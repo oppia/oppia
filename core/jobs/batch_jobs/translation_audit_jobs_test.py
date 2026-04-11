@@ -77,7 +77,13 @@ class ValidateExplorationOpportunityCountsJobTests(job_test_utils.JobTestBase):
         translation_2.update_timestamps()
         translation_2.put()
 
-        self.assert_job_output_is([job_run_result.JobRunResult.as_stdout('SUCCESS - Exploration %s counts are valid.' % exp_id)])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'SUCCESS - Exploration %s counts are valid.' % exp_id
+                )
+            ]
+        )
 
     def test_mismatch(self) -> None:
         exp_id = 'exp_2'
@@ -108,7 +114,14 @@ class ValidateExplorationOpportunityCountsJobTests(job_test_utils.JobTestBase):
         translation_1_mock.update_timestamps()
         translation_1_mock.put()
 
-        self.assert_job_output_is([job_run_result.JobRunResult.as_stderr('Mismatch for exploration %s in hi: stored=6, actual=4' % exp_id)])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stderr(
+                    'Mismatch for exploration %s in hi: stored=6, actual=4'
+                    % exp_id
+                )
+            ]
+        )
 
     def test_no_opportunity_summary_for_translation(self) -> None:
         """Test that translations without a corresponding opportunity summary
@@ -176,4 +189,11 @@ class ValidateExplorationOpportunityCountsJobTests(job_test_utils.JobTestBase):
         translation_es.update_timestamps()
         translation_es.put()
 
-        self.assert_job_output_is([job_run_result.JobRunResult.as_stderr('Mismatch for exploration %s in es: stored=0 (missing), actual=2' % exp_id)])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stderr(
+                    'Mismatch for exploration %s in es: stored=0 (missing), actual=2'
+                    % exp_id
+                )
+            ]
+        )

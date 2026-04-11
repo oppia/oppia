@@ -30,17 +30,25 @@ from core.domain import (
 from core.tests import test_utils
 
 
-class DummyTranslatableObjectWithTwoParams(translation_domain.BaseTranslatableObject):
+class DummyTranslatableObjectWithTwoParams(
+    translation_domain.BaseTranslatableObject
+):
     """A dummy translatable object with a translatable field and a
     TranslatableObject as its properties.
     """
 
-    def __init__(self, param1: str, param2: DummyTranslatableObjectWithSingleParam) -> None:
+    def __init__(
+        self, param1: str, param2: DummyTranslatableObjectWithSingleParam
+    ) -> None:
         self.param1 = param1
         self.param2 = param2
 
-    def get_translatable_contents_collection(self, **kwargs: Optional[str]) -> translation_domain.TranslatableContentsCollection:
-        translatable_contents_collection = translation_domain.TranslatableContentsCollection()
+    def get_translatable_contents_collection(
+        self, **kwargs: Optional[str]
+    ) -> translation_domain.TranslatableContentsCollection:
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection()
+        )
 
         translatable_contents_collection.add_translatable_field(
             'content_id_1',
@@ -48,11 +56,15 @@ class DummyTranslatableObjectWithTwoParams(translation_domain.BaseTranslatableOb
             translation_domain.TranslatableContentFormat.UNICODE_STRING,
             self.param1,
         )
-        translatable_contents_collection.add_fields_from_translatable_object(self.param2)
+        translatable_contents_collection.add_fields_from_translatable_object(
+            self.param2
+        )
         return translatable_contents_collection
 
 
-class DummyTranslatableObjectWithSingleParam(translation_domain.BaseTranslatableObject):
+class DummyTranslatableObjectWithSingleParam(
+    translation_domain.BaseTranslatableObject
+):
     """A dummy translatable object with a translatable field as its
     properties.
     """
@@ -60,8 +72,12 @@ class DummyTranslatableObjectWithSingleParam(translation_domain.BaseTranslatable
     def __init__(self, param3: str) -> None:
         self.param3 = param3
 
-    def get_translatable_contents_collection(self, **kwargs: Optional[str]) -> translation_domain.TranslatableContentsCollection:
-        translatable_contents_collection = translation_domain.TranslatableContentsCollection()
+    def get_translatable_contents_collection(
+        self, **kwargs: Optional[str]
+    ) -> translation_domain.TranslatableContentsCollection:
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection()
+        )
 
         translatable_contents_collection.add_translatable_field(
             'content_id_2',
@@ -72,7 +88,9 @@ class DummyTranslatableObjectWithSingleParam(translation_domain.BaseTranslatable
         return translatable_contents_collection
 
 
-class DummyTranslatableObjectWithDuplicateContentIdForParams(translation_domain.BaseTranslatableObject):
+class DummyTranslatableObjectWithDuplicateContentIdForParams(
+    translation_domain.BaseTranslatableObject
+):
     """A dummy translatable object with two translatable fields and on
     registering with same content_id an error is raised.
     """
@@ -81,8 +99,12 @@ class DummyTranslatableObjectWithDuplicateContentIdForParams(translation_domain.
         self.param1 = param1
         self.param2 = param2
 
-    def get_translatable_contents_collection(self, **kwargs: Optional[str]) -> translation_domain.TranslatableContentsCollection:
-        translatable_contents_collection = translation_domain.TranslatableContentsCollection()
+    def get_translatable_contents_collection(
+        self, **kwargs: Optional[str]
+    ) -> translation_domain.TranslatableContentsCollection:
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection()
+        )
 
         translatable_contents_collection.add_translatable_field(
             'content_id_2',
@@ -99,7 +121,9 @@ class DummyTranslatableObjectWithDuplicateContentIdForParams(translation_domain.
         return translatable_contents_collection
 
 
-class DummyTranslatableObjectWithoutRegisterMethod(translation_domain.BaseTranslatableObject):
+class DummyTranslatableObjectWithoutRegisterMethod(
+    translation_domain.BaseTranslatableObject
+):
     """A dummy translatable object without
     get_translatable_contents_collection() method should raise an exception.
     """
@@ -109,19 +133,27 @@ class DummyTranslatableObjectWithoutRegisterMethod(translation_domain.BaseTransl
         self.param2 = param2
 
 
-class DummyTranslatableObjectWithFourParams(translation_domain.BaseTranslatableObject):
+class DummyTranslatableObjectWithFourParams(
+    translation_domain.BaseTranslatableObject
+):
     """A dummy translatable object with four translatable fields as its
     properties.
     """
 
-    def __init__(self, param1: str, param2: str, param3: str, param4: str) -> None:
+    def __init__(
+        self, param1: str, param2: str, param3: str, param4: str
+    ) -> None:
         self.param1 = param1
         self.param2 = param2
         self.param3 = param3
         self.param4 = param4
 
-    def get_translatable_contents_collection(self, **kwargs: Optional[str]) -> translation_domain.TranslatableContentsCollection:
-        translatable_contents_collection = translation_domain.TranslatableContentsCollection()
+    def get_translatable_contents_collection(
+        self, **kwargs: Optional[str]
+    ) -> translation_domain.TranslatableContentsCollection:
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection()
+        )
 
         translatable_contents_collection.add_translatable_field(
             'content_id_1',
@@ -166,17 +198,28 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
 
         self.assertItemsEqual(
             expected_contents,
-            [translatable_content.content_value for translatable_content in translatable_contents],
+            [
+                translatable_content.content_value
+                for translatable_content in translatable_contents
+            ],
         )
 
     def test_unregistered_translatable_object_raises_exception(self) -> None:
-        translatable_object = DummyTranslatableObjectWithoutRegisterMethod('My name is jack.', 'My name is jhon.')
+        translatable_object = DummyTranslatableObjectWithoutRegisterMethod(
+            'My name is jack.', 'My name is jhon.'
+        )
 
-        with self.assertRaisesRegex(Exception, 'Must be implemented in subclasses.'):
+        with self.assertRaisesRegex(
+            Exception, 'Must be implemented in subclasses.'
+        ):
             translatable_object.get_translatable_contents_collection()
 
     def test_registering_duplicate_content_id_raises_exception(self) -> None:
-        translatable_object = DummyTranslatableObjectWithDuplicateContentIdForParams('My name is jack.', 'My name is jhon.')
+        translatable_object = (
+            DummyTranslatableObjectWithDuplicateContentIdForParams(
+                'My name is jack.', 'My name is jhon.'
+            )
+        )
 
         with self.assertRaisesRegex(
             Exception,
@@ -200,22 +243,33 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             translation_dict,
         )
 
-        translatable_object = DummyTranslatableObjectWithFourParams('My name is jack.', 'My name is jhon.', 'My name is Nikhil.', '')
-        contents_which_need_translation = translatable_object.get_all_contents_which_need_translations(entity_translations).values()
+        translatable_object = DummyTranslatableObjectWithFourParams(
+            'My name is jack.', 'My name is jhon.', 'My name is Nikhil.', ''
+        )
+        contents_which_need_translation = (
+            translatable_object.get_all_contents_which_need_translations(
+                entity_translations
+            ).values()
+        )
 
         expected_list_of_contents_which_need_translataion = [
             'My name is jack.',
             'My name is jhon.',
             'My name is Nikhil.',
         ]
-        list_of_contents_which_need_translataion = [translatable_content.content_value for translatable_content in contents_which_need_translation]
+        list_of_contents_which_need_translataion = [
+            translatable_content.content_value
+            for translatable_content in contents_which_need_translation
+        ]
         self.assertItemsEqual(
             expected_list_of_contents_which_need_translataion,
             list_of_contents_which_need_translataion,
         )
 
     def test_get_translatable_content_ids(self) -> None:
-        translatable_object = DummyTranslatableObjectWithFourParams('My name is jack.', 'My name is jhon.', 'My name is Nikhil.', '')
+        translatable_object = DummyTranslatableObjectWithFourParams(
+            'My name is jack.', 'My name is jhon.', 'My name is Nikhil.', ''
+        )
         content_ids = translatable_object.get_translatable_content_ids()
 
         self.assertItemsEqual(
@@ -249,8 +303,14 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             translation_dict,
         )
 
-        translatable_object = DummyTranslatableObjectWithFourParams('Content', 'My name is jhon.', 'My name is Nikhil.', '')
-        self.assertTrue(translatable_object.are_translations_displayable(entity_translations))
+        translatable_object = DummyTranslatableObjectWithFourParams(
+            'Content', 'My name is jhon.', 'My name is Nikhil.', ''
+        )
+        self.assertTrue(
+            translatable_object.are_translations_displayable(
+                entity_translations
+            )
+        )
 
     def test_are_translations_displayable_without_rule_translation(
         self,
@@ -280,8 +340,14 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             translation_dict,
         )
 
-        translatable_object = DummyTranslatableObjectWithFourParams('Content', 'My name is jhon.', 'My name is Nikhil.', 'Content')
-        self.assertFalse(translatable_object.are_translations_displayable(entity_translations))
+        translatable_object = DummyTranslatableObjectWithFourParams(
+            'Content', 'My name is jhon.', 'My name is Nikhil.', 'Content'
+        )
+        self.assertFalse(
+            translatable_object.are_translations_displayable(
+                entity_translations
+            )
+        )
 
     def test_are_translations_displayable_without_min_translation(self) -> None:
         translation_dict = {
@@ -308,9 +374,15 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             'MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS',
             1,
         )
-        translatable_object = DummyTranslatableObjectWithFourParams('Content', 'My name is jhon.', 'My name is Nikhil.', 'Content')
+        translatable_object = DummyTranslatableObjectWithFourParams(
+            'Content', 'My name is jhon.', 'My name is Nikhil.', 'Content'
+        )
         with min_value_swap:
-            self.assertFalse(translatable_object.are_translations_displayable(entity_translations))
+            self.assertFalse(
+                translatable_object.are_translations_displayable(
+                    entity_translations
+                )
+            )
 
     def test_get_content_count(self) -> None:
         translatable_object = DummyTranslatableObjectWithFourParams(
@@ -323,13 +395,17 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
         self.assertEqual(translatable_object.get_content_count(), 4)
 
     def test_get_all_html_content_strings(self) -> None:
-        translatable_object = DummyTranslatableObjectWithFourParams('<p>HTML content</p>', 'My name is jhon.', 'My name is Nikhil.', '')
+        translatable_object = DummyTranslatableObjectWithFourParams(
+            '<p>HTML content</p>', 'My name is jhon.', 'My name is Nikhil.', ''
+        )
         html_contents = translatable_object.get_all_html_content_strings()
 
         self.assertItemsEqual(html_contents, ['<p>HTML content</p>'])
 
     def test_validate_translatable_contents_raise_error(self) -> None:
-        translatable_object = DummyTranslatableObjectWithFourParams('<p>HTML content</p>', 'My name is jhon.', 'My name is Nikhil.', '')
+        translatable_object = DummyTranslatableObjectWithFourParams(
+            '<p>HTML content</p>', 'My name is jhon.', 'My name is Nikhil.', ''
+        )
 
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -365,7 +441,9 @@ class EntityTranslationsUnitTests(test_utils.GenericTestBase):
             entity_translations.translations['content_id_1'].content_value,
             'My name is Nikhil.',
         )
-        self.assertEqual(entity_translations.translations['content_id_1'].needs_update, False)
+        self.assertEqual(
+            entity_translations.translations['content_id_1'].needs_update, False
+        )
 
     def test_validate_entity_type(self) -> None:
         translation_dict = {
@@ -386,7 +464,9 @@ class EntityTranslationsUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError, 'entity_type must be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'entity_type must be a string'
+        ):
             entity_translations.entity_type = 123  # type: ignore[assignment]
             entity_translations.validate()
 
@@ -409,7 +489,9 @@ class EntityTranslationsUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError, 'entity_id must be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'entity_id must be a string'
+        ):
             entity_translations.entity_id = 123  # type: ignore[assignment]
             entity_translations.validate()
 
@@ -432,7 +514,9 @@ class EntityTranslationsUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError, 'language_code must be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'language_code must be a string'
+        ):
             entity_translations.language_code = 123  # type: ignore[assignment]
             entity_translations.validate()
 
@@ -455,7 +539,9 @@ class EntityTranslationsUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError, 'entity_version must be an int'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'entity_version must be an int'
+        ):
             entity_translations.entity_version = '123'  # type: ignore[assignment]
             entity_translations.validate()
 
@@ -478,7 +564,9 @@ class EntityTranslationsUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError, 'content_id must be a string'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'content_id must be a string'
+        ):
             entity_translations.translations[1] = (  # type: ignore[index]
                 translation_domain.TranslatedContent(
                     'My name is Nikhil.',
@@ -507,7 +595,9 @@ class EntityTranslationsUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(utils.ValidationError, 'needs_update must be a bool'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'needs_update must be a bool'
+        ):
             entity_translations.translations['content_id_1'].needs_update = 5  # type: ignore[assignment]
             entity_translations.validate()
 
@@ -551,7 +641,9 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
             'My name is Jhon.',
         )
 
-        self.assertEqual(translatable_content.to_dict(), translatable_content_dict)
+        self.assertEqual(
+            translatable_content.to_dict(), translatable_content_dict
+        )
 
 
 class TranslatedContentUnitTests(test_utils.GenericTestBase):
@@ -594,19 +686,25 @@ class MachineTranslationTests(test_utils.GenericTestBase):
 
     def _init_translation(self) -> None:
         """Initialize self.translation with valid default values."""
-        self.translation = translation_domain.MachineTranslation('en', 'es', 'hello world', 'hola mundo')
+        self.translation = translation_domain.MachineTranslation(
+            'en', 'es', 'hello world', 'hola mundo'
+        )
         self.translation.validate()
 
     def test_validate_with_invalid_source_language_code_raises(self) -> None:
         self.translation.source_language_code = 'ABC'
         expected_error_message = 'Invalid source language code: ABC'
-        with self.assertRaisesRegex(utils.ValidationError, expected_error_message):
+        with self.assertRaisesRegex(
+            utils.ValidationError, expected_error_message
+        ):
             self.translation.validate()
 
     def test_validate_with_invalid_target_language_code_raises(self) -> None:
         self.translation.target_language_code = 'ABC'
         expected_error_message = 'Invalid target language code: ABC'
-        with self.assertRaisesRegex(utils.ValidationError, expected_error_message):
+        with self.assertRaisesRegex(
+            utils.ValidationError, expected_error_message
+        ):
             self.translation.validate()
 
     def test_validate_with_same_source_target_language_codes_raises(
@@ -615,7 +713,9 @@ class MachineTranslationTests(test_utils.GenericTestBase):
         self.translation.target_language_code = 'en'
         self.translation.source_language_code = 'en'
         expected_error_message = 'Expected source_language_code to be different from target_language_code: "en" = "en"'
-        with self.assertRaisesRegex(utils.ValidationError, expected_error_message):
+        with self.assertRaisesRegex(
+            utils.ValidationError, expected_error_message
+        ):
             self.translation.validate()
 
     def test_to_dict(self) -> None:
@@ -634,7 +734,9 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on written transcripts."""
 
     def test_data_formats_are_correct_and_complete(self) -> None:
-        translatable_class_names_in_data_formats = sorted(translation_domain.WrittenTranslation.DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE.values())
+        translatable_class_names_in_data_formats = sorted(
+            translation_domain.WrittenTranslation.DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE.values()
+        )
         self.assertEqual(
             translatable_class_names_in_data_formats,
             translatable_object_registry.Registry.get_all_class_names(),
@@ -680,9 +782,13 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        written_translations = translation_domain.WrittenTranslations.from_dict(written_translations_dict)
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            written_translations_dict
+        )
         written_translations.validate(['content1', 'feedback_1'])
-        self.assertEqual(written_translations.to_dict(), written_translations_dict)
+        self.assertEqual(
+            written_translations.to_dict(), written_translations_dict
+        )
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally test
@@ -690,9 +796,13 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     def test_add_content_id_for_translation_with_invalid_content_id_raise_error(
         self,
     ) -> None:
-        written_translations = translation_domain.WrittenTranslations.from_dict({'translations_mapping': {}})
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            {'translations_mapping': {}}
+        )
         invalid_content_id = 123
-        with self.assertRaisesRegex(Exception, 'Expected content_id to be a string, received 123'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected content_id to be a string, received 123'
+        ):
             written_translations.add_content_id_for_translation(
                 invalid_content_id  # type: ignore[arg-type]
             )
@@ -712,10 +822,16 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        written_translations = translation_domain.WrittenTranslations.from_dict(written_translations_dict)
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            written_translations_dict
+        )
         existing_content_id = 'feedback_1'
-        with self.assertRaisesRegex(Exception, 'The content_id feedback_1 already exist.'):
-            written_translations.add_content_id_for_translation(existing_content_id)
+        with self.assertRaisesRegex(
+            Exception, 'The content_id feedback_1 already exist.'
+        ):
+            written_translations.add_content_id_for_translation(
+                existing_content_id
+            )
 
     def test_delete_content_id_for_translations_deletes_content_id(
         self,
@@ -732,21 +848,35 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        written_translations = translation_domain.WrittenTranslations.from_dict(old_written_translations_dict)
-        self.assertEqual(len(written_translations.translations_mapping.keys()), 1)
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            old_written_translations_dict
+        )
+        self.assertEqual(
+            len(written_translations.translations_mapping.keys()), 1
+        )
 
         written_translations.delete_content_id_for_translation('content')
 
-        self.assertEqual(len(written_translations.translations_mapping.keys()), 0)
+        self.assertEqual(
+            len(written_translations.translations_mapping.keys()), 0
+        )
 
     def test_delete_content_id_for_translation_with_nonexisting_content_id_raise_error(  # pylint: disable=line-too-long
         self,
     ) -> None:
-        written_translations_dict: translation_domain.WrittenTranslationsDict = {'translations_mapping': {'content': {}}}
-        written_translations = translation_domain.WrittenTranslations.from_dict(written_translations_dict)
+        written_translations_dict: translation_domain.WrittenTranslationsDict = {
+            'translations_mapping': {'content': {}}
+        }
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            written_translations_dict
+        )
         nonexisting_content_id_to_delete = 'feedback_1'
-        with self.assertRaisesRegex(Exception, 'The content_id feedback_1 does not exist.'):
-            written_translations.delete_content_id_for_translation(nonexisting_content_id_to_delete)
+        with self.assertRaisesRegex(
+            Exception, 'The content_id feedback_1 does not exist.'
+        ):
+            written_translations.delete_content_id_for_translation(
+                nonexisting_content_id_to_delete
+            )
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally test
@@ -754,9 +884,13 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     def test_delete_content_id_for_translation_with_invalid_content_id_raise_error(  # pylint: disable=line-too-long
         self,
     ) -> None:
-        written_translations = translation_domain.WrittenTranslations.from_dict({'translations_mapping': {}})
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            {'translations_mapping': {}}
+        )
         invalid_content_id_to_delete = 123
-        with self.assertRaisesRegex(Exception, 'Expected content_id to be a string, '):
+        with self.assertRaisesRegex(
+            Exception, 'Expected content_id to be a string, '
+        ):
             written_translations.delete_content_id_for_translation(
                 invalid_content_id_to_delete  # type: ignore[arg-type]
             )
@@ -769,12 +903,16 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {123: {}}  # type: ignore[dict-item]
         }
 
-        written_translations = translation_domain.WrittenTranslations.from_dict(written_translations_dict)
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            written_translations_dict
+        )
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(Exception, 'Expected content_id to be a string, '):
+        with self.assertRaisesRegex(
+            Exception, 'Expected content_id to be a string, '
+        ):
             written_translations.validate([123])  # type: ignore[list-item]
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -811,9 +949,13 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        written_translations = translation_domain.WrittenTranslations.from_dict(written_translations_dict)
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            written_translations_dict
+        )
 
-        with self.assertRaisesRegex(Exception, 'Expected language_code to be a string, '):
+        with self.assertRaisesRegex(
+            Exception, 'Expected language_code to be a string, '
+        ):
             written_translations.validate(['content'])
 
     def test_validation_with_unknown_language_code_raise_error(self) -> None:
@@ -829,7 +971,9 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        written_translations = translation_domain.WrittenTranslations.from_dict(written_translations_dict)
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            written_translations_dict
+        )
 
         with self.assertRaisesRegex(Exception, 'Invalid language_code: ed'):
             written_translations.validate(['content'])
@@ -847,31 +991,45 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        written_translations = translation_domain.WrittenTranslations.from_dict(written_translations_dict)
+        written_translations = translation_domain.WrittenTranslations.from_dict(
+            written_translations_dict
+        )
 
         with self.assertRaisesRegex(
             Exception,
-            re.escape('Expected state written_translations to match the listed content ids [\'invalid_content\']'),
+            re.escape(
+                'Expected state written_translations to match the listed content ids [\'invalid_content\']'
+            ),
         ):
             written_translations.validate(['invalid_content'])
 
     def test_written_translation_validation(self) -> None:
         """Test validation of translation script."""
-        written_translation = translation_domain.WrittenTranslation('html', 'Test.', True)
+        written_translation = translation_domain.WrittenTranslation(
+            'html', 'Test.', True
+        )
         written_translation.validate()
 
-        with self.assertRaisesRegex(AssertionError, 'Expected unicode HTML string, received 30'):
+        with self.assertRaisesRegex(
+            AssertionError, 'Expected unicode HTML string, received 30'
+        ):
             with self.swap(written_translation, 'translation', 30):
                 written_translation.validate()
 
-        with self.assertRaisesRegex(utils.ValidationError, 'Expected needs_update to be a bool'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected needs_update to be a bool'
+        ):
             with self.swap(written_translation, 'needs_update', 20):
                 written_translation.validate()
 
-        with self.assertRaisesRegex(utils.ValidationError, 'Invalid data_format'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid data_format'
+        ):
             with self.swap(written_translation, 'data_format', 'int'):
                 written_translation.validate()
 
-        with self.assertRaisesRegex(utils.ValidationError, 'Invalid data_format'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid data_format'
+        ):
             with self.swap(written_translation, 'data_format', 2):
                 written_translation.validate()

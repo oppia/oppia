@@ -36,7 +36,9 @@ LANGUAGE_CODE_TO_VOICEOVER_FILENAMES: Dict[str, str] = {
 }
 
 
-def regenerate_speech_from_text(_: str, language_accent_code: str, _oppia_project_id: Optional[str] = None) -> Tuple[bytes, List[Dict[str, Union[str, float]]], Optional[str]]:
+def regenerate_speech_from_text(
+    _: str, language_accent_code: str, _oppia_project_id: Optional[str] = None
+) -> Tuple[bytes, List[Dict[str, Union[str, float]]], Optional[str]]:
     """The method provides mock data to simulate the Azure text-to-speech
     synthesis service in the development environment.
 
@@ -58,16 +60,24 @@ def regenerate_speech_from_text(_: str, language_accent_code: str, _oppia_projec
             - str|None: A string describing any error encountered during
             speech synthesis. None, if synthesis is successful.
     """
-    language_code = voiceover_services.get_language_code_from_language_accent_code(language_accent_code)
+    language_code = (
+        voiceover_services.get_language_code_from_language_accent_code(
+            language_accent_code
+        )
+    )
 
     if language_code not in LANGUAGE_CODE_TO_VOICEOVER_FILENAMES:
         # Default language code.
         language_code = 'en'
 
     assert isinstance(language_code, str)
-    voiceover_filename: str = LANGUAGE_CODE_TO_VOICEOVER_FILENAMES[language_code]
+    voiceover_filename: str = LANGUAGE_CODE_TO_VOICEOVER_FILENAMES[
+        language_code
+    ]
 
-    voiceover_path = os.path.join(feconf.SAMPLE_AUTO_VOICEOVERS_DATA_DIR, voiceover_filename)
+    voiceover_path = os.path.join(
+        feconf.SAMPLE_AUTO_VOICEOVERS_DATA_DIR, voiceover_filename
+    )
 
     with open(voiceover_path, 'rb', encoding=None) as file:
         binary_audio_data = file.read()

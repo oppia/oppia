@@ -57,7 +57,11 @@ class SkillMasteryDataHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {'selected_skill_ids': {'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}}},
+        'GET': {
+            'selected_skill_ids': {
+                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
+            }
+        },
         'PUT': {
             'mastery_change_per_skill': {
                 'schema': {
@@ -80,14 +84,18 @@ class SkillMasteryDataHandler(
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
         except utils.ValidationError as e:
-            raise self.InvalidInputException('Invalid skill ID %s' % skill_id) from e
+            raise self.InvalidInputException(
+                'Invalid skill ID %s' % skill_id
+            ) from e
 
         try:
             skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
             raise self.NotFoundException(e) from e
 
-        degrees_of_mastery = skill_services.get_multi_user_skill_mastery(self.user_id, skill_ids)
+        degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
+            self.user_id, skill_ids
+        )
 
         self.values.update({'degrees_of_mastery': degrees_of_mastery})
         self.render_json(self.values)
@@ -97,23 +105,33 @@ class SkillMasteryDataHandler(
         """Handles PUT requests."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
-        mastery_change_per_skill = self.normalized_payload['mastery_change_per_skill']
+        mastery_change_per_skill = self.normalized_payload[
+            'mastery_change_per_skill'
+        ]
 
         skill_ids = list(mastery_change_per_skill.keys())
 
-        current_degrees_of_mastery_dict = skill_services.get_multi_user_skill_mastery(self.user_id, skill_ids)
+        current_degrees_of_mastery_dict = (
+            skill_services.get_multi_user_skill_mastery(self.user_id, skill_ids)
+        )
         new_degrees_of_mastery = {}
 
         for skill_id in skill_ids:
             try:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
             except utils.ValidationError as e:
-                raise self.InvalidInputException('Invalid skill ID %s' % skill_id) from e
+                raise self.InvalidInputException(
+                    'Invalid skill ID %s' % skill_id
+                ) from e
 
-            current_degrees_of_mastery = current_degrees_of_mastery_dict[skill_id]
+            current_degrees_of_mastery = current_degrees_of_mastery_dict[
+                skill_id
+            ]
             if current_degrees_of_mastery is None:
                 current_degrees_of_mastery = 0.0
-            new_degrees_of_mastery[skill_id] = current_degrees_of_mastery + mastery_change_per_skill[skill_id]
+            new_degrees_of_mastery[skill_id] = (
+                current_degrees_of_mastery + mastery_change_per_skill[skill_id]
+            )
 
             if new_degrees_of_mastery[skill_id] < 0.0:
                 new_degrees_of_mastery[skill_id] = 0.0
@@ -125,7 +143,9 @@ class SkillMasteryDataHandler(
         except Exception as e:
             raise self.NotFoundException(e) from e
 
-        skill_services.create_multi_user_skill_mastery(self.user_id, new_degrees_of_mastery)
+        skill_services.create_multi_user_skill_mastery(
+            self.user_id, new_degrees_of_mastery
+        )
 
         self.render_json({})
 
@@ -138,12 +158,22 @@ class SubtopicMasteryDataHandlerNormalizedRequestDict(TypedDict):
     selected_topic_ids: List[str]
 
 
-class SubtopicMasteryDataHandler(base.BaseHandler[Dict[str, str], SubtopicMasteryDataHandlerNormalizedRequestDict]):
+class SubtopicMasteryDataHandler(
+    base.BaseHandler[
+        Dict[str, str], SubtopicMasteryDataHandlerNormalizedRequestDict
+    ]
+):
     """A handler that handles fetching user subtopic mastery for a topic."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {'selected_topic_ids': {'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}}}}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'selected_topic_ids': {
+                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
+            }
+        }
+    }
 
     @acl_decorators.can_access_learner_dashboard
     def get(self) -> None:
@@ -158,19 +188,29 @@ class SubtopicMasteryDataHandler(base.BaseHandler[Dict[str, str], SubtopicMaster
         topics = []
         for ind, topic in enumerate(topics_by_ids):
             if not topic:
-                raise self.InvalidInputException('Invalid topic ID %s' % topic_ids[ind])
+                raise self.InvalidInputException(
+                    'Invalid topic ID %s' % topic_ids[ind]
+                )
             all_skill_ids.extend(topic.get_all_skill_ids())
             topics.append(topic)
 
         all_skill_ids = list(set(all_skill_ids))
-        all_skills_mastery_dict = skill_services.get_multi_user_skill_mastery(self.user_id, all_skill_ids)
+        all_skills_mastery_dict = skill_services.get_multi_user_skill_mastery(
+            self.user_id, all_skill_ids
+        )
         for topic in topics:
             subtopic_mastery_dict[topic.id] = {}
             for subtopic in topic.subtopics:
-                skill_mastery_dict = {skill_id: mastery for skill_id, mastery in all_skills_mastery_dict.items() if mastery is not None and skill_id in subtopic.skill_ids}
+                skill_mastery_dict = {
+                    skill_id: mastery
+                    for skill_id, mastery in all_skills_mastery_dict.items()
+                    if mastery is not None and skill_id in subtopic.skill_ids
+                }
                 if skill_mastery_dict:
                     # Subtopic mastery is average of skill masteries.
-                    subtopic_mastery_dict[topic.id][subtopic.id] = sum(skill_mastery_dict.values()) / len(skill_mastery_dict)
+                    subtopic_mastery_dict[topic.id][subtopic.id] = sum(
+                        skill_mastery_dict.values()
+                    ) / len(skill_mastery_dict)
 
         self.values.update({'subtopic_mastery_dict': subtopic_mastery_dict})
         self.render_json(self.values)

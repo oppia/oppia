@@ -30,7 +30,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, subtopic_models
 
-(base_models, subtopic_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.SUBTOPIC])
+(base_models, subtopic_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.SUBTOPIC]
+)
 
 
 class SubtopicPageSnapshotContentModelTests(test_utils.GenericTestBase):
@@ -50,7 +52,9 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
         expected_export_policy_dict = {
             'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'page_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'page_contents_schema_version': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'page_contents_schema_version': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+            ),
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -78,12 +82,18 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
             id=self.SUBTOPIC_PAGE_ID,
             topic_id='topic_id',
             page_contents={},
-            page_contents_schema_version=(feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION),
+            page_contents_schema_version=(
+                feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
+            ),
             language_code='en',
         )
         # We check that subtopic page has not been saved before calling
         # commit().
-        self.assertIsNone(subtopic_models.SubtopicPageModel.get(entity_id=self.SUBTOPIC_PAGE_ID, strict=False))
+        self.assertIsNone(
+            subtopic_models.SubtopicPageModel.get(
+                entity_id=self.SUBTOPIC_PAGE_ID, strict=False
+            )
+        )
         # We call commit() expecting that _trusted_commit works fine
         # and saves subtopic page to datastore.
         subtopic_page.commit(
@@ -93,7 +103,11 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
         )
         # Now we check that subtopic page is not None and that actually
         # now subtopic page exists, that means that commit() worked fine.
-        self.assertIsNotNone(subtopic_models.SubtopicPageModel.get(entity_id=self.SUBTOPIC_PAGE_ID, strict=False))
+        self.assertIsNotNone(
+            subtopic_models.SubtopicPageModel.get(
+                entity_id=self.SUBTOPIC_PAGE_ID, strict=False
+            )
+        )
 
 
 class StudyGuideModelUnitTest(test_utils.GenericTestBase):
@@ -106,7 +120,9 @@ class StudyGuideModelUnitTest(test_utils.GenericTestBase):
             'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'next_content_id_index': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'sections': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'sections_schema_version': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'sections_schema_version': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+            ),
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -134,12 +150,18 @@ class StudyGuideModelUnitTest(test_utils.GenericTestBase):
             id=self.STUDY_GUIDE_ID,
             topic_id='topic_id',
             sections={},
-            sections_schema_version=(feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION),
+            sections_schema_version=(
+                feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION
+            ),
             language_code='en',
         )
         # We check that study guide has not been saved before calling
         # commit().
-        self.assertIsNone(subtopic_models.StudyGuideModel.get(entity_id=self.STUDY_GUIDE_ID, strict=False))
+        self.assertIsNone(
+            subtopic_models.StudyGuideModel.get(
+                entity_id=self.STUDY_GUIDE_ID, strict=False
+            )
+        )
         # We call commit() expecting that _trusted_commit works fine
         # and saves study guide to datastore.
         study_guide.commit(
@@ -149,7 +171,11 @@ class StudyGuideModelUnitTest(test_utils.GenericTestBase):
         )
         # Now we check that study guide is not None and that actually
         # now study guide exists, that means that commit() worked fine.
-        self.assertIsNotNone(subtopic_models.StudyGuideModel.get(entity_id=self.STUDY_GUIDE_ID, strict=False))
+        self.assertIsNotNone(
+            subtopic_models.StudyGuideModel.get(
+                entity_id=self.STUDY_GUIDE_ID, strict=False
+            )
+        )
 
 
 class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
@@ -169,8 +195,16 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         commit.subtopic_page_id = 'b'
         commit.update_timestamps()
         commit.put()
-        self.assertTrue(subtopic_models.SubtopicPageCommitLogEntryModel.has_reference_to_user_id('committer_id'))
-        self.assertFalse(subtopic_models.SubtopicPageCommitLogEntryModel.has_reference_to_user_id('x_id'))
+        self.assertTrue(
+            subtopic_models.SubtopicPageCommitLogEntryModel.has_reference_to_user_id(
+                'committer_id'
+            )
+        )
+        self.assertFalse(
+            subtopic_models.SubtopicPageCommitLogEntryModel.has_reference_to_user_id(
+                'x_id'
+            )
+        )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -187,8 +221,12 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'commit_cmds': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'commit_message': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'commit_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'post_commit_community_owned': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
-            'post_commit_is_private': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'post_commit_community_owned': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+            ),
+            'post_commit_is_private': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+            ),
             'post_commit_status': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -201,17 +239,21 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     def test__get_instance_id(self) -> None:
         # Calling create() method calls _get_instance (a protected method)
         # and sets the instance id equal to the result of calling that method.
-        subtopic_page_commit_log_entry = subtopic_models.SubtopicPageCommitLogEntryModel.create(
-            entity_id='entity_id',
-            version=1,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_message='Created new SubtopicPageCommitLogEntry',
-            commit_cmds=[{'cmd': 'create_new'}],
-            status=constants.ACTIVITY_STATUS_PRIVATE,
-            community_owned=True,
+        subtopic_page_commit_log_entry = (
+            subtopic_models.SubtopicPageCommitLogEntryModel.create(
+                entity_id='entity_id',
+                version=1,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_message='Created new SubtopicPageCommitLogEntry',
+                commit_cmds=[{'cmd': 'create_new'}],
+                status=constants.ACTIVITY_STATUS_PRIVATE,
+                community_owned=True,
+            )
         )
-        self.assertEqual(subtopic_page_commit_log_entry.id, 'subtopicpage-entity_id-1')
+        self.assertEqual(
+            subtopic_page_commit_log_entry.id, 'subtopicpage-entity_id-1'
+        )
 
 
 class StudyGuideCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
@@ -231,8 +273,16 @@ class StudyGuideCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         commit.study_guide_id = 'b'
         commit.update_timestamps()
         commit.put()
-        self.assertTrue(subtopic_models.StudyGuideCommitLogEntryModel.has_reference_to_user_id('committer_id'))
-        self.assertFalse(subtopic_models.StudyGuideCommitLogEntryModel.has_reference_to_user_id('x_id'))
+        self.assertTrue(
+            subtopic_models.StudyGuideCommitLogEntryModel.has_reference_to_user_id(
+                'committer_id'
+            )
+        )
+        self.assertFalse(
+            subtopic_models.StudyGuideCommitLogEntryModel.has_reference_to_user_id(
+                'x_id'
+            )
+        )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -249,8 +299,12 @@ class StudyGuideCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'commit_cmds': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'commit_message': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'commit_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'post_commit_community_owned': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
-            'post_commit_is_private': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'post_commit_community_owned': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+            ),
+            'post_commit_is_private': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+            ),
             'post_commit_status': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -263,14 +317,18 @@ class StudyGuideCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     def test__get_instance_id(self) -> None:
         # Calling create() method calls _get_instance (a protected method)
         # and sets the instance id equal to the result of calling that method.
-        study_guide_commit_log_entry = subtopic_models.StudyGuideCommitLogEntryModel.create(
-            entity_id='entity_id',
-            version=1,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_message='Created new SubtopicPageCommitLogEntry',
-            commit_cmds=[{'cmd': 'create_new'}],
-            status=constants.ACTIVITY_STATUS_PRIVATE,
-            community_owned=True,
+        study_guide_commit_log_entry = (
+            subtopic_models.StudyGuideCommitLogEntryModel.create(
+                entity_id='entity_id',
+                version=1,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_message='Created new SubtopicPageCommitLogEntry',
+                commit_cmds=[{'cmd': 'create_new'}],
+                status=constants.ACTIVITY_STATUS_PRIVATE,
+                community_owned=True,
+            )
         )
-        self.assertEqual(study_guide_commit_log_entry.id, 'studyguide-entity_id-1')
+        self.assertEqual(
+            study_guide_commit_log_entry.id, 'studyguide-entity_id-1'
+        )

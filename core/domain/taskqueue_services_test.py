@@ -53,11 +53,16 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         arg1 = NonSerializableArgs()
         serialization_exception = self.assertRaisesRegex(
             ValueError,
-            'The args or kwargs passed to the deferred call with function_identifier, %s, are not json serializable.' % feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS['FUNCTION_ID_UPDATE_STATS'],
+            'The args or kwargs passed to the deferred call with function_identifier, %s, are not json serializable.'
+            % feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_UPDATE_STATS'
+            ],
         )
         with serialization_exception:
             taskqueue_services.defer(
-                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS['FUNCTION_ID_UPDATE_STATS'],
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_UPDATE_STATS'
+                ],
                 taskqueue_services.QUEUE_NAME_DEFAULT,
                 arg1,
             )
@@ -71,7 +76,9 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             'The params added to the email task call cannot be json serialized',
         )
         with serialization_exception:
-            taskqueue_services.enqueue_task(feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS, params, 0)
+            taskqueue_services.enqueue_task(
+                feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS, params, 0
+            )
 
     def test_defer_makes_the_correct_request(self) -> None:
         correct_fn_identifier = 'delete_exps_from_activities'
@@ -85,7 +92,9 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             **correct_kwargs,
         )
 
-        cloud_task_run: cloud_task_domain.CloudTaskRun = (taskqueue_services.get_all_cloud_task_runs())[0]
+        cloud_task_run: cloud_task_domain.CloudTaskRun = (
+            taskqueue_services.get_all_cloud_task_runs()
+        )[0]
         assert cloud_task_run is not None
         self.assertEqual(cloud_task_run.function_id, correct_fn_identifier)
 
@@ -131,9 +140,13 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         )
         function_id = 'delete_exps_from_user_models'
 
-        taskqueue_services.create_new_cloud_task_model(new_model_id, task_name, function_id)
+        taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id
+        )
 
-        cloud_task_run_models: List[cloud_task_models.CloudTaskRunModel] = list(cloud_task_models.CloudTaskRunModel.get_all().fetch())
+        cloud_task_run_models: List[cloud_task_models.CloudTaskRunModel] = list(
+            cloud_task_models.CloudTaskRunModel.get_all().fetch()
+        )
         self.assertIsNotNone(cloud_task_run_models)
         self.assertEqual(len(cloud_task_run_models), 1)
 
@@ -161,19 +174,29 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         )
         function_id = 'delete_exps_from_user_models'
 
-        taskqueue_services.create_new_cloud_task_model(new_model_id, task_name, function_id)
+        taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id
+        )
 
-        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(new_model_id)
+        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
+            new_model_id
+        )
         assert cloud_task_run is not None
         self.assertIsNotNone(cloud_task_run)
 
         cloud_task_run.current_retry_attempt = 1
-        cloud_task_run.latest_job_state = cloud_task_models.CloudTaskState.SUCCEEDED.value
-        cloud_task_run.exception_messages_for_failed_runs = ['Timeout error occurred.']
+        cloud_task_run.latest_job_state = (
+            cloud_task_models.CloudTaskState.SUCCEEDED.value
+        )
+        cloud_task_run.exception_messages_for_failed_runs = [
+            'Timeout error occurred.'
+        ]
 
         taskqueue_services.update_cloud_task_run_model(cloud_task_run)
 
-        updated_cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(new_model_id)
+        updated_cloud_task_run = (
+            taskqueue_services.get_cloud_task_run_by_model_id(new_model_id)
+        )
         assert updated_cloud_task_run is not None
 
         self.assertEqual(updated_cloud_task_run.current_retry_attempt, 1)
@@ -201,9 +224,13 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         )
         function_id = 'delete_exps_from_user_models'
 
-        taskqueue_services.create_new_cloud_task_model(new_model_id, task_name, function_id)
+        taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id
+        )
 
-        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(new_model_id)
+        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
+            new_model_id
+        )
         assert cloud_task_run is not None
 
         # Updating the ID for testing error handling.
@@ -229,12 +256,18 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         )
         function_id = 'delete_exps_from_user_models'
 
-        taskqueue_services.create_new_cloud_task_model(new_model_id, task_name, function_id)
+        taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id
+        )
 
-        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(new_model_id)
+        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
+            new_model_id
+        )
         self.assertIsNotNone(cloud_task_run)
 
-        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id('incorrect_model_id')
+        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
+            'incorrect_model_id'
+        )
         self.assertIsNone(cloud_task_run)
 
     def test_should_fetch_cloud_task_run_models(self) -> None:
@@ -296,15 +329,25 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         )
         function_id = 'regenerate_voiceovers_after_accepting_suggestion'
 
-        taskqueue_services.create_new_cloud_task_model(new_model_id, task_name, function_id)
+        taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id
+        )
 
-        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(new_model_id)
+        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
+            new_model_id
+        )
         assert cloud_task_run is not None
 
-        start_datetime = cloud_task_run.last_updated.replace(tzinfo=datetime.timezone.utc)
-        end_datetime = cloud_task_run.last_updated.replace(tzinfo=datetime.timezone.utc)
+        start_datetime = cloud_task_run.last_updated.replace(
+            tzinfo=datetime.timezone.utc
+        )
+        end_datetime = cloud_task_run.last_updated.replace(
+            tzinfo=datetime.timezone.utc
+        )
 
-        cloud_task_run = taskqueue_services.get_cloud_task_run_by_given_params(queue_name, start_datetime, end_datetime)[0]
+        cloud_task_run = taskqueue_services.get_cloud_task_run_by_given_params(
+            queue_name, start_datetime, end_datetime
+        )[0]
 
         self.assertEqual(cloud_task_run.cloud_task_name, task_name)
         self.assertEqual(cloud_task_run.function_id, function_id)

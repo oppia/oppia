@@ -39,7 +39,9 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
     """
 
     # ID of blog post currently being viewed.
-    blog_post_id = datastore_services.StringProperty(indexed=True, required=True)
+    blog_post_id = datastore_services.StringProperty(
+        indexed=True, required=True
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -66,7 +68,9 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
             )
             if not cls.get_by_id(new_id):
                 return new_id
-        raise Exception('The id generator for the model is producing too many collisions.')
+        raise Exception(
+            'The id generator for the model is producing too many collisions.'
+        )
 
     @classmethod
     def create(
@@ -81,7 +85,9 @@ class BlogPostViewedEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain neccessary information for user for
         takeout.
         """
@@ -108,7 +114,9 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
     """
 
     # ID of blog post currently being read.
-    blog_post_id = datastore_services.StringProperty(indexed=True, required=True)
+    blog_post_id = datastore_services.StringProperty(
+        indexed=True, required=True
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -135,7 +143,9 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
             )
             if not cls.get_by_id(new_id):
                 return new_id
-        raise Exception('The id generator for the model is producing too many collisions.')
+        raise Exception(
+            'The id generator for the model is producing too many collisions.'
+        )
 
     @classmethod
     def create(cls, blog_post_id: str) -> str:
@@ -147,7 +157,9 @@ class BlogPostReadEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain neccessary information for user for
         takeout.
         """
@@ -174,9 +186,13 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
     """
 
     # ID of blog post being exited.
-    blog_post_id = datastore_services.StringProperty(indexed=True, required=True)
+    blog_post_id = datastore_services.StringProperty(
+        indexed=True, required=True
+    )
     # Time user stayed on the blog post.
-    time_user_stayed_on_blog_post = datastore_services.FloatProperty(indexed=True, required=True)
+    time_user_stayed_on_blog_post = datastore_services.FloatProperty(
+        indexed=True, required=True
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -203,7 +219,9 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
             )
             if not cls.get_by_id(new_id):
                 return new_id
-        raise Exception('The id generator for the model is producing too many collisions.')
+        raise Exception(
+            'The id generator for the model is producing too many collisions.'
+        )
 
     @classmethod
     def create(
@@ -223,7 +241,9 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain neccessary information for user for
         takeout.
         """
@@ -238,7 +258,9 @@ class BlogPostExitedEventLogEntryModel(base_models.BaseModel):
             super(cls, cls).get_export_policy(),
             **{
                 'blog_post_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'time_user_stayed_on_blog_post': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                'time_user_stayed_on_blog_post': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
             },
         )
 
@@ -255,16 +277,22 @@ class BlogPostViewsAggregatedStatsModel(base_models.BaseModel):
     # (in the UTC format) and number of views as values. We will maintain hourly
     # views for past 3 days (including the ongoing day) and delete the rest
     # whenever a PUT request is performed on the storage model.
-    views_by_hour = datastore_services.JsonProperty(indexed=False, required=True, repeated=False)
+    views_by_hour = datastore_services.JsonProperty(
+        indexed=False, required=True, repeated=False
+    )
     # It will consist of key-value pairs where key is the month(YYYY-MM) and
     # value is dict with keys as UTC date and values as  number of views on the
     # blog posts on that date. At max there will be views by date keyed to 3
     # months (ongoing month and the past 2 months(all the days of the month)).
-    views_by_date = datastore_services.JsonProperty(indexed=False, required=True, repeated=False)
+    views_by_date = datastore_services.JsonProperty(
+        indexed=False, required=True, repeated=False
+    )
     # It will consist of a dict of dictionaries where key is the year (in the
     # UTC format) and value is dict with keys as month number (in the UTC
     # format) and number of views in that month as value.
-    views_by_month = datastore_services.JsonProperty(indexed=False, required=True, repeated=False)
+    views_by_month = datastore_services.JsonProperty(
+        indexed=False, required=True, repeated=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -272,7 +300,9 @@ class BlogPostViewsAggregatedStatsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """The model doesn't contain relevant data corresponding to users."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -307,7 +337,9 @@ class BlogPostViewsAggregatedStatsModel(base_models.BaseModel):
                 already.
         """
         if cls.get_by_id(blog_post_id):
-            raise Exception('A blog post views stats model with the given blog post IDexists already.')
+            raise Exception(
+                'A blog post views stats model with the given blog post IDexists already.'
+            )
         entity = cls(
             id=blog_post_id,
             views_by_hour={},
@@ -332,16 +364,22 @@ class BlogPostReadsAggregatedStatsModel(base_models.BaseModel):
     # (in the UTC format) and number of views as values. We will maintain hourly
     # reads for past 3 days (including the ongoing day) and delete the rest
     # whenever a PUT request is performed on the storage model.
-    reads_by_hour = datastore_services.JsonProperty(indexed=False, required=True, repeated=False)
+    reads_by_hour = datastore_services.JsonProperty(
+        indexed=False, required=True, repeated=False
+    )
     # It will consist of key-value pairs where key is the month(YYYY-MM) and
     # value is dict with keys as UTC date and values as number of reads on the
     # blog posts on that date. At max there will be reads by date keyed to 3
     # months (ongoing month and the past 2 months(all the days of the month)).
-    reads_by_date = datastore_services.JsonProperty(indexed=False, required=True, repeated=False)
+    reads_by_date = datastore_services.JsonProperty(
+        indexed=False, required=True, repeated=False
+    )
     # It will consist of a dict of dictionaries where key is the year (in the
     # UTC format) and value is dict with keys as month number (in the UTC
     # format) and number of reads in that month as value.
-    reads_by_month = datastore_services.JsonProperty(indexed=False, required=True, repeated=False)
+    reads_by_month = datastore_services.JsonProperty(
+        indexed=False, required=True, repeated=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -349,7 +387,9 @@ class BlogPostReadsAggregatedStatsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """The model doesn't contain relevant data corresponding to users."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -384,7 +424,9 @@ class BlogPostReadsAggregatedStatsModel(base_models.BaseModel):
                 already.
         """
         if cls.get_by_id(blog_post_id):
-            raise Exception('A blog post reads stats model with the given blog post IDexists already.')
+            raise Exception(
+                'A blog post reads stats model with the given blog post IDexists already.'
+            )
         entity = cls(
             id=blog_post_id,
             reads_by_hour={},
@@ -407,27 +449,49 @@ class BlogPostReadingTimeModel(base_models.BaseModel):
     """
 
     # Number of user taking less than a minute to read the blog post.
-    zero_to_one_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
+    zero_to_one_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking one to two minutes to read the blog post.
-    one_to_two_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
+    one_to_two_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking two to three minutes to read the blog post.
-    two_to_three_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
+    two_to_three_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking three to four minutes to read the blog post.
-    three_to_four_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
+    three_to_four_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking four to five minutes to read the blog post.
-    four_to_five_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
+    four_to_five_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking five to six minutes to read the blog post.
-    five_to_six_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
+    five_to_six_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking six to seven minutes to read the blog post.
-    six_to_seven_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
+    six_to_seven_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking seven to eight minutes to read the blog post.
-    seven_to_eight_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
+    seven_to_eight_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking eight to nine minutes to read the blog post.
-    eight_to_nine_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
+    eight_to_nine_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking nine to ten minutes to read the blog post.
-    nine_to_ten_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
+    nine_to_ten_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking more than ten minutes to read the blog post.
-    more_than_ten_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
+    more_than_ten_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -435,7 +499,9 @@ class BlogPostReadingTimeModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """The model doesn't contain relevant data corresponding to users."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -478,7 +544,9 @@ class BlogPostReadingTimeModel(base_models.BaseModel):
                 already.
         """
         if cls.get_by_id(blog_post_id):
-            raise Exception('A blog post reading time model with the given blog post IDexists already.')
+            raise Exception(
+                'A blog post reading time model with the given blog post IDexists already.'
+            )
         entity = cls(
             id=blog_post_id,
             zero_to_one_min=0,
@@ -512,16 +580,22 @@ class AuthorBlogPostViewsAggregatedStatsModel(base_models.BaseModel):
     # (in the UTC format) and number of views as values. We will maintain hourly
     # views for past 3 days (including the ongoing day) and delete the rest
     # whenever a PUT request is performed on the storage model.
-    views_by_hour = datastore_services.JsonProperty(indexed=False, required=True, repeated=False)
+    views_by_hour = datastore_services.JsonProperty(
+        indexed=False, required=True, repeated=False
+    )
     # It will consist of key-value pairs where key is the month(YYYY-MM) and
     # value is dict with keys as UTC date and values as number of views on the
     # blog posts on that date. At max there will be views by date keyed to 3
     # months (ongoing month and the past 2 months(all the days of the month)).
-    views_by_date = datastore_services.JsonProperty(indexed=False, required=True, repeated=False)
+    views_by_date = datastore_services.JsonProperty(
+        indexed=False, required=True, repeated=False
+    )
     # It will consist of a dict of dictionaries where key is the year (in the
     # UTC format) and value is dict with keys as month number (in the UTC
     # format) and number of views in that month as value.
-    views_by_month = datastore_services.JsonProperty(indexed=False, required=True, repeated=False)
+    views_by_month = datastore_services.JsonProperty(
+        indexed=False, required=True, repeated=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -529,7 +603,9 @@ class AuthorBlogPostViewsAggregatedStatsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain neccessary information for user for
         takeout.
         """
@@ -568,8 +644,12 @@ class AuthorBlogPostViewsAggregatedStatsModel(base_models.BaseModel):
         """
 
         if cls.get_by_id(author_id):
-            raise Exception('A author blog post views stats model with the given author ID exists already.')
-        entity = cls(id=author_id, views_by_hour={}, views_by_date={}, views_by_month={})
+            raise Exception(
+                'A author blog post views stats model with the given author ID exists already.'
+            )
+        entity = cls(
+            id=author_id, views_by_hour={}, views_by_date={}, views_by_month={}
+        )
         entity.update_timestamps()
         entity.put()
 
@@ -598,19 +678,41 @@ class AuthorBlogPostAggregatedReadingTimeModel(base_models.BaseModel):
     """
 
     # Number of user taking less than a minute to read the blog post.
-    zero_to_one_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
+    zero_to_one_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking one to two minutes to read the blog post.
-    one_to_two_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
-    two_to_three_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
-    three_to_four_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
-    four_to_five_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
-    five_to_six_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
-    six_to_seven_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
-    seven_to_eight_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
-    eight_to_nine_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
-    nine_to_ten_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
+    one_to_two_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
+    two_to_three_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
+    three_to_four_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
+    four_to_five_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
+    five_to_six_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
+    six_to_seven_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
+    seven_to_eight_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
+    eight_to_nine_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
+    nine_to_ten_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
     # Number of users taking more than ten minutes to read the blog post.
-    more_than_ten_min = datastore_services.IntegerProperty(indexed=False, required=True, repeated=False)
+    more_than_ten_min = datastore_services.IntegerProperty(
+        indexed=False, required=True, repeated=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -618,7 +720,9 @@ class AuthorBlogPostAggregatedReadingTimeModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain neccessary information for user for
         takeout.
         """
@@ -674,7 +778,9 @@ class AuthorBlogPostAggregatedReadingTimeModel(base_models.BaseModel):
                 already.
         """
         if cls.get_by_id(author_id):
-            raise Exception('A author blog post reading time model with the given author ID exists already.')
+            raise Exception(
+                'A author blog post reading time model with the given author ID exists already.'
+            )
 
         entity = cls(
             id=author_id,
@@ -709,16 +815,22 @@ class AuthorBlogPostReadsAggregatedStatsModel(base_models.BaseModel):
     # (in the UTC format) and number of views as values. We will maintain hourly
     # reads for past 3 days (including the ongoing day) and delete the rest
     # whenever a PUT request is performed on the storage model.
-    reads_by_hour = datastore_services.JsonProperty(indexed=False, required=True, repeated=False)
+    reads_by_hour = datastore_services.JsonProperty(
+        indexed=False, required=True, repeated=False
+    )
     # It will consist of key-value pairs where key is the month(YYYY-MM) and
     # value is dict with keys as UTC date and values as number of reads on the
     # blog posts on that date. At max there will be reads by date keyed to 3
     # months (ongoing month and the past 2 months(all the days of the month)).
-    reads_by_date = datastore_services.JsonProperty(indexed=False, required=True, repeated=False)
+    reads_by_date = datastore_services.JsonProperty(
+        indexed=False, required=True, repeated=False
+    )
     # It will consist of a dict of dictionaries where key is the year ( in the
     # UTC format) and value is dict with keys as month number (in the UTC
     # format) and number of reads in that month as value.
-    reads_by_month = datastore_services.JsonProperty(indexed=False, required=True, repeated=False)
+    reads_by_month = datastore_services.JsonProperty(
+        indexed=False, required=True, repeated=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -726,7 +838,9 @@ class AuthorBlogPostReadsAggregatedStatsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain neccessary information for user for
         takeout.
         """
@@ -762,9 +876,13 @@ class AuthorBlogPostReadsAggregatedStatsModel(base_models.BaseModel):
                 already.
         """
         if cls.get_by_id(author_id):
-            raise Exception('A author blog post reads stats model with the given author ID exists already.')
+            raise Exception(
+                'A author blog post reads stats model with the given author ID exists already.'
+            )
 
-        entity = cls(id=author_id, reads_by_hour={}, reads_by_date={}, reads_by_month={})
+        entity = cls(
+            id=author_id, reads_by_hour={}, reads_by_date={}, reads_by_month={}
+        )
         entity.update_timestamps()
         entity.put()
 

@@ -44,17 +44,23 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
 
     def test_deduplication_of_dependency_ids(self) -> None:
         self.assertItemsEqual(
-            interaction_registry.Registry.get_deduplicated_dependency_ids(['CodeRepl']),
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                ['CodeRepl']
+            ),
             ['skulpt', 'codemirror'],
         )
 
         self.assertItemsEqual(
-            interaction_registry.Registry.get_deduplicated_dependency_ids(['CodeRepl', 'CodeRepl', 'CodeRepl']),
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                ['CodeRepl', 'CodeRepl', 'CodeRepl']
+            ),
             ['skulpt', 'codemirror'],
         )
 
         self.assertItemsEqual(
-            interaction_registry.Registry.get_deduplicated_dependency_ids(['CodeRepl', 'AlgebraicExpressionInput']),
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                ['CodeRepl', 'AlgebraicExpressionInput']
+            ),
             ['skulpt', 'codemirror', 'guppy', 'nerdamer'],
         )
 
@@ -70,13 +76,19 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
     def test_interaction_registry(self) -> None:
         """Do some sanity checks on the interaction registry."""
         self.assertEqual(
-            {type(i).__name__ for i in interaction_registry.Registry.get_all_interactions()},
+            {
+                type(i).__name__
+                for i in interaction_registry.Registry.get_all_interactions()
+            },
             set(interaction_registry.Registry.get_all_interaction_ids()),
         )
 
         with self.swap(interaction_registry.Registry, '_interactions', {}):
             self.assertEqual(
-                {type(i).__name__ for i in interaction_registry.Registry.get_all_interactions()},
+                {
+                    type(i).__name__
+                    for i in interaction_registry.Registry.get_all_interactions()
+                },
                 set(interaction_registry.Registry.get_all_interaction_ids()),
             )
 
@@ -96,7 +108,9 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
             if item['is_terminal']:
                 terminal_interactions_count += 1
 
-        self.assertEqual(terminal_interactions_count, EXPECTED_TERMINAL_INTERACTIONS_COUNT)
+        self.assertEqual(
+            terminal_interactions_count, EXPECTED_TERMINAL_INTERACTIONS_COUNT
+        )
 
     def test_interaction_specs_json_sync_all_specs(self) -> None:
         """Test to ensure that the interaction_specs.json file is upto date
@@ -104,7 +118,9 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         """
         all_specs = interaction_registry.Registry.get_all_specs()
 
-        spec_file = os.path.join('extensions', 'interactions', 'interaction_specs.json')
+        spec_file = os.path.join(
+            'extensions', 'interactions', 'interaction_specs.json'
+        )
         with open(spec_file, 'r', encoding='utf-8') as f:
             specs_from_json = json.loads(f.read())
 
@@ -162,7 +178,9 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         # Here we use type Any because values in schema dictionary can
         # be of type str, int, List, Dict and other types too. So to make
         # it generalized for every type of value we used Any here.
-        def traverse_schema_to_find_and_validate_subtitled_content(value: Any, schema: Dict[str, Any]) -> None:
+        def traverse_schema_to_find_and_validate_subtitled_content(
+            value: Any, schema: Dict[str, Any]
+        ) -> None:
             """Recursively traverse the schema to find SubtitledHtml or
             SubtitledUnicode contained or nested in value.
 
@@ -170,32 +188,54 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
                 value: *. The value of the customization argument.
                 schema: dict. The customization argument schema.
             """
-            is_subtitled_html_spec = schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and schema['obj_type'] == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML
-            is_subtitled_unicode_spec = schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM and schema['obj_type'] == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
+            is_subtitled_html_spec = (
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM
+                and schema['obj_type']
+                == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML
+            )
+            is_subtitled_unicode_spec = (
+                schema['type'] == schema_utils.SCHEMA_TYPE_CUSTOM
+                and schema['obj_type']
+                == schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
+            )
 
             if is_subtitled_html_spec or is_subtitled_unicode_spec:
                 self.assertIsNone(value['content_id'])
             elif schema['type'] == schema_utils.SCHEMA_TYPE_LIST:
                 for x in value:
-                    traverse_schema_to_find_and_validate_subtitled_content(x, schema['items'])
+                    traverse_schema_to_find_and_validate_subtitled_content(
+                        x, schema['items']
+                    )
             elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
                 for schema_property in schema['properties']:
-                    traverse_schema_to_find_and_validate_subtitled_content(x[schema_property.name], schema_property['schema'])
+                    traverse_schema_to_find_and_validate_subtitled_content(
+                        x[schema_property.name], schema_property['schema']
+                    )
 
         for interaction_id in all_specs:
             for ca_spec in all_specs[interaction_id]['customization_arg_specs']:
-                traverse_schema_to_find_and_validate_subtitled_content(ca_spec['default_value'], ca_spec['schema'])
+                traverse_schema_to_find_and_validate_subtitled_content(
+                    ca_spec['default_value'], ca_spec['schema']
+                )
 
     def test_get_all_specs_for_state_schema_version_for_unsaved_version(
         self,
     ) -> None:
-        with self.assertRaisesRegex(IOError, 'No specs JSON file found for state schema'):
-            (interaction_registry.Registry.get_all_specs_for_state_schema_version(10))
+        with self.assertRaisesRegex(
+            IOError, 'No specs JSON file found for state schema'
+        ):
+            (
+                interaction_registry.Registry.get_all_specs_for_state_schema_version(
+                    10
+                )
+            )
 
     def test_get_interaction_by_id_raises_error_for_none_interaction_id(
         self,
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'No interaction exists for the None interaction_id.'):
+        with self.assertRaisesRegex(
+            Exception, 'No interaction exists for the None interaction_id.'
+        ):
             interaction_registry.Registry.get_interaction_by_id(None)
 
     def test_refresh_skips_classes_not_inheriting_base_interaction(

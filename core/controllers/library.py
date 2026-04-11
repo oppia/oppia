@@ -74,21 +74,36 @@ def get_matching_activity_dicts(
     # TODO(sll): Remove this special casing.
     collection_ids: List[str] = []
     if not search_offset:
-        collection_ids, _ = collection_services.get_collection_ids_matching_query(query_string, categories, language_codes)
+        collection_ids, _ = (
+            collection_services.get_collection_ids_matching_query(
+                query_string, categories, language_codes
+            )
+        )
 
-    exp_ids, new_search_offset = exp_services.get_exploration_ids_matching_query(query_string, categories, language_codes, offset=search_offset)
+    exp_ids, new_search_offset = (
+        exp_services.get_exploration_ids_matching_query(
+            query_string, categories, language_codes, offset=search_offset
+        )
+    )
     activity_list: List[UnionSummaryDictType] = []
-    for collection_summary_dict in summary_services.get_displayable_collection_summary_dicts_matching_ids(  # pylint: disable=line-too-long
+    for (
+        collection_summary_dict
+    ) in summary_services.get_displayable_collection_summary_dicts_matching_ids(  # pylint: disable=line-too-long
         collection_ids
     ):
         activity_list.append(collection_summary_dict)
-    for exp_summary_dict in summary_services.get_displayable_exp_summary_dicts_matching_ids(  # pylint: disable=line-too-long
+    for (
+        exp_summary_dict
+    ) in summary_services.get_displayable_exp_summary_dicts_matching_ids(  # pylint: disable=line-too-long
         exp_ids
     ):
         activity_list.append(exp_summary_dict)
 
     if len(activity_list) == feconf.DEFAULT_QUERY_LIMIT:
-        logging.exception('%s activities were fetched to load the library page. You may be running up against the default query limits.' % feconf.DEFAULT_QUERY_LIMIT)
+        logging.exception(
+            '%s activities were fetched to load the library page. You may be running up against the default query limits.'
+            % feconf.DEFAULT_QUERY_LIMIT
+        )
     return activity_list, new_search_offset
 
 
@@ -115,12 +130,20 @@ class LibraryIndexHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     def get(self) -> None:
         """Handles GET requests."""
         # TODO(sll): Support index pages for other language codes.
-        summary_dicts_by_category = summary_services.get_library_groups([constants.DEFAULT_LANGUAGE_CODE])
-        top_rated_activity_summary_dicts = summary_services.get_top_rated_exploration_summary_dicts(
-            [constants.DEFAULT_LANGUAGE_CODE],
-            feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE,
+        summary_dicts_by_category = summary_services.get_library_groups(
+            [constants.DEFAULT_LANGUAGE_CODE]
         )
-        featured_activity_summary_dicts = summary_services.get_featured_activity_summary_dicts([constants.DEFAULT_LANGUAGE_CODE])
+        top_rated_activity_summary_dicts = (
+            summary_services.get_top_rated_exploration_summary_dicts(
+                [constants.DEFAULT_LANGUAGE_CODE],
+                feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE,
+            )
+        )
+        featured_activity_summary_dicts = (
+            summary_services.get_featured_activity_summary_dicts(
+                [constants.DEFAULT_LANGUAGE_CODE]
+            )
+        )
 
         preferred_language_codes = [constants.DEFAULT_LANGUAGE_CODE]
         if self.user_id:
@@ -136,7 +159,9 @@ class LibraryIndexHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 {
                     'activity_summary_dicts': top_rated_activity_summary_dicts,
                     'categories': [],
-                    'header_i18n_id': (feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
+                    'header_i18n_id': (
+                        feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
+                    ),
                     'has_full_results_page': True,
                     'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
                     'protractor_id': 'top-rated',  # type: ignore[typeddict-item]
@@ -148,7 +173,9 @@ class LibraryIndexHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 {
                     'activity_summary_dicts': featured_activity_summary_dicts,
                     'categories': [],
-                    'header_i18n_id': (feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES),
+                    'header_i18n_id': (
+                        feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES
+                    ),
                     'has_full_results_page': False,
                     'full_results_url': None,
                 },
@@ -156,7 +183,9 @@ class LibraryIndexHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         self.values.update(
             {
-                'activity_summary_dicts_by_category': (summary_dicts_by_category),
+                'activity_summary_dicts_by_category': (
+                    summary_dicts_by_category
+                ),
                 'preferred_language_codes': preferred_language_codes,
             }
         )
@@ -171,7 +200,11 @@ class LibraryGroupIndexHandlerNormalizedRequestDict(TypedDict):
     group_name: str
 
 
-class LibraryGroupIndexHandler(base.BaseHandler[Dict[str, str], LibraryGroupIndexHandlerNormalizedRequestDict]):
+class LibraryGroupIndexHandler(
+    base.BaseHandler[
+        Dict[str, str], LibraryGroupIndexHandlerNormalizedRequestDict
+    ]
+):
     """Provides data for categories such as top rated and recently published."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -200,15 +233,21 @@ class LibraryGroupIndexHandler(base.BaseHandler[Dict[str, str], LibraryGroupInde
         header_i18n_id = ''
 
         if group_name == feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED:
-            recently_published_summary_dicts = summary_services.get_recently_published_exp_summary_dicts(feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE)
+            recently_published_summary_dicts = (
+                summary_services.get_recently_published_exp_summary_dicts(
+                    feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE
+                )
+            )
             if recently_published_summary_dicts:
                 activity_list = recently_published_summary_dicts
                 header_i18n_id = feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED
 
         elif group_name == feconf.LIBRARY_GROUP_TOP_RATED:
-            top_rated_activity_summary_dicts = summary_services.get_top_rated_exploration_summary_dicts(
-                [constants.DEFAULT_LANGUAGE_CODE],
-                feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE,
+            top_rated_activity_summary_dicts = (
+                summary_services.get_top_rated_exploration_summary_dicts(
+                    [constants.DEFAULT_LANGUAGE_CODE],
+                    feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE,
+                )
             )
             if top_rated_activity_summary_dicts:
                 activity_list = top_rated_activity_summary_dicts
@@ -240,7 +279,9 @@ class SearchHandlerNormalizedRequestDict(TypedDict):
     offset: Optional[int]
 
 
-class SearchHandler(base.BaseHandler[Dict[str, str], SearchHandlerNormalizedRequestDict]):
+class SearchHandler(
+    base.BaseHandler[Dict[str, str], SearchHandlerNormalizedRequestDict]
+):
     """Provides data for activity search results."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -282,22 +323,30 @@ class SearchHandler(base.BaseHandler[Dict[str, str], SearchHandlerNormalizedRequ
     def get(self) -> None:
         """Handles GET requests."""
         assert self.normalized_request is not None
-        query_string = utils.get_formatted_query_string(self.normalized_request['q'])
+        query_string = utils.get_formatted_query_string(
+            self.normalized_request['q']
+        )
 
         # If there is a category parameter, it should be in the following form:
         #     category=("Algebra" OR "Math")
         category_string = self.normalized_request['category']
-        categories = utils.convert_filter_parameter_string_into_list(category_string)
+        categories = utils.convert_filter_parameter_string_into_list(
+            category_string
+        )
 
         # If there is a language code parameter, it should be in the following
         # form:
         #     language_code=("en" OR "hi")
         language_code_string = self.normalized_request['language_code']
-        language_codes = utils.convert_filter_parameter_string_into_list(language_code_string)
+        language_codes = utils.convert_filter_parameter_string_into_list(
+            language_code_string
+        )
 
         search_offset = self.normalized_request.get('offset')
 
-        activity_list, new_search_offset = get_matching_activity_dicts(query_string, categories, language_codes, search_offset)
+        activity_list, new_search_offset = get_matching_activity_dicts(
+            query_string, categories, language_codes, search_offset
+        )
 
         self.values.update(
             {
@@ -330,7 +379,11 @@ class ExplorationSummariesHandlerNormalizedRequestDict(TypedDict):
     include_private_explorations: Optional[bool]
 
 
-class ExplorationSummariesHandler(base.BaseHandler[Dict[str, str], ExplorationSummariesHandlerNormalizedRequestDict]):
+class ExplorationSummariesHandler(
+    base.BaseHandler[
+        Dict[str, str], ExplorationSummariesHandlerNormalizedRequestDict
+    ]
+):
     """Returns summaries corresponding to ids of public explorations. This
     controller supports returning private explorations for the given user.
     """
@@ -339,7 +392,9 @@ class ExplorationSummariesHandler(base.BaseHandler[Dict[str, str], ExplorationSu
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'stringified_exp_ids': {'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}},
+            'stringified_exp_ids': {
+                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
+            },
             'include_private_explorations': {
                 'schema': {'type': 'bool'},
                 'default_value': False,
@@ -352,19 +407,31 @@ class ExplorationSummariesHandler(base.BaseHandler[Dict[str, str], ExplorationSu
         """Handles GET requests."""
         assert self.normalized_request is not None
         exp_ids = self.normalized_request['stringified_exp_ids']
-        include_private_exps = self.normalized_request.get('include_private_explorations')
+        include_private_exps = self.normalized_request.get(
+            'include_private_explorations'
+        )
 
         editor_user_id = self.user_id if include_private_exps else None
         if not editor_user_id:
             include_private_exps = False
 
-        if not isinstance(exp_ids, list) or not all(isinstance(exp_id, str) for exp_id in exp_ids):
+        if not isinstance(exp_ids, list) or not all(
+            isinstance(exp_id, str) for exp_id in exp_ids
+        ):
             raise self.NotFoundException
 
         if include_private_exps:
-            summaries = summary_services.get_displayable_exp_summary_dicts_matching_ids(exp_ids, user=self.user)
+            summaries = (
+                summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                    exp_ids, user=self.user
+                )
+            )
         else:
-            summaries = summary_services.get_displayable_exp_summary_dicts_matching_ids(exp_ids)
+            summaries = (
+                summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                    exp_ids
+                )
+            )
         self.values.update({'summaries': summaries})
         self.render_json(self.values)
 
@@ -377,12 +444,22 @@ class CollectionSummariesHandlerNormalizedRequestDict(TypedDict):
     stringified_collection_ids: List[str]
 
 
-class CollectionSummariesHandler(base.BaseHandler[Dict[str, str], CollectionSummariesHandlerNormalizedRequestDict]):
+class CollectionSummariesHandler(
+    base.BaseHandler[
+        Dict[str, str], CollectionSummariesHandlerNormalizedRequestDict
+    ]
+):
     """Returns collection summaries corresponding to collection ids."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {'stringified_collection_ids': {'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}}}}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'stringified_collection_ids': {
+                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self) -> None:

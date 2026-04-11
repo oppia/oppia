@@ -100,14 +100,20 @@ def get_blog_post_by_id(blog_post_id: str) -> blog_domain.BlogPost: ...
 
 
 @overload
-def get_blog_post_by_id(blog_post_id: str, *, strict: Literal[True]) -> blog_domain.BlogPost: ...
+def get_blog_post_by_id(
+    blog_post_id: str, *, strict: Literal[True]
+) -> blog_domain.BlogPost: ...
 
 
 @overload
-def get_blog_post_by_id(blog_post_id: str, *, strict: Literal[False]) -> Optional[blog_domain.BlogPost]: ...
+def get_blog_post_by_id(
+    blog_post_id: str, *, strict: Literal[False]
+) -> Optional[blog_domain.BlogPost]: ...
 
 
-def get_blog_post_by_id(blog_post_id: str, strict: bool = True) -> Optional[blog_domain.BlogPost]:
+def get_blog_post_by_id(
+    blog_post_id: str, strict: bool = True
+) -> Optional[blog_domain.BlogPost]:
     """Returns a domain object representing a blog post.
 
     Args:
@@ -137,7 +143,9 @@ def get_blog_post_by_url_fragment(
         BlogPost or None. The domain object representing a blog post with the
         given ID, or None if it does not exist.
     """
-    blog_post_model = blog_models.BlogPostModel.get_by_url_fragment(url_fragment)
+    blog_post_model = blog_models.BlogPostModel.get_by_url_fragment(
+        url_fragment
+    )
     if blog_post_model is None:
         return None
 
@@ -179,14 +187,20 @@ def get_blog_post_summary_by_id(
 
 
 @overload
-def get_blog_post_summary_by_id(blog_post_id: str, *, strict: Literal[True]) -> blog_domain.BlogPostSummary: ...
+def get_blog_post_summary_by_id(
+    blog_post_id: str, *, strict: Literal[True]
+) -> blog_domain.BlogPostSummary: ...
 
 
 @overload
-def get_blog_post_summary_by_id(blog_post_id: str, *, strict: Literal[False]) -> Optional[blog_domain.BlogPostSummary]: ...
+def get_blog_post_summary_by_id(
+    blog_post_id: str, *, strict: Literal[False]
+) -> Optional[blog_domain.BlogPostSummary]: ...
 
 
-def get_blog_post_summary_by_id(blog_post_id: str, strict: bool = True) -> Optional[blog_domain.BlogPostSummary]:
+def get_blog_post_summary_by_id(
+    blog_post_id: str, strict: bool = True
+) -> Optional[blog_domain.BlogPostSummary]:
     """Returns a domain object representing a blog post summary.
 
     Args:
@@ -197,9 +211,13 @@ def get_blog_post_summary_by_id(blog_post_id: str, strict: bool = True) -> Optio
         BlogPostSummary or None. The domain object representing a blog post
         summary with the given ID, or None if it does not exist.
     """
-    blog_post_summary_model = blog_models.BlogPostSummaryModel.get(blog_post_id, strict=strict)
+    blog_post_summary_model = blog_models.BlogPostSummaryModel.get(
+        blog_post_id, strict=strict
+    )
     if blog_post_summary_model:
-        blog_post_summary = get_blog_post_summary_from_model(blog_post_summary_model)
+        blog_post_summary = get_blog_post_summary_from_model(
+            blog_post_summary_model
+        )
         return blog_post_summary
     else:
         return None
@@ -219,11 +237,19 @@ def get_blog_post_summary_models_by_ids(
         List[BlogPostSummary]. The list of blog post summary domain object
         corresponding to the given list of blog post IDs.
     """
-    blog_post_summary_models = blog_models.BlogPostSummaryModel.get_multi(blog_post_ids)
-    return [get_blog_post_summary_from_model(model) for model in blog_post_summary_models if model is not None]
+    blog_post_summary_models = blog_models.BlogPostSummaryModel.get_multi(
+        blog_post_ids
+    )
+    return [
+        get_blog_post_summary_from_model(model)
+        for model in blog_post_summary_models
+        if model is not None
+    ]
 
 
-def get_blog_post_summary_models_list_by_user_id(user_id: str, blog_post_is_published: bool) -> List[blog_domain.BlogPostSummary]:
+def get_blog_post_summary_models_list_by_user_id(
+    user_id: str, blog_post_is_published: bool
+) -> List[blog_domain.BlogPostSummary]:
     """Given the user ID and status, it returns the list of blog post summary
     domain object for which user is an editor and the status matches.
 
@@ -238,17 +264,29 @@ def get_blog_post_summary_models_list_by_user_id(user_id: str, blog_post_is_publ
         (draft/published).
     """
     blog_post_ids = filter_blog_post_ids(user_id, blog_post_is_published)
-    blog_post_summary_models = blog_models.BlogPostSummaryModel.get_multi(blog_post_ids)
+    blog_post_summary_models = blog_models.BlogPostSummaryModel.get_multi(
+        blog_post_ids
+    )
     blog_post_summaries = []
-    blog_post_summaries = [get_blog_post_summary_from_model(model) for model in blog_post_summary_models if model is not None]
+    blog_post_summaries = [
+        get_blog_post_summary_from_model(model)
+        for model in blog_post_summary_models
+        if model is not None
+    ]
 
     def sort_blog_post_summaries(k: blog_domain.BlogPostSummary) -> float:
         return k.last_updated.timestamp() if k.last_updated else 0
 
-    return sorted(blog_post_summaries, key=sort_blog_post_summaries, reverse=True) if len(blog_post_summaries) != 0 else []
+    return (
+        sorted(blog_post_summaries, key=sort_blog_post_summaries, reverse=True)
+        if len(blog_post_summaries) != 0
+        else []
+    )
 
 
-def filter_blog_post_ids(user_id: str, blog_post_is_published: bool) -> List[str]:
+def filter_blog_post_ids(
+    user_id: str, blog_post_is_published: bool
+) -> List[str]:
     """Given the user ID and status, it returns the IDs of all blog post
     according to the status.
 
@@ -261,9 +299,15 @@ def filter_blog_post_ids(user_id: str, blog_post_is_published: bool) -> List[str
         editor corresponding to the status(draft/published).
     """
     if blog_post_is_published:
-        blog_post_rights_models = blog_models.BlogPostRightsModel.get_published_models_by_user(user_id)
+        blog_post_rights_models = (
+            blog_models.BlogPostRightsModel.get_published_models_by_user(
+                user_id
+            )
+        )
     else:
-        blog_post_rights_models = blog_models.BlogPostRightsModel.get_draft_models_by_user(user_id)
+        blog_post_rights_models = (
+            blog_models.BlogPostRightsModel.get_draft_models_by_user(user_id)
+        )
     model_ids = []
     if blog_post_rights_models:
         for model in blog_post_rights_models:
@@ -283,9 +327,11 @@ def get_blog_post_summary_by_title(
         BlogPostSummary or None. The domain object representing a blog post
         summary with the given title, or None if it does not exist.
     """
-    blog_post_summary_model: Sequence[blog_models.BlogPostSummaryModel] = blog_models.BlogPostSummaryModel.query(
-        blog_models.BlogPostSummaryModel.title == title  # pylint: disable=singleton-comparison
-    ).fetch()
+    blog_post_summary_model: Sequence[blog_models.BlogPostSummaryModel] = (
+        blog_models.BlogPostSummaryModel.query(
+            blog_models.BlogPostSummaryModel.title == title  # pylint: disable=singleton-comparison
+        ).fetch()
+    )
 
     if len(blog_post_summary_model) == 0:
         return None
@@ -328,14 +374,20 @@ def get_blog_post_rights(blog_post_id: str) -> blog_domain.BlogPostRights: ...
 
 
 @overload
-def get_blog_post_rights(blog_post_id: str, *, strict: Literal[True]) -> blog_domain.BlogPostRights: ...
+def get_blog_post_rights(
+    blog_post_id: str, *, strict: Literal[True]
+) -> blog_domain.BlogPostRights: ...
 
 
 @overload
-def get_blog_post_rights(blog_post_id: str, *, strict: Literal[False]) -> Optional[blog_domain.BlogPostRights]: ...
+def get_blog_post_rights(
+    blog_post_id: str, *, strict: Literal[False]
+) -> Optional[blog_domain.BlogPostRights]: ...
 
 
-def get_blog_post_rights(blog_post_id: str, strict: bool = True) -> Optional[blog_domain.BlogPostRights]:
+def get_blog_post_rights(
+    blog_post_id: str, strict: bool = True
+) -> Optional[blog_domain.BlogPostRights]:
     """Retrieves the rights object for the given blog post.
 
     Args:
@@ -359,7 +411,9 @@ def get_blog_post_rights(blog_post_id: str, strict: bool = True) -> Optional[blo
     return get_blog_post_rights_from_model(model)
 
 
-def get_total_number_of_matching_blog_posts(query_string: str, tags: List[str]) -> int:
+def get_total_number_of_matching_blog_posts(
+    query_string: str, tags: List[str]
+) -> int:
     """Returns the total number of blog posts matching the search query and tags."""
     valid_blog_post_ids: List[str] = []
     search_offset: Optional[int] = None
@@ -367,7 +421,9 @@ def get_total_number_of_matching_blog_posts(query_string: str, tags: List[str]) 
     for _ in range(MAX_ITERATIONS):
         remaining_to_fetch = 1000
 
-        batch_ids, search_offset = get_blog_post_ids_matching_query(query_string, tags, size=remaining_to_fetch, offset=search_offset)
+        batch_ids, search_offset = get_blog_post_ids_matching_query(
+            query_string, tags, size=remaining_to_fetch, offset=search_offset
+        )
         valid_blog_post_ids.extend(batch_ids)
 
         if search_offset is None:
@@ -375,7 +431,9 @@ def get_total_number_of_matching_blog_posts(query_string: str, tags: List[str]) 
     return len(valid_blog_post_ids)
 
 
-def get_published_blog_post_summaries_by_user_id(user_id: str, max_limit: int, offset: int = 0) -> List[blog_domain.BlogPostSummary]:
+def get_published_blog_post_summaries_by_user_id(
+    user_id: str, max_limit: int, offset: int = 0
+) -> List[blog_domain.BlogPostSummary]:
     """Retrieves the summary objects for given number of published blog posts
     for which the given user is an editor.
 
@@ -393,11 +451,23 @@ def get_published_blog_post_summaries_by_user_id(user_id: str, max_limit: int, o
     # for "not None", since checking directly for "not None" results in a
     # query error.
     blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = (
-        blog_models.BlogPostSummaryModel.query(blog_models.BlogPostSummaryModel.author_id == user_id).filter(blog_models.BlogPostSummaryModel.published_on >= datetime.datetime(2000, 1, 1)).order(-blog_models.BlogPostSummaryModel.published_on).fetch(max_limit, offset=offset)
+        blog_models.BlogPostSummaryModel.query(
+            blog_models.BlogPostSummaryModel.author_id == user_id
+        )
+        .filter(
+            blog_models.BlogPostSummaryModel.published_on
+            >= datetime.datetime(2000, 1, 1)
+        )
+        .order(-blog_models.BlogPostSummaryModel.published_on)
+        .fetch(max_limit, offset=offset)
     )
     if len(blog_post_summary_models) == 0:
         return []
-    blog_post_summaries = [get_blog_post_summary_from_model(model) for model in blog_post_summary_models if model is not None]
+    blog_post_summaries = [
+        get_blog_post_summary_from_model(model)
+        for model in blog_post_summary_models
+        if model is not None
+    ]
     return blog_post_summaries
 
 
@@ -414,7 +484,10 @@ def does_blog_post_with_url_fragment_exist(url_fragment: str) -> bool:
         Exception. Blog Post URL fragment is not a string.
     """
     if not isinstance(url_fragment, str):
-        raise utils.ValidationError('Blog Post URL fragment should be a string. Recieved:%s' % url_fragment)
+        raise utils.ValidationError(
+            'Blog Post URL fragment should be a string. Recieved:%s'
+            % url_fragment
+        )
     existing_blog_post = get_blog_post_by_url_fragment(url_fragment)
     return existing_blog_post is not None
 
@@ -455,7 +528,9 @@ def publish_blog_post(blog_post_id: str) -> None:
     blog_post.validate(strict=True)
     blog_post_summary = get_blog_post_summary_by_id(blog_post_id, strict=True)
     blog_post_summary.validate(strict=True)
-    author_model = blog_models.BlogAuthorDetailsModel.get_by_author(blog_post.author_id)
+    author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
+        blog_post.author_id
+    )
     if author_model is None:
         create_blog_author_details_model(blog_post.author_id)
 
@@ -522,7 +597,9 @@ def _save_blog_post_summary(
         blog_post_summary: BlogPostSummary. The summary object for the given
             blog post summary.
     """
-    model = blog_models.BlogPostSummaryModel.get(blog_post_summary.id, strict=False)
+    model = blog_models.BlogPostSummaryModel.get(
+        blog_post_summary.id, strict=False
+    )
     if model:
         model.author_id = blog_post_summary.author_id
         model.title = blog_post_summary.title
@@ -553,7 +630,9 @@ def save_blog_post_rights(blog_post_rights: blog_domain.BlogPostRights) -> None:
         blog_post_rights: BlogPostRights. The rights object for the given
             blog post.
     """
-    model = blog_models.BlogPostRightsModel.get(blog_post_rights.id, strict=True)
+    model = blog_models.BlogPostRightsModel.get(
+        blog_post_rights.id, strict=True
+    )
 
     model.editor_ids = blog_post_rights.editor_ids
     model.blog_post_is_published = blog_post_rights.blog_post_is_published
@@ -665,7 +744,9 @@ def compute_summary_of_blog_post(
     )
 
 
-def apply_change_dict(blog_post_id: str, change_dict: BlogPostChangeDict) -> blog_domain.BlogPost:
+def apply_change_dict(
+    blog_post_id: str, change_dict: BlogPostChangeDict
+) -> blog_domain.BlogPost:
     """Applies a changelist to blog post and returns the result.
 
     Args:
@@ -681,7 +762,9 @@ def apply_change_dict(blog_post_id: str, change_dict: BlogPostChangeDict) -> blo
 
     if 'title' in change_dict:
         blog_post.update_title(change_dict['title'].strip())
-        url_fragment = generate_url_fragment(change_dict['title'].strip(), blog_post_id)
+        url_fragment = generate_url_fragment(
+            change_dict['title'].strip(), blog_post_id
+        )
         blog_post.update_url_fragment(url_fragment)
     if 'thumbnail_filename' in change_dict:
         blog_post.update_thumbnail_filename(change_dict['thumbnail_filename'])
@@ -693,7 +776,9 @@ def apply_change_dict(blog_post_id: str, change_dict: BlogPostChangeDict) -> blo
     return blog_post
 
 
-def update_blog_post(blog_post_id: str, change_dict: BlogPostChangeDict) -> None:
+def update_blog_post(
+    blog_post_id: str, change_dict: BlogPostChangeDict
+) -> None:
     """Updates the blog post and its summary model in the datastore.
 
     Args:
@@ -705,7 +790,10 @@ def update_blog_post(blog_post_id: str, change_dict: BlogPostChangeDict) -> None
     updated_blog_post = apply_change_dict(blog_post_id, change_dict)
     if 'title' in change_dict:
         if does_blog_post_with_title_exist(change_dict['title'], blog_post_id):
-            raise utils.ValidationError('Blog Post with given title already exists: %s' % updated_blog_post.title)
+            raise utils.ValidationError(
+                'Blog Post with given title already exists: %s'
+                % updated_blog_post.title
+            )
     _save_blog_post(updated_blog_post)
     updated_blog_post_summary = compute_summary_of_blog_post(updated_blog_post)
     _save_blog_post_summary(updated_blog_post_summary)
@@ -721,7 +809,11 @@ def does_blog_post_with_title_exist(title: str, blog_post_id: str) -> bool:
     Returns:
         bool. Whether a blog post with given title already exists.
     """
-    blog_post_models: Sequence[blog_models.BlogPostModel] = blog_models.BlogPostModel.get_all().filter(blog_models.BlogPostModel.title == title).fetch()
+    blog_post_models: Sequence[blog_models.BlogPostModel] = (
+        blog_models.BlogPostModel.get_all()
+        .filter(blog_models.BlogPostModel.title == title)
+        .fetch()
+    )
     if len(blog_post_models) > 0:
         if len(blog_post_models) > 1 or blog_post_models[0].id != blog_post_id:
             return True
@@ -743,7 +835,9 @@ def create_new_blog_post(author_id: str) -> blog_domain.BlogPost:
         create_blog_author_details_model(author_id)
 
     blog_post_id = get_new_blog_post_id()
-    new_blog_post_model = blog_models.BlogPostModel.create(blog_post_id, author_id)
+    new_blog_post_model = blog_models.BlogPostModel.create(
+        blog_post_id, author_id
+    )
     blog_models.BlogPostRightsModel.create(blog_post_id, author_id)
     new_blog_post = get_blog_post_from_model(new_blog_post_model)
     new_blog_post_summary_model = compute_summary_of_blog_post(new_blog_post)
@@ -752,7 +846,9 @@ def create_new_blog_post(author_id: str) -> blog_domain.BlogPost:
     return new_blog_post
 
 
-def get_published_blog_post_summaries(offset: int = 0, size: Optional[int] = None) -> List[blog_domain.BlogPostSummary]:
+def get_published_blog_post_summaries(
+    offset: int = 0, size: Optional[int] = None
+) -> List[blog_domain.BlogPostSummary]:
     """Returns published BlogPostSummaries list.
 
     Args:
@@ -772,11 +868,22 @@ def get_published_blog_post_summaries(offset: int = 0, size: Optional[int] = Non
         max_limit = feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
     # We use "2000 or later" as shorthand for "not None", since checking
     # directly for "not None" results in a query error.
-    blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = blog_models.BlogPostSummaryModel.query(blog_models.BlogPostSummaryModel.published_on >= datetime.datetime(2000, 1, 1)).order(-blog_models.BlogPostSummaryModel.published_on).fetch(max_limit, offset=offset)
+    blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = (
+        blog_models.BlogPostSummaryModel.query(
+            blog_models.BlogPostSummaryModel.published_on
+            >= datetime.datetime(2000, 1, 1)
+        )
+        .order(-blog_models.BlogPostSummaryModel.published_on)
+        .fetch(max_limit, offset=offset)
+    )
     if len(blog_post_summary_models) == 0:
         return []
     blog_post_summaries = []
-    blog_post_summaries = [get_blog_post_summary_from_model(model) for model in blog_post_summary_models if model is not None]
+    blog_post_summaries = [
+        get_blog_post_summary_from_model(model)
+        for model in blog_post_summary_models
+        if model is not None
+    ]
     return blog_post_summaries
 
 
@@ -786,7 +893,9 @@ def get_total_number_of_published_blog_post_summaries() -> int:
     Returns:
         int. Total number of published BlogPostSummaries.
     """
-    return blog_models.BlogPostRightsModel.query(blog_models.BlogPostRightsModel.blog_post_is_published).count()
+    return blog_models.BlogPostRightsModel.query(
+        blog_models.BlogPostRightsModel.blog_post_is_published
+    ).count()
 
 
 def get_total_number_of_published_blog_post_summaries_by_author(
@@ -797,10 +906,14 @@ def get_total_number_of_published_blog_post_summaries_by_author(
     Returns:
         int. Total number of published BlogPostSummaries by author.
     """
-    return len(blog_models.BlogPostRightsModel.get_published_models_by_user(author_id))
+    return len(
+        blog_models.BlogPostRightsModel.get_published_models_by_user(author_id)
+    )
 
 
-def update_blog_models_author_and_published_on_date(blog_post_id: str, author_id: str, date: str) -> None:
+def update_blog_models_author_and_published_on_date(
+    blog_post_id: str, author_id: str, date: str
+) -> None:
     """Updates blog post model with the author id and published on
     date provided.
 
@@ -814,7 +927,9 @@ def update_blog_models_author_and_published_on_date(blog_post_id: str, author_id
 
     blog_post.author_id = author_id
     supported_date_string = date + ', 00:00:00:00'
-    blog_post.published_on = utils.convert_string_to_naive_datetime_object(supported_date_string)
+    blog_post.published_on = utils.convert_string_to_naive_datetime_object(
+        supported_date_string
+    )
     blog_post.validate(strict=True)
 
     blog_post_summary = compute_summary_of_blog_post(blog_post)
@@ -843,19 +958,25 @@ def index_blog_post_summaries_given_ids(blog_post_ids: List[str]) -> None:
     blog_post_content_id_to_content_map = {}
     for model in blog_post_models:
         if model:
-            blog_post_content_id_to_content_map[model.id] = html_cleaner.strip_html_tags(model.content)
+            blog_post_content_id_to_content_map[model.id] = (
+                html_cleaner.strip_html_tags(model.content)
+            )
     valid_summaries = []
     for summary in blog_post_summaries:
         if summary is not None:
             if summary.id in blog_post_content_id_to_content_map:
-                summary.summary = blog_post_content_id_to_content_map[summary.id]
+                summary.summary = blog_post_content_id_to_content_map[
+                    summary.id
+                ]
 
             valid_summaries.append(summary)
     if len(valid_summaries) > 0:
         search_services.index_blog_post_summaries(valid_summaries)
 
 
-def get_blog_post_ids_matching_query(query_string: str, tags: List[str], size: int, offset: Optional[int] = None) -> Tuple[List[str], Optional[int]]:
+def get_blog_post_ids_matching_query(
+    query_string: str, tags: List[str], size: int, offset: Optional[int] = None
+) -> Tuple[List[str], Optional[int]]:
     """Returns a list with all blog post ids matching the given search query
     string, as well as a search offset for future fetches.
 
@@ -893,23 +1014,41 @@ def get_blog_post_ids_matching_query(query_string: str, tags: List[str], size: i
     for _ in range(MAX_ITERATIONS):
         remaining_to_fetch = size - len(valid_blog_post_ids)
 
-        blog_post_ids, search_offset = search_services.search_blog_post_summaries(query_string, tags, remaining_to_fetch, offset=search_offset)
+        blog_post_ids, search_offset = (
+            search_services.search_blog_post_summaries(
+                query_string, tags, remaining_to_fetch, offset=search_offset
+            )
+        )
 
         invalid_blog_post_ids = []
-        for ind, model in enumerate(blog_models.BlogPostSummaryModel.get_multi(blog_post_ids)):
+        for ind, model in enumerate(
+            blog_models.BlogPostSummaryModel.get_multi(blog_post_ids)
+        ):
             if model is not None:
                 valid_blog_post_ids.append(blog_post_ids[ind])
             else:
                 invalid_blog_post_ids.append(blog_post_ids[ind])
 
-        if (len(valid_blog_post_ids) == feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE) or search_offset is None:
+        if (
+            len(valid_blog_post_ids)
+            == feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
+        ) or search_offset is None:
             break
 
         if len(invalid_blog_post_ids) > 0:
-            logging.error('Search index contains stale blog post ids: %s' % ', '.join(invalid_blog_post_ids))
+            logging.error(
+                'Search index contains stale blog post ids: %s'
+                % ', '.join(invalid_blog_post_ids)
+            )
 
-    if (len(valid_blog_post_ids) < feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE) and search_offset is not None:
-        logging.error('Could not fulfill search request for query string %s; at least %s retries were needed.' % (query_string, MAX_ITERATIONS))
+    if (
+        len(valid_blog_post_ids)
+        < feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
+    ) and search_offset is not None:
+        logging.error(
+            'Could not fulfill search request for query string %s; at least %s retries were needed.'
+            % (query_string, MAX_ITERATIONS)
+        )
     return (valid_blog_post_ids, search_offset)
 
 
@@ -927,10 +1066,14 @@ def create_blog_author_details_model(user_id: str) -> None:
     if user_settings is None or user_settings.username is None:
         raise Exception('Unable to fetch user details for the given user')
 
-    blog_models.BlogAuthorDetailsModel.create(user_id, user_settings.username, user_settings.user_bio)
+    blog_models.BlogAuthorDetailsModel.create(
+        user_id, user_settings.username, user_settings.user_bio
+    )
 
 
-def get_blog_author_details(user_id: str, strict: bool = True) -> blog_domain.BlogAuthorDetails:
+def get_blog_author_details(
+    user_id: str, strict: bool = True
+) -> blog_domain.BlogAuthorDetails:
     """Returns the blog author details for the given user id.
 
     This is a pure getter function that does not create missing models.
@@ -956,8 +1099,13 @@ def get_blog_author_details(user_id: str, strict: bool = True) -> blog_domain.Bl
 
     if author_model is None:
         if strict:
-            raise Exception('No BlogAuthorDetailsModel found for user_id=%s. This may indicate the author\'s account was deleted or the model was never created.' % user_id)
-        return blog_domain.BlogAuthorDetails.create_default_author_details_for_user(user_id)
+            raise Exception(
+                'No BlogAuthorDetailsModel found for user_id=%s. This may indicate the author\'s account was deleted or the model was never created.'
+                % user_id
+            )
+        return blog_domain.BlogAuthorDetails.create_default_author_details_for_user(
+            user_id
+        )
 
     return blog_domain.BlogAuthorDetails(
         author_model.id,
@@ -968,7 +1116,9 @@ def get_blog_author_details(user_id: str, strict: bool = True) -> blog_domain.Bl
     )
 
 
-def update_blog_author_details(user_id: str, displayed_author_name: str, author_bio: str) -> None:
+def update_blog_author_details(
+    user_id: str, displayed_author_name: str, author_bio: str
+) -> None:
     """Updates the author name and bio for the given user id.
 
     Args:
@@ -979,14 +1129,22 @@ def update_blog_author_details(user_id: str, displayed_author_name: str, author_
     Raises:
         Exception. Unable to fetch blog author details for the given user ID.
     """
-    blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_author(user_id)
-    blog_domain.BlogAuthorDetails.require_valid_displayed_author_name(displayed_author_name)
+    blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
+        user_id
+    )
+    blog_domain.BlogAuthorDetails.require_valid_displayed_author_name(
+        displayed_author_name
+    )
 
     if blog_author_model is None:
         create_blog_author_details_model(user_id)
-        blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_author(user_id)
+        blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
+            user_id
+        )
         if blog_author_model is None:
-            raise Exception('Unable to fetch author details for the given user.')
+            raise Exception(
+                'Unable to fetch author details for the given user.'
+            )
 
     blog_author_model.displayed_author_name = displayed_author_name
     blog_author_model.author_bio = author_bio

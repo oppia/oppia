@@ -58,7 +58,9 @@ from core.domain import (
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
 
-def _does_exploration_exist(exploration_id: str, version: Optional[int], collection_id: Optional[str]) -> bool:
+def _does_exploration_exist(
+    exploration_id: str, version: Optional[int], collection_id: Optional[str]
+) -> bool:
     """Returns if an exploration exists.
 
     Args:
@@ -69,13 +71,17 @@ def _does_exploration_exist(exploration_id: str, version: Optional[int], collect
     Returns:
         bool. True if the exploration exists False otherwise.
     """
-    exploration = exp_fetchers.get_exploration_by_id(exploration_id, strict=False, version=version)
+    exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, strict=False, version=version
+    )
 
     if exploration is None:
         return False
 
     if collection_id:
-        collection = collection_services.get_collection_by_id(collection_id, strict=False)
+        collection = collection_services.get_collection_by_id(
+            collection_id, strict=False
+        )
         if collection is None:
             return False
 
@@ -91,7 +97,9 @@ class ExplorationHandlerNormalizedRequestDict(TypedDict):
     pid: Optional[str]
 
 
-class ExplorationHandler(base.BaseHandler[Dict[str, str], ExplorationHandlerNormalizedRequestDict]):
+class ExplorationHandler(
+    base.BaseHandler[Dict[str, str], ExplorationHandlerNormalizedRequestDict]
+):
     """Provides the initial data for a single exploration."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -149,12 +157,20 @@ class ExplorationHandler(base.BaseHandler[Dict[str, str], ExplorationHandlerNorm
         version = self.normalized_request.get('v')
         unique_progress_url_id = self.normalized_request.get('pid')
 
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id, strict=False, version=version)
+        exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id, strict=False, version=version
+        )
         if exploration is None:
             raise self.NotFoundException()
 
-        exploration_rights = rights_manager.get_exploration_rights(exploration_id, strict=False)
-        user_settings = user_services.get_user_settings(self.user_id, strict=False) if self.user_id else None
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False
+        )
+        user_settings = (
+            user_services.get_user_settings(self.user_id, strict=False)
+            if self.user_id
+            else None
+        )
 
         preferred_audio_language_code = None
         preferred_language_codes = None
@@ -162,12 +178,20 @@ class ExplorationHandler(base.BaseHandler[Dict[str, str], ExplorationHandlerNorm
 
         displayable_language_codes = []
         if exp_services.get_story_id_linked_to_exploration(exploration_id):
-            displayable_language_codes = translation_services.get_displayable_translation_languages(feconf.TranslatableEntityType.EXPLORATION, exploration)
+            displayable_language_codes = (
+                translation_services.get_displayable_translation_languages(
+                    feconf.TranslatableEntityType.EXPLORATION, exploration
+                )
+            )
 
         if user_settings is not None:
-            preferred_audio_language_code = user_settings.preferred_audio_language_code
+            preferred_audio_language_code = (
+                user_settings.preferred_audio_language_code
+            )
             preferred_language_codes = user_settings.preferred_language_codes
-            has_viewed_lesson_info_modal_once = user_settings.has_viewed_lesson_info_modal_once
+            has_viewed_lesson_info_modal_once = (
+                user_settings.has_viewed_lesson_info_modal_once
+            )
 
         furthest_reached_checkpoint_exp_version = None
         furthest_reached_checkpoint_state_name = None
@@ -175,14 +199,18 @@ class ExplorationHandler(base.BaseHandler[Dict[str, str], ExplorationHandlerNorm
         most_recently_reached_checkpoint_state_name = None
 
         if not self.user_id and unique_progress_url_id is not None:
-            logged_out_user_data = exp_fetchers.get_logged_out_user_progress(unique_progress_url_id, strict=True)
+            logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+                unique_progress_url_id, strict=True
+            )
 
             synced_exp_user_data = None
             # If the latest exploration version is ahead of the most recently
             # interacted exploration version.
             if (
-                logged_out_user_data.most_recently_reached_checkpoint_exp_version is not None  # pylint: disable=line-too-long
-                and logged_out_user_data.most_recently_reached_checkpoint_exp_version < exploration.version  # pylint: disable=line-too-long
+                logged_out_user_data.most_recently_reached_checkpoint_exp_version
+                is not None  # pylint: disable=line-too-long
+                and logged_out_user_data.most_recently_reached_checkpoint_exp_version
+                < exploration.version  # pylint: disable=line-too-long
             ):
                 synced_exp_user_data = exp_services.sync_logged_out_learner_checkpoint_progress_with_current_exp_version(  # pylint: disable=line-too-long
                     logged_out_user_data.exploration_id,
@@ -192,13 +220,21 @@ class ExplorationHandler(base.BaseHandler[Dict[str, str], ExplorationHandlerNorm
             else:
                 synced_exp_user_data = logged_out_user_data
 
-            furthest_reached_checkpoint_exp_version = synced_exp_user_data.furthest_reached_checkpoint_exp_version
-            furthest_reached_checkpoint_state_name = synced_exp_user_data.furthest_reached_checkpoint_state_name
+            furthest_reached_checkpoint_exp_version = (
+                synced_exp_user_data.furthest_reached_checkpoint_exp_version
+            )
+            furthest_reached_checkpoint_state_name = (
+                synced_exp_user_data.furthest_reached_checkpoint_state_name
+            )
             most_recently_reached_checkpoint_exp_version = synced_exp_user_data.most_recently_reached_checkpoint_exp_version
-            most_recently_reached_checkpoint_state_name = synced_exp_user_data.most_recently_reached_checkpoint_state_name
+            most_recently_reached_checkpoint_state_name = (
+                synced_exp_user_data.most_recently_reached_checkpoint_state_name
+            )
 
         elif self.user_id is not None:
-            exp_user_data = exp_fetchers.get_exploration_user_data(self.user_id, exploration_id)
+            exp_user_data = exp_fetchers.get_exploration_user_data(
+                self.user_id, exploration_id
+            )
 
             # If exp_user_data is None, it means the exploration is started
             # for the first time and no checkpoint progress of the user
@@ -213,8 +249,10 @@ class ExplorationHandler(base.BaseHandler[Dict[str, str], ExplorationHandlerNorm
                 # If the latest exploration version is ahead of the most
                 # recently interacted exploration version.
                 if (
-                    exp_user_data.most_recently_reached_checkpoint_exp_version is not None  # pylint: disable=line-too-long
-                    and exp_user_data.most_recently_reached_checkpoint_exp_version < exploration.version  # pylint: disable=line-too-long
+                    exp_user_data.most_recently_reached_checkpoint_exp_version
+                    is not None  # pylint: disable=line-too-long
+                    and exp_user_data.most_recently_reached_checkpoint_exp_version
+                    < exploration.version  # pylint: disable=line-too-long
                 ):
                     synced_exp_logged_in_user_data = user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version(  # pylint: disable=line-too-long
                         self.user_id, exploration_id, strict=True
@@ -229,7 +267,11 @@ class ExplorationHandler(base.BaseHandler[Dict[str, str], ExplorationHandlerNorm
 
         self.values.update(
             {
-                'can_edit': (rights_manager.check_can_edit_activity(self.user, exploration_rights)),
+                'can_edit': (
+                    rights_manager.check_can_edit_activity(
+                        self.user, exploration_rights
+                    )
+                ),
                 'exploration': exploration.to_player_dict(),
                 'exploration_metadata': exploration.get_metadata().to_dict(),
                 'exploration_id': exploration_id,
@@ -239,19 +281,35 @@ class ExplorationHandler(base.BaseHandler[Dict[str, str], ExplorationHandlerNorm
                 'preferred_audio_language_code': preferred_audio_language_code,
                 'preferred_language_codes': preferred_language_codes,
                 'auto_tts_enabled': exploration.auto_tts_enabled,
-                'record_playthrough_probability': (platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.RECORD_PLAYTHROUGH_PROBABILITY.value)),
-                'has_viewed_lesson_info_modal_once': (has_viewed_lesson_info_modal_once),
-                'furthest_reached_checkpoint_exp_version': (furthest_reached_checkpoint_exp_version),
-                'furthest_reached_checkpoint_state_name': (furthest_reached_checkpoint_state_name),
-                'most_recently_reached_checkpoint_exp_version': (most_recently_reached_checkpoint_exp_version),
-                'most_recently_reached_checkpoint_state_name': (most_recently_reached_checkpoint_state_name),
+                'record_playthrough_probability': (
+                    platform_parameter_services.get_platform_parameter_value(
+                        platform_parameter_list.ParamName.RECORD_PLAYTHROUGH_PROBABILITY.value
+                    )
+                ),
+                'has_viewed_lesson_info_modal_once': (
+                    has_viewed_lesson_info_modal_once
+                ),
+                'furthest_reached_checkpoint_exp_version': (
+                    furthest_reached_checkpoint_exp_version
+                ),
+                'furthest_reached_checkpoint_state_name': (
+                    furthest_reached_checkpoint_state_name
+                ),
+                'most_recently_reached_checkpoint_exp_version': (
+                    most_recently_reached_checkpoint_exp_version
+                ),
+                'most_recently_reached_checkpoint_state_name': (
+                    most_recently_reached_checkpoint_state_name
+                ),
                 'displayable_language_codes': displayable_language_codes,
             }
         )
         self.render_json(self.values)
 
 
-class EntityTranslationHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+class EntityTranslationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """The handler to fetch translations for a given entity in a given
     language.
     """
@@ -325,7 +383,9 @@ class PretestHandlerNormalizedRequestDict(TypedDict):
     story_url_fragment: str
 
 
-class PretestHandler(base.BaseHandler[Dict[str, str], PretestHandlerNormalizedRequestDict]):
+class PretestHandler(
+    base.BaseHandler[Dict[str, str], PretestHandlerNormalizedRequestDict]
+):
     """Provides subsequent pretest questions after initial batch."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -359,10 +419,17 @@ class PretestHandler(base.BaseHandler[Dict[str, str], PretestHandlerNormalizedRe
             raise self.InvalidInputException
         if not story.has_exploration(exploration_id):
             raise self.InvalidInputException
-        prerequisite_skill_ids = story.get_prerequisite_skill_ids_for_exp_id(exploration_id)
+        prerequisite_skill_ids = story.get_prerequisite_skill_ids_for_exp_id(
+            exploration_id
+        )
         if prerequisite_skill_ids is None:
-            raise Exception('No prerequisite skill_ids found for the exploration with exploration_id: %s' % exploration_id)
-        pretest_questions = question_services.get_questions_by_skill_ids(feconf.NUM_PRETEST_QUESTIONS, prerequisite_skill_ids, True)
+            raise Exception(
+                'No prerequisite skill_ids found for the exploration with exploration_id: %s'
+                % exploration_id
+            )
+        pretest_questions = question_services.get_questions_by_skill_ids(
+            feconf.NUM_PRETEST_QUESTIONS, prerequisite_skill_ids, True
+        )
         question_dicts = [question.to_dict() for question in pretest_questions]
 
         self.values.update(
@@ -382,7 +449,11 @@ class StorePlaythroughHandlerNormalizedPayloadDict(TypedDict):
     playthrough_data: stats_domain.Playthrough
 
 
-class StorePlaythroughHandler(base.BaseHandler[StorePlaythroughHandlerNormalizedPayloadDict, Dict[str, str]]):
+class StorePlaythroughHandler(
+    base.BaseHandler[
+        StorePlaythroughHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Commits a playthrough recorded on the frontend to storage."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -428,9 +499,13 @@ class StorePlaythroughHandler(base.BaseHandler[StorePlaythroughHandlerNormalized
 
         playthrough = self.normalized_payload['playthrough_data']
 
-        exp_issues = stats_services.get_exp_issues(exploration_id, playthrough.exp_version)
+        exp_issues = stats_services.get_exp_issues(
+            exploration_id, playthrough.exp_version
+        )
 
-        if stats_services.assign_playthrough_to_corresponding_issue(playthrough, exp_issues, issue_schema_version):
+        if stats_services.assign_playthrough_to_corresponding_issue(
+            playthrough, exp_issues, issue_schema_version
+        ):
             stats_services.save_exp_issues_model(exp_issues)
         self.render_json({})
 
@@ -444,7 +519,9 @@ class StatsEventsHandlerNormalizedPayloadDict(TypedDict):
     exp_version: int
 
 
-class StatsEventsHandler(base.BaseHandler[StatsEventsHandlerNormalizedPayloadDict, Dict[str, str]]):
+class StatsEventsHandler(
+    base.BaseHandler[StatsEventsHandlerNormalizedPayloadDict, Dict[str, str]]
+):
     """Handles a batch of events coming in from the frontend."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
@@ -467,7 +544,9 @@ class StatsEventsHandler(base.BaseHandler[StatsEventsHandlerNormalizedPayloadDic
             'aggregated_stats': {
                 'schema': {
                     'type': 'object_dict',
-                    'validation_method': (domain_objects_validator.validate_aggregated_stats),
+                    'validation_method': (
+                        domain_objects_validator.validate_aggregated_stats
+                    ),
                 }
             },
             'exp_version': {
@@ -490,7 +569,9 @@ class StatsEventsHandler(base.BaseHandler[StatsEventsHandlerNormalizedPayloadDic
         assert self.normalized_payload is not None
         aggregated_stats = self.normalized_payload['aggregated_stats']
         exp_version = self.normalized_payload['exp_version']
-        event_services.StatsEventsHandler.record(exploration_id, exp_version, aggregated_stats)
+        event_services.StatsEventsHandler.record(
+            exploration_id, exp_version, aggregated_stats
+        )
         self.render_json({})
 
 
@@ -510,7 +591,11 @@ class AnswerSubmittedEventHandlerNormalizedPayloadDict(TypedDict):
     classification_categorization: str
 
 
-class AnswerSubmittedEventHandler(base.BaseHandler[AnswerSubmittedEventHandlerNormalizedPayloadDict, Dict[str, str]]):
+class AnswerSubmittedEventHandler(
+    base.BaseHandler[
+        AnswerSubmittedEventHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Tracks a learner submitting an answer."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
@@ -609,23 +694,37 @@ class AnswerSubmittedEventHandler(base.BaseHandler[AnswerSubmittedEventHandlerNo
         # The version of the exploration.
         version = self.normalized_payload['version']
         session_id = self.normalized_payload['session_id']
-        client_time_spent_in_secs = self.normalized_payload['client_time_spent_in_secs']
+        client_time_spent_in_secs = self.normalized_payload[
+            'client_time_spent_in_secs'
+        ]
         # The answer group and rule spec indexes, which will be used to get
         # the rule spec string.
         answer_group_index = self.normalized_payload['answer_group_index']
         rule_spec_index = self.normalized_payload['rule_spec_index']
-        classification_categorization = self.normalized_payload['classification_categorization']
+        classification_categorization = self.normalized_payload[
+            'classification_categorization'
+        ]
 
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id, version=version)
+        exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id, version=version
+        )
 
         old_interaction = exploration.states[old_state_name].interaction
 
-        old_interaction_instance = interaction_registry.Registry.get_interaction_by_id(old_interaction.id)
+        old_interaction_instance = (
+            interaction_registry.Registry.get_interaction_by_id(
+                old_interaction.id
+            )
+        )
 
         try:
-            normalized_answer = old_interaction_instance.normalize_answer(answer)
+            normalized_answer = old_interaction_instance.normalize_answer(
+                answer
+            )
         except utils.InvalidInputException as e:
-            raise self.InvalidInputException('Schema validation for \'answer\' failed: %s' % e) from e
+            raise self.InvalidInputException(
+                'Schema validation for \'answer\' failed: %s' % e
+            ) from e
 
         event_services.AnswerSubmissionEventHandler.record(
             exploration_id,
@@ -655,12 +754,16 @@ class StateHitEventHandlerNormalizedPayloadDict(TypedDict):
     old_params: Dict[str, Union[str, int, Dict[str, str], List[str]]]
 
 
-class StateHitEventHandler(base.BaseHandler[StateHitEventHandlerNormalizedPayloadDict, Dict[str, str]]):
+class StateHitEventHandler(
+    base.BaseHandler[StateHitEventHandlerNormalizedPayloadDict, Dict[str, str]]
+):
     """Tracks a learner hitting a new state."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     REQUIRE_PAYLOAD_CSRF_CHECK = False
-    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}}
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}
+    }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'session_id': {'schema': {'type': 'basestring'}},
@@ -748,14 +851,20 @@ class StateCompleteEventHandlerNormalizedPayloadDict(TypedDict):
     exp_version: int
 
 
-class StateCompleteEventHandler(base.BaseHandler[StateCompleteEventHandlerNormalizedPayloadDict, Dict[str, str]]):
+class StateCompleteEventHandler(
+    base.BaseHandler[
+        StateCompleteEventHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Tracks a learner complete a state. Here, 'completing' means answering
     the state and progressing to a new state.
     """
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}}
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}
+    }
 
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
@@ -798,7 +907,9 @@ class StateCompleteEventHandler(base.BaseHandler[StateCompleteEventHandlerNormal
         assert self.normalized_payload is not None
         state_name = self.normalized_payload['state_name']
         session_id = self.normalized_payload['session_id']
-        time_spent_in_state_secs = self.normalized_payload['time_spent_in_state_secs']
+        time_spent_in_state_secs = self.normalized_payload[
+            'time_spent_in_state_secs'
+        ]
         exp_version = self.normalized_payload['exp_version']
         event_services.StateCompleteEventHandler.record(
             exploration_id,
@@ -822,12 +933,18 @@ class LeaveForRefresherExpEventHandlerNormalizedPayloadDict(TypedDict):
     time_spent_in_state_secs: float
 
 
-class LeaveForRefresherExpEventHandler(base.BaseHandler[LeaveForRefresherExpEventHandlerNormalizedPayloadDict, Dict[str, str]]):
+class LeaveForRefresherExpEventHandler(
+    base.BaseHandler[
+        LeaveForRefresherExpEventHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Tracks a learner leaving an exploration for a refresher exploration."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}}
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}
+    }
 
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
@@ -873,7 +990,9 @@ class LeaveForRefresherExpEventHandler(base.BaseHandler[LeaveForRefresherExpEven
         exp_version = self.normalized_payload['exp_version']
         state_name = self.normalized_payload['state_name']
         session_id = self.normalized_payload['session_id']
-        time_spent_in_state_secs = self.normalized_payload['time_spent_in_state_secs']
+        time_spent_in_state_secs = self.normalized_payload[
+            'time_spent_in_state_secs'
+        ]
 
         event_services.LeaveForRefresherExpEventHandler.record(
             exploration_id,
@@ -897,7 +1016,9 @@ class ReaderFeedbackHandlerNormalizedPayloadDict(TypedDict):
     state_name: Optional[str]
 
 
-class ReaderFeedbackHandler(base.BaseHandler[ReaderFeedbackHandlerNormalizedPayloadDict, Dict[str, str]]):
+class ReaderFeedbackHandler(
+    base.BaseHandler[ReaderFeedbackHandlerNormalizedPayloadDict, Dict[str, str]]
+):
     """Submits feedback from the reader."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
@@ -924,7 +1045,9 @@ class ReaderFeedbackHandler(base.BaseHandler[ReaderFeedbackHandlerNormalizedPayl
             'feedback': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{'id': 'has_length_at_most', 'max_value': 10000}],
+                    'validators': [
+                        {'id': 'has_length_at_most', 'max_value': 10000}
+                    ],
                 }
             },
             'include_author': {
@@ -979,7 +1102,11 @@ class ExplorationStartEventHandlerNormalizedPayloadDict(TypedDict):
     version: int
 
 
-class ExplorationStartEventHandler(base.BaseHandler[ExplorationStartEventHandlerNormalizedPayloadDict, Dict[str, str]]):
+class ExplorationStartEventHandler(
+    base.BaseHandler[
+        ExplorationStartEventHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Tracks a learner starting an exploration."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
@@ -1051,7 +1178,11 @@ class ExplorationActualStartEventHandlerNormalizedPayloadDict(TypedDict):
     session_id: str
 
 
-class ExplorationActualStartEventHandler(base.BaseHandler[ExplorationActualStartEventHandlerNormalizedPayloadDict, Dict[str, str]]):
+class ExplorationActualStartEventHandler(
+    base.BaseHandler[
+        ExplorationActualStartEventHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Tracks a learner actually starting an exploration. These are the learners
     who traverse past the initial state.
     """
@@ -1108,10 +1239,16 @@ class SolutionHitEventHandlerNormalizedPayloadDict(TypedDict):
     time_spent_in_state_secs: float
 
 
-class SolutionHitEventHandler(base.BaseHandler[SolutionHitEventHandlerNormalizedPayloadDict, Dict[str, str]]):
+class SolutionHitEventHandler(
+    base.BaseHandler[
+        SolutionHitEventHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Tracks a learner clicking on the 'View Solution' button."""
 
-    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}}
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}
+    }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'exploration_version': {'schema': editor.SCHEMA_FOR_VERSION},
@@ -1165,13 +1302,19 @@ class ExplorationCompleteEventHandlerNormalizedPayloadDict(TypedDict):
     params: Dict[str, Union[str, int, Dict[str, str], List[str]]]
 
 
-class ExplorationCompleteEventHandler(base.BaseHandler[ExplorationCompleteEventHandlerNormalizedPayloadDict, Dict[str, str]]):
+class ExplorationCompleteEventHandler(
+    base.BaseHandler[
+        ExplorationCompleteEventHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Tracks a learner completing an exploration.
 
     The state name recorded should be a state with a terminal interaction.
     """
 
-    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}}
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}
+    }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'collection_id': {
@@ -1246,18 +1389,28 @@ class ExplorationCompleteEventHandler(base.BaseHandler[ExplorationCompleteEventH
         )
 
         if user_id:
-            learner_progress_services.mark_exploration_as_completed(user_id, exploration_id)
+            learner_progress_services.mark_exploration_as_completed(
+                user_id, exploration_id
+            )
 
         if user_id and collection_id:
-            collection_services.record_played_exploration_in_collection_context(user_id, collection_id, exploration_id)
-            next_exp_id_to_complete = collection_services.get_next_exploration_id_to_complete_by_user(  # pylint: disable=line-too-long
-                user_id, collection_id
+            collection_services.record_played_exploration_in_collection_context(
+                user_id, collection_id, exploration_id
+            )
+            next_exp_id_to_complete = (
+                collection_services.get_next_exploration_id_to_complete_by_user(  # pylint: disable=line-too-long
+                    user_id, collection_id
+                )
             )
 
             if not next_exp_id_to_complete:
-                learner_progress_services.mark_collection_as_completed(user_id, collection_id)
+                learner_progress_services.mark_collection_as_completed(
+                    user_id, collection_id
+                )
             else:
-                learner_progress_services.mark_collection_as_incomplete(user_id, collection_id)
+                learner_progress_services.mark_collection_as_incomplete(
+                    user_id, collection_id
+                )
 
         self.render_json(self.values)
 
@@ -1275,13 +1428,19 @@ class ExplorationMaybeLeaveHandlerNormalizedPayloadDict(TypedDict):
     params: Dict[str, Union[str, int, Dict[str, str], List[str]]]
 
 
-class ExplorationMaybeLeaveHandler(base.BaseHandler[ExplorationMaybeLeaveHandlerNormalizedPayloadDict, Dict[str, str]]):
+class ExplorationMaybeLeaveHandler(
+    base.BaseHandler[
+        ExplorationMaybeLeaveHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Tracks a learner leaving an exploration without completing it.
 
     The state name recorded should be a state with a non-terminal interaction.
     """
 
-    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}}
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}
+    }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'version': {'schema': editor.SCHEMA_FOR_VERSION},
@@ -1344,22 +1503,34 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler[ExplorationMaybeLeaveHandler
         state_name = self.normalized_payload['state_name']
         user_id = self.user_id
         collection_id = self.normalized_payload.get('collection_id')
-        story_id = exp_services.get_story_id_linked_to_exploration(exploration_id)
+        story_id = exp_services.get_story_id_linked_to_exploration(
+            exploration_id
+        )
 
         if user_id:
-            learner_progress_services.mark_exploration_as_incomplete(user_id, exploration_id, state_name, version)
+            learner_progress_services.mark_exploration_as_incomplete(
+                user_id, exploration_id, state_name, version
+            )
 
         if user_id and collection_id:
-            learner_progress_services.mark_collection_as_incomplete(user_id, collection_id)
+            learner_progress_services.mark_collection_as_incomplete(
+                user_id, collection_id
+            )
 
         if user_id and story_id:
             story = story_fetchers.get_story_by_id(story_id)
             if story is not None:
-                learner_progress_services.record_story_started(user_id, story.id)
+                learner_progress_services.record_story_started(
+                    user_id, story.id
+                )
                 if story.corresponding_topic_id is not None:
-                    learner_progress_services.record_topic_started(user_id, story.corresponding_topic_id)
+                    learner_progress_services.record_topic_started(
+                        user_id, story.corresponding_topic_id
+                    )
             else:
-                logging.error('Could not find a story corresponding to %s id.' % story_id)
+                logging.error(
+                    'Could not find a story corresponding to %s id.' % story_id
+                )
                 self.render_json({})
                 return
 
@@ -1375,7 +1546,9 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler[ExplorationMaybeLeaveHandler
         self.render_json(self.values)
 
 
-class LearnerIncompleteActivityHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+class LearnerIncompleteActivityHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles operations related to the activities in the incomplete list of
     the user.
     """
@@ -1418,13 +1591,21 @@ class LearnerIncompleteActivityHandler(base.BaseHandler[Dict[str, str], Dict[str
         """
         assert self.user_id is not None
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-            learner_progress_services.remove_exp_from_incomplete_list(self.user_id, activity_id)
+            learner_progress_services.remove_exp_from_incomplete_list(
+                self.user_id, activity_id
+            )
         elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
-            learner_progress_services.remove_collection_from_incomplete_list(self.user_id, activity_id)
+            learner_progress_services.remove_collection_from_incomplete_list(
+                self.user_id, activity_id
+            )
         elif activity_type == constants.ACTIVITY_TYPE_STORY:
-            learner_progress_services.remove_story_from_incomplete_list(self.user_id, activity_id)
+            learner_progress_services.remove_story_from_incomplete_list(
+                self.user_id, activity_id
+            )
         elif activity_type == constants.ACTIVITY_TYPE_LEARN_TOPIC:
-            learner_progress_services.remove_topic_from_partially_learnt_list(self.user_id, activity_id)
+            learner_progress_services.remove_topic_from_partially_learnt_list(
+                self.user_id, activity_id
+            )
 
         self.render_json(self.values)
 
@@ -1437,7 +1618,9 @@ class RatingHandlerNormalizedPayloadDict(TypedDict):
     user_rating: int
 
 
-class RatingHandler(base.BaseHandler[RatingHandlerNormalizedPayloadDict, Dict[str, str]]):
+class RatingHandler(
+    base.BaseHandler[RatingHandlerNormalizedPayloadDict, Dict[str, str]]
+):
     """Records the rating of an exploration submitted by a user.
 
     Note that this represents ratings submitted on completion of the
@@ -1459,7 +1642,11 @@ class RatingHandler(base.BaseHandler[RatingHandlerNormalizedPayloadDict, Dict[st
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
-        'PUT': {'user_rating': {'schema': {'type': 'int', 'choices': [1, 2, 3, 4, 5]}}},
+        'PUT': {
+            'user_rating': {
+                'schema': {'type': 'int', 'choices': [1, 2, 3, 4, 5]}
+            }
+        },
     }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1469,8 +1656,16 @@ class RatingHandler(base.BaseHandler[RatingHandlerNormalizedPayloadDict, Dict[st
         """Handles GET requests."""
         self.values.update(
             {
-                'overall_ratings': rating_services.get_overall_ratings_for_exploration(exploration_id),
-                'user_rating': (rating_services.get_user_specific_rating_for_exploration(self.user_id, exploration_id) if self.user_id else None),
+                'overall_ratings': rating_services.get_overall_ratings_for_exploration(
+                    exploration_id
+                ),
+                'user_rating': (
+                    rating_services.get_user_specific_rating_for_exploration(
+                        self.user_id, exploration_id
+                    )
+                    if self.user_id
+                    else None
+                ),
             }
         )
         self.render_json(self.values)
@@ -1483,7 +1678,9 @@ class RatingHandler(base.BaseHandler[RatingHandlerNormalizedPayloadDict, Dict[st
         assert self.user_id is not None
         assert self.normalized_payload is not None
         user_rating = self.normalized_payload['user_rating']
-        rating_services.assign_rating_to_exploration(self.user_id, exploration_id, user_rating)
+        rating_services.assign_rating_to_exploration(
+            self.user_id, exploration_id, user_rating
+        )
         self.render_json({})
 
 
@@ -1499,7 +1696,11 @@ class RecommendationsHandlerNormalizedRequestDict(TypedDict):
     current_node_id: Optional[str]
 
 
-class RecommendationsHandler(base.BaseHandler[Dict[str, str], RecommendationsHandlerNormalizedRequestDict]):
+class RecommendationsHandler(
+    base.BaseHandler[
+        Dict[str, str], RecommendationsHandlerNormalizedRequestDict
+    ]
+):
     """Provides recommendations to be displayed at the end of explorations.
     Which explorations are provided depends on whether the exploration was
     played within the context of a collection and whether the user is logged in.
@@ -1540,7 +1741,9 @@ class RecommendationsHandler(base.BaseHandler[Dict[str, str], RecommendationsHan
                 'schema': {'type': 'bool'},
                 'default_value': True,
             },
-            'author_recommended_ids': {'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}},
+            'author_recommended_ids': {
+                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
+            },
             'story_id': {
                 'schema': {
                     'type': 'basestring',
@@ -1573,8 +1776,12 @@ class RecommendationsHandler(base.BaseHandler[Dict[str, str], RecommendationsHan
         """Handles GET requests."""
         assert self.normalized_request is not None
         collection_id = self.normalized_request.get('collection_id')
-        include_system_recommendations = self.normalized_request['include_system_recommendations']
-        author_recommended_exp_ids = self.normalized_request['author_recommended_ids']
+        include_system_recommendations = self.normalized_request[
+            'include_system_recommendations'
+        ]
+        author_recommended_exp_ids = self.normalized_request[
+            'author_recommended_ids'
+        ]
 
         system_recommended_exp_ids = []
         next_exp_id = None
@@ -1585,23 +1792,39 @@ class RecommendationsHandler(base.BaseHandler[Dict[str, str], RecommendationsHan
                     self.user_id, collection_id
                 )
             else:
-                collection = collection_services.get_collection_by_id(collection_id)
-                next_exp_id = collection.get_next_exploration_id_in_sequence(exploration_id)
+                collection = collection_services.get_collection_by_id(
+                    collection_id
+                )
+                next_exp_id = collection.get_next_exploration_id_in_sequence(
+                    exploration_id
+                )
         elif include_system_recommendations:
-            system_chosen_exp_ids = recommendations_services.get_exploration_recommendations(exploration_id)
-            filtered_exp_ids = list(set(system_chosen_exp_ids) - set(author_recommended_exp_ids))
+            system_chosen_exp_ids = (
+                recommendations_services.get_exploration_recommendations(
+                    exploration_id
+                )
+            )
+            filtered_exp_ids = list(
+                set(system_chosen_exp_ids) - set(author_recommended_exp_ids)
+            )
             system_recommended_exp_ids = random.sample(
                 filtered_exp_ids,
                 min(MAX_SYSTEM_RECOMMENDATIONS, len(filtered_exp_ids)),
             )
 
-        recommended_exp_ids = set(author_recommended_exp_ids + system_recommended_exp_ids)
+        recommended_exp_ids = set(
+            author_recommended_exp_ids + system_recommended_exp_ids
+        )
         if next_exp_id is not None:
             recommended_exp_ids.add(next_exp_id)
 
         self.values.update(
             {
-                'summaries': (summary_services.get_displayable_exp_summary_dicts_matching_ids(list(recommended_exp_ids))),
+                'summaries': (
+                    summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                        list(recommended_exp_ids)
+                    )
+                ),
             }
         )
         self.render_json(self.values)
@@ -1615,7 +1838,11 @@ class FlagExplorationHandlerNormalizedPayloadDict(TypedDict):
     report_text: str
 
 
-class FlagExplorationHandler(base.BaseHandler[FlagExplorationHandlerNormalizedPayloadDict, Dict[str, str]]):
+class FlagExplorationHandler(
+    base.BaseHandler[
+        FlagExplorationHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handles operations relating to learner flagging of explorations."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -1631,7 +1858,9 @@ class FlagExplorationHandler(base.BaseHandler[FlagExplorationHandlerNormalizedPa
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'POST': {'report_text': {'schema': {'type': 'basestring'}}}}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {'report_text': {'schema': {'type': 'basestring'}}}
+    }
 
     @acl_decorators.can_flag_exploration
     def post(self, exploration_id: str) -> None:
@@ -1642,7 +1871,9 @@ class FlagExplorationHandler(base.BaseHandler[FlagExplorationHandlerNormalizedPa
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
-        moderator_services.enqueue_flag_exploration_email_task(exploration_id, self.normalized_payload['report_text'], self.user_id)
+        moderator_services.enqueue_flag_exploration_email_task(
+            exploration_id, self.normalized_payload['report_text'], self.user_id
+        )
         self.render_json(self.values)
 
 
@@ -1656,7 +1887,9 @@ class QuestionPlayerHandlerNormalizedRequestDict(TypedDict):
     fetch_by_difficulty: bool
 
 
-class QuestionPlayerHandler(base.BaseHandler[Dict[str, str], QuestionPlayerHandlerNormalizedRequestDict]):
+class QuestionPlayerHandler(
+    base.BaseHandler[Dict[str, str], QuestionPlayerHandlerNormalizedRequestDict]
+):
     """Provides questions with given skill ids."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1696,17 +1929,27 @@ class QuestionPlayerHandler(base.BaseHandler[Dict[str, str], QuestionPlayerHandl
         fetch_by_difficulty = self.normalized_request['fetch_by_difficulty']
 
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
-            skill_ids = skill_services.filter_skills_by_mastery(self.user_id, skill_ids) if self.user_id else skill_ids
+            skill_ids = (
+                skill_services.filter_skills_by_mastery(self.user_id, skill_ids)
+                if self.user_id
+                else skill_ids
+            )
 
-        questions = question_services.get_questions_by_skill_ids(int(question_count), skill_ids, fetch_by_difficulty)
+        questions = question_services.get_questions_by_skill_ids(
+            int(question_count), skill_ids, fetch_by_difficulty
+        )
         random.shuffle(questions)
 
         question_dicts = [question.to_dict() for question in questions]
-        self.values.update({'question_dicts': question_dicts[: feconf.QUESTION_BATCH_SIZE]})
+        self.values.update(
+            {'question_dicts': question_dicts[: feconf.QUESTION_BATCH_SIZE]}
+        )
         self.render_json(self.values)
 
 
-class TransientCheckpointUrlPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+class TransientCheckpointUrlPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Responsible for redirecting the learner to the checkpoint
     last reached on the exploration page as a logged out user."""
 
@@ -1729,7 +1972,9 @@ class TransientCheckpointUrlPage(base.BaseHandler[Dict[str, str], Dict[str, str]
     def get(self, unique_progress_url_id: str) -> None:
         """Handles GET requests. Fetches the logged-out learner's progress."""
 
-        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(unique_progress_url_id)
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
 
         if logged_out_user_data is None:
             raise self.NotFoundException()
@@ -1777,7 +2022,9 @@ class SaveTransientCheckpointProgressHandler(
                     ],
                 }
             },
-            'most_recently_reached_checkpoint_exp_version': {'schema': editor.SCHEMA_FOR_VERSION},
+            'most_recently_reached_checkpoint_exp_version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            },
         },
         'PUT': {
             'unique_progress_url_id': {
@@ -1796,7 +2043,9 @@ class SaveTransientCheckpointProgressHandler(
                     ],
                 }
             },
-            'most_recently_reached_checkpoint_exp_version': {'schema': editor.SCHEMA_FOR_VERSION},
+            'most_recently_reached_checkpoint_exp_version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            },
         },
     }
 
@@ -1809,11 +2058,17 @@ class SaveTransientCheckpointProgressHandler(
             exploration_id: str. The ID of the exploration.
         """
         assert self.normalized_payload is not None
-        most_recently_reached_checkpoint_state_name = self.normalized_payload['most_recently_reached_checkpoint_state_name']
-        most_recently_reached_checkpoint_exp_version = self.normalized_payload['most_recently_reached_checkpoint_exp_version']
+        most_recently_reached_checkpoint_state_name = self.normalized_payload[
+            'most_recently_reached_checkpoint_state_name'
+        ]
+        most_recently_reached_checkpoint_exp_version = self.normalized_payload[
+            'most_recently_reached_checkpoint_exp_version'
+        ]
 
         # Create a new unique_progress_url_id.
-        new_unique_progress_url_id = exp_fetchers.get_new_unique_progress_url_id()
+        new_unique_progress_url_id = (
+            exp_fetchers.get_new_unique_progress_url_id()
+        )
 
         # Create a new model corresponding to the new progress id.
         exp_services.update_logged_out_user_progress(
@@ -1829,9 +2084,15 @@ class SaveTransientCheckpointProgressHandler(
     def put(self, exploration_id: str) -> None:
         """Handles the PUT requests. Saves the logged-out user's progress."""
         assert self.normalized_payload is not None
-        unique_progress_url_id = self.normalized_payload['unique_progress_url_id']
-        most_recently_reached_checkpoint_state_name = self.normalized_payload['most_recently_reached_checkpoint_state_name']
-        most_recently_reached_checkpoint_exp_version = self.normalized_payload['most_recently_reached_checkpoint_exp_version']
+        unique_progress_url_id = self.normalized_payload[
+            'unique_progress_url_id'
+        ]
+        most_recently_reached_checkpoint_state_name = self.normalized_payload[
+            'most_recently_reached_checkpoint_state_name'
+        ]
+        most_recently_reached_checkpoint_exp_version = self.normalized_payload[
+            'most_recently_reached_checkpoint_exp_version'
+        ]
 
         exp_services.update_logged_out_user_progress(
             exploration_id,
@@ -1915,18 +2176,37 @@ class LearnerAnswerDetailsSubmissionHandler(
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             state_name = self.normalized_payload.get('state_name')
             if state_name is None:
-                raise Exception('The \'state_name\' must be provided when the entity_type is %s.' % feconf.ENTITY_TYPE_EXPLORATION)
-            state_reference = stats_services.get_state_reference_for_exploration(entity_id, state_name)
-            if interaction_id != exp_services.get_interaction_id_for_state(entity_id, state_name):
-                raise utils.InvalidInputException('Interaction id given does not match with the interaction id of the state')
+                raise Exception(
+                    'The \'state_name\' must be provided when the entity_type is %s.'
+                    % feconf.ENTITY_TYPE_EXPLORATION
+                )
+            state_reference = (
+                stats_services.get_state_reference_for_exploration(
+                    entity_id, state_name
+                )
+            )
+            if interaction_id != exp_services.get_interaction_id_for_state(
+                entity_id, state_name
+            ):
+                raise utils.InvalidInputException(
+                    'Interaction id given does not match with the interaction id of the state'
+                )
         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            state_reference = stats_services.get_state_reference_for_question(entity_id)
-            if interaction_id != (question_services.get_interaction_id_for_question(entity_id)):
-                raise utils.InvalidInputException('Interaction id given does not match with the interaction id of the question')
+            state_reference = stats_services.get_state_reference_for_question(
+                entity_id
+            )
+            if interaction_id != (
+                question_services.get_interaction_id_for_question(entity_id)
+            ):
+                raise utils.InvalidInputException(
+                    'Interaction id given does not match with the interaction id of the question'
+                )
 
         answer = self.normalized_payload['answer']
         answer_details = self.normalized_payload['answer_details']
-        stats_services.record_learner_answer_info(entity_type, state_reference, interaction_id, answer, answer_details)
+        stats_services.record_learner_answer_info(
+            entity_type, state_reference, interaction_id, answer, answer_details
+        )
         self.render_json({})
 
 
@@ -1939,13 +2219,21 @@ class CheckpointReachedEventHandlerNormalizedPayloadDict(TypedDict):
     most_recently_reached_checkpoint_state_name: str
 
 
-class CheckpointReachedEventHandler(base.BaseHandler[CheckpointReachedEventHandlerNormalizedPayloadDict, Dict[str, str]]):
+class CheckpointReachedEventHandler(
+    base.BaseHandler[
+        CheckpointReachedEventHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Tracks a learner reaching a checkpoint."""
 
-    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}}
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}
+    }
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
-            'most_recently_reached_checkpoint_exp_version': {'schema': editor.SCHEMA_FOR_VERSION},
+            'most_recently_reached_checkpoint_exp_version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            },
             'most_recently_reached_checkpoint_state_name': {
                 'schema': {
                     'type': 'basestring',
@@ -1968,8 +2256,12 @@ class CheckpointReachedEventHandler(base.BaseHandler[CheckpointReachedEventHandl
             exploration_id: str. The ID of the exploration.
         """
         assert self.normalized_payload is not None
-        most_recently_reached_checkpoint_state_name = self.normalized_payload['most_recently_reached_checkpoint_state_name']
-        most_recently_reached_checkpoint_exp_version = self.normalized_payload['most_recently_reached_checkpoint_exp_version']
+        most_recently_reached_checkpoint_state_name = self.normalized_payload[
+            'most_recently_reached_checkpoint_state_name'
+        ]
+        most_recently_reached_checkpoint_exp_version = self.normalized_payload[
+            'most_recently_reached_checkpoint_exp_version'
+        ]
 
         if self.user_id is not None:
             user_services.update_learner_checkpoint_progress(
@@ -1990,10 +2282,16 @@ class ExplorationRestartEventHandlerNormalizedPayloadDict(TypedDict):
     most_recently_reached_checkpoint_state_name: Optional[str]
 
 
-class ExplorationRestartEventHandler(base.BaseHandler[ExplorationRestartEventHandlerNormalizedPayloadDict, Dict[str, str]]):
+class ExplorationRestartEventHandler(
+    base.BaseHandler[
+        ExplorationRestartEventHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Tracks a learner restarting an exploration."""
 
-    URL_PATH_ARGS_SCHEMAS = {'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}}
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}
+    }
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'most_recently_reached_checkpoint_state_name': {
@@ -2019,11 +2317,17 @@ class ExplorationRestartEventHandler(base.BaseHandler[ExplorationRestartEventHan
             exploration_id: str. The ID of the exploration.
         """
         assert self.normalized_payload is not None
-        most_recently_reached_checkpoint_state_name = self.normalized_payload.get('most_recently_reached_checkpoint_state_name')
+        most_recently_reached_checkpoint_state_name = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_state_name'
+            )
+        )
 
         if most_recently_reached_checkpoint_state_name is None:
             if self.user_id is not None:
-                user_services.clear_learner_checkpoint_progress(self.user_id, exploration_id)
+                user_services.clear_learner_checkpoint_progress(
+                    self.user_id, exploration_id
+                )
 
         self.render_json(self.values)
 
@@ -2036,7 +2340,11 @@ class SyncLoggedOutLearnerProgressHandlerNormalizedPayloadDict(TypedDict):
     unique_progress_url_id: str
 
 
-class SyncLoggedOutLearnerProgressHandler(base.BaseHandler[SyncLoggedOutLearnerProgressHandlerNormalizedPayloadDict, Dict[str, str]]):
+class SyncLoggedOutLearnerProgressHandler(
+    base.BaseHandler[
+        SyncLoggedOutLearnerProgressHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Syncs logged out progress of a learner with the logged in progress."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -2066,7 +2374,9 @@ class SyncLoggedOutLearnerProgressHandler(base.BaseHandler[SyncLoggedOutLearnerP
     def post(self, exploration_id: str) -> None:
         """Handles POST requests."""
         assert self.normalized_payload is not None
-        unique_progress_url_id = self.normalized_payload['unique_progress_url_id']
+        unique_progress_url_id = self.normalized_payload[
+            'unique_progress_url_id'
+        ]
         if self.user_id is not None:
             exp_services.sync_logged_out_learner_progress_with_logged_in_progress(  # pylint: disable=line-too-long
                 self.user_id, exploration_id, unique_progress_url_id
@@ -2075,7 +2385,9 @@ class SyncLoggedOutLearnerProgressHandler(base.BaseHandler[SyncLoggedOutLearnerP
         self.render_json(self.values)
 
 
-class StateVersionHistoryHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+class StateVersionHistoryHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles the fetching of the version history for a state at the given
     version of the exploration.
     """
@@ -2116,34 +2428,57 @@ class StateVersionHistoryHandler(base.BaseHandler[Dict[str, str], Dict[str, str]
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str, state_name: str, version: int) -> None:
         """Handles GET requests."""
-        version_history = exp_fetchers.get_exploration_version_history(exploration_id, version)
+        version_history = exp_fetchers.get_exploration_version_history(
+            exploration_id, version
+        )
 
         if version_history is None:
             raise self.NotFoundException
 
-        state_version_history = version_history.state_version_history[state_name]
-        last_edited_version_number = state_version_history.previously_edited_in_version
-        state_name_in_previous_version = state_version_history.state_name_in_previous_version
+        state_version_history = version_history.state_version_history[
+            state_name
+        ]
+        last_edited_version_number = (
+            state_version_history.previously_edited_in_version
+        )
+        state_name_in_previous_version = (
+            state_version_history.state_name_in_previous_version
+        )
         state_in_previous_version = None
-        last_edited_committer_username = user_services.get_username(state_version_history.committer_id)
+        last_edited_committer_username = user_services.get_username(
+            state_version_history.committer_id
+        )
 
         # If the state has not been updated after it was added for the
         # first time, the value of last_edited_version_number will be None.
-        if last_edited_version_number is not None and state_name_in_previous_version is not None:
-            exploration = exp_fetchers.get_exploration_by_id(exploration_id, version=last_edited_version_number)
-            state_in_previous_version = exploration.states[state_name_in_previous_version]
+        if (
+            last_edited_version_number is not None
+            and state_name_in_previous_version is not None
+        ):
+            exploration = exp_fetchers.get_exploration_by_id(
+                exploration_id, version=last_edited_version_number
+            )
+            state_in_previous_version = exploration.states[
+                state_name_in_previous_version
+            ]
 
         self.render_json(
             {
                 'last_edited_version_number': last_edited_version_number,
                 'state_name_in_previous_version': state_name_in_previous_version,
-                'state_dict_in_previous_version': (state_in_previous_version.to_dict() if state_in_previous_version is not None else None),
+                'state_dict_in_previous_version': (
+                    state_in_previous_version.to_dict()
+                    if state_in_previous_version is not None
+                    else None
+                ),
                 'last_edited_committer_username': last_edited_committer_username,
             }
         )
 
 
-class MetadataVersionHistoryHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+class MetadataVersionHistoryHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles the fetching of the version history for the exploration metadata
     at the given version of the exploration.
     """
@@ -2173,7 +2508,9 @@ class MetadataVersionHistoryHandler(base.BaseHandler[Dict[str, str], Dict[str, s
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str, version: int) -> None:
         """Handles GET requests."""
-        version_history = exp_fetchers.get_exploration_version_history(exploration_id, version)
+        version_history = exp_fetchers.get_exploration_version_history(
+            exploration_id, version
+        )
 
         if version_history is None:
             raise self.NotFoundException
@@ -2192,8 +2529,16 @@ class MetadataVersionHistoryHandler(base.BaseHandler[Dict[str, str], Dict[str, s
 
         self.render_json(
             {
-                'last_edited_version_number': (metadata_version_history.last_edited_version_number),
-                'last_edited_committer_username': user_services.get_username(metadata_version_history.last_edited_committer_id),
-                'metadata_dict_in_previous_version': (metadata_in_previous_version.to_dict() if metadata_in_previous_version is not None else None),
+                'last_edited_version_number': (
+                    metadata_version_history.last_edited_version_number
+                ),
+                'last_edited_committer_username': user_services.get_username(
+                    metadata_version_history.last_edited_committer_id
+                ),
+                'metadata_dict_in_previous_version': (
+                    metadata_in_previous_version.to_dict()
+                    if metadata_in_previous_version is not None
+                    else None
+                ),
             }
         )

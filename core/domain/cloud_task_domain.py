@@ -62,7 +62,9 @@ class CloudTaskRun:
         self.queue_id = queue_id
         self.latest_job_state = latest_job_state
         self.function_id = function_id
-        self.exception_messages_for_failed_runs = exception_messages_for_failed_runs
+        self.exception_messages_for_failed_runs = (
+            exception_messages_for_failed_runs
+        )
         self.current_retry_attempt = current_retry_attempt
         self.last_updated = last_updated
         self.created_on = created_on
@@ -81,7 +83,9 @@ class CloudTaskRun:
             'queue_id': self.queue_id,
             'latest_job_state': self.latest_job_state,
             'function_id': self.function_id,
-            'exception_messages_for_failed_runs': (self.exception_messages_for_failed_runs),
+            'exception_messages_for_failed_runs': (
+                self.exception_messages_for_failed_runs
+            ),
             'current_retry_attempt': self.current_retry_attempt,
             'last_updated': self.last_updated.isoformat(),
             'created_on': self.created_on.isoformat(),
@@ -106,10 +110,16 @@ class CloudTaskRun:
             queue_id=cloud_task_run_dict['queue_id'],
             latest_job_state=cloud_task_run_dict['latest_job_state'],
             function_id=cloud_task_run_dict['function_id'],
-            exception_messages_for_failed_runs=cloud_task_run_dict['exception_messages_for_failed_runs'],
+            exception_messages_for_failed_runs=cloud_task_run_dict[
+                'exception_messages_for_failed_runs'
+            ],
             current_retry_attempt=cloud_task_run_dict['current_retry_attempt'],
-            last_updated=datetime.datetime.fromisoformat(cloud_task_run_dict['last_updated']),
-            created_on=datetime.datetime.fromisoformat(cloud_task_run_dict['created_on']),
+            last_updated=datetime.datetime.fromisoformat(
+                cloud_task_run_dict['last_updated']
+            ),
+            created_on=datetime.datetime.fromisoformat(
+                cloud_task_run_dict['created_on']
+            ),
         )
 
 
@@ -142,7 +152,9 @@ class VoiceoverRegenerationJob:
         """
         self.exploration_id = exploration_id
         self.task_run_id = task_run_id
-        self.language_accent_to_content_status_map = language_accent_to_content_status_map
+        self.language_accent_to_content_status_map = (
+            language_accent_to_content_status_map
+        )
 
     def to_dict(self) -> VoiceoverRegenerationJobDict:
         """Returns a dictionary representation of this domain object.
@@ -156,7 +168,9 @@ class VoiceoverRegenerationJob:
         return {
             'exploration_id': self.exploration_id,
             'task_run_id': self.task_run_id,
-            'language_accent_to_content_status_map': (self.language_accent_to_content_status_map),
+            'language_accent_to_content_status_map': (
+                self.language_accent_to_content_status_map
+            ),
         }
 
     @classmethod
@@ -212,9 +226,16 @@ class VoiceoverRegenerationJob:
         Returns:
             bool. Whether all contents have been generated successfully or not.
         """
-        for content_id_to_regeneration_status in self.language_accent_to_content_status_map.values():
-            for regeneration_status in content_id_to_regeneration_status.values():
-                if regeneration_status != feconf.VoiceoverRegenerationState.SUCCEEDED.value:
+        for (
+            content_id_to_regeneration_status
+        ) in self.language_accent_to_content_status_map.values():
+            for (
+                regeneration_status
+            ) in content_id_to_regeneration_status.values():
+                if (
+                    regeneration_status
+                    != feconf.VoiceoverRegenerationState.SUCCEEDED.value
+                ):
                     return False
         return True
 
@@ -309,15 +330,23 @@ class VoiceoverRegenerationJob:
             failed_content_ids: List[str]. The list of content IDs for which
                 voiceover regeneration has failed.
         """
-        content_status_map = self.language_accent_to_content_status_map.get(language_accent_code, {})
+        content_status_map = self.language_accent_to_content_status_map.get(
+            language_accent_code, {}
+        )
 
         for content_id in content_status_map.keys():
             if content_id in failed_content_ids:
-                content_status_map[content_id] = feconf.VoiceoverRegenerationState.FAILED.value
+                content_status_map[content_id] = (
+                    feconf.VoiceoverRegenerationState.FAILED.value
+                )
             else:
-                content_status_map[content_id] = feconf.VoiceoverRegenerationState.SUCCEEDED.value
+                content_status_map[content_id] = (
+                    feconf.VoiceoverRegenerationState.SUCCEEDED.value
+                )
 
-    def add_language_accent_to_content_status_map(self, language_accent_code: str, content_id_list: List[str]) -> None:
+    def add_language_accent_to_content_status_map(
+        self, language_accent_code: str, content_id_list: List[str]
+    ) -> None:
         """Adds a new language accent to content status mapping for the
         voiceover regeneration task and mark all content IDs as GENERATING.
 
@@ -328,7 +357,9 @@ class VoiceoverRegenerationJob:
         """
         content_status_map = {}
         for content_id in content_id_list:
-            content_status_map[content_id] = feconf.VoiceoverRegenerationState.GENERATING.value
+            content_status_map[content_id] = (
+                feconf.VoiceoverRegenerationState.GENERATING.value
+            )
 
         self.language_accent_to_content_status_map[language_accent_code] = (
             content_status_map

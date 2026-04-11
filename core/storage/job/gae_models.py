@@ -78,7 +78,9 @@ class JobModel(base_models.BaseModel):
     error = datastore_services.TextProperty(indexed=False)
     # Whether the datastore models associated with this job have been cleaned
     # up (i.e., deleted).
-    has_been_cleaned_up = datastore_services.BooleanProperty(default=False, indexed=True)
+    has_been_cleaned_up = datastore_services.BooleanProperty(
+        default=False, indexed=True
+    )
     # Store additional params passed with job.
     additional_job_params = datastore_services.JsonProperty(default=None)
 
@@ -93,7 +95,9 @@ class JobModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -137,7 +141,16 @@ class JobModel(base_models.BaseModel):
             list(JobModel) or None. A list of at most `limit` number
             of unfinished jobs.
         """
-        return cls.query().filter(JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED])).order(-cls.time_queued_msec).fetch(limit)
+        return (
+            cls.query()
+            .filter(
+                JobModel.status_code.IN(
+                    [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
+                )
+            )
+            .order(-cls.time_queued_msec)
+            .fetch(limit)
+        )
 
     @classmethod
     def get_unfinished_jobs(cls, job_type: str) -> datastore_services.Query:
@@ -150,7 +163,15 @@ class JobModel(base_models.BaseModel):
             list(JobModel) or None. A list of all jobs that belong
             to the given job_type.
         """
-        return cls.query().filter(cls.job_type == job_type).filter(JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED]))
+        return (
+            cls.query()
+            .filter(cls.job_type == job_type)
+            .filter(
+                JobModel.status_code.IN(
+                    [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
+                )
+            )
+        )
 
     @classmethod
     def do_unfinished_jobs_exist(cls, job_type: str) -> bool:

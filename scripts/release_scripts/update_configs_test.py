@@ -47,7 +47,9 @@ FECONF_CONFIG_PATH_WITH_EXTRA_LINE: Final = os.path.join(
     'release_sources',
     'feconf_updates_with_extra_line.config',
 )
-MOCK_LOCAL_FECONF_PATH: Final = os.path.join(os.getcwd(), 'core', 'tests', 'release_sources', 'feconf.txt')
+MOCK_LOCAL_FECONF_PATH: Final = os.path.join(
+    os.getcwd(), 'core', 'tests', 'release_sources', 'feconf.txt'
+)
 
 
 class UpdateConfigsTests(test_utils.GenericTestBase):
@@ -70,7 +72,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# NOTE TO DEVELOPERS: This format should not be changed, '
             'since it is used in\n'
             '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (mailgun_api_key, mailchimp_api_key)
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n'
+            % (mailgun_api_key, mailchimp_api_key)
         )
         with open(temp_feconf_path, 'w', encoding='utf-8') as f:
             f.write(feconf_text)
@@ -113,12 +116,17 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# NOTE TO DEVELOPERS: This format should not be changed, '
             'since it is used in\n'
             '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (mailgun_api_key, mailchimp_api_key)
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n'
+            % (mailgun_api_key, mailchimp_api_key)
         )
         with open(temp_feconf_path, 'w', encoding='utf-8') as f:
             f.write(feconf_text)
-        with self.assertRaisesRegex(Exception, 'REDISHOST must be updated before deployment.'):
-            update_configs.verify_config_files(temp_feconf_path, temp_app_yaml.name)
+        with self.assertRaisesRegex(
+            Exception, 'REDISHOST must be updated before deployment.'
+        ):
+            update_configs.verify_config_files(
+                temp_feconf_path, temp_app_yaml.name
+            )
 
     def test_app_yaml_verification_with_wildcard_header_present(self) -> None:
         mailgun_api_key = 'key-%s' % ('').join(['1'] * 32)
@@ -136,7 +144,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# NOTE TO DEVELOPERS: This format should not be changed, '
             'since it is used in\n'
             '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (mailgun_api_key, mailchimp_api_key)
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n'
+            % (mailgun_api_key, mailchimp_api_key)
         )
         with open(temp_feconf_path, 'w', encoding='utf-8') as f:
             f.write(feconf_text)
@@ -148,7 +157,9 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             r'\'Access-Control-Allow-Origin: "\*"\' must be updated to '
             r'a specific origin before deployment.',
         ):
-            update_configs.verify_config_files(temp_feconf_path, temp_app_yaml_path)
+            update_configs.verify_config_files(
+                temp_feconf_path, temp_app_yaml_path
+            )
 
     def test_update_app_yaml_correctly_updates(self) -> None:
         temp_feconf_config_path = tempfile.NamedTemporaryFile().name
@@ -161,11 +172,15 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with open(temp_app_yaml_path, 'w', encoding='utf-8') as f:
             f.write(app_yaml_text)
 
-        update_configs.update_app_yaml(temp_app_yaml_path, temp_feconf_config_path)
+        update_configs.update_app_yaml(
+            temp_app_yaml_path, temp_feconf_config_path
+        )
 
         with open(temp_app_yaml_path, 'r', encoding='utf-8') as f:
             app_yaml_text = f.read()
-            self.assertIn('Access-Control-Allow-Origin: https://oppia.org', app_yaml_text)
+            self.assertIn(
+                'Access-Control-Allow-Origin: https://oppia.org', app_yaml_text
+            )
 
     def test_update_app_yaml_raises_error_for_invalid_oppia_site_url_key(
         self,
@@ -180,8 +195,12 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         with open(temp_app_yaml_path, 'w', encoding='utf-8') as f:
             f.write(app_yaml_text)
 
-        with self.assertRaisesRegex(Exception, 'Error: No OPPIA_SITE_URL key found.'):
-            update_configs.update_app_yaml(temp_app_yaml_path, temp_feconf_config_path)
+        with self.assertRaisesRegex(
+            Exception, 'Error: No OPPIA_SITE_URL key found.'
+        ):
+            update_configs.update_app_yaml(
+                temp_app_yaml_path, temp_feconf_config_path
+            )
 
     def test_invalid_config(self) -> None:
         with self.assertRaisesRegex(
@@ -245,7 +264,9 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             unused_config_filepath: str,
             unused_expected_config_line_regex: str,
         ) -> None:
-            check_function_calls['apply_changes_based_on_config_gets_called'] = True
+            check_function_calls[
+                'apply_changes_based_on_config_gets_called'
+            ] = True
 
         def mock_verify_config_files(
             unused_release_feconf_path: str,
@@ -259,12 +280,22 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         ) -> None:
             check_function_calls['update_app_yaml_gets_called'] = True
 
-        def mock_update_analytics_constants_based_on_config(unused_webpack_config_path: str, unused_release_constants_path: str) -> None:
-            check_function_calls['update_analytics_constants_based_on_config'] = True
+        def mock_update_analytics_constants_based_on_config(
+            unused_webpack_config_path: str, unused_release_constants_path: str
+        ) -> None:
+            check_function_calls[
+                'update_analytics_constants_based_on_config'
+            ] = True
 
-        apply_changes_swap = self.swap(update_configs, 'apply_changes_based_on_config', mock_apply_changes)
-        verify_config_files_swap = self.swap(update_configs, 'verify_config_files', mock_verify_config_files)
-        update_app_yaml_swap = self.swap(update_configs, 'update_app_yaml', mock_update_app_yaml)
+        apply_changes_swap = self.swap(
+            update_configs, 'apply_changes_based_on_config', mock_apply_changes
+        )
+        verify_config_files_swap = self.swap(
+            update_configs, 'verify_config_files', mock_verify_config_files
+        )
+        update_app_yaml_swap = self.swap(
+            update_configs, 'update_app_yaml', mock_update_app_yaml
+        )
         update_analytics_constants_based_on_config_swap = self.swap(
             update_configs,
             'update_analytics_constants_based_on_config',
@@ -287,50 +318,78 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
 
     def test_update_analytics_ids(self) -> None:
         temp_constants_path = tempfile.NamedTemporaryFile().name
-        temp_analytics_constants_config_path = tempfile.NamedTemporaryFile().name
+        temp_analytics_constants_config_path = (
+            tempfile.NamedTemporaryFile().name
+        )
         constants_text = '  "GA_ANALYTICS_ID": "123"\n  "GTM_ANALYTICS_ID": "456"\n  "SITE_NAME_FOR_ANALYTICS": "site-name"\n  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         analytics_constants_config_text = '  "GA_ANALYTICS_ID": ""\n  "GTM_ANALYTICS_ID": ""\n  "SITE_NAME_FOR_ANALYTICS": ""\n  "CAN_SEND_ANALYTICS_EVENTS": false\n'
         expected_analytics_constants_config_text = '  "GA_ANALYTICS_ID": "123"\n  "GTM_ANALYTICS_ID": "456"\n  "SITE_NAME_FOR_ANALYTICS": "site-name"\n  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         with open(temp_constants_path, 'w', encoding='utf-8') as f:
             f.write(constants_text)
-        with open(temp_analytics_constants_config_path, 'w', encoding='utf-8') as f:
+        with open(
+            temp_analytics_constants_config_path, 'w', encoding='utf-8'
+        ) as f:
             f.write(analytics_constants_config_text)
 
-        update_configs.update_analytics_constants_based_on_config(temp_analytics_constants_config_path, temp_constants_path)
-        with open(temp_analytics_constants_config_path, 'r', encoding='utf-8') as f:
+        update_configs.update_analytics_constants_based_on_config(
+            temp_analytics_constants_config_path, temp_constants_path
+        )
+        with open(
+            temp_analytics_constants_config_path, 'r', encoding='utf-8'
+        ) as f:
             self.assertEqual(f.read(), expected_analytics_constants_config_text)
 
     def test_raises_error_with_invalid_update_analytics_ids(self) -> None:
         temp_constants_path = tempfile.NamedTemporaryFile().name
-        temp_analytics_constants_config_path = tempfile.NamedTemporaryFile().name
+        temp_analytics_constants_config_path = (
+            tempfile.NamedTemporaryFile().name
+        )
         analytics_constants_config_text = '  "GA_ANALYTICS_ID": ""\n  "GTM_ANALYTICS_ID": ""\n  "SITE_NAME_FOR_ANALYTICS": ""\n  "CAN_SEND_ANALYTICS_EVENTS": false\n'
-        with open(temp_analytics_constants_config_path, 'w', encoding='utf-8') as f:
+        with open(
+            temp_analytics_constants_config_path, 'w', encoding='utf-8'
+        ) as f:
             f.write(analytics_constants_config_text)
 
         # Testing invalid GA_ANALYTICS_ID key.
         constants_text = '  "GA_analytics_ID": "123"\n  "GTM_ANALYTICS_ID": "456"\n  "SITE_NAME_FOR_ANALYTICS": "site-name"\n  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         with open(temp_constants_path, 'w', encoding='utf-8') as f:
             f.write(constants_text)
-        with self.assertRaisesRegex(Exception, 'Error: No GA_ANALYTICS_ID key found.'):
-            update_configs.update_analytics_constants_based_on_config(temp_analytics_constants_config_path, temp_constants_path)
+        with self.assertRaisesRegex(
+            Exception, 'Error: No GA_ANALYTICS_ID key found.'
+        ):
+            update_configs.update_analytics_constants_based_on_config(
+                temp_analytics_constants_config_path, temp_constants_path
+            )
 
         # Testing invalid GTM_ANALYTICS_ID key.
         constants_text = '  "GA_ANALYTICS_ID": "123"\n  "GTM_blablabla_ID": "123"\n  "SITE_NAME_FOR_ANALYTICS": "site-name"\n  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         with open(temp_constants_path, 'w', encoding='utf-8') as f:
             f.write(constants_text)
-        with self.assertRaisesRegex(Exception, 'Error: No GTM_ANALYTICS_ID key found.'):
-            update_configs.update_analytics_constants_based_on_config(temp_analytics_constants_config_path, temp_constants_path)
+        with self.assertRaisesRegex(
+            Exception, 'Error: No GTM_ANALYTICS_ID key found.'
+        ):
+            update_configs.update_analytics_constants_based_on_config(
+                temp_analytics_constants_config_path, temp_constants_path
+            )
 
         # Testing invalid SITE_NAME_FOR_ANALYTICS key.
         constants_text = '  "GA_ANALYTICS_ID": "123"\n  "GTM_ANALYTICS_ID": "456"\n  "SITE_name_for_ANALYTICS": "site-name"\n  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         with open(temp_constants_path, 'w', encoding='utf-8') as f:
             f.write(constants_text)
-        with self.assertRaisesRegex(Exception, 'Error: No SITE_NAME_FOR_ANALYTICS key found.'):
-            update_configs.update_analytics_constants_based_on_config(temp_analytics_constants_config_path, temp_constants_path)
+        with self.assertRaisesRegex(
+            Exception, 'Error: No SITE_NAME_FOR_ANALYTICS key found.'
+        ):
+            update_configs.update_analytics_constants_based_on_config(
+                temp_analytics_constants_config_path, temp_constants_path
+            )
 
         # Testing invalid CAN_SEND_ANALYTICS_EVENTS key.
         constants_text = '  "GA_ANALYTICS_ID": "123"\n  "GTM_ANALYTICS_ID": "456"\n  "SITE_NAME_FOR_ANALYTICS": "site-name"\n  "can_SEND_analytics_EVENTS": true\n'
         with open(temp_constants_path, 'w', encoding='utf-8') as f:
             f.write(constants_text)
-        with self.assertRaisesRegex(Exception, 'Error: No CAN_SEND_ANALYTICS_EVENTS key found.'):
-            update_configs.update_analytics_constants_based_on_config(temp_analytics_constants_config_path, temp_constants_path)
+        with self.assertRaisesRegex(
+            Exception, 'Error: No CAN_SEND_ANALYTICS_EVENTS key found.'
+        ):
+            update_configs.update_analytics_constants_based_on_config(
+                temp_analytics_constants_config_path, temp_constants_path
+            )

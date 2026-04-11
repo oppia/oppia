@@ -33,7 +33,9 @@ UNASSIGN_DAYS_THRESHOLD = 10
 REPO_OWNER = 'oppia'
 REPO_NAME = 'oppia'
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 
 class IssueDict(TypedDict, total=False):
@@ -174,7 +176,9 @@ class GitHubService:
         response = requests.get(url, headers=self.rest_headers, timeout=10)
 
         if response is None:
-            raise AssertionError('Received null res while fetching collaborators')
+            raise AssertionError(
+                'Received null res while fetching collaborators'
+            )
         response.raise_for_status()
 
         collaborators = set()
@@ -197,7 +201,9 @@ class GitHubService:
             AssertionError. Raised if the response from the request is None.
             requests.HTTPError. Raised if the request fails.
         """
-        response = requests.get(issue.events_url, headers=self.rest_headers, timeout=10)
+        response = requests.get(
+            issue.events_url, headers=self.rest_headers, timeout=10
+        )
         if response is None:
             raise AssertionError('Received null res while fetching events')
         response.raise_for_status()
@@ -215,7 +221,12 @@ class GitHubService:
         if not assignee_events:
             return None
 
-        latest_event_date = max(datetime.datetime.strptime(event['created_at'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=datetime.timezone.utc) for event in assignee_events)
+        latest_event_date = max(
+            datetime.datetime.strptime(
+                event['created_at'], '%Y-%m-%dT%H:%M:%SZ'
+            ).replace(tzinfo=datetime.timezone.utc)
+            for event in assignee_events
+        )
         return latest_event_date
 
     def get_issues_with_prs(self) -> Dict[int, Set[int]]:
@@ -338,7 +349,9 @@ class GitHubService:
             f'else can take it up.\n\n Also, if you are stuck, please let us '
             f'know, so that we can help you. Thanks!'
         )
-        response = requests.post(url, headers=self.rest_headers, json={'body': comment}, timeout=10)
+        response = requests.post(
+            url, headers=self.rest_headers, json={'body': comment}, timeout=10
+        )
         if response is None:
             raise AssertionError('Received null res while commenting on issue')
         response.raise_for_status()
@@ -355,7 +368,9 @@ class GitHubService:
         """
         url = f'{self.base_url}/issues/{issue.number}/comments'
         comment = f'Unassigning @{issue.assignee_username} from this issue, due to their inactivity for more than 10 days. \n\nThis issue is now open for other contributors to take up.'
-        response = requests.post(url, headers=self.rest_headers, json={'body': comment}, timeout=10)
+        response = requests.post(
+            url, headers=self.rest_headers, json={'body': comment}, timeout=10
+        )
         if response is None:
             raise AssertionError('Received null res while commenting on issue')
         response.raise_for_status()
@@ -441,7 +456,9 @@ class IssueManager:
                 else:
                     logging.error('Failed to unassign issue #%d', issue.number)
             except Exception as e:
-                logging.error('Error processing issue #%d: %s', issue.number, str(e))
+                logging.error(
+                    'Error processing issue #%d: %s', issue.number, str(e)
+                )
 
 
 def main() -> None:

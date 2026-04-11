@@ -54,7 +54,9 @@ class PutResults(beam.PTransform):  # type: ignore[misc]
         super().__init__(label=label)
         self.job_id = job_id
 
-    def expand(self, results: beam.PCollection[job_run_result.JobRunResult]) -> beam.pvalue.PDone:
+    def expand(
+        self, results: beam.PCollection[job_run_result.JobRunResult]
+    ) -> beam.pvalue.PDone:
         """Writes the given job results to the NDB datastore.
 
         This overrides expand from parent class.
@@ -82,7 +84,9 @@ class PutResults(beam.PTransform):  # type: ignore[misc]
             | ndb_io.PutModels()
         )
 
-    def create_beam_job_run_result_model(self, result: job_run_result.JobRunResult, namespace: Optional[str]) -> beam_job_models.BeamJobRunResultModel:
+    def create_beam_job_run_result_model(
+        self, result: job_run_result.JobRunResult, namespace: Optional[str]
+    ) -> beam_job_models.BeamJobRunResultModel:
         """Returns an NDB model for storing the given JobRunResult.
 
         Args:
@@ -93,4 +97,6 @@ class PutResults(beam.PTransform):  # type: ignore[misc]
             BeamJobRunResultModel. The NDB model.
         """
         with datastore_services.get_ndb_context(namespace=namespace):
-            return beam_job_services.create_beam_job_run_result_model(self.job_id, result.stdout, result.stderr)
+            return beam_job_services.create_beam_job_run_result_model(
+                self.job_id, result.stdout, result.stderr
+            )

@@ -211,7 +211,11 @@ class Emulator:
         Returns:
             Task. The task that was created and added to the queue.
         """
-        scheduled_for_time = time.mktime(scheduled_for.timetuple()) if scheduled_for else time.time()
+        scheduled_for_time = (
+            time.mktime(scheduled_for.timetuple())
+            if scheduled_for
+            else time.time()
+        )
         with self._lock:
             if queue_name not in self._queues:
                 self._queues[queue_name] = []

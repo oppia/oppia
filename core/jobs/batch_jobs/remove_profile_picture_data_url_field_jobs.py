@@ -36,7 +36,9 @@ if MYPY:  # pragma: no cover
 class RemoveProfilePictureFieldJob(base_jobs.JobBase):
     """Remove profile_picture_data_url from UserSettingsModel."""
 
-    def _remove_profile_field(self, user_model: user_models.UserSettingsModel) -> user_models.UserSettingsModel:
+    def _remove_profile_field(
+        self, user_model: user_models.UserSettingsModel
+    ) -> user_models.UserSettingsModel:
         """Remove profile_picture_data_url field from the model.
 
         Args:
@@ -54,10 +56,29 @@ class RemoveProfilePictureFieldJob(base_jobs.JobBase):
         return user_model
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        users_with_updated_fields = self.pipeline | 'Get all non-deleted UserSettingsModel' >> ndb_io.GetModels(user_models.UserSettingsModel.get_all(include_deleted=True)) | 'Remove the profile_picture_data_url field' >> beam.Map(self._remove_profile_field)
+        users_with_updated_fields = (
+            self.pipeline
+            | 'Get all non-deleted UserSettingsModel'
+            >> ndb_io.GetModels(
+                user_models.UserSettingsModel.get_all(include_deleted=True)
+            )
+            | 'Remove the profile_picture_data_url field'
+            >> beam.Map(self._remove_profile_field)
+        )
 
-        count_user_models_updated = users_with_updated_fields | 'Total count for user models' >> (job_result_transforms.CountObjectsToJobRunResult('USER MODELS ITERATED OR UPDATED'))
+        count_user_models_updated = (
+            users_with_updated_fields
+            | 'Total count for user models'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'USER MODELS ITERATED OR UPDATED'
+                )
+            )
+        )
 
-        (users_with_updated_fields | 'Put models into the datastore' >> ndb_io.PutModels())
+        (
+            users_with_updated_fields
+            | 'Put models into the datastore' >> ndb_io.PutModels()
+        )
 
         return count_user_models_updated

@@ -94,7 +94,9 @@ def get_client() -> ndb.Client:
     return NdbClientSingleton().get_client()
 
 
-def get_ndb_context(namespace: Optional[str] = None, global_cache: Optional[RedisCache] = None) -> ContextManager[ndb.context.Context]:
+def get_ndb_context(
+    namespace: Optional[str] = None, global_cache: Optional[RedisCache] = None
+) -> ContextManager[ndb.context.Context]:
     """Get the context of the Cloud NDB. This context needs to be entered in
     order to do any Cloud NDB operations.
 
@@ -105,7 +107,11 @@ def get_ndb_context(namespace: Optional[str] = None, global_cache: Optional[Redi
     # a new context if we are outside of one. This is used because in some
     # places we need a context but we are unsure if it exists.
     context = ndb.get_context(raise_context_error=False)
-    return get_client().context(namespace=namespace, global_cache=global_cache) if context is None else contextlib.nullcontext(enter_result=context)
+    return (
+        get_client().context(namespace=namespace, global_cache=global_cache)
+        if context is None
+        else contextlib.nullcontext(enter_result=context)
+    )
 
 
 def get_multi(keys: List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]:
@@ -143,7 +149,9 @@ def update_timestamps_multi(
             last_updated field of the model.
     """
     for entity in entities:
-        entity.update_timestamps(update_last_updated_time=update_last_updated_time)
+        entity.update_timestamps(
+            update_last_updated_time=update_last_updated_time
+        )
 
 
 def put_multi(entities: Sequence[Model]) -> List[str]:
@@ -298,14 +306,20 @@ def fetch_multiple_entities_by_ids_and_models(
         raise Exception('Model names should not be duplicated in input list.')
     for model_name, entity_ids in ids_and_models:
         # Add the keys to the list of keys whose entities we have to fetch.
-        entity_keys = entity_keys + [ndb.Key(model_name, entity_id) for entity_id in entity_ids]
+        entity_keys = entity_keys + [
+            ndb.Key(model_name, entity_id) for entity_id in entity_ids
+        ]
 
     all_models: List[Optional[TYPE_MODEL_SUBCLASS]] = ndb.get_multi(entity_keys)
-    all_models_grouped_by_model_type: List[List[Optional[TYPE_MODEL_SUBCLASS]]] = []
+    all_models_grouped_by_model_type: List[
+        List[Optional[TYPE_MODEL_SUBCLASS]]
+    ] = []
 
     start_index = 0
     for _, entity_ids in ids_and_models:
-        all_models_grouped_by_model_type.append(all_models[start_index : start_index + len(entity_ids)])
+        all_models_grouped_by_model_type.append(
+            all_models[start_index : start_index + len(entity_ids)]
+        )
         start_index = start_index + len(entity_ids)
 
     return all_models_grouped_by_model_type

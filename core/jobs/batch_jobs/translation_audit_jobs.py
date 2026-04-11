@@ -48,7 +48,9 @@ class ValidateExplorationOpportunityCountsJob(base_jobs.JobBase):
     if all counts match, and logs the mismatches otherwise.
     """
 
-    def _get_translation_counts(self, translation_model: translation_models.EntityTranslationsModel) -> Tuple[str, Tuple[str, int]]:
+    def _get_translation_counts(
+        self, translation_model: translation_models.EntityTranslationsModel
+    ) -> Tuple[str, Tuple[str, int]]:
         """Extracts translation counts from an EntityTranslationsModel.
 
         Args:
@@ -68,7 +70,9 @@ class ValidateExplorationOpportunityCountsJob(base_jobs.JobBase):
     def _validate_counts(
         self,
         exploration_id: str,
-        opportunity_summary_models_list: Iterable[opportunity_models.ExplorationOpportunitySummaryModel],
+        opportunity_summary_models_list: Iterable[
+            opportunity_models.ExplorationOpportunitySummaryModel
+        ],
         translation_counts_list: Iterable[Tuple[str, int]],
     ) -> Iterable[job_run_result.JobRunResult]:
         """Validates the translation counts for a given exploration.
@@ -104,15 +108,23 @@ class ValidateExplorationOpportunityCountsJob(base_jobs.JobBase):
             actual_count = actual_translation_counts_dict.get(lang_code, 0)
             if stored_count != actual_count:
                 mismatch_found = True
-                yield job_run_result.JobRunResult.as_stderr('Mismatch for exploration %s in %s: stored=%s, actual=%s' % (exploration_id, lang_code, stored_count, actual_count))
+                yield job_run_result.JobRunResult.as_stderr(
+                    'Mismatch for exploration %s in %s: stored=%s, actual=%s'
+                    % (exploration_id, lang_code, stored_count, actual_count)
+                )
 
         for lang_code, actual_count in actual_translation_counts_dict.items():
             if lang_code not in stored_translation_counts and actual_count > 0:
                 mismatch_found = True
-                yield job_run_result.JobRunResult.as_stderr('Mismatch for exploration %s in %s: stored=0 (missing), actual=%s' % (exploration_id, lang_code, actual_count))
+                yield job_run_result.JobRunResult.as_stderr(
+                    'Mismatch for exploration %s in %s: stored=0 (missing), actual=%s'
+                    % (exploration_id, lang_code, actual_count)
+                )
 
         if not mismatch_found:
-            yield job_run_result.JobRunResult.as_stdout('SUCCESS - Exploration %s counts are valid.' % exploration_id)
+            yield job_run_result.JobRunResult.as_stdout(
+                'SUCCESS - Exploration %s counts are valid.' % exploration_id
+            )
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the translation
@@ -123,14 +135,28 @@ class ValidateExplorationOpportunityCountsJob(base_jobs.JobBase):
         """
         opportunity_summaries = (
             self.pipeline
-            | 'Get all ExplorationOpportunitySummaryModels' >> ndb_io.GetModels(opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+            | 'Get all ExplorationOpportunitySummaryModels'
+            >> ndb_io.GetModels(
+                opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+            )
             | 'Key Opportunity by exploration_id'
             >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
                 lambda model: model.id
             )
         )
 
-        translation_counts = self.pipeline | 'Get all Exploration EntityTranslationsModels' >> ndb_io.GetModels(translation_models.EntityTranslationsModel.query(translation_models.EntityTranslationsModel.entity_type == 'exploration')) | 'Extract translation counts' >> beam.Map(self._get_translation_counts)
+        translation_counts = (
+            self.pipeline
+            | 'Get all Exploration EntityTranslationsModels'
+            >> ndb_io.GetModels(
+                translation_models.EntityTranslationsModel.query(
+                    translation_models.EntityTranslationsModel.entity_type
+                    == 'exploration'
+                )
+            )
+            | 'Extract translation counts'
+            >> beam.Map(self._get_translation_counts)
+        )
 
         grouped_data = {
             'opportunity_summary': opportunity_summaries,

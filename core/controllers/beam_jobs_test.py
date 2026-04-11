@@ -41,7 +41,9 @@ class BeamHandlerTestBase(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
+        self.signup(
+            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME
+        )
         self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR,
@@ -56,7 +58,9 @@ class BeamHandlerTestBase(test_utils.GenericTestBase):
 class BeamJobHandlerTests(BeamHandlerTestBase):
     def test_get_returns_registered_jobs(self) -> None:
         job = beam_job_domain.BeamJob(FooJob)
-        get_beam_jobs_swap = self.swap_to_always_return(beam_job_services, 'get_beam_jobs', value=[job])
+        get_beam_jobs_swap = self.swap_to_always_return(
+            beam_job_services, 'get_beam_jobs', value=[job]
+        )
 
         with get_beam_jobs_swap:
             response = self.get_json('/beam_job')
@@ -109,7 +113,9 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
             False,
         )
 
-        swap_cancel_beam_job = self.swap_to_always_return(beam_job_services, 'cancel_beam_job', value=run)
+        swap_cancel_beam_job = self.swap_to_always_return(
+            beam_job_services, 'cancel_beam_job', value=run
+        )
         with swap_cancel_beam_job:
             response = self.delete_json('/beam_job_run', {'job_id': model.id})
 
@@ -120,15 +126,21 @@ class BeamJobRunResultHandlerTests(BeamHandlerTestBase):
     def test_get_returns_job_output(self) -> None:
         run_model = beam_job_services.create_beam_job_run_model('WorkingJob')
         run_model.put()
-        result_model = beam_job_services.create_beam_job_run_result_model(run_model.id, 'o', '')
+        result_model = beam_job_services.create_beam_job_run_result_model(
+            run_model.id, 'o', ''
+        )
         result_model.put()
 
-        response = self.get_json('/beam_job_run_result?job_id=%s' % run_model.id)
+        response = self.get_json(
+            '/beam_job_run_result?job_id=%s' % run_model.id
+        )
 
         self.assertEqual(response, {'stdout': 'o', 'stderr': ''})
 
     def test_get_raises_when_job_id_missing(self) -> None:
-        response = self.get_json('/beam_job_run_result', expected_status_int=400)
+        response = self.get_json(
+            '/beam_job_run_result', expected_status_int=400
+        )
 
         self.assertEqual(
             response['error'],

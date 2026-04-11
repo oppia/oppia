@@ -29,7 +29,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, skill_models
 
-(base_models, skill_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.SKILL])
+(base_models, skill_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.SKILL]
+)
 
 
 class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
@@ -43,7 +45,11 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}],
         )
 
-        output = self.pipeline | beam.Create([valid_commit_cmd_model]) | beam.ParDo(skill_validation.ValidateSkillSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([valid_commit_cmd_model])
+            | beam.ParDo(skill_validation.ValidateSkillSnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(output, [])
 
@@ -57,7 +63,11 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'invalid': 'data'}],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(skill_validation.ValidateSkillSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(skill_validation.ValidateSkillSnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -80,7 +90,11 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd': 'invalid'}],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(skill_validation.ValidateSkillSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(skill_validation.ValidateSkillSnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -107,7 +121,11 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[commit_dict],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(skill_validation.ValidateSkillSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(skill_validation.ValidateSkillSnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -137,7 +155,11 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[commit_dict],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(skill_validation.ValidateSkillSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(skill_validation.ValidateSkillSnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -166,7 +188,11 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[commit_dict],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(skill_validation.ValidateSkillSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(skill_validation.ValidateSkillSnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -203,7 +229,11 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[commit_dict],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(skill_validation.ValidateSkillSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(skill_validation.ValidateSkillSnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -239,7 +269,11 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[commit_dict],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(skill_validation.ValidateSkillSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(skill_validation.ValidateSkillSnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -266,7 +300,11 @@ class ValidateSkillCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd': 'create_new'}],
         )
 
-        output = self.pipeline | beam.Create([valid_commit_cmd_model]) | beam.ParDo(skill_validation.ValidateSkillCommitLogEntryModel())
+        output = (
+            self.pipeline
+            | beam.Create([valid_commit_cmd_model])
+            | beam.ParDo(skill_validation.ValidateSkillCommitLogEntryModel())
+        )
 
         self.assert_pcoll_equal(output, [])
 
@@ -282,9 +320,17 @@ class ValidateSkillCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd': 'create_new'}],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(skill_validation.ValidateSkillCommitLogEntryModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(skill_validation.ValidateSkillCommitLogEntryModel())
+        )
 
         self.assert_pcoll_equal(
             output,
-            [base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model)],
+            [
+                base_validation_errors.CommitCmdsNoneError(
+                    invalid_commit_cmd_model
+                )
+            ],
         )

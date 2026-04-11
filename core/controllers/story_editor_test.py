@@ -152,7 +152,8 @@ class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
             language_code='en',
         )
         json_response = self.get_json(
-            '%s/%s' % (feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX, self.story_id),
+            '%s/%s'
+            % (feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX, self.story_id),
             params={'comma_separated_exp_ids': '15,0'},
         )
 
@@ -166,7 +167,8 @@ class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
         # Check that admins can publish a story.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_json(
-            '%s/%s' % (feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX, self.story_id),
+            '%s/%s'
+            % (feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX, self.story_id),
             expected_status_int=400,
         )
         self.logout()
@@ -449,7 +451,9 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': 'node_1',
                     'old_value': None,
                     'new_value': '0',
@@ -458,16 +462,24 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS
+                    ),
                     'node_id': 'node_1',
                     'old_value': old_value,
                     'new_value': ['skill_id_1'],
                 }
             ),
         ]
-        self.save_new_skill('skill_id_1', self.admin_id, description='Description 3')
-        story_services.update_story(self.admin_id, self.story_id, change_list, 'Updated story node.')
-        json_response = self.get_json('%s/%s' % (feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id))
+        self.save_new_skill(
+            'skill_id_1', self.admin_id, description='Description 3'
+        )
+        story_services.update_story(
+            self.admin_id, self.story_id, change_list, 'Updated story node.'
+        )
+        json_response = self.get_json(
+            '%s/%s' % (feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id)
+        )
         self.assertEqual(self.story_id, json_response['story_dict']['id'])
         self.assertEqual('Name', json_response['topic_name'])
         self.assertEqual(len(json_response['skill_summaries']), 0)
@@ -496,7 +508,9 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             csrf_token=csrf_token,
         )
         self.assertEqual(self.story_id, json_response['story_dict']['id'])
-        self.assertEqual('New Description', json_response['story_dict']['description'])
+        self.assertEqual(
+            'New Description', json_response['story_dict']['description']
+        )
         self.logout()
 
         # Check that non-admins cannot edit a story.
@@ -512,7 +526,9 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             '%s/%s' % (feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id),
             expected_status_int=401,
         )
-        self.assertEqual(response['error'], 'You must be logged in to access this resource.')
+        self.assertEqual(
+            response['error'], 'You must be logged in to access this resource.'
+        )
 
     def test_admins_can_delete_story(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -637,12 +653,17 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         new_story_id = story_services.get_new_story_id()
         story = self.save_new_story(new_story_id, self.admin_id, self.topic_id)
 
-        json_response = self.get_json('%s/%s' % (feconf.STORY_URL_FRAGMENT_HANDLER, story.url_fragment))
+        json_response = self.get_json(
+            '%s/%s' % (feconf.STORY_URL_FRAGMENT_HANDLER, story.url_fragment)
+        )
 
         url_fragment_exists = json_response['story_url_fragment_exists']
         self.assertEqual(url_fragment_exists, True)
 
-        json_response = self.get_json('%s/%s' % (feconf.STORY_URL_FRAGMENT_HANDLER, 'non-existent-url-fragment'))
+        json_response = self.get_json(
+            '%s/%s'
+            % (feconf.STORY_URL_FRAGMENT_HANDLER, 'non-existent-url-fragment')
+        )
 
         url_fragment_exists = json_response['story_url_fragment_exists']
         self.assertEqual(url_fragment_exists, False)

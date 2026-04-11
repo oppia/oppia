@@ -65,8 +65,12 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
                 delattr(sys, 'real_prefix')
 
     def test_check_python_env_is_suitable_passes_when_in_venv(self) -> None:
-        prefix_swap = self.swap(sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
-        base_prefix_swap = self.swap(sys, 'base_prefix', '/home/user/.pyenv/versions/oppia')
+        prefix_swap = self.swap(
+            sys, 'prefix', '/home/user/.pyenv/versions/3.7.10'
+        )
+        base_prefix_swap = self.swap(
+            sys, 'base_prefix', '/home/user/.pyenv/versions/oppia'
+        )
         real_prefix_manager = self.sys_real_prefix_context('')
         environ_swap = self.swap(os, 'environ', {})
         with prefix_swap, base_prefix_swap, real_prefix_manager, environ_swap:
@@ -75,27 +79,43 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
     def test_check_python_env_is_suitable_passes_when_in_venv_real_prefix(
         self,
     ) -> None:
-        prefix_swap = self.swap(sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
-        base_prefix_swap = self.swap(sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10')
-        real_prefix_manager = self.sys_real_prefix_context('/home/user/.pyenv/versions/oppia')
+        prefix_swap = self.swap(
+            sys, 'prefix', '/home/user/.pyenv/versions/3.7.10'
+        )
+        base_prefix_swap = self.swap(
+            sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10'
+        )
+        real_prefix_manager = self.sys_real_prefix_context(
+            '/home/user/.pyenv/versions/oppia'
+        )
         environ_swap = self.swap(os, 'environ', {})
         with prefix_swap, base_prefix_swap, real_prefix_manager, environ_swap:
             install_python_dev_dependencies.check_python_env_is_suitable()
 
     def test_check_python_env_is_suitable_fails_when_out_of_venv(self) -> None:
-        prefix_swap = self.swap(sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
-        base_prefix_swap = self.swap(sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10')
+        prefix_swap = self.swap(
+            sys, 'prefix', '/home/user/.pyenv/versions/3.7.10'
+        )
+        base_prefix_swap = self.swap(
+            sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10'
+        )
         real_prefix_manager = self.sys_real_prefix_context('')
         environ_swap = self.swap(os, 'environ', {})
         expected_error = 'Oppia must be developed within a virtual environment.'
         with self.assertRaisesRegex(AssertionError, expected_error):
             with prefix_swap, base_prefix_swap, real_prefix_manager:
                 with environ_swap:
-                    (install_python_dev_dependencies.check_python_env_is_suitable())
+                    (
+                        install_python_dev_dependencies.check_python_env_is_suitable()
+                    )
 
     def test_check_python_env_is_suitable_passes_when_on_ci(self) -> None:
-        prefix_swap = self.swap(sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
-        base_prefix_swap = self.swap(sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10')
+        prefix_swap = self.swap(
+            sys, 'prefix', '/home/user/.pyenv/versions/3.7.10'
+        )
+        base_prefix_swap = self.swap(
+            sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10'
+        )
         real_prefix_manager = self.sys_real_prefix_context('')
         environ_swap = self.swap(os, 'environ', {'GITHUB_ACTION': '1'})
         with prefix_swap, base_prefix_swap, real_prefix_manager, environ_swap:
@@ -109,7 +129,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         }
         installed_tools: Dict[str, str] = {}
 
-        process = subprocess.Popen(['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process = subprocess.Popen(
+            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
 
         def mock_popen(  # pylint: disable=unused-argument
             cmd_tokens: List[str],
@@ -189,7 +211,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             pass
 
         def mock_open(*_args: str, **_kwargs: str) -> io.StringIO:
-            return io.StringIO('#    pip-compile --generate-hashes\nmock file contents')
+            return io.StringIO(
+                '#    pip-compile --generate-hashes\nmock file contents'
+            )
 
         run_swap = self.swap_with_checks(
             subprocess,
@@ -228,7 +252,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         )
 
         with run_swap, open_swap:
-            change = install_python_dev_dependencies.compile_pip_requirements('requirements_dev.in', 'requirements_dev.txt')
+            change = install_python_dev_dependencies.compile_pip_requirements(
+                'requirements_dev.in', 'requirements_dev.txt'
+            )
         self.assertFalse(change)
 
     def test_compile_pip_requirements_change(self) -> None:
@@ -239,7 +265,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
         def mock_open(*_args: str, **_kwargs: str) -> io.StringIO:
             counter.append(1)
-            return io.StringIO(f'#    pip-compile --generate-hashes\nmock file {len(counter)}')
+            return io.StringIO(
+                f'#    pip-compile --generate-hashes\nmock file {len(counter)}'
+            )
 
         run_swap = self.swap_with_checks(
             subprocess,
@@ -278,7 +306,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         )
 
         with run_swap, open_swap:
-            change = install_python_dev_dependencies.compile_pip_requirements('requirements_dev.in', 'requirements_dev.txt')
+            change = install_python_dev_dependencies.compile_pip_requirements(
+                'requirements_dev.in', 'requirements_dev.txt'
+            )
         self.assertTrue(change)
 
     def test_main_passes_with_no_assert_and_no_change(self) -> None:

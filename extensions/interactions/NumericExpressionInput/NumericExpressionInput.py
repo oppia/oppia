@@ -51,7 +51,9 @@ class NumericExpressionInput(base.BaseInteraction):
         },
         {
             'name': 'useFractionForDivision',
-            'description': ('Represent division using fractions (rather than ÷).'),
+            'description': (
+                'Represent division using fractions (rather than ÷).'
+            ),
             'schema': {'type': 'bool'},
             'default_value': False,
         },

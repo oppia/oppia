@@ -41,15 +41,29 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     topic_name = datastore_services.StringProperty(required=True, indexed=True)
     story_id = datastore_services.StringProperty(required=True, indexed=True)
     story_title = datastore_services.StringProperty(required=True, indexed=True)
-    chapter_title = datastore_services.StringProperty(required=True, indexed=True)
-    content_count = datastore_services.IntegerProperty(required=True, indexed=True)
-    incomplete_translation_language_codes = datastore_services.StringProperty(repeated=True, indexed=True)
-    translation_counts = datastore_services.JsonProperty(default={}, indexed=False)
-    language_codes_with_assigned_voice_artists = datastore_services.StringProperty(repeated=True, indexed=True)
-    language_codes_needing_voice_artists = datastore_services.StringProperty(repeated=True, indexed=True)
+    chapter_title = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+    content_count = datastore_services.IntegerProperty(
+        required=True, indexed=True
+    )
+    incomplete_translation_language_codes = datastore_services.StringProperty(
+        repeated=True, indexed=True
+    )
+    translation_counts = datastore_services.JsonProperty(
+        default={}, indexed=False
+    )
+    language_codes_with_assigned_voice_artists = (
+        datastore_services.StringProperty(repeated=True, indexed=True)
+    )
+    language_codes_needing_voice_artists = datastore_services.StringProperty(
+        repeated=True, indexed=True
+    )
     # The number of content items that are only translatable by reviewers
     # (e.g. content with 'set_of_strings' data format).
-    reviewer_only_content_count = datastore_services.IntegerProperty(required=True, default=0, indexed=False)
+    reviewer_only_content_count = datastore_services.IntegerProperty(
+        required=True, default=0, indexed=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -57,7 +71,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -90,7 +106,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         urlsafe_start_cursor: Optional[str],
         language_code: str,
         topic_name: Optional[str],
-    ) -> Tuple[Sequence[ExplorationOpportunitySummaryModel], Optional[str], bool]:
+    ) -> Tuple[
+        Sequence[ExplorationOpportunitySummaryModel], Optional[str], bool
+    ]:
         """Returns a list of opportunities available for translation in a
         specific language.
 
@@ -120,11 +138,15 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                     this batch.
         """
         if urlsafe_start_cursor:
-            start_cursor = datastore_services.make_cursor(urlsafe_cursor=urlsafe_start_cursor)
+            start_cursor = datastore_services.make_cursor(
+                urlsafe_cursor=urlsafe_start_cursor
+            )
         else:
             start_cursor = datastore_services.make_cursor()
 
-        language_query = cls.query(cls.incomplete_translation_language_codes == language_code).order(cls.topic_name)
+        language_query = cls.query(
+            cls.incomplete_translation_language_codes == language_code
+        ).order(cls.topic_name)
 
         if topic_name:
             language_query = language_query.filter(cls.topic_name == topic_name)
@@ -138,7 +160,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
-        fetch_result = language_query.fetch_page(page_size + 1, start_cursor=start_cursor)
+        fetch_result = language_query.fetch_page(
+            page_size + 1, start_cursor=start_cursor
+        )
         plus_one_query_models, _, _ = fetch_result
         more_results = len(plus_one_query_models) == page_size + 1
 
@@ -150,7 +174,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         )
 
     @classmethod
-    def get_by_topic(cls, topic_id: str) -> Sequence[ExplorationOpportunitySummaryModel]:
+    def get_by_topic(
+        cls, topic_id: str
+    ) -> Sequence[ExplorationOpportunitySummaryModel]:
         """Returns all the models corresponding to the specific topic.
 
         Returns:
@@ -171,9 +197,13 @@ class SkillOpportunityModel(base_models.BaseModel):
     """
 
     # The description of the opportunity's skill.
-    skill_description = datastore_services.StringProperty(required=True, indexed=True)
+    skill_description = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
     # The number of questions associated with this opportunity's skill.
-    question_count = datastore_services.IntegerProperty(required=True, indexed=True)
+    question_count = datastore_services.IntegerProperty(
+        required=True, indexed=True
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -181,7 +211,9 @@ class SkillOpportunityModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -199,7 +231,9 @@ class SkillOpportunityModel(base_models.BaseModel):
     # TODO(#13523): Change the return value of the function below from
     # tuple(list, str|None, bool) to a domain object.
     @classmethod
-    def get_skill_opportunities(cls, page_size: int, urlsafe_start_cursor: Optional[str]) -> Tuple[Sequence[SkillOpportunityModel], Optional[str], bool]:
+    def get_skill_opportunities(
+        cls, page_size: int, urlsafe_start_cursor: Optional[str]
+    ) -> Tuple[Sequence[SkillOpportunityModel], Optional[str], bool]:
         """Returns a list of skill opportunities available for adding questions.
 
         Args:
@@ -222,14 +256,20 @@ class SkillOpportunityModel(base_models.BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        start_cursor = datastore_services.make_cursor(urlsafe_cursor=urlsafe_start_cursor)
+        start_cursor = datastore_services.make_cursor(
+            urlsafe_cursor=urlsafe_start_cursor
+        )
 
         created_on_query = cls.get_all().order(cls.created_on)
-        fetch_result: Tuple[Sequence[SkillOpportunityModel], datastore_services.Cursor, bool] = created_on_query.fetch_page(page_size, start_cursor=start_cursor)
+        fetch_result: Tuple[
+            Sequence[SkillOpportunityModel], datastore_services.Cursor, bool
+        ] = created_on_query.fetch_page(page_size, start_cursor=start_cursor)
         query_models, cursor, _ = fetch_result
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
-        fetch_result = created_on_query.fetch_page(page_size + 1, start_cursor=start_cursor)
+        fetch_result = created_on_query.fetch_page(
+            page_size + 1, start_cursor=start_cursor
+        )
         plus_one_query_models, _, _ = fetch_result
         more_results = len(plus_one_query_models) == page_size + 1
         # The urlsafe returns bytes and we need to decode them to string.
@@ -255,11 +295,17 @@ class TranslationOpportunityModel(base_models.BaseModel):
     # A list of topic IDs that are related to this opportunity.
     topic_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # The total number of contents available for translation.
-    content_count = datastore_services.IntegerProperty(required=True, indexed=True)
+    content_count = datastore_services.IntegerProperty(
+        required=True, indexed=True
+    )
     # List of language codes in which the entity translation is incomplete.
-    incomplete_translation_language_codes = datastore_services.StringProperty(repeated=True, indexed=True)
+    incomplete_translation_language_codes = datastore_services.StringProperty(
+        repeated=True, indexed=True
+    )
     # Dict mapping language codes to number of completed translations.
-    translation_counts = datastore_services.JsonProperty(required=True, indexed=True)
+    translation_counts = datastore_services.JsonProperty(
+        required=True, indexed=True
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -267,7 +313,9 @@ class TranslationOpportunityModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """This model is not associated with any user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -307,9 +355,13 @@ class TranslationOpportunityModel(base_models.BaseModel):
 
         for lang_code, count in self.translation_counts.items():
             if not isinstance(count, int) or count < 0:
-                raise Exception(f'Invalid translation count for {lang_code}: {count}')
+                raise Exception(
+                    f'Invalid translation count for {lang_code}: {count}'
+                )
             if count > self.content_count:
-                raise Exception(f'Translation count for {lang_code} ({count}) exceeds content_count ({self.content_count})')
+                raise Exception(
+                    f'Translation count for {lang_code} ({count}) exceeds content_count ({self.content_count})'
+                )
 
     @staticmethod
     def _generate_id(entity_type: str, entity_id: str) -> str:
@@ -355,7 +407,9 @@ class TranslationOpportunityModel(base_models.BaseModel):
             entity_id=entity_id,
             topic_ids=list(topic_ids),
             content_count=content_count,
-            incomplete_translation_language_codes=list(incomplete_translation_language_codes),
+            incomplete_translation_language_codes=list(
+                incomplete_translation_language_codes
+            ),
             translation_counts=translation_counts,
         )
 
@@ -365,12 +419,22 @@ class ExplorationOpportunitySummaryAuditModel(base_models.BaseModel):
     ExplorationOpportunitySummaryModel.
     """
 
-    exploration_id = datastore_services.StringProperty(required=True, indexed=True)
-    language_code = datastore_services.StringProperty(required=True, indexed=True)
+    exploration_id = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
     action = datastore_services.StringProperty(required=True, indexed=True)
-    old_translation_count = datastore_services.IntegerProperty(required=True, indexed=False)
-    new_translation_count = datastore_services.IntegerProperty(required=True, indexed=False)
-    content_count = datastore_services.IntegerProperty(required=True, indexed=False)
+    old_translation_count = datastore_services.IntegerProperty(
+        required=True, indexed=False
+    )
+    new_translation_count = datastore_services.IntegerProperty(
+        required=True, indexed=False
+    )
+    content_count = datastore_services.IntegerProperty(
+        required=True, indexed=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -378,7 +442,9 @@ class ExplorationOpportunitySummaryAuditModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 

@@ -47,7 +47,9 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        self.admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.admin_user_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL
+        )
         self.curr_time = datetime.datetime.utcnow()
         self.completed_activities_model = user_models.CompletedActivitiesModel(
             id=self.admin_user_id,
@@ -66,17 +68,27 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         )
 
     def test_update_timestamps_multi(self) -> None:
-        self.assertIsNone(user_models.CompletedActivitiesModel.get_by_id(self.admin_user_id))
+        self.assertIsNone(
+            user_models.CompletedActivitiesModel.get_by_id(self.admin_user_id)
+        )
         self.assertIsNone(user_models.UserQueryModel.get_by_id('query_id'))
 
-        cloud_datastore_services.update_timestamps_multi([self.completed_activities_model, self.user_query_model], False)
-        cloud_datastore_services.put_multi([self.completed_activities_model, self.user_query_model])
+        cloud_datastore_services.update_timestamps_multi(
+            [self.completed_activities_model, self.user_query_model], False
+        )
+        cloud_datastore_services.put_multi(
+            [self.completed_activities_model, self.user_query_model]
+        )
 
-        self.assertIsNotNone(user_models.CompletedActivitiesModel.get_by_id(self.admin_user_id))
+        self.assertIsNotNone(
+            user_models.CompletedActivitiesModel.get_by_id(self.admin_user_id)
+        )
         self.assertIsNotNone(user_models.UserQueryModel.get_by_id('query_id'))
 
         self.assertEqual(
-            self.completed_activities_model.get_by_id(self.admin_user_id).last_updated,
+            self.completed_activities_model.get_by_id(
+                self.admin_user_id
+            ).last_updated,
             self.curr_time,
         )
         self.assertEqual(
@@ -85,31 +97,47 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         )
 
     def test_delete_multi_transactional(self) -> None:
-        cloud_datastore_services.update_timestamps_multi([self.completed_activities_model, self.user_query_model], False)
-        cloud_datastore_services.put_multi([self.completed_activities_model, self.user_query_model])
+        cloud_datastore_services.update_timestamps_multi(
+            [self.completed_activities_model, self.user_query_model], False
+        )
+        cloud_datastore_services.put_multi(
+            [self.completed_activities_model, self.user_query_model]
+        )
 
-        self.assertIsNotNone(user_models.CompletedActivitiesModel.get_by_id(self.admin_user_id))
+        self.assertIsNotNone(
+            user_models.CompletedActivitiesModel.get_by_id(self.admin_user_id)
+        )
         self.assertIsNotNone(user_models.UserQueryModel.get_by_id('query_id'))
 
         cloud_datastore_services.delete_multi_transactional(
             [
-                datastore_services.Key(user_models.CompletedActivitiesModel, self.admin_user_id),
+                datastore_services.Key(
+                    user_models.CompletedActivitiesModel, self.admin_user_id
+                ),
                 datastore_services.Key(user_models.UserQueryModel, 'query_id'),
             ]
         )
 
-        self.assertIsNone(user_models.CompletedActivitiesModel.get_by_id(self.admin_user_id))
+        self.assertIsNone(
+            user_models.CompletedActivitiesModel.get_by_id(self.admin_user_id)
+        )
         self.assertIsNone(user_models.UserQueryModel.get_by_id('query_id'))
 
     def test_fetch_multiple_entities_by_ids_and_models(self) -> None:
-        cloud_datastore_services.update_timestamps_multi([self.completed_activities_model, self.user_query_model], False)
-        cloud_datastore_services.put_multi([self.completed_activities_model, self.user_query_model])
+        cloud_datastore_services.update_timestamps_multi(
+            [self.completed_activities_model, self.user_query_model], False
+        )
+        cloud_datastore_services.put_multi(
+            [self.completed_activities_model, self.user_query_model]
+        )
 
-        returned_models = cloud_datastore_services.fetch_multiple_entities_by_ids_and_models(
-            [
-                ('CompletedActivitiesModel', [self.admin_user_id]),
-                ('UserQueryModel', ['query_id']),
-            ]
+        returned_models = (
+            cloud_datastore_services.fetch_multiple_entities_by_ids_and_models(
+                [
+                    ('CompletedActivitiesModel', [self.admin_user_id]),
+                    ('UserQueryModel', ['query_id']),
+                ]
+            )
         )
 
         self.assertEqual(
@@ -120,8 +148,12 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
     def test_fetch_multiple_entities_throws_error_on_duplicate_parameters(
         self,
     ) -> None:
-        cloud_datastore_services.update_timestamps_multi([self.completed_activities_model, self.user_query_model], False)
-        cloud_datastore_services.put_multi([self.completed_activities_model, self.user_query_model])
+        cloud_datastore_services.update_timestamps_multi(
+            [self.completed_activities_model, self.user_query_model], False
+        )
+        cloud_datastore_services.put_multi(
+            [self.completed_activities_model, self.user_query_model]
+        )
 
         error_msg = 'Model names should not be duplicated in input list.'
         with self.assertRaisesRegex(Exception, error_msg):
@@ -144,9 +176,14 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
             ndb.Key('model2', 'id2'),
             ndb.Key('model3', 'id3'),
         ]
-        error_msg = 'get_multi failed after %s retries' % cloud_datastore_services.MAX_GET_RETRIES
+        error_msg = (
+            'get_multi failed after %s retries'
+            % cloud_datastore_services.MAX_GET_RETRIES
+        )
         with (
-            self.swap_to_always_raise(ndb, 'get_multi', Exception('Mock key error')),
+            self.swap_to_always_raise(
+                ndb, 'get_multi', Exception('Mock key error')
+            ),
             self.swap(logging, 'exception', _mock_logging_function),
         ):
             with self.assertRaisesRegex(Exception, error_msg):
@@ -175,13 +212,18 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
             query_status=feconf.USER_QUERY_STATUS_COMPLETED,
             last_updated=self.curr_time,
         )
-        cloud_datastore_services.update_timestamps_multi([user_query_model1, user_query_model2], False)
-        cloud_datastore_services.put_multi([user_query_model1, user_query_model2])
+        cloud_datastore_services.update_timestamps_multi(
+            [user_query_model1, user_query_model2], False
+        )
+        cloud_datastore_services.put_multi(
+            [user_query_model1, user_query_model2]
+        )
 
         result = user_models.UserQueryModel.query(
             cloud_datastore_services.all_of(
                 user_models.UserQueryModel.submitter_id == self.admin_user_id,
-                user_models.UserQueryModel.query_status == (feconf.USER_QUERY_STATUS_COMPLETED),
+                user_models.UserQueryModel.query_status
+                == (feconf.USER_QUERY_STATUS_COMPLETED),
             )
         ).get()
 
@@ -190,7 +232,8 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         result = user_models.UserQueryModel.query(
             cloud_datastore_services.any_of(
                 user_models.UserQueryModel.submitter_id == 'new_id',
-                user_models.UserQueryModel.query_status == (feconf.USER_QUERY_STATUS_PROCESSING),
+                user_models.UserQueryModel.query_status
+                == (feconf.USER_QUERY_STATUS_PROCESSING),
             )
         ).get()
 

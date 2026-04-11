@@ -40,7 +40,9 @@ from core.constants import constants
 
 _OPENING_PARENS: List[str] = ['[', '{', '(']
 _CLOSING_PARENS: List[str] = [')', '}', ']']
-_VALID_OPERATORS: List[str] = _OPENING_PARENS + _CLOSING_PARENS + ['+', '-', '/', '*', '^']
+_VALID_OPERATORS: List[str] = (
+    _OPENING_PARENS + _CLOSING_PARENS + ['+', '-', '/', '*', '^']
+)
 
 _TOKEN_CATEGORY_IDENTIFIER: Final = 'identifier'
 _TOKEN_CATEGORY_FUNCTION: Final = 'function'
@@ -100,7 +102,9 @@ def contains_at_least_one_variable(expression: str) -> bool:
     Parser().parse(expression)
     token_list = tokenize(expression)
 
-    return any(token.category == _TOKEN_CATEGORY_IDENTIFIER for token in token_list)
+    return any(
+        token.category == _TOKEN_CATEGORY_IDENTIFIER for token in token_list
+    )
 
 
 def tokenize(expression: str) -> List[Token]:
@@ -126,7 +130,8 @@ def tokenize(expression: str) -> List[Token]:
     re_string = r'(%s|[a-zA-Z]|[0-9]+\.[0-9]+|[0-9]+|[%s])' % (
         '|'.join(
             sorted(
-                list(constants.GREEK_LETTER_NAMES_TO_SYMBOLS.keys()) + constants.MATH_FUNCTION_NAMES,
+                list(constants.GREEK_LETTER_NAMES_TO_SYMBOLS.keys())
+                + constants.MATH_FUNCTION_NAMES,
                 reverse=True,
                 key=len,
             )
@@ -145,7 +150,10 @@ def tokenize(expression: str) -> List[Token]:
     tokenized_exp_frequency = collections.Counter(''.join(token_texts))
 
     for character in original_exp_frequency:
-        if original_exp_frequency[character] != tokenized_exp_frequency[character]:
+        if (
+            original_exp_frequency[character]
+            != tokenized_exp_frequency[character]
+        ):
             raise Exception('Invalid token: %s.' % character)
 
     token_list = []
@@ -169,7 +177,13 @@ def tokenize(expression: str) -> List[Token]:
             # operation to be performed is multiplication and insert a '*' sign
             # to explicitly denote the operation. For eg. 'ab+x' would be
             # transformed into 'a*b+x'.
-            if (token.category in _CLOSING_CATEGORIES or token.text in _CLOSING_PARENS) and (token_list[i + 1].category in _OPENING_CATEGORIES or token_list[i + 1].text in _OPENING_PARENS):
+            if (
+                token.category in _CLOSING_CATEGORIES
+                or token.text in _CLOSING_PARENS
+            ) and (
+                token_list[i + 1].category in _OPENING_CATEGORIES
+                or token_list[i + 1].text in _OPENING_PARENS
+            ):
                 final_token_list.append(Token('*'))
 
     return final_token_list
@@ -438,7 +452,9 @@ class Parser:
         """
         # Expression should not contain any invalid characters.
         for character in expression:
-            if not bool(re.match(r'(\s|\d|\w|\.)', character)) and (character not in _VALID_OPERATORS):
+            if not bool(re.match(r'(\s|\d|\w|\.)', character)) and (
+                character not in _VALID_OPERATORS
+            ):
                 raise Exception('Invalid character: %s.' % character)
 
         if not contains_balanced_brackets(expression):
@@ -471,7 +487,9 @@ class Parser:
                 parsed_expr = AdditionOperatorNode(parsed_expr, parsed_right)
             else:
                 parsed_expr = SubtractionOperatorNode(parsed_expr, parsed_right)
-            operator_token = self._get_next_token_if_text_in(['+', '-'], token_list)
+            operator_token = self._get_next_token_if_text_in(
+                ['+', '-'], token_list
+            )
         return parsed_expr
 
     def _parse_mul_expr(self, token_list: List[Token]) -> Node:
@@ -490,10 +508,14 @@ class Parser:
         while operator_token:
             parsed_right = self._parse_pow_expr(token_list)
             if operator_token.text == '*':
-                parsed_expr = MultiplicationOperatorNode(parsed_expr, parsed_right)
+                parsed_expr = MultiplicationOperatorNode(
+                    parsed_expr, parsed_right
+                )
             else:
                 parsed_expr = DivisionOperatorNode(parsed_expr, parsed_right)
-            operator_token = self._get_next_token_if_text_in(['*', '/'], token_list)
+            operator_token = self._get_next_token_if_text_in(
+                ['*', '/'], token_list
+            )
         return parsed_expr
 
     def _parse_pow_expr(self, token_list: List[Token]) -> Node:
@@ -581,7 +603,9 @@ class Parser:
 
         raise Exception('Invalid syntax: Unexpected end of expression.')
 
-    def _get_next_token_if_text_in(self, allowed_token_texts: List[str], token_list: List[Token]) -> Optional[Token]:
+    def _get_next_token_if_text_in(
+        self, allowed_token_texts: List[str], token_list: List[Token]
+    ) -> Optional[Token]:
         """Function to verify that there is at least one more token remaining
         and that the next token text is among the allowed_token_texts provided.
         If true, returns the token; otherwise, returns None.

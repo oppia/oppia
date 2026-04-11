@@ -37,7 +37,9 @@ datastore_services = models.Registry.import_datastore_services()
 class AuditStoriesWithDisconnectedNodeIdsJobTest(job_test_utils.JobTestBase):
     """Test for AuditStoriesWithDisconnectedNodeIdsJob."""
 
-    JOB_CLASS: Type[audit_stories_with_disconnected_node_ids_job.AuditStoriesWithDisconnectedNodeIdsJob] = audit_stories_with_disconnected_node_ids_job.AuditStoriesWithDisconnectedNodeIdsJob
+    JOB_CLASS: Type[
+        audit_stories_with_disconnected_node_ids_job.AuditStoriesWithDisconnectedNodeIdsJob
+    ] = audit_stories_with_disconnected_node_ids_job.AuditStoriesWithDisconnectedNodeIdsJob
 
     TOPIC_ID_1: Final = 'topic_id_1'
     STORY_ID_1: Final = 'story_id_1'
@@ -69,7 +71,13 @@ class AuditStoriesWithDisconnectedNodeIdsJobTest(job_test_utils.JobTestBase):
             url_fragment='story-one-fragment',
         )
         self.put_multi([story_1])
-        self.assert_job_output_is([job_run_result.JobRunResult.as_stdout(f'Story ID: {self.STORY_ID_1} has no nodes.')])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    f'Story ID: {self.STORY_ID_1} has no nodes.'
+                )
+            ]
+        )
 
     def test_stories_with_disconnected_node_ids(self) -> None:
         story_1 = self.create_model(
@@ -125,7 +133,13 @@ class AuditStoriesWithDisconnectedNodeIdsJobTest(job_test_utils.JobTestBase):
             url_fragment='story-one-fragment',
         )
         self.put_multi([story_1])
-        self.assert_job_output_is([job_run_result.JobRunResult.as_stdout(f'Story ID: {self.STORY_ID_1} has disconnected nodes.')])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    f'Story ID: {self.STORY_ID_1} has disconnected nodes.'
+                )
+            ]
+        )
 
     def test_stories_with_all_connected_node_ids(self) -> None:
         story_1 = self.create_model(
@@ -181,7 +195,13 @@ class AuditStoriesWithDisconnectedNodeIdsJobTest(job_test_utils.JobTestBase):
             url_fragment='story-one-fragment',
         )
         self.put_multi([story_1])
-        self.assert_job_output_is([job_run_result.JobRunResult.as_stdout(f'SUCCESS: {self.STORY_ID_1} has no disconnected nodes.')])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    f'SUCCESS: {self.STORY_ID_1} has no disconnected nodes.'
+                )
+            ]
+        )
 
     def test_stories_with_all_the_three_cases(self) -> None:
         story_1 = self.create_model(
@@ -308,8 +328,14 @@ class AuditStoriesWithDisconnectedNodeIdsJobTest(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult.as_stdout(f'Story ID: {self.STORY_ID_1} has no nodes.'),
-                job_run_result.JobRunResult.as_stdout(f'Story ID: {self.STORY_ID_2} has disconnected nodes.'),
-                job_run_result.JobRunResult.as_stdout(f'SUCCESS: {self.STORY_ID_3} has no disconnected nodes.'),
+                job_run_result.JobRunResult.as_stdout(
+                    f'Story ID: {self.STORY_ID_1} has no nodes.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    f'Story ID: {self.STORY_ID_2} has disconnected nodes.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    f'SUCCESS: {self.STORY_ID_3} has no disconnected nodes.'
+                ),
             ]
         )

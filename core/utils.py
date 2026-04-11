@@ -96,9 +96,13 @@ class SingletonMeta(type):
                 initialization arguments are provided.
         """
         if cls not in cls._instances:
-            cls._instances[cls] = super(SingletonMeta, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = super(SingletonMeta, cls).__call__(
+                *args, **kwargs
+            )
         elif args or kwargs:
-            raise ValueError(f'Singleton instance of {cls.__name__} already exists. Cannot reinitialize with new arguments: args={args}, kwargs={kwargs}')
+            raise ValueError(
+                f'Singleton instance of {cls.__name__} already exists. Cannot reinitialize with new arguments: args={args}, kwargs={kwargs}'
+            )
         return cls._instances[cls]
 
 
@@ -135,14 +139,20 @@ def get_file_contents(filepath: str, *, mode: str = 'r') -> str: ...
 
 
 @overload
-def get_file_contents(filepath: str, *, raw_bytes: Literal[False], mode: str = 'r') -> str: ...
+def get_file_contents(
+    filepath: str, *, raw_bytes: Literal[False], mode: str = 'r'
+) -> str: ...
 
 
 @overload
-def get_file_contents(filepath: str, *, raw_bytes: Literal[True], mode: str = 'r') -> bytes: ...
+def get_file_contents(
+    filepath: str, *, raw_bytes: Literal[True], mode: str = 'r'
+) -> bytes: ...
 
 
-def get_file_contents(filepath: str, raw_bytes: bool = False, mode: str = 'r') -> Union[str, bytes]:
+def get_file_contents(
+    filepath: str, raw_bytes: bool = False, mode: str = 'r'
+) -> Union[str, bytes]:
     """Gets the contents of a file, given a relative filepath
     from oppia.
 
@@ -198,7 +208,9 @@ def get_exploration_components_from_dir(
     for root, directories, files in os.walk(dir_path):
         for directory in directories:
             if root == dir_path and directory not in ('assets', '__pycache__'):
-                raise Exception('The only directory in %s should be assets/' % dir_path)
+                raise Exception(
+                    'The only directory in %s should be assets/' % dir_path
+                )
 
         for filename in files:
             filepath = os.path.join(root, filename)
@@ -207,16 +219,24 @@ def get_exploration_components_from_dir(
                 # We ignore them.
                 if not filepath.endswith('.DS_Store'):
                     if yaml_content is not None:
-                        raise Exception('More than one non-asset file specified for %s' % dir_path)
+                        raise Exception(
+                            'More than one non-asset file specified for %s'
+                            % dir_path
+                        )
                     if not filepath.endswith('.yaml'):
-                        raise Exception('Found invalid non-asset file %s. There should only be a single non-asset file, and it should have a .yaml suffix.' % filepath)
+                        raise Exception(
+                            'Found invalid non-asset file %s. There should only be a single non-asset file, and it should have a .yaml suffix.'
+                            % filepath
+                        )
 
                     yaml_content = get_file_contents(filepath)
             else:
                 filepath_array = filepath.split('/')
                 # The additional offset is to remove the 'assets/' prefix.
                 filename = '/'.join(filepath_array[dir_path_length + 1 :])
-                assets_list.append((filename, get_file_contents(filepath, raw_bytes=True)))
+                assets_list.append(
+                    (filename, get_file_contents(filepath, raw_bytes=True))
+                )
 
     if yaml_content is None:
         raise Exception('No yaml file specifed for %s' % dir_path)
@@ -308,7 +328,9 @@ def get_random_int(upper_bound: int) -> int:
     Returns:
         int. Randomly generated integer less than the upper_bound.
     """
-    assert upper_bound >= 0 and isinstance(upper_bound, int), 'Only positive integers allowed'
+    assert upper_bound >= 0 and isinstance(upper_bound, int), (
+        'Only positive integers allowed'
+    )
     generator = random.SystemRandom()
     return generator.randrange(0, stop=upper_bound)
 
@@ -322,7 +344,9 @@ def get_random_choice(alist: List[T]) -> T:
     Returns:
         *. Random element choosen from the passed input list.
     """
-    assert isinstance(alist, list) and len(alist) > 0, 'Only non-empty lists allowed'
+    assert isinstance(alist, list) and len(alist) > 0, (
+        'Only non-empty lists allowed'
+    )
     index = get_random_int(len(alist))
     return alist[index]
 
@@ -369,9 +393,15 @@ def convert_data_url_to_binary(image_data_url: str, file_type: str) -> bytes:
         Exception. The given string does not represent a PNG data URL.
     """
     if image_data_url.startswith(DATA_URL_FORMAT_PREFIX % file_type):
-        return base64.b64decode(urllib.parse.unquote(image_data_url[len(DATA_URL_FORMAT_PREFIX % file_type) :]))
+        return base64.b64decode(
+            urllib.parse.unquote(
+                image_data_url[len(DATA_URL_FORMAT_PREFIX % file_type) :]
+            )
+        )
     else:
-        raise Exception('The given string does not represent a %s data URL.' % file_type)
+        raise Exception(
+            'The given string does not represent a %s data URL.' % file_type
+        )
 
 
 def convert_image_binary_to_data_url(content: bytes, file_type: str) -> str:
@@ -391,7 +421,9 @@ def convert_image_binary_to_data_url(content: bytes, file_type: str) -> str:
     """
     file_details = filetype.guess(content)
     if file_details is None or file_details.extension != file_type:
-        raise Exception('The given binary string does not represent a %s image.' % file_type)
+        raise Exception(
+            'The given binary string does not represent a %s image.' % file_type
+        )
 
     return '%s%s' % (
         DATA_URL_FORMAT_PREFIX % file_type,
@@ -470,7 +502,10 @@ def set_url_query_parameter(url: str, param_name: str, param_value: str) -> str:
             them this exception is raised.
     """
     if not isinstance(param_name, str):
-        raise Exception('URL query parameter name must be a string, received %s' % param_name)
+        raise Exception(
+            'URL query parameter name must be a string, received %s'
+            % param_name
+        )
 
     scheme, netloc, path, query_string, fragment = urllib.parse.urlsplit(url)
     query_params = urllib.parse.parse_qs(query_string)
@@ -478,7 +513,9 @@ def set_url_query_parameter(url: str, param_name: str, param_value: str) -> str:
     query_params[param_name] = [param_value]
     new_query_string = urllib.parse.urlencode(query_params, doseq=True)
 
-    return urllib.parse.urlunsplit((scheme, netloc, path, new_query_string, fragment))
+    return urllib.parse.urlunsplit(
+        (scheme, netloc, path, new_query_string, fragment)
+    )
 
 
 class JSONEncoderForHTML(json.JSONEncoder):
@@ -493,7 +530,11 @@ class JSONEncoderForHTML(json.JSONEncoder):
     def iterencode(self, o: str, _one_shot: bool = False) -> Iterator[str]:
         chunks = super().iterencode(o, _one_shot=_one_shot)
         for chunk in chunks:
-            yield (chunk.replace('&', '\\u0026').replace('<', '\\u003c').replace('>', '\\u003e'))
+            yield (
+                chunk.replace('&', '\\u0026')
+                .replace('<', '\\u003c')
+                .replace('>', '\\u003e')
+            )
 
 
 def convert_to_hash(input_string: str, max_length: int) -> str:
@@ -512,12 +553,17 @@ def convert_to_hash(input_string: str, max_length: int) -> str:
             them this exception is raised.
     """
     if not isinstance(input_string, str):
-        raise Exception('Expected string, received %s of type %s' % (input_string, type(input_string)))
+        raise Exception(
+            'Expected string, received %s of type %s'
+            % (input_string, type(input_string))
+        )
 
     # Encodes strings using the character set [A-Za-z0-9].
     # Prefixing altchars with b' to ensure that all characters in encoded_string
     # remain encoded (otherwise encoded_string would be of type unicode).
-    encoded_string = base64.b64encode(hashlib.sha1(input_string.encode('utf-8')).digest(), altchars=b'ab').replace(b'=', b'c')
+    encoded_string = base64.b64encode(
+        hashlib.sha1(input_string.encode('utf-8')).digest(), altchars=b'ab'
+    ).replace(b'=', b'c')
 
     return encoded_string[:max_length].decode('utf-8')
 
@@ -559,7 +605,9 @@ def convert_millisecs_time_to_datetime_object(
         datetime. An object of type datetime.datetime corresponding to
         the given milliseconds.
     """
-    return datetime.datetime.fromtimestamp(date_time_msecs / 1000.0, tz=datetime.timezone.utc)
+    return datetime.datetime.fromtimestamp(
+        date_time_msecs / 1000.0, tz=datetime.timezone.utc
+    )
 
 
 def convert_naive_datetime_to_string(datetime_obj: datetime.datetime) -> str:
@@ -654,7 +702,9 @@ def create_string_from_largest_unit_in_timedelta(
     """
     total_seconds = timedelta_obj.total_seconds()
     if total_seconds <= 0:
-        raise Exception('Expected a positive timedelta, received: %s.' % total_seconds)
+        raise Exception(
+            'Expected a positive timedelta, received: %s.' % total_seconds
+        )
     if timedelta_obj.days != 0:
         return '%s day%s' % (
             int(timedelta_obj.days),
@@ -675,7 +725,9 @@ def create_string_from_largest_unit_in_timedelta(
             return '1 minute'
 
 
-def are_datetimes_close(later_datetime: datetime.datetime, earlier_datetime: datetime.datetime) -> bool:
+def are_datetimes_close(
+    later_datetime: datetime.datetime, earlier_datetime: datetime.datetime
+) -> bool:
     """Given two datetimes, determines whether they are separated by less than
     feconf.PROXIMAL_TIMEDELTA_SECS seconds.
 
@@ -737,7 +789,9 @@ def vfs_normpath(path: str) -> str:
     return os.path.normpath(path)
 
 
-def require_valid_name(name: str, name_type: str, allow_empty: bool = False) -> None:
+def require_valid_name(
+    name: str, name_type: str, allow_empty: bool = False
+) -> None:
     """Generic name validation.
 
     Args:
@@ -763,20 +817,29 @@ def require_valid_name(name: str, name_type: str, allow_empty: bool = False) -> 
     # This check is needed because state names are used in URLs and as ids
     # for statistics, so the name length should be bounded above.
     if len(name) > 50 or len(name) < 1:
-        raise ValidationError('The length of %s should be between 1 and 50 characters; received %s' % (name_type, name))
+        raise ValidationError(
+            'The length of %s should be between 1 and 50 characters; received %s'
+            % (name_type, name)
+        )
 
     if name[0] in string.whitespace or name[-1] in string.whitespace:
         raise ValidationError('Names should not start or end with whitespace.')
 
     if re.search(r'\s\s+', name):
-        raise ValidationError('Adjacent whitespace in %s should be collapsed.' % name_type)
+        raise ValidationError(
+            'Adjacent whitespace in %s should be collapsed.' % name_type
+        )
 
     for character in constants.INVALID_NAME_CHARS:
         if character in name:
-            raise ValidationError(r'Invalid character %s in %s: %s' % (character, name_type, name))
+            raise ValidationError(
+                r'Invalid character %s in %s: %s' % (character, name_type, name)
+            )
 
 
-def require_valid_url_fragment(name: str, name_type: str, allowed_length: int) -> None:
+def require_valid_url_fragment(
+    name: str, name_type: str, allowed_length: int
+) -> None:
     """Generic URL fragment validation.
 
     Args:
@@ -792,16 +855,24 @@ def require_valid_url_fragment(name: str, name_type: str, allowed_length: int) -
         ValidationError. Invalid character is present in the name.
     """
     if not isinstance(name, str):
-        raise ValidationError('%s field must be a string. Received %s.' % (name_type, name))
+        raise ValidationError(
+            '%s field must be a string. Received %s.' % (name_type, name)
+        )
 
     if name == '':
         raise ValidationError('%s field should not be empty.' % name_type)
 
     if len(name) > allowed_length:
-        raise ValidationError('%s field should not exceed %d characters, received %s.' % (name_type, allowed_length, name))
+        raise ValidationError(
+            '%s field should not exceed %d characters, received %s.'
+            % (name_type, allowed_length, name)
+        )
 
     if not re.match(constants.VALID_URL_FRAGMENT_REGEX, name):
-        raise ValidationError('%s field contains invalid characters. Only lowercase words separated by hyphens are allowed. Received %s.' % (name_type, name))
+        raise ValidationError(
+            '%s field contains invalid characters. Only lowercase words separated by hyphens are allowed. Received %s.'
+            % (name_type, name)
+        )
 
 
 def require_valid_thumbnail_filename(thumbnail_filename: str) -> None:
@@ -820,18 +891,30 @@ def require_valid_thumbnail_filename(thumbnail_filename: str) -> None:
     """
     if thumbnail_filename is not None:
         if not isinstance(thumbnail_filename, str):
-            raise ValidationError('Expected thumbnail filename to be a string, received %s' % thumbnail_filename)
+            raise ValidationError(
+                'Expected thumbnail filename to be a string, received %s'
+                % thumbnail_filename
+            )
         if thumbnail_filename.rfind('.') == 0:
-            raise ValidationError('Thumbnail filename should not start with a dot.')
+            raise ValidationError(
+                'Thumbnail filename should not start with a dot.'
+            )
         if '/' in thumbnail_filename or '..' in thumbnail_filename:
-            raise ValidationError('Thumbnail filename should not include slashes or consecutive dot characters.')
+            raise ValidationError(
+                'Thumbnail filename should not include slashes or consecutive dot characters.'
+            )
         if '.' not in thumbnail_filename:
-            raise ValidationError('Thumbnail filename should include an extension.')
+            raise ValidationError(
+                'Thumbnail filename should include an extension.'
+            )
 
         dot_index = thumbnail_filename.rfind('.')
         extension = thumbnail_filename[dot_index + 1 :].lower()
         if extension != 'svg':
-            raise ValidationError('Expected a filename ending in svg, received %s' % thumbnail_filename)
+            raise ValidationError(
+                'Expected a filename ending in svg, received %s'
+                % thumbnail_filename
+            )
 
 
 def require_valid_image_filename(image_filename: str) -> None:
@@ -849,11 +932,16 @@ def require_valid_image_filename(image_filename: str) -> None:
     """
     if image_filename is not None:
         if not isinstance(image_filename, str):
-            raise ValidationError('Expected image filename to be a string, received %s' % image_filename)
+            raise ValidationError(
+                'Expected image filename to be a string, received %s'
+                % image_filename
+            )
         if image_filename.rfind('.') == 0:
             raise ValidationError('Image filename should not start with a dot.')
         if '/' in image_filename or '..' in image_filename:
-            raise ValidationError('Image filename should not include slashes or consecutive dot characters.')
+            raise ValidationError(
+                'Image filename should not include slashes or consecutive dot characters.'
+            )
         if '.' not in image_filename:
             raise ValidationError('Image filename should include an extension.')
 
@@ -869,9 +957,15 @@ def require_valid_meta_tag_content(meta_tag_content: str) -> None:
         ValidationError. Meta tag content is longer than expected.
     """
     if not isinstance(meta_tag_content, str):
-        raise ValidationError('Expected meta tag content to be a string, received %s' % meta_tag_content)
+        raise ValidationError(
+            'Expected meta tag content to be a string, received %s'
+            % meta_tag_content
+        )
     if len(meta_tag_content) > constants.MAX_CHARS_IN_META_TAG_CONTENT:
-        raise ValidationError('Meta tag content should not be longer than %s characters.' % constants.MAX_CHARS_IN_META_TAG_CONTENT)
+        raise ValidationError(
+            'Meta tag content should not be longer than %s characters.'
+            % constants.MAX_CHARS_IN_META_TAG_CONTENT
+        )
 
 
 def require_valid_page_title_fragment_for_web(
@@ -887,15 +981,28 @@ def require_valid_page_title_fragment_for_web(
         ValidationError. Page title fragment is too lengthy.
         ValidationError. Page title fragment is too small.
     """
-    max_chars_in_page_title_frag_for_web = constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
-    min_chars_in_page_title_frag_for_web = constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+    max_chars_in_page_title_frag_for_web = (
+        constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+    )
+    min_chars_in_page_title_frag_for_web = (
+        constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+    )
 
     if not isinstance(page_title_fragment_for_web, str):
-        raise ValidationError('Expected page title fragment to be a string, received %s' % page_title_fragment_for_web)
+        raise ValidationError(
+            'Expected page title fragment to be a string, received %s'
+            % page_title_fragment_for_web
+        )
     if len(page_title_fragment_for_web) > max_chars_in_page_title_frag_for_web:
-        raise ValidationError('Page title fragment should not be longer than %s characters.' % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+        raise ValidationError(
+            'Page title fragment should not be longer than %s characters.'
+            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+        )
     if len(page_title_fragment_for_web) < min_chars_in_page_title_frag_for_web:
-        raise ValidationError('Page title fragment should not be shorter than %s characters.' % constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+        raise ValidationError(
+            'Page title fragment should not be shorter than %s characters.'
+            % constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+        )
 
 
 def capitalize_string(input_string: str) -> str:
@@ -925,7 +1032,11 @@ def get_hex_color_for_category(category: str) -> str:
     Returns:
         str. Color assigned to that category.
     """
-    color: str = constants.CATEGORIES_TO_COLORS[category] if category in constants.CATEGORIES_TO_COLORS else constants.DEFAULT_COLOR
+    color: str = (
+        constants.CATEGORIES_TO_COLORS[category]
+        if category in constants.CATEGORIES_TO_COLORS
+        else constants.DEFAULT_COLOR
+    )
     return color
 
 
@@ -939,7 +1050,11 @@ def get_thumbnail_icon_url_for_category(category: str) -> str:
     Returns:
         str. Path to the Thumbnail Icon assigned to that category.
     """
-    icon_name = category if category in constants.CATEGORIES_TO_COLORS else constants.DEFAULT_THUMBNAIL_ICON
+    icon_name = (
+        category
+        if category in constants.CATEGORIES_TO_COLORS
+        else constants.DEFAULT_THUMBNAIL_ICON
+    )
     # Remove all spaces from the string.
     return '/subjects/%s.svg' % (icon_name.replace(' ', ''))
 
@@ -966,7 +1081,9 @@ def is_valid_language_code(language_code: str) -> bool:
     Returns:
         bool. Whether the language code is valid or not.
     """
-    language_codes = [lc['code'] for lc in constants.SUPPORTED_CONTENT_LANGUAGES]
+    language_codes = [
+        lc['code'] for lc in constants.SUPPORTED_CONTENT_LANGUAGES
+    ]
     return language_code in language_codes
 
 
@@ -1056,7 +1173,9 @@ def get_formatted_query_string(escaped_string: str) -> str:
     # Remove all punctuation from the query string, and replace it with
     # spaces. See http://stackoverflow.com/a/266162 and
     # http://stackoverflow.com/a/11693937
-    remove_punctuation_map = dict((ord(char), None) for char in string.punctuation)
+    remove_punctuation_map = dict(
+        (ord(char), None) for char in string.punctuation
+    )
     return query_string.translate(remove_punctuation_map)
 
 
@@ -1169,7 +1288,9 @@ class OrderedCounter(collections.Counter, collections.OrderedDict):  # type: ign
     pass
 
 
-def grouper(iterable: Iterable[T], chunk_len: int, fillvalue: Optional[T] = None) -> Iterable[Iterable[T]]:
+def grouper(
+    iterable: Iterable[T], chunk_len: int, fillvalue: Optional[T] = None
+) -> Iterable[Iterable[T]]:
     """Collect data into fixed-length chunks.
 
     Source: https://docs.python.org/3/library/itertools.html#itertools-recipes.
@@ -1219,7 +1340,9 @@ def partition(
     iterable: Iterable[T],
     predicate: Callable[..., bool] = bool,
     enumerated: bool = False,
-) -> Tuple[Iterable[Union[T, Tuple[int, T]]], Iterable[Union[T, Tuple[int, T]]]]:
+) -> Tuple[
+    Iterable[Union[T, Tuple[int, T]]], Iterable[Union[T, Tuple[int, T]]]
+]:
     """Returns two generators which split the iterable based on the predicate.
 
     NOTE: The predicate is called AT MOST ONCE per item.
@@ -1264,7 +1387,9 @@ def partition(
         new_iterable = iterable
 
     # Creates two distinct generators over the same iterable. Memory-efficient.
-    true_part, false_part = itertools.tee((i, predicate(i)) for i in new_iterable)
+    true_part, false_part = itertools.tee(
+        (i, predicate(i)) for i in new_iterable
+    )
     return (
         (i for i, predicate_is_true in true_part if predicate_is_true),
         (i for i, predicate_is_true in false_part if not predicate_is_true),
@@ -1302,7 +1427,9 @@ def escape_html(unescaped_html_data: str) -> str:
     ]
     escaped_html_data = unescaped_html_data
     for replace_tuple in replace_list_for_escaping:
-        escaped_html_data = escaped_html_data.replace(replace_tuple[0], replace_tuple[1])
+        escaped_html_data = escaped_html_data.replace(
+            replace_tuple[0], replace_tuple[1]
+        )
 
     return escaped_html_data
 
@@ -1326,7 +1453,9 @@ def unescape_html(escaped_html_data: str) -> str:
     ]
     unescaped_html_data = escaped_html_data
     for replace_tuple in replace_list_for_unescaping:
-        unescaped_html_data = unescaped_html_data.replace(replace_tuple[0], replace_tuple[1])
+        unescaped_html_data = unescaped_html_data.replace(
+            replace_tuple[0], replace_tuple[1]
+        )
 
     return unescaped_html_data
 

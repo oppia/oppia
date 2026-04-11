@@ -41,25 +41,37 @@ class ClassroomModel(base_models.BaseModel):
     # The name of the classroom.
     name = datastore_services.StringProperty(required=True, indexed=True)
     # The url fragment of the classroom.
-    url_fragment = datastore_services.StringProperty(required=True, indexed=True)
+    url_fragment = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
     # A text to provide course details present in the classroom.
-    course_details = datastore_services.StringProperty(indexed=True, required=True)
+    course_details = datastore_services.StringProperty(
+        indexed=True, required=True
+    )
     # A text to provide a summary of the classroom.
     teaser_text = datastore_services.StringProperty(indexed=True, required=True)
     # A text to provide an introduction for all the topics in the classroom.
-    topic_list_intro = datastore_services.StringProperty(indexed=True, required=True)
+    topic_list_intro = datastore_services.StringProperty(
+        indexed=True, required=True
+    )
     # A property that is used to establish dependencies among the topics in the
     # classroom. This field contains a dict with topic ID as key and a list of
     # prerequisite topic IDs as value.
-    topic_id_to_prerequisite_topic_ids = datastore_services.JsonProperty(indexed=False, required=False)
+    topic_id_to_prerequisite_topic_ids = datastore_services.JsonProperty(
+        indexed=False, required=False
+    )
     # Whether this classroom is published or not.
     # False if classroom is hidden, True if published.
-    is_published = datastore_services.BooleanProperty(indexed=True, required=True, default=False)
+    is_published = datastore_services.BooleanProperty(
+        indexed=True, required=True, default=False
+    )
     # Whether this classroom's diagnostic test
     #  functionality is enabled or not.
     # False if diagnostic test functionality
     #  is hidden, True if enabled.
-    diagnostic_test_is_enabled = datastore_services.BooleanProperty(indexed=True, required=True, default=False)
+    diagnostic_test_is_enabled = datastore_services.BooleanProperty(
+        indexed=True, required=True, default=False
+    )
     # The thumbnail filename of the classroom.
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # The thumbnail background color of the classroom.
@@ -81,7 +93,9 @@ class ClassroomModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -96,9 +110,13 @@ class ClassroomModel(base_models.BaseModel):
                 'course_details': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'teaser_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'topic_list_intro': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'topic_id_to_prerequisite_topic_ids': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                'topic_id_to_prerequisite_topic_ids': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
                 'is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'diagnostic_test_is_enabled': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                'diagnostic_test_is_enabled': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
                 'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'thumbnail_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -129,7 +147,9 @@ class ClassroomModel(base_models.BaseModel):
             )
             if not cls.get_by_id(classroom_id):
                 return classroom_id
-        raise Exception('New classroom id generator is producing too many collisions.')
+        raise Exception(
+            'New classroom id generator is producing too many collisions.'
+        )
 
     @classmethod
     def create(
@@ -182,7 +202,9 @@ class ClassroomModel(base_models.BaseModel):
             Exception. A classroom with the given ID already exists.
         """
         if cls.get_by_id(classroom_id):
-            raise Exception('A classroom with the given classroom ID already exists.')
+            raise Exception(
+                'A classroom with the given classroom ID already exists.'
+            )
 
         entity = cls(
             id=classroom_id,
@@ -191,7 +213,9 @@ class ClassroomModel(base_models.BaseModel):
             course_details=course_details,
             teaser_text=teaser_text,
             topic_list_intro=topic_list_intro,
-            topic_id_to_prerequisite_topic_ids=(topic_id_to_prerequisite_topic_ids),
+            topic_id_to_prerequisite_topic_ids=(
+                topic_id_to_prerequisite_topic_ids
+            ),
             is_published=is_published,
             diagnostic_test_is_enabled=diagnostic_test_is_enabled,
             thumbnail_filename=thumbnail_filename,

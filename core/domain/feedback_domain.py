@@ -139,7 +139,9 @@ class FeedbackThread:
             dict. A dict representation of the FeedbackThread object.
         """
         return {
-            'last_updated_msecs': (utils.get_time_in_millisecs(self.last_updated)),
+            'last_updated_msecs': (
+                utils.get_time_in_millisecs(self.last_updated)
+            ),
             'original_author_id': self.original_author_id,
             'state_name': self.state_name,
             'status': self.status,
@@ -148,7 +150,9 @@ class FeedbackThread:
             'thread_id': self.id,
             'message_count': self.message_count,
             'last_nonempty_message_text': self.last_nonempty_message_text,
-            'last_nonempty_message_author_id': (self.last_nonempty_message_author_id),
+            'last_nonempty_message_author_id': (
+                self.last_nonempty_message_author_id
+            ),
         }
 
     def _get_full_message_id(self, message_id: int) -> str:
@@ -172,7 +176,10 @@ class FeedbackThread:
             list(str|None). The ids of the last two messages of the thread. If
             the message does not exist, None is returned.
         """
-        return [self._get_full_message_id(i) if i >= 0 else None for i in range(self.message_count - 1, self.message_count - 3, -1)]
+        return [
+            self._get_full_message_id(i) if i >= 0 else None
+            for i in range(self.message_count - 1, self.message_count - 3, -1)
+        ]
 
 
 class FeedbackMessage:
@@ -327,7 +334,9 @@ class FeedbackMessageReference:
         message_id: int. The ID of the feedback thread message.
     """
 
-    def __init__(self, entity_type: str, entity_id: str, thread_id: str, message_id: int) -> None:
+    def __init__(
+        self, entity_type: str, entity_id: str, thread_id: str, message_id: int
+    ) -> None:
         """Initializes FeedbackMessageReference object."""
         self.entity_type = entity_type
         self.entity_id = entity_id
@@ -407,7 +416,9 @@ class FeedbackThreadSummary:
         return {
             'status': self.status,
             'original_author_id': self.original_author_id,
-            'last_updated_msecs': (utils.get_time_in_millisecs(self.last_updated)),
+            'last_updated_msecs': (
+                utils.get_time_in_millisecs(self.last_updated)
+            ),
             'last_message_text': self.last_message_text,
             'total_message_count': self.total_message_count,
             'last_message_is_read': self.last_message_is_read,

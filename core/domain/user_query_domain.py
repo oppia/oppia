@@ -86,17 +86,25 @@ class UserQuery:
             ValidationError. Expected user ID in user_ids to be a valid user ID.
         """
         if not utils.is_user_id_valid(self.submitter_id):
-            raise utils.ValidationError('Expected submitter ID to be a valid user ID, received %s' % self.submitter_id)
+            raise utils.ValidationError(
+                'Expected submitter ID to be a valid user ID, received %s'
+                % self.submitter_id
+            )
 
         if self.status not in feconf.ALLOWED_USER_QUERY_STATUSES:
             raise utils.ValidationError('Invalid status: %s' % self.status)
 
         for user_id in self.user_ids:
             if not utils.is_user_id_valid(user_id):
-                raise utils.ValidationError('Expected user ID in user_ids to be a valid user ID, received %s' % user_id)
+                raise utils.ValidationError(
+                    'Expected user ID in user_ids to be a valid user ID, received %s'
+                    % user_id
+                )
 
     @classmethod
-    def create_default(cls, query_id: str, query_params: UserQueryParams, submitter_id: str) -> UserQuery:
+    def create_default(
+        cls, query_id: str, query_params: UserQueryParams, submitter_id: str
+    ) -> UserQuery:
         """Create default user query.
 
         Args:

@@ -40,7 +40,13 @@ app_identity_services = models.Registry.import_app_identity_services()
 
 # The 'auth.default()' returns tuple of credentials and project ID. As we are
 # only interested in credentials, we are using '[0]' to access it.
-CLIENT = tasks_v2.CloudTasksClient(credentials=(auth.credentials.AnonymousCredentials() if constants.EMULATOR_MODE else auth.default()[0]))
+CLIENT = tasks_v2.CloudTasksClient(
+    credentials=(
+        auth.credentials.AnonymousCredentials()
+        if constants.EMULATOR_MODE
+        else auth.default()[0]
+    )
+)
 
 
 # Here we use type Any because the payload here has no constraints, so that's
@@ -73,7 +79,9 @@ def create_http_task(
     # The cloud tasks library requires the Oppia project id and region, as well
     # as the queue name as the path to be able to find the correct queue.
     oppia_project_id = app_identity_services.get_application_id()
-    parent = CLIENT.queue_path(oppia_project_id, feconf.GOOGLE_APP_ENGINE_REGION, queue_name)
+    parent = CLIENT.queue_path(
+        oppia_project_id, feconf.GOOGLE_APP_ENGINE_REGION, queue_name
+    )
 
     # Here we use type Any because task's structure can vary a lot. So, to allow
     # every type of value we used Dict[str, Any] type here.
@@ -90,7 +98,9 @@ def create_http_task(
     if payload is not None:
         if isinstance(payload, dict):
             payload_text = json.dumps(payload)
-            task['app_engine_http_request']['headers'] = {'Content-type': 'application/json'}
+            task['app_engine_http_request']['headers'] = {
+                'Content-type': 'application/json'
+            }
 
         # The API expects a payload of type bytes.
         converted_payload = payload_text.encode('utf-8')

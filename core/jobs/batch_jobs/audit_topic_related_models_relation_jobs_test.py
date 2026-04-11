@@ -36,8 +36,12 @@ if MYPY:  # pragma: no cover
 (topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 
 
-class ValidateTopicModelsJobTests(job_test_utils.JobTestBase, test_utils.GenericTestBase):
-    JOB_CLASS: Type[(audit_topic_related_models_relation_jobs.ValidateTopicModelsJob)] = audit_topic_related_models_relation_jobs.ValidateTopicModelsJob
+class ValidateTopicModelsJobTests(
+    job_test_utils.JobTestBase, test_utils.GenericTestBase
+):
+    JOB_CLASS: Type[
+        (audit_topic_related_models_relation_jobs.ValidateTopicModelsJob)
+    ] = audit_topic_related_models_relation_jobs.ValidateTopicModelsJob
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -52,7 +56,9 @@ class ValidateTopicModelsJobTests(job_test_utils.JobTestBase, test_utils.Generic
             url_fragment='url-fragment',
             description='description',
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            story_reference_schema_version=(feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+            story_reference_schema_version=(
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            ),
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
@@ -103,7 +109,9 @@ class ValidateTopicModelsJobTests(job_test_utils.JobTestBase, test_utils.Generic
             url_fragment='url-fragment',
             description='description',
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            story_reference_schema_version=(feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+            story_reference_schema_version=(
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            ),
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
@@ -138,7 +146,9 @@ class ValidateTopicModelsJobTests(job_test_utils.JobTestBase, test_utils.Generic
         self.assert_job_output_is(
             [
                 base_validation_errors.ModelRelationshipError(
-                    model_property.ModelProperty(topic_models.TopicModel, topic_models.TopicModel.name),
+                    model_property.ModelProperty(
+                        topic_models.TopicModel, topic_models.TopicModel.name
+                    ),
                     topic_model,
                     target_kind='TopicRightsModel',
                     target_id='topic_1',
@@ -156,7 +166,9 @@ class ValidateTopicModelsJobTests(job_test_utils.JobTestBase, test_utils.Generic
             url_fragment='url-fragment',
             description='description',
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            story_reference_schema_version=(feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+            story_reference_schema_version=(
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            ),
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
@@ -176,7 +188,9 @@ class ValidateTopicModelsJobTests(job_test_utils.JobTestBase, test_utils.Generic
         self.assert_job_output_is(
             [
                 base_validation_errors.ModelRelationshipError(
-                    id_property=model_property.ModelProperty(topic_models.TopicModel, topic_models.TopicModel.name),
+                    id_property=model_property.ModelProperty(
+                        topic_models.TopicModel, topic_models.TopicModel.name
+                    ),
                     model=topic_model,
                     target_kind='TopicSummaryModel',
                     target_id='topic_1',
@@ -194,7 +208,9 @@ class ValidateTopicModelsJobTests(job_test_utils.JobTestBase, test_utils.Generic
             url_fragment='url-fragment',
             description='description',
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            story_reference_schema_version=(feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+            story_reference_schema_version=(
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            ),
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
@@ -240,7 +256,9 @@ class ValidateTopicModelsJobTests(job_test_utils.JobTestBase, test_utils.Generic
             url_fragment='url-fragment',
             description='description',
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            story_reference_schema_version=(feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+            story_reference_schema_version=(
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            ),
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
@@ -300,7 +318,9 @@ class ValidateTopicModelsJobTests(job_test_utils.JobTestBase, test_utils.Generic
             url_fragment='url-fragment',
             description='description',
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            story_reference_schema_version=(feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+            story_reference_schema_version=(
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            ),
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
@@ -346,7 +366,9 @@ class ValidateTopicModelsJobTests(job_test_utils.JobTestBase, test_utils.Generic
             url_fragment='url-fragment',
             description='description',
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            story_reference_schema_version=(feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+            story_reference_schema_version=(
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            ),
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
@@ -385,7 +407,9 @@ class ValidateTopicModelsJobTests(job_test_utils.JobTestBase, test_utils.Generic
             url_fragment='url-fragment',
             description='description',
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            story_reference_schema_version=(feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+            story_reference_schema_version=(
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            ),
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
@@ -415,13 +439,17 @@ class ValidateTopicModelsJobTests(job_test_utils.JobTestBase, test_utils.Generic
         self.assert_job_output_is(
             [
                 base_validation_errors.ModelRelationshipError(
-                    model_property.ModelProperty(topic_models.TopicModel, topic_models.TopicModel.name),
+                    model_property.ModelProperty(
+                        topic_models.TopicModel, topic_models.TopicModel.name
+                    ),
                     model=topic_model2,
                     target_kind='TopicRightsModel',
                     target_id='topic_2',
                 ),
                 base_validation_errors.ModelRelationshipError(
-                    model_property.ModelProperty(topic_models.TopicModel, topic_models.TopicModel.name),
+                    model_property.ModelProperty(
+                        topic_models.TopicModel, topic_models.TopicModel.name
+                    ),
                     model=topic_model3,
                     target_kind='TopicSummaryModel',
                     target_id='topic_3',

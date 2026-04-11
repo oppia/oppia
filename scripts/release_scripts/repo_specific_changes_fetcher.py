@@ -65,8 +65,12 @@ def get_changed_schema_version_constant_names(
     with open(FECONF_FILEPATH, 'r', encoding='utf-8') as feconf_file:
         new_feconf = feconf_file.read()
     for version_constant in FECONF_SCHEMA_VERSION_CONSTANT_NAMES:
-        old_version = re.findall(VERSION_RE_FORMAT_STRING % version_constant, old_feconf)[0]
-        new_version = re.findall(VERSION_RE_FORMAT_STRING % version_constant, new_feconf)[0]
+        old_version = re.findall(
+            VERSION_RE_FORMAT_STRING % version_constant, old_feconf
+        )[0]
+        new_version = re.findall(
+            VERSION_RE_FORMAT_STRING % version_constant, new_feconf
+        )[0]
         if old_version != new_version:
             changed_version_constants_in_feconf.append(version_constant)
     return changed_version_constants_in_feconf
@@ -107,8 +111,13 @@ def get_setup_scripts_changes_status(
         against which diff is being checked.
     """
     setup_script_filepaths = ['scripts/install_third_party_libs.py']
-    changed_filenames = _get_changed_filenames_since_tag(release_tag_to_diff_against)
-    changes_dict = {script_filepath: script_filepath in changed_filenames for script_filepath in setup_script_filepaths}
+    changed_filenames = _get_changed_filenames_since_tag(
+        release_tag_to_diff_against
+    )
+    changes_dict = {
+        script_filepath: script_filepath in changed_filenames
+        for script_filepath in setup_script_filepaths
+    }
     return changes_dict
 
 
@@ -124,8 +133,14 @@ def get_changed_storage_models_filenames(
     Returns:
         list(str). The changed filenames in core/storage (if any).
     """
-    changed_model_filenames = _get_changed_filenames_since_tag(release_tag_to_diff_against)
-    return [model_filename for model_filename in changed_model_filenames if model_filename.startswith('core/storage')]
+    changed_model_filenames = _get_changed_filenames_since_tag(
+        release_tag_to_diff_against
+    )
+    return [
+        model_filename
+        for model_filename in changed_model_filenames
+        if model_filename.startswith('core/storage')
+    ]
 
 
 def get_changes(release_tag_to_diff_against: str) -> List[str]:
@@ -143,19 +158,27 @@ def get_changes(release_tag_to_diff_against: str) -> List[str]:
     """
     changes = []
 
-    feconf_version_changes = get_changed_schema_version_constant_names(release_tag_to_diff_against)
+    feconf_version_changes = get_changed_schema_version_constant_names(
+        release_tag_to_diff_against
+    )
     if feconf_version_changes:
-        changes.append('\n### Feconf version changes:\nThis indicates that a migration may be needed\n\n')
+        changes.append(
+            '\n### Feconf version changes:\nThis indicates that a migration may be needed\n\n'
+        )
         for var in feconf_version_changes:
             changes.append('* %s\n' % var)
 
-    setup_changes = get_setup_scripts_changes_status(release_tag_to_diff_against)
+    setup_changes = get_setup_scripts_changes_status(
+        release_tag_to_diff_against
+    )
     if setup_changes:
         changes.append('\n### Changed setup scripts:\n')
         for var in setup_changes.keys():
             changes.append('* %s\n' % var)
 
-    storage_changes = get_setup_scripts_changes_status(release_tag_to_diff_against)
+    storage_changes = get_setup_scripts_changes_status(
+        release_tag_to_diff_against
+    )
     if storage_changes:
         changes.append('\n### Changed storage models:\n')
         for item in storage_changes:

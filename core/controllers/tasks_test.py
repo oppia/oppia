@@ -50,7 +50,9 @@ if MYPY:  # pragma: no cover
 class TasksTests(test_utils.EmailTestBase):
     USER_A_EMAIL: Final = 'a@example.com'
     USER_B_EMAIL: Final = 'b@example.com'
-    EMAIL_FOOTER: Final = 'You can change your email preferences via the Preferences page.'
+    EMAIL_FOOTER: Final = (
+        'You can change your email preferences via the Preferences page.'
+    )
 
     def setUp(self) -> None:
         super().setUp()
@@ -66,8 +68,12 @@ class TasksTests(test_utils.EmailTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
-        self.exploration = self.save_new_default_exploration('A', self.editor_id, title='Title')
-        self.can_send_feedback_email_ctx = self.swap(feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True)
+        self.exploration = self.save_new_default_exploration(
+            'A', self.editor_id, title='Title'
+        )
+        self.can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True
+        )
         self.THREAD_ID = 'exploration.exp1.thread_1'
 
     @test_utils.set_platform_parameters(
@@ -99,23 +105,31 @@ class TasksTests(test_utils.EmailTestBase):
                 'a subject',
                 'some text',
             )
-            threadlist = feedback_services.get_all_threads(feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
+            threadlist = feedback_services.get_all_threads(
+                feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False
+            )
             thread_id = threadlist[0].id
 
             # Create another message.
-            feedback_services.create_message(thread_id, self.user_id_b, None, None, 'user b message')
+            feedback_services.create_message(
+                thread_id, self.user_id_b, None, None, 'user b message'
+            )
 
             # Check that there are two messages in thread.
             messages = feedback_services.get_messages(thread_id)
             self.assertEqual(len(messages), 2)
 
             # Check that there are no feedback emails sent to Editor.
-            mock_email_messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
+            mock_email_messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL
+            )
             self.assertEqual(len(mock_email_messages), 0)
 
             # Send task and subsequent email to Editor.
             self.process_and_flush_pending_tasks()
-            mock_email_messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
+            mock_email_messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL
+            )
             expected_message = (
                 'Hi editor,\n\nYou\'ve received 2 new messages on your'
                 ' Oppia explorations:\n- Title:\n- some text\n- user b message'
@@ -131,7 +145,9 @@ class TasksTests(test_utils.EmailTestBase):
 
             # Create another message that is len = 201.
             user_b_message = 'B' * 201
-            feedback_services.create_message(thread_id, self.user_id_b, None, None, user_b_message)
+            feedback_services.create_message(
+                thread_id, self.user_id_b, None, None, user_b_message
+            )
 
             # Check that there are three messages in thread.
             messages = feedback_services.get_messages(thread_id)
@@ -139,7 +155,9 @@ class TasksTests(test_utils.EmailTestBase):
 
             # Send task and subsequent email to Editor.
             self.process_and_flush_pending_tasks()
-            mock_email_messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
+            mock_email_messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL
+            )
 
             # What is expected in the email body.
             expected_message = (
@@ -153,14 +171,20 @@ class TasksTests(test_utils.EmailTestBase):
             self.assertEqual(mock_email_messages[1].body, expected_message)
 
             # Create another message.
-            feedback_services.create_message(thread_id, self.user_id_b, None, None, 'user b another message')
+            feedback_services.create_message(
+                thread_id, self.user_id_b, None, None, 'user b another message'
+            )
 
             # Pops feedback message references.
-            feedback_services.pop_feedback_message_references_transactional(self.editor_id, 0)
+            feedback_services.pop_feedback_message_references_transactional(
+                self.editor_id, 0
+            )
 
             # Send task and subsequent email to Editor.
             self.process_and_flush_pending_tasks()
-            mock_email_messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
+            mock_email_messages = self._get_sent_email_messages(
+                self.EDITOR_EMAIL
+            )
 
             # Check that there are three messages.
             self.assertEqual(len(mock_email_messages), 3)
@@ -192,7 +216,9 @@ class TasksTests(test_utils.EmailTestBase):
         """Tests ContributorDashboardAchievementEmailHandler functionality."""
 
         user_id = self.user_id_a
-        user_services.update_email_preferences(user_id, True, False, False, False)
+        user_services.update_email_preferences(
+            user_id, True, False, False, False
+        )
 
         payload = {
             'contributor_user_id': user_id,
@@ -259,17 +285,23 @@ class TasksTests(test_utils.EmailTestBase):
                 'a subject',
                 'some text',
             )
-            threadlist = feedback_services.get_all_threads(feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
+            threadlist = feedback_services.get_all_threads(
+                feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False
+            )
             thread_id = threadlist[0].id
             # Create reply message.
-            feedback_services.create_message(thread_id, self.user_id_b, None, None, 'user b message')
+            feedback_services.create_message(
+                thread_id, self.user_id_b, None, None, 'user b message'
+            )
             # Get all messages in the thread.
             messages = feedback_services.get_messages(thread_id)
             # Make sure there are only 2 messages in thread.
             self.assertEqual(len(messages), 2)
 
             # Ensure that user A has no emails sent yet.
-            mock_email_messages = self._get_sent_email_messages(self.USER_A_EMAIL)
+            mock_email_messages = self._get_sent_email_messages(
+                self.USER_A_EMAIL
+            )
             self.assertEqual(len(mock_email_messages), 0)
 
             # Invoke InstantFeedbackMessageEmail which sends
@@ -277,7 +309,9 @@ class TasksTests(test_utils.EmailTestBase):
             self.process_and_flush_pending_tasks()
 
             # Ensure that user A has an email sent now.
-            mock_email_messages = self._get_sent_email_messages(self.USER_A_EMAIL)
+            mock_email_messages = self._get_sent_email_messages(
+                self.USER_A_EMAIL
+            )
             self.assertEqual(len(mock_email_messages), 1)
 
             # Ensure that user A has right email sent to them.
@@ -314,7 +348,9 @@ class TasksTests(test_utils.EmailTestBase):
                 'a subject',
                 'some text',
             )
-            threadlist = feedback_services.get_all_threads(feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
+            threadlist = feedback_services.get_all_threads(
+                feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False
+            )
             thread_id = threadlist[0].id
 
             # User B creates message with status change.
@@ -369,7 +405,9 @@ class TasksTests(test_utils.EmailTestBase):
             """Replaces get_user_ids_by_role for testing purposes."""
             return [self.moderator_id]
 
-        get_moderator_id_as_list = self.swap(user_services, 'get_user_ids_by_role', fake_get_user_ids_by_role)
+        get_moderator_id_as_list = self.swap(
+            user_services, 'get_user_ids_by_role', fake_get_user_ids_by_role
+        )
 
         with self.can_send_feedback_email_ctx:
             with get_moderator_id_as_list:
@@ -388,7 +426,9 @@ class TasksTests(test_utils.EmailTestBase):
                     'report_text': 'He said a bad word :-( ',
                     'reporter_id': self.user_id_b,
                 }
-                taskqueue_services.enqueue_task(feconf.TASK_URL_FLAG_EXPLORATION_EMAILS, payload, 0)
+                taskqueue_services.enqueue_task(
+                    feconf.TASK_URL_FLAG_EXPLORATION_EMAILS, payload, 0
+                )
                 # Ensure moderator has no messages sent to him yet.
                 messages = self._get_sent_email_messages(self.MODERATOR_EMAIL)
                 self.assertEqual(len(messages), 0)
@@ -408,7 +448,8 @@ class TasksTests(test_utils.EmailTestBase):
         incorrect_function_identifier = 'incorrect_function_id'
         raises_incorrect_function_id_exception = self.assertRaisesRegex(
             Exception,
-            'Value \'%s\' for property function_id is not an allowed choice' % incorrect_function_identifier,
+            'Value \'%s\' for property function_id is not an allowed choice'
+            % incorrect_function_identifier,
         )
 
         with raises_incorrect_function_id_exception:
@@ -463,7 +504,9 @@ class TasksTests(test_utils.EmailTestBase):
             'kwargs': {},
         }
 
-        cloud_task_run_model = taskqueue_services.create_new_cloud_task_model(new_model_id, task_name, function_id)
+        cloud_task_run_model = taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id
+        )
         self.assertEqual(cloud_task_run_model.latest_job_state, 'PENDING')
 
         self.post_task(
@@ -475,7 +518,9 @@ class TasksTests(test_utils.EmailTestBase):
             headers=headers,
         )
 
-        cloud_task_run_model_obj = taskqueue_services.get_cloud_task_run_by_model_id(new_model_id)
+        cloud_task_run_model_obj = (
+            taskqueue_services.get_cloud_task_run_by_model_id(new_model_id)
+        )
         assert cloud_task_run_model_obj is not None
         self.assertEqual(cloud_task_run_model_obj.latest_job_state, 'SUCCEEDED')
 
@@ -511,7 +556,9 @@ class TasksTests(test_utils.EmailTestBase):
             'kwargs': {},
         }
 
-        cloud_task_run_model = taskqueue_services.create_new_cloud_task_model(new_model_id, task_name, function_id)
+        cloud_task_run_model = taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id
+        )
         self.assertEqual(cloud_task_run_model.latest_job_state, 'PENDING')
         self.post_task(
             url,
@@ -522,7 +569,9 @@ class TasksTests(test_utils.EmailTestBase):
             headers=headers,
         )
 
-        cloud_task_run_model_obj = taskqueue_services.get_cloud_task_run_by_model_id(new_model_id)
+        cloud_task_run_model_obj = (
+            taskqueue_services.get_cloud_task_run_by_model_id(new_model_id)
+        )
         assert cloud_task_run_model_obj is not None
         self.assertEqual(cloud_task_run_model_obj.latest_job_state, 'SUCCEEDED')
 
@@ -539,7 +588,9 @@ class TasksTests(test_utils.EmailTestBase):
         language_codes_mapping: Dict[str, Dict[str, bool]] = {
             'en': {'en-US': True, 'en-NG': True},
         }
-        voiceover_services.save_language_accent_support(language_codes_mapping=language_codes_mapping)
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=language_codes_mapping
+        )
 
         url = feconf.TASK_URL_DEFERRED
         csrf_token = self.get_new_csrf_token()
@@ -641,7 +692,9 @@ class TasksTests(test_utils.EmailTestBase):
             )
         )
         assert cloud_task_run_model_obj is not None
-        self.assertEqual(cloud_task_run_model_obj.latest_job_state, 'PERMANENTLY_FAILED')
+        self.assertEqual(
+            cloud_task_run_model_obj.latest_job_state, 'PERMANENTLY_FAILED'
+        )
 
     def test_should_request_batch_regeneration_successfully(self) -> None:
         exploration_id = 'exploration_id'
@@ -834,7 +887,9 @@ class TasksTests(test_utils.EmailTestBase):
             'kwargs': {},
         }
 
-        cloud_task_run_model = taskqueue_services.create_new_cloud_task_model(new_model_id, task_name, function_id)
+        cloud_task_run_model = taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id
+        )
         self.assertEqual(cloud_task_run_model.latest_job_state, 'PENDING')
 
         response = self.post_task(
@@ -845,10 +900,14 @@ class TasksTests(test_utils.EmailTestBase):
             csrf_token=csrf_token,
             headers=headers,
         )
-        error_message = b'Error running deferred task: delete_explorations_from_user_models'
+        error_message = (
+            b'Error running deferred task: delete_explorations_from_user_models'
+        )
         self.assertIn(error_message, response.body)
 
-        cloud_task_run_model_obj = taskqueue_services.get_cloud_task_run_by_model_id(new_model_id)
+        cloud_task_run_model_obj = (
+            taskqueue_services.get_cloud_task_run_by_model_id(new_model_id)
+        )
         assert cloud_task_run_model_obj is not None
         self.assertEqual(
             cloud_task_run_model_obj.latest_job_state,
@@ -883,7 +942,9 @@ class TasksTests(test_utils.EmailTestBase):
             'kwargs': {},
         }
 
-        cloud_task_run_model = taskqueue_services.create_new_cloud_task_model(new_model_id, task_name, function_id)
+        cloud_task_run_model = taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id
+        )
         cloud_task_run_model.current_retry_attempt = 2
         cloud_task_run_model.update_timestamps()
         cloud_task_run_model.put()
@@ -899,11 +960,17 @@ class TasksTests(test_utils.EmailTestBase):
             headers=headers,
         )
 
-        error_message = b'Error running deferred task: delete_explorations_from_user_models'
+        error_message = (
+            b'Error running deferred task: delete_explorations_from_user_models'
+        )
         self.assertIn(error_message, response.body)
-        cloud_task_run_model_obj = taskqueue_services.get_cloud_task_run_by_model_id(new_model_id)
+        cloud_task_run_model_obj = (
+            taskqueue_services.get_cloud_task_run_by_model_id(new_model_id)
+        )
         assert cloud_task_run_model_obj is not None
-        self.assertEqual(cloud_task_run_model_obj.latest_job_state, 'PERMANENTLY_FAILED')
+        self.assertEqual(
+            cloud_task_run_model_obj.latest_job_state, 'PERMANENTLY_FAILED'
+        )
 
     def test_deferred_tasks_handler_handles_tasks_correctly(self) -> None:
         exp_id = '15'
@@ -914,8 +981,12 @@ class TasksTests(test_utils.EmailTestBase):
 
         exp_version = exploration.version
         state_name = 'Home'
-        state_stats_mapping = {state_name: stats_domain.StateStats.create_default()}
-        exploration_stats = stats_domain.ExplorationStats(exp_id, exp_version, 0, 0, 0, 0, 0, 0, state_stats_mapping)
+        state_stats_mapping = {
+            state_name: stats_domain.StateStats.create_default()
+        }
+        exploration_stats = stats_domain.ExplorationStats(
+            exp_id, exp_version, 0, 0, 0, 0, 0, 0, state_stats_mapping
+        )
         stats_services.create_stats_model(exploration_stats)
 
         aggregated_stats = {
@@ -937,17 +1008,23 @@ class TasksTests(test_utils.EmailTestBase):
             '/explorehandler/stats_events/%s' % (exp_id),
             {'aggregated_stats': aggregated_stats, 'exp_version': exp_version},
         )
-        self.assertEqual(self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_STATS), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_STATS), 1
+        )
         self.process_and_flush_pending_tasks()
 
         # Check that the models are updated.
-        updated_exploration_stats = stats_services.get_exploration_stats_by_id(exp_id, exp_version)
+        updated_exploration_stats = stats_services.get_exploration_stats_by_id(
+            exp_id, exp_version
+        )
         assert updated_exploration_stats is not None
         self.assertEqual(updated_exploration_stats.num_starts_v2, 1)
         self.assertEqual(updated_exploration_stats.num_actual_starts_v2, 1)
         self.assertEqual(updated_exploration_stats.num_completions_v2, 1)
         self.assertEqual(
-            updated_exploration_stats.state_stats_mapping[state_name].total_hit_count_v2,
+            updated_exploration_stats.state_stats_mapping[
+                state_name
+            ].total_hit_count_v2,
             1,
         )
 
@@ -995,7 +1072,9 @@ class RetryEmailHandlerTests(test_utils.EmailTestBase):
         def mock_send_mail_that_fails(*_args: str, **_kwargs: str) -> None:
             raise Exception('Mock email failure')
 
-        send_mail_swap = self.swap(email_services, 'send_mail', mock_send_mail_that_fails)
+        send_mail_swap = self.swap(
+            email_services, 'send_mail', mock_send_mail_that_fails
+        )
 
         with send_mail_swap:
             response = self.post_task(
@@ -1008,13 +1087,17 @@ class RetryEmailHandlerTests(test_utils.EmailTestBase):
             )
 
         self.assertEqual(response.status_int, 500)
-        self.assertIn(b'Failed to resend email: Mock email failure', response.body)
+        self.assertIn(
+            b'Failed to resend email: Mock email failure', response.body
+        )
 
     def test_drops_task_after_max_retries_exceeded(self) -> None:
         def mock_send_mail_that_fails(*_args: str, **_kwargs: str) -> None:
             raise Exception('Mock email failure')
 
-        send_mail_swap = self.swap(email_services, 'send_mail', mock_send_mail_that_fails)
+        send_mail_swap = self.swap(
+            email_services, 'send_mail', mock_send_mail_that_fails
+        )
 
         self.headers['X-AppEngine-TaskExecutionCount'] = '3'
 

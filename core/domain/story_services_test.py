@@ -44,7 +44,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import story_models, user_models
 
-(story_models, user_models) = models.Registry.import_models([models.Names.STORY, models.Names.USER])
+(story_models, user_models) = models.Registry.import_models(
+    [models.Names.STORY, models.Names.USER]
+)
 
 
 class StoryServicesUnitTests(test_utils.GenericTestBase):
@@ -63,7 +65,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
-        self.user_id_admin = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.user_id_admin = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL
+        )
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.topic = self.save_new_topic(
@@ -80,8 +84,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             next_subtopic_id=0,
         )
         self.save_new_story(self.STORY_ID, self.USER_ID, self.TOPIC_ID)
-        topic_services.add_canonical_story(self.USER_ID, self.TOPIC_ID, self.STORY_ID)
-        self.save_new_valid_exploration(self.EXP_ID, self.user_id_admin, end_state_name='End')
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, self.STORY_ID
+        )
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.user_id_admin, end_state_name='End'
+        )
         self.publish_exploration(self.user_id_admin, self.EXP_ID)
         changelist = [
             story_domain.StoryChange(
@@ -94,21 +102,29 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': self.EXP_ID,
                 }
             ),
         ]
-        story_services.update_story(self.USER_ID, self.STORY_ID, changelist, 'Added node.')
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, changelist, 'Added node.'
+        )
         self.story = story_fetchers.get_story_by_id(self.STORY_ID)
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.set_topic_managers([user_services.get_username(self.user_id_a)], self.TOPIC_ID)
+        self.set_topic_managers(
+            [user_services.get_username(self.user_id_a)], self.TOPIC_ID
+        )
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
-        self.user_admin = user_services.get_user_actions_info(self.user_id_admin)
+        self.user_admin = user_services.get_user_actions_info(
+            self.user_id_admin
+        )
         self.OLD_VALUE: List[str] = []
 
     def test_compute_summary(self) -> None:
@@ -126,7 +142,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         self.story.created_on = None
 
-        with self.assertRaisesRegex(Exception, 'No data available for when the story was last_updated'):
+        with self.assertRaisesRegex(
+            Exception, 'No data available for when the story was last_updated'
+        ):
             story_services.compute_summary_of_story(self.story)
 
     def test_get_new_story_id(self) -> None:
@@ -136,7 +154,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_models.StoryModel.get_by_id(new_story_id), None)
 
     def test_commit_log_entry(self) -> None:
-        story_commit_log_entry = story_models.StoryCommitLogEntryModel.get_commit(self.STORY_ID, 1)
+        story_commit_log_entry = (
+            story_models.StoryCommitLogEntryModel.get_commit(self.STORY_ID, 1)
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert story_commit_log_entry is not None
         self.assertEqual(story_commit_log_entry.commit_type, 'create')
@@ -172,15 +192,21 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
-                    'property_name': (story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR),
+                    'property_name': (
+                        story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR
+                    ),
                     'old_value': None,
-                    'new_value': constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0],
+                    'new_value': constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][
+                        0
+                    ],
                 }
             ),
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
-                    'property_name': (story_domain.STORY_PROPERTY_META_TAG_CONTENT),
+                    'property_name': (
+                        story_domain.STORY_PROPERTY_META_TAG_CONTENT
+                    ),
                     'old_value': None,
                     'new_value': 'new story meta tag content',
                 }
@@ -239,8 +265,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 }
             )
         ]
-        topic_services.publish_story(self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
-        story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Changed title')
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin
+        )
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, change_list, 'Changed title'
+        )
         updated_story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(updated_story.title, 'New Title')
 
@@ -256,7 +286,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_2,
                     'old_value': None,
                     'new_value': 'exp_2',
@@ -265,7 +297,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_DESCRIPTION),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_DESCRIPTION
+                    ),
                     'node_id': self.NODE_ID_2,
                     'old_value': '',
                     'new_value': 'Description 2',
@@ -274,7 +308,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS
+                    ),
                     'node_id': self.NODE_ID_2,
                     'old_value': self.OLD_VALUE,
                     'new_value': [self.NODE_ID_1],
@@ -300,7 +336,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                     'node_id': self.NODE_ID_2,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME
+                    ),
                     'old_value': None,
                     'new_value': 'image.svg',
                 }
@@ -309,9 +347,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                     'node_id': self.NODE_ID_2,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR
+                    ),
                     'old_value': None,
-                    'new_value': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+                    'new_value': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                        'chapter'
+                    ][0],
                 }
             ),
             story_domain.StoryChange(
@@ -327,7 +369,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                     'node_id': self.NODE_ID_2,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE
+                    ),
                     'old_value': None,
                     'new_value': 1672617600000,
                 }
@@ -336,7 +380,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                     'node_id': self.NODE_ID_2,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_LAST_MODIFIED),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_LAST_MODIFIED
+                    ),
                     'old_value': None,
                     'new_value': 1672531200000,
                 }
@@ -345,7 +391,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                     'node_id': self.NODE_ID_2,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE
+                    ),
                     'old_value': None,
                     'new_value': 1672531200000,
                 }
@@ -366,9 +414,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             mimetype='image/svg+xml',
         )
 
-        story_services.update_story(self.USER_ID, self.STORY_ID, changelist, 'Added story node.')
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, changelist, 'Added story node.'
+        )
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story.story_contents.nodes[1].thumbnail_filename, 'image.svg')
+        self.assertEqual(
+            story.story_contents.nodes[1].thumbnail_filename, 'image.svg'
+        )
         self.assertEqual(
             story.story_contents.nodes[1].thumbnail_size_in_bytes,
             len(raw_image),
@@ -377,10 +429,16 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story.story_contents.nodes[1].thumbnail_bg_color,
             constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
         )
-        self.assertEqual(story.story_contents.nodes[1].destination_node_ids, [self.NODE_ID_1])
-        self.assertEqual(story.story_contents.nodes[1].outline_is_finalized, True)
+        self.assertEqual(
+            story.story_contents.nodes[1].destination_node_ids, [self.NODE_ID_1]
+        )
+        self.assertEqual(
+            story.story_contents.nodes[1].outline_is_finalized, True
+        )
         self.assertEqual(story.story_contents.nodes[1].title, 'Title 2')
-        self.assertEqual(story.story_contents.nodes[1].description, 'Description 2')
+        self.assertEqual(
+            story.story_contents.nodes[1].description, 'Description 2'
+        )
         self.assertEqual(story.story_contents.initial_node_id, self.NODE_ID_2)
         self.assertEqual(story.story_contents.next_node_id, 'node_3')
         self.assertEqual(story.version, 3)
@@ -434,7 +492,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_DESCRIPTION),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_DESCRIPTION
+                    ),
                     'node_id': self.NODE_ID_2,
                     'old_value': 'Description 2',
                     'new_value': 'Modified description 2',
@@ -444,20 +504,32 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                     'node_id': self.NODE_ID_2,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_UNPUBLISHING_REASON),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_UNPUBLISHING_REASON
+                    ),
                     'old_value': None,
-                    'new_value': (constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS[0]),
+                    'new_value': (
+                        constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS[0]
+                    ),
                 }
             ),
         ]
-        story_services.update_story(self.USER_ID, self.STORY_ID, changelist, 'Removed a story node.')
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, changelist, 'Removed a story node.'
+        )
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story_summary.node_titles, ['Modified title 2'])
-        self.assertEqual(story.story_contents.nodes[0].title, 'Modified title 2')
-        self.assertEqual(story.story_contents.nodes[0].description, 'Modified description 2')
+        self.assertEqual(
+            story.story_contents.nodes[0].title, 'Modified title 2'
+        )
+        self.assertEqual(
+            story.story_contents.nodes[0].description, 'Modified description 2'
+        )
         self.assertEqual(story.story_contents.nodes[0].destination_node_ids, [])
-        self.assertEqual(story.story_contents.nodes[0].outline_is_finalized, False)
+        self.assertEqual(
+            story.story_contents.nodes[0].outline_is_finalized, False
+        )
         self.assertEqual(
             story.story_contents.nodes[0].unpublishing_reason,
             constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS[0],
@@ -468,7 +540,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         node_1: story_domain.StoryNodeDict = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
@@ -487,7 +561,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         node_2: story_domain.StoryNodeDict = {
             'id': 'node_2',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
@@ -506,7 +582,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         node_3: story_domain.StoryNodeDict = {
             'id': 'node_3',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 3',
             'description': 'Description 3',
@@ -530,15 +608,21 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         expected_error_string = 'The skills with ids skill_4 were specified as prerequisites for Chapter Title 3, but were not taught in any chapter before it'
-        with self.assertRaisesRegex(utils.ValidationError, expected_error_string):
-            story_services.validate_prerequisite_skills_in_story_contents(self.topic.get_all_skill_ids(), self.story.story_contents)
+        with self.assertRaisesRegex(
+            utils.ValidationError, expected_error_string
+        ):
+            story_services.validate_prerequisite_skills_in_story_contents(
+                self.topic.get_all_skill_ids(), self.story.story_contents
+            )
 
     def test_story_with_loop(self) -> None:
         self.story.story_contents.next_node_id = 'node_4'
         node_1: story_domain.StoryNodeDict = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
@@ -557,7 +641,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         node_2: story_domain.StoryNodeDict = {
             'id': 'node_2',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
@@ -576,7 +662,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         node_3: story_domain.StoryNodeDict = {
             'id': 'node_3',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 3',
             'description': 'Description 3',
@@ -598,19 +686,37 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict(node_3),
         ]
         expected_error_string = 'Loops are not allowed in stories.'
-        with self.assertRaisesRegex(utils.ValidationError, expected_error_string):
-            story_services.validate_prerequisite_skills_in_story_contents(self.topic.get_all_skill_ids(), self.story.story_contents)
+        with self.assertRaisesRegex(
+            utils.ValidationError, expected_error_string
+        ):
+            story_services.validate_prerequisite_skills_in_story_contents(
+                self.topic.get_all_skill_ids(), self.story.story_contents
+            )
 
     def test_does_story_exist_with_url_fragment(self) -> None:
         story_id_1 = story_services.get_new_story_id()
         story_id_2 = story_services.get_new_story_id()
-        self.save_new_story(story_id_1, self.USER_ID, self.TOPIC_ID, url_fragment='story-one')
-        self.save_new_story(story_id_2, self.USER_ID, self.TOPIC_ID, url_fragment='story-two')
-        topic_services.add_canonical_story(self.USER_ID, self.TOPIC_ID, story_id_1)
-        topic_services.add_canonical_story(self.USER_ID, self.TOPIC_ID, story_id_2)
-        self.assertTrue(story_services.does_story_exist_with_url_fragment('story-one'))
-        self.assertTrue(story_services.does_story_exist_with_url_fragment('story-two'))
-        self.assertFalse(story_services.does_story_exist_with_url_fragment('story-three'))
+        self.save_new_story(
+            story_id_1, self.USER_ID, self.TOPIC_ID, url_fragment='story-one'
+        )
+        self.save_new_story(
+            story_id_2, self.USER_ID, self.TOPIC_ID, url_fragment='story-two'
+        )
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, story_id_1
+        )
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, story_id_2
+        )
+        self.assertTrue(
+            story_services.does_story_exist_with_url_fragment('story-one')
+        )
+        self.assertTrue(
+            story_services.does_story_exist_with_url_fragment('story-two')
+        )
+        self.assertFalse(
+            story_services.does_story_exist_with_url_fragment('story-three')
+        )
 
     def test_update_story_with_invalid_corresponding_topic_id_value(
         self,
@@ -629,7 +735,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': self.EXP_ID,
@@ -639,9 +747,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            ('Expected story to only belong to a valid topic, but found no topic with ID: %s' % topic_id),
+            (
+                'Expected story to only belong to a valid topic, but found no topic with ID: %s'
+                % topic_id
+            ),
         ):
-            story_services.update_story(self.USER_ID, story_id, changelist, 'Added node.')
+            story_services.update_story(
+                self.USER_ID, story_id, changelist, 'Added node.'
+            )
 
     def test_update_story_which_not_corresponding_topic_id(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
@@ -672,7 +785,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': self.EXP_ID,
@@ -682,9 +797,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            ('Expected story to belong to the topic %s, but it is neither a part of the canonical stories or the additional stories of the topic.' % topic_id),
+            (
+                'Expected story to belong to the topic %s, but it is neither a part of the canonical stories or the additional stories of the topic.'
+                % topic_id
+            ),
         ):
-            story_services.update_story(self.USER_ID, story_id, changelist, 'Added node.')
+            story_services.update_story(
+                self.USER_ID, story_id, changelist, 'Added node.'
+            )
 
     def test_update_story_schema(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
@@ -715,7 +835,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 }
             )
         ]
-        story_services.update_story(self.USER_ID, story_id, changelist, 'Update schema.')
+        story_services.update_story(
+            self.USER_ID, story_id, changelist, 'Update schema.'
+        )
 
         new_story_dict = story_fetchers.get_story_by_id(story_id).to_dict()
 
@@ -729,7 +851,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
     def test_delete_story(self) -> None:
         story_services.delete_story(self.USER_ID, self.STORY_ID)
-        self.assertEqual(story_fetchers.get_story_by_id(self.STORY_ID, strict=False), None)
+        self.assertEqual(
+            story_fetchers.get_story_by_id(self.STORY_ID, strict=False), None
+        )
         self.assertEqual(
             story_fetchers.get_story_summary_by_id(self.STORY_ID, strict=False),
             None,
@@ -744,12 +868,15 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'Sorry, we can only process v1-v%d story schemas at present.' % feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
+            'Sorry, we can only process v1-v%d story schemas at present.'
+            % feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
         ):
             story_fetchers.get_story_from_model(story_model)
 
     def test_get_story_summaries_by_ids(self) -> None:
-        story_summaries = story_fetchers.get_story_summaries_by_ids([self.STORY_ID])
+        story_summaries = story_fetchers.get_story_summaries_by_ids(
+            [self.STORY_ID]
+        )
 
         self.assertEqual(len(story_summaries), 1)
         self.assertEqual(story_summaries[0].id, self.STORY_ID)
@@ -769,7 +896,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(Exception, 'Expected change to be of type StoryChange')
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Expected change to be of type StoryChange'
+        )
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally
@@ -784,7 +913,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             observed_log_messages,
-            ['Exception Expected change to be of type StoryChange %s [{}]' % self.STORY_ID],
+            [
+                'Exception Expected change to be of type StoryChange %s [{}]'
+                % self.STORY_ID
+            ],
         )
 
     def test_update_story_node_outline(self) -> None:
@@ -803,7 +935,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story outline.')
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, change_list, 'Updated story outline.'
+        )
 
         story = story_fetchers.get_story_by_id(self.STORY_ID)
 
@@ -824,7 +958,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        with self.assertRaisesRegex(Exception, 'The node with id invalid_node is not part of this story'):
+        with self.assertRaisesRegex(
+            Exception, 'The node with id invalid_node is not part of this story'
+        ):
             story_services.update_story(
                 self.USER_ID,
                 self.STORY_ID,
@@ -837,7 +973,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_DESCRIPTION),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_DESCRIPTION
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': '',
                     'new_value': 'New description.',
@@ -848,7 +986,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally
         # test wrong inputs that we can normally catch by typing.
-        with self.assertRaisesRegex(Exception, 'Expected a commit message but received none.'):
+        with self.assertRaisesRegex(
+            Exception, 'Expected a commit message but received none.'
+        ):
             story_services.update_story(
                 self.USER_ID,
                 self.STORY_ID,
@@ -864,7 +1004,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                    ),
                     'node_id': 'node_1',
                     'old_value': self.OLD_VALUE,
                     'new_value': ['skill_id'],
@@ -881,7 +1023,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         story = story_fetchers.get_story_by_id(self.STORY_ID)
 
-        self.assertEqual(story.story_contents.nodes[0].acquired_skill_ids, ['skill_id'])
+        self.assertEqual(
+            story.story_contents.nodes[0].acquired_skill_ids, ['skill_id']
+        )
 
     def test_exploration_context_model_is_modified_correctly(self) -> None:
         changelist = [
@@ -895,7 +1039,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_2,
                     'old_value': None,
                     'new_value': 'exp_2',
@@ -904,14 +1050,18 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': self.OLD_VALUE,
                     'new_value': [self.NODE_ID_2],
                 }
             ),
         ]
-        story_services.update_story(self.USER_ID, self.STORY_ID, changelist, 'Added node.')
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, changelist, 'Added node.'
+        )
         self.save_new_valid_exploration(
             '0',
             self.user_id_admin,
@@ -944,7 +1094,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': '0',
@@ -953,22 +1105,32 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_2,
                     'old_value': None,
                     'new_value': '1',
                 }
             ),
         ]
-        story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
-        self.assertEqual(exp_services.get_story_id_linked_to_exploration('0'), self.STORY_ID)
-        self.assertEqual(exp_services.get_story_id_linked_to_exploration('1'), self.STORY_ID)
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+        )
+        self.assertEqual(
+            exp_services.get_story_id_linked_to_exploration('0'), self.STORY_ID
+        )
+        self.assertEqual(
+            exp_services.get_story_id_linked_to_exploration('1'), self.STORY_ID
+        )
 
         change_list = [
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_2,
                     'old_value': '1',
                     'new_value': '2',
@@ -977,7 +1139,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_2,
                     'old_value': '2',
                     'new_value': '1',
@@ -986,23 +1150,33 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': '0',
                     'new_value': '2',
                 }
             ),
         ]
-        story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+        )
         self.assertIsNone(exp_services.get_story_id_linked_to_exploration('0'))
-        self.assertEqual(exp_services.get_story_id_linked_to_exploration('1'), self.STORY_ID)
-        self.assertEqual(exp_services.get_story_id_linked_to_exploration('2'), self.STORY_ID)
+        self.assertEqual(
+            exp_services.get_story_id_linked_to_exploration('1'), self.STORY_ID
+        )
+        self.assertEqual(
+            exp_services.get_story_id_linked_to_exploration('2'), self.STORY_ID
+        )
 
         change_list = [
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': '2',
                     'new_value': '0',
@@ -1011,7 +1185,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_2,
                     'old_value': '1',
                     'new_value': '2',
@@ -1033,7 +1209,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': self.OLD_VALUE,
                     'new_value': ['node_3'],
@@ -1042,16 +1220,24 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': 'node_3',
                     'old_value': None,
                     'new_value': '1',
                 }
             ),
         ]
-        story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
-        self.assertEqual(exp_services.get_story_id_linked_to_exploration('0'), self.STORY_ID)
-        self.assertEqual(exp_services.get_story_id_linked_to_exploration('1'), self.STORY_ID)
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+        )
+        self.assertEqual(
+            exp_services.get_story_id_linked_to_exploration('0'), self.STORY_ID
+        )
+        self.assertEqual(
+            exp_services.get_story_id_linked_to_exploration('1'), self.STORY_ID
+        )
         self.assertIsNone(exp_services.get_story_id_linked_to_exploration('2'))
 
         story_services.delete_story(self.USER_ID, self.STORY_ID)
@@ -1060,7 +1246,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(exp_services.get_story_id_linked_to_exploration('2'))
 
         self.save_new_story('story_id_2', self.USER_ID, self.TOPIC_ID)
-        topic_services.add_canonical_story(self.USER_ID, self.TOPIC_ID, 'story_id_2')
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, 'story_id_2'
+        )
 
         # Creates node 1 -> node 2 -> node 3, links exp IDs 0, 1 and 2 with them
         # respectively. Then, deletes 2, 3, adds node 4 (node 1 -> node 4),
@@ -1090,7 +1278,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': self.OLD_VALUE,
                     'new_value': ['node_2'],
@@ -1099,7 +1289,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS
+                    ),
                     'node_id': self.NODE_ID_2,
                     'old_value': self.OLD_VALUE,
                     'new_value': ['node_3'],
@@ -1108,7 +1300,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': '0',
@@ -1117,7 +1311,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_2,
                     'old_value': None,
                     'new_value': '1',
@@ -1126,7 +1322,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': 'node_3',
                     'old_value': None,
                     'new_value': '2',
@@ -1138,7 +1336,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     'node_id': self.NODE_ID_2,
                 }
             ),
-            story_domain.StoryChange({'cmd': story_domain.CMD_DELETE_STORY_NODE, 'node_id': 'node_3'}),
+            story_domain.StoryChange(
+                {'cmd': story_domain.CMD_DELETE_STORY_NODE, 'node_id': 'node_3'}
+            ),
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_ADD_STORY_NODE,
@@ -1149,13 +1349,17 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': 'node_4',
                     'old_value': None,
                     'new_value': '2',
                 }
             ),
-            story_domain.StoryChange({'cmd': story_domain.CMD_DELETE_STORY_NODE, 'node_id': 'node_4'}),
+            story_domain.StoryChange(
+                {'cmd': story_domain.CMD_DELETE_STORY_NODE, 'node_id': 'node_4'}
+            ),
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_ADD_STORY_NODE,
@@ -1166,7 +1370,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS
+                    ),
                     'node_id': 'node_1',
                     'old_value': ['node_2'],
                     'new_value': ['node_5'],
@@ -1175,22 +1381,32 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': 'node_5',
                     'old_value': None,
                     'new_value': '1',
                 }
             ),
         ]
-        story_services.update_story(self.USER_ID, 'story_id_2', change_list, 'Updated story node.')
+        story_services.update_story(
+            self.USER_ID, 'story_id_2', change_list, 'Updated story node.'
+        )
 
-        self.assertEqual(exp_services.get_story_id_linked_to_exploration('0'), 'story_id_2')
-        self.assertEqual(exp_services.get_story_id_linked_to_exploration('1'), 'story_id_2')
+        self.assertEqual(
+            exp_services.get_story_id_linked_to_exploration('0'), 'story_id_2'
+        )
+        self.assertEqual(
+            exp_services.get_story_id_linked_to_exploration('1'), 'story_id_2'
+        )
         self.assertIsNone(exp_services.get_story_id_linked_to_exploration('2'))
 
     def test_exploration_story_link_collision(self) -> None:
         self.save_new_story('story_id_2', self.USER_ID, self.TOPIC_ID)
-        topic_services.add_canonical_story(self.USER_ID, self.TOPIC_ID, 'story_id_2')
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, 'story_id_2'
+        )
         self.save_new_valid_exploration(
             '0',
             self.user_id_admin,
@@ -1204,14 +1420,18 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': '0',
                 }
             )
         ]
-        story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+        )
 
         change_list = [
             story_domain.StoryChange(
@@ -1224,7 +1444,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': '0',
@@ -1234,9 +1456,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'The exploration with ID 0 is already linked to story with ID %s' % self.STORY_ID,
+            'The exploration with ID 0 is already linked to story with ID %s'
+            % self.STORY_ID,
         ):
-            story_services.update_story(self.USER_ID, 'story_id_2', change_list, 'Added chapter.')
+            story_services.update_story(
+                self.USER_ID, 'story_id_2', change_list, 'Added chapter.'
+            )
 
     def test_cannot_update_story_acquired_skill_ids_with_invalid_node_id(
         self,
@@ -1245,7 +1470,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                    ),
                     'node_id': 'invalid_node',
                     'old_value': self.OLD_VALUE,
                     'new_value': ['skill_id'],
@@ -1253,7 +1480,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        with self.assertRaisesRegex(Exception, 'The node with id invalid_node is not part of this story'):
+        with self.assertRaisesRegex(
+            Exception, 'The node with id invalid_node is not part of this story'
+        ):
             story_services.update_story(
                 self.USER_ID,
                 self.STORY_ID,
@@ -1276,7 +1505,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story notes.')
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, change_list, 'Updated story notes.'
+        )
 
         story = story_fetchers.get_story_by_id(self.STORY_ID)
 
@@ -1368,15 +1599,21 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'Unexpected error: received an invalid change list when trying to save story',
         ):
-            story_services.update_story(self.USER_ID, self.STORY_ID, [], 'Commit message')
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, [], 'Commit message'
+            )
 
     def test_cannot_update_story_with_invalid_exploration_id(self) -> None:
-        topic_services.publish_story(self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin
+        )
         change_list = [
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': 'invalid_exp_id',
@@ -1384,8 +1621,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        with self.assertRaisesRegex(Exception, 'Expected story to only reference valid explorations'):
-            story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+        with self.assertRaisesRegex(
+            Exception, 'Expected story to only reference valid explorations'
+        ):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+            )
 
     def test_validate_exploration_throws_an_exception(self) -> None:
         observed_log_messages = []
@@ -1394,7 +1635,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             """Mocks logging.exception()."""
             observed_log_messages.append(msg)
 
-        def _mock_validate_function(_exploration: exp_domain.Exploration, _strict: bool) -> None:
+        def _mock_validate_function(
+            _exploration: exp_domain.Exploration, _strict: bool
+        ) -> None:
             """Mocks logging.exception()."""
             raise Exception('Error in exploration')
 
@@ -1405,32 +1648,52 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             _mock_validate_function,
         )
         with logging_swap, validate_fn_swap:
-            self.save_new_valid_exploration('exp_id_1', self.user_id_a, title='title', category='Algebra')
+            self.save_new_valid_exploration(
+                'exp_id_1', self.user_id_a, title='title', category='Algebra'
+            )
             self.publish_exploration(self.user_id_a, 'exp_id_1')
 
             with self.assertRaisesRegex(Exception, 'Error in exploration'):
-                story_services.validate_explorations_for_story(['exp_id_1'], False)
+                story_services.validate_explorations_for_story(
+                    ['exp_id_1'], False
+                )
                 self.assertItemsEqual(
                     observed_log_messages,
-                    ['Exploration validation failed for exploration with ID: exp_id_1. Error: Error in exploration'],
+                    [
+                        'Exploration validation failed for exploration with ID: exp_id_1. Error: Error in exploration'
+                    ],
                 )
 
     def test_validate_exploration_returning_error_messages(self) -> None:
-        topic_services.publish_story(self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
-        self.save_new_valid_exploration('exp_id_1', self.user_id_a, title='title', category='Algebra')
-        validation_error_messages = story_services.validate_explorations_for_story(['invalid_exp', 'exp_id_1'], False)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin
+        )
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Algebra'
+        )
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(
+                ['invalid_exp', 'exp_id_1'], False
+            )
+        )
         message_1 = 'Expected story to only reference valid explorations, but found a reference to an invalid exploration with ID: invalid_exp'
         message_2 = 'Exploration with ID exp_id_1 is not public. Please publish explorations before adding them to a story.'
         self.assertEqual(validation_error_messages, [message_1, message_2])
 
     def test_cannot_update_story_with_private_exploration_id(self) -> None:
-        topic_services.publish_story(self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
-        self.save_new_valid_exploration('exp_id_1', self.user_id_a, title='title', category='Algebra')
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin
+        )
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Algebra'
+        )
         change_list = [
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': 'exp_id_1',
@@ -1438,17 +1701,25 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        with self.assertRaisesRegex(Exception, 'Exploration with ID exp_id_1 is not public'):
-            story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+        with self.assertRaisesRegex(
+            Exception, 'Exploration with ID exp_id_1 is not public'
+        ):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+            )
 
     def test_cannot_update_story_with_blank_exp_id(self) -> None:
-        topic_services.publish_story(self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin
+        )
 
         change_list = [
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': self.EXP_ID,
                     'new_value': None,
@@ -1456,17 +1727,27 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        with self.assertRaisesRegex(Exception, 'Expected exploration ID to not be None'):
-            story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+        with self.assertRaisesRegex(
+            Exception, 'Expected exploration ID to not be None'
+        ):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+            )
 
     def test_cannot_update_story_with_exps_with_different_categories(
         self,
     ) -> None:
-        topic_services.publish_story(self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
-        self.save_new_valid_exploration('exp_id_1', self.user_id_a, title='title', category='Algebra')
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin
+        )
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Algebra'
+        )
         self.publish_exploration(self.user_id_a, 'exp_id_1')
 
-        self.save_new_valid_exploration('exp_id_2', self.user_id_a, title='title', category='Reading')
+        self.save_new_valid_exploration(
+            'exp_id_2', self.user_id_a, title='title', category='Reading'
+        )
         self.publish_exploration(self.user_id_a, 'exp_id_2')
 
         change_list = [
@@ -1480,7 +1761,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': 'exp_id_1',
@@ -1489,7 +1772,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS
+                    ),
                     'node_id': 'node_1',
                     'old_value': self.OLD_VALUE,
                     'new_value': ['node_2'],
@@ -1498,7 +1783,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_2,
                     'old_value': None,
                     'new_value': 'exp_id_2',
@@ -1506,30 +1793,44 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
         ]
 
-        validation_error_messages = story_services.validate_explorations_for_story(['exp_id_2', 'exp_id_1'], False)
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(
+                ['exp_id_2', 'exp_id_1'], False
+            )
+        )
 
         self.assertEqual(
             validation_error_messages,
-            ['All explorations in a story should be of the same category. The explorations with ID exp_id_2 and exp_id_1 have different categories.'],
+            [
+                'All explorations in a story should be of the same category. The explorations with ID exp_id_2 and exp_id_1 have different categories.'
+            ],
         )
         with self.assertRaisesRegex(
             Exception,
             'All explorations in a story should be of the same category',
         ):
-            story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+            )
 
     def test_cannot_update_story_with_exps_with_invalid_categories(
         self,
     ) -> None:
-        topic_services.publish_story(self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
-        self.save_new_valid_exploration('exp_id_1', self.user_id_a, title='title', category='Category 1')
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin
+        )
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1'
+        )
         self.publish_exploration(self.user_id_a, 'exp_id_1')
 
         change_list = [
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': 'exp_id_1',
@@ -1537,7 +1838,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        validation_error_messages = story_services.validate_explorations_for_story(['exp_id_1'], False)
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(['exp_id_1'], False)
+        )
 
         self.assertEqual(
             validation_error_messages,
@@ -1550,10 +1853,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'All explorations in a story should be of a default category. The exploration with ID exp_id_1 has an invalid category Category 1.',
         ):
-            story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+            )
 
     def test_cannot_update_story_with_exps_with_other_languages(self) -> None:
-        topic_services.publish_story(self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin
+        )
         self.save_new_valid_exploration(
             'exp_id_1',
             self.user_id_a,
@@ -1567,7 +1874,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': 'exp_id_1',
@@ -1575,21 +1884,29 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        validation_error_messages = story_services.validate_explorations_for_story(['exp_id_1'], False)
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(['exp_id_1'], False)
+        )
         self.assertEqual(
             validation_error_messages,
-            ['Invalid language es found for exploration with ID exp_id_1. This language is not supported for explorations in a story on the mobile app.'],
+            [
+                'Invalid language es found for exploration with ID exp_id_1. This language is not supported for explorations in a story on the mobile app.'
+            ],
         )
         with self.assertRaisesRegex(
             Exception,
             'Invalid language es found for exploration with ID exp_id_1. This language is not supported for explorations in a story on the mobile app.',
         ):
-            story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+            )
 
     def test_cannot_update_story_with_exps_with_invalid_interactions(
         self,
     ) -> None:
-        topic_services.publish_story(self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin
+        )
         self.save_new_valid_exploration(
             'exp_id_1',
             self.user_id_a,
@@ -1603,7 +1920,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': 'exp_id_1',
@@ -1611,19 +1930,27 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        validation_error_messages = story_services.validate_explorations_for_story(['exp_id_1'], False)
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(['exp_id_1'], False)
+        )
         self.assertEqual(
             validation_error_messages,
-            ['Invalid interaction GraphInput in exploration with ID: exp_id_1. This interaction is not supported for explorations in a story on the mobile app.'],
+            [
+                'Invalid interaction GraphInput in exploration with ID: exp_id_1. This interaction is not supported for explorations in a story on the mobile app.'
+            ],
         )
         with self.assertRaisesRegex(
             Exception,
             'Invalid interaction GraphInput in exploration with ID: exp_id_1. This interaction is not supported for explorations in a story on the mobile app.',
         ):
-            story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+            )
 
     def test_cannot_update_story_with_exps_with_recommended_exps(self) -> None:
-        topic_services.publish_story(self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin
+        )
         self.save_new_valid_exploration(
             'exp_id_1',
             self.user_id_a,
@@ -1641,9 +1968,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 exp_domain.ExplorationChange(
                     {
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                        'property_name': (
+                            exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
+                        ),
                         'state_name': 'End',
-                        'new_value': {'recommendedExplorationIds': {'value': ['1', '2']}},
+                        'new_value': {
+                            'recommendedExplorationIds': {'value': ['1', '2']}
+                        },
                     }
                 )
             ],
@@ -1654,7 +1985,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': 'exp_id_1',
@@ -1662,21 +1995,29 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        validation_error_messages = story_services.validate_explorations_for_story(['exp_id_1'], False)
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(['exp_id_1'], False)
+        )
         self.assertEqual(
             validation_error_messages,
-            ['Explorations in a story are not expected to contain exploration recommendations. Exploration with ID: exp_id_1 contains exploration recommendations in its EndExploration interaction.'],
+            [
+                'Explorations in a story are not expected to contain exploration recommendations. Exploration with ID: exp_id_1 contains exploration recommendations in its EndExploration interaction.'
+            ],
         )
         with self.assertRaisesRegex(
             Exception,
             'Explorations in a story are not expected to contain exploration recommendations. Exploration with ID: exp_id_1 contains exploration recommendations in its EndExploration interaction.',
         ):
-            story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+            )
 
     def test_cannot_update_story_with_exps_with_invalid_rte_content(
         self,
     ) -> None:
-        topic_services.publish_story(self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin
+        )
         self.save_new_valid_exploration(
             'exp_id_1',
             self.user_id_a,
@@ -1696,7 +2037,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                         'state_name': 'Introduction',
                         'new_value': {
                             'content_id': 'content_0',
-                            'html': ('<oppia-noninteractive-collapsible content-with-value="&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;SubCollapsible&amp;quot;"></oppia-noninteractive-collapsible>'),
+                            'html': (
+                                '<oppia-noninteractive-collapsible content-with-value="&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;SubCollapsible&amp;quot;"></oppia-noninteractive-collapsible>'
+                            ),
                         },
                     }
                 )
@@ -1708,7 +2051,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': 'exp_id_1',
@@ -1716,20 +2061,30 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        validation_error_messages = story_services.validate_explorations_for_story(['exp_id_1'], False)
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(['exp_id_1'], False)
+        )
         self.assertEqual(
             validation_error_messages,
-            ['RTE content in state Introduction of exploration with ID exp_id_1 is not supported on mobile for explorations in a story.'],
+            [
+                'RTE content in state Introduction of exploration with ID exp_id_1 is not supported on mobile for explorations in a story.'
+            ],
         )
         with self.assertRaisesRegex(
             Exception,
             'RTE content in state Introduction of exploration with ID exp_id_1 is not supported on mobile for explorations in a story.',
         ):
-            story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+            )
 
     def test_cannot_update_story_with_exps_with_parameter_values(self) -> None:
-        topic_services.publish_story(self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
-        self.save_new_valid_exploration('exp_id_1', self.user_id_a, title='title', category='Algebra')
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin
+        )
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Algebra'
+        )
         exp_services.update_exploration(
             self.user_id_a,
             'exp_id_1',
@@ -1738,7 +2093,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     {
                         'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                         'property_name': 'param_specs',
-                        'new_value': {'theParameter': param_domain.ParamSpec('UnicodeString').to_dict()},
+                        'new_value': {
+                            'theParameter': param_domain.ParamSpec(
+                                'UnicodeString'
+                            ).to_dict()
+                        },
                     }
                 )
             ],
@@ -1750,7 +2109,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': 'exp_id_1',
@@ -1758,16 +2119,22 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        validation_error_messages = story_services.validate_explorations_for_story(['exp_id_1'], False)
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(['exp_id_1'], False)
+        )
         self.assertEqual(
             validation_error_messages,
-            ['Expected no exploration in a story to have parameter values in it. Invalid exploration: exp_id_1'],
+            [
+                'Expected no exploration in a story to have parameter values in it. Invalid exploration: exp_id_1'
+            ],
         )
         with self.assertRaisesRegex(
             Exception,
             'Expected no exploration in a story to have parameter values in it. Invalid exploration: exp_id_1',
         ):
-            story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+            )
 
         self.save_new_valid_exploration(
             'exp_id_2',
@@ -1784,7 +2151,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     {
                         'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                         'property_name': 'param_specs',
-                        'new_value': {'param1': param_domain.ParamSpec('UnicodeString').to_dict()},
+                        'new_value': {
+                            'param1': param_domain.ParamSpec(
+                                'UnicodeString'
+                            ).to_dict()
+                        },
                     }
                 ),
                 exp_domain.ExplorationChange(
@@ -1815,7 +2186,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': 'exp_id_1',
                     'new_value': 'exp_id_2',
@@ -1827,17 +2200,23 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'Expected no exploration in a story to have parameter values in it. Invalid exploration: exp_id_2',
         ):
-            story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+            )
 
     def test_cannot_update_story_with_mismatch_of_story_versions(self) -> None:
-        self.save_new_default_exploration('exp_id', self.user_id_a, title='title')
+        self.save_new_default_exploration(
+            'exp_id', self.user_id_a, title='title'
+        )
         self.publish_exploration(self.user_id_a, 'exp_id')
 
         change_list = [
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': 'exp_id',
@@ -1853,7 +2232,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'Unexpected error: trying to update version 1 of story from version 2. Please reload the page and try again.',
         ):
-            story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+            )
 
         story_model = story_models.StoryModel.get(self.STORY_ID)
         story_model.version = 10
@@ -1863,7 +2244,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'Trying to update version 11 of story from version 2, which is too old. Please reload the page and try again.',
         ):
-            story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+            )
 
     def test_get_story_by_version(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
@@ -1895,7 +2278,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        story_services.update_story(self.USER_ID, story_id, change_list, 'Updated story language_code.')
+        story_services.update_story(
+            self.USER_ID, story_id, change_list, 'Updated story language_code.'
+        )
 
         story_v1 = story_fetchers.get_story_by_id(story_id, version=1)
         story_v2 = story_fetchers.get_story_by_id(story_id, version=2)
@@ -1941,14 +2326,18 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_2,
                     'old_value': None,
                     'new_value': 'exp_2',
                 }
             ),
         ]
-        story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Added story node.')
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, change_list, 'Added story node.'
+        )
 
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.story_contents.nodes[first].id, self.NODE_ID_1)
@@ -1989,7 +2378,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        with self.assertRaisesRegex(Exception, 'The node with id invalid_node is not part of this story'):
+        with self.assertRaisesRegex(
+            Exception, 'The node with id invalid_node is not part of this story'
+        ):
             story_services.update_story(
                 self.USER_ID,
                 self.STORY_ID,
@@ -2000,21 +2391,27 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_node_exploration_id_with_existing_exploration_id(
         self,
     ) -> None:
-        self.save_new_default_exploration('exp_id', self.user_id_a, title='title')
+        self.save_new_default_exploration(
+            'exp_id', self.user_id_a, title='title'
+        )
         self.publish_exploration(self.user_id_a, 'exp_id')
 
         change_list = [
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': None,
                     'new_value': 'exp_id',
                 }
             )
         ]
-        story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, change_list, 'Updated story node.'
+        )
 
         change_list = [
             story_domain.StoryChange(
@@ -2027,7 +2424,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': self.OLD_VALUE,
                     'new_value': [self.NODE_ID_2],
@@ -2036,7 +2435,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_2,
                     'old_value': None,
                     'new_value': 'exp_id',
@@ -2044,7 +2445,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             ),
         ]
 
-        with self.assertRaisesRegex(Exception, 'A node with exploration id exp_id already exists.'):
+        with self.assertRaisesRegex(
+            Exception, 'A node with exploration id exp_id already exists.'
+        ):
             story_services.update_story(
                 self.USER_ID,
                 self.STORY_ID,
@@ -2060,7 +2463,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS
+                    ),
                     'node_id': 'invalid_node',
                     'old_value': self.OLD_VALUE,
                     'new_value': new_value,
@@ -2068,7 +2473,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        with self.assertRaisesRegex(Exception, 'The node with id invalid_node is not part of this story'):
+        with self.assertRaisesRegex(
+            Exception, 'The node with id invalid_node is not part of this story'
+        ):
             story_services.update_story(
                 self.USER_ID,
                 self.STORY_ID,
@@ -2084,7 +2491,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS
+                    ),
                     'node_id': 'invalid_node',
                     'old_value': self.OLD_VALUE,
                     'new_value': new_value,
@@ -2092,7 +2501,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        with self.assertRaisesRegex(Exception, 'The node with id invalid_node is not part of this story'):
+        with self.assertRaisesRegex(
+            Exception, 'The node with id invalid_node is not part of this story'
+        ):
             story_services.update_story(
                 self.USER_ID,
                 self.STORY_ID,
@@ -2114,7 +2525,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        with self.assertRaisesRegex(Exception, 'The node with id invalid_node is not part of this story'):
+        with self.assertRaisesRegex(
+            Exception, 'The node with id invalid_node is not part of this story'
+        ):
             story_services.update_story(
                 self.USER_ID,
                 self.STORY_ID,
@@ -2136,7 +2549,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        with self.assertRaisesRegex(Exception, 'The node with id invalid_node is not part of this story'):
+        with self.assertRaisesRegex(
+            Exception, 'The node with id invalid_node is not part of this story'
+        ):
             story_services.update_story(
                 self.USER_ID,
                 self.STORY_ID,
@@ -2157,8 +2572,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        with self.assertRaisesRegex(Exception, 'The node with id invalid_node is not part of this story'):
-            story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Update node title.')
+        with self.assertRaisesRegex(
+            Exception, 'The node with id invalid_node is not part of this story'
+        ):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Update node title.'
+            )
 
     def test_cannot_update_node_description_with_invalid_node_id(self) -> None:
         change_list = [
@@ -2173,7 +2592,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        with self.assertRaisesRegex(Exception, 'The node with id invalid_node is not part of this story'):
+        with self.assertRaisesRegex(
+            Exception, 'The node with id invalid_node is not part of this story'
+        ):
             story_services.update_story(
                 self.USER_ID,
                 self.STORY_ID,
@@ -2188,7 +2609,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME
+                    ),
                     'node_id': 'invalid_node',
                     'old_value': '',
                     'new_value': 'new_image.svg',
@@ -2196,7 +2619,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        with self.assertRaisesRegex(Exception, 'The node with id invalid_node is not part of this story'):
+        with self.assertRaisesRegex(
+            Exception, 'The node with id invalid_node is not part of this story'
+        ):
             story_services.update_story(
                 self.USER_ID,
                 self.STORY_ID,
@@ -2211,7 +2636,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR
+                    ),
                     'node_id': 'invalid_node',
                     'old_value': '',
                     'new_value': '#F8BF74',
@@ -2219,7 +2646,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        with self.assertRaisesRegex(Exception, 'The node with id invalid_node is not part of this story'):
+        with self.assertRaisesRegex(
+            Exception, 'The node with id invalid_node is not part of this story'
+        ):
             story_services.update_story(
                 self.USER_ID,
                 self.STORY_ID,
@@ -2237,8 +2666,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        with self.assertRaisesRegex(Exception, 'The node with id invalid_node is not part of this story'):
-            story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Delete node.')
+        with self.assertRaisesRegex(
+            Exception, 'The node with id invalid_node is not part of this story'
+        ):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Delete node.'
+            )
 
     def test_cannot_delete_starting_node_of_story(self) -> None:
         changelist = [
@@ -2252,7 +2685,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': self.NODE_ID_2,
                     'old_value': None,
                     'new_value': 'exp_2',
@@ -2261,7 +2696,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS
+                    ),
                     'node_id': self.NODE_ID_2,
                     'old_value': self.OLD_VALUE,
                     'new_value': [self.NODE_ID_1],
@@ -2284,7 +2721,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 }
             ),
         ]
-        story_services.update_story(self.USER_ID, self.STORY_ID, changelist, 'Added node.')
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, changelist, 'Added node.'
+        )
 
         change_list = [
             story_domain.StoryChange(
@@ -2297,9 +2736,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'The node with id %s is the starting node for the story, change the starting node before deleting it.' % self.NODE_ID_2,
+            'The node with id %s is the starting node for the story, change the starting node before deleting it.'
+            % self.NODE_ID_2,
         ):
-            story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Delete node.')
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Delete node.'
+            )
 
     def test_delete_initial_node(self) -> None:
         story = story_fetchers.get_story_by_id(self.STORY_ID)
@@ -2314,7 +2756,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 }
             )
         ]
-        story_services.update_story(self.USER_ID, self.STORY_ID, change_list, 'Delete node.')
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, change_list, 'Delete node.'
+        )
 
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertIsNone(story.story_contents.initial_node_id)
@@ -2340,7 +2784,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_PUBLISHED,
             'planned_publication_date_msecs': 1672770600000,
@@ -2359,7 +2805,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_DRAFT,
             'planned_publication_date_msecs': 1672770600000,
@@ -2378,7 +2826,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
             'planned_publication_date_msecs': 1690655400000,
@@ -2395,7 +2845,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story.story_contents.next_node_id = 'node_4'
 
         story_services.save_new_story(self.USER_ID, story)
-        topic_services.add_canonical_story(self.USER_ID, self.TOPIC_ID, canonical_story_id_1)
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, canonical_story_id_1
+        )
 
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -2414,11 +2866,19 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         topic_services.create_new_topic_rights(topic_id, self.USER_ID)
 
         topic_services.create_new_topic_rights(self.TOPIC_ID, self.USER_ID)
-        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID, strict=False)
+        topic_rights = topic_fetchers.get_topic_rights(
+            self.TOPIC_ID, strict=False
+        )
         assert topic_rights is not None
         topic_rights.topic_is_published = True
-        commit_cmds = [topic_domain.TopicRightsChange({'cmd': topic_domain.CMD_PUBLISH_TOPIC})]
-        topic_services.save_topic_rights(topic_rights, self.USER_ID, 'Published the topic', commit_cmds)
+        commit_cmds = [
+            topic_domain.TopicRightsChange(
+                {'cmd': topic_domain.CMD_PUBLISH_TOPIC}
+            )
+        ]
+        topic_services.save_topic_rights(
+            topic_rights, self.USER_ID, 'Published the topic', commit_cmds
+        )
 
         def mock_get_current_time_in_millisecs() -> int:
             return 1690555400000
@@ -2428,17 +2888,23 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs,
         ):
-            chapter_notifications = story_services.get_chapter_notifications_stories_list()
+            chapter_notifications = (
+                story_services.get_chapter_notifications_stories_list()
+            )
             self.assertEqual(len(chapter_notifications), 1)
 
-            story_publcation_timeliness = story_domain.StoryPublicationTimeliness(
-                canonical_story_id_1,
-                'title',
-                'Topic',
-                ['Chapter 2'],
-                ['Chapter 3'],
+            story_publcation_timeliness = (
+                story_domain.StoryPublicationTimeliness(
+                    canonical_story_id_1,
+                    'title',
+                    'Topic',
+                    ['Chapter 2'],
+                    ['Chapter 3'],
+                )
             )
-            self.assertEqual(chapter_notifications[0].id, story_publcation_timeliness.id)
+            self.assertEqual(
+                chapter_notifications[0].id, story_publcation_timeliness.id
+            )
             self.assertEqual(
                 chapter_notifications[0].story_name,
                 story_publcation_timeliness.story_name,
@@ -2463,15 +2929,23 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
     which are completed in the context of the story.
     """
 
-    def _get_progress_model(self, user_id: str, STORY_ID: str) -> Optional[user_models.StoryProgressModel]:
+    def _get_progress_model(
+        self, user_id: str, STORY_ID: str
+    ) -> Optional[user_models.StoryProgressModel]:
         """Returns the StoryProgressModel corresponding to the story id and user
         id.
         """
-        return user_models.StoryProgressModel.get(user_id, STORY_ID, strict=False)
+        return user_models.StoryProgressModel.get(
+            user_id, STORY_ID, strict=False
+        )
 
-    def _record_completion(self, user_id: str, STORY_ID: str, node_id: str) -> None:
+    def _record_completion(
+        self, user_id: str, STORY_ID: str, node_id: str
+    ) -> None:
         """Records the completion of a node in the context of a story."""
-        story_services.record_completed_node_in_story_context(user_id, STORY_ID, node_id)
+        story_services.record_completed_node_in_story_context(
+            user_id, STORY_ID, node_id
+        )
 
     def setUp(self) -> None:
         super().setUp()
@@ -2499,12 +2973,16 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             subtopics=[],
             next_subtopic_id=0,
         )
-        story = story_domain.Story.create_default_story(self.STORY_1_ID, 'Title', 'Description', self.TOPIC_ID, 'title')
+        story = story_domain.Story.create_default_story(
+            self.STORY_1_ID, 'Title', 'Description', self.TOPIC_ID, 'title'
+        )
 
         self.node_1: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_1,
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
@@ -2523,7 +3001,9 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         self.node_2: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_2,
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
@@ -2542,7 +3022,9 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         self.node_3: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_3,
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 3',
             'description': 'Description 3',
@@ -2561,7 +3043,9 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         self.node_4: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_4,
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 4',
             'description': 'Description 4',
@@ -2587,25 +3071,37 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         story.story_contents.initial_node_id = 'node_1'
         story.story_contents.next_node_id = 'node_5'
         story_services.save_new_story(self.USER_ID, story)
-        topic_services.add_canonical_story(self.USER_ID, self.TOPIC_ID, story.id)
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, story.id
+        )
 
     def test_get_completed_node_ids(self) -> None:
         # There should be no exception if the user or story do not exist;
         # it should also return an empty list in both of these situations.
-        self.assertEqual(story_fetchers.get_completed_node_ids('Fake', self.STORY_1_ID), [])
-        self.assertEqual(story_fetchers.get_completed_node_ids(self.owner_id, 'Fake'), [])
+        self.assertEqual(
+            story_fetchers.get_completed_node_ids('Fake', self.STORY_1_ID), []
+        )
+        self.assertEqual(
+            story_fetchers.get_completed_node_ids(self.owner_id, 'Fake'), []
+        )
 
         # If no model exists, there should be no completed node IDs.
-        self.assertIsNone(self._get_progress_model(self.owner_id, self.STORY_1_ID))
+        self.assertIsNone(
+            self._get_progress_model(self.owner_id, self.STORY_1_ID)
+        )
         self.assertEqual(
-            story_fetchers.get_completed_node_ids(self.owner_id, self.STORY_1_ID),
+            story_fetchers.get_completed_node_ids(
+                self.owner_id, self.STORY_1_ID
+            ),
             [],
         )
 
         # If the first node is completed, it should be reported.
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
         self.assertEqual(
-            story_fetchers.get_completed_node_ids(self.owner_id, self.STORY_1_ID),
+            story_fetchers.get_completed_node_ids(
+                self.owner_id, self.STORY_1_ID
+            ),
             [self.NODE_ID_1],
         )
 
@@ -2613,27 +3109,37 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
         self.assertEqual(
-            story_fetchers.get_completed_node_ids(self.owner_id, self.STORY_1_ID),
+            story_fetchers.get_completed_node_ids(
+                self.owner_id, self.STORY_1_ID
+            ),
             [self.NODE_ID_1, self.NODE_ID_2, self.NODE_ID_3],
         )
 
     def test_get_latest_completed_node_ids(self) -> None:
-        self.assertIsNone(self._get_progress_model(self.owner_id, self.STORY_1_ID))
+        self.assertIsNone(
+            self._get_progress_model(self.owner_id, self.STORY_1_ID)
+        )
         self.assertEqual(
-            story_fetchers.get_latest_completed_node_ids(self.owner_id, self.STORY_1_ID),
+            story_fetchers.get_latest_completed_node_ids(
+                self.owner_id, self.STORY_1_ID
+            ),
             [],
         )
 
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
         self.assertEqual(
-            story_fetchers.get_latest_completed_node_ids(self.owner_id, self.STORY_1_ID),
+            story_fetchers.get_latest_completed_node_ids(
+                self.owner_id, self.STORY_1_ID
+            ),
             [self.NODE_ID_1],
         )
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)
         self.assertEqual(
-            story_fetchers.get_latest_completed_node_ids(self.owner_id, self.STORY_1_ID),
+            story_fetchers.get_latest_completed_node_ids(
+                self.owner_id, self.STORY_1_ID
+            ),
             [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4],
         )
 
@@ -2646,7 +3152,9 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
 
         self.assertEqual(
-            story_fetchers.get_latest_completed_node_ids(self.owner_id, self.STORY_1_ID),
+            story_fetchers.get_latest_completed_node_ids(
+                self.owner_id, self.STORY_1_ID
+            ),
             [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4],
         )
 
@@ -2658,7 +3166,9 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)
 
         self.assertEqual(
-            story_fetchers.get_latest_completed_node_ids(self.owner_id, self.STORY_1_ID),
+            story_fetchers.get_latest_completed_node_ids(
+                self.owner_id, self.STORY_1_ID
+            ),
             [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4],
         )
 
@@ -2666,8 +3176,14 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
 
-        for ind, completed_node in enumerate(story_fetchers.get_completed_nodes_in_story(self.owner_id, self.STORY_1_ID)):
-            self.assertEqual(completed_node.to_dict(), self.nodes[ind].to_dict())
+        for ind, completed_node in enumerate(
+            story_fetchers.get_completed_nodes_in_story(
+                self.owner_id, self.STORY_1_ID
+            )
+        ):
+            self.assertEqual(
+                completed_node.to_dict(), self.nodes[ind].to_dict()
+            )
 
     def test_get_pending_and_all_nodes_in_story(self) -> None:
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
@@ -2675,10 +3191,14 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         # The starting index is 1 because the first story node is completed,
         # and the pending nodes will start from the second node.
         for index, pending_node in enumerate(
-            story_fetchers.get_pending_and_all_nodes_in_story(self.owner_id, self.STORY_1_ID)['pending_nodes'],
+            story_fetchers.get_pending_and_all_nodes_in_story(
+                self.owner_id, self.STORY_1_ID
+            )['pending_nodes'],
             start=1,
         ):
-            self.assertEqual(pending_node.to_dict(), self.nodes[index].to_dict())
+            self.assertEqual(
+                pending_node.to_dict(), self.nodes[index].to_dict()
+            )
 
     def test_record_completed_node_in_story_context(self) -> None:
         # Ensure that node completed within the context of a story are
@@ -2688,21 +3208,31 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
 
         # By default, no completion model should exist for a given user and
         # story.
-        completion_model = self._get_progress_model(self.owner_id, self.STORY_1_ID)
+        completion_model = self._get_progress_model(
+            self.owner_id, self.STORY_1_ID
+        )
         self.assertIsNone(completion_model)
 
         # If the user 'completes an node', the model should record it.
-        story_services.record_completed_node_in_story_context(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
+        story_services.record_completed_node_in_story_context(
+            self.owner_id, self.STORY_1_ID, self.NODE_ID_1
+        )
 
-        completion_model = self._get_progress_model(self.owner_id, self.STORY_1_ID)
+        completion_model = self._get_progress_model(
+            self.owner_id, self.STORY_1_ID
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert completion_model is not None
         self.assertEqual(completion_model.completed_node_ids, [self.NODE_ID_1])
 
         # If the same node is completed again within the context of this
         # story, it should not be duplicated.
-        story_services.record_completed_node_in_story_context(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
-        completion_model = self._get_progress_model(self.owner_id, self.STORY_1_ID)
+        story_services.record_completed_node_in_story_context(
+            self.owner_id, self.STORY_1_ID, self.NODE_ID_1
+        )
+        completion_model = self._get_progress_model(
+            self.owner_id, self.STORY_1_ID
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert completion_model is not None
         self.assertEqual(completion_model.completed_node_ids, [self.NODE_ID_1])
@@ -2710,18 +3240,32 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         # If the same node and another are completed within the context
         # of a different story, it shouldn't affect this one.
         self.save_new_story(self.STORY_ID_1, self.USER_ID, self.TOPIC_ID)
-        topic_services.add_canonical_story(self.USER_ID, self.TOPIC_ID, self.STORY_ID_1)
-        story_services.record_completed_node_in_story_context(self.owner_id, self.STORY_ID_1, self.NODE_ID_1)
-        story_services.record_completed_node_in_story_context(self.owner_id, self.STORY_ID_1, self.NODE_ID_2)
-        completion_model = self._get_progress_model(self.owner_id, self.STORY_1_ID)
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, self.STORY_ID_1
+        )
+        story_services.record_completed_node_in_story_context(
+            self.owner_id, self.STORY_ID_1, self.NODE_ID_1
+        )
+        story_services.record_completed_node_in_story_context(
+            self.owner_id, self.STORY_ID_1, self.NODE_ID_2
+        )
+        completion_model = self._get_progress_model(
+            self.owner_id, self.STORY_1_ID
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert completion_model is not None
         self.assertEqual(completion_model.completed_node_ids, [self.NODE_ID_1])
 
         # If two more nodes are completed, they are recorded.
-        story_services.record_completed_node_in_story_context(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
-        story_services.record_completed_node_in_story_context(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
-        completion_model = self._get_progress_model(self.owner_id, self.STORY_1_ID)
+        story_services.record_completed_node_in_story_context(
+            self.owner_id, self.STORY_1_ID, self.NODE_ID_2
+        )
+        story_services.record_completed_node_in_story_context(
+            self.owner_id, self.STORY_1_ID, self.NODE_ID_3
+        )
+        completion_model = self._get_progress_model(
+            self.owner_id, self.STORY_1_ID
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert completion_model is not None
         self.assertEqual(
@@ -2759,10 +3303,14 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT,
         )
 
-        current_schema_version_swap = self.swap(feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 5)
+        current_schema_version_swap = self.swap(
+            feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 5
+        )
 
         with current_schema_version_swap:
             story = story_fetchers.get_story_from_model(story_model)
 
         self.assertEqual(story.story_contents_schema_version, 5)
-        self.assertEqual(story.story_contents.to_dict(), self.VERSION_5_STORY_CONTENTS_DICT)
+        self.assertEqual(
+            story.story_contents.to_dict(), self.VERSION_5_STORY_CONTENTS_DICT
+        )

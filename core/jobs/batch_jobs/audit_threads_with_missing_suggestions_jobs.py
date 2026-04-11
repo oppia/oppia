@@ -56,35 +56,114 @@ class FixThreadsWithMissingSuggestionsJob(base_jobs.JobBase):
             are disabled, otherwise fix results.
         """
 
-        suggestion_thread_ids = self.pipeline | 'Get GeneralSuggestionModels' >> ndb_io.GetModels(suggestion_models.GeneralSuggestionModel.get_all(include_deleted=False)) | 'Extract suggestion thread ids' >> beam.Map(lambda model: model.id)
+        suggestion_thread_ids = (
+            self.pipeline
+            | 'Get GeneralSuggestionModels'
+            >> ndb_io.GetModels(
+                suggestion_models.GeneralSuggestionModel.get_all(
+                    include_deleted=False
+                )
+            )
+            | 'Extract suggestion thread ids'
+            >> beam.Map(lambda model: model.id)
+        )
 
-        feedback_threads = self.pipeline | 'Get GeneralFeedbackThreadModels' >> ndb_io.GetModels(feedback_models.GeneralFeedbackThreadModel.get_all(include_deleted=False)) | 'Keep threads with has_suggestion=True' >> beam.Filter(lambda thread: thread.has_suggestion)
+        feedback_threads = (
+            self.pipeline
+            | 'Get GeneralFeedbackThreadModels'
+            >> ndb_io.GetModels(
+                feedback_models.GeneralFeedbackThreadModel.get_all(
+                    include_deleted=False
+                )
+            )
+            | 'Keep threads with has_suggestion=True'
+            >> beam.Filter(lambda thread: thread.has_suggestion)
+        )
 
-        feedback_id_to_model = feedback_threads | 'Map feedback threads to (id, model)' >> beam.Map(lambda thread: (thread.id, thread))
+        feedback_id_to_model = (
+            feedback_threads
+            | 'Map feedback threads to (id, model)'
+            >> beam.Map(lambda thread: (thread.id, thread))
+        )
 
-        suggestion_id_to_none = suggestion_thread_ids | 'Map suggestion ids to None' >> beam.Map(lambda thread_id: (thread_id, None))
+        suggestion_id_to_none = (
+            suggestion_thread_ids
+            | 'Map suggestion ids to None'
+            >> beam.Map(lambda thread_id: (thread_id, None))
+        )
 
         invalid_threads = (
             {
                 'feedback': feedback_id_to_model,
                 'suggestions': suggestion_id_to_none,
             }
-            | 'CoGroup feedback threads with suggestion ids' >> beam.CoGroupByKey()
-            | 'Select threads with missing suggestions' >> beam.FlatMap(lambda group: (group[1]['feedback'] if not group[1]['suggestions'] else []))
+            | 'CoGroup feedback threads with suggestion ids'
+            >> beam.CoGroupByKey()
+            | 'Select threads with missing suggestions'
+            >> beam.FlatMap(
+                lambda group: (
+                    group[1]['feedback'] if not group[1]['suggestions'] else []
+                )
+            )
         )
 
-        invalid_thread_logs = invalid_threads | 'Log invalid threads' >> beam.Map(lambda model: job_run_result.JobRunResult.as_stdout((f'GeneralFeedbackThreadModel marked as has_suggestion=True but no GeneralSuggestionModel exists: id={model.id}')))
+        invalid_thread_logs = (
+            invalid_threads
+            | 'Log invalid threads'
+            >> beam.Map(
+                lambda model: job_run_result.JobRunResult.as_stdout(
+                    (
+                        f'GeneralFeedbackThreadModel marked as has_suggestion=True but no GeneralSuggestionModel exists: id={model.id}'
+                    )
+                )
+            )
+        )
 
-        invalid_thread_count = invalid_threads | 'Count invalid threads' >> beam.combiners.Count.Globally().with_defaults(0) | 'Report invalid thread count' >> beam.Map(lambda count: job_run_result.JobRunResult.as_stdout(f'invalid_feedback_thread_models_count: {count}'))
+        invalid_thread_count = (
+            invalid_threads
+            | 'Count invalid threads'
+            >> beam.combiners.Count.Globally().with_defaults(0)
+            | 'Report invalid thread count'
+            >> beam.Map(
+                lambda count: job_run_result.JobRunResult.as_stdout(
+                    f'invalid_feedback_thread_models_count: {count}'
+                )
+            )
+        )
 
         outputs = []
 
         if self.DATASTORE_UPDATES_ALLOWED:
-            (invalid_threads | 'Unset has_suggestion flag' >> beam.Map(self._unset_has_suggestion) | 'Put updated threads' >> ndb_io.PutModels())
+            (
+                invalid_threads
+                | 'Unset has_suggestion flag'
+                >> beam.Map(self._unset_has_suggestion)
+                | 'Put updated threads' >> ndb_io.PutModels()
+            )
 
-            updated_thread_logs = invalid_threads | 'Log fixed threads' >> beam.Map(lambda model: job_run_result.JobRunResult.as_stdout((f'Fixed GeneralFeedbackThreadModel by setting has_suggestion=False: id={model.id}')))
+            updated_thread_logs = (
+                invalid_threads
+                | 'Log fixed threads'
+                >> beam.Map(
+                    lambda model: job_run_result.JobRunResult.as_stdout(
+                        (
+                            f'Fixed GeneralFeedbackThreadModel by setting has_suggestion=False: id={model.id}'
+                        )
+                    )
+                )
+            )
 
-            updated_thread_count = invalid_threads | 'Count fixed threads' >> beam.combiners.Count.Globally().with_defaults(0) | 'Report fixed thread count' >> beam.Map(lambda count: job_run_result.JobRunResult.as_stdout(f'fixed_feedback_thread_models_count: {count}'))
+            updated_thread_count = (
+                invalid_threads
+                | 'Count fixed threads'
+                >> beam.combiners.Count.Globally().with_defaults(0)
+                | 'Report fixed thread count'
+                >> beam.Map(
+                    lambda count: job_run_result.JobRunResult.as_stdout(
+                        f'fixed_feedback_thread_models_count: {count}'
+                    )
+                )
+            )
 
             outputs.extend(
                 [
@@ -112,7 +191,9 @@ class FixThreadsWithMissingSuggestionsJob(base_jobs.JobBase):
         return thread
 
 
-class AuditThreadsWithMissingSuggestionsJob(FixThreadsWithMissingSuggestionsJob):
+class AuditThreadsWithMissingSuggestionsJob(
+    FixThreadsWithMissingSuggestionsJob
+):
     """Audit job reporting feedback threads with missing suggestions."""
 
     DATASTORE_UPDATES_ALLOWED = False

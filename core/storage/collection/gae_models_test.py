@@ -33,7 +33,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, collection_models, user_models
 
-(base_models, collection_models, user_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.COLLECTION, models.Names.USER])
+(base_models, collection_models, user_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.COLLECTION, models.Names.USER]
+)
 
 
 class CollectionSnapshotContentModelTests(test_utils.GenericTestBase):
@@ -62,7 +64,9 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         )
         collection_services.save_new_collection('id', collection)
 
-        num_collections = collection_models.CollectionModel.get_collection_count()
+        num_collections = (
+            collection_models.CollectionModel.get_collection_count()
+        )
         self.assertEqual(num_collections, 1)
 
     def test_reconstitute(self) -> None:
@@ -117,10 +121,26 @@ class CollectionRightsSnapshotContentModelTests(test_utils.GenericTestBase):
             [{'cmd': rights_domain.CMD_CREATE_NEW}],
         )
 
-        self.assertTrue(collection_models.CollectionRightsSnapshotContentModel.has_reference_to_user_id(self.USER_ID_1))
-        self.assertTrue(collection_models.CollectionRightsSnapshotContentModel.has_reference_to_user_id(self.USER_ID_2))
-        self.assertFalse(collection_models.CollectionRightsSnapshotContentModel.has_reference_to_user_id(self.USER_ID_COMMITTER))
-        self.assertFalse(collection_models.CollectionRightsSnapshotContentModel.has_reference_to_user_id('x_id'))
+        self.assertTrue(
+            collection_models.CollectionRightsSnapshotContentModel.has_reference_to_user_id(
+                self.USER_ID_1
+            )
+        )
+        self.assertTrue(
+            collection_models.CollectionRightsSnapshotContentModel.has_reference_to_user_id(
+                self.USER_ID_2
+            )
+        )
+        self.assertFalse(
+            collection_models.CollectionRightsSnapshotContentModel.has_reference_to_user_id(
+                self.USER_ID_COMMITTER
+            )
+        )
+        self.assertFalse(
+            collection_models.CollectionRightsSnapshotContentModel.has_reference_to_user_id(
+                'x_id'
+            )
+        )
 
 
 class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
@@ -220,7 +240,9 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             [{'cmd': rights_domain.CMD_CREATE_NEW}],
         )
 
-        self.col_1_dict = collection_models.CollectionRightsModel.get_by_id(self.COLLECTION_ID_1).to_dict()
+        self.col_1_dict = collection_models.CollectionRightsModel.get_by_id(
+            self.COLLECTION_ID_1
+        ).to_dict()
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
@@ -230,10 +252,26 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self) -> None:
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
-            self.assertTrue(collection_models.CollectionRightsModel.has_reference_to_user_id(self.USER_ID_1))
-            self.assertTrue(collection_models.CollectionRightsModel.has_reference_to_user_id(self.USER_ID_2))
-            self.assertTrue(collection_models.CollectionRightsModel.has_reference_to_user_id(self.USER_ID_4))
-            self.assertFalse(collection_models.CollectionRightsModel.has_reference_to_user_id(self.USER_ID_3))
+            self.assertTrue(
+                collection_models.CollectionRightsModel.has_reference_to_user_id(
+                    self.USER_ID_1
+                )
+            )
+            self.assertTrue(
+                collection_models.CollectionRightsModel.has_reference_to_user_id(
+                    self.USER_ID_2
+                )
+            )
+            self.assertTrue(
+                collection_models.CollectionRightsModel.has_reference_to_user_id(
+                    self.USER_ID_4
+                )
+            )
+            self.assertFalse(
+                collection_models.CollectionRightsModel.has_reference_to_user_id(
+                    self.USER_ID_3
+                )
+            )
 
     def test_save(self) -> None:
         collection_models.CollectionRightsModel(
@@ -256,12 +294,16 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual('id', collection_model.id)
         self.assertEqual(
             ['editor_ids', 'owner_ids', 'viewer_ids', 'voice_artist_ids'],
-            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id('id-1').content_user_ids,
+            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+                'id-1'
+            ).content_user_ids,
         )
 
     def test_export_data_on_highly_involved_user(self) -> None:
         """Test export data on user involved in all datastore collections."""
-        collection_ids = collection_models.CollectionRightsModel.export_data(self.USER_ID_1)
+        collection_ids = collection_models.CollectionRightsModel.export_data(
+            self.USER_ID_1
+        )
         expected_collection_ids = {
             'owned_collection_ids': (
                 [
@@ -277,7 +319,9 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
                     self.COLLECTION_ID_3,
                 ]
             ),
-            'voiced_collection_ids': ([self.COLLECTION_ID_1, self.COLLECTION_ID_2]),
+            'voiced_collection_ids': (
+                [self.COLLECTION_ID_1, self.COLLECTION_ID_2]
+            ),
             'viewable_collection_ids': [self.COLLECTION_ID_2],
         }
 
@@ -285,18 +329,24 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
 
     def test_export_data_on_partially_involved_user(self) -> None:
         """Test export data on user involved in some datastore collections."""
-        collection_ids = collection_models.CollectionRightsModel.export_data(self.USER_ID_2)
+        collection_ids = collection_models.CollectionRightsModel.export_data(
+            self.USER_ID_2
+        )
         expected_collection_ids = {
             'owned_collection_ids': [],
             'editable_collection_ids': [],
             'voiced_collection_ids': [self.COLLECTION_ID_3],
-            'viewable_collection_ids': ([self.COLLECTION_ID_1, self.COLLECTION_ID_3]),
+            'viewable_collection_ids': (
+                [self.COLLECTION_ID_1, self.COLLECTION_ID_3]
+            ),
         }
         self.assertEqual(expected_collection_ids, collection_ids)
 
     def test_export_data_on_uninvolved_user(self) -> None:
         """Test for empty lists when user has no collection involvement."""
-        collection_ids = collection_models.CollectionRightsModel.export_data(self.USER_ID_3)
+        collection_ids = collection_models.CollectionRightsModel.export_data(
+            self.USER_ID_3
+        )
         expected_collection_ids: Dict[str, List[str]] = {
             'owned_collection_ids': [],
             'editable_collection_ids': [],
@@ -307,7 +357,9 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
 
     def test_export_data_on_invalid_user(self) -> None:
         """Test for empty lists when the user_id is invalid."""
-        collection_ids = collection_models.CollectionRightsModel.export_data('fake_user')
+        collection_ids = collection_models.CollectionRightsModel.export_data(
+            'fake_user'
+        )
         expected_collection_ids: Dict[str, List[str]] = {
             'owned_collection_ids': [],
             'editable_collection_ids': [],
@@ -332,11 +384,17 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             'Created new collection',
             [{'cmd': rights_domain.CMD_CREATE_NEW}],
         )
-        collection_rights_model = collection_models.CollectionRightsModel.get('id')
+        collection_rights_model = collection_models.CollectionRightsModel.get(
+            'id'
+        )
         snapshot_dict = collection_rights_model.compute_snapshot()
         snapshot_dict['translator_ids'] = ['tid1', 'tid2']
-        snapshot_dict = collection_rights_model.convert_to_valid_dict(snapshot_dict)
-        collection_rights_model = collection_models.CollectionRightsModel(**snapshot_dict)
+        snapshot_dict = collection_rights_model.convert_to_valid_dict(
+            snapshot_dict
+        )
+        collection_rights_model = collection_models.CollectionRightsModel(
+            **snapshot_dict
+        )
         self.assertNotIn(
             'translator_ids',
             collection_rights_model._properties,  # pylint: disable=protected-access
@@ -378,7 +436,9 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         self.excluded_fields = ['created_on', 'last_updated', 'version']
         # Here copy.deepcopy is needed to mitigate
         # https://github.com/googlecloudplatform/datastore-ndb-python/issues/208
-        self.original_dict = copy.deepcopy(self.collection_model.to_dict(exclude=self.excluded_fields))
+        self.original_dict = copy.deepcopy(
+            self.collection_model.to_dict(exclude=self.excluded_fields)
+        )
         self.collection_model.owner_ids = [self.USER_ID_1, self.USER_ID_3]
         self.collection_model.save(
             self.USER_ID_COMMITTER,
@@ -392,9 +452,13 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
                 }
             ],
         )
-        self.allow_revert_swap = self.swap(collection_models.CollectionRightsModel, 'ALLOW_REVERT', True)
+        self.allow_revert_swap = self.swap(
+            collection_models.CollectionRightsModel, 'ALLOW_REVERT', True
+        )
 
-        collection_rights_allowed_commands = copy.deepcopy(feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS)
+        collection_rights_allowed_commands = copy.deepcopy(
+            feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS
+        )
         collection_rights_allowed_commands.append(
             {
                 'name': feconf.CMD_REVERT_COMMIT,
@@ -413,9 +477,15 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
 
     def test_revert_to_valid_version_is_successful(self) -> None:
         with self.allow_revert_swap, self.allowed_commands_swap:
-            collection_models.CollectionRightsModel.revert(self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
+            collection_models.CollectionRightsModel.revert(
+                self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1
+            )
 
-        new_collection_model = collection_models.CollectionRightsModel.get_by_id(self.COLLECTION_ID_1)
+        new_collection_model = (
+            collection_models.CollectionRightsModel.get_by_id(
+                self.COLLECTION_ID_1
+            )
+        )
         self.assertDictEqual(
             self.original_dict,
             new_collection_model.to_dict(exclude=self.excluded_fields),
@@ -425,14 +495,26 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         broken_dict = {**self.original_dict}
         broken_dict['status'] = 'publicized'
 
-        snapshot_model = collection_models.CollectionRightsSnapshotContentModel.get_by_id(collection_models.CollectionRightsModel.get_snapshot_id(self.COLLECTION_ID_1, 1))
+        snapshot_model = (
+            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
+                collection_models.CollectionRightsModel.get_snapshot_id(
+                    self.COLLECTION_ID_1, 1
+                )
+            )
+        )
         snapshot_model.content = broken_dict
         snapshot_model.update_timestamps()
         snapshot_model.put()
         with self.allow_revert_swap, self.allowed_commands_swap:
-            collection_models.CollectionRightsModel.revert(self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
+            collection_models.CollectionRightsModel.revert(
+                self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1
+            )
 
-        new_collection_model = collection_models.CollectionRightsModel.get_by_id(self.COLLECTION_ID_1)
+        new_collection_model = (
+            collection_models.CollectionRightsModel.get_by_id(
+                self.COLLECTION_ID_1
+            )
+        )
         self.assertDictEqual(
             self.original_dict,
             new_collection_model.to_dict(exclude=self.excluded_fields),
@@ -445,14 +527,26 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         del broken_dict['voice_artist_ids']
         broken_dict['translator_ids'] = [self.USER_ID_2]
 
-        snapshot_model = collection_models.CollectionRightsSnapshotContentModel.get_by_id(collection_models.CollectionRightsModel.get_snapshot_id(self.COLLECTION_ID_1, 1))
+        snapshot_model = (
+            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
+                collection_models.CollectionRightsModel.get_snapshot_id(
+                    self.COLLECTION_ID_1, 1
+                )
+            )
+        )
         snapshot_model.content = broken_dict
         snapshot_model.update_timestamps()
         snapshot_model.put()
         with self.allow_revert_swap, self.allowed_commands_swap:
-            collection_models.CollectionRightsModel.revert(self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1)
+            collection_models.CollectionRightsModel.revert(
+                self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1
+            )
 
-        new_collection_model = collection_models.CollectionRightsModel.get_by_id(self.COLLECTION_ID_1)
+        new_collection_model = (
+            collection_models.CollectionRightsModel.get_by_id(
+                self.COLLECTION_ID_1
+            )
+        )
         self.assertDictEqual(
             self.original_dict,
             new_collection_model.to_dict(exclude=self.excluded_fields),
@@ -482,8 +576,16 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         commit.collection_id = 'b'
         commit.update_timestamps()
         commit.put()
-        self.assertTrue(collection_models.CollectionCommitLogEntryModel.has_reference_to_user_id('committer_id'))
-        self.assertFalse(collection_models.CollectionCommitLogEntryModel.has_reference_to_user_id('x_id'))
+        self.assertTrue(
+            collection_models.CollectionCommitLogEntryModel.has_reference_to_user_id(
+                'committer_id'
+            )
+        )
+        self.assertFalse(
+            collection_models.CollectionCommitLogEntryModel.has_reference_to_user_id(
+                'x_id'
+            )
+        )
 
     def test_get_all_non_private_commits(self) -> None:
         private_commit = collection_models.CollectionCommitLogEntryModel.create(
@@ -512,12 +614,18 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         private_commit.put()
         public_commit.update_timestamps()
         public_commit.put()
-        results, _, more = collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits(2, None, max_age=None)
+        results, _, more = (
+            collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits(
+                2, None, max_age=None
+            )
+        )
         self.assertEqual('collection-b-0', results[0].id)
         self.assertFalse(more)
 
     def test_get_all_non_private_commits_with_invalid_max_age(self) -> None:
-        with self.assertRaisesRegex(Exception, 'max_age must be a datetime.timedelta instance or None.'):
+        with self.assertRaisesRegex(
+            Exception, 'max_age must be a datetime.timedelta instance or None.'
+        ):
             # TODO(#13528): Here we use MyPy ignore because we remove this test
             # after the backend is fully type-annotated. Here ignore[arg-type]
             # is used to test method get_all_non_private_commits() for invalid
@@ -563,7 +671,11 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         public_commit.put()
 
         max_age = datetime.timedelta(hours=1)
-        results, _, more = collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits(2, None, max_age=max_age)
+        results, _, more = (
+            collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits(
+                2, None, max_age=max_age
+            )
+        )
         self.assertEqual(len(results), 1)
         self.assertEqual('collection-b-0', results[0].id)
         self.assertFalse(more)
@@ -614,106 +726,142 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
             viewer_ids=['viewer_id'],
             contributor_ids=['contributor_id'],
         ).put()
-        self.assertTrue(collection_models.CollectionSummaryModel.has_reference_to_user_id('owner_id'))
-        self.assertTrue(collection_models.CollectionSummaryModel.has_reference_to_user_id('editor_id'))
-        self.assertTrue(collection_models.CollectionSummaryModel.has_reference_to_user_id('viewer_id'))
-        self.assertTrue(collection_models.CollectionSummaryModel.has_reference_to_user_id('contributor_id'))
-        self.assertFalse(collection_models.CollectionSummaryModel.has_reference_to_user_id('x_id'))
+        self.assertTrue(
+            collection_models.CollectionSummaryModel.has_reference_to_user_id(
+                'owner_id'
+            )
+        )
+        self.assertTrue(
+            collection_models.CollectionSummaryModel.has_reference_to_user_id(
+                'editor_id'
+            )
+        )
+        self.assertTrue(
+            collection_models.CollectionSummaryModel.has_reference_to_user_id(
+                'viewer_id'
+            )
+        )
+        self.assertTrue(
+            collection_models.CollectionSummaryModel.has_reference_to_user_id(
+                'contributor_id'
+            )
+        )
+        self.assertFalse(
+            collection_models.CollectionSummaryModel.has_reference_to_user_id(
+                'x_id'
+            )
+        )
 
     def test_get_private_at_least_viewable(self) -> None:
-        viewable_collection_summary_model = collection_models.CollectionSummaryModel(
-            id='id0',
-            title='title',
-            category='category',
-            objective='objective',
-            language_code='language_code',
-            tags=['tags'],
-            status=constants.ACTIVITY_STATUS_PRIVATE,
-            community_owned=False,
-            owner_ids=['owner_ids'],
-            editor_ids=['editor_ids'],
-            viewer_ids=['a'],
-            contributor_ids=[''],
-            contributors_summary={},
-            version=0,
-            node_count=0,
-            collection_model_last_updated=None,
-            collection_model_created_on=None,
+        viewable_collection_summary_model = (
+            collection_models.CollectionSummaryModel(
+                id='id0',
+                title='title',
+                category='category',
+                objective='objective',
+                language_code='language_code',
+                tags=['tags'],
+                status=constants.ACTIVITY_STATUS_PRIVATE,
+                community_owned=False,
+                owner_ids=['owner_ids'],
+                editor_ids=['editor_ids'],
+                viewer_ids=['a'],
+                contributor_ids=[''],
+                contributors_summary={},
+                version=0,
+                node_count=0,
+                collection_model_last_updated=None,
+                collection_model_created_on=None,
+            )
         )
         viewable_collection_summary_model.update_timestamps()
         viewable_collection_summary_model.put()
 
-        unviewable_collection_summary_model = collection_models.CollectionSummaryModel(
-            id='id1',
-            title='title',
-            category='category',
-            objective='objective',
-            language_code='language_code',
-            tags=['tags'],
-            status=constants.ACTIVITY_STATUS_PRIVATE,
-            community_owned=False,
-            owner_ids=['owner_ids'],
-            editor_ids=['editor_ids'],
-            viewer_ids=['viewer_ids'],
-            contributor_ids=[''],
-            contributors_summary={},
-            version=0,
-            node_count=0,
-            collection_model_last_updated=None,
-            collection_model_created_on=None,
+        unviewable_collection_summary_model = (
+            collection_models.CollectionSummaryModel(
+                id='id1',
+                title='title',
+                category='category',
+                objective='objective',
+                language_code='language_code',
+                tags=['tags'],
+                status=constants.ACTIVITY_STATUS_PRIVATE,
+                community_owned=False,
+                owner_ids=['owner_ids'],
+                editor_ids=['editor_ids'],
+                viewer_ids=['viewer_ids'],
+                contributor_ids=[''],
+                contributors_summary={},
+                version=0,
+                node_count=0,
+                collection_model_last_updated=None,
+                collection_model_created_on=None,
+            )
         )
         unviewable_collection_summary_model.update_timestamps()
         unviewable_collection_summary_model.put()
-        collection_summary_models = collection_models.CollectionSummaryModel.get_private_at_least_viewable('a')
+        collection_summary_models = collection_models.CollectionSummaryModel.get_private_at_least_viewable(
+            'a'
+        )
         self.assertEqual(1, len(collection_summary_models))
         self.assertEqual('id0', collection_summary_models[0].id)
 
     def test_get_at_least_editable(self) -> None:
-        editable_collection_summary_model = collection_models.CollectionSummaryModel(
-            id='id0',
-            title='title',
-            category='category',
-            objective='objective',
-            language_code='language_code',
-            tags=['tags'],
-            status=constants.ACTIVITY_STATUS_PRIVATE,
-            community_owned=False,
-            owner_ids=['a'],
-            editor_ids=['editor_ids'],
-            viewer_ids=['viewer_ids'],
-            contributor_ids=[''],
-            contributors_summary={},
-            version=0,
-            node_count=0,
-            collection_model_last_updated=None,
-            collection_model_created_on=None,
+        editable_collection_summary_model = (
+            collection_models.CollectionSummaryModel(
+                id='id0',
+                title='title',
+                category='category',
+                objective='objective',
+                language_code='language_code',
+                tags=['tags'],
+                status=constants.ACTIVITY_STATUS_PRIVATE,
+                community_owned=False,
+                owner_ids=['a'],
+                editor_ids=['editor_ids'],
+                viewer_ids=['viewer_ids'],
+                contributor_ids=[''],
+                contributors_summary={},
+                version=0,
+                node_count=0,
+                collection_model_last_updated=None,
+                collection_model_created_on=None,
+            )
         )
         editable_collection_summary_model.update_timestamps()
         editable_collection_summary_model.put()
 
-        uneditable_collection_summary_model = collection_models.CollectionSummaryModel(
-            id='id1',
-            title='title',
-            category='category',
-            objective='objective',
-            language_code='language_code',
-            tags=['tags'],
-            status=constants.ACTIVITY_STATUS_PRIVATE,
-            community_owned=False,
-            owner_ids=['owner_ids'],
-            editor_ids=['editor_ids'],
-            viewer_ids=['viewer_ids'],
-            contributor_ids=[''],
-            contributors_summary={},
-            version=0,
-            node_count=0,
-            collection_model_last_updated=None,
-            collection_model_created_on=None,
+        uneditable_collection_summary_model = (
+            collection_models.CollectionSummaryModel(
+                id='id1',
+                title='title',
+                category='category',
+                objective='objective',
+                language_code='language_code',
+                tags=['tags'],
+                status=constants.ACTIVITY_STATUS_PRIVATE,
+                community_owned=False,
+                owner_ids=['owner_ids'],
+                editor_ids=['editor_ids'],
+                viewer_ids=['viewer_ids'],
+                contributor_ids=[''],
+                contributors_summary={},
+                version=0,
+                node_count=0,
+                collection_model_last_updated=None,
+                collection_model_created_on=None,
+            )
         )
         uneditable_collection_summary_model.update_timestamps()
         uneditable_collection_summary_model.put()
-        collection_summary_models = collection_models.CollectionSummaryModel.get_at_least_editable('a')
+        collection_summary_models = (
+            collection_models.CollectionSummaryModel.get_at_least_editable('a')
+        )
         self.assertEqual(1, len(collection_summary_models))
         self.assertEqual('id0', collection_summary_models[0].id)
-        collection_summary_models = collection_models.CollectionSummaryModel.get_at_least_editable('viewer_ids')
+        collection_summary_models = (
+            collection_models.CollectionSummaryModel.get_at_least_editable(
+                'viewer_ids'
+            )
+        )
         self.assertEqual(0, len(collection_summary_models))

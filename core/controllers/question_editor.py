@@ -37,7 +37,9 @@ from core.domain import (
 
 SCHEMA_FOR_QUESTION_ID = {
     'type': 'basestring',
-    'validators': [{'id': 'is_regex_matched', 'regex_pattern': constants.ENTITY_ID_REGEX}],
+    'validators': [
+        {'id': 'is_regex_matched', 'regex_pattern': constants.ENTITY_ID_REGEX}
+    ],
 }
 
 
@@ -51,10 +53,15 @@ class QuestionCreationHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         skill_ids = self.payload.get('skill_ids')
 
         if not skill_ids:
-            raise self.InvalidInputException('skill_ids parameter isn\'t present in the payload')
+            raise self.InvalidInputException(
+                'skill_ids parameter isn\'t present in the payload'
+            )
 
         if len(skill_ids) > constants.MAX_SKILLS_PER_QUESTION:
-            raise self.InvalidInputException('More than %d QuestionSkillLinks for one question is not supported.' % constants.MAX_SKILLS_PER_QUESTION)
+            raise self.InvalidInputException(
+                'More than %d QuestionSkillLinks for one question is not supported.'
+                % constants.MAX_SKILLS_PER_QUESTION
+            )
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
@@ -67,35 +74,64 @@ class QuestionCreationHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             raise self.NotFoundException(e)
 
         question_dict = self.payload.get('question_dict')
-        if (question_dict['id'] is not None) or ('question_state_data' not in question_dict) or ('language_code' not in question_dict) or (question_dict['version'] != 0):
-            raise self.InvalidInputException('Question Data should contain id, state data, language code, and its version should be set as 0')
+        if (
+            (question_dict['id'] is not None)
+            or ('question_state_data' not in question_dict)
+            or ('language_code' not in question_dict)
+            or (question_dict['version'] != 0)
+        ):
+            raise self.InvalidInputException(
+                'Question Data should contain id, state data, language code, and its version should be set as 0'
+            )
 
-        question_dict['question_state_data_schema_version'] = feconf.CURRENT_STATE_SCHEMA_VERSION
+        question_dict['question_state_data_schema_version'] = (
+            feconf.CURRENT_STATE_SCHEMA_VERSION
+        )
         question_dict['id'] = question_services.get_new_question_id()
         question_dict['linked_skill_ids'] = skill_ids
 
         try:
             question = question_domain.Question.from_dict(question_dict)
         except Exception as e:
-            raise self.InvalidInputException('Question structure is invalid:', e)
+            raise self.InvalidInputException(
+                'Question structure is invalid:', e
+            )
 
         skill_difficulties = self.payload.get('skill_difficulties')
 
         if not skill_difficulties:
-            raise self.InvalidInputException('skill_difficulties not present in the payload')
+            raise self.InvalidInputException(
+                'skill_difficulties not present in the payload'
+            )
         if len(skill_ids) != len(skill_difficulties):
-            raise self.InvalidInputException('Skill difficulties don\'t match up with skill IDs')
+            raise self.InvalidInputException(
+                'Skill difficulties don\'t match up with skill IDs'
+            )
 
         try:
-            skill_difficulties = [float(difficulty) for difficulty in skill_difficulties]
+            skill_difficulties = [
+                float(difficulty) for difficulty in skill_difficulties
+            ]
         except (ValueError, TypeError) as e:
-            raise self.InvalidInputException('Skill difficulties must be a float value') from e
-        if any((difficulty < 0 or difficulty > 1) for difficulty in skill_difficulties):
-            raise self.InvalidInputException('Skill difficulties must be between 0 and 1')
+            raise self.InvalidInputException(
+                'Skill difficulties must be a float value'
+            ) from e
+        if any(
+            (difficulty < 0 or difficulty > 1)
+            for difficulty in skill_difficulties
+        ):
+            raise self.InvalidInputException(
+                'Skill difficulties must be between 0 and 1'
+            )
 
         question_services.add_question(self.user_id, question)
-        question_services.link_multiple_skills_for_question(self.user_id, question.id, skill_ids, skill_difficulties)
-        image_validation_error_message_suffix = 'Please go to the question editor for question with id %s and edit the image.' % question.id
+        question_services.link_multiple_skills_for_question(
+            self.user_id, question.id, skill_ids, skill_difficulties
+        )
+        image_validation_error_message_suffix = (
+            'Please go to the question editor for question with id %s and edit the image.'
+            % question.id
+        )
 
         filenames = self.payload.get('filenames')
 
@@ -105,13 +141,27 @@ class QuestionCreationHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 index = filenames_list.index(filename)
                 image = self.request.get(f'image{index}')
                 if not image:
-                    logging.exception('Image not provided for file with name %s when the question with id %s was created.' % (filename, question.id))
-                    raise self.InvalidInputException('No image data provided for file with name %s. %s' % (filename, image_validation_error_message_suffix))
+                    logging.exception(
+                        'Image not provided for file with name %s when the question with id %s was created.'
+                        % (filename, question.id)
+                    )
+                    raise self.InvalidInputException(
+                        'No image data provided for file with name %s. %s'
+                        % (filename, image_validation_error_message_suffix)
+                    )
                 try:
-                    file_format = image_validation_services.validate_image_and_filename(image, filename)
+                    file_format = (
+                        image_validation_services.validate_image_and_filename(
+                            image, filename
+                        )
+                    )
                 except utils.ValidationError as e:
-                    raise self.InvalidInputException('%s %s' % (e, image_validation_error_message_suffix))
-                image_is_compressible = file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS
+                    raise self.InvalidInputException(
+                        '%s %s' % (e, image_validation_error_message_suffix)
+                    )
+                image_is_compressible = (
+                    file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS
+                )
                 fs_services.save_original_and_compressed_versions_of_image(
                     filename,
                     feconf.ENTITY_TYPE_QUESTION,
@@ -143,7 +193,11 @@ class QuestionSkillLinkHandlerNormalizedPayloadDict(TypedDict):
     skill_ids_task_list: List[SkillIdTaskDict]
 
 
-class QuestionSkillLinkHandler(base.BaseHandler[QuestionSkillLinkHandlerNormalizedPayloadDict, Dict[str, str]]):
+class QuestionSkillLinkHandler(
+    base.BaseHandler[
+        QuestionSkillLinkHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """A handler for linking and unlinking questions to or from a skill."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -207,7 +261,9 @@ class QuestionSkillLinkHandler(base.BaseHandler[QuestionSkillLinkHandlerNormaliz
 
         for task_dict in skill_ids_task_list:
             if task_dict['task'] == 'remove':
-                question_services.delete_question_skill_link(self.user_id, question_id, task_dict['id'])
+                question_services.delete_question_skill_link(
+                    self.user_id, question_id, task_dict['id']
+                )
             elif task_dict['task'] == 'add':
                 question_services.create_new_question_skill_link(
                     self.user_id,
@@ -217,7 +273,9 @@ class QuestionSkillLinkHandler(base.BaseHandler[QuestionSkillLinkHandlerNormaliz
                 )
             else:
                 assert task_dict['task'] == 'update_difficulty'
-                question_services.update_question_skill_link_difficulty(question_id, task_dict['id'], task_dict['difficulty'])
+                question_services.update_question_skill_link_difficulty(
+                    question_id, task_dict['id'], task_dict['difficulty']
+                )
 
         self.render_json(self.values)
 
@@ -232,7 +290,11 @@ class EditableQuestionDataHandlerNormalizedPayloadDict(TypedDict):
     change_list: List[question_domain.QuestionChange]
 
 
-class EditableQuestionDataHandler(base.BaseHandler[EditableQuestionDataHandlerNormalizedPayloadDict, Dict[str, str]]):
+class EditableQuestionDataHandler(
+    base.BaseHandler[
+        EditableQuestionDataHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """A data handler for questions which supports writing."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -269,9 +331,16 @@ class EditableQuestionDataHandler(base.BaseHandler[EditableQuestionDataHandlerNo
     def get(self, question_id: str) -> None:
         """Gets the data for the question overview page."""
         assert self.user_id is not None
-        question = question_services.get_question_by_id(question_id, strict=True)
+        question = question_services.get_question_by_id(
+            question_id, strict=True
+        )
 
-        associated_skill_dicts = [skill.to_dict() for skill in skill_fetchers.get_multi_skills(question.linked_skill_ids)]
+        associated_skill_dicts = [
+            skill.to_dict()
+            for skill in skill_fetchers.get_multi_skills(
+                question.linked_skill_ids
+            )
+        ]
 
         self.values.update(
             {
@@ -290,20 +359,33 @@ class EditableQuestionDataHandler(base.BaseHandler[EditableQuestionDataHandlerNo
         change_list = self.normalized_payload['change_list']
         version = self.normalized_payload['version']
         for change in change_list:
-            if change.cmd == question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION:
-                raise self.InvalidInputException('Cannot create a new fully specified question')
+            if (
+                change.cmd
+                == question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION
+            ):
+                raise self.InvalidInputException(
+                    'Cannot create a new fully specified question'
+                )
 
-        question_services.update_question(self.user_id, question_id, change_list, commit_message, version)
+        question_services.update_question(
+            self.user_id, question_id, change_list, commit_message, version
+        )
 
-        question_dict = question_services.get_question_by_id(question_id).to_dict()
+        question_dict = question_services.get_question_by_id(
+            question_id
+        ).to_dict()
         self.render_json({'question_dict': question_dict})
 
     @acl_decorators.can_delete_question
     def delete(self, question_id: str) -> None:
         """Handles Delete requests."""
         assert self.user_id is not None
-        question = question_services.get_question_by_id(question_id, strict=False)
+        question = question_services.get_question_by_id(
+            question_id, strict=False
+        )
         if question is None:
-            raise self.NotFoundException('The question with the given id doesn\'t exist.')
+            raise self.NotFoundException(
+                'The question with the given id doesn\'t exist.'
+            )
         question_services.delete_question(self.user_id, question_id)
         self.render_json(self.values)

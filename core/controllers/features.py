@@ -28,7 +28,9 @@ from core.domain import (
 )
 
 
-class ExplorationFeaturesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+class ExplorationFeaturesHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Returns features the given exploration is configured to support."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -56,7 +58,11 @@ class ExplorationFeaturesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]
         """
         self.render_json(
             {
-                'exploration_is_curated': opportunity_services.is_exploration_available_for_contribution(exploration_id),
-                'always_ask_learners_for_answer_details': platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS.value),
+                'exploration_is_curated': opportunity_services.is_exploration_available_for_contribution(
+                    exploration_id
+                ),
+                'always_ask_learners_for_answer_details': platform_parameter_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamName.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS.value
+                ),
             }
         )

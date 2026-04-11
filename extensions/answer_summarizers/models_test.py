@@ -37,7 +37,9 @@ class BaseCalculationUnitTests(test_utils.GenericTestBase):
     def test_requires_override_for_calculation(self) -> None:
         with self.assertRaisesRegex(
             NotImplementedError,
-            re.escape('Subclasses of BaseCalculation should implement the calculate_from_state_answers_dict(state_answers_dict) method.'),
+            re.escape(
+                'Subclasses of BaseCalculation should implement the calculate_from_state_answers_dict(state_answers_dict) method.'
+            ),
         ):
             answer_models.BaseCalculation().calculate_from_state_answers_dict(
                 {
@@ -119,7 +121,9 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
 
     def _get_calculation_instance(self) -> answer_models.BaseCalculation:
         """Requires the existance of the class constant: CALCULATION_ID."""
-        return calculation_registry.Registry.get_calculation_by_id(self.CALCULATION_ID)
+        return calculation_registry.Registry.get_calculation_by_id(
+            self.CALCULATION_ID
+        )
 
     def _perform_calculation(
         self, state_answers_dict: stats_domain.StateAnswersDict
@@ -129,8 +133,14 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
     ]:
         """Performs calculation on state_answers_dict and returns its output."""
         calculation_instance = self._get_calculation_instance()
-        state_answers_calc_output = calculation_instance.calculate_from_state_answers_dict(state_answers_dict)
-        self.assertEqual(state_answers_calc_output.calculation_id, self.CALCULATION_ID)
+        state_answers_calc_output = (
+            calculation_instance.calculate_from_state_answers_dict(
+                state_answers_dict
+            )
+        )
+        self.assertEqual(
+            state_answers_calc_output.calculation_id, self.CALCULATION_ID
+        )
         return state_answers_calc_output.calculation_output
 
 
@@ -141,7 +151,20 @@ class AnswerFrequenciesUnitTests(CalculationUnitTestBase):
 
     def test_top_answers_without_ties(self) -> None:
         # Create 12 answers with different frequencies.
-        answers = ['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 + ['E'] * 8 + ['F'] * 7 + ['G'] * 6 + ['H'] * 5 + ['I'] * 4 + ['J'] * 3 + ['K'] * 2 + ['L']
+        answers = (
+            ['A'] * 12
+            + ['B'] * 11
+            + ['C'] * 10
+            + ['D'] * 9
+            + ['E'] * 8
+            + ['F'] * 7
+            + ['G'] * 6
+            + ['H'] * 5
+            + ['I'] * 4
+            + ['J'] * 3
+            + ['K'] * 2
+            + ['L']
+        )
         answer_dicts_list = [self._create_answer_dict(a) for a in answers]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
@@ -193,7 +216,9 @@ class AnswerFrequenciesUnitTests(CalculationUnitTestBase):
         # None answer can only be present when interaction is a linear
         # interaction. Eg: continue.
         answer_dicts_list = [self._create_answer_dict(None)]
-        state_answers_dict = self._create_state_answers_dict(answer_dicts_list, interaction_id='Continue')
+        state_answers_dict = self._create_state_answers_dict(
+            answer_dicts_list, interaction_id='Continue'
+        )
 
         with self.assertRaisesRegex(
             Exception,
@@ -210,7 +235,20 @@ class Top5AnswerFrequenciesUnitTests(CalculationUnitTestBase):
     def test_top5_without_ties(self) -> None:
         """Simplest case: ordering is obvious."""
         # Create 12 answers with different frequencies.
-        answers = ['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 + ['E'] * 8 + ['F'] * 7 + ['G'] * 6 + ['H'] * 5 + ['I'] * 4 + ['J'] * 3 + ['K'] * 2 + ['L']
+        answers = (
+            ['A'] * 12
+            + ['B'] * 11
+            + ['C'] * 10
+            + ['D'] * 9
+            + ['E'] * 8
+            + ['F'] * 7
+            + ['G'] * 6
+            + ['H'] * 5
+            + ['I'] * 4
+            + ['J'] * 3
+            + ['K'] * 2
+            + ['L']
+        )
         answer_dicts_list = [self._create_answer_dict(a) for a in answers]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
@@ -249,7 +287,9 @@ class Top5AnswerFrequenciesUnitTests(CalculationUnitTestBase):
         # None answer can only be present when interaction is a linear
         # interaction. Eg: continue.
         answer_dicts_list = [self._create_answer_dict(None)]
-        state_answers_dict = self._create_state_answers_dict(answer_dicts_list, interaction_id='Continue')
+        state_answers_dict = self._create_state_answers_dict(
+            answer_dicts_list, interaction_id='Continue'
+        )
 
         with self.assertRaisesRegex(
             Exception,
@@ -265,7 +305,20 @@ class Top10AnswerFrequenciesUnitTests(CalculationUnitTestBase):
 
     def test_top10_answers_without_ties(self) -> None:
         # Create 12 answers with different frequencies.
-        answers = ['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 + ['E'] * 8 + ['F'] * 7 + ['G'] * 6 + ['H'] * 5 + ['I'] * 4 + ['J'] * 3 + ['K'] * 2 + ['L']
+        answers = (
+            ['A'] * 12
+            + ['B'] * 11
+            + ['C'] * 10
+            + ['D'] * 9
+            + ['E'] * 8
+            + ['F'] * 7
+            + ['G'] * 6
+            + ['H'] * 5
+            + ['I'] * 4
+            + ['J'] * 3
+            + ['K'] * 2
+            + ['L']
+        )
         answer_dicts_list = [self._create_answer_dict(a) for a in answers]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
@@ -314,7 +367,9 @@ class Top10AnswerFrequenciesUnitTests(CalculationUnitTestBase):
         # None answer can only be present when interaction is a linear
         # interaction. Eg: continue.
         answer_dicts_list = [self._create_answer_dict(None)]
-        state_answers_dict = self._create_state_answers_dict(answer_dicts_list, interaction_id='Continue')
+        state_answers_dict = self._create_state_answers_dict(
+            answer_dicts_list, interaction_id='Continue'
+        )
 
         with self.assertRaisesRegex(
             Exception,
@@ -347,7 +402,20 @@ class FrequencyCommonlySubmittedElementsUnitTests(CalculationUnitTestBase):
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
     def test_many_shared_answers(self) -> None:
-        answers = ['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 + ['E'] * 8 + ['F'] * 7 + ['G'] * 6 + ['H'] * 5 + ['I'] * 4 + ['J'] * 3 + ['K'] * 2 + ['L']
+        answers = (
+            ['A'] * 12
+            + ['B'] * 11
+            + ['C'] * 10
+            + ['D'] * 9
+            + ['E'] * 8
+            + ['F'] * 7
+            + ['G'] * 6
+            + ['H'] * 5
+            + ['I'] * 4
+            + ['J'] * 3
+            + ['K'] * 2
+            + ['L']
+        )
         split_len = len(answers) // 4
         answer_dicts_list = [
             self._create_answer_dict(answers[: split_len * 1]),
@@ -379,7 +447,9 @@ class FrequencyCommonlySubmittedElementsUnitTests(CalculationUnitTestBase):
         # None answer can only be present when interaction is a linear
         # interaction. Eg: continue.
         answer_dicts_list = [self._create_answer_dict(None)]
-        state_answers_dict = self._create_state_answers_dict(answer_dicts_list, interaction_id='Continue')
+        state_answers_dict = self._create_state_answers_dict(
+            answer_dicts_list, interaction_id='Continue'
+        )
 
         with self.assertRaisesRegex(
             Exception,
@@ -410,7 +480,9 @@ class TopAnswersByCategorizationUnitTests(CalculationUnitTestBase):
 
     def test_only_one_category(self) -> None:
         answer_dicts_list = [
-            self._create_answer_dict('Hard A', classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
+            self._create_answer_dict(
+                'Hard A', classify_category=exp_domain.EXPLICIT_CLASSIFICATION
+            ),
         ]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
@@ -509,7 +581,9 @@ class TopAnswersByCategorizationUnitTests(CalculationUnitTestBase):
         # None answer can only be present when interaction is a linear
         # interaction. Eg: continue.
         answer_dicts_list = [self._create_answer_dict(None)]
-        state_answers_dict = self._create_state_answers_dict(answer_dicts_list, interaction_id='Continue')
+        state_answers_dict = self._create_state_answers_dict(
+            answer_dicts_list, interaction_id='Continue'
+        )
 
         with self.assertRaisesRegex(
             Exception,
@@ -619,7 +693,9 @@ class TopNUnresolvedAnswersByFrequencyUnitTests(CalculationUnitTestBase):
         # None answer can only be present when interaction is a linear
         # interaction. Eg: continue.
         answer_dicts_list = [self._create_answer_dict(None)]
-        state_answers_dict = self._create_state_answers_dict(answer_dicts_list, interaction_id='Continue')
+        state_answers_dict = self._create_state_answers_dict(
+            answer_dicts_list, interaction_id='Continue'
+        )
 
         with self.assertRaisesRegex(
             Exception,

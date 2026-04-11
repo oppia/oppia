@@ -28,25 +28,29 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, translation_models
 
-(base_models, translation_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.TRANSLATION])
+(base_models, translation_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.TRANSLATION]
+)
 
 
 class EntityTranslationsModelTest(test_utils.GenericTestBase):
     """Unit tests for EntityTranslationsModel class."""
 
     def test_create_new_model(self) -> None:
-        enitity_translation_model = translation_models.EntityTranslationsModel.create_new(
-            feconf.TranslatableEntityType.EXPLORATION.value,
-            'exp_id',
-            1,
-            'hi',
-            {
-                '123': {
-                    'content_value': 'Hello world!',
-                    'needs_update': False,
-                    'content_format': 'html',
-                }
-            },
+        enitity_translation_model = (
+            translation_models.EntityTranslationsModel.create_new(
+                feconf.TranslatableEntityType.EXPLORATION.value,
+                'exp_id',
+                1,
+                'hi',
+                {
+                    '123': {
+                        'content_value': 'Hello world!',
+                        'needs_update': False,
+                        'content_format': 'html',
+                    }
+                },
+            )
         )
         self.assertEqual(enitity_translation_model.entity_type, 'exploration')
         self.assertEqual(enitity_translation_model.entity_id, 'exp_id')
@@ -56,7 +60,9 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
             enitity_translation_model.translations['123']['content_value'],
             'Hello world!',
         )
-        self.assertEqual(enitity_translation_model.translations['123']['needs_update'], False)
+        self.assertEqual(
+            enitity_translation_model.translations['123']['needs_update'], False
+        )
 
     def test_get_model_method_returns_correctly(self) -> None:
         translation_models.EntityTranslationsModel.create_new(
@@ -72,7 +78,11 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
                 }
             },
         ).put()
-        enitity_translation_model = translation_models.EntityTranslationsModel.get_model(feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1, 'hi')
+        enitity_translation_model = (
+            translation_models.EntityTranslationsModel.get_model(
+                feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1, 'hi'
+            )
+        )
         self.assertEqual(enitity_translation_model.entity_type, 'exploration')
         self.assertEqual(enitity_translation_model.entity_id, 'exp_id')
         self.assertEqual(enitity_translation_model.entity_version, 1)
@@ -81,7 +91,9 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
             enitity_translation_model.translations['123']['content_value'],
             'Hello world!',
         )
-        self.assertEqual(enitity_translation_model.translations['123']['needs_update'], False)
+        self.assertEqual(
+            enitity_translation_model.translations['123']['needs_update'], False
+        )
 
     def test_get_all_for_entity_returns_correctly(self) -> None:
         translation_models.EntityTranslationsModel.create_new(
@@ -124,10 +136,18 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
             },
         ).put()
 
-        enitity_translation_models = translation_models.EntityTranslationsModel.get_all_for_entity(feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1)
+        enitity_translation_models = (
+            translation_models.EntityTranslationsModel.get_all_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, 'exp_id', 1
+            )
+        )
         self.assertEqual(len(enitity_translation_models), 2)
 
-        enitity_translation_models = translation_models.EntityTranslationsModel.get_all_for_entity(feconf.TranslatableEntityType.EXPLORATION, 'exp_id2', 2)
+        enitity_translation_models = (
+            translation_models.EntityTranslationsModel.get_all_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, 'exp_id2', 2
+            )
+        )
         self.assertEqual(len(enitity_translation_models), 1)
 
     def test_get_export_policy_not_applicable(self) -> None:
@@ -155,7 +175,9 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.assertEqual(
-            (translation_models.EntityTranslationsModel.get_model_association_to_user()),
+            (
+                translation_models.EntityTranslationsModel.get_model_association_to_user()
+            ),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
         )
 
@@ -290,9 +312,15 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
             }
         ]
 
-        entity_translations_models = translation_models.EntityTranslationsModel.get_model_multi(references)
+        entity_translations_models = (
+            translation_models.EntityTranslationsModel.get_model_multi(
+                references
+            )
+        )
         assert entity_translations_models[0] is not None
-        self.assertEqual(entity_translations_models[0].id, 'exploration-exp_id-1-en')
+        self.assertEqual(
+            entity_translations_models[0].id, 'exploration-exp_id-1-en'
+        )
 
     def test_get_model_multi_with_invalid_language(self) -> None:
         """Test fetching translations with invalid language codes."""
@@ -472,7 +500,9 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
         )
         # Ruling out the possibility of None for mypy type checking.
         assert model_id is not None
-        translation_model = translation_models.MachineTranslationModel.get(model_id)
+        translation_model = translation_models.MachineTranslationModel.get(
+            model_id
+        )
         self.assertEqual(translation_model.translated_text, 'hola mundo')
 
     def test_create_model_with_same_source_target_language_codes_returns_none(
@@ -493,10 +523,12 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
             source_text='hello world',
             translated_text='hola mundo',
         )
-        translation = translation_models.MachineTranslationModel.get_machine_translation(
-            source_language_code='en',
-            target_language_code='es',
-            source_text='hello world',
+        translation = (
+            translation_models.MachineTranslationModel.get_machine_translation(
+                source_language_code='en',
+                target_language_code='es',
+                source_text='hello world',
+            )
         )
         self.assertIsNotNone(translation)
         # Ruling out the possibility of None for mypy type checking.
@@ -506,10 +538,12 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
     def test_get_machine_translation_with_no_existing_translation_returns_none(
         self,
     ) -> None:
-        translation = translation_models.MachineTranslationModel.get_machine_translation(
-            source_language_code='en',
-            target_language_code='fr',
-            source_text='hello world',
+        translation = (
+            translation_models.MachineTranslationModel.get_machine_translation(
+                source_language_code='en',
+                target_language_code='fr',
+                source_text='hello world',
+            )
         )
         self.assertIsNone(translation)
 
@@ -523,7 +557,9 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.assertEqual(
-            (translation_models.MachineTranslationModel.get_model_association_to_user()),
+            (
+                translation_models.MachineTranslationModel.get_model_association_to_user()
+            ),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
         )
 

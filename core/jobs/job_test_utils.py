@@ -83,7 +83,9 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
         finally:
             super().tearDown()
 
-    def assert_pcoll_equal(self, actual: beam.PCollection, expected: beam.PCollection) -> None:
+    def assert_pcoll_equal(
+        self, actual: beam.PCollection, expected: beam.PCollection
+    ) -> None:
         """Asserts that the given PCollections are equal.
         NOTE: At most one PCollection assertion can be called in a test. This is
         because running assertions on pipelines requires flushing it and waiting
@@ -99,7 +101,9 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
             RuntimeError. A PCollection assertion has already been called.
         """
         self._assert_pipeline_context_is_acquired()
-        beam_testing_util.assert_that(actual, beam_testing_util.equal_to(expected))
+        beam_testing_util.assert_that(
+            actual, beam_testing_util.equal_to(expected)
+        )
         self._exit_pipeline_context()
 
     def assert_pcoll_empty(self, actual: beam.PCollection) -> None:
@@ -123,7 +127,9 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
     # Here we use type Any because this method can accept different properties
     # of models and those properties can be of type str, int, bool, Dict and
     # other types too. So, to allow every type of property we used Any here.
-    def create_model(self, model_class: Type[base_models.SELF_BASE_MODEL], **properties: Any) -> base_models.SELF_BASE_MODEL:
+    def create_model(
+        self, model_class: Type[base_models.SELF_BASE_MODEL], **properties: Any
+    ) -> base_models.SELF_BASE_MODEL:
         """Helper method for creating valid models with common default values.
 
         Args:
@@ -215,7 +221,9 @@ class JobTestBase(PipelinedTestBase):
         Args:
             model_list: list(Model). The NDB models to put into the datastore.
         """
-        datastore_services.update_timestamps_multi(model_list, update_last_updated_time=False)
+        datastore_services.update_timestamps_multi(
+            model_list, update_last_updated_time=False
+        )
         datastore_services.put_multi(model_list)
 
     def assert_job_output_is(self, expected: beam.PCollection) -> None:
@@ -287,13 +295,19 @@ def decorate_beam_errors() -> Iterator[None]:
 
         unexpected_elements = groupdict.get('unexpected', None)
         try:
-            unexpected_elements = ast.literal_eval(unexpected_elements) if unexpected_elements else None
+            unexpected_elements = (
+                ast.literal_eval(unexpected_elements)
+                if unexpected_elements
+                else None
+            )
         except (SyntaxError, ValueError) as e:
             raise AssertionError(exception_message) from e
 
         missing_elements = groupdict.get('missing', None)
         try:
-            missing_elements = ast.literal_eval(missing_elements) if missing_elements else None
+            missing_elements = (
+                ast.literal_eval(missing_elements) if missing_elements else None
+            )
         except (SyntaxError, ValueError) as e:
             raise AssertionError(exception_message) from e
 

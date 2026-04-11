@@ -31,7 +31,9 @@ class SubscribeHandlerNormalizedPayloadDict(TypedDict):
     creator_username: str
 
 
-class SubscribeHandler(base.BaseHandler[SubscribeHandlerNormalizedPayloadDict, Dict[str, str]]):
+class SubscribeHandler(
+    base.BaseHandler[SubscribeHandlerNormalizedPayloadDict, Dict[str, str]]
+):
     """Handles operations relating to new subscriptions."""
 
     POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -53,7 +55,9 @@ class SubscribeHandler(base.BaseHandler[SubscribeHandlerNormalizedPayloadDict, D
         assert self.user_id is not None
         assert self.normalized_payload is not None
         creator_username = self.normalized_payload['creator_username']
-        creator_id = user_services.get_user_id_from_username(creator_username, strict=True)
+        creator_id = user_services.get_user_id_from_username(
+            creator_username, strict=True
+        )
         subscription_services.subscribe_to_creator(self.user_id, creator_id)
         self.render_json(self.values)
 
@@ -66,7 +70,9 @@ class UnsubscribeHandlerNormalizedPayloadDict(TypedDict):
     creator_username: str
 
 
-class UnsubscribeHandler(base.BaseHandler[UnsubscribeHandlerNormalizedPayloadDict, Dict[str, str]]):
+class UnsubscribeHandler(
+    base.BaseHandler[UnsubscribeHandlerNormalizedPayloadDict, Dict[str, str]]
+):
     """Handles operations related to unsubscriptions."""
 
     POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -90,6 +96,9 @@ class UnsubscribeHandler(base.BaseHandler[UnsubscribeHandlerNormalizedPayloadDic
         creator_username = self.normalized_payload['creator_username']
         creator_id = user_services.get_user_id_from_username(creator_username)
         if creator_id is None:
-            raise Exception('No creator user_id found for the given creator username: %s' % creator_username)
+            raise Exception(
+                'No creator user_id found for the given creator username: %s'
+                % creator_username
+            )
         subscription_services.unsubscribe_from_creator(self.user_id, creator_id)
         self.render_json(self.values)

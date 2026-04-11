@@ -41,7 +41,9 @@ if MYPY:  # pragma: no cover
 class AuditThreadsWithMissingSuggestionsJobTest(job_test_utils.JobTestBase):
     """Tests for AuditThreadsWithMissingSuggestionsJob."""
 
-    JOB_CLASS: Type[audit_threads_with_missing_suggestions_jobs.AuditThreadsWithMissingSuggestionsJob] = audit_threads_with_missing_suggestions_jobs.AuditThreadsWithMissingSuggestionsJob
+    JOB_CLASS: Type[
+        audit_threads_with_missing_suggestions_jobs.AuditThreadsWithMissingSuggestionsJob
+    ] = audit_threads_with_missing_suggestions_jobs.AuditThreadsWithMissingSuggestionsJob
 
     def test_empty_datastore(self) -> None:
         self.assert_job_output_is([])
@@ -103,8 +105,14 @@ class AuditThreadsWithMissingSuggestionsJobTest(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult.as_stdout((f'GeneralFeedbackThreadModel marked as has_suggestion=True but no GeneralSuggestionModel exists: id={thread.id}')),
-                job_run_result.JobRunResult.as_stdout('invalid_feedback_thread_models_count: 1'),
+                job_run_result.JobRunResult.as_stdout(
+                    (
+                        f'GeneralFeedbackThreadModel marked as has_suggestion=True but no GeneralSuggestionModel exists: id={thread.id}'
+                    )
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'invalid_feedback_thread_models_count: 1'
+                ),
             ]
         )
 
@@ -129,7 +137,9 @@ class AuditThreadsWithMissingSuggestionsJobTest(job_test_utils.JobTestBase):
 class FixThreadsWithMissingSuggestionsJobTest(job_test_utils.JobTestBase):
     """Tests for FixThreadsWithMissingSuggestionsJob."""
 
-    JOB_CLASS: Type[audit_threads_with_missing_suggestions_jobs.FixThreadsWithMissingSuggestionsJob] = audit_threads_with_missing_suggestions_jobs.FixThreadsWithMissingSuggestionsJob
+    JOB_CLASS: Type[
+        audit_threads_with_missing_suggestions_jobs.FixThreadsWithMissingSuggestionsJob
+    ] = audit_threads_with_missing_suggestions_jobs.FixThreadsWithMissingSuggestionsJob
 
     def test_fix_unsets_has_suggestion_flag(self) -> None:
         invalid_thread = self.create_model(
@@ -148,12 +158,20 @@ class FixThreadsWithMissingSuggestionsJobTest(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult.as_stdout((f'Fixed GeneralFeedbackThreadModel by setting has_suggestion=False: id={invalid_thread.id}')),
-                job_run_result.JobRunResult.as_stdout('fixed_feedback_thread_models_count: 1'),
+                job_run_result.JobRunResult.as_stdout(
+                    (
+                        f'Fixed GeneralFeedbackThreadModel by setting has_suggestion=False: id={invalid_thread.id}'
+                    )
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'fixed_feedback_thread_models_count: 1'
+                ),
             ]
         )
 
-        updated_thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(invalid_thread.id)
+        updated_thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            invalid_thread.id
+        )
         self.assertIsNotNone(updated_thread)
         self.assertFalse(updated_thread.has_suggestion)
 
@@ -197,5 +215,7 @@ class FixThreadsWithMissingSuggestionsJobTest(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([])
 
-        unchanged_thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(valid_thread.id)
+        unchanged_thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            valid_thread.id
+        )
         self.assertTrue(unchanged_thread.has_suggestion)

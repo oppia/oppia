@@ -110,7 +110,10 @@ class JobMetaclass(type):
         """
         if name in mcs._JOB_REGISTRY:
             collision = mcs._JOB_REGISTRY[name]
-            raise TypeError('%s name is already used by %s.%s' % (name, collision.__module__, name))
+            raise TypeError(
+                '%s name is already used by %s.%s'
+                % (name, collision.__module__, name)
+            )
 
         job_cls = super(JobMetaclass, mcs).__new__(mcs, name, bases, namespace)
 

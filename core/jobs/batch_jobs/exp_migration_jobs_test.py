@@ -53,13 +53,15 @@ if MYPY:  # pragma: no cover
         translation_models,
     )
 
-(exp_models, opportunity_models, stats_models, translation_models) = models.Registry.import_models(
-    [
-        models.Names.EXPLORATION,
-        models.Names.OPPORTUNITY,
-        models.Names.STATISTICS,
-        models.Names.TRANSLATION,
-    ]
+(exp_models, opportunity_models, stats_models, translation_models) = (
+    models.Registry.import_models(
+        [
+            models.Names.EXPLORATION,
+            models.Names.OPPORTUNITY,
+            models.Names.STATISTICS,
+            models.Names.TRANSLATION,
+        ]
+    )
 )
 
 
@@ -191,7 +193,9 @@ title: Title of exploration
 # verify the migration.
 
 
-class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericTestBase):
+class MigrateExplorationJobTests(
+    job_test_utils.JobTestBase, test_utils.GenericTestBase
+):
     JOB_CLASS = exp_migration_jobs.MigrateExplorationJob
 
     NEW_EXP_ID = 'exp_1'
@@ -203,8 +207,12 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
         self.assert_job_output_is_empty()
 
     def test_migrated_exp_is_not_migrated(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration(self.NEW_EXP_ID, title=self.EXP_TITLE, category='category')
-        exp_services.save_new_exploration(feconf.SYSTEM_COMMITTER_ID, exploration)
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.NEW_EXP_ID, title=self.EXP_TITLE, category='category'
+        )
+        exp_services.save_new_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exploration
+        )
 
         self.assertEqual(
             exploration.states_schema_version,
@@ -213,7 +221,9 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(stdout='EXP PREVIOUSLY MIGRATED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stdout='EXP PREVIOUSLY MIGRATED SUCCESS: 1'
+                ),
                 job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1'),
             ]
         )
@@ -222,7 +232,9 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
         self.assertEqual(exp_model.version, 1)
 
     def test_broken_exp_is_not_migrated(self) -> None:
-        exploration_rights = rights_domain.ActivityRights(self.EXP_ID_ONE, [feconf.SYSTEM_COMMITTER_ID], [], [], [])
+        exploration_rights = rights_domain.ActivityRights(
+            self.EXP_ID_ONE, [feconf.SYSTEM_COMMITTER_ID], [], [], []
+        )
         commit_cmds = [{'cmd': rights_domain.CMD_CREATE_NEW}]
 
         exp_models.ExplorationRightsModel(
@@ -235,7 +247,9 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
             status=exploration_rights.status,
             viewable_if_private=exploration_rights.viewable_if_private,
             first_published_msec=exploration_rights.first_published_msec,
-        ).commit(feconf.SYSTEM_COMMITTER_ID, 'Created new exploration', commit_cmds)
+        ).commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Created new exploration', commit_cmds
+        )
         exp_model = self.create_model(
             exp_models.ExplorationModel,
             id=self.EXP_ID_ONE,
@@ -265,13 +279,21 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
             states=EXP_V46_DICT['states'],
             auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
         )
-        rights_manager.create_new_exploration_rights(self.EXP_ID_TWO, feconf.SYSTEM_COMMITTER_ID)
-        exp_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Created new exploration', commit_cmds)
+        rights_manager.create_new_exploration_rights(
+            self.EXP_ID_TWO, feconf.SYSTEM_COMMITTER_ID
+        )
+        exp_model.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Created new exploration', commit_cmds
+        )
 
         self.assertEqual(exp_model.states_schema_version, 41)
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(stderr=('EXP PROCESSED ERROR: "(\'exp_one\', ValidationError(\'Names should not start or end with whitespace.\'))": 1')),
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'EXP PROCESSED ERROR: "(\'exp_one\', ValidationError(\'Names should not start or end with whitespace.\'))": 1'
+                    )
+                ),
                 job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1'),
             ]
         )
@@ -286,7 +308,9 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
         topic_id = 'topic_id_1'
         story_id = 'story_id_1'
 
-        topic = topic_domain.Topic.create_default_topic(topic_id, 'topic', 'abbrev', 'description', 'fragment')
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'topic', 'abbrev', 'description', 'fragment'
+        )
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -305,10 +329,16 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
         topic_services.publish_topic(topic_id, feconf.SYSTEM_COMMITTER_ID)
 
-        story = story_domain.Story.create_default_story(story_id, 'A story title', 'description', topic_id, 'story-one')
+        story = story_domain.Story.create_default_story(
+            story_id, 'A story title', 'description', topic_id, 'story-one'
+        )
         story_services.save_new_story(feconf.SYSTEM_COMMITTER_ID, story)
-        topic_services.add_canonical_story(feconf.SYSTEM_COMMITTER_ID, topic_id, story_id)
-        topic_services.publish_story(topic_id, story_id, feconf.SYSTEM_COMMITTER_ID)
+        topic_services.add_canonical_story(
+            feconf.SYSTEM_COMMITTER_ID, topic_id, story_id
+        )
+        topic_services.publish_story(
+            topic_id, story_id, feconf.SYSTEM_COMMITTER_ID
+        )
         change_list = [
             story_domain.StoryChange(
                 {
@@ -320,14 +350,18 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                     'old_value': None,
                     'new_value': self.NEW_EXP_ID,
                 }
             ),
         ]
-        story_services.update_story(feconf.SYSTEM_COMMITTER_ID, story_id, change_list, 'Added node.')
+        story_services.update_story(
+            feconf.SYSTEM_COMMITTER_ID, story_id, change_list, 'Added node.'
+        )
 
     def test_unmigrated_valid_published_exp_migrates(self) -> None:
         exp_model = exp_models.ExplorationModel(
@@ -344,7 +378,9 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
             states=EXP_V46_DICT['states'],
             auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
         )
-        rights_manager.create_new_exploration_rights(self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
+        rights_manager.create_new_exploration_rights(
+            self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID
+        )
         exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
         exp_summary_model = exp_models.ExpSummaryModel(
             **{
@@ -382,24 +418,32 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
                 {},
             ).put()
 
-        all_translation_models: Sequence[translation_models.EntityTranslationsModel] = translation_models.EntityTranslationsModel.get_all().fetch()
+        all_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(all_translation_models), 2)
 
-        owner_action = user_services.get_user_actions_info(feconf.SYSTEM_COMMITTER_ID)
-        exp_services.publish_exploration_and_update_user_profiles(owner_action, self.NEW_EXP_ID)
-        opportunity_model = opportunity_models.ExplorationOpportunitySummaryModel(
-            id=self.NEW_EXP_ID,
-            topic_id='topic_id1',
-            topic_name='topic',
-            story_id='story_id_1',
-            story_title='A story title',
-            chapter_title='Title 1',
-            content_count=20,
-            incomplete_translation_language_codes=['hi', 'ar'],
-            translation_counts={'hi': 1, 'ar': 2},
-            language_codes_needing_voice_artists=['en'],
-            language_codes_with_assigned_voice_artists=[],
+        owner_action = user_services.get_user_actions_info(
+            feconf.SYSTEM_COMMITTER_ID
+        )
+        exp_services.publish_exploration_and_update_user_profiles(
+            owner_action, self.NEW_EXP_ID
+        )
+        opportunity_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel(
+                id=self.NEW_EXP_ID,
+                topic_id='topic_id1',
+                topic_name='topic',
+                story_id='story_id_1',
+                story_title='A story title',
+                chapter_title='Title 1',
+                content_count=20,
+                incomplete_translation_language_codes=['hi', 'ar'],
+                translation_counts={'hi': 1, 'ar': 2},
+                language_codes_needing_voice_artists=['en'],
+                language_codes_with_assigned_voice_artists=[],
+            )
         )
         opportunity_model.put()
 
@@ -411,12 +455,22 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
             [
                 job_run_result.JobRunResult(stdout='EXP MIGRATED SUCCESS: 1'),
                 job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1'),
-                job_run_result.JobRunResult(stdout='EXP RELATED MODELS GENERATED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stdout='EXP RELATED MODELS GENERATED SUCCESS: 1'
+                ),
             ]
         )
 
-        updated_opp_model = opportunity_models.ExplorationOpportunitySummaryModel.get(self.NEW_EXP_ID)
-        updated_opp_summary = opportunity_services.get_exploration_opportunity_summary_from_model(updated_opp_model)
+        updated_opp_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                self.NEW_EXP_ID
+            )
+        )
+        updated_opp_summary = (
+            opportunity_services.get_exploration_opportunity_summary_from_model(
+                updated_opp_model
+            )
+        )
 
         expected_opp_summary_dict = {
             'id': 'exp_1',
@@ -430,12 +484,18 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
             'is_pinned': False,
         }
 
-        self.assertEqual(updated_opp_summary.to_dict(), expected_opp_summary_dict)
+        self.assertEqual(
+            updated_opp_summary.to_dict(), expected_opp_summary_dict
+        )
 
-        all_translation_models = translation_models.EntityTranslationsModel.get_all().fetch()
+        all_translation_models = (
+            translation_models.EntityTranslationsModel.get_all().fetch()
+        )
 
         self.assertEqual(len(all_translation_models), 4)
-        self.assertItemsEqual([m.entity_version for m in all_translation_models], [1, 1, 2, 2])
+        self.assertItemsEqual(
+            [m.entity_version for m in all_translation_models], [1, 1, 2, 2]
+        )
 
     def test_unmigrated_invalid_published_exp_raise_error(self) -> None:
         exp_model = exp_models.ExplorationModel(
@@ -452,7 +512,9 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
             states=EXP_V46_DICT['states'],
             auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
         )
-        rights_manager.create_new_exploration_rights(self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
+        rights_manager.create_new_exploration_rights(
+            self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID
+        )
         exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
         exp_summary_model = exp_models.ExpSummaryModel(
             **{
@@ -481,20 +543,26 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
         exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
-        owner_action = user_services.get_user_actions_info(feconf.SYSTEM_COMMITTER_ID)
-        exp_services.publish_exploration_and_update_user_profiles(owner_action, self.NEW_EXP_ID)
-        opportunity_model = opportunity_models.ExplorationOpportunitySummaryModel(
-            id=self.NEW_EXP_ID,
-            topic_id='topic_id1',
-            topic_name='topic',
-            story_id='story_id_1',
-            story_title='A story title',
-            chapter_title='Title 1',
-            content_count=20,
-            incomplete_translation_language_codes=['hi', 'ar'],
-            translation_counts={'hi': 1, 'ar': 2},
-            language_codes_needing_voice_artists=['en'],
-            language_codes_with_assigned_voice_artists=[],
+        owner_action = user_services.get_user_actions_info(
+            feconf.SYSTEM_COMMITTER_ID
+        )
+        exp_services.publish_exploration_and_update_user_profiles(
+            owner_action, self.NEW_EXP_ID
+        )
+        opportunity_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel(
+                id=self.NEW_EXP_ID,
+                topic_id='topic_id1',
+                topic_name='topic',
+                story_id='story_id_1',
+                story_title='A story title',
+                chapter_title='Title 1',
+                content_count=20,
+                incomplete_translation_language_codes=['hi', 'ar'],
+                translation_counts={'hi': 1, 'ar': 2},
+                language_codes_needing_voice_artists=['en'],
+                language_codes_with_assigned_voice_artists=[],
+            )
         )
         opportunity_model.put()
 
@@ -506,7 +574,9 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
             [
                 job_run_result.JobRunResult(
                     stdout='',
-                    stderr=('EXP PROCESSED ERROR: "(\'exp_1\', ValidationError("Please fix the following issues before saving this exploration: 1. A title must be specified (in the \'Settings\' tab). "))": 1'),
+                    stderr=(
+                        'EXP PROCESSED ERROR: "(\'exp_1\', ValidationError("Please fix the following issues before saving this exploration: 1. A title must be specified (in the \'Settings\' tab). "))": 1'
+                    ),
                 )
             ]
         )
@@ -526,7 +596,9 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
             states=EXP_V46_DICT['states'],
             auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
         )
-        rights_manager.create_new_exploration_rights(self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
+        rights_manager.create_new_exploration_rights(
+            self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID
+        )
         exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
         exp_summary_model = exp_models.ExpSummaryModel(
             **{
@@ -555,20 +627,26 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
         exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
-        owner_action = user_services.get_user_actions_info(feconf.SYSTEM_COMMITTER_ID)
-        exp_services.publish_exploration_and_update_user_profiles(owner_action, self.NEW_EXP_ID)
-        opportunity_model = opportunity_models.ExplorationOpportunitySummaryModel(
-            id=self.NEW_EXP_ID,
-            topic_id='topic_id1',
-            topic_name='topic',
-            story_id='story_id_1',
-            story_title='A story title',
-            chapter_title='Title 1',
-            content_count=20,
-            incomplete_translation_language_codes=['hi', 'ar'],
-            translation_counts={'hi': 1, 'ar': 2},
-            language_codes_needing_voice_artists=['en'],
-            language_codes_with_assigned_voice_artists=[],
+        owner_action = user_services.get_user_actions_info(
+            feconf.SYSTEM_COMMITTER_ID
+        )
+        exp_services.publish_exploration_and_update_user_profiles(
+            owner_action, self.NEW_EXP_ID
+        )
+        opportunity_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel(
+                id=self.NEW_EXP_ID,
+                topic_id='topic_id1',
+                topic_name='topic',
+                story_id='story_id_1',
+                story_title='A story title',
+                chapter_title='Title 1',
+                content_count=20,
+                incomplete_translation_language_codes=['hi', 'ar'],
+                translation_counts={'hi': 1, 'ar': 2},
+                language_codes_needing_voice_artists=['en'],
+                language_codes_with_assigned_voice_artists=[],
+            )
         )
         opportunity_model.put()
 
@@ -583,9 +661,17 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
         ):
             self.assert_job_output_is(
                 [
-                    job_run_result.JobRunResult(stderr=('EXP RELATED MODELS GENERATED ERROR: "(\'exp_1\', Exception(\'Error generating related models\'))": 1')),
-                    job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1'),
-                    job_run_result.JobRunResult(stdout='EXP MIGRATED SUCCESS: 1'),
+                    job_run_result.JobRunResult(
+                        stderr=(
+                            'EXP RELATED MODELS GENERATED ERROR: "(\'exp_1\', Exception(\'Error generating related models\'))": 1'
+                        )
+                    ),
+                    job_run_result.JobRunResult(
+                        stdout='EXP PROCESSED SUCCESS: 1'
+                    ),
+                    job_run_result.JobRunResult(
+                        stdout='EXP MIGRATED SUCCESS: 1'
+                    ),
                 ]
             )
 
@@ -596,7 +682,9 @@ class MigrateExplorationJobTests(job_test_utils.JobTestBase, test_utils.GenericT
 # ElasticSearch stub, so MigrateExplorationJobTests also inherits from
 # GenericTestBase to successfully emulate the exploration publishing and
 # verify the migration.
-class AuditExplorationMigrationJobTests(job_test_utils.JobTestBase, test_utils.GenericTestBase):
+class AuditExplorationMigrationJobTests(
+    job_test_utils.JobTestBase, test_utils.GenericTestBase
+):
     JOB_CLASS = exp_migration_jobs.AuditExplorationMigrationJob
 
     NEW_EXP_ID = 'exp_1'
@@ -606,8 +694,12 @@ class AuditExplorationMigrationJobTests(job_test_utils.JobTestBase, test_utils.G
         self.assert_job_output_is_empty()
 
     def test_migrated_exp_is_not_migrated(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration(self.NEW_EXP_ID, title=self.EXP_TITLE, category='category')
-        exp_services.save_new_exploration(feconf.SYSTEM_COMMITTER_ID, exploration)
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.NEW_EXP_ID, title=self.EXP_TITLE, category='category'
+        )
+        exp_services.save_new_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exploration
+        )
 
         self.assertEqual(
             exploration.states_schema_version,
@@ -616,7 +708,9 @@ class AuditExplorationMigrationJobTests(job_test_utils.JobTestBase, test_utils.G
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(stdout='EXP PREVIOUSLY MIGRATED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stdout='EXP PREVIOUSLY MIGRATED SUCCESS: 1'
+                ),
                 job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1'),
             ]
         )
@@ -625,7 +719,9 @@ class AuditExplorationMigrationJobTests(job_test_utils.JobTestBase, test_utils.G
         self.assertEqual(exp_model.version, 1)
 
     def test_broken_exp_is_not_migrated(self) -> None:
-        exploration_rights = rights_domain.ActivityRights(self.NEW_EXP_ID, [feconf.SYSTEM_COMMITTER_ID], [], [], [])
+        exploration_rights = rights_domain.ActivityRights(
+            self.NEW_EXP_ID, [feconf.SYSTEM_COMMITTER_ID], [], [], []
+        )
         commit_cmds = [{'cmd': rights_domain.CMD_CREATE_NEW}]
         exp_models.ExplorationRightsModel(
             id=exploration_rights.id,
@@ -637,7 +733,9 @@ class AuditExplorationMigrationJobTests(job_test_utils.JobTestBase, test_utils.G
             status=exploration_rights.status,
             viewable_if_private=exploration_rights.viewable_if_private,
             first_published_msec=exploration_rights.first_published_msec,
-        ).commit(feconf.SYSTEM_COMMITTER_ID, 'Created new exploration', commit_cmds)
+        ).commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Created new exploration', commit_cmds
+        )
 
         exp_model = self.create_model(
             exp_models.ExplorationModel,
@@ -654,7 +752,15 @@ class AuditExplorationMigrationJobTests(job_test_utils.JobTestBase, test_utils.G
             [{'cmd': exp_domain.CMD_CREATE_NEW}],
         )
 
-        self.assert_job_output_is([job_run_result.JobRunResult(stderr=('EXP PROCESSED ERROR: "(\'exp_1\', ValidationError(\'Names should not start or end with whitespace.\'))": 1'))])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'EXP PROCESSED ERROR: "(\'exp_1\', ValidationError(\'Names should not start or end with whitespace.\'))": 1'
+                    )
+                )
+            ]
+        )
 
         migrated_exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
         self.assertEqual(migrated_exp_model.version, 1)
@@ -664,7 +770,9 @@ class AuditExplorationMigrationJobTests(job_test_utils.JobTestBase, test_utils.G
         topic_id = 'topic_id_1'
         story_id = 'story_id_1'
 
-        topic = topic_domain.Topic.create_default_topic(topic_id, 'topic', 'abbrev', 'description', 'fragment')
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'topic', 'abbrev', 'description', 'fragment'
+        )
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -683,10 +791,16 @@ class AuditExplorationMigrationJobTests(job_test_utils.JobTestBase, test_utils.G
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
         topic_services.publish_topic(topic_id, feconf.SYSTEM_COMMITTER_ID)
 
-        story = story_domain.Story.create_default_story(story_id, 'A story title', 'description', topic_id, 'story-one')
+        story = story_domain.Story.create_default_story(
+            story_id, 'A story title', 'description', topic_id, 'story-one'
+        )
         story_services.save_new_story(feconf.SYSTEM_COMMITTER_ID, story)
-        topic_services.add_canonical_story(feconf.SYSTEM_COMMITTER_ID, topic_id, story_id)
-        topic_services.publish_story(topic_id, story_id, feconf.SYSTEM_COMMITTER_ID)
+        topic_services.add_canonical_story(
+            feconf.SYSTEM_COMMITTER_ID, topic_id, story_id
+        )
+        topic_services.publish_story(
+            topic_id, story_id, feconf.SYSTEM_COMMITTER_ID
+        )
         change_list = [
             story_domain.StoryChange(
                 {
@@ -698,14 +812,18 @@ class AuditExplorationMigrationJobTests(job_test_utils.JobTestBase, test_utils.G
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                     'old_value': None,
                     'new_value': self.NEW_EXP_ID,
                 }
             ),
         ]
-        story_services.update_story(feconf.SYSTEM_COMMITTER_ID, story_id, change_list, 'Added node.')
+        story_services.update_story(
+            feconf.SYSTEM_COMMITTER_ID, story_id, change_list, 'Added node.'
+        )
 
     def test_unmigrated_exp_is_migrated(self) -> None:
         exp_model = exp_models.ExplorationModel(
@@ -722,7 +840,9 @@ class AuditExplorationMigrationJobTests(job_test_utils.JobTestBase, test_utils.G
             states=EXP_V46_DICT['states'],
             auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
         )
-        rights_manager.create_new_exploration_rights(self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
+        rights_manager.create_new_exploration_rights(
+            self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID
+        )
         exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
         exp_summary_model = exp_models.ExpSummaryModel(
             **{
@@ -759,24 +879,32 @@ class AuditExplorationMigrationJobTests(job_test_utils.JobTestBase, test_utils.G
             {},
         ).put()
 
-        all_translation_models: Sequence[translation_models.EntityTranslationsModel] = translation_models.EntityTranslationsModel.get_all().fetch()
+        all_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(all_translation_models), 1)
 
-        owner_action = user_services.get_user_actions_info(feconf.SYSTEM_COMMITTER_ID)
-        exp_services.publish_exploration_and_update_user_profiles(owner_action, self.NEW_EXP_ID)
-        opportunity_model = opportunity_models.ExplorationOpportunitySummaryModel(
-            id=self.NEW_EXP_ID,
-            topic_id='topic_id1',
-            topic_name='topic',
-            story_id='story_id_1',
-            story_title='A story title',
-            chapter_title='Title 1',
-            content_count=20,
-            incomplete_translation_language_codes=['hi', 'ar'],
-            translation_counts={'hi': 1, 'ar': 2},
-            language_codes_needing_voice_artists=['en'],
-            language_codes_with_assigned_voice_artists=[],
+        owner_action = user_services.get_user_actions_info(
+            feconf.SYSTEM_COMMITTER_ID
+        )
+        exp_services.publish_exploration_and_update_user_profiles(
+            owner_action, self.NEW_EXP_ID
+        )
+        opportunity_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel(
+                id=self.NEW_EXP_ID,
+                topic_id='topic_id1',
+                topic_name='topic',
+                story_id='story_id_1',
+                story_title='A story title',
+                chapter_title='Title 1',
+                content_count=20,
+                incomplete_translation_language_codes=['hi', 'ar'],
+                translation_counts={'hi': 1, 'ar': 2},
+                language_codes_needing_voice_artists=['en'],
+                language_codes_with_assigned_voice_artists=[],
+            )
         )
         opportunity_model.put()
 
@@ -788,12 +916,22 @@ class AuditExplorationMigrationJobTests(job_test_utils.JobTestBase, test_utils.G
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1'),
-                job_run_result.JobRunResult(stdout='EXP MIGRATED SUCCESS: 1', stderr=''),
+                job_run_result.JobRunResult(
+                    stdout='EXP MIGRATED SUCCESS: 1', stderr=''
+                ),
             ]
         )
 
-        updated_opp_model = opportunity_models.ExplorationOpportunitySummaryModel.get(self.NEW_EXP_ID)
-        updated_opp_summary = opportunity_services.get_exploration_opportunity_summary_from_model(updated_opp_model)
+        updated_opp_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                self.NEW_EXP_ID
+            )
+        )
+        updated_opp_summary = (
+            opportunity_services.get_exploration_opportunity_summary_from_model(
+                updated_opp_model
+            )
+        )
 
         expected_opp_summary_dict = {
             'id': 'exp_1',
@@ -807,7 +945,9 @@ class AuditExplorationMigrationJobTests(job_test_utils.JobTestBase, test_utils.G
             'is_pinned': False,
         }
 
-        self.assertEqual(updated_opp_summary.to_dict(), expected_opp_summary_dict)
+        self.assertEqual(
+            updated_opp_summary.to_dict(), expected_opp_summary_dict
+        )
 
     def test_unmigrated_invalid_published_exp_raise_error(self) -> None:
         exp_model = exp_models.ExplorationModel(
@@ -824,7 +964,9 @@ class AuditExplorationMigrationJobTests(job_test_utils.JobTestBase, test_utils.G
             states=EXP_V46_DICT['states'],
             auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
         )
-        rights_manager.create_new_exploration_rights(self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
+        rights_manager.create_new_exploration_rights(
+            self.NEW_EXP_ID, feconf.SYSTEM_COMMITTER_ID
+        )
         exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
         exp_summary_model = exp_models.ExpSummaryModel(
             **{
@@ -853,20 +995,26 @@ class AuditExplorationMigrationJobTests(job_test_utils.JobTestBase, test_utils.G
         exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
-        owner_action = user_services.get_user_actions_info(feconf.SYSTEM_COMMITTER_ID)
-        exp_services.publish_exploration_and_update_user_profiles(owner_action, self.NEW_EXP_ID)
-        opportunity_model = opportunity_models.ExplorationOpportunitySummaryModel(
-            id=self.NEW_EXP_ID,
-            topic_id='topic_id1',
-            topic_name='topic',
-            story_id='story_id_1',
-            story_title='A story title',
-            chapter_title='Title 1',
-            content_count=20,
-            incomplete_translation_language_codes=['hi', 'ar'],
-            translation_counts={'hi': 1, 'ar': 2},
-            language_codes_needing_voice_artists=['en'],
-            language_codes_with_assigned_voice_artists=[],
+        owner_action = user_services.get_user_actions_info(
+            feconf.SYSTEM_COMMITTER_ID
+        )
+        exp_services.publish_exploration_and_update_user_profiles(
+            owner_action, self.NEW_EXP_ID
+        )
+        opportunity_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel(
+                id=self.NEW_EXP_ID,
+                topic_id='topic_id1',
+                topic_name='topic',
+                story_id='story_id_1',
+                story_title='A story title',
+                chapter_title='Title 1',
+                content_count=20,
+                incomplete_translation_language_codes=['hi', 'ar'],
+                translation_counts={'hi': 1, 'ar': 2},
+                language_codes_needing_voice_artists=['en'],
+                language_codes_with_assigned_voice_artists=[],
+            )
         )
         opportunity_model.put()
 
@@ -878,13 +1026,17 @@ class AuditExplorationMigrationJobTests(job_test_utils.JobTestBase, test_utils.G
             [
                 job_run_result.JobRunResult(
                     stdout='',
-                    stderr=('EXP PROCESSED ERROR: "(\'exp_1\', ValidationError("Please fix the following issues before saving this exploration: 1. A title must be specified (in the \'Settings\' tab). "))": 1'),
+                    stderr=(
+                        'EXP PROCESSED ERROR: "(\'exp_1\', ValidationError("Please fix the following issues before saving this exploration: 1. A title must be specified (in the \'Settings\' tab). "))": 1'
+                    ),
                 )
             ]
         )
 
 
-class RegenerateMissingExplorationStatsModelsJobTests(job_test_utils.JobTestBase, test_utils.GenericTestBase):
+class RegenerateMissingExplorationStatsModelsJobTests(
+    job_test_utils.JobTestBase, test_utils.GenericTestBase
+):
     """Tests for the RegenerateExplorationStatsJob."""
 
     JOB_CLASS = exp_migration_jobs.RegenerateMissingExplorationStatsModelsJob
@@ -969,46 +1121,70 @@ class RegenerateMissingExplorationStatsModelsJobTests(job_test_utils.JobTestBase
             ],
             'Changed title.',
         )
-        exp_stats_model_for_version_2 = stats_models.ExplorationStatsModel.get_model(exp_id, 2)
+        exp_stats_model_for_version_2 = (
+            stats_models.ExplorationStatsModel.get_model(exp_id, 2)
+        )
         assert exp_stats_model_for_version_2 is not None
         exp_stats_model_for_version_2.delete()
 
-        exp_stats_model_for_version_4 = stats_models.ExplorationStatsModel.get_model(exp_id, 4)
+        exp_stats_model_for_version_4 = (
+            stats_models.ExplorationStatsModel.get_model(exp_id, 4)
+        )
         assert exp_stats_model_for_version_4 is not None
         exp_stats_model_for_version_4.delete()
 
-        self.assertIsNone(stats_models.ExplorationStatsModel.get_model(exp_id, 2))
-        self.assertIsNone(stats_models.ExplorationStatsModel.get_model(exp_id, 4))
+        self.assertIsNone(
+            stats_models.ExplorationStatsModel.get_model(exp_id, 2)
+        )
+        self.assertIsNone(
+            stats_models.ExplorationStatsModel.get_model(exp_id, 4)
+        )
 
-        self.assert_job_output_is([job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1')])
+        self.assert_job_output_is(
+            [job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1')]
+        )
 
-        self.assertIsNotNone(stats_models.ExplorationStatsModel.get_model(exp_id, 2))
-        self.assertIsNotNone(stats_models.ExplorationStatsModel.get_model(exp_id, 4))
+        self.assertIsNotNone(
+            stats_models.ExplorationStatsModel.get_model(exp_id, 2)
+        )
+        self.assertIsNotNone(
+            stats_models.ExplorationStatsModel.get_model(exp_id, 4)
+        )
 
     def test_job_regenerates_missing_stats_models_when_no_models_exist(
         self,
     ) -> None:
         exp_id = 'ID1'
         self.save_new_default_exploration(exp_id, 'owner_id')
-        exp_stats_model_for_version_1 = stats_models.ExplorationStatsModel.get_model(exp_id, 1)
+        exp_stats_model_for_version_1 = (
+            stats_models.ExplorationStatsModel.get_model(exp_id, 1)
+        )
         assert exp_stats_model_for_version_1 is not None
         exp_stats_model_for_version_1.delete()
 
-        self.assertIsNone(stats_models.ExplorationStatsModel.get_model(exp_id, 1))
+        self.assertIsNone(
+            stats_models.ExplorationStatsModel.get_model(exp_id, 1)
+        )
 
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(
                     stdout='',
-                    stderr=('EXP PROCESSED ERROR: "(\'ID1\', Exception(\'No ExplorationStatsModels found\'))": 1'),
+                    stderr=(
+                        'EXP PROCESSED ERROR: "(\'ID1\', Exception(\'No ExplorationStatsModels found\'))": 1'
+                    ),
                 )
             ]
         )
 
-        self.assertIsNotNone(stats_models.ExplorationStatsModel.get_model(exp_id, 1))
+        self.assertIsNotNone(
+            stats_models.ExplorationStatsModel.get_model(exp_id, 1)
+        )
 
 
-class ExpSnapshotsMigrationAuditJobTests(job_test_utils.JobTestBase, test_utils.GenericTestBase):
+class ExpSnapshotsMigrationAuditJobTests(
+    job_test_utils.JobTestBase, test_utils.GenericTestBase
+):
     """Tests for ExplorationMigrationAuditJob."""
 
     JOB_CLASS = exp_migration_jobs.ExpSnapshotsMigrationAuditJob
@@ -1025,13 +1201,21 @@ class ExpSnapshotsMigrationAuditJobTests(job_test_utils.JobTestBase, test_utils.
         """
         # Create a new, default exploration whose snapshots should not be
         # affected by the job.
-        exploration = exp_domain.Exploration.create_default_exploration(self.VALID_EXP_ID, title='title', category='category')
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category'
+        )
         content_id_generator = translation_domain.ContentIdGenerator()
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'EndExploration', content_id_generator)
-        exploration.next_content_id_index = content_id_generator.next_content_id_index
+        self.set_interaction_for_state(
+            init_state, 'EndExploration', content_id_generator
+        )
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index
+        )
         init_state.update_interaction_default_outcome(None)
-        exp_services.save_new_exploration(feconf.SYSTEM_COMMITTER_ID, exploration)
+        exp_services.save_new_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exploration
+        )
         self.assertEqual(
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
@@ -1042,7 +1226,9 @@ class ExpSnapshotsMigrationAuditJobTests(job_test_utils.JobTestBase, test_utils.
             [
                 job_run_result.JobRunResult(
                     stdout='',
-                    stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Snapshot is already at latest schema version\'))": 1'),
+                    stderr=(
+                        'EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Snapshot is already at latest schema version\'))": 1'
+                    ),
                 )
             ]
         )
@@ -1051,20 +1237,32 @@ class ExpSnapshotsMigrationAuditJobTests(job_test_utils.JobTestBase, test_utils.
         """Tests that the snapshot migration job skips deleted explorations
         and does not attempt to migrate any of the snapshots.
         """
-        exploration = exp_domain.Exploration.create_default_exploration(self.VALID_EXP_ID, title='title', category='category')
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category'
+        )
         content_id_generator = translation_domain.ContentIdGenerator()
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'EndExploration', content_id_generator)
-        exploration.next_content_id_index = content_id_generator.next_content_id_index
+        self.set_interaction_for_state(
+            init_state, 'EndExploration', content_id_generator
+        )
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index
+        )
         init_state.update_interaction_default_outcome(None)
-        exp_services.save_new_exploration(feconf.SYSTEM_COMMITTER_ID, exploration)
+        exp_services.save_new_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exploration
+        )
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
-        exp_services.regenerate_exploration_and_contributors_summaries(self.VALID_EXP_ID)
+        exp_services.regenerate_exploration_and_contributors_summaries(
+            self.VALID_EXP_ID
+        )
 
         # Delete the exploration before migration occurs.
-        exp_services.delete_exploration(feconf.SYSTEM_COMMITTER_ID, self.VALID_EXP_ID)
+        exp_services.delete_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.VALID_EXP_ID
+        )
 
         # Ensure the exploration is deleted.
         with self.assertRaisesRegex(Exception, 'Entity .* not found'):
@@ -1075,7 +1273,9 @@ class ExpSnapshotsMigrationAuditJobTests(job_test_utils.JobTestBase, test_utils.
             [
                 job_run_result.JobRunResult(
                     stdout='',
-                    stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Exploration does not exist.\'))": 2'),
+                    stderr=(
+                        'EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Exploration does not exist.\'))": 2'
+                    ),
                 )
             ]
         )
@@ -1102,7 +1302,9 @@ class ExpSnapshotsMigrationAuditJobTests(job_test_utils.JobTestBase, test_utils.
             states=EXP_V46_DICT['states'],
             auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
         )
-        rights_manager.create_new_exploration_rights(self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
+        rights_manager.create_new_exploration_rights(
+            self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID
+        )
         exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
         exp_summary_model = exp_models.ExpSummaryModel(
             **{
@@ -1130,7 +1332,9 @@ class ExpSnapshotsMigrationAuditJobTests(job_test_utils.JobTestBase, test_utils.
         )
         exp_summary_model.update_timestamps()
         exp_summary_model.put()
-        self.assertLess(exp_model.states_schema_version, feconf.CURRENT_STATE_SCHEMA_VERSION)
+        self.assertLess(
+            exp_model.states_schema_version, feconf.CURRENT_STATE_SCHEMA_VERSION
+        )
 
         # Bring the main exploration to the latest schema.
         caching_services.delete_multi(
@@ -1165,9 +1369,13 @@ class ExpSnapshotsMigrationAuditJobTests(job_test_utils.JobTestBase, test_utils.
             [
                 job_run_result.JobRunResult(
                     stdout='',
-                    stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Snapshot is already at latest schema version\'))": 1'),
+                    stderr=(
+                        'EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Snapshot is already at latest schema version\'))": 1'
+                    ),
                 ),
-                job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1', stderr=''),
+                job_run_result.JobRunResult(
+                    stdout='EXP PROCESSED SUCCESS: 1', stderr=''
+                ),
             ]
         )
 
@@ -1189,7 +1397,9 @@ class ExpSnapshotsMigrationAuditJobTests(job_test_utils.JobTestBase, test_utils.
             states=EXP_V46_DICT['states'],
             auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
         )
-        rights_manager.create_new_exploration_rights(self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
+        rights_manager.create_new_exploration_rights(
+            self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID
+        )
         exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
         exp_summary_model = exp_models.ExpSummaryModel(
             **{
@@ -1270,22 +1480,32 @@ class ExpSnapshotsMigrationAuditJobTests(job_test_utils.JobTestBase, test_utils.
                 [
                     job_run_result.JobRunResult(
                         stdout='',
-                        stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception("Exploration snapshot exp_id0 failed migration to states v47: \'property_that_dne\'"))": 1'),
+                        stderr=(
+                            'EXP PROCESSED ERROR: "(\'exp_id0\', Exception("Exploration snapshot exp_id0 failed migration to states v47: \'property_that_dne\'"))": 1'
+                        ),
                     ),
                     job_run_result.JobRunResult(
                         stdout='',
-                        stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Snapshot is already at latest schema version\'))": 1'),
+                        stderr=(
+                            'EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Snapshot is already at latest schema version\'))": 1'
+                        ),
                     ),
                 ]
             )
 
     def test_audit_job_detects_invalid_exploration(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration(self.VALID_EXP_ID, title='title', category='category')
-        exp_services.save_new_exploration(feconf.SYSTEM_COMMITTER_ID, exploration)
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category'
+        )
+        exp_services.save_new_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exploration
+        )
 
         exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
         exploration_model.language_code = 'invalid_language_code'
-        exploration_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Changed language_code.', [])
+        exploration_model.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Changed language_code.', []
+        )
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
             None,
@@ -1296,40 +1516,62 @@ class ExpSnapshotsMigrationAuditJobTests(job_test_utils.JobTestBase, test_utils.
             [
                 job_run_result.JobRunResult(
                     stdout='',
-                    stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Exploration exp_id0 failed non-strict validation\'))": 2'),
+                    stderr=(
+                        'EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Exploration exp_id0 failed non-strict validation\'))": 2'
+                    ),
                 )
             ]
         )
 
     def test_audit_job_detects_exploration_that_is_not_up_to_date(self) -> None:
-        swap_states_schema_41 = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
-        swap_exp_schema_46 = self.swap(exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41
+        )
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46
+        )
         with swap_states_schema_41, swap_exp_schema_46:
-            exploration = exp_domain.Exploration.create_default_exploration(self.VALID_EXP_ID, title='title', category='category')
-            exp_services.save_new_exploration(feconf.SYSTEM_COMMITTER_ID, exploration)
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID, title='title', category='category'
+            )
+            exp_services.save_new_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exploration
+            )
         self.assertLess(
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
         )
 
-        swap_states_schema_42 = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_47 = self.swap(exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
+        swap_states_schema_42 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42
+        )
+        swap_exp_schema_47 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47
+        )
         with swap_states_schema_42, swap_exp_schema_47:
             self.assert_job_output_is(
                 [
                     job_run_result.JobRunResult(
                         stdout='',
-                        stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Exploration is not at latest schema version\'))": 1'),
+                        stderr=(
+                            'EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Exploration is not at latest schema version\'))": 1'
+                        ),
                     )
                 ]
             )
 
     def test_audit_job_handles_missing_states_schema_version(self) -> None:
-        swap_exp_schema_37 = self.swap(exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 37)
+        swap_exp_schema_37 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 37
+        )
         with swap_exp_schema_37:
             with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
-                exploration = exp_domain.Exploration.create_default_exploration(self.VALID_EXP_ID, title='title', category='category')
-                exp_services.save_new_exploration(feconf.SYSTEM_COMMITTER_ID, exploration)
+                exploration = exp_domain.Exploration.create_default_exploration(
+                    self.VALID_EXP_ID, title='title', category='category'
+                )
+                exp_services.save_new_exploration(
+                    feconf.SYSTEM_COMMITTER_ID, exploration
+                )
 
             # Bring the main exploration to the latest schema.
             caching_services.delete_multi(
@@ -1340,7 +1582,9 @@ class ExpSnapshotsMigrationAuditJobTests(job_test_utils.JobTestBase, test_utils.
             migration_change_list = [
                 exp_domain.ExplorationChange(
                     {
-                        'cmd': (exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION),
+                        'cmd': (
+                            exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION
+                        ),
                         'from_version': '41',
                         'to_version': '44',
                     }
@@ -1353,14 +1597,22 @@ class ExpSnapshotsMigrationAuditJobTests(job_test_utils.JobTestBase, test_utils.
                     migration_change_list,
                     'Ran Exploration Migration job.',
                 )
-            exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+            exploration_model = exp_models.ExplorationModel.get(
+                self.VALID_EXP_ID
+            )
             self.assertEqual(exploration_model.states_schema_version, 44)
 
             # Modify the snapshot to have no states schema version. (This
             # implies a schema version of 0.)
-            snapshot_content_model = exp_models.ExplorationSnapshotContentModel.get('%s-1' % self.VALID_EXP_ID)
+            snapshot_content_model = (
+                exp_models.ExplorationSnapshotContentModel.get(
+                    '%s-1' % self.VALID_EXP_ID
+                )
+            )
             del snapshot_content_model.content['states_schema_version']
-            snapshot_content_model.update_timestamps(update_last_updated_time=False)
+            snapshot_content_model.update_timestamps(
+                update_last_updated_time=False
+            )
             snapshot_content_model.put()
 
             # There is no failure due to a missing states schema version.
@@ -1369,17 +1621,23 @@ class ExpSnapshotsMigrationAuditJobTests(job_test_utils.JobTestBase, test_utils.
                     [
                         job_run_result.JobRunResult(
                             stdout='',
-                            stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception("Exploration snapshot exp_id0 failed migration to states v1: type object \'Exploration\' has no attribute \'_convert_states_v0_dict_to_v1_dict\'"))": 1'),
+                            stderr=(
+                                'EXP PROCESSED ERROR: "(\'exp_id0\', Exception("Exploration snapshot exp_id0 failed migration to states v1: type object \'Exploration\' has no attribute \'_convert_states_v0_dict_to_v1_dict\'"))": 1'
+                            ),
                         ),
                         job_run_result.JobRunResult(
                             stdout='',
-                            stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Snapshot is already at latest schema version\'))": 1'),
+                            stderr=(
+                                'EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Snapshot is already at latest schema version\'))": 1'
+                            ),
                         ),
                     ]
                 )
 
 
-class ExpSnapshotsMigrationJobTests(job_test_utils.JobTestBase, test_utils.GenericTestBase):
+class ExpSnapshotsMigrationJobTests(
+    job_test_utils.JobTestBase, test_utils.GenericTestBase
+):
     JOB_CLASS = exp_migration_jobs.ExpSnapshotsMigrationJob
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -1394,13 +1652,21 @@ class ExpSnapshotsMigrationJobTests(job_test_utils.JobTestBase, test_utils.Gener
         """
         # Create a new, default exploration that should not be affected by the
         # job.
-        exploration = exp_domain.Exploration.create_default_exploration(self.VALID_EXP_ID, title='title', category='category')
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category'
+        )
         content_id_generator = translation_domain.ContentIdGenerator()
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'EndExploration', content_id_generator)
-        exploration.next_content_id_index = content_id_generator.next_content_id_index
+        self.set_interaction_for_state(
+            init_state, 'EndExploration', content_id_generator
+        )
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index
+        )
         init_state.update_interaction_default_outcome(None)
-        exp_services.save_new_exploration(feconf.SYSTEM_COMMITTER_ID, exploration)
+        exp_services.save_new_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exploration
+        )
         self.assertEqual(
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
@@ -1411,7 +1677,9 @@ class ExpSnapshotsMigrationJobTests(job_test_utils.JobTestBase, test_utils.Gener
             [
                 job_run_result.JobRunResult(
                     stdout='',
-                    stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Snapshot is already at latest schema version\'))": 1'),
+                    stderr=(
+                        'EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Snapshot is already at latest schema version\'))": 1'
+                    ),
                 )
             ]
         )
@@ -1431,7 +1699,9 @@ class ExpSnapshotsMigrationJobTests(job_test_utils.JobTestBase, test_utils.Gener
             states=EXP_V46_DICT['states'],
             auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
         )
-        rights_manager.create_new_exploration_rights(self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
+        rights_manager.create_new_exploration_rights(
+            self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID
+        )
         exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
         exp_summary_model = exp_models.ExpSummaryModel(
             **{
@@ -1493,9 +1763,13 @@ class ExpSnapshotsMigrationJobTests(job_test_utils.JobTestBase, test_utils.Gener
             [
                 job_run_result.JobRunResult(
                     stdout='',
-                    stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Snapshot is already at latest schema version\'))": 1'),
+                    stderr=(
+                        'EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Snapshot is already at latest schema version\'))": 1'
+                    ),
                 ),
-                job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1', stderr=''),
+                job_run_result.JobRunResult(
+                    stdout='EXP PROCESSED SUCCESS: 1', stderr=''
+                ),
             ]
         )
 
@@ -1503,20 +1777,32 @@ class ExpSnapshotsMigrationJobTests(job_test_utils.JobTestBase, test_utils.Gener
         """Tests that the exploration migration job skips deleted explorations
         and does not attempt to migrate.
         """
-        exploration = exp_domain.Exploration.create_default_exploration(self.VALID_EXP_ID, title='title', category='category')
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category'
+        )
         content_id_generator = translation_domain.ContentIdGenerator()
         init_state = exploration.states[exploration.init_state_name]
-        self.set_interaction_for_state(init_state, 'EndExploration', content_id_generator)
-        exploration.next_content_id_index = content_id_generator.next_content_id_index
+        self.set_interaction_for_state(
+            init_state, 'EndExploration', content_id_generator
+        )
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index
+        )
         init_state.update_interaction_default_outcome(None)
-        exp_services.save_new_exploration(feconf.SYSTEM_COMMITTER_ID, exploration)
+        exp_services.save_new_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exploration
+        )
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
-        exp_services.regenerate_exploration_and_contributors_summaries(self.VALID_EXP_ID)
+        exp_services.regenerate_exploration_and_contributors_summaries(
+            self.VALID_EXP_ID
+        )
 
         # Delete the exploration before migration occurs.
-        exp_services.delete_exploration(feconf.SYSTEM_COMMITTER_ID, self.VALID_EXP_ID)
+        exp_services.delete_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.VALID_EXP_ID
+        )
 
         # Ensure the exploration is deleted.
         with self.assertRaisesRegex(Exception, 'Entity .* not found'):
@@ -1527,7 +1813,9 @@ class ExpSnapshotsMigrationJobTests(job_test_utils.JobTestBase, test_utils.Gener
             [
                 job_run_result.JobRunResult(
                     stdout='',
-                    stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Exploration does not exist.\'))": 2'),
+                    stderr=(
+                        'EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Exploration does not exist.\'))": 2'
+                    ),
                 )
             ]
         )
@@ -1537,12 +1825,18 @@ class ExpSnapshotsMigrationJobTests(job_test_utils.JobTestBase, test_utils.Gener
             exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
     def test_migration_job_detects_invalid_exploration(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration(self.VALID_EXP_ID, title='title', category='category')
-        exp_services.save_new_exploration(feconf.SYSTEM_COMMITTER_ID, exploration)
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category'
+        )
+        exp_services.save_new_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exploration
+        )
 
         exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
         exploration_model.language_code = 'invalid_language_code'
-        exploration_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Changed language_code.', [])
+        exploration_model.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'Changed language_code.', []
+        )
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION,
             None,
@@ -1553,7 +1847,9 @@ class ExpSnapshotsMigrationJobTests(job_test_utils.JobTestBase, test_utils.Gener
             [
                 job_run_result.JobRunResult(
                     stdout='',
-                    stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Exploration exp_id0 failed non-strict validation\'))": 2'),
+                    stderr=(
+                        'EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Exploration exp_id0 failed non-strict validation\'))": 2'
+                    ),
                 )
             ]
         )
@@ -1561,24 +1857,38 @@ class ExpSnapshotsMigrationJobTests(job_test_utils.JobTestBase, test_utils.Gener
     def test_migration_job_detects_exploration_that_is_not_up_to_date(
         self,
     ) -> None:
-        swap_states_schema_41 = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
-        swap_exp_schema_46 = self.swap(exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41
+        )
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46
+        )
         with swap_states_schema_41, swap_exp_schema_46:
-            exploration = exp_domain.Exploration.create_default_exploration(self.VALID_EXP_ID, title='title', category='category')
-            exp_services.save_new_exploration(feconf.SYSTEM_COMMITTER_ID, exploration)
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.VALID_EXP_ID, title='title', category='category'
+            )
+            exp_services.save_new_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exploration
+            )
         self.assertLess(
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
         )
 
-        swap_states_schema_42 = self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42)
-        swap_exp_schema_47 = self.swap(exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47)
+        swap_states_schema_42 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42
+        )
+        swap_exp_schema_47 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47
+        )
         with swap_states_schema_42, swap_exp_schema_47:
             self.assert_job_output_is(
                 [
                     job_run_result.JobRunResult(
                         stdout='',
-                        stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Exploration is not at latest schema version\'))": 1'),
+                        stderr=(
+                            'EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Exploration is not at latest schema version\'))": 1'
+                        ),
                     )
                 ]
             )
@@ -1598,7 +1908,9 @@ class ExpSnapshotsMigrationJobTests(job_test_utils.JobTestBase, test_utils.Gener
             states=EXP_V46_DICT['states'],
             auto_tts_enabled=EXP_V46_DICT['auto_tts_enabled'],
         )
-        rights_manager.create_new_exploration_rights(self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID)
+        rights_manager.create_new_exploration_rights(
+            self.VALID_EXP_ID, feconf.SYSTEM_COMMITTER_ID
+        )
         exp_model.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
         exp_summary_model = exp_models.ExpSummaryModel(
             **{
@@ -1679,21 +1991,31 @@ class ExpSnapshotsMigrationJobTests(job_test_utils.JobTestBase, test_utils.Gener
                 [
                     job_run_result.JobRunResult(
                         stdout='',
-                        stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception("Exploration snapshot exp_id0 failed migration to states v47: \'property_that_dne\'"))": 1'),
+                        stderr=(
+                            'EXP PROCESSED ERROR: "(\'exp_id0\', Exception("Exploration snapshot exp_id0 failed migration to states v47: \'property_that_dne\'"))": 1'
+                        ),
                     ),
                     job_run_result.JobRunResult(
                         stdout='',
-                        stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Snapshot is already at latest schema version\'))": 1'),
+                        stderr=(
+                            'EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Snapshot is already at latest schema version\'))": 1'
+                        ),
                     ),
                 ]
             )
 
     def test_audit_job_handles_missing_states_schema_version(self) -> None:
-        swap_exp_schema_37 = self.swap(exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 37)
+        swap_exp_schema_37 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 37
+        )
         with swap_exp_schema_37:
             with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
-                exploration = exp_domain.Exploration.create_default_exploration(self.VALID_EXP_ID, title='title', category='category')
-                exp_services.save_new_exploration(feconf.SYSTEM_COMMITTER_ID, exploration)
+                exploration = exp_domain.Exploration.create_default_exploration(
+                    self.VALID_EXP_ID, title='title', category='category'
+                )
+                exp_services.save_new_exploration(
+                    feconf.SYSTEM_COMMITTER_ID, exploration
+                )
 
             # Bring the main exploration to the latest schema.
             caching_services.delete_multi(
@@ -1704,7 +2026,9 @@ class ExpSnapshotsMigrationJobTests(job_test_utils.JobTestBase, test_utils.Gener
             migration_change_list = [
                 exp_domain.ExplorationChange(
                     {
-                        'cmd': (exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION),
+                        'cmd': (
+                            exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION
+                        ),
                         'from_version': '41',
                         'to_version': '44',
                     }
@@ -1717,14 +2041,22 @@ class ExpSnapshotsMigrationJobTests(job_test_utils.JobTestBase, test_utils.Gener
                     migration_change_list,
                     'Ran Exploration Migration job.',
                 )
-            exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+            exploration_model = exp_models.ExplorationModel.get(
+                self.VALID_EXP_ID
+            )
             self.assertEqual(exploration_model.states_schema_version, 44)
 
             # Modify the snapshot to have no states schema version. (This
             # implies a schema version of 0.)
-            snapshot_content_model = exp_models.ExplorationSnapshotContentModel.get('%s-1' % self.VALID_EXP_ID)
+            snapshot_content_model = (
+                exp_models.ExplorationSnapshotContentModel.get(
+                    '%s-1' % self.VALID_EXP_ID
+                )
+            )
             del snapshot_content_model.content['states_schema_version']
-            snapshot_content_model.update_timestamps(update_last_updated_time=False)
+            snapshot_content_model.update_timestamps(
+                update_last_updated_time=False
+            )
             snapshot_content_model.put()
 
             # There is no failure due to a missing states schema version.
@@ -1733,11 +2065,15 @@ class ExpSnapshotsMigrationJobTests(job_test_utils.JobTestBase, test_utils.Gener
                     [
                         job_run_result.JobRunResult(
                             stdout='',
-                            stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception("Exploration snapshot exp_id0 failed migration to states v1: type object \'Exploration\' has no attribute \'_convert_states_v0_dict_to_v1_dict\'"))": 1'),
+                            stderr=(
+                                'EXP PROCESSED ERROR: "(\'exp_id0\', Exception("Exploration snapshot exp_id0 failed migration to states v1: type object \'Exploration\' has no attribute \'_convert_states_v0_dict_to_v1_dict\'"))": 1'
+                            ),
                         ),
                         job_run_result.JobRunResult(
                             stdout='',
-                            stderr=('EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Snapshot is already at latest schema version\'))": 1'),
+                            stderr=(
+                                'EXP PROCESSED ERROR: "(\'exp_id0\', Exception(\'Snapshot is already at latest schema version\'))": 1'
+                            ),
                         ),
                     ]
                 )

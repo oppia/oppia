@@ -46,10 +46,16 @@ email_services = models.Registry.import_email_services()
 class EnableFeatureFlagTests(test_utils.GenericTestBase):
     """Tests for testing test_utils.enable_feature_flags."""
 
-    @test_utils.enable_feature_flags([feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS])
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS]
+    )
     def test_enable_feature_flags_decorator(self) -> None:
         """Tests if single feature-flag is enabled."""
-        self.assertTrue(feature_flag_services.is_feature_flag_enabled('dummy_feature_flag_for_e2e_tests', None))
+        self.assertTrue(
+            feature_flag_services.is_feature_flag_enabled(
+                'dummy_feature_flag_for_e2e_tests', None
+            )
+        )
 
     @test_utils.enable_feature_flags(
         [
@@ -59,8 +65,14 @@ class EnableFeatureFlagTests(test_utils.GenericTestBase):
     )
     def test_enable_multiple_feature_flags_decorator(self) -> None:
         """Tests if multiple feature flags are enabled."""
-        self.assertTrue(feature_flag_services.is_feature_flag_enabled('dummy_feature_flag_for_e2e_tests', None))
-        self.assertTrue(feature_flag_services.is_feature_flag_enabled('blog_pages', None))
+        self.assertTrue(
+            feature_flag_services.is_feature_flag_enabled(
+                'dummy_feature_flag_for_e2e_tests', None
+            )
+        )
+        self.assertTrue(
+            feature_flag_services.is_feature_flag_enabled('blog_pages', None)
+        )
 
 
 class SetPlatformParametersTests(test_utils.GenericTestBase):
@@ -75,22 +87,30 @@ class SetPlatformParametersTests(test_utils.GenericTestBase):
     def test_set_platform_parameters_decorator(self) -> None:
         """Tests if platform parameters are set."""
         self.assertEqual(
-            platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value),
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            ),
             True,
         )
         self.assertEqual(
-            platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value),
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
+            ),
             'admin',
         )
 
-    @test_utils.set_platform_parameters([(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)])
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+    )
     def test_set_platform_parameters_decorator_with_invalid_param(self) -> None:
         """Tests if invalid platform parameter raises an error."""
         with self.assertRaisesRegex(
             Exception,
             'The value for the platform parameter dummy_parameter was needed in this test, but not specified in the set_platform_parameters decorator. Please use this information in the decorator.',
         ):
-            platform_parameter_services.get_platform_parameter_value('dummy_parameter')
+            platform_parameter_services.get_platform_parameter_value(
+                'dummy_parameter'
+            )
 
 
 class FunctionWrapperTests(test_utils.GenericTestBase):
@@ -122,7 +142,9 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
                 testcase.assertEqual(args.get('posarg'), 'foo')
                 testcase.assertEqual(args.get('kwarg'), 'bar')
 
-            def post_call_hook(self, args: OrderedDict[str, str], result: str) -> None:
+            def post_call_hook(
+                self, args: OrderedDict[str, str], result: str
+            ) -> None:
                 """Mock post call hook.
 
                 Args:
@@ -234,7 +256,9 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
         with self.login_context(self.EMAIL):
             self.assertEqual(
                 self.stub.get_auth_claims_from_request(request),
-                auth_domain.AuthClaims(self.get_auth_id_from_email(self.EMAIL), self.EMAIL, False),
+                auth_domain.AuthClaims(
+                    self.get_auth_id_from_email(self.EMAIL), self.EMAIL, False
+                ),
             )
 
         with self.super_admin_context():
@@ -250,7 +274,9 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
         self.assertIsNone(self.stub.get_auth_claims_from_request(request))
 
     def test_get_association_that_is_present(self) -> None:
-        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        self.stub.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
 
         self.assertEqual(self.stub.get_user_id_from_auth_id('aid'), 'uid')
         self.assertEqual(self.stub.get_auth_id_from_user_id('uid'), 'aid')
@@ -260,49 +286,75 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
         self.assertIsNone(self.stub.get_auth_id_from_user_id('does_not_exist'))
 
     def test_fail_to_get_deleted_association(self) -> None:
-        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        self.stub.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
         self.stub.mark_user_for_deletion('uid')
         self.assertIsNone(self.stub.get_user_id_from_auth_id('aid'))
 
     def test_get_multi_associations_with_all_present(self) -> None:
-        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
-        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid2', 'uid2'))
-        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid3', 'uid3'))
+        self.stub.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid1', 'uid1')
+        )
+        self.stub.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid2', 'uid2')
+        )
+        self.stub.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid3', 'uid3')
+        )
 
         self.assertEqual(
-            self.stub.get_multi_user_ids_from_auth_ids(['aid1', 'aid2', 'aid3']),
+            self.stub.get_multi_user_ids_from_auth_ids(
+                ['aid1', 'aid2', 'aid3']
+            ),
             ['uid1', 'uid2', 'uid3'],
         )
         self.assertEqual(
-            self.stub.get_multi_auth_ids_from_user_ids(['uid1', 'uid2', 'uid3']),
+            self.stub.get_multi_auth_ids_from_user_ids(
+                ['uid1', 'uid2', 'uid3']
+            ),
             ['aid1', 'aid2', 'aid3'],
         )
 
     def test_get_multi_associations_with_one_missing(self) -> None:
-        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
+        self.stub.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid1', 'uid1')
+        )
         # The aid2 <-> uid2 association is missing.
-        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid3', 'uid3'))
+        self.stub.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid3', 'uid3')
+        )
 
         self.assertEqual(
-            self.stub.get_multi_user_ids_from_auth_ids(['aid1', 'aid2', 'aid3']),
+            self.stub.get_multi_user_ids_from_auth_ids(
+                ['aid1', 'aid2', 'aid3']
+            ),
             ['uid1', None, 'uid3'],
         )
         self.assertEqual(
-            self.stub.get_multi_auth_ids_from_user_ids(['uid1', 'uid2', 'uid3']),
+            self.stub.get_multi_auth_ids_from_user_ids(
+                ['uid1', 'uid2', 'uid3']
+            ),
             ['aid1', None, 'aid3'],
         )
 
     def test_associate_auth_id_with_user_id_without_collision(self) -> None:
-        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        self.stub.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
 
         self.assertEqual(self.stub.get_user_id_from_auth_id('aid'), 'uid')
         self.assertEqual(self.stub.get_auth_id_from_user_id('uid'), 'aid')
 
     def test_associate_auth_id_with_user_id_with_collision_raises(self) -> None:
-        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        self.stub.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
 
         with self.assertRaisesRegex(Exception, 'already associated'):
-            self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
+            self.stub.associate_auth_id_with_user_id(
+                auth_domain.AuthIdUserIdPair('aid', 'uid')
+            )
 
     def test_associate_multi_auth_ids_with_user_ids_without_collisions(
         self,
@@ -327,7 +379,9 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
     def test_associate_multi_auth_ids_with_user_ids_with_collision_raises(
         self,
     ) -> None:
-        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
+        self.stub.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid1', 'uid1')
+        )
 
         with self.assertRaisesRegex(Exception, 'already associated'):
             self.stub.associate_multi_auth_ids_with_user_ids(
@@ -340,20 +394,34 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
 
     def test_present_association_is_not_considered_to_be_deleted(self) -> None:
         # This operation creates the external auth association.
-        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
-        self.assertFalse(self.stub.verify_external_auth_associations_are_deleted('uid'))
+        self.stub.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
+        self.assertFalse(
+            self.stub.verify_external_auth_associations_are_deleted('uid')
+        )
 
     def test_missing_association_is_considered_to_be_deleted(self) -> None:
-        self.assertTrue(self.stub.verify_external_auth_associations_are_deleted('does_not_exist'))
+        self.assertTrue(
+            self.stub.verify_external_auth_associations_are_deleted(
+                'does_not_exist'
+            )
+        )
 
     def test_delete_association_when_it_is_present(self) -> None:
         # This operation creates the external auth association.
-        self.stub.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
-        self.assertFalse(self.stub.verify_external_auth_associations_are_deleted('uid'))
+        self.stub.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
+        self.assertFalse(
+            self.stub.verify_external_auth_associations_are_deleted('uid')
+        )
 
         self.stub.delete_external_auth_associations('uid')
 
-        self.assertTrue(self.stub.verify_external_auth_associations_are_deleted('uid'))
+        self.assertTrue(
+            self.stub.verify_external_auth_associations_are_deleted('uid')
+        )
 
     def test_delete_association_when_it_is_missing_does_not_raise(self) -> None:
         # Should not raise.
@@ -417,6 +485,7 @@ class FailingFunctionTests(test_utils.GenericTestBase):
 
         def function(x):
             return x**2
+
         failing_func = test_utils.FailingFunction(
             function, MockError('Dummy Exception'), 2
         )
@@ -458,12 +527,20 @@ class TestUtilsTests(test_utils.GenericTestBase):
             self.get_updated_param_dict({}, param_change_list, exp_param_specs)
 
     def test_cannot_save_new_linear_exp_with_no_state_name(self) -> None:
-        with self.assertRaisesRegex(ValueError, 'must provide at least one state name'):
-            self.save_new_linear_exp_with_state_names_and_interactions('exp_id', 'owner_id', [], ['interaction_id'])
+        with self.assertRaisesRegex(
+            ValueError, 'must provide at least one state name'
+        ):
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                'exp_id', 'owner_id', [], ['interaction_id']
+            )
 
     def test_cannot_save_new_linear_exp_with_no_interaction_id(self) -> None:
-        with self.assertRaisesRegex(ValueError, 'must provide at least one interaction type'):
-            self.save_new_linear_exp_with_state_names_and_interactions('exp_id', 'owner_id', ['state_name'], [])
+        with self.assertRaisesRegex(
+            ValueError, 'must provide at least one interaction type'
+        ):
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                'exp_id', 'owner_id', ['state_name'], []
+            )
 
     def test_raises_error_with_aot_compiled_true(self) -> None:
         """Test that mock_load_template uses the src folder when
@@ -594,7 +671,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
 
         obj.func = test_func
 
-        with self.assertRaisesRegex(ZeroDivisionError, 'integer division or modulo by zero'):
+        with self.assertRaisesRegex(
+            ZeroDivisionError, 'integer division or modulo by zero'
+        ):
             obj.func()
 
         with self.swap_to_always_raise(obj, 'func', error=ValueError('abc')):
@@ -622,7 +701,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_getcwd() -> None:
             return
 
-        getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd, called=False)
+        getcwd_swap = self.swap_with_checks(
+            os, 'getcwd', mock_getcwd, called=False
+        )
         with getcwd_swap:
             SwapWithCheckTestClass.empty_function_without_args()
 
@@ -642,7 +723,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_samefile(*unused_args: str) -> None:
             return
 
-        getenv_swap = self.swap_with_checks(os, 'getenv', mock_getenv, expected_args=[('123',), ('456',)])
+        getenv_swap = self.swap_with_checks(
+            os, 'getenv', mock_getenv, expected_args=[('123',), ('456',)]
+        )
         samefile_swap = self.swap_with_checks(
             os.path,
             'samefile',
@@ -661,7 +744,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_samefile(*unused_args: str) -> None:
             return
 
-        getenv_swap = self.swap_with_checks(os, 'getenv', mock_getenv, expected_args=[('456',), ('123',)])
+        getenv_swap = self.swap_with_checks(
+            os, 'getenv', mock_getenv, expected_args=[('456',), ('123',)]
+        )
         samefile_swap = self.swap_with_checks(
             os.path,
             'samefile',
@@ -681,7 +766,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_samefile(*unused_args: str) -> None:
             return
 
-        getenv_swap = self.swap_with_checks(os, 'getenv', mock_getenv, expected_args=[('123',), ('456',)])
+        getenv_swap = self.swap_with_checks(
+            os, 'getenv', mock_getenv, expected_args=[('123',), ('456',)]
+        )
         samefile_swap = self.swap_with_checks(
             os.path,
             'samefile',
@@ -742,7 +829,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
 
         getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd)
 
-        with self.assertRaisesRegex(ValueError, re.escape('Exception raised from getcwd()')):
+        with self.assertRaisesRegex(
+            ValueError, re.escape('Exception raised from getcwd()')
+        ):
             with getcwd_swap:
                 SwapWithCheckTestClass.getcwd_function_without_args()
 
@@ -772,7 +861,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
         invalid_http_method = 'INVALID_METHOD'
         expected_status_int_list = [200]
 
-        with self.assertRaisesRegex(Exception, 'Invalid http method %s' % invalid_http_method):
+        with self.assertRaisesRegex(
+            Exception, 'Invalid http method %s' % invalid_http_method
+        ):
             self.get_response_without_checking_for_errors(
                 url=url,
                 expected_status_int_list=expected_status_int_list,
@@ -783,12 +874,16 @@ class TestUtilsTests(test_utils.GenericTestBase):
     # the codebase we plan to get rid of the tests that intentionally
     # test wrong inputs that we can normally catch by typing.
     def test_mock_datetime_utcnow_fails_when_wrong_type_is_passed(self) -> None:
-        with self.assertRaisesRegex(Exception, 'mocked_now must be datetime, got: 123'):
+        with self.assertRaisesRegex(
+            Exception, 'mocked_now must be datetime, got: 123'
+        ):
             with self.mock_datetime_utcnow(123):  # type: ignore[arg-type]
                 pass
 
     def test_raises_error_if_no_mock_file_path_found(self) -> None:
-        with self.assertRaisesRegex(Exception, 'No file exists for the given file name'):
+        with self.assertRaisesRegex(
+            Exception, 'No file exists for the given file name'
+        ):
             test_utils.mock_load_template('invalid_path')
 
     def test_raises_error_if_multiple_file_paths_found(self) -> None:
@@ -798,17 +893,25 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 ('page-dir-2', [], ['duplicate_file.ts']),
             ]
 
-        walk_swap = self.swap_with_checks(os, 'walk', mock_walk, expected_args=[('core/templates/pages',)])
-        with self.assertRaisesRegex(Exception, 'Multiple files found with name: duplicate_file.ts'):
+        walk_swap = self.swap_with_checks(
+            os, 'walk', mock_walk, expected_args=[('core/templates/pages',)]
+        )
+        with self.assertRaisesRegex(
+            Exception, 'Multiple files found with name: duplicate_file.ts'
+        ):
             with walk_swap:
                 test_utils.mock_load_template('duplicate_file.ts')
 
     def test_raises_error_if_no_user_name_exists_with_strict_true(self) -> None:
-        with self.assertRaisesRegex(Exception, 'No user_id found for the given email address'):
+        with self.assertRaisesRegex(
+            Exception, 'No user_id found for the given email address'
+        ):
             self.get_user_id_from_email('invalidemail@gmail.com')
 
     def test_assert_matches_regexps_error_diff_num_expressions(self) -> None:
-        with self.assertRaisesRegex(AssertionError, 'missing item expected to match: \'1\''):
+        with self.assertRaisesRegex(
+            AssertionError, 'missing item expected to match: \'1\''
+        ):
             self.assert_matches_regexps([], ['1'])
 
         with self.assertRaisesRegex(AssertionError, 'extra item \'1\''):
@@ -821,7 +924,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
         self.set_translation_coordinators(['C'], 'en')
         self.set_translation_coordinators(['C'], 'hi')
 
-        coordinator_rights_model = user_services.get_translation_rights_with_user(user_id_c)
+        coordinator_rights_model = (
+            user_services.get_translation_rights_with_user(user_id_c)
+        )
         self.assertEqual(2, len(coordinator_rights_model))
         self.assertEqual('en', coordinator_rights_model[0].language_id)
         self.assertEqual('hi', coordinator_rights_model[1].language_id)
@@ -908,7 +1013,9 @@ class EmailMockTests(test_utils.EmailTestBase):
         email_services.send_email_to_recipients() is correctly swapped to its
         mock version when the testbase extends EmailTestBase.
         """
-        referenced_function = getattr(email_services, 'send_email_to_recipients')
+        referenced_function = getattr(
+            email_services, 'send_email_to_recipients'
+        )
         correct_function = getattr(self, '_send_email_to_recipients')
         self.assertEqual(referenced_function, correct_function)
 
@@ -932,7 +1039,9 @@ class EmailMockTests(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(len(all_messages), 1)
         self.assertEqual(all_messages['b@b.com'], messages)
-        self.assertEqual(messages[0].subject, 'Hola 😂 - invitation to collaborate')
+        self.assertEqual(
+            messages[0].subject, 'Hola 😂 - invitation to collaborate'
+        )
         self.assertEqual(messages[0].body, 'plaintext_body 😂')
         self.assertEqual(messages[0].html, 'Hi abc,<br> 😂')
         self.assertEqual(messages[0].bcc, 'c@c.com')

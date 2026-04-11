@@ -51,7 +51,9 @@ if MYPY:  # pragma: no cover
     exp_models,
     story_models,
     user_models,
-) = models.Registry.import_models([models.Names.EXPLORATION, models.Names.STORY, models.Names.USER])
+) = models.Registry.import_models(
+    [models.Names.EXPLORATION, models.Names.STORY, models.Names.USER]
+)
 
 
 def get_new_story_id() -> str:
@@ -112,12 +114,18 @@ def save_new_story(committer_id: str, story: story_domain.Story) -> None:
         committer_id,
         story,
         commit_message,
-        [story_domain.StoryChange({'cmd': story_domain.CMD_CREATE_NEW, 'title': story.title})],
+        [
+            story_domain.StoryChange(
+                {'cmd': story_domain.CMD_CREATE_NEW, 'title': story.title}
+            )
+        ],
     )
 
 
 # Repository SAVE and DELETE methods.
-def apply_change_list(story_id: str, change_list: List[story_domain.StoryChange]) -> Tuple[story_domain.Story, List[str], List[str]]:
+def apply_change_list(
+    story_id: str, change_list: List[story_domain.StoryChange]
+) -> Tuple[story_domain.Story, List[str], List[str]]:
     """Applies a changelist to a story and returns the result.
 
     Args:
@@ -143,38 +151,63 @@ def apply_change_list(story_id: str, change_list: List[story_domain.StoryChange]
                 # Here we use cast because we are narrowing down the type from
                 # StoryChange to a specific change command.
                 add_story_node_cmd = cast(story_domain.AddStoryNodeCmd, change)
-                story.add_node(add_story_node_cmd.node_id, add_story_node_cmd.title)
+                story.add_node(
+                    add_story_node_cmd.node_id, add_story_node_cmd.title
+                )
             elif change.cmd == story_domain.CMD_DELETE_STORY_NODE:
                 # Here we use cast because we are narrowing down the type from
                 # StoryChange to a specific change command.
-                delete_story_node_cmd = cast(story_domain.DeleteStoryNodeCmd, change)
+                delete_story_node_cmd = cast(
+                    story_domain.DeleteStoryNodeCmd, change
+                )
                 story.delete_node(delete_story_node_cmd.node_id)
-            elif change.cmd == story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS:
+            elif (
+                change.cmd == story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS
+            ):
                 # Here we use cast because we are narrowing down the type from
                 # StoryChange to a specific change command.
-                update_story_node_outline_status = cast(story_domain.UpdateStoryNodeOutlineStatusCmd, change)
+                update_story_node_outline_status = cast(
+                    story_domain.UpdateStoryNodeOutlineStatusCmd, change
+                )
                 if update_story_node_outline_status.new_value:
-                    story.mark_node_outline_as_finalized(update_story_node_outline_status.node_id)
+                    story.mark_node_outline_as_finalized(
+                        update_story_node_outline_status.node_id
+                    )
                 else:
-                    story.mark_node_outline_as_unfinalized(update_story_node_outline_status.node_id)
+                    story.mark_node_outline_as_unfinalized(
+                        update_story_node_outline_status.node_id
+                    )
             elif change.cmd == story_domain.CMD_UPDATE_STORY_NODE_PROPERTY:
-                if change.property_name == story_domain.STORY_NODE_PROPERTY_OUTLINE:
+                if (
+                    change.property_name
+                    == story_domain.STORY_NODE_PROPERTY_OUTLINE
+                ):
                     # Here we use cast because this 'if' condition forces
                     # change to have type UpdateStoryNodePropertyOutlineCmd.
-                    update_node_outline_cmd = cast(story_domain.UpdateStoryNodePropertyOutlineCmd, change)
+                    update_node_outline_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyOutlineCmd, change
+                    )
                     story.update_node_outline(
                         update_node_outline_cmd.node_id,
                         update_node_outline_cmd.new_value,
                     )
-                elif change.property_name == story_domain.STORY_NODE_PROPERTY_TITLE:
+                elif (
+                    change.property_name
+                    == story_domain.STORY_NODE_PROPERTY_TITLE
+                ):
                     # Here we use cast because this 'elif' condition forces
                     # change to have type UpdateStoryNodePropertyTitleCmd.
-                    update_node_title_cmd = cast(story_domain.UpdateStoryNodePropertyTitleCmd, change)
+                    update_node_title_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyTitleCmd, change
+                    )
                     story.update_node_title(
                         update_node_title_cmd.node_id,
                         update_node_title_cmd.new_value,
                     )
-                elif change.property_name == story_domain.STORY_NODE_PROPERTY_DESCRIPTION:
+                elif (
+                    change.property_name
+                    == story_domain.STORY_NODE_PROPERTY_DESCRIPTION
+                ):
                     # Here we use cast because this 'elif' condition forces
                     # change to have type UpdateStoryNodePropertyDescriptionCmd.
                     update_node_description_cmd = cast(
@@ -185,7 +218,10 @@ def apply_change_list(story_id: str, change_list: List[story_domain.StoryChange]
                         update_node_description_cmd.node_id,
                         update_node_description_cmd.new_value,
                     )
-                elif change.property_name == story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME:
+                elif (
+                    change.property_name
+                    == story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyThumbnailFilenameCmd.
@@ -197,7 +233,10 @@ def apply_change_list(story_id: str, change_list: List[story_domain.StoryChange]
                         update_node_thumbnail_filename_cmd.node_id,
                         update_node_thumbnail_filename_cmd.new_value,
                     )
-                elif change.property_name == story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR:
+                elif (
+                    change.property_name
+                    == story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyThumbnailBGColorCmd.
@@ -209,7 +248,10 @@ def apply_change_list(story_id: str, change_list: List[story_domain.StoryChange]
                         update_node_thumbnail_bg_color.node_id,
                         update_node_thumbnail_bg_color.new_value,
                     )
-                elif change.property_name == story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS:
+                elif (
+                    change.property_name
+                    == story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyAcquiredSkillIdsCmd.
@@ -221,7 +263,10 @@ def apply_change_list(story_id: str, change_list: List[story_domain.StoryChange]
                         update_node_acquired_skill_ids_cmd.node_id,
                         update_node_acquired_skill_ids_cmd.new_value,
                     )
-                elif change.property_name == story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS:
+                elif (
+                    change.property_name
+                    == story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyPrerequisiteSkillIdsCmd.
@@ -233,7 +278,10 @@ def apply_change_list(story_id: str, change_list: List[story_domain.StoryChange]
                         update_prerequisite_skill_ids_cmd.node_id,
                         update_prerequisite_skill_ids_cmd.new_value,
                     )
-                elif change.property_name == story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS:
+                elif (
+                    change.property_name
+                    == story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyDestinationNodeIdsCmd.
@@ -245,7 +293,10 @@ def apply_change_list(story_id: str, change_list: List[story_domain.StoryChange]
                         update_node_destination_node_ids_cmd.node_id,
                         update_node_destination_node_ids_cmd.new_value,
                     )
-                elif change.property_name == story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID:
+                elif (
+                    change.property_name
+                    == story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyExplorationIdCmd.
@@ -257,17 +308,25 @@ def apply_change_list(story_id: str, change_list: List[story_domain.StoryChange]
                         update_node_exploration_id_cmd.node_id,
                         update_node_exploration_id_cmd.new_value,
                     )
-                elif change.property_name == story_domain.STORY_NODE_PROPERTY_STATUS:
+                elif (
+                    change.property_name
+                    == story_domain.STORY_NODE_PROPERTY_STATUS
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyStatusCmd.
-                    update_node_status_cmd = cast(story_domain.UpdateStoryNodePropertyStatusCmd, change)
+                    update_node_status_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyStatusCmd, change
+                    )
                     story.update_node_status(
                         update_node_status_cmd.node_id,
                         update_node_status_cmd.new_value,
                     )
 
-                elif change.property_name == story_domain.STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE:
+                elif (
+                    change.property_name
+                    == story_domain.STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyPlannedPublicationDateCmd.
@@ -279,7 +338,10 @@ def apply_change_list(story_id: str, change_list: List[story_domain.StoryChange]
                         update_node_planned_publication_date_cmd.node_id,
                         update_node_planned_publication_date_cmd.new_value,
                     )
-                elif change.property_name == story_domain.STORY_NODE_PROPERTY_LAST_MODIFIED:
+                elif (
+                    change.property_name
+                    == story_domain.STORY_NODE_PROPERTY_LAST_MODIFIED
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyLastModifiedCmd.
@@ -291,7 +353,10 @@ def apply_change_list(story_id: str, change_list: List[story_domain.StoryChange]
                         update_node_last_modified_cmd.node_id,
                         update_node_last_modified_cmd.new_value,
                     )
-                elif change.property_name == story_domain.STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE:
+                elif (
+                    change.property_name
+                    == story_domain.STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyFirstPublicationDateCmd.
@@ -303,7 +368,10 @@ def apply_change_list(story_id: str, change_list: List[story_domain.StoryChange]
                         update_node_first_publication_date_cmd.node_id,
                         update_node_first_publication_date_cmd.new_value,
                     )
-                elif change.property_name == story_domain.STORY_NODE_PROPERTY_UNPUBLISHING_REASON:
+                elif (
+                    change.property_name
+                    == story_domain.STORY_NODE_PROPERTY_UNPUBLISHING_REASON
+                ):
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateStoryNodePropertyUnpublishingReasonCmd.
@@ -318,23 +386,61 @@ def apply_change_list(story_id: str, change_list: List[story_domain.StoryChange]
             elif change.cmd == story_domain.CMD_UPDATE_STORY_PROPERTY:
                 # Here we use cast because we are narrowing down the type from
                 # StoryChange to a specific change command.
-                update_story_property_cmd = cast(story_domain.UpdateStoryPropertyCmd, change)
-                if update_story_property_cmd.property_name == story_domain.STORY_PROPERTY_TITLE:
+                update_story_property_cmd = cast(
+                    story_domain.UpdateStoryPropertyCmd, change
+                )
+                if (
+                    update_story_property_cmd.property_name
+                    == story_domain.STORY_PROPERTY_TITLE
+                ):
                     story.update_title(update_story_property_cmd.new_value)
-                elif update_story_property_cmd.property_name == story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME:
-                    story.update_thumbnail_filename(update_story_property_cmd.new_value)
-                elif update_story_property_cmd.property_name == story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR:
-                    story.update_thumbnail_bg_color(update_story_property_cmd.new_value)
-                elif update_story_property_cmd.property_name == story_domain.STORY_PROPERTY_DESCRIPTION:
-                    story.update_description(update_story_property_cmd.new_value)
-                elif update_story_property_cmd.property_name == story_domain.STORY_PROPERTY_NOTES:
+                elif (
+                    update_story_property_cmd.property_name
+                    == story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME
+                ):
+                    story.update_thumbnail_filename(
+                        update_story_property_cmd.new_value
+                    )
+                elif (
+                    update_story_property_cmd.property_name
+                    == story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR
+                ):
+                    story.update_thumbnail_bg_color(
+                        update_story_property_cmd.new_value
+                    )
+                elif (
+                    update_story_property_cmd.property_name
+                    == story_domain.STORY_PROPERTY_DESCRIPTION
+                ):
+                    story.update_description(
+                        update_story_property_cmd.new_value
+                    )
+                elif (
+                    update_story_property_cmd.property_name
+                    == story_domain.STORY_PROPERTY_NOTES
+                ):
                     story.update_notes(update_story_property_cmd.new_value)
-                elif update_story_property_cmd.property_name == story_domain.STORY_PROPERTY_LANGUAGE_CODE:
-                    story.update_language_code(update_story_property_cmd.new_value)
-                elif update_story_property_cmd.property_name == story_domain.STORY_PROPERTY_URL_FRAGMENT:
-                    story.update_url_fragment(update_story_property_cmd.new_value)
-                elif update_story_property_cmd.property_name == story_domain.STORY_PROPERTY_META_TAG_CONTENT:
-                    story.update_meta_tag_content(update_story_property_cmd.new_value)
+                elif (
+                    update_story_property_cmd.property_name
+                    == story_domain.STORY_PROPERTY_LANGUAGE_CODE
+                ):
+                    story.update_language_code(
+                        update_story_property_cmd.new_value
+                    )
+                elif (
+                    update_story_property_cmd.property_name
+                    == story_domain.STORY_PROPERTY_URL_FRAGMENT
+                ):
+                    story.update_url_fragment(
+                        update_story_property_cmd.new_value
+                    )
+                elif (
+                    update_story_property_cmd.property_name
+                    == story_domain.STORY_PROPERTY_META_TAG_CONTENT
+                ):
+                    story.update_meta_tag_content(
+                        update_story_property_cmd.new_value
+                    )
             elif change.cmd == story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY:
                 if change.property_name == story_domain.INITIAL_NODE_ID:
                     # Here we use cast because this 'if'
@@ -344,26 +450,42 @@ def apply_change_list(story_id: str, change_list: List[story_domain.StoryChange]
                         story_domain.UpdateStoryContentsPropertyInitialNodeIdCmd,
                         change,
                     )
-                    story.update_initial_node(update_initial_node_id_cmd.new_value)
+                    story.update_initial_node(
+                        update_initial_node_id_cmd.new_value
+                    )
                 if change.property_name == story_domain.NODE:
                     # Here we use cast because this 'elif' condition forces
                     # change to have type UpdateStoryContentsPropertyNodeCmd.
-                    update_node_cmd = cast(story_domain.UpdateStoryContentsPropertyNodeCmd, change)
-                    story.rearrange_node_in_story(update_node_cmd.old_value, update_node_cmd.new_value)
-            elif change.cmd == story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION:
+                    update_node_cmd = cast(
+                        story_domain.UpdateStoryContentsPropertyNodeCmd, change
+                    )
+                    story.rearrange_node_in_story(
+                        update_node_cmd.old_value, update_node_cmd.new_value
+                    )
+            elif (
+                change.cmd == story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION
+            ):
                 # Loading the story model from the datastore into a
                 # Story domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
                 # story is sufficient to apply the schema migration.
                 continue
 
-        exp_ids_in_modified_story = story.story_contents.get_all_linked_exp_ids()
-        exp_ids_removed_from_story = list(set(exp_ids_in_old_story).difference(exp_ids_in_modified_story))
-        exp_ids_added_to_story = list(set(exp_ids_in_modified_story).difference(exp_ids_in_old_story))
+        exp_ids_in_modified_story = (
+            story.story_contents.get_all_linked_exp_ids()
+        )
+        exp_ids_removed_from_story = list(
+            set(exp_ids_in_old_story).difference(exp_ids_in_modified_story)
+        )
+        exp_ids_added_to_story = list(
+            set(exp_ids_in_modified_story).difference(exp_ids_in_old_story)
+        )
         return story, exp_ids_removed_from_story, exp_ids_added_to_story
 
     except Exception as e:
-        logging.error('%s %s %s %s' % (e.__class__.__name__, e, story_id, change_list))
+        logging.error(
+            '%s %s %s %s' % (e.__class__.__name__, e, story_id, change_list)
+        )
         raise e
 
 
@@ -406,14 +528,18 @@ def validate_prerequisite_skills_in_story_contents(
     is_node_visited = [False] * len(story_contents.nodes)
     # Ruling out the possibility of None for mypy type checking.
     assert story_contents.initial_node_id is not None
-    starting_node_index = story_contents.get_node_index(story_contents.initial_node_id)
+    starting_node_index = story_contents.get_node_index(
+        story_contents.initial_node_id
+    )
     nodes_queue.append(story_contents.nodes[starting_node_index].id)
 
     # The user is assumed to have all the prerequisite skills of the
     # starting node before starting the story. Also, this list models
     # the skill IDs acquired by a learner as they progress through the
     # story.
-    simulated_skill_ids = copy.deepcopy(story_contents.nodes[starting_node_index].prerequisite_skill_ids)
+    simulated_skill_ids = copy.deepcopy(
+        story_contents.nodes[starting_node_index].prerequisite_skill_ids
+    )
 
     # The following loop employs a Breadth First Search from the given
     # starting node and makes sure that the user has acquired all the
@@ -438,21 +564,32 @@ def validate_prerequisite_skills_in_story_contents(
                 raise utils.ValidationError('Loops are not allowed in stories.')
             destination_node = story_contents.nodes[node_index]
             # Include only skill ids relevant to the topic for validation.
-            topic_relevant_skill_ids = list(set(skill_ids_in_corresponding_topic).intersection(set(destination_node.prerequisite_skill_ids)))
-            if not (set(topic_relevant_skill_ids).issubset(simulated_skill_ids)):
+            topic_relevant_skill_ids = list(
+                set(skill_ids_in_corresponding_topic).intersection(
+                    set(destination_node.prerequisite_skill_ids)
+                )
+            )
+            if not (
+                set(topic_relevant_skill_ids).issubset(simulated_skill_ids)
+            ):
                 raise utils.ValidationError(
                     'The skills with ids %s'
                     ' were specified as prerequisites for Chapter %s,'
                     ' but were not taught in any chapter before it.'
                     % (
-                        ' '.join(set(topic_relevant_skill_ids) - set(simulated_skill_ids)),
+                        ' '.join(
+                            set(topic_relevant_skill_ids)
+                            - set(simulated_skill_ids)
+                        ),
                         destination_node.title,
                     )
                 )
             nodes_queue.append(node_id)
 
 
-def validate_explorations_for_story(exp_ids: List[str], strict: bool) -> List[str]:
+def validate_explorations_for_story(
+    exp_ids: List[str], strict: bool
+) -> List[str]:
     """Validates the explorations in the given story and checks whether they
     are compatible with the mobile app and ready for publishing.
 
@@ -479,7 +616,9 @@ def validate_explorations_for_story(exp_ids: List[str], strict: bool) -> List[st
     validation_error_messages = []
 
     # Strict = False, since the existence of explorations is checked below.
-    exps_dict = exp_fetchers.get_multiple_explorations_by_id(exp_ids, strict=False)
+    exps_dict = exp_fetchers.get_multiple_explorations_by_id(
+        exp_ids, strict=False
+    )
 
     exp_rights = rights_manager.get_multiple_exploration_rights_by_ids(exp_ids)
 
@@ -491,13 +630,19 @@ def validate_explorations_for_story(exp_ids: List[str], strict: bool) -> List[st
 
     for exp_id in exp_ids:
         if exp_id not in exps_dict:
-            error_string = 'Expected story to only reference valid explorations, but found a reference to an invalid exploration with ID: %s' % exp_id
+            error_string = (
+                'Expected story to only reference valid explorations, but found a reference to an invalid exploration with ID: %s'
+                % exp_id
+            )
             if strict:
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
         else:
             if exp_rights_dict[exp_id] != constants.ACTIVITY_STATUS_PUBLIC:
-                error_string = 'Exploration with ID %s is not public. Please publish explorations before adding them to a story.' % exp_id
+                error_string = (
+                    'Exploration with ID %s is not public. Please publish explorations before adding them to a story.'
+                    % exp_id
+                )
                 if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
@@ -505,7 +650,10 @@ def validate_explorations_for_story(exp_ids: List[str], strict: bool) -> List[st
     if exps_dict:
         for exp_id, exp in exps_dict.items():
             if exp.category not in constants.ALL_CATEGORIES:
-                error_string = 'All explorations in a story should be of a default category. The exploration with ID %s has an invalid category %s.' % (exp_id, exp.category)
+                error_string = (
+                    'All explorations in a story should be of a default category. The exploration with ID %s has an invalid category %s.'
+                    % (exp_id, exp.category)
+                )
                 if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
@@ -518,20 +666,30 @@ def validate_explorations_for_story(exp_ids: List[str], strict: bool) -> List[st
         common_exp_category = exps_dict[sample_exp_id].category
         for exp_id, exp in exps_dict.items():
             if exp.category != common_exp_category:
-                error_string = 'All explorations in a story should be of the same category. The explorations with ID %s and %s have different categories.' % (sample_exp_id, exp_id)
+                error_string = (
+                    'All explorations in a story should be of the same category. The explorations with ID %s and %s have different categories.'
+                    % (sample_exp_id, exp_id)
+                )
                 if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
             try:
-                validation_error_messages.extend(exp_services.validate_exploration_for_story(exp, strict))
+                validation_error_messages.extend(
+                    exp_services.validate_exploration_for_story(exp, strict)
+                )
             except Exception as e:
-                logging.exception('Exploration validation failed for exploration with ID: %s. Error: %s' % (exp_id, e))
+                logging.exception(
+                    'Exploration validation failed for exploration with ID: %s. Error: %s'
+                    % (exp_id, e)
+                )
                 raise Exception(e) from e
 
     return validation_error_messages
 
 
-def populate_story_model_fields(story_model: story_models.StoryModel, story: story_domain.Story) -> story_models.StoryModel:
+def populate_story_model_fields(
+    story_model: story_models.StoryModel, story: story_domain.Story
+) -> story_models.StoryModel:
     """Populate story model with the data from story object.
 
     Args:
@@ -549,7 +707,9 @@ def populate_story_model_fields(story_model: story_models.StoryModel, story: sto
     story_model.thumbnail_size_in_bytes = story.thumbnail_size_in_bytes
     story_model.notes = story.notes
     story_model.language_code = story.language_code
-    story_model.story_contents_schema_version = story.story_contents_schema_version
+    story_model.story_contents_schema_version = (
+        story.story_contents_schema_version
+    )
     story_model.story_contents = story.story_contents.to_dict()
     story_model.corresponding_topic_id = story.corresponding_topic_id
     story_model.version = story.version
@@ -583,11 +743,18 @@ def _save_story(
             object have different version numbers.
     """
     if not change_list:
-        raise Exception('Unexpected error: received an invalid change list when trying to save story %s: %s' % (story.id, change_list))
+        raise Exception(
+            'Unexpected error: received an invalid change list when trying to save story %s: %s'
+            % (story.id, change_list)
+        )
 
     story.validate()
-    corresponding_topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
-    validate_prerequisite_skills_in_story_contents(corresponding_topic.get_all_skill_ids(), story.story_contents)
+    corresponding_topic = topic_fetchers.get_topic_by_id(
+        story.corresponding_topic_id
+    )
+    validate_prerequisite_skills_in_story_contents(
+        corresponding_topic.get_all_skill_ids(), story.story_contents
+    )
 
     if story_is_published:
         exp_ids = []
@@ -603,15 +770,23 @@ def _save_story(
     # story object.
     story_model = story_models.StoryModel.get(story.id)
     if story.version > story_model.version:
-        raise Exception('Unexpected error: trying to update version %s of story from version %s. Please reload the page and try again.' % (story_model.version, story.version))
+        raise Exception(
+            'Unexpected error: trying to update version %s of story from version %s. Please reload the page and try again.'
+            % (story_model.version, story.version)
+        )
 
     if story.version < story_model.version:
-        raise Exception('Trying to update version %s of story from version %s, which is too old. Please reload the page and try again.' % (story_model.version, story.version))
+        raise Exception(
+            'Trying to update version %s of story from version %s, which is too old. Please reload the page and try again.'
+            % (story_model.version, story.version)
+        )
 
     story_model = populate_story_model_fields(story_model, story)
     change_dicts = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_dicts)
-    caching_services.delete_multi(caching_services.CACHE_NAMESPACE_STORY, None, [story.id])
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_STORY, None, [story.id]
+    )
     story.version += 1
 
 
@@ -629,9 +804,14 @@ def is_story_published_and_present_in_topic(story: story_domain.Story) -> bool:
         ValidationError. The story does not belong to any valid topic.
         Exception. The story does not belong to the expected topic.
     """
-    topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id, strict=False)
+    topic = topic_fetchers.get_topic_by_id(
+        story.corresponding_topic_id, strict=False
+    )
     if topic is None:
-        raise utils.ValidationError('Expected story to only belong to a valid topic, but found no topic with ID: %s' % story.corresponding_topic_id)
+        raise utils.ValidationError(
+            'Expected story to only belong to a valid topic, but found no topic with ID: %s'
+            % story.corresponding_topic_id
+        )
 
     story_is_published = False
     story_is_present_in_topic = False
@@ -641,7 +821,10 @@ def is_story_published_and_present_in_topic(story: story_domain.Story) -> bool:
             story_is_published = story_reference.story_is_published
 
     if not story_is_present_in_topic:
-        raise Exception('Expected story to belong to the topic %s, but it is neither a part of the canonical stories or the additional stories of the topic.' % story.corresponding_topic_id)
+        raise Exception(
+            'Expected story to belong to the topic %s, but it is neither a part of the canonical stories or the additional stories of the topic.'
+            % story.corresponding_topic_id
+        )
 
     return story_is_published
 
@@ -675,31 +858,64 @@ def update_story(
         raise ValueError('Expected a commit message but received none.')
 
     old_story = story_fetchers.get_story_by_id(story_id)
-    new_story, exp_ids_removed_from_story, exp_ids_added_to_story = apply_change_list(story_id, change_list)
+    new_story, exp_ids_removed_from_story, exp_ids_added_to_story = (
+        apply_change_list(story_id, change_list)
+    )
     story_is_published = is_story_published_and_present_in_topic(new_story)
-    exploration_context_models_to_be_deleted_with_none = exp_models.ExplorationContextModel.get_multi(exp_ids_removed_from_story)
-    exploration_context_models_to_be_deleted = [model for model in exploration_context_models_to_be_deleted_with_none if model is not None]
-    exploration_context_models_collisions_list = exp_models.ExplorationContextModel.get_multi(exp_ids_added_to_story)
+    exploration_context_models_to_be_deleted_with_none = (
+        exp_models.ExplorationContextModel.get_multi(exp_ids_removed_from_story)
+    )
+    exploration_context_models_to_be_deleted = [
+        model
+        for model in exploration_context_models_to_be_deleted_with_none
+        if model is not None
+    ]
+    exploration_context_models_collisions_list = (
+        exp_models.ExplorationContextModel.get_multi(exp_ids_added_to_story)
+    )
     for context_model in exploration_context_models_collisions_list:
         if context_model is not None and context_model.story_id != story_id:
-            raise utils.ValidationError('The exploration with ID %s is already linked to story with ID %s' % (context_model.id, context_model.story_id))
+            raise utils.ValidationError(
+                'The exploration with ID %s is already linked to story with ID %s'
+                % (context_model.id, context_model.story_id)
+            )
 
-    if old_story.url_fragment != new_story.url_fragment and does_story_exist_with_url_fragment(new_story.url_fragment):
-        raise utils.ValidationError('Story Url Fragment is not unique across the site.')
-    _save_story(committer_id, new_story, commit_message, change_list, story_is_published)
+    if (
+        old_story.url_fragment != new_story.url_fragment
+        and does_story_exist_with_url_fragment(new_story.url_fragment)
+    ):
+        raise utils.ValidationError(
+            'Story Url Fragment is not unique across the site.'
+        )
+    _save_story(
+        committer_id, new_story, commit_message, change_list, story_is_published
+    )
     create_story_summary(new_story.id)
     if story_is_published:
-        opportunity_services.update_exploration_opportunities(old_story, new_story)
-    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids_removed_from_story)
+        opportunity_services.update_exploration_opportunities(
+            old_story, new_story
+        )
+    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
+        exp_ids_removed_from_story
+    )
 
-    exp_models.ExplorationContextModel.delete_multi(exploration_context_models_to_be_deleted)
+    exp_models.ExplorationContextModel.delete_multi(
+        exploration_context_models_to_be_deleted
+    )
 
-    new_exploration_context_models = [exp_models.ExplorationContextModel(id=exp_id, story_id=story_id) for exp_id in exp_ids_added_to_story]
-    exp_models.ExplorationContextModel.update_timestamps_multi(new_exploration_context_models)
+    new_exploration_context_models = [
+        exp_models.ExplorationContextModel(id=exp_id, story_id=story_id)
+        for exp_id in exp_ids_added_to_story
+    ]
+    exp_models.ExplorationContextModel.update_timestamps_multi(
+        new_exploration_context_models
+    )
     exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
 
 
-def delete_story(committer_id: str, story_id: str, force_deletion: bool = False) -> None:
+def delete_story(
+    committer_id: str, story_id: str, force_deletion: bool = False
+) -> None:
     """Deletes the story with the given story_id.
 
     Args:
@@ -723,21 +939,33 @@ def delete_story(committer_id: str, story_id: str, force_deletion: bool = False)
         )
         # Reject the suggestions related to the exploration used in
         # the story.
-        suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
+        suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
+            exp_ids
+        )
 
-    exploration_context_models: Sequence[exp_models.ExplorationContextModel] = exp_models.ExplorationContextModel.get_all().filter(exp_models.ExplorationContextModel.story_id == story_id).fetch()
-    exp_models.ExplorationContextModel.delete_multi(list(exploration_context_models))
+    exploration_context_models: Sequence[exp_models.ExplorationContextModel] = (
+        exp_models.ExplorationContextModel.get_all()
+        .filter(exp_models.ExplorationContextModel.story_id == story_id)
+        .fetch()
+    )
+    exp_models.ExplorationContextModel.delete_multi(
+        list(exploration_context_models)
+    )
 
     # This must come after the story is retrieved. Otherwise the memcache
     # key will be reinstated.
-    caching_services.delete_multi(caching_services.CACHE_NAMESPACE_STORY, None, [story_id])
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_STORY, None, [story_id]
+    )
 
     # Delete the summary of the story (regardless of whether
     # force_deletion is True or not).
     delete_story_summary(story_id)
 
     # Delete the opportunities available.
-    opportunity_services.delete_exp_opportunities_corresponding_to_story(story_id)
+    opportunity_services.delete_exp_opportunities_corresponding_to_story(
+        story_id
+    )
 
     # Delete references of the story from all related learner groups.
     learner_group_services.remove_story_reference_from_learner_groups(story_id)
@@ -769,10 +997,14 @@ def compute_summary_of_story(
     Raises:
         Exception. No data available for when the story was last_updated on.
     """
-    story_model_node_titles = [node.title for node in story.story_contents.nodes]
+    story_model_node_titles = [
+        node.title for node in story.story_contents.nodes
+    ]
 
     if story.created_on is None or story.last_updated is None:
-        raise Exception('No data available for when the story was last_updated on.')
+        raise Exception(
+            'No data available for when the story was last_updated on.'
+        )
     story_summary = story_domain.StorySummary(
         story.id,
         story.title,
@@ -831,7 +1063,9 @@ def populate_story_summary_model_fields(
         story_summary_model.populate(**story_summary_dict)
     else:
         story_summary_dict['id'] = story_summary.id
-        story_summary_model = story_models.StorySummaryModel(**story_summary_dict)
+        story_summary_model = story_models.StorySummaryModel(
+            **story_summary_dict
+        )
 
     return story_summary_model
 
@@ -844,13 +1078,19 @@ def save_story_summary(story_summary: story_domain.StorySummary) -> None:
         story_summary: StorySummary. The story summary object to be saved in the
             datastore.
     """
-    existing_skill_summary_model = story_models.StorySummaryModel.get_by_id(story_summary.id)
-    story_summary_model = populate_story_summary_model_fields(existing_skill_summary_model, story_summary)
+    existing_skill_summary_model = story_models.StorySummaryModel.get_by_id(
+        story_summary.id
+    )
+    story_summary_model = populate_story_summary_model_fields(
+        existing_skill_summary_model, story_summary
+    )
     story_summary_model.update_timestamps()
     story_summary_model.put()
 
 
-def record_completed_node_in_story_context(user_id: str, story_id: str, node_id: str) -> None:
+def record_completed_node_in_story_context(
+    user_id: str, story_id: str, node_id: str
+) -> None:
     """Records a node by a given user in a given story
     context as having been played.
 
@@ -859,7 +1099,9 @@ def record_completed_node_in_story_context(user_id: str, story_id: str, node_id:
         story_id: str. ID of the given story.
         node_id: str. ID of the given node.
     """
-    progress_model = user_models.StoryProgressModel.get_or_create(user_id, story_id)
+    progress_model = user_models.StoryProgressModel.get_or_create(
+        user_id, story_id
+    )
 
     if node_id not in progress_model.completed_node_ids:
         progress_model.completed_node_ids.append(node_id)
@@ -867,7 +1109,9 @@ def record_completed_node_in_story_context(user_id: str, story_id: str, node_id:
         progress_model.put()
 
 
-def get_chapter_notifications_stories_list() -> List[story_domain.StoryPublicationTimeliness]:
+def get_chapter_notifications_stories_list() -> List[
+    story_domain.StoryPublicationTimeliness
+]:
     """Returns a list of stories with behind-schedule or upcoming chapters.
 
     Returns:
@@ -876,16 +1120,27 @@ def get_chapter_notifications_stories_list() -> List[story_domain.StoryPublicati
         CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS.
     """
     topic_models = topic_fetchers.get_all_topics()
-    chapter_notifications_stories_list: List[story_domain.StoryPublicationTimeliness] = []
+    chapter_notifications_stories_list: List[
+        story_domain.StoryPublicationTimeliness
+    ] = []
     all_canonical_story_ids = []
     for topic_model in topic_models:
-        canonical_story_ids = [story_reference.story_id for story_reference in topic_model.canonical_story_references]
+        canonical_story_ids = [
+            story_reference.story_id
+            for story_reference in topic_model.canonical_story_references
+        ]
         all_canonical_story_ids += canonical_story_ids
-    all_canonical_stories = list(filter(None, story_fetchers.get_stories_by_ids(all_canonical_story_ids)))
+    all_canonical_stories = list(
+        filter(None, story_fetchers.get_stories_by_ids(all_canonical_story_ids))
+    )
     for topic_model in topic_models:
         topic_rights = topic_fetchers.get_topic_rights(topic_model.id)
         if topic_rights.topic_is_published:
-            canonical_stories = [story for story in all_canonical_stories if story.corresponding_topic_id == topic_model.id]
+            canonical_stories = [
+                story
+                for story in all_canonical_stories
+                if story.corresponding_topic_id == topic_model.id
+            ]
             for story in canonical_stories:
                 overdue_chapters = []
                 upcoming_chapters = []

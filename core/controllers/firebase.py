@@ -39,7 +39,9 @@ class FirebaseProxyPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handler to proxy auth requests to the firebase domain."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
-    URL_PATH_ARGS_SCHEMAS = {'firebase_path': {'schema': {'type': 'basestring'}}}
+    URL_PATH_ARGS_SCHEMAS = {
+        'firebase_path': {'schema': {'type': 'basestring'}}
+    }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}, 'POST': {}}
     RESPONSE_EXCLUDED_HEADERS = frozenset(
         [
@@ -55,7 +57,9 @@ class FirebaseProxyPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Proxies all requests to the firebase app."""
         firebase_domain = FIREBASE_DOMAINS.get(self.request.domain)
         if firebase_domain is None:
-            raise KeyError(f'No firebase domain found for {self.request.domain}.')
+            raise KeyError(
+                f'No firebase domain found for {self.request.domain}.'
+            )
 
         data = json.loads(self.request.body) if self.request.body else None
         response = requests.request(

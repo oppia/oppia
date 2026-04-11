@@ -63,7 +63,9 @@ if MYPY:  # pragma: no cover
 )
 
 
-def _get_change_list(state_name: str, property_name: str, new_value: Union[bool, str]) -> List[exp_domain.ExplorationChange]:
+def _get_change_list(
+    state_name: str, property_name: str, new_value: Union[bool, str]
+) -> List[exp_domain.ExplorationChange]:
     """Generates a change list for a single state change."""
     return [
         exp_domain.ExplorationChange(
@@ -101,14 +103,18 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.EDITOR_EMAIL)
-        self.get_html_response('%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
+        self.get_html_response(
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID)
+        )
         self.logout()
 
     def test_unpublished_explorations_are_visible_to_moderator(self) -> None:
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.login(self.MODERATOR_EMAIL)
-        self.get_html_response('%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
+        self.get_html_response(
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID)
+        )
         self.logout()
 
     def test_published_explorations_are_visible_to_logged_out_users(
@@ -116,7 +122,9 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
     ) -> None:
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
-        self.get_html_response('%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
+        self.get_html_response(
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID)
+        )
 
     def test_published_explorations_are_visible_to_logged_in_users(
         self,
@@ -125,7 +133,9 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
-        self.get_html_response('%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
+        self.get_html_response(
+            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID)
+        )
 
 
 class FeedbackIntegrationTest(test_utils.GenericTestBase):
@@ -143,7 +153,9 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
 
         # Viewer opens exploration.
         self.login(self.VIEWER_EMAIL)
-        exploration_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
+        )
         state_name_1 = exploration_dict['exploration']['init_state_name']
 
         # Viewer gives 1st feedback.
@@ -198,7 +210,9 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': 'node_1',
                     'old_value': None,
                     'new_value': 'exp_1',
@@ -218,7 +232,9 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS
+                    ),
                     'old_value': old_value_list,
                     'new_value': [self.skill_id],
                     'node_id': 'node_1',
@@ -227,14 +243,18 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'old_value': 'exp_1',
                     'new_value': exp_id,
                     'node_id': 'node_1',
                 }
             ),
         ]
-        story_services.update_story('user', story_id, change_list, 'Updated Node 1.')
+        story_services.update_story(
+            'user', story_id, change_list, 'Updated Node 1.'
+        )
         question_id = question_services.get_new_question_id()
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
@@ -253,20 +273,32 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             [self.skill_id],
             content_id_generator.next_content_id_index,
         )
-        question_services.create_new_question_skill_link(self.editor_id, question_id, self.skill_id, 0.3)
-        question_services.create_new_question_skill_link(self.editor_id, question_id_2, self.skill_id, 0.5)
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id, self.skill_id, 0.3
+        )
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id_2, self.skill_id, 0.5
+        )
         # Call the handler.
         with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
-            json_response_1 = self.get_json('%s/%s?story_url_fragment=title' % (feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id))
-        self.assertTrue(json_response_1['pretest_question_dicts'][0]['id'] in [question_id, question_id_2])
+            json_response_1 = self.get_json(
+                '%s/%s?story_url_fragment=title'
+                % (feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id)
+            )
+        self.assertTrue(
+            json_response_1['pretest_question_dicts'][0]['id']
+            in [question_id, question_id_2]
+        )
 
         self.get_json(
-            '%s/%s?story_url_fragment=title' % (feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2),
+            '%s/%s?story_url_fragment=title'
+            % (feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2),
             expected_status_int=400,
         )
 
         self.get_json(
-            '%s/%s?story_url_fragment=invalid-story' % (feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2),
+            '%s/%s?story_url_fragment=invalid-story'
+            % (feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id_2),
             expected_status_int=400,
         )
 
@@ -300,7 +332,9 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'node_id': 'node_1',
                     'old_value': None,
                     'new_value': 'exp_1',
@@ -317,7 +351,9 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS
+                    ),
                     'old_value': old_value_list,
                     'new_value': [self.skill_id],
                     'node_id': 'node_1',
@@ -326,14 +362,18 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'old_value': 'exp_1',
                     'new_value': exp_id,
                     'node_id': 'node_1',
                 }
             ),
         ]
-        story_services.update_story('user', story_id, change_list, 'Updated Node 1.')
+        story_services.update_story(
+            'user', story_id, change_list, 'Updated Node 1.'
+        )
         question_id = question_services.get_new_question_id()
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
@@ -351,8 +391,12 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             [self.skill_id],
             content_id_generator.next_content_id_index,
         )
-        question_services.create_new_question_skill_link(self.editor_id, question_id, self.skill_id, 0.3)
-        question_services.create_new_question_skill_link(self.editor_id, question_id_2, self.skill_id, 0.5)
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id, self.skill_id, 0.3
+        )
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id_2, self.skill_id, 0.5
+        )
         # Call the handler.
         with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
             with self.swap_to_always_return(
@@ -361,7 +405,8 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
                 None,
             ):
                 json_response = self.get_json(
-                    '%s/%s?story_url_fragment=title' % (feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id),
+                    '%s/%s?story_url_fragment=title'
+                    % (feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id),
                     expected_status_int=500,
                 )
         self.assertEqual(
@@ -397,7 +442,9 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
             [self.skill_id],
             content_id_generator.next_content_id_index,
         )
-        question_services.create_new_question_skill_link(self.editor_id, self.question_id, self.skill_id, 0.5)
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id, self.skill_id, 0.5
+        )
         content_id_generator = translation_domain.ContentIdGenerator()
         self.question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
@@ -407,7 +454,9 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
             [self.skill_id],
             content_id_generator.next_content_id_index,
         )
-        question_services.create_new_question_skill_link(self.editor_id, self.question_id_2, self.skill_id, 0.5)
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id_2, self.skill_id, 0.5
+        )
 
     def test_questions_are_returned_successfully(self) -> None:
         # Call the handler.
@@ -446,7 +495,9 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
             [self.skill_id],
             content_id_generator.next_content_id_index,
         )
-        question_services.create_new_question_skill_link(self.editor_id, question_id_3, skill_id_2, 0.5)
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id_3, skill_id_2, 0.5
+        )
         url = '%s?question_count=%s&skill_ids=%s,%s&fetch_by_difficulty=%s' % (
             feconf.QUESTIONS_URL_PREFIX,
             '3',
@@ -457,7 +508,9 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 3)
         question_ids = [data['id'] for data in json_response['question_dicts']]
-        self.assertItemsEqual([self.question_id, self.question_id_2, question_id_3], question_ids)
+        self.assertItemsEqual(
+            [self.question_id, self.question_id_2, question_id_3], question_ids
+        )
 
     def test_filter_multiple_skill_id_return_questions(self) -> None:
         self.login(self.USER_EMAIL)
@@ -477,7 +530,9 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
                 [skill_id],
                 content_id_generator.next_content_id_index,
             )
-            question_services.create_new_question_skill_link(self.editor_id, question_id, skill_id, 0.5)
+            question_services.create_new_question_skill_link(
+                self.editor_id, question_id, skill_id, 0.5
+            )
 
         # Create additional skills with user skill mastery > 0.0,
         # so that these are filtered out correctly.
@@ -485,7 +540,9 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
             skill_id = skill_services.get_new_skill_id()
             skill_ids_for_url = skill_ids_for_url + skill_id + ','
             self.save_new_skill(skill_id, 'user', description='Description')
-            skill_services.create_user_skill_mastery(self.user_id, skill_id, 0.5)
+            skill_services.create_user_skill_mastery(
+                self.user_id, skill_id, 0.5
+            )
 
         # Removing the last comma of the string.
         skill_ids_for_url = skill_ids_for_url[:-1]
@@ -497,7 +554,9 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
             'true',
         )
         json_response = self.get_json(url)
-        self.assertEqual(len(json_response['question_dicts']), feconf.QUESTION_BATCH_SIZE)
+        self.assertEqual(
+            len(json_response['question_dicts']), feconf.QUESTION_BATCH_SIZE
+        )
 
     def test_invalid_skill_id_returns_no_questions(self) -> None:
         # Call the handler.
@@ -541,11 +600,15 @@ class ExplorationParametersUnitTests(test_utils.GenericTestBase):
 
     def test_get_init_params(self) -> None:
         """Test the get_init_params() method."""
-        independent_pc = param_domain.ParamChange('a', 'Copier', {'value': 'firstValue', 'parse_with_jinja': False})
+        independent_pc = param_domain.ParamChange(
+            'a', 'Copier', {'value': 'firstValue', 'parse_with_jinja': False}
+        )
         exp_param_specs = {
             'a': param_domain.ParamSpec('UnicodeString'),
         }
-        new_params = self.get_updated_param_dict({}, [independent_pc], exp_param_specs)
+        new_params = self.get_updated_param_dict(
+            {}, [independent_pc], exp_param_specs
+        )
         self.assertEqual(new_params, {'a': 'firstValue'})
 
 
@@ -568,7 +631,9 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         # User checks rating.
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], None)
-        self.assertEqual(ratings['overall_ratings'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
+        self.assertEqual(
+            ratings['overall_ratings'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
+        )
 
         # User rates and checks rating.
         self.put_json(
@@ -578,7 +643,9 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         )
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], 2)
-        self.assertEqual(ratings['overall_ratings'], {'1': 0, '2': 1, '3': 0, '4': 0, '5': 0})
+        self.assertEqual(
+            ratings['overall_ratings'], {'1': 0, '2': 1, '3': 0, '4': 0, '5': 0}
+        )
 
         # User re-rates and checks rating.
         self.login('user@example.com')
@@ -589,7 +656,9 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         )
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], 5)
-        self.assertEqual(ratings['overall_ratings'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 1})
+        self.assertEqual(
+            ratings['overall_ratings'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 1}
+        )
 
         self.logout()
 
@@ -603,7 +672,9 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], None)
-        self.assertEqual(ratings['overall_ratings'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
+        self.assertEqual(
+            ratings['overall_ratings'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
+        )
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID,
             {'user_rating': 1},
@@ -637,7 +708,9 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         )
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], 4)
-        self.assertEqual(ratings['overall_ratings'], {'1': 0, '2': 0, '3': 0, '4': 2, '5': 0})
+        self.assertEqual(
+            ratings['overall_ratings'], {'1': 0, '2': 0, '3': 0, '4': 2, '5': 0}
+        )
         self.logout()
 
 
@@ -678,7 +751,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         collection_services.load_demo(self.COL_ID)
         self.logout()
 
-    def _get_exploration_ids_from_summaries(self, summaries: List[Dict[str, str]]) -> List[str]:
+    def _get_exploration_ids_from_summaries(
+        self, summaries: List[Dict[str, str]]
+    ) -> List[str]:
         """Returns the sorted list of all the exploration ids from summaries."""
         return sorted([summary['id'] for summary in summaries])
 
@@ -690,13 +765,25 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         author_recommended_ids_str: str = '[]',
     ) -> List[str]:
         """Gets the recommended exploration ids from the summaries."""
-        collection_id_param = '&collection_id=%s' % collection_id if collection_id is not None else ''
-        include_recommendations_param = '&include_system_recommendations=%s' % (include_system_recommendations) if include_system_recommendations is not None else ''
-        recommendations_url = '/explorehandler/recommendations/%s?author_recommended_ids=%s%s%s' % (
-            exploration_id,
-            author_recommended_ids_str,
-            collection_id_param,
-            include_recommendations_param,
+        collection_id_param = (
+            '&collection_id=%s' % collection_id
+            if collection_id is not None
+            else ''
+        )
+        include_recommendations_param = (
+            '&include_system_recommendations=%s'
+            % (include_system_recommendations)
+            if include_system_recommendations is not None
+            else ''
+        )
+        recommendations_url = (
+            '/explorehandler/recommendations/%s?author_recommended_ids=%s%s%s'
+            % (
+                exploration_id,
+                author_recommended_ids_str,
+                collection_id_param,
+                include_recommendations_param,
+            )
         )
 
         summaries = self.get_json(recommendations_url)['summaries']
@@ -705,18 +792,24 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
     # TODO(bhenning): Add tests for ensuring system explorations are properly
     # sampled when there are many matched for a given exploration ID.
 
-    def _set_recommendations(self, exp_id: str, recommended_ids: List[str]) -> None:
+    def _set_recommendations(
+        self, exp_id: str, recommended_ids: List[str]
+    ) -> None:
         """Sets the recommendations in the exploration corresponding to the
         given exploration id.
         """
-        recommendations_services.set_exploration_recommendations(exp_id, recommended_ids)
+        recommendations_services.set_exploration_recommendations(
+            exp_id, recommended_ids
+        )
 
     def _complete_exploration_in_collection(self, exp_id: str) -> None:
         """Completes the exploration within the collection. Records that the
         exploration has been played by the user in the context of the
         collection.
         """
-        collection_services.record_played_exploration_in_collection_context(self.new_user_id, self.COL_ID, exp_id)
+        collection_services.record_played_exploration_in_collection_context(
+            self.new_user_id, self.COL_ID, exp_id
+        )
 
     def _complete_entire_collection_in_order(self) -> None:
         """Completes the entire collection in order."""
@@ -734,7 +827,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         explorations and no author exploration IDs.
         """
         self.login(self.NEW_USER_EMAIL)
-        recommendation_ids = self._get_recommendation_ids(self.EXP_ID_0, include_system_recommendations=True)
+        recommendation_ids = self._get_recommendation_ids(
+            self.EXP_ID_0, include_system_recommendations=True
+        )
         self.assertEqual(recommendation_ids, [])
 
     def test_logged_in_with_some_sysexps_no_authexps_no_col_has_some_exps(
@@ -745,7 +840,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         """
         self.login(self.NEW_USER_EMAIL)
         self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
-        recommendation_ids = self._get_recommendation_ids(self.EXP_ID_0, include_system_recommendations=True)
+        recommendation_ids = self._get_recommendation_ids(
+            self.EXP_ID_0, include_system_recommendations=True
+        )
         self.assertEqual(recommendation_ids, [self.EXP_ID_1, self.EXP_ID_9])
 
     def test_logged_in_with_no_sysexps_some_authexps_no_col_has_some_exps(
@@ -777,7 +874,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             include_system_recommendations=True,
             author_recommended_ids_str='["7","9"]',
         )
-        self.assertEqual(recommendation_ids, [self.EXP_ID_1, self.EXP_ID_7, self.EXP_ID_9])
+        self.assertEqual(
+            recommendation_ids, [self.EXP_ID_1, self.EXP_ID_7, self.EXP_ID_9]
+        )
 
     # Logged in in-editor tests.
     def test_logged_in_preview_no_authexps_no_col_has_no_exps(self) -> None:
@@ -795,7 +894,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         there are some author exploration IDs.
         """
         self.login(self.NEW_USER_EMAIL)
-        recommendation_ids = self._get_recommendation_ids(self.EXP_ID_0, author_recommended_ids_str='["7","9"]')
+        recommendation_ids = self._get_recommendation_ids(
+            self.EXP_ID_0, author_recommended_ids_str='["7","9"]'
+        )
         self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
 
     # Logged in collection tests.
@@ -807,7 +908,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         """
         self.login(self.NEW_USER_EMAIL)
         self._complete_exploration_in_collection(self.EXP_ID_19)
-        recommendation_ids = self._get_recommendation_ids(self.EXP_ID_19, collection_id=self.COL_ID)
+        recommendation_ids = self._get_recommendation_ids(
+            self.EXP_ID_19, collection_id=self.COL_ID
+        )
         # The next exploration in the collection should be recommended.
         self.assertEqual(recommendation_ids, [self.EXP_ID_20])
 
@@ -820,7 +923,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         """
         self.login(self.NEW_USER_EMAIL)
         self._complete_exploration_in_collection(self.EXP_ID_20)
-        recommendation_ids = self._get_recommendation_ids(self.EXP_ID_20, collection_id=self.COL_ID)
+        recommendation_ids = self._get_recommendation_ids(
+            self.EXP_ID_20, collection_id=self.COL_ID
+        )
         # The first exploration that the user has not yet visited is
         # recommended. Since, the collection is linear, in this method, finally,
         # the user would visit every node in the collection.
@@ -834,7 +939,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         """
         self.login(self.NEW_USER_EMAIL)
         self._complete_entire_collection_in_order()
-        recommendation_ids = self._get_recommendation_ids(self.EXP_ID_0, collection_id=self.COL_ID)
+        recommendation_ids = self._get_recommendation_ids(
+            self.EXP_ID_0, collection_id=self.COL_ID
+        )
         # No explorations are recommended since the collection was completed.
         self.assertEqual(recommendation_ids, [])
 
@@ -847,7 +954,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         ignored in favor of the collection's own recommendations.
         """
         self.login(self.NEW_USER_EMAIL)
-        self._set_recommendations(self.EXP_ID_19, [self.EXP_ID_1, self.EXP_ID_9])
+        self._set_recommendations(
+            self.EXP_ID_19, [self.EXP_ID_1, self.EXP_ID_9]
+        )
         self._complete_exploration_in_collection(self.EXP_ID_19)
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_19,
@@ -867,7 +976,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         ignored in favor of the collection's own recommendations.
         """
         self.login(self.NEW_USER_EMAIL)
-        self._set_recommendations(self.EXP_ID_20, [self.EXP_ID_1, self.EXP_ID_9])
+        self._set_recommendations(
+            self.EXP_ID_20, [self.EXP_ID_1, self.EXP_ID_9]
+        )
         self._complete_exploration_in_collection(self.EXP_ID_20)
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_20,
@@ -913,7 +1024,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         )
         # The next exploration in the collection should be recommended along
         # with author specified explorations.
-        self.assertEqual(recommendation_ids, [self.EXP_ID_20, self.EXP_ID_7, self.EXP_ID_9])
+        self.assertEqual(
+            recommendation_ids, [self.EXP_ID_20, self.EXP_ID_7, self.EXP_ID_9]
+        )
 
     def test_logged_in_no_sysexps_with_authexps_mid_exp_in_col_has_exps(
         self,
@@ -931,7 +1044,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         )
         # The first & next explorations should be recommended, along with author
         # specified explorations.
-        self.assertEqual(recommendation_ids, [self.EXP_ID_19, self.EXP_ID_21, self.EXP_ID_7])
+        self.assertEqual(
+            recommendation_ids, [self.EXP_ID_19, self.EXP_ID_21, self.EXP_ID_7]
+        )
 
     def test_logged_in_no_sysexps_authexps_all_exps_in_col_has_exps(
         self,
@@ -959,7 +1074,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         out, finishes an exploration in-viewer, but there are no recommended
         explorations and no author exploration IDs.
         """
-        recommendation_ids = self._get_recommendation_ids(self.EXP_ID_0, include_system_recommendations=True)
+        recommendation_ids = self._get_recommendation_ids(
+            self.EXP_ID_0, include_system_recommendations=True
+        )
         self.assertEqual(recommendation_ids, [])
 
     def test_logged_out_with_sysexps_no_authexps_no_col_has_some_exps(
@@ -969,7 +1086,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         finishes an exploration in-viewer, and there are system recommendations.
         """
         self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
-        recommendation_ids = self._get_recommendation_ids(self.EXP_ID_0, include_system_recommendations=True)
+        recommendation_ids = self._get_recommendation_ids(
+            self.EXP_ID_0, include_system_recommendations=True
+        )
         self.assertEqual(recommendation_ids, [self.EXP_ID_1, self.EXP_ID_9])
 
     def test_logged_out_no_sysexps_some_authexps_no_col_has_some_exps(
@@ -999,7 +1118,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             include_system_recommendations=True,
             author_recommended_ids_str='["7","9"]',
         )
-        self.assertEqual(recommendation_ids, [self.EXP_ID_1, self.EXP_ID_7, self.EXP_ID_9])
+        self.assertEqual(
+            recommendation_ids, [self.EXP_ID_1, self.EXP_ID_7, self.EXP_ID_9]
+        )
 
     # Logged out collection tests.
     def test_logged_out_no_sysexps_no_authexps_first_exp_in_col_has_exp(
@@ -1008,7 +1129,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         """Check there is a recommended exploration when a user is logged out
         and completes the first exploration of a collection.
         """
-        recommendation_ids = self._get_recommendation_ids(self.EXP_ID_19, collection_id=self.COL_ID)
+        recommendation_ids = self._get_recommendation_ids(
+            self.EXP_ID_19, collection_id=self.COL_ID
+        )
         # The next exploration in the collection should be recommended.
         self.assertEqual(recommendation_ids, [self.EXP_ID_20])
 
@@ -1018,7 +1141,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         """Check there is a recommended exploration when a user is logged out
         and completes a middle exploration of the collection.
         """
-        recommendation_ids = self._get_recommendation_ids(self.EXP_ID_20, collection_id=self.COL_ID)
+        recommendation_ids = self._get_recommendation_ids(
+            self.EXP_ID_20, collection_id=self.COL_ID
+        )
         # Only the last exploration should be recommended since logged out users
         # follow a linear path through the collection.
         self.assertEqual(recommendation_ids, [self.EXP_ID_21])
@@ -1029,7 +1154,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         """Check there are not recommended explorations when a user is logged
         out and completes the last exploration in the collection.
         """
-        recommendation_ids = self._get_recommendation_ids(self.EXP_ID_0, collection_id=self.COL_ID)
+        recommendation_ids = self._get_recommendation_ids(
+            self.EXP_ID_0, collection_id=self.COL_ID
+        )
         self.assertEqual(recommendation_ids, [])
 
     def test_logged_out_with_sysexps_no_authexps_first_exp_in_col_has_exp(
@@ -1040,7 +1167,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         though the completed exploration has system recommendations, they are
         ignored in favor of the collection's own recommendations.
         """
-        self._set_recommendations(self.EXP_ID_19, [self.EXP_ID_1, self.EXP_ID_9])
+        self._set_recommendations(
+            self.EXP_ID_19, [self.EXP_ID_1, self.EXP_ID_9]
+        )
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_19,
             collection_id=self.COL_ID,
@@ -1057,7 +1186,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         though the completed exploration has system recommendations, they are
         ignored in favor of the collection's own recommendations.
         """
-        self._set_recommendations(self.EXP_ID_20, [self.EXP_ID_1, self.EXP_ID_9])
+        self._set_recommendations(
+            self.EXP_ID_20, [self.EXP_ID_1, self.EXP_ID_9]
+        )
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_20,
             collection_id=self.COL_ID,
@@ -1098,7 +1229,9 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         )
         # The next exploration in the collection should be recommended along
         # with author specified explorations.
-        self.assertEqual(recommendation_ids, [self.EXP_ID_20, self.EXP_ID_7, self.EXP_ID_9])
+        self.assertEqual(
+            recommendation_ids, [self.EXP_ID_20, self.EXP_ID_7, self.EXP_ID_9]
+        )
 
     def test_logged_out_no_sysexps_with_authexps_mid_exp_in_col_has_exps(
         self,
@@ -1393,7 +1526,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             next_subtopic_id=1,
         )
         self.save_new_story(self.STORY_ID, self.owner_id, self.TOPIC_ID)
-        topic_services.add_canonical_story(self.owner_id, self.TOPIC_ID, self.STORY_ID)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID, self.STORY_ID
+        )
 
         changelist = [
             story_domain.StoryChange(
@@ -1406,16 +1541,22 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
                     'old_value': None,
                     'new_value': self.EXP_ID_2_0,
                     'node_id': 'node_1',
                 }
             ),
         ]
-        story_services.update_story(self.owner_id, self.STORY_ID, changelist, 'Added node.')
+        story_services.update_story(
+            self.owner_id, self.STORY_ID, changelist, 'Added node.'
+        )
 
-        topic_services.publish_story(self.TOPIC_ID, self.STORY_ID, self.admin_id)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id
+        )
         topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 
         # Add two explorations to the previously saved collection and publish
@@ -1465,7 +1606,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             [self.EXP_ID_0],
         )
         self.assertEqual(
-            learner_progress_services.get_all_incomplete_collection_ids(self.user_id),
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id
+            ),
             [],
         )
 
@@ -1480,7 +1623,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             [self.EXP_ID_0, self.EXP_ID_1_0],
         )
         self.assertEqual(
-            learner_progress_services.get_all_incomplete_collection_ids(self.user_id),
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id
+            ),
             [],
         )
 
@@ -1513,7 +1658,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
         )
         self.assertEqual(
-            learner_progress_services.get_all_incomplete_collection_ids(self.user_id),
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id
+            ),
             [self.COL_ID_1],
         )
         self.assertEqual(
@@ -1528,11 +1675,15 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
         )
         self.assertEqual(
-            learner_progress_services.get_all_incomplete_collection_ids(self.user_id),
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id
+            ),
             [],
         )
         self.assertEqual(
-            learner_progress_services.get_all_completed_collection_ids(self.user_id),
+            learner_progress_services.get_all_completed_collection_ids(
+                self.user_id
+            ),
             [self.COL_ID_1],
         )
         self.assertEqual(
@@ -1612,7 +1763,8 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # If the exploration is played in the context of a collection, the
         # collection is also added to the incomplete list.
         self.post_json(
-            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_1_0,  # pylint: disable=line-too-long
+            '/explorehandler/exploration_maybe_leave_event/%s'
+            % self.EXP_ID_1_0,  # pylint: disable=line-too-long
             payload,
             csrf_token=csrf_token,
         )
@@ -1621,14 +1773,17 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             [self.EXP_ID_0, self.EXP_ID_1_0],
         )
         self.assertEqual(
-            learner_progress_services.get_all_incomplete_collection_ids(self.user_id),
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id
+            ),
             [self.COL_ID_1],
         )
 
         # If the exploration is played in the context of a story, the
         # story is also added to the incomplete list.
         self.post_json(
-            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_2_0,  # pylint: disable=line-too-long
+            '/explorehandler/exploration_maybe_leave_event/%s'
+            % self.EXP_ID_2_0,  # pylint: disable=line-too-long
             payload,
             csrf_token=csrf_token,
         )
@@ -1637,11 +1792,15 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             [self.EXP_ID_0, self.EXP_ID_1_0, self.EXP_ID_2_0],
         )
         self.assertEqual(
-            learner_progress_services.get_all_incomplete_story_ids(self.user_id),
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id
+            ),
             [self.STORY_ID],
         )
         self.assertEqual(
-            learner_progress_services.get_all_partially_learnt_topic_ids(self.user_id),
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id
+            ),
             [self.TOPIC_ID],
         )
 
@@ -1651,18 +1810,24 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             """Mocks None."""
             return None
 
-        story_fetchers_swap = self.swap(story_fetchers, 'get_story_by_id', _mock_none_function)
+        story_fetchers_swap = self.swap(
+            story_fetchers, 'get_story_by_id', _mock_none_function
+        )
 
         with story_fetchers_swap:
             with self.capture_logging(min_level=logging.ERROR) as captured_logs:
                 self.post_json(
-                    '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_2_0,
+                    '/explorehandler/exploration_maybe_leave_event/%s'
+                    % self.EXP_ID_2_0,
                     payload,
                     csrf_token=csrf_token,
                 )
                 self.assertEqual(
                     captured_logs,
-                    ['Could not find a story corresponding to %s id.' % self.STORY_ID],
+                    [
+                        'Could not find a story corresponding to %s id.'
+                        % self.STORY_ID
+                    ],
                 )
 
     def test_exp_incomplete_event_handler_with_no_version_raises_error(
@@ -1697,8 +1862,12 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         version = 1
 
         # Add two explorations to the partially completed list.
-        learner_progress_services.mark_exploration_as_incomplete(self.user_id, self.EXP_ID_0, state_name, version)
-        learner_progress_services.mark_exploration_as_incomplete(self.user_id, self.EXP_ID_1, state_name, version)
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_0, state_name, version
+        )
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_1, state_name, version
+        )
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(self.user_id),
             [self.EXP_ID_0, self.EXP_ID_1],
@@ -1738,10 +1907,16 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.login(self.USER_EMAIL)
 
         # Add two collections to incomplete list.
-        learner_progress_services.mark_collection_as_incomplete(self.user_id, self.COL_ID_0)
-        learner_progress_services.mark_collection_as_incomplete(self.user_id, self.COL_ID_1)
+        learner_progress_services.mark_collection_as_incomplete(
+            self.user_id, self.COL_ID_0
+        )
+        learner_progress_services.mark_collection_as_incomplete(
+            self.user_id, self.COL_ID_1
+        )
         self.assertEqual(
-            learner_progress_services.get_all_incomplete_collection_ids(self.user_id),
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id
+            ),
             [self.COL_ID_0, self.COL_ID_1],
         )
 
@@ -1755,7 +1930,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(
-            learner_progress_services.get_all_incomplete_collection_ids(self.user_id),
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id
+            ),
             [self.COL_ID_1],
         )
 
@@ -1769,7 +1946,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(
-            learner_progress_services.get_all_incomplete_collection_ids(self.user_id),
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id
+            ),
             [],
         )
 
@@ -1783,7 +1962,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(
-            learner_progress_services.get_all_incomplete_story_ids(self.user_id),
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id
+            ),
             [],
         )
 
@@ -1797,7 +1978,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(
-            learner_progress_services.get_all_partially_learnt_topic_ids(self.user_id),
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id
+            ),
             [],
         )
 
@@ -1825,7 +2008,9 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             [
                 {
                     'action_type': 'ExplorationStart',
-                    'action_customization_args': {'state_name': {'value': 'state_name1'}},
+                    'action_customization_args': {
+                        'state_name': {'value': 'state_name1'}
+                    },
                     'schema_version': 1,
                 }
             ],
@@ -1858,7 +2043,9 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'actions': [
                 {
                     'action_type': 'ExplorationStart',
-                    'action_customization_args': {'state_name': {'value': 'state_name1'}},
+                    'action_customization_args': {
+                        'state_name': {'value': 'state_name1'}
+                    },
                     'schema_version': 1,
                 }
             ],
@@ -1889,7 +2076,9 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         """Test that a new playthrough gets created and a new issue is created
         for it.
         """
-        self.playthrough_data['issue_customization_args']['state_name']['value'] = 'state_name2'
+        self.playthrough_data['issue_customization_args']['state_name'][
+            'value'
+        ] = 'state_name2'
 
         self.post_json(
             '/explorehandler/store_playthrough/%s' % (self.exp_id),
@@ -1916,12 +2105,16 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             self.exploration.version,
             'CyclicStateTransitions',
             {
-                'state_names': {'value': ['state_name1', 'state_name2', 'state_name1']},
+                'state_names': {
+                    'value': ['state_name1', 'state_name2', 'state_name1']
+                },
             },
             [
                 {
                     'action_type': 'ExplorationStart',
-                    'action_customization_args': {'state_name': {'value': 'state_name1'}},
+                    'action_customization_args': {
+                        'state_name': {'value': 'state_name1'}
+                    },
                     'schema_version': 1,
                 }
             ],
@@ -1933,7 +2126,9 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             {
                 'issue_type': 'CyclicStateTransitions',
                 'issue_customization_args': {
-                    'state_names': {'value': ['state_name1', 'state_name2', 'state_name1']},
+                    'state_names': {
+                        'value': ['state_name1', 'state_name2', 'state_name1']
+                    },
                 },
                 'playthrough_ids': [playthrough_id],
                 'schema_version': 1,
@@ -1948,12 +2143,16 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'exp_version': self.exploration.version,
             'issue_type': 'CyclicStateTransitions',
             'issue_customization_args': {
-                'state_names': {'value': ['state_name1', 'state_name2', 'state_name1']},
+                'state_names': {
+                    'value': ['state_name1', 'state_name2', 'state_name1']
+                },
             },
             'actions': [
                 {
                     'action_type': 'ExplorationStart',
-                    'action_customization_args': {'state_name': {'value': 'state_name1'}},
+                    'action_customization_args': {
+                        'state_name': {'value': 'state_name1'}
+                    },
                     'schema_version': 1,
                 }
             ],
@@ -1984,12 +2183,16 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             self.exploration.version,
             'CyclicStateTransitions',
             {
-                'state_names': {'value': ['state_name1', 'state_name2', 'state_name1']},
+                'state_names': {
+                    'value': ['state_name1', 'state_name2', 'state_name1']
+                },
             },
             [
                 {
                     'action_type': 'ExplorationStart',
-                    'action_customization_args': {'state_name': {'value': 'state_name1'}},
+                    'action_customization_args': {
+                        'state_name': {'value': 'state_name1'}
+                    },
                     'schema_version': 1,
                 },
             ],
@@ -2001,7 +2204,9 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             {
                 'issue_type': 'CyclicStateTransitions',
                 'issue_customization_args': {
-                    'state_names': {'value': ['state_name1', 'state_name2', 'state_name1']},
+                    'state_names': {
+                        'value': ['state_name1', 'state_name2', 'state_name1']
+                    },
                 },
                 'playthrough_ids': [playthrough_id],
                 'schema_version': 1,
@@ -2016,12 +2221,16 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'exp_version': self.exploration.version,
             'issue_type': 'CyclicStateTransitions',
             'issue_customization_args': {
-                'state_names': {'value': ['state_name2', 'state_name1', 'state_name2']},
+                'state_names': {
+                    'value': ['state_name2', 'state_name1', 'state_name2']
+                },
             },
             'actions': [
                 {
                     'action_type': 'ExplorationStart',
-                    'action_customization_args': {'state_name': {'value': 'state_name1'}},
+                    'action_customization_args': {
+                        'state_name': {'value': 'state_name1'}
+                    },
                     'schema_version': 1,
                 }
             ],
@@ -2117,8 +2326,12 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         self.exp_version = exploration.version
         self.state_name = 'Home'
         self.session_id = 'session_id1'
-        state_stats_mapping = {self.state_name: stats_domain.StateStats.create_default()}
-        exploration_stats = stats_domain.ExplorationStats(self.exp_id, self.exp_version, 0, 0, 0, 0, 0, 0, state_stats_mapping)
+        state_stats_mapping = {
+            self.state_name: stats_domain.StateStats.create_default()
+        }
+        exploration_stats = stats_domain.ExplorationStats(
+            self.exp_id, self.exp_version, 0, 0, 0, 0, 0, 0, state_stats_mapping
+        )
         stats_services.create_stats_model(exploration_stats)
 
         self.aggregated_stats: stats_domain.AggregatedStatsDict = {
@@ -2155,37 +2368,53 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             },
         )
 
-        self.assertEqual(self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_STATS), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_STATS), 1
+        )
         self.process_and_flush_pending_tasks()
 
         # Check that the models are updated.
-        exploration_stats = stats_services.get_exploration_stats_by_id(self.exp_id, self.exp_version)
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exp_version
+        )
         assert exploration_stats is not None
         self.assertEqual(exploration_stats.num_starts_v2, 1)
         self.assertEqual(exploration_stats.num_actual_starts_v2, 1)
         self.assertEqual(exploration_stats.num_completions_v2, 1)
         self.assertEqual(
-            exploration_stats.state_stats_mapping[self.state_name].total_hit_count_v2,
+            exploration_stats.state_stats_mapping[
+                self.state_name
+            ].total_hit_count_v2,
             1,
         )
         self.assertEqual(
-            exploration_stats.state_stats_mapping[self.state_name].first_hit_count_v2,
+            exploration_stats.state_stats_mapping[
+                self.state_name
+            ].first_hit_count_v2,
             1,
         )
         self.assertEqual(
-            exploration_stats.state_stats_mapping[self.state_name].total_answers_count_v2,
+            exploration_stats.state_stats_mapping[
+                self.state_name
+            ].total_answers_count_v2,
             1,
         )
         self.assertEqual(
-            exploration_stats.state_stats_mapping[self.state_name].useful_feedback_count_v2,
+            exploration_stats.state_stats_mapping[
+                self.state_name
+            ].useful_feedback_count_v2,
             1,
         )
         self.assertEqual(
-            exploration_stats.state_stats_mapping[self.state_name].num_completions_v2,
+            exploration_stats.state_stats_mapping[
+                self.state_name
+            ].num_completions_v2,
             1,
         )
         self.assertEqual(
-            exploration_stats.state_stats_mapping[self.state_name].num_times_solution_viewed_v2,
+            exploration_stats.state_stats_mapping[
+                self.state_name
+            ].num_times_solution_viewed_v2,
             1,
         )
 
@@ -2235,7 +2464,9 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
     def test_stats_events_handler_raise_error_with_missing_state_stats_property(
         self,
     ) -> None:
-        self.aggregated_stats['state_stats_mapping']['Home'].pop('total_hit_count')
+        self.aggregated_stats['state_stats_mapping']['Home'].pop(
+            'total_hit_count'
+        )
 
         response = self.post_json(
             '/explorehandler/stats_events/%s' % (self.exp_id),
@@ -2257,7 +2488,9 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        self.aggregated_stats['state_stats_mapping']['Home']['total_hit_count'] = 'invalid'  # type: ignore[assignment]
+        self.aggregated_stats['state_stats_mapping']['Home'][
+            'total_hit_count'
+        ] = 'invalid'  # type: ignore[assignment]
 
         response = self.post_json(
             '/explorehandler/stats_events/%s' % self.exp_id,
@@ -2287,7 +2520,9 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
 
-        exploration_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
+        )
         state_name_1 = exploration_dict['exploration']['init_state_name']
 
         self.post_json(
@@ -2300,12 +2535,18 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
                 'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
                 'answer_group_index': 0,
                 'rule_spec_index': 0,
-                'classification_categorization': (exp_domain.EXPLICIT_CLASSIFICATION),
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION
+                ),
             },
         )
-        submitted_answer = stats_services.get_state_answers(exp_id, version, state_name_1)
+        submitted_answer = stats_services.get_state_answers(
+            exp_id, version, state_name_1
+        )
         assert submitted_answer is not None
-        self.assertEqual(len(submitted_answer.get_submitted_answer_dict_list()), 1)
+        self.assertEqual(
+            len(submitted_answer.get_submitted_answer_dict_list()), 1
+        )
         self.assertEqual(
             submitted_answer.get_submitted_answer_dict_list()[0]['answer'],
             'This is an answer.',
@@ -2322,7 +2563,9 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
 
-        exploration_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
+        )
         state_name_1 = exploration_dict['exploration']['init_state_name']
 
         response = self.post_json(
@@ -2335,7 +2578,9 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
                 'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
                 'answer_group_index': 0,
                 'rule_spec_index': 0,
-                'classification_categorization': (exp_domain.EXPLICIT_CLASSIFICATION),
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION
+                ),
             },
             expected_status_int=400,
         )
@@ -2356,7 +2601,9 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
 
-        exploration_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
+        )
         state_name_1 = exploration_dict['exploration']['init_state_name']
 
         response = self.post_json(
@@ -2369,7 +2616,9 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
                 'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
                 'answer_group_index': 0,
                 'rule_spec_index': 0,
-                'classification_categorization': (exp_domain.EXPLICIT_CLASSIFICATION),
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION
+                ),
             },
             expected_status_int=400,
         )
@@ -2399,7 +2648,9 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
                 'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
                 'answer_group_index': 0,
                 'rule_spec_index': 0,
-                'classification_categorization': (exp_domain.EXPLICIT_CLASSIFICATION),
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION
+                ),
             },
             expected_status_int=400,
         )
@@ -2656,15 +2907,27 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.login(self.VIEWER_EMAIL)
 
-        exploration_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
-        self.assertIsNone(exploration_dict['furthest_reached_checkpoint_exp_version'])
-        self.assertIsNone(exploration_dict['furthest_reached_checkpoint_state_name'])
-        self.assertIsNone(exploration_dict['most_recently_reached_checkpoint_exp_version'])
-        self.assertIsNone(exploration_dict['most_recently_reached_checkpoint_state_name'])
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
+        )
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version']
+        )
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name']
+        )
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version']
+        )
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name']
+        )
 
         # Update exploration.
         # Now version of the exploration becomes 2.
-        change_list = _get_change_list('What language', exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT, True)
+        change_list = _get_change_list(
+            'What language', exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT, True
+        )
         exp_services.update_exploration(
             owner_id,
             exp_id,
@@ -2684,24 +2947,40 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
         )
 
         # Fetching latest exploration.
-        exploration_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
-        self.assertEqual(exploration_dict['furthest_reached_checkpoint_exp_version'], 2)
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
+        )
+        self.assertEqual(
+            exploration_dict['furthest_reached_checkpoint_exp_version'], 2
+        )
         self.assertEqual(
             exploration_dict['furthest_reached_checkpoint_state_name'],
             'Welcome!',
         )
-        self.assertEqual(exploration_dict['most_recently_reached_checkpoint_exp_version'], 2)
+        self.assertEqual(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'], 2
+        )
         self.assertEqual(
             exploration_dict['most_recently_reached_checkpoint_state_name'],
             'Welcome!',
         )
 
         # Fetching older exploration.
-        exploration_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id), {'v': 1})
-        self.assertIsNone(exploration_dict['furthest_reached_checkpoint_exp_version'])
-        self.assertIsNone(exploration_dict['furthest_reached_checkpoint_state_name'])
-        self.assertIsNone(exploration_dict['most_recently_reached_checkpoint_exp_version'])
-        self.assertIsNone(exploration_dict['most_recently_reached_checkpoint_state_name'])
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id), {'v': 1}
+        )
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version']
+        )
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name']
+        )
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version']
+        )
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name']
+        )
 
         self.logout()
 
@@ -2781,7 +3060,9 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
         exp_services.load_demo(exp_id)
         version = 1
 
-        all_models = stats_models.ExplorationActualStartEventLogEntryModel.get_all()
+        all_models = (
+            stats_models.ExplorationActualStartEventLogEntryModel.get_all()
+        )
         self.assertEqual(all_models.count(), 0)
 
         self.post_json(
@@ -2793,7 +3074,9 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
             },
         )
 
-        all_models = stats_models.ExplorationActualStartEventLogEntryModel.get_all()
+        all_models = (
+            stats_models.ExplorationActualStartEventLogEntryModel.get_all()
+        )
         self.assertEqual(all_models.count(), 1)
 
         event_log_entry_model = all_models.get()
@@ -2816,7 +3099,9 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
         exp_services.delete_demo(exp_id)
         exp_services.load_demo(exp_id)
 
-        all_models = stats_models.ExplorationActualStartEventLogEntryModel.get_all()
+        all_models = (
+            stats_models.ExplorationActualStartEventLogEntryModel.get_all()
+        )
         self.assertEqual(all_models.count(), 0)
 
         response = self.post_json(
@@ -2909,7 +3194,9 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
 
         csrf_token = self.get_new_csrf_token()
-        with self.swap(constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False
+        ):
             self.put_json(
                 '%s/%s/%s'
                 % (
@@ -2926,11 +3213,21 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
                 expected_status_int=404,
             )
-        with self.swap(constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
-            exploration_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
+        ):
+            exploration_dict = self.get_json(
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
+            )
             state_name = exploration_dict['exploration']['init_state_name']
-            interaction_id = exploration_dict['exploration']['states'][state_name]['interaction']['id']
-            state_reference = stats_services.get_state_reference_for_exploration(exp_id, state_name)
+            interaction_id = exploration_dict['exploration']['states'][
+                state_name
+            ]['interaction']['id']
+            state_reference = (
+                stats_services.get_state_reference_for_exploration(
+                    exp_id, state_name
+                )
+            )
 
             self.assertEqual(state_name, 'Sentence')
             self.assertEqual(interaction_id, 'TextInput')
@@ -2950,17 +3247,27 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
             )
 
-            learner_answer_details = stats_services.get_learner_answer_details(entity_type, state_reference)
+            learner_answer_details = stats_services.get_learner_answer_details(
+                entity_type, state_reference
+            )
             assert learner_answer_details is not None
-            self.assertEqual(learner_answer_details.state_reference, state_reference)
-            self.assertEqual(learner_answer_details.interaction_id, interaction_id)
-            self.assertEqual(len(learner_answer_details.learner_answer_info_list), 1)
+            self.assertEqual(
+                learner_answer_details.state_reference, state_reference
+            )
+            self.assertEqual(
+                learner_answer_details.interaction_id, interaction_id
+            )
+            self.assertEqual(
+                len(learner_answer_details.learner_answer_info_list), 1
+            )
             self.assertEqual(
                 learner_answer_details.learner_answer_info_list[0].answer,
                 'This is an answer.',
             )
             self.assertEqual(
-                learner_answer_details.learner_answer_info_list[0].answer_details,
+                learner_answer_details.learner_answer_info_list[
+                    0
+                ].answer_details,
                 'This is an answer details.',
             )
             self.put_json(
@@ -2991,10 +3298,16 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
 
         csrf_token = self.get_new_csrf_token()
-        with self.swap(constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
-            exploration_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
+        ):
+            exploration_dict = self.get_json(
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
+            )
             state_name = exploration_dict['exploration']['init_state_name']
-            interaction_id = exploration_dict['exploration']['states'][state_name]['interaction']['id']
+            interaction_id = exploration_dict['exploration']['states'][
+                state_name
+            ]['interaction']['id']
 
             self.assertEqual(state_name, 'Sentence')
             self.assertEqual(interaction_id, 'TextInput')
@@ -3033,8 +3346,12 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
             ['skill_1'],
             content_id_generator.next_content_id_index,
         )
-        with self.swap(constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
-            state_reference = stats_services.get_state_reference_for_question(question_id)
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
+        ):
+            state_reference = stats_services.get_state_reference_for_question(
+                question_id
+            )
             self.assertEqual(state_reference, question_id)
             self.put_json(
                 '%s/%s/%s'
@@ -3050,9 +3367,13 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                 },
                 csrf_token=csrf_token,
             )
-            learner_answer_details = stats_services.get_learner_answer_details(feconf.ENTITY_TYPE_QUESTION, state_reference)
+            learner_answer_details = stats_services.get_learner_answer_details(
+                feconf.ENTITY_TYPE_QUESTION, state_reference
+            )
             assert learner_answer_details is not None
-            self.assertEqual(learner_answer_details.state_reference, state_reference)
+            self.assertEqual(
+                learner_answer_details.state_reference, state_reference
+            )
             self.put_json(
                 '%s/%s/%s'
                 % (
@@ -3101,11 +3422,21 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
         viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         # Viewer opens exploration.
-        exploration_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
-        self.assertIsNone(exploration_dict['furthest_reached_checkpoint_exp_version'])
-        self.assertIsNone(exploration_dict['furthest_reached_checkpoint_state_name'])
-        self.assertIsNone(exploration_dict['most_recently_reached_checkpoint_exp_version'])
-        self.assertIsNone(exploration_dict['most_recently_reached_checkpoint_state_name'])
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
+        )
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version']
+        )
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name']
+        )
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version']
+        )
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name']
+        )
 
         # First checkpoint reached.
         csrf_token = self.get_new_csrf_token()
@@ -3118,11 +3449,19 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
             csrf_token=csrf_token,
         )
 
-        exp_user_data = exp_fetchers.get_exploration_user_data(viewer_id, exp_id)
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            viewer_id, exp_id
+        )
         assert exp_user_data is not None
-        self.assertEqual(exp_user_data.furthest_reached_checkpoint_exp_version, 1)
-        self.assertEqual(exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
-        self.assertEqual(exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!'
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1
+        )
         self.assertEqual(
             exp_user_data.most_recently_reached_checkpoint_state_name,
             'Welcome!',
@@ -3130,7 +3469,9 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
 
         # Update exploration.
         # Now version of the exploration becomes 2.
-        change_list = _get_change_list('What language', exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT, True)
+        change_list = _get_change_list(
+            'What language', exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT, True
+        )
         exp_services.update_exploration(
             owner_id,
             exp_id,
@@ -3139,10 +3480,18 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
         )
 
         # Viewer opens exploration again.
-        exploration_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
-        self.assertEqual(exp_user_data.furthest_reached_checkpoint_exp_version, 1)
-        self.assertEqual(exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
-        self.assertEqual(exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!'
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1
+        )
         self.assertEqual(
             exp_user_data.most_recently_reached_checkpoint_state_name,
             'Welcome!',
@@ -3158,9 +3507,13 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
             },
             csrf_token=csrf_token,
         )
-        updated_exp_user_data = exp_fetchers.get_exploration_user_data(viewer_id, exp_id)
+        updated_exp_user_data = exp_fetchers.get_exploration_user_data(
+            viewer_id, exp_id
+        )
         assert updated_exp_user_data is not None
-        self.assertEqual(updated_exp_user_data.furthest_reached_checkpoint_exp_version, 2)
+        self.assertEqual(
+            updated_exp_user_data.furthest_reached_checkpoint_exp_version, 2
+        )
         self.assertEqual(
             updated_exp_user_data.furthest_reached_checkpoint_state_name,
             'What language',
@@ -3195,11 +3548,21 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
         viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         # Viewer opens exploration.
-        exploration_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
-        self.assertIsNone(exploration_dict['furthest_reached_checkpoint_exp_version'])
-        self.assertIsNone(exploration_dict['furthest_reached_checkpoint_state_name'])
-        self.assertIsNone(exploration_dict['most_recently_reached_checkpoint_exp_version'])
-        self.assertIsNone(exploration_dict['most_recently_reached_checkpoint_state_name'])
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
+        )
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version']
+        )
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name']
+        )
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version']
+        )
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name']
+        )
 
         # First checkpoint reached.
         csrf_token = self.get_new_csrf_token()
@@ -3211,11 +3574,19 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
             },
             csrf_token=csrf_token,
         )
-        exp_user_data = exp_fetchers.get_exploration_user_data(viewer_id, exp_id)
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            viewer_id, exp_id
+        )
         assert exp_user_data is not None
-        self.assertEqual(exp_user_data.furthest_reached_checkpoint_exp_version, 1)
-        self.assertEqual(exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
-        self.assertEqual(exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!'
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1
+        )
         self.assertEqual(
             exp_user_data.most_recently_reached_checkpoint_state_name,
             'Welcome!',
@@ -3228,11 +3599,21 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
             {'most_recently_reached_checkpoint_state_name': None},
             csrf_token=csrf_token,
         )
-        exploration_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
-        self.assertEqual(exploration_dict['furthest_reached_checkpoint_exp_version'], 1)
-        self.assertEqual(exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
-        self.assertIsNone(exploration_dict['most_recently_reached_checkpoint_exp_version'])
-        self.assertIsNone(exploration_dict['most_recently_reached_checkpoint_state_name'])
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
+        )
+        self.assertEqual(
+            exploration_dict['furthest_reached_checkpoint_exp_version'], 1
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!'
+        )
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version']
+        )
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name']
+        )
 
         self.logout()
 
@@ -3253,11 +3634,21 @@ class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
         exp_services.load_demo('0')
 
         # Logged out user opens exploration.
-        exploration_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
-        self.assertIsNone(exploration_dict['furthest_reached_checkpoint_exp_version'])
-        self.assertIsNone(exploration_dict['furthest_reached_checkpoint_state_name'])
-        self.assertIsNone(exploration_dict['most_recently_reached_checkpoint_exp_version'])
-        self.assertIsNone(exploration_dict['most_recently_reached_checkpoint_state_name'])
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
+        )
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version']
+        )
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name']
+        )
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version']
+        )
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name']
+        )
 
         # First checkpoint reached.
         csrf_token = self.get_new_csrf_token()
@@ -3272,11 +3663,19 @@ class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
 
         unique_progress_url_id = response['unique_progress_url_id']
 
-        exp_user_data = exp_fetchers.get_logged_out_user_progress(unique_progress_url_id)
+        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
         assert exp_user_data is not None
-        self.assertEqual(exp_user_data.furthest_reached_checkpoint_exp_version, 1)
-        self.assertEqual(exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
-        self.assertEqual(exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!'
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1
+        )
         self.assertEqual(
             exp_user_data.most_recently_reached_checkpoint_state_name,
             'Welcome!',
@@ -3284,7 +3683,9 @@ class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
 
         # Update exploration.
         # Now version of the exploration becomes 2.
-        change_list = _get_change_list('What language', exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT, True)
+        change_list = _get_change_list(
+            'What language', exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT, True
+        )
         exp_services.update_exploration(
             owner_id,
             exp_id,
@@ -3303,9 +3704,13 @@ class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
             },
             csrf_token=csrf_token,
         )
-        updated_exp_user_data = exp_fetchers.get_logged_out_user_progress(unique_progress_url_id)
+        updated_exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
         assert updated_exp_user_data is not None
-        self.assertEqual(updated_exp_user_data.furthest_reached_checkpoint_exp_version, 2)
+        self.assertEqual(
+            updated_exp_user_data.furthest_reached_checkpoint_exp_version, 2
+        )
         self.assertEqual(
             updated_exp_user_data.furthest_reached_checkpoint_state_name,
             'What language',
@@ -3326,7 +3731,9 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
     def test_exploration_page_raises_error_with_invalid_pid(self) -> None:
         unique_progress_url_id = 'pid123'
 
-        self.get_html_response('/progress/%s' % (unique_progress_url_id), expected_status_int=404)
+        self.get_html_response(
+            '/progress/%s' % (unique_progress_url_id), expected_status_int=404
+        )
 
     def test_logged_out_progress_is_displayed_correctly_when_exp_version_is_same(  # pylint: disable=line-too-long
         self,
@@ -3339,11 +3746,21 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
         exp_services.load_demo('0')
 
         # Logged out user opens exploration.
-        exploration_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
-        self.assertIsNone(exploration_dict['furthest_reached_checkpoint_exp_version'])
-        self.assertIsNone(exploration_dict['furthest_reached_checkpoint_state_name'])
-        self.assertIsNone(exploration_dict['most_recently_reached_checkpoint_exp_version'])
-        self.assertIsNone(exploration_dict['most_recently_reached_checkpoint_state_name'])
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
+        )
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version']
+        )
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name']
+        )
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version']
+        )
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name']
+        )
 
         # First checkpoint reached.
         csrf_token = self.get_new_csrf_token()
@@ -3358,9 +3775,13 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
 
         unique_progress_url_id = response['unique_progress_url_id']
 
-        url_response = self.get_html_response('/progress/%s' % (unique_progress_url_id), expected_status_int=302)
+        url_response = self.get_html_response(
+            '/progress/%s' % (unique_progress_url_id), expected_status_int=302
+        )
 
-        exp_user_data = exp_fetchers.get_logged_out_user_progress(unique_progress_url_id)
+        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
         assert exp_user_data is not None
         self.assertTrue(
             url_response.headers['Location'].endswith(
@@ -3381,12 +3802,16 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
                 unique_progress_url_id,
             )
         )
-        self.assertEqual(exploration_dict['furthest_reached_checkpoint_exp_version'], 1)
+        self.assertEqual(
+            exploration_dict['furthest_reached_checkpoint_exp_version'], 1
+        )
         self.assertEqual(
             exploration_dict['furthest_reached_checkpoint_state_name'],
             'Welcome!',
         )
-        self.assertEqual(exploration_dict['most_recently_reached_checkpoint_exp_version'], 1)
+        self.assertEqual(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'], 1
+        )
         self.assertEqual(
             exploration_dict['most_recently_reached_checkpoint_state_name'],
             'Welcome!',
@@ -3404,15 +3829,27 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
         exp_services.load_demo('0')
 
         # Logged out user opens exploration.
-        exploration_dict = self.get_json('%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
-        self.assertIsNone(exploration_dict['furthest_reached_checkpoint_exp_version'])
-        self.assertIsNone(exploration_dict['furthest_reached_checkpoint_state_name'])
-        self.assertIsNone(exploration_dict['most_recently_reached_checkpoint_exp_version'])
-        self.assertIsNone(exploration_dict['most_recently_reached_checkpoint_state_name'])
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
+        )
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version']
+        )
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name']
+        )
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version']
+        )
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name']
+        )
 
         # Update exploration.
         # Now version of the exploration becomes 2.
-        change_list = _get_change_list('What language', exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT, True)
+        change_list = _get_change_list(
+            'What language', exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT, True
+        )
         exp_services.update_exploration(
             owner_id,
             exp_id,
@@ -3433,9 +3870,13 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
 
         unique_progress_url_id = response['unique_progress_url_id']
 
-        url_response = self.get_html_response('/progress/%s' % (unique_progress_url_id), expected_status_int=302)
+        url_response = self.get_html_response(
+            '/progress/%s' % (unique_progress_url_id), expected_status_int=302
+        )
 
-        exp_user_data = exp_fetchers.get_logged_out_user_progress(unique_progress_url_id)
+        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
         assert exp_user_data is not None
 
         self.assertTrue(
@@ -3457,12 +3898,16 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
                 unique_progress_url_id,
             )
         )
-        self.assertEqual(exploration_dict['furthest_reached_checkpoint_exp_version'], 1)
+        self.assertEqual(
+            exploration_dict['furthest_reached_checkpoint_exp_version'], 1
+        )
         self.assertEqual(
             exploration_dict['furthest_reached_checkpoint_state_name'],
             'Welcome!',
         )
-        self.assertEqual(exploration_dict['most_recently_reached_checkpoint_exp_version'], 1)
+        self.assertEqual(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'], 1
+        )
         self.assertEqual(
             exploration_dict['most_recently_reached_checkpoint_state_name'],
             'Welcome!',
@@ -3502,11 +3947,19 @@ class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
             csrf_token=csrf_token,
         )
 
-        exp_user_data = exp_fetchers.get_exploration_user_data(viewer_id, exp_id)
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            viewer_id, exp_id
+        )
         assert exp_user_data is not None
-        self.assertEqual(exp_user_data.furthest_reached_checkpoint_exp_version, 1)
-        self.assertEqual(exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
-        self.assertEqual(exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!'
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1
+        )
         self.assertEqual(
             exp_user_data.most_recently_reached_checkpoint_state_name,
             'Welcome!',
@@ -3528,8 +3981,12 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        exploration = self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-        content_id_generator = translation_domain.ContentIdGenerator(exploration.next_content_id_index)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id
+        )
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         exp_services.update_exploration(
             self.owner_id,
             self.EXP_ID,
@@ -3538,8 +3995,16 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
                     {
                         'cmd': exp_domain.CMD_ADD_STATE,
                         'state_name': 'b',
-                        'content_id_for_state_content': (content_id_generator.generate(translation_domain.ContentType.CONTENT)),
-                        'content_id_for_default_outcome': (content_id_generator.generate(translation_domain.ContentType.DEFAULT_OUTCOME)),
+                        'content_id_for_state_content': (
+                            content_id_generator.generate(
+                                translation_domain.ContentType.CONTENT
+                            )
+                        ),
+                        'content_id_for_default_outcome': (
+                            content_id_generator.generate(
+                                translation_domain.ContentType.DEFAULT_OUTCOME
+                            )
+                        ),
                     }
                 ),
                 exp_domain.ExplorationChange(
@@ -3564,11 +4029,16 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
     def test_raises_error_when_version_history_does_not_exist(self) -> None:
         self.login(self.OWNER_EMAIL)
         # Deleting the version history model produced by exp_services.
-        vh_model = exp_models.ExplorationVersionHistoryModel.get(exp_models.ExplorationVersionHistoryModel.get_instance_id(self.EXP_ID, 2))
+        vh_model = exp_models.ExplorationVersionHistoryModel.get(
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                self.EXP_ID, 2
+            )
+        )
         vh_model.delete()
 
         self.get_json(
-            '%s/%s/%s/%s' % (feconf.STATE_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 'a', 2),
+            '%s/%s/%s/%s'
+            % (feconf.STATE_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 'a', 2),
             expected_status_int=404,
         )
 
@@ -3576,16 +4046,28 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
 
     def test_version_history_for_a_state_is_fetched_correctly(self) -> None:
         self.login(self.OWNER_EMAIL)
-        exploration_v1 = exp_fetchers.get_exploration_by_id(self.EXP_ID, version=1)
-        response_for_state_a = self.get_json('%s/%s/%s/%s' % (feconf.STATE_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 'a', 2))
-        response_for_state_b = self.get_json('%s/%s/%s/%s' % (feconf.STATE_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 'b', 2))
+        exploration_v1 = exp_fetchers.get_exploration_by_id(
+            self.EXP_ID, version=1
+        )
+        response_for_state_a = self.get_json(
+            '%s/%s/%s/%s'
+            % (feconf.STATE_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 'a', 2)
+        )
+        response_for_state_b = self.get_json(
+            '%s/%s/%s/%s'
+            % (feconf.STATE_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 'b', 2)
+        )
 
         self.assertEqual(
             response_for_state_a,
             {
                 'last_edited_version_number': 1,
-                'state_name_in_previous_version': (feconf.DEFAULT_INIT_STATE_NAME),
-                'state_dict_in_previous_version': exploration_v1.states[feconf.DEFAULT_INIT_STATE_NAME].to_dict(),
+                'state_name_in_previous_version': (
+                    feconf.DEFAULT_INIT_STATE_NAME
+                ),
+                'state_dict_in_previous_version': exploration_v1.states[
+                    feconf.DEFAULT_INIT_STATE_NAME
+                ].to_dict(),
                 'last_edited_committer_username': self.OWNER_USERNAME,
             },
         )
@@ -3632,11 +4114,16 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
     def test_raises_error_when_version_history_does_not_exist(self) -> None:
         self.login(self.OWNER_EMAIL)
         # Deleting the version history model produced by exp_services.
-        vh_model = exp_models.ExplorationVersionHistoryModel.get(exp_models.ExplorationVersionHistoryModel.get_instance_id(self.EXP_ID, 2))
+        vh_model = exp_models.ExplorationVersionHistoryModel.get(
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                self.EXP_ID, 2
+            )
+        )
         vh_model.delete()
 
         self.get_json(
-            '%s/%s/%s' % (feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 2),
+            '%s/%s/%s'
+            % (feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 2),
             expected_status_int=404,
         )
 
@@ -3646,15 +4133,22 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.OWNER_EMAIL)
-        exploration_v1 = exp_fetchers.get_exploration_by_id(self.EXP_ID, version=1)
-        response = self.get_json('%s/%s/%s' % (feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 2))
+        exploration_v1 = exp_fetchers.get_exploration_by_id(
+            self.EXP_ID, version=1
+        )
+        response = self.get_json(
+            '%s/%s/%s'
+            % (feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 2)
+        )
 
         self.assertEqual(
             response,
             {
                 'last_edited_version_number': 1,
                 'last_edited_committer_username': self.OWNER_USERNAME,
-                'metadata_dict_in_previous_version': (exploration_v1.get_metadata().to_dict()),
+                'metadata_dict_in_previous_version': (
+                    exploration_v1.get_metadata().to_dict()
+                ),
             },
         )
 
@@ -3675,7 +4169,9 @@ class EntityTranslationHandlerTest(test_utils.GenericTestBase):
         }
         language_codes = ['hi', 'bn']
         for language_code in language_codes:
-            translation_models.EntityTranslationsModel.create_new('exploration', 'exp1', 5, language_code, translations_mapping).put()
+            translation_models.EntityTranslationsModel.create_new(
+                'exploration', 'exp1', 5, language_code, translations_mapping
+            ).put()
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
@@ -3683,5 +4179,7 @@ class EntityTranslationHandlerTest(test_utils.GenericTestBase):
         url = '/entity_translations_handler/exploration/exp1/5/hi'
         entity_translation_dict = self.get_json(url)
 
-        self.assertEqual(entity_translation_dict['translations'], translations_mapping)
+        self.assertEqual(
+            entity_translation_dict['translations'], translations_mapping
+        )
         self.logout()

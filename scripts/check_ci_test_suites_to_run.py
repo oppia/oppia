@@ -105,11 +105,19 @@ class RootFilesConfigDict(TypedDict):
 
 GITHUB_OUTPUT_TEST_SUITES_TO_RUN: Final = 'TEST_SUITES_TO_RUN'
 ROOT_FILES_MAPPING_FILE_PATH: Final = 'root-files-mapping.json'
-ROOT_FILES_CONFIG_FILE_PATH: Final = os.path.join('core', 'tests', 'root-files-config.json')
-LIGHTHOUSE_PAGES_CONFIG_FILE_PATH: Final = os.path.join('core', 'tests', 'lighthouse-pages.json')
-CI_TEST_SUITE_CONFIGS_DIRECTORY: Final = os.path.join('core', 'tests', 'ci-test-suite-configs')
+ROOT_FILES_CONFIG_FILE_PATH: Final = os.path.join(
+    'core', 'tests', 'root-files-config.json'
+)
+LIGHTHOUSE_PAGES_CONFIG_FILE_PATH: Final = os.path.join(
+    'core', 'tests', 'lighthouse-pages.json'
+)
+CI_TEST_SUITE_CONFIGS_DIRECTORY: Final = os.path.join(
+    'core', 'tests', 'ci-test-suite-configs'
+)
 DEFAULT_SUITE = 'suites'
-TEST_MODULES_MAPPING_DIRECTORY: Final = os.path.join('core', 'tests', 'test-modules-mappings')
+TEST_MODULES_MAPPING_DIRECTORY: Final = os.path.join(
+    'core', 'tests', 'test-modules-mappings'
+)
 
 LIGHTHOUSE_PAGES_PER_SHARD: Final = 17
 LIGHTHOUSE_ACCESSIBILITY_MODULE: Final = '.lighthouserc-accessibility.js'
@@ -152,8 +160,10 @@ def create_ci_test_suites_to_run_dict(
     return {
         'e2e': e2e or create_ci_test_suites_dict(),
         'acceptance': acceptance or create_ci_test_suites_dict(),
-        'lighthouse_performance': lighthouse_performance or create_ci_test_suites_dict(),
-        'lighthouse_accessibility': lighthouse_accessibility or create_ci_test_suites_dict(),
+        'lighthouse_performance': lighthouse_performance
+        or create_ci_test_suites_dict(),
+        'lighthouse_accessibility': lighthouse_accessibility
+        or create_ci_test_suites_dict(),
     }
 
 
@@ -174,7 +184,9 @@ def get_git_diff_name_status_files(left: str, right: str) -> List[str]:
     git_cmd.extend([left, right])
     git_cmd.append('--')
 
-    task = subprocess.Popen(git_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    task = subprocess.Popen(
+        git_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     out, err = task.communicate()
     if not err:
         file_list = []
@@ -214,7 +226,9 @@ def get_root_files_config() -> RootFilesConfigDict:
         }
 
 
-def output_variable_to_github_workflow(output_variable: str, output_value: str) -> None:
+def output_variable_to_github_workflow(
+    output_variable: str, output_value: str
+) -> None:
     """Outputs a variable to the GitHub workflow.
 
     Args:
@@ -244,10 +258,16 @@ def output_test_suites_to_run_to_github_workflow(
         'e2e': test_suites_to_run['e2e'],
         'acceptance': test_suites_to_run['acceptance'],
         'lighthouse_performance': test_suites_to_run['lighthouse_performance'],
-        'lighthouse_accessibility': test_suites_to_run['lighthouse_accessibility'],
+        'lighthouse_accessibility': test_suites_to_run[
+            'lighthouse_accessibility'
+        ],
     }
-    print('Test Suites to Run: ', json.dumps(test_suites_to_run_output, indent=4))
-    output_variable_to_github_workflow(GITHUB_OUTPUT_TEST_SUITES_TO_RUN, json.dumps(test_suites_to_run_output))
+    print(
+        'Test Suites to Run: ', json.dumps(test_suites_to_run_output, indent=4)
+    )
+    output_variable_to_github_workflow(
+        GITHUB_OUTPUT_TEST_SUITES_TO_RUN, json.dumps(test_suites_to_run_output)
+    )
 
 
 def get_test_suites_from_config(
@@ -288,7 +308,9 @@ def get_lighthouse_pages_from_config() -> List[LighthousePageDict]:
     return lighthouse_pages
 
 
-def partition_lighthouse_pages_into_test_suites(lighthouse_module: str, lighthouse_pages: List[LighthousePageDict]) -> List[LighthouseTestSuiteDict]:
+def partition_lighthouse_pages_into_test_suites(
+    lighthouse_module: str, lighthouse_pages: List[LighthousePageDict]
+) -> List[LighthouseTestSuiteDict]:
     """Partitions the Lighthouse pages into test suites.
 
     Args:
@@ -324,11 +346,23 @@ def get_all_test_suites_by_type() -> TestSuitesByTypeDict:
         dict. The test suites configurations for each test type.
     """
 
-    e2e_test_suites = get_test_suites_from_config(os.path.join(CI_TEST_SUITE_CONFIGS_DIRECTORY, 'e2e.json'))
-    acceptance_test_suites = get_test_suites_from_config(os.path.join(CI_TEST_SUITE_CONFIGS_DIRECTORY, 'acceptance.json'))
+    e2e_test_suites = get_test_suites_from_config(
+        os.path.join(CI_TEST_SUITE_CONFIGS_DIRECTORY, 'e2e.json')
+    )
+    acceptance_test_suites = get_test_suites_from_config(
+        os.path.join(CI_TEST_SUITE_CONFIGS_DIRECTORY, 'acceptance.json')
+    )
 
-    lighthouse_accessibility_test_suites = partition_lighthouse_pages_into_test_suites(LIGHTHOUSE_ACCESSIBILITY_MODULE, get_lighthouse_pages_from_config())
-    lighthouse_performance_test_suites = partition_lighthouse_pages_into_test_suites(LIGHTHOUSE_PERFORMANCE_MODULE, get_lighthouse_pages_from_config())
+    lighthouse_accessibility_test_suites = (
+        partition_lighthouse_pages_into_test_suites(
+            LIGHTHOUSE_ACCESSIBILITY_MODULE, get_lighthouse_pages_from_config()
+        )
+    )
+    lighthouse_performance_test_suites = (
+        partition_lighthouse_pages_into_test_suites(
+            LIGHTHOUSE_PERFORMANCE_MODULE, get_lighthouse_pages_from_config()
+        )
+    )
 
     return {
         'e2e': e2e_test_suites,
@@ -343,14 +377,22 @@ def output_all_test_suites_to_run_to_github_workflow() -> None:
     all_test_suites_by_type = get_all_test_suites_by_type()
     test_suites_to_run = create_ci_test_suites_to_run_dict(
         e2e=create_ci_test_suites_dict(all_test_suites_by_type['e2e']),
-        acceptance=create_ci_test_suites_dict(all_test_suites_by_type['acceptance']),
-        lighthouse_performance=create_ci_test_suites_dict(all_test_suites_by_type['lighthouse_performance']),
-        lighthouse_accessibility=create_ci_test_suites_dict(all_test_suites_by_type['lighthouse_accessibility']),
+        acceptance=create_ci_test_suites_dict(
+            all_test_suites_by_type['acceptance']
+        ),
+        lighthouse_performance=create_ci_test_suites_dict(
+            all_test_suites_by_type['lighthouse_performance']
+        ),
+        lighthouse_accessibility=create_ci_test_suites_dict(
+            all_test_suites_by_type['lighthouse_accessibility']
+        ),
     )
     output_test_suites_to_run_to_github_workflow(test_suites_to_run)
 
 
-def get_test_suite_by_name_from_list(test_suites: Sequence[GenericTestSuiteDict], test_suite_name: str) -> GenericTestSuiteDict | None:
+def get_test_suite_by_name_from_list(
+    test_suites: Sequence[GenericTestSuiteDict], test_suite_name: str
+) -> GenericTestSuiteDict | None:
     """Gets a test suite by name from a list of test suites.
 
     Args:
@@ -362,7 +404,11 @@ def get_test_suite_by_name_from_list(test_suites: Sequence[GenericTestSuiteDict]
         it does not exist.
     """
     return next(
-        (test_suite for test_suite in test_suites if test_suite['name'] == test_suite_name),
+        (
+            test_suite
+            for test_suite in test_suites
+            if test_suite['name'] == test_suite_name
+        ),
         None,
     )
 
@@ -388,9 +434,15 @@ def get_test_suites_to_module_mapping_from_file(
     full_path = os.path.join(root_directory, file_path)
     with open(full_path, 'r', encoding='utf-8') as f:
         modules = f.read().splitlines()
-        file_path_relative_to_main_directory = os.path.relpath(full_path, main_directory)
-        file_path_without_extension = os.path.splitext(file_path_relative_to_main_directory)[0]
-        test_suite = get_test_suite_by_name_from_list(test_suites, file_path_without_extension)
+        file_path_relative_to_main_directory = os.path.relpath(
+            full_path, main_directory
+        )
+        file_path_without_extension = os.path.splitext(
+            file_path_relative_to_main_directory
+        )[0]
+        test_suite = get_test_suite_by_name_from_list(
+            test_suites, file_path_without_extension
+        )
         if test_suite is not None:
             test_suites_to_modules_mapping[test_suite['name']] = modules
 
@@ -419,10 +471,18 @@ def get_test_suites_to_module_mapping_from_directory(
     test_suites_to_modules_mapping: dict[str, List[str]] = {}
     for root, directories, files in os.walk(module_mapping_directory):
         for file in files:
-            test_suites_to_modules_mapping.update(get_test_suites_to_module_mapping_from_file(root, file, test_suites, main_directory))
+            test_suites_to_modules_mapping.update(
+                get_test_suites_to_module_mapping_from_file(
+                    root, file, test_suites, main_directory
+                )
+            )
         for directory in directories:
             sub_directory_path = os.path.join(root, directory)
-            test_suites_to_modules_mapping.update(get_test_suites_to_module_mapping_from_directory(sub_directory_path, test_suites, main_directory))
+            test_suites_to_modules_mapping.update(
+                get_test_suites_to_module_mapping_from_directory(
+                    sub_directory_path, test_suites, main_directory
+                )
+            )
 
     return test_suites_to_modules_mapping
 
@@ -471,14 +531,21 @@ def get_test_suites_affected_by_root_file(
         test_suite_name,
         test_suite_modules,
     ) in test_suites_to_module_mapping.items():
-        test_suite_by_name = get_test_suite_by_name_from_list(test_suites, test_suite_name)
-        if test_suite_by_name is not None and (root_file in test_suite_modules or root_file == test_suite_by_name['module']):
+        test_suite_by_name = get_test_suite_by_name_from_list(
+            test_suites, test_suite_name
+        )
+        if test_suite_by_name is not None and (
+            root_file in test_suite_modules
+            or root_file == test_suite_by_name['module']
+        ):
             test_suites_affected.append(test_suite_by_name)
 
     return extend_test_suites_without_duplicates([], test_suites_affected)
 
 
-def get_affected_lighthouse_pages(modified_root_files: Set[str], lighthouse_module: str) -> List[LighthousePageDict]:
+def get_affected_lighthouse_pages(
+    modified_root_files: Set[str], lighthouse_module: str
+) -> List[LighthousePageDict]:
     """Gets the affected Lighthouse pages by a list of modified root files.
 
     Args:
@@ -502,7 +569,9 @@ def get_affected_lighthouse_pages(modified_root_files: Set[str], lighthouse_modu
     return sorted(affected_lighthouse_pages, key=lambda x: x['name'])
 
 
-def get_ci_test_suites_to_run(modified_files: List[str], root_files_mapping: dict[str, List[str]]) -> CITestSuitesToRunDict | None:
+def get_ci_test_suites_to_run(
+    modified_files: List[str], root_files_mapping: dict[str, List[str]]
+) -> CITestSuitesToRunDict | None:
     """Gets the test suites to run in the CI.
 
     Args:
@@ -523,14 +592,18 @@ def get_ci_test_suites_to_run(modified_files: List[str], root_files_mapping: dic
         modified_root_files.update(root_files_mapping[file])
 
     root_files_config = get_root_files_config()
-    if modified_root_files.intersection(root_files_config['run_all_tests_root_files']):
+    if modified_root_files.intersection(
+        root_files_config['run_all_tests_root_files']
+    ):
         return None
 
     all_test_suites_by_type = get_all_test_suites_by_type()
 
-    acceptance_test_suites_to_module_mapping = get_test_suites_to_module_mapping_from_directory(
-        os.path.join(TEST_MODULES_MAPPING_DIRECTORY, 'acceptance'),
-        all_test_suites_by_type['acceptance'],
+    acceptance_test_suites_to_module_mapping = (
+        get_test_suites_to_module_mapping_from_directory(
+            os.path.join(TEST_MODULES_MAPPING_DIRECTORY, 'acceptance'),
+            all_test_suites_by_type['acceptance'],
+        )
     )
 
     acceptance_test_suites: List[GenericTestSuiteDict] = []
@@ -545,21 +618,33 @@ def get_ci_test_suites_to_run(modified_files: List[str], root_files_mapping: dic
             ),
         )
 
-    lighthouse_accessibility_test_suites = partition_lighthouse_pages_into_test_suites(
-        LIGHTHOUSE_ACCESSIBILITY_MODULE,
-        get_affected_lighthouse_pages(modified_root_files, LIGHTHOUSE_ACCESSIBILITY_MODULE),
+    lighthouse_accessibility_test_suites = (
+        partition_lighthouse_pages_into_test_suites(
+            LIGHTHOUSE_ACCESSIBILITY_MODULE,
+            get_affected_lighthouse_pages(
+                modified_root_files, LIGHTHOUSE_ACCESSIBILITY_MODULE
+            ),
+        )
     )
 
-    lighthouse_performance_test_suites = partition_lighthouse_pages_into_test_suites(
-        LIGHTHOUSE_PERFORMANCE_MODULE,
-        get_affected_lighthouse_pages(modified_root_files, LIGHTHOUSE_PERFORMANCE_MODULE),
+    lighthouse_performance_test_suites = (
+        partition_lighthouse_pages_into_test_suites(
+            LIGHTHOUSE_PERFORMANCE_MODULE,
+            get_affected_lighthouse_pages(
+                modified_root_files, LIGHTHOUSE_PERFORMANCE_MODULE
+            ),
+        )
     )
 
     return create_ci_test_suites_to_run_dict(
         e2e=create_ci_test_suites_dict(all_test_suites_by_type['e2e']),
         acceptance=create_ci_test_suites_dict(acceptance_test_suites),
-        lighthouse_accessibility=create_ci_test_suites_dict(lighthouse_accessibility_test_suites),
-        lighthouse_performance=create_ci_test_suites_dict(lighthouse_performance_test_suites),
+        lighthouse_accessibility=create_ci_test_suites_dict(
+            lighthouse_accessibility_test_suites
+        ),
+        lighthouse_performance=create_ci_test_suites_dict(
+            lighthouse_performance_test_suites
+        ),
     )
 
 
@@ -572,7 +657,9 @@ def main(args: Optional[list[str]] = None) -> None:
         output_all_test_suites_to_run_to_github_workflow()
         return
 
-    changed_files = get_git_diff_name_status_files(parsed_args.github_base_ref, parsed_args.github_head_ref)
+    changed_files = get_git_diff_name_status_files(
+        parsed_args.github_base_ref, parsed_args.github_head_ref
+    )
 
     print('Changed files:', changed_files)
 
@@ -582,7 +669,9 @@ def main(args: Optional[list[str]] = None) -> None:
 
     with open(ROOT_FILES_MAPPING_FILE_PATH, 'r', encoding='utf-8') as f:
         root_files_mapping = json.load(f)
-        ci_test_suites_to_run = get_ci_test_suites_to_run(changed_files, root_files_mapping)
+        ci_test_suites_to_run = get_ci_test_suites_to_run(
+            changed_files, root_files_mapping
+        )
 
         if ci_test_suites_to_run is None:
             output_all_test_suites_to_run_to_github_workflow()

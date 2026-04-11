@@ -24,9 +24,15 @@ from typing import Optional, Sequence
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
-FULL_STACK_TEST_VIDEO_RECORDING_DIR = os.path.join(CURR_DIR, '..', 'oppia_full_stack_test_video_recordings')
-FULL_STACK_TEST_SCREENSHOT_DIR = os.path.join(CURR_DIR, '..', 'oppia_full_stack_test_screenshots')
-FULL_STACK_TEST_DOWNLOAD_DIR = os.path.join(CURR_DIR, '..', 'oppia_acceptance_test_downloads')
+FULL_STACK_TEST_VIDEO_RECORDING_DIR = os.path.join(
+    CURR_DIR, '..', 'oppia_full_stack_test_video_recordings'
+)
+FULL_STACK_TEST_SCREENSHOT_DIR = os.path.join(
+    CURR_DIR, '..', 'oppia_full_stack_test_screenshots'
+)
+FULL_STACK_TEST_DOWNLOAD_DIR = os.path.join(
+    CURR_DIR, '..', 'oppia_acceptance_test_downloads'
+)
 
 _PARSER = argparse.ArgumentParser(
     description="""

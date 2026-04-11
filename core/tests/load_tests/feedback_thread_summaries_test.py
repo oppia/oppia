@@ -81,14 +81,18 @@ class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
                 self.EXPECTED_THREAD_DICT['subject'],
                 'not used here',
             )
-        threadlist = feedback_services.get_all_threads(feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1, False)
+        threadlist = feedback_services.get_all_threads(
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1, False
+        )
 
         thread_ids = []
         for thread in threadlist:
             thread_ids.append(thread.id)
             # Create 5 messages in each thread.
             for _ in range(5):
-                feedback_services.create_message(thread.id, self.user_id, None, None, 'editor message')
+                feedback_services.create_message(
+                    thread.id, self.user_id, None, None, 'editor message'
+                )
 
         start = time.time()
         # Fetch the summaries of all the threads.

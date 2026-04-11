@@ -57,7 +57,9 @@ class DragAndDropSortInput(base.BaseInteraction):
                         'rte_component_config_id': 'ALL_COMPONENTS',
                         'html': {
                             'hide_complex_extensions': True,
-                            'placeholder': ('Enter an option for the learner to drag and drop.'),
+                            'placeholder': (
+                                'Enter an option for the learner to drag and drop.'
+                            ),
                         },
                     },
                 },

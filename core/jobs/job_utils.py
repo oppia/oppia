@@ -40,7 +40,9 @@ datastore_services = models.Registry.import_datastore_services()
 
 # Here we use type Any because argument 'new_values' can accept arbitrary
 # number of keyword args with different types of values.
-def clone_model(model: datastore_services.TYPE_MODEL_SUBCLASS, **new_values: Any) -> datastore_services.TYPE_MODEL_SUBCLASS:
+def clone_model(
+    model: datastore_services.TYPE_MODEL_SUBCLASS, **new_values: Any
+) -> datastore_services.TYPE_MODEL_SUBCLASS:
     """Clones the entity, adding or overriding constructor attributes.
 
     The cloned entity will have exactly the same property values as the
@@ -131,7 +133,9 @@ def get_model_kind(
     Raises:
         TypeError. When the argument is not a model.
     """
-    if isinstance(model, datastore_services.Model) or (isinstance(model, type) and issubclass(model, datastore_services.Model)):
+    if isinstance(model, datastore_services.Model) or (
+        isinstance(model, type) and issubclass(model, datastore_services.Model)
+    ):
         return model._get_kind()  # pylint: disable=protected-access
     else:
         raise TypeError('%r is not a model type or instance' % model)
@@ -159,7 +163,9 @@ def get_model_id(model: datastore_services.Model) -> Optional[str]:
 
 # Here we use type Any because this method can return a property from a
 # model and that property can be of any type.
-def get_model_property(model: datastore_services.Model, property_name: str) -> Any:
+def get_model_property(
+    model: datastore_services.Model, property_name: str
+) -> Any:
     """Returns the given property from a model.
 
     Args:
@@ -249,10 +255,14 @@ def get_beam_key_from_ndb_key(
     Returns:
         beam_datastore_types.Key. The Apache Beam key.
     """
-    return beam_datastore_types.Key(ndb_key.flat(), project=ndb_key.project(), namespace=ndb_key.namespace())
+    return beam_datastore_types.Key(
+        ndb_key.flat(), project=ndb_key.project(), namespace=ndb_key.namespace()
+    )
 
 
-def get_beam_query_from_ndb_query(query: datastore_services.Query, namespace: Optional[str] = None) -> beam_datastore_types.Query:
+def get_beam_query_from_ndb_query(
+    query: datastore_services.Query, namespace: Optional[str] = None
+) -> beam_datastore_types.Query:
     """Returns an equivalent Apache Beam query from the given NDB query.
 
     This function helps developers avoid learning two types of query syntaxes.
@@ -271,8 +281,12 @@ def get_beam_query_from_ndb_query(query: datastore_services.Query, namespace: Op
     """
     kind = query.kind
     namespace = namespace or query.namespace
-    filters = _get_beam_filters_from_ndb_node(query.filters) if query.filters else ()
-    order = _get_beam_order_from_ndb_order(query.order_by) if query.order_by else ()
+    filters = (
+        _get_beam_filters_from_ndb_node(query.filters) if query.filters else ()
+    )
+    order = (
+        _get_beam_order_from_ndb_order(query.order_by) if query.order_by else ()
+    )
 
     if not kind and not order:
         # NOTE: When kind is omitted, Apache Beam requires the query to order
@@ -324,7 +338,9 @@ def _get_beam_filters_from_ndb_node(
             )
         )
     else:
-        raise TypeError('`!=`, `IN`, and `OR` are forbidden filters. To emulate their behavior, use multiple AND queries and flatten them into a single PCollection.')
+        raise TypeError(
+            '`!=`, `IN`, and `OR` are forbidden filters. To emulate their behavior, use multiple AND queries and flatten them into a single PCollection.'
+        )
 
     return tuple(beam_filters)
 

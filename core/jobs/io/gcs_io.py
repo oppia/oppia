@@ -44,7 +44,9 @@ T = TypeVar('T')
 class ReadFile(beam.PTransform):  # type: ignore[misc]
     """Read files form the GCS."""
 
-    def __init__(self, bucket: str = BUCKET, label: Optional[str] = None) -> None:
+    def __init__(
+        self, bucket: str = BUCKET, label: Optional[str] = None
+    ) -> None:
         """Initializes the ReadFile PTransform.
 
         Args:
@@ -66,7 +68,9 @@ class ReadFile(beam.PTransform):  # type: ignore[misc]
         """
         return file_paths | 'Read the file' >> beam.Map(self._read_file)
 
-    def _read_file(self, file_path: str) -> result.Result[Tuple[str, Union[bytes, str]]]:
+    def _read_file(
+        self, file_path: str
+    ) -> result.Result[Tuple[str, Union[bytes, str]]]:
         """Helper function to read the contents of a file.
 
         Args:
@@ -137,7 +141,9 @@ class WriteFile(beam.PTransform):  # type: ignore[misc]
         Returns:
             int. Returns the number of bytes that has been written to GCS.
         """
-        storage_services.commit(self.bucket, file_obj['filepath'], file_obj['data'], self.mime_type)
+        storage_services.commit(
+            self.bucket, file_obj['filepath'], file_obj['data'], self.mime_type
+        )
         return len(file_obj['data'])
 
 
@@ -148,7 +154,9 @@ class WriteFile(beam.PTransform):  # type: ignore[misc]
 class DeleteFile(beam.PTransform):  # type: ignore[misc]
     """Delete files from GCS."""
 
-    def __init__(self, bucket: str = BUCKET, label: Optional[str] = None) -> None:
+    def __init__(
+        self, bucket: str = BUCKET, label: Optional[str] = None
+    ) -> None:
         """Initializes the DeleteFile PTransform.
 
         Args:
@@ -186,7 +194,9 @@ class DeleteFile(beam.PTransform):  # type: ignore[misc]
 class GetFiles(beam.PTransform):  # type: ignore[misc]
     """Get all files with specefic prefix."""
 
-    def __init__(self, bucket: str = BUCKET, label: Optional[str] = None) -> None:
+    def __init__(
+        self, bucket: str = BUCKET, label: Optional[str] = None
+    ) -> None:
         """Initializes the GetFiles PTransform.
 
         Args:
@@ -205,7 +215,9 @@ class GetFiles(beam.PTransform):  # type: ignore[misc]
         Returns:
             PCollection. The PCollection of the file names.
         """
-        return prefixes | 'Get names of the files' >> beam.Map(self._get_file_with_prefix)
+        return prefixes | 'Get names of the files' >> beam.Map(
+            self._get_file_with_prefix
+        )
 
     def _get_file_with_prefix(self, prefix: str) -> List[str]:
         """Helper function to get file names with the prefix.
@@ -231,7 +243,9 @@ class IsFile(beam.PTransform):  # type: ignore[misc]
     PCollections.
     """
 
-    def __init__(self, bucket: str = BUCKET, label: Optional[str] = None) -> None:
+    def __init__(
+        self, bucket: str = BUCKET, label: Optional[str] = None
+    ) -> None:
         """Initializes the IsFile PTransform.
 
         Args:
@@ -241,7 +255,9 @@ class IsFile(beam.PTransform):  # type: ignore[misc]
         super().__init__(label=label)
         self.bucket = bucket
 
-    def expand(self, file_paths: beam.PCollection[T, str]) -> beam.PCollection[T, bool]:
+    def expand(
+        self, file_paths: beam.PCollection[T, str]
+    ) -> beam.PCollection[T, bool]:
         """Returns PCollection of whether the corresponding filepath exists or
         not.
 
@@ -253,7 +269,9 @@ class IsFile(beam.PTransform):  # type: ignore[misc]
             PCollection(T, bool). The PCollection of whether the corresponding
             filepath exists or not, keyed by the same keys as file_paths.
         """
-        return file_paths | 'Check whether each filepath exists' >> beam.Map(self._is_file)
+        return file_paths | 'Check whether each filepath exists' >> beam.Map(
+            self._is_file
+        )
 
     def _is_file(self, group: Tuple[T, str]) -> Tuple[T, bool]:
         """Helper function to check whether the filepath exists or not.
@@ -278,7 +296,9 @@ class IsFile(beam.PTransform):  # type: ignore[misc]
 class CopyFile(beam.PTransform):  # type: ignore[misc]
     """Copies files to a destination filepath in GCS."""
 
-    def __init__(self, bucket: str = BUCKET, label: Optional[str] = None) -> None:
+    def __init__(
+        self, bucket: str = BUCKET, label: Optional[str] = None
+    ) -> None:
         """Initializes the CopyFile PTransform.
 
         Args:
@@ -302,9 +322,13 @@ class CopyFile(beam.PTransform):  # type: ignore[misc]
             PCollection(result(str, str, str)). The PCollection of
             the copy operation's result.
         """
-        return file_path_pairs | 'Copy files in GCS' >> beam.Map(self._copy_file)
+        return file_path_pairs | 'Copy files in GCS' >> beam.Map(
+            self._copy_file
+        )
 
-    def _copy_file(self, file_paths: Tuple[str, beam.PCollection[str]]) -> result.Result[Tuple[str, str, str]]:
+    def _copy_file(
+        self, file_paths: Tuple[str, beam.PCollection[str]]
+    ) -> result.Result[Tuple[str, str, str]]:
         """Helper function to copy files.
 
         Args:

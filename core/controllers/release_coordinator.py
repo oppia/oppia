@@ -62,7 +62,9 @@ class UserGroupHandlerNormalizePayloadDict(TypedDict):
     member_usernames: List[str]
 
 
-class UserGroupHandler(base.BaseHandler[UserGroupHandlerNormalizePayloadDict, Dict[str, str]]):
+class UserGroupHandler(
+    base.BaseHandler[UserGroupHandlerNormalizePayloadDict, Dict[str, str]]
+):
     """Handler for user groups."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -71,12 +73,16 @@ class UserGroupHandler(base.BaseHandler[UserGroupHandlerNormalizePayloadDict, Di
         'GET': {},
         'POST': {
             'name': {'schema': {'type': 'basestring'}},
-            'member_usernames': {'schema': {'type': 'list', 'items': {'type': 'basestring'}}},
+            'member_usernames': {
+                'schema': {'type': 'list', 'items': {'type': 'basestring'}}
+            },
         },
         'PUT': {
             'user_group_id': {'schema': {'type': 'basestring'}},
             'name': {'schema': {'type': 'basestring'}},
-            'member_usernames': {'schema': {'type': 'list', 'items': {'type': 'basestring'}}},
+            'member_usernames': {
+                'schema': {'type': 'list', 'items': {'type': 'basestring'}}
+            },
         },
         'DELETE': {'user_group_id': {'schema': {'type': 'basestring'}}},
     }
@@ -134,7 +140,9 @@ class FeatureFlagsHandlerNormalizedPayloadDict(TypedDict):
     user_group_ids: List[str]
 
 
-class FeatureFlagsHandler(base.BaseHandler[FeatureFlagsHandlerNormalizedPayloadDict, Dict[str, str]]):
+class FeatureFlagsHandler(
+    base.BaseHandler[FeatureFlagsHandlerNormalizedPayloadDict, Dict[str, str]]
+):
     """Handler for feature-flags."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -207,13 +215,19 @@ class FeatureFlagsHandler(base.BaseHandler[FeatureFlagsHandlerNormalizedPayloadD
             assert action == 'update_feature_flag'
             feature_flag_name = self.normalized_payload.get('feature_flag_name')
             if feature_flag_name is None:
-                raise Exception('The \'feature_flag_name\' must be provided when the action is update_feature_flag.')
+                raise Exception(
+                    'The \'feature_flag_name\' must be provided when the action is update_feature_flag.'
+                )
 
-            force_enable_for_all_users = self.normalized_payload.get('force_enable_for_all_users')
+            force_enable_for_all_users = self.normalized_payload.get(
+                'force_enable_for_all_users'
+            )
             # Ruling out the possibility of any other type for mypy
             # type checking.
             assert force_enable_for_all_users is not None
-            rollout_percentage = self.normalized_payload.get('rollout_percentage')
+            rollout_percentage = self.normalized_payload.get(
+                'rollout_percentage'
+            )
             # Ruling out the possibility of any other type for mypy
             # type checking.
             assert rollout_percentage is not None

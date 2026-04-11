@@ -62,7 +62,9 @@ class FeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
         thread_summaries = response['thread_summaries']
         self.assertEqual(thread_summaries, [])
 
-        self.save_new_default_exploration(self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1
+        )
         feedback_services.create_thread(
             'exploration',
             self.EXP_ID_1,
@@ -84,10 +86,14 @@ class FeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(response['paginated_threads_list']), 0)
         self.assertEqual(len(thread_summaries), 1)
         self.assertEqual(thread_summaries[0]['total_message_count'], 1)
-        self.assertEqual(thread_summaries[0]['exploration_title'], self.EXP_TITLE_1)
+        self.assertEqual(
+            thread_summaries[0]['exploration_title'], self.EXP_TITLE_1
+        )
         self.assertEqual(thread_summaries[0]['exploration_id'], self.EXP_ID_1)
         self.assertEqual(thread_summaries[0]['last_message_text'], 'some text')
-        self.assertEqual(thread_summaries[0]['original_author_id'], self.owner_id)
+        self.assertEqual(
+            thread_summaries[0]['original_author_id'], self.owner_id
+        )
         self.assertEqual(thread.subject, 'a subject')
         self.assertEqual(thread.entity_type, 'exploration')
         self.logout()
@@ -96,7 +102,9 @@ class FeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         csrf_token = self.get_new_csrf_token()
-        self.save_new_default_exploration(self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1
+        )
         for i in range(190):
             feedback_services.create_thread(
                 'exploration',
@@ -121,10 +129,16 @@ class FeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(paginated_threads_list[0]), 90)
         self.assertEqual(len(thread_summaries), 100)
         self.assertEqual(thread_summaries[0]['total_message_count'], 1)
-        self.assertEqual(thread_summaries[0]['exploration_title'], self.EXP_TITLE_1)
+        self.assertEqual(
+            thread_summaries[0]['exploration_title'], self.EXP_TITLE_1
+        )
         self.assertEqual(thread_summaries[0]['exploration_id'], self.EXP_ID_1)
-        self.assertEqual(thread_summaries[0]['last_message_text'], 'some text 0')
-        self.assertEqual(thread_summaries[0]['original_author_id'], self.owner_id)
+        self.assertEqual(
+            thread_summaries[0]['last_message_text'], 'some text 0'
+        )
+        self.assertEqual(
+            thread_summaries[0]['original_author_id'], self.owner_id
+        )
         self.assertEqual(thread.subject, 'a subject 0')
         self.assertEqual(thread.entity_type, 'exploration')
 
@@ -142,10 +156,16 @@ class FeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(response['paginated_threads_list']), 0)
         self.assertEqual(len(thread_summaries), 90)
         self.assertEqual(thread_summaries[0]['total_message_count'], 1)
-        self.assertEqual(thread_summaries[0]['exploration_title'], self.EXP_TITLE_1)
+        self.assertEqual(
+            thread_summaries[0]['exploration_title'], self.EXP_TITLE_1
+        )
         self.assertEqual(thread_summaries[0]['exploration_id'], self.EXP_ID_1)
-        self.assertEqual(thread_summaries[0]['last_message_text'], 'some text 100')
-        self.assertEqual(thread_summaries[0]['original_author_id'], self.owner_id)
+        self.assertEqual(
+            thread_summaries[0]['last_message_text'], 'some text 100'
+        )
+        self.assertEqual(
+            thread_summaries[0]['original_author_id'], self.owner_id
+        )
         self.assertEqual(thread.subject, 'a subject 100')
         self.assertEqual(thread.entity_type, 'exploration')
         self.logout()
@@ -177,7 +197,9 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
     def test_get_message_summaries(self) -> None:
         self.login(self.EDITOR_EMAIL)
         # Fetch all the feedback threads of that exploration.
-        response_dict = self.get_json('%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1))
+        response_dict = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1)
+        )
 
         # Get the id of the thread.
         thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
@@ -219,7 +241,9 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
         # Check the summary of the second message.
         self.assertEqual(len(messages_summary), 2)
         second_message = messages_summary[1]
-        self.assertDictContainsSubset({'text': 'Message 1', 'author_username': 'editor'}, second_message)
+        self.assertDictContainsSubset(
+            {'text': 'Message 1', 'author_username': 'editor'}, second_message
+        )
 
         self.logout()
 
@@ -232,7 +256,9 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
         )
 
         self.login(self.EDITOR_EMAIL)
-        response_dict = self.get_json('%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1))
+        response_dict = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1)
+        )
         thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
 
         # Get the message summary of the thread.
@@ -272,23 +298,30 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
             datetime.datetime(2016, 4, 10, 0, 0, 0, 0),
         )
 
-        response_dict = self.get_json('%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1))
+        response_dict = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1)
+        )
         thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
         thread_url = '%s/%s' % (
             feconf.FEEDBACK_UPDATES_THREAD_DATA_URL,
             thread_id,
         )
-        with self.swap_to_always_return(suggestion_services, 'get_suggestion_by_id', translation_suggestion):
+        with self.swap_to_always_return(
+            suggestion_services, 'get_suggestion_by_id', translation_suggestion
+        ):
             with self.assertRaisesRegex(
                 Exception,
-                'No edit state content suggestion found for the given thread_id: %s' % thread_id,
+                'No edit state content suggestion found for the given thread_id: %s'
+                % thread_id,
             ):
                 self.get_json(thread_url)
 
     def test_get_suggestions_after_updating_suggestion_summary(self) -> None:
         self.login(self.EDITOR_EMAIL)
 
-        response_dict = self.get_json('%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1))
+        response_dict = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1)
+        )
         thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
         thread_url = '%s/%s' % (
             feconf.FEEDBACK_UPDATES_THREAD_DATA_URL,
@@ -297,12 +330,16 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
         response_dict = self.get_json(thread_url)
         messages_summary = response_dict['message_summary_list'][0]
 
-        self.assertEqual(messages_summary['author_username'], self.EDITOR_USERNAME)
+        self.assertEqual(
+            messages_summary['author_username'], self.EDITOR_USERNAME
+        )
         self.assertFalse(messages_summary.get('suggestion_html'))
         self.assertFalse(messages_summary.get('current_content_html'))
         self.assertFalse(messages_summary.get('description'))
 
-        new_content = state_domain.SubtitledHtml('content', '<p>new content html</p>').to_dict()
+        new_content = state_domain.SubtitledHtml(
+            'content', '<p>new content html</p>'
+        ).to_dict()
         change_cmd: Dict[str, Union[str, state_domain.SubtitledHtmlDict]] = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -327,17 +364,27 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
         suggestion_thread = feedback_services.get_thread(thread_id)
         suggestion = suggestion_services.get_suggestion_by_id(thread_id)
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID_1)
-        current_content_html = exploration.states[suggestion.change_cmd.state_name].content.html
+        current_content_html = exploration.states[
+            suggestion.change_cmd.state_name
+        ].content.html
         response_dict = self.get_json(thread_url)
         messages_summary = response_dict['message_summary_list'][0]
         first_suggestion = feedback_services.get_messages(thread_id)[0]
 
-        self.assertEqual(messages_summary['author_username'], self.EDITOR_USERNAME)
+        self.assertEqual(
+            messages_summary['author_username'], self.EDITOR_USERNAME
+        )
         self.assertEqual(
             utils.get_time_in_millisecs(first_suggestion.created_on),
             messages_summary['created_on_msecs'],
         )
-        self.assertEqual(messages_summary['suggestion_html'], '<p>new content html</p>')
-        self.assertEqual(messages_summary['current_content_html'], current_content_html)
-        self.assertEqual(messages_summary['description'], suggestion_thread.subject)
+        self.assertEqual(
+            messages_summary['suggestion_html'], '<p>new content html</p>'
+        )
+        self.assertEqual(
+            messages_summary['current_content_html'], current_content_html
+        )
+        self.assertEqual(
+            messages_summary['description'], suggestion_thread.subject
+        )
         self.logout()

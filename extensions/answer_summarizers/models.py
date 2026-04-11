@@ -93,9 +93,13 @@ class AnswersWithClassificationDict(TypedDict):
 class HashableAnswer:
     """Wraps answer with object that can be placed into sets and dicts."""
 
-    def __init__(self, answer: state_domain.AcceptableCorrectAnswerTypes) -> None:
+    def __init__(
+        self, answer: state_domain.AcceptableCorrectAnswerTypes
+    ) -> None:
         self.answer = answer
-        self.hashable_answer: state_domain.AcceptableCorrectAnswerTypes = utils.get_hashable_value(answer)
+        self.hashable_answer: state_domain.AcceptableCorrectAnswerTypes = (
+            utils.get_hashable_value(answer)
+        )
 
     def __hash__(self) -> int:
         return hash(self.hashable_answer)
@@ -126,7 +130,14 @@ def _get_top_answers_by_frequency(
         stats_domain.AnswerFrequencyList. A list of the top "limit" answers.
     """
     answer_counter = utils.OrderedCounter(HashableAnswer(a) for a in answers)
-    return stats_domain.AnswerFrequencyList([stats_domain.AnswerOccurrence(hashable_answer.answer, frequency) for hashable_answer, frequency in answer_counter.most_common(n=limit)])
+    return stats_domain.AnswerFrequencyList(
+        [
+            stats_domain.AnswerOccurrence(hashable_answer.answer, frequency)
+            for hashable_answer, frequency in answer_counter.most_common(
+                n=limit
+            )
+        ]
+    )
 
 
 def _get_top_unresolved_answers_by_frequency(
@@ -150,7 +161,9 @@ def _get_top_unresolved_answers_by_frequency(
         stats_domain.AnswerFrequencyList. A list of the top "limit"
         unresolved answers.
     """
-    classification_results_dict: Dict[HashableAnswer, ClassificationResultsDict] = {}
+    classification_results_dict: Dict[
+        HashableAnswer, ClassificationResultsDict
+    ] = {}
 
     # The list of answers is sorted according to the time of answer submission.
     # Thus following loop goes through the list and aggregates the most recent
@@ -158,17 +171,33 @@ def _get_top_unresolved_answers_by_frequency(
     for ans in answers_with_classification:
         frequency = 0
         if HashableAnswer(ans['answer']) in classification_results_dict:
-            frequency = classification_results_dict[HashableAnswer(ans['answer'])]['frequency']
+            frequency = classification_results_dict[
+                HashableAnswer(ans['answer'])
+            ]['frequency']
         classification_results_dict[HashableAnswer(ans['answer'])] = {
-            'classification_categorization': (ans['classification_categorization']),
+            'classification_categorization': (
+                ans['classification_categorization']
+            ),
             'frequency': frequency + 1,
         }
 
-    unresolved_answers_with_frequency_list: List[AnswersWithFrequencyDict] = [{'answer': ans.answer, 'frequency': val['frequency']} for ans, val in classification_results_dict.items() if val['classification_categorization'] in (UNRESOLVED_ANSWER_CLASSIFICATION_CATEGORIES)]
+    unresolved_answers_with_frequency_list: List[AnswersWithFrequencyDict] = [
+        {'answer': ans.answer, 'frequency': val['frequency']}
+        for ans, val in classification_results_dict.items()
+        if val['classification_categorization']
+        in (UNRESOLVED_ANSWER_CLASSIFICATION_CATEGORIES)
+    ]
 
-    unresolved_answers_with_frequency_list.sort(key=lambda x: x['frequency'], reverse=True)
+    unresolved_answers_with_frequency_list.sort(
+        key=lambda x: x['frequency'], reverse=True
+    )
 
-    return stats_domain.AnswerFrequencyList([stats_domain.AnswerOccurrence(item['answer'], item['frequency']) for item in unresolved_answers_with_frequency_list[:limit]])
+    return stats_domain.AnswerFrequencyList(
+        [
+            stats_domain.AnswerOccurrence(item['answer'], item['frequency'])
+            for item in unresolved_answers_with_frequency_list[:limit]
+        ]
+    )
 
 
 class BaseCalculation:
@@ -183,13 +212,17 @@ class BaseCalculation:
         """The name of the class."""
         return self.__class__.__name__
 
-    def calculate_from_state_answers_dict(self, state_answers_dict: stats_domain.StateAnswersDict) -> stats_domain.StateAnswersCalcOutput:
+    def calculate_from_state_answers_dict(
+        self, state_answers_dict: stats_domain.StateAnswersDict
+    ) -> stats_domain.StateAnswersCalcOutput:
         """Perform calculation on a single StateAnswers entity. This is run in
         the context of a batch MapReduce job.
 
         This method must be overwritten in subclasses.
         """
-        raise NotImplementedError('Subclasses of BaseCalculation should implement the calculate_from_state_answers_dict(state_answers_dict) method.')
+        raise NotImplementedError(
+            'Subclasses of BaseCalculation should implement the calculate_from_state_answers_dict(state_answers_dict) method.'
+        )
 
 
 class AnswerFrequencies(BaseCalculation):
@@ -197,7 +230,9 @@ class AnswerFrequencies(BaseCalculation):
     submitted).
     """
 
-    def calculate_from_state_answers_dict(self, state_answers_dict: stats_domain.StateAnswersDict) -> stats_domain.StateAnswersCalcOutput:
+    def calculate_from_state_answers_dict(
+        self, state_answers_dict: stats_domain.StateAnswersDict
+    ) -> stats_domain.StateAnswersCalcOutput:
         """Computes the number of occurrences of each answer, and returns a list
         of dicts; each dict has keys 'answer' and 'frequency'.
 
@@ -224,9 +259,14 @@ class AnswerFrequencies(BaseCalculation):
         """
         interaction_id = state_answers_dict['interaction_id']
         if interaction_id in feconf.LINEAR_INTERACTION_IDS:
-            raise Exception('Linear interaction \'%s\' is not allowed for the calculation of answers\' frequencies.' % interaction_id)
+            raise Exception(
+                'Linear interaction \'%s\' is not allowed for the calculation of answers\' frequencies.'
+                % interaction_id
+            )
         answer_dicts = state_answers_dict['submitted_answer_list']
-        answer_frequency_list = _get_top_answers_by_frequency(d['answer'] for d in answer_dicts)
+        answer_frequency_list = _get_top_answers_by_frequency(
+            d['answer'] for d in answer_dicts
+        )
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -240,7 +280,9 @@ class AnswerFrequencies(BaseCalculation):
 class Top5AnswerFrequencies(BaseCalculation):
     """Calculation for the top 5 answers, by frequency."""
 
-    def calculate_from_state_answers_dict(self, state_answers_dict: stats_domain.StateAnswersDict) -> stats_domain.StateAnswersCalcOutput:
+    def calculate_from_state_answers_dict(
+        self, state_answers_dict: stats_domain.StateAnswersDict
+    ) -> stats_domain.StateAnswersCalcOutput:
         """Computes the number of occurrences of each answer, keeping only the
         top 5 answers, and returns a list of dicts; each dict has keys 'answer'
         and 'frequency'.
@@ -268,9 +310,14 @@ class Top5AnswerFrequencies(BaseCalculation):
         """
         interaction_id = state_answers_dict['interaction_id']
         if interaction_id in feconf.LINEAR_INTERACTION_IDS:
-            raise Exception('Linear interaction \'%s\' is not allowed for the calculation of top 5 answers, by frequency.' % interaction_id)
+            raise Exception(
+                'Linear interaction \'%s\' is not allowed for the calculation of top 5 answers, by frequency.'
+                % interaction_id
+            )
         answer_dicts = state_answers_dict['submitted_answer_list']
-        answer_frequency_list = _get_top_answers_by_frequency((d['answer'] for d in answer_dicts), limit=5)
+        answer_frequency_list = _get_top_answers_by_frequency(
+            (d['answer'] for d in answer_dicts), limit=5
+        )
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -284,7 +331,9 @@ class Top5AnswerFrequencies(BaseCalculation):
 class Top10AnswerFrequencies(BaseCalculation):
     """Calculation for the top 10 answers, by frequency."""
 
-    def calculate_from_state_answers_dict(self, state_answers_dict: stats_domain.StateAnswersDict) -> stats_domain.StateAnswersCalcOutput:
+    def calculate_from_state_answers_dict(
+        self, state_answers_dict: stats_domain.StateAnswersDict
+    ) -> stats_domain.StateAnswersCalcOutput:
         """Computes the number of occurrences of each answer, keeping only the
         top 10 answers, and returns a list of dicts; each dict has keys 'answer'
         and 'frequency'.
@@ -312,9 +361,14 @@ class Top10AnswerFrequencies(BaseCalculation):
         """
         interaction_id = state_answers_dict['interaction_id']
         if interaction_id in feconf.LINEAR_INTERACTION_IDS:
-            raise Exception('Linear interaction \'%s\' is not allowed for the calculation of top 10 answers, by frequency.' % interaction_id)
+            raise Exception(
+                'Linear interaction \'%s\' is not allowed for the calculation of top 10 answers, by frequency.'
+                % interaction_id
+            )
         answer_dicts = state_answers_dict['submitted_answer_list']
-        answer_frequency_list = _get_top_answers_by_frequency((d['answer'] for d in answer_dicts), limit=10)
+        answer_frequency_list = _get_top_answers_by_frequency(
+            (d['answer'] for d in answer_dicts), limit=10
+        )
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -331,7 +385,9 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
     SetOfUnicodeString).
     """
 
-    def calculate_from_state_answers_dict(self, state_answers_dict: stats_domain.StateAnswersDict) -> stats_domain.StateAnswersCalcOutput:
+    def calculate_from_state_answers_dict(
+        self, state_answers_dict: stats_domain.StateAnswersDict
+    ) -> stats_domain.StateAnswersCalcOutput:
         """Computes the number of occurrences of each individual answer across
         all given answer sets, keeping only the top 10. Returns a list of dicts;
         each dict has keys 'answer' and 'frequency'.
@@ -362,14 +418,21 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
         """
         interaction_id = state_answers_dict['interaction_id']
         if interaction_id in feconf.LINEAR_INTERACTION_IDS:
-            raise Exception('Linear interaction \'%s\' is not allowed for the calculation of commonly submitted answers\' frequencies.' % interaction_id)
+            raise Exception(
+                'Linear interaction \'%s\' is not allowed for the calculation of commonly submitted answers\' frequencies.'
+                % interaction_id
+            )
         answer_dicts = state_answers_dict['submitted_answer_list']
         answer_list = []
         for answer_dict in answer_dicts:
             if not isinstance(answer_dict['answer'], collections.abc.Iterable):
-                raise Exception('To calculate commonly submitted answers\' frequencies, answers must be provided in an iterable form, like: SetOfUnicodeString.')
+                raise Exception(
+                    'To calculate commonly submitted answers\' frequencies, answers must be provided in an iterable form, like: SetOfUnicodeString.'
+                )
             answer_list.append(answer_dict['answer'])
-        answer_frequency_list = _get_top_answers_by_frequency(itertools.chain.from_iterable(answer_list), limit=10)
+        answer_frequency_list = _get_top_answers_by_frequency(
+            itertools.chain.from_iterable(answer_list), limit=10
+        )
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -387,7 +450,9 @@ class TopAnswersByCategorization(BaseCalculation):
     frequency.
     """
 
-    def calculate_from_state_answers_dict(self, state_answers_dict: stats_domain.StateAnswersDict) -> stats_domain.StateAnswersCalcOutput:
+    def calculate_from_state_answers_dict(
+        self, state_answers_dict: stats_domain.StateAnswersDict
+    ) -> stats_domain.StateAnswersCalcOutput:
         """Computes the number of occurrences of each answer, split into groups
         based on the number of classification categories.
 
@@ -414,12 +479,17 @@ class TopAnswersByCategorization(BaseCalculation):
         """
         interaction_id = state_answers_dict['interaction_id']
         if interaction_id in feconf.LINEAR_INTERACTION_IDS:
-            raise Exception('Linear interaction \'%s\' is not allowed for the calculation of top submitted answers, by frequency.' % interaction_id)
+            raise Exception(
+                'Linear interaction \'%s\' is not allowed for the calculation of top submitted answers, by frequency.'
+                % interaction_id
+            )
         grouped_submitted_answer_dicts = itertools.groupby(
             state_answers_dict['submitted_answer_list'],
             operator.itemgetter('classification_categorization'),
         )
-        submitted_answers_by_categorization: Dict[str, List[state_domain.AcceptableCorrectAnswerTypes]] = collections.defaultdict(list)
+        submitted_answers_by_categorization: Dict[
+            str, List[state_domain.AcceptableCorrectAnswerTypes]
+        ] = collections.defaultdict(list)
         for category, answer_dicts in grouped_submitted_answer_dicts:
             # The 'classification_categorization' of SubmittedAnswer cannot
             # have a value other than those defined in
@@ -428,9 +498,16 @@ class TopAnswersByCategorization(BaseCalculation):
             # valid classification categories. Hence, 'category' must be in
             # 'CLASSIFICATION_CATEGORIES'.
             assert category in CLASSIFICATION_CATEGORIES
-            submitted_answers_by_categorization[category].extend(d['answer'] for d in answer_dicts)
+            submitted_answers_by_categorization[category].extend(
+                d['answer'] for d in answer_dicts
+            )
 
-        categorized_answer_frequency_lists = stats_domain.CategorizedAnswerFrequencyLists({category: _get_top_answers_by_frequency(categorized_answers) for category, categorized_answers in submitted_answers_by_categorization.items()})
+        categorized_answer_frequency_lists = stats_domain.CategorizedAnswerFrequencyLists(
+            {
+                category: _get_top_answers_by_frequency(categorized_answers)
+                for category, categorized_answers in submitted_answers_by_categorization.items()
+            }
+        )
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -447,7 +524,9 @@ class TopNUnresolvedAnswersByFrequency(BaseCalculation):
     in descending order of frequency.
     """
 
-    def calculate_from_state_answers_dict(self, state_answers_dict: stats_domain.StateAnswersDict) -> stats_domain.StateAnswersCalcOutput:
+    def calculate_from_state_answers_dict(
+        self, state_answers_dict: stats_domain.StateAnswersDict
+    ) -> stats_domain.StateAnswersCalcOutput:
         """Filters unresolved answers and then computes the number of
         occurrences of each unresolved answer.
 
@@ -477,11 +556,16 @@ class TopNUnresolvedAnswersByFrequency(BaseCalculation):
         """
         interaction_id = state_answers_dict['interaction_id']
         if interaction_id in feconf.LINEAR_INTERACTION_IDS:
-            raise Exception('Linear interaction \'%s\' is not allowed for the calculation of top submitted answers, by frequency.' % interaction_id)
+            raise Exception(
+                'Linear interaction \'%s\' is not allowed for the calculation of top submitted answers, by frequency.'
+                % interaction_id
+            )
         answers_with_classification: List[AnswersWithClassificationDict] = [
             {
                 'answer': ans['answer'],
-                'classification_categorization': (ans['classification_categorization']),
+                'classification_categorization': (
+                    ans['classification_categorization']
+                ),
             }
             for ans in state_answers_dict['submitted_answer_list']
         ]

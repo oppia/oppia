@@ -34,7 +34,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, exp_models, user_models
 
-(base_models, exp_models, user_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.EXPLORATION, models.Names.USER])
+(base_models, exp_models, user_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.EXPLORATION, models.Names.USER]
+)
 
 
 class ExplorationSnapshotContentModelTests(test_utils.GenericTestBase):
@@ -64,7 +66,9 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         exp_services.save_new_exploration('id', exploration)
 
         self.assertEqual(exp_models.ExplorationModel.get_exploration_count(), 1)
-        saved_exploration: exp_models.ExplorationModel = exp_models.ExplorationModel.get_all().fetch(limit=1)[0]
+        saved_exploration: exp_models.ExplorationModel = (
+            exp_models.ExplorationModel.get_all().fetch(limit=1)[0]
+        )
         self.assertEqual(saved_exploration.title, 'A Title')
         self.assertEqual(saved_exploration.category, 'A Category')
         self.assertEqual(saved_exploration.objective, 'An Objective')
@@ -82,7 +86,9 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         snapshot_dict['skill_tags'] = ['tag1', 'tag2']
         snapshot_dict['default_skin'] = 'conversation_v1'
         snapshot_dict['skin_customizations'] = {}
-        snapshot_dict = exp_models.ExplorationModel.convert_to_valid_dict(snapshot_dict)
+        snapshot_dict = exp_models.ExplorationModel.convert_to_valid_dict(
+            snapshot_dict
+        )
         exp_model = exp_models.ExplorationModel(**snapshot_dict)
         snapshot_dict = exp_model.compute_snapshot()
         for field in ['skill_tags', 'default_skin', 'skin_customization']:
@@ -128,10 +134,26 @@ class ExplorationRightsSnapshotContentModelTests(test_utils.GenericTestBase):
             [{'cmd': rights_domain.CMD_CREATE_NEW}],
         )
 
-        self.assertTrue(exp_models.ExplorationRightsSnapshotContentModel.has_reference_to_user_id(self.USER_ID_1))
-        self.assertTrue(exp_models.ExplorationRightsSnapshotContentModel.has_reference_to_user_id(self.USER_ID_2))
-        self.assertFalse(exp_models.ExplorationRightsSnapshotContentModel.has_reference_to_user_id(self.USER_ID_COMMITTER))
-        self.assertFalse(exp_models.ExplorationRightsSnapshotContentModel.has_reference_to_user_id('x_id'))
+        self.assertTrue(
+            exp_models.ExplorationRightsSnapshotContentModel.has_reference_to_user_id(
+                self.USER_ID_1
+            )
+        )
+        self.assertTrue(
+            exp_models.ExplorationRightsSnapshotContentModel.has_reference_to_user_id(
+                self.USER_ID_2
+            )
+        )
+        self.assertFalse(
+            exp_models.ExplorationRightsSnapshotContentModel.has_reference_to_user_id(
+                self.USER_ID_COMMITTER
+            )
+        )
+        self.assertFalse(
+            exp_models.ExplorationRightsSnapshotContentModel.has_reference_to_user_id(
+                'x_id'
+            )
+        )
 
 
 class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
@@ -231,7 +253,9 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             [{'cmd': rights_domain.CMD_CREATE_NEW}],
         )
 
-        self.exp_1_dict = exp_models.ExplorationRightsModel.get_by_id(self.EXPLORATION_ID_1).to_dict()
+        self.exp_1_dict = exp_models.ExplorationRightsModel.get_by_id(
+            self.EXPLORATION_ID_1
+        ).to_dict()
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
@@ -241,10 +265,26 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self) -> None:
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
-            self.assertTrue(exp_models.ExplorationRightsModel.has_reference_to_user_id(self.USER_ID_1))
-            self.assertTrue(exp_models.ExplorationRightsModel.has_reference_to_user_id(self.USER_ID_2))
-            self.assertTrue(exp_models.ExplorationRightsModel.has_reference_to_user_id(self.USER_ID_4))
-            self.assertFalse(exp_models.ExplorationRightsModel.has_reference_to_user_id(self.USER_ID_3))
+            self.assertTrue(
+                exp_models.ExplorationRightsModel.has_reference_to_user_id(
+                    self.USER_ID_1
+                )
+            )
+            self.assertTrue(
+                exp_models.ExplorationRightsModel.has_reference_to_user_id(
+                    self.USER_ID_2
+                )
+            )
+            self.assertTrue(
+                exp_models.ExplorationRightsModel.has_reference_to_user_id(
+                    self.USER_ID_4
+                )
+            )
+            self.assertFalse(
+                exp_models.ExplorationRightsModel.has_reference_to_user_id(
+                    self.USER_ID_3
+                )
+            )
 
     def test_save(self) -> None:
         exp_models.ExplorationRightsModel(
@@ -269,12 +309,16 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(saved_model.viewer_ids, ['viewer_id'])
         self.assertEqual(
             ['editor_id', 'owner_id', 'viewer_id', 'voice_artist_id'],
-            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id('id_0-1').content_user_ids,
+            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
+                'id_0-1'
+            ).content_user_ids,
         )
 
     def test_export_data_on_highly_involved_user(self) -> None:
         """Test export data on user involved in all datastore explorations."""
-        exploration_ids = exp_models.ExplorationRightsModel.export_data(self.USER_ID_1)
+        exploration_ids = exp_models.ExplorationRightsModel.export_data(
+            self.USER_ID_1
+        )
         expected_exploration_ids = {
             'owned_exploration_ids': (
                 [
@@ -290,25 +334,33 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
                     self.EXPLORATION_ID_3,
                 ]
             ),
-            'voiced_exploration_ids': ([self.EXPLORATION_ID_1, self.EXPLORATION_ID_2]),
+            'voiced_exploration_ids': (
+                [self.EXPLORATION_ID_1, self.EXPLORATION_ID_2]
+            ),
             'viewable_exploration_ids': [self.EXPLORATION_ID_2],
         }
         self.assertEqual(expected_exploration_ids, exploration_ids)
 
     def test_export_data_on_partially_involved_user(self) -> None:
         """Test export data on user involved in some datastore explorations."""
-        exploration_ids = exp_models.ExplorationRightsModel.export_data(self.USER_ID_2)
+        exploration_ids = exp_models.ExplorationRightsModel.export_data(
+            self.USER_ID_2
+        )
         expected_exploration_ids = {
             'owned_exploration_ids': [],
             'editable_exploration_ids': [],
             'voiced_exploration_ids': [self.EXPLORATION_ID_3],
-            'viewable_exploration_ids': ([self.EXPLORATION_ID_1, self.EXPLORATION_ID_3]),
+            'viewable_exploration_ids': (
+                [self.EXPLORATION_ID_1, self.EXPLORATION_ID_3]
+            ),
         }
         self.assertEqual(expected_exploration_ids, exploration_ids)
 
     def test_export_data_on_uninvolved_user(self) -> None:
         """Test for empty lists when user has no exploration involvement."""
-        exploration_ids = exp_models.ExplorationRightsModel.export_data(self.USER_ID_3)
+        exploration_ids = exp_models.ExplorationRightsModel.export_data(
+            self.USER_ID_3
+        )
         expected_exploration_ids: Dict[str, List[str]] = {
             'owned_exploration_ids': [],
             'editable_exploration_ids': [],
@@ -319,7 +371,9 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
 
     def test_export_data_on_nonexistent_user(self) -> None:
         """Test for empty lists when user has no exploration involvement."""
-        exploration_ids = exp_models.ExplorationRightsModel.export_data('fake_user')
+        exploration_ids = exp_models.ExplorationRightsModel.export_data(
+            'fake_user'
+        )
         expected_exploration_ids: Dict[str, List[str]] = {
             'owned_exploration_ids': [],
             'editable_exploration_ids': [],
@@ -350,7 +404,9 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         snapshot_dict['translator_ids'] = ['owner_id']
         snapshot_dict['all_viewer_ids'] = []
 
-        snapshot_dict = exp_models.ExplorationRightsModel.convert_to_valid_dict(snapshot_dict)
+        snapshot_dict = exp_models.ExplorationRightsModel.convert_to_valid_dict(
+            snapshot_dict
+        )
 
         exp_rights_model = exp_models.ExplorationRightsModel(**snapshot_dict)
 
@@ -396,7 +452,9 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         self.excluded_fields = ['created_on', 'last_updated', 'version']
         # Here copy.deepcopy is needed to mitigate
         # https://github.com/googlecloudplatform/datastore-ndb-python/issues/208
-        self.original_dict = copy.deepcopy(self.exploration_model.to_dict(exclude=self.excluded_fields))
+        self.original_dict = copy.deepcopy(
+            self.exploration_model.to_dict(exclude=self.excluded_fields)
+        )
         self.exploration_model.owner_ids = [self.USER_ID_1, self.USER_ID_3]
         self.exploration_model.save(
             self.USER_ID_COMMITTER,
@@ -410,9 +468,13 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
                 }
             ],
         )
-        self.allow_revert_swap = self.swap(exp_models.ExplorationRightsModel, 'ALLOW_REVERT', True)
+        self.allow_revert_swap = self.swap(
+            exp_models.ExplorationRightsModel, 'ALLOW_REVERT', True
+        )
 
-        exploration_rights_allowed_commands = copy.deepcopy(feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS)
+        exploration_rights_allowed_commands = copy.deepcopy(
+            feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS
+        )
         exploration_rights_allowed_commands.append(
             {
                 'name': feconf.CMD_REVERT_COMMIT,
@@ -431,8 +493,12 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
 
     def test_revert_to_valid_version_is_successful(self) -> None:
         with self.allow_revert_swap, self.allowed_commands_swap:
-            exp_models.ExplorationRightsModel.revert(self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
-        new_collection_model = exp_models.ExplorationRightsModel.get_by_id(self.EXPLORATION_ID_1)
+            exp_models.ExplorationRightsModel.revert(
+                self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1
+            )
+        new_collection_model = exp_models.ExplorationRightsModel.get_by_id(
+            self.EXPLORATION_ID_1
+        )
         self.assertDictEqual(
             self.original_dict,
             new_collection_model.to_dict(exclude=self.excluded_fields),
@@ -448,14 +514,24 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
             self.USER_ID_3,
         ]
 
-        snapshot_model = exp_models.ExplorationRightsSnapshotContentModel.get_by_id(exp_models.ExplorationRightsModel.get_snapshot_id(self.EXPLORATION_ID_1, 1))
+        snapshot_model = (
+            exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
+                exp_models.ExplorationRightsModel.get_snapshot_id(
+                    self.EXPLORATION_ID_1, 1
+                )
+            )
+        )
         snapshot_model.content = broken_dict
         snapshot_model.update_timestamps()
         snapshot_model.put()
 
         with self.allow_revert_swap, self.allowed_commands_swap:
-            exp_models.ExplorationRightsModel.revert(self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
-        new_collection_model = exp_models.ExplorationRightsModel.get_by_id(self.EXPLORATION_ID_1)
+            exp_models.ExplorationRightsModel.revert(
+                self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1
+            )
+        new_collection_model = exp_models.ExplorationRightsModel.get_by_id(
+            self.EXPLORATION_ID_1
+        )
         self.assertDictEqual(
             self.original_dict,
             new_collection_model.to_dict(exclude=self.excluded_fields),
@@ -465,14 +541,24 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         broken_dict = {**self.original_dict}
         broken_dict['status'] = 'publicized'
 
-        snapshot_model = exp_models.ExplorationRightsSnapshotContentModel.get_by_id(exp_models.ExplorationRightsModel.get_snapshot_id(self.EXPLORATION_ID_1, 1))
+        snapshot_model = (
+            exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
+                exp_models.ExplorationRightsModel.get_snapshot_id(
+                    self.EXPLORATION_ID_1, 1
+                )
+            )
+        )
         snapshot_model.content = broken_dict
         snapshot_model.update_timestamps()
         snapshot_model.put()
 
         with self.allow_revert_swap, self.allowed_commands_swap:
-            exp_models.ExplorationRightsModel.revert(self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
-        new_collection_model = exp_models.ExplorationRightsModel.get_by_id(self.EXPLORATION_ID_1)
+            exp_models.ExplorationRightsModel.revert(
+                self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1
+            )
+        new_collection_model = exp_models.ExplorationRightsModel.get_by_id(
+            self.EXPLORATION_ID_1
+        )
         self.assertDictEqual(
             self.original_dict,
             new_collection_model.to_dict(exclude=self.excluded_fields),
@@ -480,9 +566,13 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
 
     def test_revert_to_check_deprecated_fields_are_absent(self) -> None:
         with self.allow_revert_swap, self.allowed_commands_swap:
-            exp_models.ExplorationRightsModel.revert(self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
+            exp_models.ExplorationRightsModel.revert(
+                self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1
+            )
 
-            exp_rights_model = exp_models.ExplorationRightsModel.get_by_id(self.EXPLORATION_ID_1)
+            exp_rights_model = exp_models.ExplorationRightsModel.get_by_id(
+                self.EXPLORATION_ID_1
+            )
 
             snapshot_dict = exp_rights_model.compute_snapshot()
 
@@ -513,8 +603,16 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         commit.exploration_id = 'b'
         commit.update_timestamps()
         commit.put()
-        self.assertTrue(exp_models.ExplorationCommitLogEntryModel.has_reference_to_user_id('committer_id'))
-        self.assertFalse(exp_models.ExplorationCommitLogEntryModel.has_reference_to_user_id('x_id'))
+        self.assertTrue(
+            exp_models.ExplorationCommitLogEntryModel.has_reference_to_user_id(
+                'committer_id'
+            )
+        )
+        self.assertFalse(
+            exp_models.ExplorationCommitLogEntryModel.has_reference_to_user_id(
+                'x_id'
+            )
+        )
 
     def test_get_all_non_private_commits(self) -> None:
         private_commit = exp_models.ExplorationCommitLogEntryModel.create(
@@ -543,11 +641,17 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         private_commit.put()
         public_commit.update_timestamps()
         public_commit.put()
-        results, _, more = exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(2, None, max_age=None)
+        results, _, more = (
+            exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(
+                2, None, max_age=None
+            )
+        )
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
 
-        with self.assertRaisesRegex(Exception, 'max_age must be a datetime.timedelta instance or None.'):
+        with self.assertRaisesRegex(
+            Exception, 'max_age must be a datetime.timedelta instance or None.'
+        ):
             # TODO(#13528): Here we use MyPy ignore because we remove this test
             # after the backend is fully type-annotated. Here ignore[arg-type]
             # is used to test method get_all_non_private_commits() for invalid
@@ -563,7 +667,11 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             )
 
         max_age = datetime.timedelta(hours=1)
-        results, _, more = exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(2, None, max_age=max_age)
+        results, _, more = (
+            exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(
+                2, None, max_age=max_age
+            )
+        )
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
 
@@ -595,7 +703,9 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         commit2.update_timestamps()
         commit2.put()
 
-        actual_models = exp_models.ExplorationCommitLogEntryModel.get_multi('a', [1, 2, 3])
+        actual_models = exp_models.ExplorationCommitLogEntryModel.get_multi(
+            'a', [1, 2, 3]
+        )
 
         # Ruling out the possibility of None for mypy type checking.
         assert actual_models[0] is not None
@@ -651,11 +761,23 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             viewer_ids=['viewer_id'],
             contributor_ids=['contributor_id'],
         ).put()
-        self.assertTrue(exp_models.ExpSummaryModel.has_reference_to_user_id('owner_id'))
-        self.assertTrue(exp_models.ExpSummaryModel.has_reference_to_user_id('editor_id'))
-        self.assertTrue(exp_models.ExpSummaryModel.has_reference_to_user_id('viewer_id'))
-        self.assertTrue(exp_models.ExpSummaryModel.has_reference_to_user_id('contributor_id'))
-        self.assertFalse(exp_models.ExpSummaryModel.has_reference_to_user_id('x_id'))
+        self.assertTrue(
+            exp_models.ExpSummaryModel.has_reference_to_user_id('owner_id')
+        )
+        self.assertTrue(
+            exp_models.ExpSummaryModel.has_reference_to_user_id('editor_id')
+        )
+        self.assertTrue(
+            exp_models.ExpSummaryModel.has_reference_to_user_id('viewer_id')
+        )
+        self.assertTrue(
+            exp_models.ExpSummaryModel.has_reference_to_user_id(
+                'contributor_id'
+            )
+        )
+        self.assertFalse(
+            exp_models.ExpSummaryModel.has_reference_to_user_id('x_id')
+        )
 
     def test_get_top_rated(self) -> None:
         good_rating_exploration_summary_model = exp_models.ExpSummaryModel(
@@ -722,7 +844,9 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         )
 
         # Test that private summaries should be ignored.
-        good_rating_exploration_summary_model.status = constants.ACTIVITY_STATUS_PRIVATE
+        good_rating_exploration_summary_model.status = (
+            constants.ACTIVITY_STATUS_PRIVATE
+        )
         good_rating_exploration_summary_model.update_timestamps()
         good_rating_exploration_summary_model.put()
         self.assertEqual(
@@ -772,7 +896,9 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         )
         unviewable_exploration_summary_model.update_timestamps()
         unviewable_exploration_summary_model.put()
-        exploration_summary_models = exp_models.ExpSummaryModel.get_private_at_least_viewable('a')
+        exploration_summary_models = (
+            exp_models.ExpSummaryModel.get_private_at_least_viewable('a')
+        )
         self.assertEqual(1, len(exploration_summary_models))
         self.assertEqual('id0', exploration_summary_models[0].id)
 
@@ -819,14 +945,20 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         uneditable_collection_summary_model.update_timestamps()
         uneditable_collection_summary_model.put()
 
-        exploration_summary_models = exp_models.ExpSummaryModel.get_at_least_editable('a')
+        exploration_summary_models = (
+            exp_models.ExpSummaryModel.get_at_least_editable('a')
+        )
         self.assertEqual(1, len(exploration_summary_models))
         self.assertEqual('id0', exploration_summary_models[0].id)
 
-        exploration_summary_models = exp_models.ExpSummaryModel.get_at_least_editable('viewer_id')
+        exploration_summary_models = (
+            exp_models.ExpSummaryModel.get_at_least_editable('viewer_id')
+        )
         self.assertEqual(0, len(exploration_summary_models))
 
-        exploration_summary_models = exp_models.ExpSummaryModel.get_at_least_editable('nonexistent_id')
+        exploration_summary_models = (
+            exp_models.ExpSummaryModel.get_at_least_editable('nonexistent_id')
+        )
         self.assertEqual(0, len(exploration_summary_models))
 
 
@@ -846,8 +978,12 @@ class ExplorationVersionHistoryModelUnitTest(test_utils.GenericTestBase):
                 'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'state_version_history': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'metadata_last_edited_version_number': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
-                'metadata_last_edited_committer_id': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                'metadata_last_edited_version_number': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'metadata_last_edited_committer_id': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
                 'committer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             }
         )
@@ -865,7 +1001,9 @@ class ExplorationVersionHistoryModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_instance_id(self) -> None:
         expected_instance_id = 'exp1.2'
-        actual_instance_id = exp_models.ExplorationVersionHistoryModel.get_instance_id('exp1', 2)
+        actual_instance_id = (
+            exp_models.ExplorationVersionHistoryModel.get_instance_id('exp1', 2)
+        )
 
         self.assertEqual(actual_instance_id, expected_instance_id)
 
@@ -876,7 +1014,9 @@ class ExplorationVersionHistoryModelUnitTest(test_utils.GenericTestBase):
             state_version_history={
                 feconf.DEFAULT_INIT_STATE_NAME: {
                     'previously_edited_in_version': 1,
-                    'state_name_in_previous_version': (feconf.DEFAULT_INIT_STATE_NAME),
+                    'state_name_in_previous_version': (
+                        feconf.DEFAULT_INIT_STATE_NAME
+                    ),
                     'committer_id': 'user_1',
                 }
             },
@@ -885,8 +1025,16 @@ class ExplorationVersionHistoryModelUnitTest(test_utils.GenericTestBase):
             committer_ids=['user_1'],
         ).put()
 
-        self.assertTrue(exp_models.ExplorationVersionHistoryModel.has_reference_to_user_id('user_1'))
-        self.assertFalse(exp_models.ExplorationVersionHistoryModel.has_reference_to_user_id('user_2'))
+        self.assertTrue(
+            exp_models.ExplorationVersionHistoryModel.has_reference_to_user_id(
+                'user_1'
+            )
+        )
+        self.assertFalse(
+            exp_models.ExplorationVersionHistoryModel.has_reference_to_user_id(
+                'user_2'
+            )
+        )
 
 
 class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
@@ -912,8 +1060,12 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
             'most_recently_reached_checkpoint_exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'most_recently_reached_checkpoint_state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
-        fetched_dict = exp_models.TransientCheckpointUrlModel.get_export_policy()
-        self.assertEqual(expected_dict['exploration_id'], fetched_dict['exploration_id'])
+        fetched_dict = (
+            exp_models.TransientCheckpointUrlModel.get_export_policy()
+        )
+        self.assertEqual(
+            expected_dict['exploration_id'], fetched_dict['exploration_id']
+        )
         self.assertEqual(
             expected_dict['furthest_reached_checkpoint_exp_version'],
             fetched_dict['furthest_reached_checkpoint_exp_version'],
@@ -933,15 +1085,29 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
 
     def test_create_new_object(self) -> None:
         exp_models.TransientCheckpointUrlModel.create('exp_id', 'progress_id')
-        transient_checkpoint_url_model = exp_models.TransientCheckpointUrlModel.get('progress_id', strict=True)
+        transient_checkpoint_url_model = (
+            exp_models.TransientCheckpointUrlModel.get(
+                'progress_id', strict=True
+            )
+        )
 
         # Ruling out the possibility of None for mypy type checking.
         assert transient_checkpoint_url_model is not None
-        self.assertEqual(transient_checkpoint_url_model.exploration_id, 'exp_id')
-        self.assertIsNone(transient_checkpoint_url_model.most_recently_reached_checkpoint_exp_version)
-        self.assertIsNone(transient_checkpoint_url_model.most_recently_reached_checkpoint_state_name)
-        self.assertIsNone(transient_checkpoint_url_model.furthest_reached_checkpoint_exp_version)
-        self.assertIsNone(transient_checkpoint_url_model.furthest_reached_checkpoint_state_name)
+        self.assertEqual(
+            transient_checkpoint_url_model.exploration_id, 'exp_id'
+        )
+        self.assertIsNone(
+            transient_checkpoint_url_model.most_recently_reached_checkpoint_exp_version
+        )
+        self.assertIsNone(
+            transient_checkpoint_url_model.most_recently_reached_checkpoint_state_name
+        )
+        self.assertIsNone(
+            transient_checkpoint_url_model.furthest_reached_checkpoint_exp_version
+        )
+        self.assertIsNone(
+            transient_checkpoint_url_model.furthest_reached_checkpoint_state_name
+        )
 
     def test_get_object(self) -> None:
         exp_models.TransientCheckpointUrlModel.create('exp_id', 'progress_id')
@@ -953,9 +1119,13 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
             furthest_reached_checkpoint_state_name=None,
         )
 
-        actual_model = exp_models.TransientCheckpointUrlModel.get('progress_id', strict=True)
+        actual_model = exp_models.TransientCheckpointUrlModel.get(
+            'progress_id', strict=True
+        )
 
-        self.assertEqual(actual_model.exploration_id, expected_model.exploration_id)
+        self.assertEqual(
+            actual_model.exploration_id, expected_model.exploration_id
+        )
         self.assertEqual(
             actual_model.most_recently_reached_checkpoint_exp_version,
             expected_model.most_recently_reached_checkpoint_exp_version,
@@ -975,14 +1145,20 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
 
     def test_raise_exception_by_mocking_collision(self) -> None:
         """Tests get_new_progress_id method for raising exception."""
-        transient_checkpoint_progress_model_cls = exp_models.TransientCheckpointUrlModel
+        transient_checkpoint_progress_model_cls = (
+            exp_models.TransientCheckpointUrlModel
+        )
 
         # Test get_new_progress_id method.
-        with self.assertRaisesRegex(Exception, 'New id generator is producing too many collisions.'):
+        with self.assertRaisesRegex(
+            Exception, 'New id generator is producing too many collisions.'
+        ):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
                 transient_checkpoint_progress_model_cls,
                 'get_by_id',
-                types.MethodType(lambda x, y: True, transient_checkpoint_progress_model_cls),
+                types.MethodType(
+                    lambda x, y: True, transient_checkpoint_progress_model_cls
+                ),
             ):
                 transient_checkpoint_progress_model_cls.get_new_progress_id()

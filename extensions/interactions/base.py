@@ -168,7 +168,10 @@ class BaseInteraction:
     @property
     def customization_arg_specs(self) -> List[domain.CustomizationArgSpec]:
         """The customization arg specs for the interaction."""
-        return [domain.CustomizationArgSpec(**cas) for cas in self._customization_arg_specs]
+        return [
+            domain.CustomizationArgSpec(**cas)
+            for cas in self._customization_arg_specs
+        ]
 
     @property
     def answer_visualization_specs(self) -> List[AnswerVisualizationSpecsDict]:
@@ -180,7 +183,11 @@ class BaseInteraction:
         """A list of answer visualization specs of the interaction."""
         result = []
         for spec in self._answer_visualization_specs:
-            factory_cls = visualization_registry.Registry.get_visualization_class(spec['id'])
+            factory_cls = (
+                visualization_registry.Registry.get_visualization_class(
+                    spec['id']
+                )
+            )
             result.append(
                 factory_cls(
                     spec['calculation_id'],
@@ -195,12 +202,18 @@ class BaseInteraction:
         """A copy of dependency ids of the interaction."""
         return copy.deepcopy(self._dependency_ids)
 
-    def normalize_answer(self, answer: state_domain.AcceptableCorrectAnswerTypes) -> state_domain.AcceptableCorrectAnswerTypes:
+    def normalize_answer(
+        self, answer: state_domain.AcceptableCorrectAnswerTypes
+    ) -> state_domain.AcceptableCorrectAnswerTypes:
         """Normalizes a learner's input to this interaction."""
         if self.answer_type is None:
             return None
         else:
-            answers: state_domain.AcceptableCorrectAnswerTypes = object_registry.Registry.get_object_class_by_type(self.answer_type).normalize(answer)
+            answers: state_domain.AcceptableCorrectAnswerTypes = (
+                object_registry.Registry.get_object_class_by_type(
+                    self.answer_type
+                ).normalize(answer)
+            )
             return answers
 
     @property
@@ -209,7 +222,11 @@ class BaseInteraction:
         if self._cached_rules_dict is not None:
             return self._cached_rules_dict
 
-        rules_index_dict = json.loads(constants.get_package_file_contents('extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH))
+        rules_index_dict = json.loads(
+            constants.get_package_file_contents(
+                'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH
+            )
+        )
         self._cached_rules_dict = rules_index_dict[self.id]
 
         return self._cached_rules_dict
@@ -222,7 +239,10 @@ class BaseInteraction:
         Returns:
             dict(str, str). A dict of rule names to rule descriptions.
         """
-        return {rule_name: self.rules_dict[rule_name]['description'] for rule_name in self.rules_dict}
+        return {
+            rule_name: self.rules_dict[rule_name]['description']
+            for rule_name in self.rules_dict
+        }
 
     def to_dict(self) -> BaseInteractionDict:
         """Gets a dict representing this interaction. Only default values are
@@ -262,7 +282,9 @@ class BaseInteraction:
 
         return self.rules_dict[rule_name]['description']
 
-    def get_rule_param_list(self, rule_name: str) -> List[Tuple[str, Type[objects.BaseObject]]]:
+    def get_rule_param_list(
+        self, rule_name: str
+    ) -> List[Tuple[str, Type[objects.BaseObject]]]:
         """Gets the parameter list for a given rule."""
         description = self.get_rule_description(rule_name)
 
@@ -283,11 +305,15 @@ class BaseInteraction:
 
         return param_list
 
-    def get_rule_param_type(self, rule_name: str, rule_param_name: str) -> Type[objects.BaseObject]:
+    def get_rule_param_type(
+        self, rule_name: str, rule_param_name: str
+    ) -> Type[objects.BaseObject]:
         """Gets the parameter type for a given rule parameter name."""
         rule_param_list = self.get_rule_param_list(rule_name)
 
         for param_name, param_type in rule_param_list:
             if param_name == rule_param_name:
                 return param_type
-        raise Exception('Rule %s has no param called %s' % (rule_name, rule_param_name))
+        raise Exception(
+            'Rule %s has no param called %s' % (rule_name, rule_param_name)
+        )

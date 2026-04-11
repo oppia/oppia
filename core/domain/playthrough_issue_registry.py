@@ -62,7 +62,9 @@ class Registry:
             module = importlib.import_module('.'.join(module_path_parts))
             clazz = getattr(module, issue_type)
 
-            ancestor_names = [base_class.__name__ for base_class in clazz.__bases__]
+            ancestor_names = [
+                base_class.__name__ for base_class in clazz.__bases__
+            ]
             if 'BaseExplorationIssueSpec' in ancestor_names:
                 cls._issues[clazz.__name__] = clazz()
 
@@ -79,7 +81,9 @@ class Registry:
         return list(cls._issues.values())
 
     @classmethod
-    def get_issue_by_type(cls, issue_type: str) -> base.BaseExplorationIssueSpec:
+    def get_issue_by_type(
+        cls, issue_type: str
+    ) -> base.BaseExplorationIssueSpec:
         """Gets an issue by its type.
 
         Refreshes once if the issue is not found; subsequently, throws a

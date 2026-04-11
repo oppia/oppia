@@ -50,7 +50,10 @@ def _get_new_model_id(model_class: Type[base_models.BaseModel]) -> str:
         new_id = utils.convert_to_hash(uuid.uuid4().hex, 22)
         if model_class.get(new_id, strict=False) is None:
             return new_id
-    raise RuntimeError('Failed to generate a unique ID after %d attempts' % (_MAX_ID_GENERATION_ATTEMPTS))
+    raise RuntimeError(
+        'Failed to generate a unique ID after %d attempts'
+        % (_MAX_ID_GENERATION_ATTEMPTS)
+    )
 
 
 class BeamJobState(enum.Enum):
@@ -114,7 +117,9 @@ class BeamJobRunModel(base_models.BaseModel):
     # The ID of the dataflow job this model corresponds to. If the job is run
     # synchronously, then this value will be empty.
     # https://cloud.google.com/dataflow/docs/reference/rest/v1b3/projects.jobs#resource:-job
-    dataflow_job_id = datastore_services.StringProperty(required=False, indexed=True)
+    dataflow_job_id = datastore_services.StringProperty(
+        required=False, indexed=True
+    )
     # The name of the job class that implements the job's logic.
     job_name = datastore_services.StringProperty(required=True, indexed=True)
     # The state of the job at the time the model was last updated.
@@ -162,7 +167,9 @@ class BeamJobRunModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model doesn't contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -221,7 +228,9 @@ class BeamJobRunResultModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model doesn't contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 

@@ -136,19 +136,27 @@ def normalize_against_schema(
         # them into the schema framework -- probably the latter.
         from core.domain import object_registry
 
-        obj_class = object_registry.Registry.get_object_class_by_type(schema[SCHEMA_KEY_OBJ_TYPE])
+        obj_class = object_registry.Registry.get_object_class_by_type(
+            schema[SCHEMA_KEY_OBJ_TYPE]
+        )
         if not apply_custom_validators:
-            normalized_obj = normalize_against_schema(obj, obj_class.get_schema(), apply_custom_validators=False)
+            normalized_obj = normalize_against_schema(
+                obj, obj_class.get_schema(), apply_custom_validators=False
+            )
         else:
             normalized_obj = obj_class.normalize(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
         assert isinstance(obj, dict), 'Expected dict, received %s' % obj
-        expected_dict_keys = [p[SCHEMA_KEY_NAME] for p in schema[SCHEMA_KEY_PROPERTIES]]
+        expected_dict_keys = [
+            p[SCHEMA_KEY_NAME] for p in schema[SCHEMA_KEY_PROPERTIES]
+        ]
 
         missing_keys = list(sorted(set(expected_dict_keys) - set(obj.keys())))
         extra_keys = list(sorted(set(obj.keys()) - set(expected_dict_keys)))
 
-        assert set(obj.keys()) == set(expected_dict_keys), 'Missing keys: %s, Extra keys: %s' % (missing_keys, extra_keys)
+        assert set(obj.keys()) == set(expected_dict_keys), (
+            'Missing keys: %s, Extra keys: %s' % (missing_keys, extra_keys)
+        )
 
         normalized_obj = {}
         for prop in schema[SCHEMA_KEY_PROPERTIES]:
@@ -178,20 +186,30 @@ def normalize_against_schema(
         try:
             obj = float(obj)
         except Exception as e:
-            raise Exception('Could not convert %s to float: %s' % (type(obj).__name__, obj)) from e
-        assert isinstance(obj, numbers.Real), 'Expected float, received %s' % obj
+            raise Exception(
+                'Could not convert %s to float: %s' % (type(obj).__name__, obj)
+            ) from e
+        assert isinstance(obj, numbers.Real), (
+            'Expected float, received %s' % obj
+        )
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_INT:
         try:
             obj = int(obj)
         except Exception as e:
-            raise Exception('Could not convert %s to int: %s' % (type(obj).__name__, obj)) from e
-        assert isinstance(obj, numbers.Integral), 'Expected int, received %s' % obj
+            raise Exception(
+                'Could not convert %s to int: %s' % (type(obj).__name__, obj)
+            ) from e
+        assert isinstance(obj, numbers.Integral), (
+            'Expected int, received %s' % obj
+        )
         assert isinstance(obj, int), 'Expected int, received %s' % obj
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_HTML:
         # TODO(#14028): Use just one type.
-        assert isinstance(obj, (str, bytes)), 'Expected unicode HTML string, received %s' % obj
+        assert isinstance(obj, (str, bytes)), (
+            'Expected unicode HTML string, received %s' % obj
+        )
         if isinstance(obj, bytes):
             obj = obj.decode('utf-8')
         else:
@@ -202,18 +220,30 @@ def normalize_against_schema(
         assert isinstance(obj, list), 'Expected list, received %s' % obj
         item_schema = schema[SCHEMA_KEY_ITEMS]
         if SCHEMA_KEY_LEN in schema:
-            assert len(obj) == schema[SCHEMA_KEY_LEN], 'Expected length of %s got %s' % (
-                schema[SCHEMA_KEY_LEN],
-                len(obj),
+            assert len(obj) == schema[SCHEMA_KEY_LEN], (
+                'Expected length of %s got %s'
+                % (
+                    schema[SCHEMA_KEY_LEN],
+                    len(obj),
+                )
             )
-        normalized_obj = [normalize_against_schema(item, item_schema, global_validators=global_validators) for item in obj]
+        normalized_obj = [
+            normalize_against_schema(
+                item, item_schema, global_validators=global_validators
+            )
+            for item in obj
+        ]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BASESTRING:
         # TODO(#14028): Use just one type.
-        assert isinstance(obj, (str, bytes)), 'Expected string, received %s' % obj
+        assert isinstance(obj, (str, bytes)), (
+            'Expected string, received %s' % obj
+        )
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE:
         # TODO(#14028): Use just one type.
-        assert isinstance(obj, (str, bytes)), 'Expected unicode string, received %s' % obj
+        assert isinstance(obj, (str, bytes)), (
+            'Expected unicode string, received %s' % obj
+        )
         if isinstance(obj, bytes):
             obj = obj.decode('utf-8')
         else:
@@ -222,7 +252,9 @@ def normalize_against_schema(
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE_OR_NONE:
         # TODO(#14028): Use just one type.
-        assert obj is None or isinstance(obj, (str, bytes)), 'Expected unicode string or None, received %s' % obj
+        assert obj is None or isinstance(obj, (str, bytes)), (
+            'Expected unicode string or None, received %s' % obj
+        )
         if obj is not None:
             if isinstance(obj, bytes):
                 obj = obj.decode('utf-8')
@@ -255,9 +287,12 @@ def normalize_against_schema(
         raise Exception('Invalid schema type: %s' % schema[SCHEMA_KEY_TYPE])
 
     if SCHEMA_KEY_CHOICES in schema:
-        assert normalized_obj in schema[SCHEMA_KEY_CHOICES], 'Received %s which is not in the allowed range of choices: %s' % (
-            normalized_obj,
-            schema[SCHEMA_KEY_CHOICES],
+        assert normalized_obj in schema[SCHEMA_KEY_CHOICES], (
+            'Received %s which is not in the allowed range of choices: %s'
+            % (
+                normalized_obj,
+                schema[SCHEMA_KEY_CHOICES],
+            )
         )
 
     # When type normalization is finished, apply the post-normalizers in the
@@ -266,7 +301,9 @@ def normalize_against_schema(
         for normalizer in schema[SCHEMA_KEY_POST_NORMALIZERS]:
             kwargs = dict(normalizer)
             del kwargs['id']
-            normalized_obj = Normalizers.get(normalizer['id'])(normalized_obj, **kwargs)
+            normalized_obj = Normalizers.get(normalizer['id'])(
+                normalized_obj, **kwargs
+            )
 
     # Validate the normalized object.
     if apply_custom_validators:
@@ -275,21 +312,32 @@ def normalize_against_schema(
                 kwargs = dict(validator)
                 expect_invalid_default_value = False
                 if 'expect_invalid_default_value' in kwargs:
-                    expect_invalid_default_value = kwargs['expect_invalid_default_value']
+                    expect_invalid_default_value = kwargs[
+                        'expect_invalid_default_value'
+                    ]
                     del kwargs['expect_invalid_default_value']
                 del kwargs['id']
                 validator_func = get_validator(validator['id'])
-                if not validator_func(normalized_obj, **kwargs) and not expect_invalid_default_value:
-                    raise utils.InvalidInputException('Validation failed: %s (%s) for object %s' % (validator['id'], kwargs, normalized_obj))
+                if (
+                    not validator_func(normalized_obj, **kwargs)
+                    and not expect_invalid_default_value
+                ):
+                    raise utils.InvalidInputException(
+                        'Validation failed: %s (%s) for object %s'
+                        % (validator['id'], kwargs, normalized_obj)
+                    )
 
     if global_validators is not None:
         for validator in global_validators:
             kwargs = dict(validator)
             del kwargs['id']
-            assert get_validator(validator['id'])(normalized_obj, **kwargs), 'Validation failed: %s (%s) for object %s' % (
-                validator['id'],
-                kwargs,
-                normalized_obj,
+            assert get_validator(validator['id'])(normalized_obj, **kwargs), (
+                'Validation failed: %s (%s) for object %s'
+                % (
+                    validator['id'],
+                    kwargs,
+                    normalized_obj,
+                )
             )
 
     return normalized_obj
@@ -365,11 +413,16 @@ class Normalizers:
         if obj == '':
             return obj
         url_components = urllib.parse.urlsplit(obj)
-        quoted_url_components = [urllib.parse.quote(component) for component in url_components]
+        quoted_url_components = [
+            urllib.parse.quote(component) for component in url_components
+        ]
         raw = urllib.parse.urlunsplit(quoted_url_components)
 
         acceptable = html_cleaner.filter_a('a', 'href', obj)
-        assert acceptable, 'Invalid URL: Sanitized URL should start with \'http://\' or \'https://\'; received %s' % raw
+        assert acceptable, (
+            'Invalid URL: Sanitized URL should start with \'http://\' or \'https://\'; received %s'
+            % raw
+        )
         return raw
 
     @staticmethod
@@ -575,7 +628,9 @@ class _Validators:
         if not expression_parser.is_valid_expression(obj):
             return False
 
-        expression_contains_at_least_one_variable = expression_parser.contains_at_least_one_variable(obj)
+        expression_contains_at_least_one_variable = (
+            expression_parser.contains_at_least_one_variable(obj)
+        )
         # This ensures that numeric expressions don't contain variables.
         return algebraic or not expression_contains_at_least_one_variable
 
@@ -620,7 +675,9 @@ class _Validators:
         if obj.count('=') != 1:
             return False
 
-        is_valid_algebraic_expression = get_validator('is_valid_algebraic_expression')
+        is_valid_algebraic_expression = get_validator(
+            'is_valid_algebraic_expression'
+        )
         lhs, rhs = obj.split('=')
 
         # Both sides have to be valid expressions and at least one of them has
@@ -631,8 +688,12 @@ class _Validators:
         if not lhs_is_valid or not rhs_is_valid:
             return False
 
-        lhs_contains_variable = expression_parser.contains_at_least_one_variable(lhs)
-        rhs_contains_variable = expression_parser.contains_at_least_one_variable(rhs)
+        lhs_contains_variable = (
+            expression_parser.contains_at_least_one_variable(lhs)
+        )
+        rhs_contains_variable = (
+            expression_parser.contains_at_least_one_variable(rhs)
+        )
 
         if not lhs_contains_variable and not rhs_contains_variable:
             return False
@@ -708,7 +769,9 @@ class _Validators:
             return False
 
     @staticmethod
-    def has_expected_subtitled_content_length(obj: objects.SubtitledUnicode, max_value: int) -> bool:
+    def has_expected_subtitled_content_length(
+        obj: objects.SubtitledUnicode, max_value: int
+    ) -> bool:
         """Checks if the given subtitled content length is within max value.
 
         Args:
@@ -781,8 +844,13 @@ class _Validators:
         try:
             audio = mutagen.mp3.MP3(tempbuffer)
         except mutagen.MutagenError as e:
-            raise Exception('Audio not recognized as a %s file' % extension) from e
+            raise Exception(
+                'Audio not recognized as a %s file' % extension
+            ) from e
 
         if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
-            raise Exception('Audio files must be under %s seconds in length. The uploaded file is %.2f seconds long.' % (feconf.MAX_AUDIO_FILE_LENGTH_SEC, audio.info.length))
+            raise Exception(
+                'Audio files must be under %s seconds in length. The uploaded file is %.2f seconds long.'
+                % (feconf.MAX_AUDIO_FILE_LENGTH_SEC, audio.info.length)
+            )
         return True

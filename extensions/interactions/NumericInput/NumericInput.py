@@ -31,7 +31,9 @@ class NumericInput(base.BaseInteraction):
     """Interaction for numeric input."""
 
     name: str = 'Number Input'
-    description: str = 'Allows learners to enter integers and floating point numbers.'
+    description: str = (
+        'Allows learners to enter integers and floating point numbers.'
+    )
     display_mode: str = base.DISPLAY_MODE_INLINE
     is_trainable: bool = False
     _dependency_ids: List[str] = []

@@ -191,7 +191,9 @@ class IncomingAndroidFeedbackReportHandler(
         report_obj = app_feedback_report_domain.AppFeedbackReport.from_submitted_feedback_dict(  # pylint: disable=line-too-long
             report_dict
         )
-        app_feedback_report_services.save_feedback_report_to_storage(report_obj, new_incoming_report=True)
+        app_feedback_report_services.save_feedback_report_to_storage(
+            report_obj, new_incoming_report=True
+        )
         app_feedback_report_services.store_incoming_report_stats(report_obj)
 
         return self.render_json({})

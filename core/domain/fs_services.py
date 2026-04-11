@@ -71,7 +71,9 @@ class GeneralFileSystem:
         self._validate_entity_parameters(entity_name, entity_id)
         self._assets_path = '%s/%s/assets' % (entity_name, entity_id)
 
-    def _validate_entity_parameters(self, entity_name: str, entity_id: str) -> None:
+    def _validate_entity_parameters(
+        self, entity_name: str, entity_id: str
+    ) -> None:
         """Checks whether the entity_id and entity_name passed in are valid.
 
         Args:
@@ -82,10 +84,17 @@ class GeneralFileSystem:
         Raises:
             ValidationError. When parameters passed in are invalid.
         """
-        if entity_name not in ALLOWED_ENTITY_NAMES and entity_name not in ALLOWED_SUGGESTION_IMAGE_CONTEXTS:
-            raise utils.ValidationError('Invalid entity_name received: %s.' % entity_name)
+        if (
+            entity_name not in ALLOWED_ENTITY_NAMES
+            and entity_name not in ALLOWED_SUGGESTION_IMAGE_CONTEXTS
+        ):
+            raise utils.ValidationError(
+                'Invalid entity_name received: %s.' % entity_name
+            )
         if not isinstance(entity_id, str):
-            raise utils.ValidationError('Invalid entity_id received: %s' % entity_id)
+            raise utils.ValidationError(
+                'Invalid entity_id received: %s' % entity_id
+            )
         if entity_id == '':
             raise utils.ValidationError('Entity id cannot be empty')
 
@@ -121,7 +130,9 @@ class GcsFileSystem(GeneralFileSystem):
                 required when running on Beam Dataflow, as workers cannot
                 retrieve the ID from environment variables.
         """
-        self._bucket_name = app_identity_services.get_gcs_resource_bucket_name(oppia_project_id)
+        self._bucket_name = app_identity_services.get_gcs_resource_bucket_name(
+            oppia_project_id
+        )
         super().__init__(entity_name, entity_id)
 
     def _get_gcs_file_url(self, filepath: str) -> str:
@@ -168,7 +179,9 @@ class GcsFileSystem(GeneralFileSystem):
             bool. Whether the file exists in GCS.
         """
         self._check_filepath(filepath)
-        return storage_services.isfile(self._bucket_name, self._get_gcs_file_url(filepath))
+        return storage_services.isfile(
+            self._bucket_name, self._get_gcs_file_url(filepath)
+        )
 
     def get(self, filepath: str) -> bytes:
         """Gets a file as an unencoded stream of raw bytes.
@@ -184,11 +197,15 @@ class GcsFileSystem(GeneralFileSystem):
             OSError. Given file does not exist.
         """
         if self.isfile(filepath):
-            return storage_services.get(self._bucket_name, self._get_gcs_file_url(filepath))
+            return storage_services.get(
+                self._bucket_name, self._get_gcs_file_url(filepath)
+            )
         else:
             raise IOError('File %s not found.' % (filepath))
 
-    def commit(self, filepath: str, raw_bytes: bytes, mimetype: Optional[str] = None) -> None:
+    def commit(
+        self, filepath: str, raw_bytes: bytes, mimetype: Optional[str] = None
+    ) -> None:
         """Commit raw_bytes to the relevant file in the entity's assets folder.
 
         Args:
@@ -221,7 +238,9 @@ class GcsFileSystem(GeneralFileSystem):
             OSError. Given file does not exist.
         """
         if self.isfile(filepath):
-            storage_services.delete(self._bucket_name, self._get_gcs_file_url(filepath))
+            storage_services.delete(
+                self._bucket_name, self._get_gcs_file_url(filepath)
+            )
         else:
             raise IOError('File does not exist: %s' % filepath)
 
@@ -235,7 +254,9 @@ class GcsFileSystem(GeneralFileSystem):
                 assets folder.
         """
         source_file_url = '%s/%s' % (source_assets_path, filepath)
-        storage_services.copy(self._bucket_name, source_file_url, self._get_gcs_file_url(filepath))
+        storage_services.copy(
+            self._bucket_name, source_file_url, self._get_gcs_file_url(filepath)
+        )
 
     def listdir(self, dir_name: str) -> List[str]:
         """Lists all files in a directory.
@@ -252,7 +273,10 @@ class GcsFileSystem(GeneralFileSystem):
         """
         self._check_filepath(dir_name)
         if dir_name.startswith('/') or dir_name.endswith('/'):
-            raise IOError('The dir_name should not start with / or end with / : %s' % dir_name)
+            raise IOError(
+                'The dir_name should not start with / or end with / : %s'
+                % dir_name
+            )
 
         # The trailing slash is necessary to prevent non-identical directory
         # names with the same prefix from matching, e.g. /abcd/123.png should
@@ -305,8 +329,12 @@ def save_original_and_compressed_versions_of_image(
     fs = GcsFileSystem(entity_type, entity_id)
 
     if image_is_compressible:
-        compressed_image_content = image_services.compress_image(original_image_content, 0.8)
-        micro_image_content = image_services.compress_image(original_image_content, 0.7)
+        compressed_image_content = image_services.compress_image(
+            original_image_content, 0.8
+        )
+        micro_image_content = image_services.compress_image(
+            original_image_content, 0.7
+        )
     else:
         compressed_image_content = original_image_content
         micro_image_content = original_image_content
@@ -347,7 +375,9 @@ def copy_images(
         filenames: list(str). The list of filenames to copy.
     """
     source_fs = GcsFileSystem(source_entity_type, source_entity_id)
-    destination_fs = GcsFileSystem(destination_entity_type, destination_entity_id)
+    destination_fs = GcsFileSystem(
+        destination_entity_type, destination_entity_id
+    )
     for filename in filenames:
         filename_wo_filetype = filename[: filename.rfind('.')]
         filetype = filename[filename.rfind('.') + 1 :]
@@ -357,8 +387,12 @@ def copy_images(
         )
         micro_image_filename = '%s_micro.%s' % (filename_wo_filetype, filetype)
         destination_fs.copy(source_fs.assets_path, ('image/%s' % filename))
-        destination_fs.copy(source_fs.assets_path, ('image/%s' % compressed_image_filename))
-        destination_fs.copy(source_fs.assets_path, ('image/%s' % micro_image_filename))
+        destination_fs.copy(
+            source_fs.assets_path, ('image/%s' % compressed_image_filename)
+        )
+        destination_fs.copy(
+            source_fs.assets_path, ('image/%s' % micro_image_filename)
+        )
 
 
 def validate_and_save_image(
@@ -381,7 +415,11 @@ def validate_and_save_image(
         ValidationError. Image or filename supplied fails one of the
             validation checks.
     """
-    validated_file_format = image_validation_services.validate_image_and_filename(raw_image, filename, entity_type)
+    validated_file_format = (
+        image_validation_services.validate_image_and_filename(
+            raw_image, filename, entity_type
+        )
+    )
     is_compressible = validated_file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS
     save_original_and_compressed_versions_of_image(
         filename,
@@ -416,8 +454,12 @@ def get_static_asset_url(filepath: str) -> str:
 
     # TODO(release-scripts#137): Remove once site URL is verified on all
     # servers.
-    oppia_site_url = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value)
-    logging.info('Logging OPPIA_SITE_URL_FOR_EMAILS for debugging: %s' % oppia_site_url)
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    logging.info(
+        'Logging OPPIA_SITE_URL_FOR_EMAILS for debugging: %s' % oppia_site_url
+    )
     if constants.EMULATOR_MODE:
         # By using assetsstatic the app returns the requested
         # files in assets folder by that it bypasses

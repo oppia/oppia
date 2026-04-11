@@ -35,7 +35,9 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class ChangeUserNullBiosToEmptyStringJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[user_bios_change_jobs.ChangeUserNullBiosToEmptyStringJob] = user_bios_change_jobs.ChangeUserNullBiosToEmptyStringJob
+    JOB_CLASS: Type[
+        user_bios_change_jobs.ChangeUserNullBiosToEmptyStringJob
+    ] = user_bios_change_jobs.ChangeUserNullBiosToEmptyStringJob
 
     USER_USERNAME_1: Final = 'user_1'
     USER_USERNAME_2: Final = 'user_2'
@@ -59,11 +61,17 @@ class ChangeUserNullBiosToEmptyStringJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(stdout=f"""Test Output - Username: {self.USER_USERNAME_1}, New Bio: """),  # pylint: disable=line-too-long
+                job_run_result.JobRunResult(
+                    stdout=f"""Test Output - Username: {self.USER_USERNAME_1}, New Bio: """
+                ),  # pylint: disable=line-too-long
             ]
         )
-        user_setting_model = user_models.UserSettingsModel.get_by_email('a@a.com')
-        self.assertIsNotNone(user_setting_model, """retrieve user_setting model is None""")
+        user_setting_model = user_models.UserSettingsModel.get_by_email(
+            'a@a.com'
+        )
+        self.assertIsNotNone(
+            user_setting_model, """retrieve user_setting model is None"""
+        )
         assert user_setting_model is not None
         self.assertTrue(
             isinstance(user_setting_model.user_bio, str),
@@ -82,7 +90,9 @@ class ChangeUserNullBiosToEmptyStringJobTests(job_test_utils.JobTestBase):
         self.put_multi([user])
 
         self.assert_job_output_is_empty()
-        user_setting_model = user_models.UserSettingsModel.get_by_email('b@b.com')
+        user_setting_model = user_models.UserSettingsModel.get_by_email(
+            'b@b.com'
+        )
         assert user_setting_model is not None
         self.assertEqual(
             user_setting_model.user_bio,

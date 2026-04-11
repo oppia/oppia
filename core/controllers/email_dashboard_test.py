@@ -31,7 +31,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import email_models, user_models
 
-(user_models, email_models) = models.Registry.import_models([models.Names.USER, models.Names.EMAIL])
+(user_models, email_models) = models.Registry.import_models(
+    [models.Names.USER, models.Names.EMAIL]
+)
 
 
 class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
@@ -70,13 +72,21 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
     def test_query_status_check_handler(self) -> None:
         self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
 
-        user_query_id = user_query_services.save_new_user_query(self.submitter_id, self.SAMPLE_QUERY_PARAM)
+        user_query_id = user_query_services.save_new_user_query(
+            self.submitter_id, self.SAMPLE_QUERY_PARAM
+        )
 
-        query_data = self.get_json('/querystatuscheck', params={'query_id': user_query_id})['query']
+        query_data = self.get_json(
+            '/querystatuscheck', params={'query_id': user_query_id}
+        )['query']
 
         self.assertEqual(query_data['id'], user_query_id)
-        self.assertEqual(query_data['status'], feconf.USER_QUERY_STATUS_PROCESSING)
-        self.assertEqual(query_data['submitter_username'], self.SUBMITTER_USERNAME)
+        self.assertEqual(
+            query_data['status'], feconf.USER_QUERY_STATUS_PROCESSING
+        )
+        self.assertEqual(
+            query_data['submitter_username'], self.SUBMITTER_USERNAME
+        )
         self.assertNotIn('submitter_id', query_data)
 
         self.logout()
@@ -150,20 +160,32 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         system_email_address = 'system@example.com'
         self.signup(system_email_address, 'systemUser')
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
-        user_services.update_email_preferences(self.user_a_id, True, True, True, True)
-        self.save_new_valid_exploration(self.EXP_ID_1, self.user_a_id, end_state_name='End')
+        user_services.update_email_preferences(
+            self.user_a_id, True, True, True, True
+        )
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.user_a_id, end_state_name='End'
+        )
         # User B has one created exploration.
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
         self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
-        user_services.update_email_preferences(self.user_b_id, True, True, True, True)
-        self.save_new_valid_exploration(self.EXP_ID_2, self.user_b_id, end_state_name='End')
+        user_services.update_email_preferences(
+            self.user_b_id, True, True, True, True
+        )
+        self.save_new_valid_exploration(
+            self.EXP_ID_2, self.user_b_id, end_state_name='End'
+        )
 
         # Submitter and new_submitter are submitter of query.
         self.signup(self.SUBMITTER_EMAIL, self.SUBMITTER_USERNAME)
         self.submitter_id = self.get_user_id_from_email(self.SUBMITTER_EMAIL)
         self.signup(self.NEW_SUBMITTER_EMAIL, self.NEW_SUBMITTER_USERNAME)
-        self.new_submitter_id = self.get_user_id_from_email(self.NEW_SUBMITTER_EMAIL)
-        self.set_curriculum_admins([self.SUBMITTER_USERNAME, self.NEW_SUBMITTER_USERNAME])
+        self.new_submitter_id = self.get_user_id_from_email(
+            self.NEW_SUBMITTER_EMAIL
+        )
+        self.set_curriculum_admins(
+            [self.SUBMITTER_USERNAME, self.NEW_SUBMITTER_USERNAME]
+        )
 
     @test_utils.set_platform_parameters(
         [
@@ -209,7 +231,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.logout()
 
         query_model = user_models.UserQueryModel.get_by_id(query_id)
-        self.assertEqual(query_model.query_status, feconf.USER_QUERY_STATUS_ARCHIVED)
+        self.assertEqual(
+            query_model.query_status, feconf.USER_QUERY_STATUS_ARCHIVED
+        )
         self.assertTrue(query_model.deleted)
 
         # Check that no email is sent to qualified users.
@@ -259,7 +283,8 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         )
         self.assertEqual(
             response['error'],
-            '%s is not an authorized user for this query.' % (self.NEW_SUBMITTER_USERNAME),
+            '%s is not an authorized user for this query.'
+            % (self.NEW_SUBMITTER_USERNAME),
         )
         self.logout()
 
@@ -317,13 +342,17 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.assertEqual(messages[0].html, test_email_html_body)
         self.assertEqual(messages[0].body, test_email_text_body)
 
-        all_model: Sequence[email_models.SentEmailModel] = email_models.SentEmailModel.query().fetch()
+        all_model: Sequence[email_models.SentEmailModel] = (
+            email_models.SentEmailModel.query().fetch()
+        )
         self.assertEqual(len(all_model), 1)
 
         sent_email_model = all_model[0]
         self.assertEqual(sent_email_model.subject, email_subject)
         self.assertEqual(sent_email_model.html_body, test_email_html_body)
-        self.assertEqual(sent_email_model.recipient_id, query_model.submitter_id)
+        self.assertEqual(
+            sent_email_model.recipient_id, query_model.submitter_id
+        )
         self.assertEqual(sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
         self.assertEqual(sent_email_model.intent, feconf.BULK_EMAIL_INTENT_TEST)
 
@@ -372,7 +401,8 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         )
         self.assertEqual(
             response['error'],
-            '%s is not an authorized user for this query.' % (self.NEW_SUBMITTER_USERNAME),
+            '%s is not an authorized user for this query.'
+            % (self.NEW_SUBMITTER_USERNAME),
         )
         self.logout()
 
@@ -395,19 +425,27 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
     def test_email_dashboard_data_handler(self) -> None:
         self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
 
-        response = self.get_json('/emaildashboarddatahandler', params={'num_queries_to_fetch': 1})
+        response = self.get_json(
+            '/emaildashboarddatahandler', params={'num_queries_to_fetch': 1}
+        )
         self.assertEqual(response['recent_queries'], [])
 
-        user_query_id = user_query_services.save_new_user_query(self.submitter_id, self.SAMPLE_QUERY_PARAM)
+        user_query_id = user_query_services.save_new_user_query(
+            self.submitter_id, self.SAMPLE_QUERY_PARAM
+        )
 
-        response = self.get_json('/emaildashboarddatahandler', params={'num_queries_to_fetch': 1})
+        response = self.get_json(
+            '/emaildashboarddatahandler', params={'num_queries_to_fetch': 1}
+        )
 
         self.assertEqual(len(response['recent_queries']), 1)
 
         recent_query = response['recent_queries'][0]
 
         self.assertEqual(recent_query['id'], user_query_id)
-        self.assertEqual(recent_query['status'], feconf.USER_QUERY_STATUS_PROCESSING)
+        self.assertEqual(
+            recent_query['status'], feconf.USER_QUERY_STATUS_PROCESSING
+        )
         self.assertNotIn('submitter_id', recent_query)
 
         self.logout()

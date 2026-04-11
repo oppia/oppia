@@ -28,7 +28,9 @@ from core.tests import test_utils
 # TODO(#14219): Update these tests to fully cover file change_domain.py.
 class ChangeDomainTests(test_utils.GenericTestBase):
     def test_that_domain_object_is_created_correctly(self) -> None:
-        change_object = change_domain.BaseChange({'cmd': feconf.CMD_DELETE_COMMIT})
+        change_object = change_domain.BaseChange(
+            {'cmd': feconf.CMD_DELETE_COMMIT}
+        )
         expected_change_object_dict = {'cmd': feconf.CMD_DELETE_COMMIT}
         self.assertEqual(change_object.to_dict(), expected_change_object_dict)
 
@@ -150,17 +152,25 @@ class ChangeDomainTests(test_utils.GenericTestBase):
                 'user_id_attribute_names': [],
             },
         )
-        with self.assertRaisesRegex(utils.ValidationError, 'Value for x in cmd add: bad is not allowed'):
-            change_domain.validate_cmd('add', cmd_spec, {'cmd': 'add', 'x': 'bad'})
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Value for x in cmd add: bad is not allowed'
+        ):
+            change_domain.validate_cmd(
+                'add', cmd_spec, {'cmd': 'add', 'x': 'bad'}
+            )
 
         change_domain.validate_cmd('add', cmd_spec, {'cmd': 'add', 'x': 'ok'})
 
     def test_init_with_invalid_command_raises(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError, 'Command fake is not allowed'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Command fake is not allowed'
+        ):
             change_domain.BaseChange({'cmd': 'fake'})
 
     def test_init_with_missing_cmd_key_raises(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError, 'Missing cmd key in change dict'):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Missing cmd key in change dict'
+        ):
             change_domain.BaseChange({})
 
     def test_init_with_deprecated_command_raises(self) -> None:
@@ -171,7 +181,9 @@ class ChangeDomainTests(test_utils.GenericTestBase):
 
             DEPRECATED_COMMANDS = ['old_cmd']
 
-        with self.assertRaisesRegex(utils.DeprecatedCommandError, 'Command old_cmd is deprecated'):
+        with self.assertRaisesRegex(
+            utils.DeprecatedCommandError, 'Command old_cmd is deprecated'
+        ):
             DeprecatedChange({'cmd': 'old_cmd'})
 
     def test_to_dict_and_from_dict_work_correctly(self) -> None:
@@ -396,7 +408,9 @@ class ChangeDomainTests(test_utils.GenericTestBase):
                     # during the test to verify validation behavior, and a more specific type would restrict the test scenario.
                     self.status: Any = None
 
-        change: ValidatedChange = ValidatedChange({'cmd': 'flag', 'status': 'ok'})
+        change: ValidatedChange = ValidatedChange(
+            {'cmd': 'flag', 'status': 'ok'}
+        )
         change.status = 'bad'
 
         with self.assertRaisesRegex(

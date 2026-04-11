@@ -27,7 +27,9 @@ from core.tests import test_utils
 class FirebaseProxyPageTest(test_utils.GenericTestBase):
     """Tests for FirebaseProxyPage."""
 
-    MockResponse = collections.namedtuple('MockResponse', ['headers', 'status_code', 'content'])
+    MockResponse = collections.namedtuple(
+        'MockResponse', ['headers', 'status_code', 'content']
+    )
     MOCK_FIREBASE_RESPONSE = MockResponse(
         {
             'Content-Type': 'application/json',
@@ -40,7 +42,9 @@ class FirebaseProxyPageTest(test_utils.GenericTestBase):
     MOCK_FIREBASE_DOMAIN = 'https://mock.firebaseapp.com'
 
     def test_no_firebase_domain_error_raised(self) -> None:
-        response = self.post_task('/__/auth/', {'a': 'a'}, {'b': 'b'}, expected_status_int=500)
+        response = self.post_task(
+            '/__/auth/', {'a': 'a'}, {'b': 'b'}, expected_status_int=500
+        )
         self.assertIn(b'No firebase domain found for localhost', response.body)
 
     def test_get_request_forwarded_to_firebase_proxy(self) -> None:
@@ -103,9 +107,14 @@ class FirebaseProxyPageTest(test_utils.GenericTestBase):
             response = self.post_task(url, payload, headers)
 
             for header, value in self.MOCK_FIREBASE_RESPONSE.headers.items():
-                if header.lower() in firebase.FirebaseProxyPage.RESPONSE_EXCLUDED_HEADERS:
+                if (
+                    header.lower()
+                    in firebase.FirebaseProxyPage.RESPONSE_EXCLUDED_HEADERS
+                ):
                     self.assertNotIn(header, response.headers)
                 else:
                     self.assertEqual(response.headers[header], value)
-            self.assertEqual(response.status_int, self.MOCK_FIREBASE_RESPONSE.status_code)
+            self.assertEqual(
+                response.status_int, self.MOCK_FIREBASE_RESPONSE.status_code
+            )
             self.assertEqual(response.body, self.MOCK_FIREBASE_RESPONSE.content)

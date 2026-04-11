@@ -37,7 +37,9 @@ class FlushCacheTests(job_test_utils.PipelinedTestBase):
                 """Flush cache."""
                 called_functions['flush_caches'] = True
 
-        with self.swap(caching_services, 'memory_cache_services', MockMemoryCachingServices):
+        with self.swap(
+            caching_services, 'memory_cache_services', MockMemoryCachingServices
+        ):
             self.assert_pcoll_equal(
                 self.pipeline | beam.Create(items) | cache_io.FlushCache(),
                 [None],

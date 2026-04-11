@@ -48,7 +48,9 @@ class CustomizationArgsDictWithValueList(CustomizationArgsDict):
     list_of_values: List[str]
 
 
-AllowedCustomizationArgsDict = Union[CustomizationArgsDictWithValue, CustomizationArgsDictWithValueList]
+AllowedCustomizationArgsDict = Union[
+    CustomizationArgsDictWithValue, CustomizationArgsDictWithValueList
+]
 
 
 class ParamSpecDict(TypedDict):
@@ -100,7 +102,10 @@ class ParamSpec:
 
         # Ensure the obj_type is among the supported ParamSpec types.
         if self.obj_type not in feconf.SUPPORTED_OBJ_TYPES:
-            raise utils.ValidationError('%s is not among the supported object types for parameters: {%s}.' % (self.obj_type, ', '.join(sorted(feconf.SUPPORTED_OBJ_TYPES))))
+            raise utils.ValidationError(
+                '%s is not among the supported object types for parameters: {%s}.'
+                % (self.obj_type, ', '.join(sorted(feconf.SUPPORTED_OBJ_TYPES)))
+            )
 
 
 class ParamChangeDict(TypedDict):
@@ -158,7 +163,9 @@ class ParamChange:
             subclass of BaseValueGenerator. The generator object for the
             parameter.
         """
-        return value_generators_domain.Registry.get_generator_class_by_id(self._generator_id)()
+        return value_generators_domain.Registry.get_generator_class_by_id(
+            self._generator_id
+        )()
 
     @property
     def customization_args(self) -> AllowedCustomizationArgsDict:
@@ -217,26 +224,44 @@ class ParamChange:
 
     def get_value(self, context_params: Dict[str, str]) -> str:
         """Generates a single value for a parameter change."""
-        value: str = self.generator.generate_value(context_params, **self.customization_args)
+        value: str = self.generator.generate_value(
+            context_params, **self.customization_args
+        )
         return value
 
     def validate(self) -> None:
         """Checks that the properties of this ParamChange object are valid."""
         if not isinstance(self.name, str):
-            raise utils.ValidationError('Expected param_change name to be a string, received %s' % self.name)
+            raise utils.ValidationError(
+                'Expected param_change name to be a string, received %s'
+                % self.name
+            )
         if not re.match(feconf.ALPHANUMERIC_REGEX, self.name):
-            raise utils.ValidationError('Only parameter names with characters in [a-zA-Z0-9] are accepted.')
+            raise utils.ValidationError(
+                'Only parameter names with characters in [a-zA-Z0-9] are accepted.'
+            )
 
         if not isinstance(self._generator_id, str):
-            raise utils.ValidationError('Expected generator ID to be a string, received %s ' % self._generator_id)
+            raise utils.ValidationError(
+                'Expected generator ID to be a string, received %s '
+                % self._generator_id
+            )
 
         try:
             hasattr(self, 'generator')
         except KeyError as e:
-            raise utils.ValidationError('Invalid generator ID %s' % self._generator_id) from e
+            raise utils.ValidationError(
+                'Invalid generator ID %s' % self._generator_id
+            ) from e
 
         if not isinstance(self.customization_args, dict):
-            raise utils.ValidationError('Expected a dict of customization_args, received %s' % self.customization_args)
+            raise utils.ValidationError(
+                'Expected a dict of customization_args, received %s'
+                % self.customization_args
+            )
         for arg_name in self.customization_args:
             if not isinstance(arg_name, str):
-                raise Exception('Invalid parameter change customization_arg name: %s' % arg_name)
+                raise Exception(
+                    'Invalid parameter change customization_arg name: %s'
+                    % arg_name
+                )

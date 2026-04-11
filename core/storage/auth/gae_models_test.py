@@ -28,7 +28,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import auth_models, base_models, user_models
 
-(auth_models, base_models, user_models) = models.Registry.import_models([models.Names.AUTH, models.Names.BASE_MODEL, models.Names.USER])
+(auth_models, base_models, user_models) = models.Registry.import_models(
+    [models.Names.AUTH, models.Names.BASE_MODEL, models.Names.USER]
+)
 
 
 class UserAuthDetailsModelTests(test_utils.GenericTestBase):
@@ -56,8 +58,12 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             id=self.FIREBASE_USER_ID,
             firebase_auth_id=self.FIREBASE_AUTH_ID,
         ).put()
-        auth_models.UserAuthDetailsModel(id=self.PROFILE_ID, gae_id=None, parent_user_id=self.USER_ID).put()
-        auth_models.UserAuthDetailsModel(id=self.PROFILE_2_ID, gae_id=None, parent_user_id=self.USER_ID).put()
+        auth_models.UserAuthDetailsModel(
+            id=self.PROFILE_ID, gae_id=None, parent_user_id=self.USER_ID
+        ).put()
+        auth_models.UserAuthDetailsModel(
+            id=self.PROFILE_2_ID, gae_id=None, parent_user_id=self.USER_ID
+        ).put()
 
     def test_get_deletion_policy_is_delete_at_end(self) -> None:
         self.assertEqual(
@@ -95,12 +101,16 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
     def test_export_data_trivial(self) -> None:
         """Trivial test of export_data functionality."""
 
-        exported_dict = auth_models.UserAuthDetailsModel.export_data(self.NONEXISTENT_USER_ID)
+        exported_dict = auth_models.UserAuthDetailsModel.export_data(
+            self.NONEXISTENT_USER_ID
+        )
 
         self.assertEqual(exported_dict, {})
 
     def test_export_data_nontrivial(self) -> None:
-        user_auth_model = auth_models.UserAuthDetailsModel.get_by_id(self.PROFILE_2_ID)
+        user_auth_model = auth_models.UserAuthDetailsModel.get_by_id(
+            self.PROFILE_2_ID
+        )
         self.assertIsNotNone(user_auth_model)
 
         # The parent_user_id should exist to fetch the
@@ -120,7 +130,9 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             username='user',
         ).put()
 
-        exported_dict = auth_models.UserAuthDetailsModel.export_data(self.PROFILE_2_ID)
+        exported_dict = auth_models.UserAuthDetailsModel.export_data(
+            self.PROFILE_2_ID
+        )
         expected_dict = {'parent_username': 'user'}
 
         self.assertEqual(expected_dict, exported_dict)
@@ -130,42 +142,76 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
     ) -> None:
         # Deleting a full user.
         auth_models.UserAuthDetailsModel.apply_deletion_policy(self.USER_ID)
-        self.assertIsNone(auth_models.UserAuthDetailsModel.get_by_id(self.USER_ID))
+        self.assertIsNone(
+            auth_models.UserAuthDetailsModel.get_by_id(self.USER_ID)
+        )
 
         # Deleting a profile user.
         auth_models.UserAuthDetailsModel.apply_deletion_policy(self.PROFILE_ID)
-        self.assertIsNone(auth_models.UserAuthDetailsModel.get_by_id(self.PROFILE_ID))
+        self.assertIsNone(
+            auth_models.UserAuthDetailsModel.get_by_id(self.PROFILE_ID)
+        )
 
     def test_apply_deletion_policy_nonexistent_user_raises_no_exception(
         self,
     ) -> None:
-        self.assertIsNone(auth_models.UserAuthDetailsModel.get_by_id(self.NONEXISTENT_USER_ID))
-        auth_models.UserAuthDetailsModel.apply_deletion_policy(self.NONEXISTENT_USER_ID)
+        self.assertIsNone(
+            auth_models.UserAuthDetailsModel.get_by_id(self.NONEXISTENT_USER_ID)
+        )
+        auth_models.UserAuthDetailsModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID
+        )
 
     def test_has_reference_to_existing_user_id_is_true(self) -> None:
         # For a full user.
-        self.assertTrue(auth_models.UserAuthDetailsModel.has_reference_to_user_id(self.USER_ID))
+        self.assertTrue(
+            auth_models.UserAuthDetailsModel.has_reference_to_user_id(
+                self.USER_ID
+            )
+        )
 
         # For a profile user.
-        self.assertTrue(auth_models.UserAuthDetailsModel.has_reference_to_user_id(self.PROFILE_ID))
+        self.assertTrue(
+            auth_models.UserAuthDetailsModel.has_reference_to_user_id(
+                self.PROFILE_ID
+            )
+        )
 
     def test_has_reference_to_non_existing_user_id_is_false(self) -> None:
-        self.assertFalse(auth_models.UserAuthDetailsModel.has_reference_to_user_id(self.NONEXISTENT_USER_ID))
+        self.assertFalse(
+            auth_models.UserAuthDetailsModel.has_reference_to_user_id(
+                self.NONEXISTENT_USER_ID
+            )
+        )
 
     def test_get_by_auth_id_with_invalid_auth_method_name_is_none(self) -> None:
         # For registered auth ID.
-        self.assertIsNone(auth_models.UserAuthDetailsModel.get_by_auth_id(self.NONEXISTENT_AUTH_METHOD_NAME, self.USER_GAE_ID))
+        self.assertIsNone(
+            auth_models.UserAuthDetailsModel.get_by_auth_id(
+                self.NONEXISTENT_AUTH_METHOD_NAME, self.USER_GAE_ID
+            )
+        )
 
         # For non registered auth ID.
-        self.assertIsNone(auth_models.UserAuthDetailsModel.get_by_auth_id(self.NONEXISTENT_AUTH_METHOD_NAME, self.NONREGISTERED_GAE_ID))
+        self.assertIsNone(
+            auth_models.UserAuthDetailsModel.get_by_auth_id(
+                self.NONEXISTENT_AUTH_METHOD_NAME, self.NONREGISTERED_GAE_ID
+            )
+        )
 
     def test_get_by_auth_id_for_unregistered_auth_id_is_none(self) -> None:
-        self.assertIsNone(auth_models.UserAuthDetailsModel.get_by_auth_id(feconf.GAE_AUTH_PROVIDER_ID, self.NONREGISTERED_GAE_ID))
+        self.assertIsNone(
+            auth_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.GAE_AUTH_PROVIDER_ID, self.NONREGISTERED_GAE_ID
+            )
+        )
 
     def test_get_by_auth_id_for_correct_user_id_auth_id_mapping(self) -> None:
         self.assertEqual(
             auth_models.UserAuthDetailsModel.get_by_id(self.USER_ID),
-            auth_models.UserAuthDetailsModel.get_by_auth_id(feconf.GAE_AUTH_PROVIDER_ID, self.USER_GAE_ID),
+            auth_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.GAE_AUTH_PROVIDER_ID, self.USER_GAE_ID
+            ),
         )
 
     def test_get_by_auth_id_registered_auth_id_returns_no_profile_user(
@@ -173,13 +219,17 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
     ) -> None:
         self.assertNotEqual(
             auth_models.UserAuthDetailsModel.get_by_id(self.PROFILE_ID),
-            auth_models.UserAuthDetailsModel.get_by_auth_id(feconf.GAE_AUTH_PROVIDER_ID, self.USER_GAE_ID),
+            auth_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.GAE_AUTH_PROVIDER_ID, self.USER_GAE_ID
+            ),
         )
 
     def test_get_by_firebase_auth_id_returns_correct_profile_user(self) -> None:
         self.assertEqual(
             auth_models.UserAuthDetailsModel.get_by_id(self.FIREBASE_USER_ID),
-            auth_models.UserAuthDetailsModel.get_by_auth_id(feconf.FIREBASE_AUTH_PROVIDER_ID, self.FIREBASE_AUTH_ID),
+            auth_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.FIREBASE_AUTH_PROVIDER_ID, self.FIREBASE_AUTH_ID
+            ),
         )
 
 
@@ -232,20 +282,34 @@ class UserIdentifiersModelTests(test_utils.GenericTestBase):
     ) -> None:
         # Deleting a full user.
         auth_models.UserIdentifiersModel.apply_deletion_policy(self.USER_ID)
-        self.assertIsNone(auth_models.UserIdentifiersModel.get_by_id(self.USER_ID))
+        self.assertIsNone(
+            auth_models.UserIdentifiersModel.get_by_id(self.USER_ID)
+        )
 
     def test_apply_deletion_policy_nonexistent_user_raises_no_exception(
         self,
     ) -> None:
-        self.assertIsNone(auth_models.UserIdentifiersModel.get_by_id(self.NONEXISTENT_USER_ID))
-        auth_models.UserIdentifiersModel.apply_deletion_policy(self.NONEXISTENT_USER_ID)
+        self.assertIsNone(
+            auth_models.UserIdentifiersModel.get_by_id(self.NONEXISTENT_USER_ID)
+        )
+        auth_models.UserIdentifiersModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID
+        )
 
     def test_has_reference_to_existing_user_id_is_true(self) -> None:
         # For a full user.
-        self.assertTrue(auth_models.UserIdentifiersModel.has_reference_to_user_id(self.USER_ID))
+        self.assertTrue(
+            auth_models.UserIdentifiersModel.has_reference_to_user_id(
+                self.USER_ID
+            )
+        )
 
     def test_has_reference_to_non_existing_user_id_is_false(self) -> None:
-        self.assertFalse(auth_models.UserIdentifiersModel.has_reference_to_user_id(self.NONEXISTENT_USER_ID))
+        self.assertFalse(
+            auth_models.UserIdentifiersModel.has_reference_to_user_id(
+                self.NONEXISTENT_USER_ID
+            )
+        )
 
     def test_get_by_gae_id_for_correct_user_id(self) -> None:
         self.assertEqual(
@@ -254,7 +318,9 @@ class UserIdentifiersModelTests(test_utils.GenericTestBase):
         )
 
     def test_get_by_gae_id_for_correct_user_id_marked_as_deleted(self) -> None:
-        user_identifiers_model = auth_models.UserIdentifiersModel.get_by_id(self.USER_GAE_ID)
+        user_identifiers_model = auth_models.UserIdentifiersModel.get_by_id(
+            self.USER_GAE_ID
+        )
         user_identifiers_model.deleted = True
         user_identifiers_model.update_timestamps()
         user_identifiers_model.put()
@@ -285,7 +351,9 @@ class UserIdByFirebaseAuthIdModelTests(test_utils.GenericTestBase):
         """Set up user models in storage for use in testing."""
         super().setUp()
 
-        auth_models.UserIdByFirebaseAuthIdModel(id=self.USER_AUTH_ID, user_id=self.USER_ID).put()
+        auth_models.UserIdByFirebaseAuthIdModel(
+            id=self.USER_AUTH_ID, user_id=self.USER_ID
+        ).put()
 
     def test_get_deletion_policy_is_delete_at_end(self) -> None:
         self.assertEqual(
@@ -297,25 +365,47 @@ class UserIdByFirebaseAuthIdModelTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         # Deleting a full user.
-        auth_models.UserIdByFirebaseAuthIdModel.apply_deletion_policy(self.USER_ID)
-        self.assertIsNone(auth_models.UserIdByFirebaseAuthIdModel.get(self.USER_ID, strict=False))
+        auth_models.UserIdByFirebaseAuthIdModel.apply_deletion_policy(
+            self.USER_ID
+        )
+        self.assertIsNone(
+            auth_models.UserIdByFirebaseAuthIdModel.get(
+                self.USER_ID, strict=False
+            )
+        )
 
     def test_apply_deletion_policy_nonexistent_user_raises_no_exception(
         self,
     ) -> None:
-        self.assertIsNone(auth_models.UserIdByFirebaseAuthIdModel.get(self.NONEXISTENT_USER_ID, strict=False))
-        auth_models.UserIdByFirebaseAuthIdModel.apply_deletion_policy(self.NONEXISTENT_USER_ID)
+        self.assertIsNone(
+            auth_models.UserIdByFirebaseAuthIdModel.get(
+                self.NONEXISTENT_USER_ID, strict=False
+            )
+        )
+        auth_models.UserIdByFirebaseAuthIdModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID
+        )
 
     def test_has_reference_to_existing_user_id_is_true(self) -> None:
-        self.assertTrue(auth_models.UserIdByFirebaseAuthIdModel.has_reference_to_user_id(self.USER_ID))
+        self.assertTrue(
+            auth_models.UserIdByFirebaseAuthIdModel.has_reference_to_user_id(
+                self.USER_ID
+            )
+        )
 
     def test_has_reference_to_non_existing_user_id_is_false(self) -> None:
-        self.assertFalse(auth_models.UserIdByFirebaseAuthIdModel.has_reference_to_user_id(self.NONEXISTENT_USER_ID))
+        self.assertFalse(
+            auth_models.UserIdByFirebaseAuthIdModel.has_reference_to_user_id(
+                self.NONEXISTENT_USER_ID
+            )
+        )
 
     def test_get_by_user_id_for_correct_user_id(self) -> None:
         self.assertEqual(
             auth_models.UserIdByFirebaseAuthIdModel.get(self.USER_AUTH_ID),
-            auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(self.USER_ID),
+            auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(
+                self.USER_ID
+            ),
         )
 
     def test_get_model_association_to_user(self) -> None:
@@ -354,7 +444,9 @@ class FirebaseSeedModelTests(test_utils.GenericTestBase):
         )
 
     def test_has_reference_to_existing_user_id(self) -> None:
-        self.assertFalse(auth_models.FirebaseSeedModel.has_reference_to_user_id(self.USER_ID))
+        self.assertFalse(
+            auth_models.FirebaseSeedModel.has_reference_to_user_id(self.USER_ID)
+        )
 
 
 class CsrfSecretModelUnitTests(test_utils.GenericTestBase):

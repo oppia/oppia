@@ -37,7 +37,11 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
         correct_queue_name = 'dummy_queue'
         dummy_url = '/dummy_handler'
         correct_payload = {
-            'fn_identifier': (feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS['FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS']),
+            'fn_identifier': (
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS'
+                ]
+            ),
             'args': [['1', '2', '3']],
             'kwargs': {},
         }
@@ -61,7 +65,9 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             self.assertEqual(payload, correct_payload)
             self.assertEqual(task_name, correct_task_name)
 
-        swap_create_task = self.swap(dev_mode_taskqueue_services.CLIENT, 'create_task', mock_create_task)
+        swap_create_task = self.swap(
+            dev_mode_taskqueue_services.CLIENT, 'create_task', mock_create_task
+        )
         with swap_create_task:
             dev_mode_taskqueue_services.create_http_task(
                 correct_queue_name,
@@ -75,7 +81,11 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
         dummy_url = '/dummy_handler'
         correct_port = dev_mode_taskqueue_services.GOOGLE_APP_ENGINE_PORT
         correct_payload = {
-            'fn_identifier': (feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS['FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS']),
+            'fn_identifier': (
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS'
+                ]
+            ),
             'args': [['1', '2', '3']],
             'kwargs': {},
         }
@@ -101,7 +111,9 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             headers: Dict[str, str],
             timeout: int,
         ) -> None:
-            self.assertEqual(url, 'http://localhost:%s%s' % (correct_port, dummy_url))
+            self.assertEqual(
+                url, 'http://localhost:%s%s' % (correct_port, dummy_url)
+            )
             self.assertEqual(json, correct_payload)
             self.assertEqual(headers, correct_headers)
             self.assertEqual(timeout, feconf.DEFAULT_TASKQUEUE_TIMEOUT_SECONDS)

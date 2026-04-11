@@ -31,7 +31,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import app_feedback_report_models
 
-(app_feedback_report_models,) = models.Registry.import_models([models.Names.APP_FEEDBACK_REPORT])
+(app_feedback_report_models,) = models.Registry.import_models(
+    [models.Names.APP_FEEDBACK_REPORT]
+)
 
 REPORT_JSON: app_feedback_report_domain.AndroidFeedbackReportDict = {
     'platform_type': 'android',
@@ -101,9 +103,13 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
         self._post_json_with_test_headers(self.payload, headers)
 
         report_model_class = app_feedback_report_models.AppFeedbackReportModel
-        all_reports: Sequence[app_feedback_report_models.AppFeedbackReportModel] = report_model_class.get_all().fetch()
+        all_reports: Sequence[
+            app_feedback_report_models.AppFeedbackReportModel
+        ] = report_model_class.get_all().fetch()
         self.assertEqual(len(all_reports), 1)
-        report_model: app_feedback_report_models.AppFeedbackReportModel = all_reports[0]
+        report_model: app_feedback_report_models.AppFeedbackReportModel = (
+            all_reports[0]
+        )
 
         self.assertEqual(report_model.platform, 'android')
         self.assertEqual(
@@ -148,7 +154,9 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
     # str and other types too.
     def _post_json_with_test_headers(
         self,
-        payload: Dict[str, app_feedback_report_domain.AndroidFeedbackReportDict],
+        payload: Dict[
+            str, app_feedback_report_domain.AndroidFeedbackReportDict
+        ],
         headers: Dict[str, str],
         expected_status: int = 200,
     ) -> Dict[str, Any]:

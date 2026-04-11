@@ -62,7 +62,9 @@ class Registry:
             module = importlib.import_module('.'.join(module_path_parts))
             clazz = getattr(module, action_type)
 
-            ancestor_names = [base_class.__name__ for base_class in clazz.__bases__]
+            ancestor_names = [
+                base_class.__name__ for base_class in clazz.__bases__
+            ]
             if 'BaseLearnerActionSpec' in ancestor_names:
                 cls._actions[clazz.__name__] = clazz()
 

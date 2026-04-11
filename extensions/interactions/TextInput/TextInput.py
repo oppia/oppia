@@ -76,7 +76,9 @@ class TextInput(base.BaseInteraction):
         },
         {
             'name': 'catchMisspellings',
-            'description': ('Catch Misspellings (Detect if answer is misspelled and nudge the learner to correct the misspelling)'),
+            'description': (
+                'Catch Misspellings (Detect if answer is misspelled and nudge the learner to correct the misspelling)'
+            ),
             'schema': {'type': 'bool'},
             'default_value': False,
         },

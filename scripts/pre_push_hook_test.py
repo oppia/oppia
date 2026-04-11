@@ -39,7 +39,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        process = subprocess.Popen(['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process = subprocess.Popen(
+            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
 
         def mock_popen(  # pylint: disable=unused-argument
             cmd_tokens: List[str],
@@ -115,13 +117,25 @@ class PrePushHookTests(test_utils.GenericTestBase):
             'get_local_git_repository_remote_name',
             mock_get_remote_name,
         )
-        self.get_refs_swap = self.swap(git_changes_utils, 'get_refs', mock_get_refs)
-        self.get_changed_files_swap = self.swap(git_changes_utils, 'get_changed_files', mock_get_changed_files)
-        self.uncommitted_files_swap = self.swap(pre_push_hook, 'has_uncommitted_files', mock_has_uncommitted_files)
+        self.get_refs_swap = self.swap(
+            git_changes_utils, 'get_refs', mock_get_refs
+        )
+        self.get_changed_files_swap = self.swap(
+            git_changes_utils, 'get_changed_files', mock_get_changed_files
+        )
+        self.uncommitted_files_swap = self.swap(
+            pre_push_hook, 'has_uncommitted_files', mock_has_uncommitted_files
+        )
         self.print_swap = self.swap(builtins, 'print', mock_print)
-        self.check_output_swap = self.swap(subprocess, 'check_output', mock_check_output)
-        self.start_linter_swap = self.swap(pre_push_hook, 'start_linter', mock_start_linter)
-        self.execute_mypy_checks_swap = self.swap(pre_push_hook, 'execute_mypy_checks', mock_execute_mypy_checks)
+        self.check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output
+        )
+        self.start_linter_swap = self.swap(
+            pre_push_hook, 'start_linter', mock_start_linter
+        )
+        self.execute_mypy_checks_swap = self.swap(
+            pre_push_hook, 'execute_mypy_checks', mock_execute_mypy_checks
+        )
         self.ts_swap = self.swap(
             pre_push_hook,
             'does_diff_include_ts_files',
@@ -143,7 +157,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_run_script_and_get_returncode(self) -> None:
         with self.popen_swap:
-            self.assertEqual(pre_push_hook.run_script_and_get_returncode(['script']), 0)
+            self.assertEqual(
+                pre_push_hook.run_script_and_get_returncode(['script']), 0
+            )
 
     def test_has_uncommitted_files(self) -> None:
         def mock_check_output(  # pylint: disable=unused-argument
@@ -151,7 +167,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
         ) -> str:
             return 'file1'
 
-        check_output_swap = self.swap(subprocess, 'check_output', mock_check_output)
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output
+        )
         with check_output_swap:
             self.assertTrue(pre_push_hook.has_uncommitted_files())
 
@@ -178,7 +196,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with islink_swap, exists_swap, subprocess_swap, self.print_swap:
             pre_push_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
-        self.assertTrue('pre-push hook file is now executable!' in self.print_arr)
+        self.assertTrue(
+            'pre-push hook file is now executable!' in self.print_arr
+        )
 
     def test_install_hook_with_error_in_making_pre_push_executable(
         self,
@@ -206,7 +226,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
                 pre_push_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
-        self.assertFalse('pre-push hook file is now executable!' in self.print_arr)
+        self.assertFalse(
+            'pre-push hook file is now executable!' in self.print_arr
+        )
 
     def test_install_hook_with_creation_of_symlink(self) -> None:
         check_function_calls = {'symlink_is_called': False}
@@ -243,8 +265,12 @@ class PrePushHookTests(test_utils.GenericTestBase):
         ):
             pre_push_hook.install_hook()
         self.assertTrue(check_function_calls['symlink_is_called'])
-        self.assertTrue('Created symlink in .git/hooks directory' in self.print_arr)
-        self.assertTrue('pre-push hook file is now executable!' in self.print_arr)
+        self.assertTrue(
+            'Created symlink in .git/hooks directory' in self.print_arr
+        )
+        self.assertTrue(
+            'pre-push hook file is now executable!' in self.print_arr
+        )
 
     def test_install_hook_with_error_in_creation_of_symlink(self) -> None:
         check_function_calls = {
@@ -289,7 +315,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 pre_push_hook.install_hook()
         self.assertEqual(check_function_calls, expected_check_function_calls)
         self.assertTrue('Copied file to .git/hooks directory' in self.print_arr)
-        self.assertTrue('pre-push hook file is now executable!' in self.print_arr)
+        self.assertTrue(
+            'pre-push hook file is now executable!' in self.print_arr
+        )
 
     def test_install_hook_with_broken_symlink(self) -> None:
         check_function_calls = {
@@ -330,19 +358,45 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.assertTrue(check_function_calls['unlink_is_called'])
         self.assertTrue(check_function_calls['symlink_is_called'])
         self.assertTrue('Removing broken symlink' in self.print_arr)
-        self.assertTrue('pre-push hook file is now executable!' in self.print_arr)
+        self.assertTrue(
+            'pre-push hook file is now executable!' in self.print_arr
+        )
 
     def test_does_diff_include_ts_files(self) -> None:
-        self.assertTrue(pre_push_hook.does_diff_include_ts_files([b'file1.ts', b'file2.ts', b'file3.js']))
+        self.assertTrue(
+            pre_push_hook.does_diff_include_ts_files(
+                [b'file1.ts', b'file2.ts', b'file3.js']
+            )
+        )
 
     def test_does_diff_include_ts_files_fail(self) -> None:
-        self.assertFalse(pre_push_hook.does_diff_include_ts_files([b'file1.html', b'file2.yml', b'file3.js']))
+        self.assertFalse(
+            pre_push_hook.does_diff_include_ts_files(
+                [b'file1.html', b'file2.yml', b'file3.js']
+            )
+        )
 
     def test_does_diff_include_ci_config_or_test_files(self) -> None:
-        self.assertTrue(pre_push_hook.does_diff_include_ci_config_or_test_files([b'core/tests/ci-test-suite-configs/acceptance.json']))
-        self.assertTrue(pre_push_hook.does_diff_include_ci_config_or_test_files([b'core/tests/wdio.conf.js', b'test.html']))
-        self.assertTrue(pre_push_hook.does_diff_include_ci_config_or_test_files([b'webdriverio_desktop/test.js', b'test.html']))
-        self.assertTrue(pre_push_hook.does_diff_include_ci_config_or_test_files([b'webdriverio/test.js', b'test.js']))
+        self.assertTrue(
+            pre_push_hook.does_diff_include_ci_config_or_test_files(
+                [b'core/tests/ci-test-suite-configs/acceptance.json']
+            )
+        )
+        self.assertTrue(
+            pre_push_hook.does_diff_include_ci_config_or_test_files(
+                [b'core/tests/wdio.conf.js', b'test.html']
+            )
+        )
+        self.assertTrue(
+            pre_push_hook.does_diff_include_ci_config_or_test_files(
+                [b'webdriverio_desktop/test.js', b'test.html']
+            )
+        )
+        self.assertTrue(
+            pre_push_hook.does_diff_include_ci_config_or_test_files(
+                [b'webdriverio/test.js', b'test.js']
+            )
+        )
         self.assertTrue(
             pre_push_hook.does_diff_include_ci_config_or_test_files(
                 [
@@ -353,19 +407,28 @@ class PrePushHookTests(test_utils.GenericTestBase):
         )
 
     def test_does_diff_include_ci_config_or_test_files_fail(self) -> None:
-        self.assertFalse(pre_push_hook.does_diff_include_ci_config_or_test_files([b'file1.ts', b'file2.ts', b'file3.html']))
+        self.assertFalse(
+            pre_push_hook.does_diff_include_ci_config_or_test_files(
+                [b'file1.ts', b'file2.ts', b'file3.html']
+            )
+        )
 
     def test_repo_in_dirty_state(self) -> None:
         def mock_has_uncommitted_files() -> bool:
             return True
 
-        uncommitted_files_swap = self.swap(pre_push_hook, 'has_uncommitted_files', mock_has_uncommitted_files)
+        uncommitted_files_swap = self.swap(
+            pre_push_hook, 'has_uncommitted_files', mock_has_uncommitted_files
+        )
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.get_changed_files_swap, uncommitted_files_swap:
                 with self.assertRaisesRegex(SystemExit, '1'):
                     with self.swap_check_backend_python_libs:
                         pre_push_hook.main(args=[])
-        self.assertTrue('Your repo is in a dirty state which prevents the linting from working.\nStash your changes or commit them.\n' in self.print_arr)
+        self.assertTrue(
+            'Your repo is in a dirty state which prevents the linting from working.\nStash your changes or commit them.\n'
+            in self.print_arr
+        )
 
     def test_error_while_branch_change(self) -> None:
         def mock_check_output(
@@ -376,7 +439,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 return 'old-branch'
             raise subprocess.CalledProcessError(1, 'cmd', output='Output')
 
-        check_output_swap = self.swap(subprocess, 'check_output', mock_check_output)
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output
+        )
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.get_changed_files_swap, self.uncommitted_files_swap:
                 with check_output_swap, self.assertRaisesRegex(SystemExit, '1'):
@@ -396,7 +461,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
                         with self.assertRaisesRegex(SystemExit, '1'):
                             with self.swap_check_backend_python_libs:
                                 pre_push_hook.main(args=[])
-        self.assertTrue('Push failed, please correct the linting issues above.' in self.print_arr)
+        self.assertTrue(
+            'Push failed, please correct the linting issues above.'
+            in self.print_arr
+        )
 
     def test_mypy_check_failure(self) -> None:
         self.mypy_check_code = 1
@@ -433,7 +501,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
                             with self.assertRaisesRegex(SystemExit, '1'):
                                 with self.swap_check_backend_python_libs:
                                     pre_push_hook.main(args=[])
-        self.assertTrue('Push aborted due to failing typescript checks.' in self.print_arr)
+        self.assertTrue(
+            'Push aborted due to failing typescript checks.' in self.print_arr
+        )
 
     def test_strict_typescript_check_failiure(self) -> None:
         self.does_diff_include_ts_files = True
@@ -456,7 +526,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
                             with self.assertRaisesRegex(SystemExit, '1'):
                                 with self.swap_check_backend_python_libs:
                                     pre_push_hook.main(args=[])
-        self.assertTrue('Push aborted due to failing typescript checks in strict mode.' in self.print_arr)
+        self.assertTrue(
+            'Push aborted due to failing typescript checks in strict mode.'
+            in self.print_arr
+        )
 
     def test_backend_associated_test_file_check_failure(self) -> None:
         def mock_run_script_and_get_returncode(script: List[str]) -> int:
@@ -478,7 +551,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
                             with self.assertRaisesRegex(SystemExit, '1'):
                                 with self.swap_check_backend_python_libs:
                                     pre_push_hook.main(args=[])
-        self.assertTrue('Push failed due to some backend files lacking an associated test file.' in self.print_arr)
+        self.assertTrue(
+            'Push failed due to some backend files lacking an associated test file.'
+            in self.print_arr
+        )
 
     def test_frontend_test_failure(self) -> None:
         def mock_run_script_and_get_returncode(script: List[str]) -> int:
@@ -513,11 +589,15 @@ class PrePushHookTests(test_utils.GenericTestBase):
                                 with self.assertRaisesRegex(SystemExit, '1'):
                                     with self.swap_check_backend_python_libs:
                                         pre_push_hook.main(args=[])
-        self.assertTrue('Push aborted due to failing frontend tests.' in self.print_arr)
+        self.assertTrue(
+            'Push aborted due to failing frontend tests.' in self.print_arr
+        )
 
     def test_backend_test_failure(self) -> None:
         def mock_run_script_and_get_returncode(script: List[str]) -> int:
-            if script == pre_push_hook.BACKEND_TEST_CMDS + ['--test_targets=test.file1_test,test.file2_test']:
+            if script == pre_push_hook.BACKEND_TEST_CMDS + [
+                '--test_targets=test.file1_test,test.file2_test'
+            ]:
                 return 1
             return 0
 
@@ -545,7 +625,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
                                 with self.assertRaisesRegex(SystemExit, '1'):
                                     with self.swap_check_backend_python_libs:  # pylint: disable=line-too-long
                                         pre_push_hook.main(args=[])
-        self.assertTrue('Push aborted due to failing backend tests.' in self.print_arr)
+        self.assertTrue(
+            'Push aborted due to failing backend tests.' in self.print_arr
+        )
 
     def test_invalid_ci_config_tests_failure(self) -> None:
         self.does_diff_include_ci_config_or_test_files = True
@@ -569,7 +651,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
                                 with self.assertRaisesRegex(SystemExit, '1'):
                                     with self.swap_check_backend_python_libs:
                                         pre_push_hook.main(args=[])
-        self.assertTrue('Push aborted due to failing tests are captured in ci check.' in self.print_arr)
+        self.assertTrue(
+            'Push aborted due to failing tests are captured in ci check.'
+            in self.print_arr
+        )
 
     def test_main_with_install_arg(self) -> None:
         check_function_calls = {'install_hook_is_called': False}
@@ -679,13 +764,17 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with swap_get_mismatches, self.print_swap:
             pre_push_hook.check_for_backend_python_library_inconsistencies()
 
-        self.assertEqual(self.print_arr, ['Python dependencies consistency check succeeded.'])
+        self.assertEqual(
+            self.print_arr, ['Python dependencies consistency check succeeded.']
+        )
 
     def test_branch_is_not_changed_when_new_branch_is_same_as_the_old_branch(
         self,
     ) -> None:
         # Here we use object because we need to mock subprocess.check_output which is a built-in function.
-        with mock.patch.object(subprocess, 'check_output', autospec=True) as mock_check_output:
+        with mock.patch.object(
+            subprocess, 'check_output', autospec=True
+        ) as mock_check_output:
             mock_check_output.return_value = 'old-branch'
 
             with pre_push_hook.ChangedBranch('old-branch'):
@@ -705,14 +794,18 @@ class PrePushHookTests(test_utils.GenericTestBase):
         parse_args_swap = self.swap(
             argparse.ArgumentParser,
             'parse_args',
-            lambda *args, **kwargs: mock.Mock(install=False, remote=None, url=None),
+            lambda *args, **kwargs: mock.Mock(
+                install=False, remote=None, url=None
+            ),
         )
         get_remote_name_swap = self.swap(
             git_changes_utils,
             'get_local_git_repository_remote_name',
             lambda *args, **kwargs: 'origin',
         )
-        get_refs_swap = self.swap(git_changes_utils, 'get_refs', lambda: 'dummy_refs')
+        get_refs_swap = self.swap(
+            git_changes_utils, 'get_refs', lambda: 'dummy_refs'
+        )
         get_changed_files_swap = self.swap(
             git_changes_utils,
             'get_changed_files',
@@ -720,7 +813,9 @@ class PrePushHookTests(test_utils.GenericTestBase):
             # so the set of files to lint is empty and the linter should be skipped.
             lambda *args, **kwargs: {'feature-branch': (['modified1.py'], [])},
         )
-        has_uncommitted_files_swap = self.swap(pre_push_hook, 'has_uncommitted_files', lambda: False)
+        has_uncommitted_files_swap = self.swap(
+            pre_push_hook, 'has_uncommitted_files', lambda: False
+        )
         check_libs_swap = self.swap(
             pre_push_hook,
             'check_for_backend_python_library_inconsistencies',
@@ -732,13 +827,19 @@ class PrePushHookTests(test_utils.GenericTestBase):
         exit_mock = mock.Mock()
         mypy_mock = mock.Mock(return_value=0)
 
-        start_linter_swap = self.swap(pre_push_hook, 'start_linter', start_linter_mock)
+        start_linter_swap = self.swap(
+            pre_push_hook, 'start_linter', start_linter_mock
+        )
         mypy_swap = self.swap(pre_push_hook, 'execute_mypy_checks', mypy_mock)
-        run_script_swap = self.swap(pre_push_hook, 'run_script_and_get_returncode', run_script_mock)
+        run_script_swap = self.swap(
+            pre_push_hook, 'run_script_and_get_returncode', run_script_mock
+        )
         exit_swap = self.swap(sys, 'exit', exit_mock)
 
         mock_changed_branch = mock.MagicMock()
-        changed_branch_swap = self.swap(pre_push_hook, 'ChangedBranch', lambda _: mock_changed_branch)
+        changed_branch_swap = self.swap(
+            pre_push_hook, 'ChangedBranch', lambda _: mock_changed_branch
+        )
 
         with (
             parse_args_swap,

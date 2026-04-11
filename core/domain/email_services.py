@@ -120,11 +120,17 @@ def send_mail(
             (signifying API returned bad status code).
     """
     if not _is_email_valid(recipient_email):
-        raise ValueError('Malformed recipient email address: %s' % recipient_email)
+        raise ValueError(
+            'Malformed recipient email address: %s' % recipient_email
+        )
 
     if not _is_sender_email_valid(sender_email):
         raise ValueError('Malformed sender email address: %s' % sender_email)
-    admin_email_address = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value)
+    admin_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+        )
+    )
     assert isinstance(admin_email_address, str)
     bcc = [admin_email_address] if bcc_admin else None
 
@@ -143,7 +149,11 @@ def send_mail(
         )
     )
 
-    server_can_send_emails = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value)
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
     if server_can_send_emails:
         response = email_services.send_email_to_recipients(
             sender_email,
@@ -159,7 +169,12 @@ def send_mail(
         )
 
         if not response:
-            raise Exception(('Email to %s failed to send. Please try again later or contact us to report a bug at https://www.oppia.org/contact.') % recipient_email)
+            raise Exception(
+                (
+                    'Email to %s failed to send. Please try again later or contact us to report a bug at https://www.oppia.org/contact.'
+                )
+                % recipient_email
+            )
 
 
 def send_bulk_mail(
@@ -201,7 +216,9 @@ def send_bulk_mail(
     """
     for recipient_email in recipient_emails:
         if not _is_email_valid(recipient_email):
-            raise ValueError('Malformed recipient email address: %s' % recipient_email)
+            raise ValueError(
+                'Malformed recipient email address: %s' % recipient_email
+            )
 
     if not _is_sender_email_valid(sender_email):
         raise ValueError('Malformed sender email address: %s' % sender_email)
@@ -217,7 +234,11 @@ def send_bulk_mail(
         )
     )
 
-    server_can_send_emails = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value)
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
 
     if server_can_send_emails:
         response = email_services.send_email_to_recipients(
@@ -230,7 +251,9 @@ def send_bulk_mail(
         )
 
         if not response:
-            raise Exception('Bulk email failed to send. Please try again later or contact us to report a bug at https://www.oppia.org/contact.')
+            raise Exception(
+                'Bulk email failed to send. Please try again later or contact us to report a bug at https://www.oppia.org/contact.'
+            )
 
 
 def convert_email_to_loggable_string(
@@ -242,7 +265,9 @@ def convert_email_to_loggable_string(
     cc: Optional[List[str]] = None,
     bcc: Optional[List[str]] = None,
     reply_to: Optional[str] = None,
-    recipient_variables: Optional[Dict[str, Dict[str, Union[str, float]]]] = None,
+    recipient_variables: Optional[
+        Dict[str, Dict[str, Union[str, float]]]
+    ] = None,
     attachments: Optional[List[Dict[str, str]]] = None,
 ) -> str:
     """Generates a loggable email which can be printed to console in order
@@ -286,9 +311,13 @@ def convert_email_to_loggable_string(
         str. The loggable email string.
     """
     # Show the first 3 emails in the recipient list.
-    recipient_email_list_str = ' '.join(['%s' % (recipient_email,) for recipient_email in recipient_emails[:3]])
+    recipient_email_list_str = ' '.join(
+        ['%s' % (recipient_email,) for recipient_email in recipient_emails[:3]]
+    )
     if len(recipient_emails) > 3:
-        recipient_email_list_str += '... Total: %s emails.' % (str(len(recipient_emails)))
+        recipient_email_list_str += '... Total: %s emails.' % (
+            str(len(recipient_emails))
+        )
 
     filenames = []
     if attachments:
@@ -296,13 +325,17 @@ def convert_email_to_loggable_string(
             filenames.append(attachment['filename'])
 
     if cc:
-        cc_email_list_str = ' '.join(['%s' % (cc_email,) for cc_email in cc[:3]])
+        cc_email_list_str = ' '.join(
+            ['%s' % (cc_email,) for cc_email in cc[:3]]
+        )
         if len(cc) > 3:
             cc_email_list_str += '... Total: %s emails.' % str(len(cc))
 
     # Show the first 3 emails in bcc email list.
     if bcc:
-        bcc_email_list_str = ' '.join(['%s' % (bcc_email,) for bcc_email in bcc[:3]])
+        bcc_email_list_str = ' '.join(
+            ['%s' % (bcc_email,) for bcc_email in bcc[:3]]
+        )
         if len(bcc) > 3:
             bcc_email_list_str += '... Total: %s emails.' % str(len(bcc))
 
@@ -341,5 +374,9 @@ def convert_email_to_loggable_string(
     attachments_msg_description = """
         Attachments: %s
         """ % (', '.join(filenames) if len(filenames) > 0 else 'None')
-    loggable_msg = textwrap.dedent(msg) + textwrap.dedent(optional_msg_description) + textwrap.dedent(attachments_msg_description)
+    loggable_msg = (
+        textwrap.dedent(msg)
+        + textwrap.dedent(optional_msg_description)
+        + textwrap.dedent(attachments_msg_description)
+    )
     return loggable_msg

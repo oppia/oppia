@@ -35,7 +35,9 @@ if MYPY:
 
 
 class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[subtopic_migration_jobs.MigrateStudyGuideJob] = subtopic_migration_jobs.MigrateStudyGuideJob
+    JOB_CLASS: Type[subtopic_migration_jobs.MigrateStudyGuideJob] = (
+        subtopic_migration_jobs.MigrateStudyGuideJob
+    )
 
     TOPIC_1_ID: Final = 'topic_1_id'
     STUDY_GUIDE_1_ID: Final = 'study_guide_1_id'
@@ -44,7 +46,9 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.study_guide = study_guide_domain.StudyGuide.create_study_guide(self.subtopic_id, self.TOPIC_1_ID, 'Heading 1', '<p>Content 1</p>')
+        self.study_guide = study_guide_domain.StudyGuide.create_study_guide(
+            self.subtopic_id, self.TOPIC_1_ID, 'Heading 1', '<p>Content 1</p>'
+        )
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -70,14 +74,20 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(stdout='STUDY GUIDE PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stdout='STUDY GUIDE PROCESSED SUCCESS: 1'
+                ),
                 # Remove 'PREVIOUSLY' from the string once
                 # sections_schema_versions v2 and further are available.
-                job_run_result.JobRunResult(stdout='STUDY GUIDE PREVIOUSLY MIGRATED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stdout='STUDY GUIDE PREVIOUSLY MIGRATED SUCCESS: 1'
+                ),
             ]
         )
 
-        migrated_study_guide_model = subtopic_models.StudyGuideModel.get(self.STUDY_GUIDE_1_ID)
+        migrated_study_guide_model = subtopic_models.StudyGuideModel.get(
+            self.STUDY_GUIDE_1_ID
+        )
         self.assertEqual(
             migrated_study_guide_model.sections_schema_version,
             feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION,
@@ -115,14 +125,24 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
         )
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(stderr=('STUDY GUIDE PROCESSED ERROR: "(\'study_guide_1_id\', ValidationError(\'Invalid language code: abc\'))": 1')),
-                job_run_result.JobRunResult(stdout='STUDY GUIDE PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'STUDY GUIDE PROCESSED ERROR: "(\'study_guide_1_id\', ValidationError(\'Invalid language code: abc\'))": 1'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stdout='STUDY GUIDE PROCESSED SUCCESS: 1'
+                ),
             ]
         )
-        first_migrated_model = subtopic_models.StudyGuideModel.get(self.STUDY_GUIDE_1_ID)
+        first_migrated_model = subtopic_models.StudyGuideModel.get(
+            self.STUDY_GUIDE_1_ID
+        )
         self.assertEqual(first_migrated_model.version, 1)
 
-        second_migrated_model = subtopic_models.StudyGuideModel.get(self.STUDY_GUIDE_2_ID)
+        second_migrated_model = subtopic_models.StudyGuideModel.get(
+            self.STUDY_GUIDE_2_ID
+        )
         self.assertEqual(second_migrated_model.version, 1)
 
     def test_migrated_study_guide_is_not_migrated(self) -> None:
@@ -131,7 +151,9 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
             id=self.STUDY_GUIDE_1_ID,
             topic_id=self.TOPIC_1_ID,
             sections=[self.study_guide.sections[0].to_dict()],
-            sections_schema_version=(feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION),
+            sections_schema_version=(
+                feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION
+            ),
             language_code='en',
         )
         unmigrated_study_guide_model.update_timestamps()
@@ -143,17 +165,25 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(stdout='STUDY GUIDE PROCESSED SUCCESS: 1'),
-                job_run_result.JobRunResult(stdout='STUDY GUIDE PREVIOUSLY MIGRATED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stdout='STUDY GUIDE PROCESSED SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='STUDY GUIDE PREVIOUSLY MIGRATED SUCCESS: 1'
+                ),
             ]
         )
 
-        migrated_study_guide_model = subtopic_models.StudyGuideModel.get(self.STUDY_GUIDE_1_ID)
+        migrated_study_guide_model = subtopic_models.StudyGuideModel.get(
+            self.STUDY_GUIDE_1_ID
+        )
         self.assertEqual(migrated_study_guide_model.version, 1)
 
 
 class AuditStudyGuideMigrationJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[subtopic_migration_jobs.AuditStudyGuideMigrationJob] = subtopic_migration_jobs.AuditStudyGuideMigrationJob
+    JOB_CLASS: Type[subtopic_migration_jobs.AuditStudyGuideMigrationJob] = (
+        subtopic_migration_jobs.AuditStudyGuideMigrationJob
+    )
 
     TOPIC_1_ID: Final = 'topic_1_id'
     STUDY_GUIDE_2_ID: Final = 'study_guide_2_id'
@@ -162,7 +192,9 @@ class AuditStudyGuideMigrationJobTests(job_test_utils.JobTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.study_guide = study_guide_domain.StudyGuide.create_study_guide(self.subtopic_id, self.TOPIC_1_ID, 'Heading 1', '<p>Content 1</p>')
+        self.study_guide = study_guide_domain.StudyGuide.create_study_guide(
+            self.subtopic_id, self.TOPIC_1_ID, 'Heading 1', '<p>Content 1</p>'
+        )
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -199,14 +231,24 @@ class AuditStudyGuideMigrationJobTests(job_test_utils.JobTestBase):
         )
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(stderr=('STUDY GUIDE PROCESSED ERROR: "(\'study_guide_1_id\', ValidationError(\'Invalid language code: abc\'))": 1')),
-                job_run_result.JobRunResult(stdout='STUDY GUIDE PROCESSED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'STUDY GUIDE PROCESSED ERROR: "(\'study_guide_1_id\', ValidationError(\'Invalid language code: abc\'))": 1'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stdout='STUDY GUIDE PROCESSED SUCCESS: 1'
+                ),
             ]
         )
-        first_migrated_model = subtopic_models.StudyGuideModel.get(self.STUDY_GUIDE_1_ID)
+        first_migrated_model = subtopic_models.StudyGuideModel.get(
+            self.STUDY_GUIDE_1_ID
+        )
         self.assertEqual(first_migrated_model.version, 1)
 
-        second_migrated_model = subtopic_models.StudyGuideModel.get(self.STUDY_GUIDE_2_ID)
+        second_migrated_model = subtopic_models.StudyGuideModel.get(
+            self.STUDY_GUIDE_2_ID
+        )
         self.assertEqual(second_migrated_model.version, 1)
 
     def test_migrated_study_guide_is_not_migrated(self) -> None:
@@ -215,7 +257,9 @@ class AuditStudyGuideMigrationJobTests(job_test_utils.JobTestBase):
             id=self.STUDY_GUIDE_1_ID,
             topic_id=self.TOPIC_1_ID,
             sections=[self.study_guide.sections[0].to_dict()],
-            sections_schema_version=(feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION),
+            sections_schema_version=(
+                feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION
+            ),
             language_code='en',
         )
         unmigrated_study_guide_model.update_timestamps()
@@ -227,10 +271,16 @@ class AuditStudyGuideMigrationJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(stdout='STUDY GUIDE PROCESSED SUCCESS: 1'),
-                job_run_result.JobRunResult(stdout='STUDY GUIDE PREVIOUSLY MIGRATED SUCCESS: 1'),
+                job_run_result.JobRunResult(
+                    stdout='STUDY GUIDE PROCESSED SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='STUDY GUIDE PREVIOUSLY MIGRATED SUCCESS: 1'
+                ),
             ]
         )
 
-        migrated_study_guide_model = subtopic_models.StudyGuideModel.get(self.STUDY_GUIDE_1_ID)
+        migrated_study_guide_model = subtopic_models.StudyGuideModel.get(
+            self.STUDY_GUIDE_1_ID
+        )
         self.assertEqual(migrated_study_guide_model.version, 1)

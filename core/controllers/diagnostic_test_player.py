@@ -49,7 +49,11 @@ class DiagnosticTestQuestionsHandlerNormalizedRequestDict(TypedDict):
     excluded_question_ids: List[str]
 
 
-class DiagnosticTestQuestionsHandler(base.BaseHandler[Dict[str, str], DiagnosticTestQuestionsHandlerNormalizedRequestDict]):
+class DiagnosticTestQuestionsHandler(
+    base.BaseHandler[
+        Dict[str, str], DiagnosticTestQuestionsHandlerNormalizedRequestDict
+    ]
+):
     """Handler class to fetch the questions from the diagnostic test skills of
     the given topic ID.
     """
@@ -103,14 +107,18 @@ class DiagnosticTestQuestionsHandler(base.BaseHandler[Dict[str, str], Diagnostic
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
-            raise self.NotFoundException('No corresponding topic exists for the given topic ID.')
+            raise self.NotFoundException(
+                'No corresponding topic exists for the given topic ID.'
+            )
 
         diagnostic_test_skill_ids = topic.skill_ids_for_diagnostic_test
 
         # A dict with skill ID as key and a list with two questions as value.
         # Among the two questions, one question should be considered as the
         # main and the other should be considered as the backup.
-        skill_id_to_questions_map: Dict[str, List[question_domain.Question]] = collections.defaultdict(list)
+        skill_id_to_questions_map: Dict[str, List[question_domain.Question]] = (
+            collections.defaultdict(list)
+        )
 
         for skill_id in diagnostic_test_skill_ids:
             questions = question_services.get_questions_by_skill_ids(
@@ -137,7 +145,9 @@ class DiagnosticTestQuestionsHandler(base.BaseHandler[Dict[str, str], Diagnostic
         # and if they attempted incorrectly then the backup question will be
         # asked otherwise not. The main question and the backup question are of
         # the same difficulty.
-        skill_id_to_questions_dict: Dict[str, Dict[str, question_domain.QuestionDict]] = collections.defaultdict(dict)
+        skill_id_to_questions_dict: Dict[
+            str, Dict[str, question_domain.QuestionDict]
+        ] = collections.defaultdict(dict)
 
         for skill_id, linked_questions in skill_id_to_questions_map.items():
             if len(linked_questions) < 2:
@@ -146,7 +156,13 @@ class DiagnosticTestQuestionsHandler(base.BaseHandler[Dict[str, str], Diagnostic
             # Each diagnostic test skill contains two questions. The first
             # question is considered the main question and the second one is
             # considered the backup question.
-            skill_id_to_questions_dict[skill_id][feconf.DIAGNOSTIC_TEST_QUESTION_TYPE_MAIN] = linked_questions[0].to_dict()
-            skill_id_to_questions_dict[skill_id][feconf.DIAGNOSTIC_TEST_QUESTION_TYPE_BACKUP] = linked_questions[1].to_dict()
+            skill_id_to_questions_dict[skill_id][
+                feconf.DIAGNOSTIC_TEST_QUESTION_TYPE_MAIN
+            ] = linked_questions[0].to_dict()
+            skill_id_to_questions_dict[skill_id][
+                feconf.DIAGNOSTIC_TEST_QUESTION_TYPE_BACKUP
+            ] = linked_questions[1].to_dict()
 
-        self.render_json({'skill_id_to_questions_dict': skill_id_to_questions_dict})
+        self.render_json(
+            {'skill_id_to_questions_dict': skill_id_to_questions_dict}
+        )

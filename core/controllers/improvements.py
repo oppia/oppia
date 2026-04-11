@@ -51,7 +51,9 @@ def get_task_dict_with_username_and_profile_picture(
 
     task_entry_dict = task_entry.to_dict()
     if task_entry.resolver_id:
-        resolver_settings = user_services.get_user_settings(task_entry.resolver_id, strict=True)
+        resolver_settings = user_services.get_user_settings(
+            task_entry.resolver_id, strict=True
+        )
         task_entry_dict['resolver_username'] = resolver_settings.username
     return task_entry_dict
 
@@ -64,7 +66,11 @@ class ExplorationImprovementsHandlerNormalizedPayloadDict(TypedDict):
     task_entries: List[improvements_domain.TaskEntryDict]
 
 
-class ExplorationImprovementsHandler(base.BaseHandler[ExplorationImprovementsHandlerNormalizedPayloadDict, Dict[str, str]]):
+class ExplorationImprovementsHandler(
+    base.BaseHandler[
+        ExplorationImprovementsHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handles operations related to managing exploration improvement tasks.
 
     NOTE: Only exploration creators and editors can interface with tasks.
@@ -92,7 +98,9 @@ class ExplorationImprovementsHandler(base.BaseHandler[ExplorationImprovementsHan
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'validation_method': (domain_objects_validator.validate_task_entries),
+                        'validation_method': (
+                            domain_objects_validator.validate_task_entries
+                        ),
                     },
                 }
             }
@@ -101,11 +109,20 @@ class ExplorationImprovementsHandler(base.BaseHandler[ExplorationImprovementsHan
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id: str) -> None:
-        open_tasks, resolved_task_types_by_state_name = improvements_services.fetch_exploration_tasks(exp_fetchers.get_exploration_by_id(exploration_id))
+        open_tasks, resolved_task_types_by_state_name = (
+            improvements_services.fetch_exploration_tasks(
+                exp_fetchers.get_exploration_by_id(exploration_id)
+            )
+        )
         self.render_json(
             {
-                'open_tasks': [get_task_dict_with_username_and_profile_picture(task) for task in open_tasks],
-                'resolved_task_types_by_state_name': (resolved_task_types_by_state_name),
+                'open_tasks': [
+                    get_task_dict_with_username_and_profile_picture(task)
+                    for task in open_tasks
+                ],
+                'resolved_task_types_by_state_name': (
+                    resolved_task_types_by_state_name
+                ),
             }
         )
 
@@ -172,28 +189,39 @@ class ExplorationImprovementsHistoryHandler(
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'GET': {'cursor': {'schema': {'type': 'basestring'}, 'default_value': None}}}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'cursor': {'schema': {'type': 'basestring'}, 'default_value': None}
+        }
+    }
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id: str) -> None:
         assert self.normalized_request is not None
         urlsafe_start_cursor = self.normalized_request.get('cursor')
 
-        results, new_urlsafe_start_cursor, more = improvements_services.fetch_exploration_task_history_page(
-            exp_fetchers.get_exploration_by_id(exploration_id),
-            urlsafe_start_cursor=urlsafe_start_cursor,
+        results, new_urlsafe_start_cursor, more = (
+            improvements_services.fetch_exploration_task_history_page(
+                exp_fetchers.get_exploration_by_id(exploration_id),
+                urlsafe_start_cursor=urlsafe_start_cursor,
+            )
         )
 
         self.render_json(
             {
-                'results': [get_task_dict_with_username_and_profile_picture(task) for task in results],
+                'results': [
+                    get_task_dict_with_username_and_profile_picture(task)
+                    for task in results
+                ],
                 'cursor': new_urlsafe_start_cursor,
                 'more': more,
             }
         )
 
 
-class ExplorationImprovementsConfigHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+class ExplorationImprovementsConfigHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """Handles fetching the configuration of exploration tasks."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -217,15 +245,29 @@ class ExplorationImprovementsConfigHandler(base.BaseHandler[Dict[str, str], Dict
         self.render_json(
             {
                 'exploration_id': exploration_id,
-                'exploration_version': (exp_fetchers.get_exploration_by_id(exploration_id).version),
+                'exploration_version': (
+                    exp_fetchers.get_exploration_by_id(exploration_id).version
+                ),
                 'is_improvements_tab_enabled': (
                     feature_flag_services.is_feature_flag_enabled(
                         feature_flag_list.FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED.value,
                         self.user_id,
                     )
                 ),
-                'high_bounce_rate_task_state_bounce_rate_creation_threshold': (platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD.value)),
-                'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold': (platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD.value)),
-                'high_bounce_rate_task_minimum_exploration_starts': (platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS.value)),
+                'high_bounce_rate_task_state_bounce_rate_creation_threshold': (
+                    platform_parameter_services.get_platform_parameter_value(
+                        platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD.value
+                    )
+                ),
+                'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold': (
+                    platform_parameter_services.get_platform_parameter_value(
+                        platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD.value
+                    )
+                ),
+                'high_bounce_rate_task_minimum_exploration_starts': (
+                    platform_parameter_services.get_platform_parameter_value(
+                        platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS.value
+                    )
+                ),
             }
         )

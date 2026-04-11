@@ -38,47 +38,83 @@ if MYPY:  # pragma: no cover
 
 translate_services = models.Registry.import_translate_services()
 
-(translation_models,) = models.Registry.import_models([models.Names.TRANSLATION])
+(translation_models,) = models.Registry.import_models(
+    [models.Names.TRANSLATION]
+)
 
 
 class TranslationServiceTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
-        translation_models.MachineTranslationModel.create('en', 'es', 'text to translate', 'texto para traducir')
+        translation_models.MachineTranslationModel.create(
+            'en', 'es', 'text to translate', 'texto para traducir'
+        )
 
     def test_get_machine_translation_with_same_source_and_target_language_code(
         self,
     ) -> None:
-        translated_text = translation_services.get_and_cache_machine_translation('en', 'en', 'text to translate')
+        translated_text = (
+            translation_services.get_and_cache_machine_translation(
+                'en', 'en', 'text to translate'
+            )
+        )
         self.assertEqual(translated_text, 'text to translate')
-        translation = translation_fetchers.get_machine_translation('en', 'en', 'text to translate')
+        translation = translation_fetchers.get_machine_translation(
+            'en', 'en', 'text to translate'
+        )
         self.assertIsNone(translation)
 
     def test_machine_translation_with_non_allowlisted_language_returns_none(
         self,
     ) -> None:
-        translated_text = translation_services.get_and_cache_machine_translation('en', 'hi', 'text to translate')
+        translated_text = (
+            translation_services.get_and_cache_machine_translation(
+                'en', 'hi', 'text to translate'
+            )
+        )
         self.assertIsNone(translated_text)
-        translated_text = translation_services.get_and_cache_machine_translation('hi', 'en', 'text to translate')
+        translated_text = (
+            translation_services.get_and_cache_machine_translation(
+                'hi', 'en', 'text to translate'
+            )
+        )
         self.assertIsNone(translated_text)
         # Ensure that no translation is cached when returning none (no
         # translation found).
-        self.assertIsNone(translation_models.MachineTranslationModel.get_machine_translation('en', 'hi', 'text to translated'))
-        self.assertIsNone(translation_models.MachineTranslationModel.get_machine_translation('hi', 'en', 'text to translated'))
+        self.assertIsNone(
+            translation_models.MachineTranslationModel.get_machine_translation(
+                'en', 'hi', 'text to translated'
+            )
+        )
+        self.assertIsNone(
+            translation_models.MachineTranslationModel.get_machine_translation(
+                'hi', 'en', 'text to translated'
+            )
+        )
 
     def test_get_machine_translation_checks_datastore_first(self) -> None:
-        with self.swap_to_always_raise(translate_services.CLIENT, 'translate', error=AssertionError):
+        with self.swap_to_always_raise(
+            translate_services.CLIENT, 'translate', error=AssertionError
+        ):
             self.assertEqual(
-                translation_services.get_and_cache_machine_translation('en', 'es', 'text to translate'),
+                translation_services.get_and_cache_machine_translation(
+                    'en', 'es', 'text to translate'
+                ),
                 'texto para traducir',
             )
 
     def test_get_machine_translation_with_new_translation_saves_translation(
         self,
     ) -> None:
-        translated_text = translation_services.get_and_cache_machine_translation('en', 'fr', 'hello world')
+        translated_text = (
+            translation_services.get_and_cache_machine_translation(
+                'en', 'fr', 'hello world'
+            )
+        )
         self.assertEqual(translated_text, 'Bonjour le monde')
-        translation = translation_fetchers.get_machine_translation('en', 'fr', 'hello world')
+        translation = translation_fetchers.get_machine_translation(
+            'en', 'fr', 'hello world'
+        )
         self.assertIsNotNone(translation)
         # Ruling out the possibility of None for mypy type checking.
         assert translation is not None
@@ -98,7 +134,9 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         self.exp = self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
 
     def test_add_new_translation_creats_new_model_if_needed(self) -> None:
-        entity_translation_models: Sequence[translation_models.EntityTranslationsModel] = translation_models.EntityTranslationsModel.get_all().fetch()
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = translation_models.EntityTranslationsModel.get_all().fetch()
         self.assertEqual(len(entity_translation_models), 0)
 
         translation_services.add_new_translation(
@@ -114,7 +152,9 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             ),
         )
 
-        entity_translation_models = translation_models.EntityTranslationsModel.get_all().fetch()
+        entity_translation_models = (
+            translation_models.EntityTranslationsModel.get_all().fetch()
+        )
         self.assertEqual(len(entity_translation_models), 1)
         self.assertEqual(entity_translation_models[0].entity_id, self.EXP_ID)
         self.assertEqual(entity_translation_models[0].language_code, 'hi')
@@ -135,12 +175,16 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             ),
         )
 
-        entity_translation_models: Sequence[translation_models.EntityTranslationsModel] = translation_models.EntityTranslationsModel.get_all().fetch()
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = translation_models.EntityTranslationsModel.get_all().fetch()
         self.assertEqual(len(entity_translation_models), 1)
         entity_translation_model = entity_translation_models[0]
         self.assertEqual(entity_translation_model.entity_id, self.EXP_ID)
         self.assertEqual(entity_translation_model.language_code, 'hi')
-        self.assertEqual(list(entity_translation_model.translations), ['content_5'])
+        self.assertEqual(
+            list(entity_translation_model.translations), ['content_5']
+        )
 
         translation_services.add_new_translation(
             feconf.TranslatableEntityType.EXPLORATION,
@@ -155,7 +199,9 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             ),
         )
 
-        entity_translation_models = translation_models.EntityTranslationsModel.get_all().fetch()
+        entity_translation_models = (
+            translation_models.EntityTranslationsModel.get_all().fetch()
+        )
         self.assertEqual(len(entity_translation_models), 1)
         entity_translation_model = entity_translation_models[0]
         self.assertEqual(entity_translation_model.entity_id, self.EXP_ID)
@@ -193,7 +239,9 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             ),
         )
 
-        entity_translation_models: Sequence[translation_models.EntityTranslationsModel] = translation_models.EntityTranslationsModel.get_all().fetch()
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = translation_models.EntityTranslationsModel.get_all().fetch()
         self.assertEqual(len(entity_translation_models), 1)
         entity_translation_model = entity_translation_models[0]
         self.assertEqual(entity_translation_model.entity_version, 5)
@@ -211,11 +259,17 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
                 }
             )
         ]
-        entity_translations, _ = translation_services.compute_translation_related_change(self.exp, change_list)
+        entity_translations, _ = (
+            translation_services.compute_translation_related_change(
+                self.exp, change_list
+            )
+        )
 
         self.assertEqual(len(entity_translations), 1)
         entity_translation = entity_translations[0]
-        self.assertEqual(list(entity_translation.translations.keys()), ['content_6'])
+        self.assertEqual(
+            list(entity_translation.translations.keys()), ['content_6']
+        )
 
     def test_compute_translation_related_change_mark_translation_needs_update(
         self,
@@ -245,12 +299,17 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             ),
         )
 
-        entity_translation_models: Sequence[translation_models.EntityTranslationsModel] = translation_models.EntityTranslationsModel.get_all().fetch()
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = translation_models.EntityTranslationsModel.get_all().fetch()
         self.assertEqual(len(entity_translation_models), 1)
         entity_translation_model = entity_translation_models[0]
         self.assertEqual(entity_translation_model.entity_version, 5)
         self.assertEqual(
-            [t['needs_update'] for t in entity_translation_model.translations.values()],
+            [
+                t['needs_update']
+                for t in entity_translation_model.translations.values()
+            ],
             [False, False],
         )
 
@@ -264,12 +323,19 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             )
         ]
 
-        entity_translation_models, _ = translation_services.compute_translation_related_change(self.exp, change_list)
+        entity_translation_models, _ = (
+            translation_services.compute_translation_related_change(
+                self.exp, change_list
+            )
+        )
 
         self.assertEqual(len(entity_translation_models), 1)
         entity_translation = entity_translation_models[0]
         self.assertItemsEqual(
-            [t['needs_update'] for t in entity_translation.translations.values()],
+            [
+                t['needs_update']
+                for t in entity_translation.translations.values()
+            ],
             [False, True],
         )
 
@@ -301,12 +367,17 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             ),
         )
 
-        entity_translation_models: Sequence[translation_models.EntityTranslationsModel] = translation_models.EntityTranslationsModel.get_all().fetch()
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = translation_models.EntityTranslationsModel.get_all().fetch()
         self.assertEqual(len(entity_translation_models), 1)
         entity_translation_model = entity_translation_models[0]
         self.assertEqual(entity_translation_model.entity_version, 5)
         self.assertEqual(
-            [translation['needs_update'] for translation in entity_translation_model.translations.values()],
+            [
+                translation['needs_update']
+                for translation in entity_translation_model.translations.values()
+            ],
             [False, False],
         )
 
@@ -321,12 +392,19 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             )
         ]
 
-        entity_translation_models, _ = translation_services.compute_translation_related_change(self.exp, change_list)
+        entity_translation_models, _ = (
+            translation_services.compute_translation_related_change(
+                self.exp, change_list
+            )
+        )
 
         self.assertEqual(len(entity_translation_models), 1)
         entity_translation = entity_translation_models[0]
         self.assertItemsEqual(
-            [translation['needs_update'] for translation in entity_translation.translations.values()],
+            [
+                translation['needs_update']
+                for translation in entity_translation.translations.values()
+            ],
             [False, True],
         )
 
@@ -358,12 +436,17 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             ),
         )
 
-        entity_translation_models: Sequence[translation_models.EntityTranslationsModel] = translation_models.EntityTranslationsModel.get_all().fetch()
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = translation_models.EntityTranslationsModel.get_all().fetch()
         self.assertEqual(len(entity_translation_models), 1)
         entity_translation_model = entity_translation_models[0]
         self.assertEqual(entity_translation_model.entity_version, 5)
         self.assertEqual(
-            [t['needs_update'] for t in entity_translation_model.translations.values()],
+            [
+                t['needs_update']
+                for t in entity_translation_model.translations.values()
+            ],
             [False, False],
         )
 
@@ -383,7 +466,11 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             )
         ]
 
-        entity_translation_models, _ = translation_services.compute_translation_related_change(self.exp, change_list)
+        entity_translation_models, _ = (
+            translation_services.compute_translation_related_change(
+                self.exp, change_list
+            )
+        )
 
         self.assertEqual(len(entity_translation_models), 1)
         entity_translation = entity_translation_models[0]
@@ -420,12 +507,17 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             ),
         )
 
-        entity_translation_models: Sequence[translation_models.EntityTranslationsModel] = translation_models.EntityTranslationsModel.get_all().fetch()
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = translation_models.EntityTranslationsModel.get_all().fetch()
         self.assertEqual(len(entity_translation_models), 1)
         entity_translation_model = entity_translation_models[0]
         self.assertEqual(entity_translation_model.entity_version, 5)
         self.assertEqual(
-            [t['needs_update'] for t in entity_translation_model.translations.values()],
+            [
+                t['needs_update']
+                for t in entity_translation_model.translations.values()
+            ],
             [False, False],
         )
 
@@ -445,10 +537,16 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             )
         ]
 
-        entity_translation_models, _ = translation_services.compute_translation_related_change(self.exp, change_list)
+        entity_translation_models, _ = (
+            translation_services.compute_translation_related_change(
+                self.exp, change_list
+            )
+        )
 
         self.assertEqual(len(entity_translation_models), 2)
-        self.assertTrue('ar' in [et.language_code for et in entity_translation_models])
+        self.assertTrue(
+            'ar' in [et.language_code for et in entity_translation_models]
+        )
 
     def test_compute_translation_related_changes_upon_revert(self) -> None:
         translation_services.add_new_translation(
@@ -513,20 +611,26 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         )
 
         self.exp.version = 6
-        entity_translation_models: Sequence[translation_models.EntityTranslationsModel] = translation_models.EntityTranslationsModel.get_all().fetch()
+        entity_translation_models: Sequence[
+            translation_models.EntityTranslationsModel
+        ] = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 2)
         self.assertEqual(len(entity_translation_models[0].translations), 2)
         self.assertEqual(len(entity_translation_models[1].translations), 3)
 
         current_exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
-        entity_translation_models, _ = translation_services.compute_translation_related_changes_upon_revert(  # pylint: disable=line-too-long
-            current_exploration, 5
+        entity_translation_models, _ = (
+            translation_services.compute_translation_related_changes_upon_revert(  # pylint: disable=line-too-long
+                current_exploration, 5
+            )
         )
 
         self.assertEqual(len(entity_translation_models), 1)
         self.assertEqual(len(entity_translation_models[0].translations), 2)
-        self.assertTrue('hi' in [et.language_code for et in entity_translation_models])
+        self.assertTrue(
+            'hi' in [et.language_code for et in entity_translation_models]
+        )
 
     def test_invalid_translation_change_raise_error(self) -> None:
         translation_services.add_new_translation(
@@ -556,7 +660,9 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             Exception,
             'Invalid translation change cmd: edit_exploration_property',
         ):
-            translation_services.compute_translation_related_change(self.exp, change_list)
+            translation_services.compute_translation_related_change(
+                self.exp, change_list
+            )
 
     def test_get_displayable_translation_languages_returns_correct_items(
         self,
@@ -575,17 +681,31 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
                     False,
                 ),
             )
-        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID, 'exp title')
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'exp title'
+        )
         exp.version = 5
 
-        are_translations_displayable_swap = self.swap_to_always_return(exp, 'are_translations_displayable', True)
+        are_translations_displayable_swap = self.swap_to_always_return(
+            exp, 'are_translations_displayable', True
+        )
         with are_translations_displayable_swap:
-            observed_language_list = translation_services.get_displayable_translation_languages(feconf.TranslatableEntityType.EXPLORATION, exp)
+            observed_language_list = (
+                translation_services.get_displayable_translation_languages(
+                    feconf.TranslatableEntityType.EXPLORATION, exp
+                )
+            )
         self.assertItemsEqual(observed_language_list, expected_language_list)
 
-        are_translations_displayable_swap = self.swap_to_always_return(exp, 'are_translations_displayable', False)
+        are_translations_displayable_swap = self.swap_to_always_return(
+            exp, 'are_translations_displayable', False
+        )
         with are_translations_displayable_swap:
-            observed_language_list = translation_services.get_displayable_translation_languages(feconf.TranslatableEntityType.EXPLORATION, exp)
+            observed_language_list = (
+                translation_services.get_displayable_translation_languages(
+                    feconf.TranslatableEntityType.EXPLORATION, exp
+                )
+            )
         self.assertItemsEqual(observed_language_list, [])
 
     def test_get_languages_with_complete_translation_returns_correct_lang(
@@ -630,18 +750,24 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             ),
         )
 
-        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID, 'exp title')
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'exp title'
+        )
         init_state = exp.states[exp.init_state_name]
         init_state.content.html = 'Content for translation'
         assert init_state.interaction.default_outcome is not None
         init_state.interaction.default_outcome.feedback.html = 'Content'
         exp.version = 5
 
-        observed_language_list = translation_services.get_languages_with_complete_translation(exp)
+        observed_language_list = (
+            translation_services.get_languages_with_complete_translation(exp)
+        )
         self.assertItemsEqual(observed_language_list, expected_language_list)
 
     def test_get_translatable_text_returns_correct_dict(self) -> None:
-        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID, 'exp title')
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'exp title'
+        )
         init_state = exp.states[exp.init_state_name]
         init_state.content.html = 'Content for translation'
         assert init_state.interaction.default_outcome is not None
@@ -661,8 +787,12 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             ),
         )
 
-        observed_translatable_text = translation_services.get_translatable_text(exp, 'sq')
-        self.assertEqual(list(observed_translatable_text.keys()), ['Introduction'])
+        observed_translatable_text = translation_services.get_translatable_text(
+            exp, 'sq'
+        )
+        self.assertEqual(
+            list(observed_translatable_text.keys()), ['Introduction']
+        )
         self.assertEqual(
             list(observed_translatable_text['Introduction'].keys()),
             ['default_outcome_1'],

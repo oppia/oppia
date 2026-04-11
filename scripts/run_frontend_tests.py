@@ -86,10 +86,14 @@ def get_file_spec(file_path: str) -> str | None:
         If the file is not a TypeScript or JavaScript file, None is returned.
     """
     normalized_file_path = file_path.replace('\\', '/')
-    if normalized_file_path.startswith('core/tests/puppeteer-acceptance-tests/'):
+    if normalized_file_path.startswith(
+        'core/tests/puppeteer-acceptance-tests/'
+    ):
         return None
 
-    if file_path.endswith(('.spec.ts', '.spec.js', 'Spec.js')) and os.path.exists(file_path):
+    if file_path.endswith(
+        ('.spec.ts', '.spec.js', 'Spec.js')
+    ) and os.path.exists(file_path):
         return file_path
 
     if file_path.endswith(('.ts', '.js')):
@@ -143,19 +147,25 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             if not acmrt_files:
                 continue
 
-            files_to_run = git_changes_utils.get_js_or_ts_files_from_diff(acmrt_files)
+            files_to_run = git_changes_utils.get_js_or_ts_files_from_diff(
+                acmrt_files
+            )
             for file_path in files_to_run:
                 spec_file = get_file_spec(file_path)
                 if spec_file:
                     specs_to_run.add(spec_file)
         staged_files = git_changes_utils.get_staged_acmrt_files()
-        staged_files_to_run = git_changes_utils.get_js_or_ts_files_from_diff(staged_files)
+        staged_files_to_run = git_changes_utils.get_js_or_ts_files_from_diff(
+            staged_files
+        )
         for file_path in staged_files_to_run:
             spec_file = get_file_spec(file_path)
             if spec_file:
                 specs_to_run.add(spec_file)
 
-    if (parsed_args.specs_to_run or parsed_args.run_on_changed_files_in_branch) and not specs_to_run:
+    if (
+        parsed_args.specs_to_run or parsed_args.run_on_changed_files_in_branch
+    ) and not specs_to_run:
         print('No valid specs found to run.')
         exit_code = 0 if parsed_args.allow_no_spec else 1
         sys.exit(exit_code)
@@ -202,11 +212,17 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 print(line.decode('utf-8'), end='')
                 output_lines.append(line)
             # Download the combined-tests.js file from the web-server.
-            if 'Executed' in line.decode('utf-8') and not combined_spec_file_started_downloading and parsed_args.download_combined_frontend_spec_file:
+            if (
+                'Executed' in line.decode('utf-8')
+                and not combined_spec_file_started_downloading
+                and parsed_args.download_combined_frontend_spec_file
+            ):
                 download_task = subprocess.Popen(
                     [
                         'wget',
-                        ('http://localhost:9876/base/core/templates/combined-tests.spec.js'),
+                        (
+                            'http://localhost:9876/base/core/templates/combined-tests.spec.js'
+                        ),
                         '-P',
                         os.path.join('../karma_coverage_reports'),
                     ]
@@ -216,31 +232,43 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 download_task.wait()
                 combined_spec_file_started_downloading = True
         # Standard output is in bytes, we need to decode the line to print it.
-        concatenated_output = ''.join(line.decode('utf-8') for line in output_lines)
+        concatenated_output = ''.join(
+            line.decode('utf-8') for line in output_lines
+        )
         if download_task:
             # The result of the download is printed at the end for
             # easy access to it.
             if download_task.returncode:
                 print('Failed to download the combined-tests.spec.js file.')
             else:
-                print('Downloaded the combined-tests.spec.js file and storedin ../karma_coverage_reports')
+                print(
+                    'Downloaded the combined-tests.spec.js file and storedin ../karma_coverage_reports'
+                )
         print('Done!')
 
         if 'Trying to get the Angular injector' in concatenated_output:
-            print('If you run into the error "Trying to get the Angular injector", please see https://github.com/oppia/oppia/wiki/Frontend-unit-tests-guide#how-to-handle-common-errors for details on how to fix it.')
+            print(
+                'If you run into the error "Trying to get the Angular injector", please see https://github.com/oppia/oppia/wiki/Frontend-unit-tests-guide#how-to-handle-common-errors for details on how to fix it.'
+            )
 
         if 'Disconnected , because no message' in concatenated_output:
-            print('Detected chrome disconnected flake (#16607), so rerunning if attempts allow.')
+            print(
+                'Detected chrome disconnected flake (#16607), so rerunning if attempts allow.'
+            )
         else:
             break
 
     if parsed_args.check_coverage:
         if task.returncode:
-            sys.exit('The frontend tests failed. Please fix it before running the test coverage check.')
+            sys.exit(
+                'The frontend tests failed. Please fix it before running the test coverage check.'
+            )
         else:
             check_frontend_test_coverage_args = []
             if len(specs_to_run) > 0:
-                check_frontend_test_coverage_args.append('--files_to_check=%s' % ','.join(sorted(specs_to_run)))
+                check_frontend_test_coverage_args.append(
+                    '--files_to_check=%s' % ','.join(sorted(specs_to_run))
+                )
             check_frontend_test_coverage.main(check_frontend_test_coverage_args)
     elif task.returncode:
         sys.exit(task.returncode)

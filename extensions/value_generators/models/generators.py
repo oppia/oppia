@@ -58,5 +58,7 @@ class RandomSelector(value_generators_domain.BaseValueGenerator):
 
     default_value: str = ''
 
-    def generate_value(self, unused_context_params: Dict[str, str], list_of_values: List[str]) -> str:
+    def generate_value(
+        self, unused_context_params: Dict[str, str], list_of_values: List[str]
+    ) -> str:
         return copy.deepcopy(utils.get_random_choice(list_of_values))

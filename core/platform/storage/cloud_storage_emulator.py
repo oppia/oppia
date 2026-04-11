@@ -39,7 +39,9 @@ REDIS_CLIENT = redis.StrictRedis(  # type: ignore[type-arg]
 class EmulatorBlob:
     """Object for storing the file data."""
 
-    def __init__(self, name: str, data: Union[bytes, str], content_type: Optional[str]) -> None:
+    def __init__(
+        self, name: str, data: Union[bytes, str], content_type: Optional[str]
+    ) -> None:
         """Initialize blob.
 
         Args:
@@ -56,10 +58,16 @@ class EmulatorBlob:
         self._name = name
         # TODO(#13500): Refactor this method that only bytes are passed
         # into data.
-        self._raw_bytes = data.encode('utf-8') if isinstance(data, str) else data
+        self._raw_bytes = (
+            data.encode('utf-8') if isinstance(data, str) else data
+        )
         if content_type is None:
             guessed_content_type, _ = mimetypes.guess_type(name)
-            self._content_type = guessed_content_type if guessed_content_type else 'application/octet-stream'
+            self._content_type = (
+                guessed_content_type
+                if guessed_content_type
+                else 'application/octet-stream'
+            )
         # TODO(#13480): In some places we set 'audio/mp3' as content type, but
         # it is not a valid MIME type. This needs to be fixed in our codebase
         # and we need to validate that existing files in storage do not have
@@ -77,7 +85,9 @@ class EmulatorBlob:
             self._content_type = content_type
 
     @classmethod
-    def create_copy(cls, original_blob: EmulatorBlob, new_name: str) -> EmulatorBlob:
+    def create_copy(
+        cls, original_blob: EmulatorBlob, new_name: str
+    ) -> EmulatorBlob:
         """Create new instance of EmulatorBlob with the same values.
 
         Args:
@@ -243,7 +253,9 @@ class CloudStorageEmulator:
             list(EmulatorBlob). The list of blobs whose filepaths start with
             the given prefix.
         """
-        matching_filepaths = REDIS_CLIENT.scan_iter(match='%s*' % self._get_redis_key(prefix))
+        matching_filepaths = REDIS_CLIENT.scan_iter(
+            match='%s*' % self._get_redis_key(prefix)
+        )
 
         # Create a pipeline that is then executed at one.
         pipeline = REDIS_CLIENT.pipeline()
@@ -255,5 +267,7 @@ class CloudStorageEmulator:
 
     def reset(self) -> None:
         """Reset the emulator and remove all blobs."""
-        for key in REDIS_CLIENT.scan_iter(match='%s*' % self._get_redis_key('')):
+        for key in REDIS_CLIENT.scan_iter(
+            match='%s*' % self._get_redis_key('')
+        ):
             REDIS_CLIENT.delete(key)

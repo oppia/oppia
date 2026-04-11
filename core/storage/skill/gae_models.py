@@ -75,7 +75,9 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         return 'skill-%s-%s' % (skill_id, version)
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
@@ -108,24 +110,38 @@ class SkillModel(base_models.VersionedModel):
     # The description of the skill.
     description = datastore_services.StringProperty(required=True, indexed=True)
     # The schema version for each of the misconception dicts.
-    misconceptions_schema_version = datastore_services.IntegerProperty(required=True, indexed=True)
+    misconceptions_schema_version = datastore_services.IntegerProperty(
+        required=True, indexed=True
+    )
     # The schema version for each of the rubric dicts.
-    rubric_schema_version = datastore_services.IntegerProperty(required=True, indexed=True)
+    rubric_schema_version = datastore_services.IntegerProperty(
+        required=True, indexed=True
+    )
     # A list of misconceptions associated with the skill, in which each
     # element is a dict.
-    misconceptions = datastore_services.JsonProperty(repeated=True, indexed=False)
+    misconceptions = datastore_services.JsonProperty(
+        repeated=True, indexed=False
+    )
     # The rubrics for the skill that explain each difficulty level.
     rubrics = datastore_services.JsonProperty(repeated=True, indexed=False)
     # The ISO 639-1 code for the language this skill is written in.
-    language_code = datastore_services.StringProperty(required=True, indexed=True)
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
     # The schema version for the skill_contents.
-    skill_contents_schema_version = datastore_services.IntegerProperty(required=True, indexed=True)
+    skill_contents_schema_version = datastore_services.IntegerProperty(
+        required=True, indexed=True
+    )
     # A dict representing the skill contents.
     skill_contents = datastore_services.JsonProperty(indexed=False)
     # The prerequisite skills for the skill.
-    prerequisite_skill_ids = datastore_services.StringProperty(repeated=True, indexed=True)
+    prerequisite_skill_ids = datastore_services.StringProperty(
+        repeated=True, indexed=True
+    )
     # The id to be used by the next misconception added.
-    next_misconception_id = datastore_services.IntegerProperty(required=True, indexed=False)
+    next_misconception_id = datastore_services.IntegerProperty(
+        required=True, indexed=False
+    )
     # The id that the skill is merged into, in case the skill has been
     # marked as duplicate to another one and needs to be merged.
     # This is an optional field.
@@ -133,7 +149,9 @@ class SkillModel(base_models.VersionedModel):
     # A flag indicating whether deduplication is complete for this skill.
     # It will initially be False, and set to true only when there is a value
     # for superseding_skill_id and the merge was completed.
-    all_questions_merged = datastore_services.BooleanProperty(indexed=True, required=True)
+    all_questions_merged = datastore_services.BooleanProperty(
+        indexed=True, required=True
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -148,7 +166,14 @@ class SkillModel(base_models.VersionedModel):
             list(SkillModel). List of skill models which have been merged.
         """
 
-        return [skill for skill in cls.query() if (skill.superseding_skill_id is not None and (len(skill.superseding_skill_id) > 0))]
+        return [
+            skill
+            for skill in cls.query()
+            if (
+                skill.superseding_skill_id is not None
+                and (len(skill.superseding_skill_id) > 0)
+            )
+        ]
 
     def compute_models_to_commit(
         self,
@@ -211,7 +236,9 @@ class SkillModel(base_models.VersionedModel):
         }
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -267,17 +294,25 @@ class SkillSummaryModel(base_models.BaseModel):
     # The description of the skill.
     description = datastore_services.StringProperty(required=True, indexed=True)
     # The number of misconceptions associated with the skill.
-    misconception_count = datastore_services.IntegerProperty(required=True, indexed=True)
+    misconception_count = datastore_services.IntegerProperty(
+        required=True, indexed=True
+    )
     # The ISO 639-1 code for the language this skill is written in.
-    language_code = datastore_services.StringProperty(required=True, indexed=True)
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
     # Time when the skill model was last updated (not to be
     # confused with last_updated, which is the time when the
     # skill *summary* model was last updated).
-    skill_model_last_updated = datastore_services.DateTimeProperty(required=True, indexed=True)
+    skill_model_last_updated = datastore_services.DateTimeProperty(
+        required=True, indexed=True
+    )
     # Time when the skill model was created (not to be confused
     # with created_on, which is the time when the skill *summary*
     # model was created).
-    skill_model_created_on = datastore_services.DateTimeProperty(required=True, indexed=True)
+    skill_model_created_on = datastore_services.DateTimeProperty(
+        required=True, indexed=True
+    )
     version = datastore_services.IntegerProperty(required=True)
 
     @staticmethod
@@ -286,7 +321,9 @@ class SkillSummaryModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -334,17 +371,42 @@ class SkillSummaryModel(base_models.BaseModel):
                     this batch. If False, there are no further results
                     after this batch.
         """
-        cursor = datastore_services.make_cursor(urlsafe_cursor=urlsafe_start_cursor)
+        cursor = datastore_services.make_cursor(
+            urlsafe_cursor=urlsafe_start_cursor
+        )
         sort = -cls.skill_model_created_on
-        if sort_by == (constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['DecreasingCreatedOn']):
+        if (
+            sort_by
+            == (
+                constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                    'DecreasingCreatedOn'
+                ]
+            )
+        ):
             sort = cls.skill_model_created_on
-        elif sort_by == (constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['IncreasingUpdatedOn']):
+        elif (
+            sort_by
+            == (
+                constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                    'IncreasingUpdatedOn'
+                ]
+            )
+        ):
             sort = -cls.skill_model_last_updated
-        elif sort_by == (constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['DecreasingUpdatedOn']):
+        elif (
+            sort_by
+            == (
+                constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                    'DecreasingUpdatedOn'
+                ]
+            )
+        ):
             sort = cls.skill_model_last_updated
 
         sort_query = cls.query().order(sort)
-        fetch_result: Tuple[Sequence[SkillSummaryModel], datastore_services.Cursor, bool] = sort_query.fetch_page(page_size, start_cursor=cursor)
+        fetch_result: Tuple[
+            Sequence[SkillSummaryModel], datastore_services.Cursor, bool
+        ] = sort_query.fetch_page(page_size, start_cursor=cursor)
         query_models, next_cursor, _ = fetch_result
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
@@ -352,5 +414,9 @@ class SkillSummaryModel(base_models.BaseModel):
         plus_one_query_models, _, _ = fetch_result
         # The urlsafe returns bytes and we need to decode them to string.
         more_results = len(plus_one_query_models) == page_size + 1
-        new_urlsafe_start_cursor = next_cursor.urlsafe().decode('utf-8') if (next_cursor and more_results) else None
+        new_urlsafe_start_cursor = (
+            next_cursor.urlsafe().decode('utf-8')
+            if (next_cursor and more_results)
+            else None
+        )
         return (query_models, new_urlsafe_start_cursor, more_results)

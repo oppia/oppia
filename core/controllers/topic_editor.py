@@ -103,7 +103,9 @@ class TopicEditorStoryHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': (constants.MAX_CHARS_IN_STORY_DESCRIPTION),
+                            'max_value': (
+                                constants.MAX_CHARS_IN_STORY_DESCRIPTION
+                            ),
                         }
                     ],
                 }
@@ -125,18 +127,39 @@ class TopicEditorStoryHandler(
         topic = topic_fetchers.get_topic_by_id(topic_id)
         story_id_to_publication_status_map = {}
         for reference in topic.canonical_story_references:
-            story_id_to_publication_status_map[reference.story_id] = reference.story_is_published
+            story_id_to_publication_status_map[reference.story_id] = (
+                reference.story_is_published
+            )
         for reference in topic.additional_story_references:
-            story_id_to_publication_status_map[reference.story_id] = reference.story_is_published
-        canonical_story_summaries = story_fetchers.get_story_summaries_by_ids(topic.get_canonical_story_ids())
-        additional_story_summaries = story_fetchers.get_story_summaries_by_ids(topic.get_additional_story_ids())
+            story_id_to_publication_status_map[reference.story_id] = (
+                reference.story_is_published
+            )
+        canonical_story_summaries = story_fetchers.get_story_summaries_by_ids(
+            topic.get_canonical_story_ids()
+        )
+        additional_story_summaries = story_fetchers.get_story_summaries_by_ids(
+            topic.get_additional_story_ids()
+        )
 
-        canonical_story_summary_dicts = [summary.to_dict() for summary in canonical_story_summaries]
-        additional_story_summary_dicts = [summary.to_dict() for summary in additional_story_summaries]
+        canonical_story_summary_dicts = [
+            summary.to_dict() for summary in canonical_story_summaries
+        ]
+        additional_story_summary_dicts = [
+            summary.to_dict() for summary in additional_story_summaries
+        ]
 
-        canonical_stories_ids = [summary['id'] for summary in canonical_story_summary_dicts]
-        canonical_stories = list(filter(None, story_fetchers.get_stories_by_ids(canonical_stories_ids)))
-        canonical_stories_dict: Dict[str, story_domain.Story] = {canonical_story.id: canonical_story for canonical_story in canonical_stories}
+        canonical_stories_ids = [
+            summary['id'] for summary in canonical_story_summary_dicts
+        ]
+        canonical_stories = list(
+            filter(
+                None, story_fetchers.get_stories_by_ids(canonical_stories_ids)
+            )
+        )
+        canonical_stories_dict: Dict[str, story_domain.Story] = {
+            canonical_story.id: canonical_story
+            for canonical_story in canonical_stories
+        }
         updated_canonical_story_summary_dicts = []
 
         for summary in canonical_story_summary_dicts:
@@ -154,10 +177,22 @@ class TopicEditorStoryHandler(
                     published_chapters_count += 1
                 if node.planned_publication_date is not None:
                     current_time_msecs = utils.get_current_time_in_millisecs()
-                    planned_publication_date_msecs = utils.get_time_in_millisecs(node.planned_publication_date)
+                    planned_publication_date_msecs = (
+                        utils.get_time_in_millisecs(
+                            node.planned_publication_date
+                        )
+                    )
                     if node.is_node_upcoming():
                         upcoming_chapters_count += 1
-                        upcoming_chapters_expected_days.append((int)((planned_publication_date_msecs - current_time_msecs) / (1000.0 * 3600 * 24)))
+                        upcoming_chapters_expected_days.append(
+                            (int)(
+                                (
+                                    planned_publication_date_msecs
+                                    - current_time_msecs
+                                )
+                                / (1000.0 * 3600 * 24)
+                            )
+                        )
                     if node.is_node_behind_schedule():
                         overdue_chapters_count += 1
 
@@ -174,16 +209,22 @@ class TopicEditorStoryHandler(
                 'url_fragment': summary['url_fragment'],
                 'story_model_created_on': summary['story_model_created_on'],
                 'story_model_last_updated': summary['story_model_last_updated'],
-                'story_is_published': (story_id_to_publication_status_map[summary['id']]),
+                'story_is_published': (
+                    story_id_to_publication_status_map[summary['id']]
+                ),
                 'completed_node_titles': [],
                 'all_node_dicts': [node.to_dict() for node in nodes],
                 'total_chapters_count': total_chapters_count,
                 'published_chapters_count': published_chapters_count,
                 'upcoming_chapters_count': upcoming_chapters_count,
-                'upcoming_chapters_expected_days': (upcoming_chapters_expected_days),
+                'upcoming_chapters_expected_days': (
+                    upcoming_chapters_expected_days
+                ),
                 'overdue_chapters_count': overdue_chapters_count,
             }
-            updated_canonical_story_summary_dicts.append(updated_canonical_story_summary_dict)
+            updated_canonical_story_summary_dicts.append(
+                updated_canonical_story_summary_dict
+            )
 
         updated_additional_story_summary_dicts = []
         for summary in additional_story_summary_dicts:
@@ -199,16 +240,24 @@ class TopicEditorStoryHandler(
                 'url_fragment': summary['url_fragment'],
                 'story_model_created_on': summary['story_model_created_on'],
                 'story_model_last_updated': summary['story_model_last_updated'],
-                'story_is_published': (story_id_to_publication_status_map[summary['id']]),
+                'story_is_published': (
+                    story_id_to_publication_status_map[summary['id']]
+                ),
                 'completed_node_titles': [],
                 'all_node_dicts': [],
             }
-            updated_additional_story_summary_dicts.append(updated_additional_story_summary_dict)
+            updated_additional_story_summary_dicts.append(
+                updated_additional_story_summary_dict
+            )
 
         self.values.update(
             {
-                'canonical_story_summary_dicts': (updated_canonical_story_summary_dicts),
-                'additional_story_summary_dicts': (updated_additional_story_summary_dicts),
+                'canonical_story_summary_dicts': (
+                    updated_canonical_story_summary_dicts
+                ),
+                'additional_story_summary_dicts': (
+                    updated_additional_story_summary_dicts
+                ),
             }
         )
         self.render_json(self.values)
@@ -230,8 +279,12 @@ class TopicEditorStoryHandler(
         story_url_fragment = self.normalized_payload['story_url_fragment']
 
         story_domain.Story.require_valid_title(title)
-        if story_services.does_story_exist_with_url_fragment(story_url_fragment):
-            raise self.InvalidInputException('Story url fragment is not unique across the site.')
+        if story_services.does_story_exist_with_url_fragment(
+            story_url_fragment
+        ):
+            raise self.InvalidInputException(
+                'Story url fragment is not unique across the site.'
+            )
 
         new_story_id = story_services.get_new_story_id()
         # Add the story id to canonical_story_ids in the topic.
@@ -241,11 +294,15 @@ class TopicEditorStoryHandler(
         # get created. Hence, topic_services.add_canonical_story is called
         # before story_services.save_new_story.
         topic_services.add_canonical_story(self.user_id, topic_id, new_story_id)
-        story = story_domain.Story.create_default_story(new_story_id, title, description, topic_id, story_url_fragment)
+        story = story_domain.Story.create_default_story(
+            new_story_id, title, description, topic_id, story_url_fragment
+        )
         story_services.save_new_story(self.user_id, story)
 
         try:
-            file_format = image_validation_services.validate_image_and_filename(raw_image, thumbnail_filename)
+            file_format = image_validation_services.validate_image_and_filename(
+                raw_image, thumbnail_filename
+            )
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
@@ -290,7 +347,9 @@ class TopicEditorStoryHandler(
         self.render_json({'storyId': new_story_id})
 
 
-class EditableSubtopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+class EditableSubtopicPageDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """The data handler for subtopic pages."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -328,17 +387,23 @@ class EditableSubtopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str,
             topic_id: str. The ID of the topic.
             subtopic_id: str. The ID of the subtopic.
         """
-        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(topic_id, subtopic_id, strict=False)
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            topic_id, subtopic_id, strict=False
+        )
 
         if subtopic_page is None:
-            raise self.NotFoundException('The subtopic page with the given id doesn\'t exist.')
+            raise self.NotFoundException(
+                'The subtopic page with the given id doesn\'t exist.'
+            )
 
         self.values.update({'subtopic_page_dict': subtopic_page.to_dict()})
 
         self.render_json(self.values)
 
 
-class EditableStudyGuideDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+class EditableStudyGuideDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """The data handler for study guides."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -376,10 +441,14 @@ class EditableStudyGuideDataHandler(base.BaseHandler[Dict[str, str], Dict[str, s
             topic_id: str. The ID of the topic.
             subtopic_id: str. The ID of the subtopic.
         """
-        study_guide = study_guide_services.get_study_guide_by_id(topic_id, subtopic_id, strict=False)
+        study_guide = study_guide_services.get_study_guide_by_id(
+            topic_id, subtopic_id, strict=False
+        )
 
         if study_guide is None:
-            raise self.NotFoundException('The study guide with the given id doesn\'t exist.')
+            raise self.NotFoundException(
+                'The study guide with the given id doesn\'t exist.'
+            )
 
         self.values.update({'study_guide_dict': study_guide.to_dict()})
 
@@ -396,7 +465,11 @@ class EditableTopicDataHandlerNormalizedPayloadDict(TypedDict):
     topic_and_subtopic_page_change_dicts: List[topic_domain.TopicChange]
 
 
-class EditableTopicDataHandler(base.BaseHandler[EditableTopicDataHandlerNormalizedPayloadDict, Dict[str, str]]):
+class EditableTopicDataHandler(
+    base.BaseHandler[
+        EditableTopicDataHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """A data handler for topics which supports writing."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -442,7 +515,9 @@ class EditableTopicDataHandler(base.BaseHandler[EditableTopicDataHandlerNormaliz
         'DELETE': {},
     }
 
-    def _require_valid_version(self, version_from_payload: int, topic_version: int) -> None:
+    def _require_valid_version(
+        self, version_from_payload: int, topic_version: int
+    ) -> None:
         """Check that the payload version matches the given topic
         version.
 
@@ -452,7 +527,10 @@ class EditableTopicDataHandler(base.BaseHandler[EditableTopicDataHandlerNormaliz
         """
 
         if version_from_payload != topic_version:
-            raise base.BaseHandler.InvalidInputException('Trying to update version %s of topic from version %s, which is too old. Please reload the page and try again.' % (topic_version, version_from_payload))
+            raise base.BaseHandler.InvalidInputException(
+                'Trying to update version %s of topic from version %s, which is too old. Please reload the page and try again.'
+                % (topic_version, version_from_payload)
+            )
 
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id: str) -> None:
@@ -464,45 +542,93 @@ class EditableTopicDataHandler(base.BaseHandler[EditableTopicDataHandlerNormaliz
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         if topic is None:
-            raise self.NotFoundException(Exception('The topic with the given id doesn\'t exist.'))
+            raise self.NotFoundException(
+                Exception('The topic with the given id doesn\'t exist.')
+            )
 
-        skill_id_to_description_dict, deleted_skill_ids = skill_services.get_descriptions_of_skills(topic.get_all_skill_ids())
+        skill_id_to_description_dict, deleted_skill_ids = (
+            skill_services.get_descriptions_of_skills(topic.get_all_skill_ids())
+        )
 
         topics = topic_fetchers.get_all_topics()
         grouped_skill_summary_dicts = {}
         skill_id_to_rubrics_dict = {}
 
         for topic_object in topics:
-            skill_id_to_rubrics_dict_local, deleted_skill_ids = skill_services.get_rubrics_of_skills(topic_object.get_all_skill_ids())
+            skill_id_to_rubrics_dict_local, deleted_skill_ids = (
+                skill_services.get_rubrics_of_skills(
+                    topic_object.get_all_skill_ids()
+                )
+            )
 
             skill_id_to_rubrics_dict.update(skill_id_to_rubrics_dict_local)
 
             if deleted_skill_ids:
                 deleted_skills_string = ', '.join(deleted_skill_ids)
-                logging.exception('The deleted skills: %s are still present in topic with id %s' % (deleted_skills_string, topic_id))
-                server_can_send_emails = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value)
+                logging.exception(
+                    'The deleted skills: %s are still present in topic with id %s'
+                    % (deleted_skills_string, topic_id)
+                )
+                server_can_send_emails = platform_parameter_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+                )
                 if server_can_send_emails:
                     email_manager.send_mail_to_admin(
                         'Deleted skills present in topic',
-                        'The deleted skills: %s are still present in topic with id %s' % (deleted_skills_string, topic_id),
+                        'The deleted skills: %s are still present in topic with id %s'
+                        % (deleted_skills_string, topic_id),
                     )
-            skill_summaries = skill_services.get_multi_skill_summaries(topic_object.get_all_skill_ids())
-            skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
+            skill_summaries = skill_services.get_multi_skill_summaries(
+                topic_object.get_all_skill_ids()
+            )
+            skill_summary_dicts = [
+                summary.to_dict() for summary in skill_summaries
+            ]
             grouped_skill_summary_dicts[topic_object.name] = skill_summary_dicts
 
-        classroom_url_fragment = classroom_config_services.get_classroom_url_fragment_for_topic_id(topic_id)
-        classroom_name = classroom_config_services.get_classroom_name_for_topic_id(topic_id)
+        classroom_url_fragment = (
+            classroom_config_services.get_classroom_url_fragment_for_topic_id(
+                topic_id
+            )
+        )
+        classroom_name = (
+            classroom_config_services.get_classroom_name_for_topic_id(topic_id)
+        )
         skill_question_count_dict = {}
         for skill_id in topic.get_all_skill_ids():
-            skill_question_count_dict[skill_id] = question_services.get_total_question_count_for_skill_ids([skill_id])
-        skill_creation_is_allowed = role_services.ACTION_CREATE_NEW_SKILL in self.user.actions
+            skill_question_count_dict[skill_id] = (
+                question_services.get_total_question_count_for_skill_ids(
+                    [skill_id]
+                )
+            )
+        skill_creation_is_allowed = (
+            role_services.ACTION_CREATE_NEW_SKILL in self.user.actions
+        )
 
-        curriculum_admin_usernames = user_services.get_usernames_by_role('ADMIN')
+        curriculum_admin_usernames = user_services.get_usernames_by_role(
+            'ADMIN'
+        )
 
         self.values.update(
             {
-                'classroom_url_fragment': (None if (classroom_url_fragment == str(constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS)) else classroom_url_fragment),
-                'classroom_name': (None if (classroom_name == str(constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS)) else classroom_name),
+                'classroom_url_fragment': (
+                    None
+                    if (
+                        classroom_url_fragment
+                        == str(
+                            constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS
+                        )
+                    )
+                    else classroom_url_fragment
+                ),
+                'classroom_name': (
+                    None
+                    if (
+                        classroom_name
+                        == str(constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS)
+                    )
+                    else classroom_name
+                ),
                 'topic_dict': topic.to_dict(),
                 'grouped_skill_summary_dicts': grouped_skill_summary_dicts,
                 'skill_question_count_dict': skill_question_count_dict,
@@ -536,7 +662,9 @@ class EditableTopicDataHandler(base.BaseHandler[EditableTopicDataHandlerNormaliz
 
         commit_message = self.normalized_payload['commit_message']
 
-        topic_and_subtopic_page_change_dicts = self.normalized_payload['topic_and_subtopic_page_change_dicts']
+        topic_and_subtopic_page_change_dicts = self.normalized_payload[
+            'topic_and_subtopic_page_change_dicts'
+        ]
         topic_and_subtopic_page_change_list: List[
             Union[
                 study_guide_domain.StudyGuideChange,
@@ -545,10 +673,18 @@ class EditableTopicDataHandler(base.BaseHandler[EditableTopicDataHandlerNormaliz
             ]
         ] = []
         for change in topic_and_subtopic_page_change_dicts:
-            if change.cmd == (subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
-                topic_and_subtopic_page_change_list.append(subtopic_page_domain.SubtopicPageChange(change.to_dict()))
-            elif change.cmd == (study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY):
-                topic_and_subtopic_page_change_list.append(study_guide_domain.StudyGuideChange(change.to_dict()))
+            if change.cmd == (
+                subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY
+            ):
+                topic_and_subtopic_page_change_list.append(
+                    subtopic_page_domain.SubtopicPageChange(change.to_dict())
+                )
+            elif change.cmd == (
+                study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY
+            ):
+                topic_and_subtopic_page_change_list.append(
+                    study_guide_domain.StudyGuideChange(change.to_dict())
+                )
             else:
                 topic_and_subtopic_page_change_list.append(change)
         try:
@@ -563,18 +699,28 @@ class EditableTopicDataHandler(base.BaseHandler[EditableTopicDataHandlerNormaliz
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=True)
 
-        skill_id_to_description_dict, deleted_skill_ids = skill_services.get_descriptions_of_skills(topic.get_all_skill_ids())
+        skill_id_to_description_dict, deleted_skill_ids = (
+            skill_services.get_descriptions_of_skills(topic.get_all_skill_ids())
+        )
 
-        skill_id_to_rubrics_dict, deleted_skill_ids = skill_services.get_rubrics_of_skills(topic.get_all_skill_ids())
+        skill_id_to_rubrics_dict, deleted_skill_ids = (
+            skill_services.get_rubrics_of_skills(topic.get_all_skill_ids())
+        )
 
         if deleted_skill_ids:
             deleted_skills_string = ', '.join(deleted_skill_ids)
-            logging.exception('The deleted skills: %s are still present in topic with id %s' % (deleted_skills_string, topic_id))
-            server_can_send_emails = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value)
+            logging.exception(
+                'The deleted skills: %s are still present in topic with id %s'
+                % (deleted_skills_string, topic_id)
+            )
+            server_can_send_emails = platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            )
             if server_can_send_emails:
                 email_manager.send_mail_to_admin(
                     'Deleted skills present in topic',
-                    'The deleted skills: %s are still present in topic with id %s' % (deleted_skills_string, topic_id),
+                    'The deleted skills: %s are still present in topic with id %s'
+                    % (deleted_skills_string, topic_id),
                 )
 
         self.values.update(
@@ -600,12 +746,20 @@ class EditableTopicDataHandler(base.BaseHandler[EditableTopicDataHandlerNormaliz
         assert self.user_id is not None
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
-            raise self.NotFoundException('The topic with the given id doesn\'t exist.')
+            raise self.NotFoundException(
+                'The topic with the given id doesn\'t exist.'
+            )
 
-        classroom_name = classroom_config_services.get_classroom_name_for_topic_id(topic_id)
+        classroom_name = (
+            classroom_config_services.get_classroom_name_for_topic_id(topic_id)
+        )
 
-        if classroom_name != str(constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS):
-            raise Exception(f'The topic is assigned to the {classroom_name} classroom. Contact the curriculum admins to remove it from the classroom first.')
+        if classroom_name != str(
+            constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS
+        ):
+            raise Exception(
+                f'The topic is assigned to the {classroom_name} classroom. Contact the curriculum admins to remove it from the classroom first.'
+            )
 
         topic_services.delete_topic(self.user_id, topic_id)
 
@@ -644,11 +798,18 @@ class TopicRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         assert self.user_id is not None
         topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         if topic_rights is None:
-            raise self.InvalidInputException('Expected a valid topic id to be provided.')
+            raise self.InvalidInputException(
+                'Expected a valid topic id to be provided.'
+            )
         user_actions_info = user_services.get_user_actions_info(self.user_id)
-        can_edit_topic = topic_services.check_can_edit_topic(user_actions_info, topic_rights)
+        can_edit_topic = topic_services.check_can_edit_topic(
+            user_actions_info, topic_rights
+        )
 
-        can_publish_topic = role_services.ACTION_CHANGE_TOPIC_STATUS in user_actions_info.actions
+        can_publish_topic = (
+            role_services.ACTION_CHANGE_TOPIC_STATUS
+            in user_actions_info.actions
+        )
 
         self.values.update(
             {
@@ -669,7 +830,11 @@ class TopicPublishSendMailHandlerNormalizedPayloadDict(TypedDict):
     topic_name: str
 
 
-class TopicPublishSendMailHandler(base.BaseHandler[TopicPublishSendMailHandlerNormalizedPayloadDict, Dict[str, str]]):
+class TopicPublishSendMailHandler(
+    base.BaseHandler[
+        TopicPublishSendMailHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """A handler for sending mail to admins to review and publish topic."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -711,7 +876,11 @@ class TopicPublishSendMailHandler(base.BaseHandler[TopicPublishSendMailHandlerNo
         """
         assert self.normalized_payload is not None
         topic_url = '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, topic_id)
-        server_can_send_emails = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value)
+        server_can_send_emails = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            )
+        )
         if server_can_send_emails:
             email_manager.send_mail_to_admin(
                 'Request to review and publish a topic',
@@ -735,7 +904,9 @@ class TopicPublishHandlerNormalizedPayloadDict(TypedDict):
     publish_status: bool
 
 
-class TopicPublishHandler(base.BaseHandler[TopicPublishHandlerNormalizedPayloadDict, Dict[str, str]]):
+class TopicPublishHandler(
+    base.BaseHandler[TopicPublishHandlerNormalizedPayloadDict, Dict[str, str]]
+):
     """A handler for publishing and unpublishing topics."""
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -751,7 +922,9 @@ class TopicPublishHandler(base.BaseHandler[TopicPublishHandlerNormalizedPayloadD
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'PUT': {'publish_status': {'schema': {'type': 'bool'}}}}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {'publish_status': {'schema': {'type': 'bool'}}}
+    }
 
     @acl_decorators.can_change_topic_publication_status
     def put(self, topic_id: str) -> None:
@@ -772,14 +945,20 @@ class TopicPublishHandler(base.BaseHandler[TopicPublishHandlerNormalizedPayloadD
 
         publish_status = self.normalized_payload['publish_status']
 
-        classroom_name = classroom_config_services.get_classroom_name_for_topic_id(topic_id)
+        classroom_name = (
+            classroom_config_services.get_classroom_name_for_topic_id(topic_id)
+        )
 
         try:
             if publish_status:
                 topic_services.publish_topic(topic_id, self.user_id)
             else:
-                if classroom_name != str(constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS):
-                    raise Exception(f'The topic is assigned to the {classroom_name} classroom. Contact the curriculum admins to remove it from the classroom first.')
+                if classroom_name != str(
+                    constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS
+                ):
+                    raise Exception(
+                        f'The topic is assigned to the {classroom_name} classroom. Contact the curriculum admins to remove it from the classroom first.'
+                    )
                 topic_services.unpublish_topic(topic_id, self.user_id)
         except Exception as e:
             raise self.UnauthorizedUserException(e)
@@ -792,7 +971,9 @@ class TopicUrlFragmentHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = {'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS}
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
+    }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_create_topic
@@ -803,7 +984,15 @@ class TopicUrlFragmentHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         Args:
             topic_url_fragment: str. The topic URL fragment.
         """
-        self.values.update({'topic_url_fragment_exists': (topic_services.does_topic_with_url_fragment_exist(topic_url_fragment))})
+        self.values.update(
+            {
+                'topic_url_fragment_exists': (
+                    topic_services.does_topic_with_url_fragment_exist(
+                        topic_url_fragment
+                    )
+                )
+            }
+        )
         self.render_json(self.values)
 
 
@@ -832,7 +1021,11 @@ class TopicIdToTopicNameHandlerNormalizedRequestDict(TypedDict):
     comma_separated_topic_ids: List[str]
 
 
-class TopicIdToTopicNameHandler(base.BaseHandler[Dict[str, str], TopicIdToTopicNameHandlerNormalizedRequestDict]):
+class TopicIdToTopicNameHandler(
+    base.BaseHandler[
+        Dict[str, str], TopicIdToTopicNameHandlerNormalizedRequestDict
+    ]
+):
     """Handler class to get topic ID to topic name dict."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -853,5 +1046,11 @@ class TopicIdToTopicNameHandler(base.BaseHandler[Dict[str, str], TopicIdToTopicN
         """Accesses a classroom admin page."""
         assert self.normalized_request is not None
         topic_ids = self.normalized_request['comma_separated_topic_ids']
-        self.values.update({'topic_id_to_topic_name': (topic_services.get_topic_id_to_topic_name_dict(topic_ids))})
+        self.values.update(
+            {
+                'topic_id_to_topic_name': (
+                    topic_services.get_topic_id_to_topic_name_dict(topic_ids)
+                )
+            }
+        )
         self.render_json(self.values)

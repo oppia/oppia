@@ -71,7 +71,11 @@ class LearnerGoalsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         belongs_to_learnt_list = False
         goals_limit_exceeded = False
 
-        belongs_to_learnt_list, goals_limit_exceeded = learner_progress_services.validate_and_add_topic_to_learn_goal(self.user_id, topic_id)
+        belongs_to_learnt_list, goals_limit_exceeded = (
+            learner_progress_services.validate_and_add_topic_to_learn_goal(
+                self.user_id, topic_id
+            )
+        )
 
         self.values.update(
             {
@@ -101,6 +105,8 @@ class LearnerGoalsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             topic_id: str. The topic ID.
         """
         assert self.user_id is not None
-        learner_goals_services.remove_topics_from_learn_goal(self.user_id, [topic_id])
+        learner_goals_services.remove_topics_from_learn_goal(
+            self.user_id, [topic_id]
+        )
 
         self.render_json(self.values)

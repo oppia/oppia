@@ -42,11 +42,15 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import auth_models
 
-auth_models, user_models = models.Registry.import_models([models.Names.AUTH, models.Names.USER])
+auth_models, user_models = models.Registry.import_models(
+    [models.Names.AUTH, models.Names.USER]
+)
 
 UidsPartitionTupleType = Tuple[List[Tuple[int, str]], List[Tuple[int, str]]]
 
-UidsZipPartitionTupleType = Tuple[List[Tuple[int, Tuple[str, str]]], List[Tuple[int, Tuple[str, str]]]]
+UidsZipPartitionTupleType = Tuple[
+    List[Tuple[int, Tuple[str, str]]], List[Tuple[int, Tuple[str, str]]]
+]
 
 RecordsPartitionTupleType = Tuple[
     List[Tuple[int, Tuple[firebase_auth.ImportUserRecord, str]]],
@@ -129,10 +133,16 @@ class FirebaseAdminSdkStub:
 
         with contextlib.ExitStack() as swap_stack:
             for name in self._IMPLEMENTED_SDK_FUNCTION_NAMES:
-                swap_stack.enter_context(test.swap(firebase_auth, name, getattr(self, name)))
+                swap_stack.enter_context(
+                    test.swap(firebase_auth, name, getattr(self, name))
+                )
 
             for name in self._UNIMPLEMENTED_SDK_FUNCTION_NAMES:
-                swap_stack.enter_context(test.swap_to_always_raise(firebase_auth, name, NotImplementedError))
+                swap_stack.enter_context(
+                    test.swap_to_always_raise(
+                        firebase_auth, name, NotImplementedError
+                    )
+                )
 
             # Allows us to exit the current context manager without closing the
             # entered contexts. They will be exited later by the uninstall()
@@ -145,7 +155,9 @@ class FirebaseAdminSdkStub:
             self._swap_stack.close()
             self._swap_stack = None
 
-    def create_session_cookie(self, id_token: str, unused_max_age: datetime.timedelta) -> str:
+    def create_session_cookie(
+        self, id_token: str, unused_max_age: datetime.timedelta
+    ) -> str:
         """Creates a new session cookie which expires after given duration.
 
         Args:
@@ -171,7 +183,9 @@ class FirebaseAdminSdkStub:
         self._uid_by_session_cookie[session_cookie] = claims['sub']
         return session_cookie
 
-    def create_user(self, uid: str, email: Optional[str] = None, disabled: bool = False) -> str:
+    def create_user(
+        self, uid: str, email: Optional[str] = None, disabled: bool = False
+    ) -> str:
         """Adds user to storage if new, otherwise raises an error.
 
         Args:
@@ -187,7 +201,9 @@ class FirebaseAdminSdkStub:
             UidAlreadyExistsError. The uid has already been assigned to a user.
         """
         if uid in self._users_by_uid:
-            raise firebase_auth.UidAlreadyExistsError('uid=%r already exists' % uid, None, None)
+            raise firebase_auth.UidAlreadyExistsError(
+                'uid=%r already exists' % uid, None, None
+            )
         self._set_user_fragile(uid, email, disabled, None)
         return self._encode_user_claims(uid)
 
@@ -204,7 +220,9 @@ class FirebaseAdminSdkStub:
             raise firebase_auth.UserNotFoundError('%s not found' % uid)
         del self._users_by_uid[uid]
 
-    def delete_users(self, uids: List[str], force_delete: bool = False) -> firebase_auth.BatchDeleteAccountsResponse:
+    def delete_users(
+        self, uids: List[str], force_delete: bool = False
+    ) -> firebase_auth.BatchDeleteAccountsResponse:
         """Deletes the users identified by the specified user ids.
 
         Deleting a non-existing user does not generate an error (the method is
@@ -247,7 +265,10 @@ class FirebaseAdminSdkStub:
                 ),
             )
             uids_to_delete = {uid for _, uid in disabled_uids}
-            errors = [(i, 'uid=%r must be disabled first' % uid) for i, uid in enabled_uids]
+            errors = [
+                (i, 'uid=%r must be disabled first' % uid)
+                for i, uid in enabled_uids
+            ]
 
         for uid in uids_to_delete.intersection(self._users_by_uid):
             del self._users_by_uid[uid]
@@ -270,7 +291,9 @@ class FirebaseAdminSdkStub:
             raise firebase_auth.UserNotFoundError('%s not found' % uid)
         return users[0]
 
-    def get_users(self, identifiers: List[firebase_auth.UidIdentifier]) -> firebase_auth.GetUsersResult:
+    def get_users(
+        self, identifiers: List[firebase_auth.UidIdentifier]
+    ) -> firebase_auth.GetUsersResult:
         """Returns user with given ID if found, otherwise raises an error.
 
         Args:
@@ -283,8 +306,16 @@ class FirebaseAdminSdkStub:
         Raises:
             UserNotFoundError. The Firebase account has not been created yet.
         """
-        found_users = [self._users_by_uid[identifier.uid] for identifier in identifiers if identifier.uid in self._users_by_uid]
-        not_found_identifiers = [identifier for identifier in identifiers if identifier.uid not in self._users_by_uid]
+        found_users = [
+            self._users_by_uid[identifier.uid]
+            for identifier in identifiers
+            if identifier.uid in self._users_by_uid
+        ]
+        not_found_identifiers = [
+            identifier
+            for identifier in identifiers
+            if identifier.uid not in self._users_by_uid
+        ]
         return firebase_auth.GetUsersResult(found_users, not_found_identifiers)
 
     def get_user_by_email(self, email: str) -> firebase_auth.UserRecord:
@@ -305,7 +336,9 @@ class FirebaseAdminSdkStub:
             raise firebase_auth.UserNotFoundError('%s not found' % email)
         return user
 
-    def import_users(self, records: List[firebase_admin.auth.ImportUserRecord]) -> firebase_admin.auth.UserImportResult:
+    def import_users(
+        self, records: List[firebase_admin.auth.ImportUserRecord]
+    ) -> firebase_admin.auth.UserImportResult:
         """Adds the given user records to the stub's storage.
 
         Args:
@@ -325,7 +358,9 @@ class FirebaseAdminSdkStub:
             )
         return self._create_user_import_result_fragile(len(records), [])
 
-    def list_users(self, page_token: Optional[str] = None, max_results: int = 1000) -> firebase_admin.auth.ListUsersPage:
+    def list_users(
+        self, page_token: Optional[str] = None, max_results: int = 1000
+    ) -> firebase_admin.auth.ListUsersPage:
         """Retrieves a page of user accounts from a Firebase project.
 
         The `page_token` argument governs the starting point of the page. The
@@ -355,7 +390,10 @@ class FirebaseAdminSdkStub:
 
         # NOTE: This is only sorted to make unit testing easier.
         all_users = sorted(self._users_by_uid.values(), key=lambda u: u.uid)
-        page_list = [[user for user in user_group if user is not None] for user_group in utils.grouper(all_users, max_results)]
+        page_list = [
+            [user for user in user_group if user is not None]
+            for user_group in utils.grouper(all_users, max_results)
+        ]
 
         if not page_list:
             return self._create_list_users_page_fragile([], 0)
@@ -381,9 +419,13 @@ class FirebaseAdminSdkStub:
         """
         if uid not in self._users_by_uid:
             raise firebase_auth.UserNotFoundError('%s not found' % uid)
-        self._uid_by_session_cookie = {k: v for k, v in self._uid_by_session_cookie.items() if v != uid}
+        self._uid_by_session_cookie = {
+            k: v for k, v in self._uid_by_session_cookie.items() if v != uid
+        }
 
-    def set_custom_user_claims(self, uid: str, custom_claims: Optional[str]) -> str:
+    def set_custom_user_claims(
+        self, uid: str, custom_claims: Optional[str]
+    ) -> str:
         """Updates the custom claims of the given user.
 
         Args:
@@ -426,7 +468,9 @@ class FirebaseAdminSdkStub:
         self._set_user_fragile(uid, email, disabled, custom_claims)
         return uid
 
-    def verify_id_token(self, token: str) -> Dict[str, Optional[Union[str, bool]]]:
+    def verify_id_token(
+        self, token: str
+    ) -> Dict[str, Optional[Union[str, bool]]]:
         """Returns claims for the corresponding user if the ID token is valid.
 
         Args:
@@ -442,7 +486,9 @@ class FirebaseAdminSdkStub:
             raise firebase_auth.UserNotFoundError('%s not found' % uid)
         return claims
 
-    def verify_session_cookie(self, session_cookie: str, check_revoked: bool = False) -> Dict[str, Optional[Union[str, bool]]]:
+    def verify_session_cookie(
+        self, session_cookie: str, check_revoked: bool = False
+    ) -> Dict[str, Optional[Union[str, bool]]]:
         """Returns claims for the corresponding user if the cookie is valid.
 
         Args:
@@ -455,7 +501,9 @@ class FirebaseAdminSdkStub:
             cookie.
         """
         if check_revoked and session_cookie not in self._uid_by_session_cookie:
-            raise firebase_auth.RevokedSessionCookieError('The provided Firebase session cookie is invalid')
+            raise firebase_auth.RevokedSessionCookieError(
+                'The provided Firebase session cookie is invalid'
+            )
         claims = self._decode_user_claims(session_cookie)
         assert claims is not None
         uid = claims['sub']
@@ -507,7 +555,9 @@ class FirebaseAdminSdkStub:
         self.assert_is_user(uid)
         custom_claims = self.get_user(uid).custom_claims or {}
         assert self._test is not None
-        self._test.assertEqual(custom_claims.get('role', None), feconf.FIREBASE_ROLE_SUPER_ADMIN)
+        self._test.assertEqual(
+            custom_claims.get('role', None), feconf.FIREBASE_ROLE_SUPER_ADMIN
+        )
 
     def assert_is_not_super_admin(self, uid: str) -> None:
         """Asserts that the given ID does not have super admin privileges.
@@ -521,7 +571,9 @@ class FirebaseAdminSdkStub:
         self.assert_is_user(uid)
         custom_claims = self.get_user(uid).custom_claims or {}
         assert self._test is not None
-        self._test.assertNotEqual(custom_claims.get('role', None), feconf.FIREBASE_ROLE_SUPER_ADMIN)
+        self._test.assertNotEqual(
+            custom_claims.get('role', None), feconf.FIREBASE_ROLE_SUPER_ADMIN
+        )
 
     def assert_is_disabled(self, uid: str) -> None:
         """Asserts that the given ID is a disabled account.
@@ -612,9 +664,13 @@ class FirebaseAdminSdkStub:
             Context manager. The context manager with the mocked implementation.
         """
         updated_batch_error_pattern = itertools.cycle(batch_error_pattern)
-        updated_individual_error_pattern = itertools.cycle(individual_error_pattern)
+        updated_individual_error_pattern = itertools.cycle(
+            individual_error_pattern
+        )
 
-        def mock_delete_users(uids: List[str], force_delete: bool = False) -> firebase_auth.BatchDeleteAccountsResponse:
+        def mock_delete_users(
+            uids: List[str], force_delete: bool = False
+        ) -> firebase_auth.BatchDeleteAccountsResponse:
             """Mock function that fails according to the input patterns."""
             error_to_raise = next(updated_batch_error_pattern)
             if error_to_raise is not None:
@@ -673,7 +729,9 @@ class FirebaseAdminSdkStub:
             Context manager. The context manager with the mocked implementation.
         """
         updated_batch_error_pattern = itertools.cycle(batch_error_pattern)
-        updated_individual_error_pattern = itertools.cycle(individual_error_pattern)
+        updated_individual_error_pattern = itertools.cycle(
+            individual_error_pattern
+        )
 
         def mock_import_users(
             records: List[firebase_admin.auth.ImportUserRecord],
@@ -691,7 +749,9 @@ class FirebaseAdminSdkStub:
                 RecordsPartitionTupleType,
                 utils.partition(
                     zip(records, updated_individual_error_pattern),
-                    predicate=(lambda record_and_error: record_and_error[1] is None),
+                    predicate=(
+                        lambda record_and_error: record_and_error[1] is None
+                    ),
                     enumerated=True,
                 ),
             )
@@ -699,7 +759,9 @@ class FirebaseAdminSdkStub:
             self.import_users([record for _, (record, _) in records_to_import])
 
             errors = [(i, error) for i, (_, error) in records_to_fail]
-            return self._create_user_import_result_fragile(len(records), errors=errors)
+            return self._create_user_import_result_fragile(
+                len(records), errors=errors
+            )
 
         assert self._test is not None
         return self._test.swap(firebase_auth, 'import_users', mock_import_users)
@@ -721,7 +783,9 @@ class FirebaseAdminSdkStub:
             claims.update(user.custom_claims)
         return json.dumps(claims)
 
-    def _decode_user_claims(self, encoded_claims: str) -> Optional[Dict[str, Optional[Union[str, bool]]]]:
+    def _decode_user_claims(
+        self, encoded_claims: str
+    ) -> Optional[Dict[str, Optional[Union[str, bool]]]]:
         """Returns the given decoded claims.
 
         Args:
@@ -769,7 +833,9 @@ class FirebaseAdminSdkStub:
             }
         )
 
-    def _create_list_users_page_fragile(self, page_list: List[List[firebase_auth.UserRecord]], page_index: int) -> mock.Mock:
+    def _create_list_users_page_fragile(
+        self, page_list: List[List[firebase_auth.UserRecord]], page_index: int
+    ) -> mock.Mock:
         """Creates a new ListUsersPage mock.
 
         FRAGILE! The mock is not from the real SDK, so it's vulnerable to
@@ -786,9 +852,19 @@ class FirebaseAdminSdkStub:
         if page_index < len(page_list):
             page.users = page_list[page_index]
             page.has_next_page = (page_index + 1) < len(page_list)
-            page.next_page_token = '' if not page.has_next_page else str(page_index + 1)
-            page.get_next_page = lambda: (None if not page.has_next_page else self._create_list_users_page_fragile(page_list, page_index + 1))
-            page.iterate_all = lambda: (itertools.chain.from_iterable(page_list[page_index:]))
+            page.next_page_token = (
+                '' if not page.has_next_page else str(page_index + 1)
+            )
+            page.get_next_page = lambda: (
+                None
+                if not page.has_next_page
+                else self._create_list_users_page_fragile(
+                    page_list, page_index + 1
+                )
+            )
+            page.iterate_all = lambda: (
+                itertools.chain.from_iterable(page_list[page_index:])
+            )
         else:
             page.users = []
             page.has_next_page = False
@@ -797,7 +873,9 @@ class FirebaseAdminSdkStub:
             page.iterate_all = lambda: iter([])
         return page
 
-    def _create_delete_users_result_fragile(self, errors: List[Tuple[int, str]]) -> firebase_auth.BatchDeleteAccountsResponse:
+    def _create_delete_users_result_fragile(
+        self, errors: List[Tuple[int, str]]
+    ) -> firebase_auth.BatchDeleteAccountsResponse:
         """Creates a new BatchDeleteAccountsResponse instance with the given
         values.
 
@@ -811,9 +889,13 @@ class FirebaseAdminSdkStub:
         Returns:
             firebase_admin.auth.BatchDeleteAccountsResponse. The response.
         """
-        return firebase_auth.BatchDeleteAccountsResponse(errors=[{'index': i, 'message': error} for i, error in errors])
+        return firebase_auth.BatchDeleteAccountsResponse(
+            errors=[{'index': i, 'message': error} for i, error in errors]
+        )
 
-    def _create_user_import_result_fragile(self, total: int, errors: List[Tuple[int, str]]) -> firebase_auth.UserImportResult:
+    def _create_user_import_result_fragile(
+        self, total: int, errors: List[Tuple[int, str]]
+    ) -> firebase_auth.UserImportResult:
         """Creates a new UserImportResult instance with the given values.
 
         FRAGILE! The dict keys used by the UserImportResult constructor are an
@@ -828,7 +910,9 @@ class FirebaseAdminSdkStub:
         """
         return firebase_auth.UserImportResult(
             {
-                'error': [{'index': i, 'message': error} for i, error in errors],
+                'error': [
+                    {'index': i, 'message': error} for i, error in errors
+                ],
             },
             total,
         )
@@ -838,8 +922,12 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
     APP = object()
 
     def test_initializes_when_connection_does_not_exist(self) -> None:
-        get_app_swap = self.swap_with_call_counter(firebase_admin, 'get_app', raises=ValueError('initialize_app'))
-        init_app_swap = self.swap_with_call_counter(firebase_admin, 'initialize_app', returns=self.APP)
+        get_app_swap = self.swap_with_call_counter(
+            firebase_admin, 'get_app', raises=ValueError('initialize_app')
+        )
+        init_app_swap = self.swap_with_call_counter(
+            firebase_admin, 'initialize_app', returns=self.APP
+        )
 
         with get_app_swap as get_app_counter, init_app_swap as init_app_counter:
             firebase_auth_services.establish_firebase_connection()
@@ -848,7 +936,9 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
         self.assertEqual(init_app_counter.times_called, 1)
 
     def test_returns_existing_connection(self) -> None:
-        get_app_swap = self.swap_with_call_counter(firebase_admin, 'get_app', returns=self.APP)
+        get_app_swap = self.swap_with_call_counter(
+            firebase_admin, 'get_app', returns=self.APP
+        )
         init_app_swap = self.swap_with_call_counter(
             firebase_admin,
             'initialize_app',
@@ -862,7 +952,9 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
         self.assertEqual(init_app_counter.times_called, 0)
 
     def test_raises_authentic_get_app_error(self) -> None:
-        get_app_swap = self.swap_with_call_counter(firebase_admin, 'get_app', raises=ValueError('uh-oh!'))
+        get_app_swap = self.swap_with_call_counter(
+            firebase_admin, 'get_app', raises=ValueError('uh-oh!')
+        )
         init_app_swap = self.swap_with_call_counter(
             firebase_admin,
             'initialize_app',
@@ -877,8 +969,12 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
         self.assertEqual(init_app_counter.times_called, 0)
 
     def test_raises_authentic_initialize_app_error(self) -> None:
-        get_app_swap = self.swap_with_call_counter(firebase_admin, 'get_app', raises=ValueError('initialize_app'))
-        init_app_swap = self.swap_with_call_counter(firebase_admin, 'initialize_app', raises=ValueError('uh-oh!'))
+        get_app_swap = self.swap_with_call_counter(
+            firebase_admin, 'get_app', raises=ValueError('initialize_app')
+        )
+        init_app_swap = self.swap_with_call_counter(
+            firebase_admin, 'initialize_app', raises=ValueError('uh-oh!')
+        )
 
         with get_app_swap as get_app_counter, init_app_swap as init_app_counter:
             with self.assertRaisesRegex(ValueError, 'uh-oh!'):
@@ -903,7 +999,9 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         self.firebase_sdk_stub.uninstall()
         super().tearDown()
 
-    def capture_logging(self, min_level: int = logging.INFO) -> contextlib._GeneratorContextManager[List[str]]:
+    def capture_logging(
+        self, min_level: int = logging.INFO
+    ) -> contextlib._GeneratorContextManager[List[str]]:
         """Context manager that captures logs into a list.
 
         Overridden to set the minimum logging level as INFO.
@@ -939,10 +1037,14 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         if id_token:
             req.headers['Authorization'] = 'Bearer %s' % id_token
         if session_cookie:
-            req.cookies[constants.FIREBASE_AUTH_SESSION_COOKIE_NAME] = session_cookie
+            req.cookies[constants.FIREBASE_AUTH_SESSION_COOKIE_NAME] = (
+                session_cookie
+            )
         return req
 
-    def create_response(self, session_cookie: Optional[str] = None) -> webapp2.Response:
+    def create_response(
+        self, session_cookie: Optional[str] = None
+    ) -> webapp2.Response:
         """Returns a new response with the given session cookie.
 
         Args:
@@ -979,45 +1081,63 @@ class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
     def test_raises_error_when_user_does_not_exist(self) -> None:
         auth_models.UserAuthDetailsModel(id='uid', firebase_auth_id=None).put()
 
-        with self.assertRaisesRegex(ValueError, 'user_id=uid has no Firebase account'):
+        with self.assertRaisesRegex(
+            ValueError, 'user_id=uid has no Firebase account'
+        ):
             firebase_auth_services.grant_super_admin_privileges('uid')
 
-        with self.assertRaisesRegex(ValueError, 'user_id=uid has no Firebase account'):
+        with self.assertRaisesRegex(
+            ValueError, 'user_id=uid has no Firebase account'
+        ):
             firebase_auth_services.revoke_super_admin_privileges('uid')
 
     def test_grant_super_admin_privileges_revokes_session_cookies(self) -> None:
         id_token = self.firebase_sdk_stub.create_user('aid')
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
-        cookie = firebase_auth.create_session_cookie(id_token, feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
+        cookie = firebase_auth.create_session_cookie(
+            id_token, feconf.FIREBASE_SESSION_COOKIE_MAX_AGE
+        )
 
         # Should not raise.
         firebase_auth.verify_session_cookie(cookie, check_revoked=True)
 
         firebase_auth_services.grant_super_admin_privileges('uid')
 
-        with self.assertRaisesRegex(firebase_auth.RevokedSessionCookieError, 'invalid'):
+        with self.assertRaisesRegex(
+            firebase_auth.RevokedSessionCookieError, 'invalid'
+        ):
             firebase_auth.verify_session_cookie(cookie, check_revoked=True)
 
     def test_revoke_super_admin_privileges_revokes_session_cookies(
         self,
     ) -> None:
         id_token = self.firebase_sdk_stub.create_user('aid')
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
-        cookie = firebase_auth.create_session_cookie(id_token, feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
+        cookie = firebase_auth.create_session_cookie(
+            id_token, feconf.FIREBASE_SESSION_COOKIE_MAX_AGE
+        )
 
         # Should not raise.
         firebase_auth.verify_session_cookie(cookie, check_revoked=True)
 
         firebase_auth_services.revoke_super_admin_privileges('uid')
 
-        with self.assertRaisesRegex(firebase_auth.RevokedSessionCookieError, 'invalid'):
+        with self.assertRaisesRegex(
+            firebase_auth.RevokedSessionCookieError, 'invalid'
+        ):
             firebase_auth.verify_session_cookie(cookie, check_revoked=True)
 
 
 class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
     def setUp(self) -> None:
         super().setUp()
-        self.id_token = self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL)
+        self.id_token = self.firebase_sdk_stub.create_user(
+            self.AUTH_ID, email=self.EMAIL
+        )
 
     def test_adds_cookie_to_response_from_id_token_in_request(self) -> None:
         req = self.create_request(id_token=self.id_token)
@@ -1025,10 +1145,14 @@ class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
 
         firebase_auth_services.establish_auth_session(req, res)
 
-        self.assert_matches_regexps(res.headers.get_all('Set-Cookie'), ['session=.*;'])
+        self.assert_matches_regexps(
+            res.headers.get_all('Set-Cookie'), ['session=.*;']
+        )
 
     def test_does_nothing_when_request_has_cookie(self) -> None:
-        cookie = firebase_auth.create_session_cookie(self.id_token, feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
+        cookie = firebase_auth.create_session_cookie(
+            self.id_token, feconf.FIREBASE_SESSION_COOKIE_MAX_AGE
+        )
         req = self.create_request(session_cookie=cookie)
         res = self.create_response()
 
@@ -1042,7 +1166,9 @@ class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
         req = self.create_request()
         res = self.create_response()
 
-        with self.assertRaisesRegex(firebase_auth.InvalidIdTokenError, 'missing id_token'):
+        with self.assertRaisesRegex(
+            firebase_auth.InvalidIdTokenError, 'missing id_token'
+        ):
             firebase_auth_services.establish_auth_session(req, res)
 
         self.assertEqual(res.headers.get_all('Set-Cookie'), [])
@@ -1051,7 +1177,9 @@ class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
 class DestroyAuthSessionTests(FirebaseAuthServicesTestBase):
     def test_deletes_cookie_from_response(self) -> None:
         res = self.create_response(session_cookie='abc')
-        self.assert_matches_regexps(res.headers.get_all('Set-Cookie'), ['session=abc;'])
+        self.assert_matches_regexps(
+            res.headers.get_all('Set-Cookie'), ['session=abc;']
+        )
 
         firebase_auth_services.destroy_auth_session(res)
         self.assert_matches_regexps(
@@ -1064,8 +1192,16 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
     def test_returns_none_when_cookie_is_missing(self) -> None:
         id_token = self.firebase_sdk_stub.create_user(self.AUTH_ID)
 
-        self.assertIsNone(firebase_auth_services.get_auth_claims_from_request(self.create_request()))
-        self.assertIsNone(firebase_auth_services.get_auth_claims_from_request(self.create_request(id_token=id_token)))
+        self.assertIsNone(
+            firebase_auth_services.get_auth_claims_from_request(
+                self.create_request()
+            )
+        )
+        self.assertIsNone(
+            firebase_auth_services.get_auth_claims_from_request(
+                self.create_request(id_token=id_token)
+            )
+        )
 
     def test_returns_claims_when_cookie_is_present(self) -> None:
         cookie = firebase_auth.create_session_cookie(
@@ -1074,7 +1210,9 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
         )
 
         self.assertEqual(
-            firebase_auth_services.get_auth_claims_from_request(self.create_request(session_cookie=cookie)),
+            firebase_auth_services.get_auth_claims_from_request(
+                self.create_request(session_cookie=cookie)
+            ),
             auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL, False),
         )
 
@@ -1082,12 +1220,16 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
         admin_email_address = 'testadmin@example.com'
 
         cookie = firebase_auth.create_session_cookie(
-            self.firebase_sdk_stub.create_user(self.AUTH_ID, email=admin_email_address),
+            self.firebase_sdk_stub.create_user(
+                self.AUTH_ID, email=admin_email_address
+            ),
             feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
         )
 
         self.assertEqual(
-            firebase_auth_services.get_auth_claims_from_request(self.create_request(session_cookie=cookie)),
+            firebase_auth_services.get_auth_claims_from_request(
+                self.create_request(session_cookie=cookie)
+            ),
             auth_domain.AuthClaims(self.AUTH_ID, admin_email_address, True),
         )
 
@@ -1107,9 +1249,13 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
 
         with (
             always_raise_expired_session_cookie_error,
-            self.assertRaisesRegex(auth_domain.StaleAuthSessionError, 'expired'),
+            self.assertRaisesRegex(
+                auth_domain.StaleAuthSessionError, 'expired'
+            ),
         ):
-            firebase_auth_services.get_auth_claims_from_request(self.create_request(session_cookie=cookie))
+            firebase_auth_services.get_auth_claims_from_request(
+                self.create_request(session_cookie=cookie)
+            )
 
     def test_raises_stale_auth_session_error_when_cookie_is_revoked(
         self,
@@ -1126,12 +1272,18 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
         )
 
         with always_raise_revoked_session_cookie_error:
-            with self.assertRaisesRegex(auth_domain.StaleAuthSessionError, 'revoked'):
-                firebase_auth_services.get_auth_claims_from_request(self.create_request(session_cookie=cookie))
+            with self.assertRaisesRegex(
+                auth_domain.StaleAuthSessionError, 'revoked'
+            ):
+                firebase_auth_services.get_auth_claims_from_request(
+                    self.create_request(session_cookie=cookie)
+                )
 
     def test_raises_user_disabled_error_when_user_is_disabled(self) -> None:
         cookie = firebase_auth.create_session_cookie(
-            self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL, disabled=True),
+            self.firebase_sdk_stub.create_user(
+                self.AUTH_ID, email=self.EMAIL, disabled=True
+            ),
             feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
         )
 
@@ -1143,9 +1295,13 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
 
         with (
             always_raise_expired_session_cookie_error,
-            self.assertRaisesRegex(auth_domain.UserDisabledError, 'user is being deleted'),
+            self.assertRaisesRegex(
+                auth_domain.UserDisabledError, 'user is being deleted'
+            ),
         ):
-            firebase_auth_services.get_auth_claims_from_request(self.create_request(session_cookie=cookie))
+            firebase_auth_services.get_auth_claims_from_request(
+                self.create_request(session_cookie=cookie)
+            )
 
     def test_raises_auth_session_error_when_cookie_is_invalid(self) -> None:
         cookie = firebase_auth.create_session_cookie(
@@ -1160,68 +1316,114 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
         )
 
         with always_raise_unknown_error:
-            with self.assertRaisesRegex(auth_domain.InvalidAuthSessionError, 'uh-oh'):
-                firebase_auth_services.get_auth_claims_from_request(self.create_request(session_cookie=cookie))
+            with self.assertRaisesRegex(
+                auth_domain.InvalidAuthSessionError, 'uh-oh'
+            ):
+                firebase_auth_services.get_auth_claims_from_request(
+                    self.create_request(session_cookie=cookie)
+                )
 
 
 class GenericAssociationTests(FirebaseAuthServicesTestBase):
     def test_get_association_that_is_present(self) -> None:
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
-
-        self.assertEqual(firebase_auth_services.get_user_id_from_auth_id('aid'), 'uid')
-        self.assertEqual(firebase_auth_services.get_auth_id_from_user_id('uid'), 'aid')
-
-    def test_get_association_that_is_missing(self) -> None:
-        self.assertIsNone(firebase_auth_services.get_user_id_from_auth_id('does_not_exist'))
-        self.assertIsNone(firebase_auth_services.get_auth_id_from_user_id('does_not_exist'))
-
-    def test_get_multi_associations_with_all_present(self) -> None:
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid2', 'uid2'))
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid3', 'uid3'))
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
 
         self.assertEqual(
-            firebase_auth_services.get_multi_user_ids_from_auth_ids(['aid1', 'aid2', 'aid3']),
+            firebase_auth_services.get_user_id_from_auth_id('aid'), 'uid'
+        )
+        self.assertEqual(
+            firebase_auth_services.get_auth_id_from_user_id('uid'), 'aid'
+        )
+
+    def test_get_association_that_is_missing(self) -> None:
+        self.assertIsNone(
+            firebase_auth_services.get_user_id_from_auth_id('does_not_exist')
+        )
+        self.assertIsNone(
+            firebase_auth_services.get_auth_id_from_user_id('does_not_exist')
+        )
+
+    def test_get_multi_associations_with_all_present(self) -> None:
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid1', 'uid1')
+        )
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid2', 'uid2')
+        )
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid3', 'uid3')
+        )
+
+        self.assertEqual(
+            firebase_auth_services.get_multi_user_ids_from_auth_ids(
+                ['aid1', 'aid2', 'aid3']
+            ),
             ['uid1', 'uid2', 'uid3'],
         )
         self.assertEqual(
-            firebase_auth_services.get_multi_auth_ids_from_user_ids(['uid1', 'uid2', 'uid3']),
+            firebase_auth_services.get_multi_auth_ids_from_user_ids(
+                ['uid1', 'uid2', 'uid3']
+            ),
             ['aid1', 'aid2', 'aid3'],
         )
 
     def test_get_multi_associations_with_one_missing(self) -> None:
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid1', 'uid1')
+        )
         # The aid2 <-> uid2 association is missing.
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid3', 'uid3'))
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid3', 'uid3')
+        )
 
         self.assertEqual(
-            firebase_auth_services.get_multi_user_ids_from_auth_ids(['aid1', 'aid2', 'aid3']),
+            firebase_auth_services.get_multi_user_ids_from_auth_ids(
+                ['aid1', 'aid2', 'aid3']
+            ),
             ['uid1', None, 'uid3'],
         )
         self.assertEqual(
-            firebase_auth_services.get_multi_auth_ids_from_user_ids(['uid1', 'uid2', 'uid3']),
+            firebase_auth_services.get_multi_auth_ids_from_user_ids(
+                ['uid1', 'uid2', 'uid3']
+            ),
             ['aid1', None, 'aid3'],
         )
 
     def test_associate_without_collision(self) -> None:
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
 
-        self.assertEqual(firebase_auth_services.get_user_id_from_auth_id('aid'), 'uid')
-        self.assertEqual(firebase_auth_services.get_auth_id_from_user_id('uid'), 'aid')
+        self.assertEqual(
+            firebase_auth_services.get_user_id_from_auth_id('aid'), 'uid'
+        )
+        self.assertEqual(
+            firebase_auth_services.get_auth_id_from_user_id('uid'), 'aid'
+        )
 
     def test_associate_with_user_id_collision_raises(self) -> None:
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
 
         with self.assertRaisesRegex(Exception, 'already associated'):
-            firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
+            firebase_auth_services.associate_auth_id_with_user_id(
+                auth_domain.AuthIdUserIdPair('aid', 'uid')
+            )
 
     def test_associate_with_auth_id_collision_raises(self) -> None:
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
         # Erase the user_id collision, but leave the auth_id collision.
         auth_models.UserIdByFirebaseAuthIdModel.delete_by_id('aid')
 
         with self.assertRaisesRegex(Exception, 'already associated'):
-            firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
+            firebase_auth_services.associate_auth_id_with_user_id(
+                auth_domain.AuthIdUserIdPair('aid', 'uid')
+            )
 
     def test_associate_multi_without_collisions(self) -> None:
         firebase_auth_services.associate_multi_auth_ids_with_user_ids(
@@ -1242,7 +1444,9 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         )
 
     def test_associate_multi_with_user_id_collision_raises(self) -> None:
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid1', 'uid1')
+        )
 
         with self.assertRaisesRegex(Exception, 'already associated'):
             firebase_auth_services.associate_multi_auth_ids_with_user_ids(
@@ -1254,7 +1458,9 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
             )
 
     def test_associate_multi_with_auth_id_collision_raises(self) -> None:
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid1', 'uid1')
+        )
         # Erase the user_id collision, but leave the auth_id collision.
         auth_models.UserIdByFirebaseAuthIdModel.delete_by_id('aid1')
 
@@ -1269,38 +1475,68 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
 
     def test_present_association_is_not_considered_to_be_deleted(self) -> None:
         self.firebase_sdk_stub.create_user('aid')
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
 
-        self.assertFalse(firebase_auth_services.verify_external_auth_associations_are_deleted('uid'))
+        self.assertFalse(
+            firebase_auth_services.verify_external_auth_associations_are_deleted(
+                'uid'
+            )
+        )
 
     def test_missing_association_is_considered_to_be_deleted(self) -> None:
-        self.assertTrue(firebase_auth_services.verify_external_auth_associations_are_deleted('does_not_exist'))
+        self.assertTrue(
+            firebase_auth_services.verify_external_auth_associations_are_deleted(
+                'does_not_exist'
+            )
+        )
 
     def test_delete_association_when_it_is_present(self) -> None:
         self.firebase_sdk_stub.create_user('aid')
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
-        self.assertFalse(firebase_auth_services.verify_external_auth_associations_are_deleted('uid'))
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
+        self.assertFalse(
+            firebase_auth_services.verify_external_auth_associations_are_deleted(
+                'uid'
+            )
+        )
 
         firebase_auth_services.delete_external_auth_associations('uid')
 
-        self.assertTrue(firebase_auth_services.verify_external_auth_associations_are_deleted('uid'))
+        self.assertTrue(
+            firebase_auth_services.verify_external_auth_associations_are_deleted(
+                'uid'
+            )
+        )
 
     def test_delete_association_when_it_is_missing_does_not_raise(self) -> None:
         # Should not raise.
-        firebase_auth_services.delete_external_auth_associations('does_not_exist')
+        firebase_auth_services.delete_external_auth_associations(
+            'does_not_exist'
+        )
 
     def test_disable_association_marks_user_for_deletion(self) -> None:
         self.firebase_sdk_stub.create_user('aid')
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
 
-        self.assertEqual(firebase_auth_services.get_user_id_from_auth_id('aid'), 'uid')
+        self.assertEqual(
+            firebase_auth_services.get_user_id_from_auth_id('aid'), 'uid'
+        )
         self.firebase_sdk_stub.assert_is_not_disabled('aid')
 
         firebase_auth_services.mark_user_for_deletion('uid')
 
-        self.assertIsNone(firebase_auth_services.get_user_id_from_auth_id('aid'))
+        self.assertIsNone(
+            firebase_auth_services.get_user_id_from_auth_id('aid')
+        )
         self.assertEqual(
-            firebase_auth_services.get_user_id_from_auth_id('aid', include_deleted=True),
+            firebase_auth_services.get_user_id_from_auth_id(
+                'aid', include_deleted=True
+            ),
             'uid',
         )
         self.firebase_sdk_stub.assert_is_disabled('aid')
@@ -1309,7 +1545,9 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         self,
     ) -> None:
         self.firebase_sdk_stub.create_user('aid')
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
         update_user_swap = self.swap_to_always_raise(
             firebase_auth,
             'update_user',
@@ -1317,16 +1555,22 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         )
         log_capturing_context = self.capture_logging()
 
-        self.assertEqual(firebase_auth_services.get_user_id_from_auth_id('aid'), 'uid')
+        self.assertEqual(
+            firebase_auth_services.get_user_id_from_auth_id('aid'), 'uid'
+        )
         self.firebase_sdk_stub.assert_is_not_disabled('aid')
 
         with update_user_swap, log_capturing_context as logs:
             firebase_auth_services.mark_user_for_deletion('uid')
 
         self.assert_matches_regexps(logs, ['could not update'])
-        self.assertIsNone(firebase_auth_services.get_user_id_from_auth_id('aid'))
+        self.assertIsNone(
+            firebase_auth_services.get_user_id_from_auth_id('aid')
+        )
         self.assertEqual(
-            firebase_auth_services.get_user_id_from_auth_id('aid', include_deleted=True),
+            firebase_auth_services.get_user_id_from_auth_id(
+                'aid', include_deleted=True
+            ),
             'uid',
         )
         self.firebase_sdk_stub.assert_is_not_disabled('aid')
@@ -1337,7 +1581,9 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         with self.capture_logging() as logs:
             firebase_auth_services.mark_user_for_deletion('uid')
 
-        self.assert_matches_regexps(logs, [r'\[WIPEOUT\] User with user_id=uid has no Firebase account'])
+        self.assert_matches_regexps(
+            logs, [r'\[WIPEOUT\] User with user_id=uid has no Firebase account']
+        )
 
 
 class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
@@ -1347,7 +1593,9 @@ class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.firebase_sdk_stub.create_user(self.AUTH_ID)
-        firebase_auth_services.associate_auth_id_with_user_id(auth_domain.AuthIdUserIdPair(self.AUTH_ID, self.USER_ID))
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair(self.AUTH_ID, self.USER_ID)
+        )
 
     def test_delete_user_when_firebase_raises_an_error(self) -> None:
         delete_swap = self.swap_to_always_raise(
@@ -1357,16 +1605,28 @@ class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
         )
 
         with delete_swap, self.capture_logging() as logs:
-            firebase_auth_services.delete_external_auth_associations(self.USER_ID)
+            firebase_auth_services.delete_external_auth_associations(
+                self.USER_ID
+            )
 
-        self.assertFalse(firebase_auth_services.verify_external_auth_associations_are_deleted(self.USER_ID))
+        self.assertFalse(
+            firebase_auth_services.verify_external_auth_associations_are_deleted(
+                self.USER_ID
+            )
+        )
         self.assert_matches_regexps(logs, ['could not connect'])
 
     def test_delete_user_when_firebase_succeeds(self) -> None:
         with self.capture_logging() as logs:
-            firebase_auth_services.delete_external_auth_associations(self.USER_ID)
+            firebase_auth_services.delete_external_auth_associations(
+                self.USER_ID
+            )
 
-        self.assertTrue(firebase_auth_services.verify_external_auth_associations_are_deleted(self.USER_ID))
+        self.assertTrue(
+            firebase_auth_services.verify_external_auth_associations_are_deleted(
+                self.USER_ID
+            )
+        )
         self.assertEqual(logs, [])
 
     def test_get_all_external_accounts_returns_all_firebase_users(self) -> None:
@@ -1412,7 +1672,9 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
         return self.swap_to_always_return(
             firebase_auth,
             'get_users',
-            firebase_auth.GetUsersResult([firebase_auth.UserRecord({'localId': 'id'})], []),
+            firebase_auth.GetUsersResult(
+                [firebase_auth.UserRecord({'localId': 'id'})], []
+            ),
         )
 
     def swap_get_users_to_raise_error(self) -> ContextManager[None]:
@@ -1425,13 +1687,19 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
 
     def swap_delete_user_to_always_fail(self) -> ContextManager[None]:
         """Swaps the delete_user function so that it always fails."""
-        return self.swap_to_always_raise(firebase_auth, 'delete_user', error=self.UNKNOWN_ERROR)
+        return self.swap_to_always_raise(
+            firebase_auth, 'delete_user', error=self.UNKNOWN_ERROR
+        )
 
     def test_delete_external_auth_associations_happy_path(self) -> None:
         firebase_auth_services.delete_external_auth_associations(self.user_id)
 
         self.firebase_sdk_stub.assert_is_not_user(self.AUTH_ID)
-        self.assertTrue(firebase_auth_services.verify_external_auth_associations_are_deleted(self.user_id))
+        self.assertTrue(
+            firebase_auth_services.verify_external_auth_associations_are_deleted(
+                self.user_id
+            )
+        )
 
     def test_delete_external_auth_associations_when_user_not_found(
         self,
@@ -1439,7 +1707,9 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
         firebase_auth.delete_user(self.AUTH_ID)
 
         with self.capture_logging() as logs:
-            firebase_auth_services.delete_external_auth_associations(self.user_id)
+            firebase_auth_services.delete_external_auth_associations(
+                self.user_id
+            )
 
         self.assert_matches_regexps(
             logs,
@@ -1452,11 +1722,17 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
         self,
     ) -> None:
         with self.swap_delete_user_to_always_fail():
-            firebase_auth_services.delete_external_auth_associations(self.user_id)
+            firebase_auth_services.delete_external_auth_associations(
+                self.user_id
+            )
 
         self.firebase_sdk_stub.assert_is_user(self.AUTH_ID)
 
-        self.assertFalse(firebase_auth_services.verify_external_auth_associations_are_deleted(self.user_id))
+        self.assertFalse(
+            firebase_auth_services.verify_external_auth_associations_are_deleted(
+                self.user_id
+            )
+        )
 
     def test_delete_external_auth_associations_when_get_users_fails(
         self,
@@ -1466,9 +1742,17 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
         self.firebase_sdk_stub.assert_is_not_user(self.AUTH_ID)
 
         with self.swap_get_users_to_return_non_empty_users_result():
-            self.assertFalse(firebase_auth_services.verify_external_auth_associations_are_deleted(self.user_id))
+            self.assertFalse(
+                firebase_auth_services.verify_external_auth_associations_are_deleted(
+                    self.user_id
+                )
+            )
 
-        self.assertTrue(firebase_auth_services.verify_external_auth_associations_are_deleted(self.user_id))
+        self.assertTrue(
+            firebase_auth_services.verify_external_auth_associations_are_deleted(
+                self.user_id
+            )
+        )
 
     def test_delete_external_auth_associations_when_get_users_raise_error(
         self,
@@ -1479,11 +1763,19 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
 
         with self.swap_get_users_to_raise_error():
             with self.capture_logging() as logs:
-                self.assertFalse(firebase_auth_services.verify_external_auth_associations_are_deleted(self.user_id))
+                self.assertFalse(
+                    firebase_auth_services.verify_external_auth_associations_are_deleted(
+                        self.user_id
+                    )
+                )
                 self.assertEqual(len(logs), 1)
                 self.assertEqual(
                     logs[0].split('\n')[0],
                     '[WIPEOUT] Firebase Admin SDK failed! Stack trace:',
                 )
 
-        self.assertTrue(firebase_auth_services.verify_external_auth_associations_are_deleted(self.user_id))
+        self.assertTrue(
+            firebase_auth_services.verify_external_auth_associations_are_deleted(
+                self.user_id
+            )
+        )

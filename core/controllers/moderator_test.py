@@ -44,11 +44,15 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_id)
 
-        self.save_new_valid_collection(self.COL_ID_1, self.user_id, exploration_id=self.EXP_ID_1)
+        self.save_new_valid_collection(
+            self.COL_ID_1, self.user_id, exploration_id=self.EXP_ID_1
+        )
 
         rights_manager.publish_collection(self.user, self.COL_ID_1)
 
-        self.save_new_valid_collection(self.COL_ID_2, self.user_id, exploration_id=self.EXP_ID_1)
+        self.save_new_valid_collection(
+            self.COL_ID_2, self.user_id, exploration_id=self.EXP_ID_1
+        )
 
     def test_nonexistent_exploration_id_should_fail(self) -> None:
         self.login(self.MODERATOR_EMAIL)
@@ -434,7 +438,9 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
             },
             csrf_token=csrf_token,
         )
-        featured_activity_references = self.get_json('/moderatorhandler/featured')['featured_activity_references']
+        featured_activity_references = self.get_json(
+            '/moderatorhandler/featured'
+        )['featured_activity_references']
         self.assertEqual(featured_activity_references[0]['id'], self.EXP_ID_1)
         self.assertEqual(featured_activity_references[1]['id'], self.COL_ID_1)
         self.logout()
@@ -462,6 +468,8 @@ class EmailDraftHandlerTests(test_utils.GenericTestBase):
     def test_get_draft_email_body(self) -> None:
         self.login(self.MODERATOR_EMAIL)
         expected_draft_text_body = 'I\'m writing to inform you that I have unpublished the above exploration.'
-        d_text = self.get_json('/moderatorhandler/email_draft')['draft_email_body']
+        d_text = self.get_json('/moderatorhandler/email_draft')[
+            'draft_email_body'
+        ]
         self.assertEqual(d_text, expected_draft_text_body)
         self.logout()

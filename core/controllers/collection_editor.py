@@ -34,13 +34,20 @@ from core.domain import (
 )
 
 
-def _require_valid_version(version_from_payload: Optional[int], collection_version: int) -> None:
+def _require_valid_version(
+    version_from_payload: Optional[int], collection_version: int
+) -> None:
     """Check that the payload version matches the given collection version."""
     if version_from_payload is None:
-        raise base.BaseHandler.InvalidInputException('Invalid POST request: a version must be specified.')
+        raise base.BaseHandler.InvalidInputException(
+            'Invalid POST request: a version must be specified.'
+        )
 
     if version_from_payload != collection_version:
-        raise base.BaseHandler.InvalidInputException('Trying to update version %s of collection from version %s, which is too old. Please reload the page and try again.' % (collection_version, version_from_payload))
+        raise base.BaseHandler.InvalidInputException(
+            'Trying to update version %s of collection from version %s, which is too old. Please reload the page and try again.'
+            % (collection_version, version_from_payload)
+        )
 
 
 class EditableCollectionDataHandlerNormalizedPayloadDict(TypedDict):
@@ -53,11 +60,17 @@ class EditableCollectionDataHandlerNormalizedPayloadDict(TypedDict):
     change_list: List[collection_domain.CollectionChange]
 
 
-class EditableCollectionDataHandler(base.BaseHandler[EditableCollectionDataHandlerNormalizedPayloadDict, Dict[str, str]]):
+class EditableCollectionDataHandler(
+    base.BaseHandler[
+        EditableCollectionDataHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """A data handler for collections which supports writing."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {'collection_id': {'schema': {'type': 'basestring'}}}
+    URL_PATH_ARGS_SCHEMAS = {
+        'collection_id': {'schema': {'type': 'basestring'}}
+    }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'PUT': {
@@ -94,7 +107,9 @@ class EditableCollectionDataHandler(base.BaseHandler[EditableCollectionDataHandl
             collection_id: str. The ID of the collection.
         """
 
-        collection_dict = summary_services.get_learner_collection_dict_by_id(collection_id, self.user, allow_invalid_explorations=True)
+        collection_dict = summary_services.get_learner_collection_dict_by_id(
+            collection_id, self.user, allow_invalid_explorations=True
+        )
 
         self.values.update({'collection_dict': collection_dict})
 
@@ -123,7 +138,9 @@ class EditableCollectionDataHandler(base.BaseHandler[EditableCollectionDataHandl
             commit_message,
         )
 
-        collection_dict = summary_services.get_learner_collection_dict_by_id(collection_id, self.user, allow_invalid_explorations=True)
+        collection_dict = summary_services.get_learner_collection_dict_by_id(
+            collection_id, self.user, allow_invalid_explorations=True
+        )
 
         # Send the updated collection back to the frontend.
         self.values.update({'collection_dict': collection_dict})
@@ -135,7 +152,9 @@ class CollectionRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles management of collection editing rights."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {'collection_id': {'schema': {'type': 'basestring'}}}
+    URL_PATH_ARGS_SCHEMAS = {
+        'collection_id': {'schema': {'type': 'basestring'}}
+    }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_edit_collection
@@ -148,18 +167,31 @@ class CollectionRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         Raises:
             Exception. No collection found for the given collection_id.
         """
-        (collection, collection_rights) = collection_services.get_collection_and_collection_rights_by_id(collection_id)
+        (collection, collection_rights) = (
+            collection_services.get_collection_and_collection_rights_by_id(
+                collection_id
+            )
+        )
 
         if collection is None:
-            raise Exception('No collection found for the given collection_id: %s' % collection_id)
+            raise Exception(
+                'No collection found for the given collection_id: %s'
+                % collection_id
+            )
 
         self.values.update(
             {
                 'can_edit': True,
-                'can_unpublish': rights_manager.check_can_unpublish_activity(self.user, collection_rights),
+                'can_unpublish': rights_manager.check_can_unpublish_activity(
+                    self.user, collection_rights
+                ),
                 'collection_id': collection.id,
-                'is_private': rights_manager.is_collection_private(collection_id),
-                'owner_names': rights_manager.get_collection_owner_names(collection_id),
+                'is_private': rights_manager.is_collection_private(
+                    collection_id
+                ),
+                'owner_names': rights_manager.get_collection_owner_names(
+                    collection_id
+                ),
             }
         )
 
@@ -174,11 +206,19 @@ class CollectionPublishHandlerNormalizedPayloadDict(TypedDict):
     version: Optional[int]
 
 
-class CollectionPublishHandler(base.BaseHandler[CollectionPublishHandlerNormalizedPayloadDict, Dict[str, str]]):
+class CollectionPublishHandler(
+    base.BaseHandler[
+        CollectionPublishHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handles the publication of the given collection."""
 
-    URL_PATH_ARGS_SCHEMAS = {'collection_id': {'schema': {'type': 'basestring'}}}
-    HANDLER_ARGS_SCHEMAS = {'PUT': {'version': {'schema': {'type': 'int'}, 'default_value': None}}}
+    URL_PATH_ARGS_SCHEMAS = {
+        'collection_id': {'schema': {'type': 'basestring'}}
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {'version': {'schema': {'type': 'int'}, 'default_value': None}}
+    }
 
     @acl_decorators.can_publish_collection
     def put(self, collection_id: str) -> None:
@@ -188,25 +228,37 @@ class CollectionPublishHandler(base.BaseHandler[CollectionPublishHandlerNormaliz
             collection_id: str. The ID of the collection.
         """
         assert self.normalized_payload is not None
-        collection = collection_services.get_collection_by_id(collection_id, strict=True)
+        collection = collection_services.get_collection_by_id(
+            collection_id, strict=True
+        )
         version = self.normalized_payload.get('version')
         _require_valid_version(version, collection.version)
 
         collection.validate(strict=True)
         collection_services.validate_exps_in_collection_are_public(collection)
 
-        collection_services.publish_collection_and_update_user_profiles(self.user, collection_id)
+        collection_services.publish_collection_and_update_user_profiles(
+            self.user, collection_id
+        )
         collection_services.index_collections_given_ids([collection_id])
 
-        collection_rights = rights_manager.get_collection_rights(collection_id, strict=False)
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False
+        )
 
         self.values.update(
             {
                 'can_edit': True,
-                'can_unpublish': rights_manager.check_can_unpublish_activity(self.user, collection_rights),
+                'can_unpublish': rights_manager.check_can_unpublish_activity(
+                    self.user, collection_rights
+                ),
                 'collection_id': collection.id,
-                'is_private': rights_manager.is_collection_private(collection_id),
-                'owner_names': rights_manager.get_collection_owner_names(collection_id),
+                'is_private': rights_manager.is_collection_private(
+                    collection_id
+                ),
+                'owner_names': rights_manager.get_collection_owner_names(
+                    collection_id
+                ),
             }
         )
         self.render_json(self.values)
@@ -220,11 +272,19 @@ class CollectionUnpublishHandlerNormalizedPayloadDict(TypedDict):
     version: Optional[int]
 
 
-class CollectionUnpublishHandler(base.BaseHandler[CollectionUnpublishHandlerNormalizedPayloadDict, Dict[str, str]]):
+class CollectionUnpublishHandler(
+    base.BaseHandler[
+        CollectionUnpublishHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Handles the unpublication of the given collection."""
 
-    URL_PATH_ARGS_SCHEMAS = {'collection_id': {'schema': {'type': 'basestring'}}}
-    HANDLER_ARGS_SCHEMAS = {'PUT': {'version': {'schema': {'type': 'int'}, 'default_value': None}}}
+    URL_PATH_ARGS_SCHEMAS = {
+        'collection_id': {'schema': {'type': 'basestring'}}
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {'version': {'schema': {'type': 'int'}, 'default_value': None}}
+    }
 
     @acl_decorators.can_unpublish_collection
     def put(self, collection_id: str) -> None:
@@ -241,15 +301,23 @@ class CollectionUnpublishHandler(base.BaseHandler[CollectionUnpublishHandlerNorm
         rights_manager.unpublish_collection(self.user, collection_id)
         search_services.delete_collections_from_search_index([collection_id])
 
-        collection_rights = rights_manager.get_collection_rights(collection_id, strict=False)
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False
+        )
 
         self.values.update(
             {
                 'can_edit': True,
-                'can_unpublish': rights_manager.check_can_unpublish_activity(self.user, collection_rights),
+                'can_unpublish': rights_manager.check_can_unpublish_activity(
+                    self.user, collection_rights
+                ),
                 'collection_id': collection.id,
-                'is_private': rights_manager.is_collection_private(collection_id),
-                'owner_names': rights_manager.get_collection_owner_names(collection_id),
+                'is_private': rights_manager.is_collection_private(
+                    collection_id
+                ),
+                'owner_names': rights_manager.get_collection_owner_names(
+                    collection_id
+                ),
             }
         )
         self.render_json(self.values)
@@ -264,7 +332,11 @@ class ExplorationMetadataSearchHandlerNormalizedRequestDict(TypedDict):
     offset: Optional[int]
 
 
-class ExplorationMetadataSearchHandler(base.BaseHandler[Dict[str, str], ExplorationMetadataSearchHandlerNormalizedRequestDict]):
+class ExplorationMetadataSearchHandler(
+    base.BaseHandler[
+        Dict[str, str], ExplorationMetadataSearchHandlerNormalizedRequestDict
+    ]
+):
     """Provides data for exploration search."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -289,7 +361,11 @@ class ExplorationMetadataSearchHandler(base.BaseHandler[Dict[str, str], Explorat
 
         search_offset = self.normalized_request.get('offset')
 
-        collection_node_metadata_list, new_search_offset = summary_services.get_exp_metadata_dicts_matching_query(query_string, search_offset, self.user)
+        collection_node_metadata_list, new_search_offset = (
+            summary_services.get_exp_metadata_dicts_matching_query(
+                query_string, search_offset, self.user
+            )
+        )
 
         self.values.update(
             {

@@ -47,19 +47,48 @@ class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
     """
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        exp_models_pcoll = self.pipeline | 'Get all ExplorationModels' >> ndb_io.GetModels(exp_models.ExplorationModel.get_all())
+        exp_models_pcoll = (
+            self.pipeline
+            | 'Get all ExplorationModels'
+            >> ndb_io.GetModels(exp_models.ExplorationModel.get_all())
+        )
 
-        exp_models_filtered = exp_models_pcoll | 'Filter Math ExplorationModels' >> beam.Filter(self.contains_math_interactions)
+        exp_models_filtered = (
+            exp_models_pcoll
+            | 'Filter Math ExplorationModels'
+            >> beam.Filter(self.contains_math_interactions)
+        )
 
-        exp_models_with_states = exp_models_filtered | 'Mapping exp_ids with states' >> (beam.FlatMap(self.flat_map_exp_with_states))
+        exp_models_with_states = (
+            exp_models_filtered
+            | 'Mapping exp_ids with states'
+            >> (beam.FlatMap(self.flat_map_exp_with_states))
+        )
 
-        exp_models_with_states_filtered = exp_models_with_states | 'Filtering out states without math interactions' >> (beam.Filter(lambda tup: tup[2]['interaction']['id'] in feconf.MATH_INTERACTION_IDS))
+        exp_models_with_states_filtered = (
+            exp_models_with_states
+            | 'Filtering out states without math interactions'
+            >> (
+                beam.Filter(
+                    lambda tup: tup[2]['interaction']['id']
+                    in feconf.MATH_INTERACTION_IDS
+                )
+            )
+        )
 
-        exp_models_with_states_and_rules = exp_models_with_states_filtered | 'Mapping with rule types list' >> (beam.Map(self.map_with_rule_types))
+        exp_models_with_states_and_rules = (
+            exp_models_with_states_filtered
+            | 'Mapping with rule types list'
+            >> (beam.Map(self.map_with_rule_types))
+        )
 
-        return exp_models_with_states_and_rules | 'Final output' >> beam.Map(job_run_result.JobRunResult.as_stdout)
+        return exp_models_with_states_and_rules | 'Final output' >> beam.Map(
+            job_run_result.JobRunResult.as_stdout
+        )
 
-    def contains_math_interactions(self, model: exp_models.ExplorationModel) -> bool:
+    def contains_math_interactions(
+        self, model: exp_models.ExplorationModel
+    ) -> bool:
         """Checks if the exploration contains any state with any of the
         math interactions.
 
@@ -69,9 +98,14 @@ class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
         Returns:
             bool. Whether the exploration contains math interactions.
         """
-        return any(state_dict['interaction']['id'] in feconf.MATH_INTERACTION_IDS for state_dict in model.states.values())
+        return any(
+            state_dict['interaction']['id'] in feconf.MATH_INTERACTION_IDS
+            for state_dict in model.states.values()
+        )
 
-    def flat_map_exp_with_states(self, model: exp_models.ExplorationModel) -> List[Tuple[str, str, state_domain.StateDict]]:
+    def flat_map_exp_with_states(
+        self, model: exp_models.ExplorationModel
+    ) -> List[Tuple[str, str, state_domain.StateDict]]:
         """Maps exploration model with it's states data.
 
         Args:
@@ -81,9 +115,14 @@ class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
             List[Tuple[str, str, dict]]. List of tuples
             (exp_id, state_name, state_dict).
         """
-        return [(model.id, state_name, state_dict) for state_name, state_dict in model.states.items()]
+        return [
+            (model.id, state_name, state_dict)
+            for state_name, state_dict in model.states.items()
+        ]
 
-    def map_with_rule_types(self, tup: Tuple[str, str, state_domain.StateDict]) -> Tuple[str, str, List[str]]:
+    def map_with_rule_types(
+        self, tup: Tuple[str, str, state_domain.StateDict]
+    ) -> Tuple[str, str, List[str]]:
         """Maps state tuple with it's rule types.
 
         Args:

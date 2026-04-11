@@ -42,4 +42,8 @@ class FlushCache(beam.PTransform):  # type: ignore[misc]
         Returns:
             PCollection. An empty PCollection.
         """
-        return items | beam.CombineGlobally(lambda _: []) | beam.Map(lambda _: caching_services.flush_memory_caches())
+        return (
+            items
+            | beam.CombineGlobally(lambda _: [])
+            | beam.Map(lambda _: caching_services.flush_memory_caches())
+        )

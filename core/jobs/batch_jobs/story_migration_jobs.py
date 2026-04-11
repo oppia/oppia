@@ -47,7 +47,9 @@ if MYPY:  # pragma: no cover
         topic_models,
     )
 
-(base_models, story_models, topic_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.STORY, models.Names.TOPIC])
+(base_models, story_models, topic_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.STORY, models.Names.TOPIC]
+)
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -88,8 +90,12 @@ class MigrateStoryModels(beam.PTransform):  # type: ignore[misc]
             story = story_fetchers.get_story_from_model(story_model)
             story.validate()
             assert topic_id_to_topic is not None
-            corresponding_topic = topic_id_to_topic[story.corresponding_topic_id]
-            story_services.validate_prerequisite_skills_in_story_contents(corresponding_topic.get_all_skill_ids(), story.story_contents)
+            corresponding_topic = topic_id_to_topic[
+                story.corresponding_topic_id
+            ]
+            story_services.validate_prerequisite_skills_in_story_contents(
+                corresponding_topic.get_all_skill_ids(), story.story_contents
+            )
         except Exception as e:
             logging.exception(e)
             return result.Err((story_id, e))
@@ -97,7 +103,9 @@ class MigrateStoryModels(beam.PTransform):  # type: ignore[misc]
         return result.Ok((story_id, story))
 
     @staticmethod
-    def _generate_story_changes(story_id: str, story_model: story_models.StoryModel) -> Iterable[Tuple[str, story_domain.StoryChange]]:
+    def _generate_story_changes(
+        story_id: str, story_model: story_models.StoryModel
+    ) -> Iterable[Tuple[str, story_domain.StoryChange]]:
         """Generates story change objects. Story change object is generated when
         schema version for some field is lower than the latest schema version.
 
@@ -139,7 +147,8 @@ class MigrateStoryModels(beam.PTransform):  # type: ignore[misc]
         """
         unmigrated_story_models = (
             pipeline
-            | 'Get all non-deleted story models' >> (ndb_io.GetModels(story_models.StoryModel.get_all()))
+            | 'Get all non-deleted story models'
+            >> (ndb_io.GetModels(story_models.StoryModel.get_all()))
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
             | 'Add story keys'
@@ -149,7 +158,8 @@ class MigrateStoryModels(beam.PTransform):  # type: ignore[misc]
         )
         story_summary_models = (
             pipeline
-            | 'Get all non-deleted story summary models' >> (ndb_io.GetModels(story_models.StorySummaryModel.get_all()))
+            | 'Get all non-deleted story summary models'
+            >> (ndb_io.GetModels(story_models.StorySummaryModel.get_all()))
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
             | 'Add story summary keys'
@@ -159,8 +169,10 @@ class MigrateStoryModels(beam.PTransform):  # type: ignore[misc]
         )
         topics = (
             self.pipeline
-            | 'Get all non-deleted topic models' >> (ndb_io.GetModels(topic_models.TopicModel.get_all()))
-            | 'Transform model into domain object' >> beam.Map(topic_fetchers.get_topic_from_model)
+            | 'Get all non-deleted topic models'
+            >> (ndb_io.GetModels(topic_models.TopicModel.get_all()))
+            | 'Transform model into domain object'
+            >> beam.Map(topic_fetchers.get_topic_from_model)
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
             | 'Add topic keys'
@@ -170,13 +182,33 @@ class MigrateStoryModels(beam.PTransform):  # type: ignore[misc]
         )
         topic_id_to_topic = beam.pvalue.AsDict(topics)
 
-        all_migrated_story_results = unmigrated_story_models | 'Transform and migrate model' >> beam.MapTuple(self._migrate_story, topic_id_to_topic=topic_id_to_topic)
-        migrated_story_job_run_results = all_migrated_story_results | 'Generate results for migration' >> (job_result_transforms.ResultsToJobRunResults('STORY PROCESSED'))
-        filtered_migrated_stories = all_migrated_story_results | 'Filter migration results' >> (results_transforms.DrainResultsOnError())
+        all_migrated_story_results = (
+            unmigrated_story_models
+            | 'Transform and migrate model'
+            >> beam.MapTuple(
+                self._migrate_story, topic_id_to_topic=topic_id_to_topic
+            )
+        )
+        migrated_story_job_run_results = (
+            all_migrated_story_results
+            | 'Generate results for migration'
+            >> (job_result_transforms.ResultsToJobRunResults('STORY PROCESSED'))
+        )
+        filtered_migrated_stories = (
+            all_migrated_story_results
+            | 'Filter migration results'
+            >> (results_transforms.DrainResultsOnError())
+        )
 
-        migrated_stories = filtered_migrated_stories | 'Unwrap ok' >> beam.Map(lambda result_item: result_item.unwrap())
+        migrated_stories = filtered_migrated_stories | 'Unwrap ok' >> beam.Map(
+            lambda result_item: result_item.unwrap()
+        )
 
-        story_changes = unmigrated_story_models | 'Generate story changes' >> beam.FlatMapTuple(self._generate_story_changes)
+        story_changes = (
+            unmigrated_story_models
+            | 'Generate story changes'
+            >> beam.FlatMapTuple(self._generate_story_changes)
+        )
 
         story_objects_list = (
             {
@@ -191,7 +223,10 @@ class MigrateStoryModels(beam.PTransform):  # type: ignore[misc]
 
         transformed_story_objects_list = (
             story_objects_list
-            | 'Remove unmigrated stories' >> beam.Filter(lambda x: len(x['story_change']) > 0 and len(x['story']) > 0)
+            | 'Remove unmigrated stories'
+            >> beam.Filter(
+                lambda x: len(x['story_change']) > 0 and len(x['story']) > 0
+            )
             | 'Reorganize the story objects'
             >> beam.Map(
                 lambda objects: {
@@ -203,9 +238,29 @@ class MigrateStoryModels(beam.PTransform):  # type: ignore[misc]
             )
         )
 
-        already_migrated_job_run_results = story_objects_list | 'Remove migrated stories' >> beam.Filter(lambda x: (len(x['story_change']) == 0 and len(x['story']) > 0)) | 'Transform previously migrated stories into job run results' >> (job_result_transforms.CountObjectsToJobRunResult('STORY PREVIOUSLY MIGRATED'))
+        already_migrated_job_run_results = (
+            story_objects_list
+            | 'Remove migrated stories'
+            >> beam.Filter(
+                lambda x: (len(x['story_change']) == 0 and len(x['story']) > 0)
+            )
+            | 'Transform previously migrated stories into job run results'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'STORY PREVIOUSLY MIGRATED'
+                )
+            )
+        )
 
-        story_objects_list_job_run_results = transformed_story_objects_list | 'Transform story objects into job run results' >> (job_result_transforms.CountObjectsToJobRunResult('STORY MIGRATED'))
+        story_objects_list_job_run_results = (
+            transformed_story_objects_list
+            | 'Transform story objects into job run results'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'STORY MIGRATED'
+                )
+            )
+        )
 
         job_run_results = (
             migrated_story_job_run_results,
@@ -238,13 +293,16 @@ class MigrateStoryJob(base_jobs.JobBase):
             sequence(BaseModel). Sequence of models which should be put into
             the datastore.
         """
-        updated_story_model = story_services.populate_story_model_fields(story_model, migrated_story)
+        updated_story_model = story_services.populate_story_model_fields(
+            story_model, migrated_story
+        )
         change_dicts = [story_change.to_dict()]
         with datastore_services.get_ndb_context():
             models_to_put = updated_story_model.compute_models_to_commit(
                 feconf.MIGRATION_BOT_USERNAME,
                 feconf.COMMIT_TYPE_EDIT,
-                'Update story contents schema version to %d.' % (feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+                'Update story contents schema version to %d.'
+                % (feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
                 change_dicts,
                 additional_models={},
             )
@@ -274,7 +332,11 @@ class MigrateStoryJob(base_jobs.JobBase):
         """
         story_summary = story_services.compute_summary_of_story(migrated_story)
         story_summary.version += 1
-        updated_story_summary_model = story_services.populate_story_summary_model_fields(story_summary_model, story_summary)
+        updated_story_summary_model = (
+            story_services.populate_story_summary_model_fields(
+                story_summary_model, story_summary
+            )
+        )
         return updated_story_summary_model
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -283,19 +345,39 @@ class MigrateStoryJob(base_jobs.JobBase):
         Returns:
             PCollection. A PCollection of results from the story migration.
         """
-        transformed_story_objects_list, job_run_results = self.pipeline | 'Perform migration and filter migration results' >> (MigrateStoryModels())
+        transformed_story_objects_list, job_run_results = (
+            self.pipeline
+            | 'Perform migration and filter migration results'
+            >> (MigrateStoryModels())
+        )
 
-        story_models_to_put = transformed_story_objects_list | 'Generate story models to put' >> beam.FlatMap(
-            lambda story_objects: self._update_story(
-                story_objects['story_model'],
-                story_objects['story'],
-                story_objects['story_change'],
+        story_models_to_put = (
+            transformed_story_objects_list
+            | 'Generate story models to put'
+            >> beam.FlatMap(
+                lambda story_objects: self._update_story(
+                    story_objects['story_model'],
+                    story_objects['story'],
+                    story_objects['story_change'],
+                )
             )
         )
 
-        story_summary_models_to_put = transformed_story_objects_list | 'Generate story summary models to put' >> beam.Map(lambda story_objects: self._update_story_summary(story_objects['story'], story_objects['story_summary_model']))
+        story_summary_models_to_put = (
+            transformed_story_objects_list
+            | 'Generate story summary models to put'
+            >> beam.Map(
+                lambda story_objects: self._update_story_summary(
+                    story_objects['story'], story_objects['story_summary_model']
+                )
+            )
+        )
 
-        ((story_models_to_put, story_summary_models_to_put) | 'Merge models' >> beam.Flatten() | 'Put models into the datastore' >> ndb_io.PutModels())
+        (
+            (story_models_to_put, story_summary_models_to_put)
+            | 'Merge models' >> beam.Flatten()
+            | 'Put models into the datastore' >> ndb_io.PutModels()
+        )
 
         return job_run_results
 
@@ -310,6 +392,10 @@ class AuditStoryMigrationJob(base_jobs.JobBase):
             PCollection. A PCollection of results from the story migration.
         """
 
-        unused_transformed_story_objects_list, job_run_results = self.pipeline | 'Perform migration and filter migration results' >> (MigrateStoryModels())
+        unused_transformed_story_objects_list, job_run_results = (
+            self.pipeline
+            | 'Perform migration and filter migration results'
+            >> (MigrateStoryModels())
+        )
 
         return job_run_results

@@ -28,7 +28,9 @@ from core.tests import test_utils
 class ImageValidationServiceTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None) as f:
+        with open(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
             self.raw_image = f.read()
 
     def _assert_image_validation_error(
@@ -39,8 +41,12 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
         expected_error_substring: str,
     ) -> None:
         """Checks that the image passes validation."""
-        with self.assertRaisesRegex(utils.ValidationError, expected_error_substring):
-            image_validation_services.validate_image_and_filename(image, filename, entity_type)
+        with self.assertRaisesRegex(
+            utils.ValidationError, expected_error_substring
+        ):
+            image_validation_services.validate_image_and_filename(
+                image, filename, entity_type
+            )
 
     def test_image_validation_checks(self) -> None:
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -62,7 +68,9 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
             'No filename supplied',
         )
 
-        large_image = '<svg><path d="%s" /></svg>' % ('M150 0 L75 200 L225 200 Z ' * 4000)
+        large_image = '<svg><path d="%s" /></svg>' % (
+            'M150 0 L75 200 L225 200 Z ' * 4000
+        )
         self._assert_image_validation_error(
             large_image,
             'image.svg',
@@ -70,7 +78,9 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
             'Image exceeds file size limit of 100 KB',
         )
 
-        large_image = '<svg><path d="%s" /></svg>' % ('M150 0 L75 200 L225 200 Z ' * 50000)
+        large_image = '<svg><path d="%s" /></svg>' % (
+            'M150 0 L75 200 L225 200 Z ' * 50000
+        )
         self._assert_image_validation_error(
             large_image,
             'image.svg',
@@ -93,7 +103,9 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION,
             'The svg tag does not contains the \'xmlns\' attribute.',
         )
-        corrupted_image_data = b'\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff'
+        corrupted_image_data = (
+            b'\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff'
+        )
         bmp_image_data = b'BM\x1a\x00\x00\x00\x00\x00\x00\x00\x1a\x00\x00\x00\x0c\x00\x00\x00\x01\x00\x01\x00\x01\x00\x18\x00\xff\xff\xff\x00\x00\x00'
         self._assert_image_validation_error(
             bmp_image_data,

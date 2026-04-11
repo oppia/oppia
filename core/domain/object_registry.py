@@ -25,7 +25,9 @@ from typing import Dict, List, Optional, Type, Union
 from core import constants, feconf
 from extensions.objects.models import objects
 
-AllowedDefaultValueTypes = Union[str, int, float, bool, List[str], Dict[str, Optional[str]]]
+AllowedDefaultValueTypes = Union[
+    str, int, float, bool, List[str], Dict[str, Optional[str]]
+]
 
 
 class Registry:
@@ -42,11 +44,15 @@ class Registry:
         cls.objects_dict.clear()
 
         # Add new object instances to the registry.
-        for name, clazz in inspect.getmembers(objects, predicate=inspect.isclass):
+        for name, clazz in inspect.getmembers(
+            objects, predicate=inspect.isclass
+        ):
             if name == 'BaseObject':
                 continue
 
-            ancestor_names = [base_class.__name__ for base_class in inspect.getmro(clazz)]
+            ancestor_names = [
+                base_class.__name__ for base_class in inspect.getmro(clazz)
+            ]
 
             assert 'BaseObject' in ancestor_names
             cls.objects_dict[clazz.__name__] = clazz
@@ -58,7 +64,9 @@ class Registry:
         return copy.deepcopy(cls.objects_dict)
 
     @classmethod
-    def get_object_class_by_type(cls, obj_type: str) -> Type[objects.BaseObject]:
+    def get_object_class_by_type(
+        cls, obj_type: str
+    ) -> Type[objects.BaseObject]:
         """Gets an object class by its type. Types are CamelCased.
 
         Refreshes once if the class is not found; subsequently, throws an
@@ -75,5 +83,9 @@ def get_default_object_values() -> Dict[str, AllowedDefaultValueTypes]:
     """Returns a dictionary containing the default object values."""
     # TODO(#20401): Cache this as it is accessed many times.
 
-    default_object_values: Dict[str, AllowedDefaultValueTypes] = json.loads(constants.get_package_file_contents('extensions', feconf.OBJECT_DEFAULT_VALUES_EXTENSIONS_MODULE_PATH))
+    default_object_values: Dict[str, AllowedDefaultValueTypes] = json.loads(
+        constants.get_package_file_contents(
+            'extensions', feconf.OBJECT_DEFAULT_VALUES_EXTENSIONS_MODULE_PATH
+        )
+    )
     return default_object_values

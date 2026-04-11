@@ -31,11 +31,19 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import exp_models, story_models
 
-(exp_models, story_models) = models.Registry.import_models([models.Names.EXPLORATION, models.Names.STORY])
+(exp_models, story_models) = models.Registry.import_models(
+    [models.Names.EXPLORATION, models.Names.STORY]
+)
 
 
-@validation_decorators.AuditsExisting(exp_models.ExplorationSnapshotMetadataModel)
-class ValidateExplorationSnapshotMetadataModel(base_validation.BaseValidateCommitCmdsSchema[exp_models.ExplorationSnapshotMetadataModel]):
+@validation_decorators.AuditsExisting(
+    exp_models.ExplorationSnapshotMetadataModel
+)
+class ValidateExplorationSnapshotMetadataModel(
+    base_validation.BaseValidateCommitCmdsSchema[
+        exp_models.ExplorationSnapshotMetadataModel
+    ]
+):
     """Overrides _get_change_domain_class for exploration models"""
 
     def _get_change_domain_class(
@@ -96,8 +104,14 @@ def exp_summary_model_relationships(
     yield model.id, [exp_models.ExplorationRightsModel]
 
 
-@validation_decorators.AuditsExisting(exp_models.ExplorationRightsSnapshotMetadataModel)
-class ValidateExplorationRightsSnapshotMetadataModel(base_validation.BaseValidateCommitCmdsSchema[exp_models.ExplorationRightsSnapshotMetadataModel]):
+@validation_decorators.AuditsExisting(
+    exp_models.ExplorationRightsSnapshotMetadataModel
+)
+class ValidateExplorationRightsSnapshotMetadataModel(
+    base_validation.BaseValidateCommitCmdsSchema[
+        exp_models.ExplorationRightsSnapshotMetadataModel
+    ]
+):
     """Overrides _get_change_domain_class for exploration models"""
 
     def _get_change_domain_class(
@@ -117,7 +131,11 @@ class ValidateExplorationRightsSnapshotMetadataModel(base_validation.BaseValidat
 
 
 @validation_decorators.AuditsExisting(exp_models.ExplorationCommitLogEntryModel)
-class ValidateExplorationCommitLogEntryModel(base_validation.BaseValidateCommitCmdsSchema[exp_models.ExplorationCommitLogEntryModel]):
+class ValidateExplorationCommitLogEntryModel(
+    base_validation.BaseValidateCommitCmdsSchema[
+        exp_models.ExplorationCommitLogEntryModel
+    ]
+):
     """Overrides _get_change_domain_class for exploration models"""
 
     # Here we use MyPy ignore because the signature of this method doesn't

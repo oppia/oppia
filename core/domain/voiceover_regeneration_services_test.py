@@ -135,7 +135,9 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         provider = feconf.OPPIA_AUTOMATIC_VOICEOVER_PROVIDER
 
         parsed_text = voiceover_regeneration_services.parse_html(content_html)
-        parsed_text_hash_code = voiceover_models.CachedAutomaticVoiceoversModel.generate_hash_from_text(parsed_text)
+        parsed_text_hash_code = voiceover_models.CachedAutomaticVoiceoversModel.generate_hash_from_text(
+            parsed_text
+        )
 
         cached_model_id = '%s:%s:%s' % (
             language_accent_code,
@@ -143,17 +145,25 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             provider,
         )
 
-        cached_model = voiceover_models.CachedAutomaticVoiceoversModel.get(cached_model_id, strict=False)
+        cached_model = voiceover_models.CachedAutomaticVoiceoversModel.get(
+            cached_model_id, strict=False
+        )
         self.assertIsNone(cached_model)
 
-        audio_offset_list = voiceover_regeneration_services.synthesize_voiceover_for_html_string(exploration_id, content_html, language_accent_code, filename)
+        audio_offset_list = voiceover_regeneration_services.synthesize_voiceover_for_html_string(
+            exploration_id, content_html, language_accent_code, filename
+        )
 
-        cached_model = voiceover_models.CachedAutomaticVoiceoversModel.get(cached_model_id)
+        cached_model = voiceover_models.CachedAutomaticVoiceoversModel.get(
+            cached_model_id
+        )
 
         self.assertIsNotNone(cached_model)
         self.assertEqual(cached_model.hash_code, parsed_text_hash_code)
         self.assertEqual(cached_model.audio_offset_list, audio_offset_list)
-        self.assertEqual(cached_model.language_accent_code, language_accent_code)
+        self.assertEqual(
+            cached_model.language_accent_code, language_accent_code
+        )
         self.assertEqual(cached_model.plaintext, parsed_text)
 
     def test_use_existing_cache_model_for_fetching_automatic_voiceover_data(
@@ -173,7 +183,9 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             {'token': 'model', 'audio_offset_msecs': 400.0},
         ]
 
-        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id
+        )
         voiceover_filename_for_binary = 'english.mp3'
         voiceover_path = os.path.join(
             feconf.SAMPLE_AUTO_VOICEOVERS_DATA_DIR,
@@ -184,13 +196,21 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         with open(voiceover_path, 'rb', encoding=None) as file:
             binary_audio_data = file.read()
 
-        fs.commit('%s/%s' % ('audio', filename), binary_audio_data, mimetype=mimetype)
+        fs.commit(
+            '%s/%s' % ('audio', filename), binary_audio_data, mimetype=mimetype
+        )
 
-        cached_model = voiceover_models.CachedAutomaticVoiceoversModel.create_cache_model(language_accent_code, parsed_text, filename, audio_offset_list)
+        cached_model = (
+            voiceover_models.CachedAutomaticVoiceoversModel.create_cache_model(
+                language_accent_code, parsed_text, filename, audio_offset_list
+            )
+        )
         cached_model.update_timestamps()
         cached_model.put()
 
-        generated_audio_offset_list = voiceover_regeneration_services.synthesize_voiceover_for_html_string(exploration_id, content_html, language_accent_code, filename)
+        generated_audio_offset_list = voiceover_regeneration_services.synthesize_voiceover_for_html_string(
+            exploration_id, content_html, language_accent_code, filename
+        )
 
         self.assertEqual(audio_offset_list, generated_audio_offset_list)
 
@@ -205,7 +225,6 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             _language_accent_code: str,
             _oppia_project_id: Optional[str] = None,
         ) -> Tuple[bytes, List[Dict[str, Union[str, float]]], Optional[str]]:
-
             return (b'', [], '')
 
         with self.swap(
@@ -240,7 +259,9 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             {'token': 'text', 'audio_offset_msecs': 400.0},
         ]
 
-        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id
+        )
         voiceover_filename_for_binary = 'english.mp3'
         voiceover_path = os.path.join(
             feconf.SAMPLE_AUTO_VOICEOVERS_DATA_DIR,
@@ -251,13 +272,21 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         with open(voiceover_path, 'rb', encoding=None) as file:
             binary_audio_data = file.read()
 
-        fs.commit('%s/%s' % ('audio', filename), binary_audio_data, mimetype=mimetype)
+        fs.commit(
+            '%s/%s' % ('audio', filename), binary_audio_data, mimetype=mimetype
+        )
 
-        cached_model = voiceover_models.CachedAutomaticVoiceoversModel.create_cache_model(language_accent_code, parsed_text, filename, audio_offset_list)
+        cached_model = (
+            voiceover_models.CachedAutomaticVoiceoversModel.create_cache_model(
+                language_accent_code, parsed_text, filename, audio_offset_list
+            )
+        )
         cached_model.update_timestamps()
         cached_model.put()
 
-        generated_audio_offset_list = voiceover_regeneration_services.synthesize_voiceover_for_html_string(exploration_id, content_html, language_accent_code, filename)
+        generated_audio_offset_list = voiceover_regeneration_services.synthesize_voiceover_for_html_string(
+            exploration_id, content_html, language_accent_code, filename
+        )
 
         self.assertEqual(audio_offset_list, generated_audio_offset_list)
 
@@ -269,9 +298,15 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         filename = 'content_0-en-US-asdjytdyop.mp3'
         provider = feconf.OPPIA_AUTOMATIC_VOICEOVER_PROVIDER
 
-        parsed_text_1 = voiceover_regeneration_services.parse_html(content_html_1)
-        parsed_text_2 = voiceover_regeneration_services.parse_html(content_html_2)
-        parsed_text_2_hash_code = voiceover_models.CachedAutomaticVoiceoversModel.generate_hash_from_text(parsed_text_2)
+        parsed_text_1 = voiceover_regeneration_services.parse_html(
+            content_html_1
+        )
+        parsed_text_2 = voiceover_regeneration_services.parse_html(
+            content_html_2
+        )
+        parsed_text_2_hash_code = voiceover_models.CachedAutomaticVoiceoversModel.generate_hash_from_text(
+            parsed_text_2
+        )
 
         audio_offset_list_1 = [
             {'token': 'This', 'audio_offset_msecs': 0.0},
@@ -288,7 +323,9 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             {'token': 'text', 'audio_offset_msecs': 400.0},
         ]
 
-        fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id
+        )
         voiceover_filename_for_binary = 'english.mp3'
         voiceover_path = os.path.join(
             feconf.SAMPLE_AUTO_VOICEOVERS_DATA_DIR,
@@ -297,13 +334,17 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         mimetype = 'audio/mpeg'
         with open(voiceover_path, 'rb', encoding=None) as file:
             binary_audio_data = file.read()
-        fs.commit('%s/%s' % ('audio', filename), binary_audio_data, mimetype=mimetype)
+        fs.commit(
+            '%s/%s' % ('audio', filename), binary_audio_data, mimetype=mimetype
+        )
 
-        cached_model = voiceover_models.CachedAutomaticVoiceoversModel.create_cache_model(
-            language_accent_code,
-            parsed_text_2,
-            filename,
-            audio_offset_list_2,
+        cached_model = (
+            voiceover_models.CachedAutomaticVoiceoversModel.create_cache_model(
+                language_accent_code,
+                parsed_text_2,
+                filename,
+                audio_offset_list_2,
+            )
         )
         # Here we intend to cause a collision, hence changing the plaintext.
         cached_model.plaintext = parsed_text_1
@@ -311,7 +352,9 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         cached_model.update_timestamps()
         cached_model.put()
 
-        generated_audio_offset_list = voiceover_regeneration_services.synthesize_voiceover_for_html_string(exploration_id, content_html_2, language_accent_code, filename)
+        generated_audio_offset_list = voiceover_regeneration_services.synthesize_voiceover_for_html_string(
+            exploration_id, content_html_2, language_accent_code, filename
+        )
         self.assertEqual(audio_offset_list_2, generated_audio_offset_list)
 
         cached_model_id = '%s:%s:%s' % (
@@ -319,26 +362,42 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             parsed_text_2_hash_code,
             provider,
         )
-        reteived_cached_model = voiceover_models.CachedAutomaticVoiceoversModel.get(cached_model_id)
+        reteived_cached_model = (
+            voiceover_models.CachedAutomaticVoiceoversModel.get(cached_model_id)
+        )
 
         self.assertIsNotNone(reteived_cached_model)
-        self.assertEqual(reteived_cached_model.hash_code, parsed_text_2_hash_code)
-        self.assertEqual(reteived_cached_model.audio_offset_list, audio_offset_list_2)
-        self.assertEqual(reteived_cached_model.language_accent_code, language_accent_code)
+        self.assertEqual(
+            reteived_cached_model.hash_code, parsed_text_2_hash_code
+        )
+        self.assertEqual(
+            reteived_cached_model.audio_offset_list, audio_offset_list_2
+        )
+        self.assertEqual(
+            reteived_cached_model.language_accent_code, language_accent_code
+        )
         self.assertEqual(reteived_cached_model.plaintext, parsed_text_2)
 
     @mock.patch(
         'core.platform.speech_synthesis.dev_mode_speech_synthesis_services.regenerate_speech_from_text',
         side_effect=Exception('Mocked exception during voicever regeneration'),
     )
-    def test_should_raise_exception_if_regeneration_failed(self, _: mock.Mock) -> None:
+    def test_should_raise_exception_if_regeneration_failed(
+        self, _: mock.Mock
+    ) -> None:
         content_html = '<p> This is a test text </p>'
         exploration_id = 'exp_id'
         language_accent_code = 'en-US'
         filename = 'content_0-en-US-asdjytdyop.mp3'
 
-        with self.assertRaisesRegex(Exception, 'Mocked exception during voicever regeneration'):
-            (voiceover_regeneration_services.synthesize_voiceover_for_html_string(exploration_id, content_html, language_accent_code, filename))
+        with self.assertRaisesRegex(
+            Exception, 'Mocked exception during voicever regeneration'
+        ):
+            (
+                voiceover_regeneration_services.synthesize_voiceover_for_html_string(
+                    exploration_id, content_html, language_accent_code, filename
+                )
+            )
 
     def test_should_get_empty_audio_sucessfully_in_sync(self) -> None:
         content_html = '<p></p>'
@@ -358,7 +417,9 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             'regenerate_speech_from_text',
             _mock_regenerate_speech_from_text,
         ):
-            audio_offset_list = voiceover_regeneration_services.synthesize_voiceover_for_html_string(exploration_id, content_html, language_accent_code, filename)
+            audio_offset_list = voiceover_regeneration_services.synthesize_voiceover_for_html_string(
+                exploration_id, content_html, language_accent_code, filename
+            )
         self.assertEqual(audio_offset_list, [])
 
     def test_should_get_empty_audio_sucessfully_in_async(self) -> None:
@@ -393,7 +454,11 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         language_accent_code = 'en-US'
         filename = 'content_0-en-US-asdjytdyop.mp3'
 
-        new_filename = voiceover_regeneration_services.generate_new_voiceover_filename(content_id, language_accent_code)
+        new_filename = (
+            voiceover_regeneration_services.generate_new_voiceover_filename(
+                content_id, language_accent_code
+            )
+        )
 
         self.assertNotEqual(filename, new_filename)
         self.assertTrue(new_filename.startswith('content_0-en-US-'))
@@ -406,7 +471,9 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
 
         exploration_id = 'exp_id'
         content_html = '<p> This is a test text </p>'
-        exploration = self.save_new_valid_exploration(exploration_id, 'user_id', title='Exploration title')
+        exploration = self.save_new_valid_exploration(
+            exploration_id, 'user_id', title='Exploration title'
+        )
         change_list = [
             exp_domain.ExplorationChange(
                 {
@@ -420,7 +487,9 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
                 }
             )
         ]
-        exp_services.update_exploration(editor_id, exploration.id, change_list, 'Updates content')
+        exp_services.update_exploration(
+            editor_id, exploration.id, change_list, 'Updates content'
+        )
 
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
 
@@ -457,7 +526,9 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             translated_content,
         )
 
-        retrieved_content_html = voiceover_regeneration_services.get_content_html_in_requested_language(entity_id, entity_version, 'Introduction', 'content_id_0', 'hi-IN')
+        retrieved_content_html = voiceover_regeneration_services.get_content_html_in_requested_language(
+            entity_id, entity_version, 'Introduction', 'content_id_0', 'hi-IN'
+        )
         self.assertEqual(retrieved_content_html, content_html)
 
         with self.assertRaisesRegex(
@@ -482,7 +553,9 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
 
         exploration_id = 'exp_id'
         content_html = '<p> This is a test text </p>'
-        exploration = self.save_new_valid_exploration(exploration_id, 'user_id', title='Exploration title')
+        exploration = self.save_new_valid_exploration(
+            exploration_id, 'user_id', title='Exploration title'
+        )
         change_list = [
             exp_domain.ExplorationChange(
                 {
@@ -496,7 +569,9 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
                 }
             )
         ]
-        exp_services.update_exploration(editor_id, exploration.id, change_list, 'Updates content')
+        exp_services.update_exploration(
+            editor_id, exploration.id, change_list, 'Updates content'
+        )
 
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
 
@@ -508,12 +583,14 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             {'token': 'text', 'audio_offset_msecs': 400.0},
         ]
 
-        voiceovers, sentence_tokens_with_durations = voiceover_regeneration_services.regenerate_voiceover_for_exploration_content(
-            exploration_id,
-            exploration.version,
-            'Introduction',
-            'content_0',
-            'en-US',
+        voiceovers, sentence_tokens_with_durations = (
+            voiceover_regeneration_services.regenerate_voiceover_for_exploration_content(
+                exploration_id,
+                exploration.version,
+                'Introduction',
+                'content_0',
+                'en-US',
+            )
         )
 
         self.assertTrue(voiceovers.filename.startswith('content_0-en-US-'))
@@ -533,7 +610,9 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             </html>
         """
         soup = bs4.BeautifulSoup(html, 'html.parser')
-        result = voiceover_regeneration_services.get_text_with_delimiters(soup, delimiter=feconf.OPPIA_CONTENT_TAG_DELIMITER)
+        result = voiceover_regeneration_services.get_text_with_delimiters(
+            soup, delimiter=feconf.OPPIA_CONTENT_TAG_DELIMITER
+        )
         self.assertEqual(
             result,
             'Text directly in the body.; Hello world, this is a test text.; This is the third paragraph.',
@@ -551,7 +630,11 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         exploration_id = 'exp_id'
         content_html = '<p> This is a test text </p>'
 
-        entity_voiceovers_models = voiceover_services.get_entity_voiceovers_for_given_exploration(exploration_id, 'exploration', exploration_version)
+        entity_voiceovers_models = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                exploration_id, 'exploration', exploration_version
+            )
+        )
         self.assertEqual(len(entity_voiceovers_models), 0)
         errors_while_voiceover_regeneration = voiceover_regeneration_services.regenerate_voiceovers_of_exploration(
             exploration_id,
@@ -560,7 +643,11 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             language_accent_code,
         )
         self.assertEqual(errors_while_voiceover_regeneration, [])
-        entity_voiceovers_models = voiceover_services.get_entity_voiceovers_for_given_exploration(exploration_id, 'exploration', exploration_version)
+        entity_voiceovers_models = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                exploration_id, 'exploration', exploration_version
+            )
+        )
         self.assertEqual(len(entity_voiceovers_models), 1)
 
     def test_should_return_errors_if_voiceover_regeneration_fails(self) -> None:
@@ -599,11 +686,15 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
     def test_all_custom_tags_have_associated_voiceover_extraction_rules(
         self,
     ) -> None:
-        existing_custom_rte_tags = list(rte_component_registry.Registry.get_tag_list_with_attrs().keys())
+        existing_custom_rte_tags = list(
+            rte_component_registry.Registry.get_tag_list_with_attrs().keys()
+        )
 
         self.assertGreater(len(existing_custom_rte_tags), 0)
 
-        custom_tags_with_voiceover_extraction_rules = list(voiceover_regeneration_services.CUSTOM_RTE_TAGS_TO_VOICEOVER_TEXT_EXTRACTION_RULES.keys())
+        custom_tags_with_voiceover_extraction_rules = list(
+            voiceover_regeneration_services.CUSTOM_RTE_TAGS_TO_VOICEOVER_TEXT_EXTRACTION_RULES.keys()
+        )
 
         self.assertEqual(
             sorted(existing_custom_rte_tags),

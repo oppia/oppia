@@ -41,7 +41,9 @@ class DocstringsCheckerTest(test_utils.GenericTestBase):
             pass
         """
         )
-        property_name = docstrings_checker.get_setters_property_name(setter_node)
+        property_name = docstrings_checker.get_setters_property_name(
+            setter_node
+        )
         self.assertEqual(property_name, 'test')
 
     def test_get_setters_property_name_without_setter(self) -> None:
@@ -116,7 +118,9 @@ class DocstringsCheckerTest(test_utils.GenericTestBase):
         """
         )
 
-        self.assertEqual(docstrings_checker.returns_something(return_node), True)
+        self.assertEqual(
+            docstrings_checker.returns_something(return_node), True
+        )
 
     def test_returns_something_with_none_return(self) -> None:
         return_none_node = astroid.extract_node(
@@ -125,7 +129,9 @@ class DocstringsCheckerTest(test_utils.GenericTestBase):
         """
         )
 
-        self.assertEqual(docstrings_checker.returns_something(return_none_node), False)
+        self.assertEqual(
+            docstrings_checker.returns_something(return_none_node), False
+        )
 
     def test_returns_something_with_empty_return(self) -> None:
         none_return_node = astroid.extract_node(
@@ -134,7 +140,9 @@ class DocstringsCheckerTest(test_utils.GenericTestBase):
         """
         )
 
-        self.assertEqual(docstrings_checker.returns_something(none_return_node), False)
+        self.assertEqual(
+            docstrings_checker.returns_something(none_return_node), False
+        )
 
     def test_possible_exc_types_with_valid_name(self) -> None:
         raise_node = astroid.extract_node(

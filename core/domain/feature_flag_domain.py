@@ -45,7 +45,15 @@ def get_server_mode() -> ServerMode:
     Returns:
         ServerMode. The current server mode.
     """
-    return ServerMode.DEV if constants.DEV_MODE else (ServerMode.PROD if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER else ServerMode.TEST)
+    return (
+        ServerMode.DEV
+        if constants.DEV_MODE
+        else (
+            ServerMode.PROD
+            if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
+            else ServerMode.TEST
+        )
+    )
 
 
 class FeatureFlagDict(TypedDict):
@@ -97,9 +105,14 @@ class FeatureFlag:
     def validate(self) -> None:
         """Validates the FeatureFlag object."""
         if re.match(self.FEATURE_NAME_REGEXP, self._name) is None:
-            raise utils.ValidationError('Invalid feature flag name \'%s\', expected to match regexp %s.' % (self._name, self.FEATURE_NAME_REGEXP))
+            raise utils.ValidationError(
+                'Invalid feature flag name \'%s\', expected to match regexp %s.'
+                % (self._name, self.FEATURE_NAME_REGEXP)
+            )
 
-        self._feature_flag_config.validate(self._feature_flag_spec.feature_stage)
+        self._feature_flag_config.validate(
+            self._feature_flag_spec.feature_stage
+        )
 
     def to_dict(self) -> FeatureFlagDict:
         """Returns a dict representation of the FeatureFlag domain object.
@@ -107,12 +120,20 @@ class FeatureFlag:
         Returns:
             dict. A dict mapping of all fields of FeatureFlag object.
         """
-        last_updated = utils.convert_naive_datetime_to_string(self._feature_flag_config.last_updated) if self._feature_flag_config.last_updated else None
+        last_updated = (
+            utils.convert_naive_datetime_to_string(
+                self._feature_flag_config.last_updated
+            )
+            if self._feature_flag_config.last_updated
+            else None
+        )
         return {
             'name': self._name,
             'description': self._feature_flag_spec.description,
             'feature_stage': self._feature_flag_spec.feature_stage.value,
-            'force_enable_for_all_users': (self._feature_flag_config.force_enable_for_all_users),
+            'force_enable_for_all_users': (
+                self._feature_flag_config.force_enable_for_all_users
+            ),
             'rollout_percentage': self._feature_flag_config.rollout_percentage,
             'user_group_ids': self._feature_flag_config.user_group_ids,
             'last_updated': last_updated,
@@ -137,7 +158,9 @@ class FeatureFlag:
         )
         feature_flag_config = FeatureFlagConfig.from_dict(
             {
-                'force_enable_for_all_users': feature_dict['force_enable_for_all_users'],
+                'force_enable_for_all_users': feature_dict[
+                    'force_enable_for_all_users'
+                ],
                 'rollout_percentage': feature_dict['rollout_percentage'],
                 'user_group_ids': feature_dict['user_group_ids'],
                 'last_updated': feature_dict['last_updated'],
@@ -211,7 +234,9 @@ class FeatureFlagSpec:
         elif feature_dict['feature_stage'] == 'prod':
             feature_stage = ServerMode.PROD
         else:
-            raise Exception('Invalid feature stage, should be one of ServerMode.DEV, ServerMode.TEST or ServerMode.PROD.')
+            raise Exception(
+                'Invalid feature stage, should be one of ServerMode.DEV, ServerMode.TEST or ServerMode.PROD.'
+            )
 
         return cls(feature_dict['description'], feature_stage)
 
@@ -249,7 +274,9 @@ class FeatureFlagConfig:
         """
         return self._force_enable_for_all_users
 
-    def set_force_enable_for_all_users(self, force_enable_for_all_users: bool) -> None:
+    def set_force_enable_for_all_users(
+        self, force_enable_for_all_users: bool
+    ) -> None:
         """Sets the force_enable_for_all_users of FeatureFlagConfig.
 
         Args:
@@ -314,16 +341,24 @@ class FeatureFlagConfig:
     def validate(self, feature_stage: ServerMode) -> None:
         """Validates the FeatureFlagConfig object."""
         if self._rollout_percentage < 0 or self._rollout_percentage > 100:
-            raise utils.ValidationError('Feature flag rollout-percentage should be between 0 and 100 inclusive.')
+            raise utils.ValidationError(
+                'Feature flag rollout-percentage should be between 0 and 100 inclusive.'
+            )
 
         server_mode = get_server_mode()
         if server_mode == ServerMode.TEST and feature_stage == ServerMode.DEV:
-            raise utils.ValidationError('Feature flag in %s stage cannot be updated in %s environment.' % (feature_stage.value, server_mode.value))
+            raise utils.ValidationError(
+                'Feature flag in %s stage cannot be updated in %s environment.'
+                % (feature_stage.value, server_mode.value)
+            )
         if server_mode == ServerMode.PROD and feature_stage in (
             ServerMode.DEV,
             ServerMode.TEST,
         ):
-            raise utils.ValidationError('Feature flag in %s stage cannot be updated in %s environment.' % (feature_stage.value, server_mode.value))
+            raise utils.ValidationError(
+                'Feature flag in %s stage cannot be updated in %s environment.'
+                % (feature_stage.value, server_mode.value)
+            )
 
     def to_dict(self) -> FeatureFlagConfigDict:
         """Returns a dict representation of the FeatureFlagConfig domain object.
@@ -331,7 +366,11 @@ class FeatureFlagConfig:
         Returns:
             dict. A dict mapping of all fields of FeatureFlagConfig object.
         """
-        last_updated = utils.convert_naive_datetime_to_string(self.last_updated) if self.last_updated else None
+        last_updated = (
+            utils.convert_naive_datetime_to_string(self.last_updated)
+            if self.last_updated
+            else None
+        )
         return {
             'force_enable_for_all_users': self._force_enable_for_all_users,
             'rollout_percentage': self._rollout_percentage,
@@ -340,7 +379,9 @@ class FeatureFlagConfig:
         }
 
     @classmethod
-    def from_dict(cls, feature_flag_config_dict: FeatureFlagConfigDict) -> FeatureFlagConfig:
+    def from_dict(
+        cls, feature_flag_config_dict: FeatureFlagConfigDict
+    ) -> FeatureFlagConfig:
         """Returns an FeatureFlagConfig object from dictionary.
 
         Args:
@@ -351,7 +392,13 @@ class FeatureFlagConfig:
             FeatureFlagConfig. The corresponding FeatureFlagConfig domain
             object.
         """
-        last_updated = utils.convert_string_to_naive_datetime_object(feature_flag_config_dict['last_updated']) if isinstance(feature_flag_config_dict['last_updated'], str) else None
+        last_updated = (
+            utils.convert_string_to_naive_datetime_object(
+                feature_flag_config_dict['last_updated']
+            )
+            if isinstance(feature_flag_config_dict['last_updated'], str)
+            else None
+        )
         return cls(
             feature_flag_config_dict['force_enable_for_all_users'],
             feature_flag_config_dict['rollout_percentage'],

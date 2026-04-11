@@ -35,7 +35,9 @@ if MYPY:  # pragma: no cover
         user_models,  # pylint: disable=unused-import
     )
 
-(base_models, email_models, user_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.EMAIL, models.Names.USER])
+(base_models, email_models, user_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.EMAIL, models.Names.USER]
+)
 
 
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
@@ -86,9 +88,17 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_has_reference_to_user_id(self) -> None:
-        self.assertTrue(email_models.SentEmailModel.has_reference_to_user_id('recipient_id'))
-        self.assertTrue(email_models.SentEmailModel.has_reference_to_user_id(self.SENDER_ID))
-        self.assertFalse(email_models.SentEmailModel.has_reference_to_user_id(self.NONEXISTENT_USER_ID))
+        self.assertTrue(
+            email_models.SentEmailModel.has_reference_to_user_id('recipient_id')
+        )
+        self.assertTrue(
+            email_models.SentEmailModel.has_reference_to_user_id(self.SENDER_ID)
+        )
+        self.assertFalse(
+            email_models.SentEmailModel.has_reference_to_user_id(
+                self.NONEXISTENT_USER_ID
+            )
+        )
 
     def test_apply_deletion_policy_deletes_model_for_user_who_is_sender(
         self,
@@ -100,23 +110,31 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         email_models.SentEmailModel.apply_deletion_policy(self.RECIPIENT_ID)
-        self.assertIsNone(email_models.SentEmailModel.get_by_id(self.RECIPIENT_ID))
+        self.assertIsNone(
+            email_models.SentEmailModel.get_by_id(self.RECIPIENT_ID)
+        )
 
     def test_apply_deletion_policy_raises_no_exception_for_nonexistent_user(
         self,
     ) -> None:
-        email_models.SentEmailModel.apply_deletion_policy(self.NONEXISTENT_USER_ID)
+        email_models.SentEmailModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID
+        )
 
     def test_saved_model_can_be_retrieved_with_same_hash(self) -> None:
         query = email_models.SentEmailModel.query()
-        query = query.filter(email_models.SentEmailModel.email_hash == 'Email Hash')
+        query = query.filter(
+            email_models.SentEmailModel.email_hash == 'Email Hash'
+        )
 
         results: Sequence[email_models.SentEmailModel] = query.fetch(2)
 
         self.assertEqual(len(results), 1)
 
         query = email_models.SentEmailModel.query()
-        query = query.filter(email_models.SentEmailModel.email_hash == 'Bad Email Hash')
+        query = query.filter(
+            email_models.SentEmailModel.email_hash == 'Bad Email Hash'
+        )
 
         results = query.fetch(2)
 
@@ -160,17 +178,25 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 datetime.datetime.utcnow(),
             )
 
-        results = email_models.SentEmailModel.get_by_hash('Email Hash', sent_datetime_lower_bound=time_now)
+        results = email_models.SentEmailModel.get_by_hash(
+            'Email Hash', sent_datetime_lower_bound=time_now
+        )
         self.assertEqual(len(results), 1)
 
         time_now1 = datetime.datetime.utcnow()
 
-        results = email_models.SentEmailModel.get_by_hash('Email Hash', sent_datetime_lower_bound=time_now1)
+        results = email_models.SentEmailModel.get_by_hash(
+            'Email Hash', sent_datetime_lower_bound=time_now1
+        )
         self.assertEqual(len(results), 0)
 
-        time_before = datetime.datetime.utcnow() - datetime.timedelta(minutes=10)
+        time_before = datetime.datetime.utcnow() - datetime.timedelta(
+            minutes=10
+        )
 
-        results = email_models.SentEmailModel.get_by_hash('Email Hash', sent_datetime_lower_bound=time_before)
+        results = email_models.SentEmailModel.get_by_hash(
+            'Email Hash', sent_datetime_lower_bound=time_before
+        )
         self.assertEqual(len(results), 2)
 
         # Check that it accepts only DateTime objects.
@@ -224,7 +250,11 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             datetime.datetime.utcnow(),
         )
 
-        self.assertTrue(email_models.SentEmailModel.check_duplicate_message('recipient_id', 'Email Subject', 'Email Body'))
+        self.assertTrue(
+            email_models.SentEmailModel.check_duplicate_message(
+                'recipient_id', 'Email Subject', 'Email Body'
+            )
+        )
 
         email_models.SentEmailModel.create(
             'recipient_id2',
@@ -234,10 +264,15 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             feconf.EMAIL_INTENT_SIGNUP,
             'Email Subject',
             'Email Body',
-            datetime.datetime.utcnow() - datetime.timedelta(minutes=feconf.DUPLICATE_EMAIL_INTERVAL_MINS),
+            datetime.datetime.utcnow()
+            - datetime.timedelta(minutes=feconf.DUPLICATE_EMAIL_INTERVAL_MINS),
         )
 
-        self.assertFalse(email_models.SentEmailModel.check_duplicate_message('recipient_id2', 'Email Subject', 'Email Body'))
+        self.assertFalse(
+            email_models.SentEmailModel.check_duplicate_message(
+                'recipient_id2', 'Email Subject', 'Email Body'
+            )
+        )
 
     def test_check_duplicate_messages_with_same_hash(self) -> None:
         def mock_convert_to_hash(
@@ -246,7 +281,9 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         ) -> str:
             return 'some_poor_hash'
 
-        swap_generate_hash = self.swap(utils, 'convert_to_hash', mock_convert_to_hash)
+        swap_generate_hash = self.swap(
+            utils, 'convert_to_hash', mock_convert_to_hash
+        )
         with swap_generate_hash:
             email_models.SentEmailModel.create(
                 'recipient_id',
@@ -259,7 +296,11 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 datetime.datetime.utcnow(),
             )
 
-            self.assertFalse(email_models.SentEmailModel.check_duplicate_message('recipient_id2', 'Email Subject2', 'Email Body2'))
+            self.assertFalse(
+                email_models.SentEmailModel.check_duplicate_message(
+                    'recipient_id2', 'Email Subject2', 'Email Body2'
+                )
+            )
 
     def test_raise_exception_by_mocking_collision(self) -> None:
         # Test Exception for SentEmailModel.
@@ -271,7 +312,9 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             with self.swap(
                 email_models.SentEmailModel,
                 'get_by_id',
-                types.MethodType(lambda x, y: True, email_models.SentEmailModel),
+                types.MethodType(
+                    lambda x, y: True, email_models.SentEmailModel
+                ),
             ):
                 email_models.SentEmailModel.create(
                     'recipient_id',
@@ -310,8 +353,14 @@ class BulkEmailModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_has_reference_to_user_id(self) -> None:
-        self.assertTrue(email_models.BulkEmailModel.has_reference_to_user_id(self.SENDER_ID))
-        self.assertFalse(email_models.BulkEmailModel.has_reference_to_user_id(self.NONEXISTENT_USER_ID))
+        self.assertTrue(
+            email_models.BulkEmailModel.has_reference_to_user_id(self.SENDER_ID)
+        )
+        self.assertFalse(
+            email_models.BulkEmailModel.has_reference_to_user_id(
+                self.NONEXISTENT_USER_ID
+            )
+        )
 
     def test_apply_deletion_policy_deletes_model_for_user_who_is_sender(
         self,
@@ -322,7 +371,9 @@ class BulkEmailModelUnitTests(test_utils.GenericTestBase):
     def test_apply_deletion_policy_raises_no_exception_for_nonexistent_user(
         self,
     ) -> None:
-        email_models.BulkEmailModel.apply_deletion_policy(self.NONEXISTENT_USER_ID)
+        email_models.BulkEmailModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID
+        )
 
     def test_get_export_policy(self) -> None:
         expected_dict = {

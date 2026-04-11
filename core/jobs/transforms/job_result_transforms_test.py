@@ -28,7 +28,11 @@ from core.jobs.types import job_run_result
 
 class ResultsToJobRunResultsTests(job_test_utils.PipelinedTestBase):
     def test_ok_results_without_prefix_correctly_outputs(self) -> None:
-        transform_result = self.pipeline | beam.Create([result.Ok('ok'), result.Ok('ok')]) | job_result_transforms.ResultsToJobRunResults()
+        transform_result = (
+            self.pipeline
+            | beam.Create([result.Ok('ok'), result.Ok('ok')])
+            | job_result_transforms.ResultsToJobRunResults()
+        )
 
         self.assert_pcoll_equal(
             transform_result,
@@ -36,7 +40,11 @@ class ResultsToJobRunResultsTests(job_test_utils.PipelinedTestBase):
         )
 
     def test_ok_results_with_prefix_correctly_outputs(self) -> None:
-        transform_result = self.pipeline | beam.Create([result.Ok('ok'), result.Ok('ok')]) | job_result_transforms.ResultsToJobRunResults('PREFIX')
+        transform_result = (
+            self.pipeline
+            | beam.Create([result.Ok('ok'), result.Ok('ok')])
+            | job_result_transforms.ResultsToJobRunResults('PREFIX')
+        )
 
         self.assert_pcoll_equal(
             transform_result,
@@ -44,7 +52,13 @@ class ResultsToJobRunResultsTests(job_test_utils.PipelinedTestBase):
         )
 
     def test_err_results_without_prefix_correctly_outputs(self) -> None:
-        transform_result = self.pipeline | beam.Create([result.Err('err 1'), result.Err('err 2'), result.Err('err 2')]) | job_result_transforms.ResultsToJobRunResults()
+        transform_result = (
+            self.pipeline
+            | beam.Create(
+                [result.Err('err 1'), result.Err('err 2'), result.Err('err 2')]
+            )
+            | job_result_transforms.ResultsToJobRunResults()
+        )
 
         self.assert_pcoll_equal(
             transform_result,
@@ -55,7 +69,13 @@ class ResultsToJobRunResultsTests(job_test_utils.PipelinedTestBase):
         )
 
     def test_err_results_with_prefix_correctly_outputs(self) -> None:
-        transform_result = self.pipeline | beam.Create([result.Err('err 1'), result.Err('err 2'), result.Err('err 2')]) | job_result_transforms.ResultsToJobRunResults('PRE')
+        transform_result = (
+            self.pipeline
+            | beam.Create(
+                [result.Err('err 1'), result.Err('err 2'), result.Err('err 2')]
+            )
+            | job_result_transforms.ResultsToJobRunResults('PRE')
+        )
 
         self.assert_pcoll_equal(
             transform_result,
@@ -68,7 +88,11 @@ class ResultsToJobRunResultsTests(job_test_utils.PipelinedTestBase):
 
 class CountObjectsToJobRunResultTests(job_test_utils.PipelinedTestBase):
     def test_three_objects_without_prefix_correctly_outputs(self) -> None:
-        transform_result = self.pipeline | beam.Create(['item', 'item', 'item']) | job_result_transforms.CountObjectsToJobRunResult()
+        transform_result = (
+            self.pipeline
+            | beam.Create(['item', 'item', 'item'])
+            | job_result_transforms.CountObjectsToJobRunResult()
+        )
 
         self.assert_pcoll_equal(
             transform_result,
@@ -76,7 +100,11 @@ class CountObjectsToJobRunResultTests(job_test_utils.PipelinedTestBase):
         )
 
     def test_three_objects_with_prefix_correctly_outputs(self) -> None:
-        transform_result = self.pipeline | beam.Create(['item', 'item', 'item']) | job_result_transforms.CountObjectsToJobRunResult('PREFIX')
+        transform_result = (
+            self.pipeline
+            | beam.Create(['item', 'item', 'item'])
+            | job_result_transforms.CountObjectsToJobRunResult('PREFIX')
+        )
 
         self.assert_pcoll_equal(
             transform_result,
@@ -84,6 +112,10 @@ class CountObjectsToJobRunResultTests(job_test_utils.PipelinedTestBase):
         )
 
     def test_zero_objects_correctly_outputs(self) -> None:
-        transform_result = self.pipeline | beam.Create([]) | job_result_transforms.CountObjectsToJobRunResult()
+        transform_result = (
+            self.pipeline
+            | beam.Create([])
+            | job_result_transforms.CountObjectsToJobRunResult()
+        )
 
         self.assert_pcoll_empty(transform_result)

@@ -44,7 +44,9 @@ class ValidateFirebaseSeedModelId(base_validation.ValidateBaseModelId):
 
 
 @validation_decorators.AuditsExisting(auth_models.UserIdByFirebaseAuthIdModel)
-class ValidateUserIdByFirebaseAuthIdModelId(base_validation.ValidateBaseModelId):
+class ValidateUserIdByFirebaseAuthIdModelId(
+    base_validation.ValidateBaseModelId
+):
     """Overrides regex to match the Firebase account ID pattern."""
 
     def __init__(self) -> None:

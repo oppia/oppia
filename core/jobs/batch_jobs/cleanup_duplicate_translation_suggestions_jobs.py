@@ -83,7 +83,19 @@ class CleanupDuplicateTranslationSuggestionsJob(base_jobs.JobBase):
         suggestions_grouped_by_content = (
             self.pipeline
             | 'Get all translation suggestions in review'
-            >> ndb_io.GetModels(suggestion_models.GeneralSuggestionModel.get_all(include_deleted=False).filter(suggestion_models.GeneralSuggestionModel.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT).filter(suggestion_models.GeneralSuggestionModel.status == suggestion_models.STATUS_IN_REVIEW))
+            >> ndb_io.GetModels(
+                suggestion_models.GeneralSuggestionModel.get_all(
+                    include_deleted=False
+                )
+                .filter(
+                    suggestion_models.GeneralSuggestionModel.suggestion_type
+                    == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                )
+                .filter(
+                    suggestion_models.GeneralSuggestionModel.status
+                    == suggestion_models.STATUS_IN_REVIEW
+                )
+            )
             | 'Key by target_id, language_code, and content_id'
             >> beam.Map(
                 lambda model: (
@@ -96,23 +108,70 @@ class CleanupDuplicateTranslationSuggestionsJob(base_jobs.JobBase):
                 )
             )
             | 'Group by content' >> beam.GroupByKey()
-            | 'Convert values to list' >> beam.Map(lambda item: (item[0], list(item[1])))
+            | 'Convert values to list'
+            >> beam.Map(lambda item: (item[0], list(item[1])))
         )
 
-        duplicate_suggestions = suggestions_grouped_by_content | 'Filter only duplicate groups' >> beam.Filter(lambda item: len(item[1]) > 1)
+        duplicate_suggestions = (
+            suggestions_grouped_by_content
+            | 'Filter only duplicate groups'
+            >> beam.Filter(lambda item: len(item[1]) > 1)
+        )
 
-        duplicate_suggestions_report = duplicate_suggestions | 'Report duplicates' >> beam.Map(lambda item: job_run_result.JobRunResult.as_stdout(f'Duplicates found for exploration {item[0][0]}, language {item[0][1]}, content_id {item[0][2]}. Suggestion IDs: {[m.id for m in item[1]]}'))
+        duplicate_suggestions_report = (
+            duplicate_suggestions
+            | 'Report duplicates'
+            >> beam.Map(
+                lambda item: job_run_result.JobRunResult.as_stdout(
+                    f'Duplicates found for exploration {item[0][0]}, language {item[0][1]}, content_id {item[0][2]}. Suggestion IDs: {[m.id for m in item[1]]}'
+                )
+            )
+        )
 
-        duplicate_groups_count = duplicate_suggestions | 'Count duplicate groups' >> (job_result_transforms.CountObjectsToJobRunResult('DUPLICATE GROUPS COUNT')) | 'Filter non-zero counts' >> beam.Filter(lambda result: 'SUCCESS: 0' not in result.stdout)
+        duplicate_groups_count = (
+            duplicate_suggestions
+            | 'Count duplicate groups'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'DUPLICATE GROUPS COUNT'
+                )
+            )
+            | 'Filter non-zero counts'
+            >> beam.Filter(lambda result: 'SUCCESS: 0' not in result.stdout)
+        )
 
-        suggestions_to_update = duplicate_suggestions | 'Reject extra suggestions' >> beam.FlatMap(self._reject_extra_suggestions)
+        suggestions_to_update = (
+            duplicate_suggestions
+            | 'Reject extra suggestions'
+            >> beam.FlatMap(self._reject_extra_suggestions)
+        )
 
-        total_suggestions_count = suggestions_grouped_by_content | 'Extract suggestions' >> beam.FlatMap(lambda item: item[1]) | 'Count total suggestions' >> (job_result_transforms.CountObjectsToJobRunResult('TOTAL SUGGESTIONS COUNT'))
+        total_suggestions_count = (
+            suggestions_grouped_by_content
+            | 'Extract suggestions' >> beam.FlatMap(lambda item: item[1])
+            | 'Count total suggestions'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOTAL SUGGESTIONS COUNT'
+                )
+            )
+        )
 
-        rejected_suggestions_count = suggestions_to_update | 'Count rejected suggestions' >> (job_result_transforms.CountObjectsToJobRunResult('REJECTED DUPLICATE SUGGESTIONS COUNT'))
+        rejected_suggestions_count = (
+            suggestions_to_update
+            | 'Count rejected suggestions'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'REJECTED DUPLICATE SUGGESTIONS COUNT'
+                )
+            )
+        )
 
         if self.DATASTORE_UPDATES_ALLOWED:
-            (suggestions_to_update | 'Put models into the datastore' >> ndb_io.PutModels())
+            (
+                suggestions_to_update
+                | 'Put models into the datastore' >> ndb_io.PutModels()
+            )
 
         return (
             duplicate_suggestions_report,
@@ -122,7 +181,9 @@ class CleanupDuplicateTranslationSuggestionsJob(base_jobs.JobBase):
         ) | 'Combine results' >> beam.Flatten()
 
 
-class AuditDuplicateTranslationSuggestionsJob(CleanupDuplicateTranslationSuggestionsJob):
+class AuditDuplicateTranslationSuggestionsJob(
+    CleanupDuplicateTranslationSuggestionsJob
+):
     """Job that audits duplicate translation suggestions."""
 
     DATASTORE_UPDATES_ALLOWED = False

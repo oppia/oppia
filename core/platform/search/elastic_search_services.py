@@ -49,8 +49,16 @@ class ElasticSearchClient:
         """Creates and returns elastic search client."""
         if self._client is None:
             with datastore_services.get_ndb_context():
-                es_cloud_id = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.ES_CLOUD_ID.value)
-                es_username = platform_parameter_services.get_platform_parameter_value(platform_parameter_list.ParamName.ES_USERNAME.value)
+                es_cloud_id = (
+                    platform_parameter_services.get_platform_parameter_value(
+                        platform_parameter_list.ParamName.ES_CLOUD_ID.value
+                    )
+                )
+                es_username = (
+                    platform_parameter_services.get_platform_parameter_value(
+                        platform_parameter_list.ParamName.ES_USERNAME.value
+                    )
+                )
 
                 es_password = secrets_services.get_secret('ES_PASSWORD') or ''
 
@@ -58,7 +66,11 @@ class ElasticSearchClient:
                 # Only one of cloud_id or hosts can be used with the Elasticsearch v8 client.
 
                 cloud_id = es_cloud_id or None
-                hosts = None if es_cloud_id else [f'http://{feconf.ES_HOST}:{feconf.ES_LOCALHOST_PORT}']
+                hosts = (
+                    None
+                    if es_cloud_id
+                    else [f'http://{feconf.ES_HOST}:{feconf.ES_LOCALHOST_PORT}']
+                )
                 verify_certs = bool(es_cloud_id)
 
                 self._client = elasticsearch.Elasticsearch(
@@ -163,7 +175,9 @@ def _create_index(index_name: str) -> None:
 # This can be seen from the type stubs of elastic search.
 # The type of 'body' here is Any.
 # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L172
-def add_documents_to_index(documents: Sequence[Mapping[str, Any]], index_name: str) -> None:
+def add_documents_to_index(
+    documents: Sequence[Mapping[str, Any]], index_name: str
+) -> None:
     """Adds a document to an index. This function also creates the index if it
     does not exist yet.
 
@@ -184,11 +198,15 @@ def add_documents_to_index(documents: Sequence[Mapping[str, Any]], index_name: s
         assert 'id' in document
     for document in documents:
         try:
-            response = ES.get_client().index(index=index_name, document=document, id=document['id'])
+            response = ES.get_client().index(
+                index=index_name, document=document, id=document['id']
+            )
         except elasticsearch.NotFoundError:
             # The index does not exist yet. Create it and repeat the operation.
             _create_index(index_name)
-            response = ES.get_client().index(index=index_name, document=document, id=document['id'])
+            response = ES.get_client().index(
+                index=index_name, document=document, id=document['id']
+            )
 
         if response is None or response['_shards']['failed'] > 0:
             raise SearchException('Failed to add document to index.')
@@ -209,7 +227,9 @@ def delete_documents_from_index(doc_ids: List[str], index_name: str) -> None:
 
     for doc_id in doc_ids:
         try:
-            document_exists_in_index = ES.get_client().exists(index=index_name, id=doc_id)
+            document_exists_in_index = ES.get_client().exists(
+                index=index_name, id=doc_id
+            )
         except elasticsearch.NotFoundError:
             # The index does not exist yet. Create it and set
             # document_exists_in_index to False.
@@ -230,7 +250,9 @@ def clear_index(index_name: str) -> None:
     # More details on clearing an index can be found here:
     # https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.delete_by_query
     # https://stackoverflow.com/questions/57778438/delete-all-documents-from-elasticsearch-index-in-python-3-x
-    ES.get_client().delete_by_query(index=index_name, body={'query': {'match_all': {}}})
+    ES.get_client().delete_by_query(
+        index=index_name, body={'query': {'match_all': {}}}
+    )
 
 
 def search(
@@ -310,12 +332,18 @@ def search(
         ]
     if categories:
         category_string = ' '.join(['"%s"' % cat for cat in categories])
-        query_definition['query']['bool']['filter'].append({'match': {'category': category_string}})
+        query_definition['query']['bool']['filter'].append(
+            {'match': {'category': category_string}}
+        )
     if language_codes:
         language_code_string = ' '.join(['"%s"' % lc for lc in language_codes])
-        query_definition['query']['bool']['filter'].append({'match': {'language_code': language_code_string}})
+        query_definition['query']['bool']['filter'].append(
+            {'match': {'language_code': language_code_string}}
+        )
 
-    result_ids, resulting_offset = _fetch_response_from_elastic_search(query_definition, index_name, offset, size)
+    result_ids, resulting_offset = _fetch_response_from_elastic_search(
+        query_definition, index_name, offset, size
+    )
 
     return result_ids, resulting_offset
 
@@ -390,9 +418,13 @@ def blog_post_summaries_search(
         ]
     if tags:
         for tag in tags:
-            query_definition['query']['bool']['filter'].append({'match': {'tags': tag}})
+            query_definition['query']['bool']['filter'].append(
+                {'match': {'tags': tag}}
+            )
 
     index_name = search_services.SEARCH_INDEX_BLOG_POSTS
-    result_ids, resulting_offset = _fetch_response_from_elastic_search(query_definition, index_name, offset, size)
+    result_ids, resulting_offset = _fetch_response_from_elastic_search(
+        query_definition, index_name, offset, size
+    )
 
     return result_ids, resulting_offset

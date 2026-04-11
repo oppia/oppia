@@ -29,7 +29,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, story_models
 
-(base_models, story_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.STORY])
+(base_models, story_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.STORY]
+)
 
 
 class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
@@ -43,7 +45,11 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}],
         )
 
-        output = self.pipeline | beam.Create([valid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([valid_commit_cmd_model])
+            | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(output, [])
 
@@ -57,7 +63,11 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'invalid': 'data'}],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -80,7 +90,11 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'invalid': 'data'}],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -107,7 +121,11 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[commit_dict],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -136,7 +154,11 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             ],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -169,7 +191,11 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[commit_dict],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -200,7 +226,11 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             ],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -237,7 +267,11 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[commit_dict],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(story_validation.ValidateStorySnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -264,7 +298,11 @@ class ValidateStoryCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}],
         )
 
-        output = self.pipeline | beam.Create([valid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStoryCommitLogEntryModel())
+        output = (
+            self.pipeline
+            | beam.Create([valid_commit_cmd_model])
+            | beam.ParDo(story_validation.ValidateStoryCommitLogEntryModel())
+        )
 
         self.assert_pcoll_equal(output, [])
 
@@ -280,9 +318,17 @@ class ValidateStoryCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(story_validation.ValidateStoryCommitLogEntryModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(story_validation.ValidateStoryCommitLogEntryModel())
+        )
 
         self.assert_pcoll_equal(
             output,
-            [base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model)],
+            [
+                base_validation_errors.CommitCmdsNoneError(
+                    invalid_commit_cmd_model
+                )
+            ],
         )

@@ -37,7 +37,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import stats_models, transaction_services, user_models
 
-(stats_models, user_models) = models.Registry.import_models([models.Names.STATISTICS, models.Names.USER])
+(stats_models, user_models) = models.Registry.import_models(
+    [models.Names.STATISTICS, models.Names.USER]
+)
 
 transaction_services = models.Registry.import_transaction_services()
 
@@ -68,7 +70,9 @@ class BaseEventHandler:
                 derived classes.
         """
         if getattr(cls, '_handle_event', None) is None:
-            raise NotImplementedError('Subclasses of BaseEventHandler should implement the _handle_event() method, using explicit arguments (no *args or **kwargs).')
+            raise NotImplementedError(
+                'Subclasses of BaseEventHandler should implement the _handle_event() method, using explicit arguments (no *args or **kwargs).'
+            )
 
         cls._handle_event(*args, **kwargs)
 
@@ -99,11 +103,16 @@ class StatsEventsHandler(BaseEventHandler):
         aggregated stats data.
         """
         if 'undefined' in aggregated_stats['state_stats_mapping']:
-            logging.error('Aggregated stats contains an undefined state name: %s' % list(aggregated_stats['state_stats_mapping'].keys()))
+            logging.error(
+                'Aggregated stats contains an undefined state name: %s'
+                % list(aggregated_stats['state_stats_mapping'].keys())
+            )
             return
         if cls._is_latest_version(exploration_id, exp_version):
             taskqueue_services.defer(
-                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS['FUNCTION_ID_UPDATE_STATS'],
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_UPDATE_STATS'
+                ],
                 taskqueue_services.QUEUE_NAME_STATS,
                 exploration_id,
                 exp_version,
@@ -153,7 +162,9 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
             ),
         )
 
-        feedback_is_useful = classification_categorization != (exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
+        feedback_is_useful = classification_categorization != (
+            exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
+        )
 
         stats_models.AnswerSubmittedEventLogEntryModel.create(
             exploration_id,
@@ -171,11 +182,15 @@ class ExplorationActualStartEventHandler(BaseEventHandler):
     EVENT_TYPE: str = feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION
 
     @classmethod
-    def _handle_event(cls, exp_id: str, exp_version: int, state_name: str, session_id: str) -> None:
+    def _handle_event(
+        cls, exp_id: str, exp_version: int, state_name: str, session_id: str
+    ) -> None:
         """Perform in-request processing of recording exploration actual start
         events.
         """
-        stats_models.ExplorationActualStartEventLogEntryModel.create(exp_id, exp_version, state_name, session_id)
+        stats_models.ExplorationActualStartEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id
+        )
 
 
 class SolutionHitEventHandler(BaseEventHandler):
@@ -220,7 +235,9 @@ class StartExplorationEventHandler(BaseEventHandler):
         """Perform in-request processing of recording exploration start
         events.
         """
-        stats_models.StartExplorationEventLogEntryModel.create(exp_id, exp_version, state_name, session_id, params, play_type)
+        stats_models.StartExplorationEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id, params, play_type
+        )
         handle_exploration_start(exp_id)
 
 
@@ -290,11 +307,15 @@ class RateExplorationEventHandler(BaseEventHandler):
     EVENT_TYPE: str = feconf.EVENT_TYPE_RATE_EXPLORATION
 
     @classmethod
-    def _handle_event(cls, exp_id: str, user_id: str, rating: int, old_rating: int) -> None:
+    def _handle_event(
+        cls, exp_id: str, user_id: str, rating: int, old_rating: int
+    ) -> None:
         """Perform in-request processing of recording exploration rating
         events.
         """
-        stats_models.RateExplorationEventLogEntryModel.create(exp_id, user_id, rating, old_rating)
+        stats_models.RateExplorationEventLogEntryModel.create(
+            exp_id, user_id, rating, old_rating
+        )
         handle_exploration_rating(exp_id, rating, old_rating)
 
 
@@ -315,7 +336,9 @@ class StateHitEventHandler(BaseEventHandler):
         play_type: str,
     ) -> None:
         """Perform in-request processing of recording state hit events."""
-        stats_models.StateHitEventLogEntryModel.create(exp_id, exp_version, state_name, session_id, params, play_type)
+        stats_models.StateHitEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id, params, play_type
+        )
 
 
 class StateCompleteEventHandler(BaseEventHandler):
@@ -389,11 +412,15 @@ class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
     EVENT_TYPE: str = feconf.EVENT_TYPE_THREAD_STATUS_CHANGED
 
     @classmethod
-    def _handle_event(cls, exp_id: str, old_status: str, new_status: str) -> None:
+    def _handle_event(
+        cls, exp_id: str, old_status: str, new_status: str
+    ) -> None:
         """Perform in-request processing of recording reopening feedback
         thread events.
         """
-        feedback_services.handle_thread_status_changed(exp_id, old_status, new_status)
+        feedback_services.handle_thread_status_changed(
+            exp_id, old_status, new_status
+        )
 
 
 def handle_exploration_start(exp_id: str) -> None:
@@ -402,13 +429,17 @@ def handle_exploration_start(exp_id: str) -> None:
     Args:
         exp_id: str. The exploration which has been started.
     """
-    exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id, strict=False)
+    exp_summary = exp_fetchers.get_exploration_summary_by_id(
+        exp_id, strict=False
+    )
     if exp_summary is not None:
         for user_id in exp_summary.owner_ids:
             _increment_total_plays_count_transactional(user_id)
 
 
-def handle_exploration_rating(exp_id: str, rating: int, old_rating: Optional[int]) -> None:
+def handle_exploration_rating(
+    exp_id: str, rating: int, old_rating: Optional[int]
+) -> None:
     """Handles a new rating for an exploration.
 
     Args:
@@ -418,14 +449,18 @@ def handle_exploration_rating(exp_id: str, rating: int, old_rating: Optional[int
             refreshing, or None if the exploration hasn't been rated by the user
             yet.
     """
-    exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id, strict=False)
+    exp_summary = exp_fetchers.get_exploration_summary_by_id(
+        exp_id, strict=False
+    )
     if exp_summary is not None:
         for user_id in exp_summary.owner_ids:
             _refresh_average_ratings_transactional(user_id, rating, old_rating)
 
 
 @transaction_services.run_in_transaction_wrapper
-def _refresh_average_ratings_transactional(user_id: str, new_rating: int, old_rating: Optional[int]) -> None:
+def _refresh_average_ratings_transactional(
+    user_id: str, new_rating: int, old_rating: Optional[int]
+) -> None:
     """Refreshes the average rating for a user.
 
     Args:
@@ -437,7 +472,9 @@ def _refresh_average_ratings_transactional(user_id: str, new_rating: int, old_ra
     """
     user_stats_model = user_models.UserStatsModel.get(user_id, strict=False)
     if user_stats_model is None:
-        user_models.UserStatsModel(id=user_id, average_ratings=new_rating, num_ratings=1).put()
+        user_models.UserStatsModel(
+            id=user_id, average_ratings=new_rating, num_ratings=1
+        ).put()
         return
 
     num_ratings = user_stats_model.num_ratings

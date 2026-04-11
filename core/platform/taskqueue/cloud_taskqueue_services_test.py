@@ -48,7 +48,11 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         queue_name = 'queue'
         dummy_url = '/task/dummy_handler'
         payload = {
-            'fn_identifier': (feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS['FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS']),
+            'fn_identifier': (
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS'
+                ]
+            ),
             'args': [['1', '2', '3']],
             'kwargs': {},
         }
@@ -81,19 +85,29 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
             )
             return self.Response(task_name)
 
-        with self.swap(cloud_taskqueue_services.CLIENT, 'create_task', mock_create_task):
-            cloud_taskqueue_services.create_http_task(queue_name, dummy_url, payload=payload, task_name=task_name)
+        with self.swap(
+            cloud_taskqueue_services.CLIENT, 'create_task', mock_create_task
+        ):
+            cloud_taskqueue_services.create_http_task(
+                queue_name, dummy_url, payload=payload, task_name=task_name
+            )
 
     def test_http_task_scheduled_for_later_sends_correct_request(self) -> None:
         queue_name = 'queue'
         dummy_url = '/task/dummy_handler'
         payload = {
-            'fn_identifier': (feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS['FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS']),
+            'fn_identifier': (
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS'
+                ]
+            ),
             'args': [['1', '2', '3']],
             'kwargs': {},
         }
         # Create Timestamp protobuf.
-        datetime_to_execute_task = datetime.datetime.utcnow() + datetime.timedelta(seconds=20)
+        datetime_to_execute_task = (
+            datetime.datetime.utcnow() + datetime.timedelta(seconds=20)
+        )
         timestamp = timestamp_pb2.Timestamp()
         timestamp.FromDatetime(datetime_to_execute_task)
         task_name = 'task1'
@@ -126,7 +140,9 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
             )
             return self.Response(task_name)
 
-        with self.swap(cloud_taskqueue_services.CLIENT, 'create_task', mock_create_task):
+        with self.swap(
+            cloud_taskqueue_services.CLIENT, 'create_task', mock_create_task
+        ):
             cloud_taskqueue_services.create_http_task(
                 queue_name,
                 dummy_url,

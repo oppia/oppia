@@ -70,7 +70,9 @@ def commit(
     """
     # TODO(#13500): Refactor this method that only bytes are passed
     # into raw_bytes.
-    blob = cloud_storage_emulator.EmulatorBlob(filepath, raw_bytes, content_type=mimetype)
+    blob = cloud_storage_emulator.EmulatorBlob(
+        filepath, raw_bytes, content_type=mimetype
+    )
     CLIENT.upload_blob(filepath, blob)
 
 
@@ -84,7 +86,9 @@ def delete(unused_bucket_name: str, filepath: str) -> None:
     CLIENT.delete_blob(filepath)
 
 
-def copy(unused_bucket_name: str, source_assets_path: str, dest_assets_path: str) -> None:
+def copy(
+    unused_bucket_name: str, source_assets_path: str, dest_assets_path: str
+) -> None:
     """Copies images from source_path.
 
     Args:
@@ -106,7 +110,9 @@ def copy(unused_bucket_name: str, source_assets_path: str, dest_assets_path: str
     CLIENT.copy_blob(src_blob, dest_assets_path)
 
 
-def listdir(unused_bucket_name: str, dir_name: str) -> List[cloud_storage_emulator.EmulatorBlob]:
+def listdir(
+    unused_bucket_name: str, dir_name: str
+) -> List[cloud_storage_emulator.EmulatorBlob]:
     """Lists all files in a directory.
 
     Args:

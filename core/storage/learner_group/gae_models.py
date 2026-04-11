@@ -58,7 +58,9 @@ class LearnerGroupModel(base_models.BaseModel):
     # The description of the learner group.
     description = datastore_services.StringProperty(required=True, indexed=True)
     # The list of user_ids of facilitators of the learner group.
-    facilitator_user_ids = datastore_services.StringProperty(repeated=True, indexed=True)
+    facilitator_user_ids = datastore_services.StringProperty(
+        repeated=True, indexed=True
+    )
     # The list of user_ids of learners of the learner group.
     learner_user_ids = datastore_services.StringProperty(repeated=True)
     # The list of user_ids of the learners who are invited to join the
@@ -79,7 +81,9 @@ class LearnerGroupModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model is exported as multiple instances per user as a
         user can be part of multiple learner groups.
         """
@@ -115,14 +119,21 @@ class LearnerGroupModel(base_models.BaseModel):
                 of attempts.
         """
         for _ in range(base_models.MAX_RETRIES):
-            group_id = ''.join(random.choice('%s%s' % (string.ascii_lowercase, string.ascii_uppercase)) for _ in range(base_models.ID_LENGTH))
+            group_id = ''.join(
+                random.choice(
+                    '%s%s' % (string.ascii_lowercase, string.ascii_uppercase)
+                )
+                for _ in range(base_models.ID_LENGTH)
+            )
             if not cls.get_by_id(group_id):
                 return group_id
 
         raise Exception('New id generator is producing too many collisions.')
 
     @classmethod
-    def create(cls, group_id: str, title: str, description: str) -> LearnerGroupModel:
+    def create(
+        cls, group_id: str, title: str, description: str
+    ) -> LearnerGroupModel:
         """Creates a new LearnerGroupModel instance and returns it.
 
         Args:
@@ -137,7 +148,9 @@ class LearnerGroupModel(base_models.BaseModel):
             Exception. A learner group with the given group ID exists already.
         """
         if cls.get_by_id(group_id):
-            raise Exception('A learner group with the given group ID exists already.')
+            raise Exception(
+                'A learner group with the given group ID exists already.'
+            )
 
         entity = cls(id=group_id, title=title, description=description)
 
@@ -249,14 +262,20 @@ class LearnerGroupModel(base_models.BaseModel):
         for learner_group_model in found_models:
             # If the user is the facilitator of the group and there is
             # only one facilitator_user_id, delete the group.
-            if user_id in learner_group_model.facilitator_user_ids and len(learner_group_model.facilitator_user_ids) == 1:
+            if (
+                user_id in learner_group_model.facilitator_user_ids
+                and len(learner_group_model.facilitator_user_ids) == 1
+            ):
                 learner_group_model.delete()
                 continue
 
             # If the user is the facilitator of the group and there are
             # more then one facilitator_user_ids, delete the user from the
             # facilitator_user_ids list.
-            if user_id in learner_group_model.facilitator_user_ids and len(learner_group_model.facilitator_user_ids) > 1:
+            if (
+                user_id in learner_group_model.facilitator_user_ids
+                and len(learner_group_model.facilitator_user_ids) > 1
+            ):
                 learner_group_model.facilitator_user_ids.remove(user_id)
 
             # If the user is a learner, delete the user from the
@@ -278,7 +297,9 @@ class LearnerGroupModel(base_models.BaseModel):
         cls.put_multi(learner_group_models_to_put)
 
     @classmethod
-    def get_by_facilitator_id(cls, facilitator_id: str) -> Sequence[LearnerGroupModel]:
+    def get_by_facilitator_id(
+        cls, facilitator_id: str
+    ) -> Sequence[LearnerGroupModel]:
         """Returns a list of all LearnerGroupModels that have the given
         facilitator id.
 
@@ -290,12 +311,22 @@ class LearnerGroupModel(base_models.BaseModel):
             have the given facilitator id or None if no such learner group
             models exist.
         """
-        found_models: Sequence[LearnerGroupModel] = cls.get_all().filter(datastore_services.any_of(cls.facilitator_user_ids == facilitator_id)).fetch()
+        found_models: Sequence[LearnerGroupModel] = (
+            cls.get_all()
+            .filter(
+                datastore_services.any_of(
+                    cls.facilitator_user_ids == facilitator_id
+                )
+            )
+            .fetch()
+        )
 
         return found_models
 
     @classmethod
-    def get_by_learner_user_id(cls, learner_user_id: str) -> Sequence[LearnerGroupModel]:
+    def get_by_learner_user_id(
+        cls, learner_user_id: str
+    ) -> Sequence[LearnerGroupModel]:
         """Returns a list of all LearnerGroupModels that have the given
         user id as a learner.
 
@@ -307,12 +338,22 @@ class LearnerGroupModel(base_models.BaseModel):
             the given learner is part of or None if no such learner group
             models exist.
         """
-        found_models: Sequence[LearnerGroupModel] = cls.get_all().filter(datastore_services.any_of(cls.learner_user_ids == learner_user_id)).fetch()
+        found_models: Sequence[LearnerGroupModel] = (
+            cls.get_all()
+            .filter(
+                datastore_services.any_of(
+                    cls.learner_user_ids == learner_user_id
+                )
+            )
+            .fetch()
+        )
 
         return found_models
 
     @classmethod
-    def get_by_invited_learner_user_id(cls, invited_learner_user_id: str) -> Sequence[LearnerGroupModel]:
+    def get_by_invited_learner_user_id(
+        cls, invited_learner_user_id: str
+    ) -> Sequence[LearnerGroupModel]:
         """Returns a list of all LearnerGroupModels which the given user has
         been invited to join.
 
@@ -325,6 +366,14 @@ class LearnerGroupModel(base_models.BaseModel):
             the given learner is being invited to join or None if no such
             learner group models exist.
         """
-        found_models: Sequence[LearnerGroupModel] = cls.get_all().filter(datastore_services.any_of(cls.invited_learner_user_ids == invited_learner_user_id)).fetch()
+        found_models: Sequence[LearnerGroupModel] = (
+            cls.get_all()
+            .filter(
+                datastore_services.any_of(
+                    cls.invited_learner_user_ids == invited_learner_user_id
+                )
+            )
+            .fetch()
+        )
 
         return found_models

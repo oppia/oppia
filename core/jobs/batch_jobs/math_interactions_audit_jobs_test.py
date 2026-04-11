@@ -36,7 +36,9 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[math_interactions_audit_jobs.FindMathExplorationsWithRulesJob] = math_interactions_audit_jobs.FindMathExplorationsWithRulesJob
+    JOB_CLASS: Type[
+        math_interactions_audit_jobs.FindMathExplorationsWithRulesJob
+    ] = math_interactions_audit_jobs.FindMathExplorationsWithRulesJob
 
     EXP_1_ID: Final = 'exp_1_id'
     EXP_2_ID: Final = 'exp_2_id'
@@ -83,7 +85,9 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
             },
             next_content_id_index=8,
         )
-        exp_model_1.states['alg_state']['interaction']['id'] = 'AlgebraicExpressionInput'
+        exp_model_1.states['alg_state']['interaction']['id'] = (
+            'AlgebraicExpressionInput'
+        )
         exp_model_1.states['alg_state']['interaction']['answer_groups'] = [
             {
                 'rule_specs': [
@@ -92,7 +96,9 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
                 ]
             }
         ]
-        exp_model_1.states['eq_state']['interaction']['id'] = 'MathEquationInput'
+        exp_model_1.states['eq_state']['interaction']['id'] = (
+            'MathEquationInput'
+        )
         exp_model_1.states['eq_state']['interaction']['answer_groups'] = [
             {
                 'rule_specs': [
@@ -136,7 +142,9 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
             },
             next_content_id_index=6,
         )
-        exp_model_2.states['num_state']['interaction']['id'] = 'NumericExpressionInput'
+        exp_model_2.states['num_state']['interaction']['id'] = (
+            'NumericExpressionInput'
+        )
         exp_model_2.states['num_state']['interaction']['answer_groups'] = [
             {
                 'rule_specs': [
@@ -183,15 +191,33 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
         )
 
         exp_model_3.states['text_state']['interaction']['id'] = 'TextInput'
-        exp_model_3.states['text_state']['interaction']['answer_groups'] = [{'rule_specs': [{'rule_type': 'CaseSensitiveEquals', 'inputs': {'x': ''}}]}]
+        exp_model_3.states['text_state']['interaction']['answer_groups'] = [
+            {
+                'rule_specs': [
+                    {'rule_type': 'CaseSensitiveEquals', 'inputs': {'x': ''}}
+                ]
+            }
+        ]
         exp_model_3.update_timestamps()
 
         datastore_services.put_multi([exp_model_1, exp_model_2, exp_model_3])
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(stdout=('(\'exp_1_id\', \'alg_state\', [\'IsEquivalentTo\', \'ContainsSomeOf\'])')),
-                job_run_result.JobRunResult(stdout=('(\'exp_1_id\', \'eq_state\', [\'MatchesExactlyWith\'])')),
-                job_run_result.JobRunResult(stdout=('(\'exp_2_id\', \'num_state\', [\'MatchesExactlyWith\', \'OmitsSomeOf\'])')),
+                job_run_result.JobRunResult(
+                    stdout=(
+                        '(\'exp_1_id\', \'alg_state\', [\'IsEquivalentTo\', \'ContainsSomeOf\'])'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stdout=(
+                        '(\'exp_1_id\', \'eq_state\', [\'MatchesExactlyWith\'])'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stdout=(
+                        '(\'exp_2_id\', \'num_state\', [\'MatchesExactlyWith\', \'OmitsSomeOf\'])'
+                    )
+                ),
             ]
         )

@@ -36,7 +36,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services, subtopic_models
 
-(base_models, subtopic_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.SUBTOPIC])
+(base_models, subtopic_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.SUBTOPIC]
+)
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -51,7 +53,11 @@ class MigrateStudyGuideModels(beam.PTransform):  # type: ignore[misc]
     """
 
     @staticmethod
-    def _migrate_study_guide(study_guide_id: str, study_guide_model: subtopic_models.StudyGuideModel) -> result.Result[Tuple[str, study_guide_domain.StudyGuide], Tuple[str, Exception]]:
+    def _migrate_study_guide(
+        study_guide_id: str, study_guide_model: subtopic_models.StudyGuideModel
+    ) -> result.Result[
+        Tuple[str, study_guide_domain.StudyGuide], Tuple[str, Exception]
+    ]:
         """Migrates study guide and transform study guide model into
             study guide object.
 
@@ -67,7 +73,9 @@ class MigrateStudyGuideModels(beam.PTransform):  # type: ignore[misc]
             successful and Exception is returned otherwise.
         """
         try:
-            study_guide = study_guide_services.get_study_guide_from_model(study_guide_model)
+            study_guide = study_guide_services.get_study_guide_from_model(
+                study_guide_model
+            )
             study_guide.validate()
         except Exception as e:
             logging.exception(e)
@@ -77,7 +85,11 @@ class MigrateStudyGuideModels(beam.PTransform):  # type: ignore[misc]
 
     # Remove no cover comment once migrations for study guides are available.
     @staticmethod
-    def _generate_study_guide_changes(study_guide_id: str, study_guide_model: subtopic_models.StudyGuideModel) -> Iterable[Tuple[str, study_guide_domain.StudyGuideChange]]:  # pragma: no cover pylint: disable=line-too-long
+    def _generate_study_guide_changes(
+        study_guide_id: str, study_guide_model: subtopic_models.StudyGuideModel
+    ) -> Iterable[
+        Tuple[str, study_guide_domain.StudyGuideChange]
+    ]:  # pragma: no cover pylint: disable=line-too-long
         """Generates Study Guide change objects. Study Guide change object is
         generated when schema version for some field is lower than the latest
         schema version.
@@ -92,12 +104,19 @@ class MigrateStudyGuideModels(beam.PTransform):  # type: ignore[misc]
             study guide change object.
         """
         study_guide_version = study_guide_model.sections_schema_version
-        if study_guide_version < feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION:  # pylint: disable=line-too-long
+        if (
+            study_guide_version
+            < feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION
+        ):  # pylint: disable=line-too-long
             study_guide_change = study_guide_domain.StudyGuideChange(
                 {
-                    'cmd': (study_guide_domain.CMD_MIGRATE_STUDY_GUIDE_SECTIONS_SCHEMA_TO_LATEST_VERSION),  # pylint: disable=line-too-long
+                    'cmd': (
+                        study_guide_domain.CMD_MIGRATE_STUDY_GUIDE_SECTIONS_SCHEMA_TO_LATEST_VERSION
+                    ),  # pylint: disable=line-too-long
                     'from_version': study_guide_version,
-                    'to_version': (feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION),
+                    'to_version': (
+                        feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION
+                    ),
                 }
             )
             yield (study_guide_id, study_guide_change)
@@ -122,7 +141,8 @@ class MigrateStudyGuideModels(beam.PTransform):  # type: ignore[misc]
 
         unmigrated_study_guide_models = (
             pipeline
-            | 'Get all non-deleted study guide models' >> (ndb_io.GetModels(subtopic_models.StudyGuideModel.get_all()))
+            | 'Get all non-deleted study guide models'
+            >> (ndb_io.GetModels(subtopic_models.StudyGuideModel.get_all()))
             # Pylint disable is needed becasue pylint is not able to correclty
             # detect that the value is passed through the pipe.
             | 'Add study guide keys'
@@ -131,15 +151,38 @@ class MigrateStudyGuideModels(beam.PTransform):  # type: ignore[misc]
             )
         )
 
-        all_migrated_study_guide_results = unmigrated_study_guide_models | 'Transform and migrate model' >> beam.MapTuple(self._migrate_study_guide)
+        all_migrated_study_guide_results = (
+            unmigrated_study_guide_models
+            | 'Transform and migrate model'
+            >> beam.MapTuple(self._migrate_study_guide)
+        )
 
-        migrated_study_guide_job_run_results = all_migrated_study_guide_results | 'Generates results for migration' >> (job_result_transforms.ResultsToJobRunResults('STUDY GUIDE PROCESSED'))
+        migrated_study_guide_job_run_results = (
+            all_migrated_study_guide_results
+            | 'Generates results for migration'
+            >> (
+                job_result_transforms.ResultsToJobRunResults(
+                    'STUDY GUIDE PROCESSED'
+                )
+            )
+        )
 
-        filtered_migrated_study_guides = all_migrated_study_guide_results | 'Filter migration results' >> (results_transforms.DrainResultsOnError())
+        filtered_migrated_study_guides = (
+            all_migrated_study_guide_results
+            | 'Filter migration results'
+            >> (results_transforms.DrainResultsOnError())
+        )
 
-        migrated_study_guides = filtered_migrated_study_guides | 'Unwrap ok' >> beam.Map(lambda result_item: result_item.unwrap())
+        migrated_study_guides = (
+            filtered_migrated_study_guides
+            | 'Unwrap ok' >> beam.Map(lambda result_item: result_item.unwrap())
+        )
 
-        study_guide_changes = unmigrated_study_guide_models | 'Generates study guide changes' >> beam.FlatMapTuple(self._generate_study_guide_changes)
+        study_guide_changes = (
+            unmigrated_study_guide_models
+            | 'Generates study guide changes'
+            >> beam.FlatMapTuple(self._generate_study_guide_changes)
+        )
 
         study_guide_objects_list = (
             {
@@ -153,7 +196,11 @@ class MigrateStudyGuideModels(beam.PTransform):  # type: ignore[misc]
 
         transformed_study_guide_objects_list = (
             study_guide_objects_list
-            | 'Remove unmigrated study guides' >> beam.Filter(lambda x: len(x['study_guide_changes']) > 0 and len(x['study_guide']) > 0)
+            | 'Remove unmigrated study guides'
+            >> beam.Filter(
+                lambda x: len(x['study_guide_changes']) > 0
+                and len(x['study_guide']) > 0
+            )
             | 'Reorganize the study_guide objects'
             >> beam.Map(
                 lambda objects: {
@@ -165,10 +212,31 @@ class MigrateStudyGuideModels(beam.PTransform):  # type: ignore[misc]
         )
 
         already_migrated_job_run_results = (
-            study_guide_objects_list | 'Remove migrated models' >> beam.Filter(lambda x: (len(x['study_guide_changes']) == 0 and len(x['study_guide']) > 0)) | 'Transform previously migrated studyguide to job run results' >> (job_result_transforms.CountObjectsToJobRunResult('STUDY GUIDE PREVIOUSLY MIGRATED'))
+            study_guide_objects_list
+            | 'Remove migrated models'
+            >> beam.Filter(
+                lambda x: (
+                    len(x['study_guide_changes']) == 0
+                    and len(x['study_guide']) > 0
+                )
+            )
+            | 'Transform previously migrated studyguide to job run results'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'STUDY GUIDE PREVIOUSLY MIGRATED'
+                )
+            )
         )
 
-        study_guide_objects_list_job_run_results = transformed_study_guide_objects_list | 'Transform study guide objects into job run results' >> (job_result_transforms.CountObjectsToJobRunResult('STUDY GUIDE MIGRATED'))
+        study_guide_objects_list_job_run_results = (
+            transformed_study_guide_objects_list
+            | 'Transform study guide objects into job run results'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'STUDY GUIDE MIGRATED'
+                )
+            )
+        )
 
         job_run_results = (
             migrated_study_guide_job_run_results,
@@ -203,14 +271,19 @@ class MigrateStudyGuideJob(base_jobs.JobBase):
             sequence(BaseModel). Sequence of models which should be put into
             the datastore.
         """
-        updated_study_guide_model = study_guide_services.populate_study_guide_model_fields(study_guide_model, migrated_study_guide)
+        updated_study_guide_model = (
+            study_guide_services.populate_study_guide_model_fields(
+                study_guide_model, migrated_study_guide
+            )
+        )
 
         change_dicts = [change.to_dict() for change in study_guide_change]
         with datastore_services.get_ndb_context():
             models_to_put = updated_study_guide_model.compute_models_to_commit(
                 feconf.MIGRATION_BOT_USER_ID,
                 feconf.COMMIT_TYPE_EDIT,
-                'Update study guide sections schema version to %d.' % (feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION),
+                'Update study guide sections schema version to %d.'
+                % (feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION),
                 change_dicts,
                 additional_models={},
             )
@@ -224,7 +297,9 @@ class MigrateStudyGuideJob(base_jobs.JobBase):
 
     def run(
         self,
-    ) -> beam.PCollection[job_run_result.JobRunResult]:  # pragma: no cover pylint: disable=line-too-long
+    ) -> beam.PCollection[
+        job_run_result.JobRunResult
+    ]:  # pragma: no cover pylint: disable=line-too-long
         """Returns a PCollection of results from the study guide migration.
 
         Returns:
@@ -232,17 +307,28 @@ class MigrateStudyGuideJob(base_jobs.JobBase):
             migration.
         """
 
-        transformed_study_guide_objects_list, job_run_results = self.pipeline | 'Perform migration and filter migration results' >> (MigrateStudyGuideModels())
+        transformed_study_guide_objects_list, job_run_results = (
+            self.pipeline
+            | 'Perform migration and filter migration results'
+            >> (MigrateStudyGuideModels())
+        )
 
-        study_guide_models_to_put = transformed_study_guide_objects_list | 'Generate study guide models to put' >> beam.FlatMap(
-            lambda study_guide_objects: self._update_study_guide(
-                study_guide_objects['study_guide_model'],
-                study_guide_objects['study_guide'],
-                study_guide_objects['study_guide_changes'],
+        study_guide_models_to_put = (
+            transformed_study_guide_objects_list
+            | 'Generate study guide models to put'
+            >> beam.FlatMap(
+                lambda study_guide_objects: self._update_study_guide(
+                    study_guide_objects['study_guide_model'],
+                    study_guide_objects['study_guide'],
+                    study_guide_objects['study_guide_changes'],
+                )
             )
         )
 
-        (study_guide_models_to_put | 'Put models into datastore' >> ndb_io.PutModels())
+        (
+            study_guide_models_to_put
+            | 'Put models into datastore' >> ndb_io.PutModels()
+        )
 
         return job_run_results
 
@@ -259,6 +345,10 @@ class AuditStudyGuideMigrationJob(base_jobs.JobBase):
             guide migration.
         """
 
-        unused_transformed_study_guide_objects_list, job_run_results = self.pipeline | 'Perform migration and filter migration results' >> (MigrateStudyGuideModels())
+        unused_transformed_study_guide_objects_list, job_run_results = (
+            self.pipeline
+            | 'Perform migration and filter migration results'
+            >> (MigrateStudyGuideModels())
+        )
 
         return job_run_results

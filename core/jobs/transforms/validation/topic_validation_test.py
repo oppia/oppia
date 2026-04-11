@@ -32,10 +32,14 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, topic_models
 
-(base_models, topic_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.TOPIC])
+(base_models, topic_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.TOPIC]
+)
 
 
-class ValidateCanonicalNameMatchesNameInLowercaseTests(job_test_utils.PipelinedTestBase):
+class ValidateCanonicalNameMatchesNameInLowercaseTests(
+    job_test_utils.PipelinedTestBase
+):
     def test_process_for_not_matching_canonical_name(self) -> None:
         model_with_different_name = topic_models.TopicModel(
             id='123',
@@ -49,10 +53,20 @@ class ValidateCanonicalNameMatchesNameInLowercaseTests(job_test_utils.PipelinedT
             subtopic_schema_version=0,
             story_reference_schema_version=0,
         )
-        output = self.pipeline | beam.Create([model_with_different_name]) | beam.ParDo(topic_validation.ValidateCanonicalNameMatchesNameInLowercase())
+        output = (
+            self.pipeline
+            | beam.Create([model_with_different_name])
+            | beam.ParDo(
+                topic_validation.ValidateCanonicalNameMatchesNameInLowercase()
+            )
+        )
         self.assert_pcoll_equal(
             output,
-            [topic_validation_errors.ModelCanonicalNameMismatchError(model_with_different_name)],
+            [
+                topic_validation_errors.ModelCanonicalNameMismatchError(
+                    model_with_different_name
+                )
+            ],
         )
 
     def test_process_for_matching_canonical_name(self) -> None:
@@ -68,7 +82,13 @@ class ValidateCanonicalNameMatchesNameInLowercaseTests(job_test_utils.PipelinedT
             subtopic_schema_version=0,
             story_reference_schema_version=0,
         )
-        output = self.pipeline | beam.Create([model_with_same_name]) | beam.ParDo(topic_validation.ValidateCanonicalNameMatchesNameInLowercase())
+        output = (
+            self.pipeline
+            | beam.Create([model_with_same_name])
+            | beam.ParDo(
+                topic_validation.ValidateCanonicalNameMatchesNameInLowercase()
+            )
+        )
         self.assert_pcoll_equal(output, [])
 
 
@@ -83,7 +103,11 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}],
         )
 
-        output = self.pipeline | beam.Create([valid_commit_cmd_model]) | beam.ParDo(topic_validation.ValidateTopicSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([valid_commit_cmd_model])
+            | beam.ParDo(topic_validation.ValidateTopicSnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(output, [])
 
@@ -97,7 +121,11 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'invalid': 'data'}],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(topic_validation.ValidateTopicSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(topic_validation.ValidateTopicSnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -120,7 +148,11 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd': 'invalid'}],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(topic_validation.ValidateTopicSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(topic_validation.ValidateTopicSnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -148,7 +180,11 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             ],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(topic_validation.ValidateTopicSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(topic_validation.ValidateTopicSnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -182,7 +218,11 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             ],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(topic_validation.ValidateTopicSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(topic_validation.ValidateTopicSnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -218,7 +258,11 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             ],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(topic_validation.ValidateTopicSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(topic_validation.ValidateTopicSnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -254,7 +298,11 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             ],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(topic_validation.ValidateTopicSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(topic_validation.ValidateTopicSnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -293,7 +341,11 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             ],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(topic_validation.ValidateTopicSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(topic_validation.ValidateTopicSnapshotMetadataModel())
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -313,18 +365,28 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
         )
 
 
-class ValidateTopicRightsSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
+class ValidateTopicRightsSnapshotMetadataModelTests(
+    job_test_utils.PipelinedTestBase
+):
     def test_topic_rights_change_object_with_missing_cmd(self) -> None:
-        invalid_commit_cmd_model = topic_models.TopicRightsSnapshotMetadataModel(
-            id='123',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='delete',
-            commit_cmds=[{'invalid': 'data'}],
+        invalid_commit_cmd_model = (
+            topic_models.TopicRightsSnapshotMetadataModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='delete',
+                commit_cmds=[{'invalid': 'data'}],
+            )
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(topic_validation.ValidateTopicRightsSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                topic_validation.ValidateTopicRightsSnapshotMetadataModel()
+            )
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -338,16 +400,24 @@ class ValidateTopicRightsSnapshotMetadataModelTests(job_test_utils.PipelinedTest
         )
 
     def test_topic_change_rights_object_with_invalid_cmd(self) -> None:
-        invalid_commit_cmd_model = topic_models.TopicRightsSnapshotMetadataModel(
-            id='123',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='delete',
-            commit_cmds=[{'cmd': 'invalid'}],
+        invalid_commit_cmd_model = (
+            topic_models.TopicRightsSnapshotMetadataModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='delete',
+                commit_cmds=[{'cmd': 'invalid'}],
+            )
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(topic_validation.ValidateTopicRightsSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                topic_validation.ValidateTopicRightsSnapshotMetadataModel()
+            )
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -367,16 +437,24 @@ class ValidateTopicRightsSnapshotMetadataModelTests(job_test_utils.PipelinedTest
             'cmd': 'change_role',
             'assignee_id': 'assignee_id',
         }
-        invalid_commit_cmd_model = topic_models.TopicRightsSnapshotMetadataModel(
-            id='123',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='edit',
-            commit_cmds=[commit_dict],
+        invalid_commit_cmd_model = (
+            topic_models.TopicRightsSnapshotMetadataModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='edit',
+                commit_cmds=[commit_dict],
+            )
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(topic_validation.ValidateTopicRightsSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                topic_validation.ValidateTopicRightsSnapshotMetadataModel()
+            )
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -393,16 +471,24 @@ class ValidateTopicRightsSnapshotMetadataModelTests(job_test_utils.PipelinedTest
         self,
     ) -> None:
         commit_dict = {'cmd': 'publish_topic', 'invalid': 'invalid'}
-        invalid_commit_cmd_model = topic_models.TopicRightsSnapshotMetadataModel(
-            id='123',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_cmds=[commit_dict],
+        invalid_commit_cmd_model = (
+            topic_models.TopicRightsSnapshotMetadataModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds=[commit_dict],
+            )
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(topic_validation.ValidateTopicRightsSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                topic_validation.ValidateTopicRightsSnapshotMetadataModel()
+            )
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -422,16 +508,24 @@ class ValidateTopicRightsSnapshotMetadataModelTests(job_test_utils.PipelinedTest
             'old_role': 'invalid',
             'new_role': topic_domain.ROLE_MANAGER,
         }
-        invalid_commit_cmd_model = topic_models.TopicRightsSnapshotMetadataModel(
-            id='123',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='edit',
-            commit_cmds=[commit_dict],
+        invalid_commit_cmd_model = (
+            topic_models.TopicRightsSnapshotMetadataModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='edit',
+                commit_cmds=[commit_dict],
+            )
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(topic_validation.ValidateTopicRightsSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                topic_validation.ValidateTopicRightsSnapshotMetadataModel()
+            )
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -458,7 +552,11 @@ class ValidateTopicCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}],
         )
 
-        output = self.pipeline | beam.Create([valid_commit_cmd_model]) | beam.ParDo(topic_validation.ValidateTopicCommitLogEntryModel())
+        output = (
+            self.pipeline
+            | beam.Create([valid_commit_cmd_model])
+            | beam.ParDo(topic_validation.ValidateTopicCommitLogEntryModel())
+        )
 
         self.assert_pcoll_equal(output, [])
 
@@ -474,7 +572,11 @@ class ValidateTopicCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}],
         )
 
-        output = self.pipeline | beam.Create([valid_commit_cmd_model]) | beam.ParDo(topic_validation.ValidateTopicCommitLogEntryModel())
+        output = (
+            self.pipeline
+            | beam.Create([valid_commit_cmd_model])
+            | beam.ParDo(topic_validation.ValidateTopicCommitLogEntryModel())
+        )
 
         self.assert_pcoll_equal(output, [])
 
@@ -490,17 +592,27 @@ class ValidateTopicCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}],
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(topic_validation.ValidateTopicCommitLogEntryModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(topic_validation.ValidateTopicCommitLogEntryModel())
+        )
 
         self.assert_pcoll_equal(
             output,
-            [base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model)],
+            [
+                base_validation_errors.CommitCmdsNoneError(
+                    invalid_commit_cmd_model
+                )
+            ],
         )
 
 
 class RelationshipsOfTests(test_utils.TestBase):
     def test_topic_summary_model_relationships(self) -> None:
         self.assertItemsEqual(
-            validation_decorators.RelationshipsOf.get_model_kind_references('TopicSummaryModel', 'id'),
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'TopicSummaryModel', 'id'
+            ),
             ['TopicModel', 'TopicRightsModel'],
         )

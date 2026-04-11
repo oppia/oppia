@@ -79,7 +79,9 @@ _INTERACTION_CONFIG_SCHEMA: Final = [
 ]
 
 
-AnswerVisualizationsDictKeys = Literal['id', 'options', 'calculation_id', 'addressed_info_is_supported']
+AnswerVisualizationsDictKeys = Literal[
+    'id', 'options', 'calculation_id', 'addressed_info_is_supported'
+]
 
 
 class InteractionAnswerUnitTests(test_utils.GenericTestBase):
@@ -101,19 +103,27 @@ class InteractionAnswerUnitTests(test_utils.GenericTestBase):
     def test_get_rule_description_with_invalid_rule_name_raises_error(
         self,
     ) -> None:
-        interaction = interaction_registry.Registry.get_interaction_by_id('CodeRepl')
-        with self.assertRaisesRegex(Exception, 'Could not find rule with name invalid_rule_name'):
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            'CodeRepl'
+        )
+        with self.assertRaisesRegex(
+            Exception, 'Could not find rule with name invalid_rule_name'
+        ):
             interaction.get_rule_description('invalid_rule_name')
 
     def test_get_rule_param_type_with_invalid_rule_param_name_raises_error(
         self,
     ) -> None:
-        interaction = interaction_registry.Registry.get_interaction_by_id('CodeRepl')
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            'CodeRepl'
+        )
         with self.assertRaisesRegex(
             Exception,
             'Rule CodeEquals has no param called invalid_rule_param_name',
         ):
-            interaction.get_rule_param_type('CodeEquals', 'invalid_rule_param_name')
+            interaction.get_rule_param_type(
+                'CodeEquals', 'invalid_rule_param_name'
+            )
 
 
 class InteractionUnitTests(test_utils.GenericTestBase):
@@ -129,7 +139,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
     # Here we use type Any because the schema has type Any included and this
     # is just a helper function which requires `schema` as an arguments.
-    def _set_expect_invalid_default_value(self, schema: Dict[str, Any], value: bool = False) -> None:
+    def _set_expect_invalid_default_value(
+        self, schema: Dict[str, Any], value: bool = False
+    ) -> None:
         """Helper function to set expect_invalid_default_value to avoid
         schema validations for the default value.
 
@@ -145,7 +157,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 for item_validator in schema['items']['validators']:
                     item_validator['expect_invalid_default_value'] = value
 
-    def _validate_customization_arg_specs(self, customization_args: List[domain.CustomizationArgSpec]) -> None:
+    def _validate_customization_arg_specs(
+        self, customization_args: List[domain.CustomizationArgSpec]
+    ) -> None:
         """Validates the customization arg specs for the interaction.
 
         Args:
@@ -174,11 +188,15 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self._set_expect_invalid_default_value(ca_spec.schema, True)
             self.assertEqual(
                 ca_spec.default_value,
-                schema_utils.normalize_against_schema(ca_spec.default_value, ca_spec.schema),
+                schema_utils.normalize_against_schema(
+                    ca_spec.default_value, ca_spec.schema
+                ),
             )
 
             if ca_spec.schema['type'] == 'custom':
-                obj_class = object_registry.Registry.get_object_class_by_type(ca_spec.schema['obj_type'])
+                obj_class = object_registry.Registry.get_object_class_by_type(
+                    ca_spec.schema['obj_type']
+                )
                 self.assertEqual(
                     ca_spec.default_value,
                     obj_class.normalize(ca_spec.default_value),
@@ -197,13 +215,17 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         """
         # Here we use object because every in-built type is inherited from
         # object class.
-        _answer_visualizations_specs_schema: List[Tuple[AnswerVisualizationsDictKeys, Type[object]]] = [
+        _answer_visualizations_specs_schema: List[
+            Tuple[AnswerVisualizationsDictKeys, Type[object]]
+        ] = [
             ('id', str),
             ('options', dict),
             ('calculation_id', str),
             ('addressed_info_is_supported', bool),
         ]
-        _answer_visualization_keys = [item[0] for item in _answer_visualizations_specs_schema]
+        _answer_visualization_keys = [
+            item[0] for item in _answer_visualizations_specs_schema
+        ]
 
         # Check that the keys and the types of their values are correct.
         for spec in answer_visualization_specs:
@@ -219,7 +241,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         """
         names = os.listdir(directory)
         for suffix in IGNORED_FILE_SUFFIXES:
-            names = [name for name in names if name != '__pycache__' and not name.endswith(suffix)]
+            names = [
+                name
+                for name in names
+                if name != '__pycache__' and not name.endswith(suffix)
+            ]
         return names
 
     def _get_linear_interaction_ids(self) -> List[str]:
@@ -228,13 +254,23 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         Returns:
             list(str). The list of linear interaction ids.
         """
-        all_interaction_ids = interaction_registry.Registry.get_all_interaction_ids()
-        return [interaction_id for interaction_id in all_interaction_ids if interaction_registry.Registry.get_interaction_by_id(interaction_id).is_linear]
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids()
+        )
+        return [
+            interaction_id
+            for interaction_id in all_interaction_ids
+            if interaction_registry.Registry.get_interaction_by_id(
+                interaction_id
+            ).is_linear
+        ]
 
     def test_interaction_properties(self) -> None:
         """Test the standard properties of interactions."""
 
-        interaction = interaction_registry.Registry.get_interaction_by_id(TEXT_INPUT_ID)
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            TEXT_INPUT_ID
+        )
         self.assertEqual(interaction.id, TEXT_INPUT_ID)
         self.assertEqual(interaction.name, 'Text Input')
 
@@ -295,7 +331,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 },
                 {
                     'name': 'catchMisspellings',
-                    'description': ('Catch Misspellings (Detect if answer is misspelled and nudge the learner to correct the misspelling)'),
+                    'description': (
+                        'Catch Misspellings (Detect if answer is misspelled and nudge the learner to correct the misspelling)'
+                    ),
                     'schema': {'type': 'bool'},
                     'default_value': False,
                 },
@@ -305,7 +343,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
     def test_interaction_rules(self) -> None:
         """Tests the interaction rules."""
 
-        def _check_num_interaction_rules(interaction_id: str, expected_num: int) -> None:
+        def _check_num_interaction_rules(
+            interaction_id: str, expected_num: int
+        ) -> None:
             """Checks the number of rules in the interaction corresponding to
             the given interaction id.
 
@@ -314,7 +354,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 expected_num: int. The expected number of rules for the
                     interaction.
             """
-            interaction = interaction_registry.Registry.get_interaction_by_id(interaction_id)
+            interaction = interaction_registry.Registry.get_interaction_by_id(
+                interaction_id
+            )
             self.assertEqual(len(interaction.rules_dict), expected_num)
 
         _check_num_interaction_rules('MultipleChoiceInput', 1)
@@ -325,7 +367,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
     def test_interaction_rule_descriptions_in_dict(self) -> None:
         """Tests the interaction rule descriptions in dict format."""
-        interaction = interaction_registry.Registry.get_interaction_by_id('NumericInput')
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            'NumericInput'
+        )
         self.assertEqual(
             interaction.to_dict()['rule_descriptions'],
             {
@@ -334,7 +378,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 'IsGreaterThan': 'is greater than {{x|Real}}',
                 'IsLessThanOrEqualTo': 'is less than or equal to {{x|Real}}',
                 'IsGreaterThanOrEqualTo': 'is greater than or equal to {{x|Real}}',
-                'IsInclusivelyBetween': ('is between {{a|Real}} and {{b|Real}}, inclusive'),
+                'IsInclusivelyBetween': (
+                    'is between {{a|Real}} and {{b|Real}}, inclusive'
+                ),
                 'IsWithinTolerance': 'is within {{tol|Real}} of {{x|Real}}',
             },
         )
@@ -357,11 +403,25 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         # The file having the templates for the structure of the rule specs.
         # Contents of the file html_field_types_to_rule_specs.json will be
         # verified against this file.
-        rule_descriptions_dict = json.loads(constants.get_package_file_contents('extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH))
+        rule_descriptions_dict = json.loads(
+            constants.get_package_file_contents(
+                'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH
+            )
+        )
 
         # In the following part, we generate the html_field_types_to_rule_specs
         # dict based on the values in the rule_descriptions.json file.
-        generated_html_field_types_dict: Dict[str, Dict[str, Dict[str, Dict[str, Dict[str, Set[str]]]]]] = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(set)))))
+        generated_html_field_types_dict: Dict[
+            str, Dict[str, Dict[str, Dict[str, Dict[str, Set[str]]]]]
+        ] = collections.defaultdict(
+            lambda: collections.defaultdict(
+                lambda: collections.defaultdict(
+                    lambda: collections.defaultdict(
+                        lambda: collections.defaultdict(set)
+                    )
+                )
+            )
+        )
 
         # Verify that each html_type dict has a format key, which must be
         # unique. After verification we delete the key for comparison with
@@ -373,7 +433,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             html_type_dict,
         ) in html_field_types_to_rule_specs_dict.items():
             self.assertTrue('format' in html_type_dict)
-            self.assertTrue(html_type_dict['format'] in feconf.ALLOWED_HTML_RULE_VARIABLE_FORMATS)
+            self.assertTrue(
+                html_type_dict['format']
+                in feconf.ALLOWED_HTML_RULE_VARIABLE_FORMATS
+            )
             del html_type_dict['format']
 
         for interaction_id, interaction_rules in rule_descriptions_dict.items():
@@ -381,12 +444,18 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 description = rule_description['description']
                 # Extract the input variables and html_types from the rule
                 # description.
-                input_variables_with_html_type = re.findall(r'{{([a-z])\|([^}]*)}', description)
+                input_variables_with_html_type = re.findall(
+                    r'{{([a-z])\|([^}]*)}', description
+                )
                 input_variables: Set[str] = set()
-                input_variables_to_html_type_mapping_dict = collections.defaultdict(set)
+                input_variables_to_html_type_mapping_dict = (
+                    collections.defaultdict(set)
+                )
                 for value in input_variables_with_html_type:
                     if 'Html' in value[1] and 'HtmlContentId' not in value[1]:
-                        input_variables_to_html_type_mapping_dict[value[1]].add(value[0])
+                        input_variables_to_html_type_mapping_dict[value[1]].add(
+                            value[0]
+                        )
 
                 # We need to iterate through the html_types for each rule_type,
                 # because only after visiting each rule_type the inner dict
@@ -413,10 +482,14 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                         # interaction ID is overwritten by another
                         # interaction ID.
                         if html_type_dict['interactionId'] != interaction_id:
-                            raise Exception('Each html type should refer to only one interaction_id.')
+                            raise Exception(
+                                'Each html type should refer to only one interaction_id.'
+                            )
 
                     html_type_dict['interactionId'] = interaction_id
-                    html_type_dict['ruleTypes'][rule_type]['htmlInputVariables'] = sorted(input_variables)
+                    html_type_dict['ruleTypes'][rule_type][
+                        'htmlInputVariables'
+                    ] = sorted(input_variables)
 
         self.assertEqual(
             html_field_types_to_rule_specs_dict,
@@ -426,14 +499,20 @@ class InteractionUnitTests(test_utils.GenericTestBase):
     def test_default_interactions_are_valid(self) -> None:
         """Test that the default interactions are valid."""
 
-        all_interaction_ids = interaction_registry.Registry.get_all_interaction_ids()
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids()
+        )
         for interaction_id in all_interaction_ids:
             # Check that the interaction id is valid.
             self.assertTrue(self._is_camel_cased(interaction_id))
-            hyphenated_interaction_id = utils.camelcase_to_hyphenated(interaction_id)
+            hyphenated_interaction_id = utils.camelcase_to_hyphenated(
+                interaction_id
+            )
 
             # Check that the interaction directory exists.
-            interaction_dir = os.path.join(feconf.INTERACTIONS_DIR, interaction_id)
+            interaction_dir = os.path.join(
+                feconf.INTERACTIONS_DIR, interaction_id
+            )
             self.assertTrue(os.path.isdir(interaction_dir))
 
             # The interaction directory should contain the following files:
@@ -449,12 +528,18 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             #    * A directory named 'static' containing at least a .png file.
             #  Optional:
             #    * A JS file called webdriverio.js.
-            interaction_dir_contents = self._listdir_omit_ignored(interaction_dir)
+            interaction_dir_contents = self._listdir_omit_ignored(
+                interaction_dir
+            )
 
             interaction_dir_optional_dirs_and_files_count = 0
 
             try:
-                self.assertTrue(os.path.isfile(os.path.join(interaction_dir, 'webdriverio.js')))
+                self.assertTrue(
+                    os.path.isfile(
+                        os.path.join(interaction_dir, 'webdriverio.js')
+                    )
+                )
                 interaction_dir_optional_dirs_and_files_count += 1
             except Exception:
                 pass
@@ -464,7 +549,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     os.path.isfile(
                         os.path.join(
                             interaction_dir,
-                            '%s-interactions.module.ts' % hyphenated_interaction_id,
+                            '%s-interactions.module.ts'
+                            % hyphenated_interaction_id,
                         )
                     )
                 )
@@ -511,19 +597,24 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             #      {InteractionName}-validation.service.specs.ts.
             #    * A TS file called {InteractionName}-rules.service.specs.ts.
 
-            hyphenated_interaction_id = utils.camelcase_to_hyphenated(interaction_id)
+            hyphenated_interaction_id = utils.camelcase_to_hyphenated(
+                interaction_id
+            )
             if interaction_id in INTERACTIONS_THAT_USE_COMPONENTS:
                 interaction_ts_file = os.path.join(
                     directives_dir,
-                    'oppia-interactive-%s.component.ts' % (hyphenated_interaction_id),
+                    'oppia-interactive-%s.component.ts'
+                    % (hyphenated_interaction_id),
                 )
                 response_ts_file = os.path.join(
                     directives_dir,
-                    'oppia-response-%s.component.ts' % hyphenated_interaction_id,
+                    'oppia-response-%s.component.ts'
+                    % hyphenated_interaction_id,
                 )
                 short_response_ts_file = os.path.join(
                     directives_dir,
-                    'oppia-short-response-%s.component.ts' % (hyphenated_interaction_id),
+                    'oppia-short-response-%s.component.ts'
+                    % (hyphenated_interaction_id),
                 )
                 rules_service_ts_file = os.path.join(
                     directives_dir,
@@ -543,20 +634,24 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 )
                 short_response_html = os.path.join(
                     directives_dir,
-                    '%s-short-response.component.html' % hyphenated_interaction_id,
+                    '%s-short-response.component.html'
+                    % hyphenated_interaction_id,
                 )
             else:
                 interaction_ts_file = os.path.join(
                     directives_dir,
-                    'oppia-interactive-%s.directive.ts' % (hyphenated_interaction_id),
+                    'oppia-interactive-%s.directive.ts'
+                    % (hyphenated_interaction_id),
                 )
                 response_ts_file = os.path.join(
                     directives_dir,
-                    'oppia-response-%s.directive.ts' % hyphenated_interaction_id,
+                    'oppia-response-%s.directive.ts'
+                    % hyphenated_interaction_id,
                 )
                 short_response_ts_file = os.path.join(
                     directives_dir,
-                    'oppia-short-response-%s.directive.ts' % (hyphenated_interaction_id),
+                    'oppia-short-response-%s.directive.ts'
+                    % (hyphenated_interaction_id),
                 )
                 rules_service_ts_file = os.path.join(
                     directives_dir,
@@ -576,7 +671,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 )
                 short_response_html = os.path.join(
                     directives_dir,
-                    '%s-short-response.directive.html' % hyphenated_interaction_id,
+                    '%s-short-response.directive.html'
+                    % hyphenated_interaction_id,
                 )
 
             self.assertTrue(os.path.isfile(interaction_ts_file))
@@ -591,7 +687,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # Check that the PNG thumbnail image has the correct dimensions.
             static_dir = os.path.join(interaction_dir, 'static')
             self.assertTrue(os.path.isdir(static_dir))
-            png_file = os.path.join(interaction_dir, 'static', '%s.png' % interaction_id)
+            png_file = os.path.join(
+                interaction_dir, 'static', '%s.png' % interaction_id
+            )
             self.assertTrue(os.path.isfile(png_file))
             with open(png_file, 'rb', encoding=None) as f:
                 img_data = f.read()
@@ -599,12 +697,20 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(int(width), INTERACTION_THUMBNAIL_WIDTH_PX)
                 self.assertEqual(int(height), INTERACTION_THUMBNAIL_HEIGHT_PX)
 
-            interaction_ts_file_content = utils.get_file_contents(interaction_ts_file)
+            interaction_ts_file_content = utils.get_file_contents(
+                interaction_ts_file
+            )
             response_ts_file_content = utils.get_file_contents(response_ts_file)
-            short_response_ts_file_content = utils.get_file_contents(short_response_ts_file)
+            short_response_ts_file_content = utils.get_file_contents(
+                short_response_ts_file
+            )
             ts_file_content = utils.get_file_contents(ts_file)
-            rules_service_ts_file_content = utils.get_file_contents(rules_service_ts_file)
-            validation_service_ts_file_content = utils.get_file_contents(validation_service_ts_file)
+            rules_service_ts_file_content = utils.get_file_contents(
+                rules_service_ts_file
+            )
+            validation_service_ts_file_content = utils.get_file_contents(
+                validation_service_ts_file
+            )
 
             self.assertIn(
                 '%sRulesService' % (interaction_id[0] + interaction_id[1:]),
@@ -617,9 +723,33 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             # Check that the html template includes js script for the
             # interaction.
-            self.assertTrue('oppia-interactive-%s.component.ts' % hyphenated_interaction_id in ts_file_content or ('oppia-interactive-%s.directive.ts' % hyphenated_interaction_id in ts_file_content))
-            self.assertTrue('oppia-response-%s.component.ts' % hyphenated_interaction_id in ts_file_content or ('oppia-response-%s.directive.ts' % hyphenated_interaction_id in ts_file_content))
-            self.assertTrue('oppia-short-response-%s.component.ts' % hyphenated_interaction_id in ts_file_content or ('oppia-short-response-%s.directive.ts' % hyphenated_interaction_id in ts_file_content))
+            self.assertTrue(
+                'oppia-interactive-%s.component.ts' % hyphenated_interaction_id
+                in ts_file_content
+                or (
+                    'oppia-interactive-%s.directive.ts'
+                    % hyphenated_interaction_id
+                    in ts_file_content
+                )
+            )
+            self.assertTrue(
+                'oppia-response-%s.component.ts' % hyphenated_interaction_id
+                in ts_file_content
+                or (
+                    'oppia-response-%s.directive.ts' % hyphenated_interaction_id
+                    in ts_file_content
+                )
+            )
+            self.assertTrue(
+                'oppia-short-response-%s.component.ts'
+                % hyphenated_interaction_id
+                in ts_file_content
+                or (
+                    'oppia-short-response-%s.directive.ts'
+                    % hyphenated_interaction_id
+                    in ts_file_content
+                )
+            )
             self.assertIn(
                 '%s-rules.service.ts' % hyphenated_interaction_id,
                 ts_file_content,
@@ -640,7 +770,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertNotIn('<script>', validation_service_ts_file_content)
             self.assertNotIn('</script>', validation_service_ts_file_content)
 
-            interaction = interaction_registry.Registry.get_interaction_by_id(interaction_id)
+            interaction = interaction_registry.Registry.get_interaction_by_id(
+                interaction_id
+            )
 
             # Check that the specified interaction id is the same as the class
             # name.
@@ -664,16 +796,24 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 # checking, because in the above 'if' clause we are already
                 # checking for None answer_type.
                 assert interaction.answer_type is not None
-                object_registry.Registry.get_object_class_by_type(interaction.answer_type)
+                object_registry.Registry.get_object_class_by_type(
+                    interaction.answer_type
+                )
 
-            self._validate_customization_arg_specs(interaction.customization_arg_specs)
+            self._validate_customization_arg_specs(
+                interaction.customization_arg_specs
+            )
 
             answer_visualization_specs = interaction.answer_visualization_specs
-            self._validate_answer_visualization_specs(answer_visualization_specs)
+            self._validate_answer_visualization_specs(
+                answer_visualization_specs
+            )
 
             answer_visualizations = interaction.answer_visualizations
             for ind, visualization in enumerate(answer_visualizations):
-                self.assertEqual(visualization.id, answer_visualization_specs[ind]['id'])
+                self.assertEqual(
+                    visualization.id, answer_visualization_specs[ind]['id']
+                )
                 self.assertEqual(
                     visualization.calculation_id,
                     answer_visualization_specs[ind]['calculation_id'],
@@ -703,7 +843,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # Check that only linear interactions have a
             # default_outcome_heading property.
             if interaction.is_linear:
-                self.assertTrue(isinstance(interaction.default_outcome_heading, str) and interaction.default_outcome_heading)
+                self.assertTrue(
+                    isinstance(interaction.default_outcome_heading, str)
+                    and interaction.default_outcome_heading
+                )
             else:
                 self.assertIsNone(interaction.default_outcome_heading)
 
@@ -739,22 +882,33 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         rule, as that would break frontend functionality (users would not be
         able to create manual answer groups).
         """
-        all_interaction_ids = interaction_registry.Registry.get_all_interaction_ids()
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids()
+        )
 
         for interaction_id in all_interaction_ids:
-            interaction = interaction_registry.Registry.get_interaction_by_id(interaction_id)
+            interaction = interaction_registry.Registry.get_interaction_by_id(
+                interaction_id
+            )
             if interaction.is_trainable:
                 self.assertNotEqual(
                     len(interaction.rules_dict),
                     1,
-                    msg=('Expected trainable interaction to have more classifier: %s' % interaction_id),
+                    msg=(
+                        'Expected trainable interaction to have more classifier: %s'
+                        % interaction_id
+                    ),
                 )
 
     def test_get_interaction_dependency_ids_correctly(self) -> None:
-        all_interaction_ids = interaction_registry.Registry.get_all_interaction_ids()
+        all_interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids()
+        )
 
         for interaction_id in all_interaction_ids:
-            interaction = interaction_registry.Registry.get_interaction_by_id(interaction_id)
+            interaction = interaction_registry.Registry.get_interaction_by_id(
+                interaction_id
+            )
             # '_dependency_ids' is a private attribute of Base Interaction
             # which gets overwritten by the derived interactions. To access it,
             # we use the property 'dependency_ids'. To check if the property
@@ -778,7 +932,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         IDs.
         """
         actual_linear_interaction_ids = self._get_linear_interaction_ids()
-        self.assertEqual(actual_linear_interaction_ids, feconf.LINEAR_INTERACTION_IDS)
+        self.assertEqual(
+            actual_linear_interaction_ids, feconf.LINEAR_INTERACTION_IDS
+        )
 
 
 class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
@@ -788,9 +944,13 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
 
     def test_interactions_demo_exploration(self) -> None:
         exp_services.load_demo(self._DEMO_EXPLORATION_ID)
-        exploration = exp_fetchers.get_exploration_by_id(self._DEMO_EXPLORATION_ID)
+        exploration = exp_fetchers.get_exploration_by_id(
+            self._DEMO_EXPLORATION_ID
+        )
 
-        all_interaction_ids = set(interaction_registry.Registry.get_all_interaction_ids())
+        all_interaction_ids = set(
+            interaction_registry.Registry.get_all_interaction_ids()
+        )
         observed_interaction_ids = set()
 
         for state in exploration.states.values():
@@ -800,5 +960,8 @@ class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(missing_interaction_ids),
             0,
-            msg=('Missing interaction IDs in demo exploration: %s' % missing_interaction_ids),
+            msg=(
+                'Missing interaction IDs in demo exploration: %s'
+                % missing_interaction_ids
+            ),
         )

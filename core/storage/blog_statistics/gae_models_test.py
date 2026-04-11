@@ -30,7 +30,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, blog_stats_models
 
-(base_models, blog_stats_models, user_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.BLOG_STATISTICS, models.Names.USER])
+(base_models, blog_stats_models, user_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.BLOG_STATISTICS, models.Names.USER]
+)
 
 
 class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
@@ -49,19 +51,35 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         """
         super().setUp()
 
-        self.event_model_one = blog_stats_models.BlogPostViewedEventLogEntryModel(id='event_model_1', blog_post_id=self.BLOG_POST_ONE_ID)
+        self.event_model_one = (
+            blog_stats_models.BlogPostViewedEventLogEntryModel(
+                id='event_model_1', blog_post_id=self.BLOG_POST_ONE_ID
+            )
+        )
         self.event_model_one.update_timestamps()
         self.event_model_one.put()
 
-        self.event_model_two = blog_stats_models.BlogPostViewedEventLogEntryModel(id='event_model_2', blog_post_id=self.BLOG_POST_ONE_ID)
+        self.event_model_two = (
+            blog_stats_models.BlogPostViewedEventLogEntryModel(
+                id='event_model_2', blog_post_id=self.BLOG_POST_ONE_ID
+            )
+        )
         self.event_model_two.update_timestamps()
         self.event_model_two.put()
 
-        self.event_model_three = blog_stats_models.BlogPostViewedEventLogEntryModel(id='event_model_3', blog_post_id=self.BLOG_POST_ONE_ID)
+        self.event_model_three = (
+            blog_stats_models.BlogPostViewedEventLogEntryModel(
+                id='event_model_3', blog_post_id=self.BLOG_POST_ONE_ID
+            )
+        )
         self.event_model_three.update_timestamps()
         self.event_model_three.put()
 
-        self.event_model_four = blog_stats_models.BlogPostViewedEventLogEntryModel(id='event_model_4', blog_post_id=self.BLOG_POST_TWO_ID)
+        self.event_model_four = (
+            blog_stats_models.BlogPostViewedEventLogEntryModel(
+                id='event_model_4', blog_post_id=self.BLOG_POST_TWO_ID
+            )
+        )
         self.event_model_four.update_timestamps()
         self.event_model_four.put()
 
@@ -108,15 +126,21 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             mock_get_current_time_in_millisecs,
         ):
             with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
-                new_id = blog_stats_models.BlogPostViewedEventLogEntryModel.get_new_event_entity_id('BLOG')
+                new_id = blog_stats_models.BlogPostViewedEventLogEntryModel.get_new_event_entity_id(
+                    'BLOG'
+                )
                 self.assertEqual(
                     new_id,
                     ':'.join([str(int(time_in_millisecs)), 'BLOG', rand_hash]),
                 )
 
     def test_create_and_get_event_models(self) -> None:
-        entity_id = blog_stats_models.BlogPostViewedEventLogEntryModel.create(self.BLOG_POST_TWO_ID)
-        event_model = blog_stats_models.BlogPostViewedEventLogEntryModel.get(entity_id)
+        entity_id = blog_stats_models.BlogPostViewedEventLogEntryModel.create(
+            self.BLOG_POST_TWO_ID
+        )
+        event_model = blog_stats_models.BlogPostViewedEventLogEntryModel.get(
+            entity_id
+        )
 
         self.assertEqual(event_model.blog_post_id, self.BLOG_POST_TWO_ID)
 
@@ -155,19 +179,31 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         """
         super().setUp()
 
-        self.event_model_one = blog_stats_models.BlogPostReadEventLogEntryModel(id='event_model_1', blog_post_id=self.BLOG_POST_ONE_ID)
+        self.event_model_one = blog_stats_models.BlogPostReadEventLogEntryModel(
+            id='event_model_1', blog_post_id=self.BLOG_POST_ONE_ID
+        )
         self.event_model_one.update_timestamps()
         self.event_model_one.put()
 
-        self.event_model_two = blog_stats_models.BlogPostReadEventLogEntryModel(id='event_model_2', blog_post_id=self.BLOG_POST_ONE_ID)
+        self.event_model_two = blog_stats_models.BlogPostReadEventLogEntryModel(
+            id='event_model_2', blog_post_id=self.BLOG_POST_ONE_ID
+        )
         self.event_model_two.update_timestamps()
         self.event_model_two.put()
 
-        self.event_model_three = blog_stats_models.BlogPostReadEventLogEntryModel(id='event_model_3', blog_post_id=self.BLOG_POST_ONE_ID)
+        self.event_model_three = (
+            blog_stats_models.BlogPostReadEventLogEntryModel(
+                id='event_model_3', blog_post_id=self.BLOG_POST_ONE_ID
+            )
+        )
         self.event_model_three.update_timestamps()
         self.event_model_three.put()
 
-        self.event_model_four = blog_stats_models.BlogPostReadEventLogEntryModel(id='event_model_4', blog_post_id=self.BLOG_POST_TWO_ID)
+        self.event_model_four = (
+            blog_stats_models.BlogPostReadEventLogEntryModel(
+                id='event_model_4', blog_post_id=self.BLOG_POST_TWO_ID
+            )
+        )
         self.event_model_four.update_timestamps()
         self.event_model_four.put()
 
@@ -196,7 +232,9 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             mock_get_current_time_in_millisecs,
         ):
             with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
-                new_id = blog_stats_models.BlogPostReadEventLogEntryModel.get_new_event_entity_id('BLOG')
+                new_id = blog_stats_models.BlogPostReadEventLogEntryModel.get_new_event_entity_id(
+                    'BLOG'
+                )
                 self.assertEqual(
                     new_id,
                     ':'.join([str(int(time_in_millisecs)), 'BLOG', rand_hash]),
@@ -220,8 +258,12 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
                 stats_model_class.create('blog_post_id')
 
     def test_create_and_get_event_models(self) -> None:
-        entity_id = blog_stats_models.BlogPostReadEventLogEntryModel.create(self.BLOG_POST_TWO_ID)
-        event_model = blog_stats_models.BlogPostReadEventLogEntryModel.get(entity_id)
+        entity_id = blog_stats_models.BlogPostReadEventLogEntryModel.create(
+            self.BLOG_POST_TWO_ID
+        )
+        event_model = blog_stats_models.BlogPostReadEventLogEntryModel.get(
+            entity_id
+        )
 
         self.assertEqual(event_model.blog_post_id, self.BLOG_POST_TWO_ID)
 
@@ -260,34 +302,42 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         """
         super().setUp()
 
-        self.event_model_one = blog_stats_models.BlogPostExitedEventLogEntryModel(
-            id='event_model_1',
-            blog_post_id=self.BLOG_POST_ONE_ID,
-            time_user_stayed_on_blog_post=10.05,
+        self.event_model_one = (
+            blog_stats_models.BlogPostExitedEventLogEntryModel(
+                id='event_model_1',
+                blog_post_id=self.BLOG_POST_ONE_ID,
+                time_user_stayed_on_blog_post=10.05,
+            )
         )
         self.event_model_one.update_timestamps()
         self.event_model_one.put()
 
-        self.event_model_two = blog_stats_models.BlogPostExitedEventLogEntryModel(
-            id='event_model_2',
-            blog_post_id=self.BLOG_POST_ONE_ID,
-            time_user_stayed_on_blog_post=9.05,
+        self.event_model_two = (
+            blog_stats_models.BlogPostExitedEventLogEntryModel(
+                id='event_model_2',
+                blog_post_id=self.BLOG_POST_ONE_ID,
+                time_user_stayed_on_blog_post=9.05,
+            )
         )
         self.event_model_two.update_timestamps()
         self.event_model_two.put()
 
-        self.event_model_three = blog_stats_models.BlogPostExitedEventLogEntryModel(
-            id='event_model_3',
-            blog_post_id=self.BLOG_POST_ONE_ID,
-            time_user_stayed_on_blog_post=6.5,
+        self.event_model_three = (
+            blog_stats_models.BlogPostExitedEventLogEntryModel(
+                id='event_model_3',
+                blog_post_id=self.BLOG_POST_ONE_ID,
+                time_user_stayed_on_blog_post=6.5,
+            )
         )
         self.event_model_three.update_timestamps()
         self.event_model_three.put()
 
-        self.event_model_four = blog_stats_models.BlogPostExitedEventLogEntryModel(
-            id='event_model_4',
-            blog_post_id=self.BLOG_POST_TWO_ID,
-            time_user_stayed_on_blog_post=8,
+        self.event_model_four = (
+            blog_stats_models.BlogPostExitedEventLogEntryModel(
+                id='event_model_4',
+                blog_post_id=self.BLOG_POST_TWO_ID,
+                time_user_stayed_on_blog_post=8,
+            )
         )
         self.event_model_four.update_timestamps()
         self.event_model_four.put()
@@ -318,15 +368,21 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             mock_get_current_time_in_millisecs,
         ):
             with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
-                new_id = blog_stats_models.BlogPostExitedEventLogEntryModel.get_new_event_entity_id('BLOG')
+                new_id = blog_stats_models.BlogPostExitedEventLogEntryModel.get_new_event_entity_id(
+                    'BLOG'
+                )
                 self.assertEqual(
                     new_id,
                     ':'.join([str(int(time_in_millisecs)), 'BLOG', rand_hash]),
                 )
 
     def test_create_and_get_event_models(self) -> None:
-        entity_id = blog_stats_models.BlogPostExitedEventLogEntryModel.create(self.BLOG_POST_TWO_ID, 0.5)
-        event_model = blog_stats_models.BlogPostExitedEventLogEntryModel.get(entity_id)
+        entity_id = blog_stats_models.BlogPostExitedEventLogEntryModel.create(
+            self.BLOG_POST_TWO_ID, 0.5
+        )
+        event_model = blog_stats_models.BlogPostExitedEventLogEntryModel.get(
+            entity_id
+        )
 
         self.assertEqual(event_model.blog_post_id, self.BLOG_POST_TWO_ID)
         self.assertEqual(event_model.time_user_stayed_on_blog_post, 0.5)
@@ -357,7 +413,9 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
             'blog_post_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'time_user_stayed_on_blog_post': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'time_user_stayed_on_blog_post': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+            ),
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -397,19 +455,27 @@ class BlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_create_and_get_stats_models(self) -> None:
-        blog_stats_models.BlogPostViewsAggregatedStatsModel.create(self.BLOG_POST_TWO_ID)
-        stats_model = blog_stats_models.BlogPostViewsAggregatedStatsModel.get(self.BLOG_POST_TWO_ID)
+        blog_stats_models.BlogPostViewsAggregatedStatsModel.create(
+            self.BLOG_POST_TWO_ID
+        )
+        stats_model = blog_stats_models.BlogPostViewsAggregatedStatsModel.get(
+            self.BLOG_POST_TWO_ID
+        )
 
         self.assertEqual(stats_model.id, self.BLOG_POST_TWO_ID)
 
     def test_create_raises_exception_with_existing_blog_id(self) -> None:
-        blog_stats_models.BlogPostViewsAggregatedStatsModel.create(self.BLOG_POST_THREE_ID)
+        blog_stats_models.BlogPostViewsAggregatedStatsModel.create(
+            self.BLOG_POST_THREE_ID
+        )
 
         with self.assertRaisesRegex(
             Exception,
             'A blog post views stats model with the given blog post IDexists already.',
         ):
-            blog_stats_models.BlogPostViewsAggregatedStatsModel.create(self.BLOG_POST_THREE_ID)
+            blog_stats_models.BlogPostViewsAggregatedStatsModel.create(
+                self.BLOG_POST_THREE_ID
+            )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -461,19 +527,27 @@ class BlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_create_and_get_stats_models(self) -> None:
-        blog_stats_models.BlogPostReadsAggregatedStatsModel.create(self.BLOG_POST_TWO_ID)
-        stats_model = blog_stats_models.BlogPostReadsAggregatedStatsModel.get(self.BLOG_POST_TWO_ID)
+        blog_stats_models.BlogPostReadsAggregatedStatsModel.create(
+            self.BLOG_POST_TWO_ID
+        )
+        stats_model = blog_stats_models.BlogPostReadsAggregatedStatsModel.get(
+            self.BLOG_POST_TWO_ID
+        )
 
         self.assertEqual(stats_model.id, self.BLOG_POST_TWO_ID)
 
     def test_create_raises_exception_with_existing_blog_id(self) -> None:
-        blog_stats_models.BlogPostReadsAggregatedStatsModel.create(self.BLOG_POST_THREE_ID)
+        blog_stats_models.BlogPostReadsAggregatedStatsModel.create(
+            self.BLOG_POST_THREE_ID
+        )
 
         with self.assertRaisesRegex(
             Exception,
             'A blog post reads stats model with the given blog post IDexists already.',
         ):
-            blog_stats_models.BlogPostReadsAggregatedStatsModel.create(self.BLOG_POST_THREE_ID)
+            blog_stats_models.BlogPostReadsAggregatedStatsModel.create(
+                self.BLOG_POST_THREE_ID
+            )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -534,18 +608,24 @@ class BlogPostReadingTimeModelUnitTests(test_utils.GenericTestBase):
 
     def test_create_and_get_stats_models(self) -> None:
         blog_stats_models.BlogPostReadingTimeModel.create(self.BLOG_POST_TWO_ID)
-        stats_model = blog_stats_models.BlogPostReadingTimeModel.get(self.BLOG_POST_TWO_ID)
+        stats_model = blog_stats_models.BlogPostReadingTimeModel.get(
+            self.BLOG_POST_TWO_ID
+        )
 
         self.assertEqual(stats_model.id, self.BLOG_POST_TWO_ID)
 
     def test_create_raises_exception_with_existing_blog_id(self) -> None:
-        blog_stats_models.BlogPostReadingTimeModel.create(self.BLOG_POST_THREE_ID)
+        blog_stats_models.BlogPostReadingTimeModel.create(
+            self.BLOG_POST_THREE_ID
+        )
 
         with self.assertRaisesRegex(
             Exception,
             'A blog post reading time model with the given blog post IDexists already.',
         ):
-            blog_stats_models.BlogPostReadingTimeModel.create(self.BLOG_POST_THREE_ID)
+            blog_stats_models.BlogPostReadingTimeModel.create(
+                self.BLOG_POST_THREE_ID
+            )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -576,7 +656,9 @@ class BlogPostReadingTimeModelUnitTests(test_utils.GenericTestBase):
         )
 
 
-class AuthorBlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
+class AuthorBlogPostReadsAggregatedStatsModelUnitTests(
+    test_utils.GenericTestBase
+):
     """Test the BlogPostReadsAggregatedStatsModel class."""
 
     AUTHOR_ONE_ID: Final = 'author_one'
@@ -590,11 +672,13 @@ class AuthorBlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBas
         """
         super().setUp()
 
-        self.model_one = blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel(
-            id=self.AUTHOR_ONE_ID,
-            reads_by_hour={},
-            reads_by_date={},
-            reads_by_month={},
+        self.model_one = (
+            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel(
+                id=self.AUTHOR_ONE_ID,
+                reads_by_hour={},
+                reads_by_date={},
+                reads_by_month={},
+            )
         )
         self.model_one.update_timestamps()
         self.model_one.put()
@@ -606,19 +690,31 @@ class AuthorBlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBas
         )
 
     def test_create_and_get_stats_models(self) -> None:
-        blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.create(self.AUTHOR_TWO_ID)
-        stats_model = blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(self.AUTHOR_TWO_ID)
+        blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.create(
+            self.AUTHOR_TWO_ID
+        )
+        stats_model = (
+            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.get(
+                self.AUTHOR_TWO_ID
+            )
+        )
 
         self.assertEqual(stats_model.id, self.AUTHOR_TWO_ID)
 
     def test_create_raises_exception_with_existing_author_id(self) -> None:
-        blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.create(self.AUTHOR_THREE_ID)
+        blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.create(
+            self.AUTHOR_THREE_ID
+        )
 
         with self.assertRaisesRegex(
             Exception,
             'A author blog post reads stats model with the given author ID exists already.',
         ):
-            (blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.create(self.AUTHOR_THREE_ID))
+            (
+                blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.create(
+                    self.AUTHOR_THREE_ID
+                )
+            )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -641,11 +737,21 @@ class AuthorBlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBas
         )
 
     def test_has_reference_to_user_id(self) -> None:
-        self.assertTrue(blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.has_reference_to_user_id(self.AUTHOR_ONE_ID))
-        self.assertFalse(blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.has_reference_to_user_id(self.NONEXISTENT_USER_ID))
+        self.assertTrue(
+            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.has_reference_to_user_id(
+                self.AUTHOR_ONE_ID
+            )
+        )
+        self.assertFalse(
+            blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.has_reference_to_user_id(
+                self.NONEXISTENT_USER_ID
+            )
+        )
 
 
-class AuthorBlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
+class AuthorBlogPostViewsAggregatedStatsModelUnitTests(
+    test_utils.GenericTestBase
+):
     """Test the BlogPostViewsAggregatedStatsModel class."""
 
     AUTHOR_ONE_ID: Final = 'author_one'
@@ -659,11 +765,13 @@ class AuthorBlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBas
         """
         super().setUp()
 
-        self.model_one = blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel(
-            id=self.AUTHOR_ONE_ID,
-            views_by_hour={},
-            views_by_date={},
-            views_by_month={},
+        self.model_one = (
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel(
+                id=self.AUTHOR_ONE_ID,
+                views_by_hour={},
+                views_by_date={},
+                views_by_month={},
+            )
         )
         self.model_one.update_timestamps()
         self.model_one.put()
@@ -675,19 +783,29 @@ class AuthorBlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBas
         )
 
     def test_create_and_get_stats_models(self) -> None:
-        blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(self.AUTHOR_TWO_ID)
-        stats_model = blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(self.AUTHOR_TWO_ID)
+        blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(
+            self.AUTHOR_TWO_ID
+        )
+        stats_model = (
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.get(
+                self.AUTHOR_TWO_ID
+            )
+        )
 
         self.assertEqual(stats_model.id, self.AUTHOR_TWO_ID)
 
     def test_create_raises_exception_with_existing_author_id(self) -> None:
-        blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(self.AUTHOR_THREE_ID)
+        blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(
+            self.AUTHOR_THREE_ID
+        )
 
         with self.assertRaisesRegex(
             Exception,
             'A author blog post views stats model with the given author ID exists already.',
         ):
-            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(self.AUTHOR_THREE_ID)
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(
+                self.AUTHOR_THREE_ID
+            )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -710,8 +828,16 @@ class AuthorBlogPostViewsAggregatedStatsModelUnitTests(test_utils.GenericTestBas
         )
 
     def test_has_reference_to_user_id(self) -> None:
-        self.assertTrue(blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.has_reference_to_user_id(self.AUTHOR_ONE_ID))
-        self.assertFalse(blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.has_reference_to_user_id(self.NONEXISTENT_USER_ID))
+        self.assertTrue(
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.has_reference_to_user_id(
+                self.AUTHOR_ONE_ID
+            )
+        )
+        self.assertFalse(
+            blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.has_reference_to_user_id(
+                self.NONEXISTENT_USER_ID
+            )
+        )
 
 
 class AuthorBlogPostsReadingTimeModelUnitTests(test_utils.GenericTestBase):
@@ -728,19 +854,21 @@ class AuthorBlogPostsReadingTimeModelUnitTests(test_utils.GenericTestBase):
         """
         super().setUp()
 
-        self.model_one = blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel(
-            id=self.AUTHOR_ONE_ID,
-            zero_to_one_min=0,
-            one_to_two_min=0,
-            two_to_three_min=0,
-            three_to_four_min=0,
-            four_to_five_min=0,
-            five_to_six_min=0,
-            six_to_seven_min=0,
-            seven_to_eight_min=0,
-            eight_to_nine_min=0,
-            nine_to_ten_min=0,
-            more_than_ten_min=0,
+        self.model_one = (
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel(
+                id=self.AUTHOR_ONE_ID,
+                zero_to_one_min=0,
+                one_to_two_min=0,
+                two_to_three_min=0,
+                three_to_four_min=0,
+                four_to_five_min=0,
+                five_to_six_min=0,
+                six_to_seven_min=0,
+                seven_to_eight_min=0,
+                eight_to_nine_min=0,
+                nine_to_ten_min=0,
+                more_than_ten_min=0,
+            )
         )
         self.model_one.update_timestamps()
         self.model_one.put()
@@ -752,8 +880,14 @@ class AuthorBlogPostsReadingTimeModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_create_and_get_stats_models(self) -> None:
-        blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(self.AUTHOR_TWO_ID)
-        stats_model = blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(self.AUTHOR_TWO_ID)
+        blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
+            self.AUTHOR_TWO_ID
+        )
+        stats_model = (
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
+                self.AUTHOR_TWO_ID
+            )
+        )
 
         self.assertEqual(stats_model.id, self.AUTHOR_TWO_ID)
 
@@ -763,16 +897,22 @@ class AuthorBlogPostsReadingTimeModelUnitTests(test_utils.GenericTestBase):
             Exception,
             'A author blog post reading time model with the given author ID exists already.',
         ):
-            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(self.AUTHOR_TWO_ID)
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
+                self.AUTHOR_TWO_ID
+            )
 
     def test_create_raises_exception_with_existing_author_id(self) -> None:
-        blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(self.AUTHOR_THREE_ID)
+        blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
+            self.AUTHOR_THREE_ID
+        )
 
         with self.assertRaisesRegex(
             Exception,
             'A author blog post reading time model with the given author ID exists already.',
         ):
-            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(self.AUTHOR_THREE_ID)
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
+                self.AUTHOR_THREE_ID
+            )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -803,5 +943,13 @@ class AuthorBlogPostsReadingTimeModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_has_reference_to_user_id(self) -> None:
-        self.assertTrue(blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.has_reference_to_user_id(self.AUTHOR_ONE_ID))
-        self.assertFalse(blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.has_reference_to_user_id(self.NONEXISTENT_USER_ID))
+        self.assertTrue(
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.has_reference_to_user_id(
+                self.AUTHOR_ONE_ID
+            )
+        )
+        self.assertFalse(
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.has_reference_to_user_id(
+                self.NONEXISTENT_USER_ID
+            )
+        )

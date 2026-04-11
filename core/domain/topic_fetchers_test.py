@@ -41,7 +41,9 @@ class MockTopicObject(topic_domain.Topic):
     """Mocks Topic domain object."""
 
     @classmethod
-    def _convert_story_reference_v1_dict_to_v2_dict(cls, story_reference: topic_domain.StoryReferenceDict) -> topic_domain.StoryReferenceDict:
+    def _convert_story_reference_v1_dict_to_v2_dict(
+        cls, story_reference: topic_domain.StoryReferenceDict
+    ) -> topic_domain.StoryReferenceDict:
         """Converts v1 story reference dict to v2."""
         return story_reference
 
@@ -97,27 +99,43 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
-        self.user_id_admin = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        topic_services.update_topic_and_subtopic_pages(self.user_id_admin, self.TOPIC_ID, changelist, 'Added a subtopic')
+        self.user_id_admin = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL
+        )
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist, 'Added a subtopic'
+        )
 
-        self.topic: Optional[topic_domain.Topic] = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.topic: Optional[topic_domain.Topic] = (
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        )
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.set_topic_managers([user_services.get_username(self.user_id_a)], self.TOPIC_ID)
+        self.set_topic_managers(
+            [user_services.get_username(self.user_id_a)], self.TOPIC_ID
+        )
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
-        self.user_admin = user_services.get_user_actions_info(self.user_id_admin)
+        self.user_admin = user_services.get_user_actions_info(
+            self.user_id_admin
+        )
 
     def test_get_topic_from_model(self) -> None:
-        topic_model: Optional[topic_models.TopicModel] = topic_models.TopicModel.get(self.TOPIC_ID)
+        topic_model: Optional[topic_models.TopicModel] = (
+            topic_models.TopicModel.get(self.TOPIC_ID)
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert topic_model is not None
-        topic: topic_domain.Topic = topic_fetchers.get_topic_from_model(topic_model)
+        topic: topic_domain.Topic = topic_fetchers.get_topic_from_model(
+            topic_model
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert self.topic is not None
         self.assertEqual(topic.to_dict(), self.topic.to_dict())
 
     def test_get_topic_by_name(self) -> None:
-        topic: Optional[topic_domain.Topic] = topic_fetchers.get_topic_by_name('Name')
+        topic: Optional[topic_domain.Topic] = topic_fetchers.get_topic_by_name(
+            'Name'
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert topic is not None
         self.assertEqual(topic.name, 'Name')
@@ -133,11 +151,15 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_topic_rights_is_none(self) -> None:
         fake_topic_id = topic_fetchers.get_new_topic_id()
-        fake_topic: Optional[topic_domain.TopicRights] = topic_fetchers.get_topic_rights(fake_topic_id, strict=False)
+        fake_topic: Optional[topic_domain.TopicRights] = (
+            topic_fetchers.get_topic_rights(fake_topic_id, strict=False)
+        )
         self.assertIsNone(fake_topic)
 
     def test_get_topic_by_url_fragment(self) -> None:
-        topic: Optional[topic_domain.Topic] = topic_fetchers.get_topic_by_url_fragment('name-one')
+        topic: Optional[topic_domain.Topic] = (
+            topic_fetchers.get_topic_by_url_fragment('name-one')
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert topic is not None
         self.assertEqual(topic.url_fragment, 'name-one')
@@ -150,13 +172,21 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_canonical_story_dicts(self) -> None:
         self.save_new_story(self.story_id_2, self.user_id, self.TOPIC_ID)
-        topic_services.publish_story(self.TOPIC_ID, self.story_id_1, self.user_id_admin)
-        topic_services.publish_story(self.TOPIC_ID, self.story_id_2, self.user_id_admin)
-        topic: Optional[topic_domain.Topic] = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin
+        )
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_2, self.user_id_admin
+        )
+        topic: Optional[topic_domain.Topic] = topic_fetchers.get_topic_by_id(
+            self.TOPIC_ID
+        )
 
         # Ruling out the possibility of None for mypy type checking.
         assert topic is not None
-        canonical_dict_list: List[topic_fetchers.CannonicalStoryDict] = topic_fetchers.get_canonical_story_dicts(self.user_id_admin, topic)
+        canonical_dict_list: List[topic_fetchers.CannonicalStoryDict] = (
+            topic_fetchers.get_canonical_story_dicts(self.user_id_admin, topic)
+        )
 
         self.assertEqual(len(canonical_dict_list), 2)
 
@@ -207,7 +237,9 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         topic_services.create_new_topic_rights('topic_id', self.user_id_a)
-        commit_cmd = topic_domain.TopicChange({'cmd': topic_domain.CMD_CREATE_NEW, 'name': 'name'})
+        commit_cmd = topic_domain.TopicChange(
+            {'cmd': topic_domain.CMD_CREATE_NEW, 'name': 'name'}
+        )
         subtopic_dict = {'id': 1, 'title': 'subtopic_title', 'skill_ids': []}
         model = topic_models.TopicModel(
             id='topic_id',
@@ -228,7 +260,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'Sorry, we can only process v1-v%d subtopic schemas at present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            'Sorry, we can only process v1-v%d subtopic schemas at present.'
+            % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
         ):
             topic_fetchers.get_topic_from_model(model)
 
@@ -252,13 +285,16 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'Sorry, we can only process v1-v%d story reference schemas at present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
+            'Sorry, we can only process v1-v%d story reference schemas at present.'
+            % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
         ):
             topic_fetchers.get_topic_from_model(model)
 
     def test_topic_model_migration_to_higher_version(self) -> None:
         topic_services.create_new_topic_rights('topic_id', self.user_id_a)
-        commit_cmd = topic_domain.TopicChange({'cmd': topic_domain.CMD_CREATE_NEW, 'name': 'name'})
+        commit_cmd = topic_domain.TopicChange(
+            {'cmd': topic_domain.CMD_CREATE_NEW, 'name': 'name'}
+        )
         subtopic_v1_dict = {'id': 1, 'title': 'subtopic_title', 'skill_ids': []}
         model = topic_models.TopicModel(
             id='topic_id',
@@ -277,21 +313,29 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(self.user_id_a, 'topic model created', commit_cmd_dicts)
         swap_topic_object = self.swap(topic_domain, 'Topic', MockTopicObject)
-        current_story_refrence_schema_version_swap = self.swap(feconf, 'CURRENT_STORY_REFERENCE_SCHEMA_VERSION', 2)
+        current_story_refrence_schema_version_swap = self.swap(
+            feconf, 'CURRENT_STORY_REFERENCE_SCHEMA_VERSION', 2
+        )
         with swap_topic_object, current_story_refrence_schema_version_swap:
-            topic: topic_domain.Topic = topic_fetchers.get_topic_from_model(model)
+            topic: topic_domain.Topic = topic_fetchers.get_topic_from_model(
+                model
+            )
             self.assertEqual(topic.story_reference_schema_version, 2)
 
     def test_get_topic_by_id(self) -> None:
         # Ruling out the possibility of None for mypy type checking.
         assert self.topic is not None
         expected_topic = self.topic.to_dict()
-        topic: Optional[topic_domain.Topic] = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        topic: Optional[topic_domain.Topic] = topic_fetchers.get_topic_by_id(
+            self.TOPIC_ID
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert topic is not None
         self.assertEqual(topic.to_dict(), expected_topic)
         fake_topic_id = topic_fetchers.get_new_topic_id()
-        fake_topic: Optional[topic_domain.Topic] = topic_fetchers.get_topic_by_id(fake_topic_id, strict=False)
+        fake_topic: Optional[topic_domain.Topic] = (
+            topic_fetchers.get_topic_by_id(fake_topic_id, strict=False)
+        )
         self.assertIsNone(fake_topic)
 
     def test_get_topic_by_version(self) -> None:
@@ -320,10 +364,16 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
                 }
             )
         ]
-        topic_services.update_topic_and_subtopic_pages(self.user_id, topic_id, changelist, 'Change language code')
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id, topic_id, changelist, 'Change language code'
+        )
 
-        topic_v0: Optional[topic_domain.Topic] = topic_fetchers.get_topic_by_id(topic_id, version=0)
-        topic_v1: Optional[topic_domain.Topic] = topic_fetchers.get_topic_by_id(topic_id, version=1)
+        topic_v0: Optional[topic_domain.Topic] = topic_fetchers.get_topic_by_id(
+            topic_id, version=0
+        )
+        topic_v1: Optional[topic_domain.Topic] = topic_fetchers.get_topic_by_id(
+            topic_id, version=1
+        )
 
         # Ruling out the possibility of None for mypy type checking.
         assert topic_v0 is not None
@@ -335,7 +385,9 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert self.topic is not None
         expected_topic = self.topic.to_dict()
-        topics: List[Optional[topic_domain.Topic]] = topic_fetchers.get_topics_by_ids([self.TOPIC_ID])
+        topics: List[Optional[topic_domain.Topic]] = (
+            topic_fetchers.get_topics_by_ids([self.TOPIC_ID])
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert topics[0] is not None
         self.assertEqual(topics[0].to_dict(), expected_topic)
@@ -351,18 +403,24 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
     def test_raises_error_if_topics_fetched_with_invalid_ids_and_strict(
         self,
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'No topic model exists for the topic_id: invalid_id'):
+        with self.assertRaisesRegex(
+            Exception, 'No topic model exists for the topic_id: invalid_id'
+        ):
             topic_fetchers.get_topics_by_ids(['invalid_id'], strict=True)
 
     def test_get_all_topic_rights_of_user(self) -> None:
-        topic_rights: List[topic_domain.TopicRights] = topic_fetchers.get_topic_rights_with_user(self.user_id_a)
+        topic_rights: List[topic_domain.TopicRights] = (
+            topic_fetchers.get_topic_rights_with_user(self.user_id_a)
+        )
 
         self.assertEqual(len(topic_rights), 1)
         self.assertEqual(topic_rights[0].id, self.TOPIC_ID)
         self.assertEqual(topic_rights[0].manager_ids, [self.user_id_a])
 
     def test_commit_log_entry(self) -> None:
-        topic_commit_log_entry: Optional[topic_models.TopicCommitLogEntryModel] = topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 1)
+        topic_commit_log_entry: Optional[
+            topic_models.TopicCommitLogEntryModel
+        ] = topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 1)
         # Ruling out the possibility of None for mypy type checking.
         assert topic_commit_log_entry is not None
         self.assertEqual(topic_commit_log_entry.commit_type, 'create')
@@ -381,7 +439,11 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summaries[0].subtopic_count, 1)
 
     def test_get_multi_summaries(self) -> None:
-        topic_summaries: List[Optional[topic_domain.TopicSummary]] = topic_fetchers.get_multi_topic_summaries([self.TOPIC_ID, 'invalid_id'])
+        topic_summaries: List[Optional[topic_domain.TopicSummary]] = (
+            topic_fetchers.get_multi_topic_summaries(
+                [self.TOPIC_ID, 'invalid_id']
+            )
+        )
 
         # Ruling out the possibility of None for mypy type checking.
         assert topic_summaries[0] is not None
@@ -413,7 +475,9 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             topic_domain.TopicChange(
                 {
                     'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-                    'property_name': (topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
+                    'property_name': (
+                        topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST
+                    ),
                     'old_value': old_value,
                     'new_value': [self.skill_id_1],
                 }
@@ -476,10 +540,14 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_topic_summary_from_model(self) -> None:
-        topic_summary_model: Optional[topic_models.TopicSummaryModel] = topic_models.TopicSummaryModel.get(self.TOPIC_ID)
+        topic_summary_model: Optional[topic_models.TopicSummaryModel] = (
+            topic_models.TopicSummaryModel.get(self.TOPIC_ID)
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert topic_summary_model is not None
-        topic_summary: topic_domain.TopicSummary = topic_fetchers.get_topic_summary_from_model(topic_summary_model)
+        topic_summary: topic_domain.TopicSummary = (
+            topic_fetchers.get_topic_summary_from_model(topic_summary_model)
+        )
 
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
         self.assertEqual(topic_summary.name, 'Name')
@@ -493,7 +561,9 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
 
     def test_get_topic_summary_by_id(self) -> None:
-        topic_summary: Optional[topic_domain.TopicSummary] = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
+        topic_summary: Optional[topic_domain.TopicSummary] = (
+            topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert topic_summary is not None
 
@@ -508,7 +578,9 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
 
         fake_topic_id = topic_fetchers.get_new_topic_id()
-        fake_topic: Optional[topic_domain.TopicSummary] = topic_fetchers.get_topic_summary_by_id(fake_topic_id, strict=False)
+        fake_topic: Optional[topic_domain.TopicSummary] = (
+            topic_fetchers.get_topic_summary_by_id(fake_topic_id, strict=False)
+        )
         self.assertIsNone(fake_topic)
 
     def test_get_new_topic_id(self) -> None:
@@ -518,7 +590,9 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_models.TopicModel.get_by_id(new_topic_id), None)
 
     def test_get_multi_rights(self) -> None:
-        topic_rights: List[Optional[topic_domain.TopicRights]] = topic_fetchers.get_multi_topic_rights([self.TOPIC_ID, 'invalid_id'])
+        topic_rights: List[Optional[topic_domain.TopicRights]] = (
+            topic_fetchers.get_multi_topic_rights([self.TOPIC_ID, 'invalid_id'])
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert topic_rights[0] is not None
 
@@ -533,7 +607,9 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             Exception,
             'No topic_rights exists for the given topic_id: invalid_topic_id',
         ):
-            topic_fetchers.get_multi_topic_rights(['invalid_topic_id'], strict=True)
+            topic_fetchers.get_multi_topic_rights(
+                ['invalid_topic_id'], strict=True
+            )
 
     def test_get_story_ids_linked_to_topic(self) -> None:
         """Tests that canonical story IDs linked to a topic are returned."""
@@ -541,7 +617,9 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         assert self.topic is not None
 
         story_ids = topic_fetchers.get_story_ids_linked_to_topic(self.TOPIC_ID)
-        self.assertEqual(sorted(story_ids), sorted([self.story_id_1, self.story_id_2]))
+        self.assertEqual(
+            sorted(story_ids), sorted([self.story_id_1, self.story_id_2])
+        )
 
     def test_get_multiple_topics_by_ids_and_version(self) -> None:
         """Test fetching multiple topics with specific versions."""
@@ -585,7 +663,9 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
                 }
             )
         ]
-        topic_services.update_topic_and_subtopic_pages(self.user_id, topic_1_id, changelist, 'Update topic 1 name')
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id, topic_1_id, changelist, 'Update topic 1 name'
+        )
 
         results = topic_fetchers.get_multiple_topics_by_ids_and_version(
             [
@@ -644,7 +724,9 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             next_subtopic_id=1,
         )
 
-        results = topic_fetchers.get_multiple_topics_by_ids_and_version([(topic_id, 999)])
+        results = topic_fetchers.get_multiple_topics_by_ids_and_version(
+            [(topic_id, 999)]
+        )
         self.assertEqual(len(results), 1)
         self.assertIsNone(results[0])
 
@@ -666,7 +748,9 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         )
         topic_services.delete_topic(self.user_id, topic_id)
 
-        results = topic_fetchers.get_multiple_topics_by_ids_and_version([(topic_id, 1)])
+        results = topic_fetchers.get_multiple_topics_by_ids_and_version(
+            [(topic_id, 1)]
+        )
         self.assertEqual(len(results), 1)
         self.assertIsNone(results[0])
 
@@ -694,7 +778,9 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             next_subtopic_id=1,
         )
 
-        results = topic_fetchers.get_multiple_topics_by_ids_and_version([(topic_id, 1)])
+        results = topic_fetchers.get_multiple_topics_by_ids_and_version(
+            [(topic_id, 1)]
+        )
         self.assertEqual(len(results), 1)
         self.assertIsNotNone(results[0])
         assert results[0] is not None
@@ -742,9 +828,13 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
                 }
             ),
         ]
-        topic_services.update_topic_and_subtopic_pages(self.user_id, topic_id, changelist, 'Added subtopics')
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id, topic_id, changelist, 'Added subtopics'
+        )
 
-        results = topic_fetchers.get_multiple_topics_by_ids_and_version([(topic_id, 2)])
+        results = topic_fetchers.get_multiple_topics_by_ids_and_version(
+            [(topic_id, 2)]
+        )
         self.assertEqual(len(results), 1)
         self.assertIsNotNone(results[0])
         assert results[0] is not None

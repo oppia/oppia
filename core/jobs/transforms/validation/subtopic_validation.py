@@ -33,8 +33,14 @@ if MYPY:  # pragma: no cover
 (subtopic_models,) = models.Registry.import_models([models.Names.SUBTOPIC])
 
 
-@validation_decorators.AuditsExisting(subtopic_models.SubtopicPageSnapshotMetadataModel)
-class ValidateSubtopicPageSnapshotMetadataModel(base_validation.BaseValidateCommitCmdsSchema[subtopic_models.SubtopicPageSnapshotMetadataModel]):
+@validation_decorators.AuditsExisting(
+    subtopic_models.SubtopicPageSnapshotMetadataModel
+)
+class ValidateSubtopicPageSnapshotMetadataModel(
+    base_validation.BaseValidateCommitCmdsSchema[
+        subtopic_models.SubtopicPageSnapshotMetadataModel
+    ]
+):
     """Overrides _get_change_domain_class for SubtopicPageSnapshotMetadataModel."""
 
     def _get_change_domain_class(
@@ -53,8 +59,14 @@ class ValidateSubtopicPageSnapshotMetadataModel(base_validation.BaseValidateComm
         return subtopic_page_domain.SubtopicPageChange
 
 
-@validation_decorators.AuditsExisting(subtopic_models.SubtopicPageCommitLogEntryModel)
-class ValidateSubtopicPageCommitLogEntryModel(base_validation.BaseValidateCommitCmdsSchema[subtopic_models.SubtopicPageCommitLogEntryModel]):
+@validation_decorators.AuditsExisting(
+    subtopic_models.SubtopicPageCommitLogEntryModel
+)
+class ValidateSubtopicPageCommitLogEntryModel(
+    base_validation.BaseValidateCommitCmdsSchema[
+        subtopic_models.SubtopicPageCommitLogEntryModel
+    ]
+):
     """Overrides _get_change_domain_class for SubtopicPageCommitLogEntryModel."""
 
     # Here we use MyPy ignore because the signature of this method doesn't

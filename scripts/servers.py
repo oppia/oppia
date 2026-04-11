@@ -86,7 +86,11 @@ def managed_process(
     """
 
     def get_proc_info(p: psutil.Process) -> str:
-        return '%s(name="%s", pid=%d)' % (human_readable_name, p.name(), p.pid) if p.is_running() else '%s(pid=%d)' % (human_readable_name, p.pid)
+        return (
+            '%s(name="%s", pid=%d)' % (human_readable_name, p.name(), p.pid)
+            if p.is_running()
+            else '%s(pid=%d)' % (human_readable_name, p.pid)
+        )
 
     stripped_args = (('%s' % arg).strip() for arg in command_args)
     non_empty_args = (s for s in stripped_args if s)
@@ -108,7 +112,9 @@ def managed_process(
             if popen_proc.is_running():
                 # Children must be terminated before the parent, otherwise they
                 # may become zombie processes.
-                procs_still_alive = popen_proc.children(recursive=True) + [popen_proc]
+                procs_still_alive = popen_proc.children(recursive=True) + [
+                    popen_proc
+                ]
 
             procs_to_kill = []
             for proc in procs_still_alive:
@@ -119,7 +125,9 @@ def managed_process(
                 else:
                     logging.info('%s has already ended.' % get_proc_info(proc))
 
-            procs_gone, procs_still_alive = psutil.wait_procs(procs_to_kill, timeout=timeout_secs)
+            procs_gone, procs_still_alive = psutil.wait_procs(
+                procs_to_kill, timeout=timeout_secs
+            )
             for proc in procs_still_alive:
                 logging.warning('Forced to kill %s!' % get_proc_info(proc))
                 proc.kill()
@@ -128,14 +136,24 @@ def managed_process(
         except Exception:
             # NOTE: Raising an exception while exiting a context manager is bad
             # practice, so we log and suppress exceptions instead.
-            logging.exception('Failed to stop %s gracefully!' % get_proc_info(popen_proc))
+            logging.exception(
+                'Failed to stop %s gracefully!' % get_proc_info(popen_proc)
+            )
 
         exit_code = popen_proc.returncode
         # Note that negative values indicate termination by a signal: SIGTERM,
         # SIGINT, etc. Also, exit code 143 indicates that the process received
         # a SIGTERM from the OS, and it succeeded in gracefully terminating.
-        if exit_code is not None and exit_code > 0 and exit_code != 143 and raise_on_nonzero_exit:
-            raise Exception('Process %s exited unexpectedly with exit code %s' % (proc_name, exit_code))
+        if (
+            exit_code is not None
+            and exit_code > 0
+            and exit_code != 143
+            and raise_on_nonzero_exit
+        ):
+            raise Exception(
+                'Process %s exited unexpectedly with exit code %s'
+                % (proc_name, exit_code)
+            )
 
 
 @contextlib.contextmanager
@@ -240,16 +258,24 @@ def managed_firebase_auth_emulator(
         feconf.FIREBASE_EMULATOR_CONFIG_PATH,
     ]
 
-    emulator_args.extend(['--import', common.FIREBASE_EMULATOR_CACHE_DIR, '--export-on-exit'] if recover_users else ['--export-on-exit', common.FIREBASE_EMULATOR_CACHE_DIR])
+    emulator_args.extend(
+        ['--import', common.FIREBASE_EMULATOR_CACHE_DIR, '--export-on-exit']
+        if recover_users
+        else ['--export-on-exit', common.FIREBASE_EMULATOR_CACHE_DIR]
+    )
 
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
-    proc_context = managed_process(emulator_args, human_readable_name='Firebase Emulator', shell=True)
+    proc_context = managed_process(
+        emulator_args, human_readable_name='Firebase Emulator', shell=True
+    )
     with proc_context as proc:
         # Verify that the emulator is actually responding to HTTP requests, not
         # just that the port is open. This prevents race conditions where the
         # emulator binds the port but crashes during initialization.
-        common.wait_for_firebase_emulator_to_be_ready(feconf.FIREBASE_EMULATOR_PORT)
+        common.wait_for_firebase_emulator_to_be_ready(
+            feconf.FIREBASE_EMULATOR_PORT
+        )
         yield proc
 
 
@@ -334,7 +360,9 @@ def managed_cloud_datastore_emulator(
         emulator_args.append('--no-store-on-disk')
 
     with contextlib.ExitStack() as stack:
-        data_dir_exists = os.path.exists(common.CLOUD_DATASTORE_EMULATOR_DATA_DIR)
+        data_dir_exists = os.path.exists(
+            common.CLOUD_DATASTORE_EMULATOR_DATA_DIR
+        )
         if clear_datastore and data_dir_exists:
             # Replace it with an empty directory.
             shutil.rmtree(common.CLOUD_DATASTORE_EMULATOR_DATA_DIR)
@@ -355,18 +383,30 @@ def managed_cloud_datastore_emulator(
         common.wait_for_port_to_be_in_use(feconf.CLOUD_DATASTORE_EMULATOR_PORT)
 
         # Environment variables required to communicate with the emulator.
-        stack.enter_context(common.swap_env('DATASTORE_DATASET', common.DEV_PROJECT_ID))
-        stack.enter_context(common.swap_env('DATASTORE_EMULATOR_HOST', emulator_hostport))
+        stack.enter_context(
+            common.swap_env('DATASTORE_DATASET', common.DEV_PROJECT_ID)
+        )
+        stack.enter_context(
+            common.swap_env('DATASTORE_EMULATOR_HOST', emulator_hostport)
+        )
         stack.enter_context(
             common.swap_env(
                 'DATASTORE_EMULATOR_HOST_PATH',
                 '%s/datastore' % emulator_hostport,
             )
         )
-        stack.enter_context(common.swap_env('DATASTORE_HOST', 'http://%s' % emulator_hostport))
-        stack.enter_context(common.swap_env('DATASTORE_PROJECT_ID', common.DEV_PROJECT_ID))
-        stack.enter_context(common.swap_env('DATASTORE_USE_PROJECT_ID_AS_APP_ID', 'true'))
-        stack.enter_context(common.swap_env('GOOGLE_CLOUD_PROJECT', common.DEV_PROJECT_ID))
+        stack.enter_context(
+            common.swap_env('DATASTORE_HOST', 'http://%s' % emulator_hostport)
+        )
+        stack.enter_context(
+            common.swap_env('DATASTORE_PROJECT_ID', common.DEV_PROJECT_ID)
+        )
+        stack.enter_context(
+            common.swap_env('DATASTORE_USE_PROJECT_ID_AS_APP_ID', 'true')
+        )
+        stack.enter_context(
+            common.swap_env('GOOGLE_CLOUD_PROJECT', common.DEV_PROJECT_ID)
+        )
 
         yield proc
 
@@ -416,15 +456,23 @@ def create_managed_web_browser(port: int) -> ContextManager[psutil.Process]:
     url = 'http://localhost:%s/' % port
     human_readable_name = 'Web Browser'
     if common.is_linux_os():
-        return managed_process(['xdg-open', url], human_readable_name=human_readable_name)
+        return managed_process(
+            ['xdg-open', url], human_readable_name=human_readable_name
+        )
     elif common.is_mac_os():
-        return managed_process(['open', url], human_readable_name=human_readable_name)
+        return managed_process(
+            ['open', url], human_readable_name=human_readable_name
+        )
     else:
-        raise Exception('Unable to identify the Operating System and therefore, unable to launch the web browser.')
+        raise Exception(
+            'Unable to identify the Operating System and therefore, unable to launch the web browser.'
+        )
 
 
 @contextlib.contextmanager
-def managed_ng_build(*, use_prod_env: bool = False, watch_mode: bool = False) -> Iterator[psutil.Process]:
+def managed_ng_build(
+    *, use_prod_env: bool = False, watch_mode: bool = False
+) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the ng compiler gracefully.
 
     Args:
@@ -517,9 +565,17 @@ def managed_webpack_compiler(
     if config_path is not None:
         pass
     elif use_prod_env:
-        config_path = common.WEBPACK_PROD_SOURCE_MAPS_CONFIG if use_source_maps else common.WEBPACK_PROD_CONFIG
+        config_path = (
+            common.WEBPACK_PROD_SOURCE_MAPS_CONFIG
+            if use_source_maps
+            else common.WEBPACK_PROD_CONFIG
+        )
     else:
-        config_path = common.WEBPACK_DEV_SOURCE_MAPS_CONFIG if use_source_maps else common.WEBPACK_DEV_CONFIG
+        config_path = (
+            common.WEBPACK_DEV_SOURCE_MAPS_CONFIG
+            if use_source_maps
+            else common.WEBPACK_DEV_CONFIG
+        )
 
     compiler_args = [
         common.NODE_BIN_PATH,
@@ -581,7 +637,11 @@ def get_chromedriver_version() -> str:
     # Although there are spaces between Google and Chrome in the path, we
     # don't need to escape them for Popen (as opposed to on the terminal, in
     # which case we would need to escape them for the command to run).
-    chrome_command = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' if common.is_mac_os() else 'google-chrome'
+    chrome_command = (
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+        if common.is_mac_os()
+        else 'google-chrome'
+    )
     try:
         output = subprocess.check_output([chrome_command, '--version'])
     except OSError as e:
@@ -597,7 +657,8 @@ def get_chromedriver_version() -> str:
             '--chrome_driver_version flag. To determine the '
             'chromedriver version to be used, please follow the '
             'instructions mentioned in the following URL:\n'
-            'https://chromedriver.chromium.org/downloads/version-selection' % chrome_command.replace(' ', r'\ ')
+            'https://chromedriver.chromium.org/downloads/version-selection'
+            % chrome_command.replace(' ', r'\ ')
         ) from e
 
     installed_version_bytes = b''.join(re.findall(rb'[0-9.]', output))
@@ -609,7 +670,10 @@ def get_chromedriver_version() -> str:
     if int(installed_version_parts[0]) >= 115:
         chromedriver_version: str = '.'.join(installed_version_parts)
     else:
-        response = common.url_open('https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % ('.'.join(installed_version_parts[:-1])))
+        response = common.url_open(
+            'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s'
+            % ('.'.join(installed_version_parts[:-1]))
+        )
         chromedriver_version = response.read().decode('utf-8')
 
     return chromedriver_version
@@ -648,7 +712,9 @@ def managed_portserver() -> Iterator[psutil.Process]:
     ]
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
-    proc_context = managed_process(portserver_args, human_readable_name='Portserver', shell=True)
+    proc_context = managed_process(
+        portserver_args, human_readable_name='Portserver', shell=True
+    )
 
     with proc_context as proc:
         try:
@@ -671,7 +737,9 @@ def managed_portserver() -> Iterator[psutil.Process]:
                 except psutil.TimeoutExpired:
                     # If the server fails to shut down, allow proc_context to
                     # end it by calling terminate() and/or kill().
-                    logging.error('Portserver failed to shut down after 10 seconds.')
+                    logging.error(
+                        'Portserver failed to shut down after 10 seconds.'
+                    )
 
 
 @contextlib.contextmanager
@@ -790,7 +858,9 @@ def managed_acceptance_tests_server(
             suite names.
     """
     available_suites = {}
-    with open(common.ACCEPTANCE_TEST_CONFIG_FILE_PATH, 'r', encoding='utf-8') as f:
+    with open(
+        common.ACCEPTANCE_TEST_CONFIG_FILE_PATH, 'r', encoding='utf-8'
+    ) as f:
         filedata = json.load(f)
         for suites in filedata.values():
             for suite in suites:
@@ -803,7 +873,9 @@ def managed_acceptance_tests_server(
     os.environ['SPEC_NAME'] = suite_name
     os.environ['PROD_ENV'] = 'true' if prod_env else 'false'
 
-    nodemodules_jest_bin_path = os.path.join(common.NODE_MODULES_PATH, '.bin', 'jest')
+    nodemodules_jest_bin_path = os.path.join(
+        common.NODE_MODULES_PATH, '.bin', 'jest'
+    )
 
     acceptance_tests_args = [
         nodemodules_jest_bin_path,

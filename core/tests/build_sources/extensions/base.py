@@ -163,7 +163,10 @@ class BaseInteraction:
 
     @property
     def customization_arg_specs(self) -> List[domain.CustomizationArgSpec]:
-        return [domain.CustomizationArgSpec(**cas) for cas in self._customization_arg_specs]
+        return [
+            domain.CustomizationArgSpec(**cas)
+            for cas in self._customization_arg_specs
+        ]
 
     @property
     def answer_visualization_specs(self) -> List[Dict[str, str]]:
@@ -173,7 +176,11 @@ class BaseInteraction:
     def answer_visualizations(self) -> List[models.BaseVisualization]:
         result = []
         for spec in self._answer_visualization_specs:
-            factory_cls = visualization_registry.Registry.get_visualization_class(spec['id'])
+            factory_cls = (
+                visualization_registry.Registry.get_visualization_class(
+                    spec['id']
+                )
+            )
             result.append(
                 factory_cls(
                     spec['calculation_id'],
@@ -186,7 +193,9 @@ class BaseInteraction:
     @property
     def answer_calculation_ids(self) -> Set[str]:
         visualizations = self.answer_visualizations
-        return set([visualization.calculation_id for visualization in visualizations])
+        return set(
+            [visualization.calculation_id for visualization in visualizations]
+        )
 
     @property
     def dependency_ids(self) -> List[str]:
@@ -200,7 +209,9 @@ class BaseInteraction:
         if self.answer_type is None:
             return None
         else:
-            return object_registry.Registry.get_object_class_by_type(self.answer_type).normalize(answer)
+            return object_registry.Registry.get_object_class_by_type(
+                self.answer_type
+            ).normalize(answer)
 
     @property
     def rules_dict(self) -> Dict[str, Dict[str, str]]:
@@ -208,14 +219,21 @@ class BaseInteraction:
         if self._cached_rules_dict is not None:
             return self._cached_rules_dict
 
-        rules_index_dict = json.loads(constants.get_package_file_contents('extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH))
+        rules_index_dict = json.loads(
+            constants.get_package_file_contents(
+                'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH
+            )
+        )
         self._cached_rules_dict = rules_index_dict[self.id]
 
         return self._cached_rules_dict
 
     @property
     def _rule_description_strings(self) -> Dict[str, str]:
-        return {rule_name: self.rules_dict[rule_name]['description'] for rule_name in self.rules_dict}
+        return {
+            rule_name: self.rules_dict[rule_name]['description']
+            for rule_name in self.rules_dict
+        }
 
     @property
     def html_body(self) -> str:
@@ -227,7 +245,9 @@ class BaseInteraction:
         interaction itself and the other for displaying the learner's response
         in a read-only view after it has been submitted.
         """
-        html_templates = utils.get_file_contents(os.path.join(feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id))
+        html_templates = utils.get_file_contents(
+            os.path.join(feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id)
+        )
         return html_templates
 
     @property
@@ -281,7 +301,9 @@ class BaseInteraction:
         else:
             return self.rules_dict[rule_name]['description']
 
-    def get_rule_param_list(self, rule_name: str) -> List[Tuple[str, objects.BaseObject]]:
+    def get_rule_param_list(
+        self, rule_name: str
+    ) -> List[Tuple[str, objects.BaseObject]]:
         """Gets the parameter list for a given rule."""
         description = self.get_rule_description(rule_name)
 
@@ -302,11 +324,15 @@ class BaseInteraction:
 
         return param_list
 
-    def get_rule_param_type(self, rule_name: str, rule_param_name: str) -> objects.BaseObject:
+    def get_rule_param_type(
+        self, rule_name: str, rule_param_name: str
+    ) -> objects.BaseObject:
         """Gets the parameter type for a given rule parameter name."""
         rule_param_list = self.get_rule_param_list(rule_name)
 
         for param_name, param_type in rule_param_list:
             if param_name == rule_param_name:
                 return param_type
-        raise Exception('Rule %s has no param called %s' % (rule_name, rule_param_name))
+        raise Exception(
+            'Rule %s has no param called %s' % (rule_name, rule_param_name)
+        )

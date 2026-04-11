@@ -39,9 +39,13 @@ from core.tests import test_utils
 
 
 class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
-    def _record_completion(self, user_id: str, STORY_ID: str, node_id: str) -> None:
+    def _record_completion(
+        self, user_id: str, STORY_ID: str, node_id: str
+    ) -> None:
         """Records the completion of a node in the context of a story."""
-        story_services.record_completed_node_in_story_context(user_id, STORY_ID, node_id)
+        story_services.record_completed_node_in_story_context(
+            user_id, STORY_ID, node_id
+        )
 
     def setUp(self) -> None:
         """Completes the sign up process for the various users."""
@@ -66,10 +70,18 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.NEW_TOPIC_ID = 'new_topic_id'
         self.NEW_STORY_ID = 'new_story_id'
 
-        self.save_new_valid_exploration(self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End')
-        self.save_new_valid_exploration(self.EXP_ID_1, self.admin_id, title='Title 2', end_state_name='End')
-        self.save_new_valid_exploration(self.EXP_ID_9, self.admin_id, title='Title 4', end_state_name='End')
-        self.save_new_valid_exploration(self.EXP_ID_7, self.admin_id, title='Title 3', end_state_name='End')
+        self.save_new_valid_exploration(
+            self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End'
+        )
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.admin_id, title='Title 2', end_state_name='End'
+        )
+        self.save_new_valid_exploration(
+            self.EXP_ID_9, self.admin_id, title='Title 4', end_state_name='End'
+        )
+        self.save_new_valid_exploration(
+            self.EXP_ID_7, self.admin_id, title='Title 3', end_state_name='End'
+        )
         self.publish_exploration(self.admin_id, self.EXP_ID_0)
         self.publish_exploration(self.admin_id, self.EXP_ID_1)
         self.publish_exploration(self.admin_id, self.EXP_ID_9)
@@ -84,13 +96,19 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         )
         story.meta_tag_content = 'story meta content'
 
-        self.exp_summary_dicts = summary_services.get_displayable_exp_summary_dicts_matching_ids([self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_7], user=self.admin)
+        self.exp_summary_dicts = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_7], user=self.admin
+            )
+        )
         self.node_1: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_1,
             'title': 'Title 1',
             'description': 'Description 1',
             'thumbnail_filename': 'image_1.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
@@ -109,7 +127,9 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'title': 'Title 2',
             'description': 'Description 2',
             'thumbnail_filename': 'image_2.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
@@ -128,7 +148,9 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'title': 'Title 3',
             'description': 'Description 3',
             'thumbnail_filename': 'image_3.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
@@ -151,7 +173,9 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         story.story_contents.initial_node_id = 'node_2'
         story.story_contents.next_node_id = 'node_4'
         story_services.save_new_story(self.admin_id, story)
-        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(1, 'Subtopic Title 1', 'url-frag-one')
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
@@ -166,7 +190,9 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             next_subtopic_id=2,
         )
         topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
-        topic_services.publish_story(self.TOPIC_ID, self.STORY_ID, self.admin_id)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id
+        )
         self.logout()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
@@ -176,7 +202,9 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
 
 class StoryPageTests(BaseStoryViewerControllerTests):
     def test_any_user_can_access_story_viewer_page(self) -> None:
-        self.get_html_response('/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
+        self.get_html_response(
+            '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT
+        )
 
 
 class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
@@ -194,7 +222,8 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
         )
         story_services.save_new_story(self.admin_id, story)
         self.get_json(
-            '%s/staging/topic/%s' % (feconf.STORY_DATA_HANDLER, new_story_url_fragment),
+            '%s/staging/topic/%s'
+            % (feconf.STORY_DATA_HANDLER, new_story_url_fragment),
             expected_status_int=404,
         )
 
@@ -226,7 +255,8 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
         story_services.save_new_story(self.admin_id, story)
         topic_services.publish_story('topic_id_1', new_story_id, self.admin_id)
         self.get_json(
-            '%s/staging/topics/%s' % (feconf.STORY_DATA_HANDLER, new_story_url_fragment),
+            '%s/staging/topics/%s'
+            % (feconf.STORY_DATA_HANDLER, new_story_url_fragment),
             expected_status_int=404,
         )
 
@@ -236,7 +266,9 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             'title': 'Title 1',
             'description': 'Description 1',
             'thumbnail_filename': 'image_1.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
@@ -257,7 +289,9 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             'title': 'Title 2',
             'description': 'Description 2',
             'thumbnail_filename': 'image_2.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
@@ -278,7 +312,9 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             'title': 'Title 3',
             'description': 'Description 3',
             'thumbnail_filename': 'image_3.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
@@ -294,7 +330,10 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             'first_publication_date_msecs': None,
             'unpublishing_reason': None,
         }
-        json_response = self.get_json('%s/staging/topic/%s' % (feconf.STORY_DATA_HANDLER, self.STORY_URL_FRAGMENT))
+        json_response = self.get_json(
+            '%s/staging/topic/%s'
+            % (feconf.STORY_DATA_HANDLER, self.STORY_URL_FRAGMENT)
+        )
         expected_dict = {
             'story_id': self.STORY_ID,
             'story_title': 'Title',
@@ -320,7 +359,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             ),
             expected_status_int=401,
         )
-        self.assertEqual(response['error'], 'You must be logged in to access this resource.')
+        self.assertEqual(
+            response['error'], 'You must be logged in to access this resource.'
+        )
 
     def test_redirect_when_node_id_does_not_refer_to_the_first_node(
         self,
@@ -344,8 +385,12 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
     def test_redirect_for_returning_user_with_completed_nodes(self) -> None:
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.login(self.NEW_USER_EMAIL)
-        story_services.record_completed_node_in_story_context(self.viewer_id, self.STORY_ID, self.NODE_ID_2)
-        story_services.record_completed_node_in_story_context(self.viewer_id, self.STORY_ID, self.NODE_ID_1)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_2
+        )
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_1
+        )
         response = self.get_html_response(
             '%s/staging/topic/%s/%s'
             % (
@@ -364,7 +409,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.STORY_URL_FRAGMENT = 'story-two'
 
-        self.save_new_valid_exploration(self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End')
+        self.save_new_valid_exploration(
+            self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End'
+        )
         self.publish_exploration(self.admin_id, self.EXP_ID_0)
 
         story = story_domain.Story.create_default_story(
@@ -381,7 +428,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             'title': 'Title 1',
             'description': 'Description 1',
             'thumbnail_filename': 'image_1.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
@@ -395,12 +444,16 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             'first_publication_date_msecs': None,
             'unpublishing_reason': None,
         }
-        story.story_contents.nodes = [story_domain.StoryNode.from_dict(self.node_1)]
+        story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(self.node_1)
+        ]
         self.nodes = story.story_contents.nodes
         story.story_contents.initial_node_id = 'node_1'
         story.story_contents.next_node_id = 'node_2'
         story_services.save_new_story(self.admin_id, story)
-        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(1, 'Subtopic Title 1', 'url-frag-one')
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
@@ -416,7 +469,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             next_subtopic_id=2,
         )
         topic_services.publish_topic(self.NEW_TOPIC_ID, self.admin_id)
-        topic_services.publish_story(self.NEW_TOPIC_ID, self.NEW_STORY_ID, self.admin_id)
+        topic_services.publish_story(
+            self.NEW_TOPIC_ID, self.NEW_STORY_ID, self.admin_id
+        )
         self.logout()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.login(self.NEW_USER_EMAIL)
@@ -530,7 +585,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         )
 
     def test_post_fails_when_story_is_not_published_in_story_mode(self) -> None:
-        topic_services.unpublish_story(self.TOPIC_ID, self.STORY_ID, self.admin_id)
+        topic_services.unpublish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id
+        )
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '%s/staging/topic/%s/%s'
@@ -546,8 +603,12 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
 
     def test_post_returns_empty_list_when_user_completes_story(self) -> None:
         csrf_token = self.get_new_csrf_token()
-        story_services.record_completed_node_in_story_context(self.viewer_id, self.STORY_ID, self.NODE_ID_2)
-        story_services.record_completed_node_in_story_context(self.viewer_id, self.STORY_ID, self.NODE_ID_1)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_2
+        )
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_1
+        )
         json_response = self.post_json(
             '%s/staging/topic/%s/%s'
             % (
@@ -566,7 +627,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self,
     ) -> None:
         csrf_token = self.get_new_csrf_token()
-        self.save_new_skill('skill_1', self.admin_id, description='Skill Description')
+        self.save_new_skill(
+            'skill_1', self.admin_id, description='Skill Description'
+        )
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             'question_1',
@@ -575,23 +638,33 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             ['skill_1'],
             content_id_generator.next_content_id_index,
         )
-        question_services.create_new_question_skill_link(self.admin_id, 'question_1', 'skill_1', 0.3)
+        question_services.create_new_question_skill_link(
+            self.admin_id, 'question_1', 'skill_1', 0.3
+        )
         old_value: List[str] = []
         changelist = [
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': old_value,
                     'new_value': ['skill_1'],
                 }
             )
         ]
-        story_services.update_story(self.admin_id, self.STORY_ID, changelist, 'Added acquired skill.')
+        story_services.update_story(
+            self.admin_id, self.STORY_ID, changelist, 'Added acquired skill.'
+        )
 
-        story_services.record_completed_node_in_story_context(self.viewer_id, self.STORY_ID, self.NODE_ID_2)
-        story_services.record_completed_node_in_story_context(self.viewer_id, self.STORY_ID, self.NODE_ID_1)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_2
+        )
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_1
+        )
         json_response = self.post_json(
             '%s/staging/topic/%s/%s'
             % (
@@ -606,12 +679,16 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self.assertIsNone(json_response['next_node_id'])
         self.assertFalse(json_response['ready_for_review_test'])
 
-    @test_utils.enable_feature_flags([feature_flag_list.FeatureNames.ENABLE_READY_FOR_REVIEW_TEST])
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_READY_FOR_REVIEW_TEST]
+    )
     def test_post_returns_ready_for_review_when_acquired_skills_exist_and_enable_ready_for_review_test_is_enabled(
         self,
     ) -> None:
         csrf_token = self.get_new_csrf_token()
-        self.save_new_skill('skill_1', self.admin_id, description='Skill Description')
+        self.save_new_skill(
+            'skill_1', self.admin_id, description='Skill Description'
+        )
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             'question_1',
@@ -620,23 +697,33 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             ['skill_1'],
             content_id_generator.next_content_id_index,
         )
-        question_services.create_new_question_skill_link(self.admin_id, 'question_1', 'skill_1', 0.3)
+        question_services.create_new_question_skill_link(
+            self.admin_id, 'question_1', 'skill_1', 0.3
+        )
         old_value: List[str] = []
         changelist = [
             story_domain.StoryChange(
                 {
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': (story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS),
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                    ),
                     'node_id': self.NODE_ID_1,
                     'old_value': old_value,
                     'new_value': ['skill_1'],
                 }
             )
         ]
-        story_services.update_story(self.admin_id, self.STORY_ID, changelist, 'Added acquired skill.')
+        story_services.update_story(
+            self.admin_id, self.STORY_ID, changelist, 'Added acquired skill.'
+        )
 
-        story_services.record_completed_node_in_story_context(self.viewer_id, self.STORY_ID, self.NODE_ID_2)
-        story_services.record_completed_node_in_story_context(self.viewer_id, self.STORY_ID, self.NODE_ID_1)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_2
+        )
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_1
+        )
         json_response = self.post_json(
             '%s/staging/topic/%s/%s'
             % (
@@ -667,23 +754,41 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         )
 
         self.assertEqual(
-            len(learner_progress_services.get_all_partially_learnt_topic_ids(self.viewer_id)),
+            len(
+                learner_progress_services.get_all_partially_learnt_topic_ids(
+                    self.viewer_id
+                )
+            ),
             1,
         )
         self.assertEqual(
-            len(learner_progress_services.get_all_incomplete_story_ids(self.viewer_id)),
+            len(
+                learner_progress_services.get_all_incomplete_story_ids(
+                    self.viewer_id
+                )
+            ),
             1,
         )
 
     def test_mark_story_and_topic_as_completed_and_learnt(self) -> None:
         csrf_token = self.get_new_csrf_token()
-        learner_progress_services.validate_and_add_topic_to_learn_goal(self.viewer_id, self.TOPIC_ID)
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
+            self.viewer_id, self.TOPIC_ID
+        )
         self.assertEqual(
-            len(learner_goals_services.get_all_topic_ids_to_learn(self.viewer_id)),
+            len(
+                learner_goals_services.get_all_topic_ids_to_learn(
+                    self.viewer_id
+                )
+            ),
             1,
         )
-        story_services.record_completed_node_in_story_context(self.viewer_id, self.STORY_ID, self.NODE_ID_2)
-        story_services.record_completed_node_in_story_context(self.viewer_id, self.STORY_ID, self.NODE_ID_1)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_2
+        )
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_1
+        )
         self.post_json(
             '%s/staging/topic/%s/%s'
             % (
@@ -696,20 +801,34 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         )
 
         self.assertEqual(
-            len(learner_progress_services.get_all_learnt_topic_ids(self.viewer_id)),
+            len(
+                learner_progress_services.get_all_learnt_topic_ids(
+                    self.viewer_id
+                )
+            ),
             1,
         )
         self.assertEqual(
-            len(learner_goals_services.get_all_topic_ids_to_learn(self.viewer_id)),
+            len(
+                learner_goals_services.get_all_topic_ids_to_learn(
+                    self.viewer_id
+                )
+            ),
             0,
         )
         self.assertEqual(
-            len(learner_progress_services.get_all_completed_story_ids(self.viewer_id)),
+            len(
+                learner_progress_services.get_all_completed_story_ids(
+                    self.viewer_id
+                )
+            ),
             1,
         )
 
     def test_mark_topic_as_learnt_and_story_as_completed(self) -> None:
-        self.save_new_valid_exploration(self.EXP_ID_3, self.admin_id, title='Title 3', end_state_name='End')
+        self.save_new_valid_exploration(
+            self.EXP_ID_3, self.admin_id, title='Title 3', end_state_name='End'
+        )
         self.publish_exploration(self.admin_id, self.EXP_ID_3)
 
         story = story_domain.Story.create_default_story(
@@ -726,7 +845,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             'title': 'Title 1',
             'description': 'Description 1',
             'thumbnail_filename': 'image_1.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
@@ -740,17 +861,27 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             'first_publication_date_msecs': None,
             'unpublishing_reason': None,
         }
-        story.story_contents.nodes = [story_domain.StoryNode.from_dict(self.node_1)]
+        story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(self.node_1)
+        ]
         self.nodes = story.story_contents.nodes
         story.story_contents.initial_node_id = 'node_1'
         story.story_contents.next_node_id = 'node_2'
         story_services.save_new_story(self.admin_id, story)
-        topic_services.add_canonical_story(self.admin_id, self.TOPIC_ID, self.NEW_STORY_ID)
-        topic_services.publish_story(self.TOPIC_ID, self.NEW_STORY_ID, self.admin_id)
+        topic_services.add_canonical_story(
+            self.admin_id, self.TOPIC_ID, self.NEW_STORY_ID
+        )
+        topic_services.publish_story(
+            self.TOPIC_ID, self.NEW_STORY_ID, self.admin_id
+        )
 
         csrf_token = self.get_new_csrf_token()
-        story_services.record_completed_node_in_story_context(self.viewer_id, self.STORY_ID, self.NODE_ID_1)
-        story_services.record_completed_node_in_story_context(self.viewer_id, self.STORY_ID, self.NODE_ID_2)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_1
+        )
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_2
+        )
         self.post_json(
             '%s/staging/topic/%s/%s'
             % (
@@ -762,7 +893,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             csrf_token=csrf_token,
         )
 
-        story_services.record_completed_node_in_story_context(self.viewer_id, self.NEW_STORY_ID, self.NODE_ID_1)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.NEW_STORY_ID, self.NODE_ID_1
+        )
         self.post_json(
             '%s/staging/topic/%s/%s'
             % (
@@ -775,12 +908,20 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         )
 
         self.assertEqual(
-            len(learner_progress_services.get_all_learnt_topic_ids(self.viewer_id)),
+            len(
+                learner_progress_services.get_all_learnt_topic_ids(
+                    self.viewer_id
+                )
+            ),
             1,
         )
 
         self.assertEqual(
-            len(learner_progress_services.get_all_completed_story_ids(self.viewer_id)),
+            len(
+                learner_progress_services.get_all_completed_story_ids(
+                    self.viewer_id
+                )
+            ),
             2,
         )
 
@@ -788,7 +929,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             """Mocks None."""
             return None
 
-        story_fetchers_swap = self.swap(story_fetchers, 'get_story_by_id', _mock_none_function)
+        story_fetchers_swap = self.swap(
+            story_fetchers, 'get_story_by_id', _mock_none_function
+        )
 
         with story_fetchers_swap:
             with self.capture_logging(min_level=logging.ERROR) as captured_logs:
@@ -804,18 +947,31 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                 )
                 self.assertEqual(
                     captured_logs,
-                    ['Could not find a story corresponding to %s id.' % self.STORY_ID],
+                    [
+                        'Could not find a story corresponding to %s id.'
+                        % self.STORY_ID
+                    ],
                 )
 
     def test_remove_topic_from_learn(self) -> None:
-        learner_progress_services.validate_and_add_topic_to_learn_goal(self.viewer_id, self.TOPIC_ID)
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
+            self.viewer_id, self.TOPIC_ID
+        )
         self.assertEqual(
-            len(learner_goals_services.get_all_topic_ids_to_learn(self.viewer_id)),
+            len(
+                learner_goals_services.get_all_topic_ids_to_learn(
+                    self.viewer_id
+                )
+            ),
             1,
         )
         csrf_token = self.get_new_csrf_token()
-        story_services.record_completed_node_in_story_context(self.viewer_id, self.STORY_ID, self.NODE_ID_2)
-        story_services.record_completed_node_in_story_context(self.viewer_id, self.STORY_ID, self.NODE_ID_1)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_2
+        )
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_1
+        )
         self.post_json(
             '%s/staging/topic/%s/%s'
             % (
@@ -828,6 +984,10 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         )
 
         self.assertEqual(
-            len(learner_goals_services.get_all_topic_ids_to_learn(self.viewer_id)),
+            len(
+                learner_goals_services.get_all_topic_ids_to_learn(
+                    self.viewer_id
+                )
+            ),
             0,
         )

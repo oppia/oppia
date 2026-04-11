@@ -32,8 +32,14 @@ if MYPY:  # pragma: no cover
 (config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
 
-@validation_decorators.AuditsExisting(config_models.PlatformParameterSnapshotMetadataModel)
-class ValidatePlatformParameterSnapshotMetadataModel(base_validation.BaseValidateCommitCmdsSchema[config_models.PlatformParameterSnapshotMetadataModel]):
+@validation_decorators.AuditsExisting(
+    config_models.PlatformParameterSnapshotMetadataModel
+)
+class ValidatePlatformParameterSnapshotMetadataModel(
+    base_validation.BaseValidateCommitCmdsSchema[
+        config_models.PlatformParameterSnapshotMetadataModel
+    ]
+):
     """Overrides _get_change_domain_class for
     PlatformParameterSnapshotMetadataModel.
     """

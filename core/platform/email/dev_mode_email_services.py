@@ -34,7 +34,9 @@ def send_email_to_recipients(
     cc: Optional[List[str]] = None,
     bcc: Optional[List[str]] = None,
     reply_to: Optional[str] = None,
-    recipient_variables: Optional[Dict[str, Dict[str, Union[str, float]]]] = None,
+    recipient_variables: Optional[
+        Dict[str, Dict[str, Union[str, float]]]
+    ] = None,
     attachments: Optional[List[Dict[str, str]]] = None,
 ) -> bool:
     """Prints information about sent emails to the terminal console, in order
@@ -91,7 +93,9 @@ def send_email_to_recipients(
             attachments,
         )
     )
-    logging.info('You are not currently sending out real emails since this is a dev environment. Emails are sent out in the production environment.')
+    logging.info(
+        'You are not currently sending out real emails since this is a dev environment. Emails are sent out in the production environment.'
+    )
     # Returns True signifying that the "send_email_to_recipients" action was
     # successful.
     return True

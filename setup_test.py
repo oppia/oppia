@@ -78,7 +78,11 @@ class SetupTests(test_utils.GenericTestBase):
             ],
         )
 
-        dummy_path = [path for path in sys.path if common.GOOGLE_CLOUD_SDK_HOME not in path]
+        dummy_path = [
+            path
+            for path in sys.path
+            if common.GOOGLE_CLOUD_SDK_HOME not in path
+        ]
 
         swap_path = self.swap(sys, 'path', dummy_path)
 

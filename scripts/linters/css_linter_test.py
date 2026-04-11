@@ -28,7 +28,9 @@ from scripts import scripts_test_utils
 
 from . import css_linter
 
-LINTER_TESTS_DIR: Final = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
+LINTER_TESTS_DIR: Final = os.path.join(
+    os.getcwd(), 'scripts', 'linters', 'test_files'
+)
 VALID_CSS_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'valid.css')
 INVALID_CSS_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'invalid.css')
 
@@ -38,12 +40,16 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
 
     def test_all_filepaths_with_success(self) -> None:
         filepaths = [VALID_CSS_FILEPATH, INVALID_CSS_FILEPATH]
-        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(filepaths)
+        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
+            filepaths
+        )
         returned_filepaths = third_party_linter.all_filepaths
         self.assertEqual(returned_filepaths, filepaths)
 
     def test_perform_all_lint_checks_with_invalid_file(self) -> None:
-        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager([INVALID_CSS_FILEPATH])
+        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
+            [INVALID_CSS_FILEPATH]
+        )
         lint_task_report = third_party_linter.lint_css_files()
         self.assert_same_list_elements(
             ['19:16', 'Unexpected whitespace before ":"'],
@@ -58,7 +64,9 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
 
         join_swap = self.swap(os.path, 'join', mock_join)
 
-        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager([INVALID_CSS_FILEPATH])
+        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
+            [INVALID_CSS_FILEPATH]
+        )
         with (
             self.print_swap,
             join_swap,
@@ -80,7 +88,9 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
 
         popen_swap = self.swap_with_checks(subprocess, 'Popen', mock_popen)
 
-        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager([VALID_CSS_FILEPATH])
+        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
+            [VALID_CSS_FILEPATH]
+        )
         with (
             self.print_swap,
             popen_swap,
@@ -99,11 +109,19 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertFalse(lint_task_report[0].failed)
 
     def test_perform_all_lint_checks_with_valid_file(self) -> None:
-        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager([VALID_CSS_FILEPATH])
+        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
+            [VALID_CSS_FILEPATH]
+        )
         lint_task_report = third_party_linter.perform_all_lint_checks()
         self.assertTrue(isinstance(lint_task_report, list))
 
     def test_get_linters(self) -> None:
-        custom_linter, third_party_linter = css_linter.get_linters([VALID_CSS_FILEPATH, INVALID_CSS_FILEPATH])
+        custom_linter, third_party_linter = css_linter.get_linters(
+            [VALID_CSS_FILEPATH, INVALID_CSS_FILEPATH]
+        )
         self.assertEqual(custom_linter, None)
-        self.assertTrue(isinstance(third_party_linter, css_linter.ThirdPartyCSSLintChecksManager))
+        self.assertTrue(
+            isinstance(
+                third_party_linter, css_linter.ThirdPartyCSSLintChecksManager
+            )
+        )

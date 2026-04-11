@@ -40,7 +40,7 @@ sys.path.insert(0, CURR_DIR)
 
 # Now we can import from the scripts module, which defines the canonical
 # list of paths to add to sys.path.
-from scripts import common  # pylint: disable=wrong-import-position  # noqa: E402
+from scripts import common  # pylint: disable=wrong-import-position  # noqa: E402, I001
 
 
 def pytest_configure(

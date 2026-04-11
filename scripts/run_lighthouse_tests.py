@@ -43,7 +43,9 @@ APP_YAML_FILENAMES: Final = {
     SERVER_MODE_PROD: 'app.yaml',
     SERVER_MODE_DEV: 'app_dev.yaml',
 }
-LIGHTHOUSE_PAGES_JSON_FILEPATH = os.path.join('core', 'tests', 'lighthouse-pages.json')
+LIGHTHOUSE_PAGES_JSON_FILEPATH = os.path.join(
+    'core', 'tests', 'lighthouse-pages.json'
+)
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
@@ -60,7 +62,9 @@ _PARSER.add_argument(
     choices=['accessibility', 'performance'],
 )
 
-_PARSER.add_argument('--pages', help='Sets the pages to run the lighthouse tests on')
+_PARSER.add_argument(
+    '--pages', help='Sets the pages to run the lighthouse tests on'
+)
 
 _PARSER.add_argument(
     '--skip_build',
@@ -86,7 +90,9 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
     Returns:
         dict(str, str). The entities and their IDs that were collected.
     """
-    puppeteer_path = os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js')
+    puppeteer_path = os.path.join(
+        'core', 'tests', 'puppeteer', 'lighthouse_setup.js'
+    )
     bash_command = [common.NODE_BIN_PATH, puppeteer_path]
     if record:
         # Add arguments to lighthouse_setup that enable video recording.
@@ -99,7 +105,9 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
         print('Starting LHCI Puppeteer script with recording.')
         print('Video Path:' + video_path)
 
-    process = subprocess.Popen(bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(
+        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         print(stdout)
@@ -197,7 +205,9 @@ def run_lighthouse_checks(lighthouse_mode: str) -> None:
         '--max-old-space-size=4096',
     ]
 
-    process = subprocess.Popen(bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(
+        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     stdout, stderr = process.communicate()
 
     print('OUTPUT:')
@@ -207,7 +217,10 @@ def run_lighthouse_checks(lighthouse_mode: str) -> None:
     if process.returncode == 0:
         pages_count = len(os.environ['LIGHTHOUSE_URLS_TO_RUN'].split(','))
         all_pages_count = len(os.environ['ALL_LIGHTHOUSE_URLS'].split(','))
-        print('\033[1m%s out of %s lighthouse checks run, see https://github.com/oppia/oppia/wiki/Partial-CI-Tests-Structure for more information.\033[0m' % (pages_count, all_pages_count))
+        print(
+            '\033[1m%s out of %s lighthouse checks run, see https://github.com/oppia/oppia/wiki/Partial-CI-Tests-Structure for more information.\033[0m'
+            % (pages_count, all_pages_count)
+        )
         print('Lighthouse checks completed successfully.')
     else:
         print('Return code: %s' % process.returncode)
@@ -254,11 +267,15 @@ def inject_entities_into_url(url: str, entities: dict[str, str]) -> str:
         entity_name = match
         if entity_name not in entities:
             raise ValueError('Entity %s not found in entities.' % entity_name)
-        injected_url = url.replace('{{%s}}' % entity_name, entities[entity_name])
+        injected_url = url.replace(
+            '{{%s}}' % entity_name, entities[entity_name]
+        )
     return injected_url
 
 
-def get_lighthouse_urls_to_run(pages: List[str], entities: dict[str, str], pages_config: dict[str, str]) -> List[str]:
+def get_lighthouse_urls_to_run(
+    pages: List[str], entities: dict[str, str], pages_config: dict[str, str]
+) -> List[str]:
     """Gets the URLs to run Lighthouse checks on.
 
     Args:
@@ -329,7 +346,11 @@ def main(args: Optional[List[str]] = None) -> None:
 
         entities = run_lighthouse_puppeteer_script(parsed_args.record_screen)
         pages_config: dict[str, str] = get_lighthouse_pages_config()
-        os.environ['ALL_LIGHTHOUSE_URLS'] = ','.join(get_lighthouse_urls_to_run(list(pages_config.keys()), entities, pages_config))
+        os.environ['ALL_LIGHTHOUSE_URLS'] = ','.join(
+            get_lighthouse_urls_to_run(
+                list(pages_config.keys()), entities, pages_config
+            )
+        )
         if parsed_args.pages:
             os.environ['LIGHTHOUSE_URLS_TO_RUN'] = ','.join(
                 get_lighthouse_urls_to_run(

@@ -138,7 +138,9 @@ class TranslatableContent:
         Returns:
             bool. Whether the content is a list.
         """
-        return TranslatableContentFormat.is_data_format_list(self.content_format.value)
+        return TranslatableContentFormat.is_data_format_list(
+            self.content_format.value
+        )
 
 
 class TranslatedContent:
@@ -183,11 +185,15 @@ class TranslatedContent:
         }
 
     @classmethod
-    def from_dict(cls, translated_content_dict: feconf.TranslatedContentDict) -> TranslatedContent:
+    def from_dict(
+        cls, translated_content_dict: feconf.TranslatedContentDict
+    ) -> TranslatedContent:
         """Returns the TranslatedContent object."""
         return cls(
             translated_content_dict['content_value'],
-            TranslatableContentFormat(translated_content_dict['content_format']),
+            TranslatableContentFormat(
+                translated_content_dict['content_format']
+            ),
             translated_content_dict['needs_update'],
         )
 
@@ -234,15 +240,20 @@ class TranslatableContentsCollection:
                 contains the content_id.
         """
         if content_id in self.content_id_to_translatable_content:
-            raise Exception('Content_id %s already exists in the TranslatableContentsCollection.' % content_id)
+            raise Exception(
+                'Content_id %s already exists in the TranslatableContentsCollection.'
+                % content_id
+            )
 
-        self.content_id_to_translatable_content[content_id] = TranslatableContent(
-            content_id,
-            content_type,
-            content_format,
-            content_value,
-            interaction_id,
-            rule_type,
+        self.content_id_to_translatable_content[content_id] = (
+            TranslatableContent(
+                content_id,
+                content_type,
+                content_format,
+                content_value,
+                interaction_id,
+                rule_type,
+            )
         )
 
     def add_fields_from_translatable_object(
@@ -264,7 +275,11 @@ class TranslatableContentsCollection:
                 BaseTranslatableObject class.
             **kwargs: *. The keyword args for registring translatable object.
         """
-        self.content_id_to_translatable_content.update(translatable_object.get_translatable_contents_collection(**kwargs).content_id_to_translatable_content)
+        self.content_id_to_translatable_content.update(
+            translatable_object.get_translatable_contents_collection(
+                **kwargs
+            ).content_id_to_translatable_content
+        )
 
 
 class BaseTranslatableObject:
@@ -275,7 +290,9 @@ class BaseTranslatableObject:
     be child classes of BaseTranslatableObject.
     """
 
-    def get_translatable_contents_collection(self, **kwargs: Optional[str]) -> TranslatableContentsCollection:
+    def get_translatable_contents_collection(
+        self, **kwargs: Optional[str]
+    ) -> TranslatableContentsCollection:
         """Get all translatable fields in a translatable object.
 
         Raises:
@@ -293,9 +310,13 @@ class BaseTranslatableObject:
         """
         content_collection = self.get_translatable_contents_collection()
 
-        return list(content_collection.content_id_to_translatable_content.keys())
+        return list(
+            content_collection.content_id_to_translatable_content.keys()
+        )
 
-    def get_all_contents_which_need_translations(self, entity_translation: Union[EntityTranslation, None] = None) -> Dict[str, TranslatableContent]:
+    def get_all_contents_which_need_translations(
+        self, entity_translation: Union[EntityTranslation, None] = None
+    ) -> Dict[str, TranslatableContent]:
         """Returns a list of TranslatableContent instances which need new or
         updated translations.
 
@@ -323,14 +344,25 @@ class BaseTranslatableObject:
             if content_value == '':
                 continue
 
-            if translatable_content.content_id not in entity_translation.translations:
-                content_id_to_translatable_content[translatable_content.content_id] = translatable_content
-            elif entity_translation.translations[translatable_content.content_id].needs_update:
-                content_id_to_translatable_content[translatable_content.content_id] = translatable_content
+            if (
+                translatable_content.content_id
+                not in entity_translation.translations
+            ):
+                content_id_to_translatable_content[
+                    translatable_content.content_id
+                ] = translatable_content
+            elif entity_translation.translations[
+                translatable_content.content_id
+            ].needs_update:
+                content_id_to_translatable_content[
+                    translatable_content.content_id
+                ] = translatable_content
 
         return content_id_to_translatable_content
 
-    def get_translation_count(self, entity_translation: EntityTranslation) -> int:
+    def get_translation_count(
+        self, entity_translation: EntityTranslation
+    ) -> int:
         """Returs the number of updated translations avialable.
 
         Args:
@@ -351,7 +383,9 @@ class BaseTranslatableObject:
 
         return count
 
-    def are_translations_displayable(self, entity_translation: EntityTranslation) -> bool:
+    def are_translations_displayable(
+        self, entity_translation: EntityTranslation
+    ) -> bool:
         """Whether the given EntityTranslation in the given lanaguage is
         displayable.
 
@@ -371,15 +405,24 @@ class BaseTranslatableObject:
             content_id,
             translatable_content,
         ) in content_id_to_translatable_content.items():
-            if translatable_content.content_type == ContentType.RULE and content_id not in entity_translation.translations:
+            if (
+                translatable_content.content_type == ContentType.RULE
+                and content_id not in entity_translation.translations
+            ):
                 # Rule-related translations cannot be missing.
                 return False
 
         translatable_content_count = self.get_content_count()
-        translated_content_count = self.get_translation_count(entity_translation)
+        translated_content_count = self.get_translation_count(
+            entity_translation
+        )
 
-        translations_missing_count = translatable_content_count - translated_content_count
-        return translations_missing_count < (feconf.MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS)
+        translations_missing_count = (
+            translatable_content_count - translated_content_count
+        )
+        return translations_missing_count < (
+            feconf.MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS
+        )
 
     def get_content_count(self) -> int:
         """Returns the total number of distinct content fields available in the
@@ -420,9 +463,13 @@ class BaseTranslatableObject:
         """
         html_list = []
         content_collection = self.get_translatable_contents_collection()
-        translatable_contents = content_collection.content_id_to_translatable_content.values()
+        translatable_contents = (
+            content_collection.content_id_to_translatable_content.values()
+        )
         for translatable_content in translatable_contents:
-            if translatable_content.content_format == (TranslatableContentFormat.HTML):
+            if translatable_content.content_format == (
+                TranslatableContentFormat.HTML
+            ):
                 # Ruling out the possibility of any other type for MyPy type
                 # checking because content_value for rules can be a list of
                 # strings.
@@ -431,7 +478,9 @@ class BaseTranslatableObject:
 
         return html_list
 
-    def validate_translatable_contents(self, next_content_id_index: int) -> None:
+    def validate_translatable_contents(
+        self, next_content_id_index: int
+    ) -> None:
         """Validates the content Ids of the translatable contents.
 
         Args:
@@ -443,8 +492,14 @@ class BaseTranslatableObject:
         for content_id in content_id_to_translatable_content.keys():
             content_id_suffix = content_id.split('_')[-1]
 
-            if content_id_suffix.isdigit() and int(content_id_suffix) > next_content_id_index:
-                raise utils.ValidationError('Expected all content id indexes to be less than the "next content id index(%s)", but received content id %s' % (next_content_id_index, content_id))
+            if (
+                content_id_suffix.isdigit()
+                and int(content_id_suffix) > next_content_id_index
+            ):
+                raise utils.ValidationError(
+                    'Expected all content id indexes to be less than the "next content id index(%s)", but received content id %s'
+                    % (next_content_id_index, content_id)
+                )
 
 
 class EntityTranslationDict(TypedDict):
@@ -497,7 +552,10 @@ class EntityTranslation:
             EntityTranslationDict. The dict representation of the
             EntityTranslation object.
         """
-        translations_dict = {content_id: translated_content.to_dict() for content_id, translated_content in self.translations.items()}
+        translations_dict = {
+            content_id: translated_content.to_dict()
+            for content_id, translated_content in self.translations.items()
+        }
 
         return {
             'entity_id': self.entity_id,
@@ -508,7 +566,9 @@ class EntityTranslation:
         }
 
     @classmethod
-    def from_dict(cls, entity_translation_dict: EntityTranslationDict) -> EntityTranslation:
+    def from_dict(
+        cls, entity_translation_dict: EntityTranslationDict
+    ) -> EntityTranslation:
         """Creates the EntityTranslation from the given dict.
 
         Args:
@@ -522,11 +582,15 @@ class EntityTranslation:
         translations_dict = entity_translation_dict['translations']
         content_id_to_translated_content = {}
         for content_id, translated_content in translations_dict.items():
-            content_id_to_translated_content[content_id] = TranslatedContent.from_dict(translated_content)
+            content_id_to_translated_content[content_id] = (
+                TranslatedContent.from_dict(translated_content)
+            )
 
         return cls(
             entity_translation_dict['entity_id'],
-            feconf.TranslatableEntityType(entity_translation_dict['entity_type']),
+            feconf.TranslatableEntityType(
+                entity_translation_dict['entity_type']
+            ),
             entity_translation_dict['entity_version'],
             entity_translation_dict['language_code'],
             content_id_to_translated_content,
@@ -535,19 +599,34 @@ class EntityTranslation:
     def validate(self) -> None:
         """Validates the EntityTranslation object."""
         if not isinstance(self.entity_type, str):
-            raise utils.ValidationError('entity_type must be a string, recieved %r' % self.entity_type)
+            raise utils.ValidationError(
+                'entity_type must be a string, recieved %r' % self.entity_type
+            )
         if not isinstance(self.entity_id, str):
-            raise utils.ValidationError('entity_id must be a string, recieved %r' % self.entity_id)
+            raise utils.ValidationError(
+                'entity_id must be a string, recieved %r' % self.entity_id
+            )
         if not isinstance(self.entity_version, int):
-            raise utils.ValidationError('entity_version must be an int, recieved %r' % self.entity_version)
+            raise utils.ValidationError(
+                'entity_version must be an int, recieved %r'
+                % self.entity_version
+            )
         if not isinstance(self.language_code, str):
-            raise utils.ValidationError('language_code must be a string, recieved %r' % self.language_code)
+            raise utils.ValidationError(
+                'language_code must be a string, recieved %r'
+                % self.language_code
+            )
 
         for content_id, translated_content in self.translations.items():
             if not isinstance(content_id, str):
-                raise utils.ValidationError('content_id must be a string, recieved %r' % content_id)
+                raise utils.ValidationError(
+                    'content_id must be a string, recieved %r' % content_id
+                )
             if not isinstance(translated_content.needs_update, bool):
-                raise utils.ValidationError('needs_update must be a bool, recieved %r' % translated_content.needs_update)
+                raise utils.ValidationError(
+                    'needs_update must be a bool, recieved %r'
+                    % translated_content.needs_update
+                )
 
     def add_translation(
         self,
@@ -565,7 +644,9 @@ class EntityTranslation:
                 content.
             needs_update: bool. Whether the translation needs update.
         """
-        self.translations[content_id] = TranslatedContent(content_value, content_format, needs_update)
+        self.translations[content_id] = TranslatedContent(
+            content_value, content_format, needs_update
+        )
 
     def remove_translations(self, content_ids: List[str]) -> None:
         """Remove translations for the given list of content Ids.
@@ -643,16 +724,29 @@ class MachineTranslation:
         """
         # TODO(#12341): Tidy up this logic once we have a canonical list of
         # language codes.
-        if not utils.is_supported_audio_language_code(self.source_language_code) and not utils.is_valid_language_code(self.source_language_code):
-            raise utils.ValidationError('Invalid source language code: %s' % self.source_language_code)
+        if not utils.is_supported_audio_language_code(
+            self.source_language_code
+        ) and not utils.is_valid_language_code(self.source_language_code):
+            raise utils.ValidationError(
+                'Invalid source language code: %s' % self.source_language_code
+            )
 
         # TODO(#12341): Tidy up this logic once we have a canonical list of
         # language codes.
-        if not utils.is_supported_audio_language_code(self.target_language_code) and not utils.is_valid_language_code(self.target_language_code):
-            raise utils.ValidationError('Invalid target language code: %s' % self.target_language_code)
+        if not utils.is_supported_audio_language_code(
+            self.target_language_code
+        ) and not utils.is_valid_language_code(self.target_language_code):
+            raise utils.ValidationError(
+                'Invalid target language code: %s' % self.target_language_code
+            )
 
         if self.source_language_code == self.target_language_code:
-            raise utils.ValidationError(('Expected source_language_code to be different from target_language_code: "%s" = "%s"') % (self.source_language_code, self.target_language_code))
+            raise utils.ValidationError(
+                (
+                    'Expected source_language_code to be different from target_language_code: "%s" = "%s"'
+                )
+                % (self.source_language_code, self.target_language_code)
+            )
 
     def to_dict(self) -> Dict[str, str]:
         """Converts the MachineTranslation domain instance into a dictionary
@@ -698,10 +792,14 @@ class WrittenTranslation:
     DATA_FORMAT_SET_OF_NORMALIZED_STRING: Final = 'set_of_normalized_string'
     DATA_FORMAT_SET_OF_UNICODE_STRING: Final = 'set_of_unicode_string'
 
-    DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE: Dict[str, translatable_object_registry.TranslatableObjectNames] = {
+    DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE: Dict[
+        str, translatable_object_registry.TranslatableObjectNames
+    ] = {
         DATA_FORMAT_HTML: 'TranslatableHtml',
         DATA_FORMAT_UNICODE_STRING: 'TranslatableUnicodeString',
-        DATA_FORMAT_SET_OF_NORMALIZED_STRING: ('TranslatableSetOfNormalizedString'),
+        DATA_FORMAT_SET_OF_NORMALIZED_STRING: (
+            'TranslatableSetOfNormalizedString'
+        ),
         DATA_FORMAT_SET_OF_UNICODE_STRING: 'TranslatableSetOfUnicodeString',
     }
 
@@ -739,7 +837,9 @@ class WrittenTranslation:
         }
 
     @classmethod
-    def from_dict(cls, written_translation_dict: WrittenTranslationDict) -> WrittenTranslation:
+    def from_dict(
+        cls, written_translation_dict: WrittenTranslationDict
+    ) -> WrittenTranslation:
         """Return a WrittenTranslation domain object from a dict.
 
         Args:
@@ -765,14 +865,27 @@ class WrittenTranslation:
                 are invalid.
         """
         if self.data_format not in (self.DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE):
-            raise utils.ValidationError('Invalid data_format: %s' % self.data_format)
+            raise utils.ValidationError(
+                'Invalid data_format: %s' % self.data_format
+            )
 
-        translatable_class_name = self.DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE[self.data_format]
-        translatable_obj_class = translatable_object_registry.Registry.get_object_class(translatable_class_name)
-        self.translation = translatable_obj_class.normalize_value(self.translation)
+        translatable_class_name = self.DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE[
+            self.data_format
+        ]
+        translatable_obj_class = (
+            translatable_object_registry.Registry.get_object_class(
+                translatable_class_name
+            )
+        )
+        self.translation = translatable_obj_class.normalize_value(
+            self.translation
+        )
 
         if not isinstance(self.needs_update, bool):
-            raise utils.ValidationError('Expected needs_update to be a bool, received %s' % self.needs_update)
+            raise utils.ValidationError(
+                'Expected needs_update to be a bool, received %s'
+                % self.needs_update
+            )
 
 
 class WrittenTranslationsDict(TypedDict):
@@ -787,7 +900,9 @@ class WrittenTranslations:
     different languages linked through their content_id.
     """
 
-    def __init__(self, translations_mapping: Dict[str, Dict[str, WrittenTranslation]]) -> None:
+    def __init__(
+        self, translations_mapping: Dict[str, Dict[str, WrittenTranslation]]
+    ) -> None:
         """Initializes a WrittenTranslations domain object.
 
         Args:
@@ -813,13 +928,19 @@ class WrittenTranslations:
                 language_code,
                 written_translation,
             ) in language_code_to_written_translation.items():
-                translations_mapping[content_id][language_code] = written_translation.to_dict()
-        written_translations_dict: WrittenTranslationsDict = {'translations_mapping': translations_mapping}
+                translations_mapping[content_id][language_code] = (
+                    written_translation.to_dict()
+                )
+        written_translations_dict: WrittenTranslationsDict = {
+            'translations_mapping': translations_mapping
+        }
 
         return written_translations_dict
 
     @classmethod
-    def from_dict(cls, written_translations_dict: WrittenTranslationsDict) -> WrittenTranslations:
+    def from_dict(
+        cls, written_translations_dict: WrittenTranslationsDict
+    ) -> WrittenTranslations:
         """Returns a WrittenTranslations domain object from a dict.
 
         Args:
@@ -840,7 +961,9 @@ class WrittenTranslations:
                 language_code,
                 written_translation,
             ) in language_code_to_written_translation.items():
-                translations_mapping[content_id][language_code] = WrittenTranslation.from_dict(written_translation)
+                translations_mapping[content_id][language_code] = (
+                    WrittenTranslation.from_dict(written_translation)
+                )
 
         return cls(translations_mapping)
 
@@ -856,7 +979,9 @@ class WrittenTranslations:
                 are invalid.
         """
         if expected_content_id_list is not None:
-            if not set(self.translations_mapping.keys()) == (set(expected_content_id_list)):
+            if not set(self.translations_mapping.keys()) == (
+                set(expected_content_id_list)
+            ):
                 raise utils.ValidationError(
                     'Expected state written_translations to match the listed '
                     'content ids %s, found %s'
@@ -871,21 +996,35 @@ class WrittenTranslations:
             language_code_to_written_translation,
         ) in self.translations_mapping.items():
             if not isinstance(content_id, str):
-                raise utils.ValidationError('Expected content_id to be a string, received %s' % content_id)
+                raise utils.ValidationError(
+                    'Expected content_id to be a string, received %s'
+                    % content_id
+                )
             if not isinstance(language_code_to_written_translation, dict):
-                raise utils.ValidationError('Expected content_id value to be a dict, received %s' % language_code_to_written_translation)
+                raise utils.ValidationError(
+                    'Expected content_id value to be a dict, received %s'
+                    % language_code_to_written_translation
+                )
             for (
                 language_code,
                 written_translation,
             ) in language_code_to_written_translation.items():
                 if not isinstance(language_code, str):
-                    raise utils.ValidationError('Expected language_code to be a string, received %s' % language_code)
+                    raise utils.ValidationError(
+                        'Expected language_code to be a string, received %s'
+                        % language_code
+                    )
                 # Currently, we assume written translations are used by the
                 # voice-artist to voiceover the translated text so written
                 # translations can be in supported audio/voiceover languages.
-                allowed_language_codes = [language['id'] for language in (constants.SUPPORTED_AUDIO_LANGUAGES)]
+                allowed_language_codes = [
+                    language['id']
+                    for language in (constants.SUPPORTED_AUDIO_LANGUAGES)
+                ]
                 if language_code not in allowed_language_codes:
-                    raise utils.ValidationError('Invalid language_code: %s' % language_code)
+                    raise utils.ValidationError(
+                        'Invalid language_code: %s' % language_code
+                    )
 
                 written_translation.validate()
 
@@ -900,7 +1039,9 @@ class WrittenTranslations:
             Exception. The content id isn't a string.
         """
         if not isinstance(content_id, str):
-            raise Exception('Expected content_id to be a string, received %s' % content_id)
+            raise Exception(
+                'Expected content_id to be a string, received %s' % content_id
+            )
         if content_id in self.translations_mapping:
             raise Exception('The content_id %s already exist.' % content_id)
 
@@ -916,7 +1057,9 @@ class WrittenTranslations:
             Exception. The content id isn't a string.
         """
         if not isinstance(content_id, str):
-            raise Exception('Expected content_id to be a string, received %s' % content_id)
+            raise Exception(
+                'Expected content_id to be a string, received %s' % content_id
+            )
         if content_id not in self.translations_mapping:
             raise Exception('The content_id %s does not exist.' % content_id)
 
@@ -932,7 +1075,9 @@ class ContentIdGenerator:
         """Constructs an ContentIdGenerator object."""
         self.next_content_id_index = start_index
 
-    def generate(self, content_type: ContentType, extra_prefix: Optional[str] = None) -> str:
+    def generate(
+        self, content_type: ContentType, extra_prefix: Optional[str] = None
+    ) -> str:
         """Generates the new content-id from the next content id."""
         content_id = content_type.value + '_'
         if extra_prefix:

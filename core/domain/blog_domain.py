@@ -30,7 +30,11 @@ from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
-MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT: Final = constants.MAX_CHARS_IN_BLOG_POST_TITLE + len('-') + constants.BLOG_POST_ID_LENGTH
+MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT: Final = (
+    constants.MAX_CHARS_IN_BLOG_POST_TITLE
+    + len('-')
+    + constants.BLOG_POST_ID_LENGTH
+)
 
 
 class BlogPostDict(TypedDict):
@@ -118,7 +122,9 @@ class BlogPost:
         self.published_on = published_on
 
     @classmethod
-    def require_valid_thumbnail_filename(cls, thumbnail_filename: str, strict: bool = False) -> None:
+    def require_valid_thumbnail_filename(
+        cls, thumbnail_filename: str, strict: bool = False
+    ) -> None:
         """Checks whether the thumbnail filename of the blog post is a valid
         one.
 
@@ -132,10 +138,15 @@ class BlogPost:
         """
         if strict:
             if not isinstance(thumbnail_filename, str):
-                raise utils.ValidationError('Expected thumbnail filename to be a string, received: %s.' % thumbnail_filename)
+                raise utils.ValidationError(
+                    'Expected thumbnail filename to be a string, received: %s.'
+                    % thumbnail_filename
+                )
 
         if thumbnail_filename == '':
-            raise utils.ValidationError('Thumbnail filename should not be empty.')
+            raise utils.ValidationError(
+                'Thumbnail filename should not be empty.'
+            )
 
         utils.require_valid_image_filename(thumbnail_filename)
 
@@ -153,16 +164,23 @@ class BlogPost:
         self.require_valid_tags(self.tags, strict)
         if strict:
             if not isinstance(self.thumbnail_filename, str):
-                raise utils.ValidationError('Expected Thumbnail filename should be a string, received %s' % self.thumbnail_filename)
+                raise utils.ValidationError(
+                    'Expected Thumbnail filename should be a string, received %s'
+                    % self.thumbnail_filename
+                )
 
-            self.require_valid_thumbnail_filename(self.thumbnail_filename, strict=strict)
+            self.require_valid_thumbnail_filename(
+                self.thumbnail_filename, strict=strict
+            )
 
             self.require_valid_url_fragment(self.url_fragment)
             if not self.content:
                 raise utils.ValidationError('Content can not be empty')
 
         if not isinstance(self.content, str):
-            raise utils.ValidationError('Expected contents to be a string, received: %s' % self.content)
+            raise utils.ValidationError(
+                'Expected contents to be a string, received: %s' % self.content
+            )
 
     @classmethod
     def require_valid_tags(cls, tags: List[str], strict: bool) -> None:
@@ -178,23 +196,37 @@ class BlogPost:
         """
         for tag in tags:
             if not isinstance(tag, str):
-                raise utils.ValidationError('Expected each tag in \'tags\' to be a string, received: \'%s\'' % tag)
+                raise utils.ValidationError(
+                    'Expected each tag in \'tags\' to be a string, received: \'%s\''
+                    % tag
+                )
 
             if not tag:
                 raise utils.ValidationError('Tag should not be empty.')
 
             if not re.match(constants.BLOG_POST_TAG_REGEX, tag):
-                raise utils.ValidationError('Tags should only contain alphanumeric characters and spaces, received: \'%s\'' % tag)
+                raise utils.ValidationError(
+                    'Tags should only contain alphanumeric characters and spaces, received: \'%s\''
+                    % tag
+                )
 
             if not re.match(r'^[^\s]+(\s+[^\s]+)*$', tag):
-                raise utils.ValidationError('Tags should not start or end with whitespace, received: \'%s\'' % tag)
+                raise utils.ValidationError(
+                    'Tags should not start or end with whitespace, received: \'%s\''
+                    % tag
+                )
 
             if re.search(r'\s\s+', tag):
-                raise utils.ValidationError('Adjacent whitespace in tags should be collapsed, received: \'%s\'' % tag)
+                raise utils.ValidationError(
+                    'Adjacent whitespace in tags should be collapsed, received: \'%s\''
+                    % tag
+                )
 
         if strict:
             if not tags:
-                raise utils.ValidationError('Atleast one tag should be selected')
+                raise utils.ValidationError(
+                    'Atleast one tag should be selected'
+                )
 
         if len(set(tags)) != len(tags):
             raise utils.ValidationError('Some tags duplicate each other')
@@ -215,13 +247,19 @@ class BlogPost:
             raise utils.ValidationError('Title should be a string.')
 
         if len(title) > constants.MAX_CHARS_IN_BLOG_POST_TITLE:
-            raise utils.ValidationError('Blog Post title should at most have %d chars, received: %s' % (constants.MAX_CHARS_IN_BLOG_POST_TITLE, title))
+            raise utils.ValidationError(
+                'Blog Post title should at most have %d chars, received: %s'
+                % (constants.MAX_CHARS_IN_BLOG_POST_TITLE, title)
+            )
 
         if strict:
             if not title:
                 raise utils.ValidationError('Title should not be empty')
             if not re.match(constants.VALID_BLOG_POST_TITLE_REGEX, title):
-                raise utils.ValidationError('Title field contains invalid characters. Only words (a-zA-Z0-9(\'!)) separated by spaces, hyphens (-), comma (,), ampersand (&) and colon (:) are allowed.Received %s' % title)
+                raise utils.ValidationError(
+                    'Title field contains invalid characters. Only words (a-zA-Z0-9(\'!)) separated by spaces, hyphens (-), comma (,), ampersand (&) and colon (:) are allowed.Received %s'
+                    % title
+                )
 
     @classmethod
     def require_valid_url_fragment(cls, url_fragment: str) -> None:
@@ -234,16 +272,27 @@ class BlogPost:
             ValidationErrors. URL fragment provided is invalid.
         """
         if not isinstance(url_fragment, str):
-            raise utils.ValidationError('Blog Post URL Fragment field must be a string. Received %s.' % (url_fragment))
+            raise utils.ValidationError(
+                'Blog Post URL Fragment field must be a string. Received %s.'
+                % (url_fragment)
+            )
 
         if not url_fragment:
-            raise utils.ValidationError('Blog Post URL Fragment field should not be empty.')
+            raise utils.ValidationError(
+                'Blog Post URL Fragment field should not be empty.'
+            )
 
         if len(url_fragment) > MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT:
-            raise utils.ValidationError('Blog Post URL Fragment field should not exceed %d characters.' % MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT)
+            raise utils.ValidationError(
+                'Blog Post URL Fragment field should not exceed %d characters.'
+                % MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
+            )
 
         if not re.match(constants.VALID_URL_BLOG_FRAGMENT_REGEX, url_fragment):
-            raise utils.ValidationError('Blog Post URL Fragment field contains invalid characters.Only lowercase words, numbers separated by hyphens are allowed. Received %s.' % (url_fragment))
+            raise utils.ValidationError(
+                'Blog Post URL Fragment field contains invalid characters.Only lowercase words, numbers separated by hyphens are allowed. Received %s.'
+                % (url_fragment)
+            )
 
     def to_dict(self) -> BlogPostDict:
         """Returns a dict representing this blog post domain object.
@@ -251,8 +300,16 @@ class BlogPost:
         Returns:
             dict. A dict, mapping all fields of blog post instance.
         """
-        published_on = utils.convert_naive_datetime_to_string(self.published_on) if self.published_on else None
-        last_updated = utils.convert_naive_datetime_to_string(self.last_updated) if self.last_updated else None
+        published_on = (
+            utils.convert_naive_datetime_to_string(self.published_on)
+            if self.published_on
+            else None
+        )
+        last_updated = (
+            utils.convert_naive_datetime_to_string(self.last_updated)
+            if self.last_updated
+            else None
+        )
         return {
             'id': self.id,
             'author_id': self.author_id,
@@ -276,8 +333,20 @@ class BlogPost:
         Returns:
             BlogPost. The corresponding blog post domain object.
         """
-        last_updated = utils.convert_string_to_naive_datetime_object(blog_post_dict['last_updated']) if isinstance(blog_post_dict['last_updated'], str) else None
-        published_on = utils.convert_string_to_naive_datetime_object(blog_post_dict['published_on']) if isinstance(blog_post_dict['published_on'], str) else None
+        last_updated = (
+            utils.convert_string_to_naive_datetime_object(
+                blog_post_dict['last_updated']
+            )
+            if isinstance(blog_post_dict['last_updated'], str)
+            else None
+        )
+        published_on = (
+            utils.convert_string_to_naive_datetime_object(
+                blog_post_dict['published_on']
+            )
+            if isinstance(blog_post_dict['published_on'], str)
+            else None
+        )
         blog_post = cls(
             blog_post_dict['id'],
             blog_post_dict['author_id'],
@@ -310,7 +379,9 @@ class BlogPost:
         self.require_valid_url_fragment(new_url_fragment)
         self.url_fragment = new_url_fragment
 
-    def update_thumbnail_filename(self, new_thumbnail_filename: Optional[str]) -> None:
+    def update_thumbnail_filename(
+        self, new_thumbnail_filename: Optional[str]
+    ) -> None:
         """Updates the thumbnail filename of a blog post object.
 
         Args:
@@ -394,7 +465,9 @@ class BlogPostSummary:
         self.deleted = deleted
 
     @classmethod
-    def require_valid_thumbnail_filename(cls, thumbnail_filename: str, strict: bool = False) -> None:
+    def require_valid_thumbnail_filename(
+        cls, thumbnail_filename: str, strict: bool = False
+    ) -> None:
         """Checks whether the thumbnail filename of the blog post is a valid
         one.
 
@@ -408,10 +481,15 @@ class BlogPostSummary:
         """
         if strict:
             if not isinstance(thumbnail_filename, str):
-                raise utils.ValidationError('Expected thumbnail filename to be a string, received: %s.' % thumbnail_filename)
+                raise utils.ValidationError(
+                    'Expected thumbnail filename to be a string, received: %s.'
+                    % thumbnail_filename
+                )
 
         if thumbnail_filename == '':
-            raise utils.ValidationError('Thumbnail filename should not be empty')
+            raise utils.ValidationError(
+                'Thumbnail filename should not be empty'
+            )
 
         utils.require_valid_image_filename(thumbnail_filename)
 
@@ -429,11 +507,19 @@ class BlogPostSummary:
         self.require_valid_tags(self.tags, strict)
         if strict:
             if not isinstance(self.url_fragment, str):
-                raise utils.ValidationError('Expected url fragment to be a string, received: %s.' % self.url_fragment)
+                raise utils.ValidationError(
+                    'Expected url fragment to be a string, received: %s.'
+                    % self.url_fragment
+                )
             if not isinstance(self.thumbnail_filename, str):
-                raise utils.ValidationError('Expected thumbnail filename to be a string, received: %s.' % self.thumbnail_filename)
+                raise utils.ValidationError(
+                    'Expected thumbnail filename to be a string, received: %s.'
+                    % self.thumbnail_filename
+                )
 
-            self.require_valid_thumbnail_filename(self.thumbnail_filename, strict=strict)
+            self.require_valid_thumbnail_filename(
+                self.thumbnail_filename, strict=strict
+            )
 
             self.require_valid_url_fragment(self.url_fragment)
 
@@ -441,7 +527,9 @@ class BlogPostSummary:
                 raise utils.ValidationError('Summary can not be empty')
 
         if not isinstance(self.summary, str):
-            raise utils.ValidationError('Expected summary to be a string, received: %s' % self.summary)
+            raise utils.ValidationError(
+                'Expected summary to be a string, received: %s' % self.summary
+            )
 
     @classmethod
     def require_valid_url_fragment(cls, url_fragment: str) -> None:
@@ -454,16 +542,27 @@ class BlogPostSummary:
             ValidationErrors. URL fragment provided is invalid.
         """
         if not isinstance(url_fragment, str):
-            raise utils.ValidationError('Blog Post URL Fragment field must be a string. Received %s.' % (url_fragment))
+            raise utils.ValidationError(
+                'Blog Post URL Fragment field must be a string. Received %s.'
+                % (url_fragment)
+            )
 
         if not url_fragment:
-            raise utils.ValidationError('Blog Post URL Fragment field should not be empty.')
+            raise utils.ValidationError(
+                'Blog Post URL Fragment field should not be empty.'
+            )
 
         if len(url_fragment) > MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT:
-            raise utils.ValidationError('Blog Post URL Fragment field should not exceed %d characters.' % MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT)
+            raise utils.ValidationError(
+                'Blog Post URL Fragment field should not exceed %d characters.'
+                % MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
+            )
 
         if not re.match(constants.VALID_URL_BLOG_FRAGMENT_REGEX, url_fragment):
-            raise utils.ValidationError('Blog Post URL Fragment field contains invalid characters.Only lowercase words, numbers separated by hyphens are allowed. Received %s.' % (url_fragment))
+            raise utils.ValidationError(
+                'Blog Post URL Fragment field contains invalid characters.Only lowercase words, numbers separated by hyphens are allowed. Received %s.'
+                % (url_fragment)
+            )
 
     @classmethod
     def require_valid_title(cls, title: str, strict: bool) -> None:
@@ -478,10 +577,15 @@ class BlogPostSummary:
             ValidationErrors. Title provided is invalid.
         """
         if not isinstance(title, str):
-            raise utils.ValidationError('Expected title to be a string, received: %s.' % title)
+            raise utils.ValidationError(
+                'Expected title to be a string, received: %s.' % title
+            )
 
         if len(title) > constants.MAX_CHARS_IN_BLOG_POST_TITLE:
-            raise utils.ValidationError('blog post title should at most have %d chars, received: %s' % (constants.MAX_CHARS_IN_BLOG_POST_TITLE, title))
+            raise utils.ValidationError(
+                'blog post title should at most have %d chars, received: %s'
+                % (constants.MAX_CHARS_IN_BLOG_POST_TITLE, title)
+            )
 
         if strict:
             if not title:
@@ -501,23 +605,37 @@ class BlogPostSummary:
         """
         for tag in tags:
             if not isinstance(tag, str):
-                raise utils.ValidationError('Expected each tag in \'tags\' to be a string, received: \'%s\'' % tag)
+                raise utils.ValidationError(
+                    'Expected each tag in \'tags\' to be a string, received: \'%s\''
+                    % tag
+                )
 
             if not tag:
                 raise utils.ValidationError('Tag should not be empty.')
 
             if not re.match(constants.BLOG_POST_TAG_REGEX, tag):
-                raise utils.ValidationError('Tags should only contain alphanumeric characters and spaces, received: \'%s\'' % tag)
+                raise utils.ValidationError(
+                    'Tags should only contain alphanumeric characters and spaces, received: \'%s\''
+                    % tag
+                )
 
             if not re.match(r'^[^\s]+(\s+[^\s]+)*$', tag):
-                raise utils.ValidationError('Tags should not start or end with whitespace, received: \'%s\'' % tag)
+                raise utils.ValidationError(
+                    'Tags should not start or end with whitespace, received: \'%s\''
+                    % tag
+                )
 
             if re.search(r'\s\s+', tag):
-                raise utils.ValidationError('Adjacent whitespace in tags should be collapsed, received: \'%s\'' % tag)
+                raise utils.ValidationError(
+                    'Adjacent whitespace in tags should be collapsed, received: \'%s\''
+                    % tag
+                )
 
         if strict:
             if not tags:
-                raise utils.ValidationError('Atleast one tag should be selected')
+                raise utils.ValidationError(
+                    'Atleast one tag should be selected'
+                )
 
         if len(set(tags)) != len(tags):
             raise utils.ValidationError('Some tags duplicate each other')
@@ -528,8 +646,16 @@ class BlogPostSummary:
         Returns:
             dict. A dict, mapping all fields of blog post instance.
         """
-        published_on = utils.convert_naive_datetime_to_string(self.published_on) if self.published_on else None
-        last_updated = utils.convert_naive_datetime_to_string(self.last_updated) if self.last_updated else None
+        published_on = (
+            utils.convert_naive_datetime_to_string(self.published_on)
+            if self.published_on
+            else None
+        )
+        last_updated = (
+            utils.convert_naive_datetime_to_string(self.last_updated)
+            if self.last_updated
+            else None
+        )
         return {
             'id': self.id,
             'author_id': self.author_id,
@@ -619,7 +745,9 @@ class BlogAuthorDetails:
         self.last_updated = last_updated
 
     @classmethod
-    def create_default_author_details_for_user(cls, user_id: str) -> BlogAuthorDetails:
+    def create_default_author_details_for_user(
+        cls, user_id: str
+    ) -> BlogAuthorDetails:
         """Creates a BlogAuthorDetails with default values.
 
         This is used as a fallback when the underlying
@@ -662,18 +790,28 @@ class BlogAuthorDetails:
         if not author_name:
             raise utils.ValidationError('Empty author name supplied.')
         if len(author_name) < constants.MIN_AUTHOR_NAME_LENGTH:
-            raise utils.ValidationError('Author name should have at least %s characters.' % constants.MIN_AUTHOR_NAME_LENGTH)
+            raise utils.ValidationError(
+                'Author name should have at least %s characters.'
+                % constants.MIN_AUTHOR_NAME_LENGTH
+            )
         if len(author_name) > constants.MAX_AUTHOR_NAME_LENGTH:
-            raise utils.ValidationError('Author name can have at most %s characters.' % constants.MAX_AUTHOR_NAME_LENGTH)
+            raise utils.ValidationError(
+                'Author name can have at most %s characters.'
+                % constants.MAX_AUTHOR_NAME_LENGTH
+            )
         if not re.match(constants.VALID_AUTHOR_NAME_REGEX, author_name):
-            raise utils.ValidationError('Author name can only have alphanumeric characters and spaces.')
+            raise utils.ValidationError(
+                'Author name can only have alphanumeric characters and spaces.'
+            )
 
         # Disallow author names that contain the system usernames or the
         # strings "admin".
         reserved_usernames = set(feconf.SYSTEM_USERS.values()) | {'admin'}
         for reserved_username in reserved_usernames:
             if reserved_username in author_name.lower().strip():
-                raise utils.ValidationError('This name contains reserved username. Please use some other name')
+                raise utils.ValidationError(
+                    'This name contains reserved username. Please use some other name'
+                )
 
     def to_dict(self) -> BlogAuthorDetailsDict:
         """Returns a dict representing this author details domain object.
@@ -681,7 +819,11 @@ class BlogAuthorDetails:
         Returns:
             dict. A dict, mapping all fields of blogAuthorDetails instance.
         """
-        last_updated = utils.convert_naive_datetime_to_string(self.last_updated) if self.last_updated else None
+        last_updated = (
+            utils.convert_naive_datetime_to_string(self.last_updated)
+            if self.last_updated
+            else None
+        )
         return {
             'displayed_author_name': self.displayed_author_name,
             'author_bio': self.author_bio,
@@ -697,4 +839,7 @@ class BlogAuthorDetails:
         self.require_valid_displayed_author_name(self.displayed_author_name)
 
         if not isinstance(self.author_bio, str):
-            raise utils.ValidationError('Expected Author Bio to be a string, received %s' % self.author_bio)
+            raise utils.ValidationError(
+                'Expected Author Bio to be a string, received %s'
+                % self.author_bio
+            )

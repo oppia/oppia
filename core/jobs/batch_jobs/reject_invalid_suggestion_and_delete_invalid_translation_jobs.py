@@ -42,13 +42,15 @@ if MYPY:  # pragma: no cover
         translation_models,
     )
 
-(exp_models, opportunity_models, suggestion_models, translation_models) = models.Registry.import_models(
-    [
-        models.Names.EXPLORATION,
-        models.Names.OPPORTUNITY,
-        models.Names.SUGGESTION,
-        models.Names.TRANSLATION,
-    ]
+(exp_models, opportunity_models, suggestion_models, translation_models) = (
+    models.Registry.import_models(
+        [
+            models.Names.EXPLORATION,
+            models.Names.OPPORTUNITY,
+            models.Names.SUGGESTION,
+            models.Names.TRANSLATION,
+        ]
+    )
 )
 
 datastore_services = models.Registry.import_datastore_services()
@@ -65,18 +67,66 @@ class RejectTranslationSuggestionsForTranslatedContentsJob(base_jobs.JobBase):
         Returns:
             PCollection. A PCollection of the job run results.
         """
-        entity_translation_models = _get_entity_translation_models(self.pipeline)
-        updated_suggestion_dicts = entity_translation_models | 'Get translation suggestion dicts' >> beam.ParDo(ComputeSuggestionsInReviewForTranslatedContents(is_datastore_change=True)) | 'Flatten the list' >> beam.FlatMap(lambda x: x)
+        entity_translation_models = _get_entity_translation_models(
+            self.pipeline
+        )
+        updated_suggestion_dicts = (
+            entity_translation_models
+            | 'Get translation suggestion dicts'
+            >> beam.ParDo(
+                ComputeSuggestionsInReviewForTranslatedContents(
+                    is_datastore_change=True
+                )
+            )
+            | 'Flatten the list' >> beam.FlatMap(lambda x: x)
+        )
 
-        suggestion_dicts = updated_suggestion_dicts | 'Get updated suggestion dicts' >> beam.Map(lambda updated_suggestion_dict: updated_suggestion_dict['suggestion_dict'])
+        suggestion_dicts = (
+            updated_suggestion_dicts
+            | 'Get updated suggestion dicts'
+            >> beam.Map(
+                lambda updated_suggestion_dict: updated_suggestion_dict[
+                    'suggestion_dict'
+                ]
+            )
+        )
 
-        updated_suggestions = updated_suggestion_dicts | 'Get updated suggestion models' >> beam.Map(lambda updated_suggestion_dict: updated_suggestion_dict['updated_suggestion'])
+        updated_suggestions = (
+            updated_suggestion_dicts
+            | 'Get updated suggestion models'
+            >> beam.Map(
+                lambda updated_suggestion_dict: updated_suggestion_dict[
+                    'updated_suggestion'
+                ]
+            )
+        )
 
-        job_run_results = suggestion_dicts | 'Report the suggestions to be rejected' >> beam.Map(lambda result: (job_run_result.JobRunResult.as_stdout(f'Results are - {result}')))
+        job_run_results = (
+            suggestion_dicts
+            | 'Report the suggestions to be rejected'
+            >> beam.Map(
+                lambda result: (
+                    job_run_result.JobRunResult.as_stdout(
+                        f'Results are - {result}'
+                    )
+                )
+            )
+        )
 
-        updated_suggestions_count_job_run_results = updated_suggestions | 'Updated translation suggestion models count' >> (job_result_transforms.CountObjectsToJobRunResult('REJECTED SUGGESTIONS COUNT'))
+        updated_suggestions_count_job_run_results = (
+            updated_suggestions
+            | 'Updated translation suggestion models count'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'REJECTED SUGGESTIONS COUNT'
+                )
+            )
+        )
 
-        (updated_suggestions | 'Put models into the datastore' >> ndb_io.PutModels())
+        (
+            updated_suggestions
+            | 'Put models into the datastore' >> ndb_io.PutModels()
+        )
 
         return (
             job_run_results,
@@ -84,7 +134,9 @@ class RejectTranslationSuggestionsForTranslatedContentsJob(base_jobs.JobBase):
         ) | 'Combine results' >> beam.Flatten()
 
 
-class AuditRejectTranslationSuggestionsForTranslatedContentsJob(base_jobs.JobBase):
+class AuditRejectTranslationSuggestionsForTranslatedContentsJob(
+    base_jobs.JobBase
+):
     """Audits translation suggestions in review for the content with an
     accepted translation.
     """
@@ -95,12 +147,41 @@ class AuditRejectTranslationSuggestionsForTranslatedContentsJob(base_jobs.JobBas
         Returns:
             PCollection. A PCollection of results.
         """
-        entity_translation_models = _get_entity_translation_models(self.pipeline)
-        suggestion_dicts = entity_translation_models | 'Get suggestions to be rejected list' >> beam.ParDo(ComputeSuggestionsInReviewForTranslatedContents(is_datastore_change=False)) | 'Flatten the list' >> beam.FlatMap(lambda x: x)
+        entity_translation_models = _get_entity_translation_models(
+            self.pipeline
+        )
+        suggestion_dicts = (
+            entity_translation_models
+            | 'Get suggestions to be rejected list'
+            >> beam.ParDo(
+                ComputeSuggestionsInReviewForTranslatedContents(
+                    is_datastore_change=False
+                )
+            )
+            | 'Flatten the list' >> beam.FlatMap(lambda x: x)
+        )
 
-        job_run_results = suggestion_dicts | 'Report the suggestions to be rejected' >> beam.Map(lambda result: (job_run_result.JobRunResult.as_stdout(f'Results are - {result}')))
+        job_run_results = (
+            suggestion_dicts
+            | 'Report the suggestions to be rejected'
+            >> beam.Map(
+                lambda result: (
+                    job_run_result.JobRunResult.as_stdout(
+                        f'Results are - {result}'
+                    )
+                )
+            )
+        )
 
-        suggestions_to_be_rejected_count_job_run_results = suggestion_dicts | 'Report the suggestions to be rejected count' >> (job_result_transforms.CountObjectsToJobRunResult('SUGGESTIONS TO BE REJECTED COUNT'))
+        suggestions_to_be_rejected_count_job_run_results = (
+            suggestion_dicts
+            | 'Report the suggestions to be rejected count'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'SUGGESTIONS TO BE REJECTED COUNT'
+                )
+            )
+        )
 
         return (
             job_run_results,
@@ -117,24 +198,71 @@ class DeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
         Returns:
             PCollection. A PCollection of the job run results.
         """
-        entity_translation_models = _get_entity_translation_models(self.pipeline)
-        deletion_result_dicts = entity_translation_models | 'Get deletion results' >> beam.ParDo(ComputeTranslationsWithInvalidContentIds(is_datastore_change=True)) | 'Filter out None values' >> beam.Filter(lambda x: x is not None)
+        entity_translation_models = _get_entity_translation_models(
+            self.pipeline
+        )
+        deletion_result_dicts = (
+            entity_translation_models
+            | 'Get deletion results'
+            >> beam.ParDo(
+                ComputeTranslationsWithInvalidContentIds(
+                    is_datastore_change=True
+                )
+            )
+            | 'Filter out None values' >> beam.Filter(lambda x: x is not None)
+        )
 
         deleted_translations_count_job_run_results = (
             deletion_result_dicts
-            | 'Deleted translations counts' >> beam.Map(lambda x: x['deleted_translations_count'])
+            | 'Deleted translations counts'
+            >> beam.Map(lambda x: x['deleted_translations_count'])
             | 'Total deleted translations count' >> (beam.CombineGlobally(sum))
-            | 'Only create result for non-zero number of objects' >> (beam.Filter(lambda x: x > 0))
-            | 'Report total deleted translations count' >> beam.Map(lambda result: (job_run_result.JobRunResult.as_stdout(f'DELETED TRANSLATIONS COUNT SUCCESS: {result}')))
+            | 'Only create result for non-zero number of objects'
+            >> (beam.Filter(lambda x: x > 0))
+            | 'Report total deleted translations count'
+            >> beam.Map(
+                lambda result: (
+                    job_run_result.JobRunResult.as_stdout(
+                        f'DELETED TRANSLATIONS COUNT SUCCESS: {result}'
+                    )
+                )
+            )
         )
 
-        updated_entity_translation_models = deletion_result_dicts | 'Updated entity translation models' >> beam.Map(lambda x: x['entity_translation_model'])
+        updated_entity_translation_models = (
+            deletion_result_dicts
+            | 'Updated entity translation models'
+            >> beam.Map(lambda x: x['entity_translation_model'])
+        )
 
-        updated_entity_translation_models_count_job_run_results = updated_entity_translation_models | 'Updated entity transltion models count' >> (job_result_transforms.CountObjectsToJobRunResult('UPDATED ENTITY TRANSLATION MODELS COUNT'))
+        updated_entity_translation_models_count_job_run_results = (
+            updated_entity_translation_models
+            | 'Updated entity transltion models count'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'UPDATED ENTITY TRANSLATION MODELS COUNT'
+                )
+            )
+        )
 
-        invalid_translation_dicts = deletion_result_dicts | 'Get invalid translation dicts' >> beam.Map(lambda x: x['invalid_translation_dicts']) | 'Flatten the list' >> beam.FlatMap(lambda x: x)
+        invalid_translation_dicts = (
+            deletion_result_dicts
+            | 'Get invalid translation dicts'
+            >> beam.Map(lambda x: x['invalid_translation_dicts'])
+            | 'Flatten the list' >> beam.FlatMap(lambda x: x)
+        )
 
-        job_run_results = invalid_translation_dicts | 'Report translations to be deleted' >> beam.Map(lambda result: (job_run_result.JobRunResult.as_stdout(f'Results are - {result}')))
+        job_run_results = (
+            invalid_translation_dicts
+            | 'Report translations to be deleted'
+            >> beam.Map(
+                lambda result: (
+                    job_run_result.JobRunResult.as_stdout(
+                        f'Results are - {result}'
+                    )
+                )
+            )
+        )
 
         latest_version_updated_entity_translation_models = (
             updated_entity_translation_models
@@ -146,14 +274,23 @@ class DeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
             # PCollection<entity_id: list(entity_translation_model)>.
             | 'Group by entity id' >> beam.GroupByKey()
             # PCollection<entity_id: entity_translation_model>.
-            | 'Filter model with latest entity version' >> beam.ParDo(GetLatestModel())
+            | 'Filter model with latest entity version'
+            >> beam.ParDo(GetLatestModel())
             # PCollection<entity_translation_model>.
             | 'Get list of latest entity translation model' >> beam.Values()  # pylint: disable=no-value-for-parameter
         )
 
-        updated_exp_opportunity_models = latest_version_updated_entity_translation_models | 'Get updated exploration opportunity models' >> beam.ParDo(ComputeUpdatedExpOpportunityModel())
+        updated_exp_opportunity_models = (
+            latest_version_updated_entity_translation_models
+            | 'Get updated exploration opportunity models'
+            >> beam.ParDo(ComputeUpdatedExpOpportunityModel())
+        )
 
-        ((updated_entity_translation_models, updated_exp_opportunity_models) | 'Merge lists' >> beam.Flatten() | 'Put models into the datastore' >> ndb_io.PutModels())
+        (
+            (updated_entity_translation_models, updated_exp_opportunity_models)
+            | 'Merge lists' >> beam.Flatten()
+            | 'Put models into the datastore' >> ndb_io.PutModels()
+        )
 
         return (
             job_run_results,
@@ -171,20 +308,55 @@ class AuditDeleteTranslationsForInvalidContentIDsJob(base_jobs.JobBase):
         Returns:
             PCollection. A PCollection of results.
         """
-        entity_translation_models = _get_entity_translation_models(self.pipeline)
-        invalid_translation_dicts = entity_translation_models | 'Get invalid translation dicts' >> beam.ParDo(ComputeTranslationsWithInvalidContentIds(is_datastore_change=False)) | 'Flatten the list' >> beam.FlatMap(lambda x: x)
+        entity_translation_models = _get_entity_translation_models(
+            self.pipeline
+        )
+        invalid_translation_dicts = (
+            entity_translation_models
+            | 'Get invalid translation dicts'
+            >> beam.ParDo(
+                ComputeTranslationsWithInvalidContentIds(
+                    is_datastore_change=False
+                )
+            )
+            | 'Flatten the list' >> beam.FlatMap(lambda x: x)
+        )
 
-        job_run_results = invalid_translation_dicts | 'Report translations to be deleted' >> beam.Map(lambda result: (job_run_result.JobRunResult.as_stdout(f'Results are - {result}')))
+        job_run_results = (
+            invalid_translation_dicts
+            | 'Report translations to be deleted'
+            >> beam.Map(
+                lambda result: (
+                    job_run_result.JobRunResult.as_stdout(
+                        f'Results are - {result}'
+                    )
+                )
+            )
+        )
 
-        invalid_translations_count_job_run_results = invalid_translation_dicts | 'Report translations to be deleted count' >> (job_result_transforms.CountObjectsToJobRunResult('TRANSLATIONS TO BE DELETED COUNT'))
+        invalid_translations_count_job_run_results = (
+            invalid_translation_dicts
+            | 'Report translations to be deleted count'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TRANSLATIONS TO BE DELETED COUNT'
+                )
+            )
+        )
 
         invalid_entity_translation_models_count_job_run_results = (
             invalid_translation_dicts
-            | 'Invalid entity translation model ids' >> beam.Map(lambda x: x['entity_translation_model_id'])
+            | 'Invalid entity translation model ids'
+            >> beam.Map(lambda x: x['entity_translation_model_id'])
             | 'Create pair' >> beam.Map(lambda x: (x, None))
             | 'Group pairs' >> beam.GroupByKey()
             | 'Extract unique keys' >> beam.Map(lambda x: x[0])
-            | 'Report entity translation models to be updated count' >> (job_result_transforms.CountObjectsToJobRunResult('ENTITY TRANSLATION MODELS TO BE UPDATED COUNT'))
+            | 'Report entity translation models to be updated count'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'ENTITY TRANSLATION MODELS TO BE UPDATED COUNT'
+                )
+            )
         )
 
         return (
@@ -265,16 +437,28 @@ class ComputeSuggestionsInReviewForTranslatedContents(beam.DoFn):  # type: ignor
         with datastore_services.get_ndb_context():
             content_ids_not_needing_update = []
             for content_id in entity_translation_model.translations.keys():
-                if entity_translation_model.translations[content_id]['needs_update'] is False:
+                if (
+                    entity_translation_model.translations[content_id][
+                        'needs_update'
+                    ]
+                    is False
+                ):
                     content_ids_not_needing_update.append(content_id)
 
-            suggestions: Sequence[suggestion_models.GeneralSuggestionModel] = suggestion_models.GeneralSuggestionModel.query(
-                suggestion_models.GeneralSuggestionModel.suggestion_type == (feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
-                suggestion_models.GeneralSuggestionModel.target_id == entity_translation_model.entity_id,
-                suggestion_models.GeneralSuggestionModel.target_version_at_submission == (entity_translation_model.entity_version),
-                suggestion_models.GeneralSuggestionModel.language_code == (entity_translation_model.language_code),
-                suggestion_models.GeneralSuggestionModel.status == suggestion_models.STATUS_IN_REVIEW,
-            ).fetch()
+            suggestions: Sequence[suggestion_models.GeneralSuggestionModel] = (
+                suggestion_models.GeneralSuggestionModel.query(
+                    suggestion_models.GeneralSuggestionModel.suggestion_type
+                    == (feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                    suggestion_models.GeneralSuggestionModel.target_id
+                    == entity_translation_model.entity_id,
+                    suggestion_models.GeneralSuggestionModel.target_version_at_submission
+                    == (entity_translation_model.entity_version),
+                    suggestion_models.GeneralSuggestionModel.language_code
+                    == (entity_translation_model.language_code),
+                    suggestion_models.GeneralSuggestionModel.status
+                    == suggestion_models.STATUS_IN_REVIEW,
+                ).fetch()
+            )
 
             if self.is_datastore_change:
                 updated_suggestion_dicts: List[
@@ -294,18 +478,29 @@ class ComputeSuggestionsInReviewForTranslatedContents(beam.DoFn):  # type: ignor
                     ]
                 ] = []
                 for suggestion in suggestions:
-                    if suggestion.change_cmd['content_id'] in content_ids_not_needing_update:
+                    if (
+                        suggestion.change_cmd['content_id']
+                        in content_ids_not_needing_update
+                    ):
                         suggestion.status = suggestion_models.STATUS_REJECTED
-                        suggestion.final_reviewer_id = feconf.SUGGESTION_BOT_USER_ID
+                        suggestion.final_reviewer_id = (
+                            feconf.SUGGESTION_BOT_USER_ID
+                        )
                         suggestion.last_updated = datetime.datetime.utcnow()
                         updated_suggestion_dicts.append(
                             {
                                 'updated_suggestion': suggestion,
                                 'suggestion_dict': {
                                     'entity_id': entity_translation_model.entity_id,
-                                    'entity_version': (entity_translation_model.entity_version),
-                                    'entity_translation_model_id': (entity_translation_model.id),
-                                    'content_id': suggestion.change_cmd['content_id'],
+                                    'entity_version': (
+                                        entity_translation_model.entity_version
+                                    ),
+                                    'entity_translation_model_id': (
+                                        entity_translation_model.id
+                                    ),
+                                    'content_id': suggestion.change_cmd[
+                                        'content_id'
+                                    ],
                                     'suggestion_id': suggestion.id,
                                 },
                             }
@@ -315,17 +510,28 @@ class ComputeSuggestionsInReviewForTranslatedContents(beam.DoFn):  # type: ignor
                 suggestion_dicts: List[
                     Dict[
                         str,
-                        Union[str, int, suggestion_models.GeneralSuggestionModel],
+                        Union[
+                            str, int, suggestion_models.GeneralSuggestionModel
+                        ],
                     ]
                 ] = []
                 for suggestion in suggestions:
-                    if suggestion.change_cmd['content_id'] in content_ids_not_needing_update:
+                    if (
+                        suggestion.change_cmd['content_id']
+                        in content_ids_not_needing_update
+                    ):
                         suggestion_dicts.append(
                             {
                                 'entity_id': entity_translation_model.entity_id,
-                                'entity_version': (entity_translation_model.entity_version),
-                                'entity_translation_model_id': (entity_translation_model.id),
-                                'content_id': suggestion.change_cmd['content_id'],
+                                'entity_version': (
+                                    entity_translation_model.entity_version
+                                ),
+                                'entity_translation_model_id': (
+                                    entity_translation_model.id
+                                ),
+                                'content_id': suggestion.change_cmd[
+                                    'content_id'
+                                ],
                                 'suggestion_id': suggestion.id,
                             }
                         )
@@ -393,7 +599,9 @@ class ComputeTranslationsWithInvalidContentIds(beam.DoFn):  # type: ignore[misc]
             exp = exp_fetchers.get_exploration_from_model(exp_model)
 
             exp_content_ids = exp.get_translatable_content_ids()
-            translated_content_ids = list(entity_translation_model.translations.keys())
+            translated_content_ids = list(
+                entity_translation_model.translations.keys()
+            )
 
             invalid_translation_dicts: List[Dict[str, Union[str, int]]] = []
 
@@ -405,8 +613,12 @@ class ComputeTranslationsWithInvalidContentIds(beam.DoFn):  # type: ignore[misc]
                         invalid_translation_dicts.append(
                             {
                                 'entity_id': entity_translation_model.entity_id,
-                                'entity_version': (entity_translation_model.entity_version),
-                                'entity_translation_model_id': (entity_translation_model.id),
+                                'entity_version': (
+                                    entity_translation_model.entity_version
+                                ),
+                                'entity_translation_model_id': (
+                                    entity_translation_model.id
+                                ),
                                 'content_id': content_id,
                             }
                         )
@@ -424,7 +636,9 @@ class ComputeTranslationsWithInvalidContentIds(beam.DoFn):  # type: ignore[misc]
                         ],
                     ] = {
                         'entity_translation_model': entity_translation_model,
-                        'deleted_translations_count': (deleted_translations_count),
+                        'deleted_translations_count': (
+                            deleted_translations_count
+                        ),
                         'invalid_translation_dicts': invalid_translation_dicts,
                     }
                     yield result
@@ -435,8 +649,12 @@ class ComputeTranslationsWithInvalidContentIds(beam.DoFn):  # type: ignore[misc]
                         invalid_translation_dicts.append(
                             {
                                 'entity_id': entity_translation_model.entity_id,
-                                'entity_version': (entity_translation_model.entity_version),
-                                'entity_translation_model_id': (entity_translation_model.id),
+                                'entity_version': (
+                                    entity_translation_model.entity_version
+                                ),
+                                'entity_translation_model_id': (
+                                    entity_translation_model.id
+                                ),
                                 'content_id': content_id,
                             }
                         )
@@ -466,11 +684,19 @@ class ComputeUpdatedExpOpportunityModel(beam.DoFn):  # type: ignore[misc]
             model with updated translation count.
         """
         with datastore_services.get_ndb_context():
-            exp_opportunity_model = opportunity_models.ExplorationOpportunitySummaryModel.get(entity_translation_model.entity_id)
+            exp_opportunity_model = (
+                opportunity_models.ExplorationOpportunitySummaryModel.get(
+                    entity_translation_model.entity_id
+                )
+            )
 
-            new_translation_count = len(entity_translation_model.translations.keys())
+            new_translation_count = len(
+                entity_translation_model.translations.keys()
+            )
 
-            exp_opportunity_model.translation_counts[entity_translation_model.language_code] = new_translation_count
+            exp_opportunity_model.translation_counts[
+                entity_translation_model.language_code
+            ] = new_translation_count
 
             yield exp_opportunity_model
 
@@ -501,7 +727,9 @@ class GetLatestModel(beam.DoFn):  # type: ignore[misc]
         """
         with datastore_services.get_ndb_context():
             entity_id, entity_translation_models = element
-            version_list = list(model.entity_version for model in entity_translation_models)
+            version_list = list(
+                model.entity_version for model in entity_translation_models
+            )
             latest_version = max(version_list)
             latest_model = entity_translation_models[0]
             for model in entity_translation_models:
@@ -524,6 +752,14 @@ def _get_entity_translation_models(
         PCollection(EntityTranslationsModel). The PCollection of
         EntityTranslationsModel.
     """
-    entity_translation_models = pipeline | 'Get all entity translation models' >> ndb_io.GetModels(translation_models.EntityTranslationsModel.get_all(include_deleted=False))
+    entity_translation_models = (
+        pipeline
+        | 'Get all entity translation models'
+        >> ndb_io.GetModels(
+            translation_models.EntityTranslationsModel.get_all(
+                include_deleted=False
+            )
+        )
+    )
 
     return entity_translation_models

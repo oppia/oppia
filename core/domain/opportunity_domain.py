@@ -40,7 +40,9 @@ class PartialExplorationOpportunitySummaryDict(TypedDict):
     is_pinned: bool
 
 
-class ExplorationOpportunitySummaryDict(PartialExplorationOpportunitySummaryDict):
+class ExplorationOpportunitySummaryDict(
+    PartialExplorationOpportunitySummaryDict
+):
     """A dictionary representing ExplorationOpportunitySummary object.
 
     Contains all fields of an ExplorationOpportunitySummary object.
@@ -128,10 +130,16 @@ class ExplorationOpportunitySummary:
         self.story_title = story_title
         self.chapter_title = chapter_title
         self.content_count = content_count
-        self.incomplete_translation_language_codes = incomplete_translation_language_codes
+        self.incomplete_translation_language_codes = (
+            incomplete_translation_language_codes
+        )
         self.translation_counts = translation_counts
-        self.language_codes_needing_voice_artists = language_codes_needing_voice_artists
-        self.language_codes_with_assigned_voice_artists = language_codes_with_assigned_voice_artists
+        self.language_codes_needing_voice_artists = (
+            language_codes_needing_voice_artists
+        )
+        self.language_codes_with_assigned_voice_artists = (
+            language_codes_with_assigned_voice_artists
+        )
         self.translation_in_review_counts = translation_in_review_counts
         self.reviewer_only_content_count = reviewer_only_content_count
         self.is_pinned = is_pinned
@@ -160,12 +168,22 @@ class ExplorationOpportunitySummary:
             exploration_opportunity_summary_dict['story_title'],
             exploration_opportunity_summary_dict['chapter_title'],
             exploration_opportunity_summary_dict['content_count'],
-            exploration_opportunity_summary_dict['incomplete_translation_language_codes'],
+            exploration_opportunity_summary_dict[
+                'incomplete_translation_language_codes'
+            ],
             exploration_opportunity_summary_dict['translation_counts'],
-            exploration_opportunity_summary_dict['language_codes_needing_voice_artists'],
-            exploration_opportunity_summary_dict['language_codes_with_assigned_voice_artists'],
-            exploration_opportunity_summary_dict['translation_in_review_counts'],
-            exploration_opportunity_summary_dict.get('reviewer_only_content_count', 0),
+            exploration_opportunity_summary_dict[
+                'language_codes_needing_voice_artists'
+            ],
+            exploration_opportunity_summary_dict[
+                'language_codes_with_assigned_voice_artists'
+            ],
+            exploration_opportunity_summary_dict[
+                'translation_in_review_counts'
+            ],
+            exploration_opportunity_summary_dict.get(
+                'reviewer_only_content_count', 0
+            ),
         )
 
     def to_dict(self) -> PartialExplorationOpportunitySummaryDict:
@@ -200,11 +218,18 @@ class ExplorationOpportunitySummary:
         """
 
         if self.content_count < 0:
-            raise utils.ValidationError('Expected content_count to be a non-negative integer, received %s' % self.content_count)
+            raise utils.ValidationError(
+                'Expected content_count to be a non-negative integer, received %s'
+                % self.content_count
+            )
 
-        allowed_language_codes = [language['id'] for language in (constants.SUPPORTED_AUDIO_LANGUAGES)]
+        allowed_language_codes = [
+            language['id'] for language in (constants.SUPPORTED_AUDIO_LANGUAGES)
+        ]
 
-        if not set(self.language_codes_with_assigned_voice_artists).isdisjoint(self.language_codes_needing_voice_artists):
+        if not set(self.language_codes_with_assigned_voice_artists).isdisjoint(
+            self.language_codes_needing_voice_artists
+        ):
             raise utils.ValidationError(
                 'Expected voice_artist "needed" and "assigned" list of '
                 'languages to be disjoint, received: %s, %s'
@@ -217,16 +242,27 @@ class ExplorationOpportunitySummary:
         self._validate_translation_counts(self.translation_counts)
         self._validate_translation_counts(self.translation_in_review_counts)
 
-        expected_set_of_all_languages = set(self.incomplete_translation_language_codes + self.language_codes_needing_voice_artists + self.language_codes_with_assigned_voice_artists)
+        expected_set_of_all_languages = set(
+            self.incomplete_translation_language_codes
+            + self.language_codes_needing_voice_artists
+            + self.language_codes_with_assigned_voice_artists
+        )
 
         for language_code in expected_set_of_all_languages:
             if language_code not in allowed_language_codes:
-                raise utils.ValidationError('Invalid language_code: %s' % language_code)
+                raise utils.ValidationError(
+                    'Invalid language_code: %s' % language_code
+                )
 
         if expected_set_of_all_languages != set(allowed_language_codes):
-            raise utils.ValidationError('Expected set of all languages available in incomplete_translation, needs_voiceover and assigned_voiceover to be the same as the supported audio languages, received %s' % list(sorted(expected_set_of_all_languages)))
+            raise utils.ValidationError(
+                'Expected set of all languages available in incomplete_translation, needs_voiceover and assigned_voiceover to be the same as the supported audio languages, received %s'
+                % list(sorted(expected_set_of_all_languages))
+            )
 
-    def _validate_translation_counts(self, translation_counts: Dict[str, int]) -> None:
+    def _validate_translation_counts(
+        self, translation_counts: Dict[str, int]
+    ) -> None:
         """Validates per-language counts of translations.
 
         Args:
@@ -238,19 +274,29 @@ class ExplorationOpportunitySummary:
         """
         for language_code, count in translation_counts.items():
             if not utils.is_supported_audio_language_code(language_code):
-                raise utils.ValidationError('Invalid language_code: %s' % language_code)
+                raise utils.ValidationError(
+                    'Invalid language_code: %s' % language_code
+                )
 
             if count < 0:
-                raise utils.ValidationError('Expected count for language_code %s to be a non-negative integer, received %s' % (language_code, count))
+                raise utils.ValidationError(
+                    'Expected count for language_code %s to be a non-negative integer, received %s'
+                    % (language_code, count)
+                )
 
             if count > self.content_count:
-                raise utils.ValidationError('Expected translation count for language_code %s to be less than or equal to content_count(%s), received %s' % (language_code, self.content_count, count))
+                raise utils.ValidationError(
+                    'Expected translation count for language_code %s to be less than or equal to content_count(%s), received %s'
+                    % (language_code, self.content_count, count)
+                )
 
 
 class SkillOpportunity:
     """The domain object for skill opportunities."""
 
-    def __init__(self, skill_id: str, skill_description: str, question_count: int) -> None:
+    def __init__(
+        self, skill_id: str, skill_description: str, question_count: int
+    ) -> None:
         """Constructs a SkillOpportunity domain object.
 
         Args:
@@ -271,10 +317,15 @@ class SkillOpportunity:
         """
 
         if self.question_count < 0:
-            raise utils.ValidationError('Expected question_count to be a non-negative integer, received %s' % self.question_count)
+            raise utils.ValidationError(
+                'Expected question_count to be a non-negative integer, received %s'
+                % self.question_count
+            )
 
     @classmethod
-    def from_dict(cls, skill_opportunity_dict: SkillOpportunityDict) -> 'SkillOpportunity':
+    def from_dict(
+        cls, skill_opportunity_dict: SkillOpportunityDict
+    ) -> 'SkillOpportunity':
         """Return a SkillOpportunity domain object from a dict.
 
         Args:
@@ -310,7 +361,9 @@ class PinnedOpportunity:
     the contributor dashboard.
     """
 
-    def __init__(self, language_code: str, topic_id: str, opportunity_id: str) -> None:
+    def __init__(
+        self, language_code: str, topic_id: str, opportunity_id: str
+    ) -> None:
         """Constructs a PinnedOpportunity domain object.
 
         Args:
@@ -400,7 +453,9 @@ class TranslationOpportunity:
         self.topic_ids = topic_ids
         self.entity_id = entity_id
         self.content_count = content_count
-        self.incomplete_translation_language_codes = incomplete_translation_language_codes
+        self.incomplete_translation_language_codes = (
+            incomplete_translation_language_codes
+        )
         self.translation_counts = translation_counts
         self.entity_type = entity_type
         self.validate()
@@ -412,27 +467,48 @@ class TranslationOpportunity:
             ValidationError. One or more attributes of the object are invalid.
         """
         if self.content_count < 0:
-            raise utils.ValidationError('Expected content_count to be a non-negative integer, received %s' % self.content_count)
+            raise utils.ValidationError(
+                'Expected content_count to be a non-negative integer, received %s'
+                % self.content_count
+            )
 
         if self.entity_type not in feconf.TRANSLATABLE_ENTITY_TYPES:
-            raise utils.ValidationError('Invalid entity_type: %s' % self.entity_type)
+            raise utils.ValidationError(
+                'Invalid entity_type: %s' % self.entity_type
+            )
 
-        allowed_language_codes = [language['id'] for language in (constants.SUPPORTED_AUDIO_LANGUAGES)]
+        allowed_language_codes = [
+            language['id'] for language in (constants.SUPPORTED_AUDIO_LANGUAGES)
+        ]
 
         for language_code in self.incomplete_translation_language_codes:
             if language_code not in allowed_language_codes:
-                raise utils.ValidationError('Invalid language_code in incomplete_translation_language_codes: %s' % language_code)
+                raise utils.ValidationError(
+                    'Invalid language_code in incomplete_translation_language_codes: %s'
+                    % language_code
+                )
 
         for language_code, count in self.translation_counts.items():
             if not utils.is_supported_audio_language_code(language_code):
-                raise utils.ValidationError('Invalid language_code in translation_counts: %s' % language_code)
+                raise utils.ValidationError(
+                    'Invalid language_code in translation_counts: %s'
+                    % language_code
+                )
             if count < 0:
-                raise utils.ValidationError('Expected translation count for language_code %s to be non-negative, received %s' % (language_code, count))
+                raise utils.ValidationError(
+                    'Expected translation count for language_code %s to be non-negative, received %s'
+                    % (language_code, count)
+                )
             if count > self.content_count:
-                raise utils.ValidationError('Expected translation count for language_code %s to be less than or equal to content_count(%s), received %s' % (language_code, self.content_count, count))
+                raise utils.ValidationError(
+                    'Expected translation count for language_code %s to be less than or equal to content_count(%s), received %s'
+                    % (language_code, self.content_count, count)
+                )
 
     @classmethod
-    def from_dict(cls, translation_opportunity_dict: TranslationOpportunityDict) -> TranslationOpportunity:
+    def from_dict(
+        cls, translation_opportunity_dict: TranslationOpportunityDict
+    ) -> TranslationOpportunity:
         """Returns a TranslationOpportunity domain object from a dict.
 
         Args:
@@ -446,7 +522,9 @@ class TranslationOpportunity:
             translation_opportunity_dict['topic_ids'],
             translation_opportunity_dict['entity_id'],
             translation_opportunity_dict['content_count'],
-            translation_opportunity_dict['incomplete_translation_language_codes'],
+            translation_opportunity_dict[
+                'incomplete_translation_language_codes'
+            ],
             translation_opportunity_dict['translation_counts'],
             translation_opportunity_dict['entity_type'],
         )
@@ -462,7 +540,9 @@ class TranslationOpportunity:
             'topic_ids': self.topic_ids,
             'entity_id': self.entity_id,
             'content_count': self.content_count,
-            'incomplete_translation_language_codes': (self.incomplete_translation_language_codes),
+            'incomplete_translation_language_codes': (
+                self.incomplete_translation_language_codes
+            ),
             'translation_counts': self.translation_counts,
             'entity_type': self.entity_type,
         }
@@ -511,7 +591,9 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
         self.topic_ids = topic_ids
         self.entity_id = entity_id
         self.content_count = content_count
-        self.incomplete_translation_language_codes = incomplete_translation_language_codes
+        self.incomplete_translation_language_codes = (
+            incomplete_translation_language_codes
+        )
         self.translation_counts = translation_counts
         self.entity_type = entity_type
         self.topic_name = topic_name
@@ -525,11 +607,15 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
             'topic_ids': self.topic_ids,
             'entity_id': self.entity_id,
             'content_count': self.content_count,
-            'incomplete_translation_language_codes': (self.incomplete_translation_language_codes),
+            'incomplete_translation_language_codes': (
+                self.incomplete_translation_language_codes
+            ),
             'translation_counts': self.translation_counts,
             'entity_type': self.entity_type,
             'topic_name': self.topic_name,
             'entity_description': self.entity_description,
             'is_pinned': self.is_pinned,
-            'currently_available_to_learners': (self.currently_available_to_learners),
+            'currently_available_to_learners': (
+                self.currently_available_to_learners
+            ),
         }

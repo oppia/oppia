@@ -33,10 +33,14 @@ if MYPY:  # pragma: no cover
 
 translate_services = models.Registry.import_translate_services()
 
-(translation_models,) = models.Registry.import_models([models.Names.TRANSLATION])
+(translation_models,) = models.Registry.import_models(
+    [models.Names.TRANSLATION]
+)
 
 
-def get_and_cache_machine_translation(source_language_code: str, target_language_code: str, source_text: str) -> Optional[str]:
+def get_and_cache_machine_translation(
+    source_language_code: str, target_language_code: str, source_text: str
+) -> Optional[str]:
     """Gets a machine translation of the source text for the given source and
     target languages. If no translation exists in the datastore for the given
     input, generates a machine translation using cloud_translate_services and
@@ -52,13 +56,17 @@ def get_and_cache_machine_translation(source_language_code: str, target_language
     Returns:
         str|None. The translated text or None if no translation is found.
     """
-    translation = translation_fetchers.get_machine_translation(source_language_code, target_language_code, source_text.strip())
+    translation = translation_fetchers.get_machine_translation(
+        source_language_code, target_language_code, source_text.strip()
+    )
     if translation is not None:
         return translation.translated_text
 
     translated_text = None
     try:
-        translated_text = translate_services.translate_text(source_text, source_language_code, target_language_code)
+        translated_text = translate_services.translate_text(
+            source_text, source_language_code, target_language_code
+        )
     # An error here indicates a valid, but not allowlisted language code, or an
     # error raised by the Google Cloud Translate API. The error is logged
     # instead of raised to provide an uninterrupted end user experience while
@@ -96,7 +104,9 @@ def add_new_translation(
         content_id: str. The Id of the content.
         translated_content: TranslatedContent. The translated content object.
     """
-    entity_translation = translation_fetchers.get_entity_translation(entity_type, entity_id, entity_version, language_code)
+    entity_translation = translation_fetchers.get_entity_translation(
+        entity_type, entity_id, entity_version, language_code
+    )
     entity_translation.translations[content_id] = translated_content
     entity_translation.validate()
 
@@ -134,14 +144,24 @@ def _apply_changes(
 
             if entity_translation.language_code != change.language_code:
                 continue
-            entity_translation.translations[change.content_id] = translation_domain.TranslatedContent.from_dict(change.translation)
+            entity_translation.translations[change.content_id] = (
+                translation_domain.TranslatedContent.from_dict(
+                    change.translation
+                )
+            )
         elif change.cmd == exp_domain.CMD_REMOVE_TRANSLATIONS:
             entity_translation.remove_translations([change.content_id])
         elif change.cmd == exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE:
-            entity_translation.mark_translations_needs_update([change.content_id])
-        elif change.cmd == (exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE):
+            entity_translation.mark_translations_needs_update(
+                [change.content_id]
+            )
+        elif change.cmd == (
+            exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE
+        ):
             if entity_translation.language_code == change.language_code:
-                entity_translation.mark_translations_needs_update([change.content_id])
+                entity_translation.mark_translations_needs_update(
+                    [change.content_id]
+                )
         else:
             raise Exception('Invalid translation change cmd: %s' % change.cmd)
 
@@ -183,11 +203,13 @@ def compute_translation_related_change(
         if change.language_code in language_code_to_entity_translation:
             continue
 
-        language_code_to_entity_translation[change.language_code] = translation_domain.EntityTranslation.create_empty(
-            feconf.TranslatableEntityType.EXPLORATION,
-            updated_exploration.id,
-            change.language_code,
-            updated_exploration.version - 1,
+        language_code_to_entity_translation[change.language_code] = (
+            translation_domain.EntityTranslation.create_empty(
+                feconf.TranslatableEntityType.EXPLORATION,
+                updated_exploration.id,
+                change.language_code,
+                updated_exploration.version - 1,
+            )
         )
 
     # Create entity_translation models for all languages.
@@ -196,7 +218,9 @@ def compute_translation_related_change(
     for entity_translation in language_code_to_entity_translation.values():
         _apply_changes(entity_translation, translation_changes)
 
-        translation_counts[entity_translation.language_code] = updated_exploration.get_translation_count(entity_translation)
+        translation_counts[entity_translation.language_code] = (
+            updated_exploration.get_translation_count(entity_translation)
+        )
 
         new_translation_models.append(
             translation_models.EntityTranslationsModel.create_new(
@@ -210,7 +234,9 @@ def compute_translation_related_change(
     return new_translation_models, translation_counts
 
 
-def compute_translation_related_changes_upon_revert(reverted_exploration: exp_domain.Exploration, revert_to_version: int) -> Tuple[List[translation_models.EntityTranslationsModel], Dict[str, int]]:
+def compute_translation_related_changes_upon_revert(
+    reverted_exploration: exp_domain.Exploration, revert_to_version: int
+) -> Tuple[List[translation_models.EntityTranslationsModel], Dict[str, int]]:
     """Create new EntityTranslation models corresponding to translation related
     changes upon exploration revert.
 
@@ -240,7 +266,9 @@ def compute_translation_related_changes_upon_revert(reverted_exploration: exp_do
     new_translation_models = []
     translation_counts = {}
     for entity_translation in language_code_to_entity_translation.values():
-        translation_counts[entity_translation.language_code] = reverted_exploration.get_translation_count(entity_translation)
+        translation_counts[entity_translation.language_code] = (
+            reverted_exploration.get_translation_count(entity_translation)
+        )
 
         new_translation_models.append(
             translation_models.EntityTranslationsModel.create_new(
@@ -266,14 +294,18 @@ def get_languages_with_complete_translation(
     """
     content_count = exploration.get_content_count()
     language_code_list = []
-    for language_code, count in get_translation_counts(feconf.TranslatableEntityType.EXPLORATION, exploration).items():
+    for language_code, count in get_translation_counts(
+        feconf.TranslatableEntityType.EXPLORATION, exploration
+    ).items():
         if count == content_count:
             language_code_list.append(language_code)
 
     return language_code_list
 
 
-def get_displayable_translation_languages(entity_type: feconf.TranslatableEntityType, entity: exp_domain.Exploration) -> List[str]:
+def get_displayable_translation_languages(
+    entity_type: feconf.TranslatableEntityType, entity: exp_domain.Exploration
+) -> List[str]:
     """Returns a list of language codes in which the exploration translation
     is 100%.
 
@@ -282,7 +314,11 @@ def get_displayable_translation_languages(entity_type: feconf.TranslatableEntity
         exploration is complete i.e, 100%.
     """
     language_code_list = []
-    entity_translations = translation_fetchers.get_all_entity_translations_for_entity(entity_type, entity.id, entity.version)
+    entity_translations = (
+        translation_fetchers.get_all_entity_translations_for_entity(
+            entity_type, entity.id, entity.version
+        )
+    )
 
     for entity_translation in entity_translations:
         if entity.are_translations_displayable(entity_translation):
@@ -291,7 +327,9 @@ def get_displayable_translation_languages(entity_type: feconf.TranslatableEntity
     return language_code_list
 
 
-def get_translation_counts(entity_type: feconf.TranslatableEntityType, entity: exp_domain.Exploration) -> Dict[str, int]:
+def get_translation_counts(
+    entity_type: feconf.TranslatableEntityType, entity: exp_domain.Exploration
+) -> Dict[str, int]:
     """Returns a dict representing the number of translations available in a
     language for which there exists at least one translation in the
     exploration.
@@ -300,11 +338,22 @@ def get_translation_counts(entity_type: feconf.TranslatableEntityType, entity: e
         dict(str, int). A dict with language code as a key and number of
         translation available in that language as the value.
     """
-    entity_translations = translation_fetchers.get_all_entity_translations_for_entity(entity_type, entity.id, entity.version)
-    return {entity_translation.language_code: entity.get_translation_count(entity_translation) for entity_translation in entity_translations}
+    entity_translations = (
+        translation_fetchers.get_all_entity_translations_for_entity(
+            entity_type, entity.id, entity.version
+        )
+    )
+    return {
+        entity_translation.language_code: entity.get_translation_count(
+            entity_translation
+        )
+        for entity_translation in entity_translations
+    }
 
 
-def get_translatable_text(exploration: exp_domain.Exploration, language_code: str) -> Dict[str, Dict[str, translation_domain.TranslatableContent]]:
+def get_translatable_text(
+    exploration: exp_domain.Exploration, language_code: str
+) -> Dict[str, Dict[str, translation_domain.TranslatableContent]]:
     """Returns all the contents which needs translation in the given
     language.
 
@@ -325,6 +374,8 @@ def get_translatable_text(exploration: exp_domain.Exploration, language_code: st
     )
     state_names_to_content_id_mapping = {}
     for state_name, state in exploration.states.items():
-        state_names_to_content_id_mapping[state_name] = state.get_all_contents_which_need_translations(entity_translations)
+        state_names_to_content_id_mapping[state_name] = (
+            state.get_all_contents_which_need_translations(entity_translations)
+        )
 
     return state_names_to_content_id_mapping

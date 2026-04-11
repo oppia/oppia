@@ -86,7 +86,11 @@ def index_exploration_summaries(
             objects to be indexed.
     """
     platform_search_services.add_documents_to_index(
-        [_exp_summary_to_search_dict(exp_summary) for exp_summary in exp_summaries if _should_index_exploration(exp_summary)],
+        [
+            _exp_summary_to_search_dict(exp_summary)
+            for exp_summary in exp_summaries
+            if _should_index_exploration(exp_summary)
+        ],
         SEARCH_INDEX_EXPLORATIONS,
     )
 
@@ -129,7 +133,10 @@ def _should_index_exploration(
         bool. Whether the given exploration should be indexed for future
         search queries.
     """
-    return not exp_summary.deleted and exp_summary.status != rights_domain.ACTIVITY_STATUS_PRIVATE
+    return (
+        not exp_summary.deleted
+        and exp_summary.status != rights_domain.ACTIVITY_STATUS_PRIVATE
+    )
 
 
 def get_search_rank_from_exp_summary(
@@ -152,7 +159,10 @@ def get_search_rank_from_exp_summary(
     rank = _DEFAULT_RANK
     if exp_summary.ratings:
         for rating_value in exp_summary.ratings.keys():
-            rank += exp_summary.ratings[rating_value] * rating_weightings[rating_value]
+            rank += (
+                exp_summary.ratings[rating_value]
+                * rating_weightings[rating_value]
+            )
 
     # Ranks must be non-negative.
     return max(rank, 0)
@@ -168,7 +178,11 @@ def index_collection_summaries(
             summary domain objects to be indexed.
     """
     platform_search_services.add_documents_to_index(
-        [_collection_summary_to_search_dict(collection_summary) for collection_summary in collection_summaries if _should_index_collection(collection_summary)],
+        [
+            _collection_summary_to_search_dict(collection_summary)
+            for collection_summary in collection_summaries
+            if _should_index_collection(collection_summary)
+        ],
         SEARCH_INDEX_COLLECTIONS,
     )
 
@@ -262,7 +276,9 @@ def delete_explorations_from_search_index(exploration_ids: List[str]) -> None:
         exploration_ids: list(str). A list of exploration ids whose
             documents are to be deleted from the search index.
     """
-    platform_search_services.delete_documents_from_index(exploration_ids, SEARCH_INDEX_EXPLORATIONS)
+    platform_search_services.delete_documents_from_index(
+        exploration_ids, SEARCH_INDEX_EXPLORATIONS
+    )
 
 
 def clear_exploration_search_index() -> None:
@@ -321,7 +337,9 @@ def delete_collections_from_search_index(collection_ids: List[str]) -> None:
         collection_ids: list(str). List of IDs of the collections to be removed
             from the search index.
     """
-    platform_search_services.delete_documents_from_index(collection_ids, SEARCH_INDEX_COLLECTIONS)
+    platform_search_services.delete_documents_from_index(
+        collection_ids, SEARCH_INDEX_COLLECTIONS
+    )
 
 
 def clear_collection_search_index() -> None:
@@ -355,8 +373,13 @@ def index_blog_post_summaries(
             domain objects to be indexed.
     """
 
-    docs_to_index = [_blog_post_summary_to_search_dict(blog_post_summary) for blog_post_summary in blog_post_summaries]
-    platform_search_services.add_documents_to_index([doc for doc in docs_to_index if doc], SEARCH_INDEX_BLOG_POSTS)
+    docs_to_index = [
+        _blog_post_summary_to_search_dict(blog_post_summary)
+        for blog_post_summary in blog_post_summaries
+    ]
+    platform_search_services.add_documents_to_index(
+        [doc for doc in docs_to_index if doc], SEARCH_INDEX_BLOG_POSTS
+    )
 
 
 def _blog_post_summary_to_search_dict(
@@ -372,19 +395,26 @@ def _blog_post_summary_to_search_dict(
         dict. The representation of the given blog post summary, in a form that
         can be used by the search index.
     """
-    if not blog_post_summary.deleted and blog_post_summary.published_on is not None:
+    if (
+        not blog_post_summary.deleted
+        and blog_post_summary.published_on is not None
+    ):
         doc: BlogPostSummaryDomainSearchDict = {
             'id': blog_post_summary.id,
             'title': blog_post_summary.title,
             'tags': blog_post_summary.tags,
             'summary': blog_post_summary.summary,
-            'rank': math.floor(utils.get_time_in_millisecs(blog_post_summary.published_on)),
+            'rank': math.floor(
+                utils.get_time_in_millisecs(blog_post_summary.published_on)
+            ),
         }
         return doc
     return None
 
 
-def search_blog_post_summaries(query: str, tags: List[str], size: int, offset: Optional[int] = None) -> Tuple[List[str], Optional[int]]:
+def search_blog_post_summaries(
+    query: str, tags: List[str], size: int, offset: Optional[int] = None
+) -> Tuple[List[str], Optional[int]]:
     """Searches through the available blog post summaries.
 
     Args:
@@ -405,7 +435,11 @@ def search_blog_post_summaries(query: str, tags: List[str], size: int, offset: O
               summaries to fetch, None otherwise. If an offset is returned, it
               will be a web-safe string that can be used in URLs.
     """
-    result_ids, result_offset = platform_search_services.blog_post_summaries_search(query, tags, offset=offset, size=size)
+    result_ids, result_offset = (
+        platform_search_services.blog_post_summaries_search(
+            query, tags, offset=offset, size=size
+        )
+    )
     return result_ids, result_offset
 
 
@@ -419,7 +453,9 @@ def delete_blog_post_summary_from_search_index(blog_post_id: str) -> None:
     """
     # The argument type of delete_documents_from_index() is List[str],
     # therefore, we provide [blog_post_id] as argument.
-    platform_search_services.delete_documents_from_index([blog_post_id], SEARCH_INDEX_BLOG_POSTS)
+    platform_search_services.delete_documents_from_index(
+        [blog_post_id], SEARCH_INDEX_BLOG_POSTS
+    )
 
 
 def clear_blog_post_summaries_search_index() -> None:

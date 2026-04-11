@@ -27,7 +27,11 @@ class ConceptCardDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """A card that shows the explanation of a skill's concept."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {'selected_skill_ids': {'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}}}
+    URL_PATH_ARGS_SCHEMAS = {
+        'selected_skill_ids': {
+            'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
+        }
+    }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_view_skills

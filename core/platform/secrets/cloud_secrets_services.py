@@ -35,7 +35,13 @@ app_identity_services = models.Registry.import_app_identity_services()
 
 # The 'auth.default()' returns tuple of credentials and project ID. As we are
 # only interested in credentials, we are using '[0]' to access it.
-CLIENT = secretmanager.SecretManagerServiceClient(credentials=(auth.credentials.AnonymousCredentials() if constants.EMULATOR_MODE else auth.default()[0]))
+CLIENT = secretmanager.SecretManagerServiceClient(
+    credentials=(
+        auth.credentials.AnonymousCredentials()
+        if constants.EMULATOR_MODE
+        else auth.default()[0]
+    )
+)
 
 
 @functools.lru_cache(maxsize=64)

@@ -39,7 +39,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import app_feedback_report_models
 
-(app_feedback_report_models,) = models.Registry.import_models([models.Names.APP_FEEDBACK_REPORT])
+(app_feedback_report_models,) = models.Registry.import_models(
+    [models.Names.APP_FEEDBACK_REPORT]
+)
 
 
 class AppFeedbackReportDict(TypedDict):
@@ -131,7 +133,9 @@ class AppFeedbackReport:
             'report_id': self.report_id,
             'schema_version': self.schema_version,
             'platform': self.platform,
-            'submitted_on_timestamp': utils.get_human_readable_time_string(utils.get_time_in_millisecs(self.submitted_on_timestamp)),
+            'submitted_on_timestamp': utils.get_human_readable_time_string(
+                utils.get_time_in_millisecs(self.submitted_on_timestamp)
+            ),
             'local_timezone_offset_hrs': self.local_timezone_offset_hrs,
             'ticket_id': self.ticket_id,
             'scrubbed_by': self.scrubbed_by,
@@ -150,7 +154,9 @@ class AppFeedbackReport:
                 objects is not implemented yet.
         """
         if self.platform == app_feedback_report_constants.PLATFORM_CHOICE_WEB:
-            raise NotImplementedError('Domain objects for web reports have not been implemented yet.')
+            raise NotImplementedError(
+                'Domain objects for web reports have not been implemented yet.'
+            )
 
         self.require_valid_platform(self.platform)
         self.require_valid_schema_version(self.platform, self.schema_version)
@@ -158,7 +164,11 @@ class AppFeedbackReport:
         if self.scrubbed_by is not None:
             self.require_valid_scrubber_id(self.scrubbed_by)
 
-        if not (app_feedback_report_constants.TIMEZONE_MINIMUM_OFFSET <= self.local_timezone_offset_hrs <= app_feedback_report_constants.TIMEZONE_MAXIMUM_OFFSET):
+        if not (
+            app_feedback_report_constants.TIMEZONE_MINIMUM_OFFSET
+            <= self.local_timezone_offset_hrs
+            <= app_feedback_report_constants.TIMEZONE_MAXIMUM_OFFSET
+        ):
             raise utils.ValidationError(
                 'Expected local timezone offset to be in [%d, %d], '
                 'received: %d'
@@ -174,8 +184,13 @@ class AppFeedbackReport:
 
         self.user_supplied_feedback.validate()
 
-        if not isinstance(self.device_system_context, AndroidDeviceSystemContext):
-            raise utils.ValidationError('Expected device and system context to be of type AndroidDeviceSystemContext for platform %s, received: %r' % (self.platform, self.device_system_context.__class__))
+        if not isinstance(
+            self.device_system_context, AndroidDeviceSystemContext
+        ):
+            raise utils.ValidationError(
+                'Expected device and system context to be of type AndroidDeviceSystemContext for platform %s, received: %r'
+                % (self.platform, self.device_system_context.__class__)
+            )
 
         self.device_system_context.validate()
         self.app_context.validate()
@@ -194,10 +209,15 @@ class AppFeedbackReport:
         if platform is None:
             raise utils.ValidationError('No platform supplied.')
         if platform not in app_feedback_report_constants.PLATFORM_CHOICES:
-            raise utils.ValidationError('Report platform should be one of %s, received: %s' % (app_feedback_report_constants.PLATFORM_CHOICES, platform))
+            raise utils.ValidationError(
+                'Report platform should be one of %s, received: %s'
+                % (app_feedback_report_constants.PLATFORM_CHOICES, platform)
+            )
 
     @classmethod
-    def require_valid_schema_version(cls, platform: str, schema_version: int) -> None:
+    def require_valid_schema_version(
+        cls, platform: str, schema_version: int
+    ) -> None:
         """Checks whether the report schema version is valid for the given
         platform.
 
@@ -213,9 +233,15 @@ class AppFeedbackReport:
         minimum_schema = feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION
         current_schema = feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION
         if not isinstance(schema_version, int) or schema_version <= 0:
-            raise utils.ValidationError('The report schema version %r is invalid, expected an integer in [%d, %d].' % (schema_version, minimum_schema, current_schema))
+            raise utils.ValidationError(
+                'The report schema version %r is invalid, expected an integer in [%d, %d].'
+                % (schema_version, minimum_schema, current_schema)
+            )
         if not minimum_schema <= schema_version <= current_schema:
-            raise utils.ValidationError('The supported report schema versions for %s reports are [%d, %d], received: %d.' % (platform, minimum_schema, current_schema, schema_version))
+            raise utils.ValidationError(
+                'The supported report schema versions for %s reports are [%d, %d], received: %d.'
+                % (platform, minimum_schema, current_schema, schema_version)
+            )
 
     @classmethod
     def require_valid_scrubber_id(cls, scrubber_id: str) -> None:
@@ -229,12 +255,21 @@ class AppFeedbackReport:
             ValidationError. The user id is not a valid id format.
         """
         if not isinstance(scrubber_id, str):
-            raise utils.ValidationError('The scrubbed_by user must be a string, but got %r' % (scrubber_id))
-        if not utils.is_user_id_valid(scrubber_id) and (scrubber_id != feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID):
-            raise utils.ValidationError('The scrubbed_by user id %r is invalid.' % scrubber_id)
+            raise utils.ValidationError(
+                'The scrubbed_by user must be a string, but got %r'
+                % (scrubber_id)
+            )
+        if not utils.is_user_id_valid(scrubber_id) and (
+            scrubber_id != feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID
+        ):
+            raise utils.ValidationError(
+                'The scrubbed_by user id %r is invalid.' % scrubber_id
+            )
 
     @classmethod
-    def from_submitted_feedback_dict(cls, report_dict: AndroidFeedbackReportDict) -> AppFeedbackReport:
+    def from_submitted_feedback_dict(
+        cls, report_dict: AndroidFeedbackReportDict
+    ) -> AppFeedbackReport:
         """Returns an AppFeedbackReport object from a dict of the report sent in
         an incoming feedback report request.
 
@@ -249,13 +284,19 @@ class AppFeedbackReport:
         Raises:
             NotImplementedError. Domain objects for web reports not implemented.
         """
-        if report_dict['platform_type'] == (app_feedback_report_constants.PLATFORM_CHOICE_ANDROID):
+        if report_dict['platform_type'] == (
+            app_feedback_report_constants.PLATFORM_CHOICE_ANDROID
+        ):
             return cls.get_android_report_from_dict(report_dict)
         else:
-            raise NotImplementedError('Domain objects for web reports must be implemented.')
+            raise NotImplementedError(
+                'Domain objects for web reports must be implemented.'
+            )
 
     @classmethod
-    def get_android_report_from_dict(cls, report_dict: AndroidFeedbackReportDict) -> AppFeedbackReport:
+    def get_android_report_from_dict(
+        cls, report_dict: AndroidFeedbackReportDict
+    ) -> AppFeedbackReport:
         """Returns an AppFeedbackReport object from a dict for an Android
         report.
 
@@ -268,8 +309,12 @@ class AppFeedbackReport:
         """
         user_supplied_feedback_json = report_dict['user_supplied_feedback']
         user_supplied_feedback_obj = UserSuppliedFeedback(
-            cls.get_report_type_from_string(user_supplied_feedback_json['report_type']),
-            cls.get_category_from_string(user_supplied_feedback_json['category']),
+            cls.get_report_type_from_string(
+                user_supplied_feedback_json['report_type']
+            ),
+            cls.get_category_from_string(
+                user_supplied_feedback_json['category']
+            ),
             user_supplied_feedback_json['user_feedback_selected_items'],
             user_supplied_feedback_json['user_feedback_other_text_input'],
         )
@@ -284,16 +329,22 @@ class AppFeedbackReport:
             device_context_json['android_device_model'],
             device_context_json['android_sdk_version'],
             device_context_json['build_fingerprint'],
-            cls.get_android_network_type_from_string(device_context_json['network_type']),
+            cls.get_android_network_type_from_string(
+                device_context_json['network_type']
+            ),
         )
 
         app_context_json = report_dict['app_context']
-        entry_point_obj = cls.get_entry_point_from_json(app_context_json['entry_point'])
+        entry_point_obj = cls.get_entry_point_from_json(
+            app_context_json['entry_point']
+        )
         app_context_obj = AndroidAppContext(
             entry_point_obj,
             app_context_json['text_language_code'],
             app_context_json['audio_language_code'],
-            cls.get_android_text_size_from_string(app_context_json['text_size']),
+            cls.get_android_text_size_from_string(
+                app_context_json['text_size']
+            ),
             app_context_json['only_allows_wifi_download_and_update'],
             app_context_json['automatically_update_topics'],
             app_context_json['account_is_profile_admin'],
@@ -301,8 +352,14 @@ class AppFeedbackReport:
             app_context_json['logcat_logs'],
         )
 
-        report_datetime = datetime.datetime.fromtimestamp(report_dict['report_submission_timestamp_sec'])
-        report_id = app_feedback_report_models.AppFeedbackReportModel.generate_id(report_dict['platform_type'], report_datetime)
+        report_datetime = datetime.datetime.fromtimestamp(
+            report_dict['report_submission_timestamp_sec']
+        )
+        report_id = (
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
+                report_dict['platform_type'], report_datetime
+            )
+        )
         report_obj = AppFeedbackReport(
             report_id,
             report_dict['android_report_info_schema_version'],
@@ -319,7 +376,9 @@ class AppFeedbackReport:
         return report_obj
 
     @classmethod
-    def get_report_type_from_string(cls, report_type_name: str) -> app_feedback_report_constants.ReportType:
+    def get_report_type_from_string(
+        cls, report_type_name: str
+    ) -> app_feedback_report_constants.ReportType:
         """Determines the report type based on the JSON value.
 
         Args:
@@ -331,10 +390,14 @@ class AppFeedbackReport:
         for report_type in app_feedback_report_constants.ALLOWED_REPORT_TYPES:
             if report_type_name == report_type.value:
                 return report_type
-        raise utils.InvalidInputException('The given report type %s is invalid.' % report_type_name)
+        raise utils.InvalidInputException(
+            'The given report type %s is invalid.' % report_type_name
+        )
 
     @classmethod
-    def get_category_from_string(cls, category_name: str) -> app_feedback_report_constants.Category:
+    def get_category_from_string(
+        cls, category_name: str
+    ) -> app_feedback_report_constants.Category:
         """Determines the category based on the JSON value.
 
         Args:
@@ -346,10 +409,14 @@ class AppFeedbackReport:
         for category_type in app_feedback_report_constants.ALLOWED_CATEGORIES:
             if category_name == category_type.value:
                 return category_type
-        raise utils.InvalidInputException('The given category %s is invalid.' % category_name)
+        raise utils.InvalidInputException(
+            'The given category %s is invalid.' % category_name
+        )
 
     @classmethod
-    def get_android_text_size_from_string(cls, text_size_name: str) -> app_feedback_report_constants.AndroidTextSize:
+    def get_android_text_size_from_string(
+        cls, text_size_name: str
+    ) -> app_feedback_report_constants.AndroidTextSize:
         """Determines the app text size based on the JSON value.
 
         Args:
@@ -358,13 +425,19 @@ class AppFeedbackReport:
         Returns:
             AndroidTextSize. The enum representing the text size.
         """
-        for text_size_type in app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES:
+        for (
+            text_size_type
+        ) in app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES:
             if text_size_name == text_size_type.value:
                 return text_size_type
-        raise utils.InvalidInputException('The given Android app text size %s is invalid.' % text_size_name)
+        raise utils.InvalidInputException(
+            'The given Android app text size %s is invalid.' % text_size_name
+        )
 
     @classmethod
-    def get_entry_point_from_json(cls, entry_point_json: EntryPointDict) -> EntryPoint:
+    def get_entry_point_from_json(
+        cls, entry_point_json: EntryPointDict
+    ) -> EntryPoint:
         """Determines the entry point type based on the received JSON.
 
         Args:
@@ -383,36 +456,58 @@ class AppFeedbackReport:
             Exception. No subtopic_id provided for StudyGuideEntryPoint.
         """
         entry_point_name = entry_point_json['entry_point_name']
-        if entry_point_name == (app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value):
+        if entry_point_name == (
+            app_feedback_report_constants.EntryPoint.NAVIGATION_DRAWER.value
+        ):
             return NavigationDrawerEntryPoint()
-        elif entry_point_name == (app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value):
+        elif entry_point_name == (
+            app_feedback_report_constants.EntryPoint.LESSON_PLAYER.value
+        ):
             if entry_point_json['entry_point_topic_id'] is None:
-                raise Exception('No topic_id provided for LessonPlayerEntryPoint.')
+                raise Exception(
+                    'No topic_id provided for LessonPlayerEntryPoint.'
+                )
             if entry_point_json['entry_point_story_id'] is None:
-                raise Exception('No story_id provided for LessonPlayerEntryPoint.')
+                raise Exception(
+                    'No story_id provided for LessonPlayerEntryPoint.'
+                )
             if entry_point_json['entry_point_exploration_id'] is None:
-                raise Exception('No exploration_id provided for LessonPlayerEntryPoint.')
+                raise Exception(
+                    'No exploration_id provided for LessonPlayerEntryPoint.'
+                )
             return LessonPlayerEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_story_id'],
                 entry_point_json['entry_point_exploration_id'],
             )
-        elif entry_point_name == (app_feedback_report_constants.EntryPoint.STUDY_GUIDE.value):
+        elif entry_point_name == (
+            app_feedback_report_constants.EntryPoint.STUDY_GUIDE.value
+        ):
             if entry_point_json['entry_point_topic_id'] is None:
-                raise Exception('No topic_id provided for StudyGuideEntryPoint.')
+                raise Exception(
+                    'No topic_id provided for StudyGuideEntryPoint.'
+                )
             if entry_point_json['entry_point_subtopic_id'] is None:
-                raise Exception('No subtopic_id provided for StudyGuideEntryPoint.')
+                raise Exception(
+                    'No subtopic_id provided for StudyGuideEntryPoint.'
+                )
             return StudyGuideEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_subtopic_id'],
             )
-        elif entry_point_name == (app_feedback_report_constants.EntryPoint.CRASH.value):
+        elif entry_point_name == (
+            app_feedback_report_constants.EntryPoint.CRASH.value
+        ):
             return CrashEntryPoint()
         else:
-            raise utils.InvalidInputException('The given entry point %s is invalid.' % entry_point_name)
+            raise utils.InvalidInputException(
+                'The given entry point %s is invalid.' % entry_point_name
+            )
 
     @classmethod
-    def get_android_network_type_from_string(cls, network_type_name: str) -> app_feedback_report_constants.AndroidNetworkType:
+    def get_android_network_type_from_string(
+        cls, network_type_name: str
+    ) -> app_feedback_report_constants.AndroidNetworkType:
         """Determines the network type based on the JSON value.
 
         Args:
@@ -421,10 +516,14 @@ class AppFeedbackReport:
         Returns:
             AndroidNetworkType. The enum representing the network type.
         """
-        for network_type in app_feedback_report_constants.ALLOWED_ANDROID_NETWORK_TYPES:
+        for (
+            network_type
+        ) in app_feedback_report_constants.ALLOWED_ANDROID_NETWORK_TYPES:
             if network_type_name == network_type.value:
                 return network_type
-        raise utils.InvalidInputException('The given Android network type %s is invalid.' % network_type_name)
+        raise utils.InvalidInputException(
+            'The given Android network type %s is invalid.' % network_type_name
+        )
 
 
 class UserSuppliedFeedbackDict(TypedDict):
@@ -474,7 +573,9 @@ class UserSuppliedFeedback:
             'report_type': self.report_type.value,
             'category': self.category.value,
             'user_feedback_selected_items': self.user_feedback_selected_items,
-            'user_feedback_other_text_input': (self.user_feedback_other_text_input),
+            'user_feedback_other_text_input': (
+                self.user_feedback_other_text_input
+            ),
         }
 
     def validate(self) -> None:
@@ -488,9 +589,14 @@ class UserSuppliedFeedback:
         self.require_valid_category(self.category)
 
         if self.user_feedback_selected_items is None:
-            raise utils.ValidationError('No user_feedback_selected_items supplied.')
+            raise utils.ValidationError(
+                'No user_feedback_selected_items supplied.'
+            )
         if self.user_feedback_other_text_input is None:
-            raise utils.ValidationError('No user_feedback_selected_items supplied for category %s.' % self.category)
+            raise utils.ValidationError(
+                'No user_feedback_selected_items supplied for category %s.'
+                % self.category
+            )
         self.require_valid_user_feedback_items_for_category(
             self.category,
             self.user_feedback_selected_items,
@@ -498,7 +604,9 @@ class UserSuppliedFeedback:
         )
 
     @classmethod
-    def require_valid_report_type(cls, report_type: app_feedback_report_constants.ReportType) -> None:
+    def require_valid_report_type(
+        cls, report_type: app_feedback_report_constants.ReportType
+    ) -> None:
         """Checks whether the report_type is valid.
 
         Args:
@@ -510,7 +618,9 @@ class UserSuppliedFeedback:
         """
         if report_type is None:
             raise utils.ValidationError('No report_type supplied.')
-        if report_type not in (app_feedback_report_constants.ALLOWED_REPORT_TYPES):
+        if report_type not in (
+            app_feedback_report_constants.ALLOWED_REPORT_TYPES
+        ):
             raise utils.ValidationError(
                 'Invalid report type %s, must be one of %s.'
                 % (
@@ -520,7 +630,9 @@ class UserSuppliedFeedback:
             )
 
     @classmethod
-    def require_valid_category(cls, category: app_feedback_report_constants.Category) -> None:
+    def require_valid_category(
+        cls, category: app_feedback_report_constants.Category
+    ) -> None:
         """Checks whether the category is valid.
 
         Args:
@@ -533,7 +645,10 @@ class UserSuppliedFeedback:
         if category is None:
             raise utils.ValidationError('No category supplied.')
         if category not in app_feedback_report_constants.ALLOWED_CATEGORIES:
-            raise utils.ValidationError('Invalid category %s, must be one of %s.' % (category, app_feedback_report_constants.ALLOWED_CATEGORIES))
+            raise utils.ValidationError(
+                'Invalid category %s, must be one of %s.'
+                % (category, app_feedback_report_constants.ALLOWED_CATEGORIES)
+            )
 
     @classmethod
     def require_valid_user_feedback_items_for_category(
@@ -557,7 +672,9 @@ class UserSuppliedFeedback:
             ValidationError. The given selection items and text input for the
                 category are not valid.
         """
-        if category in (app_feedback_report_constants.ALLOWED_SELECTION_ITEMS_CATEGORIES):
+        if category in (
+            app_feedback_report_constants.ALLOWED_SELECTION_ITEMS_CATEGORIES
+        ):
             # If the report category enables users to select checkbox options,
             # validate the options selected by the user.
             cls.require_valid_selected_items_for_category(selected_items)
@@ -565,14 +682,24 @@ class UserSuppliedFeedback:
         # If the report category only allows users to provide input text,
         # validate that the user_feedback_selected_items is None and that
         # there is a user_feedback_other_text_input.
-        if category in (app_feedback_report_constants.ALLOWED_ONLY_INPUT_TEXT_CATEGORIES):
+        if category in (
+            app_feedback_report_constants.ALLOWED_ONLY_INPUT_TEXT_CATEGORIES
+        ):
             if len(selected_items) != 0:
-                raise utils.ValidationError('Report cannot have selection options for category %r.' % (category))
+                raise utils.ValidationError(
+                    'Report cannot have selection options for category %r.'
+                    % (category)
+                )
             if not isinstance(other_text_input, str):
-                raise utils.ValidationError('Invalid input text, must be a string, received: %r.' % (other_text_input))
+                raise utils.ValidationError(
+                    'Invalid input text, must be a string, received: %r.'
+                    % (other_text_input)
+                )
 
     @classmethod
-    def require_valid_selected_items_for_category(cls, selected_items: List[str]) -> None:
+    def require_valid_selected_items_for_category(
+        cls, selected_items: List[str]
+    ) -> None:
         """Checks whether the user_feedback_selected_items are valid.
 
         Args:
@@ -584,7 +711,9 @@ class UserSuppliedFeedback:
         """
         for item in selected_items:
             if not isinstance(item, str):
-                raise utils.ValidationError('Invalid option %s selected by user.' % item)
+                raise utils.ValidationError(
+                    'Invalid option %s selected by user.' % item
+                )
 
 
 class DeviceSystemContextDict(TypedDict):
@@ -599,7 +728,9 @@ class DeviceSystemContext:
     to submit the report.
     """
 
-    def __init__(self, version_name: str, device_country_locale_code: str) -> None:
+    def __init__(
+        self, version_name: str, device_country_locale_code: str
+    ) -> None:
         """Constructs a DeviceSystemContext domain object.
 
         Args:
@@ -631,7 +762,9 @@ class DeviceSystemContext:
             NotImplementedError. The derived child classes must implement the
                 necessary logic as described above.
         """
-        raise NotImplementedError('Subclasses of DeviceSystemContext should implement domain validation.')
+        raise NotImplementedError(
+            'Subclasses of DeviceSystemContext should implement domain validation.'
+        )
 
 
 class AndroidDeviceContextDict(TypedDict):
@@ -737,19 +870,29 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         """
         self.require_valid_version_name(self.version_name)
         self.require_valid_package_version_code(self.package_version_code)
-        self.require_valid_locale_code('country', self.device_country_locale_code)
-        self.require_valid_locale_code('language', self.device_language_locale_code)
+        self.require_valid_locale_code(
+            'country', self.device_country_locale_code
+        )
+        self.require_valid_locale_code(
+            'language', self.device_language_locale_code
+        )
 
         if self.device_model is None:
             raise utils.ValidationError('No device model supplied.')
         if not isinstance(self.device_model, str):
-            raise utils.ValidationError('Android device model must be an string, received: %r.' % (self.device_model))
+            raise utils.ValidationError(
+                'Android device model must be an string, received: %r.'
+                % (self.device_model)
+            )
 
         self.require_valid_sdk_version(self.sdk_version)
         if self.build_fingerprint is None:
             raise utils.ValidationError('No build fingerprint supplied.')
         if not isinstance(self.build_fingerprint, str):
-            raise utils.ValidationError('Build fingerprint must be a string, received: %r.' % (self.build_fingerprint))
+            raise utils.ValidationError(
+                'Build fingerprint must be a string, received: %r.'
+                % (self.build_fingerprint)
+            )
 
         self.require_valid_network_type(self.network_type)
 
@@ -767,13 +910,20 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         if version_name is None:
             raise utils.ValidationError('No version name supplied.')
         if not isinstance(version_name, str):
-            raise utils.ValidationError('Version name must be a string, received: %r.' % version_name)
+            raise utils.ValidationError(
+                'Version name must be a string, received: %r.' % version_name
+            )
         delimiter = app_feedback_report_constants.ANDROID_VERSION_NAME_DELIMITER
         if len(version_name.split(delimiter)) != 3:
-            raise utils.ValidationError('The version name is not a valid string format, received: %s.' % version_name)
+            raise utils.ValidationError(
+                'The version name is not a valid string format, received: %s.'
+                % version_name
+            )
 
     @classmethod
-    def require_valid_package_version_code(cls, package_version_code: int) -> None:
+    def require_valid_package_version_code(
+        cls, package_version_code: int
+    ) -> None:
         """Checks whether the package version code is a valid string code for
         Oppia Android.
 
@@ -786,7 +936,10 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         if package_version_code is None:
             raise utils.ValidationError('No package version code supplied.')
         if not isinstance(package_version_code, int):
-            raise utils.ValidationError('Package version code must be an int, received: %r.' % (package_version_code))
+            raise utils.ValidationError(
+                'Package version code must be an int, received: %r.'
+                % (package_version_code)
+            )
         if package_version_code < feconf.MINIMUM_ANDROID_PACKAGE_VERSION_CODE:
             raise utils.ValidationError(
                 'The package version code is not a valid int. The minimum '
@@ -798,7 +951,9 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             )
 
     @classmethod
-    def require_valid_locale_code(cls, locale_type: str, locale_code: str) -> None:
+    def require_valid_locale_code(
+        cls, locale_type: str, locale_code: str
+    ) -> None:
         """Checks whether the device's locale code is a valid  code.
 
         Args:
@@ -811,11 +966,19 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             ValidationError. The given code is not valid.
         """
         if locale_code is None:
-            raise utils.ValidationError('No device %s locale code supplied.' % locale_type)
+            raise utils.ValidationError(
+                'No device %s locale code supplied.' % locale_type
+            )
         if not isinstance(locale_code, str):
-            raise utils.ValidationError('The device\'s %s locale code must be an string, received: %r.' % (locale_type, locale_code))
+            raise utils.ValidationError(
+                'The device\'s %s locale code must be an string, received: %r.'
+                % (locale_type, locale_code)
+            )
         if not cls._match_locale_code_string(locale_code):
-            raise utils.ValidationError('The device\'s %s locale code is not a valid string, received: %s.' % (locale_type, locale_code))
+            raise utils.ValidationError(
+                'The device\'s %s locale code is not a valid string, received: %s.'
+                % (locale_type, locale_code)
+            )
 
     @classmethod
     def _match_locale_code_string(cls, code: str) -> Optional[Match[str]]:
@@ -844,12 +1007,20 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         if sdk_version is None:
             raise utils.ValidationError('No SDK version supplied.')
         if not isinstance(sdk_version, int):
-            raise utils.ValidationError('SDK version must be an int, received: %r.' % sdk_version)
-        if sdk_version < (app_feedback_report_constants.MINIMUM_ANDROID_SDK_VERSION):
-            raise utils.ValidationError('Invalid SDK version, received: %s.' % sdk_version)
+            raise utils.ValidationError(
+                'SDK version must be an int, received: %r.' % sdk_version
+            )
+        if sdk_version < (
+            app_feedback_report_constants.MINIMUM_ANDROID_SDK_VERSION
+        ):
+            raise utils.ValidationError(
+                'Invalid SDK version, received: %s.' % sdk_version
+            )
 
     @classmethod
-    def require_valid_network_type(cls, network_type: app_feedback_report_constants.AndroidNetworkType) -> None:
+    def require_valid_network_type(
+        cls, network_type: app_feedback_report_constants.AndroidNetworkType
+    ) -> None:
         """Checks that the Android device's network type is valid.
 
         Args:
@@ -862,8 +1033,12 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         """
         if network_type is None:
             raise utils.ValidationError('No network type supplied.')
-        if network_type not in (app_feedback_report_constants.ALLOWED_ANDROID_NETWORK_TYPES):
-            raise utils.ValidationError('Invalid network type, received: %s.' % network_type)
+        if network_type not in (
+            app_feedback_report_constants.ALLOWED_ANDROID_NETWORK_TYPES
+        ):
+            raise utils.ValidationError(
+                'Invalid network type, received: %s.' % network_type
+            )
 
 
 class AppContextDict(TypedDict):
@@ -919,7 +1094,9 @@ class AppContext:
             NotImplementedError. Subclasses should implement their own
                 validation checks.
         """
-        raise NotImplementedError('Subclasses of AppContext should implement their own validation checks.')
+        raise NotImplementedError(
+            'Subclasses of AppContext should implement their own validation checks.'
+        )
 
 
 class AndroidAppContextDict(TypedDict):
@@ -982,7 +1159,9 @@ class AndroidAppContext(AppContext):
         self.text_language_code = text_language_code
         self.audio_language_code = audio_language_code
         self.text_size = text_size
-        self.only_allows_wifi_download_and_update = only_allows_wifi_download_and_update
+        self.only_allows_wifi_download_and_update = (
+            only_allows_wifi_download_and_update
+        )
         self.automatically_update_topics = automatically_update_topics
         self.account_is_profile_admin = account_is_profile_admin
         self.event_logs = event_logs
@@ -999,7 +1178,9 @@ class AndroidAppContext(AppContext):
             'text_language_code': self.text_language_code,
             'audio_language_code': self.audio_language_code,
             'text_size': self.text_size.value,
-            'only_allows_wifi_download_and_update': (self.only_allows_wifi_download_and_update),
+            'only_allows_wifi_download_and_update': (
+                self.only_allows_wifi_download_and_update
+            ),
             'automatically_update_topics': self.automatically_update_topics,
             'account_is_profile_admin': self.account_is_profile_admin,
             'event_logs': self.event_logs,
@@ -1017,19 +1198,41 @@ class AndroidAppContext(AppContext):
         self.require_valid_language_code('text', self.text_language_code)
         self.require_valid_language_code('audio', self.audio_language_code)
         self.require_valid_text_size(self.text_size)
-        if self.only_allows_wifi_download_and_update is None or not (isinstance(self.only_allows_wifi_download_and_update, bool)):
-            raise utils.ValidationError('only_allows_wifi_download_and_update field should be a boolean, received: %r' % (self.only_allows_wifi_download_and_update))
-        if self.automatically_update_topics is None or not (isinstance(self.automatically_update_topics, bool)):
-            raise utils.ValidationError('automatically_update_topics field should be a boolean, received: %r' % self.automatically_update_topics)
-        if self.account_is_profile_admin is None or not (isinstance(self.account_is_profile_admin, bool)):
-            raise utils.ValidationError('account_is_profile_admin field should be a boolean, received: %r' % self.account_is_profile_admin)
+        if self.only_allows_wifi_download_and_update is None or not (
+            isinstance(self.only_allows_wifi_download_and_update, bool)
+        ):
+            raise utils.ValidationError(
+                'only_allows_wifi_download_and_update field should be a boolean, received: %r'
+                % (self.only_allows_wifi_download_and_update)
+            )
+        if self.automatically_update_topics is None or not (
+            isinstance(self.automatically_update_topics, bool)
+        ):
+            raise utils.ValidationError(
+                'automatically_update_topics field should be a boolean, received: %r'
+                % self.automatically_update_topics
+            )
+        if self.account_is_profile_admin is None or not (
+            isinstance(self.account_is_profile_admin, bool)
+        ):
+            raise utils.ValidationError(
+                'account_is_profile_admin field should be a boolean, received: %r'
+                % self.account_is_profile_admin
+            )
         if self.event_logs is None or not isinstance(self.event_logs, list):
-            raise utils.ValidationError('Should have an event log list, received: %r' % self.event_logs)
+            raise utils.ValidationError(
+                'Should have an event log list, received: %r' % self.event_logs
+            )
         if self.logcat_logs is None or not isinstance(self.logcat_logs, list):
-            raise utils.ValidationError('Should have a logcat log list, received: %r' % (self.logcat_logs))
+            raise utils.ValidationError(
+                'Should have a logcat log list, received: %r'
+                % (self.logcat_logs)
+            )
 
     @classmethod
-    def require_valid_language_code(cls, language_type: str, language_code: str) -> None:
+    def require_valid_language_code(
+        cls, language_type: str, language_code: str
+    ) -> None:
         """Checks that the language code is valid.
 
         Args:
@@ -1042,11 +1245,19 @@ class AndroidAppContext(AppContext):
             ValidationError. The given code is not valid.
         """
         if language_code is None:
-            raise utils.ValidationError('No app %s language code supplied.' % language_type)
+            raise utils.ValidationError(
+                'No app %s language code supplied.' % language_type
+            )
         if not isinstance(language_code, str):
-            raise utils.ValidationError('Expected the app\'s %s language code to be a string, received: %r' % (language_type, language_code))
+            raise utils.ValidationError(
+                'Expected the app\'s %s language code to be a string, received: %r'
+                % (language_type, language_code)
+            )
         if not cls._match_language_code_string(language_code):
-            raise utils.ValidationError('The app\'s %s language code is not a valid string, received: %s.' % (language_type, language_code))
+            raise utils.ValidationError(
+                'The app\'s %s language code is not a valid string, received: %s.'
+                % (language_type, language_code)
+            )
 
     @classmethod
     def _match_language_code_string(cls, code: str) -> Optional[Match[str]]:
@@ -1063,7 +1274,9 @@ class AndroidAppContext(AppContext):
         return re.compile(regex_string).match(code)
 
     @classmethod
-    def require_valid_text_size(cls, text_size: app_feedback_report_constants.AndroidTextSize) -> None:
+    def require_valid_text_size(
+        cls, text_size: app_feedback_report_constants.AndroidTextSize
+    ) -> None:
         """Checks whether the package version code is a valid string code for
         Oppia Android.
 
@@ -1076,7 +1289,9 @@ class AndroidAppContext(AppContext):
         """
         if text_size is None:
             raise utils.ValidationError('No text size supplied.')
-        if text_size not in (app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES):
+        if text_size not in (
+            app_feedback_report_constants.ALLOWED_ANDROID_TEXT_SIZES
+        ):
             raise utils.ValidationError(
                 'App text size should be one of %s, received: %s'
                 % (
@@ -1139,7 +1354,9 @@ class EntryPoint:
             NotImplementedError. Subclasses should implement their own dict
                 representations.
         """
-        raise NotImplementedError('Subclasses of EntryPoint should implement their own dict representations.')
+        raise NotImplementedError(
+            'Subclasses of EntryPoint should implement their own dict representations.'
+        )
 
     def validate(self) -> None:
         """Validates the EntryPoint domain object.
@@ -1148,7 +1365,9 @@ class EntryPoint:
             NotImplementedError. Subclasses should implement their own
                 validation checks.
         """
-        raise NotImplementedError('Subclasses of EntryPoint should implement their own validation checks.')
+        raise NotImplementedError(
+            'Subclasses of EntryPoint should implement their own validation checks.'
+        )
 
     @classmethod
     def require_valid_entry_point_name(
@@ -1170,12 +1389,20 @@ class EntryPoint:
         if actual_name is None:
             raise utils.ValidationError('No entry point name supplied.')
         if not isinstance(actual_name, str):
-            raise utils.ValidationError('Entry point name must be a string, received: %r.' % (actual_name))
+            raise utils.ValidationError(
+                'Entry point name must be a string, received: %r.'
+                % (actual_name)
+            )
         if actual_name is not expected_name:
-            raise utils.ValidationError('Expected entry point name %s, received: %s.' % (expected_name, actual_name))
+            raise utils.ValidationError(
+                'Expected entry point name %s, received: %s.'
+                % (expected_name, actual_name)
+            )
 
     @classmethod
-    def require_valid_entry_point_exploration(cls, exploration_id: Optional[str], story_id: Optional[str]) -> None:
+    def require_valid_entry_point_exploration(
+        cls, exploration_id: Optional[str], story_id: Optional[str]
+    ) -> None:
         """Checks whether the exploration id is a valid one.
 
         Args:
@@ -1186,10 +1413,18 @@ class EntryPoint:
             ValidationError. The exploration ID is not a valid ID.
         """
         if not isinstance(exploration_id, str):
-            raise utils.ValidationError('Exploration id should be a string, received: %r' % (exploration_id))
-        expected_story_id = exp_services.get_story_id_linked_to_exploration(exploration_id)
+            raise utils.ValidationError(
+                'Exploration id should be a string, received: %r'
+                % (exploration_id)
+            )
+        expected_story_id = exp_services.get_story_id_linked_to_exploration(
+            exploration_id
+        )
         if expected_story_id != story_id:
-            raise utils.ValidationError('Exploration with id %s is not part of story with id of %s, should be found in story with id of %s' % (exploration_id, story_id, expected_story_id))
+            raise utils.ValidationError(
+                'Exploration with id %s is not part of story with id of %s, should be found in story with id of %s'
+                % (exploration_id, story_id, expected_story_id)
+            )
 
 
 class NavigationDrawerEntryPointDict(TypedDict):
@@ -1246,7 +1481,9 @@ class LessonPlayerEntryPointDict(TypedDict):
 class LessonPlayerEntryPoint(EntryPoint):
     """Domain object for the lesson player entry point."""
 
-    def __init__(self, topic_id: str, story_id: str, exploration_id: str) -> None:
+    def __init__(
+        self, topic_id: str, story_id: str, exploration_id: str
+    ) -> None:
         """Constructs an LessonPlayerEntryPoint domain object.
 
         Args:
@@ -1291,9 +1528,13 @@ class LessonPlayerEntryPoint(EntryPoint):
         )
         topic_domain.Topic.require_valid_topic_id(self.topic_id)
         if self.story_id is None:
-            raise utils.ValidationError('The story_id must be a string value, received None')
+            raise utils.ValidationError(
+                'The story_id must be a string value, received None'
+            )
         story_domain.Story.require_valid_story_id(self.story_id)
-        self.require_valid_entry_point_exploration(self.exploration_id, self.story_id)
+        self.require_valid_entry_point_exploration(
+            self.exploration_id, self.story_id
+        )
 
 
 class StudyGuideEntryPointDict(TypedDict):
@@ -1351,7 +1592,10 @@ class StudyGuideEntryPoint(EntryPoint):
         )
         topic_domain.Topic.require_valid_topic_id(self.topic_id)
         if not isinstance(self.subtopic_id, int):
-            raise utils.ValidationError('Expected subtopic id to be an int, received %s' % (self.subtopic_id))
+            raise utils.ValidationError(
+                'Expected subtopic id to be an int, received %s'
+                % (self.subtopic_id)
+            )
 
 
 class CrashEntryPointDict(TypedDict):
@@ -1464,7 +1708,11 @@ class AppFeedbackReportTicket:
             'github_issue_repo_name': self.github_issue_repo_name,
             'github_issue_number': self.github_issue_number,
             'archived': self.archived,
-            'newest_report_creation_timestamp_isoformat': (self.newest_report_creation_timestamp.isoformat() if self.newest_report_creation_timestamp else None),
+            'newest_report_creation_timestamp_isoformat': (
+                self.newest_report_creation_timestamp.isoformat()
+                if self.newest_report_creation_timestamp
+                else None
+            ),
             'reports': self.reports,
         }
 
@@ -1484,11 +1732,19 @@ class AppFeedbackReportTicket:
             self.require_valid_github_repo(self.github_issue_repo_name)
 
         if self.github_issue_number is not None:
-            if not isinstance(self.github_issue_number, int) or (self.github_issue_number < 1):
-                raise utils.ValidationError('The Github issue number name must be a positive integer, received: %r' % self.github_issue_number)
+            if not isinstance(self.github_issue_number, int) or (
+                self.github_issue_number < 1
+            ):
+                raise utils.ValidationError(
+                    'The Github issue number name must be a positive integer, received: %r'
+                    % self.github_issue_number
+                )
 
         if not isinstance(self.archived, bool):
-            raise utils.ValidationError('The ticket archived status must be a boolean, received: %r' % (self.archived))
+            raise utils.ValidationError(
+                'The ticket archived status must be a boolean, received: %r'
+                % (self.archived)
+            )
         self.require_valid_report_ids(self.reports)
 
     @classmethod
@@ -1502,9 +1758,20 @@ class AppFeedbackReportTicket:
             ValidationError. The id is an invalid format.
         """
         if not isinstance(ticket_id, str):
-            raise utils.ValidationError('The ticket id should be a string, received: %s' % (ticket_id))
-        if len(ticket_id.split(app_feedback_report_constants.TICKET_ID_DELIMITER)) != 3:
-            raise utils.ValidationError('The ticket id %s is invalid' % (ticket_id))
+            raise utils.ValidationError(
+                'The ticket id should be a string, received: %s' % (ticket_id)
+            )
+        if (
+            len(
+                ticket_id.split(
+                    app_feedback_report_constants.TICKET_ID_DELIMITER
+                )
+            )
+            != 3
+        ):
+            raise utils.ValidationError(
+                'The ticket id %s is invalid' % (ticket_id)
+            )
 
     @classmethod
     def require_valid_ticket_name(cls, ticket_name: str) -> None:
@@ -1519,8 +1786,13 @@ class AppFeedbackReportTicket:
         if ticket_name is None:
             raise utils.ValidationError('No ticket name supplied.')
         if not isinstance(ticket_name, str):
-            raise utils.ValidationError('The ticket name should be a string, received: %s' % (ticket_name))
-        if len(ticket_name) > (app_feedback_report_constants.MAXIMUM_TICKET_NAME_LENGTH):
+            raise utils.ValidationError(
+                'The ticket name should be a string, received: %s'
+                % (ticket_name)
+            )
+        if len(ticket_name) > (
+            app_feedback_report_constants.MAXIMUM_TICKET_NAME_LENGTH
+        ):
             raise utils.ValidationError(
                 'The ticket name is too long, has %d characters but only '
                 'allowed %d characters'
@@ -1544,10 +1816,19 @@ class AppFeedbackReportTicket:
         if report_ids is None:
             raise utils.ValidationError('No reports list supplied.')
         if not isinstance(report_ids, list):
-            raise utils.ValidationError('The reports list should be a list, received: %r' % (report_ids))
+            raise utils.ValidationError(
+                'The reports list should be a list, received: %r' % (report_ids)
+            )
         for report_id in report_ids:
-            if app_feedback_report_models.AppFeedbackReportModel.get_by_id(report_id) is None:
-                raise utils.ValidationError('The report with id %s is invalid.' % report_id)
+            if (
+                app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                    report_id
+                )
+                is None
+            ):
+                raise utils.ValidationError(
+                    'The report with id %s is invalid.' % report_id
+                )
 
     @classmethod
     def require_valid_github_repo(cls, repo_name: str) -> None:
@@ -1561,9 +1842,15 @@ class AppFeedbackReportTicket:
             ValidationError. The repo name is invalid.
         """
         if not isinstance(repo_name, str):
-            raise utils.ValidationError('The Github repo name should be a string, received: %s' % (repo_name))
+            raise utils.ValidationError(
+                'The Github repo name should be a string, received: %s'
+                % (repo_name)
+            )
         if repo_name not in app_feedback_report_constants.GITHUB_REPO_CHOICES:
-            raise utils.ValidationError('The Github repo %s is invalid, must be one of %s.' % (repo_name, app_feedback_report_constants.GITHUB_REPO_CHOICES))
+            raise utils.ValidationError(
+                'The Github repo %s is invalid, must be one of %s.'
+                % (repo_name, app_feedback_report_constants.GITHUB_REPO_CHOICES)
+            )
 
 
 AcceptableEntryPointClasses = Union[
@@ -1635,7 +1922,12 @@ class AppFeedbackReportDailyStats:
             'platform': self.platform,
             'stats_tracking_date': self.stats_tracking_date.isoformat(),
             'total_reports_submitted': self.total_reports_submitted,
-            'daily_param_stats': {param_name: param_counts_obj.to_dict() for (param_name, param_counts_obj) in (self.daily_param_stats.items())},
+            'daily_param_stats': {
+                param_name: param_counts_obj.to_dict()
+                for (param_name, param_counts_obj) in (
+                    self.daily_param_stats.items()
+                )
+            },
         }
 
     def validate(self) -> None:
@@ -1649,9 +1941,15 @@ class AppFeedbackReportDailyStats:
         self.ticket.validate()
         AppFeedbackReport.require_valid_platform(self.platform)
         if not isinstance(self.total_reports_submitted, int):
-            raise utils.ValidationError('The total number of submitted reports should be an int, received: %r' % self.total_reports_submitted)
+            raise utils.ValidationError(
+                'The total number of submitted reports should be an int, received: %r'
+                % self.total_reports_submitted
+            )
         if self.total_reports_submitted < 0:
-            raise utils.ValidationError('The total number of submitted reports should be a non-negative int, received: %d' % self.total_reports_submitted)
+            raise utils.ValidationError(
+                'The total number of submitted reports should be a non-negative int, received: %d'
+                % self.total_reports_submitted
+            )
         self.require_valid_daily_param_stats(self.daily_param_stats)
 
     @classmethod
@@ -1665,12 +1963,21 @@ class AppFeedbackReportDailyStats:
             ValidationError. The id is an invalid format.
         """
         if not isinstance(stats_id, str):
-            raise utils.ValidationError('The stats id should be a string, received: %r' % stats_id)
-        if len(stats_id.split(app_feedback_report_constants.STATS_ID_DELIMITER)) != 3:
+            raise utils.ValidationError(
+                'The stats id should be a string, received: %r' % stats_id
+            )
+        if (
+            len(
+                stats_id.split(app_feedback_report_constants.STATS_ID_DELIMITER)
+            )
+            != 3
+        ):
             raise utils.ValidationError('The stats id %s is invalid' % stats_id)
 
     @classmethod
-    def require_valid_daily_param_stats(cls, param_stats: Dict[str, ReportStatsParameterValueCounts]) -> None:
+    def require_valid_daily_param_stats(
+        cls, param_stats: Dict[str, ReportStatsParameterValueCounts]
+    ) -> None:
         """Checks whether the statistics in this domain object are valid.
 
         Args:
@@ -1681,11 +1988,22 @@ class AppFeedbackReportDailyStats:
             ValidationError. The dict is an invalid format.
         """
         if not isinstance(param_stats, dict):
-            raise utils.ValidationError('The parameter stats should be a dict, received: %r' % param_stats)
-        allowed_parameter_names = [parameter.value for parameter in (app_feedback_report_constants.ALLOWED_STATS_PARAMETERS)]
+            raise utils.ValidationError(
+                'The parameter stats should be a dict, received: %r'
+                % param_stats
+            )
+        allowed_parameter_names = [
+            parameter.value
+            for parameter in (
+                app_feedback_report_constants.ALLOWED_STATS_PARAMETERS
+            )
+        ]
         for param_name, param_count_obj in param_stats.items():
             if param_name not in allowed_parameter_names:
-                raise utils.ValidationError('The parameter %s is not a valid parameter to aggregate stats on, must be one of %s' % (param_name, allowed_parameter_names))
+                raise utils.ValidationError(
+                    'The parameter %s is not a valid parameter to aggregate stats on, must be one of %s'
+                    % (param_name, allowed_parameter_names)
+                )
             param_count_obj.validate()
 
 
@@ -1723,9 +2041,15 @@ class ReportStatsParameterValueCounts:
         """
         for param_value, param_count in self.parameter_value_counts.items():
             if not isinstance(param_value, str):
-                raise utils.ValidationError('The parameter value should be a string, received: %r' % (param_value))
+                raise utils.ValidationError(
+                    'The parameter value should be a string, received: %r'
+                    % (param_value)
+                )
             if not isinstance(param_count, int) or param_count < 0:
-                raise utils.ValidationError('The parameter value count should be a non-negative int, received: %r' % param_count)
+                raise utils.ValidationError(
+                    'The parameter value count should be a non-negative int, received: %r'
+                    % param_count
+                )
 
 
 class AppFeedbackReportFilterDict(TypedDict):
@@ -1777,13 +2101,23 @@ class AppFeedbackReportFilter:
             ValidationError. One or more attributes of the
                 AppFeedbackReportFilter are not valid.
         """
-        if self.filter_field not in (app_feedback_report_constants.ALLOWED_FILTERS):
+        if self.filter_field not in (
+            app_feedback_report_constants.ALLOWED_FILTERS
+        ):
             raise utils.ValidationError(
                 'The filter field should be one of %s, received: %s'
                 % (
-                    [item.name for item in (app_feedback_report_constants.ALLOWED_FILTERS)],
+                    [
+                        item.name
+                        for item in (
+                            app_feedback_report_constants.ALLOWED_FILTERS
+                        )
+                    ],
                     self.filter_field.name,
                 )
             )
         if not isinstance(self.filter_options, list):
-            raise utils.ValidationError('The filter options should be a list, received: %r' % (self.filter_options))
+            raise utils.ValidationError(
+                'The filter options should be a list, received: %r'
+                % (self.filter_options)
+            )

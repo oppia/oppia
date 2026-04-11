@@ -64,6 +64,10 @@ class DrainResultsOnErrorTests(job_test_utils.PipelinedTestBase):
         )
 
     def test_zero_objects_correctly_outputs(self) -> None:
-        transform_result = self.pipeline | beam.Create([]) | results_transforms.DrainResultsOnError()
+        transform_result = (
+            self.pipeline
+            | beam.Create([])
+            | results_transforms.DrainResultsOnError()
+        )
 
         self.assert_pcoll_empty(transform_result)

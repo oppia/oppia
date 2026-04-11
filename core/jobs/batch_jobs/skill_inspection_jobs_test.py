@@ -37,7 +37,9 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[skill_inspection_jobs.CountHangingPrerequisiteSkillsJob] = skill_inspection_jobs.CountHangingPrerequisiteSkillsJob
+    JOB_CLASS: Type[skill_inspection_jobs.CountHangingPrerequisiteSkillsJob] = (
+        skill_inspection_jobs.CountHangingPrerequisiteSkillsJob
+    )
 
     SKILL_1_ID: Final = 'skill_id_1'
     SKILL_1_DESC: Final = 'skill_description_1'

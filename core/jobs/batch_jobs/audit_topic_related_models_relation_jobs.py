@@ -47,11 +47,29 @@ class ValidateTopicModelsJob(base_jobs.JobBase):
             PCollection. A PCollection of audit errors discovered during the
             validation.
         """
-        topic_models_pcoll = self.pipeline | 'Get all TopicModels' >> ndb_io.GetModels(topic_models.TopicModel.get_all(include_deleted=False))
+        topic_models_pcoll = (
+            self.pipeline
+            | 'Get all TopicModels'
+            >> ndb_io.GetModels(
+                topic_models.TopicModel.get_all(include_deleted=False)
+            )
+        )
 
-        topic_rights_models_pcoll = self.pipeline | 'Get all TopicRightsModels' >> ndb_io.GetModels(topic_models.TopicRightsModel.get_all(include_deleted=False))
+        topic_rights_models_pcoll = (
+            self.pipeline
+            | 'Get all TopicRightsModels'
+            >> ndb_io.GetModels(
+                topic_models.TopicRightsModel.get_all(include_deleted=False)
+            )
+        )
 
-        topic_summary_models_pcoll = self.pipeline | 'Get all TopicSummaryModels' >> ndb_io.GetModels(topic_models.TopicSummaryModel.get_all(include_deleted=False))
+        topic_summary_models_pcoll = (
+            self.pipeline
+            | 'Get all TopicSummaryModels'
+            >> ndb_io.GetModels(
+                topic_models.TopicSummaryModel.get_all(include_deleted=False)
+            )
+        )
 
         return topic_models_pcoll | 'Validate Topic Models' >> beam.ParDo(
             self._validate_topic_models,
@@ -81,20 +99,30 @@ class ValidateTopicModelsJob(base_jobs.JobBase):
         """
         errors = []
 
-        if not any(rights_model.id == topic_model.id for rights_model in topic_rights_models):
+        if not any(
+            rights_model.id == topic_model.id
+            for rights_model in topic_rights_models
+        ):
             errors.append(
                 base_validation_errors.ModelRelationshipError(
-                    id_property=model_property.ModelProperty(topic_models.TopicModel, topic_models.TopicModel.name),
+                    id_property=model_property.ModelProperty(
+                        topic_models.TopicModel, topic_models.TopicModel.name
+                    ),
                     model=topic_model,
                     target_kind='TopicRightsModel',
                     target_id=topic_model.name,
                 )
             )
 
-        if not any(summary_model.id == topic_model.id for summary_model in topic_summary_models):
+        if not any(
+            summary_model.id == topic_model.id
+            for summary_model in topic_summary_models
+        ):
             errors.append(
                 base_validation_errors.ModelRelationshipError(
-                    id_property=model_property.ModelProperty(topic_models.TopicModel, topic_models.TopicModel.name),
+                    id_property=model_property.ModelProperty(
+                        topic_models.TopicModel, topic_models.TopicModel.name
+                    ),
                     model=topic_model,
                     target_kind='TopicSummaryModel',
                     target_id=topic_model.name,

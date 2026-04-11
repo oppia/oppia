@@ -100,12 +100,18 @@ def _extract_text_from_workedexample_tag(element: bs4.Tag) -> str:
     """
     escaped_text_question = element.get('question-with-value')
     question_text = html.unescape(escaped_text_question)
-    output_str_question: str = json.loads(question_text) if escaped_text_question else ''
+    output_str_question: str = (
+        json.loads(question_text) if escaped_text_question else ''
+    )
 
     escaped_text_answer = element.get('answer-with-value')
     answer_text = html.unescape(escaped_text_answer)
-    output_str_answer: str = json.loads(answer_text) if escaped_text_answer else ''
-    return f'Example:\n\n{output_str_question}\n\nSolution:\n\n{output_str_answer}'
+    output_str_answer: str = (
+        json.loads(answer_text) if escaped_text_answer else ''
+    )
+    return (
+        f'Example:\n\n{output_str_question}\n\nSolution:\n\n{output_str_answer}'
+    )
 
 
 def _extract_text_from_math_tag(element: bs4.Tag) -> str:
@@ -167,7 +173,11 @@ def convert_custom_oppia_tags_to_generic_tags(element: bs4.Tag) -> bs4.Tag:
         Tag. The transformed paragraph tag.
     """
     tag_name = element.name
-    voiceover_text_extractor_fn = CUSTOM_RTE_TAGS_TO_VOICEOVER_TEXT_EXTRACTION_RULES.get(tag_name, _return_empty_string)
+    voiceover_text_extractor_fn = (
+        CUSTOM_RTE_TAGS_TO_VOICEOVER_TEXT_EXTRACTION_RULES.get(
+            tag_name, _return_empty_string
+        )
+    )
 
     element.string = voiceover_text_extractor_fn(element)
     element.name = 'p'
@@ -190,13 +200,17 @@ def parse_html(html_content: str) -> str:
     html_cleaner.validate_rte_tags(html_content)
     soup = bs4.BeautifulSoup(html_content, 'html.parser')
 
-    allowed_custom_oppia_rte_tags = list(rte_component_registry.Registry.get_tag_list_with_attrs().keys())
+    allowed_custom_oppia_rte_tags = list(
+        rte_component_registry.Registry.get_tag_list_with_attrs().keys()
+    )
 
     for custom_tag_element in allowed_custom_oppia_rte_tags:
         for element in soup.find_all(custom_tag_element):
             convert_custom_oppia_tags_to_generic_tags(element)
 
-    text_content: str = get_text_with_delimiters(soup, delimiter=feconf.OPPIA_CONTENT_TAG_DELIMITER)
+    text_content: str = get_text_with_delimiters(
+        soup, delimiter=feconf.OPPIA_CONTENT_TAG_DELIMITER
+    )
 
     return text_content
 
@@ -260,7 +274,9 @@ def empty_voiceover_raw_audio_data() -> bytes:
         voiceover.
     """
 
-    voiceover_path = os.path.join(feconf.SAMPLE_AUTO_VOICEOVERS_DATA_DIR, 'empty.mp3')
+    voiceover_path = os.path.join(
+        feconf.SAMPLE_AUTO_VOICEOVERS_DATA_DIR, 'empty.mp3'
+    )
 
     with open(voiceover_path, 'rb', encoding=None) as file:
         binary_audio_data = file.read()
@@ -317,11 +333,17 @@ def synthesize_voiceover_for_html_string(
     )
     parsed_text = parse_html(content_html)
 
-    content_hash_code = voiceover_models.CachedAutomaticVoiceoversModel.generate_hash_from_text(parsed_text)
-    cached_model: Optional[voiceover_models.CachedAutomaticVoiceoversModel] = voiceover_models.CachedAutomaticVoiceoversModel.get_cached_automatic_voiceover_model(
-        content_hash_code,
-        language_accent_code,
-        feconf.OPPIA_AUTOMATIC_VOICEOVER_PROVIDER,
+    content_hash_code = (
+        voiceover_models.CachedAutomaticVoiceoversModel.generate_hash_from_text(
+            parsed_text
+        )
+    )
+    cached_model: Optional[voiceover_models.CachedAutomaticVoiceoversModel] = (
+        voiceover_models.CachedAutomaticVoiceoversModel.get_cached_automatic_voiceover_model(
+            content_hash_code,
+            language_accent_code,
+            feconf.OPPIA_AUTOMATIC_VOICEOVER_PROVIDER,
+        )
     )
     audio_offset_list: List[Dict[str, Union[str, float]]] = []
 
@@ -335,7 +357,10 @@ def synthesize_voiceover_for_html_string(
                 filename = cached_model.voiceover_filename
                 binary_audio_data = fs.get('%s/%s' % ('audio', filename))
                 is_cached_model_used_for_voiceovers = True
-                logging.info('Voiceover synthesis log: Using cached voiceover for exploration ID: %s, content_html: %s' % (exploration_id, content_html))
+                logging.info(
+                    'Voiceover synthesis log: Using cached voiceover for exploration ID: %s, content_html: %s'
+                    % (exploration_id, content_html)
+                )
         except Exception as e:
             cached_model = None
             logging.warning('Failed to retrieve voiceover from cache: %s' % e)
@@ -344,16 +369,29 @@ def synthesize_voiceover_for_html_string(
     # cache fails; otherwise, utilize the cached voiceovers.
     if not is_cached_model_used_for_voiceovers:
         try:
-            binary_audio_data, audio_offset_list, error_details = speech_synthesis_services.regenerate_speech_from_text(parsed_text, language_accent_code, oppia_project_id)
-            logging.info('Voiceover synthesis log: Generated new voiceover for exploration ID: %s, content_html: %s' % (exploration_id, content_html))
+            binary_audio_data, audio_offset_list, error_details = (
+                speech_synthesis_services.regenerate_speech_from_text(
+                    parsed_text, language_accent_code, oppia_project_id
+                )
+            )
+            logging.info(
+                'Voiceover synthesis log: Generated new voiceover for exploration ID: %s, content_html: %s'
+                % (exploration_id, content_html)
+            )
         except Exception as e:
             error_details = str(e)
     if error_details:
-        logging.error('Voiceover synthesis error: Error during speech synthesis for exploration ID: %s, content_html: %s. Error details: %s' % (exploration_id, content_html, error_details))
+        logging.error(
+            'Voiceover synthesis error: Error during speech synthesis for exploration ID: %s, content_html: %s. Error details: %s'
+            % (exploration_id, content_html, error_details)
+        )
         raise Exception(error_details)
 
     if not binary_audio_data:
-        logging.info('Voiceover synthesis log: Empty voiceover generated for exploration ID: %s, content_html: %s' % (exploration_id, content_html))
+        logging.info(
+            'Voiceover synthesis log: Empty voiceover generated for exploration ID: %s, content_html: %s'
+            % (exploration_id, content_html)
+        )
         audio_offset_list = []
 
         # In the Beam environment, the default audio file for empty voiceovers
@@ -374,7 +412,9 @@ def synthesize_voiceover_for_html_string(
     # object being recursively passed around in app engine.
     del audio
 
-    logging.info('Voiceover synthesis log: Voiceover filename: %s.' % voiceover_filename)
+    logging.info(
+        'Voiceover synthesis log: Voiceover filename: %s.' % voiceover_filename
+    )
     fs.commit(
         '%s/%s' % ('audio', voiceover_filename),
         binary_audio_data,
@@ -396,11 +436,13 @@ def synthesize_voiceover_for_html_string(
                 cached_model.update_timestamps()
                 cached_model.put()
     else:
-        new_cached_model = voiceover_models.CachedAutomaticVoiceoversModel.create_cache_model(
-            language_accent_code,
-            parsed_text,
-            voiceover_filename,
-            audio_offset_list,
+        new_cached_model = (
+            voiceover_models.CachedAutomaticVoiceoversModel.create_cache_model(
+                language_accent_code,
+                parsed_text,
+                voiceover_filename,
+                audio_offset_list,
+            )
         )
         new_cached_model.update_timestamps()
         new_cached_model.put()
@@ -408,7 +450,9 @@ def synthesize_voiceover_for_html_string(
     return audio_offset_list
 
 
-def generate_new_voiceover_filename(content_id: str, language_accent_code: str) -> str:
+def generate_new_voiceover_filename(
+    content_id: str, language_accent_code: str
+) -> str:
     """Generates a unique filename for a new voiceover. The filename is composed
     of the content ID, language accent code, and a random 10-character string.
 
@@ -451,7 +495,11 @@ def get_content_html_in_requested_language(
         Exception. The translation for the content ID is not found in the
             requested language.
     """
-    language_code = voiceover_services.get_language_code_from_language_accent_code(language_accent_code)
+    language_code = (
+        voiceover_services.get_language_code_from_language_accent_code(
+            language_accent_code
+        )
+    )
     assert isinstance(language_code, str)
 
     if language_code == 'en':
@@ -467,10 +515,15 @@ def get_content_html_in_requested_language(
             language_code,
         )
         try:
-            translated_content_html = entity_translations.translations[content_id].content_value
+            translated_content_html = entity_translations.translations[
+                content_id
+            ].content_value
             assert isinstance(translated_content_html, str)
         except Exception as e:
-            raise Exception('Translation for content_id %s not found in language %s' % (content_id, language_code)) from e
+            raise Exception(
+                'Translation for content_id %s not found in language %s'
+                % (content_id, language_code)
+            ) from e
         return translated_content_html
 
 
@@ -512,9 +565,13 @@ def regenerate_voiceover_for_exploration_content(
         content_id,
         language_accent_code,
     )
-    voiceover_filename = generate_new_voiceover_filename(content_id, language_accent_code)
+    voiceover_filename = generate_new_voiceover_filename(
+        content_id, language_accent_code
+    )
 
-    sentence_tokens_with_durations = synthesize_voiceover_for_html_string(exploration_id, content_html, language_accent_code, voiceover_filename)
+    sentence_tokens_with_durations = synthesize_voiceover_for_html_string(
+        exploration_id, content_html, language_accent_code, voiceover_filename
+    )
 
     voiceover = fetch_voiceover_by_filename(exploration_id, voiceover_filename)
 
@@ -522,21 +579,29 @@ def regenerate_voiceover_for_exploration_content(
         exploration_id, language_accent_code, content_id, 'SUCCEEDED'
     )
 
-    entity_voiceovers = voiceover_services.get_voiceovers_for_given_language_accent_code(
-        feconf.ENTITY_TYPE_EXPLORATION,
-        exploration_id,
-        exploration_version,
-        language_accent_code,
+    entity_voiceovers = (
+        voiceover_services.get_voiceovers_for_given_language_accent_code(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exploration_id,
+            exploration_version,
+            language_accent_code,
+        )
     )
-    entity_voiceovers.add_voiceover(content_id, feconf.VoiceoverType.AUTO, voiceover)
-    entity_voiceovers.add_automated_voiceovers_audio_offsets(content_id, sentence_tokens_with_durations)
+    entity_voiceovers.add_voiceover(
+        content_id, feconf.VoiceoverType.AUTO, voiceover
+    )
+    entity_voiceovers.add_automated_voiceovers_audio_offsets(
+        content_id, sentence_tokens_with_durations
+    )
     entity_voiceovers.validate()
     voiceover_services.save_entity_voiceovers(entity_voiceovers)
 
     return voiceover, sentence_tokens_with_durations
 
 
-def fetch_voiceover_by_filename(exploration_id: str, filename: str, oppia_project_id: Optional[str] = None) -> state_domain.Voiceover:
+def fetch_voiceover_by_filename(
+    exploration_id: str, filename: str, oppia_project_id: Optional[str] = None
+) -> state_domain.Voiceover:
     """Fetches the voiceover by filename from the GCS file system.
 
     Args:
@@ -562,7 +627,9 @@ def fetch_voiceover_by_filename(exploration_id: str, filename: str, oppia_projec
         duration_secs = audio.info.length
         audio_size_bytes = tempbuffer.getbuffer().nbytes
 
-    return state_domain.Voiceover(filename, audio_size_bytes, False, duration_secs)
+    return state_domain.Voiceover(
+        filename, audio_size_bytes, False, duration_secs
+    )
 
 
 def regenerate_voiceovers_of_exploration(
@@ -587,20 +654,26 @@ def regenerate_voiceovers_of_exploration(
     """
     errors_while_voiceover_regeneration = []
     for content_id, content_html in content_id_to_content_html.items():
-        voiceover_filename = generate_new_voiceover_filename(content_id, language_accent_code)
+        voiceover_filename = generate_new_voiceover_filename(
+            content_id, language_accent_code
+        )
 
         try:
             # Generates a voiceover for the provided HTML content in the
             # specified language accent.
-            sentence_tokens_with_durations = synthesize_voiceover_for_html_string(
-                exploration_id,
-                content_html,
-                language_accent_code,
-                voiceover_filename,
+            sentence_tokens_with_durations = (
+                synthesize_voiceover_for_html_string(
+                    exploration_id,
+                    content_html,
+                    language_accent_code,
+                    voiceover_filename,
+                )
             )
 
             # Fetches the generated voiceover.
-            voiceover = fetch_voiceover_by_filename(exploration_id, voiceover_filename)
+            voiceover = fetch_voiceover_by_filename(
+                exploration_id, voiceover_filename
+            )
 
             # Saves the voiceover into EntityVoiceoversModel.
             entity_voiceovers = voiceover_services.get_voiceovers_for_given_language_accent_code(
@@ -609,12 +682,19 @@ def regenerate_voiceovers_of_exploration(
                 exploration_version,
                 language_accent_code,
             )
-            entity_voiceovers.add_voiceover(content_id, feconf.VoiceoverType.AUTO, voiceover)
-            entity_voiceovers.add_automated_voiceovers_audio_offsets(content_id, sentence_tokens_with_durations)
+            entity_voiceovers.add_voiceover(
+                content_id, feconf.VoiceoverType.AUTO, voiceover
+            )
+            entity_voiceovers.add_automated_voiceovers_audio_offsets(
+                content_id, sentence_tokens_with_durations
+            )
             entity_voiceovers.validate()
             voiceover_services.save_entity_voiceovers(entity_voiceovers)
         except Exception as e:
-            logging.error('Failed to regenerate voiceover for content_id %s in exploration %s: %s' % (content_id, exploration_id, str(e)))
+            logging.error(
+                'Failed to regenerate voiceover for content_id %s in exploration %s: %s'
+                % (content_id, exploration_id, str(e))
+            )
             errors_while_voiceover_regeneration.append((content_id, str(e)))
             continue
 

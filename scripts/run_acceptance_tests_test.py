@@ -45,7 +45,9 @@ class PopenErrorReturn:
         return '', 'Some error'.encode('utf-8')
 
 
-def mock_managed_long_lived_process(*unused_args: str, **unused_kwargs: str) -> ContextManager[scripts_test_utils.PopenStub]:
+def mock_managed_long_lived_process(
+    *unused_args: str, **unused_kwargs: str
+) -> ContextManager[scripts_test_utils.PopenStub]:
     """Mock method for replacing the managed_process() functions to simulate a
     long-lived process. This process stays alive for 10 poll() calls, and
     then terminates thereafter.
@@ -71,14 +73,18 @@ def mock_managed_long_lived_process(*unused_args: str, **unused_kwargs: str) -> 
     return contextlib.nullcontext(enter_result=stub)
 
 
-def mock_managed_process(*unused_args: str, **unused_kwargs: str) -> ContextManager[scripts_test_utils.PopenStub]:
+def mock_managed_process(
+    *unused_args: str, **unused_kwargs: str
+) -> ContextManager[scripts_test_utils.PopenStub]:
     """Mock method for replacing the managed_process() functions.
 
     Returns:
         Context manager. A context manager that always yields a mock
         process.
     """
-    return contextlib.nullcontext(enter_result=scripts_test_utils.PopenStub(alive=False))
+    return contextlib.nullcontext(
+        enter_result=scripts_test_utils.PopenStub(alive=False)
+    )
 
 
 class RunAcceptanceTestsTests(test_utils.GenericTestBase):
@@ -91,8 +97,12 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         def mock_constants() -> None:
             print('mock_set_constants_to_default')
 
-        self.swap_mock_set_constants_to_default = self.swap(common, 'set_constants_to_default', mock_constants)
-        self.compile_test_ts_files_swap = self.swap(run_acceptance_tests, 'compile_test_ts_files', lambda: None)
+        self.swap_mock_set_constants_to_default = self.swap(
+            common, 'set_constants_to_default', mock_constants
+        )
+        self.compile_test_ts_files_swap = self.swap(
+            run_acceptance_tests, 'compile_test_ts_files', lambda: None
+        )
 
     def tearDown(self) -> None:
         try:
@@ -112,7 +122,9 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 run_acceptance_tests.compile_test_ts_files()
 
     def test_compile_test_ts_files_success(self) -> None:
-        process = subprocess.Popen(['test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process = subprocess.Popen(
+            ['test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
 
         def mock_os_path_exists(unused_path: str) -> bool:
             return True
@@ -133,7 +145,9 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         def mock_communicate(unused_self: str) -> Tuple[bytes, bytes]:
             return (b'', b'')
 
-        puppeteer_acceptance_tests_dir_path = os.path.join(common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
+        puppeteer_acceptance_tests_dir_path = os.path.join(
+            common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests'
+        )
         build_dir_path = os.path.join(
             puppeteer_acceptance_tests_dir_path,
             'build',
@@ -157,22 +171,35 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 )
             ],
         )
-        expected_cmd = './node_modules/typescript/bin/tsc -p %s' % './tsconfig.puppeteer-acceptance-tests.json'
+        expected_cmd = (
+            './node_modules/typescript/bin/tsc -p %s'
+            % './tsconfig.puppeteer-acceptance-tests.json'
+        )
         process_swap = self.swap_with_checks(
             subprocess,
             'Popen',
             mock_popen_call,
             expected_args=[(expected_cmd,)],
         )
-        communicate_swap = self.swap(subprocess.Popen, 'communicate', mock_communicate)
+        communicate_swap = self.swap(
+            subprocess.Popen, 'communicate', mock_communicate
+        )
 
         with os_path_exists_swap, shutil_rmtree_swap, process_swap:
             with shutil_copytree_swap, communicate_swap:
                 run_acceptance_tests.compile_test_ts_files()
 
     def test_start_tests_when_other_instances_not_stopped(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(common, 'is_oppia_server_already_running', lambda *_: True))
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                common, 'is_oppia_server_already_running', lambda *_: True
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_portserver', mock_managed_process
+            )
+        )
 
         with (
             self.compile_test_ts_files_swap,
@@ -187,7 +214,11 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_start_tests_when_no_other_instance_running(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(common, 'is_oppia_server_already_running', lambda *_: False))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                common, 'is_oppia_server_already_running', lambda *_: False
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 build,
@@ -203,10 +234,26 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_firebase_auth_emulator', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_dev_appserver', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_redis_server', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_firebase_auth_emulator', mock_managed_process
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_dev_appserver', mock_managed_process
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_redis_server', mock_managed_process
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_portserver', mock_managed_process
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 servers,
@@ -230,7 +277,11 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 ],
             )
         )
-        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(0,)]))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                sys, 'exit', lambda _: None, expected_args=[(0,)]
+            )
+        )
 
         with self.swap_mock_set_constants_to_default:
             with self.compile_test_ts_files_swap:
@@ -247,7 +298,11 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 )
             )
 
-        self.exit_stack.enter_context(self.swap_with_checks(common, 'is_oppia_server_already_running', lambda *_: False))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                common, 'is_oppia_server_already_running', lambda *_: False
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 build,
@@ -263,9 +318,21 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_firebase_auth_emulator', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_dev_appserver', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_redis_server', mock_managed_process))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_firebase_auth_emulator', mock_managed_process
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_dev_appserver', mock_managed_process
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_redis_server', mock_managed_process
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 servers,
@@ -297,10 +364,16 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             with self.compile_test_ts_files_swap:
                 lines, _ = run_acceptance_tests.run_tests(args)
 
-        self.assertEqual([line.decode('utf-8') for line in lines], ['sample', '✓', 'output'])
+        self.assertEqual(
+            [line.decode('utf-8') for line in lines], ['sample', '✓', 'output']
+        )
 
     def test_start_tests_skip_build(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(common, 'is_oppia_server_already_running', lambda *_: False))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                common, 'is_oppia_server_already_running', lambda *_: False
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 common,
@@ -309,7 +382,11 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 expected_kwargs=[{'prod_env': False}],
             )
         )
-        self.exit_stack.enter_context(self.swap_with_checks(common, 'set_constants_to_default', lambda: None))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                common, 'set_constants_to_default', lambda: None
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 servers,
@@ -317,9 +394,21 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_firebase_auth_emulator', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_dev_appserver', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_redis_server', mock_managed_process))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_firebase_auth_emulator', mock_managed_process
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_dev_appserver', mock_managed_process
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_redis_server', mock_managed_process
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 servers,
@@ -328,7 +417,11 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 called=False,
             )
         )
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_portserver', mock_managed_process
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 servers,
@@ -352,13 +445,23 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 ],
             )
         )
-        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(0,)]))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                sys, 'exit', lambda _: None, expected_args=[(0,)]
+            )
+        )
 
         with self.compile_test_ts_files_swap:
-            run_acceptance_tests.main(args=['--suite', 'testSuite', '--skip_build'])
+            run_acceptance_tests.main(
+                args=['--suite', 'testSuite', '--skip_build']
+            )
 
     def test_start_tests_in_jasmine(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(common, 'is_oppia_server_already_running', lambda *_: False))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                common, 'is_oppia_server_already_running', lambda *_: False
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 build,
@@ -374,10 +477,26 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_firebase_auth_emulator', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_dev_appserver', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_redis_server', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_firebase_auth_emulator', mock_managed_process
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_dev_appserver', mock_managed_process
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_redis_server', mock_managed_process
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_portserver', mock_managed_process
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 servers,
@@ -401,14 +520,22 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 ],
             )
         )
-        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(0,)]))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                sys, 'exit', lambda _: None, expected_args=[(0,)]
+            )
+        )
 
         with self.swap_mock_set_constants_to_default:
             with self.compile_test_ts_files_swap:
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_start_tests_for_long_lived_process(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(common, 'is_oppia_server_already_running', lambda *_: False))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                common, 'is_oppia_server_already_running', lambda *_: False
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 build,
@@ -424,9 +551,21 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_firebase_auth_emulator', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_dev_appserver', mock_managed_process))
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_redis_server', mock_managed_process))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_firebase_auth_emulator', mock_managed_process
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_dev_appserver', mock_managed_process
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_redis_server', mock_managed_process
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 servers,
@@ -452,7 +591,11 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             )
         )
 
-        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(0,)]))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                sys, 'exit', lambda _: None, expected_args=[(0,)]
+            )
+        )
 
         with self.swap_mock_set_constants_to_default:
             with self.compile_test_ts_files_swap:

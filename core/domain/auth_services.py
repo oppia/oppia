@@ -41,7 +41,9 @@ platform_auth_services = models.Registry.import_auth_services()
 CSRF_SECRET_INSTANCE_ID: Final = 'csrf_secret'
 
 
-def create_profile_user_auth_details(user_id: str, parent_user_id: str) -> auth_domain.UserAuthDetails:
+def create_profile_user_auth_details(
+    user_id: str, parent_user_id: str
+) -> auth_domain.UserAuthDetails:
     """Returns a domain object for a new profile user.
 
     Args:
@@ -72,10 +74,16 @@ def get_all_profiles_by_parent_user_id(
         list(UserAuthDetailsModel). List of UserAuthDetailsModel instances
         with the given parent user.
     """
-    return list(auth_models.UserAuthDetailsModel.query(auth_models.UserAuthDetailsModel.parent_user_id == parent_user_id).fetch())
+    return list(
+        auth_models.UserAuthDetailsModel.query(
+            auth_models.UserAuthDetailsModel.parent_user_id == parent_user_id
+        ).fetch()
+    )
 
 
-def establish_auth_session(request: webapp2.Request, response: webapp2.Response) -> None:
+def establish_auth_session(
+    request: webapp2.Request, response: webapp2.Response
+) -> None:
     """Sets login cookies to maintain a user's sign-in session.
 
     Args:
@@ -167,7 +175,9 @@ def verify_external_auth_associations_are_deleted(user_id: str) -> bool:
         bool. True if and only if we have successfully verified that all
         external associations have been deleted.
     """
-    return platform_auth_services.verify_external_auth_associations_are_deleted(user_id)
+    return platform_auth_services.verify_external_auth_associations_are_deleted(
+        user_id
+    )
 
 
 def get_auth_id_from_user_id(user_id: str) -> Optional[str]:
@@ -198,7 +208,9 @@ def get_multi_auth_ids_from_user_ids(
     return platform_auth_services.get_multi_auth_ids_from_user_ids(user_ids)
 
 
-def get_user_id_from_auth_id(auth_id: str, include_deleted: bool = False) -> Optional[str]:
+def get_user_id_from_auth_id(
+    auth_id: str, include_deleted: bool = False
+) -> Optional[str]:
     """Returns the user ID associated with the given auth ID.
 
     Args:
@@ -210,7 +222,9 @@ def get_user_id_from_auth_id(auth_id: str, include_deleted: bool = False) -> Opt
         str|None. The user ID associated with the given auth ID, or None if no
         association exists.
     """
-    return platform_auth_services.get_user_id_from_auth_id(auth_id, include_deleted=include_deleted)
+    return platform_auth_services.get_user_id_from_auth_id(
+        auth_id, include_deleted=include_deleted
+    )
 
 
 def get_multi_user_ids_from_auth_ids(
@@ -255,7 +269,9 @@ def associate_multi_auth_ids_with_user_ids(
     Raises:
         Exception. One or more auth associations already exist.
     """
-    platform_auth_services.associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs)
+    platform_auth_services.associate_multi_auth_ids_with_user_ids(
+        auth_id_user_id_pairs
+    )
 
 
 def get_all_external_accounts() -> List[auth_domain.ExternalAccount]:
@@ -300,17 +316,23 @@ def get_csrf_secret_value() -> str:
         assert isinstance(csrf_value, str)
         return csrf_value
 
-    csrf_secret_model = auth_models.CsrfSecretModel.get(CSRF_SECRET_INSTANCE_ID, strict=False)
+    csrf_secret_model = auth_models.CsrfSecretModel.get(
+        CSRF_SECRET_INSTANCE_ID, strict=False
+    )
 
     if csrf_secret_model is None:
         csrf_secret_value = base64.urlsafe_b64encode(os.urandom(20)).decode()
-        auth_models.CsrfSecretModel(id=CSRF_SECRET_INSTANCE_ID, oppia_csrf_secret=csrf_secret_value).put()
+        auth_models.CsrfSecretModel(
+            id=CSRF_SECRET_INSTANCE_ID, oppia_csrf_secret=csrf_secret_value
+        ).put()
         caching_services.set_multi(
             caching_services.CACHE_NAMESPACE_DEFAULT,
             None,
             {CSRF_SECRET_INSTANCE_ID: csrf_secret_value},
         )
-        csrf_secret_model = auth_models.CsrfSecretModel.get(CSRF_SECRET_INSTANCE_ID, strict=False)
+        csrf_secret_model = auth_models.CsrfSecretModel.get(
+            CSRF_SECRET_INSTANCE_ID, strict=False
+        )
 
     # Ruling out the possibility of csrf_secret_model being None in
     # order to avoid mypy error.

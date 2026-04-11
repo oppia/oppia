@@ -72,7 +72,9 @@ class ValidateDeletedModel(beam.DoFn):  # type: ignore[misc]
     not existing ones.
     """
 
-    def process(self, entity: base_models.BaseModel) -> Iterator[base_validation_errors.ModelExpiredError]:
+    def process(
+        self, entity: base_models.BaseModel
+    ) -> Iterator[base_validation_errors.ModelExpiredError]:
         """Yields audit errors that are discovered in the input model.
 
         Args:
@@ -83,7 +85,10 @@ class ValidateDeletedModel(beam.DoFn):  # type: ignore[misc]
         """
         cloned_entity = job_utils.clone_model(entity)
 
-        expiration_date = datetime.datetime.utcnow() - feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED
+        expiration_date = (
+            datetime.datetime.utcnow()
+            - feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED
+        )
 
         if cloned_entity.last_updated < expiration_date:
             yield base_validation_errors.ModelExpiredError(cloned_entity)
@@ -112,7 +117,9 @@ class ValidateBaseModelId(beam.DoFn):  # type: ignore[misc]
         # https://docs.python.org/3/library/pickle.html#what-can-be-pickled-and-unpickled
         self._pattern = BASE_MODEL_ID_PATTERN
 
-    def process(self, entity: base_models.BaseModel) -> Iterator[base_validation_errors.ModelIdRegexError]:
+    def process(
+        self, entity: base_models.BaseModel
+    ) -> Iterator[base_validation_errors.ModelIdRegexError]:
         """Function that defines how to process each entity in a pipeline of
         models.
 
@@ -125,7 +132,9 @@ class ValidateBaseModelId(beam.DoFn):  # type: ignore[misc]
         cloned_entity = job_utils.clone_model(entity)
 
         if not re.match(self._pattern, cloned_entity.id):
-            yield base_validation_errors.ModelIdRegexError(cloned_entity, self._pattern)
+            yield base_validation_errors.ModelIdRegexError(
+                cloned_entity, self._pattern
+            )
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -136,7 +145,9 @@ class ValidateBaseModelId(beam.DoFn):  # type: ignore[misc]
 class ValidatePostCommitStatus(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate post_commit_status."""
 
-    def process(self, entity: base_models.BaseCommitLogEntryModel) -> Iterator[base_validation_errors.InvalidCommitStatusError]:
+    def process(
+        self, entity: base_models.BaseCommitLogEntryModel
+    ) -> Iterator[base_validation_errors.InvalidCommitStatusError]:
         """Function validates that post_commit_status is either public or
         private
 
@@ -164,7 +175,9 @@ class ValidatePostCommitIsPrivate(beam.DoFn):  # type: ignore[misc]
     post_commit_is_private is true and vice-versa.
     """
 
-    def process(self, entity: base_models.BaseCommitLogEntryModel) -> Iterator[base_validation_errors.InvalidPrivateCommitStatusError]:
+    def process(
+        self, entity: base_models.BaseCommitLogEntryModel
+    ) -> Iterator[base_validation_errors.InvalidPrivateCommitStatusError]:
         """Function validates that post_commit_is_private is true iff
         post_commit_status is private
 
@@ -178,9 +191,17 @@ class ValidatePostCommitIsPrivate(beam.DoFn):  # type: ignore[misc]
         """
         cloned_entity = job_utils.clone_model(entity)
 
-        expected_post_commit_is_private = cloned_entity.post_commit_status == feconf.POST_COMMIT_STATUS_PRIVATE
-        if cloned_entity.post_commit_is_private != expected_post_commit_is_private:
-            yield base_validation_errors.InvalidPrivateCommitStatusError(cloned_entity)
+        expected_post_commit_is_private = (
+            cloned_entity.post_commit_status
+            == feconf.POST_COMMIT_STATUS_PRIVATE
+        )
+        if (
+            cloned_entity.post_commit_is_private
+            != expected_post_commit_is_private
+        ):
+            yield base_validation_errors.InvalidPrivateCommitStatusError(
+                cloned_entity
+            )
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -193,7 +214,9 @@ class ValidatePostCommitIsPublic(beam.DoFn):  # type: ignore[misc]
     post_commit_is_public is true and vice-versa.
     """
 
-    def process(self, entity: base_models.BaseCommitLogEntryModel) -> Iterator[base_validation_errors.InvalidPublicCommitStatusError]:
+    def process(
+        self, entity: base_models.BaseCommitLogEntryModel
+    ) -> Iterator[base_validation_errors.InvalidPublicCommitStatusError]:
         """Function validates that post_commit_is_public is true iff
         post_commit_status is public.
 
@@ -206,9 +229,16 @@ class ValidatePostCommitIsPublic(beam.DoFn):  # type: ignore[misc]
         """
         cloned_entity = job_utils.clone_model(entity)
 
-        expected_post_commit_is_public = cloned_entity.post_commit_status == feconf.POST_COMMIT_STATUS_PUBLIC
-        if cloned_entity.post_commit_community_owned != expected_post_commit_is_public:
-            yield base_validation_errors.InvalidPublicCommitStatusError(cloned_entity)
+        expected_post_commit_is_public = (
+            cloned_entity.post_commit_status == feconf.POST_COMMIT_STATUS_PUBLIC
+        )
+        if (
+            cloned_entity.post_commit_community_owned
+            != expected_post_commit_is_public
+        ):
+            yield base_validation_errors.InvalidPublicCommitStatusError(
+                cloned_entity
+            )
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -239,14 +269,22 @@ class ValidateModelTimestamps(beam.DoFn):  # type: ignore[misc]
             timestamps.
         """
         cloned_entity = job_utils.clone_model(entity)
-        last_updated_corrected = cloned_entity.last_updated + MAX_CLOCK_SKEW_DURATION
+        last_updated_corrected = (
+            cloned_entity.last_updated + MAX_CLOCK_SKEW_DURATION
+        )
         if cloned_entity.created_on > last_updated_corrected:
-            yield base_validation_errors.InconsistentTimestampsError(cloned_entity)
+            yield base_validation_errors.InconsistentTimestampsError(
+                cloned_entity
+            )
 
         current_datetime = datetime.datetime.utcnow()
-        last_updated_corrected = cloned_entity.last_updated - MAX_CLOCK_SKEW_DURATION
+        last_updated_corrected = (
+            cloned_entity.last_updated - MAX_CLOCK_SKEW_DURATION
+        )
         if last_updated_corrected > current_datetime:
-            yield base_validation_errors.ModelMutatedDuringJobError(cloned_entity)
+            yield base_validation_errors.ModelMutatedDuringJobError(
+                cloned_entity
+            )
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -280,7 +318,9 @@ class ValidateModelDomainObjectInstances(
         """
         return None
 
-    def _get_domain_object_validation_type(self, unused_item: ModelInstanceType) -> ValidationModes:
+    def _get_domain_object_validation_type(
+        self, unused_item: ModelInstanceType
+    ) -> ValidationModes:
         """Returns the type of domain object validation to be performed.
 
         Some of the storage models support a strict/non strict mode depending
@@ -299,7 +339,9 @@ class ValidateModelDomainObjectInstances(
         """
         return ValidationModes.NEUTRAL
 
-    def process(self, entity: ModelInstanceType) -> Iterator[base_validation_errors.ModelDomainObjectValidateError]:
+    def process(
+        self, entity: ModelInstanceType
+    ) -> Iterator[base_validation_errors.ModelDomainObjectValidateError]:
         """Function that defines how to process each entity in a pipeline of
         models.
 
@@ -323,9 +365,14 @@ class ValidateModelDomainObjectInstances(
             elif validation_type == ValidationModes.NON_STRICT:
                 domain_object.validate(strict=False)
             else:
-                raise Exception('Invalid validation type for domain object: %s' % (validation_type))
+                raise Exception(
+                    'Invalid validation type for domain object: %s'
+                    % (validation_type)
+                )
         except Exception as e:
-            yield base_validation_errors.ModelDomainObjectValidateError(entity, str(e))
+            yield base_validation_errors.ModelDomainObjectValidateError(
+                entity, str(e)
+            )
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -339,7 +386,9 @@ class BaseValidateCommitCmdsSchema(beam.DoFn, Generic[ModelInstanceType]):  # ty
     implemented. This class is used as a parent class in other places.
     """
 
-    def _get_change_domain_class(self, unused_item: ModelInstanceType) -> Type[change_domain.BaseChange]:
+    def _get_change_domain_class(
+        self, unused_item: ModelInstanceType
+    ) -> Type[change_domain.BaseChange]:
         """Returns a Change domain class for the changes made by commit
         commands of the model.
 
@@ -351,7 +400,9 @@ class BaseValidateCommitCmdsSchema(beam.DoFn, Generic[ModelInstanceType]):  # ty
         Raises:
             NotImplementedError. This function has not yet been implemented.
         """
-        raise NotImplementedError('The _get_change_domain_class() method is missing from the derived class. It should be implemented in the derived class.')
+        raise NotImplementedError(
+            'The _get_change_domain_class() method is missing from the derived class. It should be implemented in the derived class.'
+        )
 
     def process(
         self, entity: ModelInstanceType
@@ -394,14 +445,18 @@ class BaseValidateCommitCmdsSchema(beam.DoFn, Generic[ModelInstanceType]):  # ty
             try:
                 change_domain_object(commit_cmd_dict)
             except Exception as e:
-                yield base_validation_errors.CommitCmdsValidateError(entity, commit_cmd_dict, str(e))
+                yield base_validation_errors.CommitCmdsValidateError(
+                    entity, commit_cmd_dict, str(e)
+                )
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
-@validation_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel, base_models.BaseSnapshotMetadataModel)
+@validation_decorators.AuditsExisting(
+    base_models.BaseCommitLogEntryModel, base_models.BaseSnapshotMetadataModel
+)
 class ValidateCommitType(beam.DoFn):  # type: ignore[misc]
     """DoFn to check whether commit type is valid."""
 
@@ -423,5 +478,8 @@ class ValidateCommitType(beam.DoFn):  # type: ignore[misc]
         """
         cloned_entity = job_utils.clone_model(entity)
 
-        if cloned_entity.commit_type not in base_models.VersionedModel.COMMIT_TYPE_CHOICES:
+        if (
+            cloned_entity.commit_type
+            not in base_models.VersionedModel.COMMIT_TYPE_CHOICES
+        ):
             yield base_validation_errors.InvalidCommitTypeError(cloned_entity)

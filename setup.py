@@ -44,7 +44,11 @@ def main() -> None:
         )
 
         # Parse each non-empty, non-comment line as a requirement.
-        required_packages = [str(requirements.Requirement(line)) for line in modified_requirements_content.splitlines() if line.strip() and not line.strip().startswith('#')]
+        required_packages = [
+            str(requirements.Requirement(line))
+            for line in modified_requirements_content.splitlines()
+            if line.strip() and not line.strip().startswith('#')
+        ]
 
     setuptools.setup(
         name='oppia-beam-job',

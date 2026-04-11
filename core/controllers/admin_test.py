@@ -105,7 +105,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.admin_email_address = 'testadmin@example.com'
 
-        self.original_parameter_registry = platform_parameter_registry.Registry.parameter_registry.copy()
+        self.original_parameter_registry = (
+            platform_parameter_registry.Registry.parameter_registry.copy()
+        )
         platform_parameter_registry.Registry.parameter_registry.clear()
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER,
@@ -121,7 +123,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def tearDown(self) -> None:
         super().tearDown()
-        platform_parameter_registry.Registry.parameter_registry = self.original_parameter_registry
+        platform_parameter_registry.Registry.parameter_registry = (
+            self.original_parameter_registry
+        )
 
     def test_admin_get(self) -> None:
         """Test `/admin` returns a 200 response."""
@@ -144,7 +148,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(Exception, 'Cannot reload an exploration in production.')
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot reload an exploration in production.'
+        )
         with assert_raises_regexp_context_manager, self.prod_mode_swap:
             self.post_json(
                 '/adminhandler',
@@ -506,7 +512,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         new_rule_dicts = [
             {
-                'filters': [{'type': 'platform_type', 'conditions': [['=', 'Web']]}],
+                'filters': [
+                    {'type': 'platform_type', 'conditions': [['=', 'Web']]}
+                ],
                 'value_when_matched': True,
             }
         ]
@@ -536,7 +544,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(Exception, 'Cannot load new structures data in production.')
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot load new structures data in production.'
+        )
         with assert_raises_regexp_context_manager, self.prod_mode_swap:
             self.post_json(
                 '/adminhandler',
@@ -548,7 +558,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_non_admins_cannot_load_new_structures_data(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        assert_raises_regexp = self.assertRaisesRegex(Exception, 'User does not have enough rights to generate data.')
+        assert_raises_regexp = self.assertRaisesRegex(
+            Exception, 'User does not have enough rights to generate data.'
+        )
         with assert_raises_regexp:
             self.post_json(
                 '/adminhandler',
@@ -561,7 +573,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(Exception, 'Cannot generate dummy skills in production.')
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot generate dummy skills in production.'
+        )
         with assert_raises_regexp_context_manager, self.prod_mode_swap:
             self.post_json(
                 '/adminhandler',
@@ -574,7 +588,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(Exception, 'Cannot generate dummy classroom in production.')
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot generate dummy classroom in production.'
+        )
         with assert_raises_regexp_context_manager, self.prod_mode_swap:
             self.post_json(
                 '/adminhandler',
@@ -586,7 +602,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_non_admins_cannot_generate_dummy_skill_data(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        assert_raises_regexp = self.assertRaisesRegex(Exception, 'User does not have enough rights to generate data.')
+        assert_raises_regexp = self.assertRaisesRegex(
+            Exception, 'User does not have enough rights to generate data.'
+        )
         with assert_raises_regexp:
             self.post_json(
                 '/adminhandler',
@@ -598,7 +616,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_non_admins_cannot_generate_dummy_classroom_data(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        assert_raises_regexp = self.assertRaisesRegex(Exception, 'User does not have enough rights to generate data.')
+        assert_raises_regexp = self.assertRaisesRegex(
+            Exception, 'User does not have enough rights to generate data.'
+        )
         with assert_raises_regexp:
             self.post_json(
                 '/adminhandler',
@@ -611,7 +631,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(Exception, 'Cannot reload a collection in production.')
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot reload a collection in production.'
+        )
         with assert_raises_regexp_context_manager, self.prod_mode_swap:
             self.post_json(
                 '/adminhandler',
@@ -675,29 +697,41 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         )
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         self.assertEqual(len(topic_summaries), 1)
-        story_id = topic_fetchers.get_topic_by_id(topic_summaries[0].id).canonical_story_references[0].story_id
-        self.assertIsNotNone(story_fetchers.get_story_by_id(story_id, strict=False))
+        story_id = (
+            topic_fetchers.get_topic_by_id(topic_summaries[0].id)
+            .canonical_story_references[0]
+            .story_id
+        )
+        self.assertIsNotNone(
+            story_fetchers.get_story_by_id(story_id, strict=False)
+        )
         skill_summaries = skill_services.get_all_skill_summaries()
         self.assertEqual(len(skill_summaries), 3)
-        questions, _ = question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-            10,
-            [
-                skill_summaries[0].id,
-                skill_summaries[1].id,
-                skill_summaries[2].id,
-            ],
-            0,
+        questions, _ = (
+            question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
+                10,
+                [
+                    skill_summaries[0].id,
+                    skill_summaries[1].id,
+                    skill_summaries[2].id,
+                ],
+                0,
+            )
         )
         self.assertEqual(len(questions), 5)
         # Testing that there are 3 hindi translation opportunities
         # available on the Contributor Dashboard. Hindi was picked arbitrarily,
         # any language code other than english (what the dummy explorations
         # were written in) can be tested here.
-        translation_opportunities, _, _ = opportunity_services.get_translation_opportunities('hi', '', None)
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', '', None)
+        )
         self.assertEqual(len(translation_opportunities), 3)
         self.logout()
 
-    @test_utils.enable_feature_flags([feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES])
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+    )
     def test_load_new_structures_data_with_study_guides(self) -> None:
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -709,27 +743,39 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         )
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         self.assertEqual(len(topic_summaries), 1)
-        study_guide_sections = (study_guide_services.get_study_guide_sections_by_id)(topic_summaries[0].id, 1)
+        study_guide_sections = (
+            study_guide_services.get_study_guide_sections_by_id
+        )(topic_summaries[0].id, 1)
         self.assertEqual(len(study_guide_sections), 1)
-        story_id = topic_fetchers.get_topic_by_id(topic_summaries[0].id).canonical_story_references[0].story_id
-        self.assertIsNotNone(story_fetchers.get_story_by_id(story_id, strict=False))
+        story_id = (
+            topic_fetchers.get_topic_by_id(topic_summaries[0].id)
+            .canonical_story_references[0]
+            .story_id
+        )
+        self.assertIsNotNone(
+            story_fetchers.get_story_by_id(story_id, strict=False)
+        )
         skill_summaries = skill_services.get_all_skill_summaries()
         self.assertEqual(len(skill_summaries), 3)
-        questions, _ = question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-            10,
-            [
-                skill_summaries[0].id,
-                skill_summaries[1].id,
-                skill_summaries[2].id,
-            ],
-            0,
+        questions, _ = (
+            question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
+                10,
+                [
+                    skill_summaries[0].id,
+                    skill_summaries[1].id,
+                    skill_summaries[2].id,
+                ],
+                0,
+            )
         )
         self.assertEqual(len(questions), 5)
         # Testing that there are 3 hindi translation opportunities
         # available on the Contributor Dashboard. Hindi was picked arbitrarily,
         # any language code other than english (what the dummy explorations
         # were written in) can be tested here.
-        translation_opportunities, _, _ = opportunity_services.get_translation_opportunities('hi', '', None)
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', '', None)
+        )
         self.assertEqual(len(translation_opportunities), 3)
         self.logout()
 
@@ -744,7 +790,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         )
         skill_summaries = skill_services.get_all_skill_summaries()
         self.assertEqual(len(skill_summaries), 1)
-        questions, _ = question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(20, [skill_summaries[0].id], 0)
+        questions, _ = (
+            question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
+                20, [skill_summaries[0].id], 0
+            )
+        )
         self.assertEqual(len(questions), 15)
         self.logout()
 
@@ -761,7 +811,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(classrooms), 1)
         self.logout()
 
-    @test_utils.enable_feature_flags([feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW])
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+        ]
+    )
     def test_regenerate_topic_related_opportunities_action(self) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -770,10 +824,14 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         topic_id = 'topic'
         story_id = 'story'
-        self.save_new_valid_exploration('0', owner_id, title='title', end_state_name='End State')
+        self.save_new_valid_exploration(
+            '0', owner_id, title='title', end_state_name='End State'
+        )
         self.publish_exploration(owner_id, '0')
 
-        topic = topic_domain.Topic.create_default_topic(topic_id, 'topic', 'abbrev', 'description', 'fragm')
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'topic', 'abbrev', 'description', 'fragm'
+        )
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -792,7 +850,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         topic_services.save_new_topic(owner_id, topic)
         topic_services.publish_topic(topic_id, self.admin_id)
 
-        story = story_domain.Story.create_default_story(story_id, 'A story', 'Description', topic_id, 'story')
+        story = story_domain.Story.create_default_story(
+            story_id, 'A story', 'Description', topic_id, 'story'
+        )
         story_services.save_new_story(owner_id, story)
         topic_services.add_canonical_story(owner_id, topic_id, story_id)
 
@@ -821,7 +881,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'Changes.',
         )
 
-        all_opportunity_models = list(opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+        )
 
         self.assertEqual(len(all_opportunity_models), 1)
 
@@ -841,7 +903,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.assertEqual(result, {'opportunities_count': 1})
 
-        all_opportunity_models = list(opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all()
+        )
 
         self.assertEqual(len(all_opportunity_models), 1)
 
@@ -855,7 +919,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.save_new_valid_exploration('0', owner_id, title='title', end_state_name='End State')
+        self.save_new_valid_exploration(
+            '0', owner_id, title='title', end_state_name='End State'
+        )
         exp_services.update_exploration(
             owner_id,
             '0',
@@ -944,9 +1010,13 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.assertEqual(result, {'version': 5})
 
-        snapshot_content_model = exp_models.ExplorationSnapshotContentModel.get('0-5', strict=True)
+        snapshot_content_model = exp_models.ExplorationSnapshotContentModel.get(
+            '0-5', strict=True
+        )
         snapshot_content_model.delete()
-        snapshot_metadata_model = exp_models.ExplorationSnapshotMetadataModel.get('0-4', strict=True)
+        snapshot_metadata_model = (
+            exp_models.ExplorationSnapshotMetadataModel.get('0-4', strict=True)
+        )
         snapshot_metadata_model.delete()
 
         result = self.post_json(
@@ -959,7 +1029,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_admin_topics_csv_download_handler(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_custom_response('/admintopicscsvdownloadhandler', 'text/csv')
+        response = self.get_custom_response(
+            '/admintopicscsvdownloadhandler', 'text/csv'
+        )
 
         self.assertEqual(
             response.headers['Content-Disposition'],
@@ -977,7 +1049,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        self.assertEqual(recommendations_services.get_topic_similarity('Art', 'Biology'), 0.1)
+        self.assertEqual(
+            recommendations_services.get_topic_similarity('Art', 'Biology'), 0.1
+        )
         self.assertEqual(
             recommendations_services.get_topic_similarity('Art', 'Art'),
             feconf.SAME_TOPIC_SIMILARITY,
@@ -991,7 +1065,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             feconf.SAME_TOPIC_SIMILARITY,
         )
 
-        topic_similarities_data = 'Art,Biology,Chemistry\n1.0,0.2,0.1\n0.2,1.0,0.8\n0.1,0.8,1.0'
+        topic_similarities_data = (
+            'Art,Biology,Chemistry\n1.0,0.2,0.1\n0.2,1.0,0.8\n0.1,0.8,1.0'
+        )
 
         self.post_json(
             '/adminhandler',
@@ -1002,7 +1078,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
         )
 
-        self.assertEqual(recommendations_services.get_topic_similarity('Art', 'Biology'), 0.2)
+        self.assertEqual(
+            recommendations_services.get_topic_similarity('Art', 'Biology'), 0.2
+        )
 
         self.logout()
 
@@ -1024,7 +1102,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             [ParamName.TEST_PARAMETER_1],
         ):
             response_dict = self.get_json('/adminhandler')
-        self.assertEqual(response_dict['platform_params_dicts'], [param.to_dict()])
+        self.assertEqual(
+            response_dict['platform_params_dicts'], [param.to_dict()]
+        )
 
         platform_parameter_registry.Registry.parameter_registry.pop(param.name)
         self.logout()
@@ -1032,8 +1112,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_get_handler_includes_all_stories(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        topic = topic_domain.Topic.create_default_topic('topic', 'topic_name', 'topicurl', 'description', 'fragm')
-        topic_services.save_new_topic(self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic)
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl', 'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
+        )
         num_stories = 4
         created_story_ids = []
         for i in range(num_stories):
@@ -1045,7 +1129,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 'topic',
                 url_fragement[i],
             )
-            story_services.save_new_story(self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story)
+            story_services.save_new_story(
+                self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story
+            )
             created_story_ids.append('story_id_%s' % i)
             topic_services.add_canonical_story(
                 self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
@@ -1073,7 +1159,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         param = self._create_dummy_param()
         new_rule_dicts = [
             {
-                'filters': [{'type': 'platform_type', 'conditions': [['=', 'Web']]}],
+                'filters': [
+                    {'type': 'platform_type', 'conditions': [['=', 'Web']]}
+                ],
                 'value_when_matched': True,
             }
         ]
@@ -1095,7 +1183,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
             )
 
-        rule_dicts = [rule.to_dict() for rule in platform_parameter_registry.Registry.get_platform_parameter(param.name).rules]
+        rule_dicts = [
+            rule.to_dict()
+            for rule in platform_parameter_registry.Registry.get_platform_parameter(
+                param.name
+            ).rules
+        ]
         self.assertEqual(rule_dicts, new_rule_dicts)
 
         platform_parameter_registry.Registry.parameter_registry.pop(param.name)
@@ -1119,7 +1212,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         param = self._create_dummy_param()
         new_rule_dicts = [
             {
-                'filters': [{'type': 'platform_type', 'conditions': [['=', 'Web']]}],
+                'filters': [
+                    {'type': 'platform_type', 'conditions': [['=', 'Web']]}
+                ],
                 'value_when_matched': True,
             }
         ]
@@ -1130,7 +1225,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             [ParamName.TEST_PARAMETER_1],
         ):
             response_dict = self.get_json('/adminhandler')
-            self.assertEqual(response_dict['platform_params_dicts'], [param.to_dict()])
+            self.assertEqual(
+                response_dict['platform_params_dicts'], [param.to_dict()]
+            )
 
             self.post_json(
                 '/adminhandler',
@@ -1167,7 +1264,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         new_rule_dicts = [
             {
-                'filters': [{'type': 'platform_type', 'conditions': [['=', 'Web']]}],
+                'filters': [
+                    {'type': 'platform_type', 'conditions': [['=', 'Web']]}
+                ],
                 'value_when_matched': True,
             }
         ]
@@ -1189,7 +1288,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
                 expected_status_int=500,
             )
-        self.assertEqual(response['error'], 'Platform parameter not found: unknown_param.')
+        self.assertEqual(
+            response['error'], 'Platform parameter not found: unknown_param.'
+        )
 
         self.logout()
 
@@ -1203,7 +1304,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         param = self._create_dummy_param()
         new_rule_dicts = [
             {
-                'filters': [{'type': 'platform_type', 'conditions': [['=', 'Web']]}],
+                'filters': [
+                    {'type': 'platform_type', 'conditions': [['=', 'Web']]}
+                ],
                 'value_when_matched': 'unknown',
             }
         ]
@@ -1324,7 +1427,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         param = self._create_dummy_param()
         new_rule_dicts = [
             {
-                'filters': [{'type': 'platform_type', 'conditions': [['=', 'Web']]}],
+                'filters': [
+                    {'type': 'platform_type', 'conditions': [['=', 'Web']]}
+                ],
                 'value_when_matched': True,
             }
         ]
@@ -1333,7 +1438,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         # where instance of 'PlatformParameter' is expected, and this is
         # done to Replace the stored instance with None in order to
         # trigger the unexpected exception during update.
-        platform_parameter_registry.Registry.parameter_registry[param.name] = None  # type: ignore[assignment]
+        platform_parameter_registry.Registry.parameter_registry[param.name] = (
+            None  # type: ignore[assignment]
+        )
         response = self.post_json(
             '/adminhandler',
             {
@@ -1357,7 +1464,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_grant_super_admin_privileges(self) -> None:
         self.login(self.admin_email_address, is_super_admin=True)
 
-        grant_super_admin_privileges_stub = self.swap_with_call_counter(firebase_auth_services, 'grant_super_admin_privileges')
+        grant_super_admin_privileges_stub = self.swap_with_call_counter(
+            firebase_auth_services, 'grant_super_admin_privileges'
+        )
 
         with grant_super_admin_privileges_stub as call_counter:
             response = self.put_json(
@@ -1375,7 +1484,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        grant_super_admin_privileges_stub = self.swap_with_call_counter(firebase_auth_services, 'grant_super_admin_privileges')
+        grant_super_admin_privileges_stub = self.swap_with_call_counter(
+            firebase_auth_services, 'grant_super_admin_privileges'
+        )
 
         with grant_super_admin_privileges_stub as call_counter:
             response = self.put_json(
@@ -1419,7 +1530,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_revoke_super_admin_privileges(self) -> None:
         self.login(self.admin_email_address, is_super_admin=True)
 
-        revoke_super_admin_privileges_stub = self.swap_with_call_counter(firebase_auth_services, 'revoke_super_admin_privileges')
+        revoke_super_admin_privileges_stub = self.swap_with_call_counter(
+            firebase_auth_services, 'revoke_super_admin_privileges'
+        )
 
         with revoke_super_admin_privileges_stub as call_counter:
             response = self.delete_json(
@@ -1436,7 +1549,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        revoke_super_admin_privileges_stub = self.swap_with_call_counter(firebase_auth_services, 'revoke_super_admin_privileges')
+        revoke_super_admin_privileges_stub = self.swap_with_call_counter(
+            firebase_auth_services, 'revoke_super_admin_privileges'
+        )
 
         with revoke_super_admin_privileges_stub as call_counter:
             response = self.delete_json(
@@ -1454,7 +1569,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_revoke_super_admin_privileges_fails_without_username(self) -> None:
         self.login(self.admin_email_address, is_super_admin=True)
 
-        response = self.delete_json('/adminsuperadminhandler', params={}, expected_status_int=400)
+        response = self.delete_json(
+            '/adminsuperadminhandler', params={}, expected_status_int=400
+        )
 
         error_msg = 'At \'http://localhost/adminsuperadminhandler\' these errors are happening:\nMissing key in handler args: username.'
         self.assertEqual(response['error'], error_msg)
@@ -1604,7 +1721,9 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(Exception, 'Cannot generate dummy explorations in production.')
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot generate dummy explorations in production.'
+        )
 
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
@@ -1630,14 +1749,20 @@ class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(self.QUESTION_REVIEWER_EMAIL, self.QUESTION_REVIEWER_USERNAME)
+        self.signup(
+            self.QUESTION_REVIEWER_EMAIL, self.QUESTION_REVIEWER_USERNAME
+        )
         self.signup(
             self.QUESTION_ADMIN_EMAIL,
             self.QUESTION_ADMIN_USERNAME,
             is_super_admin=True,
         )
-        self.question_reviewer_id = self.get_user_id_from_email(self.QUESTION_REVIEWER_EMAIL)
-        self.add_user_role(self.QUESTION_ADMIN_USERNAME, feconf.ROLE_ID_QUESTION_ADMIN)
+        self.question_reviewer_id = self.get_user_id_from_email(
+            self.QUESTION_REVIEWER_EMAIL
+        )
+        self.add_user_role(
+            self.QUESTION_ADMIN_USERNAME, feconf.ROLE_ID_QUESTION_ADMIN
+        )
 
     def test_generate_dummy_question_suggestions_(self) -> None:
         self.login(self.QUESTION_ADMIN_EMAIL, is_super_admin=True)
@@ -1658,9 +1783,11 @@ class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
         )
 
-        generated_question_suggestions = suggestion_services.get_submitted_suggestions(  # pylint: disable=line-too-long
-            self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+        generated_question_suggestions = (
+            suggestion_services.get_submitted_suggestions(  # pylint: disable=line-too-long
+                self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            )
         )
         self.assertEqual(len(generated_question_suggestions), 12)
         self.logout()
@@ -1694,9 +1821,11 @@ class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
             )
 
-        generated_question_suggestions = suggestion_services.get_submitted_suggestions(  # pylint: disable=line-too-long
-            self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+        generated_question_suggestions = (
+            suggestion_services.get_submitted_suggestions(  # pylint: disable=line-too-long
+                self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            )
         )
         self.assertNotEqual(len(generated_question_suggestions), 12)
         self.logout()
@@ -1723,9 +1852,11 @@ class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
             )
 
-        generated_question_suggestions = suggestion_services.get_submitted_suggestions(  # pylint: disable=line-too-long
-            self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+        generated_question_suggestions = (
+            suggestion_services.get_submitted_suggestions(  # pylint: disable=line-too-long
+                self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            )
         )
         self.assertNotEqual(len(generated_question_suggestions), 12)
         self.logout()
@@ -1741,14 +1872,20 @@ class GenerateDummyStoriesTest(test_utils.GenericTestBase):
             self.CURRICULUM_ADMIN_USERNAME,
             is_super_admin=True,
         )
-        self.add_user_role(self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
+        self.add_user_role(
+            self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN
+        )
 
     def test_generate_dummy_stories(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        topic = topic_domain.Topic.create_default_topic('topic', 'topic_name', 'url', 'description', 'fragm')
-        topic_services.save_new_topic(self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic)
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'url', 'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
+        )
 
         self.post_json(
             '/adminhandler',
@@ -1771,10 +1908,16 @@ class GenerateDummyStoriesTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regex = self.assertRaisesRegex(Exception, 'Cannot generate dummy stories in production.')
+        assert_raises_regex = self.assertRaisesRegex(
+            Exception, 'Cannot generate dummy stories in production.'
+        )
 
-        topic = topic_domain.Topic.create_default_topic('topic', 'topic_name', 'url', 'description', 'fragm')
-        topic_services.save_new_topic(self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic)
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'url', 'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
+        )
 
         with assert_raises_regex, prod_mode_swap:
             self.post_json(
@@ -1805,8 +1948,12 @@ class GenerateDummyStoriesTest(test_utils.GenericTestBase):
             'User \'user1\' must be a curriculum admin in order to generate stories.',
         )
 
-        topic = topic_domain.Topic.create_default_topic('topic', 'topic_name', 'url', 'description', 'fragm')
-        topic_services.save_new_topic(self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic)
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'url', 'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
+        )
 
         with assert_raises_regex:
             self.post_json(
@@ -1834,17 +1981,27 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
             self.CURRICULUM_ADMIN_USERNAME,
             is_super_admin=True,
         )
-        self.add_user_role(self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
+        self.add_user_role(
+            self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN
+        )
 
     def test_generate_dummy_chapters(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        topic = topic_domain.Topic.create_default_topic('topic', 'topic_name', 'topicurl', 'description', 'fragm')
-        topic_services.save_new_topic(self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic)
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl', 'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
+        )
 
-        story = story_domain.Story.create_default_story('story_id', 'story_title', 'description', 'topic', 'storyurl')
-        story_services.save_new_story(self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story)
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description', 'topic', 'storyurl'
+        )
+        story_services.save_new_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story
+        )
 
         topic_services.add_canonical_story(
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
@@ -1873,13 +2030,23 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regex = self.assertRaisesRegex(Exception, 'Cannot generate dummy chapters in production.')
+        assert_raises_regex = self.assertRaisesRegex(
+            Exception, 'Cannot generate dummy chapters in production.'
+        )
 
-        topic = topic_domain.Topic.create_default_topic('topic', 'topic_name', 'topicurl', 'description', 'fragm')
-        topic_services.save_new_topic(self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic)
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl', 'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
+        )
 
-        story = story_domain.Story.create_default_story('story_id', 'story_title', 'description', 'topic', 'storyurl')
-        story_services.save_new_story(self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story)
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description', 'topic', 'storyurl'
+        )
+        story_services.save_new_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story
+        )
 
         topic_services.add_canonical_story(
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
@@ -1907,23 +2074,38 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        topic = topic_domain.Topic.create_default_topic('topic', 'topic_name', 'topicurl', 'description', 'fragm')
-        topic_services.save_new_topic(self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic)
-        story = story_domain.Story.create_default_story('story_id', 'story_title', 'description', 'topic', 'storyurl')
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl', 'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
+        )
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description', 'topic', 'storyurl'
+        )
         story.story_contents.next_node_id = 'node_4'
 
         def reload_exploration(user_id: str, exploration_id: str) -> None:
             if constants.DEV_MODE:
-                logging.info('[ADMIN] %s reloaded exploration %s' % (user_id, exploration_id))
+                logging.info(
+                    '[ADMIN] %s reloaded exploration %s'
+                    % (user_id, exploration_id)
+                )
                 exp_services.load_demo(exploration_id)
-                rights_manager.release_ownership_of_exploration(user_services.get_system_user(), exploration_id)
+                rights_manager.release_ownership_of_exploration(
+                    user_services.get_system_user(), exploration_id
+                )
             else:
                 raise Exception('Cannot reload an exploration in production.')
 
-        reload_exploration(self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), '6')
+        reload_exploration(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), '6'
+        )
         story.add_node('node_4', 'dummy chapter 4')
         story.update_node_exploration_id('node_4', '6')
-        story_services.save_new_story(self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story)
+        story_services.save_new_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story
+        )
         topic_services.add_canonical_story(
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
             'topic',
@@ -1940,7 +2122,9 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         )
 
         updated_story = story_fetchers.get_story_by_id('story_id')
-        chapter_titles = [node.title for node in updated_story.story_contents.nodes]
+        chapter_titles = [
+            node.title for node in updated_story.story_contents.nodes
+        ]
         self.assertIn('dummy chapter 4', chapter_titles)
         self.assertIn('dummy chapter 5', chapter_titles)
         self.assertIn('dummy chapter 6', chapter_titles)
@@ -1951,11 +2135,19 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        topic = topic_domain.Topic.create_default_topic('topic', 'topic_name', 'topicurl', 'description', 'fragm')
-        topic_services.save_new_topic(self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic)
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl', 'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
+        )
 
-        story = story_domain.Story.create_default_story('story_id', 'story_title', 'description', 'topic', 'storyurl')
-        story_services.save_new_story(self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story)
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description', 'topic', 'storyurl'
+        )
+        story_services.save_new_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story
+        )
         topic_services.add_canonical_story(
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
             'topic',
@@ -2017,11 +2209,19 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
             'User \'user1\' must be a curriculum admin in order to generate chapters.',
         )
 
-        topic = topic_domain.Topic.create_default_topic('topic', 'topic_name', 'topicurl', 'description', 'fragm')
-        topic_services.save_new_topic(self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic)
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl', 'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
+        )
 
-        story = story_domain.Story.create_default_story('story_id', 'story_title', 'description', 'topic', 'storyurl')
-        story_services.save_new_story(self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story)
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description', 'topic', 'storyurl'
+        )
+        story_services.save_new_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story
+        )
 
         topic_services.add_canonical_story(
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
@@ -2088,7 +2288,9 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
             )
             generated_exps = exp_services.get_all_exploration_summaries()
-            published_exps = exp_services.get_recently_published_exp_summaries(15)
+            published_exps = exp_services.get_recently_published_exp_summaries(
+                15
+            )
             self.assertEqual(len(generated_exps), 5 * i)
             self.assertEqual(len(published_exps), 5 * i)
         self.logout()
@@ -2153,7 +2355,9 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(Exception, 'Cannot load new structures data in production.')
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot load new structures data in production.'
+        )
         with assert_raises_regexp_context_manager, self.prod_mode_swap:
             self.post_json(
                 '/adminhandler',
@@ -2175,7 +2379,9 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        assert_raises_regexp = self.assertRaisesRegex(Exception, 'User does not have enough rights to generate data.')
+        assert_raises_regexp = self.assertRaisesRegex(
+            Exception, 'User does not have enough rights to generate data.'
+        )
         with assert_raises_regexp:
             self.post_json(
                 '/adminhandler',
@@ -2357,7 +2563,9 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.signup(user_email, username)
 
         topic_id = topic_fetchers.get_new_topic_id()
-        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(1, 'Subtopic Title 1', 'url-frag-one')
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
@@ -2492,7 +2700,9 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400,
         )
 
-        self.assertEqual(response['error'], 'Unsupported role for this handler.')
+        self.assertEqual(
+            response['error'], 'Unsupported role for this handler.'
+        )
 
     def test_general_role_handler_supports_unassigning_topic_manager(
         self,
@@ -2629,7 +2839,9 @@ class GenerateStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
 
     def test_generate_study_guide_models(self) -> None:
         topic_id_1 = topic_fetchers.get_new_topic_id()
-        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(1, 'Subtopic Title 1', 'url-frag-one')
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_subtopic(
@@ -2678,7 +2890,9 @@ class DeleteStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
 
     def test_delete_study_guide_models(self) -> None:
         topic_id_1 = topic_fetchers.get_new_topic_id()
-        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(1, 'Subtopic Title 1', 'url-frag-one')
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_subtopic(
@@ -2726,7 +2940,9 @@ class VerifyStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
 
     def test_verify_study_guide_models(self) -> None:
         topic_id_1 = topic_fetchers.get_new_topic_id()
-        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(1, 'Subtopic Title 1', 'url-frag-one')
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_subtopic(
@@ -2949,7 +3165,9 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
             response_dict['roles'],
             [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER],
         )
-        self.assertItemsEqual(response_dict['managed_topic_ids'], [new_topic_id, topic_id])
+        self.assertItemsEqual(
+            response_dict['managed_topic_ids'], [new_topic_id, topic_id]
+        )
 
         self.logout()
 
@@ -3280,7 +3498,9 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
         )
 
         csrf_token = self.get_new_csrf_token()
-        response_dict = self.put_json('/bannedusershandler', {'username': username}, csrf_token=csrf_token)
+        response_dict = self.put_json(
+            '/bannedusershandler', {'username': username}, csrf_token=csrf_token
+        )
 
         self.assertEqual(response_dict, {})
 
@@ -3347,7 +3567,9 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
         )
 
         csrf_token = self.get_new_csrf_token()
-        self.put_json('/bannedusershandler', {'username': username}, csrf_token=csrf_token)
+        self.put_json(
+            '/bannedusershandler', {'username': username}, csrf_token=csrf_token
+        )
 
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
@@ -3381,7 +3603,9 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        self.put_json('/bannedusershandler', {'username': username}, csrf_token=csrf_token)
+        self.put_json(
+            '/bannedusershandler', {'username': username}, csrf_token=csrf_token
+        )
 
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
@@ -3435,7 +3659,9 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.exploration = self.save_new_valid_exploration(self.EXP_ID, self.editor_id, end_state_name='End')
+        self.exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.editor_id, end_state_name='End'
+        )
 
         stats_services.record_answer(
             self.EXP_ID,
@@ -3482,7 +3708,9 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             'num_answers': 0,
         }
 
-        response = self.get_json('/explorationdataextractionhandler', params=payload)
+        response = self.get_json(
+            '/explorationdataextractionhandler', params=payload
+        )
         extracted_answers = response['data']
         self.assertEqual(len(extracted_answers), 2)
         self.assertEqual(extracted_answers[0]['answer'], 'first answer')
@@ -3496,7 +3724,9 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             'num_answers': 1,
         }
 
-        response = self.get_json('/explorationdataextractionhandler', params=payload)
+        response = self.get_json(
+            '/explorationdataextractionhandler', params=payload
+        )
         extracted_answers = response['data']
         self.assertEqual(len(extracted_answers), 1)
         self.assertEqual(extracted_answers[0]['answer'], 'first answer')
@@ -3512,7 +3742,9 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             'num_answers': 0,
         }
 
-        swap_state_answers = self.swap_to_always_return(stats_services, 'get_state_answers', None)
+        swap_state_answers = self.swap_to_always_return(
+            stats_services, 'get_state_answers', None
+        )
         with swap_state_answers:
             response = self.get_json(
                 '/explorationdataextractionhandler',
@@ -3601,10 +3833,14 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
 
     def test_clear_search_index(self) -> None:
         exp_services.load_demo('0')
-        result_explorations = search_services.search_explorations('Welcome', [], [], 2)[0]
+        result_explorations = search_services.search_explorations(
+            'Welcome', [], [], 2
+        )[0]
         self.assertEqual(result_explorations, ['0'])
         collection_services.load_demo('0')
-        result_collections = search_services.search_collections('Welcome', [], [], 2)[0]
+        result_collections = search_services.search_collections(
+            'Welcome', [], [], 2
+        )[0]
         self.assertEqual(result_collections, ['0'])
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -3626,11 +3862,17 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
         )
         self.assertEqual(generated_exps_response, {})
-        result_explorations = search_services.search_explorations('Welcome', [], [], 2)[0]
+        result_explorations = search_services.search_explorations(
+            'Welcome', [], [], 2
+        )[0]
         self.assertEqual(result_explorations, [])
-        result_collections = search_services.search_collections('Welcome', [], [], 2)[0]
+        result_collections = search_services.search_collections(
+            'Welcome', [], [], 2
+        )[0]
         self.assertEqual(result_collections, [])
-        result_blog_posts = search_services.search_blog_post_summaries('Welcome', [], 2)[0]
+        result_blog_posts = search_services.search_blog_post_summaries(
+            'Welcome', [], 2
+        )[0]
         self.assertEqual(result_blog_posts, [])
 
 
@@ -3739,7 +3981,10 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400,
         )
-        error_msg = 'At \'http://localhost/updateusernamehandler\' these errors are happening:\nSchema validation for \'new_username\' failed: Validation failed: has_length_at_most ({\'max_value\': %s}) for object %s' % (constants.MAX_USERNAME_LENGTH, long_username)
+        error_msg = (
+            'At \'http://localhost/updateusernamehandler\' these errors are happening:\nSchema validation for \'new_username\' failed: Validation failed: has_length_at_most ({\'max_value\': %s}) for object %s'
+            % (constants.MAX_USERNAME_LENGTH, long_username)
+        )
         self.assertEqual(response['error'], error_msg)
 
     def test_update_username_with_nonexistent_old_username(self) -> None:
@@ -3773,7 +4018,9 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
     def test_update_username(self) -> None:
         user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        old_fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, self.OLD_USERNAME)
+        old_fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, self.OLD_USERNAME
+        )
         image_with_old_username = old_fs.get('profile_picture.png')
 
         self.put_json(
@@ -3786,7 +4033,9 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(user_services.get_username(user_id), self.NEW_USERNAME)
 
-        new_fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, self.NEW_USERNAME)
+        new_fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, self.NEW_USERNAME
+        )
         image_with_new_username = new_fs.get('profile_picture.png')
 
         self.assertEqual(image_with_old_username, image_with_new_username)
@@ -3821,18 +4070,30 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
             )
 
-        self.assertTrue(audit_models.UsernameChangeAuditModel.has_reference_to_user_id(user_id))
+        self.assertTrue(
+            audit_models.UsernameChangeAuditModel.has_reference_to_user_id(
+                user_id
+            )
+        )
 
         model_id = '%s.%d' % (user_id, creation_time_in_millisecs)
-        username_change_audit_model = audit_models.UsernameChangeAuditModel.get(model_id)
+        username_change_audit_model = audit_models.UsernameChangeAuditModel.get(
+            model_id
+        )
 
         self.assertEqual(username_change_audit_model.committer_id, user_id)
-        self.assertEqual(username_change_audit_model.old_username, self.OLD_USERNAME)
-        self.assertEqual(username_change_audit_model.new_username, self.NEW_USERNAME)
+        self.assertEqual(
+            username_change_audit_model.old_username, self.OLD_USERNAME
+        )
+        self.assertEqual(
+            username_change_audit_model.new_username, self.NEW_USERNAME
+        )
 
     def test_profile_picture_is_missing_raises_error(self) -> None:
         csrf_token = self.get_new_csrf_token()
-        old_fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, self.EDITOR_USERNAME)
+        old_fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, self.EDITOR_USERNAME
+        )
         image_png = old_fs.get('profile_picture.png')
         old_fs.delete('profile_picture.png')
         self.put_json(
@@ -3872,8 +4133,12 @@ class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['number_of_pending_deletion_models'], 0)
 
     def test_get_with_two_deletion_request_returns_two(self) -> None:
-        user_models.PendingDeletionRequestModel(id='id1', email='id1@email.com').put()
-        user_models.PendingDeletionRequestModel(id='id2', email='id2@email.com').put()
+        user_models.PendingDeletionRequestModel(
+            id='id1', email='id1@email.com'
+        ).put()
+        user_models.PendingDeletionRequestModel(
+            id='id2', email='id2@email.com'
+        ).put()
 
         response = self.get_json('/numberofdeletionrequestshandler')
         self.assertEqual(response['number_of_pending_deletion_models'], 2)
@@ -3889,13 +4154,19 @@ class VerifyUserModelsDeletedHandlerTest(test_utils.GenericTestBase):
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        self.admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.admin_user_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL
+        )
 
     def test_get_without_user_id_raises_error(self) -> None:
-        self.get_json('/verifyusermodelsdeletedhandler', expected_status_int=400)
+        self.get_json(
+            '/verifyusermodelsdeletedhandler', expected_status_int=400
+        )
 
     def test_get_with_nonexistent_user_id_returns_true(self) -> None:
-        response = self.get_json('/verifyusermodelsdeletedhandler', params={'user_id': 'aaa'})
+        response = self.get_json(
+            '/verifyusermodelsdeletedhandler', params={'user_id': 'aaa'}
+        )
         self.assertFalse(response['related_models_exist'])
 
     def test_get_with_existing_user_id_returns_true(self) -> None:
@@ -3961,7 +4232,9 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
             },
         )
         self.assertTrue(response['success'])
-        self.assertIsNotNone(wipeout_service.get_pending_deletion_request(self.new_user_id))
+        self.assertIsNotNone(
+            wipeout_service.get_pending_deletion_request(self.new_user_id)
+        )
 
 
 class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
@@ -3973,7 +4246,9 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.system_email_address = 'system@example.com'
         self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_user_id = self.get_user_id_from_email(self.system_email_address)
+        self.admin_user_id = self.get_user_id_from_email(
+            self.system_email_address
+        )
         self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
         self.add_user_role(self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
         self.blog_admin_id = self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL)
@@ -4042,7 +4317,9 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         csrf_token = self.get_new_csrf_token()
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
-        self.add_user_role(self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR
+        )
         self.login(self.system_email_address, is_super_admin=True)
 
         self.put_json(
@@ -4076,7 +4353,9 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
     def test_update_blog_post_with_invalid_date_format(self) -> None:
         csrf_token = self.get_new_csrf_token()
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
-        self.add_user_role(self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR
+        )
         self.login(self.system_email_address, is_super_admin=True)
 
         response = self.put_json(
@@ -4096,7 +4375,9 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
     def test_update_blog_post_with_correct_params(self) -> None:
         csrf_token = self.get_new_csrf_token()
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
-        self.add_user_role(self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR
+        )
         self.login(self.system_email_address, is_super_admin=True)
 
         self.put_json(
@@ -4122,7 +4403,9 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(Exception, 'Cannot load new blog post in production mode.')
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot load new blog post in production mode.'
+        )
 
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
@@ -4134,7 +4417,9 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
             )
 
-        blog_post_count = blog_services.get_total_number_of_published_blog_post_summaries()
+        blog_post_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
         self.assertEqual(blog_post_count, 0)
         self.logout()
 
@@ -4149,7 +4434,9 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
             },
             csrf_token=csrf_token,
         )
-        blog_post_count = blog_services.get_total_number_of_published_blog_post_summaries()
+        blog_post_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
         self.assertEqual(blog_post_count, 1)
 
         self.post_json(
@@ -4160,7 +4447,9 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
             },
             csrf_token=csrf_token,
         )
-        blog_post_count = blog_services.get_total_number_of_published_blog_post_summaries()
+        blog_post_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
         self.assertEqual(blog_post_count, 2)
 
         self.post_json(
@@ -4171,7 +4460,9 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
             },
             csrf_token=csrf_token,
         )
-        blog_post_count = blog_services.get_total_number_of_published_blog_post_summaries()
+        blog_post_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
         self.assertEqual(blog_post_count, 3)
         self.logout()
 
@@ -4189,9 +4480,14 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
             expected_status_int=400,
         )
 
-        error_msg = 'At \'http://localhost/adminhandler\' these errors are happening:\nSchema validation for \'blog_post_title\' failed: Received %s which is not in the allowed range of choices: [\'Leading The Arabic Translations Team\', \'Education\', \'Blog with different font formatting\']' % invalid_blog_post_title
+        error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\nSchema validation for \'blog_post_title\' failed: Received %s which is not in the allowed range of choices: [\'Leading The Arabic Translations Team\', \'Education\', \'Blog with different font formatting\']'
+            % invalid_blog_post_title
+        )
         self.assertEqual(response['error'], error_msg)
-        blog_post_count = blog_services.get_total_number_of_published_blog_post_summaries()
+        blog_post_count = (
+            blog_services.get_total_number_of_published_blog_post_summaries()
+        )
         self.assertEqual(blog_post_count, 0)
         self.logout()
 
@@ -4208,7 +4504,9 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
         self.signup(self.admin_email_address, 'testsuper')
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.exploration1 = self.save_new_valid_exploration(self.EXP_ID_1, self.editor_id, end_state_name='End')
+        self.exploration1 = self.save_new_valid_exploration(
+            self.EXP_ID_1, self.editor_id, end_state_name='End'
+        )
 
     def test_interactions_by_exploration_id_handler(self) -> None:
         self.login(self.admin_email_address, is_super_admin=True)
@@ -4217,7 +4515,9 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
 
         response = self.get_json('/interactions', params=payload)
         interaction_ids = response['interaction_ids']
-        self.assertEqual(sorted(interaction_ids), ['EndExploration', 'TextInput'])
+        self.assertEqual(
+            sorted(interaction_ids), ['EndExploration', 'TextInput']
+        )
 
     def test_handler_with_invalid_exploration_id_raise_error(self) -> None:
         self.login(self.admin_email_address, is_super_admin=True)
@@ -4230,7 +4530,9 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
         self,
     ) -> None:  # pylint: disable=line-too-long
         self.login(self.admin_email_address, is_super_admin=True)
-        response = self.get_json('/interactions', params={}, expected_status_int=400)
+        response = self.get_json(
+            '/interactions', params={}, expected_status_int=400
+        )
         self.assertEqual(
             response['error'],
             'At \'http://localhost/interactions\' these errors are happening:\nMissing key in handler args: exp_id.',
@@ -4243,9 +4545,15 @@ class AutomaticVoiceoverAdminControlHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, 'testsuper')
-        self.voiceover_autogeneration_policy_model = voiceover_models.VoiceoverAutogenerationPolicyModel(id=voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID)
+        self.voiceover_autogeneration_policy_model = (
+            voiceover_models.VoiceoverAutogenerationPolicyModel(
+                id=voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID
+            )
+        )
         self.voiceover_autogeneration_policy_model.language_codes_mapping = {}
-        (self.voiceover_autogeneration_policy_model.autogenerated_voiceovers_are_enabled) = True
+        (
+            self.voiceover_autogeneration_policy_model.autogenerated_voiceovers_are_enabled
+        ) = True
         self.voiceover_autogeneration_policy_model.update_timestamps()
         self.voiceover_autogeneration_policy_model.put()
 
@@ -4260,8 +4568,12 @@ class AutomaticVoiceoverAdminControlHandlerTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        voiceover_services.update_admin_config_for_voiceover_autogeneration(False)
-        self.assertFalse(voiceover_services.is_voiceover_autogeneration_using_cloud_service_enabled())
+        voiceover_services.update_admin_config_for_voiceover_autogeneration(
+            False
+        )
+        self.assertFalse(
+            voiceover_services.is_voiceover_autogeneration_using_cloud_service_enabled()
+        )
 
         self.post_json(
             '/automatic_voiceover_admin_control_handler',
@@ -4269,14 +4581,20 @@ class AutomaticVoiceoverAdminControlHandlerTests(test_utils.GenericTestBase):
             csrf_token=csrf_token,
         )
 
-        self.assertTrue(voiceover_services.is_voiceover_autogeneration_using_cloud_service_enabled())
+        self.assertTrue(
+            voiceover_services.is_voiceover_autogeneration_using_cloud_service_enabled()
+        )
         self.logout()
 
     def test_non_admin_should_not_be_able_to_update_config(self) -> None:
         csrf_token = self.get_new_csrf_token()
 
-        voiceover_services.update_admin_config_for_voiceover_autogeneration(False)
-        self.assertFalse(voiceover_services.is_voiceover_autogeneration_using_cloud_service_enabled())
+        voiceover_services.update_admin_config_for_voiceover_autogeneration(
+            False
+        )
+        self.assertFalse(
+            voiceover_services.is_voiceover_autogeneration_using_cloud_service_enabled()
+        )
 
         self.post_json(
             '/automatic_voiceover_admin_control_handler',
@@ -4285,4 +4603,6 @@ class AutomaticVoiceoverAdminControlHandlerTests(test_utils.GenericTestBase):
             expected_status_int=400,
         )
 
-        self.assertFalse(voiceover_services.is_voiceover_autogeneration_using_cloud_service_enabled())
+        self.assertFalse(
+            voiceover_services.is_voiceover_autogeneration_using_cloud_service_enabled()
+        )

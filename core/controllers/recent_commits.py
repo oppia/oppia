@@ -32,7 +32,9 @@ class RecentCommitsHandlerNormalizedRequestDict(TypedDict):
     query_type: str
 
 
-class RecentCommitsHandler(base.BaseHandler[Dict[str, str], RecentCommitsHandlerNormalizedRequestDict]):
+class RecentCommitsHandler(
+    base.BaseHandler[Dict[str, str], RecentCommitsHandlerNormalizedRequestDict]
+):
     """Returns a list of recent commits."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -56,10 +58,16 @@ class RecentCommitsHandler(base.BaseHandler[Dict[str, str], RecentCommitsHandler
         assert self.normalized_request is not None
         urlsafe_start_cursor = self.normalized_request.get('cursor')
 
-        all_commits, new_urlsafe_start_cursor, more = exp_services.get_next_page_of_all_non_private_commits(urlsafe_start_cursor=urlsafe_start_cursor)
+        all_commits, new_urlsafe_start_cursor, more = (
+            exp_services.get_next_page_of_all_non_private_commits(
+                urlsafe_start_cursor=urlsafe_start_cursor
+            )
+        )
 
         exp_ids = set(commit.exploration_id for commit in all_commits)
-        exp_ids_to_exp_data = exp_services.get_exploration_titles_and_categories(list(exp_ids))
+        exp_ids_to_exp_data = (
+            exp_services.get_exploration_titles_and_categories(list(exp_ids))
+        )
 
         unique_user_ids = list(set(commit.user_id for commit in all_commits))
         unique_usernames = user_services.get_usernames(unique_user_ids)
@@ -74,7 +82,9 @@ class RecentCommitsHandler(base.BaseHandler[Dict[str, str], RecentCommitsHandler
                 'commit_message': commit_dict['commit_message'],
                 'version': commit_dict['version'],
                 'post_commit_status': commit_dict['post_commit_status'],
-                'post_commit_community_owned': (commit_dict['post_commit_community_owned']),
+                'post_commit_community_owned': (
+                    commit_dict['post_commit_community_owned']
+                ),
                 'post_commit_is_private': commit_dict['post_commit_is_private'],
                 'username': user_id_to_username[commit.user_id],
             }

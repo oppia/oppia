@@ -47,7 +47,9 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
             MOCK_FECONF_FILEPATH,
         )
         with run_cmd_swap, feconf_swap:
-            actual_version_changes = repo_specific_changes_fetcher.get_changed_schema_version_constant_names('release_tag')
+            actual_version_changes = repo_specific_changes_fetcher.get_changed_schema_version_constant_names(
+                'release_tag'
+            )
         self.assertEqual(actual_version_changes, [])
 
     def test_get_changed_schema_version_constant_names_with_diff(self) -> None:
@@ -61,8 +63,12 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
             MOCK_FECONF_FILEPATH,
         )
         with run_cmd_swap, feconf_swap:
-            actual_version_changes = repo_specific_changes_fetcher.get_changed_schema_version_constant_names('release_tag')
-        self.assertEqual(actual_version_changes, ['CURRENT_STATE_SCHEMA_VERSION'])
+            actual_version_changes = repo_specific_changes_fetcher.get_changed_schema_version_constant_names(
+                'release_tag'
+            )
+        self.assertEqual(
+            actual_version_changes, ['CURRENT_STATE_SCHEMA_VERSION']
+        )
 
     def test_get_setup_scripts_changes_status_to_get_changed_scripts_status(
         self,
@@ -71,7 +77,11 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
             return 'scripts/install_third_party_libs.py'
 
         with self.swap(common, 'run_cmd', mock_run_cmd):
-            actual_scripts = repo_specific_changes_fetcher.get_setup_scripts_changes_status('release_tag')
+            actual_scripts = (
+                repo_specific_changes_fetcher.get_setup_scripts_changes_status(
+                    'release_tag'
+                )
+            )
         expected_scripts = {
             'scripts/install_third_party_libs.py': True,
         }
@@ -82,7 +92,9 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
             return 'scripts/setup.py\nextensions/test.ts\ncore/storage/activity/gae_models.py\ncore/storage/user/gae_models.py'
 
         with self.swap(common, 'run_cmd', mock_run_cmd):
-            actual_storgae_models = repo_specific_changes_fetcher.get_changed_storage_models_filenames('release_tag')
+            actual_storgae_models = repo_specific_changes_fetcher.get_changed_storage_models_filenames(
+                'release_tag'
+            )
         expected_storage_models = [
             'core/storage/activity/gae_models.py',
             'core/storage/user/gae_models.py',
@@ -185,7 +197,9 @@ class GetRepoSpecificChangesTest(test_utils.GenericTestBase):
         def mock_print(text_to_print: str) -> None:
             printed_lines.append(text_to_print)
 
-        get_changes_swap = self.swap(repo_specific_changes_fetcher, 'get_changes', mock_get_changes)
+        get_changes_swap = self.swap(
+            repo_specific_changes_fetcher, 'get_changes', mock_get_changes
+        )
         print_swap = self.swap(builtins, 'print', mock_print)
 
         with get_changes_swap, print_swap:

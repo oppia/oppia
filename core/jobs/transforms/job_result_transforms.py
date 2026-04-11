@@ -33,7 +33,9 @@ from core.jobs.types import job_run_result
 class ResultsToJobRunResults(beam.PTransform):  # type: ignore[misc]
     """Transforms result.Result into job_run_result.JobRunResult."""
 
-    def __init__(self, prefix: Optional[str] = None, label: Optional[str] = None) -> None:
+    def __init__(
+        self, prefix: Optional[str] = None, label: Optional[str] = None
+    ) -> None:
         """Initializes the ResultsToJobRunResults PTransform.
 
         Args:
@@ -53,7 +55,9 @@ class ResultsToJobRunResults(beam.PTransform):  # type: ignore[misc]
     # converts transform_results to a job_run_results. So, to allow all types
     # of transform results, we used Any type here.
     @beam.typehints.no_annotations  # type: ignore[misc]
-    def _transform_result_to_job_run_result(self, result_item: result.Result[Any, Any]) -> job_run_result.JobRunResult:
+    def _transform_result_to_job_run_result(
+        self, result_item: result.Result[Any, Any]
+    ) -> job_run_result.JobRunResult:
         """Transforms Result objects into JobRunResult objects. When the result
         is Ok then transform it into stdout, if the result is Err transform it
         into stderr.
@@ -65,9 +69,13 @@ class ResultsToJobRunResults(beam.PTransform):  # type: ignore[misc]
             JobRunResult. The JobRunResult object.
         """
         if isinstance(result_item, result.Ok):
-            return job_run_result.JobRunResult.as_stdout('%sSUCCESS:' % self.prefix)
+            return job_run_result.JobRunResult.as_stdout(
+                '%sSUCCESS:' % self.prefix
+            )
         else:
-            return job_run_result.JobRunResult.as_stderr('%sERROR: "%s":' % (self.prefix, result_item.value))
+            return job_run_result.JobRunResult.as_stderr(
+                '%sERROR: "%s":' % (self.prefix, result_item.value)
+            )
 
     @staticmethod
     def _add_count_to_job_run_result(
@@ -99,7 +107,9 @@ class ResultsToJobRunResults(beam.PTransform):  # type: ignore[misc]
     # Pcollection results to return the unique JobRunResult objects
     # with count.
     @beam.typehints.no_annotations  # type: ignore[misc]
-    def expand(self, results: beam.PCollection[result.Result[Any, Any]]) -> beam.PCollection[job_run_result.JobRunResult]:
+    def expand(
+        self, results: beam.PCollection[result.Result[Any, Any]]
+    ) -> beam.PCollection[job_run_result.JobRunResult]:
         """Transforms Result objects into unique JobRunResult objects and
         adds counts to them.
 
@@ -109,7 +119,14 @@ class ResultsToJobRunResults(beam.PTransform):  # type: ignore[misc]
         Returns:
             PCollection. Sequence of unique JobRunResult objects with count.
         """
-        return results | 'Transform result to job run result' >> beam.Map(self._transform_result_to_job_run_result) | 'Count all elements' >> beam.combiners.Count.PerElement() | 'Add count to job run result' >> beam.Map(self._add_count_to_job_run_result)
+        return (
+            results
+            | 'Transform result to job run result'
+            >> beam.Map(self._transform_result_to_job_run_result)
+            | 'Count all elements' >> beam.combiners.Count.PerElement()
+            | 'Add count to job run result'
+            >> beam.Map(self._add_count_to_job_run_result)
+        )
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -122,7 +139,9 @@ class CountObjectsToJobRunResult(beam.PTransform):  # type: ignore[misc]
     the count into job_run_result.JobRunResult.
     """
 
-    def __init__(self, prefix: Optional[str] = None, label: Optional[str] = None) -> None:
+    def __init__(
+        self, prefix: Optional[str] = None, label: Optional[str] = None
+    ) -> None:
         """Initializes the ResultsToJobRunResults PTransform.
 
         Args:
@@ -135,7 +154,9 @@ class CountObjectsToJobRunResult(beam.PTransform):  # type: ignore[misc]
     # Here we use type Any because this method can accept any kind of
     # Pcollection object to return the unique JobRunResult objects
     # with count.
-    def expand(self, objects: beam.PCollection[Any]) -> beam.PCollection[job_run_result.JobRunResult]:
+    def expand(
+        self, objects: beam.PCollection[Any]
+    ) -> beam.PCollection[job_run_result.JobRunResult]:
         """Counts items in collection and puts the count into a job run result.
 
         Args:
@@ -145,5 +166,14 @@ class CountObjectsToJobRunResult(beam.PTransform):  # type: ignore[misc]
             PCollection. Sequence of one JobRunResult with count.
         """
         return (
-            objects | 'Count all new models' >> beam.combiners.Count.Globally() | 'Only create result for non-zero number of objects' >> (beam.Filter(lambda x: x > 0)) | 'Add count to job run result' >> beam.Map(lambda object_count: job_run_result.JobRunResult.as_stdout('%sSUCCESS: %s' % (self.prefix, object_count)))
+            objects
+            | 'Count all new models' >> beam.combiners.Count.Globally()
+            | 'Only create result for non-zero number of objects'
+            >> (beam.Filter(lambda x: x > 0))
+            | 'Add count to job run result'
+            >> beam.Map(
+                lambda object_count: job_run_result.JobRunResult.as_stdout(
+                    '%sSUCCESS: %s' % (self.prefix, object_count)
+                )
+            )
         )

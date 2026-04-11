@@ -95,7 +95,9 @@ class ValidateModelWithUserId(base_validation.ValidateBaseModelId):
 class ValidateActivityMappingOnlyAllowedKeys(beam.DoFn):  # type: ignore[misc]
     """DoFn to check for Validates that pseudonymizable_entity_mappings."""
 
-    def process(self, input_model: user_models.PendingDeletionRequestModel) -> Iterator[user_validation_errors.ModelIncorrectKeyError]:
+    def process(
+        self, input_model: user_models.PendingDeletionRequestModel
+    ) -> Iterator[user_validation_errors.ModelIncorrectKeyError]:
         """Function that check for incorrect key in model.
 
         Args:
@@ -107,11 +109,19 @@ class ValidateActivityMappingOnlyAllowedKeys(beam.DoFn):  # type: ignore[misc]
         """
         model = job_utils.clone_model(input_model)
 
-        allowed_keys = [name.value for name in models.MODULES_WITH_PSEUDONYMIZABLE_CLASSES]
-        incorrect_keys = [key for key in model.pseudonymizable_entity_mappings.keys() if key not in allowed_keys]
+        allowed_keys = [
+            name.value for name in models.MODULES_WITH_PSEUDONYMIZABLE_CLASSES
+        ]
+        incorrect_keys = [
+            key
+            for key in model.pseudonymizable_entity_mappings.keys()
+            if key not in allowed_keys
+        ]
 
         if incorrect_keys:
-            yield user_validation_errors.ModelIncorrectKeyError(model, incorrect_keys)
+            yield user_validation_errors.ModelIncorrectKeyError(
+                model, incorrect_keys
+            )
 
 
 @validation_decorators.RelationshipsOf(user_models.CompletedActivitiesModel)
@@ -159,7 +169,9 @@ def incomplete_activities_model_relationships(
 @validation_decorators.RelationshipsOf(user_models.ExpUserLastPlaythroughModel)
 def exp_user_last_playthrough_model_relationships(
     model: Type[user_models.ExpUserLastPlaythroughModel],
-) -> Iterator[Tuple[datastore_services.Property, List[Type[exp_models.ExplorationModel]]]]:
+) -> Iterator[
+    Tuple[datastore_services.Property, List[Type[exp_models.ExplorationModel]]]
+]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.exploration_id, [exp_models.ExplorationModel]
 
@@ -188,7 +200,9 @@ def learner_playlist_model_relationships(
 @validation_decorators.RelationshipsOf(user_models.UserContributionsModel)
 def user_contributions_model_relationships(
     model: Type[user_models.UserContributionsModel],
-) -> Iterator[Tuple[datastore_services.Property, List[Type[exp_models.ExplorationModel]]]]:
+) -> Iterator[
+    Tuple[datastore_services.Property, List[Type[exp_models.ExplorationModel]]]
+]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.created_exploration_ids, [exp_models.ExplorationModel]
     yield model.edited_exploration_ids, [exp_models.ExplorationModel]
@@ -197,7 +211,11 @@ def user_contributions_model_relationships(
 @validation_decorators.RelationshipsOf(user_models.UserEmailPreferencesModel)
 def user_email_preferences_model_relationships(
     model: Type[user_models.UserEmailPreferencesModel],
-) -> Iterator[Tuple[model_property.PropertyType, List[Type[user_models.UserSettingsModel]]]]:
+) -> Iterator[
+    Tuple[
+        model_property.PropertyType, List[Type[user_models.UserSettingsModel]]
+    ]
+]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [user_models.UserSettingsModel]
 
@@ -248,7 +266,11 @@ def user_subscribers_model_relationships(
 @validation_decorators.RelationshipsOf(user_models.UserRecentChangesBatchModel)
 def user_recent_changes_batch_model_relationships(
     model: Type[user_models.UserRecentChangesBatchModel],
-) -> Iterator[Tuple[model_property.PropertyType, List[Type[user_models.UserSettingsModel]]]]:
+) -> Iterator[
+    Tuple[
+        model_property.PropertyType, List[Type[user_models.UserSettingsModel]]
+    ]
+]:
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.id, [user_models.UserSettingsModel]
@@ -257,7 +279,11 @@ def user_recent_changes_batch_model_relationships(
 @validation_decorators.RelationshipsOf(user_models.UserStatsModel)
 def user_stats_model_relationships(
     model: Type[user_models.UserStatsModel],
-) -> Iterator[Tuple[model_property.PropertyType, List[Type[user_models.UserSettingsModel]]]]:
+) -> Iterator[
+    Tuple[
+        model_property.PropertyType, List[Type[user_models.UserSettingsModel]]
+    ]
+]:
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.id, [user_models.UserSettingsModel]
@@ -266,7 +292,9 @@ def user_stats_model_relationships(
 @validation_decorators.RelationshipsOf(user_models.ExplorationUserDataModel)
 def exploration_user_data_model_relationships(
     model: Type[user_models.ExplorationUserDataModel],
-) -> Iterator[Tuple[datastore_services.Property, List[Type[exp_models.ExplorationModel]]]]:
+) -> Iterator[
+    Tuple[datastore_services.Property, List[Type[exp_models.ExplorationModel]]]
+]:
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.exploration_id, [exp_models.ExplorationModel]
@@ -299,7 +327,9 @@ def collection_progress_model_relationships(
 @validation_decorators.RelationshipsOf(user_models.StoryProgressModel)
 def story_progress_model_relationships(
     model: Type[user_models.StoryProgressModel],
-) -> Iterator[Tuple[datastore_services.Property, List[Type[story_models.StoryModel]]]]:
+) -> Iterator[
+    Tuple[datastore_services.Property, List[Type[story_models.StoryModel]]]
+]:
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.story_id, [story_models.StoryModel]
@@ -308,7 +338,9 @@ def story_progress_model_relationships(
 @validation_decorators.RelationshipsOf(user_models.UserQueryModel)
 def user_query_model_relationships(
     model: Type[user_models.UserQueryModel],
-) -> Iterator[Tuple[datastore_services.Property, List[Type[email_models.BulkEmailModel]]]]:
+) -> Iterator[
+    Tuple[datastore_services.Property, List[Type[email_models.BulkEmailModel]]]
+]:
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.sent_email_model_id, [email_models.BulkEmailModel]
@@ -317,7 +349,9 @@ def user_query_model_relationships(
 @validation_decorators.RelationshipsOf(user_models.UserBulkEmailsModel)
 def user_bulk_emails_model_relationships(
     model: Type[user_models.UserBulkEmailsModel],
-) -> Iterator[Tuple[datastore_services.Property, List[Type[email_models.BulkEmailModel]]]]:
+) -> Iterator[
+    Tuple[datastore_services.Property, List[Type[email_models.BulkEmailModel]]]
+]:
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.sent_email_model_ids, [email_models.BulkEmailModel]
@@ -326,16 +360,24 @@ def user_bulk_emails_model_relationships(
 @validation_decorators.RelationshipsOf(user_models.UserSkillMasteryModel)
 def user_skill_mastery_model_relationships(
     model: Type[user_models.UserSkillMasteryModel],
-) -> Iterator[Tuple[datastore_services.Property, List[Type[skill_models.SkillModel]]]]:
+) -> Iterator[
+    Tuple[datastore_services.Property, List[Type[skill_models.SkillModel]]]
+]:
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.skill_id, [skill_models.SkillModel]
 
 
-@validation_decorators.RelationshipsOf(user_models.UserContributionProficiencyModel)
+@validation_decorators.RelationshipsOf(
+    user_models.UserContributionProficiencyModel
+)
 def user_contribution_proficiency_model_relationships(
     model: Type[user_models.UserContributionProficiencyModel],
-) -> Iterator[Tuple[datastore_services.Property, List[Type[user_models.UserSettingsModel]]]]:
+) -> Iterator[
+    Tuple[
+        datastore_services.Property, List[Type[user_models.UserSettingsModel]]
+    ]
+]:
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.user_id, [user_models.UserSettingsModel]
@@ -344,7 +386,11 @@ def user_contribution_proficiency_model_relationships(
 @validation_decorators.RelationshipsOf(user_models.UserContributionRightsModel)
 def user_contribution_rights_model_relationships(
     model: Type[user_models.UserContributionRightsModel],
-) -> Iterator[Tuple[model_property.PropertyType, List[Type[user_models.UserSettingsModel]]]]:
+) -> Iterator[
+    Tuple[
+        model_property.PropertyType, List[Type[user_models.UserSettingsModel]]
+    ]
+]:
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.id, [user_models.UserSettingsModel]
@@ -381,10 +427,17 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):  # type: ignore[misc]
         """
         model = job_utils.clone_model(input_model)
         if model.draft_change_list and not model.draft_change_list_last_updated:
-            yield user_validation_errors.DraftChangeListLastUpdatedNoneError(model)
+            yield user_validation_errors.DraftChangeListLastUpdatedNoneError(
+                model
+            )
         current_time = datetime.datetime.utcnow()
-        if model.draft_change_list_last_updated and model.draft_change_list_last_updated > current_time:
-            yield user_validation_errors.DraftChangeListLastUpdatedInvalidError(model)
+        if (
+            model.draft_change_list_last_updated
+            and model.draft_change_list_last_updated > current_time
+        ):
+            yield user_validation_errors.DraftChangeListLastUpdatedInvalidError(
+                model
+            )
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -395,7 +448,9 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):  # type: ignore[misc]
 class ValidateArchivedModelsMarkedDeleted(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate archived models marked deleted."""
 
-    def process(self, input_model: user_models.UserQueryModel) -> Iterator[user_validation_errors.ArchivedModelNotMarkedDeletedError]:
+    def process(
+        self, input_model: user_models.UserQueryModel
+    ) -> Iterator[user_validation_errors.ArchivedModelNotMarkedDeletedError]:
         """Function that checks if archived model is marked deleted.
 
         Args:
@@ -408,4 +463,6 @@ class ValidateArchivedModelsMarkedDeleted(beam.DoFn):  # type: ignore[misc]
         """
         model = job_utils.clone_model(input_model)
         if model.query_status == feconf.USER_QUERY_STATUS_ARCHIVED:
-            yield user_validation_errors.ArchivedModelNotMarkedDeletedError(model)
+            yield user_validation_errors.ArchivedModelNotMarkedDeletedError(
+                model
+            )

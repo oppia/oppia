@@ -33,11 +33,15 @@ NAME_SPACE: Final = multiprocessing.Manager().Namespace()
 NAME_SPACE.files = run_lint_checks.FileCache()
 FILE_CACHE: Final = NAME_SPACE.files
 
-LINTER_TESTS_DIR: Final = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
+LINTER_TESTS_DIR: Final = os.path.join(
+    os.getcwd(), 'scripts', 'linters', 'test_files'
+)
 VALID_JS_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'valid.js')
 VALID_TS_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'valid.ts')
 INVALID_TS_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'invalid.ts')
-VALID_BACKEND_API_SERVICE_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'valid-backend-api.service.ts')
+VALID_BACKEND_API_SERVICE_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR, 'valid-backend-api.service.ts'
+)
 
 
 class Ret:
@@ -54,7 +58,9 @@ class Ret:
 class MockProcess:
     """Mock process that properly simulates subprocess.Popen behavior."""
 
-    def __init__(self, returncode: int = 1, stdout: bytes = b'', stderr: bytes = b'') -> None:
+    def __init__(
+        self, returncode: int = 1, stdout: bytes = b'', stderr: bytes = b''
+    ) -> None:
         self.returncode = returncode
         self._stdout = stdout
         self._stderr = stderr
@@ -77,8 +83,12 @@ class JsTsLintTests(test_utils.LinterTestBase):
         for stdout in lint_task_report:
             if stdout.failed:
                 for message in expected_messages:
-                    self.assert_same_list_elements([message], stdout.trimmed_messages)
-                self.assert_failed_messages_count(stdout.get_report(), failed_count)
+                    self.assert_same_list_elements(
+                        [message], stdout.trimmed_messages
+                    )
+                self.assert_failed_messages_count(
+                    stdout.get_report(), failed_count
+                )
             else:
                 continue
 
@@ -105,10 +115,14 @@ class JsTsLintTests(test_utils.LinterTestBase):
             return (b'Output', b'Invalid')
 
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-        communicate_swap = self.swap(subprocess.Popen, 'communicate', mock_communicate)
+        communicate_swap = self.swap(
+            subprocess.Popen, 'communicate', mock_communicate
+        )
         with popen_swap, communicate_swap:
             with self.assertRaisesRegex(Exception, 'Invalid'):
-                js_ts_linter.ThirdPartyJsTsLintChecksManager([VALID_TS_FILEPATH]).perform_all_lint_checks()
+                js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                    [VALID_TS_FILEPATH]
+                ).perform_all_lint_checks()
 
     def test_third_party_linter_with_invalid_eslint_path(self) -> None:
         def mock_exists(unused_path: str) -> bool:
@@ -123,15 +137,21 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 'ERROR    Please run start.py first to install node-eslint and its dependencies.',
             ),
         ):
-            js_ts_linter.ThirdPartyJsTsLintChecksManager([VALID_TS_FILEPATH]).perform_all_lint_checks()
+            js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                [VALID_TS_FILEPATH]
+            ).perform_all_lint_checks()
 
     def test_third_party_linter_with_success_message(self) -> None:
-        lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager([VALID_TS_FILEPATH]).perform_all_lint_checks()
+        lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+            [VALID_TS_FILEPATH]
+        ).perform_all_lint_checks()
         expected_messages = ['SUCCESS  ESLint check passed']
         self.validate(lint_task_report, expected_messages, 0)
 
     def test_third_party_linter_with_no_files(self) -> None:
-        lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager([]).perform_all_lint_checks()
+        lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+            []
+        ).perform_all_lint_checks()
         self.assertEqual(
             [
                 'There are no JavaScript or Typescript files to lint.',
@@ -143,8 +163,14 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assertFalse(lint_task_report[0].failed)
 
     def test_get_linters_with_success(self) -> None:
-        third_party, _ = js_ts_linter.get_linters([VALID_JS_FILEPATH], [VALID_TS_FILEPATH])
-        self.assertTrue(isinstance(third_party, js_ts_linter.ThirdPartyJsTsLintChecksManager))
+        third_party, _ = js_ts_linter.get_linters(
+            [VALID_JS_FILEPATH], [VALID_TS_FILEPATH]
+        )
+        self.assertTrue(
+            isinstance(
+                third_party, js_ts_linter.ThirdPartyJsTsLintChecksManager
+            )
+        )
 
     def test_eslint_integration_with_invalid_ts_file(self) -> None:
         """Test ESLint integration using invalid.ts file (tests trimming through public interface)."""
@@ -175,7 +201,9 @@ class JsTsLintTests(test_utils.LinterTestBase):
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
 
         with exists_swap, popen_swap:
-            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager([INVALID_TS_FILEPATH]).perform_all_lint_checks()
+            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                [INVALID_TS_FILEPATH]
+            ).perform_all_lint_checks()
 
         self.assertTrue(lint_task_report[0].failed)
         self.assertEqual(lint_task_report[0].name, 'ESLint')
@@ -225,11 +253,15 @@ class JsTsLintTests(test_utils.LinterTestBase):
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
 
         with exists_swap, popen_swap:
-            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager([INVALID_TS_FILEPATH]).perform_all_lint_checks()
+            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                [INVALID_TS_FILEPATH]
+            ).perform_all_lint_checks()
 
         trimmed_output = ''.join(lint_task_report[0].trimmed_messages)
         self.assertNotIn('\u2716 2 problems', trimmed_output)
-        self.assertNotIn('potentially fixable with the `--fix` option.', trimmed_output)
+        self.assertNotIn(
+            'potentially fixable with the `--fix` option.', trimmed_output
+        )
         self.assertIn('25:3    Duplicate identifier', trimmed_output)
         self.assertIn('24:3    Variable never used', trimmed_output)
 
@@ -257,7 +289,9 @@ class JsTsLintTests(test_utils.LinterTestBase):
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
 
         with exists_swap, popen_swap:
-            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager([INVALID_TS_FILEPATH]).perform_all_lint_checks()
+            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                [INVALID_TS_FILEPATH]
+            ).perform_all_lint_checks()
 
         trimmed_output = ''.join(lint_task_report[0].trimmed_messages)
         self.assertIn('X 1 problem', trimmed_output)
@@ -278,7 +312,9 @@ class JsTsLintTests(test_utils.LinterTestBase):
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
 
         with exists_swap, popen_swap:
-            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager([INVALID_TS_FILEPATH]).perform_all_lint_checks()
+            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                [INVALID_TS_FILEPATH]
+            ).perform_all_lint_checks()
 
         self.assertFalse(lint_task_report[0].failed)
         self.assertEqual(lint_task_report[0].name, 'ESLint')
@@ -301,13 +337,17 @@ class JsTsLintTests(test_utils.LinterTestBase):
         def mock_popen(  # pylint: disable=unused-argument
             *args: str, **kwargs: str
         ) -> MockProcess:
-            return MockProcess(returncode=1, stdout=mock_output.encode('utf-8'), stderr=b'')
+            return MockProcess(
+                returncode=1, stdout=mock_output.encode('utf-8'), stderr=b''
+            )
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
 
         with exists_swap, popen_swap:
-            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager([INVALID_TS_FILEPATH]).perform_all_lint_checks()
+            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                [INVALID_TS_FILEPATH]
+            ).perform_all_lint_checks()
 
         expected_messages = [
             '10:5    Something bad',

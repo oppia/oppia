@@ -59,7 +59,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             def readline(self) -> bytes:  # pylint: disable=missing-docstring
                 self.counter += 1
                 if self.counter == 1:
-                    return b'Executed tests. Trying to get the Angular injector..'
+                    return (
+                        b'Executed tests. Trying to get the Angular injector..'
+                    )
                 if self.counter == 2 and self.run_counter < self.flakes:
                     return b'Disconnected , because no message'
                 self.counter = 0
@@ -119,19 +121,27 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         self.cmd_token_list: list[list[str]] = []
 
-        def mock_success_check_call(cmd_tokens: list[str], **unused_kwargs: str) -> MockTask:  # pylint: disable=unused-argument
+        def mock_success_check_call(
+            cmd_tokens: list[str], **unused_kwargs: str
+        ) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
 
-        def mock_flaky_check_call(cmd_tokens: list[str], **unused_kwargs: str) -> MockFlakyTask:  # pylint: disable=unused-argument
+        def mock_flaky_check_call(
+            cmd_tokens: list[str], **unused_kwargs: str
+        ) -> MockFlakyTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockFlakyTask()
 
-        def mock_very_flaky_check_call(cmd_tokens: list[str], **unused_kwargs: str) -> MockVeryFlakyTask:  # pylint: disable=unused-argument
+        def mock_very_flaky_check_call(
+            cmd_tokens: list[str], **unused_kwargs: str
+        ) -> MockVeryFlakyTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockVeryFlakyTask()
 
-        def mock_failed_check_call(cmd_tokens: list[str], **unused_kwargs: str) -> MockFailedTask:  # pylint: disable=unused-argument
+        def mock_failed_check_call(
+            cmd_tokens: list[str], **unused_kwargs: str
+        ) -> MockFailedTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockFailedTask()
 
@@ -152,15 +162,29 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             self.frontend_coverage_checks_called = True
             self.frontend_coverage_checks_args.append(args)
 
-        self.swap_success_Popen = self.swap(subprocess, 'Popen', mock_success_check_call)
-        self.swap_flaky_Popen = self.swap(subprocess, 'Popen', mock_flaky_check_call)
-        self.swap_very_flaky_Popen = self.swap(subprocess, 'Popen', mock_very_flaky_check_call)
-        self.swap_failed_Popen = self.swap(subprocess, 'Popen', mock_failed_check_call)
+        self.swap_success_Popen = self.swap(
+            subprocess, 'Popen', mock_success_check_call
+        )
+        self.swap_flaky_Popen = self.swap(
+            subprocess, 'Popen', mock_flaky_check_call
+        )
+        self.swap_very_flaky_Popen = self.swap(
+            subprocess, 'Popen', mock_very_flaky_check_call
+        )
+        self.swap_failed_Popen = self.swap(
+            subprocess, 'Popen', mock_failed_check_call
+        )
         self.swap_sys_exit = self.swap(sys, 'exit', mock_sys_exit)
         self.swap_build = self.swap(build, 'main', mock_build)
-        self.swap_common = self.swap(common, 'print_each_string_after_two_new_lines', lambda _: None)
-        self.swap_install_third_party_libs = self.swap(install_third_party_libs, 'main', lambda: None)
-        self.swap_check_frontend_coverage = self.swap(check_frontend_test_coverage, 'main', mock_check_frontend_coverage)
+        self.swap_common = self.swap(
+            common, 'print_each_string_after_two_new_lines', lambda _: None
+        )
+        self.swap_install_third_party_libs = self.swap(
+            install_third_party_libs, 'main', lambda: None
+        )
+        self.swap_check_frontend_coverage = self.swap(
+            check_frontend_test_coverage, 'main', mock_check_frontend_coverage
+        )
 
     def test_frontend_tests_with_specs_to_run(self) -> None:
         original_os_path_exists = os.path.exists
@@ -197,7 +221,11 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertTrue(self.frontend_coverage_checks_called)
         self.assertEqual(
             self.frontend_coverage_checks_args,
-            [['--files_to_check=about-page.component.spec.ts,home-page.component.spec.ts,test-module.spec.js']],
+            [
+                [
+                    '--files_to_check=about-page.component.spec.ts,home-page.component.spec.ts,test-module.spec.js'
+                ]
+            ],
         )
 
     def test_frontend_tests_with_specs_to_run_invalid_spec(self) -> None:
@@ -208,7 +236,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                         ValueError,
                         'No spec file found for the file: invalid.ts',
                     ):
-                        run_frontend_tests.main(args=['--specs_to_run', 'invalid.ts'])
+                        run_frontend_tests.main(
+                            args=['--specs_to_run', 'invalid.ts']
+                        )
 
     def test_frontend_tests_with_specs_to_run_no_specs_found_allow_no_spec(
         self,
@@ -226,7 +256,11 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                         )
 
     def test_frontend_tests_with_run_on_changed_files_in_branch(self) -> None:
-        git_refs = [git_changes_utils.GitRef('local_ref', 'local_sha1', 'remote_ref', 'remote_sha1')]
+        git_refs = [
+            git_changes_utils.GitRef(
+                'local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'
+            )
+        ]
 
         def mock_get_remote_name() -> str:
             return 'remote'
@@ -234,7 +268,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         def mock_get_refs() -> List[git_changes_utils.GitRef]:
             return git_refs
 
-        def mock_get_changed_files(unused_refs: List[git_changes_utils.GitRef], unused_remote_name: str) -> Dict[str, Tuple[List[git_changes_utils.FileDiff], List[bytes]]]:
+        def mock_get_changed_files(
+            unused_refs: List[git_changes_utils.GitRef], unused_remote_name: str
+        ) -> Dict[str, Tuple[List[git_changes_utils.FileDiff], List[bytes]]]:
             return {
                 'branch1': (
                     [
@@ -280,7 +316,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             'get_staged_acmrt_files',
             mock_get_staged_acmrt_files,
         )
-        get_file_spec_swap = self.swap(run_frontend_tests, 'get_file_spec', mock_get_file_spec)
+        get_file_spec_swap = self.swap(
+            run_frontend_tests, 'get_file_spec', mock_get_file_spec
+        )
         get_parent_branch_name_for_diff_swap = self.swap(
             git_changes_utils,
             'get_parent_branch_name_for_diff',
@@ -293,7 +331,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                     with get_refs_swap, get_changed_files_swap:
                         with get_file_spec_swap, get_staged_acmrt_files_swap:
                             with get_parent_branch_name_for_diff_swap:
-                                run_frontend_tests.main(args=['--run_on_changed_files_in_branch'])
+                                run_frontend_tests.main(
+                                    args=['--run_on_changed_files_in_branch']
+                                )
 
         cmd = [
             common.NODE_BIN_PATH,
@@ -320,8 +360,12 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         with self.swap_success_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage, get_remote_name_swap:
-                    with self.assertRaisesRegex(SystemExit, 'Error: No remote repository found.'):
-                        run_frontend_tests.main(args=['--run_on_changed_files_in_branch'])
+                    with self.assertRaisesRegex(
+                        SystemExit, 'Error: No remote repository found.'
+                    ):
+                        run_frontend_tests.main(
+                            args=['--run_on_changed_files_in_branch']
+                        )
 
     def test_frontend_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:
@@ -437,7 +481,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         ]
         self.assertIn(cmd, self.cmd_token_list)
         self.assertIn('Running test in production environment', self.print_arr)
-        self.assertIn(['--prod_env', '--minify_third_party_libs_only'], self.build_args)
+        self.assertIn(
+            ['--prod_env', '--minify_third_party_libs_only'], self.build_args
+        )
 
     def test_coverage_checks_are_not_run_when_frontend_tests_fail(self) -> None:
         with self.swap_failed_Popen, self.print_swap, self.swap_build:
@@ -463,7 +509,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         with self.swap_failed_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage, self.swap_sys_exit:
-                    run_frontend_tests.main(args=['--download_combined_frontend_spec_file'])
+                    run_frontend_tests.main(
+                        args=['--download_combined_frontend_spec_file']
+                    )
 
         combined_spec_download_cmd = [
             'wget',
@@ -481,7 +529,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         with self.swap_success_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage, self.swap_sys_exit:
-                    run_frontend_tests.main(args=['--download_combined_frontend_spec_file'])
+                    run_frontend_tests.main(
+                        args=['--download_combined_frontend_spec_file']
+                    )
 
         combined_spec_download_cmd = [
             'wget',
@@ -520,7 +570,11 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
     def test_main_run_on_changed_files_in_branch_with_no_spec_files(
         self,
     ) -> None:
-        git_refs = [git_changes_utils.GitRef('local_ref', 'local_sha1', 'remote_ref', 'remote_sha1')]
+        git_refs = [
+            git_changes_utils.GitRef(
+                'local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'
+            )
+        ]
 
         def mock_get_remote_name() -> str:
             return 'remote'
@@ -528,7 +582,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         def mock_get_refs() -> list[git_changes_utils.GitRef]:
             return git_refs
 
-        def mock_get_changed_files(_refs: list[str], _remote_name: str) -> dict[str, tuple[list[bytes], list[bytes]]]:
+        def mock_get_changed_files(
+            _refs: list[str], _remote_name: str
+        ) -> dict[str, tuple[list[bytes], list[bytes]]]:
             return {'branch1': ([], [b'file1.js', b'file2.ts'])}
 
         def mock_get_staged_acmrt_files() -> list[bytes]:
@@ -544,7 +600,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 mock_get_remote_name,
             ),
             self.swap(git_changes_utils, 'get_refs', mock_get_refs),
-            self.swap(git_changes_utils, 'get_changed_files', mock_get_changed_files),
+            self.swap(
+                git_changes_utils, 'get_changed_files', mock_get_changed_files
+            ),
             self.swap(
                 git_changes_utils,
                 'get_staged_acmrt_files',
@@ -558,7 +616,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             self.swap_check_frontend_coverage,
             self.assertRaisesRegex(SystemExit, '0'),
         ):
-            run_frontend_tests.main(args=['--run_on_changed_files_in_branch', '--allow_no_spec'])
+            run_frontend_tests.main(
+                args=['--run_on_changed_files_in_branch', '--allow_no_spec']
+            )
 
         printed: list[str] = []
         for msg in self.print_arr:
@@ -609,9 +669,14 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             run_frontend_tests.main(args=[])
 
         printed_lines: list[str] = []
-        printed_lines += [line for line in self.print_arr if isinstance(line, str)]
+        printed_lines += [
+            line for line in self.print_arr if isinstance(line, str)
+        ]
 
-        assert any('Executed tests. Trying to get the Angular injector..' in line for line in printed_lines)
+        assert any(
+            'Executed tests. Trying to get the Angular injector..' in line
+            for line in printed_lines
+        )
 
         assert not any('[web-server]:' in line for line in printed_lines)
 

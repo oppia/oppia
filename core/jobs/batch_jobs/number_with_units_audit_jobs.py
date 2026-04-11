@@ -29,7 +29,9 @@ if MYPY:  # pragma: no cover
     from core.domain import state_domain
     from mypy_imports import exp_models, question_models
 
-exp_models, question_models = models.Registry.import_models([models.Names.EXPLORATION, models.Names.QUESTION])
+exp_models, question_models = models.Registry.import_models(
+    [models.Names.EXPLORATION, models.Names.QUESTION]
+)
 
 
 class FindNumberWithUnitsRuleUnitsJob(base_jobs.JobBase):
@@ -40,13 +42,29 @@ class FindNumberWithUnitsRuleUnitsJob(base_jobs.JobBase):
     """
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        exp_models_pcoll = self.pipeline | 'Get all ExplorationModels' >> ndb_io.GetModels(exp_models.ExplorationModel.get_all())
+        exp_models_pcoll = (
+            self.pipeline
+            | 'Get all ExplorationModels'
+            >> ndb_io.GetModels(exp_models.ExplorationModel.get_all())
+        )
 
-        question_models_pcoll = self.pipeline | 'Get all QuestionModels' >> ndb_io.GetModels(question_models.QuestionModel.get_all())
+        question_models_pcoll = (
+            self.pipeline
+            | 'Get all QuestionModels'
+            >> ndb_io.GetModels(question_models.QuestionModel.get_all())
+        )
 
-        exp_units = exp_models_pcoll | 'Extract units from explorations' >> beam.FlatMap(self._extract_units_from_exploration)
+        exp_units = (
+            exp_models_pcoll
+            | 'Extract units from explorations'
+            >> beam.FlatMap(self._extract_units_from_exploration)
+        )
 
-        question_units = question_models_pcoll | 'Extract units from questions' >> beam.FlatMap(self._extract_units_from_question)
+        question_units = (
+            question_models_pcoll
+            | 'Extract units from questions'
+            >> beam.FlatMap(self._extract_units_from_question)
+        )
 
         all_units = (
             exp_units,
@@ -55,23 +73,36 @@ class FindNumberWithUnitsRuleUnitsJob(base_jobs.JobBase):
 
         unique_units = all_units | 'Deduplicate units' >> beam.combiners.ToSet()
 
-        sorted_units = unique_units | 'Sort units' >> beam.Map(sorted) | 'Filter empty unit lists' >> beam.Filter(lambda unit_list: len(unit_list) > 0)
+        sorted_units = (
+            unique_units
+            | 'Sort units' >> beam.Map(sorted)
+            | 'Filter empty unit lists'
+            >> beam.Filter(lambda unit_list: len(unit_list) > 0)
+        )
 
-        return sorted_units | 'Final output' >> beam.Map(job_run_result.JobRunResult.as_stdout)
+        return sorted_units | 'Final output' >> beam.Map(
+            job_run_result.JobRunResult.as_stdout
+        )
 
-    def _extract_units_from_exploration(self, model: exp_models.ExplorationModel) -> Iterable[str]:
+    def _extract_units_from_exploration(
+        self, model: exp_models.ExplorationModel
+    ) -> Iterable[str]:
         """Extracts NumberWithUnits unit strings from an exploration."""
         for state_dict in model.states.values():
             for unit in self._extract_units_from_state_dict(state_dict):
                 yield unit
 
-    def _extract_units_from_question(self, model: question_models.QuestionModel) -> Iterable[str]:
+    def _extract_units_from_question(
+        self, model: question_models.QuestionModel
+    ) -> Iterable[str]:
         """Extracts NumberWithUnits unit strings from a question."""
         state_dict = model.question_state_data
         for unit in self._extract_units_from_state_dict(state_dict):
             yield unit
 
-    def _extract_units_from_state_dict(self, state_dict: state_domain.StateDict) -> Iterable[str]:
+    def _extract_units_from_state_dict(
+        self, state_dict: state_domain.StateDict
+    ) -> Iterable[str]:
         """Extracts NumberWithUnits unit strings from a state dict."""
         interaction_dict = state_dict.get('interaction')
         if not isinstance(interaction_dict, dict):

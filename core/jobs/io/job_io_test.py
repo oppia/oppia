@@ -31,10 +31,16 @@ class PutResultsTests(job_test_utils.PipelinedTestBase):
 
     def test_single_output(self) -> None:
         messages = [
-            job_run_result.JobRunResult(stdout='Hello, World!', stderr='Uh-oh, World!'),
+            job_run_result.JobRunResult(
+                stdout='Hello, World!', stderr='Uh-oh, World!'
+            ),
         ]
 
-        self.assert_pcoll_empty(self.pipeline | beam.Create(messages) | job_io.PutResults(self.JOB_ID))
+        self.assert_pcoll_empty(
+            self.pipeline
+            | beam.Create(messages)
+            | job_io.PutResults(self.JOB_ID)
+        )
 
         result = beam_job_services.get_beam_job_run_result(self.JOB_ID)
         self.assertEqual(result.stdout, 'Hello, World!')
@@ -48,7 +54,11 @@ class PutResultsTests(job_test_utils.PipelinedTestBase):
         ]
 
         with self.swap(job_run_result, 'MAX_OUTPUT_CHARACTERS', 8):
-            self.assert_pcoll_empty(self.pipeline | beam.Create(messages) | job_io.PutResults(self.JOB_ID))
+            self.assert_pcoll_empty(
+                self.pipeline
+                | beam.Create(messages)
+                | job_io.PutResults(self.JOB_ID)
+            )
 
         result = beam_job_services.get_beam_job_run_result(self.JOB_ID)
         self.assertItemsEqual(result.stdout.split('\n'), ['abc', 'def', 'ghi'])

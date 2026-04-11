@@ -2,7 +2,7 @@
 # See [tool.ruff.format] below.
 
 [tool.ruff]
-line-length = 320
+line-length = 80
 target-version = "py311"
 extend-exclude = [
     "scripts/linters/test_files/invalid_*.py",
@@ -20,6 +20,7 @@ docstring-code-format = false       # Don't reformat docstring code (Black doesn
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
+ignore = ["E501"]
 
 [tool.ruff.lint.isort]
 known-third-party = [

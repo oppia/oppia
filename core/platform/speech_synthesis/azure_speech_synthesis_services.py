@@ -105,13 +105,19 @@ def get_azure_voicecode_from_language_accent_code(
         str. The Azure voice code associated with the given language accent
         code.
     """
-    autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = constants.autogeneratable_language_accent_constants
+    autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
+        constants.autogeneratable_language_accent_constants
+    )
 
-    voice_code: str = autogeneratable_language_accent_list[language_accent_code]['voice_code']
+    voice_code: str = autogeneratable_language_accent_list[
+        language_accent_code
+    ]['voice_code']
     return voice_code
 
 
-def process_factorial_in_text(text: str, math_symbol_pronunciations: Dict[str, str]) -> str:
+def process_factorial_in_text(
+    text: str, math_symbol_pronunciations: Dict[str, str]
+) -> str:
     """Process the text to convert factorial expressions into their
     corresponding words or phrases.
 
@@ -128,7 +134,9 @@ def process_factorial_in_text(text: str, math_symbol_pronunciations: Dict[str, s
     return re.sub(r'(\d+)!', pronounciation + r'\1', text)
 
 
-def process_superscript_in_text(text: str, math_symbol_pronunciations: Dict[str, str]) -> str:
+def process_superscript_in_text(
+    text: str, math_symbol_pronunciations: Dict[str, str]
+) -> str:
     """Process the text to convert superscript characters into their
     corresponding words or phrases.
 
@@ -191,9 +199,13 @@ def process_superscript_in_text(text: str, math_symbol_pronunciations: Dict[str,
         if superscript_chars in ('^2', '^3'):
             return ' ' + math_symbol_pronunciations[superscript_chars]
 
-        return ' ' + math_symbol_pronunciations['^'] + ' ' + superscript_chars[1:]
+        return (
+            ' ' + math_symbol_pronunciations['^'] + ' ' + superscript_chars[1:]
+        )
 
-    result = re.sub(r'\^([\d]+)', lambda m: get_pronounciation(m.group(0)), result)
+    result = re.sub(
+        r'\^([\d]+)', lambda m: get_pronounciation(m.group(0)), result
+    )
 
     return result
 
@@ -214,7 +226,9 @@ def process_algebric_fraction(text: str) -> str:
     return text
 
 
-def convert_plaintext_to_ssml_content(plaintext: str, language_accent_code: str) -> str:
+def convert_plaintext_to_ssml_content(
+    plaintext: str, language_accent_code: str
+) -> str:
     """The method transforms the given plaintext into SSML format using the
     SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS.
 
@@ -233,9 +247,17 @@ def convert_plaintext_to_ssml_content(plaintext: str, language_accent_code: str)
     """
     content_list = plaintext.split(feconf.OPPIA_CONTENT_TAG_DELIMITER)
 
-    language_code = voiceover_services.get_language_code_from_language_accent_code(language_accent_code)
+    language_code = (
+        voiceover_services.get_language_code_from_language_accent_code(
+            language_accent_code
+        )
+    )
 
-    math_symbol_pronunciations = constants.constants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.get(language_code, {})
+    math_symbol_pronunciations = (
+        constants.constants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.get(
+            language_code, {}
+        )
+    )
 
     main_ssml_content = ''
     for content in content_list:
@@ -249,18 +271,24 @@ def convert_plaintext_to_ssml_content(plaintext: str, language_accent_code: str)
 
             def replacer(match: re.Match[str]) -> str:
                 num1, num2 = match.groups()
-                pronunciation = MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['-']
+                pronunciation = (
+                    MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['-']
+                )
                 return '%s %s %s' % (num1, pronunciation, num2)
 
             content = pattern.sub(replacer, content)
 
         # Update the content to pronounce `*` correctly in the given language.
         if ' * ' in content:
-            content = content.replace('*', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['*'])
+            content = content.replace(
+                '*', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['*']
+            )
 
         # Update the content to pronounce `×` correctly in the given language.
         if '×' in content:
-            content = content.replace('×', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['×'])
+            content = content.replace(
+                '×', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['×']
+            )
 
         # Update the content of algebraic fractions to contain spaces around
         # the slashes.
@@ -275,11 +303,15 @@ def convert_plaintext_to_ssml_content(plaintext: str, language_accent_code: str)
 
         # Update the content to pronounce `÷` correctly in the given language.
         if '÷' in content:
-            content = content.replace('÷', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['÷'])
+            content = content.replace(
+                '÷', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['÷']
+            )
 
         # Update the content to pronounce `+` correctly in the given language.
         if ' + ' in content:
-            content = content.replace('+', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['+'])
+            content = content.replace(
+                '+', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['+']
+            )
 
         # Update the content to pronounce `=` correctly in the given language.
         if ' = ' in content:
@@ -294,7 +326,9 @@ def convert_plaintext_to_ssml_content(plaintext: str, language_accent_code: str)
 
         # Update the content to pronounce superscripts correctly in the given
         # language.
-        content = process_superscript_in_text(content, math_symbol_pronunciations)
+        content = process_superscript_in_text(
+            content, math_symbol_pronunciations
+        )
 
         # Update the content to pronounce 'dash' for two or more underscores in
         # the content.
@@ -343,7 +377,9 @@ def regenerate_speech_from_text(
     """
 
     # Azure text-to-speech API key.
-    azure_tts_api_key = secrets_services.get_secret('AZURE_TTS_API_KEY', oppia_project_id)
+    azure_tts_api_key = secrets_services.get_secret(
+        'AZURE_TTS_API_KEY', oppia_project_id
+    )
 
     if azure_tts_api_key is None:
         raise Exception('Azure TTS API key is not available.')
@@ -352,32 +388,51 @@ def regenerate_speech_from_text(
     azure_tts_region = feconf.AZURE_TEXT_TO_SPEECH_REGION
 
     # Speech Configuration for Azure TTS.
-    speech_config = speechsdk.SpeechConfig(subscription=azure_tts_api_key, region=azure_tts_region)
+    speech_config = speechsdk.SpeechConfig(
+        subscription=azure_tts_api_key, region=azure_tts_region
+    )
 
     # Configuring audio format to MP3.
-    speech_config.set_speech_synthesis_output_format(speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3)
+    speech_config.set_speech_synthesis_output_format(
+        speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3
+    )
 
-    speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=None)
+    speech_synthesizer = speechsdk.SpeechSynthesizer(
+        speech_config=speech_config, audio_config=None
+    )
 
-    word_boundary_collection_instance: WordBoundaryCollection = WordBoundaryCollection()
-    speech_synthesizer.synthesis_word_boundary.connect(word_boundary_collection_instance.word_boundary_event)
+    word_boundary_collection_instance: WordBoundaryCollection = (
+        WordBoundaryCollection()
+    )
+    speech_synthesizer.synthesis_word_boundary.connect(
+        word_boundary_collection_instance.word_boundary_event
+    )
 
-    ssml_text_for_speech_synthesis = convert_plaintext_to_ssml_content(plaintext, language_accent_code)
+    ssml_text_for_speech_synthesis = convert_plaintext_to_ssml_content(
+        plaintext, language_accent_code
+    )
 
     delay_in_sec_before_retrying = 1
     binary_audio_data = None
     error_details = None
 
-    for _ in range(MAX_RETRIES_FOR_VOICEOVER_SYNTHESIS_WITH_EXPONENTIAL_BACKOFF):
+    for _ in range(
+        MAX_RETRIES_FOR_VOICEOVER_SYNTHESIS_WITH_EXPONENTIAL_BACKOFF
+    ):
         logging.info(
             'Voiceover synthesis log: Retrying speech synthesis after %s seconds delay.',
             delay_in_sec_before_retrying,
         )
         time.sleep(delay_in_sec_before_retrying)
 
-        speech_synthesis_result = speech_synthesizer.speak_ssml_async(ssml_text_for_speech_synthesis).get()
+        speech_synthesis_result = speech_synthesizer.speak_ssml_async(
+            ssml_text_for_speech_synthesis
+        ).get()
 
-        if speech_synthesis_result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
+        if (
+            speech_synthesis_result.reason
+            == speechsdk.ResultReason.SynthesizingAudioCompleted
+        ):
             binary_audio_data = speech_synthesis_result.audio_data
             error_details = None
             break
@@ -385,11 +440,17 @@ def regenerate_speech_from_text(
         if speech_synthesis_result.reason == speechsdk.ResultReason.Canceled:
             cancellation_details = speech_synthesis_result.cancellation_details
 
-            if cancellation_details.reason == speechsdk.CancellationReason.Error:
+            if (
+                cancellation_details.reason
+                == speechsdk.CancellationReason.Error
+            ):
                 error_details = cancellation_details.error_details
                 error_code = cancellation_details.error_code
 
-                logging.error('Voiceover synthesis log: Speech synthesis failed for content %s with error code %s and details: %s' % (plaintext, error_code, error_details))
+                logging.error(
+                    'Voiceover synthesis log: Speech synthesis failed for content %s with error code %s and details: %s'
+                    % (plaintext, error_code, error_details)
+                )
 
                 # Exponential backoff for retrying speech synthesis in case of too
                 # many requests, connection failure, or service timeout errors.
@@ -398,19 +459,35 @@ def regenerate_speech_from_text(
                     speechsdk.CancellationErrorCode.ConnectionFailure,
                     speechsdk.CancellationErrorCode.ServiceTimeout,
                 ]:
-                    logging.info('Voiceover synthesis log: Known error encountered, retrying with exponential backoff.')
+                    logging.info(
+                        'Voiceover synthesis log: Known error encountered, retrying with exponential backoff.'
+                    )
                     delay_in_sec_before_retrying *= 2
                     continue
 
-                logging.info('Voiceover synthesis log: Non-retryable error encountered, aborting further attempts.')
+                logging.info(
+                    'Voiceover synthesis log: Non-retryable error encountered, aborting further attempts.'
+                )
                 break
 
-            error_details = 'Speech synthesis was canceled for reason: %s' % cancellation_details.reason
-            logging.error('Voiceover synthesis log: Voiceover synthesis error: %s for content: %s' % (error_details, plaintext))
+            error_details = (
+                'Speech synthesis was canceled for reason: %s'
+                % cancellation_details.reason
+            )
+            logging.error(
+                'Voiceover synthesis log: Voiceover synthesis error: %s for content: %s'
+                % (error_details, plaintext)
+            )
             break
 
-        error_details = 'Speech synthesis failed for reason: %s' % speech_synthesis_result.reason
-        logging.error('Voiceover synthesis log: Voiceover synthesis error: %s for content: %s' % (error_details, plaintext))
+        error_details = (
+            'Speech synthesis failed for reason: %s'
+            % speech_synthesis_result.reason
+        )
+        logging.error(
+            'Voiceover synthesis log: Voiceover synthesis error: %s for content: %s'
+            % (error_details, plaintext)
+        )
         break
 
     logging.info('Voiceover synthesis log: Speech synthesis attempt completed.')

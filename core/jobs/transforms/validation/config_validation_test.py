@@ -31,39 +31,63 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, config_models
 
-(base_models, config_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.CONFIG])
+(base_models, config_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.CONFIG]
+)
 
 
-class ValidatePlatformParameterSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
-    CMD_EDIT_RULES: Final = parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
+class ValidatePlatformParameterSnapshotMetadataModelTests(
+    job_test_utils.PipelinedTestBase
+):
+    CMD_EDIT_RULES: Final = (
+        parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
+    )
 
     def test_validate_change_domain_implemented(self) -> None:
-        invalid_commit_cmd_model = config_models.PlatformParameterSnapshotMetadataModel(
-            id='model_id-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}],
+        invalid_commit_cmd_model = (
+            config_models.PlatformParameterSnapshotMetadataModel(
+                id='model_id-1',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds=[
+                    {'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}
+                ],
+            )
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(config_validation.ValidatePlatformParameterSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                config_validation.ValidatePlatformParameterSnapshotMetadataModel()
+            )
+        )
 
         self.assert_pcoll_equal(output, [])
 
     def test_param_change_object_with_missing_cmd_raises_exception(
         self,
     ) -> None:
-        invalid_commit_cmd_model = config_models.PlatformParameterSnapshotMetadataModel(
-            id='model_id-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_cmds=[{'invalid': 'data'}],
+        invalid_commit_cmd_model = (
+            config_models.PlatformParameterSnapshotMetadataModel(
+                id='model_id-1',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds=[{'invalid': 'data'}],
+            )
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(config_validation.ValidatePlatformParameterSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                config_validation.ValidatePlatformParameterSnapshotMetadataModel()
+            )
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -79,16 +103,24 @@ class ValidatePlatformParameterSnapshotMetadataModelTests(job_test_utils.Pipelin
     def test_param_change_object_with_invalid_cmd_raises_exception(
         self,
     ) -> None:
-        invalid_commit_cmd_model = config_models.PlatformParameterSnapshotMetadataModel(
-            id='model_id-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_cmds=[{'cmd': 'invalid'}],
+        invalid_commit_cmd_model = (
+            config_models.PlatformParameterSnapshotMetadataModel(
+                id='model_id-1',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds=[{'cmd': 'invalid'}],
+            )
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(config_validation.ValidatePlatformParameterSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                config_validation.ValidatePlatformParameterSnapshotMetadataModel()
+            )
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -104,16 +136,24 @@ class ValidatePlatformParameterSnapshotMetadataModelTests(job_test_utils.Pipelin
     def test_param_change_object_missing_attribute_in_cmd_raises_exception(
         self,
     ) -> None:
-        invalid_commit_cmd_model = config_models.PlatformParameterSnapshotMetadataModel(
-            id='model_id-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_cmds=[{'cmd': self.CMD_EDIT_RULES}],
+        invalid_commit_cmd_model = (
+            config_models.PlatformParameterSnapshotMetadataModel(
+                id='model_id-1',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds=[{'cmd': self.CMD_EDIT_RULES}],
+            )
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(config_validation.ValidatePlatformParameterSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                config_validation.ValidatePlatformParameterSnapshotMetadataModel()
+            )
+        )
 
         self.assert_pcoll_equal(
             output,
@@ -134,16 +174,24 @@ class ValidatePlatformParameterSnapshotMetadataModelTests(job_test_utils.Pipelin
             'new_rules': [],
             'invalid': 'invalid',
         }
-        invalid_commit_cmd_model = config_models.PlatformParameterSnapshotMetadataModel(
-            id='model_id-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_cmds=[commit_dict],
+        invalid_commit_cmd_model = (
+            config_models.PlatformParameterSnapshotMetadataModel(
+                id='model_id-1',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds=[commit_dict],
+            )
         )
 
-        output = self.pipeline | beam.Create([invalid_commit_cmd_model]) | beam.ParDo(config_validation.ValidatePlatformParameterSnapshotMetadataModel())
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                config_validation.ValidatePlatformParameterSnapshotMetadataModel()
+            )
+        )
 
         self.assert_pcoll_equal(
             output,

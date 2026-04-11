@@ -38,14 +38,18 @@ from scripts import (
 CHROME_DRIVER_VERSION: Final = '77.0.3865.40'
 
 
-def mock_managed_process(*unused_args: str, **unused_kwargs: str) -> ContextManager[scripts_test_utils.PopenStub]:
+def mock_managed_process(
+    *unused_args: str, **unused_kwargs: str
+) -> ContextManager[scripts_test_utils.PopenStub]:
     """Mock method for replacing the managed_process() functions.
 
     Returns:
         Context manager. A context manager that always yields a mock
         process.
     """
-    return contextlib.nullcontext(enter_result=scripts_test_utils.PopenStub(alive=False))
+    return contextlib.nullcontext(
+        enter_result=scripts_test_utils.PopenStub(alive=False)
+    )
 
 
 class RunE2ETestsTests(test_utils.GenericTestBase):
@@ -58,7 +62,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_constants() -> None:
             print('mock_set_constants_to_default')
 
-        self.swap_mock_set_constants_to_default = self.swap(common, 'set_constants_to_default', mock_constants)
+        self.swap_mock_set_constants_to_default = self.swap(
+            common, 'set_constants_to_default', mock_constants
+        )
 
     def tearDown(self) -> None:
         try:
@@ -70,7 +76,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self,
         servers_list: list[str],
         *,
-        default_fn: Callable[..., ContextManager[scripts_test_utils.PopenStub]] = (mock_managed_process),
+        default_fn: Callable[
+            ..., ContextManager[scripts_test_utils.PopenStub]
+        ] = (mock_managed_process),
         # Here we use type Any because special_overrides may contain tuples of
         # heterogeneous shapes used across tests (1-, 2- or 3-element tuples where
         # the second element can be a list/dict or None, and the third a bool).
@@ -93,14 +101,18 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         for srv in servers_list:
             override = special_overrides.get(srv)
             if override is None:
-                self.exit_stack.enter_context(self.swap_with_checks(servers, srv, default_fn))
+                self.exit_stack.enter_context(
+                    self.swap_with_checks(servers, srv, default_fn)
+                )
                 continue
 
             # Override is a tuple where:
             # override[0] is the callable to use
             # override[1] (if present) is expected_kwargs (often a list/dict)
             # override[2] (if present) is called (bool)
-            override_fn: Callable[..., ContextManager[scripts_test_utils.PopenStub]] = override[0]
+            override_fn: Callable[
+                ..., ContextManager[scripts_test_utils.PopenStub]
+            ] = override[0]
 
             # Here we use type Any because expected_kwargs can be a list, dict or
             # None depending on the test case.
@@ -121,9 +133,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     kwargs['expected_kwargs'] = expected_kwargs
                 if called_flag is not None:
                     kwargs['called'] = called_flag
-                self.exit_stack.enter_context(self.swap_with_checks(servers, srv, override_fn, **kwargs))
+                self.exit_stack.enter_context(
+                    self.swap_with_checks(servers, srv, override_fn, **kwargs)
+                )
             else:
-                self.exit_stack.enter_context(self.swap_with_checks(servers, srv, override_fn))
+                self.exit_stack.enter_context(
+                    self.swap_with_checks(servers, srv, override_fn)
+                )
 
     def test_wait_for_port_to_be_in_use_when_port_successfully_opened(
         self,
@@ -135,8 +151,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             num_var += 1
             return num_var > 10
 
-        mock_sleep = self.exit_stack.enter_context(self.swap_with_call_counter(time, 'sleep'))
-        self.exit_stack.enter_context(self.swap_with_checks(common, 'is_port_in_use', mock_is_port_in_use))
+        mock_sleep = self.exit_stack.enter_context(
+            self.swap_with_call_counter(time, 'sleep')
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(common, 'is_port_in_use', mock_is_port_in_use)
+        )
 
         common.wait_for_port_to_be_in_use(1)
 
@@ -144,16 +164,28 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.assertEqual(mock_sleep.times_called, 10)
 
     def test_wait_for_port_to_be_in_use_when_port_failed_to_open(self) -> None:
-        mock_sleep = self.exit_stack.enter_context(self.swap_with_call_counter(time, 'sleep'))
-        self.exit_stack.enter_context(self.swap(common, 'is_port_in_use', lambda _: False))
-        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None))
+        mock_sleep = self.exit_stack.enter_context(
+            self.swap_with_call_counter(time, 'sleep')
+        )
+        self.exit_stack.enter_context(
+            self.swap(common, 'is_port_in_use', lambda _: False)
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(sys, 'exit', lambda _: None)
+        )
 
         common.wait_for_port_to_be_in_use(1)
 
-        self.assertEqual(mock_sleep.times_called, common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
+        self.assertEqual(
+            mock_sleep.times_called, common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
+        )
 
     def test_install_third_party_libraries_without_skip(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(install_third_party_libs, 'main', lambda *_, **__: None))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                install_third_party_libs, 'main', lambda *_, **__: None
+            )
+        )
 
         run_e2e_tests.install_third_party_libraries(False)
 
@@ -170,14 +202,26 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         run_e2e_tests.install_third_party_libraries(True)
 
     def test_start_tests_when_other_instances_not_stopped(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(common, 'is_oppia_server_already_running', lambda *_: True))
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                common, 'is_oppia_server_already_running', lambda *_: True
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_portserver', mock_managed_process
+            )
+        )
 
         with self.assertRaisesRegex(SystemExit, '1'):
             run_e2e_tests.main(args=[])
 
     def test_start_tests_when_no_other_instance_running(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(common, 'is_oppia_server_already_running', lambda *_: False))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                common, 'is_oppia_server_already_running', lambda *_: False
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 run_e2e_tests,
@@ -225,7 +269,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 )
             },
         )
-        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(0,)]))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                sys, 'exit', lambda _: None, expected_args=[(0,)]
+            )
+        )
         with self.swap_mock_set_constants_to_default:
             run_e2e_tests.main(args=[])
 
@@ -240,7 +288,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 )
             )
 
-        self.exit_stack.enter_context(self.swap_with_checks(common, 'is_oppia_server_already_running', lambda *_: False))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                common, 'is_oppia_server_already_running', lambda *_: False
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 run_e2e_tests,
@@ -270,7 +322,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         self._swap_servers(
             ['managed_webdriverio_server'],
-            special_overrides={'managed_webdriverio_server': (mock_managed_webdriverio_server,)},
+            special_overrides={
+                'managed_webdriverio_server': (mock_managed_webdriverio_server,)
+            },
         )
 
         args = run_e2e_tests._PARSER.parse_args(  # pylint: disable=protected-access
@@ -280,15 +334,27 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with self.swap_mock_set_constants_to_default:
             lines, _ = run_e2e_tests.run_tests(args)
 
-        self.assertEqual([line.decode('utf-8') for line in lines], ['sample', '✓', 'output'])
+        self.assertEqual(
+            [line.decode('utf-8') for line in lines], ['sample', '✓', 'output']
+        )
 
     def test_rerun_when_tests_fail_with_rerun_yes(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 1
 
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_portserver', mock_managed_process))
-        self.exit_stack.enter_context(self.swap(run_e2e_tests, 'run_tests', mock_run_tests))
-        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(1,)]))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_portserver', mock_managed_process
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap(run_e2e_tests, 'run_tests', mock_run_tests)
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                sys, 'exit', lambda _: None, expected_args=[(1,)]
+            )
+        )
 
         run_e2e_tests.main(args=['--suite', 'navigation'])
 
@@ -296,9 +362,19 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 1
 
-        self.exit_stack.enter_context(self.swap(run_e2e_tests, 'run_tests', mock_run_tests))
-        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(1,)]))
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(
+            self.swap(run_e2e_tests, 'run_tests', mock_run_tests)
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                sys, 'exit', lambda _: None, expected_args=[(1,)]
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_portserver', mock_managed_process
+            )
+        )
 
         run_e2e_tests.main(args=['--suite', 'navigation'])
 
@@ -306,9 +382,19 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 1
 
-        self.exit_stack.enter_context(self.swap(run_e2e_tests, 'run_tests', mock_run_tests))
-        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(1,)]))
-        self.exit_stack.enter_context(self.swap_with_checks(servers, 'managed_portserver', mock_managed_process))
+        self.exit_stack.enter_context(
+            self.swap(run_e2e_tests, 'run_tests', mock_run_tests)
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                sys, 'exit', lambda _: None, expected_args=[(1,)]
+            )
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                servers, 'managed_portserver', mock_managed_process
+            )
+        )
 
         run_e2e_tests.main(args=['--suite', 'navigation'])
 
@@ -318,8 +404,14 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         self._swap_servers(['managed_portserver'])
 
-        self.exit_stack.enter_context(self.swap(run_e2e_tests, 'run_tests', mock_run_tests))
-        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(1,)]))
+        self.exit_stack.enter_context(
+            self.swap(run_e2e_tests, 'run_tests', mock_run_tests)
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                sys, 'exit', lambda _: None, expected_args=[(1,)]
+            )
+        )
 
         run_e2e_tests.main(args=['--suite', 'navigation'])
 
@@ -329,13 +421,23 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         self._swap_servers(['managed_portserver'])
 
-        self.exit_stack.enter_context(self.swap(run_e2e_tests, 'run_tests', mock_run_tests))
-        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(0,)]))
+        self.exit_stack.enter_context(
+            self.swap(run_e2e_tests, 'run_tests', mock_run_tests)
+        )
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                sys, 'exit', lambda _: None, expected_args=[(0,)]
+            )
+        )
 
         run_e2e_tests.main(args=['--suite', 'navigation'])
 
     def test_start_tests_skip_build(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(common, 'is_oppia_server_already_running', lambda *_: False))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                common, 'is_oppia_server_already_running', lambda *_: False
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 run_e2e_tests,
@@ -352,7 +454,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_kwargs=[{'prod_env': False}],
             )
         )
-        self.exit_stack.enter_context(self.swap_with_checks(common, 'set_constants_to_default', lambda: None))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                common, 'set_constants_to_default', lambda: None
+            )
+        )
 
         self._swap_servers(
             [
@@ -366,7 +472,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         )
         self._swap_servers(
             ['managed_webpack_compiler'],
-            special_overrides={'managed_webpack_compiler': (mock_managed_process, None, False)},
+            special_overrides={
+                'managed_webpack_compiler': (mock_managed_process, None, False)
+            },
         )
 
         self._swap_servers(
@@ -388,12 +496,20 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 )
             },
         )
-        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(0,)]))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                sys, 'exit', lambda _: None, expected_args=[(0,)]
+            )
+        )
 
         run_e2e_tests.main(args=['--skip_install', '--skip_build'])
 
     def test_start_tests_in_debug_mode(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(common, 'is_oppia_server_already_running', lambda *_: False))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                common, 'is_oppia_server_already_running', lambda *_: False
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 run_e2e_tests,
@@ -441,13 +557,21 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 )
             },
         )
-        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(0,)]))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                sys, 'exit', lambda _: None, expected_args=[(0,)]
+            )
+        )
 
         with self.swap_mock_set_constants_to_default:
             run_e2e_tests.main(args=['--debug_mode'])
 
     def test_start_tests_in_with_chromedriver_flag(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(common, 'is_oppia_server_already_running', lambda *_: False))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                common, 'is_oppia_server_already_running', lambda *_: False
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 run_e2e_tests,
@@ -495,13 +619,23 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             },
         )
 
-        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(0,)]))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                sys, 'exit', lambda _: None, expected_args=[(0,)]
+            )
+        )
 
         with self.swap_mock_set_constants_to_default:
-            run_e2e_tests.main(args=['--chrome_driver_version', CHROME_DRIVER_VERSION])
+            run_e2e_tests.main(
+                args=['--chrome_driver_version', CHROME_DRIVER_VERSION]
+            )
 
     def test_start_tests_in_webdriverio(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(common, 'is_oppia_server_already_running', lambda *_: False))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                common, 'is_oppia_server_already_running', lambda *_: False
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 run_e2e_tests,
@@ -549,13 +683,21 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 )
             },
         )
-        self.exit_stack.enter_context(self.swap_with_checks(sys, 'exit', lambda _: None, expected_args=[(0,)]))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                sys, 'exit', lambda _: None, expected_args=[(0,)]
+            )
+        )
 
         with self.swap_mock_set_constants_to_default:
             run_e2e_tests.main(args=['--suite', 'collections'])
 
     def test_do_not_run_with_test_non_mobile_suite_in_mobile_mode(self) -> None:
-        self.exit_stack.enter_context(self.swap_with_checks(common, 'is_oppia_server_already_running', lambda *_: False))
+        self.exit_stack.enter_context(
+            self.swap_with_checks(
+                common, 'is_oppia_server_already_running', lambda *_: False
+            )
+        )
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 run_e2e_tests,
@@ -605,7 +747,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 return self.returncode
 
         with self.swap(constants, 'EMULATOR_MODE', False):
-            self.exit_stack.enter_context(self.swap(common, 'is_oppia_server_already_running', lambda *_: False))
+            self.exit_stack.enter_context(
+                self.swap(
+                    common, 'is_oppia_server_already_running', lambda *_: False
+                )
+            )
             self.exit_stack.enter_context(
                 self.swap(
                     run_e2e_tests,
@@ -613,7 +759,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     lambda _: None,
                 )
             )
-            self.exit_stack.enter_context(self.swap(build, 'build_js_files', lambda *_, **__: None))
+            self.exit_stack.enter_context(
+                self.swap(build, 'build_js_files', lambda *_, **__: None)
+            )
 
             self._swap_servers(
                 [
@@ -678,7 +826,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         fake_proc = FakeProc()
 
         with self.swap(constants, 'EMULATOR_MODE', False):
-            self.exit_stack.enter_context(self.swap(common, 'is_oppia_server_already_running', lambda *_: False))
+            self.exit_stack.enter_context(
+                self.swap(
+                    common, 'is_oppia_server_already_running', lambda *_: False
+                )
+            )
             self.exit_stack.enter_context(
                 self.swap(
                     run_e2e_tests,
@@ -686,7 +838,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     lambda _: None,
                 )
             )
-            self.exit_stack.enter_context(self.swap(build, 'build_js_files', lambda *_, **__: None))
+            self.exit_stack.enter_context(
+                self.swap(build, 'build_js_files', lambda *_, **__: None)
+            )
 
             self._swap_servers(
                 [

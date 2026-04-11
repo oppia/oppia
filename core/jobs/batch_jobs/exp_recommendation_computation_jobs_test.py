@@ -33,13 +33,17 @@ MYPY = False
 if MYPY:
     from mypy_imports import exp_models, recommendations_models
 
-(exp_models, recommendations_models) = models.Registry.import_models([models.Names.EXPLORATION, models.Names.RECOMMENDATIONS])
+(exp_models, recommendations_models) = models.Registry.import_models(
+    [models.Names.EXPLORATION, models.Names.RECOMMENDATIONS]
+)
 
 StatsType = List[Tuple[str, List[Dict[str, Union[bool, int, str]]]]]
 
 
 class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[exp_recommendation_computation_jobs.ComputeExplorationRecommendationsJob] = exp_recommendation_computation_jobs.ComputeExplorationRecommendationsJob
+    JOB_CLASS: Type[
+        exp_recommendation_computation_jobs.ComputeExplorationRecommendationsJob
+    ] = exp_recommendation_computation_jobs.ComputeExplorationRecommendationsJob
 
     EXP_1_ID: Final = 'exp_1_id'
     EXP_2_ID: Final = 'exp_2_id'
@@ -66,7 +70,11 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is_empty()
 
-        exp_recommendations_model = recommendations_models.ExplorationRecommendationsModel.get(self.EXP_1_ID, strict=False)
+        exp_recommendations_model = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_1_ID, strict=False
+            )
+        )
         self.assertIsNone(exp_recommendations_model)
 
     def test_creates_recommendations_for_similar_explorations(self) -> None:
@@ -99,16 +107,26 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
         exp_summary_2.update_timestamps()
         self.put_multi([exp_summary_1, exp_summary_2])
 
-        self.assert_job_output_is([job_run_result.JobRunResult(stdout='SUCCESS: 2')])
+        self.assert_job_output_is(
+            [job_run_result.JobRunResult(stdout='SUCCESS: 2')]
+        )
 
-        exp_recommendations_model_1 = recommendations_models.ExplorationRecommendationsModel.get(self.EXP_1_ID)
+        exp_recommendations_model_1 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_1_ID
+            )
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert exp_recommendations_model_1 is not None
         self.assertEqual(
             exp_recommendations_model_1.recommended_exploration_ids,
             [self.EXP_2_ID],
         )
-        exp_recommendations_model_2 = recommendations_models.ExplorationRecommendationsModel.get(self.EXP_2_ID)
+        exp_recommendations_model_2 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_2_ID
+            )
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert exp_recommendations_model_2 is not None
         self.assertEqual(
@@ -148,9 +166,17 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is_empty()
 
-        exp_recommendations_model_1 = recommendations_models.ExplorationRecommendationsModel.get(self.EXP_1_ID, strict=False)
+        exp_recommendations_model_1 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_1_ID, strict=False
+            )
+        )
         self.assertIsNone(exp_recommendations_model_1)
-        exp_recommendations_model_2 = recommendations_models.ExplorationRecommendationsModel.get(self.EXP_2_ID, strict=False)
+        exp_recommendations_model_2 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_2_ID, strict=False
+            )
+        )
         self.assertIsNone(exp_recommendations_model_2)
 
     def test_does_not_create_recommendations_for_different_explorations(
@@ -187,9 +213,17 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is_empty()
 
-        exp_recommendations_model_1 = recommendations_models.ExplorationRecommendationsModel.get(self.EXP_1_ID, strict=False)
+        exp_recommendations_model_1 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_1_ID, strict=False
+            )
+        )
         self.assertIsNone(exp_recommendations_model_1)
-        exp_recommendations_model_2 = recommendations_models.ExplorationRecommendationsModel.get(self.EXP_2_ID, strict=False)
+        exp_recommendations_model_2 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_2_ID, strict=False
+            )
+        )
         self.assertIsNone(exp_recommendations_model_2)
 
     def test_creates_recommendations_for_three_explorations(self) -> None:
@@ -235,23 +269,37 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
         exp_summary_3.update_timestamps()
         self.put_multi([exp_summary_1, exp_summary_2, exp_summary_3])
 
-        self.assert_job_output_is([job_run_result.JobRunResult(stdout='SUCCESS: 3')])
+        self.assert_job_output_is(
+            [job_run_result.JobRunResult(stdout='SUCCESS: 3')]
+        )
 
-        exp_recommendations_model_1 = recommendations_models.ExplorationRecommendationsModel.get(self.EXP_1_ID)
+        exp_recommendations_model_1 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_1_ID
+            )
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert exp_recommendations_model_1 is not None
         self.assertEqual(
             exp_recommendations_model_1.recommended_exploration_ids,
             [self.EXP_3_ID, self.EXP_2_ID],
         )
-        exp_recommendations_model_2 = recommendations_models.ExplorationRecommendationsModel.get(self.EXP_2_ID)
+        exp_recommendations_model_2 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_2_ID
+            )
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert exp_recommendations_model_2 is not None
         self.assertEqual(
             exp_recommendations_model_2.recommended_exploration_ids,
             [self.EXP_1_ID, self.EXP_3_ID],
         )
-        exp_recommendations_model_3 = recommendations_models.ExplorationRecommendationsModel.get(self.EXP_3_ID)
+        exp_recommendations_model_3 = (
+            recommendations_models.ExplorationRecommendationsModel.get(
+                self.EXP_3_ID
+            )
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert exp_recommendations_model_3 is not None
         self.assertEqual(

@@ -82,8 +82,12 @@ _PARSER.add_argument(
     default='error',
     choices=['critical', 'error', 'warning', 'info'],
 )
-_PARSER.add_argument('--source_maps', help='Build webpack with source maps.', action='store_true')
-_PARSER.add_argument('--mobile', help='Run e2e test in mobile viewport.', action='store_true')
+_PARSER.add_argument(
+    '--source_maps', help='Build webpack with source maps.', action='store_true'
+)
+_PARSER.add_argument(
+    '--mobile', help='Run e2e test in mobile viewport.', action='store_true'
+)
 
 
 MOBILE_SUITES = ['contributorDashboard']
@@ -119,7 +123,9 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         stack.enter_context(servers.managed_elasticsearch_dev_server())
         if constants.EMULATOR_MODE:
             stack.enter_context(servers.managed_firebase_auth_emulator())
-            stack.enter_context(servers.managed_cloud_datastore_emulator(clear_datastore=True))
+            stack.enter_context(
+                servers.managed_cloud_datastore_emulator(clear_datastore=True)
+            )
 
         app_yaml_path = 'app.yaml' if args.prod_env else 'app_dev.yaml'
         stack.enter_context(
@@ -140,7 +146,10 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         )
 
         if (args.mobile) and (args.suite not in MOBILE_SUITES):
-            print(f'The {args.suite} suite should not be run ' + 'in the mobile viewport')
+            print(
+                f'The {args.suite} suite should not be run '
+                + 'in the mobile viewport'
+            )
             sys.exit(1)
 
         proc = stack.enter_context(
@@ -155,7 +164,9 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             )
         )
 
-        print('Servers have come up.\nNote: You can view screenshots of failed tests in ../webdriverio-screenshots/')
+        print(
+            'Servers have come up.\nNote: You can view screenshots of failed tests in ../webdriverio-screenshots/'
+        )
 
         output_lines = []
         while True:

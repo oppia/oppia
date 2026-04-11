@@ -28,7 +28,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, cloud_task_models
 
-(base_models, cloud_task_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.CLOUD_TASK])
+(base_models, cloud_task_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.CLOUD_TASK]
+)
 
 
 class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
@@ -41,8 +43,12 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
                 'cloud_task_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'queue_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'task_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'current_retry_attempt': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
-                'exception_messages_for_failed_runs': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                'current_retry_attempt': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'exception_messages_for_failed_runs': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
                 'latest_job_state': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'function_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -67,8 +73,12 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
 
     def test_create_new_model_successfully(self) -> None:
         model = cloud_task_models.CloudTaskRunModel.create_cloud_task_run_model(
-            cloud_task_run_model_id=(cloud_task_models.CloudTaskRunModel.get_new_id()),
-            cloud_task_name=('projects/dev-project-id/locations/us-central1/queues/voiceover-regeneration/tasks/task1'),
+            cloud_task_run_model_id=(
+                cloud_task_models.CloudTaskRunModel.get_new_id()
+            ),
+            cloud_task_name=(
+                'projects/dev-project-id/locations/us-central1/queues/voiceover-regeneration/tasks/task1'
+            ),
             latest_job_state='RUNNING',
             function_id='update_stats',
             current_retry_attempt=1,
@@ -79,7 +89,9 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_model.cloud_task_name, model.cloud_task_name)
         self.assertEqual(retrieved_model.queue_id, 'voiceover-regeneration')
         self.assertEqual(retrieved_model.task_id, 'task1')
-        self.assertEqual(retrieved_model.latest_job_state, model.latest_job_state)
+        self.assertEqual(
+            retrieved_model.latest_job_state, model.latest_job_state
+        )
         self.assertEqual(retrieved_model.function_id, model.function_id)
         self.assertEqual(
             retrieved_model.exception_messages_for_failed_runs,
@@ -90,45 +102,71 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
     def test_get_queue_id_from_task_name(self) -> None:
         cloud_task_name = 'projects/dev-project-id/locations/us-central1/queues/voiceover-regeneration/tasks/task1'
 
-        queue_id = cloud_task_models.CloudTaskRunModel.get_queue_id_from_task_name(cloud_task_name)
+        queue_id = (
+            cloud_task_models.CloudTaskRunModel.get_queue_id_from_task_name(
+                cloud_task_name
+            )
+        )
         self.assertEqual(queue_id, 'voiceover-regeneration')
 
     def test_get_task_id_from_task_name(self) -> None:
         cloud_task_name = 'projects/dev-project-id/locations/us-central1/queues/voiceover-regeneration/tasks/task1'
 
-        cloud_task_id = cloud_task_models.CloudTaskRunModel.get_task_id_from_task_name(cloud_task_name)
+        cloud_task_id = (
+            cloud_task_models.CloudTaskRunModel.get_task_id_from_task_name(
+                cloud_task_name
+            )
+        )
         self.assertEqual(cloud_task_id, 'task1')
 
     def test_get_by_queue_id_returns_correct_models(self) -> None:
         cloud_task_models.CloudTaskRunModel.create_cloud_task_run_model(
-            cloud_task_run_model_id=(cloud_task_models.CloudTaskRunModel.get_new_id()),
-            cloud_task_name=('projects/dev-project-id/locations/us-central1/queues/queueA/tasks/task1'),
+            cloud_task_run_model_id=(
+                cloud_task_models.CloudTaskRunModel.get_new_id()
+            ),
+            cloud_task_name=(
+                'projects/dev-project-id/locations/us-central1/queues/queueA/tasks/task1'
+            ),
             latest_job_state='RUNNING',
             function_id='update_stats',
             current_retry_attempt=0,
         )
         cloud_task_models.CloudTaskRunModel.create_cloud_task_run_model(
-            cloud_task_run_model_id=(cloud_task_models.CloudTaskRunModel.get_new_id()),
-            cloud_task_name=('projects/dev-project-id/locations/us-central1/queues/queueB/tasks/task2'),
+            cloud_task_run_model_id=(
+                cloud_task_models.CloudTaskRunModel.get_new_id()
+            ),
+            cloud_task_name=(
+                'projects/dev-project-id/locations/us-central1/queues/queueB/tasks/task2'
+            ),
             latest_job_state='SUCCEEDED',
             function_id='delete_exps_from_user_models',
             current_retry_attempt=0,
         )
         cloud_task_models.CloudTaskRunModel.create_cloud_task_run_model(
-            cloud_task_run_model_id=(cloud_task_models.CloudTaskRunModel.get_new_id()),
-            cloud_task_name=('projects/dev-project-id/locations/us-central1/queues/queueA/tasks/task3'),
+            cloud_task_run_model_id=(
+                cloud_task_models.CloudTaskRunModel.get_new_id()
+            ),
+            cloud_task_name=(
+                'projects/dev-project-id/locations/us-central1/queues/queueA/tasks/task3'
+            ),
             latest_job_state='FAILED_AND_AWAITING_RETRY',
             function_id='update_stats',
             current_retry_attempt=2,
         )
 
-        cloud_task_run_models: List[cloud_task_models.CloudTaskRunModel] = list(cloud_task_models.CloudTaskRunModel.get_all().fetch())
+        cloud_task_run_models: List[cloud_task_models.CloudTaskRunModel] = list(
+            cloud_task_models.CloudTaskRunModel.get_all().fetch()
+        )
         assert cloud_task_run_models is not None
         self.assertEqual(len(cloud_task_run_models), 3)
 
-        filtered_models = cloud_task_models.CloudTaskRunModel.get_by_queue_id('queueA')
+        filtered_models = cloud_task_models.CloudTaskRunModel.get_by_queue_id(
+            'queueA'
+        )
         self.assertEqual(len(filtered_models), 2)
-        fetched_task_names = [model.cloud_task_name for model in filtered_models]
+        fetched_task_names = [
+            model.cloud_task_name for model in filtered_models
+        ]
         expected_task_names = [
             'projects/dev-project-id/locations/us-central1/queues/queueA/tasks/task1',
             'projects/dev-project-id/locations/us-central1/queues/queueA/tasks/task3',
@@ -139,14 +177,20 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
         self,
     ) -> None:
         cloud_task_model = cloud_task_models.CloudTaskRunModel.create_cloud_task_run_model(
-            cloud_task_run_model_id=(cloud_task_models.CloudTaskRunModel.get_new_id()),
-            cloud_task_name=('projects/dev-project-id/locations/us-central1/queues/queueA/tasks/task3'),
+            cloud_task_run_model_id=(
+                cloud_task_models.CloudTaskRunModel.get_new_id()
+            ),
+            cloud_task_name=(
+                'projects/dev-project-id/locations/us-central1/queues/queueA/tasks/task3'
+            ),
             latest_job_state='FAILED_AND_AWAITING_RETRY',
             function_id='update_stats',
             current_retry_attempt=2,
         )
 
-        collision_context = self.swap_to_always_return(utils, 'convert_to_hash', value=cloud_task_model.id)
+        collision_context = self.swap_to_always_return(
+            utils, 'convert_to_hash', value=cloud_task_model.id
+        )
 
         with collision_context:
             with self.assertRaisesRegex(
@@ -191,7 +235,9 @@ class VoiceoverRegenerationJobModelUnitTest(test_utils.GenericTestBase):
             id='exp1:taskrun1',
             exploration_id='exp1',
             cloud_task_run_id='taskrun1',
-            language_accent_to_content_status_map={'en-uk': {'content_1': 'SUCCEEDED'}},
+            language_accent_to_content_status_map={
+                'en-uk': {'content_1': 'SUCCEEDED'}
+            },
         )
         model_1.put()
 
@@ -199,7 +245,9 @@ class VoiceoverRegenerationJobModelUnitTest(test_utils.GenericTestBase):
             id='exp1:taskrun2',
             exploration_id='exp1',
             cloud_task_run_id='taskrun2',
-            language_accent_to_content_status_map={'en-us': {'content_2': 'FAILED_AND_AWAITING_RETRY'}},
+            language_accent_to_content_status_map={
+                'en-us': {'content_2': 'FAILED_AND_AWAITING_RETRY'}
+            },
         )
         model_2.put()
 
@@ -207,7 +255,9 @@ class VoiceoverRegenerationJobModelUnitTest(test_utils.GenericTestBase):
             id='exp2:taskrun3',
             exploration_id='exp2',
             cloud_task_run_id='taskrun3',
-            language_accent_to_content_status_map={'en-au': {'content_3': 'RUNNING'}},
+            language_accent_to_content_status_map={
+                'en-au': {'content_3': 'RUNNING'}
+            },
         )
         model_3.put()
 

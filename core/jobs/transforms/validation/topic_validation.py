@@ -43,7 +43,9 @@ if MYPY:  # pragma: no cover
 class ValidateCanonicalNameMatchesNameInLowercase(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate canonical name matching with lower case name."""
 
-    def process(self, input_model: topic_models.TopicModel) -> Iterator[topic_validation_errors.ModelCanonicalNameMismatchError]:
+    def process(
+        self, input_model: topic_models.TopicModel
+    ) -> Iterator[topic_validation_errors.ModelCanonicalNameMismatchError]:
         """Function that validate that canonical name of the model is same as
         name of the model in lowercase.
 
@@ -61,7 +63,11 @@ class ValidateCanonicalNameMatchesNameInLowercase(beam.DoFn):  # type: ignore[mi
 
 
 @validation_decorators.AuditsExisting(topic_models.TopicSnapshotMetadataModel)
-class ValidateTopicSnapshotMetadataModel(base_validation.BaseValidateCommitCmdsSchema[topic_models.TopicSnapshotMetadataModel]):
+class ValidateTopicSnapshotMetadataModel(
+    base_validation.BaseValidateCommitCmdsSchema[
+        topic_models.TopicSnapshotMetadataModel
+    ]
+):
     """Overrides _get_change_domain_class for TopicSnapshotMetadataModel."""
 
     def _get_change_domain_class(
@@ -80,8 +86,14 @@ class ValidateTopicSnapshotMetadataModel(base_validation.BaseValidateCommitCmdsS
         return topic_domain.TopicChange
 
 
-@validation_decorators.AuditsExisting(topic_models.TopicRightsSnapshotMetadataModel)
-class ValidateTopicRightsSnapshotMetadataModel(base_validation.BaseValidateCommitCmdsSchema[topic_models.TopicRightsSnapshotMetadataModel]):
+@validation_decorators.AuditsExisting(
+    topic_models.TopicRightsSnapshotMetadataModel
+)
+class ValidateTopicRightsSnapshotMetadataModel(
+    base_validation.BaseValidateCommitCmdsSchema[
+        topic_models.TopicRightsSnapshotMetadataModel
+    ]
+):
     """Overrides _get_change_domain_class for TopicRightsSnapshotMetadataModel."""
 
     def _get_change_domain_class(
@@ -101,14 +113,20 @@ class ValidateTopicRightsSnapshotMetadataModel(base_validation.BaseValidateCommi
 
 
 @validation_decorators.AuditsExisting(topic_models.TopicCommitLogEntryModel)
-class ValidateTopicCommitLogEntryModel(base_validation.BaseValidateCommitCmdsSchema[topic_models.TopicCommitLogEntryModel]):
+class ValidateTopicCommitLogEntryModel(
+    base_validation.BaseValidateCommitCmdsSchema[
+        topic_models.TopicCommitLogEntryModel
+    ]
+):
     """Overrides _get_change_domain_class for TopicCommitLogEntryModel."""
 
     # Here we use MyPy ignore because the signature of this method doesn't
     # match with super class's _get_change_domain_class() method.
     def _get_change_domain_class(  # type: ignore[override]
         self, input_model: topic_models.TopicCommitLogEntryModel
-    ) -> Optional[Type[Union[topic_domain.TopicRightsChange, topic_domain.TopicChange]]]:
+    ) -> Optional[
+        Type[Union[topic_domain.TopicRightsChange, topic_domain.TopicChange]]
+    ]:
         """Returns a change domain class.
 
         Args:
@@ -134,7 +152,9 @@ def topic_summary_model_relationships(
 ) -> Iterator[
     Tuple[
         model_property.PropertyType,
-        List[Type[Union[topic_models.TopicModel, topic_models.TopicRightsModel]]],
+        List[
+            Type[Union[topic_models.TopicModel, topic_models.TopicRightsModel]]
+        ],
     ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""

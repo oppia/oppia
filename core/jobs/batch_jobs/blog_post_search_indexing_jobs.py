@@ -54,11 +54,23 @@ class IndexBlogPostsInSearchJob(base_jobs.JobBase):
         """
         return (
             self.pipeline
-            | 'Get all non-deleted models' >> (ndb_io.GetModels(blog_models.BlogPostSummaryModel.get_all(include_deleted=False)))
-            | 'Convert BlogPostSummaryModels to domain objects' >> beam.Map(blog_services.get_blog_post_summary_from_model)
-            | 'Split models into batches' >> beam.transforms.util.BatchElements(max_batch_size=self.MAX_BATCH_SIZE)
+            | 'Get all non-deleted models'
+            >> (
+                ndb_io.GetModels(
+                    blog_models.BlogPostSummaryModel.get_all(
+                        include_deleted=False
+                    )
+                )
+            )
+            | 'Convert BlogPostSummaryModels to domain objects'
+            >> beam.Map(blog_services.get_blog_post_summary_from_model)
+            | 'Split models into batches'
+            >> beam.transforms.util.BatchElements(
+                max_batch_size=self.MAX_BATCH_SIZE
+            )
             | 'Index batches of models' >> beam.ParDo(IndexBlogPostSummaries())
-            | 'Count the output' >> (job_result_transforms.ResultsToJobRunResults())
+            | 'Count the output'
+            >> (job_result_transforms.ResultsToJobRunResults())
         )
 
 
@@ -70,7 +82,9 @@ class IndexBlogPostsInSearchJob(base_jobs.JobBase):
 class IndexBlogPostSummaries(beam.DoFn):  # type: ignore[misc]
     """DoFn to index blog post summaries."""
 
-    def process(self, blog_post_summaries: List[blog_domain.BlogPostSummary]) -> Iterable[result.Result[None, Exception]]:
+    def process(
+        self, blog_post_summaries: List[blog_domain.BlogPostSummary]
+    ) -> Iterable[result.Result[None, Exception]]:
         """Index blog post summaries and catch any errors.
 
         Args:

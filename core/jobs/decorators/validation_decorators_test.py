@@ -33,7 +33,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services, exp_models
 
-base_models, exp_models = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.EXPLORATION])
+base_models, exp_models = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.EXPLORATION]
+)
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -42,7 +44,9 @@ class MockAuditsExisting(validation_decorators.AuditsExisting):
     """Subclassed with overrides to avoid modifying the real decorator."""
 
     # Overrides the real value of _DO_FN_TYPES_BY_KIND for the unit tests.
-    _DO_FN_TYPES_BY_KIND: Dict[str, Set[Type[beam.DoFn]]] = collections.defaultdict(set)
+    _DO_FN_TYPES_BY_KIND: Dict[str, Set[Type[beam.DoFn]]] = (
+        collections.defaultdict(set)
+    )
 
     @classmethod
     def get_audit_do_fn_types(cls, kind: str) -> FrozenSet[Type[beam.DoFn]]:
@@ -136,7 +140,11 @@ class AuditsExistingTests(test_utils.TestBase):
 
         self.assertItemsEqual(
             MockAuditsExisting.get_audit_do_fn_types_by_kind().items(),
-            [(cls.__name__, {DoFn}) for cls in [base_models.BaseModel] + (models.Registry.get_all_storage_model_classes())],
+            [
+                (cls.__name__, {DoFn})
+                for cls in [base_models.BaseModel]
+                + (models.Registry.get_all_storage_model_classes())
+            ],
         )
 
     def test_replaces_base_do_fn_when_derived_do_fn_is_added_later(
@@ -166,14 +174,18 @@ class AuditsExistingTests(test_utils.TestBase):
     def test_keeps_derived_do_fn_when_base_do_fn_is_added_later(self) -> None:
         MockAuditsExisting(exp_models.ExplorationModel)(DerivedDoFn)
         MockAuditsExisting(exp_models.ExplorationModel)(UnrelatedDoFn)
-        self.assertItemsEqual(MockAuditsExisting.get_audit_do_fn_types('BaseModel'), [])
+        self.assertItemsEqual(
+            MockAuditsExisting.get_audit_do_fn_types('BaseModel'), []
+        )
         self.assertItemsEqual(
             MockAuditsExisting.get_audit_do_fn_types('ExplorationModel'),
             [DerivedDoFn, UnrelatedDoFn],
         )
 
         MockAuditsExisting(base_models.BaseModel)(DoFn)
-        self.assertItemsEqual(MockAuditsExisting.get_audit_do_fn_types('BaseModel'), [DoFn])
+        self.assertItemsEqual(
+            MockAuditsExisting.get_audit_do_fn_types('BaseModel'), [DoFn]
+        )
         self.assertItemsEqual(
             MockAuditsExisting.get_audit_do_fn_types('ExplorationModel'),
             [DerivedDoFn, UnrelatedDoFn],
@@ -181,19 +193,27 @@ class AuditsExistingTests(test_utils.TestBase):
 
     def test_does_not_register_duplicate_do_fns(self) -> None:
         MockAuditsExisting(base_models.BaseModel)(DoFn)
-        self.assertItemsEqual(MockAuditsExisting.get_audit_do_fn_types('BaseModel'), [DoFn])
+        self.assertItemsEqual(
+            MockAuditsExisting.get_audit_do_fn_types('BaseModel'), [DoFn]
+        )
 
         MockAuditsExisting(base_models.BaseModel)(DoFn)
-        self.assertItemsEqual(MockAuditsExisting.get_audit_do_fn_types('BaseModel'), [DoFn])
+        self.assertItemsEqual(
+            MockAuditsExisting.get_audit_do_fn_types('BaseModel'), [DoFn]
+        )
 
     def test_raises_value_error_when_given_no_args(self) -> None:
-        with self.assertRaisesRegex(ValueError, 'Must target at least one model'):
+        with self.assertRaisesRegex(
+            ValueError, 'Must target at least one model'
+        ):
             MockAuditsExisting()
 
     def test_raises_type_error_when_given_unregistered_model(self) -> None:
         with self.assertRaisesRegex(
             TypeError,
-            re.escape('%r is not a model registered in core.platform' % FooModel),
+            re.escape(
+                '%r is not a model registered in core.platform' % FooModel
+            ),
         ):
             MockAuditsExisting(FooModel)
 
@@ -209,7 +229,9 @@ class MockRelationshipsOf(validation_decorators.RelationshipsOf):
     """Subclassed with overrides to avoid modifying the real decorator."""
 
     # Overrides the real value for the unit tests.
-    _ID_REFERENCING_PROPERTIES: Dict[model_property.ModelProperty, Set[str]] = collections.defaultdict(set)
+    _ID_REFERENCING_PROPERTIES: Dict[model_property.ModelProperty, Set[str]] = (
+        collections.defaultdict(set)
+    )
 
     @classmethod
     def clear(cls) -> None:
@@ -222,7 +244,9 @@ class RelationshipsOfTests(test_utils.TestBase):
         super().tearDown()
         MockRelationshipsOf.clear()
 
-    def get_property_of(self, model_class: Type[base_models.BaseModel], property_name: str) -> model_property.ModelProperty:
+    def get_property_of(
+        self, model_class: Type[base_models.BaseModel], property_name: str
+    ) -> model_property.ModelProperty:
         """Helper method to create a ModelProperty.
 
         Args:
@@ -233,7 +257,9 @@ class RelationshipsOfTests(test_utils.TestBase):
             ModelProperty. An object that encodes both property and the model it
             belongs to.
         """
-        return model_property.ModelProperty(model_class, getattr(model_class, property_name))
+        return model_property.ModelProperty(
+            model_class, getattr(model_class, property_name)
+        )
 
     def test_has_no_relationships_by_default(self) -> None:
         self.assertEqual(
@@ -249,14 +275,20 @@ class RelationshipsOfTests(test_utils.TestBase):
         @MockRelationshipsOf(BarModel)
         def bar_model_relationships(
             model: Type[BarModel],
-        ) -> Iterator[Tuple[model_property.PropertyType, List[Type[base_models.BaseModel]]]]:
+        ) -> Iterator[
+            Tuple[
+                model_property.PropertyType, List[Type[base_models.BaseModel]]
+            ]
+        ]:
             """Defines the relationships of BarModel."""
             yield (model.foo_id, [FooModel])
 
         self.assertEqual(
             MockRelationshipsOf.get_id_referencing_properties_by_kind_of_possessor(),
             {
-                'BarModel': ((self.get_property_of(BarModel, 'foo_id'), ('FooModel',)),),
+                'BarModel': (
+                    (self.get_property_of(BarModel, 'foo_id'), ('FooModel',)),
+                ),
             },
         )
         self.assertEqual(
@@ -272,14 +304,20 @@ class RelationshipsOfTests(test_utils.TestBase):
         @MockRelationshipsOf(BarModel)
         def bar_model_relationships(
             model: Type[base_models.BaseModel],
-        ) -> Iterator[Tuple[model_property.PropertyType, List[Type[base_models.BaseModel]]]]:
+        ) -> Iterator[
+            Tuple[
+                model_property.PropertyType, List[Type[base_models.BaseModel]]
+            ]
+        ]:
             """Defines the relationships of BarModel."""
             yield (model.id, [BazModel])
 
         self.assertEqual(
             MockRelationshipsOf.get_id_referencing_properties_by_kind_of_possessor(),
             {
-                'BarModel': ((self.get_property_of(BarModel, 'id'), ('BazModel',)),),
+                'BarModel': (
+                    (self.get_property_of(BarModel, 'id'), ('BazModel',)),
+                ),
             },
         )
         self.assertEqual(

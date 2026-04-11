@@ -36,7 +36,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services, topic_models
 
-(base_models, topic_models) = models.Registry.import_models([models.Names.BASE_MODEL, models.Names.TOPIC])
+(base_models, topic_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.TOPIC]
+)
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -51,7 +53,9 @@ class MigrateTopicModels(beam.PTransform):  # type: ignore[misc]
     """
 
     @staticmethod
-    def _migrate_topic(topic_id: str, topic_model: topic_models.TopicModel) -> result.Result[Tuple[str, topic_domain.Topic], Tuple[str, Exception]]:
+    def _migrate_topic(
+        topic_id: str, topic_model: topic_models.TopicModel
+    ) -> result.Result[Tuple[str, topic_domain.Topic], Tuple[str, Exception]]:
         """Migrates topic and transform topic model into topic object.
 
         Args:
@@ -74,7 +78,9 @@ class MigrateTopicModels(beam.PTransform):  # type: ignore[misc]
         return result.Ok((topic_id, topic))
 
     @staticmethod
-    def _generate_topic_changes(topic_id: str, topic_model: topic_models.TopicModel) -> Iterable[Tuple[str, topic_domain.TopicChange]]:
+    def _generate_topic_changes(
+        topic_id: str, topic_model: topic_models.TopicModel
+    ) -> Iterable[Tuple[str, topic_domain.TopicChange]]:
         """Generates topic change objects. Topic change object is generated when
         schema version for some field is lower than the latest schema version.
 
@@ -91,7 +97,9 @@ class MigrateTopicModels(beam.PTransform):  # type: ignore[misc]
         if subtopic_version < feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION:
             topic_change = topic_domain.TopicChange(
                 {
-                    'cmd': (topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION),
+                    'cmd': (
+                        topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION
+                    ),
                     'from_version': subtopic_version,
                     'to_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
                 }
@@ -102,7 +110,9 @@ class MigrateTopicModels(beam.PTransform):  # type: ignore[misc]
         if story_version < feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION:
             topic_change = topic_domain.TopicChange(
                 {
-                    'cmd': (topic_domain.CMD_MIGRATE_STORY_REFERENCE_SCHEMA_TO_LATEST_VERSION),  # pylint: disable=line-too-long
+                    'cmd': (
+                        topic_domain.CMD_MIGRATE_STORY_REFERENCE_SCHEMA_TO_LATEST_VERSION
+                    ),  # pylint: disable=line-too-long
                     'from_version': story_version,
                     'to_version': feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
                 }
@@ -129,7 +139,8 @@ class MigrateTopicModels(beam.PTransform):  # type: ignore[misc]
 
         unmigrated_topic_models = (
             pipeline
-            | 'Get all non-deleted topic models' >> (ndb_io.GetModels(topic_models.TopicModel.get_all()))
+            | 'Get all non-deleted topic models'
+            >> (ndb_io.GetModels(topic_models.TopicModel.get_all()))
             # Pylint disable is needed becasue pylint is not able to correclty
             # detect that the value is passed through the pipe.
             | 'Add topic keys'
@@ -139,7 +150,8 @@ class MigrateTopicModels(beam.PTransform):  # type: ignore[misc]
         )
         topic_summary_models = (
             self.pipeline
-            | 'Get all non-deleted topic summary models' >> (ndb_io.GetModels(topic_models.TopicSummaryModel.get_all()))
+            | 'Get all non-deleted topic summary models'
+            >> (ndb_io.GetModels(topic_models.TopicSummaryModel.get_all()))
             # Pylint disable is needed because pylint is not able to correctly
             # detect that the value is passed through the pipe.
             | 'Add topic summary keys'
@@ -148,15 +160,33 @@ class MigrateTopicModels(beam.PTransform):  # type: ignore[misc]
             )
         )
 
-        all_migrated_topic_results = unmigrated_topic_models | 'Transform and migrate model' >> beam.MapTuple(self._migrate_topic)
+        all_migrated_topic_results = (
+            unmigrated_topic_models
+            | 'Transform and migrate model'
+            >> beam.MapTuple(self._migrate_topic)
+        )
 
-        migrated_topic_job_run_results = all_migrated_topic_results | 'Generates results for migration' >> (job_result_transforms.ResultsToJobRunResults('TOPIC PROCESSED'))
+        migrated_topic_job_run_results = (
+            all_migrated_topic_results
+            | 'Generates results for migration'
+            >> (job_result_transforms.ResultsToJobRunResults('TOPIC PROCESSED'))
+        )
 
-        filtered_migrated_exp = all_migrated_topic_results | 'Filter migration results' >> (results_transforms.DrainResultsOnError())
+        filtered_migrated_exp = (
+            all_migrated_topic_results
+            | 'Filter migration results'
+            >> (results_transforms.DrainResultsOnError())
+        )
 
-        migrated_topics = filtered_migrated_exp | 'Unwrap ok' >> beam.Map(lambda result_item: result_item.unwrap())
+        migrated_topics = filtered_migrated_exp | 'Unwrap ok' >> beam.Map(
+            lambda result_item: result_item.unwrap()
+        )
 
-        topic_changes = unmigrated_topic_models | 'Generates topic changes' >> beam.FlatMapTuple(self._generate_topic_changes)
+        topic_changes = (
+            unmigrated_topic_models
+            | 'Generates topic changes'
+            >> beam.FlatMapTuple(self._generate_topic_changes)
+        )
 
         topic_objects_list = (
             {
@@ -171,7 +201,10 @@ class MigrateTopicModels(beam.PTransform):  # type: ignore[misc]
 
         transformed_topic_objects_list = (
             topic_objects_list
-            | 'Remove unmigrated topics' >> beam.Filter(lambda x: len(x['topic_changes']) > 0 and len(x['topic']) > 0)
+            | 'Remove unmigrated topics'
+            >> beam.Filter(
+                lambda x: len(x['topic_changes']) > 0 and len(x['topic']) > 0
+            )
             | 'Reorganize the topic objects'
             >> beam.Map(
                 lambda objects: {
@@ -183,9 +216,29 @@ class MigrateTopicModels(beam.PTransform):  # type: ignore[misc]
             )
         )
 
-        already_migrated_job_run_results = topic_objects_list | 'Remove migrated jobs' >> beam.Filter(lambda x: (len(x['topic_changes']) == 0 and len(x['topic']) > 0)) | 'Transform previously migrated topics into job run results' >> (job_result_transforms.CountObjectsToJobRunResult('TOPIC PREVIOUSLY MIGRATED'))
+        already_migrated_job_run_results = (
+            topic_objects_list
+            | 'Remove migrated jobs'
+            >> beam.Filter(
+                lambda x: (len(x['topic_changes']) == 0 and len(x['topic']) > 0)
+            )
+            | 'Transform previously migrated topics into job run results'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOPIC PREVIOUSLY MIGRATED'
+                )
+            )
+        )
 
-        topic_objects_list_job_run_results = transformed_topic_objects_list | 'Transform topic objects into job run results' >> (job_result_transforms.CountObjectsToJobRunResult('TOPIC MIGRATED'))
+        topic_objects_list_job_run_results = (
+            transformed_topic_objects_list
+            | 'Transform topic objects into job run results'
+            >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'TOPIC MIGRATED'
+                )
+            )
+        )
 
         job_run_results = (
             migrated_topic_job_run_results,
@@ -216,14 +269,19 @@ class MigrateTopicJob(base_jobs.JobBase):
             sequence(BaseModel). Sequence of models which should be put into
             the datastore.
         """
-        updated_topic_model = topic_services.populate_topic_model_fields(topic_model, migrated_topic)
-        topic_rights_model = topic_models.TopicRightsModel.get(migrated_topic.id)
+        updated_topic_model = topic_services.populate_topic_model_fields(
+            topic_model, migrated_topic
+        )
+        topic_rights_model = topic_models.TopicRightsModel.get(
+            migrated_topic.id
+        )
         change_dicts = [change.to_dict() for change in topic_changes]
         with datastore_services.get_ndb_context():
             models_to_put = updated_topic_model.compute_models_to_commit(
                 feconf.MIGRATION_BOT_USER_ID,
                 feconf.COMMIT_TYPE_EDIT,
-                'Update subtopic contents schema version to %d.' % (feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION),
+                'Update subtopic contents schema version to %d.'
+                % (feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION),
                 change_dicts,
                 additional_models={'rights_model': topic_rights_model},
             )
@@ -254,7 +312,11 @@ class MigrateTopicJob(base_jobs.JobBase):
 
         topic_summary = topic_services.compute_summary_of_topic(migrated_topic)
         topic_summary.version += 1
-        updated_topic_summary_model = topic_services.populate_topic_summary_model_fields(topic_summary_model, topic_summary)
+        updated_topic_summary_model = (
+            topic_services.populate_topic_summary_model_fields(
+                topic_summary_model, topic_summary
+            )
+        )
         return updated_topic_summary_model
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -265,19 +327,39 @@ class MigrateTopicJob(base_jobs.JobBase):
             migration.
         """
 
-        transformed_topic_objects_list, job_run_results = self.pipeline | 'Perform migration and filter migration results' >> (MigrateTopicModels())
+        transformed_topic_objects_list, job_run_results = (
+            self.pipeline
+            | 'Perform migration and filter migration results'
+            >> (MigrateTopicModels())
+        )
 
-        topic_models_to_put = transformed_topic_objects_list | 'Generate topic models to put' >> beam.FlatMap(
-            lambda topic_objects: self._update_topic(
-                topic_objects['topic_model'],
-                topic_objects['topic'],
-                topic_objects['topic_changes'],
+        topic_models_to_put = (
+            transformed_topic_objects_list
+            | 'Generate topic models to put'
+            >> beam.FlatMap(
+                lambda topic_objects: self._update_topic(
+                    topic_objects['topic_model'],
+                    topic_objects['topic'],
+                    topic_objects['topic_changes'],
+                )
             )
         )
 
-        topic_summary_model_to_put = transformed_topic_objects_list | 'Generate topic summary to put' >> beam.Map(lambda topic_objects: self._update_topic_summary(topic_objects['topic'], topic_objects['topic_summary_model']))
+        topic_summary_model_to_put = (
+            transformed_topic_objects_list
+            | 'Generate topic summary to put'
+            >> beam.Map(
+                lambda topic_objects: self._update_topic_summary(
+                    topic_objects['topic'], topic_objects['topic_summary_model']
+                )
+            )
+        )
 
-        ((topic_models_to_put, topic_summary_model_to_put) | 'Merge models' >> beam.Flatten() | 'Put models into datastore' >> ndb_io.PutModels())
+        (
+            (topic_models_to_put, topic_summary_model_to_put)
+            | 'Merge models' >> beam.Flatten()
+            | 'Put models into datastore' >> ndb_io.PutModels()
+        )
 
         return job_run_results
 
@@ -294,6 +376,10 @@ class AuditTopicMigrateJob(base_jobs.JobBase):
             migration.
         """
 
-        unused_transformed_topic_objects_list, job_run_results = self.pipeline | 'Perform migration and filter migration results' >> (MigrateTopicModels())
+        unused_transformed_topic_objects_list, job_run_results = (
+            self.pipeline
+            | 'Perform migration and filter migration results'
+            >> (MigrateTopicModels())
+        )
 
         return job_run_results

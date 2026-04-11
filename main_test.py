@@ -55,7 +55,9 @@ class CloudLoggingTests(test_utils.GenericTestBase):
                 function_calls['setup_logging'] = True
 
         emulator_mode_swap = self.swap(constants, 'EMULATOR_MODE', False)
-        logging_client_swap = self.swap_with_checks(google.cloud.logging, 'Client', MockClient)
+        logging_client_swap = self.swap_with_checks(
+            google.cloud.logging, 'Client', MockClient
+        )
         with emulator_mode_swap, logging_client_swap:
             # This reloads the main module so that all the checks in
             # the module are reexecuted.
@@ -68,7 +70,9 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
     """Test the NdbWsgiMiddleware."""
 
     def test_ndb_wsgi_middleware_properly_wraps_given_function(self) -> None:
-        def wsgi_app_mock(environ: Dict[str, str], response: webtest.TestResponse) -> webtest.TestResponse:
+        def wsgi_app_mock(
+            environ: Dict[str, str], response: webtest.TestResponse
+        ) -> webtest.TestResponse:
             """Mock WSGI app.
 
             Args:
@@ -96,7 +100,9 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
             self.assertEqual(type(global_cache), datastore_services.RedisCache)
             return contextlib.nullcontext()
 
-        get_ndb_context_swap = self.swap_with_checks(datastore_services, 'get_ndb_context', get_ndb_context_mock)
+        get_ndb_context_swap = self.swap_with_checks(
+            datastore_services, 'get_ndb_context', get_ndb_context_mock
+        )
 
         middleware = main.NdbWsgiMiddleware(
             cast(webapp2.WSGIApplication, wsgi_app_mock)
@@ -156,7 +162,6 @@ class MainModuleDevModeTests(test_utils.GenericTestBase):
             with mock.patch(
                 'core.platform.auth.firebase_auth_services.establish_firebase_connection'
             ) as mock_connection:
-
                 importlib.reload(main)
 
                 mock_connection.assert_not_called()

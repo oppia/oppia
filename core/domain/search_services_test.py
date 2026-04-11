@@ -53,13 +53,17 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.voice_artist_id = self.get_user_id_from_email(self.VOICE_ARTIST_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL
+        )
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.user_id_admin = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.user_id_admin = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL
+        )
 
     def test_get_search_rank(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
@@ -78,14 +82,18 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             base_search_rank,
         )
 
-        rating_services.assign_rating_to_exploration(self.owner_id, self.EXP_ID, 5)
+        rating_services.assign_rating_to_exploration(
+            self.owner_id, self.EXP_ID, 5
+        )
         exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
         self.assertEqual(
             search_services.get_search_rank_from_exp_summary(exp_summary),
             base_search_rank + 10,
         )
 
-        rating_services.assign_rating_to_exploration(self.user_id_admin, self.EXP_ID, 2)
+        rating_services.assign_rating_to_exploration(
+            self.user_id_admin, self.EXP_ID, 2
+        )
         exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
         self.assertEqual(
             search_services.get_search_rank_from_exp_summary(exp_summary),
@@ -105,7 +113,9 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
         # A user can (down-)rate an exploration at most once.
         for i in range(50):
-            rating_services.assign_rating_to_exploration('user_id_1', self.EXP_ID, 1)
+            rating_services.assign_rating_to_exploration(
+                'user_id_1', self.EXP_ID, 1
+            )
         exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
         self.assertEqual(
             search_services.get_search_rank_from_exp_summary(exp_summary),
@@ -113,11 +123,15 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         )
 
         for i in range(50):
-            rating_services.assign_rating_to_exploration('user_id_%s' % i, self.EXP_ID, 1)
+            rating_services.assign_rating_to_exploration(
+                'user_id_%s' % i, self.EXP_ID, 1
+            )
 
         # The rank will be at least 0.
         exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
-        self.assertEqual(search_services.get_search_rank_from_exp_summary(exp_summary), 0)
+        self.assertEqual(
+            search_services.get_search_rank_from_exp_summary(exp_summary), 0
+        )
 
     def test_search_explorations(self) -> None:
         expected_query_string = 'a query string'
@@ -174,7 +188,9 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             retries: int = 3,
         ) -> Tuple[List[str], Optional[int]]:
             self.assertEqual(query_string, expected_query_string)
-            self.assertEqual(index, collection_services.SEARCH_INDEX_COLLECTIONS)
+            self.assertEqual(
+                index, collection_services.SEARCH_INDEX_COLLECTIONS
+            )
             self.assertEqual(categories, [])
             self.assertEqual(language_codes, [])
             self.assertEqual(offset, expected_offset)
@@ -261,7 +277,9 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         )
 
         with delete_docs_swap:
-            search_services.delete_collections_from_search_index([self.COLLECTION_ID])
+            search_services.delete_collections_from_search_index(
+                [self.COLLECTION_ID]
+            )
 
         self.assertEqual(delete_docs_counter.times_called, 1)
 
@@ -294,8 +312,12 @@ class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
             'tags': ['two'],
         }
 
-        blog_services.update_blog_post(self.blog_post_a_id, self.change_dict_one)
-        blog_services.update_blog_post(self.blog_post_b_id, self.change_dict_two)
+        blog_services.update_blog_post(
+            self.blog_post_a_id, self.change_dict_one
+        )
+        blog_services.update_blog_post(
+            self.blog_post_b_id, self.change_dict_two
+        )
         blog_services.publish_blog_post(self.blog_post_a_id)
         blog_services.publish_blog_post(self.blog_post_b_id)
 
@@ -321,7 +343,9 @@ class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
 
             return doc_ids, expected_result_offset
 
-        with self.swap(gae_search_services, 'blog_post_summaries_search', mock_search):
+        with self.swap(
+            gae_search_services, 'blog_post_summaries_search', mock_search
+        ):
             result, result_offset = search_services.search_blog_post_summaries(
                 expected_query_string,
                 [],
@@ -354,7 +378,9 @@ class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
         )
 
         with delete_docs_swap:
-            search_services.delete_blog_post_summary_from_search_index(self.blog_post_a_id)  # pylint: disable=line-too-long
+            search_services.delete_blog_post_summary_from_search_index(
+                self.blog_post_a_id
+            )  # pylint: disable=line-too-long
 
         self.assertEqual(delete_docs_counter.times_called, 1)
 
@@ -368,7 +394,9 @@ class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result, [self.blog_post_b_id])
 
         # Trying indexing draft blog post.
-        draft_blog_post = blog_services.get_blog_post_summary_by_id(self.blog_post_a_id)
+        draft_blog_post = blog_services.get_blog_post_summary_by_id(
+            self.blog_post_a_id
+        )
         search_services.index_blog_post_summaries([draft_blog_post])
 
         result = search_services.search_blog_post_summaries('title', [], 2)[0]
