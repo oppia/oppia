@@ -61,8 +61,24 @@ export class BlogAdminPageComponent implements OnInit {
   roleToActions!: RoleToActionsBackendResponse;
   formData!: FormData;
   UPDATABLE_ROLES = {};
-  statusMessage: string = '';
+  private _statusMessage: string = '';
+  private statusMessageTimeout: ReturnType<typeof setTimeout> | null = null;
   platformParameters: PlatformParameterBackendResponse = {};
+
+  get statusMessage(): string {
+    return this._statusMessage;
+  }
+
+  set statusMessage(message: string) {
+    if (this.statusMessageTimeout !== null) {
+      clearTimeout(this.statusMessageTimeout);
+    }
+    this._statusMessage = message;
+    this.statusMessageTimeout = setTimeout(() => {
+      this._statusMessage = '';
+      this.statusMessageTimeout = null;
+    }, 3000);
+  }
   constructor(
     private backendApiService: BlogAdminBackendApiService,
     private blogAdminDataService: BlogAdminDataService,
