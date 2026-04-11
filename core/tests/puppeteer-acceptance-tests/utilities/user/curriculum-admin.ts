@@ -900,9 +900,12 @@ export class CurriculumAdmin extends TopicManager {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(mobileOptionsSelector);
       await this.clickOnElementWithSelector(mobileSaveTopicButton);
-      await this.page.waitForSelector('oppia-topic-editor-save-modal', {
-        visible: true,
-      });
+      // Wait for the modal and its animation to fully complete before
+      // interacting. NgbModal adds the 'show' class to '.modal' only after
+      // the CSS fade-in animation finishes. Without this, elementFromPoint()
+      // in isElementClickable() may return a mid-animation element instead of
+      // the button, causing waitForElementToBeClickable to time out.
+      await this.page.waitForSelector('.modal.show', {visible: true});
       await this.typeInInputField(
         saveChangesMessageInput,
         'Test saving topic as curriculum admin.'
@@ -910,35 +913,21 @@ export class CurriculumAdmin extends TopicManager {
       await this.page.waitForSelector(
         `${closeSaveModalButton}:not([disabled])`
       );
-
-      let modalIsClosed = false;
-      for (let i = 0; i < 3; i++) {
-        await this.clickOnElementWithSelector(closeSaveModalButton);
-        try {
-          await this.page.waitForSelector('oppia-topic-editor-save-modal', {
-            hidden: true,
-            timeout: 2000,
-          });
-          modalIsClosed = true;
-          break;
-        } catch (e) {
-          // Retry clicking if the modal is still open after 2 seconds.
-        }
-      }
-
-      if (!modalIsClosed) {
-        throw new Error(
-          'Action failed: oppia-topic-editor-save-modal failed to hide.'
-        );
-      }
-
+      await this.clickOnElementWithSelector(closeSaveModalButton);
+      await this.page.waitForSelector('oppia-topic-editor-save-modal', {
+        hidden: true,
+      });
       if (topicName) {
         await this.openTopicEditor(topicName);
       }
     } else {
       await this.clickOnElementWithSelector(saveTopicButton);
-
-      await this.page.waitForSelector(modalDiv, {visible: true});
+      // Wait for the modal and its animation to fully complete before
+      // interacting. NgbModal adds the 'show' class to '.modal' only after
+      // the CSS fade-in animation finishes. Without this, elementFromPoint()
+      // in isElementClickable() may return a mid-animation element instead of
+      // the button, causing waitForElementToBeClickable to time out.
+      await this.page.waitForSelector('.modal.show', {visible: true});
       await this.typeInInputField(
         saveChangesMessageInput,
         'Test saving topic as curriculum admin.'
@@ -947,27 +936,8 @@ export class CurriculumAdmin extends TopicManager {
         `${closeSaveModalButton}:not([disabled])`,
         {visible: true}
       );
-
-      let modalIsClosed = false;
-      for (let i = 0; i < 3; i++) {
-        await this.clickOnElementWithSelector(closeSaveModalButton);
-        try {
-          await this.page.waitForSelector(modalDiv, {
-            hidden: true,
-            timeout: 2000,
-          });
-          modalIsClosed = true;
-          break;
-        } catch (e) {
-          // Retry clicking if the modal is still open after 2 seconds.
-        }
-      }
-
-      if (!modalIsClosed) {
-        throw new Error(
-          `Action failed: ${modalDiv} failed to hide within the allocated time.`
-        );
-      }
+      await this.clickOnElementWithSelector(closeSaveModalButton);
+      await this.page.waitForSelector(modalDiv, {hidden: true});
     }
   }
 
