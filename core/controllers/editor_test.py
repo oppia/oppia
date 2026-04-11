@@ -874,12 +874,16 @@ solicit_answer_details: false
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(io.BytesIO(golden_zipfile))
         # Compare saved with golden file.
-        saved_yaml = zf_saved.open(
-            'The title for ZIP download handler test.yaml'
-        ).read().decode('utf-8')
-        gold_yaml = zf_gold.open(
-            'The title for ZIP download handler test!.yaml'
-        ).read().decode('utf-8')
+        saved_yaml = (
+            zf_saved.open('The title for ZIP download handler test.yaml')
+            .read()
+            .decode('utf-8')
+        )
+        gold_yaml = (
+            zf_gold.open('The title for ZIP download handler test!.yaml')
+            .read()
+            .decode('utf-8')
+        )
         saved_yaml_dict = utils.dict_from_yaml(saved_yaml)
         gold_yaml_dict = utils.dict_from_yaml(gold_yaml)
 
