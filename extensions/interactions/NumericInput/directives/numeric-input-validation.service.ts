@@ -265,9 +265,7 @@ export class NumericInputValidationService {
 
     if (value.match(invalidChars)) {
       if (requireNonnegativeInput && !allowExponentialNotation) {
-        return (
-          'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT_NO_MINUS'
-        );
+        return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT_NO_MINUS';
       } else if (requireNonnegativeInput && allowExponentialNotation) {
         return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_MINUS';
       } else if (!requireNonnegativeInput && !allowExponentialNotation) {

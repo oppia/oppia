@@ -26,9 +26,7 @@ var customizeInteraction = async function (
   allowExponentialNotation = true
 ) {
   var boolEditors = await elem.$$('<schema-based-bool-editor>');
-  await objects
-    .BooleanEditor(boolEditors[0])
-    .setValue(requireNonnegativeInput);
+  await objects.BooleanEditor(boolEditors[0]).setValue(requireNonnegativeInput);
   await objects
     .BooleanEditor(boolEditors[1])
     .setValue(allowExponentialNotation);
