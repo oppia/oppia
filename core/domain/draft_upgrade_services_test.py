@@ -282,10 +282,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        migrated_draft_change_list_v58 = (
-            draft_upgrade_services.DraftUpgradeUtil._convert_states_v57_dict_to_v58_dict(  # pylint: disable=protected-access
-                draft_change_list_v57
-            )
+        migrated_draft_change_list_v58 = draft_upgrade_services.DraftUpgradeUtil._convert_states_v57_dict_to_v58_dict(  # pylint: disable=protected-access
+            draft_change_list_v57
         )
 
         self.assertEqual(migrated_draft_change_list_v58, draft_change_list_v57)

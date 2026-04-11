@@ -5728,24 +5728,22 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         states_dict = cast(
             Dict[str, state_domain.StateDict],
             {
-            'Intro': {
-                'interaction': {
-                    'id': 'NumericInput',
-                    'customization_args': {
-                        'requireNonnegativeInput': {'value': False}
-                    },
-                }
+                'Intro': {
+                    'interaction': {
+                        'id': 'NumericInput',
+                        'customization_args': {
+                            'requireNonnegativeInput': {'value': False}
+                        },
+                    }
+                },
+                'Text State': {
+                    'interaction': {'id': 'TextInput', 'customization_args': {}}
+                },
             },
-            'Text State': {
-                'interaction': {'id': 'TextInput', 'customization_args': {}}
-            },
-        },
         )
 
-        converted_states_dict = (
-            exp_domain.Exploration._convert_states_v57_dict_to_v58_dict(  # pylint: disable=protected-access
-                states_dict
-            )
+        converted_states_dict = exp_domain.Exploration._convert_states_v57_dict_to_v58_dict(  # pylint: disable=protected-access
+            states_dict
         )
 
         self.assertEqual(
