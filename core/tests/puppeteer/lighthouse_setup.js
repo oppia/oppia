@@ -273,7 +273,12 @@ const getTopicEditorUrl = async function (browser, page) {
     await page.waitForSelector(confirmTopicCreationButton, {visible: true});
     await page.waitForTimeout(5000);
     await page.click(confirmTopicCreationButton);
-    await page.waitForNavigation({waitUntil: networkIdle});
+    await new Promise(r => setTimeout(r, 2000));
+    let retries = 0;
+    while ((await browser.pages()).length < 2 && retries < 10) {
+      await new Promise(r => setTimeout(r, 1000));
+      retries++;
+    }
     await browser.pages();
 
     // Refresh page and click on topic link.
@@ -319,7 +324,7 @@ const getStoryEditorUrl = async function (browser, page) {
     await page.waitForTimeout(5000);
     await page.click(confirmStoryCreationButton);
     await page.waitForNavigation({waitUntil: networkIdle});
-    await page.waitForSelector('.e2e-test-story-title', {visible: true});
+    await page.waitForSelector('.e2e-test-save-story-button', {visible: true});
     storyEditorUrl = await page.url();
     storyId = storyEditorUrl.split('/')[4];
   } catch (e) {
@@ -467,12 +472,18 @@ const addThumbnailToTopic = async function (page, topicName) {
     await page.click(publishChangesButton);
     const successMessage = 'Changes saved.';
     let statusMessage;
+    let attempts = 0;
+    const maxAttempts = 30;
     do {
       await new Promise(r => setTimeout(r, 1000));
       statusMessage = await page.evaluate(() => {
         const el = document.querySelector('.oppia-status-message-container');
         return el ? el.textContent.trim() : '';
       });
+      attempts++;
+      if (attempts >= maxAttempts) {
+        throw new Error('Timed out waiting for topic save confirmation.');
+      }
     } while (statusMessage !== successMessage);
   } catch (e) {
     // eslint-disable-next-line no-console

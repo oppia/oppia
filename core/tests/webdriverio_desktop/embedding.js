@@ -168,11 +168,6 @@ describe('Embedding', function () {
 
     var playCountingExploration = async function (version) {
       await waitFor.pageToFullyLoad();
-      // Wait for the interaction component to be present before interacting.
-      await waitFor.presenceOf(
-        await $('.e2e-test-float-form-input'),
-        'Numeric input component took too long to appear.'
-      );
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText(
           version === 2

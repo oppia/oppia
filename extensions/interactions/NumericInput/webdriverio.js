@@ -27,13 +27,21 @@ var customizeInteraction = async function (elem, requireNonnegativeInput) {
 };
 
 var expectInteractionDetailsToMatch = async function (elem) {
-  expect(await elem.$('<oppia-interactive-numeric-input>').isExisting()).toBe(
-    true
+  const numericInputInteraction = elem.$('<oppia-interactive-numeric-input>');
+  await waitFor.presenceOf(
+    numericInputInteraction,
+    'NumericInput interaction taking too long to appear'
   );
+  expect(await numericInputInteraction.isExisting()).toBe(true);
 };
 
 var submitAnswer = async function (elem, answer) {
-  var numericInput = elem.$('<oppia-interactive-numeric-input>').$('<input>');
+  const numericInputInteraction = elem.$('<oppia-interactive-numeric-input>');
+  await waitFor.presenceOf(
+    numericInputInteraction,
+    'NumericInput interaction taking too long to appear'
+  );
+  var numericInput = numericInputInteraction.$('<input>');
   await action.setValue('Numeric Input Element', numericInput, answer);
   var submitAnswerBtn = $('.e2e-test-submit-answer-button');
   await action.click('Submit Answer Button', submitAnswerBtn);
