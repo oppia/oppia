@@ -20,6 +20,8 @@ from __future__ import annotations
 
 import importlib
 
+from typing import Any
+
 from core.domain import playthrough_issue_registry
 from core.tests import test_utils
 from extensions.issues.CyclicStateTransitions import CyclicStateTransitions
@@ -27,8 +29,6 @@ from extensions.issues.EarlyQuit import EarlyQuit
 from extensions.issues.MultipleIncorrectSubmissions import (
     MultipleIncorrectSubmissions,
 )
-
-from typing import Any
 
 
 class IssueRegistryUnitTests(test_utils.GenericTestBase):
