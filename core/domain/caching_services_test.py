@@ -49,7 +49,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         'objective': '',
         'init_state_name': 'Introduction',
         'author_notes': '',
-        'states_schema_version': 57,
+        'states_schema_version': feconf.CURRENT_STATE_SCHEMA_VERSION,
         'param_specs': {},
         'param_changes': [],
         'id': 'h51Bu72rDIqO',
