@@ -58,7 +58,7 @@ class NumericInput(base.BaseInteraction):
             ),
             'schema': {'type': 'bool'},
             'default_value': False,
-        }
+        },
     ]
 
     _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [
