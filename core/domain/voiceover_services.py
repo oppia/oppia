@@ -18,15 +18,20 @@
 
 from __future__ import annotations
 
+import collections
 import datetime
+import json
+import logging
 
 from core import constants, feconf
 from core.domain import (
+    cloud_task_domain,
     email_manager,
     exp_domain,
     exp_fetchers,
     exp_services,
     state_domain,
+    suggestion_services,
     taskqueue_services,
     translation_domain,
     translation_fetchers,
@@ -795,29 +800,6 @@ def send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
     )
 
 
-def _remove_empty_contents_for_voiceover_regeneration(
-    language_code_to_contents_mapping: Dict[str, Dict[str, str]],
-) -> None:
-    """Removes empty contents from the provided input.
-
-    Args:
-        language_code_to_contents_mapping: dict. A dictionary mapping language
-            codes to the corresponding content IDs and their associated HTML
-            that require voiceover regeneration.
-    """
-    for (
-        _,
-        content_ids_to_content_values,
-    ) in language_code_to_contents_mapping.items():
-        content_ids_to_remove = [
-            content_id
-            for content_id, html in (content_ids_to_content_values.items())
-            if not html.strip()
-        ]
-        for content_id in content_ids_to_remove:
-            del content_ids_to_content_values[content_id]
-
-
 def extract_english_voiceover_texts_from_exploration(
     exploration: exp_domain.Exploration,
 ) -> Dict[str, Dict[str, str]]:
@@ -896,68 +878,35 @@ def extract_translated_voiceover_texts_from_entity_translations(
     return language_code_to_contents_mapping
 
 
-def _regenerate_voiceovers_for_given_contents(
+def regenerate_voiceovers_for_given_contents(
     exploration_id: str,
-    exploration_title: str,
     exploration_version: int,
     language_code_to_contents_mapping: Dict[str, Dict[str, str]],
-    date_time: str,
-    author_id: str,
+    task_run_id: str,
     specific_language_accent_code: Optional[str] = None,
-    task_run_id: Optional[str] = None,
 ) -> None:
-    """Private helper method to regenerate voiceovers for specified contents
+    """Helper method to regenerate voiceovers for specified contents
     of an exploration.
 
     Args:
         exploration_id: str. The ID of the exploration for which voiceovers
             need to be regenerated.
-        exploration_title: str. The title of the exploration for which
-            voiceovers need to be regenerated.
         exploration_version: int. The version of the exploration for which
             voiceovers need to be regenerated.
         language_code_to_contents_mapping: dict. A dictionary mapping language
             codes to the corresponding content IDs and their associated HTML
             that require voiceover regeneration.
-        date_time: str. The ISO-formatted timestamp indicating when the
-            regeneration process was initiated.
-        author_id: str. The ID of the user who triggered the voiceover
-            regeneration, either directly or indirectly.
+        task_run_id: str. The unique identifier for the voiceover
+            regeneration task.
         specific_language_accent_code: Optional[str]. The specific language
             accent code to use for voiceover regeneration, if provided.
-        task_run_id: str|None. The unique identifier for the voiceover
-            regeneration task. If None, the method is invoked by a
-            synchronous process and task-tracking is not required.
     """
-    # A dictionary mapping each language code to a list of accent codes that
-    # support autogeneration.
-    language_code_to_autogeneratable_accent_codes = {}
-
-    # Remove empty contents from the voiceover regeneration mapping.
-    _remove_empty_contents_for_voiceover_regeneration(
-        language_code_to_contents_mapping
-    )
-
-    # A list of error collections that occurred during the
-    # voiceover regeneration.
-    error_collections_during_voiceover_regeneration: List[
-        Dict[str, List[Tuple[str, str]] | str]
-    ] = []
-
     # Get all language codes that need voiceover regeneration in this request.
     language_codes = list(language_code_to_contents_mapping.keys())
 
-    language_accent_codes_to_descriptions = (
-        get_language_accent_codes_to_descriptions()
-    )
-
-    # Counter to track the number of contents for which voiceover regeneration
-    # is triggered.
-    number_of_contents_for_voiceover_regeneration = 0
-
-    # Counter to track the number of contents that failed to regenerate
-    # voiceovers.
-    number_of_contents_failed_to_regenerate = 0
+    # A dictionary mapping each language code to a list of accent codes that
+    # support autogeneration.
+    language_code_to_autogeneratable_accent_codes = {}
 
     # Retrieve all Oppia-supported language accents, grouped by language code,
     # for which voiceovers need to be regenerated for the given contents.
@@ -965,158 +914,436 @@ def _regenerate_voiceovers_for_given_contents(
         language_accent_codes = (
             get_supported_autogeneratable_accents_by_language(language_code)
         )
+
         if not language_accent_codes:
             continue
+
+        if specific_language_accent_code:
+            language_code_to_autogeneratable_accent_codes[language_code] = [
+                specific_language_accent_code
+            ]
+            break
+
         language_code_to_autogeneratable_accent_codes[language_code] = (
             language_accent_codes
         )
 
-    # A list of language accents for which voiceovers are regenerated.
-    language_accents_used_for_voiceover_regeneration = []
+    voiceover_regeneration_job = voiceover_cloud_task_services.create_voiceover_regeneration_task_with_status_generating(
+        exploration_id,
+        task_run_id,
+        language_code_to_contents_mapping,
+        language_code_to_autogeneratable_accent_codes,
+    )
 
-    requested_task_is_async: bool = task_run_id is not None
+    # Ruling out the possibility of None for mypy type checking.
+    assert voiceover_regeneration_job is not None
 
-    if requested_task_is_async:
-        # Ruling out the possibility of None for mypy type checking.
-        assert task_run_id is not None
-        voiceover_regeneration_task = (
-            voiceover_cloud_task_services.get_voiceover_regeneration_task(
-                exploration_id, task_run_id
-            )
-        )
+    voiceover_cloud_task_services.save_voiceover_regeneration_job(
+        voiceover_regeneration_job
+    )
 
-    if requested_task_is_async and voiceover_regeneration_task is None:
-        # Ruling out the possibility of None for mypy type checking.
-        assert task_run_id is not None
-        voiceover_regeneration_task = voiceover_cloud_task_services.create_voiceover_regeneration_task_with_status_generating(
+    # Voiceover regeneration for a large number of contents within a single
+    # Cloud Task run (deferred request) significantly increases the workload and
+    # may lead to timeout failures due to Gunicorn limitations of 60 seconds.
+    # To mitigate this issue, a single deferred regeneration task is split into
+    # multiple smaller batches.
+    divide_and_enqueue_voiceover_regeneration_tasks_in_smaller_batches(
+        language_code_to_contents_mapping,
+        language_code_to_autogeneratable_accent_codes,
+        exploration_id,
+        exploration_version,
+        task_run_id,
+    )
+
+
+def divide_and_enqueue_voiceover_regeneration_tasks_in_smaller_batches(
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]],
+    language_code_to_autogeneratable_accent_codes: Dict[str, List[str]],
+    exploration_id: str,
+    exploration_version: int,
+    parent_cloud_task_run_id: str,
+) -> None:
+    """It divides the voiceover regeneration process for an exploration into
+    smaller batches and enqueues a separate task for each batch in the
+    Google Cloud Task Queue. This approach prevents asynchronous deferred
+    requests from timing out when processing a large number of contents
+    in one request, thereby avoiding the 60-second Gunicorn timeout limit.
+
+    Args:
+        language_code_to_contents_mapping: dict. A dictionary mapping language
+            codes to the corresponding content IDs and their associated HTML
+            that require voiceover regeneration.
+        language_code_to_autogeneratable_accent_codes: dict. A dictionary mapping
+            language codes to a list of accent codes that support autogeneration.
+        exploration_id: str. The ID of the exploration for which voiceovers
+            need to be regenerated.
+        exploration_version: int. The version of the exploration for which
+            voiceovers need to be regenerated.
+        parent_cloud_task_run_id: str. The unique identifier for the parent
+            cloud task run, which is responsible for regenerating voiceovers
+            for all the contents of the exploration in batches.
+    """
+    logging.info(
+        'Voiceover regeneration logs: Starting to divide and enqueue voiceover '
+        'regeneration tasks in smaller batches for exploration_id: %s, '
+        'parent_cloud_task_run_id: %s'
+        % (
             exploration_id,
-            task_run_id,
-            language_code_to_contents_mapping,
-            language_code_to_autogeneratable_accent_codes,
+            parent_cloud_task_run_id,
         )
+    )
+    # Based on testing data, regenerating a voiceover for each state content
+    # takes approximately 6 seconds. Therefore, to avoid hitting the timeout
+    # limit, we can process about 8 contents per batch. This would take roughly
+    # 48 seconds, leaving sufficient buffer time to handle any variations
+    # in processing.
+    batch_size = 8
 
-        # Ruling out the possibility of None for mypy type checking.
-        assert voiceover_regeneration_task is not None
+    batch_counter = 0
+    child_cloud_task_model_ids = []
 
-        voiceover_cloud_task_services.save_voiceover_regeneration_task_run_mapping(
-            voiceover_regeneration_task
-        )
-
-    errors_while_voiceover_regeneration = []
-
-    for language_code in language_codes:
+    for (
+        language_code,
+        content_ids_to_content_values,
+    ) in language_code_to_contents_mapping.items():
         language_accent_codes = (
             language_code_to_autogeneratable_accent_codes.get(language_code, [])
         )
-
-        content_ids_to_content_values = language_code_to_contents_mapping.get(
-            language_code, {}
-        )
-
         for language_accent_code in language_accent_codes:
-            if (
-                specific_language_accent_code is not None
-                and language_accent_code != specific_language_accent_code
-            ):
-                continue
+            content_id_value_pairs = list(content_ids_to_content_values.items())
 
-            language_accents_used_for_voiceover_regeneration.append(
-                language_accent_codes_to_descriptions.get(
-                    language_accent_code, ''
+            for i in range(0, len(content_id_value_pairs), batch_size):
+                batch_content_id_value_pairs = content_id_value_pairs[
+                    i : i + batch_size
+                ]
+                batch_content_ids_to_content_values = dict(
+                    batch_content_id_value_pairs
                 )
-            )
+                batch_counter += 1
 
-            number_of_contents_for_voiceover_regeneration += len(
-                content_ids_to_content_values
-            )
-
-            errors_while_voiceover_regeneration = voiceover_regeneration_services.regenerate_voiceovers_of_exploration(
-                exploration_id,
-                exploration_version,
-                content_ids_to_content_values,
-                language_accent_code,
-            )
-
-            failed_content_ids = [
-                error[0] for error in errors_while_voiceover_regeneration
-            ]
-
-            if requested_task_is_async:
-                # Ruling out the possibility of None for mypy type checking.
-                assert voiceover_regeneration_task is not None
-                voiceover_regeneration_task.update_final_content_status_for_cloud_task_run(
-                    language_accent_code, failed_content_ids
+                child_cloud_task_model_id = (
+                    taskqueue_services.get_new_cloud_task_run_id()
                 )
 
-            if errors_while_voiceover_regeneration:
-                error_collections_during_voiceover_regeneration.append(
-                    {
-                        'exploration_id': exploration_id,
-                        'language_accent_code': language_accent_code,
-                        'error_messages': errors_while_voiceover_regeneration,
-                    }
-                )
-                number_of_contents_failed_to_regenerate += len(
-                    errors_while_voiceover_regeneration
+                logging.info(
+                    'Voiceover regeneration logs: Enqueuing batch %d for '
+                    'exploration_id: %s, parent_cloud_task_run_id: %s, '
+                    'child_cloud_task_run_id: %s'
+                    % (
+                        batch_counter,
+                        exploration_id,
+                        parent_cloud_task_run_id,
+                        child_cloud_task_model_id,
+                    )
                 )
 
-    if requested_task_is_async:
-        # Ruling out the possibility of None for mypy type checking.
-        assert voiceover_regeneration_task is not None
-        voiceover_cloud_task_services.save_voiceover_regeneration_task_run_mapping(
-            voiceover_regeneration_task
+                voiceover_regeneration_task_batch_instance = (
+                    cloud_task_domain.VoiceoverRegenerationTaskBatch(
+                        parent_cloud_task_run_id,
+                        child_cloud_task_model_id,
+                        exploration_id,
+                        exploration_version,
+                        language_accent_code,
+                        batch_content_ids_to_content_values,
+                    )
+                )
+
+                voiceover_cloud_task_services.create_voiceover_regeneration_task_batch_model(
+                    voiceover_regeneration_task_batch_instance
+                )
+
+                # Enqueue to Google cloud task queue.
+                taskqueue_services.defer_voiceover_regeneration_task_in_batches(
+                    feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                        'FUNCTION_ID_REGENERATE_VOICEOVERS_FOR_BATCH_CONTENTS'
+                    ],
+                    taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
+                    parent_cloud_task_run_id,
+                    child_cloud_task_model_id,
+                    exploration_id,
+                )
+
+                child_cloud_task_model_ids.append(child_cloud_task_model_id)
+
+    logging.info(
+        'Voiceover regeneration logs: Number of batches: %s, Parent Cloud Task Run ID: %s, Child Cloud Task Run IDs: %s'
+        % (
+            batch_counter,
+            parent_cloud_task_run_id,
+            child_cloud_task_model_ids,
+        )
+    )
+
+
+def regenerate_voiceovers_for_batch_contents(
+    exploration_id: str,
+    parent_cloud_task_run_id: str,
+    child_cloud_task_run_id: str,
+) -> None:
+    """Regenerates automatic voiceovers for some contents of an exploration, so
+    that we can't hit the state where in an async deferred request due to large
+    numbers of contents to regenerate in one go we have a timeout becuase of
+    Gunicorn's timeout of 60 secs.
+
+    Args:
+        exploration_id: str. The ID of the exploration for which voiceovers
+            need to be regenerated.
+        parent_cloud_task_run_id: str. The unique identifier for the parent
+            cloud task run, which is responsible for regenerating voiceovers
+            for all the contents of the exploration in batches.
+        child_cloud_task_run_id: str. The unique identifier for the child
+            cloud task run, which is responsible for regenerating voiceovers
+            for a batch of contents of the exploration in a language accent.
+
+    Raises:
+        Exception. Raised when there is an error during the voiceover
+            regeneration process for the batch of contents.
+    """
+    logging.info(
+        'Voiceover regeneration logs: Starting to regenerate voiceovers for '
+        'batch contents for exploration_id: %s, parent_cloud_task_run_id: %s, '
+        'child_cloud_task_run_id: %s'
+        % (exploration_id, parent_cloud_task_run_id, child_cloud_task_run_id)
+    )
+
+    voiceover_regeneration_batch_execution_job = voiceover_cloud_task_services.get_voiceover_regeneration_task_batch_model(
+        parent_cloud_task_run_id, child_cloud_task_run_id
+    )
+
+    logging.info(
+        'Voiceover regeneration logs: Trying to fetch voiceover regeneration batch execution job, '
+        'parent_cloud_task_run_id: %s, child_cloud_task_run_id: %s.'
+        % (parent_cloud_task_run_id, child_cloud_task_run_id)
+    )
+
+    # Ruling out the possibility of None for mypy type checking.
+    assert voiceover_regeneration_batch_execution_job is not None
+
+    exploration_id = voiceover_regeneration_batch_execution_job.exploration_id
+    exploration_version = (
+        voiceover_regeneration_batch_execution_job.exploration_version
+    )
+    language_accent_code = (
+        voiceover_regeneration_batch_execution_job.language_accent_code
+    )
+    content_ids_to_content_values = (
+        voiceover_regeneration_batch_execution_job.content_ids_to_contents_map
+    )
+
+    try:
+        errors_while_voiceover_regeneration = voiceover_regeneration_services.regenerate_voiceovers_of_exploration(
+            exploration_id,
+            exploration_version,
+            content_ids_to_content_values,
+            language_accent_code,
+        )
+    except Exception as e:
+        errors_while_voiceover_regeneration = [
+            (content_id, str(e))
+            for content_id in content_ids_to_content_values.keys()
+        ]
+
+    error_collections_during_voiceover_regeneration = []
+
+    error_collections_during_voiceover_regeneration.append(
+        json.dumps(
+            {
+                'exploration_id': exploration_id,
+                'language_accent_code': language_accent_code,
+                'error_messages': errors_while_voiceover_regeneration,
+            }
+        )
+    )
+
+    child_cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
+        child_cloud_task_run_id
+    )
+    # Ruling out the possibility of None for mypy type checking.
+    assert child_cloud_task_run is not None
+
+    child_cloud_task_run.exception_messages_for_failed_runs.extend(
+        error_collections_during_voiceover_regeneration
+    )
+    if len(errors_while_voiceover_regeneration) > 0:
+        child_cloud_task_run.latest_job_state = 'PERMANENTLY_FAILED'
+    else:
+        child_cloud_task_run.latest_job_state = 'SUCCEEDED'
+
+    taskqueue_services.update_cloud_task_run_model(child_cloud_task_run)
+
+    wrap_up_voiceover_regeneration_task(
+        exploration_id, parent_cloud_task_run_id
+    )
+
+
+def wrap_up_voiceover_regeneration_task(
+    exploration_id: str,
+    parent_cloud_task_run_id: str,
+) -> None:
+    """Wraps up the voiceover regeneration task by sending a summary email to
+    voiceover admins and tech leads, which includes the details of the
+    voiceover regeneration process.
+
+    Args:
+        exploration_id: str. The ID of the exploration for which voiceovers
+            were regenerated.
+        parent_cloud_task_run_id: str. The unique identifier for the parent
+            cloud task run, which is responsible for regenerating voiceovers
+            for all the contents of the exploration in batches.
+    """
+    child_cloud_task_run_ids = []
+    language_accent_codes = []
+    number_of_contents_for_voiceover_regeneration = 0
+
+    voiceover_regeneration_batch_instances = voiceover_cloud_task_services.get_voiceover_regeneration_batch_instances_by_parent_task_run_id(
+        parent_cloud_task_run_id
+    )
+
+    for batch_instance in voiceover_regeneration_batch_instances:
+        child_cloud_task_run_ids.append(batch_instance.child_cloud_task_run_id)
+        language_accent_codes.append(batch_instance.language_accent_code)
+        number_of_contents_for_voiceover_regeneration += len(
+            batch_instance.content_ids_to_contents_map
         )
 
+    child_cloud_task_runs = taskqueue_services.get_cloud_task_runs_by_model_ids(
+        child_cloud_task_run_ids
+    )
+
+    # Verify first if all the task runs are completed i.e., their status must
+    # be either 'SUCCEEDED' or 'PERMANENTLY_FAILED'. If not, we should not
+    # proceed with wrapping up the voiceover regeneration task, as it indicates
+    # that some batches are still being processed.
+    for child_cloud_task_run in child_cloud_task_runs:
+        if child_cloud_task_run.latest_job_state not in [
+            'SUCCEEDED',
+            'PERMANENTLY_FAILED',
+        ]:
+            logging.info(
+                'Voiceover regeneration logs: Not wrapping up the voiceover '
+                'regeneration task for parent_cloud_task_run_id: %s, because '
+                'child_cloud_task_run_id: %s is still in processing with status: %s'
+                % (
+                    parent_cloud_task_run_id,
+                    child_cloud_task_run.task_id,
+                    child_cloud_task_run.latest_job_state,
+                )
+            )
+            return
+
+    error_collections_during_voiceover_regeneration: List[
+        Dict[str, str | List[Tuple[str, str]]]
+    ] = []
+    language_accent_code_to_error: Dict[str, List[Tuple[str, str]]] = (
+        collections.defaultdict(list)
+    )
+    number_of_contents_failed_to_regenerate = 0
+
+    voiceover_regeneration_job_status = (
+        voiceover_cloud_task_services.get_voiceover_regeneration_job(
+            exploration_id, parent_cloud_task_run_id
+        )
+    )
+    # Ruling out the possibility of None for mypy type checking.
+    assert voiceover_regeneration_job_status is not None
+
+    parent_cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
+        parent_cloud_task_run_id
+    )
+    # Ruling out the possibility of None for mypy type checking.
+    assert parent_cloud_task_run is not None
+
+    for cloud_task_run in child_cloud_task_runs:
+        for error_details in cloud_task_run.exception_messages_for_failed_runs:
+            error_collections_during_voiceover_regeneration.append(
+                json.loads(error_details)
+            )
+
+    final_error_string = 'Exploration ID: %s\n' % exploration_id
+
+    for error_collection in error_collections_during_voiceover_regeneration:
+        # Here we use cast because we are narrowing down the type of
+        # 'language_accent_code' from Union of str and List to a str.
+        language_accent_code: str = cast(
+            str, error_collection['language_accent_code']
+        )
+
+        # Here we use cast because we are narrowing down the type of
+        # 'error_messages' from Union of str and List to a List of Tuples.
+        content_id_and_error_message_tuple = cast(
+            List[Tuple[str, str]], error_collection['error_messages']
+        )
+
+        language_accent_code_to_error[language_accent_code].extend(
+            content_id_and_error_message_tuple
+        )
+
+    for (
+        language_accent_code,
+        content_id_and_error_message_tuple,
+    ) in language_accent_code_to_error.items():
+        final_error_string += 'Language Accent Code: %s\nErrors: %s \n' % (
+            language_accent_code,
+            content_id_and_error_message_tuple,
+        )
+        failed_content_ids = [
+            error[0] for error in content_id_and_error_message_tuple
+        ]
+        voiceover_regeneration_job_status.update_failed_content_status(
+            language_accent_code, failed_content_ids
+        )
+        number_of_contents_failed_to_regenerate += len(failed_content_ids)
+
+    if number_of_contents_failed_to_regenerate > 0:
+        parent_cloud_task_run.exception_messages_for_failed_runs.append(
+            final_error_string
+        )
+        parent_cloud_task_run.latest_job_state = 'PERMANENTLY_FAILED'
+        taskqueue_services.update_cloud_task_run_model(parent_cloud_task_run)
+
+    voiceover_regeneration_job_status.update_remaining_content_status_as_succeeded()
+    voiceover_cloud_task_services.save_voiceover_regeneration_job(
+        voiceover_regeneration_job_status
+    )
+    logging.info(
+        'Voiceover regeneration logs: %s'
+        % voiceover_regeneration_job_status.to_dict()
+    )
+
+    exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, strict=False
+    )
+    exploration_title = exploration.title if exploration else ''
+
+    language_accent_codes_to_descriptions = (
+        get_language_accent_codes_to_descriptions()
+    )
+    language_accent_descriptions_used_for_regeneration = [
+        language_accent_codes_to_descriptions.get(language_accent_code, '')
+        for language_accent_code in language_accent_codes
+    ]
+
+    logging.info(
+        'Voiceover regeneration logs: Finished regenerating voiceovers for '
+        'all batches for exploration_id: %s, now sending summary email to '
+        'voiceover admins and tech leads.' % exploration_id
+    )
     send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
         exploration_id,
         exploration_title,
-        date_time,
-        language_accents_used_for_voiceover_regeneration,
+        parent_cloud_task_run.created_on.isoformat(),
+        language_accent_descriptions_used_for_regeneration,
         error_collections_during_voiceover_regeneration,
         number_of_contents_for_voiceover_regeneration,
         number_of_contents_failed_to_regenerate,
-        author_id,
+        feconf.SYSTEM_COMMITTER_ID,
     )
-
-    if requested_task_is_async:
-        error_string = ''
-        for error_collection in error_collections_during_voiceover_regeneration:
-            error_string += (
-                'Exploration ID: %s\nLanguage Accent Code: %s\nErrors: %s \n'
-                % (
-                    error_collection['exploration_id'],
-                    error_collection['language_accent_code'],
-                    error_collection['error_messages'],
-                )
-            )
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert task_run_id is not None
-        cloud_task_run_domain_instance = (
-            taskqueue_services.get_cloud_task_run_by_model_id(task_run_id)
-        )
-        # Ruling out the possibility of None for mypy type checking.
-        assert cloud_task_run_domain_instance is not None
-
-        if errors_while_voiceover_regeneration:
-            cloud_task_run_domain_instance.latest_job_state = (
-                'PERMANENTLY_FAILED'
-            )
-            cloud_task_run_domain_instance.exception_messages_for_failed_runs.append(
-                error_string
-            )
-            taskqueue_services.update_cloud_task_run_model(
-                cloud_task_run_domain_instance
-            )
 
 
 def regenerate_voiceovers_on_exploration_update(
     exploration_id: str,
-    exploration_title: str,
     exploration_version: int,
-    author_id: str,
-    date_time: str,
-    task_run_id: Optional[str] = None,
+    task_run_id: str,
 ) -> None:
     """Regenerates voiceovers for the updated exploration based on the changes
     made in the exploration content (in English) or translations (in other
@@ -1128,20 +1355,21 @@ def regenerate_voiceovers_on_exploration_update(
     Args:
         exploration_id: str. The ID of the exploration for which voiceovers
             need to be regenerated.
-        exploration_title: str. The title of the exploration.
         exploration_version: int. The version of the exploration for which
             voiceovers need to be regenerated.
-        author_id: str. The ID of the author who made the changes to the
-            exploration.
-        date_time: str. The date and time when the changes were
-            made to the exploration.
-        task_run_id: str|None. The unique identifier for the voiceover
+        task_run_id: str. The unique identifier for the voiceover
             regeneration task.
 
     Raises:
         Exception. If the voiceover regeneration fails for any of the content
             IDs or language-accent codes.
     """
+    logging.info(
+        'Voiceover regeneration logs: Started regenerating voiceovers for '
+        'exploration with ID: %s and version: %s on exploration update.'
+        % (exploration_id, exploration_version)
+    )
+
     # Fetches the exploration change diff for the given exploration ID and
     # exploration version from the ExplorationCommitLogEntryModel.
     exploration_commit_log_entry_model_id = 'exploration-%s-%s' % (
@@ -1200,23 +1428,20 @@ def regenerate_voiceovers_on_exploration_update(
             language_code_to_contents_mapping.setdefault(language_code, {})[
                 content_id
             ] = updated_content
-
-    _regenerate_voiceovers_for_given_contents(
+    logging.info(
+        'Voiceover regeneration logs: %s' % language_code_to_contents_mapping
+    )
+    regenerate_voiceovers_for_given_contents(
         exploration_id,
-        exploration_title,
         exploration_version,
         language_code_to_contents_mapping,
-        date_time,
-        author_id,
-        task_run_id=task_run_id,
+        task_run_id,
     )
 
 
 def regenerate_voiceovers_on_exploration_added_to_topic(
     exploration_id: str,
-    date_time: str,
-    author_id: str,
-    task_run_id: Optional[str] = None,
+    task_run_id: str,
 ) -> None:
     """Regenerates all voiceovers (in English and in all the available
     translated languages) for the given exploration when it is curated — i.e.,
@@ -1228,11 +1453,13 @@ def regenerate_voiceovers_on_exploration_added_to_topic(
     Args:
         exploration_id: str. The ID of the exploration to regenerate
             voiceovers for.
-        date_time: str. The timestamp when the exploration was curated.
-        author_id: str. The ID of the user who curated the exploration.
-        task_run_id: str|None. The unique identifier for the voiceover
+        task_run_id: str. The unique identifier for the voiceover
             regeneration task.
     """
+    logging.info(
+        'Voiceover regeneration logs: Started regenerating voiceovers for '
+        'exploration with ID: %s when it is added to topic.' % exploration_id
+    )
     # A dictionary where each key is a language code, and each value is a
     # content mapping dictionary. The content mapping dictionary contains
     # content IDs as keys and their corresponding HTML content as values.
@@ -1242,7 +1469,6 @@ def regenerate_voiceovers_on_exploration_added_to_topic(
     assert exploration is not None
 
     exploration_version = exploration.version
-    exploration_title = exploration.title
 
     # Retrieve all English-language contents from the exploration.
     language_code_to_contents_mapping.update(
@@ -1262,23 +1488,22 @@ def regenerate_voiceovers_on_exploration_added_to_topic(
             entity_translations
         )
     )
+    logging.info(
+        'Voiceover regeneration logs: %s' % language_code_to_contents_mapping
+    )
 
-    _regenerate_voiceovers_for_given_contents(
+    regenerate_voiceovers_for_given_contents(
         exploration_id,
-        exploration_title,
         exploration_version,
         language_code_to_contents_mapping,
-        date_time,
-        author_id,
-        task_run_id=task_run_id,
+        task_run_id,
     )
 
 
 def regenerate_voiceovers_of_exploration_for_given_language_accent(
     exploration_id: str,
     language_accent_code: str,
-    author_id: str,
-    date_time: str,
+    cloud_task_run_id: str,
 ) -> None:
     """Regenerates voiceovers of the provided exploration for the given
     language accent code.
@@ -1291,14 +1516,20 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
             need to be regenerated.
         language_accent_code: str. The language accent code for which
             voiceovers need to be regenerated.
-        author_id: str. The ID of the user who initiated the voiceover
-            regeneration.
-        date_time: str. The timestamp when the voiceover regeneration was
-            initiated.
+        cloud_task_run_id: str. The unique identifier for the voiceover
+            regeneration task.
 
     Raises:
         Exception. If the provided language accent code is invalid.
     """
+    logging.info(
+        'Voiceover regeneration logs: Started regenerating voiceovers for '
+        'exploration with ID: %s and language accent code: %s.'
+        % (
+            exploration_id,
+            language_accent_code,
+        )
+    )
     # A dictionary where each key is a language code, and each value is a
     # content mapping dictionary. The content mapping dictionary contains
     # content IDs as keys and their corresponding HTML content as values.
@@ -1317,7 +1548,6 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
     assert exploration is not None
 
     exploration_version = exploration.version
-    exploration_title = exploration.title
 
     if language_code == constants.constants.DEFAULT_LANGUAGE_CODE:
         # Retrieve all English-language contents from the exploration.
@@ -1338,49 +1568,48 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
                 [entity_translation]
             )
         )
-
-    _regenerate_voiceovers_for_given_contents(
+    logging.info(
+        'Voiceover regeneration logs: %s' % language_code_to_contents_mapping
+    )
+    regenerate_voiceovers_for_given_contents(
         exploration_id,
-        exploration_title,
         exploration_version,
         language_code_to_contents_mapping,
-        date_time,
-        author_id,
+        cloud_task_run_id,
         specific_language_accent_code=language_accent_code,
     )
 
 
-def generate_voiceover_from_translated_content(
-    exploration_id: str,
-    exploration_version: int,
-    translation_content: str,
-    content_id: str,
-    language_code: str,
+def regenerate_voiceovers_after_accepting_suggestion(
+    suggestion_id: str,
+    task_run_id: str,
 ) -> None:
-    """Generates a new voiceover for translated content once translation
-    suggestions are approved by reviewers.
+    """Regenerates voiceover for the given content ID and language code after
+    accepting a translation suggestion.
 
     Args:
-        exploration_id: str. The ID of the exploration.
-        exploration_version: int. The version of the exploration.
-        translation_content: str. The translated content for which the
-            voiceover needs to be generated.
-        content_id: str. The content ID for which the voiceover is being
-            generated.
-        language_code: str. The language code for the voiceover.
+        suggestion_id: str. The ID of the suggestion.
+        task_run_id: str. The ID of the task run.
     """
+    logging.info(
+        'Voiceover regeneration logs: Started regenerating voiceovers after '
+        'accepting suggestion with ID: %s.' % suggestion_id,
+    )
+    suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+    translated_html_content = suggestion.change_cmd.translation_html
+    content_id = suggestion.change_cmd.content_id
+    language_code = suggestion.language_code
+    exploration_id = suggestion.target_id
+    exploration_version = suggestion.target_version_at_submission
     language_code_to_contents_mapping = {
-        language_code: {content_id: translation_content}
+        language_code: {content_id: translated_html_content}
     }
-    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    assert exploration is not None
-    exploration_title = exploration.title
-
-    _regenerate_voiceovers_for_given_contents(
+    logging.info(
+        'Voiceover regeneration logs: %s' % language_code_to_contents_mapping
+    )
+    regenerate_voiceovers_for_given_contents(
         exploration_id,
-        exploration_title,
         exploration_version,
         language_code_to_contents_mapping,
-        datetime.datetime.utcnow().isoformat(),
-        feconf.SYSTEM_COMMITTER_ID,
+        task_run_id,
     )
