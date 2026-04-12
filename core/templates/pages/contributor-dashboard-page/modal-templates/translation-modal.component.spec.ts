@@ -239,6 +239,34 @@ describe('Translation Modal Component', () => {
     expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(0);
   });
 
+  it('should set validation errors when translation has missing custom tags', () => {
+    component.activeDataFormat = 'html';
+    component.textToTranslate =
+      '<p>Original text</p><oppia-noninteractive-skillreview>' +
+      '</oppia-noninteractive-skillreview>';
+
+    component.updateHtml('<p>Translated text</p>');
+
+    expect(component.hasIncompleteTranslationError).toBeTrue();
+    expect(component.hasSubmitValidationErrors()).toBeTrue();
+  });
+
+  it('should clear validation errors after translated custom tags are added', () => {
+    component.activeDataFormat = 'html';
+    component.textToTranslate =
+      '<p>Original text</p><oppia-noninteractive-skillreview>' +
+      '</oppia-noninteractive-skillreview>';
+    component.updateHtml('<p>Translated text</p>');
+
+    component.updateHtml(
+      '<p>Translated text</p><oppia-noninteractive-skillreview>' +
+        '</oppia-noninteractive-skillreview>'
+    );
+
+    expect(component.hasIncompleteTranslationError).toBeFalse();
+    expect(component.hasSubmitValidationErrors()).toBeFalse();
+  });
+
   it('should return the ExoansionTabType enum', () => {
     let enumVariable = component.expansionTabType;
     expect(typeof enumVariable === typeof ExpansionTabType);
