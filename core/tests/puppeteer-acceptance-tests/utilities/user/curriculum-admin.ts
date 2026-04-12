@@ -19,9 +19,9 @@
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {TopicManager} from './topic-manager';
+import {ExplorationEditorModal} from '../common/exploration-editor';
 import puppeteer from 'puppeteer';
 import {ElementHandle} from 'puppeteer';
-import {ExplorationEditorModal} from '../common/exploration-editor';
 
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
@@ -1713,8 +1713,7 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   /**
-   * Function to dismiss exploration editor welcome modal.
-   * @param failIfMissing - Whether to fail if the welcome modal is not found.
+   * Function to dismiss welcome modal
    */
   async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
     const explorationEditor = new ExplorationEditorModal(this);
@@ -2443,6 +2442,24 @@ export class CurriculumAdmin extends TopicManager {
     await this.clickOnElementWithSelector(topicDropDownFormField);
     await this.page.waitForSelector(addTopicFormFieldInput);
     await this.page.type(addTopicFormFieldInput, topicName);
+
+    await this.page.waitForSelector(topicSelector, {visible: true});
+    const options = await this.page.$$(topicSelector);
+    let foundOption = false;
+
+    for (const option of options) {
+      const text = await option.evaluate(el => el.textContent?.trim());
+      if (text === topicName) {
+        await this.clickOnElement(option);
+        foundOption = true;
+        break;
+      }
+    }
+
+    if (!foundOption) {
+      throw new Error(`Could not find topic option matching: ${topicName}`);
+    }
+
     await this.clickOnElementWithSelector(topicSelector);
     await this.page.waitForSelector(openTopicDropdownButton);
 
