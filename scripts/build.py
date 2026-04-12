@@ -359,6 +359,7 @@ def write_to_file_stream(file_stream: TextIO, content: str) -> None:
     """
     file_stream.write(str(content))
 
+
 def _join_files(source_paths: List[str], target_file_stream: TextIO) -> None:
     """Writes multiple files into one file.
 
