@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import importlib
 import json
 import os
 
@@ -236,3 +237,91 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
             Exception, 'No interaction exists for the None interaction_id.'
         ):
             interaction_registry.Registry.get_interaction_by_id(None)
+
+    def test_refresh_skips_classes_not_inheriting_base_interaction(
+        self,
+    ) -> None:
+        """Test that _refresh skips classes whose base class is not
+        BaseInteraction.
+        """
+
+        class NotAnInteraction:
+            """A dummy class that does not inherit from BaseInteraction."""
+
+            pass
+
+        original_import = importlib.import_module
+
+        # Here we use type Any because the mock_import_module function
+        # needs to return different module types depending on the name,
+        # so a specific return type cannot be used.
+        def mock_import_module(name: str) -> Any:
+            module = original_import(name)
+            # For one specific interaction, replace the class with one that
+            # does not inherit from BaseInteraction. getattr(module,
+            # interaction_id) will then return NotAnInteraction for that id.
+            if name.endswith('.Continue.Continue'):
+                setattr(module, 'Continue', NotAnInteraction)
+            return module
+
+        with self.swap(importlib, 'import_module', mock_import_module):
+            interaction_registry.Registry._refresh()  # pylint: disable=protected-access
+
+        # 'Continue' should NOT be in the registry since its mock class
+        # does not inherit from BaseInteraction.
+        self.assertNotIn(
+            'Continue',
+            interaction_registry.Registry._interactions,  # pylint: disable=protected-access
+        )
+        # But other real interactions should still be registered.
+        self.assertTrue(
+            len(
+                interaction_registry.Registry._interactions  # pylint: disable=protected-access
+            )
+            > 0
+        )
+
+    def test_get_all_specs_for_state_schema_version_with_can_fetch_latest(
+        self,
+    ) -> None:
+        """Test that get_all_specs_for_state_schema_version returns latest
+        specs when the file is not found and can_fetch_latest_specs is True.
+        """
+        result = interaction_registry.Registry.get_all_specs_for_state_schema_version(
+            0, can_fetch_latest_specs=True
+        )
+        expected = interaction_registry.Registry.get_all_specs()
+        self.assertEqual(result, expected)
+
+    def test_get_all_specs_for_state_schema_version_loads_from_file(
+        self,
+    ) -> None:
+        """Test that get_all_specs_for_state_schema_version successfully
+        loads specs from a legacy JSON file and caches them.
+        """
+        # Use a version that has an actual legacy specs file.
+        version = 52
+        # Ensure it's not already cached.
+        if (
+            version
+            in interaction_registry.Registry._state_schema_version_to_interaction_specs  # pylint: disable=protected-access,line-too-long
+        ):
+            del interaction_registry.Registry._state_schema_version_to_interaction_specs[  # pylint: disable=protected-access,line-too-long
+                version
+            ]
+
+        # First call — reads from file and caches (lines 176-182).
+        result_first = interaction_registry.Registry.get_all_specs_for_state_schema_version(
+            version
+        )
+        self.assertTrue(len(result_first) > 0)
+        self.assertIn(
+            version,
+            interaction_registry.Registry._state_schema_version_to_interaction_specs,  # pylint: disable=protected-access,line-too-long
+        )
+
+        # Second call — should return from cache (line 193).
+        result_second = interaction_registry.Registry.get_all_specs_for_state_schema_version(
+            version
+        )
+        self.assertEqual(result_first, result_second)

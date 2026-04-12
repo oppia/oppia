@@ -343,6 +343,49 @@ describe('Blog home page component', () => {
     });
   });
 
+  it('should show warning when only free text is entered in tag filter', () => {
+    spyOn(searchService, 'executeSearchQuery');
+    spyOn(alertsService, 'addWarning');
+    const routerSpy = spyOn(router, 'navigate');
+
+    component.searchQuery = '';
+    component.selectedTags = [];
+    component.pendingTagFilterInput = 'Community';
+
+    component.onSearchQueryChangeExec();
+
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Please select a tag from the suggestions before searching by tags.'
+    );
+    expect(searchService.executeSearchQuery).not.toHaveBeenCalled();
+    expect(routerSpy).not.toHaveBeenCalled();
+  });
+
+  it('should search by keyword even when tag filter has pending free text', () => {
+    spyOn(searchService, 'executeSearchQuery').and.callFake(
+      (_query: string, _tags: string[], successCallback: () => void): void => {
+        successCallback();
+      }
+    );
+    const routerSpy = spyOn(router, 'navigate');
+
+    component.searchQuery = 'Education';
+    component.selectedTags = [];
+    component.pendingTagFilterInput = 'Community';
+
+    component.onSearchQueryChangeExec();
+
+    expect(searchService.executeSearchQuery).toHaveBeenCalledWith(
+      'Education',
+      [],
+      jasmine.any(Function),
+      jasmine.any(Function)
+    );
+    expect(routerSpy).toHaveBeenCalled();
+  });
+
   it('should correctly format selectedTags into OR query string', () => {
     component.searchQuery = 'test';
     component.selectedTags = ['news', 'learners'];

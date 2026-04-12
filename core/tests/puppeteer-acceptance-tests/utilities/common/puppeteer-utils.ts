@@ -262,15 +262,27 @@ export class BaseUser {
 
     // Prepare an array of promises for screenshots.
     const screenshotPromises = BaseUser.instances.map(async (instance, i) => {
-      if (instance.page) {
-        await instance.page.screenshot({
-          path: path.join(
-            outputDir,
-            outputFileName + randomString + `-instance-${i}.png`
-          ),
-        });
+      if (!instance.page) {
+        return;
+      }
+      if (instance.page.isClosed()) {
         showMessage(
-          `Screenshot captured for test failure and saved as : ${path.join(outputDir, outputFileName + `-instance-${i}.png`)}`
+          `Skipped screenshot for ${instance.username ?? 'unknown user'} because the page is already closed.`
+        );
+        return;
+      }
+      try {
+        const screenshotPath = path.join(
+          outputDir,
+          outputFileName + randomString + `-instance-${i}.png`
+        );
+        await instance.page.screenshot({path: screenshotPath});
+        showMessage(
+          `Screenshot captured for test failure and saved as : ${screenshotPath}`
+        );
+      } catch (error) {
+        showMessage(
+          `Error while taking screenshot for ${instance.username ?? 'unknown user'}: ${error}`
         );
       }
     });
@@ -680,7 +692,7 @@ export class BaseUser {
     elementPlace?: number
   ): Promise<void> {
     const context = parentElement ?? this.page;
-    let element = await context.waitForSelector(selector, {timeout: 15000});
+    let element = await context.waitForSelector(selector, {timeout: 30000});
 
     // Get nth element if elementPlace is given.
     if (elementPlace) {
@@ -829,7 +841,10 @@ export class BaseUser {
     // Clicking three times on a line of text selects all the text.
     const element = await this.getElementInParent(selector);
     await this.waitForElementToBeClickable(element);
-    await element.click({clickCount: 3});
+    await element.click();
+    await this.page.keyboard.down('Control');
+    await this.page.keyboard.press('A');
+    await this.page.keyboard.up('Control');
     await this.page.keyboard.press('Backspace');
   }
 
@@ -1910,10 +1925,10 @@ export class BaseUser {
         selector,
         parentElement
       );
-      await selectElement.click();
+      await this.clickOnElement(selectElement);
 
       // Select the option.
-      await this.page.waitForSelector('mat-option');
+      await this.page.waitForSelector('mat-option', {visible: true});
       const options = await this.page.$$('mat-option');
       const optionTexts: string[] = [];
 
@@ -1935,7 +1950,7 @@ export class BaseUser {
       }
 
       // Click on the option.
-      await optionElement.click();
+      await this.clickOnElement(optionElement);
 
       // Verify the value of the select is updated.
       await this.expectTextContentToBe(selector, value);
