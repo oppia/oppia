@@ -21,6 +21,7 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
+  flush,
   flushMicrotasks,
   TestBed,
   tick,
@@ -174,6 +175,8 @@ describe('Blog Admin Page component ', () => {
         'Role of username successfully updated to BLOG_ADMIN'
       );
       expect(finishTaskSpy).toHaveBeenCalled();
+
+      flush();
     }));
 
     it('should not submit update role form if already a task is in queue', fakeAsync(() => {
@@ -207,6 +210,8 @@ describe('Blog Admin Page component ', () => {
 
       expect(component.statusMessage).toBe('The user already has this role.');
       expect(finishTaskSpy).toHaveBeenCalled();
+
+      flush();
     }));
 
     it('should not enable update role button if the input values are invalid', fakeAsync(() => {
@@ -262,6 +267,8 @@ describe('Blog Admin Page component ', () => {
 
       expect(component.statusMessage).toBe('Success.');
       expect(finishTaskSpy).toHaveBeenCalled();
+
+      flush();
     }));
 
     it(
@@ -305,6 +312,8 @@ describe('Blog Admin Page component ', () => {
         'Server error: Internal Server Error.'
       );
       expect(finishTaskSpy).toHaveBeenCalled();
+
+      flush();
     }));
 
     it('should not enable remove role button if the input values are invalid', fakeAsync(() => {
@@ -338,6 +347,8 @@ describe('Blog Admin Page component ', () => {
       tick();
 
       expect(component.statusMessage).toBe('Data saved successfully.');
+
+      flush();
     }));
 
     it(
@@ -356,6 +367,8 @@ describe('Blog Admin Page component ', () => {
         expect(component.statusMessage).toBe(
           'Server error: Internal Server Error.'
         );
+
+        flush();
       })
     );
 
@@ -394,5 +407,31 @@ describe('Blog Admin Page component ', () => {
         expect(saveConfigSpy).not.toHaveBeenCalled();
       })
     );
+  });
+
+  describe('status message auto-clear', () => {
+    it('should clear after 3 seconds', fakeAsync(() => {
+      component.statusMessage = 'Test message';
+
+      expect(component.statusMessage).toBe('Test message');
+
+      tick(3000);
+
+      expect(component.statusMessage).toBe('');
+    }));
+
+    it('should reset the timer when a new status message is set', fakeAsync(() => {
+      component.statusMessage = 'First message';
+      tick(2000);
+
+      component.statusMessage = 'Second message';
+      tick(2000);
+
+      expect(component.statusMessage).toBe('Second message');
+
+      tick(1000);
+
+      expect(component.statusMessage).toBe('');
+    }));
   });
 });
