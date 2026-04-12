@@ -273,6 +273,19 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
     with open(APP_DEV_YAML_FILEPATH, 'r', encoding='utf-8') as yaml_file:
         content += yaml_file.read()
 
+    def replace_content_or_fail(
+        source_content: str,
+        pattern: str,
+        replacement: str,
+        error_message: str,
+    ) -> str:
+        updated_content, num_replacements = re.subn(
+            pattern, replacement, source_content
+        )
+        if num_replacements != 1:
+            raise Exception(error_message)
+        return updated_content
+
     if deploy_mode:
         # The version: default line is required to run jobs on a local server (
         # both in prod & non-prod env). This line is not required when app.yaml
@@ -291,13 +304,23 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
     # In app_dev.yaml, CKEditor is served from the Angular dev build output
     # (dist/oppia-angular/). For app.yaml (used in prod mode), it must point
     # to the prod build output (dist/oppia-angular-prod/).
-    content = content.replace(
-        'static_dir: dist/oppia-angular/third_party/ckeditor\n',
-        'static_dir: dist/oppia-angular-prod/third_party/ckeditor\n',
+    content = replace_content_or_fail(
+        content,
+        r'  static_dir: dist/oppia-angular/third_party/ckeditor[ \t]*\r?\n',
+        '  static_dir: dist/oppia-angular-prod/third_party/ckeditor\n',
+        'CKEditor static_dir entry was not found in app.yaml content.',
     )
-    content = content.replace(
-        'static_dir: dist/oppia-angular/third_party/ckeditor-bootstrapck\n',
-        'static_dir: dist/oppia-angular-prod/third_party/ckeditor-bootstrapck\n',
+    content = replace_content_or_fail(
+        content,
+        (
+            r'  static_dir: '
+            r'dist/oppia-angular/third_party/ckeditor-bootstrapck[ \t]*\r?\n'
+        ),
+        (
+            '  static_dir: '
+            'dist/oppia-angular-prod/third_party/ckeditor-bootstrapck\n'
+        ),
+        'CKEditor bootstrapck static_dir entry was not found in app.yaml content.',
     )
     # In app_dev.yaml, MathJax is served from the Angular dev build output
     # (dist/oppia-angular/). For app.yaml (used in prod mode), it must point
@@ -335,7 +358,6 @@ def write_to_file_stream(file_stream: TextIO, content: str) -> None:
         content: str. String content to write to file object.
     """
     file_stream.write(str(content))
-
 
 def _join_files(source_paths: List[str], target_file_stream: TextIO) -> None:
     """Writes multiple files into one file.
