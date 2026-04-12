@@ -1,2 +1,0 @@
-[paste.app_factory]
-debug = webtest.debugapp:make_debug_app
