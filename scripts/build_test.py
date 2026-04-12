@@ -879,12 +879,14 @@ class BuildTests(test_utils.GenericTestBase):
         app_dev_yaml_temp_file = tempfile.NamedTemporaryFile()
         setattr(app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
         with open(mock_dev_yaml_filepath, 'w', encoding='utf-8') as tmp:
-            tmp.write('handlers:\n')
-            tmp.write('- url: /third_party/ckeditor\n')
-            tmp.write('  static_dir: dist/oppia-angular/third_party/ckeditor\n')
-            tmp.write('- url: /third_party/ckeditor-bootstrapck\n')
+            tmp.write('handlers:\r\n')
+            tmp.write('- url: /third_party/ckeditor\r\n')
             tmp.write(
-                '  static_dir: dist/oppia-angular/third_party/ckeditor-bootstrapck\n'
+                '  static_dir: dist/oppia-angular/third_party/ckeditor   \r\n'
+            )
+            tmp.write('- url: /third_party/ckeditor-bootstrapck\r\n')
+            tmp.write(
+                '  static_dir: dist/oppia-angular/third_party/ckeditor-bootstrapck\r\n'
             )
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()

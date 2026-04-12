@@ -1,0 +1,61 @@
+Metadata-Version: 2.4
+Name: WebTest
+Version: 3.0.6
+Summary: Helper to test WSGI applications
+Home-page: https://docs.pylonsproject.org/projects/webtest/en/latest/
+Author: Ian Bicking
+Maintainer: Gael Pasgrimaud
+Maintainer-email: gael@gawel.org
+License: MIT
+Keywords: wsgi test unit tests web
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Framework :: Paste
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Topic :: Internet :: WWW/HTTP :: WSGI
+Classifier: Topic :: Internet :: WWW/HTTP :: WSGI :: Server
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.9
+Requires-Dist: WebOb>=1.2
+Requires-Dist: waitress>=3.0.2
+Requires-Dist: beautifulsoup4
+Provides-Extra: tests
+Requires-Dist: coverage; extra == "tests"
+Requires-Dist: PasteDeploy; extra == "tests"
+Requires-Dist: pyquery; extra == "tests"
+Requires-Dist: pytest; extra == "tests"
+Requires-Dist: pytest-cov; extra == "tests"
+Requires-Dist: WSGIProxy2; extra == "tests"
+Provides-Extra: docs
+Requires-Dist: docutils; extra == "docs"
+Requires-Dist: pylons-sphinx-themes>=1.0.8; extra == "docs"
+Requires-Dist: Sphinx>=3.0.0; extra == "docs"
+Dynamic: author
+Dynamic: classifier
+Dynamic: description
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: maintainer
+Dynamic: maintainer-email
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+=======
+WebTest
+=======
+
+This wraps any WSGI application and makes it easy to send test
+requests to that application, without starting up an HTTP server.
+
+This provides convenient full-stack testing of applications written
+with any WSGI-compatible framework.
+
+Full docs can be found at https://docs.pylonsproject.org/projects/webtest/en/latest/
