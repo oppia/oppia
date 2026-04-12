@@ -243,7 +243,7 @@ class LibraryGroupIndexHandler(
                 activity_list = recently_published_summary_dicts
                 header_i18n_id = feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED
 
-        elif group_name == feconf.LIBRARY_GROUP_TOP_RATED:
+        else:
             top_rated_activity_summary_dicts = (
                 summary_services.get_top_rated_exploration_summary_dicts(
                     [constants.DEFAULT_LANGUAGE_CODE],
