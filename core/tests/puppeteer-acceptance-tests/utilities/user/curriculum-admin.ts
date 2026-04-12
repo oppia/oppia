@@ -2460,7 +2460,6 @@ export class CurriculumAdmin extends TopicManager {
       throw new Error(`Could not find topic option matching: ${topicName}`);
     }
 
-    await this.clickOnElementWithSelector(topicSelector);
     await this.page.waitForSelector(openTopicDropdownButton);
 
     await this.waitForNetworkIdle(); // Wait for the topic to appear in the classroom before adding prerequisites.
