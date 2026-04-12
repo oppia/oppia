@@ -33,8 +33,8 @@
 </style>
 
 <ul *ngIf="isAnswerLengthGreaterThanZero" class="drag-and-drop-sort-response-content">
-  <li *ngFor="let responses of responseList">
-    <ul [(ngModel)]="responses" ngDefaultControl>
+  <li *ngFor="let responses of responseList; let i = index">
+    <ul [(ngModel)]="responseList[i]" ngDefaultControl>
       <li *ngFor="let response of responses; index as idx">
         <div [ngClass]="chooseItemType(idx)">
           <oppia-rte-output-display [rteString]="response"></oppia-rte-output-display>

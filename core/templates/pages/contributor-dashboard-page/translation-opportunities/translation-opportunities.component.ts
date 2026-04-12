@@ -48,6 +48,7 @@ export class TranslationOpportunitiesComponent {
   userIsLoggedIn = false;
   opportunityType = 'translation';
   languageSelected = false;
+  userIsReviewer = false;
   constructor(
     private readonly pageContextService: PageContextService,
     private readonly contributionOpportunitiesService: ContributionOpportunitiesService,
@@ -80,21 +81,39 @@ export class TranslationOpportunitiesComponent {
       const heading = opportunity.getOpportunityHeading();
       const languageCode =
         this.translationLanguageService.getActiveLanguageCode();
-      const progressPercentage =
-        opportunity.getTranslationProgressPercentage(languageCode);
+      const reviewerOnlyContentCount =
+        opportunity.getReviewerOnlyContentCount();
+      let totalCount = opportunity.getContentCount();
+      let translationsCount = opportunity.getTranslationsCount(languageCode);
+      const inReviewCount =
+        opportunity.getTranslationsInReviewCount(languageCode);
+
+      if (!this.userIsReviewer) {
+        totalCount -= reviewerOnlyContentCount;
+      }
+
+      let progressPercentage = 0;
+      if (totalCount > 0) {
+        progressPercentage = Math.min(
+          (translationsCount / totalCount) * 100,
+          100
+        );
+      }
+
       const opportunityDict: TranslationOpportunity = {
         id: opportunity.getExplorationId(),
         heading: heading,
         subheading: subheading,
         progressPercentage: progressPercentage.toFixed(2),
         actionButtonTitle: 'Translate',
-        inReviewCount: opportunity.getTranslationsInReviewCount(languageCode),
-        totalCount: opportunity.getContentCount(),
-        translationsCount: opportunity.getTranslationsCount(languageCode),
+        inReviewCount: inReviewCount,
+        totalCount: totalCount,
+        translationsCount: translationsCount,
+        reviewerOnlyContentCount: reviewerOnlyContentCount,
       };
       this.allOpportunities[opportunityDict.id] = opportunityDict;
       if (
-        opportunityDict.translationsCount + opportunityDict.inReviewCount ===
+        opportunityDict.translationsCount + opportunityDict.inReviewCount >=
         opportunityDict.totalCount
       ) {
         untranslatableOpportunitiesDicts.push(opportunityDict);
@@ -133,11 +152,31 @@ export class TranslationOpportunitiesComponent {
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
+
+    const updateReviewerStatus = async () => {
+      this.languageSelected = false;
+      const activeLanguageCode =
+        this.translationLanguageService.getActiveLanguageCode();
+      if (activeLanguageCode) {
+        const userContributionRights =
+          await this.userService.getUserContributionRightsDataAsync();
+        if (userContributionRights) {
+          this.userIsReviewer =
+            userContributionRights.can_review_translation_for_language_codes.includes(
+              activeLanguageCode
+            );
+        }
+        this.languageSelected = true;
+      }
+    };
+
     this.translationLanguageService.onActiveLanguageChanged.subscribe(
-      () => (this.languageSelected = true)
+      async () => {
+        await updateReviewerStatus();
+      }
     );
     if (this.translationLanguageService.getActiveLanguageCode()) {
-      this.languageSelected = true;
+      updateReviewerStatus();
     } else {
       this.OPPIA_AVATAR_IMAGE_URL =
         this.urlInterpolationService.getStaticCopyrightedImageUrl(
