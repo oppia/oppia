@@ -1647,7 +1647,8 @@ class ExplorationEditsAllowedHandler(
         exp_services.set_exploration_edits_allowed(
             exploration_id, self.normalized_payload['edits_are_allowed']
         )
-        self.render_json({})
+        self.response.headers['Content-Type'] = 'application/json'
+        self.render_json({...})
 
 
 class LearnerAnswerInfoHandlerNormalizedRequestDict(TypedDict):
@@ -1657,6 +1658,42 @@ class LearnerAnswerInfoHandlerNormalizedRequestDict(TypedDict):
 
     state_name: str
     learner_answer_info_id: str
+
+
+class ExplorationEditActivityHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handles tracking of active editors per state."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {'schema': SCHEMA_FOR_EXPLORATION_ID}
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {'state_name': {'schema': {'type': 'basestring'}}},
+        'GET': {},
+    }
+
+    @acl_decorators.can_edit_exploration
+    def post(self, exploration_id: str) -> None:
+        state_name = self.normalized_payload['state_name']
+
+        from core.domain import exploration_edit_service
+
+        exploration_edit_service.record_edit(
+            exploration_id, self.user_id, state_name
+        )
+
+        self.render_json({})
+
+    @acl_decorators.can_edit_exploration
+    def get(self, exploration_id: str) -> None:
+
+        from core.domain import exploration_edit_service
+
+        active = exploration_edit_service.get_active_editors(exploration_id)
+
+        self.render_json({'active_editors': active})
 
 
 class LearnerAnswerInfoHandler(

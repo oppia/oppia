@@ -49,6 +49,7 @@ import {PageContextService} from 'services/page-context.service';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
+import {ExplorationEditActivityService} from 'domain/exploration/exploration-edit-activity.service';
 
 @Component({
   selector: 'oppia-exploration-editor-tab',
@@ -77,6 +78,9 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     'editorTabTourSaveDraft',
     'editorTabTourTutorialComplete',
   ];
+  activeEditors: any[] = [];
+  someoneEditingSameState = false;
+  pollingInterval: any;
 
   constructor(
     private editabilityService: EditabilityService,
@@ -101,7 +105,8 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     private versionHistoryBackendApiService: VersionHistoryBackendApiService,
     private pageContextService: PageContextService,
     private skillBackendApiService: SkillBackendApiService,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
+    private editActivityService: ExplorationEditActivityService
   ) {}
 
   private smoothScrollTo(targetY: number, duration: number): void {
@@ -530,6 +535,24 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     this.graphDataService.recompute();
   }
 
+  startPolling(): void {
+    this.pollingInterval = setInterval(() => {
+      if (!this.explorationId || !this.stateName) {
+        return;
+      }
+
+      this.editActivityService
+        .getActiveEditors(this.explorationId)
+        .subscribe((res: any) => {
+          this.activeEditors = res.active_editors;
+
+          this.someoneEditingSameState = this.activeEditors.some(
+            (e: any) => e.state_name === this.stateName && e.user_id !== null
+          );
+        });
+    }, 3000);
+  }
+
   saveStateContent(displayedValue: SubtitledHtml): void {
     const activeStateName = this.getValidActiveStateName();
     this.explorationStatesService.saveStateContent(
@@ -539,6 +562,9 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     // Show the interaction when the text content is saved, even if no
     // content is entered.
     this.interactionIsShown = true;
+    this.editActivityService
+      .recordEdit(this.explorationId, this.stateName || '')
+      .subscribe();
   }
 
   saveLinkedSkillId(displayedValue: string): void {
@@ -575,6 +601,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
       })
     );
 
+    this.explorationId = this.pageContextService.getExplorationId() || '';
     this.explorationStatesService.registerOnStatesChangedCallback(() => {
       if (this.explorationStatesService.getStates()) {
         this.stateEditorService.setStateNames(
@@ -595,9 +622,13 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
         this.explorationNextContentIdIndexService.restoreFromMemento();
       }
     );
+    this.startPolling();
   }
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+    }
   }
 }

@@ -3,6 +3,10 @@
   <p tabindex="0">Explorations are learning experiences that you create using Oppia. Think of explorations as a conversation between a student and a tutor.</p>
 </ng-template>
 
+<div *ngIf="someoneEditingSameState" style="color:red; font-weight:bold;">
+  ⚠️ Another user is editing this state
+</div>
+
 <ng-template #EditorTabTourTutorialComplete>
   <h3 class="e2e-test-joyride-title" tabindex="0">Tutorial Complete</h3>
   <div tabindex="0">
