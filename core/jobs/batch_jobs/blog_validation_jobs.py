@@ -206,3 +206,29 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):  # type: ignore[mis
         # types of a BlogPostModel's property.
         assert isinstance(property_value, (str, bool, datetime.datetime))
         return property_value
+
+
+class FindDuplicateBlogPostRightsModelsJob(base_jobs.JobBase):
+    """Validates that only one BlogPostRightsModel exists for each blog post."""
+
+    def run(
+        self,
+    ) -> beam.PCollection[blog_validation_errors.DuplicateBlogPostRightsModelError]:
+        return (
+            self.pipeline
+            | 'Get every Blog Post Rights Model'
+            >> (ndb_io.GetModels(blog_models.BlogPostRightsModel.query()))
+            | 'Get model id as key'
+            >> beam.Map(lambda model: (model.id, model))
+            | 'Group by model id'
+            >> beam.GroupByKey()
+            | 'Filter models with duplicate ids'
+            >> beam.Filter(lambda kv: len(kv[1]) > 1)
+            | 'Flatten models into a list of errors'
+            >> beam.FlatMap(
+                lambda kv: [
+                    blog_validation_errors.DuplicateBlogPostRightsModelError(model)
+                    for model in kv[1]
+                ]
+            )
+        )

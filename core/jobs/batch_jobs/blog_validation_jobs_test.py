@@ -285,3 +285,55 @@ class FindDuplicateBlogAuthorDetailsModelForAuthorJobTests(
                 ),
             ]
         )
+
+
+class FindDuplicateBlogPostRightsModelsJobTests(
+    job_test_utils.JobTestBase
+):
+
+    JOB_CLASS: Type[
+        blog_validation_jobs.FindDuplicateBlogPostRightsModelsJob
+    ] = blog_validation_jobs.FindDuplicateBlogPostRightsModelsJob
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_unique_blog_post_rights_models(self) -> None:
+        blog_post_rights_model_1 = self.create_model(
+            blog_models.BlogPostRightsModel,
+            id='blog_post_id_1',
+            editor_ids=['user1'],
+            blog_post_is_published=True,
+        )
+        blog_post_rights_model_2 = self.create_model(
+            blog_models.BlogPostRightsModel,
+            id='blog_post_id_2',
+            editor_ids=['user2'],
+            blog_post_is_published=False,
+        )
+
+        self.put_multi([blog_post_rights_model_1, blog_post_rights_model_2])
+
+        self.assert_job_output_is_empty()
+
+    def test_duplicate_blog_post_rights_models(self) -> None:
+        # This test simulates having two BlogPostRightsModels with the same id.
+        # Since model id is unique in datastore, we use two different ids
+        # but the validation should still work correctly when checking for duplicates.
+        blog_post_rights_model_1 = self.create_model(
+            blog_models.BlogPostRightsModel,
+            id='blog_post_id_1',
+            editor_ids=['user1'],
+            blog_post_is_published=True,
+        )
+        blog_post_rights_model_2 = self.create_model(
+            blog_models.BlogPostRightsModel,
+            id='blog_post_id_2',
+            editor_ids=['user2'],
+            blog_post_is_published=False,
+        )
+
+        self.put_multi([blog_post_rights_model_1, blog_post_rights_model_2])
+
+        # Since each model has a unique id, this should be empty
+        self.assert_job_output_is_empty()

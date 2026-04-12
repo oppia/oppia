@@ -137,3 +137,11 @@ class DuplicateBlogAuthorModelError(base_validation_errors.BaseValidationError):
     def __init__(self, model: blog_models.BlogAuthorDetailsModel) -> None:
         message = 'author id=%s is not unique' % utils.quoted(model.author_id)
         super().__init__(message, model)
+
+
+class DuplicateBlogPostRightsModelError(base_validation_errors.BaseValidationError):
+    """Error class for blog post rights models with duplicate blog post ids."""
+
+    def __init__(self, model: blog_models.BlogPostRightsModel) -> None:
+        message = 'blog post id=%s is not unique' % utils.quoted(model.id)
+        super().__init__(message, model)
