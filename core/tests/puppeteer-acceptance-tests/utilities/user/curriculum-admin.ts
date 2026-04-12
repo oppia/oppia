@@ -2446,7 +2446,8 @@ export class CurriculumAdmin extends TopicManager {
     await this.clickOnElementWithSelector(topicSelector);
     await this.page.waitForSelector(openTopicDropdownButton);
 
-    // Wait for the topic to appear in the classroom before adding prerequisites.
+    await this.waitForNetworkIdle(); // Wait for the topic to appear in the classroom before adding prerequisites.
+
     // Increased timeout to 60s because addTopicId makes an async API call that can take time.
     await this.page.waitForFunction(
       (
@@ -2985,7 +2986,7 @@ export class CurriculumAdmin extends TopicManager {
           const element = document.querySelector(selector);
           return (element as HTMLInputElement).checked === true;
         },
-        {},
+        {timeout: 60000},
         practiceTabToggle
       );
     } catch (error) {
