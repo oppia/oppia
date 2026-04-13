@@ -69,7 +69,7 @@ describe('Logged-Out Learner', function () {
 
     await curriculumAdmin.createQuestionsForSkillInCurriculumAdmin(
       'fractions',
-      7
+      10
     );
 
     // Enable the "Show practice tab to learners" in Topic Editor.
@@ -96,7 +96,7 @@ describe('Logged-Out Learner', function () {
     // Save draft.
     await curriculumAdmin.saveStoryDraftInCurriculumAdmin();
     await curriculumAdmin.publishStoryDraft();
-  }, 600000);
+  }, 1200000); // 15 minutes for setup hook.
 
   it('should be able to find list of subjects to learn', async function () {
     await loggedOutLearner.navigateToSplashPageInLoggedOutUser();
