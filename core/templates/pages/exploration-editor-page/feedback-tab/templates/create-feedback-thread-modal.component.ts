@@ -42,10 +42,8 @@ export class CreateFeedbackThreadModalComponent
   readonly SUBJECT_MAX_CHARS = AppConstants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT;
   readonly MESSAGE_MIN_CHARS = AppConstants.FEEDBACK_MESSAGE_MIN_CHAR_LIMIT;
   readonly MESSAGE_MAX_CHARS = AppConstants.MAX_REVIEW_MESSAGE_LENGTH;
-  readonly THREAD_INPUT_PATTERN = '^(?=.*[A-Za-z0-9])[\\s\\S]+$';
   subjectValidationActive = false;
   messageValidationActive = false;
-  private readonly alphanumericRegex = /[A-Za-z0-9]/;
 
   create(form: NgForm): void {
     const subjectValid = this.isSubjectValueValid();
@@ -91,16 +89,9 @@ export class CreateFeedbackThreadModalComponent
     }
   }
 
-  private hasAlphaNumericCharacter(value: string): boolean {
-    return this.alphanumericRegex.test(value);
-  }
-
   private isSubjectValueValid(): boolean {
     const subject = (this.newThreadSubject || '').trim();
     if (!subject) {
-      return false;
-    }
-    if (!this.hasAlphaNumericCharacter(subject)) {
       return false;
     }
     if (
@@ -115,9 +106,6 @@ export class CreateFeedbackThreadModalComponent
   private isMessageValueValid(): boolean {
     const message = (this.newThreadText || '').trim();
     if (!message) {
-      return false;
-    }
-    if (!this.hasAlphaNumericCharacter(message)) {
       return false;
     }
     if (

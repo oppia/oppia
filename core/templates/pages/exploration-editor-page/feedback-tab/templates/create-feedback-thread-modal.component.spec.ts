@@ -20,7 +20,8 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {CreateFeedbackThreadModalComponent} from './create-feedback-thread-modal.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {NgForm} from '@angular/forms';
+import {FormsModule, NgForm} from '@angular/forms';
+import {TranslateModule} from '@ngx-translate/core';
 
 class MockActiveModal {
   close(): void {
@@ -48,6 +49,7 @@ describe('Create Feedback Thread Modal Controller', function () {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [CreateFeedbackThreadModalComponent],
+      imports: [FormsModule, TranslateModule.forRoot()],
       providers: [
         {
           provide: NgbActiveModal,
@@ -112,6 +114,21 @@ describe('Create Feedback Thread Modal Controller', function () {
     });
   });
 
+  it('should close modal for trimmed punctuation-only input', function () {
+    spyOn(ngbActiveModal, 'close').and.callThrough();
+    const mockForm = buildMockForm(false);
+    component.newThreadSubject = '  ???  ';
+    component.newThreadText = '  .....  ';
+
+    component.create(mockForm);
+
+    expect(mockForm.form.markAllAsTouched).not.toHaveBeenCalled();
+    expect(ngbActiveModal.close).toHaveBeenCalledWith({
+      newThreadSubject: '???',
+      newThreadText: '.....',
+    });
+  });
+
   it('should not close modal when subject length exceeds limit', function () {
     spyOn(ngbActiveModal, 'close').and.callThrough();
     const mockForm = buildMockForm(false);
@@ -152,7 +169,7 @@ describe('Create Feedback Thread Modal Controller', function () {
     spyOn(ngbActiveModal, 'close').and.callThrough();
     const mockForm = buildMockForm(false);
     component.newThreadSubject = 'Subject 123';
-    component.newThreadText = '123456789';
+    component.newThreadText = '1234';
 
     component.create(mockForm);
 
@@ -171,6 +188,20 @@ describe('Create Feedback Thread Modal Controller', function () {
     expect(component.messageValidationActive).toBeFalse();
   });
 
+  it('should not close modal for whitespace-only input', function () {
+    spyOn(ngbActiveModal, 'close').and.callThrough();
+    const mockForm = buildMockForm(false);
+    component.newThreadSubject = '   ';
+    component.newThreadText = '     ';
+
+    component.create(mockForm);
+
+    expect(mockForm.form.markAllAsTouched).toHaveBeenCalled();
+    expect(ngbActiveModal.close).not.toHaveBeenCalled();
+    expect(component.subjectValidationActive).toBeTrue();
+    expect(component.messageValidationActive).toBeTrue();
+  });
+
   it('should clear subject validation flag after fixing value', function () {
     component.subjectValidationActive = true;
     component.newThreadSubject = 'Valid subject';
@@ -183,7 +214,7 @@ describe('Create Feedback Thread Modal Controller', function () {
   it('should activate message validation flag when message invalid', function () {
     const mockForm = buildMockForm(false);
     component.newThreadSubject = 'Subject 123';
-    component.newThreadText = '123456789';
+    component.newThreadText = '1234';
 
     component.create(mockForm);
 

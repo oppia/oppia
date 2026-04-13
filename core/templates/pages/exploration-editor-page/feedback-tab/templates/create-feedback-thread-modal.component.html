@@ -19,7 +19,6 @@
              name="threadSubject"
              required
              [minlength]="SUBJECT_MIN_CHARS"
-             [pattern]="THREAD_INPUT_PATTERN"
              #subjectInput="ngModel"
              [(ngModel)]="newThreadSubject"
              (ngModelChange)="onSubjectInputChange()">
@@ -27,9 +26,6 @@
             *ngIf="subjectValidationActive && subjectInput.invalid">
         <span *ngIf="subjectInput.errors?.required">
           {{ 'I18N_FEEDBACK_CREATE_THREAD_SUBJECT_REQUIRED' | translate }}
-        </span>
-        <span *ngIf="subjectInput.errors?.pattern">
-          {{ 'I18N_FEEDBACK_CREATE_THREAD_SUBJECT_PATTERN' | translate }}
         </span>
         <span *ngIf="subjectInput.errors?.minlength">
           {{
@@ -57,7 +53,6 @@
                 required
                 rows="6"
                 [minlength]="MESSAGE_MIN_CHARS"
-                [pattern]="THREAD_INPUT_PATTERN"
                 #messageInput="ngModel"
                 [(ngModel)]="newThreadText"
                 (ngModelChange)="onMessageInputChange()">
@@ -66,9 +61,6 @@
             *ngIf="messageValidationActive && messageInput.invalid">
         <span *ngIf="messageInput.errors?.required">
           {{ 'I18N_FEEDBACK_CREATE_THREAD_MESSAGE_REQUIRED' | translate }}
-        </span>
-        <span *ngIf="messageInput.errors?.pattern">
-          {{ 'I18N_FEEDBACK_CREATE_THREAD_MESSAGE_PATTERN' | translate }}
         </span>
         <span *ngIf="messageInput.errors?.minlength">
           {{
