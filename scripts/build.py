@@ -751,7 +751,9 @@ def inject_angular_css_hashes() -> None:
             % hashed_vendor_styles_filename
         )
     elif deterministic_vendor_styles_exists:
-        print('Found deterministic Angular vendor styles file: vendor-styles.css')
+        print(
+            'Found deterministic Angular vendor styles file: vendor-styles.css'
+        )
 
     # Deterministic CSS names already match template references.
     if hashed_styles_filename is None and hashed_vendor_styles_filename is None:
