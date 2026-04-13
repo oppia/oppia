@@ -324,7 +324,10 @@ const getStoryEditorUrl = async function (browser, page) {
     await page.waitForTimeout(5000);
     await page.click(confirmStoryCreationButton);
     await page.waitForNavigation({waitUntil: networkIdle});
-    await page.waitForSelector('.e2e-test-save-story-button', {visible: true});
+    await page.waitForSelector('.story-editor-parent', {
+      visible: true,
+      timeout: 15000,
+    });
     storyEditorUrl = await page.url();
     storyId = storyEditorUrl.split('/')[4];
   } catch (e) {
@@ -479,6 +482,16 @@ const addThumbnailToTopic = async function (page, topicName) {
       hidden: true,
       timeout: 15000,
     });
+    await page.waitForFunction(
+      topicId =>
+        fetch(
+          `/assetsdevhandler/topic/${topicId}/assets/thumbnail/thumbnail.svg`
+        )
+          .then(r => r.ok)
+          .catch(() => false),
+      {polling: 1000, timeout: 15000},
+      topicId
+    );
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
