@@ -23,11 +23,12 @@
              [(ngModel)]="newThreadSubject"
              (ngModelChange)="onSubjectInputChange()">
       <span class="text-danger"
-            *ngIf="subjectValidationActive && subjectInput.invalid">
-        <span *ngIf="subjectInput.errors?.required">
+            *ngIf="subjectValidationActive &&
+                   (isSubjectTrimmedEmpty() || isSubjectTrimmedTooShort())">
+        <span *ngIf="isSubjectTrimmedEmpty()">
           {{ 'I18N_FEEDBACK_CREATE_THREAD_SUBJECT_REQUIRED' | translate }}
         </span>
-        <span *ngIf="subjectInput.errors?.minlength">
+        <span *ngIf="isSubjectTrimmedTooShort()">
           {{
             'I18N_FEEDBACK_CREATE_THREAD_SUBJECT_MIN_LENGTH'
               | translate:{ min: SUBJECT_MIN_CHARS }
@@ -58,11 +59,12 @@
                 (ngModelChange)="onMessageInputChange()">
       </textarea>
       <span class="text-danger"
-            *ngIf="messageValidationActive && messageInput.invalid">
-        <span *ngIf="messageInput.errors?.required">
+            *ngIf="messageValidationActive &&
+                   (isMessageTrimmedEmpty() || isMessageTrimmedTooShort())">
+        <span *ngIf="isMessageTrimmedEmpty()">
           {{ 'I18N_FEEDBACK_CREATE_THREAD_MESSAGE_REQUIRED' | translate }}
         </span>
-        <span *ngIf="messageInput.errors?.minlength">
+        <span *ngIf="isMessageTrimmedTooShort()">
           {{
             'I18N_FEEDBACK_CREATE_THREAD_MESSAGE_MIN_LENGTH'
               | translate:{ min: MESSAGE_MIN_CHARS }

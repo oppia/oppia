@@ -89,6 +89,24 @@ export class CreateFeedbackThreadModalComponent
     }
   }
 
+  isSubjectTrimmedEmpty(): boolean {
+    return !(this.newThreadSubject || '').trim();
+  }
+
+  isMessageTrimmedEmpty(): boolean {
+    return !(this.newThreadText || '').trim();
+  }
+
+  isSubjectTrimmedTooShort(): boolean {
+    const subject = (this.newThreadSubject || '').trim();
+    return !!subject && subject.length < this.SUBJECT_MIN_CHARS;
+  }
+
+  isMessageTrimmedTooShort(): boolean {
+    const message = (this.newThreadText || '').trim();
+    return !!message && message.length < this.MESSAGE_MIN_CHARS;
+  }
+
   private isSubjectValueValid(): boolean {
     const subject = (this.newThreadSubject || '').trim();
     if (!subject) {
