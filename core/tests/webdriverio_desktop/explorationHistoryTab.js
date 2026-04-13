@@ -326,7 +326,7 @@ describe('Exploration history', function () {
         highlighted: true,
       },
       29: {
-        text: '      value: false',
+        text: '      value: true',
         highlighted: true,
       },
       30: {
