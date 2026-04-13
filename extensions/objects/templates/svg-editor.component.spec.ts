@@ -985,7 +985,6 @@ describe('SvgEditor', () => {
       'setSelectionStyles'
     ).and.callThrough();
 
-    // @ts-ignore Property 'loadTextObject' is private.
     component.loadTextObject(
       textElement,
       baseObject as unknown as fabric.Object
@@ -1080,15 +1079,18 @@ describe('SvgEditor', () => {
         }
       },
     };
-    (window.FileReader as jasmine.Spy).and.returnValue(
+    (window.FileReader as unknown as jasmine.Spy).and.returnValue(
       reader as unknown as FileReader
     );
-    (window.Image as jasmine.Spy).and.returnValue({
-      onload: null as (() => void) | null,
+    const mockUploadedSvgImage: {onload: (() => void) | null; src: string} = {
+      onload: null,
       set src(_url: string) {
-        this.onload?.();
+        mockUploadedSvgImage.onload?.();
       },
-    } as unknown as HTMLImageElement);
+    };
+    (window.Image as unknown as jasmine.Spy).and.returnValue(
+      mockUploadedSvgImage as unknown as HTMLImageElement
+    );
 
     component.setUploadedFile(
       new File(['svg'], 'image.svg', {type: 'image/svg'})
@@ -1110,15 +1112,18 @@ describe('SvgEditor', () => {
         }
       },
     };
-    (window.FileReader as jasmine.Spy).and.returnValue(
+    (window.FileReader as unknown as jasmine.Spy).and.returnValue(
       reader as unknown as FileReader
     );
-    (window.Image as jasmine.Spy).and.returnValue({
-      onload: null as (() => void) | null,
+    const mockUploadedSvgImage: {onload: (() => void) | null; src: string} = {
+      onload: null,
       set src(_url: string) {
-        this.onload?.();
+        mockUploadedSvgImage.onload?.();
       },
-    } as unknown as HTMLImageElement);
+    };
+    (window.Image as unknown as jasmine.Spy).and.returnValue(
+      mockUploadedSvgImage as unknown as HTMLImageElement
+    );
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
       null as unknown as string
     );

@@ -70,6 +70,14 @@ describe('ImageEditor', () => {
       ? uploadedImageData
       : String(uploadedImageData ?? '');
   };
+  interface GifshotCreateGifOptions {
+    images?: string[] | string;
+  }
+  interface GifshotCreateGifResult {
+    image?: string | string[];
+    error?: boolean;
+  }
+  type GifshotCreateGifCallback = (result: GifshotCreateGifResult) => void;
 
   let dataGif = {
     uploadedFile: createMockFile('2442125.gif', 'image/gif'),
@@ -1800,14 +1808,16 @@ describe('ImageEditor', () => {
     });
     component.onFileChanged(file);
 
-    expect(component.invalidImageWarningIsShown).toBeTrue();
+    expect(component.invalidImageWarningIsShown).toBeTruthy();
     expect(component.data.mode).toBe(component.MODE_EMPTY);
   });
 
   it("should crop svg when user clicks the 'crop' button", () => {
-    spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
-      func({image: obj.images});
-    });
+    spyOn(gifshot, 'createGIF').and.callFake(
+      (obj: GifshotCreateGifOptions, func: GifshotCreateGifCallback) => {
+        func({image: obj.images});
+      }
+    );
     spyOn(component, 'updateDimensions').and.callThrough();
     component.cropArea = {
       x1: 0,
@@ -1832,9 +1842,11 @@ describe('ImageEditor', () => {
   });
 
   it("should crop png when user clicks the 'crop' button", () => {
-    spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
-      func({image: obj.images});
-    });
+    spyOn(gifshot, 'createGIF').and.callFake(
+      (obj: GifshotCreateGifOptions, func: GifshotCreateGifCallback) => {
+        func({image: obj.images});
+      }
+    );
     spyOn(component, 'updateDimensions').and.callThrough();
     component.cropArea = {
       x1: 0,
@@ -1892,9 +1904,11 @@ describe('ImageEditor', () => {
   });
 
   it("should crop gif when user clicks the 'crop' button", done => {
-    spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
-      func({image: dataGif.uploadedImageData});
-    });
+    spyOn(gifshot, 'createGIF').and.callFake(
+      (_obj: GifshotCreateGifOptions, func: GifshotCreateGifCallback) => {
+        func({image: dataGif.uploadedImageData});
+      }
+    );
     component.cropArea = {
       x1: 0,
       y1: 0,
@@ -2058,9 +2072,11 @@ describe('ImageEditor', () => {
     'should decrease iamge size when user decreases the image size' +
       " percentage by clicking the '-' button",
     done => {
-      spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
-        func(obj);
-      });
+      spyOn(gifshot, 'createGIF').and.callFake(
+        (obj: GifshotCreateGifResult, func: GifshotCreateGifCallback) => {
+          func(obj);
+        }
+      );
       spyOn(component, 'validateProcessedFilesize').and.stub();
       // This throws an error "Type '{ lastModified: number; name:
       // string; size: number; type: string; }' is missing the following
@@ -2296,12 +2312,14 @@ describe('ImageEditor', () => {
           },
         },
       });
-      spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
-        func({
-          image: dataGif.uploadedImageData,
-          error: false,
-        });
-      });
+      spyOn(gifshot, 'createGIF').and.callFake(
+        (_obj: GifshotCreateGifOptions, func: GifshotCreateGifCallback) => {
+          func({
+            image: dataGif.uploadedImageData,
+            error: false,
+          });
+        }
+      );
       spyOn(gifFrames, 'getFrames').and.resolveTo([
         {
           getImage: () => {
@@ -2365,12 +2383,14 @@ describe('ImageEditor', () => {
         },
       },
     });
-    spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
-      func({
-        image: btoa('data:image/gif;base64,' + Array(102410).join('a')),
-        error: false,
-      });
-    });
+    spyOn(gifshot, 'createGIF').and.callFake(
+      (_obj: GifshotCreateGifOptions, func: GifshotCreateGifCallback) => {
+        func({
+          image: btoa('data:image/gif;base64,' + Array(102410).join('a')),
+          error: false,
+        });
+      }
+    );
     spyOn(component, 'saveImage');
     spyOn(component, 'validateProcessedFilesize').and.callThrough();
     // This throws an error "Type '{ lastModified: number; name:
@@ -2408,12 +2428,14 @@ describe('ImageEditor', () => {
           },
         },
       });
-      spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
-        func({
-          image: dataGif.uploadedImageData,
-          error: false,
-        });
-      });
+      spyOn(gifshot, 'createGIF').and.callFake(
+        (_obj: GifshotCreateGifOptions, func: GifshotCreateGifCallback) => {
+          func({
+            image: dataGif.uploadedImageData,
+            error: false,
+          });
+        }
+      );
       spyOn(gifFrames, 'getFrames').and.resolveTo([
         {
           getImage: () => {
@@ -2584,7 +2606,7 @@ describe('ImageEditor', () => {
     component.saveUploadedFile();
 
     expect(component.saveImage).not.toHaveBeenCalled();
-    expect(component.processedImageIsTooLarge).toBeTrue();
+    expect(component.processedImageIsTooLarge).toBeTruthy();
     expect(component.data.mode).toBe(component.MODE_UPLOADED);
   });
 
@@ -2642,7 +2664,7 @@ describe('ImageEditor', () => {
       component.saveUploadedFile();
 
       expect(component.saveImage).not.toHaveBeenCalled();
-      expect(component.processedImageIsTooLarge).toBeTrue();
+      expect(component.processedImageIsTooLarge).toBeTruthy();
       expect(component.data.mode).toBe(component.MODE_UPLOADED);
     }
   );
@@ -2694,7 +2716,7 @@ describe('ImageEditor', () => {
       component.saveUploadedFile();
 
       expect(component.saveImage).toHaveBeenCalled();
-      expect(component.processedImageIsTooLarge).toBeFalse();
+      expect(component.processedImageIsTooLarge).toBeFalsy();
       expect(component.data.mode).toBe(component.MODE_SAVED);
     }
   );
@@ -2840,29 +2862,35 @@ describe('ImageEditor', () => {
   });
 
   it('should throw when canvas context or uploaded image metadata is missing', () => {
+    const imageEditorWithPrivateMethods = component as unknown as {
+      getCanvasContext: (canvas: HTMLCanvasElement) => CanvasRenderingContext2D;
+      getUploadedImageDataOrThrow: () => string;
+      getOriginalImageDimensions: () => {width: number; height: number};
+      imgData: string | null;
+    };
     expect(() => {
-      // @ts-ignore
-      component.getCanvasContext({
+      imageEditorWithPrivateMethods.getCanvasContext({
         getContext: () => null,
-      } as HTMLCanvasElement);
+      } as unknown as HTMLCanvasElement);
     }).toThrowError('Canvas context unavailable.');
 
-    component['imgData'] = null;
+    imageEditorWithPrivateMethods.imgData = null;
     component.data.metadata.uploadedImageData = undefined;
     expect(() => {
-      // @ts-ignore
-      component.getUploadedImageDataOrThrow();
+      imageEditorWithPrivateMethods.getUploadedImageDataOrThrow();
     }).toThrowError('Uploaded image data is missing.');
 
     component.data.metadata.originalWidth = undefined;
     component.data.metadata.originalHeight = undefined;
     expect(() => {
-      // @ts-ignore
-      component.getOriginalImageDimensions();
+      imageEditorWithPrivateMethods.getOriginalImageDimensions();
     }).toThrowError('Original image dimensions are missing.');
   });
 
   it('should throw when local storage image URL resolution fails', () => {
+    const imageEditorWithPrivateMethods = component as unknown as {
+      getTrustedResourceUrlForImageFileName: (filename: string) => string;
+    };
     spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
     );
@@ -2872,8 +2900,9 @@ describe('ImageEditor', () => {
     );
 
     expect(() => {
-      // @ts-ignore
-      component.getTrustedResourceUrlForImageFileName('image.png');
+      imageEditorWithPrivateMethods.getTrustedResourceUrlForImageFileName(
+        'image.png'
+      );
     }).toThrowError('Image data not found in local storage.');
 
     (imageLocalStorageService.getRawImageData as jasmine.Spy).and.returnValue(
@@ -2884,13 +2913,17 @@ describe('ImageEditor', () => {
     );
 
     expect(() => {
-      // @ts-ignore
-      component.getTrustedResourceUrlForImageFileName('image.svg');
+      imageEditorWithPrivateMethods.getTrustedResourceUrlForImageFileName(
+        'image.svg'
+      );
     }).toThrowError('Trusted SVG URL could not be generated.');
   });
 
   it('should return crop area styles when uploaded image data is unavailable', () => {
-    component['imgData'] = null;
+    const imageEditorWithPrivateMethods = component as unknown as {
+      imgData: string | null;
+    };
+    imageEditorWithPrivateMethods.imgData = null;
     component.data.metadata.uploadedImageData = undefined;
     component.cropArea = {
       x1: 10,
@@ -2995,13 +3028,13 @@ describe('ImageEditor', () => {
         }
       },
     };
-    (window.FileReader as jasmine.Spy).and.returnValue(
+    (window.FileReader as unknown as jasmine.Spy).and.returnValue(
       invalidReader as unknown as FileReader
     );
 
     component.setUploadedFile(createMockFile('image.png', 'image/png'));
 
-    expect(component.invalidImageWarningIsShown).toBeTrue();
+    expect(component.invalidImageWarningIsShown).toBeTruthy();
   });
 
   it('should show invalid warning when trusted svg URL cannot be generated', () => {
@@ -3015,7 +3048,7 @@ describe('ImageEditor', () => {
         }
       },
     };
-    (window.FileReader as jasmine.Spy).and.returnValue(
+    (window.FileReader as unknown as jasmine.Spy).and.returnValue(
       reader as unknown as FileReader
     );
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
@@ -3024,7 +3057,7 @@ describe('ImageEditor', () => {
 
     component.setUploadedFile(createMockFile('image.svg', 'image/svg+xml'));
 
-    expect(component.invalidImageWarningIsShown).toBeTrue();
+    expect(component.invalidImageWarningIsShown).toBeTruthy();
   });
 
   it('should stop upload when svg resampling returns null', () => {
@@ -3043,7 +3076,7 @@ describe('ImageEditor', () => {
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'Could not get resampled file.'
     );
-    expect(component.imageIsUploading).toBeFalse();
+    expect(component.imageIsUploading).toBeFalsy();
   });
 
   it('should show default warning if image upload endpoint resolves with no data', fakeAsync(() => {
