@@ -51,17 +51,23 @@ describe('Lesson Creator', function () {
       'learner2@example.com'
     );
 
-    await lessonCreator.navigateToCreatorDashboardPage();
+    await lessonCreator.navigateToCreatorDashboardPageInExplorationEditor();
     await lessonCreator.navigateToExplorationEditorFromCreatorDashboard();
-    await lessonCreator.dismissWelcomeModal();
+    await lessonCreator.dismissWelcomeModalInExplorationEditor();
 
-    await lessonCreator.updateCardContent('What is 1 + 2?');
+    await lessonCreator.updateCardContentInExplorationEditor('What is 1 + 2?');
 
-    await lessonCreator.addInteraction(INTERACTION_TYPES.NUMBER_INPUT, false);
+    await lessonCreator.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.NUMBER_INPUT,
+      false
+    );
 
     await lessonCreator.customizeNumberInputInteraction(true);
 
-    await lessonCreator.fillValueInInteractionResponseModal('3', 'input');
+    await lessonCreator.fillValueInInteractionResponseModalInExplorationEditor(
+      '3',
+      'input'
+    );
 
     await lessonCreator.addResponseDetailsInResponseModal(
       'Correct',
@@ -75,13 +81,21 @@ describe('Lesson Creator', function () {
     );
 
     await lessonCreator.navigateToCard('Second');
-    await lessonCreator.updateCardContent('What is 11 + 99?');
+    await lessonCreator.updateCardContentInExplorationEditor(
+      'What is 11 + 99?'
+    );
 
-    await lessonCreator.addInteraction(INTERACTION_TYPES.NUMBER_INPUT, false);
+    await lessonCreator.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.NUMBER_INPUT,
+      false
+    );
 
     await lessonCreator.customizeNumberInputInteraction(true);
 
-    await lessonCreator.fillValueInInteractionResponseModal('110', 'input');
+    await lessonCreator.fillValueInInteractionResponseModalInExplorationEditor(
+      '110',
+      'input'
+    );
 
     await lessonCreator.addResponseDetailsInResponseModal(
       'Correct',
@@ -95,25 +109,28 @@ describe('Lesson Creator', function () {
     );
 
     await lessonCreator.navigateToCard('Final');
-    await lessonCreator.updateCardContent('Great!');
-    await lessonCreator.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-
-    await lessonCreator.saveExplorationDraft();
-    explorationId = await lessonCreator.publishExplorationWithMetadata(
-      EXPLORATION_TITLE,
-      'Testing feedback and stats',
-      'Math'
+    await lessonCreator.updateCardContentInExplorationEditor('Great!');
+    await lessonCreator.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
     );
+
+    await lessonCreator.saveExplorationDraftInExplorationEditor();
+    explorationId =
+      await lessonCreator.publishExplorationWithMetadataInExplorationEditor(
+        EXPLORATION_TITLE,
+        'Testing feedback and stats',
+        'Math'
+      );
 
     await learner1.navigateToCommunityLibraryPage();
     await learner1.searchForLessonInSearchBar(EXPLORATION_TITLE);
     await learner1.playLessonFromSearchResults(EXPLORATION_TITLE);
 
-    await learner1.submitAnswer('3');
-    await learner1.continueToNextCard();
+    await learner1.submitAnswerInLoggedOutUser('3');
+    await learner1.continueToNextCardInLoggedOutUser();
 
-    await learner1.submitAnswer('110');
-    await learner1.continueToNextCard();
+    await learner1.submitAnswerInLoggedOutUser('110');
+    await learner1.continueToNextCardInLoggedOutUser();
 
     await learner1.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
@@ -153,7 +170,9 @@ describe('Lesson Creator', function () {
   it(
     'should view exploration statistics and take action based on thems',
     async function () {
-      await lessonCreator.navigateToExplorationEditor(explorationId);
+      await lessonCreator.navigateToExplorationEditorInExplorationEditor(
+        explorationId
+      );
       await lessonCreator.navigateToStatsTab();
       await lessonCreator.expectNumberOfPassersToBe(1);
     },

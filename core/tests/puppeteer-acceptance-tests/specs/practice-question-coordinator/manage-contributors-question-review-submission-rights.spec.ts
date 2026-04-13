@@ -82,12 +82,12 @@ describe('Practice Question Coordinator', function () {
       'Arithmetic Operations'
     );
 
-    await questionSubmitter.navigateToCreatorDashboardPage();
+    await questionSubmitter.navigateToCreatorDashboardPageInExplorationEditor();
   }, 900000);
 
   it('should be able to add question review rights for a user', async function () {
     // Navigate to the contributor dashboard admin page.
-    await questionCoordinator.navigateToContributorDashboardAdminPage();
+    await questionCoordinator.navigateToContributorDashboardAdminPageInContributorAdmin();
 
     await questionCoordinator.switchToTabInContributorAdminPage(
       'Question Reviewers'

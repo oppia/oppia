@@ -105,7 +105,7 @@ describe('Translation Coordinator', function () {
     );
 
     // Navigate to contributor dashboard and submit one translation.
-    await translationSubmitter.navigateToLearnerDashboard();
+    await translationSubmitter.navigateToLearnerDashboardInLoggedInUser();
     await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
@@ -153,7 +153,7 @@ describe('Translation Coordinator', function () {
 
   it('should be able to add language translation rights for a user', async function () {
     // Navigate to the contributor dashboard admin page.
-    await translationCoordinator.navigateToContributorDashboardAdminPage();
+    await translationCoordinator.navigateToContributorDashboardAdminPageInContributorAdmin();
     await translationCoordinator.switchToTabInContributorAdminPage(
       'Translation Reviewers'
     );
