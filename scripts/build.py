@@ -280,7 +280,7 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
         error_message: str,
     ) -> str:
         updated_content, num_replacements = re.subn(
-            pattern, replacement, source_content
+            pattern, replacement, source_content, flags=re.MULTILINE
         )
         if num_replacements != 1:
             raise Exception(error_message)
@@ -306,20 +306,18 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
     # to the prod build output (dist/oppia-angular-prod/).
     content = replace_content_or_fail(
         content,
-        r'  static_dir: dist/oppia-angular/third_party/ckeditor[ \t]*\r?\n',
-        '  static_dir: dist/oppia-angular-prod/third_party/ckeditor\n',
+        r'^[ \t]*static_dir:[ \t]*dist/oppia-angular(?:/browser)?/third_party/ckeditor[ \t]*\r?$',
+        '  static_dir: dist/oppia-angular-prod/third_party/ckeditor',
         'CKEditor static_dir entry was not found in app.yaml content.',
     )
     content = replace_content_or_fail(
         content,
         (
-            r'  static_dir: '
-            r'dist/oppia-angular/third_party/ckeditor-bootstrapck[ \t]*\r?\n'
+            r'^[ \t]*static_dir:[ \t]*'
+            r'dist/oppia-angular(?:/browser)?/third_party/ckeditor-bootstrapck'
+            r'[ \t]*\r?$'
         ),
-        (
-            '  static_dir: '
-            'dist/oppia-angular-prod/third_party/ckeditor-bootstrapck\n'
-        ),
+        '  static_dir: dist/oppia-angular-prod/third_party/ckeditor-bootstrapck',
         'CKEditor bootstrapck static_dir entry was not found in app.yaml content.',
     )
     # In app_dev.yaml, MathJax is served from the Angular dev build output
