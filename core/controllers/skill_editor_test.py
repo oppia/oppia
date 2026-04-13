@@ -299,6 +299,46 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         )
         self.logout()
 
+    def test_skill_which_is_assigned_to_second_subtopic(self) -> None:
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.admin_id, description='DescriptionSkill'
+        )
+
+        first_subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'First Subtopic', 'first-subtopic'
+        )
+        first_subtopic.skill_ids = [self.skill_id]
+
+        second_subtopic = topic_domain.Subtopic.create_default_subtopic(
+            2, 'Second Subtopic', 'second-subtopic'
+        )
+        second_subtopic.skill_ids = [skill_id]
+
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id,
+            self.admin_id,
+            name='Mixed Topic',
+            abbreviated_name='mixed-topic',
+            url_fragment='mixed-topic',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[first_subtopic, second_subtopic],
+            next_subtopic_id=3,
+        )
+
+        url = '%s/%s' % (feconf.SKILL_EDITOR_DATA_URL_PREFIX, skill_id)
+        json_response = self.get_json(url)
+
+        self.assertEqual(skill_id, json_response['skill_dict']['id'])
+        self.assertEqual(
+            json_response['assigned_skill_topic_data_dict']['Mixed Topic'],
+            'Second Subtopic',
+        )
+
     def test_editable_skill_handler_get_fails(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         # Check GET returns 404 when cannot get skill by id.
@@ -316,6 +356,27 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.assertEqual(self.skill_id, json_response['skill_dict']['id'])
         self.assertEqual(
             'New Description', json_response['skill_dict']['description']
+        )
+        self.logout()
+
+    def test_editable_skill_handler_put_fails_with_empty_commit_message(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        put_payload_copy = self.put_payload.copy()
+        put_payload_copy['commit_message'] = ''
+
+        json_response = self.put_json(
+            self.url,
+            put_payload_copy,
+            csrf_token=csrf_token,
+            expected_status_int=500,
+        )
+
+        self.assertEqual(
+            json_response['error'], 'Expected a commit message, received none.'
         )
         self.logout()
 
