@@ -7406,10 +7406,10 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        requireNonnegativeInput:
-          value: False
         allowExponentialNotation:
           value: True
+        requireNonnegativeInput:
+          value: False
       default_outcome:
         dest: (untitled state)
         dest_if_really_stuck: null
@@ -7555,10 +7555,10 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        requireNonnegativeInput:
-          value: False
         allowExponentialNotation:
           value: True
+        requireNonnegativeInput:
+          value: False
       default_outcome:
         dest: (untitled state)
         dest_if_really_stuck: null
@@ -7705,10 +7705,10 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        requireNonnegativeInput:
-          value: False
         allowExponentialNotation:
           value: True
+        requireNonnegativeInput:
+          value: False
       default_outcome:
         dest: (untitled state)
         dest_if_really_stuck: null
@@ -8614,10 +8614,10 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        requireNonnegativeInput:
-          value: false
         allowExponentialNotation:
           value: true
+        requireNonnegativeInput:
+          value: false
       default_outcome:
         dest: end
         dest_if_really_stuck: null
@@ -9724,10 +9724,10 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        requireNonnegativeInput:
-          value: false
         allowExponentialNotation:
           value: true
+        requireNonnegativeInput:
+          value: false
       default_outcome:
         dest: end
         dest_if_really_stuck: null

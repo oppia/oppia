@@ -174,6 +174,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         '"edits_allowed": true, "l'
         'anguage_code": "en", "objective": "", "init_state_name": "Introduction'
         '", "blurb": "", "author_notes": ""}'
+    ).replace(
+        '"states_schema_version": 57',
+        '"states_schema_version": %s' % feconf.CURRENT_STATE_SCHEMA_VERSION,
     )
 
     def test_retrieved_memory_profile_contains_correct_elements(self) -> None:

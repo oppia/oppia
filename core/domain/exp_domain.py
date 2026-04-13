@@ -3110,11 +3110,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     state_dict['interaction']['customization_args'],
                     state_schema_version=45,
                 )
-                for ca_name in customisation_args:
+                for _, customization_arg in customisation_args.items():
                     list_of_subtitled_unicode_content_ids.extend(
                         state_domain.InteractionCustomizationArg.traverse_by_schema_and_get(
-                            customisation_args[ca_name].schema,
-                            customisation_args[ca_name].value,
+                            customization_arg.schema,
+                            customization_arg.value,
                             [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
                             lambda subtitled_unicode: subtitled_unicode.content_id,
                         )
@@ -3373,10 +3373,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 interaction['customization_args'],
                 state_schema_version=state_schema,
             )
-            for ca_name in customisation_args:
-                content_id_list.extend(
-                    customisation_args[ca_name].get_content_ids()
-                )
+            for _, customization_arg in customisation_args.items():
+                content_id_list.extend(customization_arg.get_content_ids())
 
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
