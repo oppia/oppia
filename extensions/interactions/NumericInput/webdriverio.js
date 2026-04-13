@@ -19,6 +19,9 @@
 
 var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');
+var waitFor = require(
+  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js'
+);
 
 var customizeInteraction = async function (elem, requireNonnegativeInput) {
   await objects

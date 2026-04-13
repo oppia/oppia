@@ -440,7 +440,7 @@ const addThumbnailToTopic = async function (page, topicName) {
     await page.waitForXPath(topicLinkXPath);
     const [topicLinkElement] = await page.$x(topicLinkXPath);
     await topicLinkElement.click();
-    await page.waitForTimeout(5000);
+    await page.waitForNavigation({waitUntil: networkIdle});
 
     await page.waitForSelector(topicThumbnailButton);
     await page.click(topicThumbnailButton);
@@ -455,9 +455,8 @@ const addThumbnailToTopic = async function (page, topicName) {
 
     await page.waitForSelector(thumbnailContainer, {visible: true});
     await page.click(topicPhotoSubmit);
-    await page.waitForTimeout(3000);
+    await page.waitForSelector(topicMetaTagInput, {visible: true});
 
-    await page.waitForSelector(topicMetaTagInput);
     await page.focus(topicMetaTagInput);
     await page.type(topicMetaTagInput, 'meta');
     await page.keyboard.press('Tab');
@@ -470,21 +469,16 @@ const addThumbnailToTopic = async function (page, topicName) {
 
     await page.waitForSelector(publishChangesButton);
     await page.click(publishChangesButton);
-    const successMessage = 'Changes saved.';
-    let statusMessage;
-    let attempts = 0;
-    const maxAttempts = 30;
-    do {
-      await new Promise(r => setTimeout(r, 1000));
-      statusMessage = await page.evaluate(() => {
-        const el = document.querySelector('.oppia-status-message-container');
-        return el ? el.textContent.trim() : '';
-      });
-      attempts++;
-      if (attempts >= maxAttempts) {
-        throw new Error('Timed out waiting for topic save confirmation.');
-      }
-    } while (statusMessage !== successMessage);
+    // Wait for the ngx-toastr success toast to appear and then disappear,
+    // confirming the topic save completed successfully.
+    await page.waitForSelector('.toast-success', {
+      visible: true,
+      timeout: 15000,
+    });
+    await page.waitForSelector('.toast-success', {
+      hidden: true,
+      timeout: 15000,
+    });
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
