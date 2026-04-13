@@ -44,7 +44,8 @@
       "path": ["./node_modules/path-browserify"],
       "utility/*": ["core/templates/utility/*"],
       "visualizations/*": ["extensions/visualizations/*"],
-      "value_generators/*": ["extensions/value_generators/*"]
+      "value_generators/*": ["extensions/value_generators/*"],
+      "third-party-imports/*": ["core/templates/third-party-imports/*"]
     }
   },
   "files": [
