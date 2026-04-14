@@ -21,6 +21,8 @@ from __future__ import annotations
 import os
 from unittest import mock
 
+import redis
+
 from core import feconf
 from core.platform.cache import redis_cache_services
 from core.tests import test_utils
@@ -41,7 +43,9 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
         self, mock_get_client: mock.MagicMock
     ) -> None:
         mock_client = mock.MagicMock()
-        mock_client.memory_stats.side_effect = Exception('Mock exception')
+        mock_client.memory_stats.side_effect = redis.exceptions.ResponseError(
+            'Mock exception'
+        )
         mock_client.info.return_value = {
             'used_memory': 1024,
             'used_memory_peak': 2048,
@@ -53,6 +57,20 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
         self.assertEqual(memory_stats.total_allocated_in_bytes, 1024)
         self.assertEqual(memory_stats.peak_memory_usage_in_bytes, 2048)
         self.assertEqual(memory_stats.total_number_of_keys_stored, 5)
+
+    @mock.patch.object(redis_cache_services, 'get_oppia_redis_client')
+    def test_memory_stats_raises_on_missing_expected_keys(
+        self, mock_get_client: mock.MagicMock
+    ) -> None:
+        mock_client = mock.MagicMock()
+        mock_client.memory_stats.return_value = {
+            'total.allocated': 1024,
+            'peak.allocated': 2048,
+        }
+        mock_get_client.return_value = mock_client
+
+        with self.assertRaisesRegex(KeyError, 'keys.count'):
+            redis_cache_services.get_memory_cache_stats()
 
     def test_flush_cache_wipes_cache_clean(self) -> None:
         redis_cache_services.flush_caches()

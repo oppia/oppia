@@ -119,28 +119,22 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
     client = get_oppia_redis_client()
     try:
         redis_full_profile = client.memory_stats()
-    except Exception:
-        # Fallback for Redis versions that don't support memory stats command.
-        redis_full_profile = {}
-
-    # Redis 7.2.2 might use different keys or missing some keys.
-    # Standard info memory can also be used as fallback.
-    # Here we use MyPy ignore because the redis-py stubs in this environment
-    # do not correctly recognize the 'info' method on the Redis client.
-    info = client.info(section='memory')  # type: ignore[attr-defined]
-
-    total_allocated = redis_full_profile.get(
-        'total.allocated', info.get('used_memory', 0)
-    )
-    peak_allocated = redis_full_profile.get(
-        'peak.allocated', info.get('used_memory_peak', 0)
-    )
-    # Keys.count is still usually available in memory_stats.
-    # Here we use MyPy ignore because the redis-py stubs in this environment
-    # do not correctly recognize the 'dbsize' method on the Redis client.
-    keys_count = redis_full_profile.get(
-        'keys.count', client.dbsize()  # type: ignore[attr-defined]
-    )
+        # Fail loudly if expected keys are missing in a supported Redis version.
+        total_allocated = redis_full_profile['total.allocated']
+        peak_allocated = redis_full_profile['peak.allocated']
+        keys_count = redis_full_profile['keys.count']
+    except redis.exceptions.ResponseError:
+        # Fallback for Redis versions that do not support memory stats command.
+        # Here we use MyPy ignore because the redis-py stubs in this
+        # environment do not correctly recognize the 'info' method on the
+        # Redis client.
+        info = client.info(section='memory')  # type: ignore[attr-defined]
+        total_allocated = info['used_memory']
+        peak_allocated = info['used_memory_peak']
+        # Here we use MyPy ignore because the redis-py stubs in this
+        # environment do not correctly recognize the 'dbsize' method on the
+        # Redis client.
+        keys_count = client.dbsize()  # type: ignore[attr-defined]
 
     return caching_domain.MemoryCacheStats(
         total_allocated, peak_allocated, keys_count

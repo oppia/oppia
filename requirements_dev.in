@@ -11,9 +11,6 @@ filetype==1.2.0
 isort==5.13.2
 mypy==1.0.1
 Pillow==10.1.0
-# The packaging library is a required sub-dependency of black and pytest.
-# It is pinned here to ensure consistent versions across all environments.
-packaging==25.0
 psutil==7.0.0
 pycodestyle==2.14.0
 pylint==2.17.7
