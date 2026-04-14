@@ -2451,7 +2451,7 @@ export class CurriculumAdmin extends TopicManager {
     for (const option of options) {
       const text = await option.evaluate(el => el.textContent?.trim());
       if (text === topicName) {
-        await this.clickOnElement(option);
+        await option.evaluate(el => (el as HTMLElement).click());
         foundOption = true;
         break;
       }

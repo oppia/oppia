@@ -129,13 +129,13 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
         # Here we use MyPy ignore because the redis-py stubs in this
         # environment do not correctly recognize the 'info' method on the
         # Redis client.
-        info = client.info(section='memory')  # type: ignore[attr-defined]
+        info = client.info(section='memory')  # type: ignore
         total_allocated = info['used_memory']
         peak_allocated = info['used_memory_peak']
         # Here we use MyPy ignore because the redis-py stubs in this
         # environment do not correctly recognize the 'dbsize' method on the
         # Redis client.
-        keys_count = client.dbsize()  # type: ignore[attr-defined]
+        keys_count = client.dbsize()  # type: ignore
 
     return caching_domain.MemoryCacheStats(
         total_allocated, peak_allocated, keys_count
