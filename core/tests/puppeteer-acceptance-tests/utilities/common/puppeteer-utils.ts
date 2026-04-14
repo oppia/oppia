@@ -44,7 +44,8 @@ const warningToastMessageSelector = '.e2e-test-toast-warning-message';
 const warningToastCloseButtonSelector = '.e2e-test-close-toast-warning';
 const oskContainerSelector = '.e2e-test-osk-container';
 const hideOSKButtonSelector = '.e2e-test-osk-hide-button';
-
+const plannedPublicationDateInput = '.e2e-test-planned-publication-date-input';
+const chapterTitleSelector = '.e2e-test-chapter-title';
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
 
@@ -131,6 +132,7 @@ export class BaseUser {
           TestToModulesMatcher.registerPuppeteerBrowser(browser);
         }
         this.page = await browser.newPage();
+        this.attachNavigationLogs(this.page);
         this.pages.push(this.page);
 
         if (mobile) {
@@ -260,15 +262,27 @@ export class BaseUser {
 
     // Prepare an array of promises for screenshots.
     const screenshotPromises = BaseUser.instances.map(async (instance, i) => {
-      if (instance.page) {
-        await instance.page.screenshot({
-          path: path.join(
-            outputDir,
-            outputFileName + randomString + `-instance-${i}.png`
-          ),
-        });
+      if (!instance.page) {
+        return;
+      }
+      if (instance.page.isClosed()) {
         showMessage(
-          `Screenshot captured for test failure and saved as : ${path.join(outputDir, outputFileName + `-instance-${i}.png`)}`
+          `Skipped screenshot for ${instance.username ?? 'unknown user'} because the page is already closed.`
+        );
+        return;
+      }
+      try {
+        const screenshotPath = path.join(
+          outputDir,
+          outputFileName + randomString + `-instance-${i}.png`
+        );
+        await instance.page.screenshot({path: screenshotPath});
+        showMessage(
+          `Screenshot captured for test failure and saved as : ${screenshotPath}`
+        );
+      } catch (error) {
+        showMessage(
+          `Error while taking screenshot for ${instance.username ?? 'unknown user'}: ${error}`
         );
       }
     });
@@ -388,7 +402,10 @@ export class BaseUser {
    */
   async reloadPage(): Promise<void> {
     await this.waitForPageToFullyLoad();
-    await this.page.reload({waitUntil: ['networkidle0', 'load']});
+    await this.page.reload({
+      waitUntil: ['networkidle2', 'load'],
+      timeout: 60000,
+    });
   }
 
   /**
@@ -403,6 +420,7 @@ export class BaseUser {
         )
       ).page()) ?? (await this.browserObject.newPage());
     this.page = newPage;
+    this.attachNavigationLogs(this.page);
     this.setupDebugTools();
   }
 
@@ -494,9 +512,118 @@ export class BaseUser {
       await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
       if (error instanceof Error) {
+        const clickabilityDiagnostics = await this.page.evaluate(
+          (targetElement: Element) => {
+            const describeElement = (el: Element | null): string => {
+              if (!el) {
+                return 'none';
+              }
+
+              const tag = el.tagName.toLowerCase();
+              const id = el.id ? `#${el.id}` : '';
+              const classNames = el.className
+                ? String(el.className).trim().split(/\s+/).filter(Boolean)
+                : [];
+              const classes =
+                classNames.length > 0 ? `.${classNames.join('.')}` : '';
+              return `<${tag}${id}${classes}>`;
+            };
+
+            const rect = targetElement.getBoundingClientRect();
+            const inViewport =
+              rect.top <= window.innerHeight &&
+              rect.bottom > 0 &&
+              rect.left <= window.innerWidth &&
+              rect.right > 0;
+
+            const isNativeDisabled =
+              (targetElement instanceof HTMLButtonElement ||
+                targetElement instanceof HTMLInputElement ||
+                targetElement instanceof HTMLSelectElement ||
+                targetElement instanceof HTMLTextAreaElement ||
+                targetElement instanceof HTMLOptionElement) &&
+              targetElement.disabled;
+            const isAriaDisabled =
+              targetElement.getAttribute('aria-disabled') === 'true' ||
+              targetElement.closest('[aria-disabled="true"]') !== null;
+            const isDisabled = isNativeDisabled || isAriaDisabled;
+
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const centerTopElement = document.elementFromPoint(
+              centerX,
+              centerY
+            );
+            const firstClientRect = targetElement.getClientRects()[0];
+            const firstRectTopElement = firstClientRect
+              ? document.elementFromPoint(
+                  firstClientRect.left + firstClientRect.width / 2,
+                  firstClientRect.top + firstClientRect.height / 2
+                )
+              : null;
+
+            const isCoveredByOtherElement = [
+              centerTopElement,
+              firstRectTopElement,
+            ]
+              .filter(Boolean)
+              .some(topElement => {
+                if (!topElement) {
+                  return false;
+                }
+                return (
+                  topElement !== targetElement &&
+                  !targetElement.contains(topElement) &&
+                  !topElement.contains(targetElement)
+                );
+              });
+
+            const blockingElement =
+              [centerTopElement, firstRectTopElement]
+                .filter(
+                  topElement =>
+                    topElement &&
+                    topElement !== targetElement &&
+                    !targetElement.contains(topElement) &&
+                    !topElement.contains(targetElement)
+                )
+                .map(topElement => describeElement(topElement))[0] ?? 'none';
+
+            const reasons: string[] = [];
+            if (isDisabled) {
+              reasons.push('Element is disabled.');
+            }
+            if (!inViewport) {
+              reasons.push('Element is not in the viewport.');
+            }
+            if (isCoveredByOtherElement) {
+              reasons.push(`Element is blocked by ${blockingElement}.`);
+            }
+
+            return {
+              reasons,
+              isDisabled,
+              inViewport,
+              isCoveredByOtherElement,
+              blockingElement,
+            };
+          },
+          element
+        );
         await this.page.evaluate(isElementClickable, element, true, true);
+
+        const reasonsText =
+          clickabilityDiagnostics.reasons.length > 0
+            ? clickabilityDiagnostics.reasons
+                .map(
+                  (reason: string, index: number) => `${index + 1}. ${reason}`
+                )
+                .join('\n')
+            : 'No specific reason detected from diagnostics.';
+
         error.message =
           `Element ${elementDesc} took too long to be clickable.\n` +
+          `Detected reasons:\n${reasonsText}\n` +
           'Original Error:\n' +
           error.message;
       }
@@ -532,7 +659,7 @@ export class BaseUser {
     elementPlace?: number
   ): Promise<void> {
     const context = parentElement ?? this.page;
-    let element = await context.waitForSelector(selector, {timeout: 15000});
+    let element = await context.waitForSelector(selector, {timeout: 30000});
 
     // Get nth element if elementPlace is given.
     if (elementPlace) {
@@ -651,6 +778,7 @@ export class BaseUser {
     useSelector: boolean = false,
     options: puppeteer.WaitForOptions = {
       waitUntil: ['networkidle2', 'load'],
+      timeout: 60000,
     }
   ): Promise<void> {
     const navigationPromise = this.page.waitForNavigation(options);
@@ -680,7 +808,10 @@ export class BaseUser {
     // Clicking three times on a line of text selects all the text.
     const element = await this.getElementInParent(selector);
     await this.waitForElementToBeClickable(element);
-    await element.click({clickCount: 3});
+    await element.click();
+    await this.page.keyboard.down('Control');
+    await this.page.keyboard.press('A');
+    await this.page.keyboard.up('Control');
     await this.page.keyboard.press('Backspace');
   }
 
@@ -749,6 +880,47 @@ export class BaseUser {
   }
 
   /**
+   * This function converts a given date string into ISO format (YYYY-MM-DD).
+   */
+  private toISODate(dateString: string): string {
+    const date = new Date(dateString);
+
+    if (isNaN(date.getTime())) {
+      throw new Error(`Invalid date string: ${dateString}`);
+    }
+
+    return date.toISOString().split('T')[0];
+  }
+
+  /**
+   * This function set publication date for chapter.
+   */
+  async setNodePlannedPublicationDate(): Promise<void> {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 3);
+    const dateString = futureDate.toLocaleDateString('en-US');
+    const isoDate = this.toISODate(dateString);
+    await this.page.$eval(
+      plannedPublicationDateInput,
+      (el, value) => {
+        const input = el as HTMLInputElement;
+        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+          window.HTMLInputElement.prototype,
+          'value'
+        )?.set;
+
+        nativeInputValueSetter?.call(input, value);
+
+        input.dispatchEvent(new Event('input', {bubbles: true}));
+        input.dispatchEvent(new Event('change', {bubbles: true}));
+        input.dispatchEvent(new Event('blur', {bubbles: true}));
+      },
+      isoDate
+    );
+    showMessage('Planned publication date is set to: ' + isoDate);
+  }
+
+  /**
    * This selects a value in a dropdown.
    */
   async select(selector: string, option: string): Promise<void> {
@@ -761,7 +933,10 @@ export class BaseUser {
    * This function navigates to the given URL.
    */
   async goto(url: string, verifyURL: boolean = true): Promise<void> {
-    await this.page.goto(url, {waitUntil: ['networkidle0', 'load']});
+    await this.page.goto(url, {
+      waitUntil: ['networkidle2', 'load'],
+      timeout: 60000,
+    });
 
     if (verifyURL) {
       await this.page.waitForFunction(
@@ -1246,6 +1421,7 @@ export class BaseUser {
 
     await newPage.bringToFront();
     this.page = newPage;
+    this.attachNavigationLogs(this.page);
     return newPage;
   }
 
@@ -1463,6 +1639,7 @@ export class BaseUser {
     selector: string,
     text: string
   ): Promise<void> {
+    await this.expectElementToBeVisible(selector);
     try {
       await this.page.waitForFunction(
         (selector: string, text: string) => {
@@ -1549,6 +1726,43 @@ export class BaseUser {
         ? await this.page.waitForSelector(selector)
         : selector;
     await this.page.waitForFunction(isElementClickable, {}, element, clickable);
+  }
+
+  /**
+   * Retrieves a chapter element by its name.
+   * @param {string} chapterName - The name of the chapter to search for.
+   */
+  private async getChapterByName(
+    chapterName: string
+  ): Promise<ElementHandle<Element>> {
+    const chapters = await this.page.$$(chapterTitleSelector);
+
+    for (const chapter of chapters) {
+      const text = await this.page.evaluate(
+        el => el.textContent?.trim(),
+        chapter
+      );
+
+      if (text?.includes(chapterName)) {
+        return chapter;
+      }
+    }
+
+    throw new Error(`Chapter with name "${chapterName}" not found`);
+  }
+
+  /**
+   * Verifies whether a chapter is clickable or not.
+   * @param {string} chapterName - The name of the chapter.
+   * @param {boolean} [shouldBeClickable=true] - Expected clickability state.
+   */
+  async expectChapterToBeClickable(
+    chapterName: string,
+    shouldBeClickable: boolean = true
+  ): Promise<void> {
+    const chapterElement = await this.getChapterByName(chapterName);
+
+    await this.expectElementToBeClickable(chapterElement, shouldBeClickable);
   }
 
   /**
@@ -1678,10 +1892,10 @@ export class BaseUser {
         selector,
         parentElement
       );
-      await selectElement.click();
+      await this.clickOnElement(selectElement);
 
       // Select the option.
-      await this.page.waitForSelector('mat-option');
+      await this.page.waitForSelector('mat-option', {visible: true});
       const options = await this.page.$$('mat-option');
       const optionTexts: string[] = [];
 
@@ -1703,7 +1917,7 @@ export class BaseUser {
       }
 
       // Click on the option.
-      await optionElement.click();
+      await this.clickOnElement(optionElement);
 
       // Verify the value of the select is updated.
       await this.expectTextContentToBe(selector, value);
@@ -2162,6 +2376,15 @@ export class BaseUser {
     await this.expectElementToBeVisible(hideOSKButtonSelector);
     await this.clickOnElementWithSelector(hideOSKButtonSelector);
     await this.expectElementToBeVisible(hideOSKButtonSelector, false);
+  }
+
+  /**
+   * Logs every navigation event on the page.
+   */
+  attachNavigationLogs(page: Page): void {
+    page.on('framenavigated', frame => {
+      showMessage('NAVIGATED: ' + frame.url());
+    });
   }
 }
 

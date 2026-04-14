@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import builtins
 import json
 import os
 import subprocess
@@ -1009,3 +1010,25 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                 },
                             },
                         )
+
+    def test_output_variable_to_github_workflow_without_github_output(
+        self,
+    ) -> None:
+        """Test output_variable_to_github_workflow when GITHUB_OUTPUT is missing."""
+        output: List[str] = []
+
+        def mock_print(msg: str) -> None:
+            output.append(msg)
+
+        with self.swap(os, 'environ', {}):
+            with self.swap(builtins, 'print', mock_print):
+                check_ci_test_suites_to_run.output_variable_to_github_workflow(
+                    'variable', 'value'
+                )
+
+        self.assertEqual(len(output), 2)
+        self.assertEqual(
+            output[0],
+            'Cannot find GITHUB_OUTPUT in os.environ. Outputting to stdout instead:',
+        )
+        self.assertEqual(output[1], 'variable=value')
