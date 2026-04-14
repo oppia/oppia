@@ -36,7 +36,7 @@ class MockWindowRef {
   };
 }
 
-fdescribe('CtaSectionComponent', () => {
+describe('CtaSectionComponent', () => {
   let component: CtaSectionComponent;
   let fixture: ComponentFixture<CtaSectionComponent>;
 

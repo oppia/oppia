@@ -62,6 +62,37 @@
   </ng-template>
 
   <ng-template #volunteerContent let-mobile="mobile">
+    <ng-template #volunteerSlides let-headingClassName="headingClassName">
+      <ng-template ngbSlide *ngFor="let activeIndices of volunteerRolesIndices[screenType]">
+        <div class="oppia-about-cta-volunteer-roles">
+          <div class="oppia-about-cta-role-card" *ngFor="let roleIndex of activeIndices">
+            <div class="oppia-about-cta-role-card-head">
+              <picture class="oppia-about-cta-role-card-icon">
+                <source type="image/webp"
+                        [srcset]="getStaticImageUrl(volunteerRolesDetails[roleIndex].iconUrl + '.webp')">
+                <source type="image/png"
+                        [srcset]="getStaticImageUrl(volunteerRolesDetails[roleIndex].iconUrl + '.png')">
+                <img [src]="getStaticImageUrl(volunteerRolesDetails[roleIndex].iconUrl + '.png')"
+                     [attr.alt]="'I18N_ABOUT_PAGE_ROLE_ICON_ALT' | translate: { roleTitle: (volunteerRolesDetails[roleIndex].title | translate) }">
+              </picture>
+              <p class="oppia-about-cta-title-small oppia-about-cta-role-card-title"
+                 [ngClass]="headingClassName">
+                {{ volunteerRolesDetails[roleIndex].title | translate }}
+              </p>
+            </div>
+            <p class="oppia-about-cta-subtext oppia-about-cta-role-card-description">
+              {{ volunteerRolesDetails[roleIndex].description | translate }}
+            </p>
+            <ul class="oppia-about-cta-role-card-list">
+              <li *ngFor="let item of volunteerRolesDetails[roleIndex].listItems">
+                <p class="oppia-about-cta-subtext">{{ item | translate }}</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </ng-template>
+    </ng-template>
+
     <div class="oppia-about-cta-volunteer"
          [ngClass]="mobile
            ? 'e2e-test-about-page-volunteer-carousel-mobile'
@@ -92,33 +123,13 @@
           [showNavigationArrows]="false"
           [animation]="false"
           *ngIf="!mobile && volunteerRolesIndices[screenType].length > 1">
-          <ng-template ngbSlide *ngFor="let activeIndices of volunteerRolesIndices[screenType]">
-            <div class="oppia-about-cta-volunteer-roles">
-              <div class="oppia-about-cta-role-card" *ngFor="let roleIndex of activeIndices">
-                <div class="oppia-about-cta-role-card-head">
-                  <picture class="oppia-about-cta-role-card-icon">
-                    <source type="image/webp"
-                            [srcset]="getStaticImageUrl(volunteerRolesDetails[roleIndex].iconUrl + '.webp')">
-                    <source type="image/png"
-                            [srcset]="getStaticImageUrl(volunteerRolesDetails[roleIndex].iconUrl + '.png')">
-                    <img [src]="getStaticImageUrl(volunteerRolesDetails[roleIndex].iconUrl + '.png')"
-                         [attr.alt]="'I18N_ABOUT_PAGE_ROLE_ICON_ALT' | translate: { roleTitle: (volunteerRolesDetails[roleIndex].title | translate) }">
-                  </picture>
-                  <p class="oppia-about-cta-title-small oppia-about-cta-role-card-title e2e-test-about-page-volunteer-carousel-slide-heading-desktop">
-                    {{ volunteerRolesDetails[roleIndex].title | translate }}
-                  </p>
-                </div>
-                <p class="oppia-about-cta-subtext oppia-about-cta-role-card-description">
-                  {{ volunteerRolesDetails[roleIndex].description | translate }}
-                </p>
-                <ul class="oppia-about-cta-role-card-list">
-                  <li *ngFor="let item of volunteerRolesDetails[roleIndex].listItems">
-                    <p class="oppia-about-cta-subtext">{{ item | translate }}</p>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </ng-template>
+          <ng-container
+            [ngTemplateOutlet]="volunteerSlides"
+            [ngTemplateOutletContext]="{
+              headingClassName:
+                'e2e-test-about-page-volunteer-carousel-slide-heading-desktop'
+            }">
+          </ng-container>
         </ngb-carousel>
 
         <ngb-carousel
@@ -127,33 +138,13 @@
           [showNavigationArrows]="false"
           [animation]="false"
           *ngIf="mobile && volunteerRolesIndices[screenType].length > 1">
-          <ng-template ngbSlide *ngFor="let activeIndices of volunteerRolesIndices[screenType]">
-            <div class="oppia-about-cta-volunteer-roles">
-              <div class="oppia-about-cta-role-card" *ngFor="let roleIndex of activeIndices">
-                <div class="oppia-about-cta-role-card-head">
-                  <picture class="oppia-about-cta-role-card-icon">
-                    <source type="image/webp"
-                            [srcset]="getStaticImageUrl(volunteerRolesDetails[roleIndex].iconUrl + '.webp')">
-                    <source type="image/png"
-                            [srcset]="getStaticImageUrl(volunteerRolesDetails[roleIndex].iconUrl + '.png')">
-                    <img [src]="getStaticImageUrl(volunteerRolesDetails[roleIndex].iconUrl + '.png')"
-                         [attr.alt]="'I18N_ABOUT_PAGE_ROLE_ICON_ALT' | translate: { roleTitle: (volunteerRolesDetails[roleIndex].title | translate) }">
-                  </picture>
-                  <p class="oppia-about-cta-title-small oppia-about-cta-role-card-title e2e-test-about-page-volunteer-carousel-slide-heading-mobile">
-                    {{ volunteerRolesDetails[roleIndex].title | translate }}
-                  </p>
-                </div>
-                <p class="oppia-about-cta-subtext oppia-about-cta-role-card-description">
-                  {{ volunteerRolesDetails[roleIndex].description | translate }}
-                </p>
-                <ul class="oppia-about-cta-role-card-list">
-                  <li *ngFor="let item of volunteerRolesDetails[roleIndex].listItems">
-                    <p class="oppia-about-cta-subtext">{{ item | translate }}</p>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </ng-template>
+          <ng-container
+            [ngTemplateOutlet]="volunteerSlides"
+            [ngTemplateOutletContext]="{
+              headingClassName:
+                'e2e-test-about-page-volunteer-carousel-slide-heading-mobile'
+            }">
+          </ng-container>
         </ngb-carousel>
 
         <button class="oppia-cta-carousel-control-next-btn"
