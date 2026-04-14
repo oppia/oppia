@@ -64,6 +64,7 @@ const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
 const rolesHeaderSelector = '.e2e-test-roles-header';
+const rolesContentSelector = '.e2e-test-roles-content';
 const usernameSelector = '.e2e-test-role-username';
 
 const interactionDiv = '.e2e-test-interaction';
@@ -2520,9 +2521,11 @@ export class ExplorationEditor extends BaseUser {
         });
         await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       }
+      // Wait until the expanded mobile navbar is visible before clicking it.
       await this.page.waitForSelector(mobileNavbarDropdown, {
         visible: true,
       });
+      // Open the navbar dropdown, then navigate to Settings.
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.clickOnElementWithSelector(mobileSettingsBarSelector);
 
@@ -2566,7 +2569,7 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     if (!this.isViewportAtMobileWidth()) {
       showMessage(
-        `Skipped: Expanding ${section} section.\n` +
+        `Skipped: Expanding ${section} section on desktop.\n` +
           'Reason: Sections are already expanded on desktop.'
       );
       return;
@@ -2580,8 +2583,8 @@ export class ExplorationEditor extends BaseUser {
     // Skip if the section is already expanded.
     if (await this.isElementVisible(sectionContentSelector)) {
       showMessage(
-        `Skipped: Expanding ${section} section.\n` +
-          'Reason: Section is already expanded.'
+        `Skipped: Expanding ${section} section on desktop.\n` +
+          'Reason: Section is already expanded on desktop.'
       );
       return;
     }
@@ -2648,7 +2651,6 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} goal - The goal of the exploration.
    * @param {string} category - The category of the exploration.
    * @param {string} tags - The tags of the exploration.
-   * @param {string} language - The language of the exploration (default: 'English').
    */
   async publishExplorationWithMetadata(
     title: string,
@@ -3415,12 +3417,14 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Ensures the Roles form is open.
-   * This does not modify any prebuilt functions; it uses existing helpers
-   * and adds resilient fallbacks for mobile/constrained viewports.
+   * Opens the Roles form.
+   * Uses existing helpers and resilient fallbacks for mobile/constrained
+   * viewports.
    */
-  async expectRolesFormToBeOpen(): Promise<void> {
-    // This check is intended to run after navigating to the Settings tab.
+  async openRolesForm(): Promise<void> {
+    // Precondition: The caller must navigate to the Settings tab first.
+    // This helper intentionally avoids navigation so expectation methods do
+    // not perform extra interactions as side effects.
     if (this.isViewportAtMobileWidth()) {
       await this.expandSettingsTabSection('Roles');
     }
@@ -3446,9 +3450,9 @@ export class ExplorationEditor extends BaseUser {
       showMessage(
         'Edit roles click did not open the form; performing in-page click fallback.'
       );
-      await this.page.evaluate(() => {
+      await this.page.evaluate((editRoleButtonSelector: string) => {
         const el = document.querySelector(
-          '.e2e-test-edit-roles'
+          editRoleButtonSelector
         ) as HTMLElement | null;
         if (el) {
           el.scrollIntoView({block: 'center', inline: 'center'});
@@ -3461,7 +3465,7 @@ export class ExplorationEditor extends BaseUser {
             el.dispatchEvent(ev);
           });
         }
-      });
+      }, editRoleButton);
       await this.page.waitForSelector(addUsernameInputBox, {
         visible: true,
         timeout: 5000,
@@ -5009,7 +5013,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectUserToBeExplorationManager(username: string): Promise<void> {
     // Verify the username is listed in the Managers section (the definitive check per CUJ).
-    await this.expectElementToBeVisible('.e2e-test-roles-content');
+    await this.expectElementToBeVisible(rolesContentSelector);
     const owners = await this.page.$$(ownersListSelector);
     if (owners.length === 0) {
       throw new Error('Managers list is empty or not found.');

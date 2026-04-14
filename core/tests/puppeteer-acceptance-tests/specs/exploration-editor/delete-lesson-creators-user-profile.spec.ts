@@ -56,7 +56,7 @@ describe('Lesson Creator Profile Deletion', function () {
     );
 
     await expEditor1.navigateToSettingsTab();
-    await expEditor1.expectRolesFormToBeOpen();
+    await expEditor1.openRolesForm();
     await expEditor1.assignUserToManagerRoleAfterFormOpen('expEditor2');
     await expEditor1.expectUserToBeExplorationManager('expEditor2');
 
@@ -80,15 +80,20 @@ describe('Lesson Creator Profile Deletion', function () {
     await expEditor1.saveExplorationDraft();
   }, 600000);
 
-  it('should handle exploration ownership correctly after account deletion', async function () {
+  it('should trigger draft exploration deletion and preserve correct ownership after account deletion', async function () {
+    // TODO(#25058): Add explicit CUJ steps in this test body for expEditor1
+    // to create an exploration, navigate to Settings, and add expEditor2 as
+    // manager once issue #25058 is fixed.
     // 1. Account Deletion.
     await expEditor1.navigateToPreferencesPage();
     await expEditor1.deleteAccount();
     await expEditor1.confirmAccountDeletion('expEditor1');
 
-    // 2. Verify ownership and access permissions as expEditor2.
+    // 2. Verify account deletion removes expEditor1 draft explorations.
     await expEditor2.navigateToExplorationEditor(wholeNumbersExpId);
     await expEditor2.expectErrorPage(404);
+
+    // 3. Verify ownership and access permissions for published explorations.
     await expEditor2.navigateToExplorationEditor(negativeNumbersExpId);
     await expEditor2.navigateToSettingsTab();
     await expEditor2.expectExplorationToBeCommunityOwned(
