@@ -1544,6 +1544,14 @@ URLS.extend(
             r'/cron/blog_posts/search_rank', cron.CronBlogPostSearchRankHandler
         ),
         get_redirect_route(
+            r'/cron/cloud_task/mark_stale_cloud_task_run_as_failed',
+            cron.CronMarkStaleCloudTaskRunModelsAsFailedHandler,
+        ),
+        get_redirect_route(
+            r'/cron/cloud_task/mark_stale_voiceover_regeneration_content_as_failed',
+            cron.CronMarkStaleVoiceoverRegenerationContentAsFailedHandler,
+        ),
+        get_redirect_route(
             r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler
         ),
         get_redirect_route(
