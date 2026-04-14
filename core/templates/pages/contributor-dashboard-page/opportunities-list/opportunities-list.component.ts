@@ -49,7 +49,7 @@ export class OpportunitiesListComponent {
 
   @Input() showOpportunityButton: boolean = true;
   @Input() showPinUnpinButton: boolean = false;
-  @Input() showSearchBar: boolean = true;
+  @Input() showSearchBar: boolean = false;
 
   @Output() clickActionButton: EventEmitter<string> = new EventEmitter();
 
@@ -139,8 +139,6 @@ export class OpportunitiesListComponent {
   ngOnInit(): void {
     this.loadingOpportunityData = true;
     this.activePageNumber = 1;
-    this.searchQuery = '';
-    this.filteredOpportunities = [];
     this.fetchAndLoadOpportunities();
     this.subscribeToPinnedOpportunities();
   }
@@ -257,7 +255,7 @@ export class OpportunitiesListComponent {
     const startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
     const endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
     const query = this.searchQuery.toLowerCase();
-    if (query) {
+    if (query && this.filteredOpportunities.length > 0) {
       this.visibleOpportunities = this.filteredOpportunities.slice(
         startIndex,
         endIndex

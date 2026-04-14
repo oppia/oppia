@@ -3,7 +3,8 @@
                             (clickActionButton)="onClickButton($event)"
                             [loadMoreOpportunities]="loadMoreOpportunitiesAsync.bind(this)"
                             [progressBarRequired]="true"
-                            [opportunityType]="opportunityType">
+                            [opportunityType]="opportunityType"
+                            [showSearchBar]="true">
   </oppia-opportunities-list>
 </div>
 <div *ngIf="!languageSelected" class="oppia-language-required-message-container">
