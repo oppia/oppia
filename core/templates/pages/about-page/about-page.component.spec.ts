@@ -200,6 +200,15 @@ describe('About Page', () => {
     expect(component.partnershipsFormLink).toBe(formLink);
   });
 
+  it('should default to english form link when current language is undefined', () => {
+    translateService.currentLang = undefined;
+    component.setPartnershipsFormLink();
+
+    expect(component.partnershipsFormLink).toBe(
+      AppConstants.PARTNERSHIPS_FORM_LINK
+    );
+  });
+
   it(
     'should set english link for languages not supported by' + ' google forms',
     () => {
@@ -223,26 +232,6 @@ describe('About Page', () => {
     expect(component.featuresData[1].panelIsCollapsed).toBeFalse();
     component.closePanel(1);
     expect(component.featuresData[1].panelIsCollapsed).toBeTrue();
-  });
-
-  it('should return correct static image url when calling getStaticImageUrl', () => {
-    expect(component.getStaticImageUrl('/path/to/image')).toBe(
-      '/assets/images/path/to/image'
-    );
-  });
-
-  it('should return the correct image set', () => {
-    const imageName = '/about/testImageName';
-    const imageExt = 'png';
-
-    const expectedImageSet =
-      '/assets/images/about/testImageName1x.png 1x, ' +
-      '/assets/images/about/testImageName15x.png 1.5x, ' +
-      '/assets/images/about/testImageName2x.png 2x';
-
-    const result = component.getImageSet(imageName, imageExt, [1, 1.5, 2]);
-
-    expect(result).toBe(expectedImageSet);
   });
 
   it('should show thank you modal on query parameters change', () => {
@@ -287,36 +276,6 @@ describe('About Page', () => {
       false
     );
     expect(component.isLanguageRTL()).toBeFalse();
-  });
-
-  it('should move the correct volunteer carousel to the previous slide', () => {
-    component.volunteerCarouselMobile = jasmine.createSpyObj('NgbCarousel', [
-      'prev',
-    ]);
-    component.volunteerCarousel = jasmine.createSpyObj('NgbCarousel', ['prev']);
-
-    component.screenType = 'mobile';
-    component.moveCarouselToPreviousSlide();
-    expect(component.volunteerCarouselMobile.prev).toHaveBeenCalled();
-
-    component.screenType = 'desktop';
-    component.moveCarouselToPreviousSlide();
-    expect(component.volunteerCarousel.prev).toHaveBeenCalled();
-  });
-
-  it('should move the correct volunteer carousel to the next slide', () => {
-    component.volunteerCarouselMobile = jasmine.createSpyObj('NgbCarousel', [
-      'next',
-    ]);
-    component.volunteerCarousel = jasmine.createSpyObj('NgbCarousel', ['next']);
-
-    component.screenType = 'mobile';
-    component.moveCarouselToNextSlide();
-    expect(component.volunteerCarouselMobile.next).toHaveBeenCalled();
-
-    component.screenType = 'desktop';
-    component.moveCarouselToNextSlide();
-    expect(component.volunteerCarousel.next).toHaveBeenCalled();
   });
 
   it('should record analytics when Explore Lessons is clicked', () => {

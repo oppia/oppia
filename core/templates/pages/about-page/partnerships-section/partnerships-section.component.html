@@ -1,0 +1,96 @@
+<div class="oppia-about-partnerships-section">
+  <div class="oppia-about-partnerships-top">
+    <p class="oppia-about-title-new e2e-test-about-page-title-new">
+      {{ 'I18N_ABOUT_PAGE_PARTNERSHIPS_SECTION_TITLE' | translate }}
+    </p>
+    <p class="oppia-about-section-subtext-new">
+      {{ 'I18N_ABOUT_PAGE_PARTNERSHIPS_SECTION_SUBTEXT1' | translate }}
+      <br>
+      {{ 'I18N_ABOUT_PAGE_PARTNERSHIPS_SECTION_SUBTEXT2' | translate }}
+    </p>
+  </div>
+
+  <ng-template #partnerCard let-partner let-inCarousel="inCarousel">
+    <div class="oppia-about-partnerships-card">
+      <div class="oppia-about-partnerships-card-top"
+           *ngIf="!inCarousel">
+        <p class="oppia-about-subtitle oppia-about-partnerships-card-title">
+          {{ partner.title | translate }}
+        </p>
+        <p class="oppia-about-section-subtext-new oppia-about-partnerships-card-label">
+          {{ partner.label | translate }}
+          <span>{{ partner.name | translate }}</span>
+        </p>
+      </div>
+
+      <div class="oppia-about-partnerships-card-content-container"
+           *ngIf="inCarousel">
+        <p class="oppia-about-subtitle oppia-about-partnerships-card-title">
+          {{ partner.title | translate }}
+        </p>
+        <p class="oppia-about-section-subtext-new oppia-about-partnerships-card-label">
+          {{ partner.label | translate }}
+          <span>{{ partner.name | translate }}</span>
+        </p>
+        <p class="oppia-about-section-subtext-new">
+          {{ partner.description | translate }}
+        </p>
+      </div>
+
+      <div class="oppia-about-partnerships-card-bottom"
+           *ngIf="!inCarousel">
+        <div class="oppia-about-partnerships-card-image-container">
+          <picture class="oppia-about-partnerships-card-image">
+            <source type="image/webp"
+                    [srcset]="getImageSet(partner.imageUrl, 'webp', [1.5])">
+            <source type="image/png"
+                    [srcset]="getImageSet(partner.imageUrl, 'png', [1.5])">
+            <img [src]="getStaticImageUrl(partner.imageUrl + '15x.png')"
+                 [attr.alt]="'I18N_ABOUT_PAGE_PARTNER_ACTIVITY_IMAGE_ALT' | translate: { partnerName: (partner.name | translate) }"
+                 loading="lazy">
+          </picture>
+        </div>
+        <div>
+          <p class="oppia-about-section-subtext-new">
+            {{ partner.description | translate }}
+          </p>
+        </div>
+      </div>
+
+      <div class="oppia-about-partnerships-card-image-container"
+           *ngIf="inCarousel">
+        <picture class="oppia-about-partnerships-card-image">
+          <source type="image/webp"
+                  [srcset]="getImageSet(partner.imageUrl, 'webp', [1.5])">
+          <source type="image/png"
+                  [srcset]="getImageSet(partner.imageUrl, 'png', [1.5])">
+          <img [src]="getStaticImageUrl(partner.imageUrl + '15x.png')"
+               [attr.alt]="'I18N_ABOUT_PAGE_PARTNER_ACTIVITY_IMAGE_ALT' | translate: { partnerName: (partner.name | translate) }"
+               loading="lazy">
+        </picture>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="oppia-about-partnerships-cards-container-desktop">
+    <ng-container *ngFor="let partner of partnersData">
+      <ng-container
+        [ngTemplateOutlet]="partnerCard"
+        [ngTemplateOutletContext]="{ $implicit: partner, inCarousel: false }">
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <div class="oppia-about-partnerships-cards-container-tablet">
+    <ngb-carousel [interval]="8000"
+                  [showNavigationArrows]="false"
+                  [animation]="false">
+      <ng-template ngbSlide *ngFor="let partner of partnersData">
+        <ng-container
+          [ngTemplateOutlet]="partnerCard"
+          [ngTemplateOutletContext]="{ $implicit: partner, inCarousel: true }">
+        </ng-container>
+      </ng-template>
+    </ngb-carousel>
+  </div>
+</div>

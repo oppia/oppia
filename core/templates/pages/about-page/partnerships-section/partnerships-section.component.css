@@ -1,0 +1,198 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.about-page .oppia-about-partnerships-section {
+  background-color: #fff;
+  padding: 0 0 120px;
+  width: 100%;
+}
+
+.about-page .oppia-about-partnerships-top {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 64px 32px;
+}
+
+.about-page .oppia-about-subtitle.oppia-about-partnerships-card-title {
+  margin: 0 0 8px;
+}
+
+.about-page .oppia-about-partnerships-cards-container-tablet {
+  display: none;
+}
+
+.about-page .oppia-about-partnerships-cards-container-desktop {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.about-page .oppia-about-partnerships-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 64px;
+  width: 50%;
+}
+
+.about-page .oppia-about-partnerships-card:nth-child(1),
+.about-page .oppia-about-partnerships-card:nth-child(4) {
+  background-color: #f5f9f9;
+}
+
+.about-page .oppia-about-partnerships-card:nth-child(2),
+.about-page .oppia-about-partnerships-card:nth-child(3) {
+  background-color: #fcfcfd;
+}
+
+.about-page .oppia-about-partnerships-card-label {
+  font-weight: 300;
+}
+
+.about-page .oppia-about-partnerships-card-label span {
+  color: #000;
+  font-weight: 500;
+}
+
+.about-page .oppia-about-partnerships-card:nth-child(4) .oppia-about-section-subtext-new span {
+  font-weight: 700;
+}
+
+.about-page .oppia-about-partnerships-card-bottom {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+}
+
+.about-page .oppia-about-partnerships-card-image-container {
+  min-height: 165px;
+  min-width: 55%;
+}
+
+.about-page .oppia-about-partnerships-card-image {
+  height: 100%;
+  width: 100%;
+}
+
+.about-page .oppia-about-partnerships-card-image img {
+  height: 100%;
+  width: 100%;
+}
+
+@media only screen and (max-width: 884px) {
+  .about-page .oppia-about-partnerships-section br {
+    display: none;
+  }
+
+  .about-page .oppia-about-partnerships-top {
+    gap: 8px;
+    padding: 0 48px 16px;
+  }
+
+  .about-page .oppia-about-partnerships-cards-container-desktop {
+    display: none;
+  }
+
+  .about-page .oppia-about-partnerships-cards-container-tablet {
+    background-color: #f5f8f8;
+    display: flex;
+    padding: 48px 80px 80px;
+  }
+
+  .about-page .oppia-about-partnerships-card {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 16px;
+    padding: 0;
+    width: 100%;
+  }
+
+  .about-page .oppia-about-partnerships-cards-container-tablet .oppia-about-partnerships-card {
+    background-color: #f5f8f8;
+  }
+
+  .about-page .oppia-about-partnerships-card-label {
+    margin-bottom: 8px;
+  }
+
+  .about-page .oppia-about-partnerships-card-image-container {
+    max-height: 162px;
+    min-width: 37%;
+  }
+
+  .about-page .oppia-about-partnerships-section .carousel-indicators {
+    bottom: -66px;
+    gap: 16px;
+  }
+
+  .about-page .oppia-about-partnerships-section .carousel-indicators li {
+    height: 16px;
+    width: 16px;
+  }
+}
+
+@media only screen and (max-width: 641px) {
+  .about-page .oppia-about-subtitle {
+    font-size: 1.8rem;
+    line-height: 22.5px;
+  }
+
+  .about-page .oppia-about-partnerships-section br {
+    display: none;
+  }
+
+  .about-page .oppia-about-partnerships-top {
+    padding: 0 40px 16px;
+  }
+
+  .about-page .oppia-about-partnerships-cards-container-tablet {
+    padding: 24px 40px 64px;
+  }
+
+  .about-page .oppia-about-partnerships-card {
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+  }
+
+  .about-page .oppia-about-partnerships-card-content-container {
+    min-height: 118px;
+  }
+
+  .about-page .oppia-about-partnerships-card-image-container {
+    max-height: none;
+    min-height: 150px;
+    min-width: 100%;
+  }
+
+  .about-page .oppia-about-partnerships-section .carousel-indicators {
+    bottom: -58px;
+  }
+}
+
+@media only screen and (max-width: 376px) {
+  .about-page .oppia-about-partnerships-section br {
+    display: none;
+  }
+
+  .about-page .oppia-about-partnerships-top {
+    padding: 0 20px 16px;
+  }
+
+  .about-page .oppia-about-partnerships-cards-container-tablet {
+    padding: 24px 20px 64px;
+  }
+
+  .about-page .oppia-about-partnerships-card-title {
+    width: 92%;
+  }
+
+  .about-page .oppia-about-partnerships-card-content-container {
+    min-height: 181px;
+  }
+}
