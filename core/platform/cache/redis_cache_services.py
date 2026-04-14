@@ -22,6 +22,7 @@ from core import feconf, utils
 from core.domain import caching_domain
 
 import redis
+from redis.exceptions import ResponseError
 from typing import Dict, List, Optional
 
 
@@ -123,7 +124,7 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
         total_allocated = redis_full_profile['total.allocated']
         peak_allocated = redis_full_profile['peak.allocated']
         keys_count = redis_full_profile['keys.count']
-    except redis.exceptions.ResponseError:
+    except ResponseError:
         # Fallback for Redis versions that do not support memory stats command.
         # Here we use MyPy ignore because the redis-py stubs in this
         # environment do not correctly recognize the 'info' method on the
