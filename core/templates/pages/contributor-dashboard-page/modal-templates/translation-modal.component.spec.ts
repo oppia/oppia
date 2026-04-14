@@ -241,15 +241,16 @@ describe('Translation Modal Component', () => {
 
   it('should invoke change detection when set of strings is updated', () => {
     component.activeWrittenTranslation = ['old value'];
-    spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
+    spyOn(component, 'updateTranslationErrors').and.callThrough();
     component.updateHtml(['new value']);
 
     expect(component.activeWrittenTranslation).toEqual(['new value']);
-    expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(1);
+    expect(component.updateTranslationErrors).toHaveBeenCalledTimes(1);
   });
 
   it('should set validation errors when translation has missing custom tags', () => {
     spyOn(component, 'ngOnInit').and.stub();
+    spyOn(component, 'computeTranslationEditorOverflowState').and.stub();
     component.activeDataFormat = 'html';
     component.loadingData = false;
     component.textToTranslate =
