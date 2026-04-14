@@ -67,6 +67,7 @@
     "I18N_ABOUT_PAGE_CTA_VOLUNTEER_BUTTON_TEXT": "Volunteer with Oppia",
     "I18N_ABOUT_PAGE_CTA_VOLUNTEER_SUBTEXT": "This is a community project and all volunteers are welcome!",
     "I18N_ABOUT_PAGE_FEATURES": "Features",
+    "I18N_ABOUT_PAGE_FEATURE_PANEL_CLOSE_BUTTON": "Close feature panel",
     "I18N_ABOUT_PAGE_FEATURE_SUBTEXT1": "Oppia can be accessed from anywhere in the world, and our Android app even supports offline learning.",
     "I18N_ABOUT_PAGE_FEATURE_SUBTEXT2": "Learners find our story-based lessons engaging and impactful, regardless of their location and background.",
     "I18N_ABOUT_PAGE_FEATURE_SUBTEXT3": "Lessons are available in several languages, and we use simple English to ensure smooth auto-translations.",

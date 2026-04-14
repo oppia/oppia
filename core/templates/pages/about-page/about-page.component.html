@@ -105,7 +105,9 @@
             [ngClass]="panel.customPanelClassNames">
             <div class="oppia-about-accordion-title-container ">
               <p class="oppia-about-accordion-panel-title oppia-about-platform-subtext"> {{ panel.title | translate }} </p>
-              <button (click)="closePanel(i)" class="e2e-test-about-page-features-panel-close-button">
+              <button (click)="closePanel(i)"
+                      class="e2e-test-about-page-features-panel-close-button"
+                      [attr.aria-label]="'I18N_ABOUT_PAGE_FEATURE_PANEL_CLOSE_BUTTON' | translate">
                 <i class="fas fa-minus accordion-icon"></i>
               </button>
             </div>
