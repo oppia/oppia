@@ -36,7 +36,12 @@ var expectInteractionDetailsToMatch = async function (elem) {
 };
 
 var submitAnswer = async function (elem, answer) {
-  var numericInput = elem.$('<oppia-interactive-numeric-input>').$('<input>');
+  var numericInputInteraction = elem.$('<oppia-interactive-numeric-input>');
+  await waitFor.presenceOf(
+    numericInputInteraction,
+    'NumericInput interaction taking too long to appear.'
+  );
+  var numericInput = numericInputInteraction.$('<input>');
   await waitFor.presenceOf(
     numericInput,
     'NumericInput input field taking too long to appear.'

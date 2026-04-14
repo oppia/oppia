@@ -444,6 +444,7 @@ const addThumbnailToTopic = async function (page, topicName) {
     const [topicLinkElement] = await page.$x(topicLinkXPath);
     await topicLinkElement.click();
     await page.waitForNavigation({waitUntil: networkIdle});
+    const currentTopicId = (await page.url()).split('/')[4];
 
     await page.waitForSelector(topicThumbnailButton);
     await page.click(topicThumbnailButton);
@@ -490,7 +491,7 @@ const addThumbnailToTopic = async function (page, topicName) {
           .then(r => r.ok)
           .catch(() => false),
       {polling: 1000, timeout: 15000},
-      topicId
+      currentTopicId
     );
   } catch (e) {
     // eslint-disable-next-line no-console
