@@ -122,6 +122,7 @@ describe('Translation Modal Component', () => {
     inReviewCount: 12,
     totalCount: 50,
     translationsCount: 20,
+    reviewerOnlyContentCount: 0,
   };
   const getContentTranslatableItemWithText = (text: string) => {
     return {
@@ -1204,6 +1205,11 @@ describe('Translation Modal Component', () => {
                 getUserContributionRightsDataAsync: () =>
                   Promise.resolve({
                     can_review_translation_for_language_codes: ['ar'],
+                  }),
+                getUserInfoAsync: () =>
+                  Promise.resolve({
+                    username: 'test',
+                    isLoggedIn: true,
                   }),
               },
             },

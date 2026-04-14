@@ -34,8 +34,8 @@ describe('End Exploration Backend Api Service', () => {
       imports: [HttpClientTestingModule],
       providers: [EndExplorationBackendApiService],
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    service = TestBed.get(EndExplorationBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    service = TestBed.inject(EndExplorationBackendApiService);
   });
 
   afterEach(() => {

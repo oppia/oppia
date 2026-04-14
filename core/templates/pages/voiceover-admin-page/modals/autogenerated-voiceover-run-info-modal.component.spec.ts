@@ -84,9 +84,23 @@ describe('Voiceover regeneration information modal', () => {
     const functionId3 =
       'regenerate_voiceovers_of_exploration_for_given_language_accent';
     const expectedText3 =
-      'regenerate_voiceovers_of_exploration_for_given_language_accent \n ("Voiceover regeneration for the exploration in the chosen language accent")';
+      'regenerate_voiceovers_of_exploration_for_given_language_accent \n ("Regeneration from voiceover admin page")';
     expect(componentInstance.getFunctionIdText(functionId3)).toBe(
       expectedText3
+    );
+
+    const functionId4 = 'regenerate_voiceovers_for_batch_contents';
+    const expectedText4 =
+      'regenerate_voiceovers_for_batch_contents \n ("Batch regeneration details")';
+    expect(componentInstance.getFunctionIdText(functionId4)).toBe(
+      expectedText4
+    );
+
+    const functionId5 = 'regenerate_voiceovers_after_accepting_suggestion';
+    const expectedText5 =
+      'regenerate_voiceovers_after_accepting_suggestion \n ("Regeneration after accepting translation")';
+    expect(componentInstance.getFunctionIdText(functionId5)).toBe(
+      expectedText5
     );
 
     expect(componentInstance.getFunctionIdText('unknown_function_id')).toBe('');
