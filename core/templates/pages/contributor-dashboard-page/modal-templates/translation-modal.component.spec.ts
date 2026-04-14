@@ -239,16 +239,33 @@ describe('Translation Modal Component', () => {
     expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(0);
   });
 
+  it('should invoke change detection when set of strings is updated', () => {
+    component.activeWrittenTranslation = ['old value'];
+    spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
+    component.updateHtml(['new value']);
+
+    expect(component.activeWrittenTranslation).toEqual(['new value']);
+    expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(1);
+  });
+
   it('should set validation errors when translation has missing custom tags', () => {
+    spyOn(component, 'ngOnInit').and.stub();
     component.activeDataFormat = 'html';
+    component.loadingData = false;
     component.textToTranslate =
       '<p>Original text</p><oppia-noninteractive-skillreview>' +
       '</oppia-noninteractive-skillreview>';
 
     component.updateHtml('<p>Translated text</p>');
+    fixture.detectChanges();
+
+    const saveButton: HTMLButtonElement = fixture.nativeElement.querySelector(
+      '.e2e-test-save-button'
+    );
 
     expect(component.hasIncompleteTranslationError).toBeTrue();
     expect(component.hasSubmitValidationErrors()).toBeTrue();
+    expect(saveButton.disabled).toBeTrue();
   });
 
   it('should clear validation errors after translated custom tags are added', () => {
