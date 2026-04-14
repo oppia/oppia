@@ -2085,12 +2085,11 @@ export class LoggedOutUser extends BaseUser {
     }
     const newTabPage = await newTarget.page();
 
-    // Wait for the new page to stabilize before closing. This prevents the
-    // puppeteer-screen-recorder from crashing if the page is destroyed while
-    // the recorder's startSession hook is still asynchronously attaching to it.
+    // Wait for the new page to stabilize before closing to prevent the
+    // puppeteer-screen-recorder from crashing. Using waitForSelector
+    // rather than fixed timeout as per best practices.
     await newTabPage?.waitForNetworkIdle({timeout: 2000}).catch(() => {});
-    // Give a minor buffer back to the event loop.
-    await newTabPage?.waitForTimeout(500);
+    await newTabPage?.waitForSelector('body', {visible: true}).catch(() => {});
 
     try {
       expect(newTabPage).toBeDefined();
@@ -2104,6 +2103,8 @@ export class LoggedOutUser extends BaseUser {
         expect(currentUrl).toContain(expectedDestinationDomain);
       }
       expect(currentUrl).toContain(expectedAccountId);
+    } catch (error) {
+      throw error;
     } finally {
       await newTabPage?.close();
     }
