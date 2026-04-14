@@ -410,22 +410,22 @@ describe('Blog Admin Page component ', () => {
   });
 
   describe('status message auto-clear', () => {
-    it('should clear after 3 seconds', fakeAsync(() => {
+    it('should clear after 10 seconds', fakeAsync(() => {
       component.statusMessage = 'Test message';
 
       expect(component.statusMessage).toBe('Test message');
 
-      tick(3000);
+      tick(10000);
 
       expect(component.statusMessage).toBe('');
     }));
 
     it('should reset the timer when a new status message is set', fakeAsync(() => {
       component.statusMessage = 'First message';
-      tick(2000);
+      tick(5000);
 
       component.statusMessage = 'Second message';
-      tick(2000);
+      tick(9000);
 
       expect(component.statusMessage).toBe('Second message');
 

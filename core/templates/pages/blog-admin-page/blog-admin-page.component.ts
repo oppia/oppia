@@ -77,7 +77,7 @@ export class BlogAdminPageComponent implements OnInit {
     this.statusMessageTimeout = setTimeout(() => {
       this._statusMessage = '';
       this.statusMessageTimeout = null;
-    }, 3000);
+    }, 10000);
   }
   constructor(
     private backendApiService: BlogAdminBackendApiService,
