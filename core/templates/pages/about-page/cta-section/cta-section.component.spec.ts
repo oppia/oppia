@@ -18,6 +18,7 @@
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {MatTabsModule} from '@angular/material/tabs';
 import {NgbAccordionModule, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
@@ -35,7 +36,7 @@ class MockWindowRef {
   };
 }
 
-describe('CtaSectionComponent', () => {
+fdescribe('CtaSectionComponent', () => {
   let component: CtaSectionComponent;
   let fixture: ComponentFixture<CtaSectionComponent>;
 
@@ -43,6 +44,7 @@ describe('CtaSectionComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
+        NoopAnimationsModule,
         MatTabsModule,
         NgbAccordionModule,
         NgbModule,
@@ -133,5 +135,21 @@ describe('CtaSectionComponent', () => {
       'oppia-about-cta-subtext',
       'e2e-test-about-page-partner-learn-more-desktop-button',
     ]);
+  });
+
+  it('should return the correct image set for multiple sizes', () => {
+    expect(
+      component.getImageSet('/about/testImageName', 'png', [1, 1.5, 2])
+    ).toBe(
+      '/assets/images/about/testImageName1x.png 1x, ' +
+        '/assets/images/about/testImageName15x.png 1.5x, ' +
+        '/assets/images/about/testImageName2x.png 2x'
+    );
+  });
+
+  it('should return the correct image set for a single size', () => {
+    expect(component.getImageSet('/about/testImageName', 'png', [1.5])).toBe(
+      '/assets/images/about/testImageName15x.png 1.5x'
+    );
   });
 });

@@ -201,7 +201,9 @@ describe('About Page', () => {
   });
 
   it('should default to english form link when current language is undefined', () => {
-    translateService.currentLang = undefined;
+    (
+      translateService as TranslateService & {currentLang?: string}
+    ).currentLang = undefined;
     component.setPartnershipsFormLink();
 
     expect(component.partnershipsFormLink).toBe(
@@ -224,14 +226,14 @@ describe('About Page', () => {
   it('should ensure all items in featuresData array have panelIsCollapsed property as true', () => {
     expect(
       component.featuresData.every(item => item.panelIsCollapsed === true)
-    ).toBeTrue();
+    ).toBe(true);
   });
 
   it('should toggle the panels at given index', () => {
     component.expandPanel(1);
-    expect(component.featuresData[1].panelIsCollapsed).toBeFalse();
+    expect(component.featuresData[1].panelIsCollapsed).toBe(false);
     component.closePanel(1);
-    expect(component.featuresData[1].panelIsCollapsed).toBeTrue();
+    expect(component.featuresData[1].panelIsCollapsed).toBe(true);
   });
 
   it('should show thank you modal on query parameters change', () => {
@@ -268,14 +270,14 @@ describe('About Page', () => {
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true
     );
-    expect(component.isLanguageRTL()).toBeTrue();
+    expect(component.isLanguageRTL()).toBe(true);
   });
 
   it('should get the correct RTL status if the current language is not RTL', () => {
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       false
     );
-    expect(component.isLanguageRTL()).toBeFalse();
+    expect(component.isLanguageRTL()).toBe(false);
   });
 
   it('should record analytics when Explore Lessons is clicked', () => {

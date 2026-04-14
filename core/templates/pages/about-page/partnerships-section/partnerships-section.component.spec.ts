@@ -63,4 +63,10 @@ describe('PartnershipsSectionComponent', () => {
         '/assets/images/about/testImageName2x.png 2x'
     );
   });
+
+  it('should return the correct image set for a single size', () => {
+    expect(component.getImageSet('/about/testImageName', 'png', [1.5])).toBe(
+      '/assets/images/about/testImageName15x.png 1.5x'
+    );
+  });
 });

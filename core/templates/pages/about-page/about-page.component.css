@@ -613,12 +613,6 @@
   outline: none;
 }
 
-@media only screen and (max-width: 976px) {
-}
-
-@media only screen and (max-width: 768px) {
-}
-
 .about-page .oppia-about-subtitle {
   color: #717171;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
