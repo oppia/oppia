@@ -463,11 +463,16 @@ const addThumbnailToTopic = async function (page, topicName) {
 
     await page.focus(topicMetaTagInput);
     await page.type(topicMetaTagInput, 'meta');
-    await page.keyboard.press('Tab');
-
-    await page.waitForSelector(saveTopicButton);
+    await page.click('.e2e-test-topic-editor-container');
+    await page.waitForSelector('.e2e-test-save-topic-button:not([disabled])', {
+      visible: true,
+      timeout: 15000,
+    });
     await page.click(saveTopicButton);
-    await page.waitForSelector(topicCommitMessageInput);
+    await page.waitForSelector(topicCommitMessageInput, {
+      visible: true,
+      timeout: 15000,
+    });
     await page.focus(topicCommitMessageInput);
     await page.type(topicCommitMessageInput, 'Updated thumbnail');
 

@@ -19,9 +19,6 @@
 
 var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');
-var waitFor = require(
-  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js'
-);
 
 var customizeInteraction = async function (elem, requireNonnegativeInput) {
   await objects
@@ -36,16 +33,19 @@ var expectInteractionDetailsToMatch = async function (elem) {
 };
 
 var submitAnswer = async function (elem, answer) {
-  var numericInputInteraction = elem.$('<oppia-interactive-numeric-input>');
-  await waitFor.presenceOf(
-    numericInputInteraction,
-    'NumericInput interaction taking too long to appear.'
+  var resolvedElem = await elem;
+  var numericInputInteraction = await resolvedElem.$(
+    '<oppia-interactive-numeric-input>'
   );
-  var numericInput = numericInputInteraction.$('<input>');
-  await waitFor.presenceOf(
-    numericInput,
-    'NumericInput input field taking too long to appear.'
-  );
+  await numericInputInteraction.waitForExist({
+    timeout: 10000,
+    timeoutMsg: 'NumericInput interaction taking too long to appear.',
+  });
+  var numericInput = await numericInputInteraction.$('<input>');
+  await numericInput.waitForExist({
+    timeout: 10000,
+    timeoutMsg: 'NumericInput input field taking too long to appear.',
+  });
   await action.setValue('Numeric Input Element', numericInput, answer);
   var submitAnswerBtn = $('.e2e-test-submit-answer-button');
   await action.click('Submit Answer Button', submitAnswerBtn);
