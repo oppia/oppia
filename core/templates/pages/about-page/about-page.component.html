@@ -106,12 +106,20 @@
             <div class="oppia-about-accordion-title-container ">
               <p class="oppia-about-accordion-panel-title oppia-about-platform-subtext"> {{ panel.title | translate }} </p>
               <button (click)="closePanel(i)"
-                      class="e2e-test-about-page-features-panel-close-button">
+                      class="e2e-test-about-page-features-panel-close-button"
+                      [attr.aria-label]="'I18N_ABOUT_PAGE_FEATURE_PANEL_CLOSE_BUTTON' | translate">
                 <i class="fas fa-minus accordion-icon"></i>
               </button>
             </div>
             <p class="oppia-about-platform-subtext e2e-test-about-page-features-panel-content"> {{ panel.text | translate }} </p>
-            <img *ngIf="panel.image" [src]="panel.image" >
+            <div class="panel-image-container" *ngIf="panel.image">
+              <picture>
+                <source type="image/webp" [srcset]="getStaticImageUrl(panel.image + '.webp')">
+                <source type="image/png" [srcset]="getStaticImageUrl(panel.image + '.png')">
+                <img [src]="getStaticImageUrl(panel.image + '.png')"
+                     [alt]="panel.altText">
+              </picture>
+            </div>
           </div>
         </div>
       </div>

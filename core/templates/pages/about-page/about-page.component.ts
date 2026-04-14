@@ -21,6 +21,7 @@ import {Component, OnInit, OnDestroy} from '@angular/core';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {OppiaPlatformStatsData} from '../../oppia-platform-stats';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation-box-modal.component';
 import {ThanksForDonatingModalComponent} from 'pages/donate-page/thanks-for-donating-modal.component';
@@ -113,6 +114,7 @@ export class AboutPageComponent implements OnInit, OnDestroy {
 
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
+    private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
     private ngbModal: NgbModal,
     private windowDimensionsService: WindowDimensionsService,
@@ -190,6 +192,10 @@ export class AboutPageComponent implements OnInit, OnDestroy {
 
   closePanel(index: number): void {
     this.featuresData[index].panelIsCollapsed = true;
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
   isLanguageRTL(): boolean {
