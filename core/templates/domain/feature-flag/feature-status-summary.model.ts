@@ -36,7 +36,6 @@ export enum FeatureNames {
   CdAllowUndoingTranslationReview = 'cd_allow_undoing_translation_review',
   ExplorationEditorCanModifyTranslations = 'exploration_editor_can_modify_translations',
   ExplorationEditorCanTagMisconceptions = 'exploration_editor_can_tag_misconceptions',
-  EnableMultipleClassrooms = 'enable_multiple_classrooms',
   RedesignedTopicViewerPage = 'redesigned_topic_viewer_page',
   AutomaticVoiceoverRegenerationFromExp = 'automatic_voiceover_regeneration_from_exp',
   ShowVoiceoverTabForNonCuratedExplorations = 'show_voiceover_tab_for_non_curated_explorations',
