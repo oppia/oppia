@@ -290,7 +290,7 @@ describe('RTE display component', () => {
   it('should correctly wrap html content inside span tag for highlighting', fakeAsync(() => {
     let rteString = '<p>Hi<em>Hello</em>Hello</p>';
     let expectedOutputWrappedString =
-      '<p><span id="highlightBlock1">Hi<em>Hello</em>Hello</span></p>';
+      '<p><span class="highlightBlock1">Hi<em>Hello</em>Hello</span></p>';
 
     spyOn(
       localStorageService,
@@ -304,9 +304,9 @@ describe('RTE display component', () => {
   it('should correctly wrap html multiple sentences inside span tag for highlighting', fakeAsync(() => {
     let rteString = '<p>Hi world! I am a content creator.</p>';
     let expectedOutputWrappedString =
-      '<p><span id="highlightBlock1">Hi world!</span>' +
+      '<p><span class="highlightBlock1">Hi world!</span>' +
       '<span> </span>' +
-      '<span id="highlightBlock2">I am a content creator.</span></p>';
+      '<span class="highlightBlock2">I am a content creator.</span></p>';
 
     spyOn(
       localStorageService,
@@ -607,25 +607,39 @@ describe('RTE display component', () => {
         'getCurrentSentenceIdToHighlight'
       ).and.returnValue('highlightBlock2');
 
-      spyOn(document, 'getElementById').and.callFake((id: string) => {
-        if (id === 'highlightBlock1') {
-          return previousElement;
-        } else if (id === 'highlightBlock2') {
-          return currentElement;
+      spyOn(
+        automaticVoiceoverHighlightService,
+        'getUnmodifiedSentenceByHighlightId'
+      ).and.callFake((className: string) => {
+        if (className === 'highlightBlock1') {
+          return 'Hello world';
+        } else if (className === 'highlightBlock2') {
+          return 'New element';
         }
         return null;
       });
 
+      spyOn(document, 'getElementsByClassName').and.callFake(
+        (className: string) => {
+          if (className === 'highlightBlock1') {
+            return [previousElement];
+          } else if (className === 'highlightBlock2') {
+            return [currentElement];
+          }
+          return null;
+        }
+      );
+
       component.highlightSentenceDuringVoiceoverPlay();
 
       expect(
-        (document.getElementById('highlightBlock1') as HTMLElement).style
-          .backgroundColor
+        (document.getElementsByClassName('highlightBlock1')[0] as HTMLElement)
+          .style.backgroundColor
       ).toBe('');
 
       expect(
-        (document.getElementById('highlightBlock2') as HTMLElement).style
-          .backgroundColor
+        (document.getElementsByClassName('highlightBlock2')[0] as HTMLElement)
+          .style.backgroundColor
       ).toBe('rgb(243, 209, 64)');
       expect(component.previousHighlightedElementId).toBe('highlightBlock2');
     })
@@ -654,13 +668,15 @@ describe('RTE display component', () => {
       'getCurrentSentenceIdToHighlight'
     ).and.returnValue('highlightBlock1');
 
-    spyOn(document, 'getElementById').and.returnValue(previousElement);
+    spyOn(document, 'getElementsByClassName').and.returnValue([
+      previousElement,
+    ]);
 
     component.highlightSentenceDuringVoiceoverPlay();
 
     expect(
-      (document.getElementById('highlightBlock1') as HTMLElement).style
-        .backgroundColor
+      (document.getElementsByClassName('highlightBlock1')[0] as HTMLElement)
+        .style.backgroundColor
     ).toBe('');
   }));
 
@@ -739,5 +755,82 @@ describe('RTE display component', () => {
     );
     const result = component.isSolutionCollapsedForWorkedexample();
     expect(result).toBe(false);
+  });
+
+  it('should return false for excluded interactive tags in editor mode', () => {
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(false);
+
+    const excludedTopLevelTags = [
+      'OPPIA-INTERACTIVE-DRAG-AND-DROP-SORT-INPUT',
+      'OPPIA-INTERACTIVE-MULTIPLE-CHOICE-INPUT',
+      'OPPIA-INTERACTIVE-ITEM-SELECTION-INPUT',
+    ];
+
+    excludedTopLevelTags.forEach(tagName => {
+      component.topLevelHtmlNodename = tagName;
+      expect(component.shouldHighlightContent()).toBeFalse();
+    });
+  });
+
+  it('should return true for non-excluded tags in editor mode', () => {
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(false);
+
+    component.topLevelHtmlNodename = 'P';
+
+    expect(component.shouldHighlightContent()).toBeTrue();
+  });
+
+  it('should return true for content section in player or preview mode', () => {
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
+    spyOn(component, 'getActiveContentId').and.returnValue('content_0');
+
+    component.rteStringContext = 'content';
+
+    expect(component.shouldHighlightContent()).toBeTrue();
+  });
+
+  it('should return false for content section with non-content context in player or preview mode', () => {
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
+    spyOn(component, 'getActiveContentId').and.returnValue('content_0');
+
+    component.rteStringContext = 'feedback';
+
+    expect(component.shouldHighlightContent()).toBeFalse();
+  });
+
+  it('should return true for default outcome feedback section in player or preview mode', () => {
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
+    spyOn(component, 'getActiveContentId').and.returnValue('default_outcome_1');
+
+    component.rteStringContext = 'feedback';
+
+    expect(component.shouldHighlightContent()).toBeTrue();
+  });
+
+  it('should return true for feedback section in supplemental card context in player or preview mode', () => {
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
+    spyOn(component, 'getActiveContentId').and.returnValue('feedback_2');
+
+    component.rteStringContext = 'supplemental-card';
+
+    expect(component.shouldHighlightContent()).toBeTrue();
+  });
+
+  it('should return false for feedback section with content context in player or preview mode', () => {
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
+    spyOn(component, 'getActiveContentId').and.returnValue('feedback_2');
+
+    component.rteStringContext = 'content';
+
+    expect(component.shouldHighlightContent()).toBeFalse();
+  });
+
+  it('should return false for unknown section in player or preview mode', () => {
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
+    spyOn(component, 'getActiveContentId').and.returnValue('hint_0');
+
+    component.rteStringContext = 'content';
+
+    expect(component.shouldHighlightContent()).toBeFalse();
   });
 });
