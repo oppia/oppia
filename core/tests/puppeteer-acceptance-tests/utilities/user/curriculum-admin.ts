@@ -900,12 +900,7 @@ export class CurriculumAdmin extends TopicManager {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(mobileOptionsSelector);
       await this.clickOnElementWithSelector(mobileSaveTopicButton);
-      // Wait for the modal and its animation to fully complete before
-      // interacting. NgbModal adds the 'show' class to '.modal' only after
-      // the CSS fade-in animation finishes. Without this, elementFromPoint()
-      // in isElementClickable() may return a mid-animation element instead of
-      // the button, causing waitForElementToBeClickable to time out.
-      await this.page.waitForSelector('.modal.show', {visible: true});
+      await this.expectElementToBeVisible('.modal.show');
       await this.typeInInputField(
         saveChangesMessageInput,
         'Test saving topic as curriculum admin.'
@@ -922,12 +917,7 @@ export class CurriculumAdmin extends TopicManager {
       }
     } else {
       await this.clickOnElementWithSelector(saveTopicButton);
-      // Wait for the modal and its animation to fully complete before
-      // interacting. NgbModal adds the 'show' class to '.modal' only after
-      // the CSS fade-in animation finishes. Without this, elementFromPoint()
-      // in isElementClickable() may return a mid-animation element instead of
-      // the button, causing waitForElementToBeClickable to time out.
-      await this.page.waitForSelector('.modal.show', {visible: true});
+      await this.expectElementToBeVisible('.modal.show');
       await this.typeInInputField(
         saveChangesMessageInput,
         'Test saving topic as curriculum admin.'
