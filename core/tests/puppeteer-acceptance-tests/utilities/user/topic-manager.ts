@@ -4546,6 +4546,7 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(mobilePublishStoryButton);
       await this.clickOnElementWithSelector(mobilePublishStoryButton);
     } else {
+      await this.waitForElementToBeClickable(publishChapterButton);
       await this.clickOnElementWithSelector(publishChapterButton);
     }
   }

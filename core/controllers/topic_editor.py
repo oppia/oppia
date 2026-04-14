@@ -396,7 +396,7 @@ class EditableSubtopicPageDataHandler(
                 'The subtopic page with the given id doesn\'t exist.'
             )
 
-        self.values.update({'subtopic_page': subtopic_page.to_dict()})
+        self.values.update({'subtopic_page_dict': subtopic_page.to_dict()})
 
         self.render_json(self.values)
 
@@ -450,7 +450,7 @@ class EditableStudyGuideDataHandler(
                 'The study guide with the given id doesn\'t exist.'
             )
 
-        self.values.update({'study_guide': study_guide.to_dict()})
+        self.values.update({'study_guide_dict': study_guide.to_dict()})
 
         self.render_json(self.values)
 
