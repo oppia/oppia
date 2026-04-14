@@ -218,13 +218,13 @@ describe('Add Answer Group Modal Component', () => {
     it('should return true when interaction is not NumericInput', () => {
       component.currentInteractionId = 'TextInput';
       component.tmpRule = new Rule('Equals', {}, {});
-      expect(component.isRuleValid()).toBeTrue();
+      expect(component.isRuleValid()).toBe(true);
     });
 
     it('should return true when interaction is NumericInput but rule is not IsWithinTolerance', () => {
       component.currentInteractionId = 'NumericInput';
       component.tmpRule = new Rule('Equals', {x: 5}, {});
-      expect(component.isRuleValid()).toBeTrue();
+      expect(component.isRuleValid()).toBe(true);
     });
 
     it('should return true when interaction is NumericInput, rule is IsWithinTolerance, and tol is >= 0', () => {
@@ -234,7 +234,7 @@ describe('Add Answer Group Modal Component', () => {
         {tol: 0, x: 5},
         {tol: 'Real', x: 'Real'}
       );
-      expect(component.isRuleValid()).toBeTrue();
+      expect(component.isRuleValid()).toBe(true);
     });
 
     it('should return false when interaction is NumericInput, rule is IsWithinTolerance, and tol is < 0', () => {
@@ -244,7 +244,7 @@ describe('Add Answer Group Modal Component', () => {
         {tol: -2, x: 5},
         {tol: 'Real', x: 'Real'}
       );
-      expect(component.isRuleValid()).toBeFalse();
+      expect(component.isRuleValid()).toBe(false);
     });
   });
 });
