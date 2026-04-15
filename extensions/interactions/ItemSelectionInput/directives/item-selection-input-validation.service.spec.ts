@@ -203,13 +203,17 @@ describe('ItemSelectionInputValidationService', () => {
     ];
   });
 
-  it('should be able to perform basic validation', () => {
-    var warnings = validatorService.getAllWarnings(
+  var getWarnings = function () {
+    return validatorService.getAllWarnings(
       currentState,
       customizationArguments,
       goodAnswerGroups,
       goodDefaultOutcome
     );
+  };
+
+  it('should be able to perform basic validation', () => {
+    var warnings = getWarnings();
     expect(warnings).toEqual([]);
   });
 
@@ -217,12 +221,7 @@ describe('ItemSelectionInputValidationService', () => {
     customizationArguments.minAllowableSelectionCount.value = -1;
     customizationArguments.maxAllowableSelectionCount.value = 2;
 
-    let warnings = validatorService.getAllWarnings(
-      currentState,
-      customizationArguments,
-      goodAnswerGroups,
-      goodDefaultOutcome
-    );
+    var warnings = getWarnings();
     expect(warnings).toContain(
       jasmine.objectContaining({
         type: WARNING_TYPES.CRITICAL,
@@ -235,12 +234,7 @@ describe('ItemSelectionInputValidationService', () => {
     customizationArguments.minAllowableSelectionCount.value = 2;
     customizationArguments.maxAllowableSelectionCount.value = -1;
 
-    let warnings = validatorService.getAllWarnings(
-      currentState,
-      customizationArguments,
-      goodAnswerGroups,
-      goodDefaultOutcome
-    );
+    var warnings = getWarnings();
     expect(warnings).toContain(
       jasmine.objectContaining({
         type: WARNING_TYPES.CRITICAL,
@@ -253,12 +247,7 @@ describe('ItemSelectionInputValidationService', () => {
     customizationArguments.minAllowableSelectionCount.value = -5;
     customizationArguments.maxAllowableSelectionCount.value = -2;
 
-    let warnings = validatorService.getAllWarnings(
-      currentState,
-      customizationArguments,
-      goodAnswerGroups,
-      goodDefaultOutcome
-    );
+    var warnings = getWarnings();
     expect(warnings).toContain(
       jasmine.objectContaining({
         type: WARNING_TYPES.CRITICAL,
