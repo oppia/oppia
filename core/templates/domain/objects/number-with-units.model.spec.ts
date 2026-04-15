@@ -305,6 +305,9 @@ describe('NumberWithUnits', () => {
         NumberWithUnits.fromRawInputString('3# m/s');
       }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
+        NumberWithUnits.fromRawInputString('blah');
+      }).toThrowError(errors.INVALID_VALUE);
+      expect(() => {
         NumberWithUnits.fromRawInputString('3 $');
       }).toThrowError(errors.INVALID_CURRENCY_FORMAT);
       expect(() => {

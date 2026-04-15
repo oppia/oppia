@@ -227,6 +227,27 @@ export class NumberWithUnits {
           }
         }
         if (startsWithCorrectCurrencyUnit === false) {
+          const containsDigit = rawInput.match(/[0-9]/);
+          const startsWithCurrencySymbol = keys.some(key => {
+            return ObjectsDomainConstants.CURRENCY_UNITS[key].front_units.some(
+              frontUnit => {
+                const trimmedFrontUnit = frontUnit.trim();
+                return (
+                  rawInput.startsWith(frontUnit) ||
+                  rawInput.startsWith(trimmedFrontUnit) ||
+                  rawInput
+                    .toLowerCase()
+                    .startsWith(trimmedFrontUnit.toLowerCase())
+                );
+              }
+            );
+          });
+          if (!containsDigit && !startsWithCurrencySymbol) {
+            throw new Error(
+              // eslint-disable-next-line max-len
+              ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_VALUE
+            );
+          }
           throw new Error(
             // eslint-disable-next-line max-len
             ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_CURRENCY
