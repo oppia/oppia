@@ -866,12 +866,25 @@ class SuggestionTranslateContent(BaseSuggestion):
         Returns:
             list(str). The list of html content strings.
         """
-        assert isinstance(self.change_cmd.translation_html, str)
-        assert isinstance(self.change_cmd.content_html, str)
-        return [
-            self.change_cmd.translation_html,
-            self.change_cmd.content_html,
-        ]
+        # Here we use cast because translation/content HTML can be either
+        # string or list of strings, and we need to support both formats.
+        translation_html = cast(
+            Union[str, List[str]], self.change_cmd.translation_html
+        )
+        content_html = cast(Union[str, List[str]], self.change_cmd.content_html)
+
+        html_strings: List[str] = []
+        if isinstance(translation_html, list):
+            html_strings.extend(translation_html)
+        else:
+            html_strings.append(translation_html)
+
+        if isinstance(content_html, list):
+            html_strings.extend(content_html)
+        else:
+            html_strings.append(content_html)
+
+        return html_strings
 
     def get_target_entity_html_strings(self) -> List[str]:
         """Gets all html content strings from target entity used in the
