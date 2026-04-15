@@ -165,7 +165,7 @@ class LibraryIndexHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     ),
                     'has_full_results_page': True,
                     'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
-                    'protractor_id': 'top-rated',  # type: ignore[typeddict-unknown-key]
+                    'protractor_id': 'top-rated',  # type: ignore[typeddict-item]
                 },
             )
         if featured_activity_summary_dicts:

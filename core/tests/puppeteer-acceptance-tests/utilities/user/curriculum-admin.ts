@@ -1953,17 +1953,27 @@ export class CurriculumAdmin extends TopicManager {
 
     const isMobileWidth = this.isViewportAtMobileWidth();
     if (isMobileWidth) {
-      const optionsButton = await this.page.waitForSelector(mobileOptionsSelector);
+      const optionsButton = await this.page.waitForSelector(
+        mobileOptionsSelector
+      );
       await optionsButton?.evaluate(el => (el as HTMLElement).click());
-      const saveDropdown = await this.page.waitForSelector(mobileSaveTopicDropdown);
+      const saveDropdown = await this.page.waitForSelector(
+        mobileSaveTopicDropdown
+      );
       await saveDropdown?.evaluate(el => (el as HTMLElement).click());
       await this.page.waitForSelector(mobileNavbarDropdownOptions);
-      const unpublishButton = await this.page.waitForSelector(mobileUnpublishTopicButton);
+      const unpublishButton = await this.page.waitForSelector(
+        mobileUnpublishTopicButton
+      );
       await unpublishButton?.evaluate(el => (el as HTMLElement).click());
       await this.page.reload({waitUntil: 'networkidle0'});
-      const optionsButtonFinal = await this.page.waitForSelector(mobileOptionsSelector);
+      const optionsButtonFinal = await this.page.waitForSelector(
+        mobileOptionsSelector
+      );
       await optionsButtonFinal?.evaluate(el => (el as HTMLElement).click());
-      const saveDropdownFinal = await this.page.waitForSelector(mobileSaveTopicDropdown);
+      const saveDropdownFinal = await this.page.waitForSelector(
+        mobileSaveTopicDropdown
+      );
       await saveDropdownFinal?.evaluate(el => (el as HTMLElement).click());
       await this.page.waitForSelector(mobileNavbarDropdownOptions);
     } else {

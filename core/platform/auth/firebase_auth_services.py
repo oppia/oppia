@@ -451,7 +451,7 @@ def associate_multi_auth_ids_with_user_ids(
     # Turn list(pair) to pair(list): https://stackoverflow.com/a/7558990/4859885
     auth_ids, user_ids = zip(*auth_id_user_id_pairs)
 
-    user_id_collisions = get_multi_user_ids_from_auth_ids(list(auth_ids))
+    user_id_collisions = get_multi_user_ids_from_auth_ids(auth_ids)
     if any(user_id is not None for user_id in user_id_collisions):
         user_id_collisions_text = ', '.join(
             '{auth_id=%r: user_id=%r}' % (auth_id, user_id)
@@ -460,7 +460,7 @@ def associate_multi_auth_ids_with_user_ids(
         )
         raise Exception('already associated: %s' % user_id_collisions_text)
 
-    auth_id_collisions = get_multi_auth_ids_from_user_ids(list(user_ids))
+    auth_id_collisions = get_multi_auth_ids_from_user_ids(user_ids)
     if any(auth_id is not None for auth_id in auth_id_collisions):
         auth_id_collisions_text = ', '.join(
             '{user_id=%r: auth_id=%r}' % (user_id, auth_id)

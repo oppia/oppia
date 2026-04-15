@@ -73,7 +73,6 @@ from extensions import domain
 
 import deepdiff
 from typing import (
-    Any,
     Dict,
     Final,
     List,
@@ -137,7 +136,7 @@ class UserExplorationDataDict(TypedDict):
     show_state_editor_tutorial_on_load: bool
     show_state_translation_tutorial_on_load: bool
     is_version_of_draft_valid: Optional[bool]
-    draft_changes: Optional[List[Dict[str, Any]]]
+    draft_changes: Dict[str, str]
     email_preferences: user_domain.UserExplorationPrefsDict
     next_content_id_index: int
     exploration_metadata: exp_domain.ExplorationMetadataDict

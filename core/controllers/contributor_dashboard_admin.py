@@ -768,7 +768,7 @@ def get_translation_coordinator_frontend_dict(
         coordinator_activity_list = []
         # Here we use MyPy ignore because MyPy doesn't allow key addition
         # to TypedDict.
-        stats_dict['translators_count'] = (  # type: ignore[typeddict-unknown-key]
+        stats_dict['translators_count'] = (  # type: ignore[typeddict-item]
             contribution_stats_services.get_translator_counts(
                 stats_dict['language_id']
             )
@@ -778,7 +778,7 @@ def get_translation_coordinator_frontend_dict(
 
         # Here we use MyPy ignore because MyPy doesn't allow key addition
         # to TypedDict.
-        stats_dict['reviewers_count'] = (  # type: ignore[typeddict-unknown-key]
+        stats_dict['reviewers_count'] = (  # type: ignore[typeddict-item]
             community_stats.translation_reviewer_counts_by_lang_code[
                 stats_dict['language_id']
             ]
@@ -801,7 +801,7 @@ def get_translation_coordinator_frontend_dict(
 
         # Here we use MyPy ignore because MyPy doesn't allow key addition
         # to TypedDict.
-        stats_dict['coordinator_activity_list'] = coordinator_activity_list  # type: ignore[typeddict-unknown-key]
+        stats_dict['coordinator_activity_list'] = coordinator_activity_list  # type: ignore[typeddict-item]
 
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.

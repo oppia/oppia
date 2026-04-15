@@ -223,7 +223,8 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         result: Optional[user_models.UserQueryModel] = (
             user_models.UserQueryModel.query(
                 cloud_datastore_services.all_of(
-                    user_models.UserQueryModel.submitter_id == self.admin_user_id,
+                    user_models.UserQueryModel.submitter_id
+                    == self.admin_user_id,
                     user_models.UserQueryModel.query_status
                     == (feconf.USER_QUERY_STATUS_COMPLETED),
                 )
