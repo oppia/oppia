@@ -5722,44 +5722,6 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
             )
         )
 
-    def test_convert_states_v57_dict_to_v58_dict(self) -> None:
-        # Here we use cast because this test only needs the subset of state
-        # fields read by the migration helper.
-        states_dict = cast(
-            Dict[str, state_domain.StateDict],
-            {
-                'Intro': {
-                    'interaction': {
-                        'id': 'NumericInput',
-                        'customization_args': {
-                            'requireNonnegativeInput': {'value': False}
-                        },
-                    }
-                },
-                'Text State': {
-                    'interaction': {'id': 'TextInput', 'customization_args': {}}
-                },
-            },
-        )
-
-        converted_states_dict = exp_domain.Exploration._convert_states_v57_dict_to_v58_dict(  # pylint: disable=protected-access
-            states_dict
-        )
-
-        self.assertEqual(
-            converted_states_dict['Intro']['interaction']['customization_args'],
-            {
-                'requireNonnegativeInput': {'value': False},
-                'allowExponentialNotation': {'value': True},
-            },
-        )
-        self.assertEqual(
-            converted_states_dict['Text State']['interaction'][
-                'customization_args'
-            ],
-            {},
-        )
-
 
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
@@ -7406,8 +7368,6 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        allowExponentialNotation:
-          value: True
         requireNonnegativeInput:
           value: False
       default_outcome:
@@ -7555,8 +7515,6 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        allowExponentialNotation:
-          value: True
         requireNonnegativeInput:
           value: False
       default_outcome:
@@ -7705,8 +7663,6 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        allowExponentialNotation:
-          value: True
         requireNonnegativeInput:
           value: False
       default_outcome:
@@ -7800,7 +7756,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: Title
 """
@@ -8025,7 +7981,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: Title
 version: 0
@@ -8276,7 +8232,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: Title
 version: 0
@@ -8447,7 +8403,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: Title
 version: 0
@@ -8614,8 +8570,6 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        allowExponentialNotation:
-          value: true
         requireNonnegativeInput:
           value: false
       default_outcome:
@@ -8654,7 +8608,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -8934,7 +8888,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -9137,7 +9091,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -9310,7 +9264,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -9724,8 +9678,6 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        allowExponentialNotation:
-          value: true
         requireNonnegativeInput:
           value: false
       default_outcome:
@@ -9772,7 +9724,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -10190,7 +10142,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -10423,7 +10375,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -10721,7 +10673,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -11039,7 +10991,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -11351,7 +11303,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -11601,7 +11553,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -11818,7 +11770,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -12177,7 +12129,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -12449,7 +12401,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -12716,7 +12668,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -13181,7 +13133,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -13396,7 +13348,7 @@ states:
     linked_skill_id: null
     param_changes: []
     solicit_answer_details: false
-states_schema_version: 58
+states_schema_version: 57
 tags: []
 title: ''
 version: 0

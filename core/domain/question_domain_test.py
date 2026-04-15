@@ -2206,29 +2206,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             {'requireNonnegativeInput': {'value': False}},
         )
 
-    def test_question_state_dict_conversion_from_v57_to_v58(self) -> None:
-        self.question_state_dict['interaction']['id'] = 'NumericInput'
-        self.question_state_dict['interaction']['customization_args'] = {
-            'requireNonnegativeInput': {'value': False}
-        }
-        test_value: question_domain.VersionedQuestionStateDict = {
-            'state': self.question_state_dict,
-            'state_schema_version': 57,
-        }
-
-        question_domain.Question.update_state_from_model(
-            test_value, test_value['state_schema_version']
-        )
-
-        self.assertEqual(test_value['state_schema_version'], 58)
-        self.assertEqual(
-            test_value['state']['interaction']['customization_args'],
-            {
-                'requireNonnegativeInput': {'value': False},
-                'allowExponentialNotation': {'value': True},
-            },
-        )
-
     def test_question_state_dict_conversion_from_v49_to_v50(self) -> None:
         self.question_state_dict['interaction'][
             'id'

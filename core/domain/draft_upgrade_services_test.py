@@ -271,23 +271,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(migrated_draft_change_list_1_v57)
 
-    def test_convert_states_v57_dict_to_v58_dict(self) -> None:
-        draft_change_list_v57 = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'title',
-                    'new_value': 'New Title',
-                }
-            )
-        ]
-
-        migrated_draft_change_list_v58 = draft_upgrade_services.DraftUpgradeUtil._convert_states_v57_dict_to_v58_dict(  # pylint: disable=protected-access
-            draft_change_list_v57
-        )
-
-        self.assertEqual(migrated_draft_change_list_v58, draft_change_list_v57)
-
     def test_convert_states_v55_dict_to_v56_dict(self) -> None:
         draft_change_list_v55 = [
             exp_domain.ExplorationChange(

@@ -874,28 +874,14 @@ solicit_answer_details: false
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(io.BytesIO(golden_zipfile))
         # Compare saved with golden file.
-        saved_yaml = (
-            zf_saved.open('The title for ZIP download handler test.yaml')
-            .read()
-            .decode('utf-8')
+        self.assertEqual(
+            zf_saved.open(
+                'The title for ZIP download handler test.yaml'
+            ).read(),
+            zf_gold.open(
+                'The title for ZIP download handler test!.yaml'
+            ).read(),
         )
-        gold_yaml = (
-            zf_gold.open('The title for ZIP download handler test!.yaml')
-            .read()
-            .decode('utf-8')
-        )
-        saved_yaml_dict = utils.dict_from_yaml(saved_yaml)
-        gold_yaml_dict = utils.dict_from_yaml(gold_yaml)
-
-        # Keep this comparison resilient to schema version bumps.
-        gold_yaml_dict['schema_version'] = (
-            exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION
-        )
-        gold_yaml_dict['states_schema_version'] = (
-            feconf.CURRENT_STATE_SCHEMA_VERSION
-        )
-
-        self.assertEqual(saved_yaml_dict, gold_yaml_dict)
 
         # Check download to JSON.
         exp_services.update_exploration(

@@ -3110,11 +3110,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     state_dict['interaction']['customization_args'],
                     state_schema_version=45,
                 )
-                for _, customization_arg in customisation_args.items():
+                for ca_name in customisation_args:
                     list_of_subtitled_unicode_content_ids.extend(
                         state_domain.InteractionCustomizationArg.traverse_by_schema_and_get(
-                            customization_arg.schema,
-                            customization_arg.value,
+                            customisation_args[ca_name].schema,
+                            customisation_args[ca_name].value,
                             [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
                             lambda subtitled_unicode: subtitled_unicode.content_id,
                         )
@@ -3373,8 +3373,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 interaction['customization_args'],
                 state_schema_version=state_schema,
             )
-            for _, customization_arg in customisation_args.items():
-                content_id_list.extend(customization_arg.get_content_ids())
+            for ca_name in customisation_args:
+                content_id_list.extend(
+                    customisation_args[ca_name].get_content_ids()
+                )
 
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
@@ -5431,30 +5433,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _convert_states_v57_dict_to_v58_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Dict[str, state_domain.StateDict]:
-        """Converts from v57 to v58. Version 58 adds
-        allowExponentialNotation customization arg to NumericInput.
-
-        Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            Dict[str, state_domain.StateDict]. The converted v58 state
-            dictionary.
-        """
-        for _, state_dict in states_dict.items():
-            if state_dict['interaction']['id'] != 'NumericInput':
-                continue
-            customization_args = state_dict['interaction']['customization_args']
-            customization_args['allowExponentialNotation'] = {'value': True}
-
-        return states_dict
-
-    @classmethod
     def update_states_from_model(
         cls,
         versioned_exploration_states: VersionedExplorationStatesDict,
@@ -5921,7 +5899,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The dict representation of the Exploration domain object,
             following schema version v62.
         """
-        exploration_dict['schema_version'] = 62
+        exploration_dict['schema_version'] = 61
 
         exploration_dict['states'] = cls._convert_states_v56_dict_to_v57_dict(
             exploration_dict['states']
@@ -6092,12 +6070,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 outside the range [EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
                 CURRENT_EXP_SCHEMA_VERSION].
         """
-        versioned_exploration_dict = cls._migrate_to_latest_yaml_version(
-            yaml_content
-        )
-        exploration_dict = cls.migrate_state_schema(
-            dict(versioned_exploration_dict)
-        )
+        exploration_dict = cls._migrate_to_latest_yaml_version(yaml_content)
         exploration_dict['id'] = exploration_id
         return Exploration.from_dict(exploration_dict)
 

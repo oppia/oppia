@@ -3982,7 +3982,6 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         cust_args = question.question_state_data.interaction.customization_args
         self.assertEqual(cust_args['requireNonnegativeInput'].value, False)
-        self.assertEqual(cust_args['allowExponentialNotation'].value, True)
 
     def test_migrate_question_state_from_v45_to_latest(self) -> None:
         answer_group1 = {

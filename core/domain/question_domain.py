@@ -1968,29 +1968,6 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v57_dict_to_v58_dict(
-        cls, question_state_dict: state_domain.StateDict
-    ) -> state_domain.StateDict:
-        """Converts from v57 to v58. Version 58 adds
-        allowExponentialNotation customization arg to NumericInput.
-
-        Args:
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initialize a State domain object.
-
-        Returns:
-            dict. The converted question_state_dict.
-        """
-        if question_state_dict['interaction']['id'] != 'NumericInput':
-            return question_state_dict
-        customization_args = question_state_dict['interaction'][
-            'customization_args'
-        ]
-        customization_args['allowExponentialNotation'] = {'value': True}
-        return question_state_dict
-
-    @classmethod
     def update_state_from_model(
         cls,
         versioned_question_state: VersionedQuestionStateDict,

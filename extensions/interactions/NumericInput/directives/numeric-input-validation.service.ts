@@ -264,11 +264,9 @@ export class NumericInputValidationService {
     const extraExponent = /e.*e/g;
 
     if (value.match(invalidChars)) {
-      if (requireNonnegativeInput && !allowExponentialNotation) {
-        return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT_NO_MINUS';
-      } else if (requireNonnegativeInput && allowExponentialNotation) {
+      if (requireNonnegativeInput && value.includes('-')) {
         return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_MINUS';
-      } else if (!requireNonnegativeInput && !allowExponentialNotation) {
+      } else if (!allowExponentialNotation && value.includes('e')) {
         return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT';
       }
       return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS';
