@@ -460,7 +460,6 @@ const addThumbnailToTopic = async function (page, topicName) {
     await page.waitForSelector(thumbnailContainer, {visible: true});
     await page.click(topicPhotoSubmit);
     await page.waitForSelector(topicMetaTagInput, {visible: true});
-
     await page.focus(topicMetaTagInput);
     await page.type(topicMetaTagInput, 'meta');
     await page.click('.e2e-test-topic-editor-container');
