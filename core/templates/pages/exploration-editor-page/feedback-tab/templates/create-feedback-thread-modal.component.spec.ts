@@ -153,6 +153,18 @@ describe('Create Feedback Thread Modal Controller', function () {
     expect(ngbActiveModal.close).not.toHaveBeenCalled();
   });
 
+  it('should report subject as not too long when within limit', function () {
+    component.newThreadSubject = 'Valid subject';
+
+    expect(component.isSubjectTooLong()).toBeFalse();
+  });
+
+  it('should report message as not too long when within limit', function () {
+    component.newThreadText = 'Valid message';
+
+    expect(component.isMessageTooLong()).toBeFalse();
+  });
+
   it('should not close modal when subject shorter than limit', function () {
     spyOn(ngbActiveModal, 'close').and.callThrough();
     const mockForm = buildMockForm(false);
@@ -202,6 +214,18 @@ describe('Create Feedback Thread Modal Controller', function () {
     expect(component.messageValidationActive).toBeTrue();
   });
 
+  it('should identify when trimmed subject is empty', function () {
+    component.newThreadSubject = '   ';
+
+    expect(component.isSubjectTrimmedEmpty()).toBeTrue();
+  });
+
+  it('should identify when trimmed subject is too short', function () {
+    component.newThreadSubject = '? ';
+
+    expect(component.isSubjectTrimmedTooShort()).toBeTrue();
+  });
+
   it('should clear subject validation flag after fixing value', function () {
     component.subjectValidationActive = true;
     component.newThreadSubject = 'Valid subject';
@@ -209,6 +233,15 @@ describe('Create Feedback Thread Modal Controller', function () {
     component.onSubjectInputChange();
 
     expect(component.subjectValidationActive).toBeFalse();
+  });
+
+  it('should keep subject validation flag active when value is still invalid', function () {
+    component.subjectValidationActive = true;
+    component.newThreadSubject = '  ';
+
+    component.onSubjectInputChange();
+
+    expect(component.subjectValidationActive).toBeTrue();
   });
 
   it('should activate message validation flag when message invalid', function () {
@@ -229,5 +262,26 @@ describe('Create Feedback Thread Modal Controller', function () {
     component.onMessageInputChange();
 
     expect(component.messageValidationActive).toBeFalse();
+  });
+
+  it('should identify when trimmed message is empty', function () {
+    component.newThreadText = '   ';
+
+    expect(component.isMessageTrimmedEmpty()).toBeTrue();
+  });
+
+  it('should identify when trimmed message is too short', function () {
+    component.newThreadText = '?   ';
+
+    expect(component.isMessageTrimmedTooShort()).toBeTrue();
+  });
+
+  it('should keep message validation flag active when value is still invalid', function () {
+    component.messageValidationActive = true;
+    component.newThreadText = '  ';
+
+    component.onMessageInputChange();
+
+    expect(component.messageValidationActive).toBeTrue();
   });
 });
