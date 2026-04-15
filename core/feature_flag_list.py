@@ -150,7 +150,6 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
-    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER,
 ]
@@ -169,6 +168,7 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
     FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST,
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
+    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
 ]
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
@@ -298,13 +298,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag enables the new translation opportunity structure to '
             'the contributor dashboard.',
             feature_flag_domain.ServerMode.DEV,
-        )
-    ),
-    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT.value: (
-        (
-            'Allows creators to add worked examples to the review material '
-            'section of skills and explanation of the study guides.',
-            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS.value: (
