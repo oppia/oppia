@@ -60,6 +60,7 @@
         "core.storage.cloud_task.gae_models_test",
         "core.domain.cloud_task_domain_test",
         "core.jobs.batch_jobs.exploration_voiceover_sync_jobs_test",
+        "core.jobs.batch_jobs.cloud_task_run_migration_jobs_test",
         "core.jobs.batch_jobs.voiceover_synthesis_jobs_test"
     ],
     "2": [
