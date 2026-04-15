@@ -194,7 +194,7 @@ SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict(
                             # is a List[Any] empty list as it is the EndExploration,
                             # but the type of 'value' is defined as
                             # Dict[str, UnionOfCustomizationArgsDictValues].
-                            'value': []  # type: ignore[dict-item]
+                            'value': []
                         }
                     },
                     'answer_groups': [],

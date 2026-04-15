@@ -25,7 +25,7 @@ from core.platform.datastore import cloud_datastore_services
 from core.tests import test_utils
 
 from google.cloud import ndb
-from typing import Sequence, Tuple
+from typing import Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY:
@@ -220,13 +220,15 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
             [user_query_model1, user_query_model2]
         )
 
-        result = user_models.UserQueryModel.query(
-            cloud_datastore_services.all_of(
-                user_models.UserQueryModel.submitter_id == self.admin_user_id,
-                user_models.UserQueryModel.query_status
-                == (feconf.USER_QUERY_STATUS_COMPLETED),
-            )
-        ).get()
+        result: Optional[user_models.UserQueryModel] = (
+            user_models.UserQueryModel.query(
+                cloud_datastore_services.all_of(
+                    user_models.UserQueryModel.submitter_id == self.admin_user_id,
+                    user_models.UserQueryModel.query_status
+                    == (feconf.USER_QUERY_STATUS_COMPLETED),
+                )
+            ).get()
+        )
 
         self.assertEqual(result, user_query_model2)
 
@@ -240,14 +242,16 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
 
         self.assertEqual(result, user_query_model1)
 
-        result = user_models.UserQueryModel.query(
-            cloud_datastore_services.not_equal(
-                user_models.UserQueryModel.query_status,
-                feconf.USER_QUERY_STATUS_PROCESSING,
-            )
-        ).fetch()
+        fetched_results: Sequence[cloud_datastore_services.Model] = (
+            user_models.UserQueryModel.query(
+                cloud_datastore_services.not_equal(
+                    user_models.UserQueryModel.query_status,
+                    feconf.USER_QUERY_STATUS_PROCESSING,
+                )
+            ).fetch()
+        )
 
-        self.assertEqual(result, [user_query_model2])
+        self.assertEqual(fetched_results, [user_query_model2])
 
         results: Tuple[
             Sequence[cloud_datastore_services.Model],
