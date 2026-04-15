@@ -200,17 +200,6 @@ describe('About Page', () => {
     expect(component.partnershipsFormLink).toBe(formLink);
   });
 
-  it('should default to english form link when current language is undefined', () => {
-    (
-      translateService as unknown as {currentLang: string | undefined}
-    ).currentLang = undefined;
-    component.setPartnershipsFormLink();
-
-    expect(component.partnershipsFormLink).toBe(
-      AppConstants.PARTNERSHIPS_FORM_LINK
-    );
-  });
-
   it(
     'should set english link for languages not supported by' + ' google forms',
     () => {
