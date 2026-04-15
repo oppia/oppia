@@ -202,7 +202,7 @@ describe('About Page', () => {
 
   it('should default to english form link when current language is undefined', () => {
     (
-      translateService as TranslateService & {currentLang?: string}
+      translateService as unknown as {currentLang: string | undefined}
     ).currentLang = undefined;
     component.setPartnershipsFormLink();
 
@@ -234,6 +234,12 @@ describe('About Page', () => {
     expect(component.featuresData[1].panelIsCollapsed).toBe(false);
     component.closePanel(1);
     expect(component.featuresData[1].panelIsCollapsed).toBe(true);
+  });
+
+  it('should return the correct static image url', () => {
+    expect(component.getStaticImageUrl('/path/to/image.png')).toBe(
+      '/assets/images/path/to/image.png'
+    );
   });
 
   it('should show thank you modal on query parameters change', () => {

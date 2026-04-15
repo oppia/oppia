@@ -117,11 +117,8 @@
           </span>
         </button>
 
-        <ngb-carousel
+        <ngb-carousel [interval]="0" [showNavigationArrows]="false" [animation]="false"
           #volunteerCarousel
-          [interval]="0"
-          [showNavigationArrows]="false"
-          [animation]="false"
           *ngIf="!mobile && volunteerRolesIndices[screenType].length > 1">
           <ng-template ngbSlide *ngFor="let activeIndices of volunteerRolesIndices[screenType]">
             <ng-container
@@ -135,11 +132,8 @@
           </ng-template>
         </ngb-carousel>
 
-        <ngb-carousel
+        <ngb-carousel [interval]="0" [showNavigationArrows]="false" [animation]="false"
           #volunteerCarouselMobile
-          [interval]="0"
-          [showNavigationArrows]="false"
-          [animation]="false"
           *ngIf="mobile && volunteerRolesIndices[screenType].length > 1">
           <ng-template ngbSlide *ngFor="let activeIndices of volunteerRolesIndices[screenType]">
             <ng-container
