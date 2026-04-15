@@ -20,13 +20,13 @@ from __future__ import annotations
 
 import datetime
 
+from typing import Type
+
 from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import cloud_task_run_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
-
-from typing import Type
 
 MYPY = False
 if MYPY:  # pragma: no cover

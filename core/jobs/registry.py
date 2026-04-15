@@ -43,72 +43,7 @@ from core.jobs import base_jobs
 # We need this to happen for every job in this registry file, because the
 # registry depends on JobMetaclass to handle the responsibility of keeping track
 # of every job.
-from core.jobs.batch_jobs import (  # pylint: disable=unused-import
-    audit_non_existent_threads_messages_jobs,
-    audit_stories_with_disconnected_node_ids_job,
-    audit_threads_with_missing_suggestions_jobs,
-    blog_author_details_migration_jobs,
-    blog_post_search_indexing_jobs,
-    blog_validation_jobs,
-    cleanup_duplicate_translation_suggestions_jobs,
-    cloud_task_run_migration_jobs,
-    collection_info_jobs,
-    contributor_admin_stats_jobs,
-    delete_duplicate_content_ids_jobs,
-    dummy_jobs,
-    email_deletion_jobs,
-    exp_migration_jobs,
-    exp_search_indexing_jobs,
-    exploration_voiceover_sync_jobs,
-    math_interactions_audit_jobs,
-    model_validation_jobs,
-    number_with_units_audit_jobs,
-    opportunity_management_jobs,
-    question_migration_jobs,
-    skill_inspection_jobs,
-    skill_migration_jobs,
-    story_migration_jobs,
-    subtopic_migration_jobs,
-    suggestion_migration_jobs,
-    suggestion_stats_computation_jobs,
-    topic_migration_jobs,
-    translation_audit_jobs,
-    translation_migration_jobs,
-    user_bios_change_jobs,
-    user_stats_computation_jobs,
-    user_validation_jobs,
-    voiceover_synthesis_jobs,
-)
 
-from typing import List, Type
-
-from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
-    exp_recommendation_computation_jobs,
-)
-from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
-    suggestion_edit_state_content_deletion_jobs,
-)
-from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
-    exp_version_history_computation_job,
-)
-from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
-    rejecting_suggestion_for_invalid_content_ids_jobs,
-)
-from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
-    remove_profile_picture_data_url_field_jobs,
-)
-from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
-    story_node_jobs,
-)
-from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
-    audit_topic_related_models_relation_jobs,
-)
-from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
-    reject_invalid_suggestion_and_delete_invalid_translation_jobs,
-)
-from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
-    missing_translation_images_repair_jobs,
-)
 
 
 def get_all_jobs() -> List[Type[base_jobs.JobBase]]:

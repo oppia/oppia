@@ -22,13 +22,13 @@ from __future__ import annotations
 import datetime
 import logging
 
+import apache_beam as beam
+
 from core import feconf
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
-
-import apache_beam as beam
 
 MYPY = False
 if MYPY:  # pragma: no cover
