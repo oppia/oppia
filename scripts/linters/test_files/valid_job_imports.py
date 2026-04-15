@@ -49,6 +49,8 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     user_bios_change_jobs,
     user_stats_computation_jobs,
     user_validation_jobs,
+    cloud_task_run_migration_jobs,
+    voiceover_synthesis_jobs,
 )
 
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
@@ -86,6 +88,9 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
 )
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
     audit_threads_with_missing_suggestions_jobs,
+)
+from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
+    cleanup_duplicate_translation_suggestions_jobs,
 )
 
 

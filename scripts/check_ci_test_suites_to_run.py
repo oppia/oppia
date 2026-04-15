@@ -235,6 +235,12 @@ def output_variable_to_github_workflow(
         output_variable: str. The name of the output variable.
         output_value: str. The value of the output variable.
     """
+    if 'GITHUB_OUTPUT' not in os.environ:
+        print(
+            'Cannot find GITHUB_OUTPUT in os.environ. Outputting to stdout instead:'
+        )
+        print(f'{output_variable}={output_value}')
+        return
     with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as o:
         print(f'{output_variable}={output_value}', file=o)
 
