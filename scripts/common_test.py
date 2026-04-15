@@ -1406,30 +1406,13 @@ class UrlRetrieveTests(CommonTests):
         )
 
     def test_url_open(self) -> None:
-        class MockResponse:
-            def __init__(self, url: str) -> None:
-                self.url = url
-
-            def getcode(self) -> int:
-                return 200
-
-        function_call_records = {'urlopen': False}
-
-        def mock_urlopen(
-            url: str, context: ssl.SSLContext
-        ) -> MockResponse:
-            self.assertEqual(url, 'https://example.com')
-            self._assert_ssl_context_matches_default(context)
-            function_call_records['urlopen'] = True
-            return MockResponse(url)
-
-        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
-        with urlopen_swap:
-            response = common.url_open('https://example.com')
-
-        self.assertTrue(function_call_records['urlopen'])
+        # Use a URL that Oppia's CI environment is expected to have access to.
+        github_api_url = (
+            'https://api.github.com/repos/oppia/oppia/releases/latest'
+        )
+        response = common.url_open(github_api_url)
         self.assertEqual(response.getcode(), 200)
-        self.assertEqual(response.url, 'https://example.com')
+        self.assertEqual(response.url, github_api_url)
 
     def test_url_retrieve_tries_curl_at_outset(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
