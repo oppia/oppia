@@ -2680,6 +2680,40 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
             'Type of 1.1 is not present in options',
         )
 
+    def test_submit_answer_for_exp_raises_error_with_invalid_algebraic_answer(
+        self,
+    ) -> None:
+        exp_id = '16'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        version = 1
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
+        response = self.post_json(
+            '/explorehandler/answer_submitted_event/%s' % exp_id,
+            {
+                'old_state_name': 'Algebraic Expression Input',
+                'answer': 'V = uab',
+                'version': version,
+                'client_time_spent_in_secs': 0,
+                'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+                'answer_group_index': 0,
+                'rule_spec_index': 0,
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION
+                ),
+            },
+            expected_status_int=400,
+        )
+        self.assertEqual(
+            response['error'],
+            'Schema validation for \'answer\' failed: Validation failed: '
+            'is_valid_algebraic_expression ({}) for object V = uab',
+        )
+        self.logout()
+
 
 class StateHitEventHandlerTests(test_utils.GenericTestBase):
 

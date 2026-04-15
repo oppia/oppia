@@ -84,8 +84,6 @@ export class MyHammerConfig extends HammerGestureConfig {
   };
 }
 
-import {SharedComponentsModule} from 'components/shared-component.module';
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -97,7 +95,6 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     AppRoutingModule,
     I18nModule,
     ToastrModule.forRoot(toastrConfig),
-    SharedComponentsModule,
   ],
   declarations: [OppiaRootComponent],
   entryComponents: [OppiaRootComponent],
