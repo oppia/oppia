@@ -291,6 +291,7 @@ def _update_report_stats_model_in_transaction(
             )
         )
 
+    assert stats_model is not None
     stats_model.daily_param_stats = stats_dict
     stats_model.total_reports_submitted += delta
 

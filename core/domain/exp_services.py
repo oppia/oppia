@@ -882,7 +882,13 @@ def apply_change_list(
                     change.property_name
                     == exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS
                 ):
-                    if not isinstance(change.new_value, bool):
+                    # Here we use cast because change.new_value is typed as a
+                    # bool for this command, but we still want a runtime guard
+                    # that works on malformed data without making MyPy infer an
+                    # impossible str/bool intersection.
+                    # Here we use object because it preserves the isinstance guard
+                    # without allowing MyPy to infer an impossible str/bool union.
+                    if not isinstance(cast(object, change.new_value), bool):
                         raise Exception(
                             'Expected solicit_answer_details to be a '
                             + 'bool, received %s' % change.new_value
@@ -901,7 +907,13 @@ def apply_change_list(
                     change.property_name
                     == exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT
                 ):
-                    if not isinstance(change.new_value, bool):
+                    # Here we use cast because change.new_value is typed as a
+                    # bool for this command, but we still want a runtime guard
+                    # that works on malformed data without making MyPy infer an
+                    # impossible str/bool intersection.
+                    # Here we use object because it preserves the isinstance guard
+                    # without allowing MyPy to infer an impossible str/bool union.
+                    if not isinstance(cast(object, change.new_value), bool):
                         raise Exception(
                             'Expected card_is_checkpoint to be a '
                             + 'bool, received %s' % change.new_value

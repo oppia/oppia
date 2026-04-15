@@ -1813,6 +1813,46 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 }
             )
         ]
+        draft_change_list_3_v34 = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Intro',
+                    'property_name': 'content',
+                    'new_value': 'new value',
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Intro',
+                    'property_name': 'answer_groups',
+                    'new_value': [
+                        {
+                            'rule_specs': [
+                                {
+                                    'rule_type': 'IsMathematicallyEquivalentTo',
+                                    'inputs': {'x': 'x+y/2'},
+                                }
+                            ],
+                            'outcome': {
+                                'dest': 'Introduction',
+                                'feedback': {
+                                    'content_id': 'feedback',
+                                    'html': '<p>Content</p>',
+                                },
+                                'param_changes': [],
+                                'labelled_as_correct': False,
+                                'refresher_exploration_id': None,
+                                'missing_prerequisite_skill_id': None,
+                            },
+                            'training_data': [],
+                            'tagged_skill_misconception_id': None,
+                        }
+                    ],
+                }
+            ),
+        ]
         # Migrate exploration to state schema version 35.
         self.create_and_migrate_new_exploration('34', '35')
         migrated_draft_change_list_1_v35 = (
@@ -1842,6 +1882,13 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             migrated_draft_change_list_2_v35_dict_list,
         )
 
+        migrated_draft_change_list_3_v35 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_3_v34, 1, 2, self.EXP_ID
+            )
+        )
+        self.assertIsNone(migrated_draft_change_list_3_v35)
+
     def test_convert_states_v33_dict_to_v34_dict(self) -> None:
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
@@ -1865,7 +1912,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         'choices': {
                             'value': [
                                 '<p>1</p>',
-                                '<p>2</p>',
+                                {'html': html_content},
                                 html_content,
                                 '<p>4</p>',
                             ]
@@ -2099,7 +2146,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         'choices': {
                             'value': [
                                 '<p>1</p>',
-                                '<p>2</p>',
+                                {'html': expected_html_content},
                                 expected_html_content,
                                 '<p>4</p>',
                             ]
@@ -2330,50 +2377,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                             }
                         }
                     ],
-                }
-            ).to_dict(),
-        )
-
-    def test_convert_html_in_draft_change_list_with_widget_customization_args(
-        self,
-    ) -> None:
-        draft_change_list = [
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'state2',
-                    'property_name': 'widget_customization_args',
-                    'new_value': {
-                        'choices': {
-                            'value': [
-                                '<p>1</p>',
-                                {'html': '<p>2</p>'},
-                            ]
-                        }
-                    },
-                }
-            )
-        ]
-
-        converted_draft_change_list = draft_upgrade_services.DraftUpgradeUtil._convert_html_in_draft_change_list(
-            draft_change_list, lambda html: 'converted-' + html
-        )
-
-        self.assertEqual(
-            converted_draft_change_list[0].to_dict(),
-            exp_domain.ExplorationChange(
-                {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': 'state2',
-                    'property_name': 'widget_customization_args',
-                    'new_value': {
-                        'choices': {
-                            'value': [
-                                'converted-<p>1</p>',
-                                {'html': 'converted-<p>2</p>'},
-                            ]
-                        }
-                    },
                 }
             ).to_dict(),
         )

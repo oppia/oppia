@@ -419,13 +419,24 @@ def get_collection_and_collection_rights_by_id(
     )
 
     collection = None
-    if collection_and_rights[0][0] is not None:
-        collection = get_collection_from_model(collection_and_rights[0][0])
+    # Here we use cast because the datastore fetch result is typed broadly,
+    # but this branch must stay reachable when the collection is missing.
+    collection_model = cast(
+        Optional[collection_models.CollectionModel], collection_and_rights[0][0]
+    )
+    if collection_model is not None:
+        collection = get_collection_from_model(collection_model)
 
     collection_rights = None
-    if collection_and_rights[1][0] is not None:
+    # Here we use cast because the datastore fetch result is typed broadly,
+    # but this branch must stay reachable when the rights row is missing.
+    collection_rights_model = cast(
+        Optional[collection_models.CollectionRightsModel],
+        collection_and_rights[1][0],
+    )
+    if collection_rights_model is not None:
         collection_rights = rights_manager.get_activity_rights_from_model(
-            collection_and_rights[1][0], constants.ACTIVITY_TYPE_COLLECTION
+            collection_rights_model, constants.ACTIVITY_TYPE_COLLECTION
         )
 
     return (collection, collection_rights)
@@ -1470,8 +1481,14 @@ def save_collection_summary(
     }
 
     collection_summary_model = (
-        collection_models.CollectionSummaryModel.get_by_id(
-            collection_summary.id
+        # Here use cast because get_by_id() returns a generic Model type
+        # that needs to be narrowed to Optional[CollectionSummaryModel] for
+        # type checker narrowing in the post-fetch None check branch.
+        cast(
+            Optional[collection_models.CollectionSummaryModel],
+            collection_models.CollectionSummaryModel.get_by_id(
+                collection_summary.id
+            ),
         )
     )
     if collection_summary_model is not None:

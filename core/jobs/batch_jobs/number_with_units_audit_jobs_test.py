@@ -310,6 +310,23 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
         interaction_3['id'] = 'NumberWithUnits'
         interaction_3['answer_groups'] = ['not_a_dict']
 
+        # State with rule_specs that is not a list.
+        malformed_state_3b = self._create_base_malformed_state_dict(
+            'content_5', 'default_outcome_6'
+        )
+        interaction_3b = malformed_state_3b['interaction']
+        assert isinstance(interaction_3b, dict)
+        default_outcome_3b = interaction_3b['default_outcome']
+        interaction_3b['id'] = 'NumberWithUnits'
+        interaction_3b['answer_groups'] = [
+            {
+                'outcome': default_outcome_3b,
+                'rule_specs': 'not_a_list',
+                'training_data': [],
+                'tagged_skill_misconception_id': None,
+            }
+        ]
+
         # State with rule_spec that is not a dict.
         malformed_state_4 = self._create_base_malformed_state_dict(
             'content_6', 'default_outcome_7'
@@ -499,6 +516,7 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
                 'malformed_1': malformed_state_1,
                 'malformed_2': malformed_state_2,
                 'malformed_3': malformed_state_3,
+                'malformed_3b': malformed_state_3b,
                 'malformed_9': malformed_state_9,
                 'malformed_4': malformed_state_4,
                 'malformed_5': malformed_state_5,

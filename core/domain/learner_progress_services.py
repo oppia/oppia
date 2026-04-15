@@ -2284,13 +2284,8 @@ def get_topics_and_stories_progress(
     completed_story_summaries: List[Optional[story_domain.StorySummary]] = []
     for story_summary_model in completed_story_models:
         if story_summary_model is not None:
-            # Here we use cast because story_summary_model is narrowed by the
-            # None-check and must match StorySummaryModel for the fetcher API.
-            story_model = cast(
-                story_models.StorySummaryModel, story_summary_model
-            )
             completed_story_summaries.append(
-                story_fetchers.get_story_summary_from_model(story_model)
+                story_fetchers.get_story_summary_from_model(story_summary_model)
             )
         else:
             completed_story_summaries.append(None)
