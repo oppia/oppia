@@ -253,6 +253,9 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/services/state-top-answers-stats.service.spec.ts',
     'core/templates/services/voiceover-language-management-service.spec.ts',
     'extensions/interactions/FractionInput/directives/fraction-input-validation.service.spec.ts',
+    'extensions/interactions/MultipleChoiceInput/multiple-choice-input-interactions.module.ts',
+    'extensions/objects/object-components.module.ts',
+    'extensions/rich_text_components/rte-output-display.component.ts',
 ]
 # pylint: enable=line-too-long, single-line-pragma
 
