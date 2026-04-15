@@ -26,8 +26,8 @@ describe('Response music notes input component ', () => {
   let fixture: ComponentFixture<ResponseMusicNotesInput>;
 
   class MockHtmlEscaperService {
-    escapedJsonToObj(answer: string): {readableNoteName: string}[] {
-      return JSON.parse(answer) as {readableNoteName: string}[];
+    escapedJsonToObj(answer: string): string {
+      return answer;
     }
   }
 
@@ -48,7 +48,7 @@ describe('Response music notes input component ', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(ResponseMusicNotesInput);
       component = fixture.componentInstance;
-      component.answer = JSON.stringify([
+      component.answer = [
         {
           readableNoteName: 'B4',
           noteDuration: {
@@ -56,7 +56,7 @@ describe('Response music notes input component ', () => {
             den: 1,
           },
         },
-      ]);
+      ];
     });
 
     it('should initialise the component when submits answer', () => {
@@ -69,7 +69,7 @@ describe('Response music notes input component ', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(ResponseMusicNotesInput);
       component = fixture.componentInstance;
-      component.answer = JSON.stringify([]);
+      component.answer = [];
     });
 
     it('should initialise the component when submits answer', () => {

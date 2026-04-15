@@ -28,6 +28,7 @@ import {
 } from '@angular/core/testing';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatAutocompleteHarness} from '@angular/material/autocomplete/testing';
 import {MatButtonModule} from '@angular/material/button';
 import {MatButtonHarness} from '@angular/material/button/testing';
 import {MatCardModule} from '@angular/material/card';
@@ -35,6 +36,7 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {MatDialogHarness} from '@angular/material/dialog/testing';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
+import {MatInputHarness} from '@angular/material/input/testing';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatTableModule} from '@angular/material/table';
 import {MatTableHarness} from '@angular/material/table/testing';
@@ -195,48 +197,45 @@ describe('Beam Jobs Tab Component', () => {
   );
 
   it('should update the table when the job name input changes', async () => {
-    fixture.detectChanges();
-    await fixture.whenStable();
-
+    const input = await loader.getHarness(MatInputHarness);
+    const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const table = await loader.getHarness(MatTableHarness);
 
-    component.jobNameControl.setValue('Fo');
+    await input.setValue('Fo');
     fixture.detectChanges();
-    await fixture.whenStable();
 
+    expect(await autocomplete.getOptions()).toHaveSize(1);
     expect(await table.getRows()).toHaveSize(1);
 
-    component.jobNameControl.setValue('Fob');
+    await input.setValue('Fob');
     fixture.detectChanges();
-    await fixture.whenStable();
 
+    expect(await autocomplete.getOptions()).toHaveSize(0);
     expect(await table.getRows()).toHaveSize(0);
 
-    component.jobNameControl.setValue('Ba');
+    await input.setValue('Ba');
     fixture.detectChanges();
-    await fixture.whenStable();
 
+    expect(await autocomplete.getOptions()).toHaveSize(2);
     expect(await table.getRows()).toHaveSize(2);
 
     component.ngOnDestroy();
   });
 
   it('should deselect a job after changing the input', async () => {
-    fixture.detectChanges();
-    await fixture.whenStable();
+    const autocomplete = await loader.getHarness(MatAutocompleteHarness);
+    const input = await loader.getHarness(MatInputHarness);
 
     expect(component.selectedJob).toBeUndefined();
 
-    component.jobNameControl.setValue('FooJob');
-    component.onJobNameSelect('FooJob');
+    await input.setValue('FooJob');
+    await autocomplete.selectOption({text: 'FooJob'});
     fixture.detectChanges();
-    await fixture.whenStable();
 
     expect(component.selectedJob).toEqual(fooJob);
 
-    component.jobNameControl.setValue('FooJo');
+    await input.setValue('FooJo');
     fixture.detectChanges();
-    await fixture.whenStable();
 
     expect(component.selectedJob).toBeUndefined();
 
@@ -244,8 +243,8 @@ describe('Beam Jobs Tab Component', () => {
   });
 
   it('should add a new job after starting a new job run', async () => {
-    fixture.detectChanges();
-    await fixture.whenStable();
+    const autocomplete = await loader.getHarness(MatAutocompleteHarness);
+    const input = await loader.getHarness(MatInputHarness);
 
     const newPendingFooJob = new BeamJobRun(
       '123',
@@ -260,9 +259,9 @@ describe('Beam Jobs Tab Component', () => {
       'startNewBeamJob'
     ).and.returnValue(of(newPendingFooJob));
 
-    component.selectedJob = fooJob;
+    await input.setValue('FooJob');
+    await autocomplete.selectOption({text: 'FooJob'});
     fixture.detectChanges();
-    await fixture.whenStable();
 
     expect(component.beamJobRuns.value).not.toContain(newPendingFooJob);
 
@@ -291,8 +290,8 @@ describe('Beam Jobs Tab Component', () => {
   });
 
   it('should cancel the job and update its status', async () => {
-    fixture.detectChanges();
-    await fixture.whenStable();
+    const autocomplete = await loader.getHarness(MatAutocompleteHarness);
+    const input = await loader.getHarness(MatInputHarness);
 
     const cancellingFooJob = new BeamJobRun(
       '123',
@@ -306,6 +305,10 @@ describe('Beam Jobs Tab Component', () => {
       backendApiService,
       'cancelBeamJobRun'
     ).and.returnValue(of(cancellingFooJob));
+
+    await input.setValue('FooJob');
+    await autocomplete.selectOption({text: 'FooJob'});
+    fixture.detectChanges();
 
     expect(component.beamJobRuns.value).toContain(runningFooJob);
     expect(component.beamJobRuns.value).not.toContain(cancellingFooJob);
@@ -336,13 +339,17 @@ describe('Beam Jobs Tab Component', () => {
   });
 
   it('should show the job output', async () => {
-    fixture.detectChanges();
-    await fixture.whenStable();
+    const autocomplete = await loader.getHarness(MatAutocompleteHarness);
+    const input = await loader.getHarness(MatInputHarness);
 
     const getBeamJobRunOutputSpy = spyOn(
       backendApiService,
       'getBeamJobRunOutput'
     ).and.returnValue(of(new BeamJobRunResult('Lorem Ipsum', '')));
+
+    await input.setValue('BarJob');
+    await autocomplete.selectOption({text: 'BarJob'});
+    fixture.detectChanges();
 
     const viewOutputButton = await loader.getHarness(
       MatButtonHarness.with({

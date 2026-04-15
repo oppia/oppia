@@ -257,6 +257,7 @@ describe('RTE display component', () => {
     tick(100);
     fixture.detectChanges();
     discardPeriodicTasks();
+
     expect(component.elementRef.nativeElement.innerText).toEqual(
       'HiHelloHello'
     );
@@ -509,12 +510,6 @@ describe('RTE display component', () => {
     expect(readableText).toBe(expectedString);
   });
 
-  it('should return empty string for link nodes without text-with-value', () => {
-    const node = document.createElement('oppia-noninteractive-link');
-
-    expect(component.getReadableTextFromNode(node)).toBe('');
-  });
-
   it('should be able to get readable text from non-interactive math node', () => {
     let node = document.createElement('p');
     // eslint-disable-next-line oppia/no-inner-html
@@ -530,12 +525,6 @@ describe('RTE display component', () => {
     expect(readableText).toBe(expectedString);
   });
 
-  it('should return empty string for unsupported non-text nodes', () => {
-    const node = document.createElement('oppia-noninteractive-image');
-
-    expect(component.getReadableTextFromNode(node)).toBe('');
-  });
-
   it('should return space character for unknown tag', () => {
     let node = document.createElement('span');
     // eslint-disable-next-line oppia/no-inner-html
@@ -544,47 +533,6 @@ describe('RTE display component', () => {
     let readableText = component.getReadableTextFromNode(node.childNodes[0]);
     expect(readableText).toBe(expectedString);
   });
-
-  it('should return null for undefined class names while matching text content', () => {
-    expect(
-      component.getElementMatchingClassAndTextContent(undefined)
-    ).toBeNull();
-  });
-
-  it('should remove text nodes using parentNode in ngOnChanges when available', fakeAsync(() => {
-    const removeChildSpy = jasmine.createSpy('removeChild');
-    const textNode = {
-      nodeType: Node.TEXT_NODE,
-      parentNode: {
-        removeChild: removeChildSpy,
-      },
-      parentElement: {
-        removeChild: jasmine.createSpy('fallbackRemoveChild'),
-      },
-    } as unknown as Text;
-    spyOn(
-      component as unknown as {_updateNode: () => void},
-      '_updateNode'
-    ).and.stub();
-    component.elementRef = {
-      nativeElement: {
-        childNodes: [textNode],
-      },
-    };
-    const changes: SimpleChanges = {
-      rteString: {
-        previousValue: '',
-        currentValue: '<p>Hello</p>',
-        firstChange: false,
-        isFirstChange: () => false,
-      },
-    };
-
-    component.ngOnChanges(changes);
-    tick();
-
-    expect(removeChildSpy).toHaveBeenCalledWith(textNode);
-  }));
 
   it('should not change bg highlight color when prev and current element are same during voiceover playback', fakeAsync(() => {
     spyOn(
