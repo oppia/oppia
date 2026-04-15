@@ -401,6 +401,7 @@
         "core.platform.bulk_email.dev_mode_bulk_email_services_test",
         "core.jobs.io.job_io_test",
         "core.jobs.batch_jobs.remove_profile_picture_data_url_field_jobs_test",
+        "core.jobs.batch_jobs.numeric_input_customization_args_jobs_test",
         "core.jobs.io.gcs_io_test",
         "core.domain.android_services_test",
         "core.jobs.batch_jobs.contributor_admin_stats_jobs_test",
