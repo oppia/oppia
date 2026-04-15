@@ -59,6 +59,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     exploration_voiceover_sync_jobs,
     math_interactions_audit_jobs,
     model_validation_jobs,
+    numeric_input_customization_args_jobs,
     number_with_units_audit_jobs,
     opportunity_management_jobs,
     question_migration_jobs,
