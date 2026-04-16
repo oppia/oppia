@@ -5052,9 +5052,6 @@ export class LoggedOutUser extends BaseUser {
     });
     await this.clickOnElementWithSelector(lessonInfoButton);
     await this.page.waitForSelector(lessonInfoCardSelector, {visible: true});
-    // Wait for the modal slide-in animation to finish before callers
-    // try to interact with buttons inside the modal (e.g. .save-progress-btn).
-    await this.waitForElementToStabilize(lessonInfoCardSelector);
   }
 
   /**
@@ -5135,38 +5132,21 @@ export class LoggedOutUser extends BaseUser {
    * Saves the progress.(To be used when save progress modal is opened.)
    */
   async saveProgress(): Promise<void> {
-    // Wait for the button to appear in the DOM and be visible.
     await this.page.waitForSelector(saveProgressButton, {visible: true});
 
-    // Wait for Angular's async pipeline to settle (checkpoint detection,
-    // change-detection cycles, etc.) before checking clickability.
-    await this.waitForAngularStability();
+    // The .save-progress-btn-tooltip div is rendered directly below the button
+    // in a flex column when checkpointStatusArray[0] === 'in-progress'. This
+    // happens when the modal opens before Angular's async checkpoint service
+    // has updated completedCheckpointsCount. While the tooltip is present,
+    // elementFromPoint at the button's center returns the tooltip div instead
+    // of the button, causing waitForElementToBeClickable to time out.
+    // We wait here until the tooltip disappears (i.e. completedCheckpointsCount
+    // has been updated to reflect the reached checkpoint).
+    await this.page.waitForFunction(() => {
+      return !document.querySelector('.save-progress-btn-tooltip');
+    });
 
-    // Wait for any slide-in animation on the modal to finish so the button
-    // is no longer occluded or partially off-screen.
-    await this.waitForElementToStabilize(saveProgressButton);
-
-    // Retry loop — guards against transient overlay/animation race conditions
-    // that are common on slow CI runners.
-    const maxAttempts = 3;
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      try {
-        await this.clickOnElementWithSelector(saveProgressButton);
-        break; // Click succeeded.
-      } catch (error) {
-        if (attempt === maxAttempts) {
-          throw error; // Re-throw on the final attempt.
-        }
-        showMessage(
-          `saveProgress: click attempt ${attempt} failed, retrying... ` +
-            `(${error instanceof Error ? error.message : String(error)})`
-        );
-        // Brief pause and re-stable check before retrying.
-        await this.page.waitForTimeout(1000);
-        await this.waitForAngularStability();
-        await this.waitForElementToStabilize(saveProgressButton);
-      }
-    }
+    await this.clickOnElementWithSelector(saveProgressButton);
 
     await this.page.waitForSelector(signInBoxInSaveProressModalSelector, {
       visible: true,
