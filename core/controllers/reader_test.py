@@ -1951,15 +1951,24 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             'version': 1,
         }
 
-        story: Optional[story_domain.Story] = story_fetchers.get_story_by_id(
-            self.STORY_ID
+        mock_story = story_domain.Story(
+            self.STORY_ID,
+            'Story Title',
+            'story-title',
+            self.TOPIC_ID,
+            'Story description',
+            'story_notes',
+            [],
+            1,
+            0,
+            False,
+            'thumbnail.svg',
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0],
         )
-        self.assertIsNotNone(story)
+        mock_story.corresponding_topic_id = None
 
         def _mock_get_story_by_id(_: str) -> story_domain.Story:
-            assert story is not None
-            story.corresponding_topic_id = None
-            return story
+            return mock_story
 
         with self.swap(
             story_fetchers, 'get_story_by_id', _mock_get_story_by_id
