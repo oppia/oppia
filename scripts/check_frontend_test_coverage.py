@@ -264,6 +264,7 @@ def check_coverage_changes(files_to_check: Optional[List[str]] = None) -> None:
         print('\nThe following issues were detected:\n')
         print(errors)
         print('------------------------------------')
+        logging.error(errors)
         sys.exit(1)
     else:
         print('------------------------------------')
