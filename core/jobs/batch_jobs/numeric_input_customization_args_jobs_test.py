@@ -210,23 +210,6 @@ class BackfillNumericInputAllowExponentialNotationJobTests(
             next_content_id_index=0,
         )
 
-        updated_exp_model, was_exp_updated = (
-            self.JOB_CLASS._backfill_exploration_model(exp_model)
-        )
-        self.assertTrue(was_exp_updated)
-        self.assertEqual(
-            updated_exp_model.states['NumericStateNoArgs']['interaction'][
-                'customization_args'
-            ]['allowExponentialNotation']['value'],
-            True,
-        )
-        self.assertEqual(
-            updated_exp_model.states['NumericStateInvalidArgs']['interaction'][
-                'customization_args'
-            ]['allowExponentialNotation']['value'],
-            True,
-        )
-
         question_non_numeric_model = self.create_model(
             question_models.QuestionModel,
             id='question_non_numeric_model',
@@ -253,24 +236,48 @@ class BackfillNumericInputAllowExponentialNotationJobTests(
             linked_skill_ids=[],
             inapplicable_skill_misconception_ids=[],
         )
-
-        updated_non_numeric_question_model, was_non_numeric_question_updated = (
-            self.JOB_CLASS._backfill_question_model(question_non_numeric_model)
+        self.put_multi(
+            [exp_model, question_non_numeric_model, question_numeric_model]
         )
-        self.assertFalse(was_non_numeric_question_updated)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='EXPLORATION MODELS UPDATED SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='QUESTION MODELS UPDATED SUCCESS: 1'
+                ),
+            ]
+        )
+
+        updated_exp_model = exp_models.ExplorationModel.get('exp_model')
+        self.assertEqual(
+            updated_exp_model.states['NumericStateNoArgs']['interaction'][
+                'customization_args'
+            ]['allowExponentialNotation']['value'],
+            True,
+        )
+        self.assertEqual(
+            updated_exp_model.states['NumericStateInvalidArgs']['interaction'][
+                'customization_args'
+            ]['allowExponentialNotation']['value'],
+            True,
+        )
+
+        unchanged_question_model = question_models.QuestionModel.get(
+            'question_non_numeric_model'
+        )
         self.assertNotIn(
             'allowExponentialNotation',
-            updated_non_numeric_question_model.question_state_data[
-                'interaction'
-            ],
+            unchanged_question_model.question_state_data['interaction'],
         )
 
-        updated_numeric_question_model, was_numeric_question_updated = (
-            self.JOB_CLASS._backfill_question_model(question_numeric_model)
+        updated_question_model = question_models.QuestionModel.get(
+            'question_numeric_model'
         )
-        self.assertTrue(was_numeric_question_updated)
         self.assertEqual(
-            updated_numeric_question_model.question_state_data['interaction'][
+            updated_question_model.question_state_data['interaction'][
                 'customization_args'
             ]['allowExponentialNotation']['value'],
             True,
