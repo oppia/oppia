@@ -3816,7 +3816,9 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                 'This is an answer.',
             )
             self.assertEqual(
-                learner_answer_details.learner_answer_info_list[0].answer_details,
+                learner_answer_details.learner_answer_info_list[
+                    0
+                ].answer_details,
                 'This is an answer details.',
             )
 
@@ -3944,23 +3946,6 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
         )
 
         self.logout()
-
-    # def test_logged_out_checkpoint_reached_event_does_not_raise_error(
-    #     self,
-    # ) -> None:
-    #     """Test handler for checkpoint reached events by logged-out users."""
-    #     # Load demo exploration.
-    #     exp_id = '0'
-    #     exp_services.delete_demo('0')
-    #     exp_services.load_demo('0')
-    #
-    #     self.put_json(
-    #         '/explorehandler/checkpoint_reached/%s' % exp_id,
-    #         {
-    #             'most_recently_reached_checkpoint_exp_version': 1,
-    #             'most_recently_reached_checkpoint_state_name': 'Welcome!',
-    #         },
-    #     )
 
 
 class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
