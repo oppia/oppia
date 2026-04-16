@@ -80,6 +80,9 @@ class VoiceoverLanguageCodesMappingHandlerTests(test_utils.GenericTestBase):
     update correctly.
     """
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS]
+    )
     def test_put_language_accent_codes_mapping_correctly(self) -> None:
         self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
         self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])

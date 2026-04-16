@@ -37,6 +37,15 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {MatTableModule} from '@angular/material/table';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {CloudTaskRun} from 'domain/cloud-task/cloud-task-run.model';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    EnableBackgroundVoiceoverSynthesis: {
+      isEnabled: true,
+    },
+  };
+}
 
 class MockNgbModal {
   open() {
@@ -52,6 +61,7 @@ describe('Voiceover Admin Page component ', () => {
   let voiceoverBackendApiService: VoiceoverBackendApiService;
   let ngbModal: NgbModal;
   let languageUtilService: LanguageUtilService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -70,6 +80,10 @@ describe('Voiceover Admin Page component ', () => {
         {
           provide: NgbModal,
           useClass: MockNgbModal,
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -308,6 +322,8 @@ describe('Voiceover Admin Page component ', () => {
         'hi-IN': true,
       },
     });
+    flush();
+    discardPeriodicTasks();
   }));
 
   it('should not update cloud supported language accent codes when modal is cancelled', () => {
