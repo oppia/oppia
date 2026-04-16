@@ -3110,7 +3110,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     state_dict['interaction']['customization_args'],
                     state_schema_version=45,
                 )
-                for ca_name, ca in customisation_args.items():
+                for _, ca in customisation_args.items():
                     list_of_subtitled_unicode_content_ids.extend(
                         state_domain.InteractionCustomizationArg.traverse_by_schema_and_get(
                             ca.schema,
@@ -3373,7 +3373,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 interaction['customization_args'],
                 state_schema_version=state_schema,
             )
-            for ca_name, ca in customisation_args.items():
+            for _, ca in customisation_args.items():
                 content_id_list.extend(ca.get_content_ids())
 
         # Here we use MyPy ignore because the latest schema of state
