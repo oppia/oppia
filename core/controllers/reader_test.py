@@ -4128,11 +4128,11 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
             '/progress/%s' % (unique_progress_url_id), expected_status_int=404
         )
 
-    def test_exploration_page_raises_error_when_progress_points_to_missing_exploration(
+    def test_get_transient_checkpoint_page_with_deleted_exploration_redirects_correctly(
         self,
     ) -> None:
-        """Check the transient checkpoint page raises an error when the
-        progress points to a missing exploration.
+        """The checkpoint URL handler redirects whenever progress exists; it does
+        not check that the exploration still exists.
         """
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -4156,15 +4156,29 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
         # Delete the exploration.
         exp_services.delete_demo(exp_id)
 
-        self.get_html_response(
-            '/progress/%s' % unique_progress_url_id, expected_status_int=404
+        url_response = self.get_html_response(
+            '/progress/%s' % unique_progress_url_id, expected_status_int=302
+        )
+        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
+        assert exp_user_data is not None
+        self.assertTrue(
+            url_response.headers['Location'].endswith(
+                '%s/%s?pid=%s'
+                % (
+                    feconf.EXPLORATION_URL_PREFIX,
+                    exp_user_data.exploration_id,
+                    unique_progress_url_id,
+                )
+            )
         )
 
-    def test_exploration_page_raises_error_when_progress_points_to_missing_collection(
+    def test_get_transient_checkpoint_page_with_invalid_collection_id_redirects_correctly(
         self,
     ) -> None:
-        """Check the transient checkpoint page raises an error when the
-        progress points to a missing collection.
+        """The checkpoint URL handler builds the redirect from exploration_id;
+        an invalid collection_id on the stored model does not change that.
         """
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -4193,8 +4207,22 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
         model.update_timestamps()
         model.put()
 
-        self.get_html_response(
-            '/progress/%s' % unique_progress_url_id, expected_status_int=404
+        url_response = self.get_html_response(
+            '/progress/%s' % unique_progress_url_id, expected_status_int=302
+        )
+        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
+        assert exp_user_data is not None
+        self.assertTrue(
+            url_response.headers['Location'].endswith(
+                '%s/%s?pid=%s'
+                % (
+                    feconf.EXPLORATION_URL_PREFIX,
+                    exp_user_data.exploration_id,
+                    unique_progress_url_id,
+                )
+            )
         )
 
     def test_logged_out_progress_is_displayed_correctly_when_exp_version_is_same(  # pylint: disable=line-too-long
