@@ -175,3 +175,103 @@ class BackfillNumericInputAllowExponentialNotationJobTests(
             ]['allowExponentialNotation']['value'],
             False,
         )
+
+    def test_backfill_handles_non_numeric_and_missing_customization_args(
+        self,
+    ) -> None:
+        exp_model = self.create_model(
+            exp_models.ExplorationModel,
+            id='exp_model',
+            title='Title',
+            category='Math',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            init_state_name='Introduction',
+            states={
+                'Introduction': {
+                    'interaction': None,
+                },
+                'TextState': {
+                    'interaction': {
+                        'id': 'TextInput',
+                    },
+                },
+                'NumericStateNoArgs': {
+                    'interaction': {
+                        'id': 'NumericInput',
+                    },
+                },
+                'NumericStateInvalidArgs': {
+                    'interaction': {
+                        'id': 'NumericInput',
+                        'customization_args': [],
+                    },
+                },
+            },
+            next_content_id_index=0,
+        )
+
+        updated_exp_model, was_exp_updated = (
+            self.JOB_CLASS._backfill_exploration_model(exp_model)
+        )
+        self.assertTrue(was_exp_updated)
+        self.assertEqual(
+            updated_exp_model.states['NumericStateNoArgs']['interaction'][
+                'customization_args'
+            ]['allowExponentialNotation']['value'],
+            True,
+        )
+        self.assertEqual(
+            updated_exp_model.states['NumericStateInvalidArgs']['interaction'][
+                'customization_args'
+            ]['allowExponentialNotation']['value'],
+            True,
+        )
+
+        question_non_numeric_model = self.create_model(
+            question_models.QuestionModel,
+            id='question_non_numeric_model',
+            question_state_data={
+                'interaction': {
+                    'id': 'TextInput',
+                }
+            },
+            question_state_data_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            language_code='en',
+            linked_skill_ids=[],
+            inapplicable_skill_misconception_ids=[],
+        )
+        question_numeric_model = self.create_model(
+            question_models.QuestionModel,
+            id='question_numeric_model',
+            question_state_data={
+                'interaction': {
+                    'id': 'NumericInput',
+                }
+            },
+            question_state_data_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            language_code='en',
+            linked_skill_ids=[],
+            inapplicable_skill_misconception_ids=[],
+        )
+
+        updated_non_numeric_question_model, was_non_numeric_question_updated = (
+            self.JOB_CLASS._backfill_question_model(question_non_numeric_model)
+        )
+        self.assertFalse(was_non_numeric_question_updated)
+        self.assertNotIn(
+            'allowExponentialNotation',
+            updated_non_numeric_question_model.question_state_data[
+                'interaction'
+            ],
+        )
+
+        updated_numeric_question_model, was_numeric_question_updated = (
+            self.JOB_CLASS._backfill_question_model(question_numeric_model)
+        )
+        self.assertTrue(was_numeric_question_updated)
+        self.assertEqual(
+            updated_numeric_question_model.question_state_data['interaction'][
+                'customization_args'
+            ]['allowExponentialNotation']['value'],
+            True,
+        )

@@ -3422,6 +3422,25 @@ class InteractionCustomizationArgDomainTests(test_utils.GenericTestBase):
 
         self.assertEqual(html, ['<p>testing</p>'])
 
+    def test_convert_cust_args_dict_backfills_missing_args_from_defaults(
+        self,
+    ) -> None:
+        numeric_input_specs = [
+            spec.to_dict()
+            for spec in (
+                interaction_registry.Registry.get_interaction_by_id(
+                    'NumericInput'
+                ).customization_arg_specs
+            )
+        ]
+
+        customization_args = state_domain.InteractionCustomizationArg.convert_cust_args_dict_to_cust_args_based_on_specs(
+            {}, numeric_input_specs
+        )
+
+        self.assertFalse(customization_args['requireNonnegativeInput'].value)
+        self.assertTrue(customization_args['allowExponentialNotation'].value)
+
 
 class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
     """Test SubtitledUnicode domain object methods."""
