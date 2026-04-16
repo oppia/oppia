@@ -1980,7 +1980,10 @@ export class LoggedInUser extends BaseUser {
       }
     }
 
-    if (!sectionHeadingTexts.every(text => expectedTexts.includes(text))) {
+    const allExpectedElementsFound = expectedTexts.every(expectedText =>
+      sectionHeadingTexts.includes(expectedText)
+    );
+    if (!allExpectedElementsFound) {
       throw new Error(
         `Expected elements not found: ${expectedTexts.join(
           ', '

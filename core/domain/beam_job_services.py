@@ -24,7 +24,7 @@ from core.jobs import base_jobs, jobs_manager
 from core.jobs import registry as jobs_registry
 from core.platform import models
 
-from typing import List, Optional, Type
+from typing import Dict, List, Optional, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -38,6 +38,7 @@ datastore_services = models.Registry.import_datastore_services()
 def run_beam_job(
     job_name: Optional[str] = None,
     job_class: Optional[Type[base_jobs.JobBase]] = None,
+    parameterized_args: Optional[Dict[str, str]] = None,
 ) -> beam_job_domain.BeamJobRun:
     """Starts a new Apache Beam job and returns metadata about its execution.
 
@@ -46,6 +47,10 @@ def run_beam_job(
             job_class must not be None.
         job_class: type(JobBase). A subclass of JobBase to begin running. This
             value takes precedence over job_name.
+        parameterized_args: dict(str, str). The arguments to pass to the
+            job when it is run. The keys of the dict should be the names of the
+            arguments as defined in the job's class definition, and the values
+            should be the corresponding values to use for those arguments.
 
     Returns:
         BeamJobRun. Metadata about the run's execution.
@@ -61,7 +66,9 @@ def run_beam_job(
 
     run_synchronously = constants.EMULATOR_MODE
 
-    run_model = jobs_manager.run_job(job_class, run_synchronously)
+    run_model = jobs_manager.run_job(
+        job_class, run_synchronously, parameterized_args=parameterized_args
+    )
 
     return get_beam_job_run_from_model(run_model)
 

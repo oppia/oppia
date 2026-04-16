@@ -271,6 +271,50 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         )
         self.assertIsNone(cloud_task_run)
 
+    def test_should_fetch_cloud_task_run_models(self) -> None:
+        model_id_1 = cloud_task_models.CloudTaskRunModel.get_new_id()
+        model_id_2 = cloud_task_models.CloudTaskRunModel.get_new_id()
+        project_id = 'dev-project-id'
+        location_id = 'us-central'
+        task_id_1 = uuid.uuid4().hex
+        task_id_2 = uuid.uuid4().hex
+        queue_name = 'test_queue_name'
+
+        task_name_1 = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+            project_id,
+            location_id,
+            queue_name,
+            task_id_1,
+        )
+        task_name_2 = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+            project_id,
+            location_id,
+            queue_name,
+            task_id_2,
+        )
+        function_id = 'regenerate_voiceovers_for_batch_contents'
+
+        taskqueue_services.create_new_cloud_task_model(
+            model_id_1, task_name_1, function_id
+        )
+        taskqueue_services.create_new_cloud_task_model(
+            model_id_2, task_name_2, function_id
+        )
+
+        cloud_task_run = taskqueue_services.get_cloud_task_runs_by_model_ids(
+            [model_id_1, model_id_2]
+        )
+        self.assertIsNotNone(cloud_task_run)
+
+        fetched_model_ids = []
+        fetched_task_names = []
+        for task_run in cloud_task_run:
+            fetched_model_ids.append(task_run.task_run_id)
+            fetched_task_names.append(task_run.cloud_task_name)
+
+        self.assertListEqual(fetched_model_ids, [model_id_1, model_id_2])
+        self.assertListEqual(fetched_task_names, [task_name_1, task_name_2])
+
     def test_should_get_cloud_task_run_models_by_params(self) -> None:
         new_model_id = cloud_task_models.CloudTaskRunModel.get_new_id()
         project_id = 'dev-project-id'
@@ -284,7 +328,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             queue_name,
             task_id,
         )
-        function_id = 'delete_exps_from_user_models'
+        function_id = 'regenerate_voiceovers_after_accepting_suggestion'
 
         taskqueue_services.create_new_cloud_task_model(
             new_model_id, task_name, function_id
@@ -308,3 +352,55 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
 
         self.assertEqual(cloud_task_run.cloud_task_name, task_name)
         self.assertEqual(cloud_task_run.function_id, function_id)
+
+    def test_voiceover_defer_makes_the_correct_request(self) -> None:
+        correct_fn_identifier = 'regenerate_voiceovers_for_batch_contents'
+        correct_args = (1, 2, 3)
+        correct_kwargs = {'a': 'b', 'c': 'd'}
+        parent_cloud_task_run_id = 'parent_cloud_task_run_id'
+        child_cloud_task_run_id = 'child_cloud_task_run_id'
+
+        taskqueue_services.defer_voiceover_regeneration_task_in_batches(
+            correct_fn_identifier,
+            taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
+            parent_cloud_task_run_id,
+            child_cloud_task_run_id,
+            *correct_args,
+            **correct_kwargs,
+        )
+
+        cloud_task_run: cloud_task_domain.CloudTaskRun = (
+            taskqueue_services.get_all_cloud_task_runs()
+        )[0]
+        assert cloud_task_run is not None
+        self.assertEqual(cloud_task_run.function_id, correct_fn_identifier)
+
+    def test_exception_raised_when_voiceover_deferred_payload_is_not_serializable(
+        self,
+    ) -> None:
+        class NonSerializableArgs:
+            """Object that is not JSON serializable."""
+
+            def __init__(self) -> None:
+                self.x = 1
+                self.y = 2
+
+        arg1 = NonSerializableArgs()
+        serialization_exception = self.assertRaisesRegex(
+            ValueError,
+            'The args or kwargs passed to the deferred call with '
+            'function_identifier, %s, are not json serializable.'
+            % feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_REGENERATE_VOICEOVERS_FOR_BATCH_CONTENTS'
+            ],
+        )
+        with serialization_exception:
+            taskqueue_services.defer_voiceover_regeneration_task_in_batches(
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_REGENERATE_VOICEOVERS_FOR_BATCH_CONTENTS'
+                ],
+                taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
+                'parent_cloud_task_run_id',
+                'child_cloud_task_run_id',
+                arg1,
+            )

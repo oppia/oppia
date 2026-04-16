@@ -67,7 +67,7 @@ describe('Logged-Out Learner', function () {
     await curriculumAdmin.openSkillEditor('fractions');
     await curriculumAdmin.navigateToSkillQuestionEditorTab();
 
-    await curriculumAdmin.createQuestionsForSkill('fractions', 7);
+    await curriculumAdmin.createQuestionsForSkill('fractions', 10);
 
     // Enable the "Show practice tab to learners" in Topic Editor.
     await curriculumAdmin.openTopicEditor('Fractions');
@@ -93,7 +93,7 @@ describe('Logged-Out Learner', function () {
     // Save draft.
     await curriculumAdmin.saveStoryDraft();
     await curriculumAdmin.publishStoryDraft();
-  }, 600000);
+  }, 1200000); // 15 minutes for setup hook.
 
   it('should be able to find list of subjects to learn', async function () {
     await loggedOutLearner.navigateToSplashPage();
