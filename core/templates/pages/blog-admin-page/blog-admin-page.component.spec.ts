@@ -415,7 +415,7 @@ describe('Blog Admin Page component ', () => {
 
       expect(component.statusMessage).toBe('Test message');
 
-      tick(10000);
+      tick(10800);
 
       expect(component.statusMessage).toBe('');
     }));
@@ -429,7 +429,7 @@ describe('Blog Admin Page component ', () => {
 
       expect(component.statusMessage).toBe('Second message');
 
-      tick(1000);
+      tick(1800);
 
       expect(component.statusMessage).toBe('');
     }));

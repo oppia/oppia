@@ -63,6 +63,7 @@ export class BlogAdminPageComponent implements OnInit {
   UPDATABLE_ROLES = {};
   private _statusMessage: string = '';
   private statusMessageTimeout: ReturnType<typeof setTimeout> | null = null;
+  statusMessageFadingOut: boolean = false;
   platformParameters: PlatformParameterBackendResponse = {};
 
   get statusMessage(): string {
@@ -74,9 +75,14 @@ export class BlogAdminPageComponent implements OnInit {
       clearTimeout(this.statusMessageTimeout);
     }
     this._statusMessage = message;
+    this.statusMessageFadingOut = false;
     this.statusMessageTimeout = setTimeout(() => {
-      this._statusMessage = '';
-      this.statusMessageTimeout = null;
+      this.statusMessageFadingOut = true;
+      this.statusMessageTimeout = setTimeout(() => {
+        this._statusMessage = '';
+        this.statusMessageFadingOut = false;
+        this.statusMessageTimeout = null;
+      }, 800);
     }, 10000);
   }
   constructor(
