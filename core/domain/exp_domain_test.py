@@ -9496,6 +9496,8 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
+        allowExponentialNotation:
+          value: true
         requireNonnegativeInput:
           value: false
       default_outcome:
