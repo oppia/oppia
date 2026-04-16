@@ -210,7 +210,6 @@
   "I18N_BLOG_HOME_PAGE_TITLE": "Oppia-blog | Oppia",
   "I18N_BLOG_HOME_PAGE_WELCOME_HEADING": "Welkom op de Oppia-blog!",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_HEADING": "Zoekresultaten weergeven",
-  "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY": "Weergave van <[startingNumber]> - <[endingNumber]> uit het totale aantal zoekresultaten.",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY": "Weergave van <[startingNumber]> - <[endingNumber]> uit <[totalNumber]> berichten.",
   "I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT": "Miniatuurafbeelding toevoegen",
   "I18N_BLOG_POST_EDITOR_BODY_HEADING": "Tekst",

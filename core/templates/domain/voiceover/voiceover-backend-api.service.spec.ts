@@ -26,7 +26,10 @@ import {VoiceoverBackendApiService} from '../../domain/voiceover/voiceover-backe
 import {VoiceoverDomainConstants} from './voiceover-domain.constants';
 import {EntityVoiceovers} from './entity-voiceovers.model';
 import {VoiceoverBackendDict} from 'domain/exploration/voiceover.model';
-import {CloudTaskRun} from 'domain/cloud-task/cloud-task-run.model';
+import {
+  CloudTaskRun,
+  CloudTaskRunBackendDict,
+} from 'domain/cloud-task/cloud-task-run.model';
 
 interface VoiceAdminResponse {
   languageAccentMasterList: Record<string, Record<string, string>>;
@@ -159,7 +162,7 @@ describe('Voiceover backend API service', function () {
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/regenerate_voiceover_on_exp_update/expId/1/Exp%20title'
+      '/regenerate_voiceover_on_exp_update/expId/1'
     );
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
@@ -411,9 +414,9 @@ describe('Voiceover backend API service', function () {
     let req = httpTestingController.expectOne(expectedUrl);
     expect(req.request.method).toEqual('GET');
 
-    let automaticVoiceoverRegenerationRecords = [
+    let automaticVoiceoverRegenerationRecords: CloudTaskRunBackendDict[] = [
       {
-        id: '123',
+        task_run_id: '123',
         cloud_task_name: 'Test Task',
         latest_job_state: 'RUNNING',
         function_id: 'function_456',

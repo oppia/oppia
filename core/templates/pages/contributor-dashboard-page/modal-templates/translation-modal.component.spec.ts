@@ -33,7 +33,6 @@ import {
 import {NgbModal, NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
-import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
 import {
   TranslationModalComponent,
   TranslationOpportunity,
@@ -89,6 +88,11 @@ class MockImageLocalStorageService {
   }
 }
 
+interface MockBeforeUnloadEvent {
+  preventDefault: () => void;
+  returnValue: string;
+}
+
 describe('Translation Modal Component', () => {
   let pageContextService: PageContextService;
   let translateTextService: TranslateTextService;
@@ -106,7 +110,6 @@ describe('Translation Modal Component', () => {
   let wds: WindowDimensionsService;
   let ngbModal: NgbModal;
   let mockModalRef: MockConfirmTranslationExitModal;
-  let windowRef: WindowRef;
   let mockWindow: {
     addEventListener: jasmine.Spy<
       (event: string, handler: EventListener) => void
@@ -126,6 +129,7 @@ describe('Translation Modal Component', () => {
     inReviewCount: 12,
     totalCount: 50,
     translationsCount: 20,
+    reviewerOnlyContentCount: 0,
   };
   const getContentTranslatableItemWithText = (
     text: string
@@ -181,9 +185,7 @@ describe('Translation Modal Component', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-    OppiaAngularRootComponent.pageContextService =
-      TestBed.inject(PageContextService);
-    pageContextService = OppiaAngularRootComponent.pageContextService;
+    pageContextService = TestBed.inject(PageContextService);
   }));
 
   beforeEach(() => {
@@ -226,8 +228,6 @@ describe('Translation Modal Component', () => {
         can_review_questions: false,
       })
     );
-    windowRef = TestBed.inject(WindowRef);
-    mockWindow = windowRef.nativeWindow;
   });
 
   it('should invoke change detection when html is updated', () => {
@@ -253,13 +253,13 @@ describe('Translation Modal Component', () => {
   it('should expand the content area', () => {
     spyOn(component, 'toggleExpansionState').and.callThrough();
     // The content area is contracted by default.
-    expect(component.isContentExpanded).toBeFalse();
+    expect(component.isContentExpanded).toBe(false);
 
     // The content area should expand when the users clicks
     // on the 'View More' button.
     component.toggleExpansionState(ExpansionTabType.CONTENT);
 
-    expect(component.isContentExpanded).toBeTrue();
+    expect(component.isContentExpanded).toBe(true);
   });
 
   it('should contract the content area', () => {
@@ -270,19 +270,19 @@ describe('Translation Modal Component', () => {
     // on the 'View Less' button.
     component.toggleExpansionState(ExpansionTabType.CONTENT);
 
-    expect(component.isContentExpanded).toBeFalse();
+    expect(component.isContentExpanded).toBe(false);
   });
 
   it('should expand the translation area', () => {
     spyOn(component, 'toggleExpansionState').and.callThrough();
     // The translation area is contracted by default.
-    expect(component.isTranslationExpanded).toBeTrue();
+    expect(component.isTranslationExpanded).toBe(true);
 
     // The translation area should expand when the users clicks
     // on the 'View More' button.
     component.toggleExpansionState(ExpansionTabType.TRANSLATION);
 
-    expect(component.isTranslationExpanded).toBeFalse();
+    expect(component.isTranslationExpanded).toBe(false);
   });
 
   it('should contract the translation area', () => {
@@ -293,13 +293,13 @@ describe('Translation Modal Component', () => {
     // on the 'View Less' button.
     component.toggleExpansionState(ExpansionTabType.TRANSLATION);
 
-    expect(component.isTranslationExpanded).toBeTrue();
+    expect(component.isTranslationExpanded).toBe(true);
   });
 
   it('should correctly determine whether the content data is overflowing', fakeAsync(() => {
     // Pre-check.
     // The default values for the overflow states are false.
-    expect(component.isContentOverflowing).toBeFalse();
+    expect(component.isContentOverflowing).toBe(false);
 
     // Setup.
     component.contentPanel.elementRef.nativeElement.offsetHeight = 100;
@@ -310,7 +310,7 @@ describe('Translation Modal Component', () => {
     tick(501);
 
     // Expectations.
-    expect(component.isContentOverflowing).toBeFalse();
+    expect(component.isContentOverflowing).toBe(false);
     // Change panel height to simulate changing of the modal data.
     component.contentPanel.elementRef.nativeElement.offsetHeight = 300;
 
@@ -319,13 +319,13 @@ describe('Translation Modal Component', () => {
     tick(501);
 
     // Expectations.
-    expect(component.isContentOverflowing).toBeTrue();
+    expect(component.isContentOverflowing).toBe(true);
   }));
 
   it('should correctly determine whether the editor is overflowing', fakeAsync(() => {
     // Pre-check.
     // The default values for the overflow states are false.
-    expect(component.isTranslationOverflowing).toBeFalse();
+    expect(component.isTranslationOverflowing).toBe(false);
 
     // Setup.
     spyOn(wds, 'getHeight').and.returnValue(100);
@@ -336,7 +336,7 @@ describe('Translation Modal Component', () => {
     tick(501);
 
     // Expectations.
-    expect(component.isTranslationOverflowing).toBeFalse();
+    expect(component.isTranslationOverflowing).toBe(false);
     // Change panel height to simulate changing of the modal data.
     component.translationContainer.nativeElement.offsetHeight = 300;
 
@@ -345,7 +345,7 @@ describe('Translation Modal Component', () => {
     tick(501);
 
     // Expectations.
-    expect(component.isTranslationOverflowing).toBeTrue();
+    expect(component.isTranslationOverflowing).toBe(true);
   }));
 
   afterEach(() => {
@@ -356,6 +356,18 @@ describe('Translation Modal Component', () => {
     spyOn(activeModal, 'close');
     component.close();
     expect(activeModal.close).toHaveBeenCalled();
+  });
+
+  it('should use an empty beforeUnloadHandler callback before initialization', () => {
+    component.ngOnDestroy();
+    const handler = mockWindow.removeEventListener.calls.argsFor(0)[1];
+    const event = jasmine.createSpyObj<MockBeforeUnloadEvent>(
+      'mockBeforeUnloadEvent',
+      ['preventDefault'],
+      {returnValue: ''}
+    );
+
+    expect(handler(event)).toBeUndefined();
   });
 
   describe('when initialized', () => {
@@ -446,7 +458,7 @@ describe('Translation Modal Component', () => {
         'getPreviousTextToTranslate'
       ).and.callThrough();
       component.ngOnInit();
-      expect(component.loadingData).toBeTrue();
+      expect(component.loadingData).toBe(true);
       expect(translateTextService.init).toHaveBeenCalled();
 
       const sampleStateWiseContentMapping: Record<string, unknown> = {
@@ -463,11 +475,11 @@ describe('Translation Modal Component', () => {
         version: 1,
       });
       flushMicrotasks();
-      expect(component.loadingData).toBeFalse();
+      expect(component.loadingData).toBe(false);
       expect(translateTextService.getTextToTranslate).toHaveBeenCalled();
 
       expect(component.textToTranslate).toBe('text1');
-      expect(component.moreAvailable).toBeTrue();
+      expect(component.moreAvailable).toBe(true);
       component.skipActiveTranslation();
       component.returnToPreviousTranslation();
       expect(
@@ -478,7 +490,7 @@ describe('Translation Modal Component', () => {
       // is viewing a previous translation. If the value is false, the
       // 'save and close' button is shown. This should happen only on the
       // last translation.
-      expect(component.moreAvailable).toBeTrue();
+      expect(component.moreAvailable).toBe(true);
     }));
 
     it('should set the schema constant based on the active language', fakeAsync(() => {
@@ -505,12 +517,17 @@ describe('Translation Modal Component', () => {
     });
 
     it('should utilize the modify translations opportunity when available', () => {
+      const modifyOnlyFixture = TestBed.createComponent(
+        TranslationModalComponent
+      );
+      const modifyOnlyComponent = modifyOnlyFixture.componentInstance;
+
       let translationContent = TranslatedContent.createFromBackendDict({
         content_value: 'Current translated content.',
         content_format: 'html',
         needs_update: false,
       });
-      component.modifyTranslationOpportunity = {
+      modifyOnlyComponent.modifyTranslationOpportunity = {
         id: 'expId',
         contentId: 'content_0',
         heading: 'Update Translation',
@@ -518,18 +535,18 @@ describe('Translation Modal Component', () => {
         textToTranslate: 'Current content in English.',
         currentContentTranslation: translationContent,
       };
-      component.opportunity = null;
+      modifyOnlyComponent.ngOnInit();
 
-      component.ngOnInit();
-
-      expect(component.subheading).toBe('Introduction');
-      expect(component.heading).toBe('Update Translation');
-      expect(component.textToTranslate).toBe('Current content in English.');
-      expect(component.activeContentType).toBe('content');
-      expect(component.activeWrittenTranslation).toBe(
+      expect(modifyOnlyComponent.subheading).toBe('Introduction');
+      expect(modifyOnlyComponent.heading).toBe('Update Translation');
+      expect(modifyOnlyComponent.textToTranslate).toBe(
+        'Current content in English.'
+      );
+      expect(modifyOnlyComponent.activeContentType).toBe('content');
+      expect(modifyOnlyComponent.activeWrittenTranslation).toBe(
         'Current translated content.'
       );
-      expect(component.activeDataFormat).toBe('html');
+      expect(modifyOnlyComponent.activeDataFormat).toBe('html');
     });
   });
 
@@ -622,7 +639,7 @@ describe('Translation Modal Component', () => {
 
       it('should retrieve remaining text and availability', () => {
         expect(component.textToTranslate).toBe('text2');
-        expect(component.moreAvailable).toBeFalse();
+        expect(component.moreAvailable).toBe(false);
       });
     });
   });
@@ -1136,8 +1153,7 @@ describe('Translation Modal Component', () => {
       }
 
       let mockWindow: MockWindow;
-      let mockEvent: BeforeUnloadEvent;
-      let preventDefaultSpy: jasmine.Spy;
+      let mockEvent: jasmine.SpyObj<MockBeforeUnloadEvent>;
       let translationLanguageService: TranslationLanguageService;
 
       beforeEach(() => {
@@ -1147,11 +1163,11 @@ describe('Translation Modal Component', () => {
           removeEventListener: jasmine.createSpy('removeEventListener'),
         };
 
-        preventDefaultSpy = jasmine.createSpy('preventDefault');
-        mockEvent = {
-          preventDefault: preventDefaultSpy,
-          returnValue: '',
-        } as unknown as BeforeUnloadEvent;
+        mockEvent = jasmine.createSpyObj<MockBeforeUnloadEvent>(
+          'mockBeforeUnloadEvent',
+          ['preventDefault'],
+          {returnValue: ''}
+        );
 
         TestBed.configureTestingModule({
           imports: [HttpClientTestingModule],
@@ -1244,33 +1260,18 @@ describe('Translation Modal Component', () => {
         translationLanguageService.setActiveLanguageCode('es');
       });
 
-      it('should have beforeUnloadHandler initialized as a function returning undefined', () => {
-        const mockEvent = {
-          preventDefault: () => {},
-          returnValue: '',
-        } as BeforeUnloadEvent;
-
-        interface ComponentWithPrivateMembers
-          extends TranslationModalComponent {
-          beforeUnloadHandler: (e: BeforeUnloadEvent) => string | undefined;
-        }
-
-        const componentWithPrivateAccess =
-          component as ComponentWithPrivateMembers;
-        expect(
-          componentWithPrivateAccess.beforeUnloadHandler(mockEvent)
-        ).toBeUndefined();
-      });
+      it('should have beforeUnloadHandler initialized as a function returning undefined', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        const handler = mockWindow.addEventListener.calls.argsFor(0)[1];
+        expect(handler(mockEvent)).toBeUndefined();
+      }));
 
       it('should initialize beforeUnloadHandler to return undefined by default', fakeAsync(() => {
         component.ngOnInit();
         tick();
 
         const handler = mockWindow.addEventListener.calls.argsFor(0)[1];
-        const mockEvent = {
-          preventDefault: () => {},
-          returnValue: '',
-        } as BeforeUnloadEvent;
 
         component.activeWrittenTranslation = '';
         expect(handler(mockEvent)).toBeUndefined();
@@ -1302,7 +1303,7 @@ describe('Translation Modal Component', () => {
         const handler = mockWindow.addEventListener.calls.argsFor(0)[1];
         component.activeWrittenTranslation = '';
         handler(mockEvent);
-        expect(preventDefaultSpy).not.toHaveBeenCalled();
+        expect(mockEvent.preventDefault).not.toHaveBeenCalled();
         expect(mockEvent.returnValue).toBe('');
       }));
 
@@ -1312,7 +1313,7 @@ describe('Translation Modal Component', () => {
         const handler = mockWindow.addEventListener.calls.argsFor(0)[1];
         component.activeWrittenTranslation = 'Some unsaved text';
         handler(mockEvent);
-        expect(preventDefaultSpy).toHaveBeenCalled();
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
         expect(mockEvent.returnValue).toBe('');
       }));
     });

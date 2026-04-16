@@ -75,7 +75,7 @@ class LearnerPlaylistHandler(
                 activity_id,
                 position_to_be_inserted=position_to_be_inserted_in,
             )
-        elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+        else:
             (
                 belongs_to_completed_or_incomplete_list,
                 playlist_limit_exceeded,
@@ -107,7 +107,7 @@ class LearnerPlaylistHandler(
             learner_playlist_services.remove_exploration_from_learner_playlist(
                 self.user_id, activity_id
             )
-        elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+        else:
             learner_playlist_services.remove_collection_from_learner_playlist(
                 self.user_id, activity_id
             )

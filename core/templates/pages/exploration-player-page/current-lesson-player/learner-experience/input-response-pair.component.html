@@ -52,6 +52,7 @@
   <div dir="auto">
     <oppia-rte-output-display *ngIf="data.oppiaResponse !== null"
                               [rteString]="data.oppiaResponse"
+                              [rteStringContext]="'feedback'"
                               [class]="'oppia-rte-viewer conversation-skin-oppia-feedback-content ' + (bottomSection ? 'e2e-test-conversation-feedback-latest' : '')"
                               [ngStyle]="{'min-width': (isVideoRteElementPresentInResponse() ? '75%': 'inherit')}"
                               [ngClass]="getFeedbackAudioHighlightClass()">
