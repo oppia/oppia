@@ -20,7 +20,6 @@ import logging
 
 from core import feconf
 from core.constants import constants
-from core.controllers import reader
 from core.domain import (
     collection_domain,
     collection_services,
@@ -78,62 +77,6 @@ def _get_change_list(
             }
         )
     ]
-
-
-class DoesExplorationExistTests(test_utils.GenericTestBase):
-    """Tests for _does_exploration_exist()."""
-
-    def test_returns_false_when_exploration_does_not_exist(self) -> None:
-        with self.swap_to_always_return(
-            exp_fetchers, 'get_exploration_by_id', None
-        ):
-            self.assertFalse(
-                reader._does_exploration_exist(
-                    'exp_id', version=None, collection_id=None
-                )
-            )
-
-    def test_returns_true_when_exploration_exists_and_no_collection_id(
-        self,
-    ) -> None:
-        with self.swap_to_always_return(
-            exp_fetchers, 'get_exploration_by_id', object()
-        ):
-            self.assertTrue(
-                reader._does_exploration_exist(
-                    'exp_id', version=1, collection_id=None
-                )
-            )
-
-    def test_returns_false_when_collection_id_is_given_but_collection_missing(
-        self,
-    ) -> None:
-        with self.swap_to_always_return(
-            exp_fetchers, 'get_exploration_by_id', object()
-        ):
-            with self.swap_to_always_return(
-                collection_services, 'get_collection_by_id', None
-            ):
-                self.assertFalse(
-                    reader._does_exploration_exist(
-                        'exp_id', version=1, collection_id='col_id'
-                    )
-                )
-
-    def test_returns_true_when_exploration_and_collection_both_exist(
-        self,
-    ) -> None:
-        with self.swap_to_always_return(
-            exp_fetchers, 'get_exploration_by_id', object()
-        ):
-            with self.swap_to_always_return(
-                collection_services, 'get_collection_by_id', object()
-            ):
-                self.assertTrue(
-                    reader._does_exploration_exist(
-                        'exp_id', version=1, collection_id='col_id'
-                    )
-                )
 
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
