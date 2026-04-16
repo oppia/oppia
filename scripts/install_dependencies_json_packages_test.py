@@ -19,11 +19,14 @@
 from __future__ import annotations
 
 import builtins
+import email.message
 import io
 import os
 import re
 import ssl
 import tempfile
+import time
+import urllib.error
 import zipfile
 from urllib import request as urlrequest
 
@@ -651,6 +654,94 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             response = install_dependencies_json_packages.url_open(test_url)
         self.assertEqual(response.getcode(), 200)
         self.assertEqual(response.url, test_url)
+
+    def test_url_open_rate_limit_retry(self) -> None:
+        """Tests retry logic when GitHub rate limit (HTTP 403) occurs."""
+        test_url = 'https://example.com/test'
+
+        headers = email.message.Message()
+        headers.add_header('x-ratelimit-remaining', '0')
+        headers.add_header('x-ratelimit-reset', str(int(time.time()) + 1))
+
+        error = urllib.error.HTTPError(
+            url=test_url, code=403, msg='rate limit', hdrs=headers, fp=None
+        )
+
+        class MockResponse:
+            def __init__(self) -> None:
+                """Initialize the mock response."""
+                self.url = test_url
+
+            def getcode(self) -> int:
+                """Return HTTP status code."""
+                return 200
+
+        call_count = {'count': 0}
+
+        def mock_urlopen(_url: str, context: ssl.SSLContext) -> MockResponse:
+            """Mock urlopen to simulate a rate-limit error followed by success."""
+            self._assert_ssl_context_matches_default(context)
+            call_count['count'] += 1
+            if call_count['count'] == 1:
+                raise error
+            return MockResponse()
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        sleep_swap = self.swap(time, 'sleep', lambda x: None)
+
+        with urlopen_swap, sleep_swap:
+            response = install_dependencies_json_packages.url_open(test_url)
+
+        self.assertEqual(response.getcode(), 200)
+        self.assertEqual(call_count['count'], 2)
+
+    def test_url_open_rate_limit_failure_cases(self) -> None:
+        """Tests failure cases for rate limit handling."""
+        test_url = 'https://example.com/test'
+        headers0 = email.message.Message()
+        error0 = urllib.error.HTTPError(
+            url=test_url, code=500, msg='server error', hdrs=headers0, fp=None
+        )
+
+        headers1 = email.message.Message()
+        headers1.add_header('x-ratelimit-remaining', '5')
+
+        error1 = urllib.error.HTTPError(
+            url=test_url, code=403, msg='forbidden', hdrs=headers1, fp=None
+        )
+
+        headers2 = email.message.Message()
+        headers2.add_header('x-ratelimit-remaining', '0')
+
+        error2 = urllib.error.HTTPError(
+            url=test_url, code=403, msg='rate limit', hdrs=headers2, fp=None
+        )
+
+        headers3 = email.message.Message()
+        headers3.add_header('x-ratelimit-remaining', '0')
+        headers3.add_header('x-ratelimit-reset', str(int(time.time()) + 1000))
+
+        error3 = urllib.error.HTTPError(
+            url=test_url, code=403, msg='rate limit', hdrs=headers3, fp=None
+        )
+
+        errors = [error0, error1, error2, error3]
+
+        # Here we use type Any because the function may raise an HTTPError or return a mock response object.
+        def mock_urlopen(_url: str, context: ssl.SSLContext) -> Any:
+            raise errors.pop(0)
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+        with urlopen_swap:
+            with self.assertRaisesRegex(urllib.error.HTTPError, '.*'):
+                install_dependencies_json_packages.url_open(test_url)
+            with self.assertRaisesRegex(urllib.error.HTTPError, '.*'):
+                install_dependencies_json_packages.url_open(test_url)
+            with self.assertRaisesRegex(urllib.error.HTTPError, '.*'):
+                install_dependencies_json_packages.url_open(test_url)
+            with self.assertRaisesRegex(urllib.error.HTTPError, '.*'):
+                install_dependencies_json_packages.url_open(test_url)
 
     def _assert_ssl_context_matches_default(
         self, context: ssl.SSLContext
