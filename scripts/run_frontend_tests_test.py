@@ -405,6 +405,27 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                             args=['--run_on_changed_files_in_branch']
                         )
 
+    def test_get_rerun_reason(self) -> None:
+        self.assertEqual(
+            run_frontend_tests.get_rerun_reason(
+                'Disconnected (1 times), because no message in 120000 ms.'
+            ),
+            'Detected chrome disconnected flake (#16607), so rerunning '
+            'if attempts allow.',
+        )
+        self.assertEqual(
+            run_frontend_tests.get_rerun_reason(
+                'ChromeHeadless has not captured in 60000 ms, killing.'
+            ),
+            'Detected chrome capture-timeout flake, so rerunning '
+            'if attempts allow.',
+        )
+        self.assertIsNone(
+            run_frontend_tests.get_rerun_reason(
+                'All tests passed with no flaky browser logs.'
+            )
+        )
+
     def test_frontend_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
@@ -537,6 +558,13 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         ]
         self.assertIn(cmd, self.cmd_token_list)
         self.assertFalse(self.frontend_coverage_checks_called)
+        self.assertIn('Attempt 1 of 2', self.print_arr)
+        self.assertIn(
+            'Frontend tests exited with a non-zero status, so rerunning '
+            'once to rule out transient flakes.',
+            self.print_arr,
+        )
+        self.assertIn('Attempt 2 of 2', self.print_arr)
         self.assertIn(1, self.sys_exit_message)
 
     def test_frontend_tests_are_run_correctly_on_production(self) -> None:

@@ -108,6 +108,28 @@ def get_file_spec(file_path: str) -> str | None:
     return None
 
 
+def get_rerun_reason(output: str) -> str | None:
+    """Returns a rerun reason when a known frontend flake is detected.
+
+    Args:
+        output: str. The concatenated output from a Karma run.
+
+    Returns:
+        str|None. A message describing the detected flake, if any.
+    """
+    if 'Disconnected' in output and 'because no message' in output:
+        return (
+            'Detected chrome disconnected flake (#16607), so rerunning '
+            'if attempts allow.'
+        )
+    if 'has not captured in' in output:
+        return (
+            'Detected chrome capture-timeout flake, so rerunning '
+            'if attempts allow.'
+        )
+    return None
+
+
 def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the frontend tests."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -261,18 +283,19 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 ' for details on how to fix it.'
             )
 
-        if 'Disconnected , because no message' in concatenated_output:
+        rerun_reason = get_rerun_reason(concatenated_output)
+        if rerun_reason:
+            print(rerun_reason)
+            continue
+
+        if task.returncode and attempt < MAX_ATTEMPTS - 1:
             print(
-                'Detected chrome disconnected flake (#16607), so rerunning '
-                'if attempts allow.'
+                'Frontend tests exited with a non-zero status, so rerunning '
+                'once to rule out transient flakes.'
             )
-        elif 'has not captured in' in concatenated_output:
-            print(
-                'Detected chrome capture-timeout flake, so rerunning '
-                'if attempts allow.'
-            )
-        else:
-            break
+            continue
+
+        break
 
     if parsed_args.check_coverage:
         if task.returncode:
