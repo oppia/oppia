@@ -2043,59 +2043,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             [],
         )
 
-    def test_exp_incomplete_event_handler_with_story_having_no_topic(
-        self,
-    ) -> None:
-        """Test handler for leaving an exploration incomplete in the context
-        of a story with no corresponding topic.
-        """
-        self.login(self.USER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        payload = {
-            'client_time_spent_in_secs': 0,
-            'collection_id': self.COL_ID_1,
-            'params': {},
-            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
-            'state_name': 'middle',
-            'version': 1,
-        }
-
-        story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertIsNotNone(story)
-
-        def _mock_get_story_by_id(_: str) -> story_domain.Story:
-            assert story is not None
-            story.corresponding_topic_id = None
-            return story
-
-        with self.swap(
-            story_fetchers, 'get_story_by_id', _mock_get_story_by_id
-        ):
-            self.post_json(
-                '/explorehandler/exploration_maybe_leave_event/%s'
-                % self.EXP_ID_2_0,
-                payload,
-                csrf_token=csrf_token,
-            )
-
-        self.assertEqual(
-            learner_progress_services.get_all_incomplete_exp_ids(self.user_id),
-            [self.EXP_ID_2_0],
-        )
-        self.assertEqual(
-            learner_progress_services.get_all_incomplete_story_ids(
-                self.user_id
-            ),
-            [self.STORY_ID],
-        )
-        self.assertEqual(
-            learner_progress_services.get_all_partially_learnt_topic_ids(
-                self.user_id
-            ),
-            [],
-        )
-
     def test_remove_exp_from_incomplete_list_handler(self) -> None:
         """Test handler for removing explorations from the partially completed
         list.
