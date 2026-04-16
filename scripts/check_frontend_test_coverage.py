@@ -261,7 +261,9 @@ def check_coverage_changes(files_to_check: Optional[List[str]] = None) -> None:
         print('------------------------------------')
         print('Frontend Coverage Checks Not Passed.')
         print('------------------------------------')
-        logging.error(errors)
+        print('\nThe following issues were detected:\n')
+        print(errors)
+        print('------------------------------------')
         sys.exit(1)
     else:
         print('------------------------------------')
