@@ -1624,7 +1624,7 @@ describe('Classroom Admin Page component ', () => {
     ];
 
     spyOn(
-      (component as any).classroomBackendApiService,
+      component['classroomBackendApiService'],
       'getClassroomDataAsync'
     ).and.returnValue(
       Promise.resolve(response) as Promise<Record<string, unknown>>
