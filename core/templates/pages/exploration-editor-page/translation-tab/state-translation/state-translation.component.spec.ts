@@ -33,7 +33,7 @@ import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only
 import {Rule} from 'domain/exploration/rule.model';
 import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.js';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
