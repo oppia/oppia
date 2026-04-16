@@ -3842,12 +3842,14 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
+        csrf_token = self.get_new_csrf_token()
         self.put_json(
             '/explorehandler/checkpoint_reached/%s' % exp_id,
             {
                 'most_recently_reached_checkpoint_exp_version': 1,
                 'most_recently_reached_checkpoint_state_name': 'Welcome!',
             },
+            csrf_token=csrf_token,
         )
 
 
@@ -3947,9 +3949,11 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
+        csrf_token = self.get_new_csrf_token()
         self.put_json(
             '/explorehandler/restart/%s' % exp_id,
             {'most_recently_reached_checkpoint_state_name': None},
+            csrf_token=csrf_token,
         )
 
     def test_restart_with_logged_in_user_and_non_none_checkpoint_preserves_progress(
@@ -4442,9 +4446,13 @@ class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
         # Update progress for logged out user.
         exp_services.update_logged_out_user_progress(exp_id, pid, 'Welcome!', 1)
 
+        csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/explorehandler/sync_logged_out_learner_progress/%s' % exp_id,
-            {'unique_progress_url_id': pid},
+            '/sync_logged_out_and_logged_in_progress/%s' % exp_id,
+            {
+                'unique_progress_url_id': pid,
+            },
+            csrf_token=csrf_token,
         )
 
 
@@ -4638,25 +4646,23 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         """Test metadata version history when metadata has not been updated."""
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        owner = user_services.get_user_actions_info(owner_id)
-
-        exp_id = 'exp_id'
-        self.save_new_valid_exploration(
-            exp_id,
-            owner_id,
-            title='Title',
-            category='Category',
-        )
-        rights_manager.publish_exploration(owner, exp_id)
+        self.login(self.OWNER_EMAIL)
 
         response = self.get_json(
-            '/explorehandler/metadata_version_history/%s/%s' % (exp_id, 1)
+            '%s/%s/%s'
+            % (feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 1)
         )
 
-        self.assertIsNone(response['last_edited_version_number'])
-        self.assertIsNone(response['metadata_dict_in_previous_version'])
+        self.assertEqual(
+            response,
+            {
+                'last_edited_version_number': None,
+                'last_edited_committer_username': self.OWNER_USERNAME,
+                'metadata_dict_in_previous_version': None,
+            },
+        )
+
+        self.logout()
 
 
 class EntityTranslationHandlerTest(test_utils.GenericTestBase):
