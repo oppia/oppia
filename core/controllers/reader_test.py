@@ -4125,7 +4125,7 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
         progress points to a missing exploration.
         """
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.OWNER_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         # Load demo exploration.
         exp_id = '0'
@@ -4145,7 +4145,7 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
         unique_progress_url_id = response['unique_progress_url_id']
 
         # Delete the exploration.
-        exp_services.delete_exploration(self.OWNER_ID, exp_id)
+        exp_services.delete_exploration(owner_id, exp_id)
 
         self.get_html_response(
             '/progress/%s' % unique_progress_url_id, expected_status_int=404
@@ -4158,7 +4158,7 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
         progress points to a missing collection.
         """
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.OWNER_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         # Load demo exploration.
         exp_id = '0'
