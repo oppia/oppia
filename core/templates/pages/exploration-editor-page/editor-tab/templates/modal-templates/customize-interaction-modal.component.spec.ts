@@ -50,6 +50,9 @@ import {AppConstants} from 'app.constants';
 import {RatioExpressionInputValidationService} from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+
+const NO_INTERACTION_ID = '' as unknown as InteractionSpecsKey;
 
 class MockStateCustomizationArgsService {
   displayed = {
@@ -64,7 +67,7 @@ class MockStateCustomizationArgsService {
     numberOfTerms: {
       value: 0,
     },
-    hasOwnProperty(argName) {
+    hasOwnProperty(argName: string) {
       return true;
     },
   };
@@ -81,7 +84,7 @@ class MockStateCustomizationArgsService {
     numberOfTerms: {
       value: 0,
     },
-    hasOwnProperty(argName) {
+    hasOwnProperty(argName: string) {
       return true;
     },
   };
@@ -276,17 +279,14 @@ describe('Customize Interaction Modal Component', () => {
     component.onChangeInteractionId('RatioExpressionInput');
 
     expect(component.hasCustomizationArgs).toBe(true);
-    expect(component.isinteractionOpen).toBeFalse();
+    expect(component.isinteractionOpen).toBe(false);
   });
 
   it('should open save intreaction when user click on it', () => {
     spyOn(interactionDetailsCacheService, 'contains').and.returnValue(true);
     spyOn(interactionDetailsCacheService, 'get').and.returnValue({});
 
-    component.originalContentIdToContent = SubtitledUnicode.createDefault(
-      'unicode',
-      'contentId'
-    );
+    component.originalContentIdToContent = {};
     const mockCustomizeInteractionHeaderRef = new ElementRef(
       document.createElement('h3')
     );
@@ -294,11 +294,11 @@ describe('Customize Interaction Modal Component', () => {
     component.onChangeInteractionId('RatioExpressionInput');
 
     expect(component.hasCustomizationArgs).toBe(false);
-    expect(component.isinteractionOpen).toBeFalse();
+    expect(component.isinteractionOpen).toBe(false);
   });
 
   it('should close modal when user click close', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+    spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
       return {
         result: Promise.resolve(),
       } as NgbModalRef;
@@ -312,7 +312,7 @@ describe('Customize Interaction Modal Component', () => {
   }));
 
   it('should stay in modal if user click cancel', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+    spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
       return {
         result: Promise.reject(),
       } as NgbModalRef;
@@ -328,11 +328,11 @@ describe('Customize Interaction Modal Component', () => {
   it('should display interaction content', () => {
     component.isinteractionOpen = false;
 
-    expect(component.isinteractionOpen).toBeFalse();
+    expect(component.isinteractionOpen).toBe(false);
 
     component.returnToInteractionSelector();
 
-    expect(component.isinteractionOpen).toBeTrue();
+    expect(component.isinteractionOpen).toBe(true);
   });
 
   it('should open save intreaction when user click on it', () => {
@@ -342,18 +342,15 @@ describe('Customize Interaction Modal Component', () => {
       'convertFromCustomizationArgsBackendDict'
     ).and.returnValue(false);
 
-    component.originalContentIdToContent = SubtitledUnicode.createDefault(
-      'unicode',
-      'contentId'
-    );
+    component.originalContentIdToContent = {};
     const mockCustomizeInteractionHeaderRef = new ElementRef(
       document.createElement('h3')
     );
     component.customizeInteractionHeader = mockCustomizeInteractionHeaderRef;
     component.onChangeInteractionId('RatioExpressionInput');
 
-    expect(component.hasCustomizationArgs).toBeFalse();
-    expect(component.isinteractionOpen).toBeFalse();
+    expect(component.hasCustomizationArgs).toBe(false);
+    expect(component.isinteractionOpen).toBe(false);
   });
 
   it('should show proper warning message on popover', fakeAsync(() => {
@@ -379,7 +376,7 @@ describe('Customize Interaction Modal Component', () => {
     );
 
     component.hasCustomizationArgs = true;
-    stateInteractionIdService.displayed = undefined;
+    stateInteractionIdService.displayed = NO_INTERACTION_ID;
     tick();
 
     expect(component.getSaveInteractionButtonTooltip()).toBe(
@@ -420,13 +417,10 @@ describe('Customize Interaction Modal Component', () => {
       component.ngOnInit();
       tick();
 
-      expect(component.allowedInteractionCategories).toEqual(
-        Array.prototype.concat.apply(
-          [],
-          AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES
-        )
-      );
-      expect(component.customizationModalReopened).toBeTrue();
+      expect(component.allowedInteractionCategories).toEqual([
+        ...AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES,
+      ]);
+      expect(component.customizationModalReopened).toBe(true);
     })
   );
 
@@ -448,13 +442,10 @@ describe('Customize Interaction Modal Component', () => {
       component.ngOnInit();
       tick();
 
-      expect(component.allowedInteractionCategories).toEqual(
-        Array.prototype.concat.apply(
-          [],
-          AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES
-        )
-      );
-      expect(component.customizationModalReopened).toBeTrue();
+      expect(component.allowedInteractionCategories).toEqual([
+        ...AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES,
+      ]);
+      expect(component.customizationModalReopened).toBe(true);
     })
   );
 
@@ -467,19 +458,16 @@ describe('Customize Interaction Modal Component', () => {
         false
       );
 
-      stateInteractionIdService.displayed = '';
-      stateInteractionIdService.savedMemento = '';
+      stateInteractionIdService.displayed = NO_INTERACTION_ID;
+      stateInteractionIdService.savedMemento = NO_INTERACTION_ID;
 
       component.ngOnInit();
       tick();
 
-      expect(component.isinteractionOpen).toBeTrue();
-      expect(component.allowedInteractionCategories).toEqual(
-        Array.prototype.concat.apply(
-          [],
-          AppConstants.ALLOWED_INTERACTION_CATEGORIES
-        )
-      );
+      expect(component.isinteractionOpen).toBe(true);
+      expect(component.allowedInteractionCategories).toEqual([
+        ...AppConstants.ALLOWED_INTERACTION_CATEGORIES,
+      ]);
     })
   );
 
@@ -521,6 +509,51 @@ describe('Customize Interaction Modal Component', () => {
     expect(component.getContentIdToContent()).toEqual({contentId: 'html'});
   }));
 
+  it('should skip subtitled html entries without contentId', () => {
+    stateInteractionIdService.displayed = 'DragAndDropSortInput';
+    stateCustomizationArgsService.displayed = {
+      choices: {
+        value: [
+          {
+            _html: 'html',
+            _contentId: null,
+            isEmpty(): boolean {
+              return !this._html;
+            },
+            get contentId(): string | null {
+              return this._contentId;
+            },
+            set contentId(contentId: string | null) {
+              this._contentId = contentId;
+            },
+            get html(): string {
+              return this._html;
+            },
+            set html(html: string) {
+              this._html = html;
+            },
+          },
+        ],
+      },
+      allowMultipleItemsInSamePosition: {
+        value: false,
+      },
+    };
+
+    expect(component.getContentIdToContent()).toEqual({});
+  });
+
+  it('should skip subtitled unicode entries without contentId', () => {
+    stateInteractionIdService.displayed = 'RatioExpressionInput';
+    stateCustomizationArgsService.displayed = {
+      placeholder: {
+        value: SubtitledUnicode.createDefault('2:3', null),
+      },
+    };
+
+    expect(component.getContentIdToContent()).toEqual({});
+  });
+
   it(
     'should save and populate null for ContentIds' +
       ' for DragAndDropSortInput intreaction',
@@ -530,10 +563,7 @@ describe('Customize Interaction Modal Component', () => {
       );
 
       stateInteractionIdService.displayed = 'DragAndDropSortInput';
-      component.originalContentIdToContent = SubtitledUnicode.createDefault(
-        'unicode',
-        'contentId 2'
-      );
+      component.originalContentIdToContent = {};
       stateCustomizationArgsService.displayed = {
         choices: {
           value: [
@@ -577,5 +607,42 @@ describe('Customize Interaction Modal Component', () => {
     }).toThrowError(
       'Interaction is missing customization argument placeholder'
     );
+  });
+
+  it('should return empty warnings list when no interaction is displayed', () => {
+    stateInteractionIdService.displayed = NO_INTERACTION_ID;
+
+    expect(component.getCustomizationArgsWarningsList()).toEqual([]);
+  });
+
+  it('should return empty warnings list when validation service is unmapped', () => {
+    stateInteractionIdService.displayed = 'RatioExpressionInput';
+    const interactionSpecs = INTERACTION_SPECS as unknown as Record<
+      InteractionSpecsKey,
+      {id: string}
+    >;
+    const originalId = interactionSpecs.RatioExpressionInput.id;
+    interactionSpecs.RatioExpressionInput.id = 'UnknownValidationService';
+
+    try {
+      expect(component.getCustomizationArgsWarningsList()).toEqual([]);
+    } finally {
+      interactionSpecs.RatioExpressionInput.id = originalId;
+    }
+  });
+
+  it('should no-op when populating null content ids without interaction id', () => {
+    stateInteractionIdService.displayed = NO_INTERACTION_ID;
+    spyOn(generateContentIdService, 'getNextStateId');
+
+    component.populateNullContentIds();
+
+    expect(generateContentIdService.getNextStateId).not.toHaveBeenCalled();
+  });
+
+  it('should return empty content map when no interaction is displayed', () => {
+    stateInteractionIdService.displayed = NO_INTERACTION_ID;
+
+    expect(component.getContentIdToContent()).toEqual({});
   });
 });
