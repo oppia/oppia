@@ -266,6 +266,11 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 'Detected chrome disconnected flake (#16607), so rerunning '
                 'if attempts allow.'
             )
+        elif 'has not captured in' in concatenated_output:
+            print(
+                'Detected chrome capture-timeout flake, so rerunning '
+                'if attempts allow.'
+            )
         else:
             break
 
