@@ -4155,7 +4155,7 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
         unique_progress_url_id = response['unique_progress_url_id']
 
         # Delete the exploration.
-        exp_services.delete_exploration(owner_id, exp_id)
+        exp_services.delete_demo(exp_id)
 
         self.get_html_response(
             '/progress/%s' % unique_progress_url_id, expected_status_int=404
@@ -4191,6 +4191,7 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
         )
         assert model is not None
         setattr(model, 'collection_id', 'invalid_collection_id')
+        model.update_timestamps()
         model.put()
 
         self.get_html_response(
