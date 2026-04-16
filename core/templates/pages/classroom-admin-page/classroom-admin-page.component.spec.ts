@@ -1623,10 +1623,7 @@ describe('Classroom Admin Page component ', () => {
       {classroom_id: 'id2', classroom_name: 'Classroom 2', classroom_index: 1},
     ];
 
-    spyOn(
-      component['classroomBackendApiService'],
-      'getClassroomDataAsync'
-    ).and.returnValue(
+    spyOn(classroomBackendApiService, 'getClassroomDataAsync').and.returnValue(
       Promise.resolve(response) as Promise<Record<string, unknown>>
     );
 
