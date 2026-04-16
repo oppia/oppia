@@ -4158,7 +4158,6 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
         progress points to a missing collection.
         """
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         # Load demo exploration.
         exp_id = '0'
