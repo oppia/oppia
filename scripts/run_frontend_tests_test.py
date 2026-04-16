@@ -580,6 +580,20 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             result = run_frontend_tests.get_file_spec(file_path)
             self.assertIsNone(result)
 
+    def test_get_file_spec_with_puppeteer_acceptance_spec(self) -> None:
+        def mock_exists(path: str) -> bool:  # pylint: disable=unused-argument
+            return True
+
+        with self.swap(os.path, 'exists', mock_exists):
+            file_path = (
+                'core/tests/puppeteer-acceptance-tests/specs/'
+                'logged-in-learner/'
+                'manage-community-lesson-progress-in-home-learner-dashboard'
+                '.spec.ts'
+            )
+            result = run_frontend_tests.get_file_spec(file_path)
+            self.assertIsNone(result)
+
     def test_main_run_on_changed_files_in_branch_with_no_spec_files(
         self,
     ) -> None:

@@ -81,6 +81,7 @@ describe('Tag Filter component', () => {
         value: '',
       },
     } as ElementRef;
+    spyOn(component.tagFilter, 'setValue');
     component.selectTag({option: {viewValue: 'tag3'}});
     // Search with applied tags will be executed only when no change in tag
     // filter is done for 1500ms. We add 1ms extra to avoid flaking of test.
@@ -109,5 +110,43 @@ describe('Tag Filter component', () => {
     component.deselectTag('tag1');
 
     expect(component.selectedTags).toEqual(['tag2', 'tag3']);
+  });
+
+  it('should emit trimmed tag filter input value', () => {
+    spyOn(component.tagFilterInputChange, 'emit');
+    component.listOfDefaultTags = ['Community'];
+
+    component.ngOnInit();
+    component.tagFilter.setValue('  Community  ');
+
+    expect(component.tagFilterInputChange.emit).toHaveBeenCalledWith(
+      'Community'
+    );
+  });
+
+  it('should not emit when only whitespace input is typed', () => {
+    spyOn(component.tagFilterInputChange, 'emit');
+    component.listOfDefaultTags = ['Community'];
+
+    component.ngOnInit();
+    (component.tagFilterInputChange.emit as jasmine.Spy).calls.reset();
+    component.tagFilter.setValue(' ');
+    component.tagFilter.setValue('   ');
+
+    expect(component.tagFilterInputChange.emit).not.toHaveBeenCalled();
+  });
+
+  it('should emit empty value when whitespace clears meaningful input', () => {
+    spyOn(component.tagFilterInputChange, 'emit');
+    component.listOfDefaultTags = ['Community'];
+
+    component.ngOnInit();
+    component.tagFilter.setValue('Community');
+    component.tagFilter.setValue('   ');
+
+    expect(component.tagFilterInputChange.emit).toHaveBeenCalledWith(
+      'Community'
+    );
+    expect(component.tagFilterInputChange.emit).toHaveBeenCalledWith('');
   });
 });

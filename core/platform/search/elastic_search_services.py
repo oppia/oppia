@@ -414,6 +414,8 @@ def blog_post_summaries_search(
                 'multi_match': {
                     'query': query_string,
                     'fields': ['title', 'summary'],
+                    'type': 'bool_prefix',
+                    'operator': 'and',
                 }
             }
         ]
