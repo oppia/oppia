@@ -1951,18 +1951,24 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             'version': 1,
         }
 
-        story = story_fetchers.get_story_by_id(self.STORY_ID)
-        assert story is not None
-        story.corresponding_topic_id = None
-        story.update_timestamps()
-        story.put()
+        class MockStory:
+            def __init__(self, story_id: str) -> None:
+                self.id = story_id
+                self.corresponding_topic_id: Optional[str] = None
 
-        self.post_json(
-            '/explorehandler/exploration_maybe_leave_event/%s'
-            % self.EXP_ID_2_0,
-            payload,
-            csrf_token=csrf_token,
-        )
+        def _mock_get_story_by_id(_: str) -> MockStory:
+            return MockStory(self.STORY_ID)
+
+        with self.swap(
+            story_fetchers, 'get_story_by_id', _mock_get_story_by_id
+        ):
+            self.post_json(
+                '/explorehandler/exploration_maybe_leave_event/%s'
+                % self.EXP_ID_2_0,
+                payload,
+                csrf_token=csrf_token,
+            )
+
         self.assertEqual(
             learner_progress_services.get_all_incomplete_story_ids(
                 self.user_id
@@ -4176,13 +4182,12 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
         )
         unique_progress_url_id = response['unique_progress_url_id']
 
-        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+        model = exp_models.TransientCheckpointUrlModel.get(
             unique_progress_url_id
         )
-        assert exp_user_data is not None
-        exp_user_data.collection_id = 'invalid_collection_id'
-        exp_user_data.update_timestamps()
-        exp_user_data.put()
+        assert model is not None
+        model.collection_id = 'invalid_collection_id'
+        model.put()
 
         self.get_html_response(
             '/progress/%s' % unique_progress_url_id, expected_status_int=404
