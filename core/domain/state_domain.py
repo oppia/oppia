@@ -4144,8 +4144,8 @@ class State(translation_domain.BaseTranslatableObject):
         customization_args = InteractionInstance.convert_customization_args_dict_to_customization_args(
             self.interaction.id, customization_args_dict
         )
-        for ca_name, _ in customization_args.items():
-            customization_args[ca_name].validate_subtitled_html()
+        for ca_name, ca in customization_args.items():
+            ca.validate_subtitled_html()
 
         self.interaction.customization_args = customization_args
         new_content_id_list = list(
