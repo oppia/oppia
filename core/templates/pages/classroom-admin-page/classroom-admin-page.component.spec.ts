@@ -48,7 +48,7 @@ class MockNgbModal {
   }
 }
 
-class MockModalRef implements NgbModalRef {
+class MockModalRef {
   componentInstance: Record<string, unknown>;
   result: Promise<unknown>;
 
@@ -1624,7 +1624,7 @@ describe('Classroom Admin Page component ', () => {
     ];
 
     spyOn(
-      component.classroomBackendApiService,
+      (component as any).classroomBackendApiService,
       'getClassroomDataAsync'
     ).and.returnValue(
       Promise.resolve(response) as Promise<Record<string, unknown>>
