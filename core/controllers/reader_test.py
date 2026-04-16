@@ -1951,7 +1951,9 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             'version': 1,
         }
 
-        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        story: Optional[story_domain.Story] = story_fetchers.get_story_by_id(
+            self.STORY_ID
+        )
         self.assertIsNotNone(story)
 
         def _mock_get_story_by_id(_: str) -> story_domain.Story:
