@@ -4186,7 +4186,7 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
             unique_progress_url_id
         )
         assert model is not None
-        model.collection_id = 'invalid_collection_id'
+        setattr(model, 'collection_id', 'invalid_collection_id')
         model.put()
 
         self.get_html_response(
