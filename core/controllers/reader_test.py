@@ -1933,6 +1933,49 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         )
         self.assertEqual(response['error'], error_msg)
 
+    def test_exp_incomplete_event_handler_with_story_having_no_topic(
+        self,
+    ) -> None:
+        """Test handler for leaving an exploration incomplete in the context
+        of a story with no corresponding topic.
+        """
+        self.login(self.USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'collection_id': self.COL_ID_1,
+            'params': {},
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': 'middle',
+            'version': 1,
+        }
+
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        assert story is not None
+        story.corresponding_topic_id = None
+        story.update_timestamps()
+        story.put()
+
+        self.post_json(
+            '/explorehandler/exploration_maybe_leave_event/%s'
+            % self.EXP_ID_2_0,
+            payload,
+            csrf_token=csrf_token,
+        )
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id
+            ),
+            [self.STORY_ID],
+        )
+        self.assertEqual(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id
+            ),
+            [],
+        )
+
     def test_remove_exp_from_incomplete_list_handler(self) -> None:
         """Test handler for removing explorations from the partially completed
         list.
@@ -3784,6 +3827,23 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_checkpoint_reached_with_logged_out_user_does_not_raise_error(
+        self,
+    ) -> None:
+        """Test handler for checkpoint reached events by logged-out users."""
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        self.put_json(
+            '/explorehandler/checkpoint_reached/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!',
+            },
+        )
+
 
 class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
     """Tests for exploration restart event handler."""
@@ -3868,6 +3928,74 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(
             exploration_dict['most_recently_reached_checkpoint_state_name']
+        )
+
+        self.logout()
+
+    def test_restart_with_logged_out_user_and_none_checkpoint_does_not_raise_error(
+        self,
+    ) -> None:
+        """Test restart handler with no checkpoint state for logged-out users."""
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        self.put_json(
+            '/explorehandler/restart/%s' % exp_id,
+            {'most_recently_reached_checkpoint_state_name': None},
+        )
+
+    def test_restart_with_logged_in_user_and_non_none_checkpoint_preserves_progress(
+        self,
+    ) -> None:
+        """Test restart handler preserves checkpoint progress when the most
+        recent checkpoint state name is not None.
+        """
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        self.login(self.VIEWER_EMAIL)
+        viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/checkpoint_reached/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!',
+            },
+            csrf_token=csrf_token,
+        )
+
+        self.put_json(
+            '/explorehandler/restart/%s' % exp_id,
+            {'most_recently_reached_checkpoint_state_name': 'Welcome!'},
+            csrf_token=csrf_token,
+        )
+
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            viewer_id, exp_id
+        )
+        assert exp_user_data is not None
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!'
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'Welcome!',
         )
 
         self.logout()
@@ -3988,6 +4116,77 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
 
         self.get_html_response(
             '/progress/%s' % (unique_progress_url_id), expected_status_int=404
+        )
+
+    def test_exploration_page_raises_error_when_progress_points_to_missing_exploration(
+        self,
+    ) -> None:
+        """Check the transient checkpoint page raises an error when the
+        progress points to a missing exploration.
+        """
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.OWNER_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/explorehandler/checkpoint_reached_by_logged_out_user/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!',
+            },
+            csrf_token=csrf_token,
+        )
+        unique_progress_url_id = response['unique_progress_url_id']
+
+        # Delete the exploration.
+        exp_services.delete_exploration(self.OWNER_ID, exp_id)
+
+        self.get_html_response(
+            '/progress/%s' % unique_progress_url_id, expected_status_int=404
+        )
+
+    def test_exploration_page_raises_error_when_progress_points_to_missing_collection(
+        self,
+    ) -> None:
+        """Check the transient checkpoint page raises an error when the
+        progress points to a missing collection.
+        """
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.OWNER_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/explorehandler/checkpoint_reached_by_logged_out_user/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!',
+            },
+            csrf_token=csrf_token,
+        )
+        unique_progress_url_id = response['unique_progress_url_id']
+
+        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
+        assert exp_user_data is not None
+        exp_user_data.collection_id = 'invalid_collection_id'
+        exp_user_data.update_timestamps()
+        exp_user_data.put()
+
+        self.get_html_response(
+            '/progress/%s' % unique_progress_url_id, expected_status_int=404
         )
 
     def test_logged_out_progress_is_displayed_correctly_when_exp_version_is_same(  # pylint: disable=line-too-long
@@ -4224,6 +4423,26 @@ class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_sync_logged_out_progress_with_logged_out_user_does_not_raise_error(
+        self,
+    ) -> None:
+        """Test sync handler does not raise an error for logged-out users."""
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # Use a dummy unique_progress_url_id.
+        pid = 'pidABC'
+
+        # Update progress for logged out user.
+        exp_services.update_logged_out_user_progress(exp_id, pid, 'Welcome!', 1)
+
+        self.post_json(
+            '/explorehandler/sync_logged_out_learner_progress/%s' % exp_id,
+            {'unique_progress_url_id': pid},
+        )
+
 
 class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
     """Tests for fetching the version history of a particular state of an
@@ -4410,6 +4629,30 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
         )
 
         self.logout()
+
+    def test_metadata_version_history_with_unedited_metadata_has_none_previous_metadata(
+        self,
+    ) -> None:
+        """Test metadata version history when metadata has not been updated."""
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        owner = user_services.get_user_actions_info(owner_id)
+
+        exp_id = 'exp_id'
+        self.save_new_valid_exploration(
+            exp_id,
+            owner_id,
+            title='Title',
+            category='Category',
+        )
+        rights_manager.publish_exploration(owner, exp_id)
+
+        response = self.get_json(
+            '/explorehandler/metadata_version_history/%s/%s' % (exp_id, 1)
+        )
+
+        self.assertIsNone(response['last_edited_version_number'])
+        self.assertIsNone(response['metadata_dict_in_previous_version'])
 
 
 class EntityTranslationHandlerTest(test_utils.GenericTestBase):
