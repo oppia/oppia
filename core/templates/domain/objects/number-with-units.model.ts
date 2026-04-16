@@ -227,7 +227,6 @@ export class NumberWithUnits {
           }
         }
         if (startsWithCorrectCurrencyUnit === false) {
-          const containsDigit = rawInput.match(/[0-9]/);
           const startsWithCurrencySymbol = keys.some(key => {
             return ObjectsDomainConstants.CURRENCY_UNITS[key].front_units.some(
               frontUnit => {
@@ -242,7 +241,7 @@ export class NumberWithUnits {
               }
             );
           });
-          if (!containsDigit && !startsWithCurrencySymbol) {
+          if (!startsWithCurrencySymbol) {
             throw new Error(
               // eslint-disable-next-line max-len
               ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_VALUE

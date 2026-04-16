@@ -308,6 +308,9 @@ describe('NumberWithUnits', () => {
         NumberWithUnits.fromRawInputString('blah');
       }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
+        NumberWithUnits.fromRawInputString('blah 123');
+      }).toThrowError(errors.INVALID_VALUE);
+      expect(() => {
         NumberWithUnits.fromRawInputString('3 $');
       }).toThrowError(errors.INVALID_CURRENCY_FORMAT);
       expect(() => {
@@ -318,13 +321,13 @@ describe('NumberWithUnits', () => {
       }).toThrowError(errors.INVALID_CURRENCY);
       expect(() => {
         NumberWithUnits.fromRawInputString('kg 2 s^2');
-      }).toThrowError(errors.INVALID_CURRENCY);
+      }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
         NumberWithUnits.fromRawInputString('2 m/s#');
       }).toThrowError(errors.INVALID_UNIT_CHARS);
       expect(() => {
         NumberWithUnits.fromRawInputString('@ 2');
-      }).toThrowError(errors.INVALID_CURRENCY);
+      }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
         NumberWithUnits.fromRawInputString('2 / 3 kg&^-2');
       }).toThrowError(errors.INVALID_UNIT_CHARS);
