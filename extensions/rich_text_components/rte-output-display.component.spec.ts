@@ -510,6 +510,17 @@ describe('RTE display component', () => {
     expect(readableText).toBe(expectedString);
   });
 
+  it('should return empty readable text when non-interactive link text is missing', () => {
+    let node = document.createElement('p');
+    // eslint-disable-next-line oppia/no-inner-html
+    node.innerHTML =
+      '<oppia-noninteractive-link ' +
+      'url-with-value="&quot;https://oppia.org&quot;">' +
+      '</oppia-noninteractive-link>';
+
+    expect(component.getReadableTextFromNode(node.childNodes[0])).toBe('');
+  });
+
   it('should be able to get readable text from non-interactive math node', () => {
     let node = document.createElement('p');
     // eslint-disable-next-line oppia/no-inner-html
@@ -525,6 +536,14 @@ describe('RTE display component', () => {
     expect(readableText).toBe(expectedString);
   });
 
+  it('should return empty readable text when non-interactive math content is missing', () => {
+    let node = document.createElement('p');
+    // eslint-disable-next-line oppia/no-inner-html
+    node.innerHTML = '<oppia-noninteractive-math></oppia-noninteractive-math>';
+
+    expect(component.getReadableTextFromNode(node.childNodes[0])).toBe('');
+  });
+
   it('should return space character for unknown tag', () => {
     let node = document.createElement('span');
     // eslint-disable-next-line oppia/no-inner-html
@@ -533,6 +552,41 @@ describe('RTE display component', () => {
     let readableText = component.getReadableTextFromNode(node.childNodes[0]);
     expect(readableText).toBe(expectedString);
   });
+
+  it('should return null when className is undefined', () => {
+    expect(component.getElementMatchingClassAndTextContent(undefined)).toBe(
+      null
+    );
+  });
+
+  it('should remove text nodes using parentNode when available', fakeAsync(() => {
+    const removeChildSpy = jasmine.createSpy('Remove child node');
+
+    component.elementRef = {
+      nativeElement: {
+        childNodes: [
+          {
+            nodeType: 3,
+            parentNode: {
+              removeChild: removeChildSpy,
+            },
+          },
+        ],
+      },
+    };
+
+    component.ngOnChanges({
+      rteString: {
+        previousValue: '',
+        currentValue: '<p>Hi</p>',
+        firstChange: true,
+        isFirstChange: () => true,
+      },
+    });
+    tick(100);
+
+    expect(removeChildSpy).toHaveBeenCalled();
+  }));
 
   it('should not change bg highlight color when prev and current element are same during voiceover playback', fakeAsync(() => {
     spyOn(
