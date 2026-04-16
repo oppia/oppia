@@ -51,7 +51,7 @@ from core.tests import test_utils
 
 import webapp2
 import webtest
-from typing import Dict, Final, List, Union
+from typing import Any, Dict, Final, List, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -59,6 +59,7 @@ if MYPY:  # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 secrets_services = models.Registry.import_secrets_services()
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
 class OpenAccessDecoratorTests(test_utils.GenericTestBase):
@@ -5556,6 +5557,21 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
                 response.headers['location'],
             )
 
+    def test_user_cannot_access_story_with_no_topic(self) -> None:
+        # Save a story with no topic ID.
+        story_id = story_services.get_new_story_id()
+        self.save_new_story(
+            story_id,
+            self.admin_id,
+            '',
+            url_fragment='story-no-topic',
+        )
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_story_data/staging/topic/story-no-topic',
+                expected_status_int=404,
+            )
+
 
 class StoryViewerTests(test_utils.GenericTestBase):
     """Tests for decorator can_access_story_viewer_page."""
@@ -5752,6 +5768,21 @@ class StoryViewerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 'http://localhost/learn/staging/topic/story/story-frag',
                 response.headers['location'],
+            )
+
+    def test_cannot_access_story_with_no_topic(self) -> None:
+        # Save a story with no topic ID.
+        story_id = story_services.get_new_story_id()
+        self.save_new_story(
+            story_id,
+            self.admin_id,
+            '',
+            url_fragment='story-no-topic-guest',
+        )
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_story_data/staging/topic/story-no-topic-guest',
+                expected_status_int=404,
             )
 
 
@@ -7898,6 +7929,106 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             'suggestions.' % self.author_username,
         )
         self.logout()
+
+    def test_user_without_review_rights_cannot_update_add_question_suggestion(
+        self,
+    ) -> None:
+        content_id_generator = translation_domain.ContentIdGenerator()
+        # Here we use type Any because add_question_change_dict is a
+        # complex dictionary with mixed types that are not easily
+        # captured by a more specific type hint without being overly
+        # verbose.
+        add_question_change_dict: Dict[str, Any] = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state', content_id_generator
+                ).to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION
+                ),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1'],
+                'next_content_id_index': (
+                    content_id_generator.next_content_id_index
+                ),
+                'version': 44,
+                'id': '',
+            },
+            'skill_id': 'skill_123',
+            'skill_difficulty': 0.3,
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            'skill_123',
+            feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id,
+            add_question_change_dict,
+            'description',
+        )
+        suggestion_id = '%s.%s.1' % (
+            feconf.ENTITY_TYPE_SKILL,
+            'skill_123',
+        )
+        with self.swap(
+            suggestion_models.GeneralSuggestionModel,
+            'get_by_id',
+            lambda _: suggestion_models.GeneralSuggestionModel(
+                id=suggestion_id,
+                suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                target_type=feconf.ENTITY_TYPE_SKILL,
+                target_id='skill_123',
+                target_version_at_submission=feconf.CURRENT_STATE_SCHEMA_VERSION,
+                status=suggestion_models.STATUS_IN_REVIEW,
+                author_id=self.author_id,
+                change_cmd=add_question_change_dict,
+                score_category='category',
+                language_code='en',
+            ),
+        ):
+            self.login(self.user_email)
+            with self.swap(self, 'testapp', self.mock_testapp):
+                response = self.get_json(
+                    '/mock/%s' % suggestion_id, expected_status_int=401
+                )
+            self.assertEqual(
+                response['error'],
+                'You are not allowed to update the suggestion.',
+            )
+            self.logout()
+
+    def test_user_without_review_rights_cannot_update_translation_suggestion(
+        self,
+    ) -> None:
+        suggestion_id = self.translation_suggestion_id
+        with self.swap(
+            suggestion_models.GeneralSuggestionModel,
+            'get_by_id',
+            lambda _: suggestion_models.GeneralSuggestionModel(
+                id=suggestion_id,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                target_id=self.exploration_id,
+                target_version_at_submission=1,
+                status=suggestion_models.STATUS_IN_REVIEW,
+                author_id=self.author_id,
+                change_cmd=self.change_dict,
+                score_category='category',
+                language_code='en',
+            ),
+        ):
+            self.login(self.user_email)
+            with self.swap(self, 'testapp', self.mock_testapp):
+                response = self.get_json(
+                    '/mock/%s' % suggestion_id, expected_status_int=401
+                )
+            self.assertEqual(
+                response['error'],
+                'You are not allowed to update the suggestion.',
+            )
+            self.logout()
 
     def test_admin_can_update_any_given_translation_suggestion(self) -> None:
         self.login(self.curriculum_admin_email)
