@@ -248,6 +248,9 @@ module.exports = {
       },
       {
         test: /\.(woff|woff2|ttf|eot)$/,
+        include: [
+          path.resolve(__dirname, 'node_modules/guppy-dev/build/fonts'),
+        ],
         use: [
           {
             loader: 'file-loader',
@@ -260,6 +263,9 @@ module.exports = {
       },
       {
         test: /\.(png|jpg|gif)$/,
+        include: [
+          path.resolve(__dirname, 'node_modules/guppy-dev/build/icons'),
+        ],
         use: [
           {
             loader: 'file-loader',

@@ -430,9 +430,10 @@ def install_elasticsearch_dev_server() -> None:
 def copy_missing_guppy_katex_fonts() -> None:
     """Copies any KaTeX font files missing from guppy-dev/build/fonts.
 
-    Guppy CSS references KaTeX fonts from guppy-dev/build/fonts. Some Oppia
-    environments may have fonts present under guppy-dev/lib/katex/fonts but not
-    yet mirrored into guppy-dev/build/fonts, so we copy only the missing files.
+    Guppy stores the full KaTeX font set under lib/katex/fonts, but its CSS
+    resolves those fonts from build/fonts. If build/fonts is missing any of the
+    referenced files, webpack emits URLs for files that are not present. We only
+    copy missing files so existing package files are left untouched.
     """
     source_dir = os.path.join(
         common.NODE_MODULES_PATH, 'guppy-dev', 'lib', 'katex', 'fonts'

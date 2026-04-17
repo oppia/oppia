@@ -183,7 +183,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_external_script_call() -> None:
             pass
 
-        def mock_mkdir(unused_path: str, unused_mode: int = 0o777) -> None:
+        def mock_mkdir(unused_path: str) -> None:
             pass
 
         def mock_copytree(unused_src: str, unused_dst: str) -> None:
@@ -472,9 +472,13 @@ class CopyMissingGuppyKatexFontsTests(test_utils.TestBase):
             common.NODE_MODULES_PATH, 'guppy-dev', 'build', 'fonts'
         )
 
-        source_files = ['KaTeX_Main-BoldItalic.woff2', 'KaTeX_Main-Regular.woff']
+        source_files = [
+            'KaTeX_Main-BoldItalic.woff2',
+            'KaTeX_Main-Regular.woff',
+            'KaTeX_Size1-Regular.ttf',
+        ]
         existing_target_files = {
-            os.path.join(target_dir, 'KaTeX_Main-Regular.woff')
+            os.path.join(target_dir, 'KaTeX_Size1-Regular.ttf')
         }
 
         def mock_exists(path: str) -> bool:
@@ -513,7 +517,11 @@ class CopyMissingGuppyKatexFontsTests(test_utils.TestBase):
                 (
                     os.path.join(source_dir, 'KaTeX_Main-BoldItalic.woff2'),
                     os.path.join(target_dir, 'KaTeX_Main-BoldItalic.woff2'),
-                )
+                ),
+                (
+                    os.path.join(source_dir, 'KaTeX_Main-Regular.woff'),
+                    os.path.join(target_dir, 'KaTeX_Main-Regular.woff'),
+                ),
             ],
         )
 
