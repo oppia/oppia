@@ -52,10 +52,12 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
             FeatureNames.FEATURE_A.value: (
                 'a feature in dev stage',
                 FeatureStages.DEV,
+                '',
             ),
             FeatureNames.FEATURE_B.value: (
                 'a feature in prod stage',
                 FeatureStages.PROD,
+                '',
             ),
         }
         self.swap_name_to_description_feature_stage_registry_dict = self.swap(

@@ -47,6 +47,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                 FeatureNames.FEATURE_A.value: (
                     'test description',
                     FeatureStages.DEV,
+                    '',
                 )
             },
         )
@@ -192,6 +193,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                 FeatureNames.FEATURE_A.value: (
                     'test description',
                     FeatureStages.TEST,
+                    '',
                 )
             },
         )

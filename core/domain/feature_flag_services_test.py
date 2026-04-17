@@ -69,14 +69,17 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 FeatureNames.FEATURE_A.value: (
                     'a feature in dev stage',
                     FeatureStages.DEV,
+                    '',
                 ),
                 FeatureNames.FEATURE_B.value: (
                     'a feature in test stage',
                     FeatureStages.TEST,
+                    '',
                 ),
                 FeatureNames.FEATURE_C.value: (
                     'a feature in prod stage',
                     FeatureStages.PROD,
+                    '',
                 ),
             },
         )
@@ -122,14 +125,17 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             FeatureNames.FEATURE_A.value: (
                 'a feature in dev stage',
                 FeatureStages.DEV,
+                '',
             ),
             FeatureNames.FEATURE_B.value: (
                 'a feature in test stage',
                 FeatureStages.TEST,
+                '',
             ),
             FeatureNames.FEATURE_C.value: (
                 'a feature in prod stage',
                 FeatureStages.PROD,
+                '',
             ),
         }
 
@@ -262,14 +268,17 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 FeatureNames.FEATURE_ONE.value: (
                     'feature flag one',
                     FeatureStages.DEV,
+                    '',
                 ),
                 FeatureNames.FEATURE_TWO.value: (
                     'feature flag two',
                     FeatureStages.DEV,
+                    '',
                 ),
                 FeatureNames.FEATURE_THREE.value: (
                     'feature flag three',
                     FeatureStages.DEV,
+                    '',
                 ),
             },
         )

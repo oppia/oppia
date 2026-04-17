@@ -317,6 +317,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 FeatureNames.TEST_FEATURE_1.value: (
                     'a feature in dev stage',
                     FeatureStages.DEV,
+                    '',
                 )
             },
         )
@@ -362,6 +363,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 FeatureNames.TEST_FEATURE_1.value: (
                     'a feature in dev stage',
                     FeatureStages.DEV,
+                    '',
                 )
             },
         )
@@ -428,6 +430,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 FeatureNames.TEST_FEATURE_1.value: (
                     'a feature in dev stage',
                     FeatureStages.DEV,
+                    '',
                 )
             },
         )
@@ -463,6 +466,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 FeatureNames.TEST_FEATURE_2.value: (
                     'a feature in dev stage',
                     FeatureStages.DEV,
+                    '',
                 )
             },
         )

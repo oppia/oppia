@@ -22,12 +22,9 @@ import enum
 
 from core.domain import feature_flag_domain
 
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple
 
-FeatureFlagMetadata = Union[
-    Tuple[str, feature_flag_domain.ServerMode],
-    Tuple[str, feature_flag_domain.ServerMode, str],
-]
+FeatureFlagMetadata = Tuple[str, feature_flag_domain.ServerMode, str]
 
 
 class FeatureNames(enum.Enum):
@@ -224,12 +221,14 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
             'This flag is to show feedback updates in the '
             'profile pic drop-down menu.',
             feature_flag_domain.ServerMode.DEV,
+            '',
         )
     ),
     FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value: (
         (
             'This flag is to show new contributor admin dashboard.',
             feature_flag_domain.ServerMode.TEST,
+            '',
         )
     ),
     FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED.value: (
@@ -237,15 +236,21 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
             'Exposes the Improvements Tab for creators in the exploration '
             'editor.',
             feature_flag_domain.ServerMode.PROD,
+            '',
         )
     ),
     FeatureNames.LEARNER_GROUPS_ARE_ENABLED.value: (
-        ('Enable learner groups feature', feature_flag_domain.ServerMode.PROD)
+        (
+            'Enable learner groups feature',
+            feature_flag_domain.ServerMode.PROD,
+            '',
+        )
     ),
     FeatureNames.NEW_LESSON_PLAYER.value: (
         (
             'This flag is to enable the exploration player redesign.',
             feature_flag_domain.ServerMode.TEST,
+            '',
         )
     ),
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW.value: (
@@ -253,6 +258,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
             'This flag allows translation reviewers to undo translation '
             'suggestion review on the contributor dashboard.',
             feature_flag_domain.ServerMode.TEST,
+            '',
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value: (
@@ -261,6 +267,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
             'translations of content they are editing in the exploration '
             'editor page.',
             feature_flag_domain.ServerMode.PROD,
+            '',
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value: (
@@ -269,6 +276,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
             'misconceptions and tag answer groups with misconceptions '
             'for a curated exploration.',
             feature_flag_domain.ServerMode.PROD,
+            '',
         )
     ),
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS.value: (
@@ -276,6 +284,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
             'The flag enables flow for multiple classrooms '
             'and makes the classrooms page available to learners.',
             feature_flag_domain.ServerMode.TEST,
+            '',
         )
     ),
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE.value: (
@@ -283,6 +292,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
             'This flag activates the redesigned topic viewer page'
             'and makes it accessible to learners.',
             feature_flag_domain.ServerMode.DEV,
+            '',
         )
     ),
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP.value: (
@@ -290,12 +300,14 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
             'The flag enables the automatic regeneration of voiceovers '
             'directly from the exploration editor page.',
             feature_flag_domain.ServerMode.TEST,
+            '',
         )
     ),
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS.value: (
         (
             'The flag enables the voiceover tab for non-curated explorations.',
             feature_flag_domain.ServerMode.TEST,
+            '',
         )
     ),
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value: (
@@ -305,6 +317,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
             '(the actual content displayed by the study guides will be the '
             'same, just the user interface will be different).',
             feature_flag_domain.ServerMode.PROD,
+            '',
         )
     ),
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value: (
@@ -312,6 +325,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
             'This flag enables the new translation opportunity structure to '
             'the contributor dashboard.',
             feature_flag_domain.ServerMode.DEV,
+            '',
         )
     ),
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS.value: (
@@ -319,6 +333,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
             'This flag allows learners to see the regenerated voiceovers '
             'in the exploration player.',
             feature_flag_domain.ServerMode.TEST,
+            '',
         )
     ),
     FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value: (
@@ -326,24 +341,28 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
             'The flag enables the asynchronous voiceover synthesis for the '
             'curated exploration contents.',
             feature_flag_domain.ServerMode.TEST,
+            '',
         )
     ),
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST.value: (
         (
             'This flag enables ready_for_review_test, which controls the learner’s redirection to the Review Test upon lesson completion.',
             feature_flag_domain.ServerMode.DEV,
+            '',
         )
     ),
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER.value: (
         (
             'This flag enables the financial literacy campaign banner for the fundraising campaign.',
             feature_flag_domain.ServerMode.PROD,
+            '',
         )
     ),
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE.value: (
         (
             'This flag enables the financial literacy campaign banner for the fundraising campaign in test mode.',
             feature_flag_domain.ServerMode.TEST,
+            '',
         )
     ),
     FeatureNames.DEVELOPER_NOTES.value: (
