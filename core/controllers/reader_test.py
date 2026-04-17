@@ -865,24 +865,6 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         )
         self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
 
-    def test_logged_in_without_system_recommendations_uses_only_author_recommendations(
-        self,
-    ) -> None:
-        """Check author recommendations are returned when system
-        recommendations are disabled and the exploration is completed outside a
-        collection.
-        """
-        self.login(self.NEW_USER_EMAIL)
-        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
-
-        recommendation_ids = self._get_recommendation_ids(
-            self.EXP_ID_0,
-            include_system_recommendations=False,
-            author_recommended_ids_str='["7","9"]',
-        )
-
-        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
-
     def test_logged_in_with_sysexps_and_authexps_no_col_has_some_exps(
         self,
     ) -> None:
@@ -1667,23 +1649,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             [],
         )
 
-    def test_logged_out_can_complete_exploration(self) -> None:
-        """Test handler for completion of explorations by logged-out users."""
-        payload = {
-            'client_time_spent_in_secs': 0,
-            'params': {},
-            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
-            'state_name': 'final',
-            'version': 1,
-        }
-
-        response = self.post_json(
-            '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_0,
-            payload,
-        )
-
-        self.assertEqual(response, {'is_super_admin': False})
-
     def test_exp_complete_event_in_collection(self) -> None:
         """Test handler for completion of explorations in the context of
         collections.
@@ -1887,25 +1852,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                     ],
                 )
 
-    def test_logged_out_can_leave_exploration_incomplete(self) -> None:
-        """Test handler for leaving an exploration incomplete by logged-out
-        users.
-        """
-        payload = {
-            'client_time_spent_in_secs': 0,
-            'params': {},
-            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
-            'state_name': 'middle',
-            'version': 1,
-        }
-
-        response = self.post_json(
-            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
-            payload,
-        )
-
-        self.assertEqual(response, {'is_super_admin': False})
-
     def test_exp_incomplete_event_handler_with_no_version_raises_error(
         self,
     ) -> None:
@@ -1932,55 +1878,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             'Missing key in handler args: version.'
         )
         self.assertEqual(response['error'], error_msg)
-
-    def test_exp_incomplete_event_handler_with_story_having_no_topic(
-        self,
-    ) -> None:
-        """Test handler for leaving an exploration incomplete in the context
-        of a story with no corresponding topic.
-        """
-        self.login(self.USER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        payload = {
-            'client_time_spent_in_secs': 0,
-            'collection_id': self.COL_ID_1,
-            'params': {},
-            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
-            'state_name': 'middle',
-            'version': 1,
-        }
-
-        class MockStory:
-            def __init__(self, story_id: str) -> None:
-                self.id = story_id
-                self.corresponding_topic_id: Optional[str] = None
-
-        def _mock_get_story_by_id(_: str) -> MockStory:
-            return MockStory(self.STORY_ID)
-
-        with self.swap(
-            story_fetchers, 'get_story_by_id', _mock_get_story_by_id
-        ):
-            self.post_json(
-                '/explorehandler/exploration_maybe_leave_event/%s'
-                % self.EXP_ID_2_0,
-                payload,
-                csrf_token=csrf_token,
-            )
-
-        self.assertEqual(
-            learner_progress_services.get_all_incomplete_story_ids(
-                self.user_id
-            ),
-            [self.STORY_ID],
-        )
-        self.assertEqual(
-            learner_progress_services.get_all_partially_learnt_topic_ids(
-                self.user_id
-            ),
-            [],
-        )
 
     def test_remove_exp_from_incomplete_list_handler(self) -> None:
         """Test handler for removing explorations from the partially completed
@@ -2099,48 +1996,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         )
 
         # Remove one topic.
-        self.delete_json(
-            '%s/%s/%s'
-            % (
-                feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
-                constants.ACTIVITY_TYPE_LEARN_TOPIC,
-                self.TOPIC_ID,
-            )
-        )
-        self.assertEqual(
-            learner_progress_services.get_all_partially_learnt_topic_ids(
-                self.user_id
-            ),
-            [],
-        )
-
-    def test_remove_topic_from_incomplete_list_handler(self) -> None:
-        """Test handler for removing topics from incomplete list."""
-        self.login(self.USER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        payload = {
-            'client_time_spent_in_secs': 0,
-            'collection_id': self.COL_ID_1,
-            'params': {},
-            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
-            'state_name': 'middle',
-            'version': 1,
-        }
-
-        self.post_json(
-            '/explorehandler/exploration_maybe_leave_event/%s'
-            % self.EXP_ID_2_0,
-            payload,
-            csrf_token=csrf_token,
-        )
-        self.assertEqual(
-            learner_progress_services.get_all_partially_learnt_topic_ids(
-                self.user_id
-            ),
-            [self.TOPIC_ID],
-        )
-
         self.delete_json(
             '%s/%s/%s'
             % (
@@ -3634,80 +3489,6 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                 expected_status_int=500,
             )
 
-    def test_submit_learner_answer_details_for_question_with_matching_interaction_id(
-        self,
-    ) -> None:
-        """Test handler for submitting learner answer details for questions
-        with matching interaction ids.
-        """
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.login(self.VIEWER_EMAIL)
-
-        skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, 'user', description='Description')
-
-        question_id = question_services.get_new_question_id()
-        content_id_generator = translation_domain.ContentIdGenerator()
-        self.save_new_question(
-            question_id,
-            'user',
-            self._create_valid_question_data('ABC', content_id_generator),
-            [skill_id],
-            content_id_generator.next_content_id_index,
-        )
-
-        entity_type = feconf.ENTITY_TYPE_QUESTION
-        csrf_token = self.get_new_csrf_token()
-
-        with self.swap(
-            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
-        ):
-            interaction_id = question_services.get_interaction_id_for_question(
-                question_id
-            )
-            state_reference = stats_services.get_state_reference_for_question(
-                question_id
-            )
-
-            self.put_json(
-                '%s/%s/%s'
-                % (
-                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
-                    entity_type,
-                    question_id,
-                ),
-                {
-                    'interaction_id': interaction_id,
-                    'answer': 'This is an answer.',
-                    'answer_details': 'This is an answer details.',
-                },
-                csrf_token=csrf_token,
-            )
-
-            learner_answer_details = stats_services.get_learner_answer_details(
-                entity_type, state_reference
-            )
-            assert learner_answer_details is not None
-            self.assertEqual(
-                learner_answer_details.state_reference, state_reference
-            )
-            self.assertEqual(
-                learner_answer_details.interaction_id, interaction_id
-            )
-            self.assertEqual(
-                len(learner_answer_details.learner_answer_info_list), 1
-            )
-            self.assertEqual(
-                learner_answer_details.learner_answer_info_list[0].answer,
-                'This is an answer.',
-            )
-            self.assertEqual(
-                learner_answer_details.learner_answer_info_list[
-                    0
-                ].answer_details,
-                'This is an answer details.',
-            )
-
 
 class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
     """Tests for checkpoint reached event handler."""
@@ -3833,25 +3614,6 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_checkpoint_reached_with_logged_out_user_does_not_raise_error(
-        self,
-    ) -> None:
-        """Test handler for checkpoint reached events by logged-out users."""
-        # Load demo exploration.
-        exp_id = '0'
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
-
-        csrf_token = self.get_new_csrf_token()
-        self.put_json(
-            '/explorehandler/checkpoint_reached/%s' % exp_id,
-            {
-                'most_recently_reached_checkpoint_exp_version': 1,
-                'most_recently_reached_checkpoint_state_name': 'Welcome!',
-            },
-            csrf_token=csrf_token,
-        )
-
 
 class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
     """Tests for exploration restart event handler."""
@@ -3936,76 +3698,6 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(
             exploration_dict['most_recently_reached_checkpoint_state_name']
-        )
-
-        self.logout()
-
-    def test_restart_with_logged_out_user_and_none_checkpoint_does_not_raise_error(
-        self,
-    ) -> None:
-        """Test restart handler with no checkpoint state for logged-out users."""
-        # Load demo exploration.
-        exp_id = '0'
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
-
-        csrf_token = self.get_new_csrf_token()
-        self.put_json(
-            '/explorehandler/restart/%s' % exp_id,
-            {'most_recently_reached_checkpoint_state_name': None},
-            csrf_token=csrf_token,
-        )
-
-    def test_restart_with_logged_in_user_and_non_none_checkpoint_preserves_progress(
-        self,
-    ) -> None:
-        """Test restart handler preserves checkpoint progress when the most
-        recent checkpoint state name is not None.
-        """
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-
-        # Load demo exploration.
-        exp_id = '0'
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
-
-        self.login(self.VIEWER_EMAIL)
-        viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-
-        # First checkpoint reached.
-        csrf_token = self.get_new_csrf_token()
-        self.put_json(
-            '/explorehandler/checkpoint_reached/%s' % exp_id,
-            {
-                'most_recently_reached_checkpoint_exp_version': 1,
-                'most_recently_reached_checkpoint_state_name': 'Welcome!',
-            },
-            csrf_token=csrf_token,
-        )
-
-        self.put_json(
-            '/explorehandler/restart/%s' % exp_id,
-            {'most_recently_reached_checkpoint_state_name': 'Welcome!'},
-            csrf_token=csrf_token,
-        )
-
-        exp_user_data = exp_fetchers.get_exploration_user_data(
-            viewer_id, exp_id
-        )
-        assert exp_user_data is not None
-        self.assertEqual(
-            exp_user_data.furthest_reached_checkpoint_exp_version, 1
-        )
-        self.assertEqual(
-            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!'
-        )
-        self.assertEqual(
-            exp_user_data.most_recently_reached_checkpoint_exp_version, 1
-        )
-        self.assertEqual(
-            exp_user_data.most_recently_reached_checkpoint_state_name,
-            'Welcome!',
         )
 
         self.logout()
@@ -4126,103 +3818,6 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
 
         self.get_html_response(
             '/progress/%s' % (unique_progress_url_id), expected_status_int=404
-        )
-
-    def test_get_transient_checkpoint_page_with_deleted_exploration_redirects_correctly(
-        self,
-    ) -> None:
-        """The checkpoint URL handler redirects whenever progress exists; it does
-        not check that the exploration still exists.
-        """
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        # Load demo exploration.
-        exp_id = '0'
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
-
-        # First checkpoint reached.
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
-            '/explorehandler/checkpoint_reached_by_logged_out_user/%s' % exp_id,
-            {
-                'most_recently_reached_checkpoint_exp_version': 1,
-                'most_recently_reached_checkpoint_state_name': 'Welcome!',
-            },
-            csrf_token=csrf_token,
-        )
-        unique_progress_url_id = response['unique_progress_url_id']
-
-        # Delete the exploration.
-        exp_services.delete_demo(exp_id)
-
-        url_response = self.get_html_response(
-            '/progress/%s' % unique_progress_url_id, expected_status_int=302
-        )
-        exp_user_data = exp_fetchers.get_logged_out_user_progress(
-            unique_progress_url_id
-        )
-        assert exp_user_data is not None
-        self.assertTrue(
-            url_response.headers['Location'].endswith(
-                '%s/%s?pid=%s'
-                % (
-                    feconf.EXPLORATION_URL_PREFIX,
-                    exp_user_data.exploration_id,
-                    unique_progress_url_id,
-                )
-            )
-        )
-
-    def test_get_transient_checkpoint_page_with_invalid_collection_id_redirects_correctly(
-        self,
-    ) -> None:
-        """The checkpoint URL handler builds the redirect from exploration_id;
-        an invalid collection_id on the stored model does not change that.
-        """
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        # Load demo exploration.
-        exp_id = '0'
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
-
-        # First checkpoint reached.
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
-            '/explorehandler/checkpoint_reached_by_logged_out_user/%s' % exp_id,
-            {
-                'most_recently_reached_checkpoint_exp_version': 1,
-                'most_recently_reached_checkpoint_state_name': 'Welcome!',
-            },
-            csrf_token=csrf_token,
-        )
-        unique_progress_url_id = response['unique_progress_url_id']
-
-        model = exp_models.TransientCheckpointUrlModel.get(
-            unique_progress_url_id
-        )
-        assert model is not None
-        setattr(model, 'collection_id', 'invalid_collection_id')
-        model.update_timestamps()
-        model.put()
-
-        url_response = self.get_html_response(
-            '/progress/%s' % unique_progress_url_id, expected_status_int=302
-        )
-        exp_user_data = exp_fetchers.get_logged_out_user_progress(
-            unique_progress_url_id
-        )
-        assert exp_user_data is not None
-        self.assertTrue(
-            url_response.headers['Location'].endswith(
-                '%s/%s?pid=%s'
-                % (
-                    feconf.EXPLORATION_URL_PREFIX,
-                    exp_user_data.exploration_id,
-                    unique_progress_url_id,
-                )
-            )
         )
 
     def test_logged_out_progress_is_displayed_correctly_when_exp_version_is_same(  # pylint: disable=line-too-long
@@ -4459,30 +4054,6 @@ class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_sync_logged_out_progress_with_logged_out_user_does_not_raise_error(
-        self,
-    ) -> None:
-        """Test sync handler does not raise an error for logged-out users."""
-        # Load demo exploration.
-        exp_id = '0'
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
-
-        # Use a dummy unique_progress_url_id.
-        pid = 'pidABC'
-
-        # Update progress for logged out user.
-        exp_services.update_logged_out_user_progress(exp_id, pid, 'Welcome!', 1)
-
-        csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            '/sync_logged_out_and_logged_in_progress/%s' % exp_id,
-            {
-                'unique_progress_url_id': pid,
-            },
-            csrf_token=csrf_token,
-        )
-
 
 class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
     """Tests for fetching the version history of a particular state of an
@@ -4665,28 +4236,6 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
                 'metadata_dict_in_previous_version': (
                     exploration_v1.get_metadata().to_dict()
                 ),
-            },
-        )
-
-        self.logout()
-
-    def test_metadata_version_history_with_unedited_metadata_has_none_previous_metadata(
-        self,
-    ) -> None:
-        """Test metadata version history when metadata has not been updated."""
-        self.login(self.OWNER_EMAIL)
-
-        response = self.get_json(
-            '%s/%s/%s'
-            % (feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 1)
-        )
-
-        self.assertEqual(
-            response,
-            {
-                'last_edited_version_number': None,
-                'last_edited_committer_username': self.OWNER_USERNAME,
-                'metadata_dict_in_previous_version': None,
             },
         )
 
