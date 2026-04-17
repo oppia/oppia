@@ -43,7 +43,7 @@ from core.domain import (
 from core.platform import models
 from core.storage.voiceover import gae_models
 
-from typing import Dict, List, Optional, Tuple, cast
+from typing import Dict, List, Optional, Set, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -555,6 +555,97 @@ def save_language_accent_support(
     )
     voiceover_autogeneration_policy_model.update_timestamps()
     voiceover_autogeneration_policy_model.put()
+
+
+def is_accent_code_valid_for_autogeneration(language_accent_code: str) -> bool:
+    """The method validates whether the provided language accent code is valid
+    for Oppia's voiceover autogeneration.
+
+    Args:
+        language_accent_code: str. The language accent code to be validated.
+
+    Returns:
+        bool. True if the provided language accent code is valid for Oppia's
+        voiceover autogeneration, False otherwise.
+    """
+    autogeneratable_language_accents = (
+        get_autogeneratable_language_accent_codes()
+    )
+    return (
+        isinstance(language_accent_code, str)
+        and language_accent_code in autogeneratable_language_accents
+    )
+
+
+def get_new_auto_voiceover_accent(
+    updated_language_accent_mapping: Dict[str, Dict[str, bool]],
+) -> Optional[str]:
+    """Returns the newly added language-accent code enabled for automatic
+    voiceover regeneration, if any.
+
+    Args:
+        updated_language_accent_mapping: dict(str, dict(str, bool)). Mapping of
+            language codes to their accent configurations after the update.
+            Each accent code maps to a boolean indicating whether automatic
+            voiceover generation is enabled.
+
+    Returns:
+        Optional[str]. The newly added language-accent code enabled for automatic
+        voiceover regeneration, or None if no such accent was added.
+    """
+    retrieved_voiceover_autogeneration_policy_model = (
+        voiceover_models.VoiceoverAutogenerationPolicyModel.get(
+            voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID, strict=False
+        )
+    )
+    voiceover_autogeneration_policy_model = (
+        retrieved_voiceover_autogeneration_policy_model
+        if retrieved_voiceover_autogeneration_policy_model is not None
+        else voiceover_models.VoiceoverAutogenerationPolicyModel(
+            id=voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID
+        )
+    )
+
+    existing_language_accent_mapping = (
+        voiceover_autogeneration_policy_model.language_codes_mapping
+        if voiceover_autogeneration_policy_model.language_codes_mapping
+        is not None
+        else {}
+    )
+    existing_autogeneratable_accents: Set[str] = set()
+    updated_autogeneratable_accents: Set[str] = set()
+
+    for accent_mapping in existing_language_accent_mapping.values():
+        for (
+            language_accent_code,
+            supports_autogeneration,
+        ) in accent_mapping.items():
+            if supports_autogeneration:
+                existing_autogeneratable_accents.add(language_accent_code)
+
+    for accent_mapping in updated_language_accent_mapping.values():
+        for (
+            language_accent_code,
+            supports_autogeneration,
+        ) in accent_mapping.items():
+            if supports_autogeneration:
+                updated_autogeneratable_accents.add(language_accent_code)
+
+    new_accents_set = (
+        updated_autogeneratable_accents - existing_autogeneratable_accents
+    )
+
+    # Since the UI triggers a backend request immediately whenever a language
+    # accent code is updated, the new_accents_set can contain at most one element.
+    # Therefore, we can safely use pop() to retrieve the newly added language
+    # accent code.
+    if new_accents_set:
+        assert len(new_accents_set) == 1, (
+            'Expected only one new language-accent code to be added for automatic '
+            'voiceover regeneration, but found multiple: %s' % new_accents_set
+        )
+        return new_accents_set.pop()
+    return None
 
 
 def get_language_accent_master_list() -> Dict[str, Dict[str, str]]:

@@ -78,8 +78,8 @@
   </button>
   <button class="btn btn-success e2e-test-confirm-pre-publication"
           (click)="save()"
-          [disabled]="!isSavingAllowed()">
-    Save Changes
+          [disabled]="isSaving || !isSavingAllowed()">
+    {{ isSaving ? 'Saving...' : 'Save Changes' }}
   </button>
 </div>
 
