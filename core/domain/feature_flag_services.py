@@ -25,7 +25,7 @@ from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry as registry
 from core.platform import models
 
-from typing import Dict, List, Mapping, Optional, Set
+from typing import Dict, List, Mapping, Optional, Set, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -109,7 +109,12 @@ def _get_feature_flag_spec(name: str) -> feature_flag_domain.FeatureFlagSpec:
         name
     ]
     developer_notes = (
-        feature_spec_values[2] if len(feature_spec_values) > 2 else ''
+        cast(
+            Tuple[str, feature_flag_domain.ServerMode, str],
+            feature_spec_values,
+        )[2]
+        if len(feature_spec_values) == 3
+        else ''
     )
     return feature_flag_domain.FeatureFlagSpec(
         feature_spec_values[0],

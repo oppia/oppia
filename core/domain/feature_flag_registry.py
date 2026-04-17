@@ -22,7 +22,7 @@ from core import feature_flag_list
 from core.domain import feature_flag_domain
 from core.platform import models
 
-from typing import List, Optional
+from typing import List, Optional, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -61,8 +61,11 @@ class Registry:
 
         if feature_flag_spec_values is not None:
             developer_notes = (
-                feature_flag_spec_values[2]
-                if len(feature_flag_spec_values) > 2
+                cast(
+                    Tuple[str, feature_flag_domain.ServerMode, str],
+                    feature_flag_spec_values,
+                )[2]
+                if len(feature_flag_spec_values) == 3
                 else ''
             )
             feature_flag_spec = feature_flag_domain.FeatureFlagSpec(

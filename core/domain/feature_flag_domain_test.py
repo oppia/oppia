@@ -85,7 +85,11 @@ class FeatureFlagSpecTests(test_utils.GenericTestBase):
             'ServerMode.TEST or ServerMode.PROD.',
         ):
             feature_flag_domain.FeatureFlagSpec.from_dict(
-                {'description': 'for test', 'feature_stage': 'invalid'}
+                {
+                    'description': 'for test',
+                    'developer_notes': '',
+                    'feature_stage': 'invalid',
+                }
             )
 
     def test_to_dict_returns_correct_dict(self) -> None:
