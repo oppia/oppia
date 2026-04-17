@@ -146,7 +146,6 @@ describe('TranslateTextBackendApiService', () => {
       // parameter of type 'HTMLImageElement'.". We need to suppress this
       // error because 'HTMLImageElement' has around 250 more properties.
       // We have only defined the properties we need in 'mockReaderObject'.
-      // @ts-expect-error
       spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
       const expectedPayload = {
         suggestion_type: 'translate_content',
