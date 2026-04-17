@@ -410,6 +410,15 @@ describe('Blog Admin Page component ', () => {
   });
 
   describe('status message auto-clear', () => {
+    it('should still be visible before 10 seconds', fakeAsync(() => {
+      component.statusMessage = 'Test message';
+
+      tick(9999);
+
+      expect(component.statusMessage).toBe('Test message');
+      flush();
+    }));
+
     it('should clear after 10 seconds', fakeAsync(() => {
       component.statusMessage = 'Test message';
 
