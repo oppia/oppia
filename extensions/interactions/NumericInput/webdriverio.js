@@ -42,7 +42,7 @@ var submitAnswer = async function (elem, answer) {
     timeoutMsg: 'NumericInput interaction taking too long to appear.',
   });
   var numericInput = await numericInputInteraction.$('<input>');
-  await numericInput.waitForExist({
+  await numericInput.waitForDisplayed({
     timeout: 10000,
     timeoutMsg: 'NumericInput input field taking too long to appear.',
   });

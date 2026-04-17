@@ -273,12 +273,8 @@ const getTopicEditorUrl = async function (browser, page) {
     await page.waitForSelector(confirmTopicCreationButton, {visible: true});
     await page.waitForTimeout(5000);
     await page.click(confirmTopicCreationButton);
-    await new Promise(r => setTimeout(r, 2000));
-    let retries = 0;
-    while ((await browser.pages()).length < 2 && retries < 10) {
-      await new Promise(r => setTimeout(r, 1000));
-      retries++;
-    }
+    // Doing waitForTimeout(10000) to handle new tab being opened.
+    await page.waitForTimeout(10000);
     await browser.pages();
 
     // Refresh page and click on topic link.
@@ -460,10 +456,18 @@ const addThumbnailToTopic = async function (page, topicName) {
     await page.waitForSelector(thumbnailContainer, {visible: true});
     await page.click(topicPhotoSubmit);
     await page.waitForSelector(topicMetaTagInput, {visible: true});
-
-    await page.focus(topicMetaTagInput);
-    await page.type(topicMetaTagInput, 'meta');
-    await page.click('.e2e-test-topic-editor-container');
+    await page.click(topicMetaTagInput);
+    await page.evaluate(selector => {
+      const el = document.querySelector(selector);
+      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+        window.HTMLInputElement.prototype,
+        'value'
+      ).set;
+      nativeInputValueSetter.call(el, 'meta-tag-content');
+      el.dispatchEvent(new Event('input', {bubbles: true}));
+      el.dispatchEvent(new Event('change', {bubbles: true}));
+      el.dispatchEvent(new Event('blur', {bubbles: true}));
+    }, topicMetaTagInput);
     await page.waitForSelector('.e2e-test-save-topic-button:not([disabled])', {
       visible: true,
       timeout: 15000,
