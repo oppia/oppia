@@ -459,14 +459,18 @@ const addThumbnailToTopic = async function (page, topicName) {
     await page.click(topicMetaTagInput);
     await page.evaluate(selector => {
       const el = document.querySelector(selector);
-      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-        window.HTMLInputElement.prototype,
-        'value'
-      ).set;
-      nativeInputValueSetter.call(el, 'meta-tag-content');
-      el.dispatchEvent(new Event('input', {bubbles: true}));
+      el.focus();
+      el.value = 'meta-tag-content';
+      el.dispatchEvent(
+        new InputEvent('input', {
+          bubbles: true,
+          cancelable: true,
+          inputType: 'insertText',
+          data: 'meta-tag-content',
+        })
+      );
       el.dispatchEvent(new Event('change', {bubbles: true}));
-      el.dispatchEvent(new Event('blur', {bubbles: true}));
+      el.dispatchEvent(new FocusEvent('blur', {bubbles: true}));
     }, topicMetaTagInput);
     await page.waitForSelector('.e2e-test-save-topic-button:not([disabled])', {
       visible: true,
