@@ -59,6 +59,27 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
         self.assertIsNotNone(feature_flag)
         self.assertIsInstance(feature_flag, feature_flag_domain.FeatureFlag)
 
+    def test_get_feature_flag_returns_developer_notes(self) -> None:
+        swap_name_to_description_feature_stage_dict = self.swap(
+            registry,
+            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+            {
+                FeatureNames.FEATURE_A.value: (
+                    'test description',
+                    FeatureStages.DEV,
+                    'Please regenerate summary models after disabling.',
+                )
+            },
+        )
+        with swap_name_to_description_feature_stage_dict:
+            feature_flag = registry.Registry.get_feature_flag(
+                FeatureNames.FEATURE_A.value
+            )
+        self.assertEqual(
+            feature_flag.feature_flag_spec.developer_notes,
+            'Please regenerate summary models after disabling.',
+        )
+
     def test_get_non_existing_feature_failure(self) -> None:
         with self.assertRaisesRegex(
             Exception, 'Feature flag not found: feature_d'

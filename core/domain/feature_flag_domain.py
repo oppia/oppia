@@ -61,6 +61,7 @@ class FeatureFlagDict(TypedDict):
 
     name: str
     description: str
+    developer_notes: str
     feature_stage: str
     force_enable_for_all_users: bool
     rollout_percentage: int
@@ -130,6 +131,7 @@ class FeatureFlag:
         return {
             'name': self._name,
             'description': self._feature_flag_spec.description,
+            'developer_notes': self._feature_flag_spec.developer_notes,
             'feature_stage': self._feature_flag_spec.feature_stage.value,
             'force_enable_for_all_users': (
                 self._feature_flag_config.force_enable_for_all_users
@@ -153,6 +155,7 @@ class FeatureFlag:
         feature_flag_spec = FeatureFlagSpec.from_dict(
             {
                 'description': feature_dict['description'],
+                'developer_notes': feature_dict['developer_notes'],
                 'feature_stage': feature_dict['feature_stage'],
             }
         )
@@ -174,15 +177,22 @@ class FeatureFlagSpecDict(TypedDict):
     """Dictionary representing FeatureFlagSpec object."""
 
     description: str
+    developer_notes: str
     feature_stage: str
 
 
 class FeatureFlagSpec:
     """The FeatureFlagSpec domain object."""
 
-    def __init__(self, description: str, feature_stage: ServerMode) -> None:
+    def __init__(
+        self,
+        description: str,
+        feature_stage: ServerMode,
+        developer_notes: str = '',
+    ) -> None:
         self._description = description
         self._feature_stage = feature_stage
+        self._developer_notes = developer_notes
 
     @property
     def description(self) -> str:
@@ -202,6 +212,15 @@ class FeatureFlagSpec:
         """
         return self._feature_stage
 
+    @property
+    def developer_notes(self) -> str:
+        """Returns the developer notes of the feature flag.
+
+        Returns:
+            str. The developer notes of the feature flag.
+        """
+        return self._developer_notes
+
     def to_dict(self) -> FeatureFlagSpecDict:
         """Returns a dict representation of the FeatureFlagSpec domain object.
 
@@ -210,6 +229,7 @@ class FeatureFlagSpec:
         """
         return {
             'description': self._description,
+            'developer_notes': self._developer_notes,
             'feature_stage': self._feature_stage.value,
         }
 
@@ -239,7 +259,11 @@ class FeatureFlagSpec:
                 'ServerMode.TEST or ServerMode.PROD.'
             )
 
-        return cls(feature_dict['description'], feature_stage)
+        return cls(
+            feature_dict['description'],
+            feature_stage,
+            feature_dict.get('developer_notes', ''),
+        )
 
 
 class FeatureFlagConfigDict(TypedDict):

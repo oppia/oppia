@@ -33,6 +33,7 @@ class FeatureFlagSpecTests(test_utils.GenericTestBase):
         feature_flag_spec = feature_flag_domain.FeatureFlagSpec.from_dict(
             {
                 'description': 'for test',
+                'developer_notes': '',
                 'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
             }
         )
@@ -48,6 +49,7 @@ class FeatureFlagSpecTests(test_utils.GenericTestBase):
         feature_flag_spec = feature_flag_domain.FeatureFlagSpec.from_dict(
             {
                 'description': 'for test',
+                'developer_notes': '',
                 'feature_stage': feature_flag_domain.FeatureStages.TEST.value,
             }
         )
@@ -63,6 +65,7 @@ class FeatureFlagSpecTests(test_utils.GenericTestBase):
         feature_flag_spec = feature_flag_domain.FeatureFlagSpec.from_dict(
             {
                 'description': 'for test',
+                'developer_notes': '',
                 'feature_stage': feature_flag_domain.FeatureStages.PROD.value,
             }
         )
@@ -88,6 +91,7 @@ class FeatureFlagSpecTests(test_utils.GenericTestBase):
     def test_to_dict_returns_correct_dict(self) -> None:
         feature_flag_spec_dict: feature_flag_domain.FeatureFlagSpecDict = {
             'description': 'for test',
+            'developer_notes': '',
             'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
         }
         feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
@@ -245,6 +249,7 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             {
                 'name': 'feature_a',
                 'description': 'for test',
+                'developer_notes': '',
                 'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
                 'force_enable_for_all_users': False,
                 'rollout_percentage': 0,
@@ -282,6 +287,7 @@ class FeatureFlagTests(test_utils.GenericTestBase):
         feature_flag_dict: feature_flag_domain.FeatureFlagDict = {
             'name': 'feature_a',
             'description': 'for test',
+            'developer_notes': '',
             'feature_stage': feature_flag_domain.FeatureStages.DEV.value,
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,

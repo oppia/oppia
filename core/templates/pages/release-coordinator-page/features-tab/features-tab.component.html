@@ -6,6 +6,12 @@
       <div class="col-2 oppia-feature-column-mobile"><b>Description:</b></div>
       <div class="col-10 oppia-description-content">{{featureFlagViewModel.description}}</div>
     </div>
+    <div class="row oppia-feature-top-margin" *ngIf="featureFlagViewModel.developerNotes">
+      <div class="col-2 oppia-feature-column-mobile"><b>Developer Notes:</b></div>
+      <div class="col-10">
+        <textarea class="oppia-developer-notes" readonly>{{featureFlagViewModel.developerNotes}}</textarea>
+      </div>
+    </div>
     <div class="row oppia-feature-top-margin">
       <div class="col-2 oppia-feature-column-mobile"><b>Feature Stage:</b></div>
       <div class="col-10">{{ getFeatureStageString(featureFlagViewModel) }}</div>
@@ -112,6 +118,12 @@
     <div class="row oppia-feature-top-margin">
       <div class="col-2 oppia-feature-column-mobile"><b>Description:</b></div>
       <div class="col-10 oppia-description-content">{{featureFlagViewModel.description}}</div>
+    </div>
+    <div class="row oppia-feature-top-margin" *ngIf="featureFlagViewModel.developerNotes">
+      <div class="col-2 oppia-feature-column-mobile"><b>Developer Notes:</b></div>
+      <div class="col-10">
+        <textarea class="oppia-developer-notes" readonly>{{featureFlagViewModel.developerNotes}}</textarea>
+      </div>
     </div>
   </div>
 </div>
@@ -228,6 +240,13 @@
   .oppia-features .oppia-feature-name {
     border-bottom: 1px solid #dee2e6;
     overflow-wrap: break-word;
+  }
+
+  .oppia-features .oppia-developer-notes {
+    background-color: #fff;
+    min-height: 90px;
+    resize: none;
+    width: 100%;
   }
 
   .oppia-features .oppia-description-content {

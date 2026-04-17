@@ -105,9 +105,16 @@ def _get_feature_flag_spec(name: str) -> feature_flag_domain.FeatureFlagSpec:
     if name not in FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE:
         raise Exception('Feature flag not found: %s.' % name)
 
+    feature_spec_values = FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE[
+        name
+    ]
+    developer_notes = (
+        feature_spec_values[2] if len(feature_spec_values) > 2 else ''
+    )
     return feature_flag_domain.FeatureFlagSpec(
-        FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE[name][0],
-        FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE[name][1],
+        feature_spec_values[0],
+        feature_spec_values[1],
+        developer_notes,
     )
 
 

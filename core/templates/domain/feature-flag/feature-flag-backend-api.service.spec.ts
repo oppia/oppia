@@ -36,6 +36,7 @@ describe('FeatureFlagBackendApiService', () => {
     feature_flags: [
       {
         description: 'This is a dummy feature flag.',
+        developer_notes: '',
         feature_stage: FeatureStage.DEV,
         name: 'dummy_feature_flag_for_e2e_tests',
         force_enable_for_all_users: false,

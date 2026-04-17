@@ -22,7 +22,13 @@ import enum
 
 from core.domain import feature_flag_domain
 
-from typing import List
+from typing import Dict, List, Tuple, Union
+
+
+FeatureFlagMetadata = Union[
+    Tuple[str, feature_flag_domain.ServerMode],
+    Tuple[str, feature_flag_domain.ServerMode, str],
+]
 
 
 class FeatureNames(enum.Enum):
@@ -171,11 +177,14 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
 ]
 
-FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
+FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
+    str, FeatureFlagMetadata
+] = {
     FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value: (
         (
             'This is a dummy feature flag for the e2e tests.',
             feature_flag_domain.ServerMode.PROD,
+            '',
         )
     ),
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value: (
@@ -183,6 +192,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag is for serial chapter launch feature and making changes '
             'only in the curriculum admin view.',
             feature_flag_domain.ServerMode.TEST,
+            '',
         )
     ),
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW.value: (
@@ -190,12 +200,14 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag is for serial chapter launch feature and making changes '
             'only in the learner view.',
             feature_flag_domain.ServerMode.TEST,
+            '',
         )
     ),
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD.value: (
         (
             'This flag is to show redesigned learner dashboard.',
             feature_flag_domain.ServerMode.PROD,
+            '',
         )
     ),
     FeatureNames.SHOW_TRANSLATION_SIZE.value: (
@@ -203,6 +215,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag is to show translation size on translation cards in '
             'contributor dashboard.',
             feature_flag_domain.ServerMode.DEV,
+            '',
         )
     ),
     FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN.value: (

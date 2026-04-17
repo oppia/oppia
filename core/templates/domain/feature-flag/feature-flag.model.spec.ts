@@ -26,6 +26,7 @@ describe('FeatureFlagModel', () => {
     const feature = FeatureFlag.createFromBackendDict({
       name: 'feature name',
       description: 'This is a feature for test.',
+      developer_notes: '',
       feature_stage: FeatureStage.DEV,
       force_enable_for_all_users: true,
       rollout_percentage: 0,
@@ -35,6 +36,7 @@ describe('FeatureFlagModel', () => {
 
     expect(feature.name).toEqual('feature name');
     expect(feature.description).toEqual('This is a feature for test.');
+    expect(feature.developerNotes).toEqual('');
     expect(feature.featureStage).toEqual('dev');
     expect(feature.forceEnableForAllUsers).toBeTrue();
     expect(feature.rolloutPercentage).toEqual(0);

@@ -60,8 +60,15 @@ class Registry:
         )
 
         if feature_flag_spec_values is not None:
+            developer_notes = (
+                feature_flag_spec_values[2]
+                if len(feature_flag_spec_values) > 2
+                else ''
+            )
             feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
-                feature_flag_spec_values[0], feature_flag_spec_values[1]
+                feature_flag_spec_values[0],
+                feature_flag_spec_values[1],
+                developer_notes,
             )
         else:
             raise Exception('Feature flag not found: %s.' % name)

@@ -46,6 +46,7 @@ interface IntSchema {
 }
 
 interface FeatureFlagViewModel extends FeatureFlag {
+  developerNotes: string;
   searchQuery: string;
   filteredUserGroups: UserGroup[];
 }

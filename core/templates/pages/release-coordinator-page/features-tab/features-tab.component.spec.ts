@@ -110,6 +110,8 @@ describe('Release coordinator page feature tab', function () {
       featureFlags: [
         FeatureFlag.createFromBackendDict({
           description: 'This is a dummy feature flag.',
+          developer_notes:
+            'When disabling this flag, regenerate summary models.',
           feature_stage: FeatureStage.DEV,
           name: 'dummy_feature_flag_for_e2e_tests',
           force_enable_for_all_users: false,
@@ -145,6 +147,9 @@ describe('Release coordinator page feature tab', function () {
     expect(component.featureFlagViewModels.length).toBe(1);
     expect(component.featureFlagViewModels[0].name).toEqual(
       'dummy_feature_flag_for_e2e_tests'
+    );
+    expect(component.featureFlagViewModels[0].developerNotes).toEqual(
+      'When disabling this flag, regenerate summary models.'
     );
   });
 
@@ -487,6 +492,7 @@ describe('Release coordinator page feature tab', function () {
       () => {
         let featureFlag = FeatureFlag.createFromBackendDict({
           description: 'This is a dummy feature flag.',
+          developer_notes: '',
           feature_stage: FeatureStage.PROD,
           name: 'dummy_feature_flag_for_e2e_tests',
           force_enable_for_all_users: false,
@@ -512,6 +518,7 @@ describe('Release coordinator page feature tab', function () {
     it('should return text for test feature stage', () => {
       let featureFlagTestStage = FeatureFlag.createFromBackendDict({
         description: 'This is a dummy feature flag.',
+        developer_notes: '',
         feature_stage: FeatureStage.TEST,
         name: 'dummy_feature_flag_for_e2e_tests',
         force_enable_for_all_users: false,
@@ -527,6 +534,7 @@ describe('Release coordinator page feature tab', function () {
     it('should return text for prod feature stage', () => {
       let featureFlagProdStage = FeatureFlag.createFromBackendDict({
         description: 'This is a dummy feature flag.',
+        developer_notes: '',
         feature_stage: FeatureStage.PROD,
         name: 'dummy_feature_flag_for_e2e_tests',
         force_enable_for_all_users: false,
@@ -543,6 +551,7 @@ describe('Release coordinator page feature tab', function () {
   describe('.getFeatureValidOnCurrentServer', () => {
     let featureFlagDevStage = FeatureFlag.createFromBackendDict({
       description: 'This is a dummy feature flag.',
+      developer_notes: '',
       feature_stage: FeatureStage.DEV,
       name: 'dummy_feature_flag_for_e2e_tests',
       force_enable_for_all_users: false,
@@ -553,6 +562,7 @@ describe('Release coordinator page feature tab', function () {
 
     let featureFlagProdStage = FeatureFlag.createFromBackendDict({
       description: 'This is a dummy feature flag.',
+      developer_notes: '',
       feature_stage: FeatureStage.PROD,
       name: 'dummy_feature_flag_for_e2e_tests',
       force_enable_for_all_users: false,
@@ -801,6 +811,7 @@ describe('Release coordinator page feature tab', function () {
     it('should throw error if the feature name is not found', () => {
       const featureFlag = FeatureFlag.createFromBackendDict({
         description: 'This is a dummy feature flag.',
+        developer_notes: '',
         feature_stage: FeatureStage.DEV,
         name: 'invalid',
         force_enable_for_all_users: false,
@@ -820,6 +831,7 @@ describe('Release coordinator page feature tab', function () {
       const issues = component.validateFeatureFlagViewModel(
         FeatureFlag.createFromBackendDict({
           description: 'This is a dummy feature flag.',
+          developer_notes: '',
           feature_stage: FeatureStage.DEV,
           name: 'dummy_feature_flag_for_e2e_tests',
           force_enable_for_all_users: false,
@@ -836,6 +848,7 @@ describe('Release coordinator page feature tab', function () {
       const issues = component.validateFeatureFlagViewModel(
         FeatureFlag.createFromBackendDict({
           description: 'This is a dummy feature flag.',
+          developer_notes: '',
           feature_stage: FeatureStage.DEV,
           name: 'dummy_feature_flag_for_e2e_tests',
           force_enable_for_all_users: false,

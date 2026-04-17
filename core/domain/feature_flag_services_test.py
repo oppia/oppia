@@ -215,6 +215,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             {
                 'name': FeatureNames.FEATURE_ONE.value,
                 'description': 'feature flag one',
+                'developer_notes': '',
                 'feature_stage': FeatureStages.DEV.value,
                 'force_enable_for_all_users': False,
                 'rollout_percentage': 0,
@@ -224,6 +225,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             {
                 'name': FeatureNames.FEATURE_TWO.value,
                 'description': 'feature flag two',
+                'developer_notes': '',
                 'feature_stage': FeatureStages.DEV.value,
                 'force_enable_for_all_users': False,
                 'rollout_percentage': 0,
@@ -233,6 +235,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             {
                 'name': FeatureNames.FEATURE_THREE.value,
                 'description': 'feature flag three',
+                'developer_notes': '',
                 'feature_stage': FeatureStages.DEV.value,
                 'force_enable_for_all_users': False,
                 'rollout_percentage': 0,

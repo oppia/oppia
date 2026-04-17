@@ -25,6 +25,7 @@ export enum FeatureStage {
 export interface FeatureFlagBackendDict {
   name: string;
   description: string;
+  developer_notes: string;
   feature_stage: FeatureStage;
   force_enable_for_all_users: boolean;
   rollout_percentage: number;
@@ -41,6 +42,7 @@ export interface FeatureFlagBackendDict {
 export class FeatureFlag {
   readonly name: string;
   readonly description: string;
+  readonly developerNotes: string;
   readonly featureStage: FeatureStage;
   forceEnableForAllUsers: boolean;
   rolloutPercentage: number;
@@ -50,6 +52,7 @@ export class FeatureFlag {
   constructor(
     name: string,
     description: string,
+    developerNotes: string,
     featureStage: FeatureStage,
     forceEnableForAllUsers: boolean,
     rolloutPercentage: number,
@@ -58,6 +61,7 @@ export class FeatureFlag {
   ) {
     this.name = name;
     this.description = description;
+    this.developerNotes = developerNotes;
     this.featureStage = featureStage;
     this.forceEnableForAllUsers = forceEnableForAllUsers;
     this.rolloutPercentage = rolloutPercentage;
@@ -71,6 +75,7 @@ export class FeatureFlag {
     return new FeatureFlag(
       backendDict.name,
       backendDict.description,
+      backendDict.developer_notes,
       backendDict.feature_stage,
       backendDict.force_enable_for_all_users,
       backendDict.rollout_percentage,

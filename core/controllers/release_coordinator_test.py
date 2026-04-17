@@ -340,6 +340,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                         {
                             'name': FeatureNames.TEST_FEATURE_1.value,
                             'description': 'a feature in dev stage',
+                            'developer_notes': '',
                             'feature_stage': FeatureStages.DEV.value,
                             'force_enable_for_all_users': False,
                             'rollout_percentage': 0,
