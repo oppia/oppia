@@ -24,7 +24,6 @@ from core.domain import feature_flag_domain
 
 from typing import Dict, List, Tuple, Union
 
-
 FeatureFlagMetadata = Union[
     Tuple[str, feature_flag_domain.ServerMode],
     Tuple[str, feature_flag_domain.ServerMode, str],
