@@ -217,7 +217,7 @@ describe('ItemSelectionInputValidationService', () => {
     expect(warnings).toEqual([]);
   });
 
-  it('should expect minimum allowed selections to be non-negative', () => {
+  it('should return warning when minimum allowed selections is negative', () => {
     customizationArguments.minAllowableSelectionCount.value = -1;
     customizationArguments.maxAllowableSelectionCount.value = 2;
 
@@ -230,7 +230,7 @@ describe('ItemSelectionInputValidationService', () => {
     );
   });
 
-  it('should expect maximum allowed selections to be non-negative', () => {
+  it('should return warning when maximum allowed selections is negative', () => {
     customizationArguments.minAllowableSelectionCount.value = 2;
     customizationArguments.maxAllowableSelectionCount.value = -1;
 
@@ -243,7 +243,7 @@ describe('ItemSelectionInputValidationService', () => {
     );
   });
 
-  it('should expect both minimum and maximum allowed selections to be non-negative', () => {
+  it('should return warning when both minimum and maximum allowed selections are negative', () => {
     customizationArguments.minAllowableSelectionCount.value = -5;
     customizationArguments.maxAllowableSelectionCount.value = -2;
 
