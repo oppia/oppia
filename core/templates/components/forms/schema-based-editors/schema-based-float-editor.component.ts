@@ -168,9 +168,11 @@ export class SchemaBasedFloatEditorComponent
       checkRequireNonnegativeInput === undefined
         ? false
         : checkRequireNonnegativeInput;
+    // If uiConfig is absent (e.g. in some rule-input editors), keep the
+    // historical behavior where exponential notation is allowed by default.
     this.checkAllowExponentialNotationValue =
       checkAllowExponentialNotation === undefined
-        ? false
+        ? true
         : checkAllowExponentialNotation;
     // If customization argument of numeric input interaction is true,
     // set Min value as 0 to not let down key go below 0.

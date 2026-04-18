@@ -116,6 +116,19 @@ describe('Schema based float editor component', function () {
     expect(component.onChange).toEqual(mockFunction);
   }));
 
+  it('should allow exponential notation by default when uiConfig is missing', fakeAsync(() => {
+    component.uiConfig = {} as {
+      checkRequireNonnegativeInput: boolean;
+      checkAllowExponentialNotation: boolean;
+    };
+
+    component.ngOnInit();
+    tick(50);
+
+    expect(component.checkRequireNonnegativeInputValue).toBe(false);
+    expect(component.checkAllowExponentialNotationValue).toBe(true);
+  }));
+
   it('should call input focus when user selects the input field', () => {
     spyOn(component.inputFocus, 'emit');
 
