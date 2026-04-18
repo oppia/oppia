@@ -60,15 +60,15 @@
         "core.storage.cloud_task.gae_models_test",
         "core.domain.cloud_task_domain_test",
         "core.jobs.batch_jobs.exploration_voiceover_sync_jobs_test",
+        "core.jobs.batch_jobs.cloud_task_run_migration_jobs_test",
+        "core.jobs.batch_jobs.voiceover_synthesis_jobs_test",
+        "core.jobs.batch_jobs.synthesize_voiceover_by_language_accent_jobs_test",
         "core.jobs.batch_jobs.voiceover_synthesis_jobs_test",
         "core.jobs.io.firebase_io_test",
         "core.jobs.types.firebase_adapters_test",
         "core.jobs.batch_jobs.firebase_sync_jobs_test",
         "core.jobs.batch_jobs.firebase_validation_jobs_test",
-        "core.jobs.transforms.firebase_transforms_test",
-        "core.jobs.batch_jobs.cloud_task_run_migration_jobs_test",
-        "core.jobs.batch_jobs.voiceover_synthesis_jobs_test",
-        "core.jobs.batch_jobs.synthesize_voiceover_by_language_accent_jobs_test"
+        "core.jobs.transforms.firebase_transforms_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
