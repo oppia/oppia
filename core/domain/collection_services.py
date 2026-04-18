@@ -1483,7 +1483,7 @@ def save_collection_summary(
     collection_summary_model = (
         # This cast narrows get_by_id() to Optional[CollectionSummaryModel] so
         # the type checker can correctly narrow in the following None check.
-        # Here use cast because get_by_id() returns a generic Model type.
+        # Here we use cast because get_by_id() returns a generic Model type.
         cast(
             Optional[collection_models.CollectionSummaryModel],
             collection_models.CollectionSummaryModel.get_by_id(

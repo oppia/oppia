@@ -874,7 +874,7 @@ class CheckedProof(BaseObject):
                 assert isinstance(raw['error_category'], str)
                 assert isinstance(raw['error_code'], str)
                 assert isinstance(raw['error_message'], str)
-                assert isinstance(raw['error_line_number'], int)
+                assert isinstance(raw['error_line_number'], str)
             return copy.deepcopy(raw)
         except Exception as e:
             raise TypeError('Cannot convert to checked proof %s' % raw) from e

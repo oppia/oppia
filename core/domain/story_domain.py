@@ -1953,11 +1953,9 @@ class Story:
         Returns:
             dict. The converted story_contents_dict.
         """
-        next_node_id = None
-        for node in reversed(story_contents_dict['nodes']):
-            if next_node_id:
-                node['destination_node_ids'] = [next_node_id]
-            next_node_id = node['id']
+        nodes = story_contents_dict['nodes']
+        for index in range(len(nodes) - 1):
+            nodes[index]['destination_node_ids'] = [nodes[index + 1]['id']]
 
         return story_contents_dict
 

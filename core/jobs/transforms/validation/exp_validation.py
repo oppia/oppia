@@ -138,9 +138,7 @@ class ValidateExplorationCommitLogEntryModel(
 ):
     """Overrides _get_change_domain_class for exploration models"""
 
-    # Here we use MyPy ignore because the signature of this method doesn't
-    # match with super class's _get_change_domain_class() method.
-    def _get_change_domain_class(  # type: ignore[override]
+    def _get_change_domain_class(
         self, input_model: exp_models.ExplorationCommitLogEntryModel
     ) -> Optional[
         Type[

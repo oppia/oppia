@@ -23,7 +23,7 @@ import sys
 
 from core.tests import test_utils
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 from . import (
     build,
@@ -41,10 +41,10 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.print_arr: list[str] = []
+        self.print_arr: list[Union[str, bytes]] = []
 
         def mock_print(  # pylint: disable=unused-argument
-            msg: str, end: str = '\n'
+            msg: Union[str, bytes], end: str = '\n'
         ) -> None:
             self.print_arr.append(msg)
 

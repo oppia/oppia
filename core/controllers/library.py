@@ -28,7 +28,7 @@ from core.domain import (
     user_services,
 )
 
-from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
+from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union, cast
 
 UnionSummaryDictType = Union[
     summary_services.DisplayableExplorationSummaryDict,
@@ -407,7 +407,7 @@ class ExplorationSummariesHandler(
     def get(self) -> None:
         """Handles GET requests."""
         assert self.normalized_request is not None
-        exp_ids = self.normalized_request['stringified_exp_ids']
+        raw_exp_ids = self.normalized_request['stringified_exp_ids']
         include_private_exps = self.normalized_request.get(
             'include_private_explorations'
         )
@@ -416,10 +416,17 @@ class ExplorationSummariesHandler(
         if not editor_user_id:
             include_private_exps = False
 
-        if not isinstance(exp_ids, list) or not all(
-            isinstance(exp_id, str) for exp_id in exp_ids
+        # Here we use object because raw_exp_ids comes from a decoded request
+        # payload and needs runtime validation before narrowing.
+        # Here we use cast because the validator must inspect a generic request
+        # value before assigning a stricter type.
+        if not isinstance(cast(object, raw_exp_ids), list) or not all(
+            isinstance(exp_id, str) for exp_id in raw_exp_ids
         ):
             raise self.NotFoundException
+        # Here we use cast because raw_exp_ids is guaranteed to be List[str]
+        # after the type validation above.
+        exp_ids = cast(List[str], raw_exp_ids)
 
         if include_private_exps:
             summaries = (

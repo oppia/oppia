@@ -29,7 +29,7 @@ from extensions.rich_text_components import components
 
 import bs4
 import defusedxml.ElementTree
-from typing import Callable, Dict, Iterator, List, Tuple, Union
+from typing import Callable, Dict, Iterator, List, Tuple, Union, cast
 
 
 def wrap_with_siblings(tag: bs4.element.Tag, p: bs4.element.Tag) -> None:
@@ -992,7 +992,11 @@ def is_parsable_as_xml(xml_string: bytes) -> bool:
     Returns:
         bool. Whether xml_string is parsable as XML or not.
     """
-    if not isinstance(xml_string, bytes):
+    # Here we use object because this validator can receive malformed runtime
+    # values even though the helper annotation is bytes.
+    # Here we use cast because the runtime guard should still handle malformed
+    # inputs even though the static type for this helper is already bytes.
+    if not isinstance(cast(object, xml_string), bytes):
         return False
     try:
         defusedxml.ElementTree.fromstring(xml_string)

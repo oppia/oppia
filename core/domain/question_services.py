@@ -1072,7 +1072,7 @@ def populate_question_model_fields(
 
 
 def populate_question_summary_model_fields(
-    question_summary_model: question_models.QuestionSummaryModel,
+    question_summary_model: Optional[question_models.QuestionSummaryModel],
     question_summary: question_domain.QuestionSummary,
 ) -> question_models.QuestionSummaryModel:
     """Populate question summary model with the data from question summary

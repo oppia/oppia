@@ -29,7 +29,7 @@ from core.domain import (
     user_services,
 )
 
-from typing import Dict, Optional, TypedDict
+from typing import Dict, List, Optional, TypedDict, cast
 
 # TODO(#13605): Refactor access validation handlers to follow a single handler
 # pattern.
@@ -329,15 +329,33 @@ class PracticeSessionAccessValidationPage(
         """Handles GET requests."""
 
         assert self.normalized_request is not None
-        subtopics = self.normalized_request.get('selected_subtopic_ids')
+        raw_subtopics = self.normalized_request.get('selected_subtopic_ids')
 
-        if not isinstance(subtopics, list) or not all(
-            isinstance(s, int) for s in subtopics
+        # Here we use object because raw_subtopics comes from request payload
+        # and may be any runtime shape before validation.
+        # Here we use cast because the runtime validator must inspect a generic
+        # request value prior to narrowing it.
+        if not isinstance(cast(object, raw_subtopics), list) or not all(
+            # Here we use object because items are validated dynamically before
+            # they are narrowed to integers.
+            # Here we use cast because the all() loop must treat items as generic
+            # values while performing runtime type checks.
+            isinstance(s, int)
+            for s in cast(List[object], raw_subtopics)
         ):
             raise self.InvalidInputException('Invalid subtopic IDs')
+        # Here we use cast because subtopics is guaranteed to be List[int] after
+        # the validation check above.
+        subtopics = cast(List[int], raw_subtopics)
 
-        topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
+        # Here we use cast because the route argument is required for this
+        # handler, but framework typing keeps route_kwargs values optional.
+        topic_url_fragment = cast(
+            str, self.request.route_kwargs.get('topic_url_fragment')
+        )
         topic = topic_fetchers.get_topic_by_url_fragment(topic_url_fragment)
+        if topic is None:
+            raise self.NotFoundException
 
         subtopics_ids = {subtopic.id for subtopic in topic.subtopics}
 

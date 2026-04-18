@@ -1526,7 +1526,7 @@ class ExplorationMaybeLeaveHandler(
             )
 
         if user_id and story_id:
-            story = story_fetchers.get_story_by_id(story_id)
+            story = story_fetchers.get_story_by_id(story_id, strict=False)
             if story is not None:
                 learner_progress_services.record_story_started(
                     user_id, story.id

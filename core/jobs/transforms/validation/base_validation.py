@@ -39,7 +39,17 @@ from core.jobs.types import base_validation_errors
 from core.platform import models
 
 import apache_beam as beam
-from typing import Any, Final, Generic, Iterator, Type, TypeVar, Union
+from typing import (
+    Any,
+    Final,
+    Generic,
+    Iterator,
+    Optional,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -385,7 +395,7 @@ class BaseValidateCommitCmdsSchema(beam.DoFn, Generic[ModelInstanceType]):  # ty
 
     def _get_change_domain_class(
         self, unused_item: ModelInstanceType
-    ) -> Type[change_domain.BaseChange]:
+    ) -> Optional[Type[change_domain.BaseChange]]:
         """Returns a Change domain class for the changes made by commit
         commands of the model.
 
@@ -424,17 +434,26 @@ class BaseValidateCommitCmdsSchema(beam.DoFn, Generic[ModelInstanceType]):  # ty
             # For example, if a CollectionCommitLogEntryModel does
             # not have id starting with collection/rights, there is
             # no commit command domain object defined for this model.
-            yield base_validation_errors.CommitCmdsNoneError(entity)
+            # Here we use cast because this transform runs only on commit/snapshot
+            # models, but the generic type variable is too broad for MyPy.
+            yield base_validation_errors.CommitCmdsNoneError(
+                cast(
+                    Union[
+                        base_models.BaseCommitLogEntryModel,
+                        base_models.BaseSnapshotMetadataModel,
+                    ],
+                    entity,
+                )
+            )
             return
-        # Ruling out the possibility of any other model instance for mypy type
-        # checking.
-        assert isinstance(
+        if not isinstance(
             entity,
             (
                 base_models.BaseSnapshotMetadataModel,
                 base_models.BaseCommitLogEntryModel,
             ),
-        )
+        ):
+            return
         for commit_cmd_dict in entity.commit_cmds:
             if not commit_cmd_dict:
                 continue

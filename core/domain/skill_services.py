@@ -1278,7 +1278,7 @@ def create_skill_summary(skill_id: str) -> None:
 
 
 def populate_skill_summary_model_fields(
-    skill_summary_model: skill_models.SkillSummaryModel,
+    skill_summary_model: Optional[skill_models.SkillSummaryModel],
     skill_summary: skill_domain.SkillSummary,
 ) -> skill_models.SkillSummaryModel:
     """Populate skill summary model with the data from skill summary object.

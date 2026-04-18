@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import utils
 from core.platform import models
 
-from typing import Dict, List, Literal, Optional, Sequence, TypedDict
+from typing import Dict, List, Literal, Optional, Sequence, TypedDict, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -596,8 +596,13 @@ class BlogAuthorDetailsModel(base_models.BaseModel):
             dict. Dictionary of the data from BlogAuthorDetailModel.
         """
 
-        author_model = cls.query(cls.author_id == user_id).get()
-        if author_model:
+        # Here we use cast because query().get() may return None when no author
+        # detail exists for the given user.
+        author_model = cast(
+            Optional[BlogAuthorDetailsModel],
+            cls.query(cls.author_id == user_id).get(),
+        )
+        if author_model is not None:
             return {
                 'displayed_author_name': author_model.displayed_author_name,
                 'author_bio': author_model.author_bio,

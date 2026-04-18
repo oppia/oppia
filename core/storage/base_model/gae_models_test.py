@@ -138,10 +138,9 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         model.put()
         all_models = base_models.BaseModel.get_all()
         self.assertEqual(all_models.count(), 1)
-        base_model = all_models.get()
-
-        # Ruling out the possibility of None for mypy type checking.
-        assert base_model is not None
+        # Here we use cast because get() is known to return the single stored
+        # model after we have asserted that exactly one entity exists.
+        base_model = cast(base_models.BaseModel, all_models.get())
         self.assertEqual(base_model, model)
 
         model_id = base_model.id

@@ -30,6 +30,8 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
+from typing import cast
+
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import question_models
@@ -182,9 +184,11 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 1)
-        fetched_question_models = all_question_models.get()
-        # Ruling out the possibility of None for mypy type checking.
-        assert fetched_question_models is not None
+        # Here we use cast because the test already asserted one stored model,
+        # and get() returns that model for this query.
+        fetched_question_models = cast(
+            question_models.QuestionModel, all_question_models.get()
+        )
 
         with self.assertRaisesRegex(
             Exception,
@@ -233,9 +237,11 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 1)
-        fetched_question_models = all_question_models.get()
-        # Ruling out the possibility of None for mypy type checking.
-        assert fetched_question_models is not None
+        # Here we use cast because the test already asserted one stored model,
+        # and get() returns that model for this query.
+        fetched_question_models = cast(
+            question_models.QuestionModel, all_question_models.get()
+        )
         updated_question_model = question_fetchers.get_question_from_model(
             fetched_question_models
         )

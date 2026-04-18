@@ -585,9 +585,7 @@ class _Validators:
         Returns:
             bool. Whether the given object doesn't contain a valid email.
         """
-        if isinstance(obj, str):
-            return not bool(re.search(EMAIL_REGEX, obj))
-        return True
+        return not bool(re.search(EMAIL_REGEX, obj))
 
     @staticmethod
     def is_valid_user_id(obj: str) -> bool:

@@ -41,7 +41,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import List, Sequence, Tuple, cast
+from typing import List, Optional, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1039,7 +1039,7 @@ def create_story_summary(story_id: str) -> None:
 
 
 def populate_story_summary_model_fields(
-    story_summary_model: story_models.StorySummaryModel,
+    story_summary_model: Optional[story_models.StorySummaryModel],
     story_summary: story_domain.StorySummary,
 ) -> story_models.StorySummaryModel:
     """Populate story summary model with the data from story summary object.

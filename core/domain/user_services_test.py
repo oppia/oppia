@@ -43,7 +43,7 @@ from core.platform import models
 from core.tests import test_utils
 
 import requests_mock
-from typing import Dict, Final, List
+from typing import Dict, Final, List, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -2506,9 +2506,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(all_models_after_update.count(), 1)
 
-        user_audit_model = all_models_after_update.get()
-        # Ruling out the possibility of None for mypy type checking.
-        assert user_audit_model is not None
+        # Here we use cast because get() may be typed as optional/any, but this
+        # test has already asserted that exactly one model exists.
+        user_audit_model = cast(
+            audit_models.UsernameChangeAuditModel,
+            all_models_after_update.get(),
+        )
         self.assertEqual(user_audit_model.committer_id, committer_id)
         self.assertEqual(user_audit_model.old_username, 'oldUsername')
         self.assertEqual(user_audit_model.new_username, 'newUsername')

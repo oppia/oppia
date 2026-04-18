@@ -36,6 +36,7 @@ from typing import (
     Tuple,
     TypedDict,
     Union,
+    cast,
     overload,
 )
 
@@ -2980,7 +2981,11 @@ class UserContributionRightsModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from UserContributionRightsModel.
         """
-        rights_model = cls.get_by_id(user_id)
+        # Here we use cast because get_by_id() may return None for absent users,
+        # and this takeout path must preserve that branch explicitly.
+        rights_model = cast(
+            Optional[UserContributionRightsModel], cls.get_by_id(user_id)
+        )
 
         if rights_model is None:
             return {}
@@ -3387,10 +3392,17 @@ class LearnerGroupsUserModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from LearnerGroupsUserModel.
         """
-        learner_grp_user_model = cls.get_by_id(user_id)
+        # Here we use cast because get_by_id() may return None for absent users,
+        # and this takeout path must preserve that branch explicitly.
+        learner_grp_user_model = cast(
+            Optional[LearnerGroupsUserModel], cls.get_by_id(user_id)
+        )
 
         if learner_grp_user_model is None:
-            return {}
+            return {
+                'invited_to_learner_groups_ids': [],
+                'learner_groups_user_details': [],
+            }
 
         return {
             'invited_to_learner_groups_ids': (

@@ -39,7 +39,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -955,8 +955,11 @@ def create_skill_opportunity(skill_id: str, skill_description: str) -> None:
         Exception. If a SkillOpportunityModel corresponding to the supplied
             skill_id already exists.
     """
-    skill_opportunity_model = (
-        opportunity_models.SkillOpportunityModel.get_by_id(skill_id)
+    # Here we use cast because get_by_id() may return None and this branch checks
+    # for pre-existing opportunities before creation.
+    skill_opportunity_model = cast(
+        Optional[opportunity_models.SkillOpportunityModel],
+        opportunity_models.SkillOpportunityModel.get_by_id(skill_id),
     )
     if skill_opportunity_model is not None:
         raise Exception(
@@ -1032,8 +1035,11 @@ def _get_skill_opportunity(
         SkillOpportunity with the supplied skill_id, or None if it does not
         exist.
     """
-    skill_opportunity_model = (
-        opportunity_models.SkillOpportunityModel.get_by_id(skill_id)
+    # Here we use cast because get_by_id() may return None and callers depend on
+    # explicit Optional handling here.
+    skill_opportunity_model = cast(
+        Optional[opportunity_models.SkillOpportunityModel],
+        opportunity_models.SkillOpportunityModel.get_by_id(skill_id),
     )
     if skill_opportunity_model is not None:
         return get_skill_opportunity_from_model(skill_opportunity_model)
