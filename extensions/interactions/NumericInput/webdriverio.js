@@ -32,19 +32,21 @@ var expectInteractionDetailsToMatch = async function (elem) {
   );
 };
 
+// eslint-disable-next-line no-unused-vars
 var submitAnswer = async function (elem, answer) {
-  var resolvedElem = await elem;
-  var numericInputInteraction = await resolvedElem.$(
-    '<oppia-interactive-numeric-input>'
-  );
-  await numericInputInteraction.waitForExist({
+  // Note: elem is not used here because oppia-interactive-numeric-input
+  // is always unique on the page. Querying from the document root avoids
+  // a ChainablePromiseElement resolution bug in WebdriverIO 7 with
+  // Chrome 147+ when chaining off custom elements inside iframes.
+  var numericInputInteraction = await $('oppia-interactive-numeric-input');
+  await numericInputInteraction.waitForDisplayed({
     timeout: 10000,
-    timeoutMsg: 'NumericInput interaction taking too long to appear.',
+    timeoutMsg: 'oppia-interactive-numeric-input took too long to appear.',
   });
-  var numericInput = await numericInputInteraction.$('<input>');
+  var numericInput = await numericInputInteraction.$('input');
   await numericInput.waitForDisplayed({
     timeout: 10000,
-    timeoutMsg: 'NumericInput input field taking too long to appear.',
+    timeoutMsg: 'NumericInput input field took too long to appear.',
   });
   await action.setValue('Numeric Input Element', numericInput, answer);
   var submitAnswerBtn = $('.e2e-test-submit-answer-button');

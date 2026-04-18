@@ -102,7 +102,6 @@ var roleSelect = '.e2e-test-new-role-selector';
 var generateTopicButton = '.load-dummy-new-structures-data-button';
 var generateClassroomButton = '.load-dummy-math-classroom';
 var topicThumbnailResetButton = '.e2e-test-thumbnail-reset-button';
-var topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
 var saveTopicButton = '.e2e-test-save-topic-button';
 var topicCommitMessageInput = '.e2e-test-commit-message-input';
 var publishChangesButton = '.e2e-test-close-save-modal-button';
@@ -449,33 +448,23 @@ const addThumbnailToTopic = async function (page, topicName) {
     await page.click(topicThumbnailResetButton);
 
     await page.waitForSelector(topicUploadButton, {visible: true});
-
     const elementHandle = await page.$(topicUploadButton);
     await elementHandle.uploadFile('core/tests/data/test2_svg.svg');
 
     await page.waitForSelector(thumbnailContainer, {visible: true});
     await page.click(topicPhotoSubmit);
-    await page.waitForSelector(topicMetaTagInput, {visible: true});
-    await page.click(topicMetaTagInput);
-    await page.evaluate(selector => {
-      const el = document.querySelector(selector);
-      el.focus();
-      el.value = 'meta-tag-content';
-      el.dispatchEvent(
-        new InputEvent('input', {
-          bubbles: true,
-          cancelable: true,
-          inputType: 'insertText',
-          data: 'meta-tag-content',
-        })
-      );
-      el.dispatchEvent(new Event('change', {bubbles: true}));
-      el.dispatchEvent(new FocusEvent('blur', {bubbles: true}));
-    }, topicMetaTagInput);
-    await page.waitForSelector('.e2e-test-save-topic-button:not([disabled])', {
-      visible: true,
-      timeout: 15000,
-    });
+
+    // Wait for Angular's change detection to process the thumbnail
+    // change and enable the save button via ngAfterContentChecked.
+    // We check btn.disabled (DOM property) not the HTML attribute,
+    // because Angular uses property binding [disabled].
+    await page.waitForFunction(
+      () => {
+        const btn = document.querySelector('.e2e-test-save-topic-button');
+        return btn && !btn.disabled;
+      },
+      {polling: 500, timeout: 20000}
+    );
     await page.click(saveTopicButton);
     await page.waitForSelector(topicCommitMessageInput, {
       visible: true,
@@ -486,8 +475,6 @@ const addThumbnailToTopic = async function (page, topicName) {
 
     await page.waitForSelector(publishChangesButton);
     await page.click(publishChangesButton);
-    // Wait for the ngx-toastr success toast to appear and then disappear,
-    // confirming the topic save completed successfully.
     await page.waitForSelector('.toast-success', {
       visible: true,
       timeout: 15000,

@@ -1695,6 +1695,7 @@ class AdminHandler(
             topic_1 = topic_domain.Topic.create_default_topic(
                 topic_id_1, 'Addition', 'add', 'description', 'fragm'
             )
+            topic_1.meta_tag_content = 'addition math topic'
             topic_1.skill_ids_for_diagnostic_test = [skill_id_1]
             topic_1.thumbnail_filename = 'thumbnail.svg'
             topic_1.thumbnail_bg_color = '#C6DCDA'
@@ -1714,6 +1715,7 @@ class AdminHandler(
             topic_2 = topic_domain.Topic.create_default_topic(
                 topic_id_2, 'Subtraction', 'subtraction', 'description', 'fragm'
             )
+            topic_2.meta_tag_content = 'subtraction math topic'
             topic_2.skill_ids_for_diagnostic_test = [skill_id_2]
             topic_2.thumbnail_filename = 'thumbnail.svg'
             topic_2.thumbnail_bg_color = '#C6DCDA'
@@ -1737,6 +1739,7 @@ class AdminHandler(
                 'description',
                 'fragm',
             )
+            topic_3.meta_tag_content = 'multiplication math topic'
             topic_3.skill_ids_for_diagnostic_test = [skill_id_3]
             topic_3.thumbnail_filename = 'thumbnail.svg'
             topic_3.thumbnail_bg_color = '#C6DCDA'
@@ -1756,6 +1759,7 @@ class AdminHandler(
             topic_4 = topic_domain.Topic.create_default_topic(
                 topic_id_4, 'Division', 'division', 'description', 'fragm'
             )
+            topic_4.meta_tag_content = 'division math topic'
             topic_4.skill_ids_for_diagnostic_test = [skill_id_4]
             topic_4.thumbnail_filename = 'thumbnail.svg'
             topic_4.thumbnail_bg_color = '#C6DCDA'
@@ -1775,6 +1779,7 @@ class AdminHandler(
             topic_5 = topic_domain.Topic.create_default_topic(
                 topic_id_5, 'Fraction', 'fraction', 'description', 'fragm'
             )
+            topic_5.meta_tag_content = 'fraction math topic'
             topic_5.skill_ids_for_diagnostic_test = [skill_id_5]
             topic_5.thumbnail_filename = 'thumbnail.svg'
             topic_5.thumbnail_bg_color = '#C6DCDA'
