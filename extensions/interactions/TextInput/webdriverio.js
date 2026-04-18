@@ -63,22 +63,24 @@ var expectInteractionDetailsToMatch = async function (
   );
 };
 
+// eslint-disable-next-line no-unused-vars
 var submitAnswer = async function (elem, answer) {
-  // Try to get the text area element. If it doesn't exist, try input instead.
-  // They are different depending on the height of the box.
-  var textInputElem = elem.$('<oppia-interactive-text-input>');
-  var textAreaElem = textInputElem.$('<textarea>');
-  var inputElem = textInputElem.$('<input>');
+  // Note: elem is not used here due to a ChainablePromiseElement resolution
+  // bug in WebdriverIO 7 with Chrome 147+ when chaining off custom elements
+  // inside iframes. We query from the document root instead.
+  var textInputElem = await $('oppia-interactive-text-input');
+  await textInputElem.waitForDisplayed({
+    timeout: 10000,
+    timeoutMsg: 'oppia-interactive-text-input took too long to appear.',
+  });
+  var textAreaElem = await textInputElem.$('textarea');
   if (await textAreaElem.isExisting()) {
     await action.setValue('Text Area Input', textAreaElem, answer);
     var submitAnswerBtn = $('.e2e-test-submit-answer-button');
     await submitAnswerBtn.scrollIntoView();
     await action.click('Submit Answer Button', submitAnswerBtn);
   } else {
-    // This must be chained in here due to the textInputElem possibly being
-    // invisible after the longer text area submits, causing the instantiation
-    // of this promise object to throw a validation error due to it referring
-    // to an element which does not exist.
+    var inputElem = await textInputElem.$('input');
     if (await inputElem.isExisting()) {
       await action.clear('Text Input Element', inputElem);
       await action.setValue('Text Input Element', inputElem, answer);
