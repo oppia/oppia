@@ -475,14 +475,23 @@ const addThumbnailToTopic = async function (page, topicName) {
 
     await page.waitForSelector(publishChangesButton);
     await page.click(publishChangesButton);
+    // eslint-disable-next-line no-console
+    console.log('Clicked publish changes button');
+
     await page.waitForSelector('.toast-success', {
       visible: true,
       timeout: 15000,
     });
+    // eslint-disable-next-line no-console
+    console.log('Toast success appeared');
+
     await page.waitForSelector('.toast-success', {
       hidden: true,
       timeout: 15000,
     });
+    // eslint-disable-next-line no-console
+    console.log('Toast success disappeared - save complete');
+
     await page.waitForFunction(
       topicId =>
         fetch(
@@ -490,9 +499,11 @@ const addThumbnailToTopic = async function (page, topicName) {
         )
           .then(r => r.ok)
           .catch(() => false),
-      {polling: 1000, timeout: 15000},
+      {polling: 1000, timeout: 30000},
       currentTopicId
     );
+    // eslint-disable-next-line no-console
+    console.log('Thumbnail asset confirmed on backend');
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);

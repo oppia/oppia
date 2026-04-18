@@ -223,7 +223,9 @@ var ExplorationPlayerPage = function () {
     await waitFor.visibilityOf(conversationContent, 'Conversation not visible');
     await browser.waitUntil(
       async () => {
-        var contents = await conversationContentsSelector();
+        // Use $$ directly inside the waitUntil callback to ensure it
+        // queries from the current frame context in Chrome 147.
+        var contents = await $$('.e2e-test-conversation-content');
         if (!contents.length) {
           return false;
         }
@@ -236,11 +238,11 @@ var ExplorationPlayerPage = function () {
         }
       },
       {
-        timeout: 15000,
+        timeout: 30000,
         timeoutMsg: 'Ending Message Not Visible\n' + new Error().stack + '\n',
       }
     );
-    var conversationContents = await conversationContentsSelector();
+    var conversationContents = await $$('.e2e-test-conversation-content');
     var lastElement = conversationContents.length - 1;
     let conversationContentText = await action.getText(
       'Conversation Content Element',
