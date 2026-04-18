@@ -670,7 +670,7 @@ const completedNodeSelector =
 const newLessonProgressBarContainer = '.progress-bar-container';
 const containerSelector = '.hint-solution-individual-container';
 const saveLessonProgressButton = '.e2e-test-save-progress-button';
-const playButtonSelector = '.fa-play';
+const playButtonSelector = '.e2e-test-voiceover-play-button';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
