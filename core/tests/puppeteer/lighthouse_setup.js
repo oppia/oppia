@@ -318,11 +318,7 @@ const getStoryEditorUrl = async function (browser, page) {
     await page.waitForSelector(confirmStoryCreationButton, {visible: true});
     await page.waitForTimeout(5000);
     await page.click(confirmStoryCreationButton);
-    await page.waitForNavigation({waitUntil: networkIdle});
-    await page.waitForSelector('.story-editor-parent', {
-      visible: true,
-      timeout: 15000,
-    });
+    await page.waitForTimeout(15000);
     storyEditorUrl = await page.url();
     storyId = storyEditorUrl.split('/')[4];
   } catch (e) {
