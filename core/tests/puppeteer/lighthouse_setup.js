@@ -438,7 +438,7 @@ const addThumbnailToTopic = async function (page, topicName) {
     await page.waitForXPath(topicLinkXPath);
     const [topicLinkElement] = await page.$x(topicLinkXPath);
     await topicLinkElement.click();
-    await page.waitForNavigation({waitUntil: networkIdle});
+    await page.waitForSelector('.e2e-test-save-topic-button', {timeout: 30000});
     const currentTopicId = (await page.url()).split('/')[4];
 
     await page.waitForSelector(topicThumbnailButton);

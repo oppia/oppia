@@ -221,17 +221,27 @@ var ExplorationPlayerPage = function () {
 
   this.expectExplorationToBeOver = async function () {
     await waitFor.visibilityOf(conversationContent, 'Conversation not visible');
+    await browser.waitUntil(
+      async () => {
+        var contents = await conversationContentsSelector();
+        if (!contents.length) {
+          return false;
+        }
+        var last = contents[contents.length - 1];
+        try {
+          var text = await last.getText();
+          return text.includes('Congratulations, you have finished!');
+        } catch (e) {
+          return false;
+        }
+      },
+      {
+        timeout: 15000,
+        timeoutMsg: 'Ending Message Not Visible\n' + new Error().stack + '\n',
+      }
+    );
     var conversationContents = await conversationContentsSelector();
     var lastElement = conversationContents.length - 1;
-    await waitFor.visibilityOf(
-      conversationContents[lastElement],
-      'Ending message not visible'
-    );
-    await waitFor.textToBePresentInElement(
-      conversationContents[lastElement],
-      'Congratulations, you have finished!',
-      'Ending Message Not Visible'
-    );
     let conversationContentText = await action.getText(
       'Conversation Content Element',
       conversationContents[lastElement]
