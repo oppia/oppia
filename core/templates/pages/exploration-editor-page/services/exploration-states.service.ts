@@ -23,12 +23,14 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
+import set from 'lodash/set';
 
 import {Interaction} from 'domain/exploration/interaction.model';
 import {ConfirmDeleteStateModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 import {PageContextService} from 'services/page-context.service';
 import {
   ChangeListService,
+  StatePropertyDictValues,
   StatePropertyNames,
   StatePropertyValues,
 } from 'pages/exploration-editor-page/services/change-list.service';
@@ -188,6 +190,7 @@ export class ExplorationStatesService {
     widget_id: ['interaction', 'id'],
     widget_customization_args: ['interaction', 'customizationArgs'],
     inapplicable_skill_misconception_ids: ['inapplicableSkillMisconceptionIds'],
+    state_name: ['name'],
   };
 
   private _CONTENT_EXTRACTORS = {
@@ -313,12 +316,19 @@ export class ExplorationStatesService {
     return diffList as string[];
   }
 
+  private _getStates(): States {
+    if (this._states === null) {
+      throw new Error('Exploration states are not initialized.');
+    }
+    return this._states;
+  }
+
   private _setState(
     stateName: string,
     stateData: State,
     refreshGraph: boolean
   ): void {
-    (this._states as States).setState(stateName, cloneDeep(stateData));
+    this._getStates().setState(stateName, cloneDeep(stateData));
     if (refreshGraph) {
       this._refreshGraphEventEmitter.emit();
     }
@@ -371,10 +381,16 @@ export class ExplorationStatesService {
     backendName: StatePropertyNames
   ): StatePropertyValues {
     let accessorList: string[] = this.PROPERTY_REF_DATA[backendName];
-    let propertyRef = (this._states as States).getState(stateName);
+    let propertyRef: StatePropertyValues | State =
+      this._getStates().getState(stateName);
     try {
       accessorList.forEach((key: string) => {
-        propertyRef = propertyRef[key];
+        if (typeof propertyRef !== 'object' || propertyRef === null) {
+          throw new Error(
+            `Cannot read key "${key}" from non-object state property value.`
+          );
+        }
+        propertyRef = Reflect.get(propertyRef, key);
       });
     } catch (e) {
       let additionalInfo =
@@ -386,7 +402,7 @@ export class ExplorationStatesService {
         '\nChange list: ' +
         JSON.stringify(this.changeListService.getChangeList()) +
         '\nAll states names: ' +
-        this._states.getStateNames();
+        this._getStates().getStateNames();
       e.message += additionalInfo;
       throw e;
     }
@@ -465,19 +481,8 @@ export class ExplorationStatesService {
     newValue: StatePropertyValues
   ): void {
     let oldValue = this.getStatePropertyMemento(stateName, backendName);
-    let newBackendValue = cloneDeep(newValue);
-    let oldBackendValue = cloneDeep(oldValue);
-
-    if (this._BACKEND_CONVERSIONS.hasOwnProperty(backendName)) {
-      newBackendValue = this.convertToBackendRepresentation(
-        newValue,
-        backendName
-      );
-      oldBackendValue = this.convertToBackendRepresentation(
-        oldValue,
-        backendName
-      );
-    }
+    let newBackendValue = this._getBackendValue(backendName, newValue);
+    let oldBackendValue = this._getBackendValue(backendName, oldValue);
     if (!isEqual(oldValue, newValue)) {
       this.changeListService.editStateProperty(
         stateName,
@@ -486,18 +491,13 @@ export class ExplorationStatesService {
         oldBackendValue
       );
 
-      let newStateData = this._states.getState(stateName);
+      let newStateData = this._getStates().getState(stateName);
       let accessorList = this.PROPERTY_REF_DATA[backendName];
       if (this.contentChangesCanAffectTranslations) {
         this._verifyChangesInitialContents(backendName, newValue);
       }
 
-      let propertyRef = newStateData;
-      for (let i = 0; i < accessorList.length - 1; i++) {
-        propertyRef = propertyRef[accessorList[i]];
-      }
-
-      propertyRef[accessorList[accessorList.length - 1]] = cloneDeep(newValue);
+      set(newStateData, accessorList, cloneDeep(newValue));
 
       // We do not refresh the state editor immediately after the interaction
       // id alone is saved, because the customization args dict will be
@@ -509,11 +509,47 @@ export class ExplorationStatesService {
     }
   }
 
+  private _getBackendValue(
+    backendName: StatePropertyNames,
+    value: StatePropertyValues
+  ): StatePropertyDictValues {
+    if (this._isBackendConversionName(backendName)) {
+      return this.convertToBackendRepresentation(value, backendName);
+    }
+
+    if (
+      typeof value === 'boolean' ||
+      typeof value === 'string' ||
+      value === null ||
+      Array.isArray(value)
+    ) {
+      return cloneDeep(value) as StatePropertyDictValues;
+    }
+
+    throw new Error(
+      `Unsupported non-converted state property value for ${backendName}.`
+    );
+  }
+
+  private _isBackendConversionName(
+    backendName: StatePropertyNames
+  ): backendName is Exclude<
+    keyof ExplorationStatesService['_BACKEND_CONVERSIONS'],
+    'written_translations'
+  > {
+    return this._BACKEND_CONVERSIONS.hasOwnProperty(backendName);
+  }
+
   convertToBackendRepresentation(
     frontendValue: StatePropertyValues,
-    backendName: string
-  ): string {
-    let conversionFunction = this._BACKEND_CONVERSIONS[backendName];
+    backendName: Exclude<
+      keyof ExplorationStatesService['_BACKEND_CONVERSIONS'],
+      'written_translations'
+    >
+  ): StatePropertyDictValues {
+    let conversionFunction = this._BACKEND_CONVERSIONS[backendName] as (
+      value: StatePropertyValues
+    ) => StatePropertyDictValues;
     return conversionFunction(frontendValue);
   }
 
@@ -524,13 +560,17 @@ export class ExplorationStatesService {
     this._states = States.createFromBackendDict(statesBackendDict);
     this.contentChangesCanAffectTranslations =
       contentChangesCanAffectTranslations;
+    const states = this._getStates();
     // Initialize the solutionValidityService.
-    this.solutionValidityService.init(this._states.getStateNames());
-    this._states.getStateNames().forEach((stateName: string) => {
-      const state = this._states.getState(stateName);
+    this.solutionValidityService.init(states.getStateNames());
+    states.getStateNames().forEach((stateName: string) => {
+      const state = states.getState(stateName);
       let solution = state.interaction.solution;
       if (solution) {
         let interactionId = state.interaction.id;
+        if (interactionId === null) {
+          return;
+        }
         let result =
           this.answerClassificationService.getMatchingClassificationResult(
             stateName,
@@ -544,28 +584,29 @@ export class ExplorationStatesService {
         this.solutionValidityService.updateValidity(stateName, solutionIsValid);
       }
 
-      state
-        .getAllContents()
-        .forEach(
-          content => (this.initalContentsMapping[content.contentId] = content)
-        );
+      state.getAllContents().forEach(content => {
+        if (content.contentId === null) {
+          return;
+        }
+        this.initalContentsMapping[content.contentId] = content;
+      });
     });
   }
 
   getStates(): States {
-    return cloneDeep(this._states);
+    return cloneDeep(this._getStates());
   }
 
   getStateNames(): string[] {
-    return this._states.getStateNames();
+    return this._getStates().getStateNames();
   }
 
   hasState(stateName: string): boolean {
-    return this._states.hasState(stateName);
+    return this._getStates().hasState(stateName);
   }
 
   getState(stateName: string): State {
-    return cloneDeep(this._states.getState(stateName));
+    return cloneDeep(this._getStates().getState(stateName));
   }
 
   setState(stateName: string, stateData: State): void {
@@ -573,17 +614,18 @@ export class ExplorationStatesService {
   }
 
   getAllContentIdsByStateName(stateName: string): string[] {
-    let allContentIds = (
-      this._states.getState(stateName) as State
-    ).getAllContentIds();
+    let allContentIds = this._getStates()
+      .getState(stateName)
+      .getAllContentIds();
     return allContentIds.filter(contentId => contentId !== undefined);
   }
 
   getCheckpointCount(): number {
     let count: number = 0;
     if (this._states) {
-      this._states.getStateNames().forEach(stateName => {
-        if (this._states.getState(stateName).cardIsCheckpoint) {
+      const states = this._getStates();
+      states.getStateNames().forEach(stateName => {
+        if (states.getState(stateName).cardIsCheckpoint) {
           count++;
         }
       });
@@ -592,11 +634,11 @@ export class ExplorationStatesService {
   }
 
   isNewStateNameDuplicate(newStateName: string): boolean {
-    return this._states.hasState(newStateName);
+    return this._getStates().hasState(newStateName);
   }
 
   isNewStateNameValid(newStateName: string, showWarnings: boolean): boolean {
-    if (this._states.hasState(newStateName)) {
+    if (this._getStates().hasState(newStateName)) {
       if (showWarnings) {
         this.alertsService.addWarning('A state with this name already exists.');
       }
@@ -631,7 +673,7 @@ export class ExplorationStatesService {
   saveInteractionId(stateName: string, newInteractionId: string | null): void {
     this.saveStateProperty(stateName, 'widget_id', newInteractionId);
     this.stateInteractionSavedCallbacks.forEach(callback => {
-      callback(this._states.getState(stateName));
+      callback(this._getStates().getState(stateName));
     });
   }
 
@@ -666,7 +708,7 @@ export class ExplorationStatesService {
       newCustomizationArgs
     );
     this.stateInteractionSavedCallbacks.forEach(callback => {
-      callback(this._states.getState(stateName));
+      callback(this._getStates().getState(stateName));
     });
   }
 
@@ -680,7 +722,7 @@ export class ExplorationStatesService {
   ): void {
     this.saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
     this.stateInteractionSavedCallbacks.forEach(callback => {
-      callback(this._states.getState(stateName));
+      callback(this._getStates().getState(stateName));
     });
   }
 
@@ -701,7 +743,7 @@ export class ExplorationStatesService {
       newAnswers as AnswerGroup[]
     );
     this.stateInteractionSavedCallbacks.forEach(callback => {
-      callback(this._states.getState(stateName));
+      callback(this._getStates().getState(stateName));
     });
   }
 
@@ -771,7 +813,7 @@ export class ExplorationStatesService {
     if (!this.validatorsService.isValidStateName(newStateName, true)) {
       return;
     }
-    if (this._states.hasState(newStateName)) {
+    if (this._getStates().hasState(newStateName)) {
       this.alertsService.addWarning('A state with this name already exists.');
       return;
     }
@@ -782,7 +824,7 @@ export class ExplorationStatesService {
     let contentIdForDefaultOutcome =
       this.generateContentIdService.getNextStateId('default_outcome');
 
-    this._states.addState(
+    this._getStates().addState(
       newStateName,
       contentIdForContent,
       contentIdForDefaultOutcome
@@ -803,14 +845,14 @@ export class ExplorationStatesService {
     }
   }
 
-  deleteState(deleteStateName: string): Promise<never> {
+  deleteState(deleteStateName: string): Promise<void> {
     this.alertsService.clearWarnings();
 
     let initStateName = this.explorationInitStateNameService.displayed;
     if (deleteStateName === initStateName) {
       return Promise.reject('The initial state can not be deleted.');
     }
-    if (!this._states.hasState(deleteStateName)) {
+    if (!this._getStates().hasState(deleteStateName)) {
       let message = 'No state with name ' + deleteStateName + ' exists.';
       this.alertsService.addWarning(message);
       return Promise.reject(message);
@@ -820,9 +862,9 @@ export class ExplorationStatesService {
       backdrop: true,
     });
     modalRef.componentInstance.deleteStateName = deleteStateName;
-    modalRef.result.then(
+    return modalRef.result.then(
       () => {
-        this._states.deleteState(deleteStateName);
+        this._getStates().deleteState(deleteStateName);
 
         this.changeListService.deleteState(deleteStateName);
 
@@ -853,16 +895,16 @@ export class ExplorationStatesService {
     if (!this.validatorsService.isValidStateName(newStateName, true)) {
       return;
     }
-    if (this._states.hasState(newStateName)) {
+    if (this._getStates().hasState(newStateName)) {
       this.alertsService.addWarning('A state with this name already exists.');
       return;
     }
     this.alertsService.clearWarnings();
 
-    this._states.renameState(oldStateName, newStateName);
+    this._getStates().renameState(oldStateName, newStateName);
 
     this.stateEditorService.setActiveStateName(newStateName);
-    this.stateEditorService.setStateNames(this._states.getStateNames());
+    this.stateEditorService.setStateNames(this._getStates().getStateNames());
     // The 'rename state' command must come before the 'change
     // init_state_name' command in the change list, otherwise the backend
     // will raise an error because the new initial state name does not
