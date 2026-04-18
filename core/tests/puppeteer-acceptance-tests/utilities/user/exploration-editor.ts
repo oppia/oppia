@@ -27,6 +27,7 @@ import path from 'path';
 import {GraphViz} from '../common/interactions/graph-viz';
 import {PencilCode} from '../common/interactions/pencil-code';
 import {ImageAreaSelection} from '../common/interactions/image-area-selection';
+import {ExplorationEditorModal} from '../common/exploration-editor';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -34,7 +35,6 @@ const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 
 const createExplorationButtonSelector =
   'button.e2e-test-create-new-exploration-button';
-const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
@@ -433,6 +433,35 @@ const answerInputSelector = '.e2e-test-answer-description-fragment input';
 const saveAnswerButtonInResponseGroupSelector = '.e2e-test-save-answer';
 const activeRuleTabClass = 'oppia-rule-tab-active';
 const activeTabClass = 'e2e-test-active-tab';
+const profileDropdown = '.e2e-test-profile-dropdown';
+const creatorDashboardMenuLink = '.e2e-test-creator-dashboard-link';
+const statsButtonTab = '.e2e-test-stats-tab';
+const mobileStatsTabButton = '.e2e-test-mobile-stats-button';
+const explorationStatsTabContentSelector = '.e2e-test-exploration-stats-card';
+const explorationStateStatsModalSelector = '.e2e-test-state-stats-modal-body';
+const explorationStateStatsEnterCountSelector =
+  '.e2e-test-state-stats-card-entered-here-count';
+const feedbackTimeElement =
+  '.e2e-test-oppia-feedback-tab-row td:nth-child(4) span';
+const numberOfPassers = '.e2e-test-num-passersby';
+
+const explorationGraphSelector = 'oppia-exploration-graph';
+const explorationGraphNodeBackgroundSelector = 'rect.e2e-test-node-background';
+const explorationGraphNodeDeleteButtonSelector =
+  'g.e2e-test-delete-node rect.oppia-node-delete';
+const explorationGraphNodeSelector = 'g.e2e-test-node';
+const confirmDeleteStateButtonSelector = '.e2e-test-confirm-delete-state';
+
+const lostChangesModalSelector = '.e2e-test-lost-changes-modal';
+const discardAndExportLostChangesButtonSelector =
+  'button.e2e-test-discard-and-export-lost-changes-button';
+const stateNameSubmitButtonSelector = 'button.e2e-test-state-name-submit';
+const stateNameInputSelector = '.e2e-test-state-name-input';
+const cardHeightLimitWarningSelector = '.e2e-test-card-height-limit-warning';
+
+const saveRecommendationModalSelector = '.e2e-test-save-prompt-modal';
+const saveRecommendationModalSaveButtonSelector =
+  'button.e2e-test-recommendation-prompt-save-button';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
@@ -610,10 +639,13 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Selects multiple options from the item selection input.
+   * This function will uncheck any currently checked options that are not in
+   * the provided list, and check any options that should be selected.
    * @param options The options to select.
    */
   async selectItemSelectionOptions(options: string[]): Promise<void> {
     const optionElementSelector = '.e2e-test-item-selection-input-item';
+    const checkboxSelector = '.e2e-test-item-selection-input-checkbox';
 
     await this.expectElementToBeVisible(optionElementSelector);
     const optionElements = await this.page.$$(optionElementSelector);
@@ -625,16 +657,41 @@ export class ExplorationEditor extends BaseUser {
       if (!optionText) {
         continue;
       }
-      if (options.includes(optionText)) {
-        await optionElement.click();
 
-        const inputElement = await optionElement.$('input');
+      // Click on the mat-checkbox element inside the label.
+      const checkboxElement = await optionElement.$(checkboxSelector);
+      if (!checkboxElement) {
+        throw new Error(`Checkbox not found for option: ${optionText}`);
+      }
+
+      // Check if the checkbox is currently checked.
+      const checkboxIsCurrentlyChecked = await checkboxElement.evaluate(el =>
+        el.classList.contains('mat-checkbox-checked')
+      );
+
+      const shouldBeChecked = options.includes(optionText);
+
+      if (shouldBeChecked && !checkboxIsCurrentlyChecked) {
+        // Need to check this checkbox. Use clickOnElement to ensure the element
+        // is stable and clickable before clicking.
+        await this.clickOnElement(checkboxElement);
         await this.page.waitForFunction(
-          (element: HTMLInputElement) => {
-            return element.checked;
+          (element: Element) => {
+            return element.classList.contains('mat-checkbox-checked');
           },
           {},
-          inputElement
+          checkboxElement
+        );
+      } else if (!shouldBeChecked && checkboxIsCurrentlyChecked) {
+        // Need to uncheck this checkbox. Use clickOnElement to ensure the
+        // element is stable and clickable before clicking.
+        await this.clickOnElement(checkboxElement);
+        await this.page.waitForFunction(
+          (element: Element) => {
+            return !element.classList.contains('mat-checkbox-checked');
+          },
+          {},
+          checkboxElement
         );
       }
     }
@@ -1683,6 +1740,10 @@ export class ExplorationEditor extends BaseUser {
     await algebricExpressionEditor.click();
     await algebricExpressionEditor.type(solution);
 
+    if (await this.isOnScreenKeyboardVisible()) {
+      await this.hideOSK();
+    }
+
     await this.clickOnElementWithSelector(submitAnswerButton);
 
     // Add explanation.
@@ -1737,6 +1798,10 @@ export class ExplorationEditor extends BaseUser {
 
     await numericExpressionEditor.click();
     await numericExpressionEditor.type(solution);
+
+    if (await this.isOnScreenKeyboardVisible()) {
+      await this.hideOSK();
+    }
 
     await this.clickOnElementWithSelector(submitAnswerButton);
 
@@ -2018,6 +2083,10 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForElementToStabilize(equationBox);
     await equationBox.click();
     await equationBox.type(solution);
+
+    if (await this.isOnScreenKeyboardVisible()) {
+      await this.hideOSK();
+    }
 
     await this.clickOnElementWithSelector(submitAnswerButton);
 
@@ -2650,6 +2719,17 @@ export class ExplorationEditor extends BaseUser {
         visible: true,
       });
       await this.clickOnElementWithSelector(explorationConfirmPublishButton);
+      const success = await this.page
+        .waitForSelector(explorationIdElement, {visible: true, timeout: 20000})
+        .then(() => true)
+        .catch(() => false);
+      if (!success) {
+        await this.page.reload({waitUntil: 'networkidle0'});
+        await this.page.waitForSelector(explorationIdElement, {
+          visible: true,
+          timeout: 30000,
+        });
+      }
       await this.page.waitForSelector(explorationIdElement);
       const explorationIdUrl = await this.page.$eval(
         explorationIdElement,
@@ -2728,22 +2808,23 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to dismiss exploration editor welcome modal.
+   * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
-  async dismissWelcomeModal(): Promise<void> {
-    try {
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        visible: true,
-        timeout: 5000,
-      });
-      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        hidden: true,
-      });
-      showMessage('Tutorial pop-up closed successfully.');
-    } catch (error) {
-      showMessage(`Welcome Modal not found, but test can be continued.
-        Error: ${error.message}`);
-    }
+  async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
+    const explorationEditor = new ExplorationEditorModal(this);
+    await explorationEditor.dismissWelcomeModal(failIfMissing);
+  }
+
+  /**
+   * Function to dismiss welcome modal if it is present. This is useful when
+   * the modal may or may not appear due to race conditions or when it has
+   * already been dismissed earlier in the test flow.
+   */
+  async dismissWelcomeModalIfPresent(): Promise<void> {
+    // The existing dismissWelcomeModal() in this class already handles the
+    // case where the modal is not present (via try/catch), so we just
+    // delegate to it.
+    await this.dismissWelcomeModal(false);
   }
 
   /**
@@ -3550,6 +3631,9 @@ export class ExplorationEditor extends BaseUser {
         visible: true,
       });
       await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
+      await this.page.waitForSelector(
+        `${mobileDiscardButtonSelector}:not(.disabled)`
+      );
       await this.clickOnElementWithSelector(mobileDiscardButtonSelector);
     } else {
       await this.page.waitForSelector(discardDraftDropdownSelector, {
@@ -3559,6 +3643,9 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(desktopDiscardDraftButton, {
         visible: true,
       });
+      await this.page.waitForSelector(
+        `${desktopDiscardDraftButton}:not(.disabled)`
+      );
       await this.clickOnElementWithSelector(desktopDiscardDraftButton);
     }
     await this.page.waitForSelector(confirmDiscardButton, {
@@ -3637,18 +3724,45 @@ export class ExplorationEditor extends BaseUser {
   async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
     let elements;
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileStateGraphResizeButton, {
-        visible: true,
-      });
-      await this.clickOnElementWithSelector(mobileStateGraphResizeButton);
+      // Check if the state graph modal is already open before clicking the
+      // resize button.
+      const stateGraphModalIsOpen = await this.page.$(
+        explorationStateGraphModalSelector
+      );
+      if (!stateGraphModalIsOpen) {
+        // Wait for any blocking modal to close first before clicking the
+        // resize button.
+        const blockingModal = await this.page.$('div.modal-content');
+        if (blockingModal) {
+          await this.page.waitForSelector('div.modal-content', {hidden: true});
+        }
+        await this.page.waitForSelector(mobileStateGraphResizeButton, {
+          visible: true,
+        });
+        await this.clickOnElementWithSelector(mobileStateGraphResizeButton);
+      }
     }
 
-    await this.page.waitForSelector(stateNodeSelector);
-    elements = await this.page.$$(stateNodeSelector);
+    // Get all state node groups (not just labels) since we need to click the
+    // background rect which has the click handler.
+    const stateNodeGroupSelector = '.e2e-test-node';
+    const scopedStateNodeGroupSelector = this.isViewportAtMobileWidth()
+      ? `${explorationStateGraphModalSelector} ${stateNodeGroupSelector}`
+      : stateNodeGroupSelector;
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(explorationStateGraphModalSelector, {
+        visible: true,
+      });
+    }
+    await this.page.waitForSelector(scopedStateNodeGroupSelector);
+    elements = await this.page.$$(scopedStateNodeGroupSelector);
 
     const cardNames = await Promise.all(
       elements.map(element =>
-        element.$eval('tspan', node => node.textContent?.trim() || '')
+        element.$eval(
+          '.e2e-test-node-label',
+          node => node.textContent?.trim() || ''
+        )
       )
     );
     const cardIndex = cardNames.indexOf(cardName);
@@ -3657,18 +3771,22 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Card name ${cardName} not found in the graph.`);
     }
 
-    let cardButton: ElementHandle<Element> | null = null;
-    if (this.isViewportAtMobileWidth()) {
-      cardButton = elements[cardIndex + elements.length / 2];
-    } else {
-      cardButton = elements[cardIndex];
-    }
-
-    if (!cardButton) {
+    const nodeGroup: ElementHandle<Element> | null = elements[cardIndex];
+    if (!nodeGroup) {
       throw new Error(`Could not find card button for card: ${cardName}`);
     }
 
-    await cardButton.click();
+    // Click on the node background rect which has the click handler.
+    const nodeBackground = await nodeGroup.$('.e2e-test-node-background');
+    if (!nodeBackground) {
+      throw new Error(
+        `Could not find clickable background for card: ${cardName}`
+      );
+    }
+    await nodeBackground.evaluate(el =>
+      el.scrollIntoView({block: 'center', inline: 'center'})
+    );
+    await this.clickOnElement(nodeBackground);
     await this.waitForNetworkIdle({idleTime: 1000});
 
     const headingName = !cardName.trimEnd().endsWith('...')
@@ -4604,13 +4722,11 @@ export class ExplorationEditor extends BaseUser {
   async createAndPublishAMinimalExplorationWithTitle(
     title: string,
     category: string = 'Algebra',
-    flag: boolean = true
+    flag: boolean = false
   ): Promise<string> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorFromCreatorDashboard();
-    if (flag) {
-      await this.dismissWelcomeModal();
-    }
+    await this.dismissWelcomeModal(flag);
     await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'
@@ -4691,11 +4807,12 @@ export class ExplorationEditor extends BaseUser {
   async createAndPublishExplorationWithCards(
     explorationTitle: string,
     category: string = 'Mathematics',
-    numberOfCards: number = 2
+    numberOfCards: number = 2,
+    expectedWelcomeModal: boolean = false
   ): Promise<string> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorFromCreatorDashboard();
-    await this.dismissWelcomeModal();
+    await this.dismissWelcomeModal(expectedWelcomeModal);
 
     for (let i = 0; i < numberOfCards - 1; i++) {
       await this.updateCardContent(`Content ${i}`);
@@ -5981,11 +6098,13 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Verifies that the edit card content pencil button is visible.
+   * @param {boolean} isVisible - Whether the button is expected to be visible.
    */
-  async expectEditCardContentPencilButtonToBeVisible(): Promise<void> {
+  async expectEditCardContentPencilButtonToBeVisible(
+    isVisible: boolean = true
+  ): Promise<void> {
     const visible = await this.isElementVisible(editCardContentButtonSelector);
-
-    expect(visible).toBe(true);
+    expect(visible).toBe(isVisible);
   }
 
   /**
@@ -7059,6 +7178,381 @@ export class ExplorationEditor extends BaseUser {
       confirmDeleteInteractionButtonSelector,
       false
     );
+  }
+
+  /**
+   * Clicks on a node element in the exploration graph
+   * @param stateName The name of the state to be clicked
+   * @param selectorToClick The selector of the element to be clicked within the node
+   * @returns A boolean indicating if the click was successful
+   */
+  async clickOnGraphNodeElement(
+    stateName: string,
+    selectorToClick: string
+  ): Promise<boolean> {
+    await this.page.waitForFunction(
+      (nodeSelector: string) =>
+        document.querySelectorAll(nodeSelector).length > 0,
+      {timeout: 60000},
+      explorationGraphNodeSelector
+    );
+    return await this.page.evaluate(
+      (name: string, selectorToClick: string, nodeSelector: string) => {
+        const nodes = Array.from(document.querySelectorAll(nodeSelector));
+
+        const targetNode = nodes.find(node => {
+          const title = node.querySelector('title')?.textContent || '';
+          const normalizedTitle = title.replace(/\s+/g, ' ').trim();
+          const normalizedName = name.replace(/\s+/g, ' ').trim();
+          return normalizedTitle.includes(normalizedName);
+        });
+
+        if (!targetNode) {
+          return false;
+        }
+
+        const element = targetNode.querySelector(
+          selectorToClick
+        ) as HTMLElement | null;
+
+        if (!element) {
+          return false;
+        }
+
+        element.scrollIntoView({block: 'center', inline: 'center'});
+        element.dispatchEvent(new Event('click', {bubbles: true}));
+        return true;
+      },
+      stateName,
+      selectorToClick,
+      explorationGraphNodeSelector
+    );
+  }
+
+  /**
+   * Deletes a state from the exploration
+   * @param stateName The name of the state to be deleted
+   */
+
+  async deleteState(stateName: string): Promise<void> {
+    await this.expectExplorationGraphToContainCard(stateName);
+    const isMobile = this.isViewportAtMobileWidth();
+
+    if (isMobile) {
+      await this.openExplorationStateGraphInMobileView();
+    } else {
+      await this.navigateToCard(stateName);
+    }
+
+    await this.expectElementToBeVisible(explorationGraphSelector);
+
+    await this.clickOnGraphNodeElement(
+      stateName,
+      explorationGraphNodeBackgroundSelector
+    );
+
+    const deleteClicked = await this.clickOnGraphNodeElement(
+      stateName,
+      explorationGraphNodeDeleteButtonSelector
+    );
+
+    if (!deleteClicked) {
+      throw new Error(
+        `Delete button not found in graph for card: ${stateName}`
+      );
+    }
+
+    await this.expectElementToBeVisible(confirmDeleteStateButtonSelector);
+    await this.clickOnElementWithSelector(confirmDeleteStateButtonSelector);
+
+    await this.page.waitForFunction(
+      (selector: string, name: string) => {
+        return !Array.from(document.querySelectorAll(selector)).some(
+          el => el.textContent?.trim() === name
+        );
+      },
+      {timeout: 60000},
+      stateNodeSelector,
+      stateName
+    );
+
+    if (isMobile) {
+      const closeBtn = await this.page.$(closeModalButtonSelector);
+      if (closeBtn) {
+        await this.clickOnElementWithSelector(closeModalButtonSelector);
+      }
+      await this.expectElementToBeVisible(
+        explorationStateGraphModalSelector,
+        false
+      );
+    }
+  }
+
+  /**
+   * Expects the lost changes modal to be visible or not and matches the heading if visible
+   * @param isVisible - Whether the modal should be visible or not
+   */
+  async expectLostChangesModalToBeVisible(isVisible: boolean): Promise<void> {
+    await this.expectElementToBeVisible(lostChangesModalSelector, isVisible);
+
+    if (isVisible) {
+      await this.expectModalTitleToBe('Error Saving Exploration');
+    }
+  }
+
+  /**
+   * Exports and discards lost changes from the lost changes modal
+   */
+  async exportAndDiscardLostChanges(): Promise<void> {
+    await this.expectLostChangesModalToBeVisible(true);
+
+    await this.expectElementToBeVisible(
+      discardAndExportLostChangesButtonSelector,
+      true
+    );
+
+    await this.clickOnElementWithSelector(
+      discardAndExportLostChangesButtonSelector
+    );
+
+    await this.expectLostChangesModalToBeVisible(false);
+  }
+
+  /**
+   * Expects a file to be downloaded with given file name
+   */
+  async expectLostChangesFileToBeDownloaded(): Promise<void> {
+    const downloadedFile =
+      await this.waitForExplorationDownload('lostChanges.txt');
+    expect(downloadedFile).toBe('lostChanges.txt');
+    await this.waitForPageToFullyLoad();
+    await this.expectLostChangesModalToBeVisible(false);
+  }
+
+  /**
+   * Updates the name of a state in the exploration editor
+   * @param newStateName - The new name for the state
+   */
+  async updateStateName(newStateName: string): Promise<void> {
+    await this.expectElementToBeVisible(currentCardNameContainerSelector, true);
+    await this.clickOnElementWithSelector(currentCardNameContainerSelector);
+
+    await this.page.evaluate(selector => {
+      const input = document.querySelector(selector) as HTMLInputElement;
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+    }, stateNameInputSelector);
+
+    await this.page.keyboard.type(newStateName);
+    await this.clickOnElementWithSelector(stateNameSubmitButtonSelector);
+    await this.waitForPageToFullyLoad();
+    await this.expectTextContentToContain(
+      currentCardNameContainerSelector,
+      newStateName
+    );
+  }
+
+  /**
+   * Expects the state name to be a specific value
+   * @param expectedStateName The expected state name
+   */
+  async expectStateNameToBe(expectedStateName: string): Promise<void> {
+    await this.expectTextContentToContain(
+      currentCardNameContainerSelector,
+      expectedStateName
+    );
+  }
+
+  /**
+   * Expects the exploration graph to not contain a specific card
+   * @param cardName The name of the card to check
+   */
+  async expectExplorationGraphToNotContainCard(
+    cardName: string
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.openExplorationStateGraphInMobileView();
+    }
+
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        return !Array.from(document.querySelectorAll(selector)).some(
+          el => el.textContent?.trim() === value
+        );
+      },
+      {timeout: 60000},
+      stateNodeSelector,
+      cardName
+    );
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(closeModalButtonSelector);
+      await this.expectElementToBeVisible(
+        explorationStateGraphModalSelector,
+        false
+      );
+    }
+  }
+
+  /**
+   * Clicks on the discard lost changes button
+   */
+  async discardLostChanges(): Promise<void> {
+    await this.expectElementToBeVisible(errorSavingExplorationModal);
+    await this.clickOnElementWithSelector(errorSavingExplorationModal);
+    await this.expectLostChangesModalToBeVisible(false);
+  }
+
+  /**
+   * Expects the card height limit warning to be visible
+   */
+  async expectCardHeightLimitWarningToBeVisible(): Promise<void> {
+    await this.expectTextContentToContain(
+      cardHeightLimitWarningSelector,
+      'This card is quite long'
+    );
+  }
+
+  /**
+   * Expects the save recommendation modal to be visible
+   */
+  async expectSaveRecommendationModalToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(saveRecommendationModalSelector, true);
+
+    await this.expectModalTitleToBe('Save Changes');
+
+    await this.expectModalContentToContain(
+      'It is recommended to save if the exploration has more than 50 changes.'
+    );
+  }
+
+  /**
+   * Clicks on the save draft button in the save recommendation modal
+   * * @param commitMessage - The commit message text to be saved.
+   */
+  async saveExplorationDraftFromSaveRecommendationModal(
+    commitMessage: string = 'Testing Testing'
+  ): Promise<void> {
+    await this.expectSaveRecommendationModalToBeVisible();
+    await this.clickOnElementWithSelector(
+      saveRecommendationModalSaveButtonSelector
+    );
+
+    if (commitMessage) {
+      await this.clickOnElementWithSelector(commitMessageSelector);
+      await this.typeInInputField(commitMessageSelector, commitMessage);
+    }
+
+    await this.clickOnElementWithSelector(saveDraftButton);
+    await this.expectElementToBeVisible(saveDraftButton, false);
+
+    await this.expectElementToBeVisible(toastMessage, true);
+    await this.expectElementToBeVisible(toastMessage, false);
+    showMessage('Exploration is saved successfully.');
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(saveRecommendationModalSelector, false);
+  }
+
+  /**
+   * Navigates to creator dashboard using profile dropdown.
+   */
+  async navigateToCreatorDashboardUsingProfileDropdown(): Promise<void> {
+    await this.expectElementToBeVisible(profileDropdown);
+    await this.clickOnElementWithSelector(profileDropdown);
+
+    await this.expectElementToBeVisible(creatorDashboardMenuLink);
+    await this.clickOnElementWithSelector(creatorDashboardMenuLink);
+    await this.expectElementToBeVisible(creatorDashboardContainerSelector);
+  }
+
+  /**
+   * Navigates to the stats tab of the exploration editor.
+   */
+  async navigateToStatsTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
+      if (!mobileNavbarElement) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOnElementWithSelector(mobileStatsTabButton);
+    } else {
+      await this.clickOnElementWithSelector(statsButtonTab);
+      await this.waitForNetworkIdle();
+    }
+
+    await this.expectElementToBeVisible(explorationStatsTabContentSelector);
+  }
+
+  /**
+   * From the stats tab, open the modal showing the stats of the specified card.
+   */
+  async openCardStats(cardName: string): Promise<void> {
+    await this.navigateToCard(cardName);
+    await this.expectElementToBeVisible(explorationStateStatsModalSelector);
+  }
+
+  /**
+   * Function to check how many times a card has been entered.
+   * Requires the card stats modal to be open.
+   */
+  async expectCardEnteredTimesToBe(count: number): Promise<void> {
+    await this.expectTextContentToContain(
+      explorationStateStatsEnterCountSelector,
+      `Card entered: ${count} times.`
+    );
+  }
+
+  /**
+   * Close the currently-opened state stats modal.
+   */
+  async closeCardStats(): Promise<void> {
+    await this.clickOnElementWithSelector(closeModalButtonSelector);
+    await this.expectElementToBeVisible(
+      explorationStateStatsModalSelector,
+      false
+    );
+  }
+
+  /**
+   * Expects the number of passers to be a specific value.
+   * @param expected the expected number of passers.
+   */
+  async expectNumberOfPassersToBe(expected: number): Promise<void> {
+    await this.expectElementToBeVisible(numberOfPassers);
+
+    const text = await this.page.$eval(
+      numberOfPassers,
+      el => el.textContent?.trim() || ''
+    );
+
+    const match = text.match(/\d+/);
+    const actual = match ? Number(match[0]) : 0;
+
+    if (actual !== expected) {
+      throw new Error(
+        `Expected number of passers to be ${expected}, but found ${actual}.`
+      );
+    }
+  }
+
+  /**
+   * Expects the feedback reply details to be visible.
+   */
+  async expectFeedbackReplyDetailsToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(feedbackAuthorSelector);
+    await this.expectElementToBeVisible(feedbackStatusSelector);
+    await this.expectElementToBeVisible(feedbackTimeElement);
+  }
+
+  /**
+   * Expects Feedback Page to be visible.
+   */
+  async expectFeedbackPageTobeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
   }
 }
 

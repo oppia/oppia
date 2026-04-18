@@ -39,7 +39,7 @@ export class BlogPostSearchService {
   private _lastQuery!: string;
   private _searchOffset!: number | null;
   private _lastSelectedTags: string[] = [];
-  private _isCurrentlyFetchingResults = false;
+  private _isCurrentlyFetchingResults: boolean = false;
   private _searchBarLoadedEventEmitter = new EventEmitter<string>();
   private _initialSearchResultsLoadedEventEmitter =
     new EventEmitter<SearchResponseData>();
@@ -65,9 +65,36 @@ export class BlogPostSearchService {
     }
     return querySuffix;
   }
-
   hasReachedLastPage(): boolean {
     return this._searchOffset === null;
+  }
+
+  get lastQuery(): string {
+    return this._lastQuery;
+  }
+  set lastQuery(value: string) {
+    this._lastQuery = value;
+  }
+
+  get searchOffset(): number | null {
+    return this._searchOffset;
+  }
+  set searchOffset(value: number | null) {
+    this._searchOffset = value;
+  }
+
+  get lastSelectedtags(): string[] {
+    return this._lastSelectedTags;
+  }
+  set lastSelectedtags(value: string[]) {
+    this._lastSelectedTags = value;
+  }
+
+  get isCurrentlyFetchingResults(): boolean {
+    return this._isCurrentlyFetchingResults;
+  }
+  set isCurrentlyFetchingResults(value: boolean) {
+    this._isCurrentlyFetchingResults = value;
   }
 
   _getSelectedTagsFromUrl(itemsType: string, urlComponent: string): string[] {
@@ -101,6 +128,12 @@ export class BlogPostSearchService {
       .split('" OR "');
 
     return items;
+  }
+  resetSearchState(): void {
+    this._searchOffset = 0;
+    this._lastQuery = '';
+    this._lastSelectedTags = [];
+    this._isCurrentlyFetchingResults = false;
   }
 
   getQueryUrl(searchUrlQueryString: string): string {

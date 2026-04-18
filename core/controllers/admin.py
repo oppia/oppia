@@ -868,11 +868,15 @@ class AdminHandler(
 
         blog_post = blog_services.create_new_blog_post(self.user_id)
         fs = fs_services.GcsFileSystem('blog_post', blog_post.id)
-        with open('./assets/images/general/learner1.png', 'rb') as thumbnail:
+        with open(
+            './assets/images/general/learner1.png', 'rb', encoding=None
+        ) as thumbnail:
             fs.commit(
                 'thumbnail/blog_thumbnail.png', thumbnail.read(), 'image/png'
             )
-        with open('./assets/images/subjects/Art.svg', 'rb') as image:
+        with open(
+            './assets/images/subjects/Art.svg', 'rb', encoding=None
+        ) as image:
             fs.commit(
                 'image/blog_post_image_height_326_width_490.svg',
                 image.read(),
@@ -1336,16 +1340,16 @@ class AdminHandler(
             question_id_2 = 'dummyQuestionId2'
             question_id_3 = 'dummyQuestionId3'
 
-            initial_dummy_opportunites_generation = (
-                skill_services.does_skill_with_description_exist(
-                    'Dummy Skill 1'
-                )
-                is False
+            existing_skill = skill_fetchers.get_skill_by_id(
+                skill_id, strict=False
             )
+            initial_dummy_opportunites_generation = existing_skill is None
 
             if initial_dummy_opportunites_generation:
                 skill = self._create_dummy_skill(
-                    skill_id, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>'
+                    skill_id,
+                    'Translation Opportunities Dummy Skill',
+                    '<p>Dummy Explanation for Translation Opportunities</p>',
                 )
                 question_1 = self._create_dummy_question(
                     question_id_1, 'Question 1', [skill_id]
@@ -1358,10 +1362,10 @@ class AdminHandler(
                 )
                 story = story_domain.Story.create_default_story(
                     story_id,
-                    'Dummy Story',
-                    'Description',
+                    'Translation Opportunities Dummy Story',
+                    'Dummy story for translation opportunities',
                     topic_id,
-                    'dummy-story',
+                    'translation-dummy-story',
                 )
 
                 question_services.add_question(self.user_id, question_1)
@@ -1379,9 +1383,9 @@ class AdminHandler(
                 )
                 topic = topic_domain.Topic.create_default_topic(
                     topic_id,
-                    'Dummy Topic 1',
-                    'dummy-topic-one',
-                    'description',
+                    'Translation Opportunities Dummy Topic',
+                    'trans-dummy-topic',
+                    'Dummy topic for translation opportunities',
                     'fragm',
                 )
                 topic.update_meta_tag_content('dummy-meta')
@@ -1911,7 +1915,9 @@ class AdminHandler(
             )
 
             banner_image = b''
-            with open('core/tests/data/classroom-banner.png', 'rb') as png_file:
+            with open(
+                'core/tests/data/classroom-banner.png', 'rb', encoding=None
+            ) as png_file:
                 banner_image = png_file.read()
             fs_services.save_original_and_compressed_versions_of_image(
                 'banner.png',
@@ -2286,7 +2292,7 @@ class AdminHandler(
             # Link the generated nodes and old nodes if they exist.
             graph_change_list = []
             old_dest_ids: List[str] = []
-            updated_story = story_fetchers.get_story_by_id('story_id')
+            updated_story = story_fetchers.get_story_by_id(story_id)
             existing_node_ids = [
                 node.id
                 for node in updated_story.story_contents.nodes
@@ -3004,16 +3010,8 @@ class SendDummyMailToAdminHandler(
         """
         username = self.username
         assert username is not None
-        server_can_send_emails = (
-            parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
-        )
-        if server_can_send_emails:
-            email_manager.send_dummy_mail_to_admin(username)
-            self.render_json({})
-        else:
-            raise self.InvalidInputException('This app cannot send emails.')
+        email_manager.send_dummy_mail_to_admin(username)
+        self.render_json({})
 
 
 class UpdateUsernameHandlerNormalizedPayloadDict(TypedDict):

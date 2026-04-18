@@ -27,6 +27,8 @@ import logging
 import os
 import re
 import types
+from unittest import mock
+from xml.sax import handler
 
 import main
 from core import feconf, handler_schema_constants, utils
@@ -45,7 +47,7 @@ from core.tests import test_utils
 
 import webapp2
 import webtest
-from typing import Dict, Final, FrozenSet, List, Optional, TypedDict, cast
+from typing import Any, Dict, Final, FrozenSet, List, Optional, TypedDict, cast
 from webapp2_extras import routes
 
 MYPY = False
@@ -141,6 +143,15 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         def get(self) -> None:
             """Handles GET requests."""
+            pass
+
+    class MockPostHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {'custom_key': {'schema': {'type': 'unicode'}}}
+        }
+
+        def post(self, *args: Any) -> None:
             pass
 
     def setUp(self) -> None:
@@ -565,7 +576,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             )
             response = self.get_html_response('/', expected_status_int=200)
             self.assertIn(
-                b'<lightweight-oppia-root></lightweight-oppia-root>',
+                b'<oppia-root></oppia-root>',
                 response.body,
             )
 
@@ -596,6 +607,27 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.assert_matches_regexps(
             logs, ['No email address was found for the user.']
         )
+
+    def test_validate_and_normalize_args_with_empty_payload_string(
+        self,
+    ) -> None:
+        """Test argument normalization when payload is naturally None."""
+        mock_request = mock.Mock()
+        mock_request.environ = {'REQUEST_METHOD': 'POST'}
+        mock_request.route_kwargs = {}
+        mock_request.arguments.return_value = ['payload', 'custom_key']
+
+        def mock_get_side_effect(arg_name: str) -> Optional[str]:
+            if arg_name == 'payload':
+                return ''
+            if arg_name == 'custom_key':
+                return 'some_value'
+            return None
+
+        mock_request.get.side_effect = mock_get_side_effect
+        handler = self.MockPostHandler(mock_request, mock.Mock())
+
+        handler.validate_and_normalize_args()
 
     def test_logs_request_with_invalid_payload(self) -> None:
         with contextlib.ExitStack() as exit_stack:
@@ -1099,7 +1131,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
             )
         )
         for filename in filenames:
-            with utils.open_file(
+            with open(
                 os.path.join(os.getcwd(), 'assets', 'i18n', filename), mode='r'
             ) as f:
                 lines = f.readlines()
@@ -2515,7 +2547,7 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
         user_id = user_services.get_user_id_from_username('testlearneruser')
         csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()

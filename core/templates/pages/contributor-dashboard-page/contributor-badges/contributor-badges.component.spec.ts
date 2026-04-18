@@ -246,6 +246,23 @@ describe('Contributor badge component', () => {
         expect(component.questionReviewBadges.length).toBeGreaterThan(0);
       }));
 
+      it(
+        'should show review and correction badges when a language has both ' +
+          'submission and review stats',
+        fakeAsync(() => {
+          component.selectLanguageOption('Spanish');
+
+          expect(component.userCanReviewTranslationSuggestion).toBeTrue();
+          expect(component.reviewableLanguages).toContain('Spanish');
+          expect(
+            component.translationBadges.Spanish.review.length
+          ).toBeGreaterThan(0);
+          expect(
+            component.translationBadges.Spanish.correction.length
+          ).toBeGreaterThan(0);
+        })
+      );
+
       it('should toggle language dropdown when user clicks on it', fakeAsync(() => {
         component.dropdownShown = false;
 

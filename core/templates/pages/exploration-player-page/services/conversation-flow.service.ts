@@ -99,6 +99,9 @@ interface AnswerResponseData {
 })
 export class ConversationFlowService {
   nextCardIfStuck!: StateCard | null;
+  // Tracks the state name where the learner was originally stuck, used for
+  // navigation back to the farthest discovered state after completing revision.
+  originalStuckStateName: string | null = null;
   solutionForState: Solution | null = null;
   responseTimeout: NodeJS.Timeout | null = null;
   nextStateCard!: StateCard;
@@ -606,6 +609,32 @@ export class ConversationFlowService {
         return;
       }
     }
+    // Handle returning from a stuck state redirect.
+    // If we have an originalStuckStateName, it means the learner was redirected
+    // to an earlier card for revision. After completing it, create a fresh card
+    // for the original stuck state so the learner can try again without seeing
+    // their old failed attempts.
+    if (this.originalStuckStateName !== null) {
+      const stuckStateName = this.originalStuckStateName;
+      // Clear the tracking before navigating.
+      this.originalStuckStateName = null;
+
+      // If the next card is indeed the stuck state, we apply the fix to create
+      // a fresh card.
+      if (nextCard.getStateName() === stuckStateName) {
+        // Create a fresh StateCard for the stuck state so the learner can try again
+        // without seeing their old failed attempts.
+        const freshStuckCard =
+          this.explorationEngineService.getStateCardByName(stuckStateName);
+        // Set it as the next card and show it.
+        this.setNextStateCard(freshStuckCard);
+        this.showPendingCard();
+        return;
+      }
+      // If nextCard is NOT the stuck state (e.g., the learner moved PAST the stuck state
+      // to the end of the lesson), we just proceed with the normal flow (displayed below),
+      // effectively ignoring the stuck state tracking since we have moved on.
+    }
     /* This is for the following situation:
         if A->B->C is the arrangement of cards and C redirected to A,
         then after this, B and C are visited cards and hence
@@ -993,7 +1022,9 @@ export class ConversationFlowService {
       // to next card. Therefore this.answerIsCorrect needs
       // to be set to false before it proceeds to next card.
       this.answerIsCorrect = false;
-      this.showPendingCard();
+      // Use showUpcomingCard to ensure stuck state return navigation
+      // logic is executed (if originalStuckStateName is set).
+      this.showUpcomingCard();
     }
     this.currentInteractionService.clearPresubmitHooks();
   }
@@ -1617,6 +1648,26 @@ export class ConversationFlowService {
    */
   setNextCardIfStuck(card: StateCard | null): void {
     this.nextCardIfStuck = card;
+  }
+
+  /**
+   * Retrieves the original stuck state name where the learner was redirected from.
+   * Used for navigation back to the farthest discovered state after revision.
+   *
+   * @returns {string | null} The original stuck state name, or null if not set.
+   */
+  getOriginalStuckStateName(): string | null {
+    return this.originalStuckStateName;
+  }
+
+  /**
+   * Sets the original stuck state name for tracking where the learner was
+   * before being redirected for revision.
+   *
+   * @param {string | null} stateName - The state name where the learner was stuck.
+   */
+  setOriginalStuckStateName(stateName: string | null): void {
+    this.originalStuckStateName = stateName;
   }
 
   /**

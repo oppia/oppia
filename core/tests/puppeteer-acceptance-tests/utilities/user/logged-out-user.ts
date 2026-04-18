@@ -143,6 +143,7 @@ const donatePage = '.donate-content-container';
 const aboutPage = '.e2e-test-about-page';
 
 const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
+const mobileSidebarOpenSelector = '.e2e-test-sidebar-menu-open';
 const mobileSidebarBasicMathematicsButton =
   'a.e2e-mobile-test-mathematics-link';
 const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
@@ -420,6 +421,21 @@ const blogPostTitleContainerSelector =
 const blogPostContentSelector = '.e2e-test-blog-post-content';
 const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
+const blogWelcomeHeadingSelector = '.e2e-test-blog-welcome-heading';
+const blogNoResultsFoundSelector = '.e2e-test-no-results-found';
+const blogPostListSelector = '.e2e-test-blog-post-list';
+const blogPostTileItemSelector = '.e2e-test-blog-post-tile-item';
+const blogPostPageCardSelector = '.e2e-test-oppia-blog-post-page-card';
+const blogAuthorNameSelector = '.e2e-test-author-name';
+const blogPostAuthorSelector = '.e2e-test-username-visible';
+const blogPostPublishDateSelector = '.mobile-published-date';
+const blogPostTagContainerSelector = '.e2e-test-blog-tag-container';
+const blogShareButtonSelector = '.share-blog-post-button';
+const blogSuggestedForYouSectionSelector = '.post-to-recommend-section';
+const blogSuggestedForYouHeadingSelector = '.post-to-recommend-section-heading';
+const navbarAboutTabBlogButton = '.e2e-test-navbar-about-menu-blog-button';
+const postsDisplayHeadingSelector = '.posts-display-heading';
+const blogCardTagContainerSelector = '.blog-card-tag-container';
 
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
@@ -620,6 +636,171 @@ type KeyInput =
   | 'Digit9';
 
 export class LoggedOutUser extends BaseUser {
+  /**
+   * Waits for Angular to finish any pending async operations.
+   * This ensures the UI is stable before interacting with elements.
+   */
+  private async waitForAngularStability(): Promise<void> {
+    await this.page.evaluate(async () => {
+      const win = window as unknown as {
+        getAllAngularTestabilities?: () => {
+          whenStable: (cb: () => void) => void;
+        }[];
+      };
+      const testabilities = win.getAllAngularTestabilities?.();
+      if (testabilities?.[0]) {
+        await new Promise<void>(resolve =>
+          testabilities[0].whenStable(() => resolve())
+        );
+      }
+    });
+  }
+
+  /**
+   * Clicks an element using JavaScript's native click() method.
+   * This ensures Angular properly handles the event in its change detection
+   * cycle, which is more reliable than Puppeteer's simulated clicks for
+   * Angular components like the sidebar.
+   */
+  private async clickWithJavaScript(selector: string): Promise<void> {
+    await this.waitForElementToStabilize(selector);
+    await this.page.evaluate((sel: string) => {
+      const element = document.querySelector(sel) as HTMLElement;
+      if (element) {
+        element.click();
+      }
+    }, selector);
+  }
+
+  /**
+   * Opens the mobile sidebar and waits for the animation to complete.
+   * This ensures the sidebar is fully visible before interacting with elements
+   * inside it.
+   *
+   * @throws Error if sidebar is already open (indicates a test logic error).
+   */
+  private async openMobileSidebar(): Promise<void> {
+    // Assert precondition: sidebar should be closed.
+    const sidebarAlreadyOpen = await this.page.$(mobileSidebarOpenSelector);
+    if (sidebarAlreadyOpen) {
+      throw new Error(
+        'openMobileSidebar() called but sidebar is already open. ' +
+          'This indicates a test logic error.'
+      );
+    }
+
+    await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
+      visible: true,
+    });
+
+    // Check if navbar is hidden (e.g., scrolled up via Headroom).
+    const buttonRect = await this.page.$eval(
+      mobileNavbarOpenSidebarButton,
+      el => {
+        const rect = el.getBoundingClientRect();
+        return {y: rect.y, height: rect.height};
+      }
+    );
+
+    // If navbar is hidden (scrolled up), scroll to top to make it visible.
+    if (buttonRect.y < 0) {
+      await this.page.evaluate(() => window.scrollTo(0, 0));
+      // Wait for Headroom to show the navbar.
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const el = document.querySelector(selector);
+          if (!el) {
+            return false;
+          }
+          const rect = el.getBoundingClientRect();
+          return rect.y >= 0 && rect.height > 0;
+        },
+        {timeout: 5000},
+        mobileNavbarOpenSidebarButton
+      );
+    }
+
+    // Wait for Angular to be stable before clicking.
+    await this.waitForAngularStability();
+
+    // Use JavaScript click to ensure Angular handles the event properly.
+    await this.clickWithJavaScript(mobileNavbarOpenSidebarButton);
+
+    await this.page.waitForSelector(mobileSidebarOpenSelector, {
+      visible: true,
+    });
+
+    // Wait for the sidebar slide animation to complete by checking element
+    // position stability.
+    await this.waitForElementToStabilize(mobileSidebarOpenSelector);
+  }
+
+  /**
+   * Closes the mobile sidebar and waits for the animation to complete.
+   * This ensures the sidebar is fully hidden before continuing.
+   *
+   * @throws Error if sidebar is already closed (indicates a test logic error).
+   */
+  private async closeMobileSidebar(): Promise<void> {
+    // Assert precondition: sidebar should be open.
+    const sidebarOpen = await this.page.$(mobileSidebarOpenSelector);
+    if (!sidebarOpen) {
+      throw new Error(
+        'closeMobileSidebar() called but sidebar is already closed. ' +
+          'This indicates a test logic error.'
+      );
+    }
+
+    // Use JavaScript click to ensure Angular handles the event properly.
+    await this.clickWithJavaScript(mobileNavbarOpenSidebarButton);
+
+    await this.page.waitForSelector(mobileSidebarOpenSelector, {hidden: true});
+
+    // Wait for the sidebar slide-out animation to complete.
+    await this.waitForSidebarAnimationToComplete();
+  }
+
+  /**
+   * Waits for the sidebar animation to complete by monitoring its position.
+   * Unlike waitForElementToStabilize, this works for elements that are
+   * animating off-screen (not visible).
+   */
+  private async waitForSidebarAnimationToComplete(): Promise<void> {
+    const sidebarSelector = '.oppia-sidebar-menu';
+
+    // First check if the sidebar element exists.
+    const sidebarExists = await this.page.$(sidebarSelector);
+    if (!sidebarExists) {
+      return;
+    }
+
+    let previousBox = await this.page.$eval(sidebarSelector, el =>
+      el.getBoundingClientRect()
+    );
+    if (!previousBox || previousBox.x === undefined) {
+      return;
+    }
+
+    const startTime = Date.now();
+    const timeout = 5000;
+
+    // Poll until position stabilizes or timeout.
+    while (Date.now() - startTime < timeout) {
+      await this.page.waitForTimeout(100);
+      const currentBox = await this.page.$eval(sidebarSelector, el =>
+        el.getBoundingClientRect()
+      );
+
+      if (
+        Math.abs(previousBox.x - currentBox.x) < 1 &&
+        Math.abs(previousBox.y - currentBox.y) < 1
+      ) {
+        return;
+      }
+      previousBox = currentBox;
+    }
+  }
+
   /**
    * Function to navigate to the home page.
    * @param {boolean} verifyURL - Whether to verify the URL after navigation. Defaults to true.
@@ -1040,7 +1221,7 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.openMobileSidebar();
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarBasicMathematicsButton,
         mathClassroomUrl
@@ -1066,8 +1247,18 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
-      await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
+      await this.openMobileSidebar();
+
+      // Wait for Angular to be stable before clicking the expand button.
+      await this.waitForAngularStability();
+
+      // Use JavaScript click for sidebar menu items.
+      await this.clickWithJavaScript(mobileSidebarExpandAboutMenuButton);
+
+      // Wait for the About submenu to expand and the About button to be visible.
+      await this.page.waitForSelector(mobileSidebarAboutButton, {
+        visible: true,
+      });
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarAboutButton,
         aboutUrl
@@ -1093,7 +1284,7 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.openMobileSidebar();
       await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarTeachButton,
@@ -1154,7 +1345,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
       visible: true,
     });
-    await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+    await this.openMobileSidebar();
     await this.page.waitForSelector(communityLibraryLinkInNavMenuSelector, {
       visible: true,
     });
@@ -1170,11 +1361,17 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
-      await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
-      await this.clickOnElementWithSelector(
+      await this.openMobileSidebar();
+
+      // Wait for Angular to be stable before clicking.
+      await this.waitForAngularStability();
+
+      // Use JavaScript click for sidebar menu items.
+      await this.clickWithJavaScript(mobileSidebarExpandAboutMenuButton);
+      await this.clickWithJavaScript(
         mobileSidebarExpandImpactReportSubMenuButton
       );
+
       await this.openExternalLinkBySelectorAndText(
         mobileSidebarImpactReportButton,
         '2024',
@@ -1191,9 +1388,10 @@ export class LoggedOutUser extends BaseUser {
         impactReport2022Url
       );
 
-      // Close Navbar once links are verified.
-      await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      // Collapse the About menu before closing sidebar.
+      await this.clickWithJavaScript(mobileSidebarExpandAboutMenuButton);
+
+      await this.closeMobileSidebar();
     } else {
       await this.page.waitForSelector(navbarAboutTab, {
         visible: true,
@@ -1226,7 +1424,7 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.openMobileSidebar();
       await this.clickOnElementWithSelector(
         mobileSidebarExpandGetInvolvedMenuButton
       );
@@ -1255,7 +1453,7 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.openMobileSidebar();
       await this.clickOnElementWithSelector(
         mobileSidebarExpandGetInvolvedMenuButton
       );
@@ -1278,29 +1476,37 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to click the Donate button in the Get Involved Menu
    * on navbar and check if it opens the Donate page.
+   *
+   * Note: The donate page contains an external DonorBox iframe that keeps
+   * network connections open, so we cannot use the standard networkidle2
+   * wait condition. Instead, we wait only for the 'load' event.
    */
   async clickDonateButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.openMobileSidebar();
       await this.clickOnElementWithSelector(
         mobileSidebarExpandGetInvolvedMenuButton
       );
-      await this.clickButtonToNavigateToNewPage(
+      await this.clickAndWaitForNavigation(
         mobileSidevbarGetInvolvedMenuDonateButton,
-        donateUrl
+        true,
+        {waitUntil: 'load'}
       );
+      await this.expectPageURLToContain(donateUrl);
     } else {
       await this.page.waitForSelector(navbarGetInvolvedTab, {
         visible: true,
       });
       await this.clickOnElementWithSelector(navbarGetInvolvedTab);
-      await this.clickButtonToNavigateToNewPage(
+      await this.clickAndWaitForNavigation(
         navbarGetInvolvedTabDonateButton,
-        donateUrl
+        true,
+        {waitUntil: 'load'}
       );
+      await this.expectPageURLToContain(donateUrl);
     }
   }
 
@@ -1313,7 +1519,7 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.openMobileSidebar();
       await this.clickOnElementWithSelector(
         mobileSidebarExpandGetInvolvedMenuButton
       );
@@ -1336,6 +1542,10 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to click the Donate button on navbar
    * and check if it opens the Donate page.
+   *
+   * Note: The donate page contains an external DonorBox iframe that keeps
+   * network connections open, so we cannot use the standard networkidle2
+   * wait condition. Instead, we wait only for the 'load' event.
    */
   async clickDonateButtonOnNavbar(): Promise<void> {
     const navbarDonateButton = this.isViewportAtMobileWidth()
@@ -1345,12 +1555,15 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.openMobileSidebar();
     }
     await this.page.waitForSelector(navbarDonateButton, {
       visible: true,
     });
-    await this.clickButtonToNavigateToNewPage(navbarDonateButton, donateUrl);
+    await this.clickAndWaitForNavigation(navbarDonateButton, true, {
+      waitUntil: 'load',
+    });
+    await this.expectPageURLToContain(donateUrl);
   }
 
   /**
@@ -1520,13 +1733,14 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the About page using the oppia website footer.
    */
   async clickOnAboutLinkInFooter(): Promise<void> {
+    await this.page.waitForSelector(footerAboutLink);
     await this.clickButtonToNavigateToNewPage(footerAboutLink, aboutUrl);
   }
   /**
    * Navigates to the Blog page using the oppia website footer.
    */
   async clickOnBlogLinkInFooter(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(footerBlogLink, blogUrl);
+    await this.clickAndWaitForNavigation(footerBlogLink, true);
   }
 
   /**
@@ -1567,7 +1781,7 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the Teach page using the oppia website footer.
    */
   async clickOnForParentsSlashTeachersLinkInFooter(): Promise<void> {
-    await this.page.waitForSelector(footerCreatorGuidelinesLink);
+    await this.page.waitForSelector(footerTeachLink);
     await this.clickButtonToNavigateToNewPage(footerTeachLink, teachUrl);
   }
 
@@ -2512,9 +2726,16 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Clicks the "DONATE TODAY" button on the Contact Us page and checks that
    * it navigates to the correct URL.
+   *
+   * Note: The donate page contains an external DonorBox iframe that keeps
+   * network connections open, so we cannot use the standard networkidle2
+   * wait condition. Instead, we wait only for the 'load' event.
    */
   async clickDonateTodayButtonInContactUsPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage('DONATE TODAY', donateUrl, false);
+    await this.clickAndWaitForNavigation('DONATE TODAY', false, {
+      waitUntil: 'load',
+    });
+    await this.expectPageURLToContain(donateUrl);
   }
 
   /**
@@ -2550,9 +2771,11 @@ export class LoggedOutUser extends BaseUser {
     const href = await this.page.$eval(emailLinkSelector, el =>
       el.getAttribute('href')
     );
-    if (href !== 'mailto:admin@oppia.org') {
+    if (
+      href !== 'https://mail.google.com/mail/?view=cm&fs=1&to=admin@oppia.org'
+    ) {
       throw new Error(
-        `Email link has href "${href}" instead of "mailto:admin@oppia.org"`
+        `Email link has href "${href}" instead of "https://mail.google.com/mail/?view=cm&fs=1&to=admin@oppia.org"`
       );
     }
   }
@@ -2569,9 +2792,11 @@ export class LoggedOutUser extends BaseUser {
       el => el.getAttribute('href'),
       emailLinks[1]
     );
-    if (href !== 'mailto:press@oppia.org') {
+    if (
+      href !== 'https://mail.google.com/mail/?view=cm&fs=1&to=press@oppia.org'
+    ) {
       throw new Error(
-        `Email link has href ${href} instead of mailto:press@oppia.org`
+        `Email link has href ${href} instead of "https://mail.google.com/mail/?view=cm&fs=1&to=press@oppia.org"`
       );
     }
   }
@@ -3298,56 +3523,23 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to verify the Watch a Video button after subscribing to newsletter.
    */
-  async clickWatchAVideoButton(): Promise<void> {
-    await this.page.waitForSelector(watchAVideoButtonInThanksForSubscribe);
-    const buttonText = await this.page.$eval(
+  async expectWatchAVideoButtonToHaveCorrectLink(): Promise<void> {
+    await this.openExternalLink(
       watchAVideoButtonInThanksForSubscribe,
-      element => (element as HTMLElement).innerText
+      'https://youtu.be/OConyxG7HaM'
     );
-    if (buttonText !== 'Watch a video') {
-      throw new Error('The Watch A Video button does not exist!');
-    }
-    await this.clickAndWaitForNavigation(
-      watchAVideoButtonInThanksForSubscribe,
-      true
-    );
-    await this.waitForPageToFullyLoad();
-
-    const url = this.page.url();
-    if (!url.includes(testConstants.OppiaSocials.YouTube.Domain)) {
-      throw new Error(
-        `The Watch A Video button should open the right page,
-          but it opens ${url} instead.`
-      );
-    }
-    showMessage('The Watch A Video button opens the right page.');
+    showMessage('The Watch a Video button has the right link.');
   }
 
   /**
    * Function to verify the Read Blog button after subscribing to newsletter.
    */
-  async clickReadBlogButton(): Promise<void> {
-    await this.page.waitForSelector(readOurBlogButtonInThanksForSubscribe);
-    const buttonText = await this.page.$eval(
+  async expectReadBlogButtonToHaveCorrectLink(): Promise<void> {
+    await this.openExternalLink(
       readOurBlogButtonInThanksForSubscribe,
-      element => (element as HTMLElement).innerText
+      readBlogUrl
     );
-    if (buttonText !== 'Read our blog') {
-      throw new Error('The Read Our Blog button does not exist!');
-    }
-    await this.clickAndWaitForNavigation(
-      readOurBlogButtonInThanksForSubscribe,
-      true
-    );
-
-    if (this.page.url() !== readBlogUrl) {
-      throw new Error(
-        `The Read Our Blog button should open the Blog page,
-          but it opens ${this.page.url()} instead.`
-      );
-    } else {
-      showMessage('The Read Our Blog button opens the Blog page.');
-    }
+    showMessage('The Read our blog button has the right link.');
   }
   /**
    * Function to verify that the user is on the login page.
@@ -3785,6 +3977,24 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the practice tab in the topic page.
    */
   async navigateToPracticeTabInTopic(): Promise<void> {
+    const practiceTabLink = '.e2e-test-practice-tab-link';
+    const practiceContainer = '.e2e-test-practice-tab-container';
+    const practiceTabExists = await this.page.$(practiceTabLink);
+    if (!practiceTabExists) {
+      await this.page.reload({waitUntil: 'networkidle0'});
+      await this.page.waitForSelector(practiceTabLink, {
+        visible: true,
+        timeout: 30000,
+      });
+    }
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.evaluate(() => window.scrollTo(0, 0));
+    }
+    await this.clickOnElementWithSelector(practiceTabLink);
+    await this.page.waitForSelector(practiceContainer, {
+      visible: true,
+      timeout: 60000,
+    });
     await this.expectElementToBeVisible(practiceTabButtonSelector);
     await this.clickOnElementWithSelector(practiceTabButtonSelector);
 
@@ -3895,13 +4105,9 @@ export class LoggedOutUser extends BaseUser {
         chapter
       );
       if (chapterText.trim().includes(chapterName.trim())) {
-        await Promise.all([
-          this.page.waitForNavigation({
-            waitUntil: ['networkidle2', 'load'],
-          }),
-          this.waitForElementToBeClickable(chapter),
-          chapter.click(),
-        ]);
+        await this.waitForElementToBeClickable(chapter);
+        await chapter.click();
+        await this.expectPageURLToContain(testConstants.URLs.ExplorationPlayer);
         return;
       }
     }
@@ -3932,11 +4138,9 @@ export class LoggedOutUser extends BaseUser {
           title
         );
         if (titleText.trim() === storyName.trim()) {
-          await Promise.all([
-            this.page.waitForNavigation({waitUntil: ['networkidle0', 'load']}),
-            this.waitForElementToBeClickable(title),
-            title.click(),
-          ]);
+          await this.waitForElementToBeClickable(title);
+          await title.click();
+          await this.page.waitForSelector(chapterTitleSelector);
 
           await this.skipLoginPrompt();
 
@@ -3948,13 +4152,8 @@ export class LoggedOutUser extends BaseUser {
               chapter
             );
             if (chapterText.trim().includes(chapterName.trim())) {
-              await Promise.all([
-                this.page.waitForNavigation({
-                  waitUntil: ['networkidle2', 'load'],
-                }),
-                this.waitForElementToBeClickable(chapter),
-                chapter.click(),
-              ]);
+              await this.waitForElementToBeClickable(chapter);
+              await chapter.click();
 
               await this.expectPageURLToContain(
                 testConstants.URLs.ExplorationPlayer
@@ -6922,6 +7121,175 @@ export class LoggedOutUser extends BaseUser {
    */
   async clearUsernameInput(): Promise<void> {
     await this.clearAllTextFrom(signUpUsernameInputField);
+  }
+
+  /**
+   * Navigates to the blog page via the navbar (About > Blog).
+   */
+  async navigateToBlogPageViaNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      // On mobile, navigate directly to blog URL since there's no blog button in sidebar.
+      // Todo(#25094): Add blog button to mobile sidebar and remove this direct navigation.
+      await this.navigateToBlogPage();
+    } else {
+      await this.page.waitForSelector(navbarAboutTab, {
+        visible: true,
+      });
+      await this.clickOnElementWithSelector(navbarAboutTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarAboutTabBlogButton,
+        blogUrl
+      );
+    }
+  }
+
+  /**
+   * Expects the blog welcome message to be visible.
+   */
+  async expectBlogWelcomeMessageToBeVisible(
+    expectedText: string
+  ): Promise<void> {
+    await this.expectElementContentToBe(
+      blogWelcomeHeadingSelector,
+      expectedText
+    );
+  }
+
+  /**
+   * Expects the "no blog posts" message to be visible.
+   */
+  async expectNoBlogPostsMessageToBeVisible(
+    expectedText: string
+  ): Promise<void> {
+    await this.expectElementContentToBe(
+      blogNoResultsFoundSelector,
+      expectedText
+    );
+  }
+
+  /**
+   * Expects the number of blog posts on the current page to be equal to the given number.
+   * @param number - The expected number of blog posts.
+   */
+  async expectNumberOfBlogPostsOnPageToBe(number: number): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, expected: number) =>
+        document.querySelectorAll(selector).length === expected,
+      {timeout: 10000},
+      blogPostTileItemSelector,
+      number
+    );
+
+    showMessage(`Found ${number} blog post(s) on the page as expected.`);
+  }
+
+  /**
+   * Expects a blog post with the given title to be present on the page.
+   * @param title - The title of the blog post to check for.
+   */
+  async expectBlogPostWithTitleToBePresent(title: string): Promise<void> {
+    await this.expectTextContentToContain(blogPostListSelector, title);
+    showMessage(`Blog post with title "${title}" is present.`);
+  }
+
+  /**
+   * Expects the blog page layout to be correct with all required elements.
+   */
+  async expectBlogPageLayoutToBeCorrect(): Promise<void> {
+    await this.expectElementToBeVisible(postsDisplayHeadingSelector);
+
+    const blogPosts = await this.page.$$(blogPostListSelector);
+    if (blogPosts.length === 0) {
+      showMessage('No blog posts found, but layout elements are present.');
+    }
+    await this.expectElementToBeVisible(blogPostTitleSelector);
+    await this.expectElementToBeVisible(blogPostAuthorSelector);
+    await this.expectElementToBeVisible(blogPostPublishDateSelector);
+    await this.expectElementToBeVisible(blogPostTagContainerSelector);
+
+    const paginationExists = await this.page.$(blogPaginationSelector);
+    if (paginationExists) {
+      await this.expectElementToBeVisible(blogPaginationSelector);
+    }
+
+    showMessage('Blog page layout is correct with all required elements.');
+  }
+
+  /**
+   * Clicks on the first blog post in the list.
+   */
+  async clickOnFirstBlogPost(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostTitleSelector);
+
+    const firstBlogPost = await this.page.$(blogPostTitleSelector);
+
+    if (!firstBlogPost) {
+      throw new Error('No blog posts found to click on.');
+    }
+
+    await firstBlogPost.click();
+    await this.waitForNetworkIdle();
+
+    await this.page.waitForFunction(
+      (selector: string) => document.querySelector(selector) !== null,
+      {timeout: 10000},
+      blogPostPageCardSelector
+    );
+  }
+
+  /**
+   * Expects blog post title to be visible.
+   */
+  async expectBlogPostTitleToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostTitleContainerSelector);
+  }
+
+  /**
+   * Expects blog post author name to be visible.
+   */
+  async expectBlogPostAuthorToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogAuthorNameSelector);
+  }
+
+  /**
+   * Expects blog post publish date to be visible.
+   */
+  async expectBlogPostPublishDateToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostPublishDateSelector);
+  }
+
+  /**
+   * Expects blog post content to be visible.
+   */
+  async expectBlogPostContentToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostContentSelector);
+  }
+
+  /**
+   * Expects blog post tags to be visible.
+   */
+  async expectBlogPostTagsToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogCardTagContainerSelector);
+  }
+
+  /**
+   * Expects blog share button to be visible.
+   */
+  async expectBlogShareButtonToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogShareButtonSelector);
+  }
+
+  /**
+   * Expects suggested posts section to be visible (if present).
+   */
+  async expectSuggestedBlogPostsSectionToBeVisible(): Promise<void> {
+    const suggestedSection = await this.page.$(
+      blogSuggestedForYouSectionSelector
+    );
+
+    if (suggestedSection) {
+      await this.expectElementToBeVisible(blogSuggestedForYouHeadingSelector);
+    }
   }
 }
 

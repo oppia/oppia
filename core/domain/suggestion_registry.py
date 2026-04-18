@@ -821,6 +821,8 @@ class SuggestionTranslateContent(BaseSuggestion):
 
     def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion."""
+        exploration = exp_fetchers.get_exploration_by_id(self.target_id)
+
         translated_content = translation_domain.TranslatedContent(
             self.change_cmd.translation_html,
             translation_domain.TranslatableContentFormat(
@@ -832,7 +834,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         translation_services.add_new_translation(
             feconf.TranslatableEntityType.EXPLORATION,
             self.target_id,
-            self.target_version_at_submission,
+            exploration.version,
             self.language_code,
             self.change_cmd.content_id,
             translated_content,
@@ -1981,6 +1983,7 @@ class ContributorCertificateInfoDict(TypedDict):
     to_date: str
     team_lead: str
     contribution_hours: str
+    contribution_word_count: int
     language: Optional[str]
 
 
@@ -1995,12 +1998,14 @@ class ContributorCertificateInfo:
         to_date: str,
         team_lead: str,
         contribution_hours: str,
+        contribution_word_count: int,
         language: Optional[str],
     ) -> None:
         self.from_date = from_date
         self.to_date = to_date
         self.team_lead = team_lead
         self.contribution_hours = contribution_hours
+        self.contribution_word_count = contribution_word_count
         self.language = language
 
     def to_dict(self) -> ContributorCertificateInfoDict:
@@ -2016,6 +2021,7 @@ class ContributorCertificateInfo:
             'to_date': self.to_date,
             'team_lead': self.team_lead,
             'contribution_hours': self.contribution_hours,
+            'contribution_word_count': self.contribution_word_count,
             'language': self.language,
         }
 

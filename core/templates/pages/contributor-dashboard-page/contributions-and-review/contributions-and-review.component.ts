@@ -56,7 +56,7 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
 import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
-
+import {WindowRef} from 'services/contextual/window-ref.service';
 export interface Suggestion {
   change_cmd: {
     skill_id: string;
@@ -204,7 +204,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     private featureService: PlatformFeatureService,
     private htmlLengthService: HtmlLengthService,
     private htmlEscaperService: HtmlEscaperService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private windowRef: WindowRef
   ) {}
 
   getQuestionContributionsSummary(
@@ -284,6 +285,25 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
 
       translationContributionsSummaryList.push(requiredData);
     });
+
+    translationContributionsSummaryList.sort((a, b) => {
+      const getPriority = (statusLabel: string) => {
+        if (statusLabel === this.SUGGESTION_LABELS.rejected.text) {
+          return 0;
+        } else if (statusLabel === this.SUGGESTION_LABELS.review.text) {
+          return 1;
+        } else if (statusLabel === this.SUGGESTION_LABELS.accepted.text) {
+          return 2;
+        }
+        return 3;
+      };
+
+      const priorityA = getPriority(a.labelText);
+      const priorityB = getPriority(b.labelText);
+
+      return priorityA - priorityB;
+    });
+
     return translationContributionsSummaryList;
   }
 
@@ -630,6 +650,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   }
 
   switchToTab(tabType: string, subType: string): void {
+    this.windowRef.nativeWindow.scrollTo(0, 0);
     this.activeTabType = tabType;
     this.dropdownShown = false;
     this.activeDropdownTabChoice = this.getActiveDropdownTabText(

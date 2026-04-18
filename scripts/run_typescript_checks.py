@@ -23,7 +23,6 @@ import shutil
 import subprocess
 import sys
 
-from core import utils
 from scripts import common
 
 import yaml
@@ -112,18 +111,9 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/contributor-dashboard-page/services/translate-text.service.ts',
     'core/templates/pages/creator-dashboard-page/modal-templates/upload-activity-modal.component.spec.ts',
     'core/templates/pages/diagnostic-test-player-page/diagnostic-test-player.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/editor-tab/exploration-editor-tab.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/editor-tab/exploration-editor-tab.component.ts',
-    'core/templates/pages/exploration-editor-page/editor-tab/services/solution-verification.service.spec.ts',
     'core/templates/pages/exploration-editor-page/editor-tab/state-name-editor/state-name-editor.component.spec.ts',
     'core/templates/pages/exploration-editor-page/editor-tab/state-version-history/state-version-history.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component.ts',
-    'core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component.ts',
     'core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/teach-oppia-modal.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-data.service.spec.ts',
-    'core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.component.ts',
     'core/templates/pages/exploration-editor-page/exploration-editor-page.component.spec.ts',
     'core/templates/pages/exploration-editor-page/exploration-editor-page.component.ts',
     'core/templates/pages/exploration-editor-page/exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component.spec.ts',
@@ -141,18 +131,8 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/exploration-editor-page/param-changes-editor/value-generator-editor.component.spec.ts',
     'core/templates/pages/exploration-editor-page/param-changes-editor/value-generator-editor.component.ts',
     'core/templates/pages/exploration-editor-page/services/exploration-save.service.spec.ts',
-    'core/templates/pages/exploration-editor-page/services/exploration-states.service.spec.ts',
     'core/templates/pages/exploration-editor-page/services/exploration-states.service.ts',
-    'core/templates/pages/exploration-editor-page/services/exploration-warnings.service.spec.ts',
-    'core/templates/pages/exploration-editor-page/services/graph-data.service.spec.ts',
-    'core/templates/pages/exploration-editor-page/services/history-tab-yaml-conversion.service.spec.ts',
-    'core/templates/pages/exploration-editor-page/services/parameter-metadata.service.spec.ts',
     'core/templates/pages/exploration-editor-page/services/router.service.ts',
-    'core/templates/pages/exploration-editor-page/services/version-history.service.spec.ts',
-    'core/templates/pages/exploration-editor-page/services/versioned-exploration-caching.service.spec.ts',
-    'core/templates/pages/exploration-editor-page/settings-tab/settings-tab.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/statistics-tab/statistics-tab.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/translation-tab/services/translation-status.service.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/services/translation-topic.service.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/state-translation-editor/state-translation-editor.component.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/state-translation-status-graph/state-translation-status-graph.component.spec.ts',
@@ -241,20 +221,11 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.spec.ts',
     'core/templates/pages/topic-editor-page/editor-tab/topic-editor-stories-list.component.spec.ts',
     'core/templates/pages/topic-editor-page/editor-tab/topic-editor-stories-list.component.ts',
-    'core/templates/pages/topic-editor-page/editor-tab/topic-editor-tab.component.spec.ts',
-    'core/templates/pages/topic-editor-page/editor-tab/topic-editor-tab.component.ts',
     'core/templates/pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component.spec.ts',
-    'core/templates/pages/topic-editor-page/modal-templates/rearrange-skills-in-subtopics-modal.component.spec.ts',
-    'core/templates/pages/topic-editor-page/modal-templates/rearrange-skills-in-subtopics-modal.component.ts',
-    'core/templates/pages/topic-editor-page/navbar/topic-editor-navbar.component.spec.ts',
-    'core/templates/pages/topic-editor-page/navbar/topic-editor-navbar.component.ts',
     'core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.spec.ts',
     'core/templates/pages/topic-editor-page/subtopic-editor/add-study-guide-section.component.spec.ts',
     'core/templates/pages/topic-editor-page/subtopic-editor/study-guide-section-editor.component.spec.ts',
-    'core/templates/pages/topic-editor-page/subtopic-editor/subtopic-editor-tab.component.spec.ts',
-    'core/templates/pages/topic-editor-page/subtopic-editor/subtopic-editor-tab.component.ts',
     'core/templates/pages/topic-editor-page/subtopic-editor/subtopic-preview-tab.component.spec.ts',
-    'core/templates/pages/topic-editor-page/topic-editor-page.component.spec.ts',
     'core/templates/pages/topic-editor-page/topic-editor-page.component.ts',
     'core/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.spec.ts',
     'core/templates/pages/topics-and-skills-dashboard-page/skills-list/skills-list.component.spec.ts',
@@ -262,7 +233,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.component.spec.ts',
     'core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service.spec.ts',
     'core/templates/pages/voiceover-admin-page/voiceover-admin-page.component.spec.ts',
-    'core/templates/services/angular-services.index.ts',
     'core/templates/services/date-time-format.service.spec.ts',
     'core/templates/services/entity-voiceovers.services.spec.ts',
     'core/templates/services/exploration-features.service.spec.ts',
@@ -283,29 +253,16 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/services/state-interaction-stats.service.spec.ts',
     'core/templates/services/state-top-answers-stats.service.spec.ts',
     'core/templates/services/voiceover-language-management-service.spec.ts',
-    'core/tests/karma.conf.ts',
-    'core/tests/puppeteer-acceptance-tests/utilities/user/logged-in-user.ts',
-    'extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.spec.ts',
-    'extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts',
-    'extensions/interactions/DragAndDropSortInput/drag-and-drop-sort-input-interactions.module.ts',
     'extensions/interactions/FractionInput/directives/fraction-input-validation.service.spec.ts',
-    'extensions/interactions/GraphInput/directives/graph-viz.component.spec.ts',
-    'extensions/interactions/GraphInput/directives/graph-viz.component.ts',
-    'extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.spec.ts',
-    'extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts',
-    'extensions/interactions/ItemSelectionInput/directives/oppia-interactive-item-selection-input.component.spec.ts',
-    'extensions/interactions/ItemSelectionInput/item-selection-input-interactions.module.ts',
     'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.spec.ts',
     'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts',
     'extensions/interactions/MultipleChoiceInput/multiple-choice-input-interactions.module.ts',
     'extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.component.ts',
     'extensions/interactions/MusicNotesInput/directives/oppia-response-music-notes-input.component.ts',
     'extensions/interactions/MusicNotesInput/directives/oppia-short-response-music-notes-input.component.ts',
-    'extensions/interactions/NumberWithUnits/directives/number-with-units-validation.service.spec.ts',
     'extensions/objects/object-components.module.ts',
     'extensions/objects/templates/image-editor.component.spec.ts',
     'extensions/objects/templates/image-editor.component.ts',
-    'extensions/objects/templates/math-expression-content-editor.component.spec.ts',
     'extensions/objects/templates/svg-editor.component.spec.ts',
     'extensions/objects/templates/svg-editor.component.ts',
     'extensions/rich_text_components/rte-output-display.component.ts',
@@ -337,7 +294,7 @@ PREFIXES = ('core', 'extensions', 'typings')
 
 def validate_compiled_js_dir() -> None:
     """Validates that compiled JS dir matches out dir in tsconfig."""
-    with utils.open_file(TSCONFIG_FILEPATH, 'r') as f:
+    with open(TSCONFIG_FILEPATH, 'r', encoding='utf-8') as f:
         config_data = json.load(f)
         out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
     if out_dir != COMPILED_JS_DIR:
@@ -382,11 +339,11 @@ def compile_temp_strict_tsconfig(
     # Update "include" field of temp-tsconfig-strict.json with files those
     # are neither strict typed nor present in TS_STRICT_EXCLUDE_PATHS.
     # Example: List "files_not_type_strict".
-    with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
+    with open(STRICT_TSCONFIG_FILEPATH, 'r', encoding='utf-8') as f:
         strict_ts_config = yaml.safe_load(f)
         strict_ts_config['include'] = files_not_type_strict
 
-    with utils.open_file(TEMP_STRICT_TSCONFIG_FILEPATH, 'w') as f:
+    with open(TEMP_STRICT_TSCONFIG_FILEPATH, 'w', encoding='utf-8') as f:
         json.dump(strict_ts_config, f, indent=2, sort_keys=True)
         f.write('\n')
 
@@ -435,11 +392,11 @@ def compile_and_check_typescript(config_path: str) -> None:
     # Set strict TS config include property to ["core", "extensions", "typings"]
     # This make sure to restore include property to its original value after the
     # checks get aborted mid-way.
-    with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
+    with open(STRICT_TSCONFIG_FILEPATH, 'r', encoding='utf-8') as f:
         strict_ts_config = yaml.safe_load(f)
         strict_ts_config['include'] = PREFIXES
 
-    with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'w') as f:
+    with open(STRICT_TSCONFIG_FILEPATH, 'w', encoding='utf-8') as f:
         json.dump(strict_ts_config, f, indent=2, sort_keys=True)
         f.write('\n')
 

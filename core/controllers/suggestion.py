@@ -895,7 +895,7 @@ class ReviewableSuggestionsHandler(
             )
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             if limit is None:
-                raise ValueError(
+                raise self.InvalidInputException(
                     'Limit must be provided for question suggestions.'
                 )
             topic_name = self.normalized_request.get('topic_name')
@@ -1140,6 +1140,7 @@ class UpdateQuestionSuggestionHandlerNormalizedPayloadDict(TypedDict):
     skill_difficulty: float
     question_state_data: state_domain.StateDict
     next_content_id_index: int
+    inapplicable_skill_misconception_ids: List[str]
 
 
 class UpdateQuestionSuggestionHandler(
@@ -1177,6 +1178,10 @@ class UpdateQuestionSuggestionHandler(
                 }
             },
             'next_content_id_index': {'schema': {'type': 'int'}},
+            'inapplicable_skill_misconception_ids': {
+                'schema': {'type': 'list', 'items': {'type': 'basestring'}},
+                'default_value': None,
+            },
         }
     }
 
@@ -1200,6 +1205,7 @@ class UpdateQuestionSuggestionHandler(
             self.normalized_payload['skill_difficulty'],
             self.normalized_payload['question_state_data'],
             self.normalized_payload['next_content_id_index'],
+            self.normalized_payload.get('inapplicable_skill_misconception_ids'),
         )
 
         self.render_json(self.values)
