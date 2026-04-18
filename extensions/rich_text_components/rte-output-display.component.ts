@@ -67,7 +67,6 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   @ViewChild('blockquote') blockquoteTagPortal: TemplateRef<unknown>;
   @ViewChild('em') emTagPortal: TemplateRef<unknown>;
   @ViewChild('text') textTagPortal: TemplateRef<unknown>;
-  @ViewChild('br') brTagPortal: TemplateRef<unknown>;
   // Oppia Non interactive.
   @ViewChild('collapsible') collapsibleTagPortal: TemplateRef<unknown>;
   @ViewChild('image') imageTagPortal: TemplateRef<unknown>;
@@ -79,6 +78,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   @ViewChild('video') videoTagPortal: TemplateRef<unknown>;
   @ViewChild('workedexample') workedexampleTagPortal: TemplateRef<unknown>;
   @Input() rteString: string;
+  @Input() rteStringContext!: string;
   @Input() altTextIsDisplayed: boolean = false;
   node: OppiaRteNode | string = '';
   show = false;
@@ -89,6 +89,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   previousHighlightedElementId!: string | undefined;
   // The background color of the sentence being played in the audio player.
   backgroundColorOfHighlightedSentence = '#f3d140';
+  topLevelHtmlNodename = '';
 
   customOppiaTags = [
     'OPPIA-NONINTERACTIVE-COLLAPSIBLE',
@@ -173,8 +174,6 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       const latexText = JSON.parse(decodedMathContent)?.raw_latex;
       return this.parseAndConvertLatex(latexText);
     }
-    // Default: return textContent or empty string to avoid undefined values.
-    return node.textContent || '';
   }
 
   // The method recursively traverses the node and wraps span tags around
@@ -184,9 +183,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     sentenceRegex: RegExp
   ): Node[] | HTMLElement | Text[] | Node {
     const currentNodeName = node.nodeName;
-    if (node.nodeName === 'BR') {
-      return [node];
-    }
+
     if (node.nodeType === Node.TEXT_NODE) {
       const textContent = node.textContent || '';
       const sentences = textContent.split(sentenceRegex);
@@ -233,10 +230,6 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         let textContent = '';
 
         for (let tempChildNode of updatedChildNodes) {
-          // Skip <br> when building the combined text for sentence parsing.
-          if (tempChildNode.nodeName === 'BR') {
-            continue;
-          }
           textContent += this.getReadableTextFromNode(tempChildNode) + ' ';
         }
 
@@ -249,11 +242,6 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         let nextSentenceOffset = '';
 
         for (let childNode of updatedChildNodes) {
-          if (childNode.nodeName === 'BR') {
-            spanNodeList.push(childNode);
-            continue;
-          }
-
           let currentText = this.getReadableTextFromNode(childNode);
 
           let sentence = nextSentenceOffset + currentText;
@@ -283,45 +271,26 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           }
         }
 
-        // Clone only the element, not its children. Cloning children here
-        // would move or duplicate the original child nodes and could
-        // detach them from the source DOM. We clone the element shell and
-        // then clone/append child nodes explicitly into span wrappers to
-        // preserve the original DOM and avoid side-effects during traversal.
-        let nodeTemp = node.cloneNode(false) as Node;
+        let nodeTemp = node.cloneNode();
 
         for (let spanNode of spanNodeList) {
-          // Preserve <br> tags exactly as-is (clone so we don't move original nodes).
-          if (spanNode.nodeName === 'BR') {
-            nodeTemp.appendChild(spanNode.cloneNode(false));
-            continue;
-          }
-
-          // Process highlight spans.
           let textInsideSpanTag = '';
+
           for (let tempChildNode of spanNode.childNodes) {
             textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
           }
 
-          // If the span is just a space, reinsert it as-is (no highlight id).
           if (textInsideSpanTag === ' ') {
-            nodeTemp.appendChild(spanNode.cloneNode(true));
+            nodeTemp.appendChild(spanNode);
             continue;
           }
 
-          const span = document.createElement('span');
-          const elementId = `highlightBlock${this.index}`;
-          span.id = elementId;
-
-          // Preserve inline structure (e.g. <em>, <strong>) by cloning child nodes
-          // into the new span instead of setting textContent.
-          for (let tempChildNode of spanNode.childNodes) {
-            span.appendChild(tempChildNode.cloneNode(true));
-          }
-
-          nodeTemp.appendChild(span);
-          this.highlightIdToSentenceText[elementId] = textInsideSpanTag;
+          let elementClass = `highlightBlock${this.index}`;
+          spanNode.classList.add(elementClass);
           this.index++;
+
+          nodeTemp.appendChild(spanNode);
+          this.highlightIdToSentenceText[elementClass] = textInsideSpanTag;
         }
 
         return nodeTemp;
@@ -366,6 +335,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // eslint-disable-next-line oppia/no-inner-html
     temporaryDivElement.innerHTML = htmlString;
 
+    this.topLevelHtmlNodename = temporaryDivElement.childNodes[0]?.nodeName;
+
     const finalDivElement = this.traverseNodeAndWrapSpanTags(
       temporaryDivElement,
       sentenceRegex
@@ -387,18 +358,30 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // replaced.
     this.rteString = this.rteString.replace(/(&nbsp;(\s)?)*(<\/p>)/g, '</p>');
     // The following line is required since blank newlines in between
-    // paragraphs are treated as '<p>&nbsp;</p>' by CKEditor. So, these
-    // have to be restored, as this will get reduced to '<p></p>' above.
+    // paragraphs are treated as <p>&nbsp;</p> by ckedior. So, these
+    // have to be restored, as this will get reduced to <p></p> above.
     // There is no other via user input to get <p></p>, so this wouldn't
     // affect any other data.
     this.rteString = this.rteString.replace(/<p><\/p>/g, '<p>&nbsp;</p>');
-    // Replace newlines with spaces to preserve separation without merging words.
-    this.rteString = this.rteString.replace(/\n/g, ' ');
+    this.rteString = this.rteString.replace(/\n/g, '');
 
     // The following line wraps each sentence in a span tag to highlight
     // the sentence during voiceover playback.
-    if (this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
+    if (
+      this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled() &&
+      this.shouldHighlightContent()
+    ) {
       this.rteString = this.wrapSentencesInSpansForHighlighting(this.rteString);
+
+      this.automaticVoiceoverHighlightService.setActiveContentId(
+        this.getActiveContentId()
+      );
+      this.automaticVoiceoverHighlightService.languageCode =
+        this.localStorageService.getLastSelectedTranslationLanguageCode();
+      this.automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
+        this.highlightIdToSentenceText
+      );
+      this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
     }
 
     let domparser = new DOMParser();
@@ -483,7 +466,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       this.updateAutomatedVoiceoversAudioOffsets();
     });
 
-    // These lines run every 100ms to highlight the sentence being
+    // The below lines runs on every 200ms to highlight the sentence being
     // played in the audio player.
     setInterval(() => {
       this.highlightSentenceDuringVoiceoverPlay();
@@ -511,10 +494,13 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   }
 
   removePreviousHighlightedElement(): void {
-    let previousHighlightedElement = document.getElementById(
+    let previousHighlightedElements = document.getElementsByClassName(
       this.previousHighlightedElementId
     );
-    if (previousHighlightedElement) {
+    for (let i = 0; i < previousHighlightedElements.length; i++) {
+      let previousHighlightedElement = previousHighlightedElements[
+        i
+      ] as HTMLElement;
       previousHighlightedElement.style.backgroundColor = '';
     }
     this.previousHighlightedElementId = undefined;
@@ -542,9 +528,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         return;
       }
 
-      let previousHighlightedElement = document.getElementById(
-        this.previousHighlightedElementId
-      );
+      let previousHighlightedElement =
+        this.getElementMatchingClassAndTextContent(
+          this.previousHighlightedElementId
+        );
 
       let currentElementIdToHighlight =
         this.automaticVoiceoverHighlightService.getCurrentSentenceIdToHighlight(
@@ -556,14 +543,15 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       if (
         this.previousHighlightedElementId === currentElementIdToHighlight &&
         previousHighlightedElement?.textContent ===
-          this.highlightIdToSentenceText[currentElementIdToHighlight]
+          this.automaticVoiceoverHighlightService.getUnmodifiedSentenceByHighlightId(
+            currentElementIdToHighlight
+          )
       ) {
         return;
       }
 
-      let currentElementToHighlight = document.getElementById(
-        currentElementIdToHighlight
-      );
+      let currentElementToHighlight =
+        this.getElementMatchingClassAndTextContent(currentElementIdToHighlight);
 
       // Highlights the current sentence being played in the audio player.
       if (currentElementToHighlight) {
@@ -581,6 +569,21 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       // paused.
       this.removePreviousHighlightedElement();
     }
+  }
+
+  getElementMatchingClassAndTextContent(className: string): HTMLElement | null {
+    let elements = document.getElementsByClassName(className);
+    let textContent =
+      this.automaticVoiceoverHighlightService.getUnmodifiedSentenceByHighlightId(
+        className
+      );
+    for (let i = 0; i < elements.length; i++) {
+      let element = elements[i] as HTMLElement;
+      if (element.textContent === textContent) {
+        return element;
+      }
+    }
+    return null;
   }
 
   getActiveContentId(): string {
@@ -635,6 +638,44 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     }
   }
 
+  shouldHighlightContent(): boolean {
+    // In editor mode (i.e., not in player or preview), highlighting is
+    // generally enabled. However, these specific interactive components should
+    // be excluded because they recursively invoke this component and override
+    // highlight-related properties. Therefore, explicitly check for these tags
+    // and disable highlighting for them.
+    if (!this.isInPlayerOrPreviewPage()) {
+      if (
+        this.topLevelHtmlNodename ===
+          'OPPIA-INTERACTIVE-DRAG-AND-DROP-SORT-INPUT' ||
+        this.topLevelHtmlNodename ===
+          'OPPIA-INTERACTIVE-MULTIPLE-CHOICE-INPUT' ||
+        this.topLevelHtmlNodename === 'OPPIA-INTERACTIVE-ITEM-SELECTION-INPUT'
+      ) {
+        return false;
+      }
+      return true;
+    }
+
+    const currentContentId = this.getActiveContentId();
+
+    // In player/preview mode, learners can only interact with specific sections
+    // (content or feedback). Highlighting should be applied only when:
+    // 1. The active content ID belongs to the same section type, and
+    // 2. The current RTE context matches that section.
+    const isContentSectionActive =
+      currentContentId?.startsWith('content_') &&
+      this.rteStringContext === 'content';
+
+    const isFeedbackSectionActive =
+      (currentContentId?.startsWith('default_outcome') ||
+        currentContentId?.startsWith('feedback_')) &&
+      (this.rteStringContext === 'feedback' ||
+        this.rteStringContext === 'supplemental-card');
+
+    return isContentSectionActive || isFeedbackSectionActive;
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (
       changes.rteString &&
@@ -675,18 +716,6 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
       // If the below feature flag is not enabld then the sentence highlighting
       // feature will not work.
-      if (this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
-        const activeContentId = this.getActiveContentId();
-        this.automaticVoiceoverHighlightService.setActiveContentId(
-          activeContentId
-        );
-        this.automaticVoiceoverHighlightService.languageCode =
-          this.localStorageService.getLastSelectedTranslationLanguageCode();
-        this.automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
-          this.highlightIdToSentenceText
-        );
-        this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
-      }
       setTimeout(() => (this.show = true), 0);
     }
   }
