@@ -1912,7 +1912,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         'choices': {
                             'value': [
                                 '<p>1</p>',
-                                {'html': html_content},
+                                '<p>2</p>',
                                 html_content,
                                 '<p>4</p>',
                             ]
@@ -2146,7 +2146,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         'choices': {
                             'value': [
                                 '<p>1</p>',
-                                {'html': expected_html_content},
+                                '<p>2</p>',
                                 expected_html_content,
                                 '<p>4</p>',
                             ]

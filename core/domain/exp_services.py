@@ -882,16 +882,15 @@ def apply_change_list(
                     change.property_name
                     == exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS
                 ):
-                    # Here we use cast because change.new_value is typed as a
-                    # bool for this command, but we still want a runtime guard
-                    # that works on malformed data without making MyPy infer an
-                    # impossible str/bool intersection.
-                    # Here we use object because it preserves the isinstance guard
-                    # without allowing MyPy to infer an impossible str/bool union.
-                    if not isinstance(cast(object, change.new_value), bool):
+                    # Here we use object because change.new_value is typed as
+                    # a bool for this command, but we still need a runtime
+                    # guard for malformed data without making MyPy treat the
+                    # isinstance check as unreachable.
+                    solicit_answer_details_value: object = change.new_value
+                    if not isinstance(solicit_answer_details_value, bool):
                         raise Exception(
                             'Expected solicit_answer_details to be a '
-                            + 'bool, received %s' % change.new_value
+                            + 'bool, received %s' % solicit_answer_details_value
                         )
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
@@ -907,16 +906,15 @@ def apply_change_list(
                     change.property_name
                     == exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT
                 ):
-                    # Here we use cast because change.new_value is typed as a
-                    # bool for this command, but we still want a runtime guard
-                    # that works on malformed data without making MyPy infer an
-                    # impossible str/bool intersection.
-                    # Here we use object because it preserves the isinstance guard
-                    # without allowing MyPy to infer an impossible str/bool union.
-                    if not isinstance(cast(object, change.new_value), bool):
+                    # Here we use object because change.new_value is typed as
+                    # a bool for this command, but we still need a runtime
+                    # guard for malformed data without making MyPy treat the
+                    # isinstance check as unreachable.
+                    card_is_checkpoint_value: object = change.new_value
+                    if not isinstance(card_is_checkpoint_value, bool):
                         raise Exception(
                             'Expected card_is_checkpoint to be a '
-                            + 'bool, received %s' % change.new_value
+                            + 'bool, received %s' % card_is_checkpoint_value
                         )
                     # Here we use cast because this 'elif'
                     # condition forces change to have type

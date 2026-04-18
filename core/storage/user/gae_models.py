@@ -3399,10 +3399,9 @@ class LearnerGroupsUserModel(base_models.BaseModel):
         )
 
         if learner_grp_user_model is None:
-            return {
-                'invited_to_learner_groups_ids': [],
-                'learner_groups_user_details': [],
-            }
+            # Here we use cast because the takeout contract for missing users
+            # intentionally returns an empty dict instead of the TypedDict.
+            return cast(LearnerGroupsUserDataDict, {})
 
         return {
             'invited_to_learner_groups_ids': (

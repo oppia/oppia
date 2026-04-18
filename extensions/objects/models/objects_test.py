@@ -635,7 +635,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             'error_category': 'layout',
             'error_code': 'bad_layout',
             'error_message': 'layout is bad',
-            'error_line_number': 2,
+            'error_line_number': '2',
         }
         mappings = [
             (valid_example_1, valid_example_1),

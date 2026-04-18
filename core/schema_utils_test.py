@@ -880,6 +880,17 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(validate_url_fragment('Abc'))
         self.assertFalse(validate_url_fragment('!@#$%^&*()_+='))
 
+    def test_does_not_contain_email_validator_handles_non_string_input(
+        self,
+    ) -> None:
+        does_not_contain_email = schema_utils.get_validator(
+            'does_not_contain_email'
+        )
+
+        self.assertTrue(does_not_contain_email(2))
+        self.assertTrue(does_not_contain_email({'value': 'not an email'}))
+        self.assertTrue(does_not_contain_email(['email@email.com']))
+
     def test_global_validators_raise_exception_when_error_in_dict(self) -> None:
         with self.assertRaisesRegex(
             AssertionError,

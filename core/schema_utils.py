@@ -576,15 +576,22 @@ class _Validators:
         return obj <= max_value
 
     @staticmethod
-    def does_not_contain_email(obj: str) -> bool:
+    def does_not_contain_email(
+        # Here we use object because this validator is applied to generic
+        # schema values that may not be strings, and non-string inputs should
+        # be treated as valid.
+        obj: object,
+    ) -> bool:
         """Ensures that obj doesn't contain a valid email.
 
         Args:
-            obj: str. The object to validate.
+            obj: object. The object to validate.
 
         Returns:
             bool. Whether the given object doesn't contain a valid email.
         """
+        if not isinstance(obj, str):
+            return True
         return not bool(re.search(EMAIL_REGEX, obj))
 
     @staticmethod

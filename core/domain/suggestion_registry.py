@@ -866,11 +866,13 @@ class SuggestionTranslateContent(BaseSuggestion):
         Returns:
             list(str). The list of html content strings.
         """
-        # Here we use cast because translation/content HTML can be either
+        # Here we use cast because translation HTML can be either
         # string or list of strings, and we need to support both formats.
         translation_html = cast(
             Union[str, List[str]], self.change_cmd.translation_html
         )
+        # Here we use cast because content HTML can be either
+        # string or list of strings, and we need to support both formats.
         content_html = cast(Union[str, List[str]], self.change_cmd.content_html)
 
         html_strings: List[str] = []
