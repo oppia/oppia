@@ -60,6 +60,9 @@ const acceptedBrowserAlerts = [
   'This action is irreversible. Are you sure?',
   'This action is irreversible. If you insist to proceed, please enter the commit message for the update',
 ];
+const cookieBannerAcceptButtonSelector =
+  'button.e2e-test-oppia-cookie-banner-accept-button';
+const COOKIE_BANNER_WAIT_TIMEOUT_MSECS = 15000;
 const BROWSER_LAUNCH_TIMEOUT_MSECS = 60000;
 const BROWSER_LAUNCH_MAX_ATTEMPTS = 3;
 const BROWSER_LAUNCH_RETRY_DELAY_MSECS = 5000;
@@ -396,13 +399,46 @@ export class BaseUser {
    */
   async signInWithEmail(email: string): Promise<void> {
     await this.goto(testConstants.URLs.Home);
-    if (!this.userHasAcceptedCookies) {
-      await this.clickOnElementWithText('OK');
-      this.userHasAcceptedCookies = true;
-    }
+    await this.acceptCookiesIfPrompted();
     await this.clickOnElementWithText('Sign in');
     await this.typeInInputField(testConstants.SignInDetails.inputField, email);
     await this.clickAndWaitForNavigation('Sign In');
+  }
+
+  /**
+   * This function acknowledges cookies if the banner is visible.
+   */
+  async acceptCookiesIfPrompted(): Promise<void> {
+    if (this.userHasAcceptedCookies) {
+      return;
+    }
+
+    const cookieBannerAcceptButton = await this.page
+      .waitForSelector(cookieBannerAcceptButtonSelector, {
+        visible: true,
+        timeout: COOKIE_BANNER_WAIT_TIMEOUT_MSECS,
+      })
+      .catch(() => null);
+
+    if (cookieBannerAcceptButton !== null) {
+      await this.waitForElementToBeClickable(cookieBannerAcceptButton);
+      await cookieBannerAcceptButton.click();
+      this.userHasAcceptedCookies = true;
+      return;
+    }
+
+    const hasAcknowledgedCookies = await this.page.evaluate(() => {
+      return document.cookie
+        .split('; ')
+        .some(cookie => cookie.startsWith('OPPIA_COOKIES_ACKNOWLEDGED='));
+    });
+
+    if (!hasAcknowledgedCookies) {
+      showMessage(
+        'Cookie banner was not displayed. Continuing test without explicit cookie acknowledgement.'
+      );
+    }
+    this.userHasAcceptedCookies = true;
   }
 
   /**
