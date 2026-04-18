@@ -551,7 +551,7 @@ DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 # correct service account email when switching to the prod server.
 DATAFLOW_SERVICE_ACCOUNT_EMAIL = 'test-dataflow-service-account@example.com'
 
-OPPIA_VERSION = '3.5.0'
+OPPIA_VERSION = '3.5.1'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -1088,8 +1088,7 @@ REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL = (
     '/regenerate_automatic_voiceover/<exploration_id>'
 )
 REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL = (
-    '/regenerate_voiceover_on_exp_update/<exploration_id>/'
-    '<exploration_version>/<exploration_title>'
+    '/regenerate_voiceover_on_exp_update/<exploration_id>/<exploration_version>'
 )
 REGENERATE_VOICEOVERS_FOR_EXPLORATION_URL = (
     '/regenerate_voiceovers_for_exploration/'
@@ -1808,7 +1807,13 @@ FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS = {
     'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION': (
         'regenerate_voiceovers_on_exploration_added_to_topic'
     ),
-    'FUNCTION_ID_REGENERATE_VOICEOVERS_OF_EXPLORATION_FOR_GIVEN_LANGUAGE_ACCENT': (
+    'FUNCTION_ID_REGENERATE_VOICEOVERS_AFTER_ACCEPTING_SUGGESTION': (
+        'regenerate_voiceovers_after_accepting_suggestion'
+    ),
+    'FUNCTION_ID_REGENERATE_VOICEOVERS_BY_LANGUAGE_ACCENT': (
         'regenerate_voiceovers_of_exploration_for_given_language_accent'
+    ),
+    'FUNCTION_ID_REGENERATE_VOICEOVERS_FOR_BATCH_CONTENTS': (
+        'regenerate_voiceovers_for_batch_contents'
     ),
 }

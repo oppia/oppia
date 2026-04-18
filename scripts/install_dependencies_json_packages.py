@@ -24,6 +24,7 @@ import os
 import pathlib
 import ssl
 import sys
+import time
 import urllib
 import zipfile
 from http import client
@@ -157,9 +158,37 @@ def url_open(
 
     Returns:
         urlopen. The 'urlopen' object.
+
+    Raises:
+        HTTPError. If the request fails for a reason other than rate limiting,
+            or if the retry also fails.
+        ValueError. If the rate-limit reset time cannot be parsed.
     """
     context = ssl.create_default_context(cafile=certifi.where())
-    return urllib.request.urlopen(source_url, context=context)
+    try:
+        return urllib.request.urlopen(source_url, context=context)
+    except urllib.error.HTTPError as e:
+        if e.code != 403:
+            raise
+
+        headers = e.headers
+        remaining = headers.get('x-ratelimit-remaining')
+        if remaining != '0':
+            raise
+        reset = headers.get('x-ratelimit-reset')
+        if reset is None:
+            raise
+
+        reset_epoch = int(reset)
+
+        now = int(time.time())
+        wait = max(reset_epoch - now, 0)
+        max_wait_time = 120
+        if wait > max_wait_time:
+            raise e
+
+        time.sleep(wait)
+        return urllib.request.urlopen(source_url, context=context)
 
 
 # Here we use total=False since some fields in this dict

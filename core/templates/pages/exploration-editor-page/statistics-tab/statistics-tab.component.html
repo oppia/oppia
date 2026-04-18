@@ -1,5 +1,5 @@
 <div>
-  <mat-card class="oppia-editor-card">
+  <mat-card class="oppia-editor-card  e2e-test-exploration-stats-card">
     <div *ngIf="explorationHasBeenVisited">
       <div class="oppia-statistics-display">
         <h3 tabindex="0">Exploration Completion Rate</h3>
@@ -20,7 +20,7 @@
         <h3 tabindex="0">Card statistics</h3>
         <div class="container">
           <div class="row">
-            <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="col-lg-12 col-md-12 col-sm-12 oppia-stats-graph-container">
               <state-graph-visualization [nodeFill]="darkseagreen"
                                          [versionGraphData]="null"
                                          (onClickFunction)="onClickStateInStatsGraph($event)">

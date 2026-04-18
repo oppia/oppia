@@ -103,6 +103,7 @@ def run_job(
     sync: bool,
     namespace: Optional[str] = None,
     pipeline: Optional[beam.Pipeline] = None,
+    parameterized_args: Optional[Dict[str, str]] = None,
 ) -> beam_job_models.BeamJobRunModel:
     """Runs the specified job synchronously.
 
@@ -115,6 +116,8 @@ def run_job(
         namespace: str. The namespace in which models should be created.
         pipeline: Pipeline. The pipeline to run the job upon. If omitted, then a
             new pipeline will be used instead.
+        parameterized_args: dict(str, str). The dictionary of parameterized
+            arguments to be passed to the job.
 
     Returns:
         BeamJobRun. Contains metadata related to the execution status of the
@@ -135,6 +138,9 @@ def run_job(
             'max_num_workers': 15,
             'autoscaling_algorithm': 'THROUGHPUT_BASED',
         }
+
+    if parameterized_args:
+        additional_options.update(parameterized_args)
 
     if pipeline is None:
         pipeline = beam.Pipeline(
@@ -325,6 +331,7 @@ def does_job_requires_limiting_workers(job_name: str) -> bool:
     jobs_requiring_limiting_workers = [
         'VoiceoverSynthesisJob',
         'VoiceoverSynthesisAuditJob',
+        'VoiceoverSynthesisByAccentJob',
         # The below job is used in unit tests.
         'VoiceoverSynthesisForTestingJob',
     ]

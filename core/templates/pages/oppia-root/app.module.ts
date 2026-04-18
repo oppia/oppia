@@ -21,9 +21,9 @@ import {APP_INITIALIZER, NgModule} from '@angular/core';
 
 // Modules.
 import {
-  BrowserModule,
-  HammerGestureConfig,
-  HAMMER_GESTURE_CONFIG,
+    BrowserModule,
+    HammerGestureConfig,
+    HAMMER_GESTURE_CONFIG,
 } from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AppRoutingModule} from './routing/app.routing.module';
@@ -33,16 +33,16 @@ import {OppiaRootComponent} from './oppia-root.component';
 
 // Miscellaneous.
 import {
-  platformFeatureInitFactory,
-  PlatformFeatureService,
+    platformFeatureInitFactory,
+    PlatformFeatureService,
 } from 'services/platform-feature.service';
 import {RequestInterceptor} from 'services/request-interceptor.service';
 import {CookieModule} from 'ngx-cookie';
 import {ToastrModule} from 'ngx-toastr';
 import {
-  AngularFireAuth,
-  AngularFireAuthModule,
-  USE_EMULATOR,
+    AngularFireAuth,
+    AngularFireAuthModule,
+    USE_EMULATOR,
 } from '@angular/fire/auth';
 import {AngularFireModule} from '@angular/fire';
 import {AuthService} from 'services/auth.service';
@@ -56,74 +56,71 @@ import {I18nModule} from 'i18n/i18n.module';
 
 // Config for ToastrModule (helps in flashing messages and alerts).
 export const toastrConfig = {
-  allowHtml: false,
-  iconClasses: {
-    error: 'toast-error',
-    info: 'toast-info',
-    success: 'toast-success',
-    warning: 'toast-warning',
-  },
-  positionClass: 'toast-bottom-right',
-  messageClass: 'toast-message e2e-test-toast-message',
-  progressBar: false,
-  tapToDismiss: true,
-  titleClass: 'toast-title',
+    allowHtml: false,
+    iconClasses: {
+        error: 'toast-error',
+        info: 'toast-info',
+        success: 'toast-success',
+        warning: 'toast-warning',
+    },
+    positionClass: 'toast-bottom-right',
+    messageClass: 'toast-message e2e-test-toast-message',
+    progressBar: false,
+    tapToDismiss: true,
+    titleClass: 'toast-title',
 };
 
 export class MyHammerConfig extends HammerGestureConfig {
-  overrides = {
-    swipe: {direction: hammer.DIRECTION_HORIZONTAL},
-    pinch: {enable: false},
-    rotate: {enable: false},
-  };
+    overrides = {
+        swipe: {direction: hammer.DIRECTION_HORIZONTAL},
+        pinch: {enable: false},
+        rotate: {enable: false},
+    };
 
-  options = {
-    cssProps: {
-      userSelect: true,
-    },
-  };
+    options = {
+        cssProps: {
+            userSelect: true,
+        },
+    };
 }
 
-import {SharedComponentsModule} from 'components/shared-component.module';
-
 @NgModule({
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    CookieModule.forRoot(),
-    HttpClientModule,
-    AngularFireModule.initializeApp(AuthService.firebaseConfig),
-    AngularFireAuthModule,
-    AppRoutingModule,
-    I18nModule,
-    ToastrModule.forRoot(toastrConfig),
-    SharedComponentsModule,
-  ],
-  declarations: [OppiaRootComponent],
-  entryComponents: [OppiaRootComponent],
-  providers: [
-    AngularFireAuth,
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true,
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true,
-    },
-    {
-      provide: USE_EMULATOR,
-      useValue: AuthService.firebaseEmulatorConfig,
-    },
-    AppErrorHandlerProvider,
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig,
-    },
-  ],
-  bootstrap: [OppiaRootComponent],
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        CookieModule.forRoot(),
+        HttpClientModule,
+        AngularFireModule.initializeApp(AuthService.firebaseConfig),
+        AngularFireAuthModule,
+        AppRoutingModule,
+        I18nModule,
+        ToastrModule.forRoot(toastrConfig),
+    ],
+    declarations: [OppiaRootComponent],
+    entryComponents: [OppiaRootComponent],
+    providers: [
+        AngularFireAuth,
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: RequestInterceptor,
+            multi: true,
+        },
+        {
+            provide: APP_INITIALIZER,
+            useFactory: platformFeatureInitFactory,
+            deps: [PlatformFeatureService],
+            multi: true,
+        },
+        {
+            provide: USE_EMULATOR,
+            useValue: AuthService.firebaseEmulatorConfig,
+        },
+        AppErrorHandlerProvider,
+        {
+            provide: HAMMER_GESTURE_CONFIG,
+            useClass: MyHammerConfig,
+        },
+    ],
+    bootstrap: [OppiaRootComponent],
 })
 export class AppModule {}
