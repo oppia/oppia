@@ -770,6 +770,7 @@
   "I18N_INTERACTIONS_NUMERIC_INPUT_MINUS_AT_BEGINNING": "Error message shown when number does not have minus sign in the beginning.",
   "I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS": "Error message shown when number has invalid characters.",
   "I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT": "Error message shown when exponential notation is not allowed.",
+  "I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT_NO_MINUS": "Error message shown when both exponential notation and negative numbers are not allowed.",
   "I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_MINUS": "Error message shown when negative numbers are not allowed.",
   "I18N_INTERACTIONS_NUMERIC_INPUT_NO_RESPONSE": "Error message shown below number input field when the user clicks submit without entering an answer.",
   "I18N_INTERACTIONS_NUMERIC_INPUT_NO_TRAILING_DECIMAL": "Error message shown when number has trailing decimal points.",

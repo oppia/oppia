@@ -249,26 +249,39 @@ export class NumericInputValidationService {
     allowExponentialNotation: boolean = true
   ): string | undefined {
     value = value.toString().trim();
-    let allowedCharsRegExpSet = '0-9.,';
-    if (allowExponentialNotation) {
-      allowedCharsRegExpSet += 'e';
+    let allowedCharsRegExpSet = '0-9.,e\\-';
+    if (requireNonnegativeInput && !allowExponentialNotation) {
+      allowedCharsRegExpSet = '0-9.,';
+    } else if (requireNonnegativeInput) {
+      allowedCharsRegExpSet = '0-9.,e';
+    } else if (!allowExponentialNotation) {
+      allowedCharsRegExpSet = '0-9.,\\-';
     }
-    if (!requireNonnegativeInput) {
-      allowedCharsRegExpSet += '\\-';
-    }
+
     const invalidChars = new RegExp(`[^${allowedCharsRegExpSet}]`, 'g');
     const trailingDot = /[\.|\,|\u066B]\d/g;
     const twoDecimals = /.*[\.|\,|\u066B].*[\.|\,|\u066B]/g;
     const trailingMinus = /(^-)|(e-)/g;
     const extraMinus = /-.*-/g;
     const extraExponent = /e.*e/g;
+    const includesMinus = value.includes('-');
+    const includesExponent = value.includes('e');
 
-    if (value.match(invalidChars)) {
-      if (requireNonnegativeInput && value.includes('-')) {
+    if (requireNonnegativeInput && !allowExponentialNotation) {
+      if (includesMinus && includesExponent) {
+        return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT_NO_MINUS';
+      } else if (includesMinus) {
         return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_MINUS';
-      } else if (!allowExponentialNotation && value.includes('e')) {
+      } else if (includesExponent) {
         return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT';
       }
+    } else if (requireNonnegativeInput && includesMinus) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_MINUS';
+    } else if (!allowExponentialNotation && includesExponent) {
+      return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT';
+    }
+
+    if (value.match(invalidChars)) {
       return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS';
     } else if (value.includes(decimalSeparator) && !value.match(trailingDot)) {
       return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_TRAILING_DECIMAL';

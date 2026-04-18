@@ -449,7 +449,8 @@ export class Interaction extends BaseTranslatableObject {
     const {requireNonnegativeInput, allowExponentialNotation} = caBackendDict;
     return {
       requireNonnegativeInput,
-      // Keep old interactions backward-compatible if this field is absent.
+      // TODO(#18140): Remove this fallback after the backfill beam job has
+      // been run and old interactions include this field.
       allowExponentialNotation: allowExponentialNotation ?? {value: true},
     };
   }
