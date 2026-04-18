@@ -21,112 +21,109 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {BehaviorSubject, interval, from, Subscription} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 import {
-    VoiceoverBackendApiService,
-    LanguageAccentToContentStatusMap,
+  VoiceoverBackendApiService,
+  LanguageAccentToContentStatusMap,
 } from 'domain/voiceover/voiceover-backend-api.service';
 import {VoiceoverLanguageManagementService} from './voiceover-language-management-service';
 
 @Injectable({
-    providedIn: 'root',
+  providedIn: 'root',
 })
 export class VoiceoverRegenerationJobService {
-    public explorationID!: string;
+  public explorationID!: string;
 
-    public languageAccentToContentStatusMap: LanguageAccentToContentStatusMap =
-        {};
-    public currentLanguageAccentCodes: string[] = [];
+  public languageAccentToContentStatusMap: LanguageAccentToContentStatusMap =
+    {};
+  public currentLanguageAccentCodes: string[] = [];
 
-    public statusSubject =
-        new BehaviorSubject<LanguageAccentToContentStatusMap>({});
-    public status$ = this.statusSubject.asObservable();
+  public statusSubject = new BehaviorSubject<LanguageAccentToContentStatusMap>(
+    {}
+  );
+  public status$ = this.statusSubject.asObservable();
 
-    public pollingSub: Subscription | null = null;
-    private _newRegenerationRequestEventEmitter = new EventEmitter<void>();
+  public pollingSub: Subscription | null = null;
+  private _newRegenerationRequestEventEmitter = new EventEmitter<void>();
 
-    constructor(
-        private voiceoverBackendApiService: VoiceoverBackendApiService,
-        private voiceoverLanguageManagementService: VoiceoverLanguageManagementService
-    ) {}
+  constructor(
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private voiceoverLanguageManagementService: VoiceoverLanguageManagementService
+  ) {}
 
-    init(explorationID: string): void {
-        this.explorationID = explorationID;
-        this.startPolling();
+  init(explorationID: string): void {
+    this.explorationID = explorationID;
+    this.startPolling();
+  }
+
+  async getLatestVoiceoverRegenerationStatus(): Promise<void> {
+    const status =
+      await this.voiceoverBackendApiService.fetchLatestVoiceoverRegenerationStatusAsync(
+        this.explorationID
+      );
+
+    this.languageAccentToContentStatusMap = status;
+    this.statusSubject.next(status);
+  }
+
+  getContentRegenerationStatus(
+    languageAccentCode: string,
+    contentId: string
+  ): string {
+    return this.languageAccentToContentStatusMap[languageAccentCode]?.[
+      contentId
+    ];
+  }
+
+  updateContentRegenerationStatus(
+    languageAccentCode: string,
+    contentId: string,
+    status: string
+  ): void {
+    if (!this.languageAccentToContentStatusMap[languageAccentCode]) {
+      this.languageAccentToContentStatusMap[languageAccentCode] = {};
+    }
+    this.languageAccentToContentStatusMap[languageAccentCode][contentId] =
+      status;
+    this.statusSubject.next(this.languageAccentToContentStatusMap);
+  }
+
+  startPolling(): void {
+    if (this.pollingSub) {
+      this.pollingSub.unsubscribe();
     }
 
-    async getLatestVoiceoverRegenerationStatus(): Promise<void> {
-        const status =
-            await this.voiceoverBackendApiService.fetchLatestVoiceoverRegenerationStatusAsync(
-                this.explorationID
-            );
+    this.getLatestVoiceoverRegenerationStatus();
 
+    // Updates the voiceover regeneration status every 5 seconds.
+    this.pollingSub = interval(5000)
+      .pipe(
+        switchMap(() =>
+          from(
+            this.voiceoverBackendApiService.fetchLatestVoiceoverRegenerationStatusAsync(
+              this.explorationID
+            )
+          )
+        )
+      )
+      .subscribe(status => {
         this.languageAccentToContentStatusMap = status;
         this.statusSubject.next(status);
-    }
+      });
+  }
 
-    getContentRegenerationStatus(
-        languageAccentCode: string,
-        contentId: string
-    ): string {
-        return this.languageAccentToContentStatusMap[languageAccentCode]?.[
-            contentId
-        ];
-    }
-
-    updateContentRegenerationStatus(
-        languageAccentCode: string,
-        contentId: string,
-        status: string
-    ): void {
+  updateNewlyAddedRegenerationTasks(contentIds: string[]): void {
+    for (let languageAccentCode of this.currentLanguageAccentCodes) {
+      for (let contentId of contentIds) {
         if (!this.languageAccentToContentStatusMap[languageAccentCode]) {
-            this.languageAccentToContentStatusMap[languageAccentCode] = {};
+          this.languageAccentToContentStatusMap[languageAccentCode] = {};
         }
         this.languageAccentToContentStatusMap[languageAccentCode][contentId] =
-            status;
-        this.statusSubject.next(this.languageAccentToContentStatusMap);
+          'GENERATING';
+      }
     }
+    this._newRegenerationRequestEventEmitter.emit();
+  }
 
-    startPolling(): void {
-        if (this.pollingSub) {
-            this.pollingSub.unsubscribe();
-        }
-
-        this.getLatestVoiceoverRegenerationStatus();
-
-        // Updates the voiceover regeneration status every 5 seconds.
-        this.pollingSub = interval(5000)
-            .pipe(
-                switchMap(() =>
-                    from(
-                        this.voiceoverBackendApiService.fetchLatestVoiceoverRegenerationStatusAsync(
-                            this.explorationID
-                        )
-                    )
-                )
-            )
-            .subscribe(status => {
-                this.languageAccentToContentStatusMap = status;
-                this.statusSubject.next(status);
-            });
-    }
-
-    updateNewlyAddedRegenerationTasks(contentIds: string[]): void {
-        for (let languageAccentCode of this.currentLanguageAccentCodes) {
-            for (let contentId of contentIds) {
-                if (
-                    !this.languageAccentToContentStatusMap[languageAccentCode]
-                ) {
-                    this.languageAccentToContentStatusMap[languageAccentCode] =
-                        {};
-                }
-                this.languageAccentToContentStatusMap[languageAccentCode][
-                    contentId
-                ] = 'GENERATING';
-            }
-        }
-        this._newRegenerationRequestEventEmitter.emit();
-    }
-
-    get onNewRegenerationRequest(): EventEmitter<void> {
-        return this._newRegenerationRequestEventEmitter;
-    }
+  get onNewRegenerationRequest(): EventEmitter<void> {
+    return this._newRegenerationRequestEventEmitter;
+  }
 }

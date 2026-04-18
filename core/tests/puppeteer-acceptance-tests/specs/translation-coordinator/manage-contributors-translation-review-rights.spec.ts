@@ -34,198 +34,189 @@ import {TranslationReviewer} from '../../utilities/user/translation-reviewer';
 const ROLES = testConstants.Roles;
 
 describe('Translation Coordinator', function () {
-    let translationCoordinator: TranslationCoordinator & ContributorAdmin;
-    let translationSubmitter: ExplorationEditor &
-        CurriculumAdmin &
-        Contributor &
-        TranslationSubmitter &
-        LoggedInUser;
-    let translationReviewer2: TranslationReviewer & LoggedInUser & Contributor;
-    let releaseCoordinator: ReleaseCoordinator;
+  let translationCoordinator: TranslationCoordinator & ContributorAdmin;
+  let translationSubmitter: ExplorationEditor &
+    CurriculumAdmin &
+    Contributor &
+    TranslationSubmitter &
+    LoggedInUser;
+  let translationReviewer2: TranslationReviewer & LoggedInUser & Contributor;
+  let releaseCoordinator: ReleaseCoordinator;
 
-    beforeAll(async function () {
-        translationCoordinator = await UserFactory.createNewUser(
-            'translationCoordinator',
-            'translationCoordinator@example.com',
-            [ROLES.TRANSLATION_COORDINATOR],
-            ['en', 'hi']
-        );
+  beforeAll(async function () {
+    translationCoordinator = await UserFactory.createNewUser(
+      'translationCoordinator',
+      'translationCoordinator@example.com',
+      [ROLES.TRANSLATION_COORDINATOR],
+      ['en', 'hi']
+    );
 
-        releaseCoordinator = await UserFactory.createNewUser(
-            'releaseCoordinator',
-            'releaseCoordinator@example.com',
-            [ROLES.RELEASE_COORDINATOR]
-        );
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'releaseCoordinator@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
 
-        await UserFactory.createNewUser(
-            'translationReviewer1',
-            'translationReviewer1@example.com'
-        );
+    await UserFactory.createNewUser(
+      'translationReviewer1',
+      'translationReviewer1@example.com'
+    );
 
-        translationReviewer2 = await UserFactory.createNewUser(
-            'translationReviewer2',
-            'translationReviewer2@example.com',
-            [ROLES.TRANSLATION_REVIEWER],
-            'hi'
-        );
+    translationReviewer2 = await UserFactory.createNewUser(
+      'translationReviewer2',
+      'translationReviewer2@example.com',
+      [ROLES.TRANSLATION_REVIEWER],
+      'hi'
+    );
 
-        translationSubmitter = await UserFactory.createNewUser(
-            'translationSubmitter',
-            'translationSubmitter@example.com',
-            [ROLES.CURRICULUM_ADMIN]
-        );
+    translationSubmitter = await UserFactory.createNewUser(
+      'translationSubmitter',
+      'translationSubmitter@example.com',
+      [ROLES.CURRICULUM_ADMIN]
+    );
 
-        // Turn on feature flag for new contributor admin dashboard.
-        await releaseCoordinator.enableFeatureFlag('cd_admin_dashboard_new_ui');
+    // Turn on feature flag for new contributor admin dashboard.
+    await releaseCoordinator.enableFeatureFlag('cd_admin_dashboard_new_ui');
 
-        const explorationId =
-            await translationSubmitter.createAndPublishExplorationWithCards(
-                'Solving problems without calculator',
-                'Algebra'
-            );
+    const explorationId =
+      await translationSubmitter.createAndPublishExplorationWithCards(
+        'Solving problems without calculator',
+        'Algebra'
+      );
 
-        await translationSubmitter.createAndPublishTopic(
-            'Fractions',
-            'Basics of Fractions',
-            'fractions'
-        );
+    await translationSubmitter.createAndPublishTopic(
+      'Fractions',
+      'Basics of Fractions',
+      'fractions'
+    );
 
-        await translationSubmitter.createAndPublishStoryWithChapter(
-            'Story 1',
-            'story-one',
-            'Chapter 1',
-            explorationId,
-            'Fractions'
-        );
+    await translationSubmitter.createAndPublishStoryWithChapter(
+      'Story 1',
+      'story-one',
+      'Chapter 1',
+      explorationId,
+      'Fractions'
+    );
 
-        await translationSubmitter.createAndPublishClassroom(
-            'Math',
-            'math',
-            'Fractions'
-        );
+    await translationSubmitter.createAndPublishClassroom(
+      'Math',
+      'math',
+      'Fractions'
+    );
 
-        // Navigate to contributor dashboard and submit one translation.
-        await translationSubmitter.navigateToLearnerDashboard();
-        await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
-        await translationSubmitter.switchToTabInContributionDashboard(
-            'Translate Text'
-        );
-        await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
+    // Navigate to contributor dashboard and submit one translation.
+    await translationSubmitter.navigateToLearnerDashboard();
+    await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
+    await translationSubmitter.switchToTabInContributionDashboard(
+      'Translate Text'
+    );
+    await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
 
-        await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
-            'Chapter 1',
-            'Fractions - Story 1'
-        );
-        await translationSubmitter.typeTextForRTE('सामग्री शून्य');
-        await translationSubmitter.clickOnElementWithText(
-            'Save and translate another'
-        );
-        await translationSubmitter.expectToastMessage(
-            'Submitted translation for review.'
-        );
-        await translationSubmitter.typeTextInTranslationInput('जारी रखना');
-        await translationSubmitter.clickOnElementWithText(
-            'Save and translate another'
-        );
-        await translationSubmitter.expectToastMessage(
-            'Submitted translation for review.'
-        );
-        await translationSubmitter.typeTextForRTE('सामग्री एक');
-        await translationSubmitter.clickOnElementWithText('Save and close');
-        await translationSubmitter.expectToastMessage(
-            'Submitted translation for review.'
-        );
+    await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
+      'Chapter 1',
+      'Fractions - Story 1'
+    );
+    await translationSubmitter.typeTextForRTE('सामग्री शून्य');
+    await translationSubmitter.clickOnElementWithText(
+      'Save and translate another'
+    );
+    await translationSubmitter.expectToastMessage(
+      'Submitted translation for review.'
+    );
+    await translationSubmitter.typeTextInTranslationInput('जारी रखना');
+    await translationSubmitter.clickOnElementWithText(
+      'Save and translate another'
+    );
+    await translationSubmitter.expectToastMessage(
+      'Submitted translation for review.'
+    );
+    await translationSubmitter.typeTextForRTE('सामग्री एक');
+    await translationSubmitter.clickOnElementWithText('Save and close');
+    await translationSubmitter.expectToastMessage(
+      'Submitted translation for review.'
+    );
 
-        await translationReviewer2.navigateToContributorDashboardUsingProfileDropdown();
-        await translationReviewer2.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
-            'Chapter 1',
-            'Fractions - Story 1'
-        );
-        await translationReviewer2.startTranslationReview(
-            'सामग्री शून्य',
-            'Fractions / Story 1'
-        );
-        await translationReviewer2.submitTranslationReview('accept');
-        await translationReviewer2.submitTranslationReview('accept');
-        await translationReviewer2.submitTranslationReview(
-            'accept',
-            'Looks good.'
-        );
-        await translationReviewer2.expectReviewModalToBePresent(false);
-    }, 900000);
+    await translationReviewer2.navigateToContributorDashboardUsingProfileDropdown();
+    await translationReviewer2.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
+      'Chapter 1',
+      'Fractions - Story 1'
+    );
+    await translationReviewer2.startTranslationReview(
+      'सामग्री शून्य',
+      'Fractions / Story 1'
+    );
+    await translationReviewer2.submitTranslationReview('accept');
+    await translationReviewer2.submitTranslationReview('accept');
+    await translationReviewer2.submitTranslationReview('accept', 'Looks good.');
+    await translationReviewer2.expectReviewModalToBePresent(false);
+  }, 900000);
 
-    it('should be able to add language translation rights for a user', async function () {
-        // Navigate to the contributor dashboard admin page.
-        await translationCoordinator.navigateToContributorDashboardAdminPage();
-        await translationCoordinator.switchToTabInContributorAdminPage(
-            'Translation Reviewers'
-        );
+  it('should be able to add language translation rights for a user', async function () {
+    // Navigate to the contributor dashboard admin page.
+    await translationCoordinator.navigateToContributorDashboardAdminPage();
+    await translationCoordinator.switchToTabInContributorAdminPage(
+      'Translation Reviewers'
+    );
 
-        // Add translation rights.
-        await translationCoordinator.clickOnAddReviewerOrSubmitterButton();
-        await translationCoordinator.addUsernameInUsernameInputModal(
-            'translationReviewer1'
-        );
-        await translationCoordinator.expectScreenshotToMatch(
-            'addTranslationRightsModal',
-            __dirname
-        );
+    // Add translation rights.
+    await translationCoordinator.clickOnAddReviewerOrSubmitterButton();
+    await translationCoordinator.addUsernameInUsernameInputModal(
+      'translationReviewer1'
+    );
+    await translationCoordinator.expectScreenshotToMatch(
+      'addTranslationRightsModal',
+      __dirname
+    );
 
-        await translationCoordinator.addLanguageInLanguageSelectorModal(
-            'hi',
-            'हिन्दी (Hindi)'
-        );
-        await translationCoordinator.closeLanguageSelectorModal();
-        await translationCoordinator.page.reload();
-        await translationCoordinator.switchToTabInContributorAdminPage(
-            'Translation Reviewers'
-        );
+    await translationCoordinator.addLanguageInLanguageSelectorModal(
+      'hi',
+      'हिन्दी (Hindi)'
+    );
+    await translationCoordinator.closeLanguageSelectorModal();
+    await translationCoordinator.page.reload();
+    await translationCoordinator.switchToTabInContributorAdminPage(
+      'Translation Reviewers'
+    );
 
-        await translationCoordinator.selectLanguageInAdminPage(
-            'Hindi (हिन्दी)'
-        );
-        await translationCoordinator.expectNumberOfContributorsToBe(2);
-    });
+    await translationCoordinator.selectLanguageInAdminPage('Hindi (हिन्दी)');
+    await translationCoordinator.expectNumberOfContributorsToBe(2);
+  });
 
-    it('should filter translation submitters by last submitted date', async function () {
-        await translationCoordinator.switchToTabInContributorAdminPage(
-            'Translation Submitters'
-        );
-        await translationCoordinator.selectLanguageInAdminPage(
-            'Hindi (हिन्दी)'
-        );
-        await translationCoordinator.setLastActivityDateFilterToYesterday();
-        await translationCoordinator.expectNumberOfStatsRowsToBe(1);
-    });
+  it('should filter translation submitters by last submitted date', async function () {
+    await translationCoordinator.switchToTabInContributorAdminPage(
+      'Translation Submitters'
+    );
+    await translationCoordinator.selectLanguageInAdminPage('Hindi (हिन्दी)');
+    await translationCoordinator.setLastActivityDateFilterToYesterday();
+    await translationCoordinator.expectNumberOfStatsRowsToBe(1);
+  });
 
-    it('should be able to remove language translation rights for a user', async function () {
-        await translationCoordinator.switchToTabInContributorAdminPage(
-            'Translation Reviewers'
-        );
-        await translationCoordinator.clickOnAddReviewerOrSubmitterButton();
-        await translationCoordinator.addUsernameInUsernameInputModal(
-            'translationReviewer1'
-        );
-        await translationCoordinator.expectScreenshotToMatch(
-            'translationRightsModalWithHindiSelected',
-            __dirname
-        );
+  it('should be able to remove language translation rights for a user', async function () {
+    await translationCoordinator.switchToTabInContributorAdminPage(
+      'Translation Reviewers'
+    );
+    await translationCoordinator.clickOnAddReviewerOrSubmitterButton();
+    await translationCoordinator.addUsernameInUsernameInputModal(
+      'translationReviewer1'
+    );
+    await translationCoordinator.expectScreenshotToMatch(
+      'translationRightsModalWithHindiSelected',
+      __dirname
+    );
 
-        await translationCoordinator.removeLanguageFromLanguageSelectorModal(
-            'हिन्दी (Hindi)'
-        );
-        await translationCoordinator.closeLanguageSelectorModal();
-        await translationCoordinator.page.reload();
-        await translationCoordinator.switchToTabInContributorAdminPage(
-            'Translation Reviewers'
-        );
-        await translationCoordinator.selectLanguageInAdminPage(
-            'Hindi (हिन्दी)'
-        );
-        await translationCoordinator.expectNumberOfContributorsToBe(1);
-    });
+    await translationCoordinator.removeLanguageFromLanguageSelectorModal(
+      'हिन्दी (Hindi)'
+    );
+    await translationCoordinator.closeLanguageSelectorModal();
+    await translationCoordinator.page.reload();
+    await translationCoordinator.switchToTabInContributorAdminPage(
+      'Translation Reviewers'
+    );
+    await translationCoordinator.selectLanguageInAdminPage('Hindi (हिन्दी)');
+    await translationCoordinator.expectNumberOfContributorsToBe(1);
+  });
 
-    afterAll(async function () {
-        await UserFactory.closeAllBrowsers();
-    });
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });

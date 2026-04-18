@@ -26,93 +26,69 @@ import {UserService} from 'services/user.service';
 import {CanAccessSplashPageGuard} from './can-access-splash-page.guard';
 
 class MockWindowRef {
-    nativeWindow = {
-        location: {
-            href: '',
-        },
-    };
+  nativeWindow = {
+    location: {
+      href: '',
+    },
+  };
 }
 
 describe('Can access splash page guard', () => {
-    let caspg: CanAccessSplashPageGuard;
-    let windowRef: MockWindowRef;
-    let userService: UserService;
+  let caspg: CanAccessSplashPageGuard;
+  let windowRef: MockWindowRef;
+  let userService: UserService;
 
-    beforeEach(() => {
-        TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule],
-            providers: [
-                {
-                    provide: WindowRef,
-                    useClass: MockWindowRef,
-                },
-                UserService,
-            ],
-        }).compileComponents();
-        caspg = TestBed.inject(CanAccessSplashPageGuard);
-        windowRef = TestBed.inject(WindowRef);
-        userService = TestBed.inject(UserService);
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef,
+        },
+        UserService,
+      ],
+    }).compileComponents();
+    caspg = TestBed.inject(CanAccessSplashPageGuard);
+    windowRef = TestBed.inject(WindowRef);
+    userService = TestBed.inject(UserService);
+  });
+
+  it('should redirect user to default dashboard', fakeAsync(() => {
+    let defaultDashboard = 'learner';
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(
+        new UserInfo([], false, false, false, false, false, '', '', '', true)
+      )
+    );
+    spyOn(userService, 'getUserPreferredDashboardAsync').and.returnValue(
+      Promise.resolve('learner')
+    );
+    caspg.canLoad({} as Route, []);
+    tick();
+    tick();
+    expect(windowRef.nativeWindow.location.href).toEqual(
+      '/' + defaultDashboard + '-dashboard'
+    );
+  }));
+
+  it('should allow user to access page if not logged in', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(
+        new UserInfo([], false, false, false, false, false, '', '', '', false)
+      )
+    );
+    caspg.canLoad({} as Route, []).then(value => {
+      expect(value).toEqual(true);
     });
+    tick();
+  }));
 
-    it('should redirect user to default dashboard', fakeAsync(() => {
-        let defaultDashboard = 'learner';
-        spyOn(userService, 'getUserInfoAsync').and.returnValue(
-            Promise.resolve(
-                new UserInfo(
-                    [],
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    '',
-                    '',
-                    '',
-                    true
-                )
-            )
-        );
-        spyOn(userService, 'getUserPreferredDashboardAsync').and.returnValue(
-            Promise.resolve('learner')
-        );
-        caspg.canLoad({} as Route, []);
-        tick();
-        tick();
-        expect(windowRef.nativeWindow.location.href).toEqual(
-            '/' + defaultDashboard + '-dashboard'
-        );
-    }));
-
-    it('should allow user to access page if not logged in', fakeAsync(() => {
-        spyOn(userService, 'getUserInfoAsync').and.returnValue(
-            Promise.resolve(
-                new UserInfo(
-                    [],
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    '',
-                    '',
-                    '',
-                    false
-                )
-            )
-        );
-        caspg.canLoad({} as Route, []).then(value => {
-            expect(value).toEqual(true);
-        });
-        tick();
-    }));
-
-    it('should show user splash page if request to user hander fails', fakeAsync(() => {
-        spyOn(userService, 'getUserInfoAsync').and.returnValue(
-            Promise.reject()
-        );
-        caspg.canLoad({} as Route, []).then(value => {
-            expect(value).toEqual(true);
-        });
-        tick();
-    }));
+  it('should show user splash page if request to user hander fails', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.reject());
+    caspg.canLoad({} as Route, []).then(value => {
+      expect(value).toEqual(true);
+    });
+    tick();
+  }));
 });

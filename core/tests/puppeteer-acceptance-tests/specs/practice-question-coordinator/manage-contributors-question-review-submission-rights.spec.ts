@@ -34,163 +34,160 @@ import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 const ROLES = testConstants.Roles;
 
 describe('Practice Question Coordinator', function () {
-    let questionCoordinator: QuestionCoordinator & ContributorAdmin;
-    let questionReviewer: PracticeQuestionReviewer & LoggedInUser;
-    let questionSubmitter: ExplorationEditor &
-        CurriculumAdmin &
-        Contributor &
-        PracticeQuestionSubmitter &
-        LoggedInUser;
-    let releaseCoordinator: ReleaseCoordinator;
+  let questionCoordinator: QuestionCoordinator & ContributorAdmin;
+  let questionReviewer: PracticeQuestionReviewer & LoggedInUser;
+  let questionSubmitter: ExplorationEditor &
+    CurriculumAdmin &
+    Contributor &
+    PracticeQuestionSubmitter &
+    LoggedInUser;
+  let releaseCoordinator: ReleaseCoordinator;
 
-    beforeAll(async function () {
-        questionCoordinator = await UserFactory.createNewUser(
-            'questionCoordinator',
-            'questionCoordinator@example.com',
-            [ROLES.QUESTION_COORDINATOR]
-        );
+  beforeAll(async function () {
+    questionCoordinator = await UserFactory.createNewUser(
+      'questionCoordinator',
+      'questionCoordinator@example.com',
+      [ROLES.QUESTION_COORDINATOR]
+    );
 
-        releaseCoordinator = await UserFactory.createNewUser(
-            'releaseCoordinator',
-            'releaseCoordinator@example.com',
-            [ROLES.RELEASE_COORDINATOR]
-        );
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'releaseCoordinator@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
 
-        questionReviewer = await UserFactory.createNewUser(
-            'questionReviewer',
-            'questionReviewer@example.com'
-        );
+    questionReviewer = await UserFactory.createNewUser(
+      'questionReviewer',
+      'questionReviewer@example.com'
+    );
 
-        questionSubmitter = await UserFactory.createNewUser(
-            'questionSubmitter',
-            'questionSubmitter@example.com',
-            [ROLES.CURRICULUM_ADMIN]
-        );
+    questionSubmitter = await UserFactory.createNewUser(
+      'questionSubmitter',
+      'questionSubmitter@example.com',
+      [ROLES.CURRICULUM_ADMIN]
+    );
 
-        // Turn on feature flag for new contributor admin dashboard.
-        await releaseCoordinator.enableFeatureFlag('cd_admin_dashboard_new_ui');
+    // Turn on feature flag for new contributor admin dashboard.
+    await releaseCoordinator.enableFeatureFlag('cd_admin_dashboard_new_ui');
 
-        await questionSubmitter.createAndPublishTopic(
-            'Arithmetic Operations',
-            'Basics of Arithmetic',
-            'Addition'
-        );
+    await questionSubmitter.createAndPublishTopic(
+      'Arithmetic Operations',
+      'Basics of Arithmetic',
+      'Addition'
+    );
 
-        await questionSubmitter.createAndPublishClassroom(
-            'Math',
-            'math',
-            'Arithmetic Operations'
-        );
+    await questionSubmitter.createAndPublishClassroom(
+      'Math',
+      'math',
+      'Arithmetic Operations'
+    );
 
-        await questionSubmitter.navigateToCreatorDashboardPage();
-    }, 900000);
+    await questionSubmitter.navigateToCreatorDashboardPage();
+  }, 900000);
 
-    it('should be able to add question review rights for a user', async function () {
-        // Navigate to the contributor dashboard admin page.
-        await questionCoordinator.navigateToContributorDashboardAdminPage();
+  it('should be able to add question review rights for a user', async function () {
+    // Navigate to the contributor dashboard admin page.
+    await questionCoordinator.navigateToContributorDashboardAdminPage();
 
-        await questionCoordinator.switchToTabInContributorAdminPage(
-            'Question Reviewers'
-        );
+    await questionCoordinator.switchToTabInContributorAdminPage(
+      'Question Reviewers'
+    );
 
-        // Add question reviewer rights.
-        await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
-        await questionCoordinator.addUsernameInUsernameInputModal(
-            questionReviewer.username ?? ''
-        );
+    // Add question reviewer rights.
+    await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
+    await questionCoordinator.addUsernameInUsernameInputModal(
+      questionReviewer.username ?? ''
+    );
 
-        await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
-            'Reviewer'
-        );
-        await questionCoordinator.saveAndCloseQuestionRoleEditorModal();
-        await questionCoordinator.page.reload();
-        await questionCoordinator.expectTotalQuestionReviewersToBe(1);
-    });
+    await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
+      'Reviewer'
+    );
+    await questionCoordinator.saveAndCloseQuestionRoleEditorModal();
+    await questionCoordinator.page.reload();
+    await questionCoordinator.expectTotalQuestionReviewersToBe(1);
+  });
 
-    it('should be able to add question submitter rights for a user', async function () {
-        // Add question submitter rights.
-        await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
-        await questionCoordinator.addUsernameInUsernameInputModal(
-            questionSubmitter.username ?? ''
-        );
-        await questionCoordinator.expectScreenshotToMatch(
-            'addQuestionRightsModal',
-            __dirname
-        );
+  it('should be able to add question submitter rights for a user', async function () {
+    // Add question submitter rights.
+    await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
+    await questionCoordinator.addUsernameInUsernameInputModal(
+      questionSubmitter.username ?? ''
+    );
+    await questionCoordinator.expectScreenshotToMatch(
+      'addQuestionRightsModal',
+      __dirname
+    );
 
-        await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
-            'Submitter'
-        );
-        await questionCoordinator.saveAndCloseQuestionRoleEditorModal();
+    await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
+      'Submitter'
+    );
+    await questionCoordinator.saveAndCloseQuestionRoleEditorModal();
 
-        // Submit a question as question submitter.
-        await questionSubmitter.navigateToContributorDashboardUsingProfileDropdown();
-        await questionSubmitter.startAndCompleteQuestionSuggestion(
-            'Addition',
-            'Arithmetic Operations',
-            'What is 2 + 3?'
-        );
+    // Submit a question as question submitter.
+    await questionSubmitter.navigateToContributorDashboardUsingProfileDropdown();
+    await questionSubmitter.startAndCompleteQuestionSuggestion(
+      'Addition',
+      'Arithmetic Operations',
+      'What is 2 + 3?'
+    );
 
-        // Review and accept the submitted question as question reviewer.
-        await questionReviewer.navigateToContributorDashboardUsingProfileDropdown();
-        await questionReviewer.startQuestionReview(
-            'What is 2 + 3?',
-            'Addition'
-        );
-        await questionReviewer.submitReview('accept');
-        await questionReviewer.expectQuestionReviewModalToBePresent(false);
+    // Review and accept the submitted question as question reviewer.
+    await questionReviewer.navigateToContributorDashboardUsingProfileDropdown();
+    await questionReviewer.startQuestionReview('What is 2 + 3?', 'Addition');
+    await questionReviewer.submitReview('accept');
+    await questionReviewer.expectQuestionReviewModalToBePresent(false);
 
-        // Verify contributor count on question submitter and reviewer tabs.
-        await questionCoordinator.page.reload();
-        await questionCoordinator.expectNumberOfStatsRowsToBe(1);
-        await questionCoordinator.setLastActivityDateFilterToYesterday();
-        await questionCoordinator.expectNumberOfStatsRowsToBe(1);
+    // Verify contributor count on question submitter and reviewer tabs.
+    await questionCoordinator.page.reload();
+    await questionCoordinator.expectNumberOfStatsRowsToBe(1);
+    await questionCoordinator.setLastActivityDateFilterToYesterday();
+    await questionCoordinator.expectNumberOfStatsRowsToBe(1);
 
-        await questionCoordinator.switchToTabInContributorAdminPage(
-            'Question Reviewers'
-        );
-        await questionCoordinator.setLastActivityDateFilterToYesterday();
-        await questionCoordinator.expectNumberOfStatsRowsToBe(1);
-    });
+    await questionCoordinator.switchToTabInContributorAdminPage(
+      'Question Reviewers'
+    );
+    await questionCoordinator.setLastActivityDateFilterToYesterday();
+    await questionCoordinator.expectNumberOfStatsRowsToBe(1);
+  });
 
-    it('should be able to remove question submitter rights for a user', async function () {
-        await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
-        await questionCoordinator.addUsernameInUsernameInputModal(
-            questionSubmitter.username ?? ''
-        );
-        await questionCoordinator.expectScreenshotToMatch(
-            'editQuestionRightsModalWithSubmitterChecked',
-            __dirname
-        );
+  it('should be able to remove question submitter rights for a user', async function () {
+    await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
+    await questionCoordinator.addUsernameInUsernameInputModal(
+      questionSubmitter.username ?? ''
+    );
+    await questionCoordinator.expectScreenshotToMatch(
+      'editQuestionRightsModalWithSubmitterChecked',
+      __dirname
+    );
 
-        await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
-            'Submitter',
-            'remove'
-        );
-        await questionCoordinator.saveAndCloseQuestionRoleEditorModal();
-    });
+    await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
+      'Submitter',
+      'remove'
+    );
+    await questionCoordinator.saveAndCloseQuestionRoleEditorModal();
+  });
 
-    it('should be able to remove question review rights for a user', async function () {
-        await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
-        await questionCoordinator.addUsernameInUsernameInputModal(
-            questionReviewer.username ?? ''
-        );
-        await questionCoordinator.expectScreenshotToMatch(
-            'editQuestionRightsModalWithReviewerChecked',
-            __dirname
-        );
+  it('should be able to remove question review rights for a user', async function () {
+    await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
+    await questionCoordinator.addUsernameInUsernameInputModal(
+      questionReviewer.username ?? ''
+    );
+    await questionCoordinator.expectScreenshotToMatch(
+      'editQuestionRightsModalWithReviewerChecked',
+      __dirname
+    );
 
-        await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
-            'Reviewer',
-            'remove'
-        );
-        await questionCoordinator.saveAndCloseQuestionRoleEditorModal();
+    await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
+      'Reviewer',
+      'remove'
+    );
+    await questionCoordinator.saveAndCloseQuestionRoleEditorModal();
 
-        await questionCoordinator.page.reload();
-        await questionCoordinator.expectTotalQuestionReviewersToBe(0);
-    });
+    await questionCoordinator.page.reload();
+    await questionCoordinator.expectTotalQuestionReviewersToBe(0);
+  });
 
-    afterAll(async function () {
-        await UserFactory.closeAllBrowsers();
-    });
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });

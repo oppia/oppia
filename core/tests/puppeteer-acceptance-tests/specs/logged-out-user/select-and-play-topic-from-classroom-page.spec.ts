@@ -30,86 +30,86 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 ConsoleReporter.setConsoleErrorsToIgnore([
-    /Occurred at http:\/\/localhost:8181\/story_editor\/[a-zA-Z0-9]+\/.*Cannot read properties of undefined \(reading 'getStory'\)/,
-    /Occurred at http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+\/.*Invalid active state name: null/,
-    new RegExp('Invalid active state name: null'),
-    /Occurred at http:\/\/localhost:8181\/.*Failed to load resource: net::ERR_NETWORK_CHANGED/,
-    /Occurred at http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+\/.*Failed to load resource: net::ERR_BLOCKED_BY_RESPONSE\.NotSameOrigin/,
-    /.*404.*Not Found.*/,
+  /Occurred at http:\/\/localhost:8181\/story_editor\/[a-zA-Z0-9]+\/.*Cannot read properties of undefined \(reading 'getStory'\)/,
+  /Occurred at http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+\/.*Invalid active state name: null/,
+  new RegExp('Invalid active state name: null'),
+  /Occurred at http:\/\/localhost:8181\/.*Failed to load resource: net::ERR_NETWORK_CHANGED/,
+  /Occurred at http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+\/.*Failed to load resource: net::ERR_BLOCKED_BY_RESPONSE\.NotSameOrigin/,
+  /.*404.*Not Found.*/,
 ]);
 
 describe('Logged-out User', function () {
-    let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
-    let loggedOutUser: LoggedOutUser;
-    let explorationId: string | null;
+  let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
+  let loggedOutUser: LoggedOutUser;
+  let explorationId: string | null;
 
-    beforeAll(async function () {
-        loggedOutUser = await UserFactory.createLoggedOutUser();
+  beforeAll(async function () {
+    loggedOutUser = await UserFactory.createLoggedOutUser();
 
-        curriculumAdmin = await UserFactory.createNewUser(
-            'curriculumAdm',
-            'curriculumAdmin@example.com',
-            [ROLES.CURRICULUM_ADMIN]
-        );
-
-        explorationId =
-            await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-                'Negative Numbers'
-            );
-
-        await curriculumAdmin.createAndPublishTopic(
-            'Algebra I',
-            'Negative Numbers',
-            'Negative Numbers'
-        );
-
-        await curriculumAdmin.createAndPublishClassroom(
-            'Math',
-            'math',
-            'Algebra I'
-        );
-
-        await curriculumAdmin.createAndPublishStoryWithChapter(
-            'Algebra Story',
-            'algebra-story',
-            'Understanding Negative Numbers',
-            explorationId as string,
-            'Algebra I'
-        );
-    }, 900000);
-
-    it(
-        'should be able to select and play a topic from the classroom page',
-        async function () {
-            await loggedOutUser.navigateToClassroomPage('math');
-            await loggedOutUser.expectTopicsToBePresent(['Algebra I']);
-
-            await loggedOutUser.selectAndOpenTopic('Algebra I');
-            await loggedOutUser.selectChapterWithinStoryToLearn(
-                'Algebra Story',
-                'Understanding Negative Numbers'
-            );
-
-            // Check for the completion message as the exploration has a single state.
-            await loggedOutUser.expectExplorationCompletionToastMessage(
-                'Congratulations for completing this lesson!'
-            );
-
-            // Returning to the topic page from the exploration player itself.
-            await loggedOutUser.returnToTopicPageAfterCompletingExploration();
-            await loggedOutUser.navigateToStudyTab();
-
-            // Review cards are the subtopic that are created in the topic.
-            await loggedOutUser.selectReviewCardToLearn('Negative Numbers');
-            await loggedOutUser.expectReviewCardToHaveContent(
-                'Negative Numbers',
-                'Subtopic creation description text for Negative Numbers'
-            );
-        },
-        DEFAULT_SPEC_TIMEOUT_MSECS
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculumAdmin@example.com',
+      [ROLES.CURRICULUM_ADMIN]
     );
 
-    afterAll(async function () {
-        await UserFactory.closeAllBrowsers();
-    });
+    explorationId =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'Negative Numbers'
+      );
+
+    await curriculumAdmin.createAndPublishTopic(
+      'Algebra I',
+      'Negative Numbers',
+      'Negative Numbers'
+    );
+
+    await curriculumAdmin.createAndPublishClassroom(
+      'Math',
+      'math',
+      'Algebra I'
+    );
+
+    await curriculumAdmin.createAndPublishStoryWithChapter(
+      'Algebra Story',
+      'algebra-story',
+      'Understanding Negative Numbers',
+      explorationId as string,
+      'Algebra I'
+    );
+  }, 900000);
+
+  it(
+    'should be able to select and play a topic from the classroom page',
+    async function () {
+      await loggedOutUser.navigateToClassroomPage('math');
+      await loggedOutUser.expectTopicsToBePresent(['Algebra I']);
+
+      await loggedOutUser.selectAndOpenTopic('Algebra I');
+      await loggedOutUser.selectChapterWithinStoryToLearn(
+        'Algebra Story',
+        'Understanding Negative Numbers'
+      );
+
+      // Check for the completion message as the exploration has a single state.
+      await loggedOutUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
+
+      // Returning to the topic page from the exploration player itself.
+      await loggedOutUser.returnToTopicPageAfterCompletingExploration();
+      await loggedOutUser.navigateToStudyTab();
+
+      // Review cards are the subtopic that are created in the topic.
+      await loggedOutUser.selectReviewCardToLearn('Negative Numbers');
+      await loggedOutUser.expectReviewCardToHaveContent(
+        'Negative Numbers',
+        'Subtopic creation description text for Negative Numbers'
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });

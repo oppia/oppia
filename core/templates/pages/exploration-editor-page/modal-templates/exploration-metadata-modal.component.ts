@@ -34,257 +34,250 @@ import {ChangeListService} from '../services/change-list.service';
 import {filter, take} from 'rxjs/operators';
 
 interface CategoryChoices {
-    id: string;
-    text: string;
+  id: string;
+  text: string;
 }
 
 @Component({
-    selector: 'oppia-exploration-metadata-modal',
-    templateUrl: './exploration-metadata-modal.component.html',
+  selector: 'oppia-exploration-metadata-modal',
+  templateUrl: './exploration-metadata-modal.component.html',
 })
 export class ExplorationMetadataModalComponent
-    extends ConfirmOrCancelModal
-    implements OnInit
+  extends ConfirmOrCancelModal
+  implements OnInit
 {
-    // These properties below are initialized using Angular lifecycle hooks
-    // where we need to do non-null assertion. For more information see
-    // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-    categoryLocalValue!: string;
-    objectiveHasBeenPreviouslyEdited!: boolean;
-    requireTitleToBeSpecified!: boolean;
-    requireObjectiveToBeSpecified!: boolean;
-    requireCategoryToBeSpecified!: boolean;
-    askForLanguageCheck!: boolean;
-    askForTags!: boolean;
-    newCategory!: CategoryChoices;
-    CATEGORY_LIST_FOR_SELECT2!: CategoryChoices[];
-    isValueHasbeenUpdated: boolean = false;
-    addOnBlur: boolean = true;
-    explorationTags: string[] = [];
-    filteredChoices: CategoryChoices[] = [];
-    readonly separatorKeysCodes = [ENTER, COMMA] as const;
-    tagIsInvalid: boolean = false;
-    isSaving: boolean = false;
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  categoryLocalValue!: string;
+  objectiveHasBeenPreviouslyEdited!: boolean;
+  requireTitleToBeSpecified!: boolean;
+  requireObjectiveToBeSpecified!: boolean;
+  requireCategoryToBeSpecified!: boolean;
+  askForLanguageCheck!: boolean;
+  askForTags!: boolean;
+  newCategory!: CategoryChoices;
+  CATEGORY_LIST_FOR_SELECT2!: CategoryChoices[];
+  isValueHasbeenUpdated: boolean = false;
+  addOnBlur: boolean = true;
+  explorationTags: string[] = [];
+  filteredChoices: CategoryChoices[] = [];
+  readonly separatorKeysCodes = [ENTER, COMMA] as const;
+  tagIsInvalid: boolean = false;
+  isSaving: boolean = false;
 
-    constructor(
-        private alertsService: AlertsService,
-        private explorationCategoryService: ExplorationCategoryService,
-        private explorationLanguageCodeService: ExplorationLanguageCodeService,
-        private explorationObjectiveService: ExplorationObjectiveService,
-        private explorationStatesService: ExplorationStatesService,
-        private explorationTagsService: ExplorationTagsService,
-        private explorationTitleService: ExplorationTitleService,
-        private changeListService: ChangeListService,
-        private ngbActiveModal: NgbActiveModal
-    ) {
-        super(ngbActiveModal);
+  constructor(
+    private alertsService: AlertsService,
+    private explorationCategoryService: ExplorationCategoryService,
+    private explorationLanguageCodeService: ExplorationLanguageCodeService,
+    private explorationObjectiveService: ExplorationObjectiveService,
+    private explorationStatesService: ExplorationStatesService,
+    private explorationTagsService: ExplorationTagsService,
+    private explorationTitleService: ExplorationTitleService,
+    private changeListService: ChangeListService,
+    private ngbActiveModal: NgbActiveModal
+  ) {
+    super(ngbActiveModal);
+  }
+
+  updateCategoryListWithUserData(): void {
+    if (this.newCategory) {
+      this.CATEGORY_LIST_FOR_SELECT2.push(this.newCategory);
     }
+  }
 
-    updateCategoryListWithUserData(): void {
-        if (this.newCategory) {
-            this.CATEGORY_LIST_FOR_SELECT2.push(this.newCategory);
-        }
+  filterChoices(searchTerm: string): void {
+    this.newCategory = {
+      id: searchTerm,
+      text: searchTerm,
+    };
+
+    this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2.filter(
+      value => value.text.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1
+    );
+
+    this.filteredChoices.push(this.newCategory);
+
+    if (searchTerm === '') {
+      this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2;
     }
+  }
 
-    filterChoices(searchTerm: string): void {
-        this.newCategory = {
-            id: searchTerm,
-            text: searchTerm,
-        };
+  add(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
+    let tagRegex = new RegExp(AppConstants.TAG_REGEX);
 
-        this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2.filter(
-            value =>
-                value.text.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1
-        );
-
-        this.filteredChoices.push(this.newCategory);
-
-        if (searchTerm === '') {
-            this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2;
-        }
-    }
-
-    add(event: MatChipInputEvent): void {
-        const value = (event.value || '').trim();
-        let tagRegex = new RegExp(AppConstants.TAG_REGEX);
-
-        // Add our explorationTags.
-        if (value) {
-            if (
-                !this.explorationTagsService.displayed ||
-                (this.explorationTagsService.displayed as []).length < 10
-            ) {
-                if (
-                    (
-                        this.explorationTagsService.displayed as string[]
-                    ).includes(value.toLowerCase()) ||
-                    !value.match(tagRegex)
-                ) {
-                    // Clear the input value.
-                    event.input.value = '';
-                    this.tagIsInvalid = true;
-                    return;
-                }
-
-                this.explorationTags.push(value.toLowerCase());
-            }
-        }
-
-        // Clear the input value.
-        event.input.value = '';
-        this.tagIsInvalid = false;
-
-        this.explorationTagsService.displayed = this.explorationTags;
-    }
-
-    remove(explorationTags: string): void {
-        const index = this.explorationTags.indexOf(explorationTags);
-
-        if (index >= 0) {
-            this.explorationTags.splice(index, 1);
-        }
-
-        this.explorationTagsService.displayed = this.explorationTags;
-    }
-
-    save(): void {
-        if (!this.areRequiredFieldsFilled()) {
-            return;
-        }
-
-        const initialChangeListLength =
-            this.changeListService.getChangeList().length;
-
-        // Record any fields that have changed.
-        let metadataList: string[] = [];
-        if (this.explorationTitleService.hasChanged()) {
-            metadataList.push('title');
-        }
-        if (this.explorationObjectiveService.hasChanged()) {
-            metadataList.push('objective');
-        }
-        if (this.explorationCategoryService.hasChanged()) {
-            metadataList.push('category');
-        }
-        if (this.explorationLanguageCodeService.hasChanged()) {
-            metadataList.push('language');
-        }
-        if (this.explorationTagsService.hasChanged()) {
-            metadataList.push('tags');
-        }
-
-        // Save all the displayed values.
-        this.explorationTitleService.saveDisplayedValue();
-        this.explorationObjectiveService.saveDisplayedValue();
-        this.explorationCategoryService.saveDisplayedValue();
-        this.explorationLanguageCodeService.saveDisplayedValue();
-        this.explorationTagsService.saveDisplayedValue();
-
+    // Add our explorationTags.
+    if (value) {
+      if (
+        !this.explorationTagsService.displayed ||
+        (this.explorationTagsService.displayed as []).length < 10
+      ) {
         if (
-            this.changeListService.getChangeList().length ===
-            initialChangeListLength
+          (this.explorationTagsService.displayed as string[]).includes(
+            value.toLowerCase()
+          ) ||
+          !value.match(tagRegex)
         ) {
-            this.ngbActiveModal.close(metadataList);
-            return;
+          // Clear the input value.
+          event.input.value = '';
+          this.tagIsInvalid = true;
+          return;
         }
 
-        this.isSaving = true;
-        this.changeListService.autosaveIsInProgress$
-            .pipe(
-                filter(inProgress => !inProgress),
-                take(1)
-            )
-            .subscribe(() => {
-                this.ngbActiveModal.close(metadataList);
-            });
+        this.explorationTags.push(value.toLowerCase());
+      }
     }
 
-    areRequiredFieldsFilled(): boolean {
-        if (!this.explorationTitleService.displayed) {
-            this.alertsService.addWarning('Please specify a title');
-            return false;
-        }
-        if (!this.explorationObjectiveService.displayed) {
-            this.alertsService.addWarning('Please specify an objective');
-            return false;
-        }
-        if (!this.explorationCategoryService.displayed) {
-            this.alertsService.addWarning('Please specify a category');
-            return false;
-        }
+    // Clear the input value.
+    event.input.value = '';
+    this.tagIsInvalid = false;
 
-        return true;
+    this.explorationTagsService.displayed = this.explorationTags;
+  }
+
+  remove(explorationTags: string): void {
+    const index = this.explorationTags.indexOf(explorationTags);
+
+    if (index >= 0) {
+      this.explorationTags.splice(index, 1);
     }
 
-    isSavingAllowed(): boolean {
-        return Boolean(
-            this.explorationTitleService.displayed &&
-                this.explorationObjectiveService.displayed &&
-                this.explorationObjectiveService.displayed.length >= 15 &&
-                this.explorationCategoryService.displayed &&
-                this.explorationLanguageCodeService.displayed
-        );
+    this.explorationTagsService.displayed = this.explorationTags;
+  }
+
+  save(): void {
+    if (!this.areRequiredFieldsFilled()) {
+      return;
     }
 
-    ngOnInit(): void {
-        this.CATEGORY_LIST_FOR_SELECT2 = [];
-        this.objectiveHasBeenPreviouslyEdited =
-            (this.explorationObjectiveService.savedMemento as ParamChange[])
-                .length > 0;
+    const initialChangeListLength =
+      this.changeListService.getChangeList().length;
 
-        this.requireTitleToBeSpecified =
-            !this.explorationTitleService.savedMemento;
-        this.requireObjectiveToBeSpecified =
-            (this.explorationObjectiveService.savedMemento as ParamChange[])
-                .length < 15;
-        this.requireCategoryToBeSpecified =
-            !this.explorationCategoryService.savedMemento;
-        this.askForLanguageCheck =
-            this.explorationLanguageCodeService.savedMemento ===
-            AppConstants.DEFAULT_LANGUAGE_CODE;
-        this.askForTags =
-            (this.explorationTagsService.savedMemento as ParamChange[])
-                .length === 0;
+    // Record any fields that have changed.
+    let metadataList: string[] = [];
+    if (this.explorationTitleService.hasChanged()) {
+      metadataList.push('title');
+    }
+    if (this.explorationObjectiveService.hasChanged()) {
+      metadataList.push('objective');
+    }
+    if (this.explorationCategoryService.hasChanged()) {
+      metadataList.push('category');
+    }
+    if (this.explorationLanguageCodeService.hasChanged()) {
+      metadataList.push('language');
+    }
+    if (this.explorationTagsService.hasChanged()) {
+      metadataList.push('tags');
+    }
 
-        for (let i = 0; i < AppConstants.ALL_CATEGORIES.length; i++) {
-            this.CATEGORY_LIST_FOR_SELECT2.push({
-                id: AppConstants.ALL_CATEGORIES[i],
-                text: AppConstants.ALL_CATEGORIES[i],
-            });
+    // Save all the displayed values.
+    this.explorationTitleService.saveDisplayedValue();
+    this.explorationObjectiveService.saveDisplayedValue();
+    this.explorationCategoryService.saveDisplayedValue();
+    this.explorationLanguageCodeService.saveDisplayedValue();
+    this.explorationTagsService.saveDisplayedValue();
+
+    if (
+      this.changeListService.getChangeList().length === initialChangeListLength
+    ) {
+      this.ngbActiveModal.close(metadataList);
+      return;
+    }
+
+    this.isSaving = true;
+    this.changeListService.autosaveIsInProgress$
+      .pipe(
+        filter(inProgress => !inProgress),
+        take(1)
+      )
+      .subscribe(() => {
+        this.ngbActiveModal.close(metadataList);
+      });
+  }
+
+  areRequiredFieldsFilled(): boolean {
+    if (!this.explorationTitleService.displayed) {
+      this.alertsService.addWarning('Please specify a title');
+      return false;
+    }
+    if (!this.explorationObjectiveService.displayed) {
+      this.alertsService.addWarning('Please specify an objective');
+      return false;
+    }
+    if (!this.explorationCategoryService.displayed) {
+      this.alertsService.addWarning('Please specify a category');
+      return false;
+    }
+
+    return true;
+  }
+
+  isSavingAllowed(): boolean {
+    return Boolean(
+      this.explorationTitleService.displayed &&
+        this.explorationObjectiveService.displayed &&
+        this.explorationObjectiveService.displayed.length >= 15 &&
+        this.explorationCategoryService.displayed &&
+        this.explorationLanguageCodeService.displayed
+    );
+  }
+
+  ngOnInit(): void {
+    this.CATEGORY_LIST_FOR_SELECT2 = [];
+    this.objectiveHasBeenPreviouslyEdited =
+      (this.explorationObjectiveService.savedMemento as ParamChange[]).length >
+      0;
+
+    this.requireTitleToBeSpecified = !this.explorationTitleService.savedMemento;
+    this.requireObjectiveToBeSpecified =
+      (this.explorationObjectiveService.savedMemento as ParamChange[]).length <
+      15;
+    this.requireCategoryToBeSpecified =
+      !this.explorationCategoryService.savedMemento;
+    this.askForLanguageCheck =
+      this.explorationLanguageCodeService.savedMemento ===
+      AppConstants.DEFAULT_LANGUAGE_CODE;
+    this.askForTags =
+      (this.explorationTagsService.savedMemento as ParamChange[]).length === 0;
+
+    for (let i = 0; i < AppConstants.ALL_CATEGORIES.length; i++) {
+      this.CATEGORY_LIST_FOR_SELECT2.push({
+        id: AppConstants.ALL_CATEGORIES[i],
+        text: AppConstants.ALL_CATEGORIES[i],
+      });
+    }
+
+    if (this.explorationStatesService.isInitialized()) {
+      let categoryIsInSelect2 = this.CATEGORY_LIST_FOR_SELECT2.some(
+        categoryItem => {
+          return (
+            categoryItem.id === this.explorationCategoryService.savedMemento
+          );
         }
+      );
 
-        if (this.explorationStatesService.isInitialized()) {
-            let categoryIsInSelect2 = this.CATEGORY_LIST_FOR_SELECT2.some(
-                categoryItem => {
-                    return (
-                        categoryItem.id ===
-                        this.explorationCategoryService.savedMemento
-                    );
-                }
-            );
-
-            // If the current category is not in the dropdown, add it
-            // as the first option.
-            if (
-                !categoryIsInSelect2 &&
-                this.explorationCategoryService.savedMemento
-            ) {
-                this.CATEGORY_LIST_FOR_SELECT2.unshift({
-                    id: this.explorationCategoryService.savedMemento as string,
-                    text: this.explorationCategoryService
-                        .savedMemento as string,
-                });
-            }
-        }
-
-        this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2;
-        this.explorationTags = this.explorationTagsService
-            .displayed as string[];
-
-        // This logic has been used here to
-        // solve ExpressionChangedAfterItHasBeenCheckedError error.
-        setTimeout(() => {
-            this.isValueHasbeenUpdated = true;
+      // If the current category is not in the dropdown, add it
+      // as the first option.
+      if (
+        !categoryIsInSelect2 &&
+        this.explorationCategoryService.savedMemento
+      ) {
+        this.CATEGORY_LIST_FOR_SELECT2.unshift({
+          id: this.explorationCategoryService.savedMemento as string,
+          text: this.explorationCategoryService.savedMemento as string,
         });
+      }
     }
+
+    this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2;
+    this.explorationTags = this.explorationTagsService.displayed as string[];
+
+    // This logic has been used here to
+    // solve ExpressionChangedAfterItHasBeenCheckedError error.
+    setTimeout(() => {
+      this.isValueHasbeenUpdated = true;
+    });
+  }
 }

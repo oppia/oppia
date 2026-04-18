@@ -22,34 +22,34 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {UserService} from 'services/user.service';
 
 @Injectable({
-    providedIn: 'root',
+  providedIn: 'root',
 })
 export class CanAccessSplashPageGuard implements CanLoad {
-    constructor(
-        private userService: UserService,
-        private windowRef: WindowRef
-    ) {}
+  constructor(
+    private userService: UserService,
+    private windowRef: WindowRef
+  ) {}
 
-    canLoad(route: Route, segments: UrlSegment[]): Promise<boolean> {
-        return this.userService.getUserInfoAsync().then(
-            userInfo => {
-                if (userInfo.isLoggedIn()) {
-                    this.userService
-                        .getUserPreferredDashboardAsync()
-                        .then(preferredDashboard => {
-                            // Use router.navigate once both learner dashbaord page and
-                            // creator dashboard page are migrated to angular router.
-                            this.windowRef.nativeWindow.location.href =
-                                '/' + preferredDashboard + '-dashboard';
-                        });
-                    return false;
-                } else {
-                    return true;
-                }
-            },
-            () => {
-                return true;
-            }
-        );
-    }
+  canLoad(route: Route, segments: UrlSegment[]): Promise<boolean> {
+    return this.userService.getUserInfoAsync().then(
+      userInfo => {
+        if (userInfo.isLoggedIn()) {
+          this.userService
+            .getUserPreferredDashboardAsync()
+            .then(preferredDashboard => {
+              // Use router.navigate once both learner dashbaord page and
+              // creator dashboard page are migrated to angular router.
+              this.windowRef.nativeWindow.location.href =
+                '/' + preferredDashboard + '-dashboard';
+            });
+          return false;
+        } else {
+          return true;
+        }
+      },
+      () => {
+        return true;
+      }
+    );
+  }
 }

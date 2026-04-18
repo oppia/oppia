@@ -23,236 +23,221 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {StateBackendDict, State} from 'domain/state/state.model';
 import {VersionHistoryBackendApiService} from 'pages/exploration-editor-page/services/version-history-backend-api.service';
 import {
-    StateDiffData,
-    VersionHistoryService,
+  StateDiffData,
+  VersionHistoryService,
 } from 'pages/exploration-editor-page/services/version-history.service';
 import {StateVersionHistoryComponent} from './state-version-history.component';
 
 describe('State version history component', () => {
-    let component: StateVersionHistoryComponent;
-    let fixture: ComponentFixture<StateVersionHistoryComponent>;
-    let versionHistoryService: VersionHistoryService;
-    let stateObject: StateBackendDict;
-    let ngbModal: NgbModal;
-    let versionHistoryBackendApiService: VersionHistoryBackendApiService;
+  let component: StateVersionHistoryComponent;
+  let fixture: ComponentFixture<StateVersionHistoryComponent>;
+  let versionHistoryService: VersionHistoryService;
+  let stateObject: StateBackendDict;
+  let ngbModal: NgbModal;
+  let versionHistoryBackendApiService: VersionHistoryBackendApiService;
 
-    class MockNgbModal {
-        open() {
-            return {
-                result: Promise.resolve(),
-            };
-        }
+  class MockNgbModal {
+    open() {
+      return {
+        result: Promise.resolve(),
+      };
     }
+  }
 
-    beforeEach(waitForAsync(() => {
-        TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule],
-            declarations: [StateVersionHistoryComponent],
-            providers: [
-                VersionHistoryBackendApiService,
-                VersionHistoryService,
-                {
-                    provide: NgbModal,
-                    useClass: MockNgbModal,
-                },
-            ],
-            schemas: [NO_ERRORS_SCHEMA],
-        }).compileComponents();
-    }));
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [StateVersionHistoryComponent],
+      providers: [
+        VersionHistoryBackendApiService,
+        VersionHistoryService,
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal,
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
+  }));
 
-    beforeEach(() => {
-        fixture = TestBed.createComponent(StateVersionHistoryComponent);
-        component = fixture.componentInstance;
-        versionHistoryBackendApiService = TestBed.inject(
-            VersionHistoryBackendApiService
-        );
-        versionHistoryService = TestBed.inject(VersionHistoryService);
-        ngbModal = TestBed.inject(NgbModal);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(StateVersionHistoryComponent);
+    component = fixture.componentInstance;
+    versionHistoryBackendApiService = TestBed.inject(
+      VersionHistoryBackendApiService
+    );
+    versionHistoryService = TestBed.inject(VersionHistoryService);
+    ngbModal = TestBed.inject(NgbModal);
 
-        stateObject = {
-            classifier_model_id: null,
-            content: {
-                content_id: 'content',
-                html: '',
+    stateObject = {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: '',
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: 1,
+          },
+          placeholder: {
+            value: {
+              unicode_str: 'Type your answer here.',
+              content_id: '',
             },
-            interaction: {
-                answer_groups: [],
-                confirmed_unclassified_answers: [],
-                customization_args: {
-                    rows: {
-                        value: 1,
-                    },
-                    placeholder: {
-                        value: {
-                            unicode_str: 'Type your answer here.',
-                            content_id: '',
-                        },
-                    },
-                },
-                default_outcome: {
-                    dest: '(untitled state)',
-                    dest_if_really_stuck: null,
-                    feedback: {
-                        content_id: 'default_outcome',
-                        html: '',
-                    },
-                    param_changes: [],
-                    labelled_as_correct: false,
-                    refresher_exploration_id: null,
-                    missing_prerequisite_skill_id: null,
-                },
-                hints: [],
-                solution: null,
-                id: 'TextInput',
-            },
-            linked_skill_id: null,
-            inapplicable_skill_misconception_ids: null,
-            param_changes: [],
-            solicit_answer_details: false,
-            card_is_checkpoint: false,
+          },
+        },
+        default_outcome: {
+          dest: '(untitled state)',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'default_outcome',
+            html: '',
+          },
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        },
+        hints: [],
+        solution: null,
+        id: 'TextInput',
+      },
+      linked_skill_id: null,
+      inapplicable_skill_misconception_ids: null,
+      param_changes: [],
+      solicit_answer_details: false,
+      card_is_checkpoint: false,
+    };
+    let stateData = State.createFromBackendDict('State', stateObject);
+    spyOn(
+      versionHistoryBackendApiService,
+      'fetchStateVersionHistoryAsync'
+    ).and.resolveTo({
+      lastEditedVersionNumber: 2,
+      stateNameInPreviousVersion: 'State',
+      stateInPreviousVersion: stateData,
+      lastEditedCommitterUsername: 'some',
+    });
+  });
+
+  it('should get the last edited version number for the active state', () => {
+    spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValue({
+      oldVersionNumber: 3,
+    } as StateDiffData);
+
+    expect(component.getLastEditedVersionNumber()).toEqual(3);
+  });
+
+  it('should get the last edited committer username for the active state', () => {
+    spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValue({
+      committerUsername: 'some',
+    } as StateDiffData);
+
+    expect(component.getLastEditedCommitterUsername()).toEqual('some');
+  });
+
+  it('should throw error when last edited version number is null', () => {
+    spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValue({
+      oldVersionNumber: null,
+    } as StateDiffData);
+
+    expect(() => component.getLastEditedVersionNumber()).toThrowError(
+      'The value of last edited version number cannot be null'
+    );
+  });
+
+  it('should get whether version history can be explored', () => {
+    spyOn(
+      versionHistoryService,
+      'canShowBackwardStateDiffData'
+    ).and.returnValue(true);
+
+    expect(component.canShowExploreVersionHistoryButton()).toBe(true);
+  });
+
+  it(
+    'should open the state version history modal on clicking the explore ' +
+      'version history button',
+    () => {
+      class MockComponentInstance {
+        componentInstance = {
+          newState: null,
+          newStateName: 'A',
+          oldState: null,
+          oldStateName: 'B',
+          headers: {
+            leftPane: '',
+            rightPane: '',
+          },
         };
-        let stateData = State.createFromBackendDict('State', stateObject);
-        spyOn(
-            versionHistoryBackendApiService,
-            'fetchStateVersionHistoryAsync'
-        ).and.resolveTo({
-            lastEditedVersionNumber: 2,
-            stateNameInPreviousVersion: 'State',
-            stateInPreviousVersion: stateData,
-            lastEditedCommitterUsername: 'some',
-        });
-    });
+      }
+      spyOn(ngbModal, 'open').and.returnValues(
+        {
+          componentInstance: MockComponentInstance,
+          result: Promise.resolve(),
+        } as NgbModalRef,
+        {
+          componentInstance: MockComponentInstance,
+          result: Promise.reject(),
+        } as NgbModalRef
+      );
+      let stateData = State.createFromBackendDict('State', stateObject);
+      spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValue({
+        oldState: stateData,
+        newState: stateData,
+        oldVersionNumber: 3,
+      } as StateDiffData);
 
-    it('should get the last edited version number for the active state', () => {
-        spyOn(
-            versionHistoryService,
-            'getBackwardStateDiffData'
-        ).and.returnValue({
-            oldVersionNumber: 3,
-        } as StateDiffData);
+      component.onClickExploreVersionHistoryButton();
 
-        expect(component.getLastEditedVersionNumber()).toEqual(3);
-    });
+      expect(ngbModal.open).toHaveBeenCalled();
 
-    it('should get the last edited committer username for the active state', () => {
-        spyOn(
-            versionHistoryService,
-            'getBackwardStateDiffData'
-        ).and.returnValue({
-            committerUsername: 'some',
-        } as StateDiffData);
+      component.onClickExploreVersionHistoryButton();
+    }
+  );
 
-        expect(component.getLastEditedCommitterUsername()).toEqual('some');
-    });
+  it(
+    'should throw error on exploring version history when state' +
+      ' names from version history data are not defined',
+    () => {
+      class MockComponentInstance {
+        componentInstance = {
+          newState: null,
+          newStateName: 'A',
+          oldState: null,
+          oldStateName: 'B',
+          headers: {
+            leftPane: '',
+            rightPane: '',
+          },
+        };
+      }
+      spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValues(
+        {
+          oldState: State.createFromBackendDict(null, stateObject),
+          newState: State.createFromBackendDict(null, stateObject),
+          oldVersionNumber: 3,
+        } as StateDiffData,
+        {
+          oldState: State.createFromBackendDict(null, stateObject),
+          newState: State.createFromBackendDict('State', stateObject),
+          oldVersionNumber: 3,
+        } as StateDiffData
+      );
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: MockComponentInstance,
+        result: Promise.resolve(),
+      } as NgbModalRef);
 
-    it('should throw error when last edited version number is null', () => {
-        spyOn(
-            versionHistoryService,
-            'getBackwardStateDiffData'
-        ).and.returnValue({
-            oldVersionNumber: null,
-        } as StateDiffData);
-
-        expect(() => component.getLastEditedVersionNumber()).toThrowError(
-            'The value of last edited version number cannot be null'
-        );
-    });
-
-    it('should get whether version history can be explored', () => {
-        spyOn(
-            versionHistoryService,
-            'canShowBackwardStateDiffData'
-        ).and.returnValue(true);
-
-        expect(component.canShowExploreVersionHistoryButton()).toBe(true);
-    });
-
-    it(
-        'should open the state version history modal on clicking the explore ' +
-            'version history button',
-        () => {
-            class MockComponentInstance {
-                componentInstance = {
-                    newState: null,
-                    newStateName: 'A',
-                    oldState: null,
-                    oldStateName: 'B',
-                    headers: {
-                        leftPane: '',
-                        rightPane: '',
-                    },
-                };
-            }
-            spyOn(ngbModal, 'open').and.returnValues(
-                {
-                    componentInstance: MockComponentInstance,
-                    result: Promise.resolve(),
-                } as NgbModalRef,
-                {
-                    componentInstance: MockComponentInstance,
-                    result: Promise.reject(),
-                } as NgbModalRef
-            );
-            let stateData = State.createFromBackendDict('State', stateObject);
-            spyOn(
-                versionHistoryService,
-                'getBackwardStateDiffData'
-            ).and.returnValue({
-                oldState: stateData,
-                newState: stateData,
-                oldVersionNumber: 3,
-            } as StateDiffData);
-
-            component.onClickExploreVersionHistoryButton();
-
-            expect(ngbModal.open).toHaveBeenCalled();
-
-            component.onClickExploreVersionHistoryButton();
-        }
-    );
-
-    it(
-        'should throw error on exploring version history when state' +
-            ' names from version history data are not defined',
-        () => {
-            class MockComponentInstance {
-                componentInstance = {
-                    newState: null,
-                    newStateName: 'A',
-                    oldState: null,
-                    oldStateName: 'B',
-                    headers: {
-                        leftPane: '',
-                        rightPane: '',
-                    },
-                };
-            }
-            spyOn(
-                versionHistoryService,
-                'getBackwardStateDiffData'
-            ).and.returnValues(
-                {
-                    oldState: State.createFromBackendDict(null, stateObject),
-                    newState: State.createFromBackendDict(null, stateObject),
-                    oldVersionNumber: 3,
-                } as StateDiffData,
-                {
-                    oldState: State.createFromBackendDict(null, stateObject),
-                    newState: State.createFromBackendDict('State', stateObject),
-                    oldVersionNumber: 3,
-                } as StateDiffData
-            );
-            spyOn(ngbModal, 'open').and.returnValue({
-                componentInstance: MockComponentInstance,
-                result: Promise.resolve(),
-            } as NgbModalRef);
-
-            expect(() =>
-                component.onClickExploreVersionHistoryButton()
-            ).toThrowError('State name cannot be null');
-            expect(() =>
-                component.onClickExploreVersionHistoryButton()
-            ).toThrowError('State name cannot be null');
-        }
-    );
+      expect(() => component.onClickExploreVersionHistoryButton()).toThrowError(
+        'State name cannot be null'
+      );
+      expect(() => component.onClickExploreVersionHistoryButton()).toThrowError(
+        'State name cannot be null'
+      );
+    }
+  );
 });

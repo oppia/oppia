@@ -19,39 +19,39 @@
 
 import {Injectable} from '@angular/core';
 import {
-    ActivatedRouteSnapshot,
-    CanActivate,
-    Router,
-    RouterStateSnapshot,
+  ActivatedRouteSnapshot,
+  CanActivate,
+  Router,
+  RouterStateSnapshot,
 } from '@angular/router';
 
 import {AppConstants} from 'app.constants';
 import {UserService} from 'services/user.service';
 
 @Injectable({
-    providedIn: 'root',
+  providedIn: 'root',
 })
 export class IsLoggedInGuard implements CanActivate {
-    constructor(
-        private userService: UserService,
-        private router: Router
-    ) {}
+  constructor(
+    private userService: UserService,
+    private router: Router
+  ) {}
 
-    async canActivate(
-        route: ActivatedRouteSnapshot,
-        state: RouterStateSnapshot
-    ): Promise<boolean> {
-        const userInfo = await this.userService.getUserInfoAsync();
-        if (userInfo.isLoggedIn()) {
-            return true;
-        }
-
-        this.router.navigate(
-            [`/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN.ROUTE}`],
-            {
-                queryParams: {return_url: state.url},
-            }
-        );
-        return false;
+  async canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Promise<boolean> {
+    const userInfo = await this.userService.getUserInfoAsync();
+    if (userInfo.isLoggedIn()) {
+      return true;
     }
+
+    this.router.navigate(
+      [`/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN.ROUTE}`],
+      {
+        queryParams: {return_url: state.url},
+      }
+    );
+    return false;
+  }
 }

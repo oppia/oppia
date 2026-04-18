@@ -20,11 +20,11 @@ import {RouterService} from './router.service';
 import {Subscription} from 'rxjs';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {
-    discardPeriodicTasks,
-    fakeAsync,
-    flush,
-    TestBed,
-    tick,
+  discardPeriodicTasks,
+  fakeAsync,
+  flush,
+  TestBed,
+  tick,
 } from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {PageContextService} from 'services/page-context.service';
@@ -36,394 +36,388 @@ import {TranslationLanguageService} from 'pages/exploration-editor-page/translat
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 class MockPageContextService {
-    getExplorationId() {
-        return 'expID';
-    }
+  getExplorationId() {
+    return 'expID';
+  }
 }
 
 class MockExplorationInitStateNameService {
-    savedMemento = 'main';
+  savedMemento = 'main';
 }
 
 class MockActiveModal {
-    dismiss(): void {
-        return;
-    }
+  dismiss(): void {
+    return;
+  }
 }
 
 describe('Router Service', () => {
-    let routerService: RouterService;
-    let testSubscriptions: Subscription;
-    let explorationImprovementsService: ExplorationImprovementsService;
-    let explorationStatesService: ExplorationStatesService;
-    let stateEditorService: StateEditorService;
-    let translationLanguageService: TranslationLanguageService;
-    let windowRef: WindowRef;
-    let hasStateSpy: jasmine.Spy;
-    let isInitializedSpy: jasmine.Spy;
+  let routerService: RouterService;
+  let testSubscriptions: Subscription;
+  let explorationImprovementsService: ExplorationImprovementsService;
+  let explorationStatesService: ExplorationStatesService;
+  let stateEditorService: StateEditorService;
+  let translationLanguageService: TranslationLanguageService;
+  let windowRef: WindowRef;
+  let hasStateSpy: jasmine.Spy;
+  let isInitializedSpy: jasmine.Spy;
 
-    beforeEach(() => {
-        TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule],
-            providers: [
-                RouterService,
-                WindowRef,
-                {
-                    provide: NgbActiveModal,
-                    useClass: MockActiveModal,
-                },
-                ExplorationImprovementsService,
-                ExplorationStatesService,
-                StateEditorService,
-                TranslationLanguageService,
-                {
-                    provide: PageContextService,
-                    useClass: MockPageContextService,
-                },
-                {
-                    provide: ExplorationInitStateNameService,
-                    useClass: MockExplorationInitStateNameService,
-                },
-            ],
-        });
-
-        routerService = TestBed.inject(RouterService);
-        explorationImprovementsService = TestBed.inject(
-            ExplorationImprovementsService
-        );
-        explorationStatesService = TestBed.inject(ExplorationStatesService);
-        windowRef = TestBed.inject(WindowRef);
-        stateEditorService = TestBed.inject(StateEditorService);
-        translationLanguageService = TestBed.inject(TranslationLanguageService);
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        RouterService,
+        WindowRef,
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
+        ExplorationImprovementsService,
+        ExplorationStatesService,
+        StateEditorService,
+        TranslationLanguageService,
+        {
+          provide: PageContextService,
+          useClass: MockPageContextService,
+        },
+        {
+          provide: ExplorationInitStateNameService,
+          useClass: MockExplorationInitStateNameService,
+        },
+      ],
     });
 
-    beforeEach(() => {
-        isInitializedSpy = spyOn(explorationStatesService, 'isInitialized');
-        isInitializedSpy.and.returnValue(true);
-        hasStateSpy = spyOn(explorationStatesService, 'hasState');
-        hasStateSpy.and.returnValue(true);
-        spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+    routerService = TestBed.inject(RouterService);
+    explorationImprovementsService = TestBed.inject(
+      ExplorationImprovementsService
+    );
+    explorationStatesService = TestBed.inject(ExplorationStatesService);
+    windowRef = TestBed.inject(WindowRef);
+    stateEditorService = TestBed.inject(StateEditorService);
+    translationLanguageService = TestBed.inject(TranslationLanguageService);
+  });
 
-        testSubscriptions = new Subscription();
-        routerService.navigateToMainTab('first card');
-    });
-    afterEach(() => {
-        testSubscriptions.unsubscribe();
-    });
+  beforeEach(() => {
+    isInitializedSpy = spyOn(explorationStatesService, 'isInitialized');
+    isInitializedSpy.and.returnValue(true);
+    hasStateSpy = spyOn(explorationStatesService, 'hasState');
+    hasStateSpy.and.returnValue(true);
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
 
-    it('should not navigate to main tab when already there', fakeAsync(() => {
-        spyOn(document, 'querySelector')
-            .withArgs('.oppia-editor-cards-container')
-            .and.returnValue(document.createElement('div'));
+    testSubscriptions = new Subscription();
+    routerService.navigateToMainTab('first card');
+  });
+  afterEach(() => {
+    testSubscriptions.unsubscribe();
+  });
 
-        expect(routerService.getActiveTabName()).toBe('main');
-        routerService.navigateToPreviewTab();
-        tick(300);
+  it('should not navigate to main tab when already there', fakeAsync(() => {
+    spyOn(document, 'querySelector')
+      .withArgs('.oppia-editor-cards-container')
+      .and.returnValue(document.createElement('div'));
 
-        routerService.navigateToMainTab('first card');
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToPreviewTab();
+    tick(300);
 
-        tick(300);
+    routerService.navigateToMainTab('first card');
 
-        expect(routerService.getActiveTabName()).toBe('main');
+    tick(300);
 
-        routerService.navigateToMainTab('first card');
+    expect(routerService.getActiveTabName()).toBe('main');
 
-        tick(300);
+    routerService.navigateToMainTab('first card');
 
-        expect(routerService.getActiveTabName()).toBe('main');
+    tick(300);
 
-        flush();
-        discardPeriodicTasks();
-    }));
+    expect(routerService.getActiveTabName()).toBe('main');
 
-    it('should navigate to main tab if path is ""', fakeAsync(() => {
-        window.location.hash = '';
-        routerService._changeTab('');
+    flush();
+    discardPeriodicTasks();
+  }));
 
-        tick(300);
+  it('should navigate to main tab if path is ""', fakeAsync(() => {
+    window.location.hash = '';
+    routerService._changeTab('');
 
-        routerService.onCenterGraph.emit();
-        expect(routerService.getActiveTabName()).toBe('main');
+    tick(300);
 
-        flush();
-        discardPeriodicTasks();
-    }));
+    routerService.onCenterGraph.emit();
+    expect(routerService.getActiveTabName()).toBe('main');
 
-    it('should navigate to setting tab', fakeAsync(() => {
-        expect(routerService.getActiveTabName()).toBe('main');
-        routerService.navigateToSettingsTab();
+    flush();
+    discardPeriodicTasks();
+  }));
 
-        tick(300);
+  it('should navigate to setting tab', fakeAsync(() => {
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToSettingsTab();
 
-        routerService.onRefreshSettingsTab.emit();
-        expect(routerService.getActiveTabName()).toBe('settings');
+    tick(300);
 
-        flush();
-        discardPeriodicTasks();
-    }));
+    routerService.onRefreshSettingsTab.emit();
+    expect(routerService.getActiveTabName()).toBe('settings');
 
-    it('should navigate to translation tab', fakeAsync(() => {
-        expect(routerService.getActiveTabName()).toBe('main');
-        routerService.navigateToTranslationTab();
+    flush();
+    discardPeriodicTasks();
+  }));
 
-        routerService.onRefreshTranslationTab.emit();
-        tick(300);
+  it('should navigate to translation tab', fakeAsync(() => {
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToTranslationTab();
 
-        expect(routerService.getActiveTabName()).toBe('translation');
+    routerService.onRefreshTranslationTab.emit();
+    tick(300);
 
-        flush();
-        discardPeriodicTasks();
-    }));
+    expect(routerService.getActiveTabName()).toBe('translation');
 
-    it('should set active state when navigating to translation tab with state', () => {
-        const setActiveStateNameSpy = spyOn(
-            stateEditorService,
-            'setActiveStateName'
-        );
-        const actuallyNavigateSpy = spyOn(routerService, '_actuallyNavigate');
+    flush();
+    discardPeriodicTasks();
+  }));
 
-        routerService.navigateToTranslationTab('Introduction');
+  it('should set active state when navigating to translation tab with state', () => {
+    const setActiveStateNameSpy = spyOn(
+      stateEditorService,
+      'setActiveStateName'
+    );
+    const actuallyNavigateSpy = spyOn(routerService, '_actuallyNavigate');
 
-        expect(setActiveStateNameSpy).toHaveBeenCalledWith('Introduction');
-        expect(actuallyNavigateSpy).toHaveBeenCalledWith(
-            'translation',
-            'Introduction'
-        );
-    });
+    routerService.navigateToTranslationTab('Introduction');
 
-    it('should navigate to translation tab', fakeAsync(() => {
-        window.location.hash = '/translation/Start/ca_buttonText_6';
-        routerService._changeTab('/translation/Start/ca_buttonText_6');
+    expect(setActiveStateNameSpy).toHaveBeenCalledWith('Introduction');
+    expect(actuallyNavigateSpy).toHaveBeenCalledWith(
+      'translation',
+      'Introduction'
+    );
+  });
 
-        tick(300);
+  it('should navigate to translation tab', fakeAsync(() => {
+    window.location.hash = '/translation/Start/ca_buttonText_6';
+    routerService._changeTab('/translation/Start/ca_buttonText_6');
 
-        expect(stateEditorService.getInitActiveContentId()).toBe(
-            'ca_buttonText_6'
-        );
-    }));
+    tick(300);
 
-    it('should navigate to translation tab with correct voiceover language', fakeAsync(() => {
-        window.location.hash = '/translation/Start/ca_buttonText_6/ak';
-        routerService._changeTab('/translation/Start/ca_buttonText_6/ak');
+    expect(stateEditorService.getInitActiveContentId()).toBe('ca_buttonText_6');
+  }));
 
-        tick(300);
+  it('should navigate to translation tab with correct voiceover language', fakeAsync(() => {
+    window.location.hash = '/translation/Start/ca_buttonText_6/ak';
+    routerService._changeTab('/translation/Start/ca_buttonText_6/ak');
 
-        expect(translationLanguageService.getActiveLanguageCode()).toBe('ak');
-    }));
+    tick(300);
 
-    it('should navigate to preview tab', fakeAsync(() => {
-        expect(routerService.getActiveTabName()).toBe('main');
-        routerService.navigateToPreviewTab();
+    expect(translationLanguageService.getActiveLanguageCode()).toBe('ak');
+  }));
 
-        tick(300);
+  it('should navigate to preview tab', fakeAsync(() => {
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToPreviewTab();
 
-        expect(routerService.getActiveTabName()).toBe('preview');
+    tick(300);
 
-        flush();
-        discardPeriodicTasks();
-    }));
+    expect(routerService.getActiveTabName()).toBe('preview');
 
-    it('should navigate to preview tab', fakeAsync(() => {
-        hasStateSpy.and.returnValue(false);
-        isInitializedSpy.and.returnValue(true);
-        tick();
-        expect(routerService.getActiveTabName()).toBe('main');
-        routerService.navigateToPreviewTab();
+    flush();
+    discardPeriodicTasks();
+  }));
 
-        tick(3000);
+  it('should navigate to preview tab', fakeAsync(() => {
+    hasStateSpy.and.returnValue(false);
+    isInitializedSpy.and.returnValue(true);
+    tick();
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToPreviewTab();
 
-        expect(routerService.getActiveTabName()).toBe('preview');
+    tick(3000);
 
-        flush();
-        discardPeriodicTasks();
-    }));
+    expect(routerService.getActiveTabName()).toBe('preview');
 
-    it('should navigate to stats tab', fakeAsync(() => {
-        expect(routerService.getActiveTabName()).toBe('main');
-        routerService.navigateToStatsTab();
+    flush();
+    discardPeriodicTasks();
+  }));
 
-        tick(300);
+  it('should navigate to stats tab', fakeAsync(() => {
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToStatsTab();
 
-        routerService.onRefreshStatisticsTab.emit();
-        expect(routerService.getActiveTabName()).toBe('stats');
+    tick(300);
 
-        flush();
-        discardPeriodicTasks();
-    }));
+    routerService.onRefreshStatisticsTab.emit();
+    expect(routerService.getActiveTabName()).toBe('stats');
 
-    it('should navigate to main tab if improvements tab is not enabled', fakeAsync(() => {
-        spyOn(
-            explorationImprovementsService,
-            'isImprovementsTabEnabledAsync'
-        ).and.returnValue(Promise.resolve(false));
+    flush();
+    discardPeriodicTasks();
+  }));
 
-        expect(routerService.getActiveTabName()).toBe('main');
+  it('should navigate to main tab if improvements tab is not enabled', fakeAsync(() => {
+    spyOn(
+      explorationImprovementsService,
+      'isImprovementsTabEnabledAsync'
+    ).and.returnValue(Promise.resolve(false));
 
-        routerService.navigateToImprovementsTab();
-        tick(300);
+    expect(routerService.getActiveTabName()).toBe('main');
 
-        expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToImprovementsTab();
+    tick(300);
 
-        flush();
-        discardPeriodicTasks();
-    }));
+    expect(routerService.getActiveTabName()).toBe('main');
 
-    it('should navigate to improvements tab is not enabled', fakeAsync(() => {
-        spyOn(
-            explorationImprovementsService,
-            'isImprovementsTabEnabledAsync'
-        ).and.returnValue(Promise.resolve(true));
+    flush();
+    discardPeriodicTasks();
+  }));
 
-        expect(routerService.getActiveTabName()).toBe('main');
-        routerService.navigateToImprovementsTab();
+  it('should navigate to improvements tab is not enabled', fakeAsync(() => {
+    spyOn(
+      explorationImprovementsService,
+      'isImprovementsTabEnabledAsync'
+    ).and.returnValue(Promise.resolve(true));
 
-        tick(300);
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToImprovementsTab();
 
-        expect(routerService.getActiveTabName()).toBe('improvements');
+    tick(300);
 
-        flush();
-        discardPeriodicTasks();
-    }));
+    expect(routerService.getActiveTabName()).toBe('improvements');
 
-    it('should navigate to history tab', fakeAsync(() => {
-        expect(routerService.getActiveTabName()).toBe('main');
-        routerService.navigateToHistoryTab();
+    flush();
+    discardPeriodicTasks();
+  }));
 
-        tick(300);
+  it('should navigate to history tab', fakeAsync(() => {
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToHistoryTab();
 
-        routerService.onRefreshVersionHistory.emit();
-        expect(routerService.getActiveTabName()).toBe('history');
+    tick(300);
 
-        flush();
-        discardPeriodicTasks();
-    }));
+    routerService.onRefreshVersionHistory.emit();
+    expect(routerService.getActiveTabName()).toBe('history');
 
-    it('should navigate to feedback tab', fakeAsync(() => {
-        expect(routerService.getActiveTabName()).toBe('main');
-        routerService.navigateToFeedbackTab();
+    flush();
+    discardPeriodicTasks();
+  }));
 
-        tick(300);
+  it('should navigate to feedback tab', fakeAsync(() => {
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToFeedbackTab();
 
-        expect(routerService.getActiveTabName()).toBe('feedback');
+    tick(300);
 
-        flush();
-        discardPeriodicTasks();
-    }));
+    expect(routerService.getActiveTabName()).toBe('feedback');
 
-    it('should navigate to main tab when newpath is unknow', fakeAsync(() => {
-        expect(routerService.getActiveTabName()).toBe('main');
+    flush();
+    discardPeriodicTasks();
+  }));
 
-        routerService._changeTab('error-page');
-        tick(300);
+  it('should navigate to main tab when newpath is unknow', fakeAsync(() => {
+    expect(routerService.getActiveTabName()).toBe('main');
 
-        expect(routerService.getActiveTabName()).toBe('main');
+    routerService._changeTab('error-page');
+    tick(300);
 
-        flush();
-        discardPeriodicTasks();
-    }));
+    expect(routerService.getActiveTabName()).toBe('main');
 
-    it('should tell isLocationSetToNonStateEditorTab', fakeAsync(() => {
-        spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-            location: {
-                hash: '#/settings',
-            },
-        });
+    flush();
+    discardPeriodicTasks();
+  }));
 
-        expect(routerService.isLocationSetToNonStateEditorTab()).toBe(true);
-
-        flush();
-        discardPeriodicTasks();
-    }));
-
-    it('should tell current State From Location Path to be null', fakeAsync(() => {
-        spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-            location: {
-                hash: '#/gui/Introduction',
-            },
-            scrollTo: () => {},
-        });
-
-        routerService.savePendingChanges();
-        expect(routerService.getCurrentStateFromLocationPath()).toBe(
-            '/Introduction'
-        );
-
-        routerService.navigateToMainTab('/Introduction');
-        flush();
-        discardPeriodicTasks();
-    }));
-
-    it('should fadeOut, navigate, and fadeIn when navigating to main tab', fakeAsync(() => {
-        const service = routerService as unknown as {
-            _savePendingChanges: () => void;
-            _getCurrentStateFromLocationPath: () => string;
-            _actuallyNavigate: (slug: string, state: string | null) => void;
-            _activeTabName: string;
-            TABS: {MAIN: {name: string}};
-            SLUG_GUI: string;
-            navigateToMainTab: (state: string | null) => void;
-        };
-
-        spyOn(service, '_savePendingChanges');
-        spyOn(service, '_getCurrentStateFromLocationPath').and.returnValue(
-            '/oldState'
-        );
-        const navigateSpy = spyOn(service, '_actuallyNavigate');
-
-        service._activeTabName = service.TABS.MAIN.name;
-
-        // Create a fake container.
-        const container = document.createElement('div');
-        container.className = 'oppia-editor-cards-container';
-        container.style.opacity = '1';
-        document.body.appendChild(container);
-
-        spyOn(window, 'requestAnimationFrame').and.callFake(
-            (cb: FrameRequestCallback) => {
-                setTimeout(() => cb(performance.now()), 0);
-                return 0;
-            }
-        );
-
-        service.navigateToMainTab('newState');
-
-        tick(200);
-        tick(150);
-        tick(200);
-
-        expect(navigateSpy).toHaveBeenCalledWith(service.SLUG_GUI, 'newState');
-        expect(container.style.opacity).toBe('1');
-
-        document.body.removeChild(container);
-        flush();
-        discardPeriodicTasks();
-    }));
-
-    it('should navigate to main tab when current location state is null', () => {
-        spyOn(routerService, '_savePendingChanges');
-        spyOn(
-            routerService,
-            '_getCurrentStateFromLocationPath'
-        ).and.returnValue(null);
-        spyOn(document, 'querySelector').and.returnValue(null);
-        const navigateSpy = spyOn(routerService, '_actuallyNavigate');
-
-        routerService.navigateToMainTab('newState');
-
-        expect(routerService._savePendingChanges).toHaveBeenCalled();
-        expect(navigateSpy).toHaveBeenCalledWith('gui', 'newState');
+  it('should tell isLocationSetToNonStateEditorTab', fakeAsync(() => {
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      location: {
+        hash: '#/settings',
+      },
     });
 
-    it('should not navigate to main tab', () => {
-        spyOn(
-            routerService,
-            '_getCurrentStateFromLocationPath'
-        ).and.returnValue('/main');
+    expect(routerService.isLocationSetToNonStateEditorTab()).toBe(true);
 
-        routerService.navigateToMainTab('main');
+    flush();
+    discardPeriodicTasks();
+  }));
 
-        expect(
-            routerService._getCurrentStateFromLocationPath
-        ).toHaveBeenCalled();
+  it('should tell current State From Location Path to be null', fakeAsync(() => {
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      location: {
+        hash: '#/gui/Introduction',
+      },
+      scrollTo: () => {},
     });
+
+    routerService.savePendingChanges();
+    expect(routerService.getCurrentStateFromLocationPath()).toBe(
+      '/Introduction'
+    );
+
+    routerService.navigateToMainTab('/Introduction');
+    flush();
+    discardPeriodicTasks();
+  }));
+
+  it('should fadeOut, navigate, and fadeIn when navigating to main tab', fakeAsync(() => {
+    const service = routerService as unknown as {
+      _savePendingChanges: () => void;
+      _getCurrentStateFromLocationPath: () => string;
+      _actuallyNavigate: (slug: string, state: string | null) => void;
+      _activeTabName: string;
+      TABS: {MAIN: {name: string}};
+      SLUG_GUI: string;
+      navigateToMainTab: (state: string | null) => void;
+    };
+
+    spyOn(service, '_savePendingChanges');
+    spyOn(service, '_getCurrentStateFromLocationPath').and.returnValue(
+      '/oldState'
+    );
+    const navigateSpy = spyOn(service, '_actuallyNavigate');
+
+    service._activeTabName = service.TABS.MAIN.name;
+
+    // Create a fake container.
+    const container = document.createElement('div');
+    container.className = 'oppia-editor-cards-container';
+    container.style.opacity = '1';
+    document.body.appendChild(container);
+
+    spyOn(window, 'requestAnimationFrame').and.callFake(
+      (cb: FrameRequestCallback) => {
+        setTimeout(() => cb(performance.now()), 0);
+        return 0;
+      }
+    );
+
+    service.navigateToMainTab('newState');
+
+    tick(200);
+    tick(150);
+    tick(200);
+
+    expect(navigateSpy).toHaveBeenCalledWith(service.SLUG_GUI, 'newState');
+    expect(container.style.opacity).toBe('1');
+
+    document.body.removeChild(container);
+    flush();
+    discardPeriodicTasks();
+  }));
+
+  it('should navigate to main tab when current location state is null', () => {
+    spyOn(routerService, '_savePendingChanges');
+    spyOn(routerService, '_getCurrentStateFromLocationPath').and.returnValue(
+      null
+    );
+    spyOn(document, 'querySelector').and.returnValue(null);
+    const navigateSpy = spyOn(routerService, '_actuallyNavigate');
+
+    routerService.navigateToMainTab('newState');
+
+    expect(routerService._savePendingChanges).toHaveBeenCalled();
+    expect(navigateSpy).toHaveBeenCalledWith('gui', 'newState');
+  });
+
+  it('should not navigate to main tab', () => {
+    spyOn(routerService, '_getCurrentStateFromLocationPath').and.returnValue(
+      '/main'
+    );
+
+    routerService.navigateToMainTab('main');
+
+    expect(routerService._getCurrentStateFromLocationPath).toHaveBeenCalled();
+  });
 });

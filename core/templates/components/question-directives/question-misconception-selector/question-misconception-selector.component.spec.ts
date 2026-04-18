@@ -21,94 +21,84 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {
-    MisconceptionSkillMap,
-    Misconception,
+  MisconceptionSkillMap,
+  Misconception,
 } from 'domain/skill/misconception.model';
 import {QuestionMisconceptionSelectorComponent} from './question-misconception-selector.component';
 
 describe('Question Misconception Selector Component', () => {
-    let component: QuestionMisconceptionSelectorComponent;
-    let fixture: ComponentFixture<QuestionMisconceptionSelectorComponent>;
-    let stateEditorService: StateEditorService;
+  let component: QuestionMisconceptionSelectorComponent;
+  let fixture: ComponentFixture<QuestionMisconceptionSelectorComponent>;
+  let stateEditorService: StateEditorService;
 
-    let mockMisconceptionObject: MisconceptionSkillMap;
+  let mockMisconceptionObject: MisconceptionSkillMap;
 
-    beforeEach(waitForAsync(() => {
-        TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule],
-            declarations: [QuestionMisconceptionSelectorComponent],
-            providers: [StateEditorService],
-            schemas: [NO_ERRORS_SCHEMA],
-        }).compileComponents();
-    }));
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [QuestionMisconceptionSelectorComponent],
+      providers: [StateEditorService],
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
+  }));
 
-    beforeEach(() => {
-        fixture = TestBed.createComponent(
-            QuestionMisconceptionSelectorComponent
-        );
-        component = fixture.componentInstance;
-        stateEditorService = TestBed.inject(StateEditorService);
-        stateEditorService = TestBed.inject(StateEditorService);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(QuestionMisconceptionSelectorComponent);
+    component = fixture.componentInstance;
+    stateEditorService = TestBed.inject(StateEditorService);
+    stateEditorService = TestBed.inject(StateEditorService);
 
-        mockMisconceptionObject = {
-            abc: [
-                Misconception.create(1, 'misc1', 'notes1', 'feedback1', true),
-            ],
-            def: [
-                Misconception.create(2, 'misc2', 'notes2', 'feedback1', true),
-            ],
-        };
-        spyOn(stateEditorService, 'getMisconceptionsBySkill').and.callFake(
-            () => {
-                return mockMisconceptionObject;
-            }
-        );
-
-        component.selectedMisconception = mockMisconceptionObject.abc[0];
-        component.selectedMisconceptionSkillId = 'abc';
-        fixture.detectChanges();
+    mockMisconceptionObject = {
+      abc: [Misconception.create(1, 'misc1', 'notes1', 'feedback1', true)],
+      def: [Misconception.create(2, 'misc2', 'notes2', 'feedback1', true)],
+    };
+    spyOn(stateEditorService, 'getMisconceptionsBySkill').and.callFake(() => {
+      return mockMisconceptionObject;
     });
 
-    it('should initialize the properties correctly', () => {
-        expect(component.misconceptionFeedbackIsUsed).toBeTrue();
-        expect(component.misconceptionsBySkill).toEqual(
-            mockMisconceptionObject
-        );
+    component.selectedMisconception = mockMisconceptionObject.abc[0];
+    component.selectedMisconceptionSkillId = 'abc';
+    fixture.detectChanges();
+  });
+
+  it('should initialize the properties correctly', () => {
+    expect(component.misconceptionFeedbackIsUsed).toBeTrue();
+    expect(component.misconceptionsBySkill).toEqual(mockMisconceptionObject);
+  });
+
+  it('should toggle feedback usage boolean correctly', () => {
+    expect(component.misconceptionFeedbackIsUsed).toBeTrue();
+
+    component.toggleMisconceptionFeedbackUsage();
+
+    expect(component.misconceptionFeedbackIsUsed).toBeFalse();
+  });
+
+  it('should set selected misconception correctly', () => {
+    expect(component.selectedMisconception).toEqual(
+      mockMisconceptionObject.abc[0]
+    );
+    expect(component.selectedMisconceptionSkillId).toEqual('abc');
+
+    component.selectMisconception(mockMisconceptionObject.def[0], 'def');
+
+    expect(component.selectedMisconception).toEqual(
+      mockMisconceptionObject.def[0]
+    );
+    expect(component.selectedMisconceptionSkillId).toEqual('def');
+  });
+
+  it('should clear selected misconception when selectNoMisconception is called', () => {
+    const emitSpy = spyOn(component.updateMisconceptionValues, 'emit');
+
+    component.selectNoMisconception();
+
+    expect(component.selectedMisconception).toBeNull();
+    expect(component.selectedMisconceptionSkillId).toBeNull();
+    expect(emitSpy).toHaveBeenCalledWith({
+      misconception: null,
+      skillId: null,
+      feedbackIsUsed: component.misconceptionFeedbackIsUsed,
     });
-
-    it('should toggle feedback usage boolean correctly', () => {
-        expect(component.misconceptionFeedbackIsUsed).toBeTrue();
-
-        component.toggleMisconceptionFeedbackUsage();
-
-        expect(component.misconceptionFeedbackIsUsed).toBeFalse();
-    });
-
-    it('should set selected misconception correctly', () => {
-        expect(component.selectedMisconception).toEqual(
-            mockMisconceptionObject.abc[0]
-        );
-        expect(component.selectedMisconceptionSkillId).toEqual('abc');
-
-        component.selectMisconception(mockMisconceptionObject.def[0], 'def');
-
-        expect(component.selectedMisconception).toEqual(
-            mockMisconceptionObject.def[0]
-        );
-        expect(component.selectedMisconceptionSkillId).toEqual('def');
-    });
-
-    it('should clear selected misconception when selectNoMisconception is called', () => {
-        const emitSpy = spyOn(component.updateMisconceptionValues, 'emit');
-
-        component.selectNoMisconception();
-
-        expect(component.selectedMisconception).toBeNull();
-        expect(component.selectedMisconceptionSkillId).toBeNull();
-        expect(emitSpy).toHaveBeenCalledWith({
-            misconception: null,
-            skillId: null,
-            feedbackIsUsed: component.misconceptionFeedbackIsUsed,
-        });
-    });
+  });
 });

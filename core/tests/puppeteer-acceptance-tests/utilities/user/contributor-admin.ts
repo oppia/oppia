@@ -21,7 +21,7 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 
 const ContributorDashboardAdminUrl =
-    testConstants.URLs.ContributorDashboardAdmin;
+  testConstants.URLs.ContributorDashboardAdmin;
 
 const activeTabInContributorAdminPageSelector = '.dashboard-tabs-active';
 const addContributorButtonSelector = '.e2e-test-add-contributor-button';
@@ -31,145 +31,141 @@ const addRightsButtonSelector = '.e2e-test-add-rights-button';
 const contributorCountSelector = '.e2e-test-contributor-count';
 const lastDatePickerInputSelector = '.e2e-test-last-date-picker-input';
 const mobileLastDatePickerInputSelector =
-    '.e2e-test-mobile-last-date-picker-input';
+  '.e2e-test-mobile-last-date-picker-input';
 const statsListItemSelector = '.e2e-test-stats-list-item';
 const tabSelectionDropdownMobileSelector = '.e2e-test-tab-selection-dropdown';
 const newContributorAdminDashboardPageSelector =
-    '.e2e-test-new-contributor-admin-dashboard-page';
+  '.e2e-test-new-contributor-admin-dashboard-page';
 const oldContributorAdminDashboardPageSelector =
-    '.oppia-contributor-dashboard-admin-page-tabs-container';
+  '.oppia-contributor-dashboard-admin-page-tabs-container';
 
 export class ContributorAdmin extends BaseUser {
-    /**
-     * Function for navigating to the contributor dashboard admin page.
-     */
-    async navigateToContributorDashboardAdminPage(): Promise<void> {
-        await this.goto(ContributorDashboardAdminUrl);
-        const newDashVisible = await this.isElementVisible(
-            newContributorAdminDashboardPageSelector
-        );
-        const oldDashVisible = await this.isElementVisible(
-            oldContributorAdminDashboardPageSelector
-        );
-        expect(newDashVisible || oldDashVisible).toBe(true);
+  /**
+   * Function for navigating to the contributor dashboard admin page.
+   */
+  async navigateToContributorDashboardAdminPage(): Promise<void> {
+    await this.goto(ContributorDashboardAdminUrl);
+    const newDashVisible = await this.isElementVisible(
+      newContributorAdminDashboardPageSelector
+    );
+    const oldDashVisible = await this.isElementVisible(
+      oldContributorAdminDashboardPageSelector
+    );
+    expect(newDashVisible || oldDashVisible).toBe(true);
+  }
+
+  /**
+   * Switches to the tab in the contributor dashboard admin page.
+   * @param {'Translation Submitters' | 'Translation Reviewers' | 'Question Submitters' | 'Question Reviewers'} tabName - The name of the tab to switch to.
+   */
+  async switchToTabInContributorAdminPage(
+    tabName:
+      | 'Translation Submitters'
+      | 'Translation Reviewers'
+      | 'Question Submitters'
+      | 'Question Reviewers'
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      // Remove last 's' from the tab name.
+      const modifiedName = tabName.replace(/s$/, '');
+      await this.expectElementToBeVisible(tabSelectionDropdownMobileSelector);
+      await this.updateMatOption(
+        tabSelectionDropdownMobileSelector,
+        modifiedName
+      );
+    } else {
+      const tabNameInLowerCase = tabName.toLocaleLowerCase().replace(' ', '-');
+      const tabSelector = `.e2e-test-${tabNameInLowerCase}-tab`;
+      await this.expectElementToBeVisible(tabSelector);
+      await this.clickOnElementWithSelector(tabSelector);
+
+      const activeTabSelector = `${activeTabInContributorAdminPageSelector} ${tabSelector}`;
+      await this.expectTextContentToBe(
+        activeTabSelector,
+        tabName.replace(' ', '')
+      );
+    }
+  }
+
+  /**
+   * Clicks on the add contributor button.
+   */
+  async clickOnAddReviewerOrSubmitterButton(): Promise<void> {
+    await this.expectElementToBeVisible(addContributorButtonSelector);
+    await this.clickOnElementWithSelector(addContributorButtonSelector);
+
+    await this.expectElementToBeVisible(commonModalTitleSelector);
+    await this.expectTextContentToContain(
+      commonModalTitleSelector,
+      'Enter the username to add'
+    );
+  }
+
+  /**
+   * Adds a username in the username input modal and clicks on the add rights button.
+   * @param username The username to add.
+   */
+  async addUsernameInUsernameInputModal(username: string): Promise<void> {
+    await this.expectElementToBeVisible(commonModalContainerSelector);
+    const modalContainer = await this.page.$(commonModalContainerSelector);
+    if (!modalContainer) {
+      throw new Error('Modal container not found.');
     }
 
-    /**
-     * Switches to the tab in the contributor dashboard admin page.
-     * @param {'Translation Submitters' | 'Translation Reviewers' | 'Question Submitters' | 'Question Reviewers'} tabName - The name of the tab to switch to.
-     */
-    async switchToTabInContributorAdminPage(
-        tabName:
-            | 'Translation Submitters'
-            | 'Translation Reviewers'
-            | 'Question Submitters'
-            | 'Question Reviewers'
-    ): Promise<void> {
-        if (this.isViewportAtMobileWidth()) {
-            // Remove last 's' from the tab name.
-            const modifiedName = tabName.replace(/s$/, '');
-            await this.expectElementToBeVisible(
-                tabSelectionDropdownMobileSelector
-            );
-            await this.updateMatOption(
-                tabSelectionDropdownMobileSelector,
-                modifiedName
-            );
-        } else {
-            const tabNameInLowerCase = tabName
-                .toLocaleLowerCase()
-                .replace(' ', '-');
-            const tabSelector = `.e2e-test-${tabNameInLowerCase}-tab`;
-            await this.expectElementToBeVisible(tabSelector);
-            await this.clickOnElementWithSelector(tabSelector);
+    const usernameInputSelector = `${commonModalContainerSelector} input`;
+    await this.typeInInputField(usernameInputSelector, username);
 
-            const activeTabSelector = `${activeTabInContributorAdminPageSelector} ${tabSelector}`;
-            await this.expectTextContentToBe(
-                activeTabSelector,
-                tabName.replace(' ', '')
-            );
-        }
-    }
+    await this.clickOnElementWithSelector(addRightsButtonSelector);
+    await this.expectElementToBeVisible(addRightsButtonSelector, false);
+  }
 
-    /**
-     * Clicks on the add contributor button.
-     */
-    async clickOnAddReviewerOrSubmitterButton(): Promise<void> {
-        await this.expectElementToBeVisible(addContributorButtonSelector);
-        await this.clickOnElementWithSelector(addContributorButtonSelector);
+  /**
+   * Checks if the number of contributors is as expected.
+   * @param {number} number - The expected number of contributors.
+   */
+  async expectNumberOfContributorsToBe(number: number): Promise<void> {
+    await this.expectTextContentToBe(
+      contributorCountSelector,
+      number.toString()
+    );
+  }
 
-        await this.expectElementToBeVisible(commonModalTitleSelector);
-        await this.expectTextContentToContain(
-            commonModalTitleSelector,
-            'Enter the username to add'
-        );
-    }
+  /**
+   * Sets the "last activity" date filter to yesterday.
+   */
+  async setLastActivityDateFilterToYesterday(): Promise<void> {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const day = String(yesterday.getDate()).padStart(2, '0');
+    const month = yesterday.toLocaleString('en-US', {month: 'short'});
+    const year = String(yesterday.getFullYear());
+    const yesterdayDate = `${day}-${month}-${year}`;
+    const dateInputSelector = this.isViewportAtMobileWidth()
+      ? mobileLastDatePickerInputSelector
+      : lastDatePickerInputSelector;
 
-    /**
-     * Adds a username in the username input modal and clicks on the add rights button.
-     * @param username The username to add.
-     */
-    async addUsernameInUsernameInputModal(username: string): Promise<void> {
-        await this.expectElementToBeVisible(commonModalContainerSelector);
-        const modalContainer = await this.page.$(commonModalContainerSelector);
-        if (!modalContainer) {
-            throw new Error('Modal container not found.');
-        }
+    await this.clearAllTextFrom(dateInputSelector);
+    await this.typeInInputField(dateInputSelector, yesterdayDate);
+    await this.page.keyboard.press('Enter');
+    await this.expectElementValueToBe(dateInputSelector, yesterdayDate);
+  }
 
-        const usernameInputSelector = `${commonModalContainerSelector} input`;
-        await this.typeInInputField(usernameInputSelector, username);
-
-        await this.clickOnElementWithSelector(addRightsButtonSelector);
-        await this.expectElementToBeVisible(addRightsButtonSelector, false);
-    }
-
-    /**
-     * Checks if the number of contributors is as expected.
-     * @param {number} number - The expected number of contributors.
-     */
-    async expectNumberOfContributorsToBe(number: number): Promise<void> {
-        await this.expectTextContentToBe(
-            contributorCountSelector,
-            number.toString()
-        );
-    }
-
-    /**
-     * Sets the "last activity" date filter to yesterday.
-     */
-    async setLastActivityDateFilterToYesterday(): Promise<void> {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const day = String(yesterday.getDate()).padStart(2, '0');
-        const month = yesterday.toLocaleString('en-US', {month: 'short'});
-        const year = String(yesterday.getFullYear());
-        const yesterdayDate = `${day}-${month}-${year}`;
-        const dateInputSelector = this.isViewportAtMobileWidth()
-            ? mobileLastDatePickerInputSelector
-            : lastDatePickerInputSelector;
-
-        await this.clearAllTextFrom(dateInputSelector);
-        await this.typeInInputField(dateInputSelector, yesterdayDate);
-        await this.page.keyboard.press('Enter');
-        await this.expectElementValueToBe(dateInputSelector, yesterdayDate);
-    }
-
-    /**
-     * Checks if the number of contributor stats rows in the table is as expected.
-     * @param {number} number - The expected number of stats rows.
-     */
-    async expectNumberOfStatsRowsToBe(number: number): Promise<void> {
-        await this.page.waitForFunction(
-            (selector: string, expectedCount: number) => {
-                const rows = document.querySelectorAll(selector);
-                return rows.length === expectedCount;
-            },
-            {},
-            statsListItemSelector,
-            number
-        );
-    }
+  /**
+   * Checks if the number of contributor stats rows in the table is as expected.
+   * @param {number} number - The expected number of stats rows.
+   */
+  async expectNumberOfStatsRowsToBe(number: number): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, expectedCount: number) => {
+        const rows = document.querySelectorAll(selector);
+        return rows.length === expectedCount;
+      },
+      {},
+      statsListItemSelector,
+      number
+    );
+  }
 }
 
 export let ContributorAdminFactory = (): ContributorAdmin =>
-    new ContributorAdmin();
+  new ContributorAdmin();
