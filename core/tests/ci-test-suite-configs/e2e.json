@@ -1,60 +1,52 @@
 {
-  "suites": [
-    {
-      "name": "collections",
-      "module": "core/tests/webdriverio_desktop/collections.js"
-    },
-    {
-      "name": "contributorAdminDashboard",
-      "module": "core/tests/webdriverio_desktop/contributorAdminDashboard.js"
-    },
-    {
-      "name": "creatorDashboard",
-      "module": "core/tests/webdriverio_desktop/creatorDashboard.js"
-    },
-    {
-      "name": "embedding",
-      "module": "core/tests/webdriverio_desktop/embedding.js"
-    },
-    {
-      "name": "explorationImprovementsTab",
-      "module": "core/tests/webdriverio_desktop/explorationImprovementsTab.js"
-    },
-    {
-      "name": "explorationHistoryTab",
-      "module": "core/tests/webdriverio_desktop/explorationHistoryTab.js"
-    },
-    {
-      "name": "explorationStatisticsTab",
-      "module": "core/tests/webdriverio_desktop/explorationStatisticsTab.js"
-    },
-    {
-      "name": "learner",
-      "module": "core/tests/webdriverio/learnerFlow.js"
-    },
-    {
-      "name": "navigation",
-      "module": "core/tests/webdriverio_desktop/navigation.js"
-    },
-    {
-      "name": "publication",
-      "module": "core/tests/webdriverio_desktop/publicationAndLibrary.js"
-    },
-    {
-      "name": "skillEditor",
-      "module": "core/tests/webdriverio_desktop/skillEditor.js"
-    },
-    {
-      "name": "topicAndStoryEditor",
-      "module": "core/tests/webdriverio_desktop/topicAndStoryEditor.js"
-    },
-    {
-      "name": "users",
-      "module": "core/tests/webdriverio_desktop/userJourneys.js"
-    },
-    {
-      "name": "wipeout",
-      "module": "core/tests/webdriverio_desktop/wipeout.js"
-    }
-  ]
+    "suites": [
+        {
+            "name": "collections",
+            "module": "core/tests/webdriverio_desktop/collections.js"
+        },
+        {
+            "name": "creatorDashboard",
+            "module": "core/tests/webdriverio_desktop/creatorDashboard.js"
+        },
+        {
+            "name": "embedding",
+            "module": "core/tests/webdriverio_desktop/embedding.js"
+        },
+        {
+            "name": "explorationImprovementsTab",
+            "module": "core/tests/webdriverio_desktop/explorationImprovementsTab.js"
+        },
+        {
+            "name": "explorationHistoryTab",
+            "module": "core/tests/webdriverio_desktop/explorationHistoryTab.js"
+        },
+        {
+            "name": "learner",
+            "module": "core/tests/webdriverio/learnerFlow.js"
+        },
+        {
+            "name": "navigation",
+            "module": "core/tests/webdriverio_desktop/navigation.js"
+        },
+        {
+            "name": "publication",
+            "module": "core/tests/webdriverio_desktop/publicationAndLibrary.js"
+        },
+        {
+            "name": "skillEditor",
+            "module": "core/tests/webdriverio_desktop/skillEditor.js"
+        },
+        {
+            "name": "topicAndStoryEditor",
+            "module": "core/tests/webdriverio_desktop/topicAndStoryEditor.js"
+        },
+        {
+            "name": "users",
+            "module": "core/tests/webdriverio_desktop/userJourneys.js"
+        },
+        {
+            "name": "wipeout",
+            "module": "core/tests/webdriverio_desktop/wipeout.js"
+        }
+    ]
 }

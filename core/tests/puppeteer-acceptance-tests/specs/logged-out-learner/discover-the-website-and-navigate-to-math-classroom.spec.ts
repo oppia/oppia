@@ -29,141 +29,145 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 const ROLES = testConstants.Roles;
 
 describe('Logged-Out Learner', function () {
-  let loggedOutLearner: LoggedOutUser;
-  let curriculumAdmin: CurriculumAdmin &
-    TopicManager &
-    ExplorationEditor &
-    LoggedOutUser;
-  let explorationId1: string;
-  let explorationId2: string;
+    let loggedOutLearner: LoggedOutUser;
+    let curriculumAdmin: CurriculumAdmin &
+        TopicManager &
+        ExplorationEditor &
+        LoggedOutUser;
+    let explorationId1: string;
+    let explorationId2: string;
 
-  beforeAll(async function () {
-    // Create Users.
-    loggedOutLearner = await UserFactory.createLoggedOutUser();
-    curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdm',
-      'curriculum_admin@example.com',
-      [ROLES.CURRICULUM_ADMIN]
-    );
+    beforeAll(async function () {
+        // Create Users.
+        loggedOutLearner = await UserFactory.createLoggedOutUser();
+        curriculumAdmin = await UserFactory.createNewUser(
+            'curriculumAdm',
+            'curriculum_admin@example.com',
+            [ROLES.CURRICULUM_ADMIN]
+        );
 
-    // Create explorations.
-    explorationId1 = await curriculumAdmin.createAndPublishExplorationWithCards(
-      'Fractions 1',
-      'Algebra'
-    );
-    explorationId2 = await curriculumAdmin.createAndPublishExplorationWithCards(
-      'Fractions 2',
-      'Algebra'
-    );
+        // Create explorations.
+        explorationId1 =
+            await curriculumAdmin.createAndPublishExplorationWithCards(
+                'Fractions 1',
+                'Algebra'
+            );
+        explorationId2 =
+            await curriculumAdmin.createAndPublishExplorationWithCards(
+                'Fractions 2',
+                'Algebra'
+            );
 
-    // Create a topic and classroom.
-    await curriculumAdmin.createAndPublishTopic(
-      'Fractions',
-      'Algebra',
-      'fractions'
-    );
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+        // Create a topic and classroom.
+        await curriculumAdmin.createAndPublishTopic(
+            'Fractions',
+            'Algebra',
+            'fractions'
+        );
+        await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
 
-    await curriculumAdmin.openSkillEditor('fractions');
-    await curriculumAdmin.navigateToSkillQuestionEditorTab();
+        await curriculumAdmin.openSkillEditor('fractions');
+        await curriculumAdmin.navigateToSkillQuestionEditorTab();
 
-    await curriculumAdmin.createQuestionsForSkill('fractions', 7);
+        await curriculumAdmin.createQuestionsForSkill('fractions', 10);
 
-    // Enable the "Show practice tab to learners" in Topic Editor.
-    await curriculumAdmin.openTopicEditor('Fractions');
-    await curriculumAdmin.togglePracticeTabCheckbox();
-    await curriculumAdmin.saveTopicDraft('Fractions');
+        // Enable the "Show practice tab to learners" in Topic Editor.
+        await curriculumAdmin.openTopicEditor('Fractions');
+        await curriculumAdmin.togglePracticeTabCheckbox();
+        await curriculumAdmin.saveTopicDraft('Fractions');
 
-    await curriculumAdmin.createAndPublishClassroom(
-      'Math',
-      'math',
-      'Fractions'
-    );
-    await curriculumAdmin.enableDiagnosticTestForClassroom('Math');
+        await curriculumAdmin.createAndPublishClassroom(
+            'Math',
+            'math',
+            'Fractions'
+        );
+        await curriculumAdmin.enableDiagnosticTestForClassroom('Math');
 
-    // Add explorations to classroom.
-    await curriculumAdmin.addStoryToTopic(
-      'Learning Fractions',
-      'learn-fractions',
-      'Fractions'
-    );
-    await curriculumAdmin.addChapter('Fractions 1', explorationId1);
-    await curriculumAdmin.addChapter('Fractions 2', explorationId2);
+        // Add explorations to classroom.
+        await curriculumAdmin.addStoryToTopic(
+            'Learning Fractions',
+            'learn-fractions',
+            'Fractions'
+        );
+        await curriculumAdmin.addChapter('Fractions 1', explorationId1);
+        await curriculumAdmin.addChapter('Fractions 2', explorationId2);
 
-    // Save draft.
-    await curriculumAdmin.saveStoryDraft();
-    await curriculumAdmin.publishStoryDraft();
-  }, 600000);
+        // Save draft.
+        await curriculumAdmin.saveStoryDraft();
+        await curriculumAdmin.publishStoryDraft();
+    }, 1200000); // 15 minutes for setup hook.
 
-  it('should be able to find list of subjects to learn', async function () {
-    await loggedOutLearner.navigateToSplashPage();
-    await loggedOutLearner.expectHomePageTitleToBe(
-      'Free Education for Everyone'
-    );
-    await loggedOutLearner.expectDevModeLabelToBeVisible(
-      !(await loggedOutLearner.isInProdMode())
-    );
+    it('should be able to find list of subjects to learn', async function () {
+        await loggedOutLearner.navigateToSplashPage();
+        await loggedOutLearner.expectHomePageTitleToBe(
+            'Free Education for Everyone'
+        );
+        await loggedOutLearner.expectDevModeLabelToBeVisible(
+            !(await loggedOutLearner.isInProdMode())
+        );
 
-    // Click "Explore Oppia Classrooms" button.
-    await loggedOutLearner.clickBrowseLessonsButtonInHomePage();
-    await loggedOutLearner.isTextPresentOnPage('The Math Classroom');
+        // Click "Explore Oppia Classrooms" button.
+        await loggedOutLearner.clickBrowseLessonsButtonInHomePage();
+        await loggedOutLearner.isTextPresentOnPage('The Math Classroom');
 
-    await loggedOutLearner.expectHeadingInClassroomPageToContain(
-      'Course Details'
-    );
-    await loggedOutLearner.expectHeadingInClassroomPageToContain(
-      'Topics Covered'
-    );
-    await loggedOutLearner.expectTopicsToBePresent(['Fractions']);
-  });
+        await loggedOutLearner.expectHeadingInClassroomPageToContain(
+            'Course Details'
+        );
+        await loggedOutLearner.expectHeadingInClassroomPageToContain(
+            'Topics Covered'
+        );
+        await loggedOutLearner.expectTopicsToBePresent(['Fractions']);
+    });
 
-  it('should be able start learning from the first topic', async function () {
-    // Click "Start Here" under "Don't know where to start" section.
-    await loggedOutLearner.expectDiagnosticTestBoxToBePresent(
-      'Don’t know where to start?',
-      'Start here'
-    );
-    await loggedOutLearner.clickOnStartHereButtonInClassroomPage();
-    await loggedOutLearner.expectTabTitleInTopicPageToBe('Fractions');
-    await loggedOutLearner.expectTopicToContainStories(['Learning Fractions']);
+    it('should be able start learning from the first topic', async function () {
+        // Click "Start Here" under "Don't know where to start" section.
+        await loggedOutLearner.expectDiagnosticTestBoxToBePresent(
+            'Don’t know where to start?',
+            'Start here'
+        );
+        await loggedOutLearner.clickOnStartHereButtonInClassroomPage();
+        await loggedOutLearner.expectTabTitleInTopicPageToBe('Fractions');
+        await loggedOutLearner.expectTopicToContainStories([
+            'Learning Fractions',
+        ]);
 
-    await loggedOutLearner.navigateToRevisionTabInTopic();
-    await loggedOutLearner.expectTabTitleInTopicPageToBe(
-      'Study Skills for Fractions'
-    );
+        await loggedOutLearner.navigateToRevisionTabInTopic();
+        await loggedOutLearner.expectTabTitleInTopicPageToBe(
+            'Study Skills for Fractions'
+        );
 
-    await loggedOutLearner.navigateToPracticeTabInTopic();
-    await loggedOutLearner.expectTabTitleInTopicPageToBe(
-      'BetaMaster Skills for Fractions'
-    );
+        await loggedOutLearner.navigateToPracticeTabInTopic();
+        await loggedOutLearner.expectTabTitleInTopicPageToBe(
+            'BetaMaster Skills for Fractions'
+        );
 
-    await loggedOutLearner.navigateToLessonsTabInTopic();
-    await loggedOutLearner.navigateBackToClassroomFromTopicPage();
-    await loggedOutLearner.expectToBeInClassroomPage('math');
-  });
+        await loggedOutLearner.navigateToLessonsTabInTopic();
+        await loggedOutLearner.navigateBackToClassroomFromTopicPage();
+        await loggedOutLearner.expectToBeInClassroomPage('math');
+    });
 
-  it('should be able to figure out which topic would be best for them', async function () {
-    await loggedOutLearner.navigateToClassroomPage('math');
+    it('should be able to figure out which topic would be best for them', async function () {
+        await loggedOutLearner.navigateToClassroomPage('math');
 
-    // Click on "Take a Quiz" under "Already know some Math?" section.
-    await loggedOutLearner.expectDiagnosticTestBoxToBePresent(
-      'Already know some Math?',
-      'Take quiz'
-    );
-    await loggedOutLearner.clickOnTakeQuizButtonInClassroomPage();
-    await loggedOutLearner.startDiagnosticTest();
-    await loggedOutLearner.expectToBeInDiagnosticTestPlayer();
+        // Click on "Take a Quiz" under "Already know some Math?" section.
+        await loggedOutLearner.expectDiagnosticTestBoxToBePresent(
+            'Already know some Math?',
+            'Take quiz'
+        );
+        await loggedOutLearner.clickOnTakeQuizButtonInClassroomPage();
+        await loggedOutLearner.startDiagnosticTest();
+        await loggedOutLearner.expectToBeInDiagnosticTestPlayer();
 
-    await loggedOutLearner.expectCardContentToMatch('Add 1+2');
+        await loggedOutLearner.expectCardContentToMatch('Add 1+2');
 
-    await loggedOutLearner.skipQuestionInDiagnosticTest();
-    await loggedOutLearner.skipQuestionInDiagnosticTest();
+        await loggedOutLearner.skipQuestionInDiagnosticTest();
+        await loggedOutLearner.skipQuestionInDiagnosticTest();
 
-    await loggedOutLearner.isTextPresentOnPage('Test complete. Well Done!');
-    await loggedOutLearner.expectTopicsToBePresent(['Fractions']);
-  });
+        await loggedOutLearner.isTextPresentOnPage('Test complete. Well Done!');
+        await loggedOutLearner.expectTopicsToBePresent(['Fractions']);
+    });
 
-  afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
-  });
+    afterAll(async function () {
+        await UserFactory.closeAllBrowsers();
+    });
 });
