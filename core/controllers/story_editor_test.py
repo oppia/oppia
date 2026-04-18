@@ -20,6 +20,7 @@ from core import feconf
 from core.domain import (
     story_domain,
     story_services,
+    topic_domain,
     topic_fetchers,
     user_services,
 )
@@ -140,6 +141,38 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
             csrf_token=csrf_token,
             expected_status_int=401,
         )
+
+    def test_story_unpublish_temporarily(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        self.put_json(
+            '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
+            {'new_story_status_is_public': True},
+            csrf_token=csrf_token,
+        )
+
+        self.put_json(
+            '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
+            {
+                'new_story_status_is_public': False,
+                'story_unpublish_type': (
+                    topic_domain.STORY_UNPUBLISH_TYPE_TEMPORARY
+                ),
+            },
+            csrf_token=csrf_token,
+        )
+
+        topic = topic_fetchers.get_topic_by_id(self.topic_id)
+        for reference in topic.canonical_story_references:
+            if reference.story_id == self.story_id:
+                self.assertEqual(reference.story_is_published, False)
+                self.assertEqual(
+                    reference.story_unpublish_type,
+                    topic_domain.STORY_UNPUBLISH_TYPE_TEMPORARY,
+                )
+
+        self.logout()
 
 
 class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):

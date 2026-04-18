@@ -276,7 +276,8 @@ export class StoryEditorStateService {
 
   changeStoryPublicationStatus(
     newStoryStatusIsPublic: boolean,
-    successCallback: (value?: Object) => void
+    successCallback: (value?: Object) => void,
+    mode?: 'temporary' | 'permanent'
   ): boolean {
     const storyId = this._story.getId();
     if (!storyId || !this._storyIsInitialized) {
@@ -285,22 +286,35 @@ export class StoryEditorStateService {
       );
       return false;
     }
-    this.editableStoryBackendApiService
-      .changeStoryPublicationStatusAsync(storyId, newStoryStatusIsPublic)
-      .then(
-        storyBackendObject => {
-          this._setStoryPublicationStatus(newStoryStatusIsPublic);
-          if (successCallback) {
-            successCallback();
-          }
-        },
-        error => {
-          this.alertsService.addWarning(
-            error ||
-              'There was an error when publishing/unpublishing the story.'
-          );
+
+    let promise: Promise<void>;
+    if (mode !== undefined) {
+      promise =
+        this.editableStoryBackendApiService.changeStoryPublicationStatusAsync(
+          storyId,
+          newStoryStatusIsPublic,
+          mode
+        );
+    } else {
+      promise =
+        this.editableStoryBackendApiService.changeStoryPublicationStatusAsync(
+          storyId,
+          newStoryStatusIsPublic
+        );
+    }
+    promise.then(
+      () => {
+        this._setStoryPublicationStatus(newStoryStatusIsPublic);
+        if (successCallback) {
+          successCallback();
         }
-      );
+      },
+      error => {
+        this.alertsService.addWarning(
+          error || 'There was an error when publishing/unpublishing the story.'
+        );
+      }
+    );
     return true;
   }
 

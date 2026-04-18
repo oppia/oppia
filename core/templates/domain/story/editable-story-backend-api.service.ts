@@ -55,6 +55,11 @@ interface ValidationExplorationBackendResponse {
   validation_error_messages: string[];
 }
 
+interface ChangeStoryPublicationStatusRequest {
+  new_story_status_is_public: boolean;
+  story_unpublish_type: 'temporary' | 'permanent';
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -134,7 +139,8 @@ export class EditableStoryBackendApiService {
     storyId: string,
     newStoryStatusIsPublic: boolean,
     successCallback: (value: void) => void,
-    errorCallback: (reason: string) => void
+    errorCallback: (reason: string) => void,
+    mode?: 'temporary' | 'permanent'
   ): void {
     const storyPublishUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.STORY_PUBLISH_URL_TEMPLATE,
@@ -142,8 +148,9 @@ export class EditableStoryBackendApiService {
         story_id: storyId,
       }
     );
-    const putData = {
+    const putData: ChangeStoryPublicationStatusRequest = {
       new_story_status_is_public: newStoryStatusIsPublic,
+      story_unpublish_type: mode || 'permanent',
     };
     this.http
       .put(storyPublishUrl, putData)
@@ -273,15 +280,26 @@ export class EditableStoryBackendApiService {
 
   async changeStoryPublicationStatusAsync(
     storyId: string,
-    newStoryStatusIsPublic: boolean
+    newStoryStatusIsPublic: boolean,
+    mode?: 'temporary' | 'permanent'
   ): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._changeStoryPublicationStatus(
-        storyId,
-        newStoryStatusIsPublic,
-        resolve,
-        reject
-      );
+      if (mode !== undefined) {
+        this._changeStoryPublicationStatus(
+          storyId,
+          newStoryStatusIsPublic,
+          resolve,
+          reject,
+          mode
+        );
+      } else {
+        this._changeStoryPublicationStatus(
+          storyId,
+          newStoryStatusIsPublic,
+          resolve,
+          reject
+        );
+      }
     });
   }
 

@@ -289,6 +289,22 @@ describe('Editable story backend API service', () => {
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   }));
+  it('should unpublish a story', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    // Send a request to update story.
+    editableStoryBackendApiService
+      .changeStoryPublicationStatusAsync('storyId', false, 'permanent')
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne('/story_publish_handler/storyId');
+    expect(req.request.method).toEqual('PUT');
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
   it(
     'should call success handler if the story is associated ' +

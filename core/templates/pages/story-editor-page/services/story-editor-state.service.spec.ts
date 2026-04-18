@@ -378,6 +378,39 @@ describe('Story editor state service', () => {
     expect(successCallback).toHaveBeenCalled();
   }));
 
+  it('should be able to unpublish the story', fakeAsync(() => {
+    spyOn(
+      fakeEditableStoryBackendApiService,
+      'changeStoryPublicationStatusAsync'
+    ).and.callThrough();
+    var successCallback = jasmine.createSpy('successCallback');
+
+    storyEditorStateService.loadStory('storyId_0');
+    tick(1000);
+
+    storyEditorStateService._storyIsPublished = true;
+    expect(storyEditorStateService.isStoryPublished()).toBe(true);
+    expect(
+      storyEditorStateService.changeStoryPublicationStatus(
+        false,
+        successCallback,
+        'permanent'
+      )
+    ).toBe(true);
+    tick(1000);
+
+    var expectedId = 'storyId_0';
+    var publishStorySpy =
+      fakeEditableStoryBackendApiService.changeStoryPublicationStatusAsync;
+    expect(publishStorySpy).toHaveBeenCalledWith(
+      expectedId,
+      false,
+      'permanent'
+    );
+    expect(storyEditorStateService.isStoryPublished()).toBe(false);
+    expect(successCallback).toHaveBeenCalled();
+  }));
+
   it('should warn user when story is not published', fakeAsync(() => {
     const successCallback = jasmine.createSpy('successCallback');
     spyOn(

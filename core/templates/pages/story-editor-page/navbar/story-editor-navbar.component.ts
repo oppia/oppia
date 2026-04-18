@@ -269,16 +269,19 @@ export class StoryEditorNavbarComponent implements OnInit {
     this.ngbModal
       .open(StoryEditorUnpublishModalComponent, {backdrop: 'static'})
       .result.then(
-        () => {
-          this.storyEditorStateService.changeStoryPublicationStatus(
-            false,
-            () => {
-              this.storyIsPublished =
-                this.storyEditorStateService.isStoryPublished();
-              this.forceValidateExplorations = true;
-              this._validateStory();
-            }
-          );
+        result => {
+          if (result?.mode) {
+            this.storyEditorStateService.changeStoryPublicationStatus(
+              false,
+              () => {
+                this.storyIsPublished =
+                  this.storyEditorStateService.isStoryPublished();
+                this.forceValidateExplorations = true;
+                this._validateStory();
+              },
+              result.mode
+            );
+          }
         },
         () => {
           // Note to developers:
@@ -318,7 +321,8 @@ export class StoryEditorNavbarComponent implements OnInit {
         }
         modalRef.componentInstance.unpublishedChapters = unpublishedChapters;
         modalRef.result.then(
-          unpublishingReason => {
+          result => {
+            const unpublishingReason = result?.reason;
             for (
               let i = Number(selectedChapterIndexInPublishUptoDropdown) + 1;
               i <= lastPublishedChapterIndex;

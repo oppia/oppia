@@ -1326,13 +1326,20 @@ def publish_story(topic_id: str, story_id: str, committer_id: str) -> None:
     )
 
 
-def unpublish_story(topic_id: str, story_id: str, committer_id: str) -> None:
+def unpublish_story(
+    topic_id: str,
+    story_id: str,
+    committer_id: str,
+    unpublish_type: str = topic_domain.STORY_UNPUBLISH_TYPE_PERMANENT,
+) -> None:
     """Marks the given story as unpublished.
 
     Args:
         topic_id: str. The id of the topic.
         story_id: str. The id of the given story.
         committer_id: str. ID of the committer.
+        unpublish_type: str. Either STORY_UNPUBLISH_TYPE_PERMANENT or
+            STORY_UNPUBLISH_TYPE_TEMPORARY. Defaults to permanent.
 
     Raises:
         Exception. The given story does not exist.
@@ -1381,7 +1388,7 @@ def unpublish_story(topic_id: str, story_id: str, committer_id: str) -> None:
                 topic.id,
             )
 
-    topic.unpublish_story(story_id)
+    topic.unpublish_story(story_id, unpublish_type)
     change_list = [
         topic_domain.TopicChange(
             {'cmd': topic_domain.CMD_UNPUBLISH_STORY, 'story_id': story_id}
@@ -1397,9 +1404,12 @@ def unpublish_story(topic_id: str, story_id: str, committer_id: str) -> None:
 
     # Delete corresponding exploration opportunities and reject associated
     # translation suggestions.
-    exp_ids = story.story_contents.get_all_linked_exp_ids()
-    opportunity_services.delete_exploration_opportunities(exp_ids)
-    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
+    if unpublish_type == topic_domain.STORY_UNPUBLISH_TYPE_PERMANENT:
+        exp_ids = story.story_contents.get_all_linked_exp_ids()
+        opportunity_services.delete_exploration_opportunities(exp_ids)
+        suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
+            exp_ids
+        )
 
 
 def delete_canonical_story(user_id: str, topic_id: str, story_id: str) -> None:
