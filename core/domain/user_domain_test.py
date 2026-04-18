@@ -1956,3 +1956,61 @@ class UserContributionRightsUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             user_contribution_rights.can_submit_at_least_one_item()
         )
+
+
+class UsernameChangeAudit(test_utils.GenericTestBase):
+    """Tests for the UsernameChangeAudit"""
+
+    def test_valid_committer_id(self) -> None:
+        obj = user_domain.UserIdByFirebaseAuthId('abc123')
+        obj.validate()
+
+    def test_invalid_committer_id_type(self) -> None:
+        obj = user_domain.UserIdByFirebaseAuthId(123)  # type: ignore[arg-type]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected committer_id to be a string'
+        ):
+            obj.validate()
+
+    def test_empty_committer_id(self) -> None:
+        obj = user_domain.UserIdByFirebaseAuthId('')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'No committer id specified'
+        ):
+            obj.validate()
+
+    def test_valid_old_username(self) -> None:
+        obj = user_domain.UserIdByFirebaseAuthId('abc123')
+        obj.validate()
+
+    def test_invalid_old_username(self) -> None:
+        obj = user_domain.UserIdByFirebaseAuthId(123)
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected old_username to be a string'
+        ):
+            obj.validate()
+
+    def test_empty_old_username(self) -> None:
+        obj = user_domain.UserIdByFirebaseAuthId('')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'No old username specified'
+        ):
+            obj.validate()
+
+    def test_valid_new_username(self) -> None:
+        obj = user_domain.UserIdByFirebaseAuthId('abc123')
+        obj.validate()
+
+    def test_invalid_new_username(self) -> None:
+        obj = user_domain.UserIdByFirebaseAuthId(123)
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected old_username to be a string'
+        ):
+            obj.validate()
+
+    def test_empty_new_username(self) -> None:
+        obj = user_domain.UserIdByFirebaseAuthId('')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'No old username specified'
+        ):
+            obj.validate()

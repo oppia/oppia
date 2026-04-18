@@ -1850,3 +1850,43 @@ class TranslationCoordinatorStats:
             'coordinator_ids': self.coordinator_ids,
             'coordinators_count': self.coordinators_count,
         }
+
+
+class UsernameChangeAudit:
+    """Domain Object for the UsernameChangeAuditModel"""
+
+    def __init__(
+        self, committer_id: str, old_username: str, new_username: str
+    ) -> None:
+        self.committer_id = committer_id
+        self.old_username = old_username
+        self.new_username = new_username
+
+    def validate(self) -> None:
+        """Validates the UsernameChangeAudit Domain Object."""
+        if not isinstance(self.committer_id, str):
+            raise utils.ValidationError(
+                'Expected committer_id to be a string, received %s'
+                % self.committer_id
+            )
+
+        if not self.committer_id:
+            raise utils.ValidationError('No committer id specified.')
+
+        if not isinstance(self.old_username, str):
+            raise utils.ValidationError(
+                'Expected old_username to be a string, received %s'
+                % self.old_username
+            )
+
+        if not self.old_username:
+            raise utils.ValidationError('No old username specified.')
+
+        if not isinstance(self.committer_id, str):
+            raise utils.ValidationError(
+                'Expected new_username to be a string, received %s'
+                % self.new_username
+            )
+
+        if not self.new_username:
+            raise utils.ValidationError('No new username specified.')
