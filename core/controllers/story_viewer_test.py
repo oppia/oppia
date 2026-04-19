@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import logging
+from unittest import mock
 
 from core import feature_flag_list, feconf
 from core.constants import constants
@@ -935,11 +936,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             """Mocks None."""
             return None
 
-        story_fetchers_swap = self.swap(
+        with mock.patch.object(
             story_fetchers, 'get_story_by_id', _mock_none_function
-        )
-
-        with story_fetchers_swap:
+        ):
             with self.capture_logging(min_level=logging.ERROR) as captured_logs:
                 self.post_json(
                     '%s/staging/topic/%s/%s'

@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import datetime
 import os
+from unittest import mock
 
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
@@ -321,7 +322,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         def mock_get_current_time_in_millisecs() -> int:
             return 1690555400000
 
-        with self.swap(
+        with mock.patch.object(
             utils,
             'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs,
