@@ -63,6 +63,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     number_with_units_audit_jobs,
     opportunity_management_jobs,
     question_migration_jobs,
+    recover_orphaned_translations_jobs,
     skill_inspection_jobs,
     skill_migration_jobs,
     story_migration_jobs,
