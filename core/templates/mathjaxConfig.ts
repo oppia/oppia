@@ -19,6 +19,7 @@ window.MathJax = {
       width: '500px',
     },
     scale: 91,
+    font: 'STIX-Web',
     showMathMenu: false,
     useFontCache: false,
   },

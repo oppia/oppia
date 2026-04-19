@@ -67,6 +67,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     story_migration_jobs,
     subtopic_migration_jobs,
     suggestion_migration_jobs,
+    regenerate_math_svgs_migration_job,
     suggestion_stats_computation_jobs,
     topic_migration_jobs,
     translation_audit_jobs,
