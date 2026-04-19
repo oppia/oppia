@@ -98,8 +98,8 @@ export class NoninteractiveMath implements OnInit, OnChanges {
       const dimensions =
         this.imagePreloaderService.getDimensionsOfMathSvg(svgFilename);
       this.imageContainerStyle = {
-        height: dimensions.height * 0.9 + 'ex',
-        width: dimensions.width * 0.9 + 'ex',
+        height: Math.round(dimensions.height * 0.9 * 10000) / 10000 + 'ex',
+        width: Math.round(dimensions.width * 0.9 * 10000) / 10000 + 'ex',
         'vertical-align': '-' + dimensions.verticalPadding + 'ex',
       };
     }

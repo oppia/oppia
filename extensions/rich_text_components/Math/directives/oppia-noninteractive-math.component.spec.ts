@@ -142,8 +142,8 @@ describe('NoninteractiveMath', () => {
 
     component.ngOnInit();
 
-    expect(component.imageContainerStyle.height).toBe('3.205ex');
-    expect(component.imageContainerStyle.width).toBe('1.784ex');
+    expect(component.imageContainerStyle.height).toBe('2.8845ex');
+    expect(component.imageContainerStyle.width).toBe('1.6056ex');
     expect(component.imageContainerStyle['vertical-align']).toBe('-1.306ex');
     expect(component.imageUrl).toBe(explorationPlayerImageUrl);
   });
@@ -168,8 +168,8 @@ describe('NoninteractiveMath', () => {
 
     component.ngOnInit();
 
-    expect(component.imageContainerStyle.height).toBe('3.205ex');
-    expect(component.imageContainerStyle.width).toBe('1.784ex');
+    expect(component.imageContainerStyle.height).toBe('2.8845ex');
+    expect(component.imageContainerStyle.width).toBe('1.6056ex');
     expect(component.imageContainerStyle['vertical-align']).toBe('-1.306ex');
     expect(component.imageUrl).toBe(rawImagedata);
   });
@@ -189,8 +189,8 @@ describe('NoninteractiveMath', () => {
       component.ngOnInit();
       tick();
 
-      expect(component.imageContainerStyle.height).toBe('3.205ex');
-      expect(component.imageContainerStyle.width).toBe('1.784ex');
+      expect(component.imageContainerStyle.height).toBe('2.8845ex');
+      expect(component.imageContainerStyle.width).toBe('1.6056ex');
       expect(component.imageContainerStyle['vertical-align']).toBe('-1.306ex');
       expect(component.imageUrl).toBe(serverImageUrl);
     })
@@ -323,8 +323,8 @@ describe('NoninteractiveMath', () => {
 
     component.ngOnChanges(changes);
 
-    expect(component.imageContainerStyle.height).toBe('3.205ex');
-    expect(component.imageContainerStyle.width).toBe('1.784ex');
+    expect(component.imageContainerStyle.height).toBe('2.8845ex');
+    expect(component.imageContainerStyle.width).toBe('1.6056ex');
     expect(component.imageContainerStyle['vertical-align']).toBe('-1.306ex');
     expect(component.imageUrl).toBe(explorationPlayerImageUrl);
   });

@@ -72,7 +72,7 @@ def _load_svg_mapping() -> Dict[str, str]:
     return mapping
 
 
-SVG_FILENAME_MAPPING: Dict[str, str] = _load_svg_mapping()
+SVG_FILENAME_MAPPING: Dict[str, str] = {}
 
 
 def _unescape_html(html_string: str) -> str:
@@ -299,6 +299,9 @@ class RegenerateMathSvgsJob(base_jobs.JobBase):
         Returns:
             PCollection. A PCollection of JobRunResult objects.
         """
+        if not SVG_FILENAME_MAPPING:
+            SVG_FILENAME_MAPPING.update(_load_svg_mapping())
+
         svg_mapping = SVG_FILENAME_MAPPING
 
         migration_results = (
