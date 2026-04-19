@@ -74,6 +74,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   @Input() showLearnerDashboardIconsIfPossible!: string;
   @Input() isContainerNarrow: boolean = false;
   @Input() isOwnedByCurrentUser: boolean = false;
+  @Input() tags: string[] = [];
 
   activityType!: string;
   resizeSubscription!: Subscription;
@@ -169,7 +170,8 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     this.mobileCardToBeShown =
       !this.isWindowLarge &&
       (currentPageUrl === '/community-library' ||
-        currentPageUrl.includes('/explore'));
+        currentPageUrl.includes('/explore') ||
+        currentPageUrl.includes('/create'));
   }
 
   setHoverState(hoverState: boolean): void {
