@@ -212,22 +212,29 @@ export class NumberWithUnits {
           ObjectsDomainConstants.CURRENCY_UNITS
         ) as CurrencyUnitsKeys;
         const normalizedRawInput = rawInput.toLowerCase();
-        const startsWithCurrencyUnit = keys.some(key => {
-          return ObjectsDomainConstants.CURRENCY_UNITS[key].front_units.some(
-            frontUnit => {
-              const normalizedFrontUnit = frontUnit.toLowerCase();
-              return normalizedRawInput.startsWith(normalizedFrontUnit);
+        let matchingCurrencyFrontUnit: string | null = null;
+        for (let i = 0; i < keys.length; i++) {
+          const frontUnits =
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units;
+          for (let j = 0; j < frontUnits.length; j++) {
+            const normalizedFrontUnit = frontUnits[j].toLowerCase();
+            if (normalizedRawInput.startsWith(normalizedFrontUnit)) {
+              matchingCurrencyFrontUnit = frontUnits[j];
+              break;
             }
-          );
-        });
+          }
+          if (matchingCurrencyFrontUnit !== null) {
+            break;
+          }
+        }
 
-        if (!startsWithCurrencyUnit) {
+        if (matchingCurrencyFrontUnit === null) {
           throw new Error(
             // eslint-disable-next-line max-len
             ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_VALUE
           );
         }
-        const ind = rawInput.indexOf(String(rawInput.match(/[0-9]/)));
+        const ind = rawInput.search(/[0-9]/);
         if (ind === -1) {
           throw new Error(
             // eslint-disable-next-line max-len
@@ -236,23 +243,7 @@ export class NumberWithUnits {
         }
         units = rawInput.substr(0, ind).trim();
 
-        let startsWithCorrectCurrencyUnit = false;
-        for (let i = 0; i < keys.length; i++) {
-          let unitLength =
-            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length;
-          for (let j = 0; j < unitLength; j++) {
-            if (
-              units ===
-              ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units[
-                j
-              ].trim()
-            ) {
-              startsWithCorrectCurrencyUnit = true;
-              break;
-            }
-          }
-        }
-        if (startsWithCorrectCurrencyUnit === false) {
+        if (units !== matchingCurrencyFrontUnit.trim()) {
           throw new Error(
             // eslint-disable-next-line max-len
             ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_CURRENCY
