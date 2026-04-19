@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import os
+from unittest import mock
 
 from core import feconf
 from core.constants import constants
@@ -780,11 +781,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             """Mocks '_get_question_by_id'. Returns None."""
             return None
 
-        question_services_swap = self.swap(
+        with mock.patch.object(
             question_services, 'get_question_by_id', _mock_get_question_by_id
-        )
-
-        with question_services_swap:
+        ):
             self.login(self.EDITOR_EMAIL)
             self.get_json(
                 '%s/%s'
