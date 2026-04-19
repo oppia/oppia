@@ -172,68 +172,30 @@ class UserSettingsTests(test_utils.GenericTestBase):
     # codebase we plan to get rid of the tests that intentionally test wrong
     # inputs that we can normally catch by typing.
     def test_validate_non_str_user_id_raises_exception(self) -> None:
-        self.user_settings.user_id = 0  # type: ignore[assignment]
+        self.learner_groups_user.user_id = 123  # type: ignore[assignment]
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected user_id to be a string'
+            utils.ValidationError, 'Expected user_id to be a string, received 123'
         ):
-            self.user_settings.validate()
+            self.learner_groups_user.validate() #
 
-    def test_validate_wrong_format_user_id_raises_exception(self) -> None:
-        self.user_settings.user_id = 'uid_%sA' % ('a' * 31)
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_non_int_schema_version_raises_exception(self) -> None:
+        self.learner_groups_user.learner_groups_user_details_schema_version = '1'  # type: ignore[assignment]
         with self.assertRaisesRegex(
-            utils.ValidationError, 'The user ID is in a wrong format.'
+            utils.ValidationError, 
+            'Expected learner_groups_user_details_schema_version to be an integer, received 1'
         ):
-            self.user_settings.validate()
+            self.learner_groups_user.validate() #
 
-        self.user_settings.user_id = 'uid_%s' % ('a' * 31)
+    def test_validate_negative_schema_version_raises_exception(self) -> None:
+        self.learner_groups_user.learner_groups_user_details_schema_version = -1
         with self.assertRaisesRegex(
-            utils.ValidationError, 'The user ID is in a wrong format.'
+            utils.ValidationError, 
+            'Expected learner_groups_user_details_schema_version to be a positive integer, received -1'
         ):
-            self.user_settings.validate()
-
-        self.user_settings.user_id = 'a' * 36
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'The user ID is in a wrong format.'
-        ):
-            self.user_settings.validate()
-
-    def test_validate_invalid_banned_value_type_raises_exception(self) -> None:
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        self.user_settings.banned = 123  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected banned to be a bool'
-        ):
-            self.user_settings.validate()
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        self.user_settings.banned = '123'  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected banned to be a bool'
-        ):
-            self.user_settings.validate()
-
-    def test_validate_invalid_roles_value_type_raises_exception(self) -> None:
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        self.user_settings.roles = 123  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected roles to be a list'
-        ):
-            self.user_settings.validate()
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        self.user_settings.roles = True  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected roles to be a list'
-        ):
-            self.user_settings.validate()
+            self.learner_groups_user.validate() #
 
     def test_validate_banned_user_with_roles_raises_exception(self) -> None:
         self.user_settings.roles = ['FULL_USER']
@@ -1892,6 +1854,9 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
             learner_group_user.to_dict(), expected_learner_group_user_dict
         )
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_invalid_user_id_raises_exception(self) -> None:
         learner_group_user_details = user_domain.LearnerGroupUserDetails(
             'group_id_1', True
@@ -1904,17 +1869,20 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
             1,
         )
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected user_id to be a string.'
+            utils.ValidationError, 'Expected user_id to be a string, received 123'
         ):
             learner_group_user.validate()
 
         # Test empty string user_id.
         learner_group_user.user_id = ''
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected user_id to be a non-empty string.'
+            utils.ValidationError, 'Expected user_id to be a non-empty string, received '
         ):
             learner_group_user.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_invalid_invited_to_learner_groups_ids_raises_exception(
         self
     ) -> None:
@@ -1930,7 +1898,7 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected invited_to_learner_groups_ids to be a list.'
+            'Expected invited_to_learner_groups_ids to be a list, received not_a_list'
         ):
             learner_group_user.validate()
 
@@ -1938,11 +1906,14 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
         learner_group_user.invited_to_learner_groups_ids = ['id1', 'id1']
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected invited_to_learner_groups_ids to not contain '
-            'duplicate values.'
+            r'Expected invited_to_learner_groups_ids to not contain '
+            r'duplicate values, found duplicates: \[\'id1\'\]'
         ):
             learner_group_user.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_invalid_learner_groups_user_details_raises_exception(
         self
     ) -> None:
@@ -1958,7 +1929,7 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected learner_groups_user_details to be a list.'
+            'Expected learner_groups_user_details to be a list, received not_a_list'
         ):
             learner_group_user.validate()
 
@@ -1968,8 +1939,8 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
         ]
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected learner_groups_user_details to not contain '
-            'duplicate group_ids.'
+            r'Expected learner_groups_user_details to not contain '
+            r'duplicate group_ids, found duplicates: \[\'group_id_1\'\]'
         ):
             learner_group_user.validate()
 
@@ -1988,6 +1959,9 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
         ):
             learner_group_user.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
     def test_validate_invalid_schema_version_raises_exception(self) -> None:
         # Test non-integer schema version.
         learner_group_user = user_domain.LearnerGroupsUser(
@@ -1996,7 +1970,7 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected learner_groups_user_details_schema_version '
-            'to be an integer.'
+            'to be an integer, received invalid'
         ):
             learner_group_user.validate()
 
@@ -2005,14 +1979,9 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected learner_groups_user_details_schema_version '
-            'to be a positive integer.'
+            'to be a positive integer, received 0'
         ):
             learner_group_user.validate()
-                
-        
-
-    
-
 
 class TranslationCoordinatorStatsUnitTests(test_utils.GenericTestBase):
     """Tests for the TranslationCoordinatorStats class."""

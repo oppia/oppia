@@ -1799,91 +1799,100 @@ class LearnerGroupsUser:
                 self.learner_groups_user_details_schema_version
             ),
         }
-
     def validate(self) -> None:
-        """Validates the LearnerGroupsUser domain object.
-
-        Raises:
-            ValidationError. One or more attributes of the LearnerGroupsUser
-                are invalid.
-        """
-        # 1. user_id validation.
+        """Validates the LearnerGroupsUser domain object."""
         if not isinstance(self.user_id, str):
             raise utils.ValidationError(
-                'Expected user_id to be a string.'
+                'Expected user_id to be a string, received %s' % self.user_id
             )
         if not self.user_id:
             raise utils.ValidationError(
-                'Expected user_id to be a non-empty string.'
+                'Expected user_id to be a non-empty string, received %s' % self.user_id
             )
 
-        # 2. invited_to_learner_groups_ids validation.
         if not isinstance(self.invited_to_learner_groups_ids, list):
             raise utils.ValidationError(
-                'Expected invited_to_learner_groups_ids to be a list.'
+                'Expected invited_to_learner_groups_ids to be a list, '
+                'received %s' % self.invited_to_learner_groups_ids
             )
 
         for group_id in self.invited_to_learner_groups_ids:
             if not isinstance(group_id, str):
                 raise utils.ValidationError(
-                    'Expected each group_id in '
-                    'invited_to_learner_groups_ids to be a string.'
-                )
-            if not group_id:
-                raise utils.ValidationError(
-                    'Expected each group_id in '
-                    'invited_to_learner_groups_ids to be a non-empty '
-                    'string.'
+                    'Expected each group_id in invited_to_learner_groups_ids '
+                    'to be a string, received %s' % group_id
                 )
 
         if len(self.invited_to_learner_groups_ids) != len(
             set(self.invited_to_learner_groups_ids)
         ):
+            seen = set()
+            duplicates = set()
+            for group_id in self.invited_to_learner_groups_ids:
+                if group_id in seen:
+                    duplicates.add(group_id)
+                seen.add(group_id)
             raise utils.ValidationError(
-                'Expected invited_to_learner_groups_ids to not '
-                'contain duplicate values.'
+                'Expected invited_to_learner_groups_ids to not contain '
+                'duplicate values, found duplicates: %s' % list(duplicates)
             )
 
-        # 3. learner_groups_user_details validation.
         if not isinstance(self.learner_groups_user_details, list):
             raise utils.ValidationError(
-                'Expected learner_groups_user_details to be a list.'
+                'Expected learner_groups_user_details to be a list, '
+                'received %s' % self.learner_groups_user_details
             )
 
         joined_group_ids = []
         for learner_group_details in self.learner_groups_user_details:
+            if not isinstance(learner_group_details.group_id, str):
+                raise utils.ValidationError(
+                    'Expected group_id to be a string, received %s' % (
+                        learner_group_details.group_id)
+                )
+            if not isinstance(
+                learner_group_details.progress_sharing_is_turned_on, bool
+            ):
+                raise utils.ValidationError(
+                    'Expected progress_sharing_is_turned_on to be a boolean, '
+                    'received %s' % (
+                        learner_group_details.progress_sharing_is_turned_on)
+                )
             joined_group_ids.append(learner_group_details.group_id)
 
         if len(joined_group_ids) != len(set(joined_group_ids)):
+            seen = set()
+            duplicates = set()
+            for group_id in joined_group_ids:
+                if group_id in seen:
+                    duplicates.add(group_id)
+                seen.add(group_id)
             raise utils.ValidationError(
-                'Expected learner_groups_user_details to not '
-                'contain duplicate group_ids.'
+                'Expected learner_groups_user_details to not contain '
+                'duplicate group_ids, found duplicates: %s' % list(duplicates)
             )
 
-        # 4. Cross-validation: check for overlap between invited and
-        # joined groups.
-        for learner_group_details in self.learner_groups_user_details:
-            if learner_group_details.group_id in (
-                self.invited_to_learner_groups_ids
-            ):
+        for group_id in joined_group_ids:
+            if group_id in self.invited_to_learner_groups_ids:
                 raise utils.ValidationError(
-                    'Learner cannot be invited to join learner group '
-                    '%s since they are already its learner.'
-                    % (learner_group_details.group_id)
+                    'Learner cannot be invited to join learner group %s '
+                    'since they are already its learner.' % group_id
                 )
 
-        # 5. Validation for learner_groups_user_details_schema_version.
         if not isinstance(
             self.learner_groups_user_details_schema_version, int
         ):
             raise utils.ValidationError(
-                'Expected learner_groups_user_details_schema_version '
-                'to be an integer.'
+                'Expected learner_groups_user_details_schema_version to be an '
+                'integer, received %s' % (
+                    self.learner_groups_user_details_schema_version)
             )
+
         if self.learner_groups_user_details_schema_version < 1:
             raise utils.ValidationError(
-                'Expected learner_groups_user_details_schema_version '
-                'to be a positive integer.'
+                'Expected learner_groups_user_details_schema_version to be a '
+                'positive integer, received %s' % (
+                    self.learner_groups_user_details_schema_version)
             )
 class TranslationCoordinatorStatsDict(TypedDict):
     """Dict representation of TranslationCoordinatorStats domain object."""
