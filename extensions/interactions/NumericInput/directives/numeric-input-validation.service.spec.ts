@@ -279,7 +279,7 @@ describe('NumericInputValidationService', () => {
     expect(warnings).toContain(
       jasmine.objectContaining({
         type: WARNING_TYPES.CRITICAL,
-        message: 'The tolerance cannot be negative.',
+        message: 'The value of tolerance cannot be negative.',
       })
     );
   });
@@ -308,7 +308,7 @@ describe('NumericInputValidationService', () => {
     expect(warnings).not.toContain(
       jasmine.objectContaining({
         type: WARNING_TYPES.CRITICAL,
-        message: 'The tolerance cannot be negative.',
+        message: 'The value of tolerance cannot be negative.',
       })
     );
   });
