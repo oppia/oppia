@@ -208,48 +208,23 @@ export class NumberWithUnits {
           }
         }
       } else {
-        let startsWithCorrectCurrencyUnit = false;
         const keys = Object.keys(
           ObjectsDomainConstants.CURRENCY_UNITS
         ) as CurrencyUnitsKeys;
-        for (let i = 0; i < keys.length; i++) {
-          let unitLength =
-            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length;
-          for (let j = 0; j < unitLength; j++) {
-            if (
-              rawInput.startsWith(
-                ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units[j]
-              )
-            ) {
-              startsWithCorrectCurrencyUnit = true;
-              break;
+        const normalizedRawInput = rawInput.toLowerCase();
+        const startsWithCurrencyUnit = keys.some(key => {
+          return ObjectsDomainConstants.CURRENCY_UNITS[key].front_units.some(
+            frontUnit => {
+              const normalizedFrontUnit = frontUnit.toLowerCase();
+              return normalizedRawInput.startsWith(normalizedFrontUnit);
             }
-          }
-        }
-        if (startsWithCorrectCurrencyUnit === false) {
-          const startsWithCurrencySymbol = keys.some(key => {
-            return ObjectsDomainConstants.CURRENCY_UNITS[key].front_units.some(
-              frontUnit => {
-                const trimmedFrontUnit = frontUnit.trim();
-                return (
-                  rawInput.startsWith(frontUnit) ||
-                  rawInput.startsWith(trimmedFrontUnit) ||
-                  rawInput
-                    .toLowerCase()
-                    .startsWith(trimmedFrontUnit.toLowerCase())
-                );
-              }
-            );
-          });
-          if (!startsWithCurrencySymbol) {
-            throw new Error(
-              // eslint-disable-next-line max-len
-              ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_VALUE
-            );
-          }
+          );
+        });
+
+        if (!startsWithCurrencyUnit) {
           throw new Error(
             // eslint-disable-next-line max-len
-            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_CURRENCY
+            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_VALUE
           );
         }
         const ind = rawInput.indexOf(String(rawInput.match(/[0-9]/)));
@@ -261,7 +236,7 @@ export class NumberWithUnits {
         }
         units = rawInput.substr(0, ind).trim();
 
-        startsWithCorrectCurrencyUnit = false;
+        let startsWithCorrectCurrencyUnit = false;
         for (let i = 0; i < keys.length; i++) {
           let unitLength =
             ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length;

@@ -267,6 +267,14 @@ describe('NumberWithUnits', () => {
           Units.fromRawInputString('$')
         )
       );
+      expect(NumberWithUnits.fromRawInputString('Rs 5')).toEqual(
+        new NumberWithUnits(
+          'real',
+          5,
+          new Fraction(false, 0, 0, 1),
+          Units.fromRawInputString('Rs')
+        )
+      );
       expect(NumberWithUnits.fromRawInputString('Rs 2 / 3 per hour')).toEqual(
         new NumberWithUnits(
           'fraction',
@@ -315,7 +323,7 @@ describe('NumberWithUnits', () => {
       }).toThrowError(errors.INVALID_CURRENCY_FORMAT);
       expect(() => {
         NumberWithUnits.fromRawInputString('Rs5');
-      }).toThrowError(errors.INVALID_CURRENCY);
+      }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
         NumberWithUnits.fromRawInputString('$');
       }).toThrowError(errors.INVALID_CURRENCY);
