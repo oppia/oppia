@@ -603,10 +603,13 @@ def apply_change_list(
     try:
         for change in change_list:
             if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
+                # Here we use cast because we are narrowing down the type from
+                # TopicChange to a specific change command.
+                add_subtopic_cmd = cast(topic_domain.AddSubtopicCmd, change)
                 _handle_add_subtopic(
                     topic,
                     topic_id,
-                    cast(topic_domain.AddSubtopicCmd, change),
+                    add_subtopic_cmd,
                     modified_subtopic_pages,
                     modified_study_guides,
                     modified_subtopic_change_cmds,
@@ -614,66 +617,126 @@ def apply_change_list(
                     newly_created_subtopic_ids,
                 )
             elif change.cmd == topic_domain.CMD_DELETE_SUBTOPIC:
+                # Here we use cast because we are narrowing down the type from
+                # TopicChange to a specific change command.
+                delete_subtopic_cmd = cast(
+                    topic_domain.DeleteSubtopicCmd, change
+                )
                 _handle_delete_subtopic(
                     topic,
-                    cast(topic_domain.DeleteSubtopicCmd, change),
+                    delete_subtopic_cmd,
                     newly_created_subtopic_ids,
                     deleted_subtopic_ids,
                 )
             elif change.cmd == topic_domain.CMD_ADD_CANONICAL_STORY:
+                # Here we use cast because we are narrowing down the type from
+                # TopicChange to a specific change command.
+                add_canonical_story_cmd = cast(
+                    topic_domain.AddCanonicalStoryCmd, change
+                )
                 _handle_add_canonical_story(
                     topic,
-                    cast(topic_domain.AddCanonicalStoryCmd, change),
+                    add_canonical_story_cmd,
                 )
             elif change.cmd == topic_domain.CMD_DELETE_CANONICAL_STORY:
+                # Here we use cast because we are narrowing down the type from
+                # TopicChange to a specific change command.
+                delete_canonical_story_cmd = cast(
+                    topic_domain.DeleteCanonicalStoryCmd, change
+                )
                 _handle_delete_canonical_story(
                     topic,
-                    cast(topic_domain.DeleteCanonicalStoryCmd, change),
+                    delete_canonical_story_cmd,
                 )
             elif change.cmd == topic_domain.CMD_REARRANGE_CANONICAL_STORY:
+                # Here we use cast because we are narrowing down the type from
+                # TopicChange to a specific change command.
+                rearrange_canonical_story_cmd = cast(
+                    topic_domain.RearrangeCanonicalStoryCmd, change
+                )
                 _handle_rearrange_canonical_story(
                     topic,
-                    cast(topic_domain.RearrangeCanonicalStoryCmd, change),
+                    rearrange_canonical_story_cmd,
                 )
             elif change.cmd == topic_domain.CMD_ADD_ADDITIONAL_STORY:
+                # Here we use cast because we are narrowing down the type from
+                # TopicChange to a specific change command.
+                add_additional_story_cmd = cast(
+                    topic_domain.AddAdditionalStoryCmd, change
+                )
                 _handle_add_additional_story(
                     topic,
-                    cast(topic_domain.AddAdditionalStoryCmd, change),
+                    add_additional_story_cmd,
                 )
             elif change.cmd == topic_domain.CMD_DELETE_ADDITIONAL_STORY:
+                # Here we use cast because we are narrowing down the type from
+                # TopicChange to a specific change command.
+                delete_additional_story_cmd = cast(
+                    topic_domain.DeleteAdditionalStoryCmd, change
+                )
                 _handle_delete_additional_story(
                     topic,
-                    cast(topic_domain.DeleteAdditionalStoryCmd, change),
+                    delete_additional_story_cmd,
                 )
             elif change.cmd == topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID:
+                # Here we use cast because we are narrowing down the type from
+                # TopicChange to a specific change command.
+                add_uncategorized_skill_id_cmd = cast(
+                    topic_domain.AddUncategorizedSkillIdCmd, change
+                )
                 _handle_add_uncategorized_skill_id(
                     topic,
-                    cast(topic_domain.AddUncategorizedSkillIdCmd, change),
+                    add_uncategorized_skill_id_cmd,
                 )
             elif change.cmd == topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
+                # Here we use cast because we are narrowing down the type from
+                # TopicChange to a specific change command.
+                remove_uncategorized_skill_id_cmd = cast(
+                    topic_domain.RemoveUncategorizedSkillIdCmd, change
+                )
                 _handle_remove_uncategorized_skill_id(
                     topic,
-                    cast(topic_domain.RemoveUncategorizedSkillIdCmd, change),
+                    remove_uncategorized_skill_id_cmd,
                 )
             elif change.cmd == topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC:
+                # Here we use cast because we are narrowing down the type from
+                # TopicChange to a specific change command.
+                move_skill_id_to_subtopic_cmd = cast(
+                    topic_domain.MoveSkillIdToSubtopicCmd, change
+                )
                 _handle_move_skill_id_to_subtopic(
                     topic,
-                    cast(topic_domain.MoveSkillIdToSubtopicCmd, change),
+                    move_skill_id_to_subtopic_cmd,
                 )
             elif change.cmd == topic_domain.CMD_REARRANGE_SKILL_IN_SUBTOPIC:
+                # Here we use cast because we are narrowing down the type from
+                # TopicChange to a specific change command.
+                rearrange_skill_in_subtopic_cmd = cast(
+                    topic_domain.RearrangeSkillInSubtopicCmd, change
+                )
                 _handle_rearrange_skill_in_subtopic(
                     topic,
-                    cast(topic_domain.RearrangeSkillInSubtopicCmd, change),
+                    rearrange_skill_in_subtopic_cmd,
                 )
             elif change.cmd == topic_domain.CMD_REARRANGE_SUBTOPIC:
+                # Here we use cast because we are narrowing down the type from
+                # TopicChange to a specific change command.
+                rearrange_subtopic_cmd = cast(
+                    topic_domain.RearrangeSubtopicCmd, change
+                )
                 _handle_rearrange_subtopic(
                     topic,
-                    cast(topic_domain.RearrangeSubtopicCmd, change),
+                    rearrange_subtopic_cmd,
                 )
             elif change.cmd == topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC:
+                # Here we use cast because we are narrowing down the type from
+                # TopicChange to a specific change command.
+                remove_skill_id_from_subtopic_cmd = cast(
+                    topic_domain.RemoveSkillIdFromSubtopicCmd, change
+                )
                 _handle_remove_skill_id_from_subtopic(
                     topic,
-                    cast(topic_domain.RemoveSkillIdFromSubtopicCmd, change),
+                    remove_skill_id_from_subtopic_cmd,
                 )
             elif change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
                 if change.property_name == topic_domain.TOPIC_PROPERTY_NAME:
