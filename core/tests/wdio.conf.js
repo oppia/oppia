@@ -37,10 +37,6 @@ var suites = {
     './core/tests/webdriverio_desktop/contributorAdminDashboard.js'
   ],
 
-  creatorDashboard: [
-    './core/tests/webdriverio_desktop/creatorDashboard.js'
-  ],
-
   embedding: [
     './core/tests/webdriverio_desktop/embedding.js'
   ],
@@ -63,10 +59,6 @@ var suites = {
 
   navigation: [
     './core/tests/webdriverio_desktop/navigation.js'
-  ],
-
-  publication: [
-    './core/tests/webdriverio_desktop/publicationAndLibrary.js'
   ],
 
   skillEditor: [

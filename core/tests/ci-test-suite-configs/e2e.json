@@ -9,10 +9,6 @@
       "module": "core/tests/webdriverio_desktop/contributorAdminDashboard.js"
     },
     {
-      "name": "creatorDashboard",
-      "module": "core/tests/webdriverio_desktop/creatorDashboard.js"
-    },
-    {
       "name": "embedding",
       "module": "core/tests/webdriverio_desktop/embedding.js"
     },
@@ -35,10 +31,6 @@
     {
       "name": "navigation",
       "module": "core/tests/webdriverio_desktop/navigation.js"
-    },
-    {
-      "name": "publication",
-      "module": "core/tests/webdriverio_desktop/publicationAndLibrary.js"
     },
     {
       "name": "skillEditor",

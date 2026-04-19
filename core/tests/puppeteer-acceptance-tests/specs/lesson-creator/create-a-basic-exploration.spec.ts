@@ -19,7 +19,10 @@
  * LC.1. Create a basic exploration.
  */
 import {UserFactory} from '../../utilities/common/user-factory';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {
+  ExplorationEditor,
+  INTERACTION_TYPES,
+} from '../../utilities/user/exploration-editor';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
@@ -40,6 +43,19 @@ describe('Lesson Creator', function () {
       await explorationEditor.expectToBeInCreatorDashboard();
       await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
       await explorationEditor.dismissWelcomeModal();
+
+      await explorationEditor.updateStateName('Introduction');
+      await explorationEditor.updateCardContent('Welcome to this exploration!');
+      await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+      await explorationEditor.saveExplorationDraft('Set up introduction card');
+
+      await explorationEditor.expectStateNameToBe('Introduction');
+      await explorationEditor.expectCardContentToBe(
+        'Welcome to this exploration!'
+      );
+      await explorationEditor.expectExplorationGraphToContainCard(
+        'Introduction'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
