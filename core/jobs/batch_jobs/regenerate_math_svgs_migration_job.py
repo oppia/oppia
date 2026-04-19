@@ -14,12 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Jobs for regenerating math SVGs with updated font configuration."""
+
 from __future__ import annotations
 
 import json
 import logging
 import os
-import re
 
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -30,8 +31,7 @@ from core.platform import models
 import apache_beam as beam
 import bs4
 import result
-
-from typing import Dict, Iterator, List, Sequence, Tuple
+from typing import Dict, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -47,10 +47,13 @@ _SVG_MAPPING_PATH = os.path.join(
 
 def _load_svg_mapping() -> Dict[str, str]:
     """Loads the svg_mapping.json file and returns a dict of
-    old_filename → new_filename.
+    old_filename -> new_filename.
 
     Returns:
-        dict(str, str). Mapping from old SVG filename to new SVG filename.
+        Dict[str, str]. Mapping from old SVG filename to new SVG filename.
+
+    Raises:
+        FileNotFoundError. If svg_mapping.json is not found at the expected path.
     """
     if not os.path.exists(_SVG_MAPPING_PATH):
         raise FileNotFoundError(
@@ -172,7 +175,7 @@ def _update_exploration_model(
     try:
         total_replacements = 0
 
-        for state_name, state_dict in exp_model.states.items():
+        for _, state_dict in exp_model.states.items():
             # Update content HTML.
             content_html = state_dict.get('content', {}).get('html', '')
             if content_html:
@@ -183,13 +186,11 @@ def _update_exploration_model(
                     state_dict['content']['html'] = updated_html
                     total_replacements += count
 
-            # Update interaction customization args (may contain math HTML).
             interaction = state_dict.get('interaction', {})
             cust_args = interaction.get('customization_args', {})
-            for arg_name, arg_value in cust_args.items():
+            for _, arg_value in cust_args.items():
                 _update_html_in_dict(arg_value, svg_mapping, total_replacements)
 
-            # Update answer groups' feedback HTML.
             for answer_group in interaction.get('answer_groups', []):
                 feedback = answer_group.get('outcome', {}).get('feedback', {})
                 feedback_html = feedback.get('html', '')
@@ -201,7 +202,6 @@ def _update_exploration_model(
                         feedback['html'] = updated_html
                         total_replacements += count
 
-            # Update default outcome feedback HTML.
             default_outcome = interaction.get('default_outcome')
             if default_outcome:
                 feedback = default_outcome.get('feedback', {})
@@ -214,7 +214,6 @@ def _update_exploration_model(
                         feedback['html'] = updated_html
                         total_replacements += count
 
-            # Update hints HTML.
             for hint in state_dict.get('hints', []):
                 hint_html = hint.get('hint_content', {}).get('html', '')
                 if hint_html:
@@ -225,7 +224,6 @@ def _update_exploration_model(
                         hint['hint_content']['html'] = updated_html
                         total_replacements += count
 
-            # Update solution explanation HTML.
             solution = state_dict.get('solution')
             if solution:
                 explanation = solution.get('explanation', {})
@@ -255,6 +253,8 @@ def _update_exploration_model(
 
 
 def _update_html_in_dict(
+    # Here we use object because the function handles dict, list, and str
+    # types recursively and no single more specific type covers all cases.
     obj: object,
     svg_mapping: Dict[str, str],
     total_replacements: int,
@@ -308,7 +308,7 @@ class RegenerateMathSvgsJob(base_jobs.JobBase):
                 exp_models.ExplorationModel.get_all(include_deleted=False)
             )
             | 'Filter explorations with math content'
-            >> beam.Filter(lambda model: _exploration_has_math_content(model))
+            >> beam.Filter(_exploration_has_math_content)
             | 'Update math SVG filenames'
             >> beam.Map(
                 lambda model: _update_exploration_model(model, svg_mapping)
@@ -321,18 +321,11 @@ class RegenerateMathSvgsJob(base_jobs.JobBase):
             | 'Unwrap ok results' >> beam.Map(lambda r: r.unwrap())
         )
 
-        # Split into actually-changed vs unchanged
         actually_migrated = (
             migrated_models
             | 'Filter actually migrated'
             >> beam.Filter(lambda pair: pair[1] > 0)
             | 'Unwrap model from pair' >> beam.Map(lambda pair: pair[0])
-        )
-
-        not_migrated = (
-            migrated_models
-            | 'Filter not migrated' >> beam.Filter(lambda pair: pair[1] == 0)
-            | 'Unwrap unchanged model' >> beam.Map(lambda pair: pair[0])
         )
 
         migration_job_run_results = (

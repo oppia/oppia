@@ -18,10 +18,6 @@
 
 from __future__ import annotations
 
-import json
-import os
-import tempfile
-
 from core import feconf
 from core.domain import exp_domain, exp_services
 from core.jobs import job_test_utils
@@ -136,11 +132,6 @@ def _create_exploration_with_html(
     return exp_models.ExplorationModel.get(exp_id)
 
 
-# ---------------------------------------------------------------------------
-# Tests for RegenerateMathSvgsJob
-# ---------------------------------------------------------------------------
-
-
 class RegenerateMathSvgsJobTests(job_test_utils.JobTestBase):
     """Tests for RegenerateMathSvgsJob."""
 
@@ -152,7 +143,6 @@ class RegenerateMathSvgsJobTests(job_test_utils.JobTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        # Inject a controlled mapping so tests don't depend on svg_mapping.json.
         _patch_svg_mapping(
             self,
             {OLD_SVG_FILENAME: NEW_SVG_FILENAME},
@@ -164,14 +154,17 @@ class RegenerateMathSvgsJobTests(job_test_utils.JobTestBase):
 
     def test_exploration_without_math_is_not_migrated(self) -> None:
         """Exploration with no math tags produces a processed result but
-        no migrated result, because there is nothing to update."""
+        no migrated result, because there is nothing to update.
+        """
         _create_exploration_with_html(self.EXP_ID, HTML_WITHOUT_MATH)
 
         self.assert_job_output_is_empty()
 
     def test_exploration_with_known_math_filename_is_migrated(self) -> None:
         """Exploration whose math tag filename is in the mapping gets updated
-        and the model is written back to the datastore."""
+        and the model is written back to the datastore.
+        """
+
         _create_exploration_with_html(self.EXP_ID, HTML_WITH_KNOWN_MATH_TAG)
 
         self.assert_job_output_is(
@@ -185,7 +178,6 @@ class RegenerateMathSvgsJobTests(job_test_utils.JobTestBase):
             ]
         )
 
-        # Verify the model was actually updated in the datastore.
         updated_model = exp_models.ExplorationModel.get(self.EXP_ID)
         init_state_name = updated_model.init_state_name
         updated_html = updated_model.states[init_state_name]['content']['html']
@@ -194,11 +186,10 @@ class RegenerateMathSvgsJobTests(job_test_utils.JobTestBase):
 
     def test_exploration_with_unknown_math_filename_is_unchanged(self) -> None:
         """Exploration whose math tag filename is NOT in the mapping is
-        processed but not migrated — the filename is left as-is."""
+        processed but not migrated — the filename is left as-is.
+        """
         _create_exploration_with_html(self.EXP_ID, HTML_WITH_UNKNOWN_MATH_TAG)
 
-        # The exploration has math content so it passes the filter, but
-        # none of its filenames are in the mapping so nothing changes.
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(
@@ -207,7 +198,6 @@ class RegenerateMathSvgsJobTests(job_test_utils.JobTestBase):
             ]
         )
 
-        # Verify the model was NOT changed.
         updated_model = exp_models.ExplorationModel.get(self.EXP_ID)
         init_state_name = updated_model.init_state_name
         updated_html = updated_model.states[init_state_name]['content']['html']
@@ -230,24 +220,17 @@ class RegenerateMathSvgsJobTests(job_test_utils.JobTestBase):
             ]
         )
 
-        # The math exploration was migrated.
         updated_model = exp_models.ExplorationModel.get(self.EXP_ID)
         init_state_name = updated_model.init_state_name
         updated_html = updated_model.states[init_state_name]['content']['html']
         self.assertIn(NEW_SVG_FILENAME, updated_html)
 
-        # The non-math exploration was not touched.
         unchanged_model = exp_models.ExplorationModel.get(exp_id_2)
         unchanged_init = unchanged_model.init_state_name
         unchanged_html = unchanged_model.states[unchanged_init]['content'][
             'html'
         ]
         self.assertNotIn(NEW_SVG_FILENAME, unchanged_html)
-
-
-# ---------------------------------------------------------------------------
-# Tests for AuditRegenerateMathSvgsJob
-# ---------------------------------------------------------------------------
 
 
 class AuditRegenerateMathSvgsJobTests(job_test_utils.JobTestBase):
@@ -283,10 +266,9 @@ class AuditRegenerateMathSvgsJobTests(job_test_utils.JobTestBase):
 
     def test_audit_job_reports_migration_without_writing(self) -> None:
         """Audit job reports the same results as the real job but does NOT
-        update the datastore model."""
+        update the datastore model.
+        """
         _create_exploration_with_html(self.EXP_ID, HTML_WITH_KNOWN_MATH_TAG)
-
-        # Record the model version before running the audit job.
         model_before = exp_models.ExplorationModel.get(self.EXP_ID)
         version_before = model_before.version
 
@@ -301,11 +283,9 @@ class AuditRegenerateMathSvgsJobTests(job_test_utils.JobTestBase):
             ]
         )
 
-        # Verify the model was NOT written to the datastore.
         model_after = exp_models.ExplorationModel.get(self.EXP_ID)
         self.assertEqual(model_after.version, version_before)
 
-        # The old filename should still be in the HTML.
         init_state_name = model_after.init_state_name
         html_after = model_after.states[init_state_name]['content']['html']
         self.assertIn(OLD_SVG_FILENAME, html_after)
