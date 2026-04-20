@@ -1169,13 +1169,13 @@ def get_chapter_notifications_stories_list() -> (
 
 
 def populate_story_progress_model_fields(
-    model: story_models.StoryProgressModel | None,
+    model: user_models.StoryProgressModel | None,
     story_progress: story_domain.StoryProgress,
-) -> story_models.StoryProgressModel:
+) -> user_models.StoryProgressModel:
     """Populate story progress model with the data from story progress object.
 
     Args:
-        model: story_models.StoryProgressModel. The model to populate.
+        model: user_models.StoryProgressModel. The model to populate.
         story_progress: stoty_domain.StoryProgress. The story progress domain object which
             should be used to populate the model.
 
@@ -1183,7 +1183,7 @@ def populate_story_progress_model_fields(
         StoryProgressModel. Populated model.
     """
     if model is None:
-        model = story_models.StoryProgressModel(
+        model = user_models.StoryProgressModel(
             id=f'{story_progress.user_id}.{story_progress.story_id}'
         )
 
@@ -1202,7 +1202,7 @@ def save_story_progress(story_progress: story_domain.StoryProgress) -> None:
         story_progress: StoryProgress. The story progress object to be saved
             in the datastore.
     """
-    existing_story_progress_model = story_models.StoryProgressModel.get_by_id(
+    existing_story_progress_model = user_models.StoryProgressModel.get_by_id(
         f'{story_progress.user_id}.{story_progress.story_id}'
     )
     story_progress_model = populate_story_progress_model_fields(
