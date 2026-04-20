@@ -770,15 +770,15 @@ def get_story_progress_from_model(
     story_progress_model: story_models.StoryProgressModel,
 ) -> story_domain.StoryProgress:
     """Returns a story progress domain object given a story progress model
-        loaded from the datastore.
+    loaded from the datastore.
 
     Args:
         story_progress_model: story_models.StoryProgressModel. The story progress model
-        loaded from the datastore.
+            loaded from the datastore.
 
     Returns:
         StoryProgress. A StoryProgress domain object corresponding to the
-        given story model.
+            given story model.
     """
 
     return story_domain.StoryProgress(

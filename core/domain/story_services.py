@@ -1183,7 +1183,7 @@ def populate_story_progress_model_fields(
         StoryProgressModel. Populated model.
     """
     if model is None:
-        model = gae_models.StoryProgressModel(
+        model = story_models.StoryProgressModel(
             id=f'{story_progress.user_id}.{story_progress.story_id}'
         )
 
