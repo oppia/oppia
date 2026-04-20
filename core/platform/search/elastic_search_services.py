@@ -87,6 +87,17 @@ class ElasticSearchClient:
 ES = ElasticSearchClient()
 
 
+# The minimum length of a single-token query that triggers split-word
+# generation. This avoids splitting short acronyms or tiny words.
+_MIN_SINGLE_TOKEN_QUERY_LENGTH_FOR_SPLITS = 4
+# The maximum length of a query that triggers split-word generation.
+# A query of length N generates N-3 possible 2-way splits. This limit (50)
+# ensures we generate at most 47 'should' clauses, which is performant
+# and stays well within the default Elasticsearch 'max_clause_count' (1024)
+# while covering almost any practical search concatenation (>10 words).
+_MAX_SINGLE_TOKEN_QUERY_LENGTH_FOR_SPLITS = 50
+
+
 class SearchException(Exception):
     """Exception used when some search operation is unsuccessful."""
 
@@ -323,13 +334,9 @@ def search(
         ],
     }
     if query_string:
-        query_definition['query']['bool']['must'] = [
-            {
-                'multi_match': {
-                    'query': query_string,
-                }
-            }
-        ]
+        query_definition['query']['bool'].update(
+            _build_query_match_clauses(query_string)
+        )
     if categories:
         category_string = ' '.join(['"%s"' % cat for cat in categories])
         query_definition['query']['bool']['filter'].append(
@@ -408,16 +415,14 @@ def blog_post_summaries_search(
         ],
     }
     if query_string:
-        query_definition['query']['bool']['must'] = [
-            {
-                'multi_match': {
-                    'query': query_string,
-                    'fields': ['title', 'summary'],
-                    'type': 'bool_prefix',
-                    'operator': 'and',
-                }
-            }
-        ]
+        query_definition['query']['bool'].update(
+            _build_query_match_clauses(
+                query_string,
+                fields=['title', 'summary'],
+                match_type='bool_prefix',
+                operator='and',
+            )
+        )
     if tags:
         for tag in tags:
             query_definition['query']['bool']['filter'].append(
@@ -430,3 +435,63 @@ def blog_post_summaries_search(
     )
 
     return result_ids, resulting_offset
+
+
+def _build_query_match_clauses(
+    query_string: str,
+    fields: Optional[List[str]] = None,
+    match_type: Optional[str] = None,
+    operator: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Builds the 'must' or 'should' clauses for the given query string.
+
+    For single-token queries, this generates alternative 2-way splits to
+    handle concatenated keywords (e.g. "positivenumbers" -> "positive numbers").
+
+    Args:
+        query_string: str. The terms that the user is searching for.
+        fields: list(str)|None. The fields to search in.
+        match_type: str|None. The type of match (e.g. 'bool_prefix').
+        operator: str|None. The operator to use (e.g. 'and').
+
+    Returns:
+        dict(str, any). A dictionary containing either the 'must' or 'should'
+        Elasticsearch clauses.
+    """
+    multi_match_base: Dict[str, Any] = {
+        'query': query_string,
+    }
+    if fields:
+        multi_match_base['fields'] = fields
+    if match_type:
+        multi_match_base['type'] = match_type
+    if operator:
+        multi_match_base['operator'] = operator
+
+    # Single-token query (no spaces) of reasonable length.
+    if ' ' not in query_string and (
+        _MIN_SINGLE_TOKEN_QUERY_LENGTH_FOR_SPLITS
+        <= len(query_string)
+        <= _MAX_SINGLE_TOKEN_QUERY_LENGTH_FOR_SPLITS
+    ):
+        # Generate all possible 2-way splits.
+        # Examples: "abcde" -> "ab cde", "abc de", "abcd e".
+        # We require each fragment to be at least 2 chars long to avoid
+        # noisy one-letter splits like "p ositivenumbers".
+        splits = []
+        for i in range(2, len(query_string) - 1):
+            splits.append(f'{query_string[:i]} {query_string[i:]}')
+
+        # Build should clauses: the original query + all splits.
+        should_clauses = [{'multi_match': multi_match_base}]
+        for split_query in splits:
+            should_multi_match = multi_match_base.copy()
+            should_multi_match['query'] = split_query
+            should_clauses.append({'multi_match': should_multi_match})
+
+        return {
+            'should': should_clauses,
+            'minimum_should_match': 1,
+        }
+
+    return {'must': [{'multi_match': multi_match_base}]}

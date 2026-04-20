@@ -215,7 +215,12 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 {
                     'query': {
                         'bool': {
-                            'must': [{'multi_match': {'query': 'query'}}],
+                            'should': [
+                                {'multi_match': {'query': 'query'}},
+                                {'multi_match': {'query': 'qu ery'}},
+                                {'multi_match': {'query': 'que ry'}},
+                            ],
+                            'minimum_should_match': 1,
                             'filter': [
                                 {
                                     'match': {
@@ -385,7 +390,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 {
                     'query': {
                         'bool': {
-                            'must': [
+                            'should': [
                                 {
                                     'multi_match': {
                                         'query': 'query',
@@ -393,8 +398,25 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                                         'type': 'bool_prefix',
                                         'operator': 'and',
                                     }
-                                }
+                                },
+                                {
+                                    'multi_match': {
+                                        'query': 'qu ery',
+                                        'fields': ['title', 'summary'],
+                                        'type': 'bool_prefix',
+                                        'operator': 'and',
+                                    }
+                                },
+                                {
+                                    'multi_match': {
+                                        'query': 'que ry',
+                                        'fields': ['title', 'summary'],
+                                        'type': 'bool_prefix',
+                                        'operator': 'and',
+                                    }
+                                },
                             ],
+                            'minimum_should_match': 1,
                             'filter': [
                                 {
                                     'match': {
@@ -472,3 +494,42 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(result, [])
         self.assertEqual(new_offset, None)
+
+    def test_build_query_match_clauses_boundary_splitting(self) -> None:
+        # A 50-character query should be split.
+        # Splits start at index 2 and end at len-2.
+        # For N=50, i ranges from 2 up to 48 (exclusive i.e. 2..47).
+        # range(2, 50 - 1) -> range(2, 49) -> 2, 3, ..., 48.
+        # That's 47 split points.
+        # Total clauses = 1 (original) + 47 (splits) = 48.
+        query_50 = 'a' * 50
+        clauses_50 = elastic_search_services._build_query_match_clauses(
+            query_50
+        )
+        self.assertIn('should', clauses_50)
+        self.assertEqual(len(clauses_50['should']), 48)
+
+        # A 51-character query should NOT be split.
+        query_51 = 'a' * 51
+        clauses_51 = elastic_search_services._build_query_match_clauses(
+            query_51
+        )
+        self.assertIn('must', clauses_51)
+        self.assertEqual(len(clauses_51['must']), 1)
+        self.assertEqual(
+            clauses_51['must'][0]['multi_match']['query'], query_51
+        )
+
+        # Short query (3 chars) should NOT be split.
+        query_3 = 'abc'
+        clauses_3 = elastic_search_services._build_query_match_clauses(query_3)
+        self.assertIn('must', clauses_3)
+        self.assertEqual(len(clauses_3['must']), 1)
+
+        # Query with space should NOT be split.
+        query_space = 'hello world'
+        clauses_space = elastic_search_services._build_query_match_clauses(
+            query_space
+        )
+        self.assertIn('must', clauses_space)
+        self.assertEqual(len(clauses_space['must']), 1)
