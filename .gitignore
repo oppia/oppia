@@ -83,3 +83,4 @@ debug.log
 
 # Puppeteer acceptance tests.
 jest-runtime-config.json
+*.rdb
