@@ -1828,6 +1828,8 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         # If the exploration is played in context of an invalid story, raise
         # an error.
+        # Here we use object because this test double must accept arbitrary
+        # positional and keyword arguments from the mocked fetcher call.
         def _mock_none_function(*_: object, **__: object) -> None:
             """Mocks None."""
             return None
