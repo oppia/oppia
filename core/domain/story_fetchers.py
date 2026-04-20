@@ -41,7 +41,7 @@ from typing import Dict, List, Literal, Optional, Sequence, Tuple, overload
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import story_models, user_models, gae_models
+    from mypy_imports import story_models, user_models
 
 (story_models, user_models) = models.Registry.import_models(
     [models.Names.STORY, models.Names.USER]
@@ -767,13 +767,13 @@ def get_node_index_by_story_id_and_node_id(story_id: str, node_id: str) -> int:
 
 
 def get_story_progress_from_model(
-    story_progress_model: gae_models.StoryProgressModel,
+    story_progress_model: story_models.StoryProgressModel,
 ) -> story_domain.StoryProgress:
     """Returns a story progress domain object given a story progress model
-    loaded from the datastore.
+        loaded from the datastore.
 
     Args:
-        story_progress_model: StoryProgressModel. The story progress model
+        story_progress_model: story_models.StoryProgressModel. The story progress model
         loaded from the datastore.
 
     Returns:

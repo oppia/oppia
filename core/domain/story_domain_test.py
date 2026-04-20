@@ -2845,31 +2845,31 @@ class StoryProgressTests(test_utils.GenericTestBase):
 
     def test_user_id_cannot_be_none(self) -> None:
         with self.assertRaisesRegex(
-            utils.ValidationError, "Expected 'user_id' to not be None"
+            utils.ValidationError, 'Expected \'user_id\' to not be None'
         ):
             story_domain.StoryProgress(None, 'story', ['node']).validate()
 
     def test_user_id_cannot_be_empty(self) -> None:
-        with self.assertRaisesRegex(utils.ValidationError, "user ID"):
+        with self.assertRaisesRegex(utils.ValidationError, 'user ID'):
             story_domain.StoryProgress('', 'story', ['node']).validate()
 
     def test_story_id_cannot_be_none(self) -> None:
         with self.assertRaisesRegex(
-            utils.ValidationError, "Expected 'story_id' to not be None"
+            utils.ValidationError, 'Expected \'story_id\' to not be None'
         ):
             story_domain.StoryProgress('user', None, ['node']).validate()
 
     def test_completed_node_ids_must_be_list(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError,
-            "Expected 'completed_node_ids' to be a list, received not_list",
+            'Expected \'completed_node_ids\' to be a list, received not_list',
         ):
             story_domain.StoryProgress('user', 'story', 'not_list').validate()
 
     def test_no_duplicates_in_completed_node_ids(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError,
-            "Duplicate node ID 'node' found in 'completed_node_ids'",
+            'Duplicate node ID \'node\' found in \'completed_node_ids\'',
         ):
             story_domain.StoryProgress(
                 'user', 'story', ['node', 'node']

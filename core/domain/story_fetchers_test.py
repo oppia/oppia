@@ -638,7 +638,7 @@ class StoryProgressFetchersUnitTests(test_utils.GenericTestBase):
         self.completed_node_ids = ['node1', 'node2', 'node3']
 
         self.story_progress_model = story_models.StoryProgressModel(
-            id=f"{self.user_id}.{self.story_id}",
+            id=f'{self.user_id}.{self.story_id}',
             user_id=self.user_id,
             story_id=self.story_id,
             completed_node_ids=self.completed_node_ids,
