@@ -32,9 +32,11 @@ from typing import Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import story_models
+    from mypy_imports import story_models, user_models
 
-(story_models,) = models.Registry.import_models([models.Names.STORY])
+(story_models, user_models) = models.Registry.import_models(
+    [models.Names.STORY, models.Names.USER]
+)
 
 
 class StoryFetchersUnitTests(test_utils.GenericTestBase):
