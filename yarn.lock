@@ -5722,6 +5722,15 @@ cjson@^0.5.0:
   dependencies:
     json-parse-helpfulerror "^1.0.3"
 
+"ckeditor4-bootstrapck@https://github.com/Kunstmaan/BootstrapCK4-Skin/archive/v1.0.0.tar.gz":
+  version "1.0.0"
+  resolved "https://github.com/Kunstmaan/BootstrapCK4-Skin/archive/v1.0.0.tar.gz#609132f1bf8199eeb0ae049071abac954c45efa5"
+
+ckeditor4@4.16.1:
+  version "4.16.1"
+  resolved "https://registry.yarnpkg.com/ckeditor4/-/ckeditor4-4.16.1.tgz#c1d34d032085d33e2efe3c12b30431b5f9230c16"
+  integrity sha512-dfclP3QDQfXMOrPex3s/l6b5E+MBSxhMpW3+nUM6lFX3ax1u/1tl2ETpe7iYJRtoN4TdvddL5XFweQT17woN5A==
+
 class-utils@^0.3.5:
   version "0.3.6"
   resolved "https://registry.yarnpkg.com/class-utils/-/class-utils-0.3.6.tgz#f93369ae8b9a7ce02fd41faad0ca83033190c463"
