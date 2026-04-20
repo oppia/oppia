@@ -64,6 +64,7 @@ class ClassroomDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """
         classrooms = classroom_config_services.get_all_classrooms()
         public_classrooms_count = 0
+        classroom = None
 
         for c in classrooms:
             if c.url_fragment == classroom_url_fragment:
