@@ -844,7 +844,13 @@ def apply_change_list(
                         exp_domain.EditExpStatePropertyInteractionHintsCmd,
                         change,
                     )
-                    hint_dicts = edit_state_interaction_hints_cmd.new_value
+                    # Here we use object because hint_dicts is typed as
+                    # a list for this command, but we still need a runtime
+                    # guard for malformed data without making MyPy treat the
+                    # isinstance check as unreachable.
+                    hint_dicts: object = (
+                        edit_state_interaction_hints_cmd.new_value
+                    )
                     if not isinstance(hint_dicts, list):
                         raise Exception(
                             'Expected hints_list to be a list,'
