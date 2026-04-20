@@ -39,12 +39,12 @@ export class ExplorationSaveAndPublishButtonsComponent
   directiveSubscriptions = new Subscription();
 
   isModalDisplayed: boolean = false;
-  autosaveIsInProgress: boolean;
-  saveIsInProcess: boolean;
-  publishIsInProcess: boolean;
-  loadingDotsAreShown: boolean;
-  explorationCanBePublished: boolean;
-  connectedToInternet: boolean;
+  autosaveIsInProgress!: boolean;
+  saveIsInProcess!: boolean;
+  publishIsInProcess!: boolean;
+  loadingDotsAreShown!: boolean;
+  explorationCanBePublished!: boolean;
+  connectedToInternet!: boolean;
 
   constructor(
     private explorationRightsService: ExplorationRightsService,
