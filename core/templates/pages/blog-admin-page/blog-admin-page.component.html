@@ -1,9 +1,3 @@
-<div *ngIf="statusMessage"
-     class="oppia-status-message-container e2e-test-status-message"
-     [class.fade-out]="statusMessageFadingOut">
-  <p>{{ statusMessage }}</p>
-</div>
-<br>
 <div class="blog-admin-page-container">
   <div class="container-fluid row">
     <div class="col-md-8 me-auto ms-auto">
@@ -112,24 +106,6 @@
 
   .blog-admin-page-container {
     padding-top: 16px;
-  }
-
-  .oppia-status-message-container {
-    background-color: #4caf50;
-    border-radius: 8px;
-    bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    color: white;
-    margin: 20px;
-    padding: 12px 16px;
-    position: fixed;
-    right: 20px;
-    transition: opacity 0.8s ease;
-    width: 300px;
-    z-index: 9999;
-  }
-  .oppia-status-message-container.fade-out {
-    opacity: 0;
   }
 
   .oppia-page-card {

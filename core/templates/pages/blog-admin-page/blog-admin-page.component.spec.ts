@@ -21,7 +21,6 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
-  flush,
   flushMicrotasks,
   TestBed,
   tick,
@@ -35,6 +34,8 @@ import {
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AdminTaskManagerService} from 'pages/admin-page/services/admin-task-manager.service';
 import {BlogAdminPageComponent} from 'pages/blog-admin-page/blog-admin-page.component';
+import {AlertsService} from 'services/alerts.service';
+
 class MockWindowRef {
   nativeWindow = {
     confirm() {
@@ -59,11 +60,15 @@ describe('Blog Admin Page component ', () => {
 
   let blogAdminBackendApiService: BlogAdminBackendApiService;
   let adminTaskManagerService: AdminTaskManagerService;
+  let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
 
   let confirmSpy: jasmine.Spy;
   let startTaskSpy: jasmine.Spy;
   let finishTaskSpy: jasmine.Spy;
+  let addInfoMessageSpy: jasmine.Spy;
+  let addSuccessMessageSpy: jasmine.Spy;
+  let addWarningSpy: jasmine.Spy;
 
   const blogAdminPageData: BlogAdminPageData = {
     roleToActions: {
@@ -89,6 +94,7 @@ describe('Blog Admin Page component ', () => {
       providers: [
         BlogAdminBackendApiService,
         AdminTaskManagerService,
+        AlertsService,
         {
           provide: WindowRef,
           useValue: mockWindowRef,
@@ -104,9 +110,13 @@ describe('Blog Admin Page component ', () => {
   beforeEach(() => {
     blogAdminBackendApiService = TestBed.inject(BlogAdminBackendApiService);
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
+    alertsService = TestBed.inject(AlertsService);
 
     startTaskSpy = spyOn(adminTaskManagerService, 'startTask');
     finishTaskSpy = spyOn(adminTaskManagerService, 'finishTask');
+    addInfoMessageSpy = spyOn(alertsService, 'addInfoMessage');
+    addSuccessMessageSpy = spyOn(alertsService, 'addSuccessMessage');
+    addWarningSpy = spyOn(alertsService, 'addWarning');
     spyOn(blogAdminBackendApiService, 'getDataAsync').and.resolveTo(
       blogAdminPageData
     );
@@ -167,16 +177,14 @@ describe('Blog Admin Page component ', () => {
       component.submitUpdateRoleForm(component.formData.updateRole);
 
       expect(startTaskSpy).toHaveBeenCalled();
-      expect(component.statusMessage).toBe('Updating User Role');
+      expect(addInfoMessageSpy).toHaveBeenCalledWith('Updating User Role');
 
       flushMicrotasks();
 
-      expect(component.statusMessage).toBe(
+      expect(addSuccessMessageSpy).toHaveBeenCalledWith(
         'Role of username successfully updated to BLOG_ADMIN'
       );
       expect(finishTaskSpy).toHaveBeenCalled();
-
-      flush();
     }));
 
     it('should not submit update role form if already a task is in queue', fakeAsync(() => {
@@ -204,14 +212,14 @@ describe('Blog Admin Page component ', () => {
       component.submitUpdateRoleForm(component.formData.updateRole);
 
       expect(startTaskSpy).toHaveBeenCalled();
-      expect(component.statusMessage).toBe('Updating User Role');
+      expect(addInfoMessageSpy).toHaveBeenCalledWith('Updating User Role');
 
       flushMicrotasks();
 
-      expect(component.statusMessage).toBe('The user already has this role.');
+      expect(addWarningSpy).toHaveBeenCalledWith(
+        'The user already has this role.'
+      );
       expect(finishTaskSpy).toHaveBeenCalled();
-
-      flush();
     }));
 
     it('should not enable update role button if the input values are invalid', fakeAsync(() => {
@@ -261,14 +269,12 @@ describe('Blog Admin Page component ', () => {
       component.submitRemoveEditorRoleForm(component.formData.updateRole);
 
       expect(startTaskSpy).toHaveBeenCalled();
-      expect(component.statusMessage).toBe('Processing query...');
+      expect(addInfoMessageSpy).toHaveBeenCalledWith('Processing query...');
 
       flushMicrotasks();
 
-      expect(component.statusMessage).toBe('Success.');
+      expect(addSuccessMessageSpy).toHaveBeenCalledWith('Success.');
       expect(finishTaskSpy).toHaveBeenCalled();
-
-      flush();
     }));
 
     it(
@@ -304,16 +310,14 @@ describe('Blog Admin Page component ', () => {
       component.submitRemoveEditorRoleForm(component.formData.updateRole);
 
       expect(startTaskSpy).toHaveBeenCalled();
-      expect(component.statusMessage).toBe('Processing query...');
+      expect(addInfoMessageSpy).toHaveBeenCalledWith('Processing query...');
 
       flushMicrotasks();
 
-      expect(component.statusMessage).toBe(
+      expect(addWarningSpy).toHaveBeenCalledWith(
         'Server error: Internal Server Error.'
       );
       expect(finishTaskSpy).toHaveBeenCalled();
-
-      flush();
     }));
 
     it('should not enable remove role button if the input values are invalid', fakeAsync(() => {
@@ -346,9 +350,9 @@ describe('Blog Admin Page component ', () => {
       component.savePlatformParameters();
       tick();
 
-      expect(component.statusMessage).toBe('Data saved successfully.');
-
-      flush();
+      expect(addSuccessMessageSpy).toHaveBeenCalledWith(
+        'Data saved successfully.'
+      );
     }));
 
     it(
@@ -364,11 +368,9 @@ describe('Blog Admin Page component ', () => {
         component.savePlatformParameters();
         tick();
 
-        expect(component.statusMessage).toBe(
+        expect(addWarningSpy).toHaveBeenCalledWith(
           'Server error: Internal Server Error.'
         );
-
-        flush();
       })
     );
 
@@ -407,40 +409,5 @@ describe('Blog Admin Page component ', () => {
         expect(saveConfigSpy).not.toHaveBeenCalled();
       })
     );
-  });
-
-  describe('status message auto-clear', () => {
-    it('should still be visible before 10 seconds', fakeAsync(() => {
-      component.statusMessage = 'Test message';
-
-      tick(9999);
-
-      expect(component.statusMessage).toBe('Test message');
-      flush();
-    }));
-
-    it('should clear after 10 seconds', fakeAsync(() => {
-      component.statusMessage = 'Test message';
-
-      expect(component.statusMessage).toBe('Test message');
-
-      tick(10800);
-
-      expect(component.statusMessage).toBe('');
-    }));
-
-    it('should reset the timer when a new status message is set', fakeAsync(() => {
-      component.statusMessage = 'First message';
-      tick(5000);
-
-      component.statusMessage = 'Second message';
-      tick(9000);
-
-      expect(component.statusMessage).toBe('Second message');
-
-      tick(1800);
-
-      expect(component.statusMessage).toBe('');
-    }));
   });
 });
