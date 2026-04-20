@@ -981,7 +981,7 @@ class TopicUrlFragmentHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.can_create_topic
+    @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self, topic_url_fragment: str) -> None:
         """Handler that receives a topic url fragment and checks whether
         a topic with the same url fragment exists.
