@@ -875,14 +875,16 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
 class BlogPostReadEventLogEntryTests(test_utils.GenericTestBase):
     """Tests for BlogPostReadEventLogEntry domain object."""
 
-    def test_valid_entry_passes_validation(self):
+    def test_valid_entry_passes_validation(self) -> None:
+        """Tests that a valid entry passes validation."""
         entry = blog_domain.BlogPostReadEventLogEntry(
             blog_post_id='valid_id',
             created_on=datetime.datetime.utcnow()
         )
         entry.validate()  # Should not raise.
 
-    def test_validate_raises_if_blog_post_id_not_string(self):
+    def test_validate_raises_if_blog_post_id_not_string(self) -> None:
+        """Tests that validate raises if blog_post_id is not a string."""
         entry = blog_domain.BlogPostReadEventLogEntry(
             blog_post_id=123,
             created_on=datetime.datetime.utcnow()
@@ -893,7 +895,8 @@ class BlogPostReadEventLogEntryTests(test_utils.GenericTestBase):
         ):
             entry.validate()
 
-    def test_validate_raises_if_blog_post_id_is_empty(self):
+    def test_validate_raises_if_blog_post_id_is_empty(self) -> None:
+        """Tests that validate raises if blog_post_id is empty."""
         entry = blog_domain.BlogPostReadEventLogEntry(
             blog_post_id='',
             created_on=datetime.datetime.utcnow()
@@ -903,3 +906,43 @@ class BlogPostReadEventLogEntryTests(test_utils.GenericTestBase):
             'Expected blog_post_id to be non-empty'
         ):
             entry.validate()
+
+
+class BlogPostViewedEventLogEntryTests(test_utils.GenericTestBase):
+    """Tests for BlogPostViewedEventLogEntry domain object."""
+
+    def test_valid_entry_passes_validation(self) -> None:
+        """Tests that a valid entry passes validation."""
+        entry = blog_domain.BlogPostViewedEventLogEntry(
+            blog_post_id='valid_id',
+            user_id='valid_user_id', # Added missing user_id
+            created_on=datetime.datetime.utcnow()
+        )
+        entry.validate()  # Should not raise.
+
+    def test_validate_raises_if_blog_post_id_not_string(self) -> None:
+        """Tests that validate raises if blog_post_id is not a string."""
+        entry = blog_domain.BlogPostViewedEventLogEntry(
+            blog_post_id=123,
+            user_id='valid_user_id', # Added missing user_id
+            created_on=datetime.datetime.utcnow()
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected blog_post_id to be a string'
+        ):
+            entry.validate()
+
+    def test_validate_raises_if_blog_post_id_is_empty(self) -> None:
+        """Tests that validate raises if blog_post_id is empty."""
+        entry = blog_domain.BlogPostViewedEventLogEntry(
+            blog_post_id='',
+            user_id='valid_user_id', # Added missing user_id
+            created_on=datetime.datetime.utcnow()
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected blog_post_id to be non-empty'
+        ):
+            entry.validate()
+

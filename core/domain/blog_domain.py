@@ -854,23 +854,11 @@ class BlogPostReadEventLogEntry:
     """Domain object for a blog post read event log entry."""
 
     def __init__(self, blog_post_id, created_on):
-        """Initializes a BlogPostReadEventLogEntry domain object.
-
-        Args:
-            blog_post_id: str. The unique ID of the blog post that was read.
-            created_on: datetime.datetime. The timestamp when the read event
-                occurred.
-        """
         self.blog_post_id = blog_post_id
         self.created_on = created_on
 
     def validate(self):
-        """Validates the blog post read event log entry.
-
-        Raises:
-            utils.ValidationError. The blog_post_id is not a string.
-            utils.ValidationError. The blog_post_id is empty.
-        """
+        """Validates the blog post read event log entry."""
         if not isinstance(self.blog_post_id, str):
             raise utils.ValidationError(
                 'Expected blog_post_id to be a string, received %s'
@@ -878,28 +866,18 @@ class BlogPostReadEventLogEntry:
         if not self.blog_post_id:
             raise utils.ValidationError(
                 'Expected blog_post_id to be non-empty.')
+
 
 class BlogPostViewedEventLogEntry:
     """Domain object for a blog post viewed event log entry."""
 
-    def __init__(self, blog_post_id, created_on):
-        """Initializes a BlogPostViewedEventLogEntry domain object.
-
-        Args:
-            blog_post_id: str. The unique ID of the blog post that was viewed.
-            created_on: datetime.datetime. The timestamp when the view event
-                occurred.
-        """
+    def __init__(self, blog_post_id, user_id, created_on):
         self.blog_post_id = blog_post_id
+        self.user_id = user_id
         self.created_on = created_on
 
     def validate(self):
-        """Validates the blog post viewed event log entry.
-
-        Raises:
-            utils.ValidationError. The blog_post_id is not a string.
-            utils.ValidationError. The blog_post_id is empty.
-        """
+        """Validates the blog post viewed event log entry."""
         if not isinstance(self.blog_post_id, str):
             raise utils.ValidationError(
                 'Expected blog_post_id to be a string, received %s'
@@ -907,43 +885,7 @@ class BlogPostViewedEventLogEntry:
         if not self.blog_post_id:
             raise utils.ValidationError(
                 'Expected blog_post_id to be non-empty.')
-
-
-class BlogPostExitedEventLogEntry:
-    """Domain object for a blog post exited event log entry."""
-
-    def __init__(self, blog_post_id, time_spent_msec, created_on):
-        """Initializes a BlogPostExitedEventLogEntry domain object.
-
-        Args:
-            blog_post_id: str. The unique ID of the blog post that was exited.
-            time_spent_msec: float. Milliseconds the user spent on the post.
-            created_on: datetime.datetime. The timestamp when exit occurred.
-        """
-        self.blog_post_id = blog_post_id
-        self.time_spent_msec = time_spent_msec
-        self.created_on = created_on
-
-    def validate(self):
-        """Validates the blog post exited event log entry.
-
-        Raises:
-            utils.ValidationError. The blog_post_id is not a string.
-            utils.ValidationError. The blog_post_id is empty.
-            utils.ValidationError. The time_spent_msec is not a number.
-            utils.ValidationError. The time_spent_msec is negative.
-        """
-        if not isinstance(self.blog_post_id, str):
+        if not isinstance(self.user_id, str):
             raise utils.ValidationError(
-                'Expected blog_post_id to be a string, received %s'
-                % self.blog_post_id)
-        if not self.blog_post_id:
-            raise utils.ValidationError(
-                'Expected blog_post_id to be non-empty.')
-        if not isinstance(self.time_spent_msec, (int, float)):
-            raise utils.ValidationError(
-                'Expected time_spent_msec to be a number, received %s'
-                % self.time_spent_msec)
-        if self.time_spent_msec < 0:
-            raise utils.ValidationError(
-                'Expected time_spent_msec to be non-negative.')
+                'Expected user_id to be a string, received %s'
+                % self.user_id)
