@@ -16,8 +16,6 @@
 
 from __future__ import annotations
 
-import json
-
 from core import feconf
 from core.controllers import acl_decorators, base
 
@@ -61,12 +59,11 @@ class FirebaseProxyPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 f'No firebase domain found for {self.request.domain}.'
             )
 
-        data = json.loads(self.request.body) if self.request.body else None
         response = requests.request(
             self.request.method,
             f'{firebase_domain}{self.request.path}',
             params=dict(self.request.params),
-            data=data,
+            data=self.request.body if self.request.body else None,
             headers=dict(self.request.headers.items()),
             timeout=TIMEOUT_SECS,
         )
