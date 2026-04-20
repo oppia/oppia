@@ -2844,6 +2844,9 @@ class StoryProgressTests(test_utils.GenericTestBase):
         progress.validate()
 
     def test_user_id_cannot_be_none(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected \'user_id\' to not be None'
         ):
@@ -2854,12 +2857,18 @@ class StoryProgressTests(test_utils.GenericTestBase):
             story_domain.StoryProgress('', 'story', ['node']).validate()
 
     def test_story_id_cannot_be_none(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected \'story_id\' to not be None'
         ):
             story_domain.StoryProgress('user', None, ['node']).validate()  # type: ignore[arg-type]
 
     def test_completed_node_ids_must_be_list(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected \'completed_node_ids\' to be a list, received not_list',
