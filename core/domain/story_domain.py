@@ -2761,7 +2761,7 @@ class StoryProgress:
 
         if not isinstance(self.completed_node_ids, list):
             raise utils.ValidationError(
-                'Expected \'completed_node_ids\' to be a list,'
+                'Expected \'completed_node_ids\' to be a list, '
                 'received %s' % self.completed_node_ids
             )
 
