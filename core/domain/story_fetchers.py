@@ -780,7 +780,6 @@ def get_story_progress_from_model(
         StoryProgress. A StoryProgress domain object corresponding to the
             given story model.
     """
-
     return story_domain.StoryProgress(
         story_progress_model.user_id,
         story_progress_model.story_id,
