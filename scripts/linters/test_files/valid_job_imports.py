@@ -37,6 +37,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     number_with_units_audit_jobs,
     opportunity_management_jobs,
     question_migration_jobs,
+    regenerate_math_svgs_migration_job,
     skill_inspection_jobs,
     skill_migration_jobs,
     story_migration_jobs,
