@@ -95,7 +95,7 @@ export class ExplorationStatesService {
   contentChangesCanAffectTranslations: boolean = true;
 
   stateInteractionSavedCallbacks: ((state: State) => void)[] = [];
-  private _states: States | null = null;
+  private _states!: States;
   private _refreshGraphEventEmitter: EventEmitter<string> = new EventEmitter();
 
   constructor(
@@ -370,11 +370,15 @@ export class ExplorationStatesService {
     stateName: string,
     backendName: StatePropertyNames
   ): StatePropertyValues {
-    let accessorList: string[] = this.PROPERTY_REF_DATA[backendName];
+    let accessorList: string[] = (
+      this.PROPERTY_REF_DATA as Record<string, string[]>
+    )[backendName];
     let propertyRef = (this._states as States).getState(stateName);
     try {
       accessorList.forEach((key: string) => {
-        propertyRef = propertyRef[key];
+        propertyRef = (propertyRef as unknown as Record<string, unknown>)[
+          key
+        ] as typeof propertyRef;
       });
     } catch (e) {
       let additionalInfo =
@@ -462,7 +466,7 @@ export class ExplorationStatesService {
   saveStateProperty(
     stateName: string,
     backendName: StatePropertyNames,
-    newValue: StatePropertyValues
+    newValue: StatePropertyValues | null
   ): void {
     let oldValue = this.getStatePropertyMemento(stateName, backendName);
     let newBackendValue = cloneDeep(newValue);
@@ -470,7 +474,7 @@ export class ExplorationStatesService {
 
     if (this._BACKEND_CONVERSIONS.hasOwnProperty(backendName)) {
       newBackendValue = this.convertToBackendRepresentation(
-        newValue,
+        newValue as StatePropertyValues,
         backendName
       );
       oldBackendValue = this.convertToBackendRepresentation(
@@ -482,19 +486,25 @@ export class ExplorationStatesService {
       this.changeListService.editStateProperty(
         stateName,
         backendName,
-        newBackendValue,
+        newBackendValue as StatePropertyValues,
         oldBackendValue
       );
 
       let newStateData = this._states.getState(stateName);
-      let accessorList = this.PROPERTY_REF_DATA[backendName];
+      let accessorList = (this.PROPERTY_REF_DATA as Record<string, string[]>)[
+        backendName
+      ];
       if (this.contentChangesCanAffectTranslations) {
-        this._verifyChangesInitialContents(backendName, newValue);
+        this._verifyChangesInitialContents(
+          backendName,
+          newValue as StatePropertyValues
+        );
       }
 
-      let propertyRef = newStateData;
+      let propertyRef: Record<string, unknown> =
+        newStateData as unknown as Record<string, unknown>;
       for (let i = 0; i < accessorList.length - 1; i++) {
-        propertyRef = propertyRef[accessorList[i]];
+        propertyRef = propertyRef[accessorList[i]] as Record<string, unknown>;
       }
 
       propertyRef[accessorList[accessorList.length - 1]] = cloneDeep(newValue);
@@ -513,7 +523,13 @@ export class ExplorationStatesService {
     frontendValue: StatePropertyValues,
     backendName: string
   ): string {
-    let conversionFunction = this._BACKEND_CONVERSIONS[backendName];
+    let conversionFunction = (
+      this._BACKEND_CONVERSIONS as unknown as Record<
+        string,
+        (value: unknown) => string
+      >
+    )[backendName];
+
     return conversionFunction(frontendValue);
   }
 
@@ -529,8 +545,8 @@ export class ExplorationStatesService {
     this._states.getStateNames().forEach((stateName: string) => {
       const state = this._states.getState(stateName);
       let solution = state.interaction.solution;
-      if (solution) {
-        let interactionId = state.interaction.id;
+      let interactionId = state.interaction.id;
+      if (solution && interactionId) {
         let result =
           this.answerClassificationService.getMatchingClassificationResult(
             stateName,
@@ -544,11 +560,11 @@ export class ExplorationStatesService {
         this.solutionValidityService.updateValidity(stateName, solutionIsValid);
       }
 
-      state
-        .getAllContents()
-        .forEach(
-          content => (this.initalContentsMapping[content.contentId] = content)
-        );
+      state.getAllContents().forEach(content => {
+        if (content.contentId !== null) {
+          this.initalContentsMapping[content.contentId] = content;
+        }
+      });
     });
   }
 
@@ -803,7 +819,7 @@ export class ExplorationStatesService {
     }
   }
 
-  deleteState(deleteStateName: string): Promise<never> {
+  deleteState(deleteStateName: string): Promise<void> {
     this.alertsService.clearWarnings();
 
     let initStateName = this.explorationInitStateNameService.displayed;
@@ -820,7 +836,7 @@ export class ExplorationStatesService {
       backdrop: true,
     });
     modalRef.componentInstance.deleteStateName = deleteStateName;
-    modalRef.result.then(
+    return modalRef.result.then(
       () => {
         this._states.deleteState(deleteStateName);
 
