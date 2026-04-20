@@ -746,7 +746,7 @@ def get_completed_node_ids(user_id: str, story_id: str) -> List[str]:
 
 def get_node_index_by_story_id_and_node_id(story_id: str, node_id: str) -> int:
     """Returns the index of the story node with the given story id
-        and node id.
+    and node id.
 
     Args:
         story_id: str. ID of the story.
@@ -766,11 +766,11 @@ def get_node_index_by_story_id_and_node_id(story_id: str, node_id: str) -> int:
     return node_index
 
 
-def get_story_progress_from_model(
+def get_story_progress_from_model(  # pylint: disable=4-space-indentation-in-docstring
     story_progress_model: story_models.StoryProgressModel,
 ) -> story_domain.StoryProgress:
     """Returns a story progress domain object given a story progress model
-        loaded from the datastore.
+    loaded from the datastore.
 
     Args:
         story_progress_model: story_models.StoryProgressModel. The story progress model
