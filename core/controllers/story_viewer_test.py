@@ -931,7 +931,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             2,
         )
 
-        def _mock_none_function(_: str, _strict: bool = True) -> None:
+        def _mock_none_function(*_: object, **__: object) -> None:
             """Mocks None."""
             return None
 
