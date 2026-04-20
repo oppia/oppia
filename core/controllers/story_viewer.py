@@ -63,13 +63,7 @@ class StoryPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         Args:
             story_id: str. The story ID.
         """
-        story = story_fetchers.get_story_by_id(story_id, strict=False)
-        if story is None:
-            logging.error(
-                'Could not find a story corresponding to %s id.' % story_id
-            )
-            self.render_json({})
-            return
+        story = story_fetchers.get_story_by_id(story_id)
         topic_id = story.corresponding_topic_id
         topic_name = topic_fetchers.get_topic_by_id(topic_id).name
 

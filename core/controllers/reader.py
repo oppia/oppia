@@ -46,6 +46,7 @@ from core.domain import (
     skill_services,
     stats_domain,
     stats_services,
+    story_domain,
     story_fetchers,
     summary_services,
     translation_fetchers,
@@ -53,7 +54,7 @@ from core.domain import (
     user_services,
 )
 
-from typing import Dict, List, Optional, TypedDict, Union
+from typing import Dict, List, Optional, TypedDict, Union, cast
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
@@ -1526,22 +1527,28 @@ class ExplorationMaybeLeaveHandler(
             )
 
         if user_id and story_id:
-            story = story_fetchers.get_story_by_id(story_id, strict=False)
-            if story is not None:
-                learner_progress_services.record_story_started(
-                    user_id, story.id
-                )
-                if story.corresponding_topic_id is not None:
-                    learner_progress_services.record_topic_started(
-                        user_id, story.corresponding_topic_id
-                    )
-            else:
+            # Here we use object because get_story_by_id() is typed as
+            # non-optional, but we still guard against malformed mocked data
+            # in tests without making MyPy treat the fallback branch as
+            # unreachable.
+            story_or_none: object = story_fetchers.get_story_by_id(story_id)
+            if story_or_none is None:
                 logging.error(
                     'Could not find a story corresponding to %s '
                     'id.' % story_id
                 )
                 self.render_json({})
                 return
+
+            # Here we use cast because the None branch above narrows
+            # story_or_none at runtime, and we need the explicit Story type
+            # for attribute access in strict type checking.
+            story = cast(story_domain.Story, story_or_none)
+            learner_progress_services.record_story_started(user_id, story.id)
+            if story.corresponding_topic_id is not None:
+                learner_progress_services.record_topic_started(
+                    user_id, story.corresponding_topic_id
+                )
 
         event_services.MaybeLeaveExplorationEventHandler.record(
             exploration_id,

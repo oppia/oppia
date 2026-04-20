@@ -933,7 +933,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
 
         def _mock_none_function(_: str, _strict: bool = True) -> None:
             """Mocks None."""
-            pass
+            return None
 
         story_fetchers_swap = self.swap(
             story_fetchers, 'get_story_by_id', _mock_none_function
