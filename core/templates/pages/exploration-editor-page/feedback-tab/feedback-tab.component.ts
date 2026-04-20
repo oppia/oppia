@@ -40,15 +40,15 @@ import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model
 export class FeedbackTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   STATUS_CHOICES = this.threadStatusDisplayService.STATUS_CHOICES;
-  activeThread: SuggestionThread;
-  userIsLoggedIn: boolean;
-  threadIsStale: boolean;
-  threadData: FeedbackThread[];
-  messageSendingInProgress: boolean;
+  activeThread: SuggestionThread | null = null;
+  userIsLoggedIn: boolean | null = null;
+  threadIsStale: boolean = false;
+  threadData!: FeedbackThread[];
+  messageSendingInProgress: boolean = false;
   feedbackMessage: {
-    status: string;
+    status: string | null;
     text: string;
-  };
+  } = {status: null, text: ''};
 
   constructor(
     private alertsService: AlertsService,
@@ -76,13 +76,15 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
 
   // Fetches the threads again if any thread is updated.
   fetchUpdatedThreads(): Promise<void> {
-    let activeThreadId = this.activeThread && this.activeThread.threadId;
+    const activeThreadId = this.activeThread
+      ? this.activeThread.threadId
+      : null;
     return this.threadDataBackendApiService
       .getFeedbackThreadsAsync()
       .then(data => {
         this.threadData = data;
         this.threadIsStale = false;
-        if (activeThreadId !== null) {
+        if (activeThreadId) {
           // Fetching threads invalidates old thread domain objects, so we
           // need to update our reference to the active thread afterwards.
           this.activeThread = this.threadDataBackendApiService.getThread(
@@ -102,17 +104,19 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
 
   _isSuggestionHandled(): boolean {
     return (
-      this.activeThread !== null && this.activeThread.isSuggestionHandled()
+      this.activeThread !== null && !!this.activeThread.isSuggestionHandled()
     );
   }
 
   _isSuggestionValid(): boolean {
-    return (
-      this.activeThread !== null &&
-      this.explorationStatesService.hasState(
-        this.activeThread.getSuggestionStateName()
-      )
-    );
+    if (this.activeThread === null) {
+      return false;
+    }
+    const stateName = this.activeThread.getSuggestionStateName();
+    if (stateName === null) {
+      return false;
+    }
+    return this.explorationStatesService.hasState(stateName);
   }
 
   _hasUnsavedChanges(): boolean {
@@ -153,7 +157,11 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
       : 'default';
   }
 
-  addNewMessage(threadId: string, tmpText: string, tmpStatus: string): void {
+  addNewMessage(
+    threadId: string | null,
+    tmpText: string,
+    tmpStatus: string | null
+  ): void {
     if (threadId === null) {
       this.alertsService.addWarning(
         'Cannot add message to thread with ID: null.'
@@ -180,7 +188,9 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
       .then(
         messages => {
           this._resetFeedbackMessageFields();
-          this.activeThread.messages = messages;
+          if (this.activeThread) {
+            this.activeThread.messages = messages;
+          }
           this.messageSendingInProgress = false;
         },
         () => {

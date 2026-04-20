@@ -153,6 +153,7 @@ describe('Feedback Tab Component', () => {
           new_value: {html: ''},
           old_value: {html: ''},
           skill_id: '',
+          content_id: '',
         },
         last_updated_msecs: 0,
       }
@@ -225,6 +226,7 @@ describe('Feedback Tab Component', () => {
               new_value: {html: ''},
               old_value: {html: ''},
               skill_id: '',
+              content_id: '',
             },
             last_updated_msecs: 0,
           }
@@ -283,6 +285,7 @@ describe('Feedback Tab Component', () => {
             new_value: {html: ''},
             old_value: {html: ''},
             skill_id: '',
+            content_id: '',
           },
           last_updated_msecs: 0,
         }
@@ -334,6 +337,7 @@ describe('Feedback Tab Component', () => {
             new_value: {html: ''},
             old_value: {html: ''},
             skill_id: '',
+            content_id: '',
           },
           last_updated_msecs: 0,
         }
@@ -378,6 +382,7 @@ describe('Feedback Tab Component', () => {
             new_value: {html: ''},
             old_value: {html: ''},
             skill_id: '',
+            content_id: '',
           },
           last_updated_msecs: 0,
         }
@@ -423,6 +428,7 @@ describe('Feedback Tab Component', () => {
           new_value: {html: ''},
           old_value: {html: ''},
           skill_id: '',
+          content_id: '',
         },
         last_updated_msecs: 0,
       }
@@ -436,7 +442,7 @@ describe('Feedback Tab Component', () => {
   }));
 
   it('should create a new thread when closing create new thread modal', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+    spyOn(ngbModal, 'open').and.callFake(() => {
       return {
         result: Promise.resolve({
           newThreadSubject: 'New subject',
@@ -465,7 +471,7 @@ describe('Feedback Tab Component', () => {
 
   it('should not create a new thread when dismissing create new thread modal', () => {
     spyOn(threadDataBackendApiService, 'createNewThreadAsync');
-    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+    spyOn(ngbModal, 'open').and.callFake(() => {
       return {
         result: Promise.reject(),
       } as NgbModalRef;
