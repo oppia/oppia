@@ -866,6 +866,62 @@ class BuildTests(test_utils.GenericTestBase):
         app_yaml_temp_file.close()
         app_dev_yaml_temp_file.close()
 
+    def test_generate_app_yaml_rewrites_ckeditor_asset_paths(self) -> None:
+        mock_dev_yaml_filepath = 'mock_app_dev.yaml'
+        mock_yaml_filepath = 'mock_app.yaml'
+        app_dev_yaml_filepath_swap = self.swap(
+            build, 'APP_DEV_YAML_FILEPATH', mock_dev_yaml_filepath
+        )
+        app_yaml_filepath_swap = self.swap(
+            build, 'APP_YAML_FILEPATH', mock_yaml_filepath
+        )
+
+        app_dev_yaml_temp_file = tempfile.NamedTemporaryFile()
+        setattr(app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
+        with open(mock_dev_yaml_filepath, 'w', encoding='utf-8') as tmp:
+            tmp.write('handlers:\r\n')
+            tmp.write('- url: /third_party/ckeditor\r\n')
+            tmp.write(
+                '  static_dir: dist/oppia-angular/third_party/ckeditor   \r\n'
+            )
+            tmp.write('- url: /third_party/ckeditor-bootstrapck\r\n')
+            tmp.write(
+                '  static_dir: dist/oppia-angular/third_party/ckeditor-bootstrapck\r\n'
+            )
+
+        app_yaml_temp_file = tempfile.NamedTemporaryFile()
+        setattr(app_yaml_temp_file, 'name', mock_yaml_filepath)
+        with open(mock_yaml_filepath, 'w', encoding='utf-8') as tmp:
+            tmp.write('Initial content in mock_app.yaml')
+
+        with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
+            build.generate_app_yaml(deploy_mode=False)
+
+        with open(mock_yaml_filepath, 'r', encoding='utf-8') as yaml_file:
+            content = yaml_file.read()
+
+        self.assertIn(
+            'static_dir: dist/oppia-angular-prod/third_party/ckeditor\n',
+            content,
+        )
+        self.assertIn(
+            (
+                'static_dir: '
+                'dist/oppia-angular-prod/third_party/ckeditor-bootstrapck\n'
+            ),
+            content,
+        )
+        self.assertNotIn(
+            'static_dir: dist/oppia-angular/third_party/ckeditor\n', content
+        )
+        self.assertNotIn(
+            'static_dir: dist/oppia-angular/third_party/ckeditor-bootstrapck\n',
+            content,
+        )
+
+        app_yaml_temp_file.close()
+        app_dev_yaml_temp_file.close()
+
     def test_generate_app_yaml_with_deploy_mode_with_nonexistent_var_raises(
         self,
     ) -> None:
