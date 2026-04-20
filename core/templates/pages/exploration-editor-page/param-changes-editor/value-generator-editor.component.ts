@@ -35,10 +35,10 @@ import {RandomSelectorComponent} from 'value_generators/templates/random-selecto
   templateUrl: './value-generator-editor.component.html',
 })
 export class ValueGeneratorEditorComponent implements OnChanges, AfterViewInit {
-  @Input() generatorId: string;
-  @Input() initArgs: string;
-  @Input() objType: string;
-  @Input() customizationArgs: {
+  @Input() generatorId!: string;
+  @Input() initArgs!: string;
+  @Input() objType!: string;
+  @Input() customizationArgs!: {
     value: string;
     list_of_values: string[];
   };
@@ -66,7 +66,14 @@ export class ValueGeneratorEditorComponent implements OnChanges, AfterViewInit {
     const componentFactory =
       this.componentFactoryResolver.resolveComponentFactory<
         CopierComponent | RandomSelectorComponent
-      >(this.TAG_TO_INTERACTION_MAPPING[componentName]);
+      >(
+        (
+          this.TAG_TO_INTERACTION_MAPPING as Record<
+            string,
+            typeof CopierComponent | typeof RandomSelectorComponent
+          >
+        )[componentName]
+      );
 
     const componentRef = this.viewContainerRef.createComponent<
       CopierComponent | RandomSelectorComponent

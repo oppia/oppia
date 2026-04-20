@@ -67,6 +67,9 @@
       ],
       "utility/*": [
         "core/templates/utility/*"
+      ],
+      "value_generators/*": [
+        "extensions/value_generators/*"
       ]
     },
     "resolveJsonModule": true,

@@ -128,8 +128,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/exploration-editor-page/modal-templates/exploration-modify-translations-modal.component.spec.ts',
     'core/templates/pages/exploration-editor-page/modal-templates/state-version-history-modal.component.spec.ts',
     'core/templates/pages/exploration-editor-page/param-changes-editor/param-changes-editor.component.ts',
-    'core/templates/pages/exploration-editor-page/param-changes-editor/value-generator-editor.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/param-changes-editor/value-generator-editor.component.ts',
     'core/templates/pages/exploration-editor-page/services/exploration-save.service.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/services/translation-topic.service.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/state-translation-editor/state-translation-editor.component.spec.ts',
