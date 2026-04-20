@@ -435,8 +435,6 @@ const addThumbnailToTopic = async function (page, topicName) {
     const [topicLinkElement] = await page.$x(topicLinkXPath);
     await topicLinkElement.click();
     await page.waitForSelector('.e2e-test-save-topic-button', {timeout: 30000});
-    const currentTopicId = (await page.url()).split('/')[4];
-
     await page.waitForSelector(topicThumbnailButton);
     await page.click(topicThumbnailButton);
 
@@ -449,11 +447,8 @@ const addThumbnailToTopic = async function (page, topicName) {
 
     await page.waitForSelector(thumbnailContainer, {visible: true});
     await page.click(topicPhotoSubmit);
+    await page.waitForTimeout(3000);
 
-    // Wait for Angular's change detection to process the thumbnail
-    // change and enable the save button via ngAfterContentChecked.
-    // We check btn.disabled (DOM property) not the HTML attribute,
-    // because Angular uses property binding [disabled].
     await page.waitForFunction(
       () => {
         const btn = document.querySelector('.e2e-test-save-topic-button');
@@ -471,35 +466,15 @@ const addThumbnailToTopic = async function (page, topicName) {
 
     await page.waitForSelector(publishChangesButton);
     await page.click(publishChangesButton);
-    // eslint-disable-next-line no-console
-    console.log('Clicked publish changes button');
-
     await page.waitForSelector('.toast-success', {
       visible: true,
       timeout: 15000,
     });
-    // eslint-disable-next-line no-console
-    console.log('Toast success appeared');
-
     await page.waitForSelector('.toast-success', {
       hidden: true,
       timeout: 15000,
     });
-    // eslint-disable-next-line no-console
-    console.log('Toast success disappeared - save complete');
-
-    await page.waitForFunction(
-      topicId =>
-        fetch(
-          `/assetsdevhandler/topic/${topicId}/assets/thumbnail/thumbnail.svg`
-        )
-          .then(r => r.ok)
-          .catch(() => false),
-      {polling: 1000, timeout: 30000},
-      currentTopicId
-    );
-    // eslint-disable-next-line no-console
-    console.log('Thumbnail asset confirmed on backend');
+    await page.waitForTimeout(5000);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);

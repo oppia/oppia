@@ -223,14 +223,12 @@ var ExplorationPlayerPage = function () {
     await waitFor.visibilityOf(conversationContent, 'Conversation not visible');
     await browser.waitUntil(
       async () => {
-        // Use $$ directly inside the waitUntil callback to ensure it
-        // queries from the current frame context in Chrome 147.
-        var contents = await $$('.e2e-test-conversation-content');
-        if (!contents.length) {
-          return false;
-        }
-        var last = contents[contents.length - 1];
         try {
+          var contents = await $$('.e2e-test-conversation-content');
+          if (!contents.length) {
+            return false;
+          }
+          var last = contents[contents.length - 1];
           var text = await last.getText();
           return text.includes('Congratulations, you have finished!');
         } catch (e) {
