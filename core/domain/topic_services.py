@@ -195,9 +195,9 @@ def _collect_study_guide_changes(
         modified_study_guide_change_cmds: dict(str, list(StudyGuideChange)).
             Study guide change commands grouped by study guide id.
     """
-    # Remove union and StudyGuideChange once the study
-    # guide logic when updating a subtopic page is
-    # removed from line 337.
+    # Remove union and StudyGuideChange once the legacy
+    # study guide update path from subtopic page updates
+    # is removed.
     update_study_guide_property_cmd: Union[
         study_guide_domain.UpdateStudyGuidePropertyCmd,
         study_guide_domain.StudyGuideChange,
