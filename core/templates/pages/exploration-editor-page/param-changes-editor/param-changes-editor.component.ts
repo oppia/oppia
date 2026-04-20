@@ -38,9 +38,9 @@ import {CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
   templateUrl: './param-changes-editor.component.html',
 })
 export class ParamChangesEditorComponent implements OnInit, OnDestroy {
-  @Input() paramChangesServiceName: string;
-  @Input() postSaveHook: () => void;
-  @Input() currentlyInSettingsTab: boolean;
+  @Input() paramChangesServiceName!: string;
+  @Input() postSaveHook!: () => void;
+  @Input() currentlyInSettingsTab!: boolean;
 
   SERVICE_MAPPING = {
     explorationParamChangesService: ExplorationParamChangesService,
@@ -48,12 +48,12 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
   };
 
   directiveSubscriptions = new Subscription();
-  isParamChangesEditorOpen: boolean;
-  paramNameChoices: {id: string; text: string}[];
-  warningText: string;
-  HUMAN_READABLE_ARGS_RENDERERS: {
-    Copier: (value) => void;
-    RandomSelector: (value) => void;
+  isParamChangesEditorOpen!: boolean;
+  paramNameChoices!: {id: string; text: string}[];
+  warningText!: string;
+  HUMAN_READABLE_ARGS_RENDERERS!: {
+    Copier: (value: {value: string}) => string;
+    RandomSelector: (value: {list_of_values: string[]}) => string;
   };
 
   PREAMBLE_TEXT = {
@@ -61,7 +61,7 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     RandomSelector: 'to one of',
   };
 
-  paramChangesService:
+  paramChangesService!:
     | ExplorationParamChangesService
     | StateParamChangesService;
 
@@ -102,10 +102,12 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     let newParamChange = ParamChange.createDefault(newParamName);
     // Add the new param name to this.paramNameChoices, if necessary,
     // so that it shows up in the dropdown.
+    // TODO: Update ParamSpecs.addParamIfNew to accept a nullable second
+    // parameter; the call sites have always passed null at runtime.
     if (
       (this.explorationParamSpecsService.displayed as ParamSpecs).addParamIfNew(
         newParamChange.name,
-        null
+        null as unknown as Parameters<ParamSpecs['addParamIfNew']>[1]
       )
     ) {
       this.paramNameChoices = this.generateParamNameChoices();
@@ -130,17 +132,21 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
   }
 
   areDisplayedParamChangesValid(): boolean {
-    let paramChanges = this.paramChangesService.displayed;
+    let paramChanges = this.paramChangesService.displayed as ParamChange[];
 
-    if (paramChanges && (paramChanges as ParamChange[]).length) {
-      for (let i = 0; i < (paramChanges as ParamChange[]).length; i++) {
+    if (paramChanges && paramChanges.length) {
+      for (let i = 0; i < paramChanges.length; i++) {
         let paramName = paramChanges[i].name;
         if (paramName === '') {
           this.warningText = 'Please pick a non-empty parameter name.';
           return false;
         }
 
-        if (AppConstants.INVALID_PARAMETER_NAMES.indexOf(paramName) !== -1) {
+        if (
+          (AppConstants.INVALID_PARAMETER_NAMES as readonly string[]).indexOf(
+            paramName
+          ) !== -1
+        ) {
           this.warningText =
             "The parameter name '" + paramName + "' is reserved.";
           return false;
@@ -163,7 +169,7 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
 
         if (
           generatorId === 'RandomSelector' &&
-          customizationArgs.list_of_values.length === 0
+          customizationArgs.list_of_values?.length === 0
         ) {
           this.warningText =
             'Each parameter should have at least one possible value.';
@@ -191,7 +197,10 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
       paramChange => {
         (
           this.explorationParamSpecsService.displayed as ParamSpecs
-        ).addParamIfNew(paramChange.name, null);
+        ).addParamIfNew(
+          paramChange.name,
+          null as unknown as Parameters<ParamSpecs['addParamIfNew']>[1]
+        );
       }
     );
 
@@ -225,7 +234,10 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
       paramChange => {
         (
           this.explorationParamSpecsService.displayed as ParamSpecs
-        ).addParamIfNew(paramChange.name, null);
+        ).addParamIfNew(
+          paramChange.name,
+          null as unknown as Parameters<ParamSpecs['addParamIfNew']>[1]
+        );
       }
     );
     this.paramNameChoices = this.generateParamNameChoices();
@@ -244,7 +256,13 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.paramChangesService = this.injector.get(
-      this.SERVICE_MAPPING[this.paramChangesServiceName]
+      (
+        this.SERVICE_MAPPING as Record<
+          string,
+          | typeof ExplorationParamChangesService
+          | typeof StateParamChangesService
+        >
+      )[this.paramChangesServiceName]
     );
 
     this.isParamChangesEditorOpen = false;
