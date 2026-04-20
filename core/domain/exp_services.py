@@ -492,7 +492,11 @@ def get_content_updates_from_cmd_edit_state_property_change(
     if change.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
         return content_id_to_content_value
 
-    if change.new_value is None:
+    # Here we use object because change.new_value can be malformed at runtime,
+    # and we need a runtime guard without forcing MyPy to assume the branch is
+    # unreachable.
+    change_new_value: object = change.new_value
+    if change_new_value is None:
         return content_id_to_content_value
 
     def add_subtitled_html_from_dict(
