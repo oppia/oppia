@@ -45,7 +45,7 @@ from typing import List, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import exp_models, story_models, user_models
+    from mypy_imports import exp_models, story_models, user_models, gae_models
 
 (
     exp_models,
@@ -1166,3 +1166,47 @@ def get_chapter_notifications_stories_list() -> (
                     chapter_notifications_stories_list.append(story_timeliness)
 
     return chapter_notifications_stories_list
+
+
+def populate_story_progress_model_fields(
+    model: gae_models.StoryProgressModel | None,
+    story_progress: story_domain.StoryProgress,
+) -> gae_models.StoryProgressModel:
+    """Populate story progress model with the data from story progress object.
+
+    Args:
+        story_progress_model: StoryProgressModel. The model to populate.
+        story_progress: StoryProgress. The story progress domain object which
+            should be used to populate the model.
+
+    Returns:
+        StoryProgressModel. Populated model.
+    """
+    if model is None:
+        model = gae_models.StoryProgressModel(
+            id=f"{story_progress.user_id}.{story_progress.story_id}"
+        )
+
+    model.user_id = story_progress.user_id
+    model.story_id = story_progress.story_id
+    model.completed_node_ids = story_progress.completed_node_ids
+
+    return model
+
+
+def save_story_progress(story_progress: story_domain.StoryProgress) -> None:
+    """Save a StoryProgress domain object as a StoryProgressModel
+    entity in the datastore.
+
+    Args:
+        story_progress: StoryProgress. The story progress object to be saved
+            in the datastore.
+    """
+    existing_story_progress_model = gae_models.StoryProgressModel.get_by_id(
+        f"{story_progress.user_id}.{story_progress.story_id}"
+    )
+    story_progress_model = populate_story_progress_model_fields(
+        existing_story_progress_model, story_progress
+    )
+    story_progress_model.update_timestamps()
+    story_progress_model.put()
