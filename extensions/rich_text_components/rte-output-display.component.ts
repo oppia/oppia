@@ -268,7 +268,6 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           );
           if (hasParagraphChild) {
             // Just recurse into children without wrapping the LI itself.
-            let nodeTemp = node.cloneNode();
             updatedChildNodes.forEach(child => nodeTemp.appendChild(child));
             return nodeTemp;
           }
