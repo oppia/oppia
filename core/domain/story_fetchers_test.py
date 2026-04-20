@@ -626,3 +626,34 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(nodes[0].title, 'Node 1')
         self.assertEqual(nodes[1].id, self.NODE_ID_2)
         self.assertEqual(nodes[1].title, 'Node 2')
+
+
+class StoryProgressFetchersUnitTests(test_utils.GenericTestBase):
+    """Test the story progress fetchers module."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.user_id = 'user'
+        self.story_id = 'story'
+        self.completed_node_ids = ['node1', 'node2', 'node3']
+
+        self.story_progress_model = story_models.StoryProgressModel(
+            id=f"{self.user_id}.{self.story_id}",
+            user_id=self.user_id,
+            story_id=self.story_id,
+            completed_node_ids=self.completed_node_ids,
+        )
+        self.story_progress_model.update_timestamps()
+        self.story_progress_model.put()
+
+    def test_get_story_progress_from_model(self) -> None:
+        """Test converting a StoryProgressModel to StoryProgress domain object."""
+        story_progress = story_fetchers.get_story_progress_from_model(
+            self.story_progress_model
+        )
+
+        self.assertEqual(story_progress.user_id, self.user_id)
+        self.assertEqual(story_progress.story_id, self.story_id)
+        self.assertEqual(
+            story_progress.completed_node_ids, self.completed_node_ids
+        )

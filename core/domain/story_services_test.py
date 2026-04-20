@@ -3311,6 +3311,23 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             [self.NODE_ID_1, self.NODE_ID_2, self.NODE_ID_3],
         )
 
+    def test_save_story_progress(self) -> None:
+        """Test saving a StoryProgress domain object to the datastore."""
+        story_progress = story_domain.StoryProgress(
+            self.USER_ID, self.STORY_1_ID, [self.NODE_ID_1, self.NODE_ID_2]
+        )
+
+        story_services.save_story_progress(story_progress)
+
+        model = self._get_progress_model(self.USER_ID, self.STORY_1_ID)
+        self.assertIsNotNone(model)
+        assert model is not None
+        self.assertEqual(model.user_id, self.USER_ID)
+        self.assertEqual(model.story_id, self.STORY_1_ID)
+        self.assertEqual(
+            model.completed_node_ids, [self.NODE_ID_1, self.NODE_ID_2]
+        )
+
 
 class StoryContentsMigrationTests(test_utils.GenericTestBase):
 
