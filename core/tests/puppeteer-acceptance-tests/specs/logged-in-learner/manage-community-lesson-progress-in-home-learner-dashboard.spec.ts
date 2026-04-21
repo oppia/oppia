@@ -84,7 +84,6 @@ describe('Logged-In Learner', function () {
 
       await loggedInLearner.continueToNextCard();
       await loggedInLearner.navigateToLearnerDashboard();
-      await loggedInLearner.disableLearnerDashboardNavTransitions();
       await loggedInLearner.expectScreenshotToMatch(
         'learnerDashboardHomeTabWithLessonsInProgressExploreTitle1',
         __dirname
@@ -110,7 +109,6 @@ describe('Logged-In Learner', function () {
     );
 
     await loggedInLearner.navigateToLearnerDashboard();
-    await loggedInLearner.disableLearnerDashboardNavTransitions();
     await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgressExploreTitle1AndExploreTitle2InLearnPlatLaterSection',
       __dirname

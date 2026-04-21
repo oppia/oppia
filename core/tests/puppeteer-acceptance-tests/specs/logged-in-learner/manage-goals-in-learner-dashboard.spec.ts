@@ -262,7 +262,6 @@ describe('Logged-In Learner - Manage Goals', function () {
     await loggedInUser.navigateToGoalsSection();
     await loggedInUser.expectGoalsTabButtonToBeActive();
 
-    await loggedInUser.disableLearnerDashboardNavTransitions();
     await loggedInUser.expectScreenshotToMatch(
       'goalsTabSidebarHighlighted',
       __dirname

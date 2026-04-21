@@ -1144,21 +1144,6 @@ export class BaseUser {
   }
 
   /**
-   * Disables CSS transitions and animations on learner dashboard navigation
-   * controls to reduce screenshot flakiness from class re-application.
-   */
-  async disableLearnerDashboardNavTransitions(): Promise<void> {
-    await this.page.addStyleTag({
-      content: `
-        .oppia-learner-dash-sidebar_position * {
-          transition: none !important;
-          animation: none !important;
-        }
-      `,
-    });
-  }
-
-  /**
    * This function waits until a page is fully rendered.
    * It does so via checking every second if the size of the HTML content of the page is stable.
    * If the size is stable for at least 3 checks, it considers the page fully rendered.
@@ -1223,6 +1208,18 @@ export class BaseUser {
     await currentPage.mouse.move(0, 0);
     // To wait for all images to load and the page to be stable.
     await currentPage.waitForTimeout(5000);
+
+    // Disable all CSS transitions and animations before taking the
+    // screenshot to prevent snapshot mismatches caused by transitions
+    // being mid-way when the screenshot is captured.
+    await currentPage.addStyleTag({
+      content: `
+        *, *::before, *::after {
+          transition: none !important;
+          animation: none !important;
+        }
+      `,
+    });
 
     /* The variable failureTrigger is the percentage of the difference between the stored screenshot and the current screenshot that would trigger a failure
      * In general, it is set as 0.04/4% (desktop) 0.042/4.2% (mobile) for the randomness of the page that are small enough to be ignored.

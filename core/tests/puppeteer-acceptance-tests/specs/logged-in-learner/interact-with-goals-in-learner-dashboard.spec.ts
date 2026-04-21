@@ -224,7 +224,6 @@ describe('Logged-In Learner', function () {
 
     await loggedInUser.expectMobileLayoutToBeCorrect();
 
-    await loggedInUser.disableLearnerDashboardNavTransitions();
     await loggedInUser.expectScreenshotToMatch('goalsTabMobileView', __dirname);
   });
 
