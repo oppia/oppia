@@ -1747,7 +1747,18 @@ class LearnerGroupUserDetails:
             'group_id': self.group_id,
             'progress_sharing_is_turned_on': self.progress_sharing_is_turned_on,
         }
-
+    def validate(self) -> None:
+        """Validates the LearnerGroupUserDetails domain object."""
+        if not isinstance(self.group_id, str):
+            raise utils.ValidationError(
+                'Expected group_id to be a string, received %s' % (
+                    self.group_id)
+            )
+        if not isinstance(self.progress_sharing_is_turned_on, bool):
+            raise utils.ValidationError(
+                'Expected progress_sharing_is_turned_on to be a boolean, '
+                'received %s' % (self.progress_sharing_is_turned_on)
+            )
 
 class LearnerGroupsUser:
     """Domain object for learner groups user."""
@@ -1868,19 +1879,7 @@ class LearnerGroupsUser:
 
         joined_group_ids = []
         for learner_group_details in self.learner_groups_user_details:
-            if not isinstance(learner_group_details.group_id, str):
-                raise utils.ValidationError(
-                    'Expected group_id to be a string, received %s' % (
-                        learner_group_details.group_id)
-                )
-            if not isinstance(
-                learner_group_details.progress_sharing_is_turned_on, bool
-            ):
-                raise utils.ValidationError(
-                    'Expected progress_sharing_is_turned_on to be a boolean, '
-                    'received %s' % (
-                        learner_group_details.progress_sharing_is_turned_on)
-                )
+            learner_group_details.validate()
             joined_group_ids.append(learner_group_details.group_id)
 
         if len(joined_group_ids) != len(set(joined_group_ids)):

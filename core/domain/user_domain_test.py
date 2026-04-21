@@ -1816,7 +1816,32 @@ class LearnerGroupUserDetailsTests(test_utils.GenericTestBase):
             expected_learner_grp_user_details_dict,
         )
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_invalid_group_id_raises_exception(self) -> None:
+        learner_group_user_details = user_domain.LearnerGroupUserDetails(
+            123, True  # type: ignore[arg-type]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected group_id to be a string, received 123'
+        ):
+            learner_group_user_details.validate()
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_invalid_progress_sharing_raises_exception(self) -> None:
+        learner_group_user_details = user_domain.LearnerGroupUserDetails(
+            'group_id_1', 'True'  # type: ignore[arg-type]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected progress_sharing_is_turned_on to be a boolean, '
+            'received True'
+        ):
+            learner_group_user_details.validate()
 class LearnerGroupsUserTest(test_utils.GenericTestBase):
     """Tests for LearnerGroupsUser domain object."""
 
