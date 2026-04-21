@@ -35,6 +35,16 @@
                 "glob": "**/*",
                 "input": "./node_modules/midi/examples/soundfont/",
                 "output": "./midi/examples/soundfont/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/ckeditor4",
+                "output": "/third_party/ckeditor"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/ckeditor4-bootstrapck",
+                "output": "/third_party/ckeditor-bootstrapck"
               }
             ],
             "styles": [
