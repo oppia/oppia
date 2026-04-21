@@ -18,11 +18,16 @@
 
 from __future__ import annotations
 
+import copy
+
+from core import feconf
 from core.domain import (
     exp_domain,
     exp_fetchers,
     state_domain,
     translation_domain,
+    voiceover_domain,
+    voiceover_services,
 )
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -34,9 +39,11 @@ from typing import Any, Dict, List, Set, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services, exp_models
+    from mypy_imports import datastore_services, exp_models, voiceover_models
 
-(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
+(exp_models, voiceover_models) = models.Registry.import_models(
+    [models.Names.EXPLORATION, models.Names.VOICEOVER]
+)
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -157,8 +164,13 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
         if self.DATASTORE_UPDATES_ALLOWED:
             unused_put_results = (
                 fixed_explorations
-                | 'Extract fixed exploration models'
-                >> beam.Map(lambda result: result['fixed_model'])
+                | 'Extract fixed exploration and voiceover models'
+                >> beam.FlatMap(
+                    lambda result: [
+                        result['fixed_model'],
+                        *result['fixed_voiceover_models'],
+                    ]
+                )
                 | 'Put fixed models' >> ndb_io.PutModels()
             )
 
@@ -173,10 +185,7 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
     @staticmethod
     def _check_and_fix_duplicate_content_ids(
         exploration: exp_domain.Exploration,
-    ) -> (
-        Dict[str, Union[str, int, List[str], 'exp_models.ExplorationModel']]
-        | None
-    ):
+    ) -> Dict[str, Any] | None:
         """Check and fix duplicate content IDs in an exploration.
 
         Args:
@@ -212,6 +221,7 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
         )
 
         fixed_content_ids = []
+        content_id_replacements: Dict[str, List[str]] = {}
 
         for duplicate_id in duplicate_content_ids:
             states_with_duplicate = [
@@ -231,12 +241,21 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
                 _replace_content_id_in_state(
                     state, duplicate_id, new_content_id
                 )
+                if duplicate_id not in content_id_replacements:
+                    content_id_replacements[duplicate_id] = []
+                content_id_replacements[duplicate_id].append(new_content_id)
                 fixed_content_ids.append(
                     f'{duplicate_id} -> {new_content_id} in {state_name}'
                 )
 
         exploration.next_content_id_index = (
             content_id_generator.next_content_id_index
+        )
+        updated_voiceover_models = _create_updated_entity_voiceovers_models(
+            exploration.id,
+            exploration.version,
+            exploration.version + 1,
+            content_id_replacements,
         )
 
         with datastore_services.get_ndb_context():
@@ -252,7 +271,81 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
                 'version': exploration.version,
                 'fixed_content_ids': fixed_content_ids,
                 'fixed_model': updated_model,
+                'fixed_voiceover_models': updated_voiceover_models,
             }
+
+
+def _create_updated_entity_voiceovers_models(
+    exploration_id: str,
+    old_version: int,
+    new_version: int,
+    content_id_replacements: Dict[str, List[str]],
+) -> List[Any]:
+    """Create updated voiceover models for a migrated exploration version.
+
+    Args:
+        exploration_id: str. The exploration ID being fixed.
+        old_version: int. The current exploration version before the fix.
+        new_version: int. The new exploration version after the fix.
+        content_id_replacements: dict(str, list(str)). Mapping from each old
+            duplicate content ID to the new content IDs generated for later
+            states.
+
+    Returns:
+        list(EntityVoiceoversModel). The voiceover models for the new
+        exploration version.
+    """
+    updated_voiceover_models = []
+    entity_voiceovers_list = (
+        voiceover_services.get_entity_voiceovers_for_given_exploration(
+            exploration_id,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            old_version,
+        )
+    )
+
+    for entity_voiceovers in entity_voiceovers_list:
+        new_voiceovers_mapping = copy.deepcopy(
+            entity_voiceovers.voiceovers_mapping
+        )
+        new_audio_offsets = copy.deepcopy(
+            entity_voiceovers.automated_voiceovers_audio_offsets_msecs
+        )
+
+        for old_content_id, new_content_ids in content_id_replacements.items():
+            if old_content_id in entity_voiceovers.voiceovers_mapping:
+                for new_content_id in new_content_ids:
+                    new_voiceovers_mapping[new_content_id] = copy.deepcopy(
+                        entity_voiceovers.voiceovers_mapping[old_content_id]
+                    )
+
+            if (
+                old_content_id
+                in entity_voiceovers.automated_voiceovers_audio_offsets_msecs
+            ):
+                for new_content_id in new_content_ids:
+                    new_audio_offsets[new_content_id] = copy.deepcopy(
+                        entity_voiceovers.automated_voiceovers_audio_offsets_msecs[
+                            old_content_id
+                        ]
+                    )
+
+        updated_entity_voiceovers = voiceover_domain.EntityVoiceovers(
+            entity_id=entity_voiceovers.entity_id,
+            entity_type=entity_voiceovers.entity_type,
+            entity_version=new_version,
+            language_accent_code=entity_voiceovers.language_accent_code,
+            voiceovers_mapping=new_voiceovers_mapping,
+            automated_voiceovers_audio_offsets_msecs=new_audio_offsets,
+        )
+        updated_entity_voiceovers.validate()
+        updated_voiceover_models.append(
+            voiceover_services.create_entity_voiceovers_model(
+                updated_entity_voiceovers
+            )
+        )
+
+    return updated_voiceover_models
 
 
 def _replace_content_id_in_state(

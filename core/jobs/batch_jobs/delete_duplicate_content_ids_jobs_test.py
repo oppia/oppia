@@ -18,12 +18,15 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.domain import (
     exp_domain,
     exp_fetchers,
     exp_services,
     state_domain,
     translation_domain,
+    voiceover_domain,
+    voiceover_services,
 )
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import delete_duplicate_content_ids_jobs
@@ -160,6 +163,139 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
 
         self.assertEqual(state1_updated.content.content_id, original_content_id)
         self.assertEqual(state2_updated.content.content_id, 'content_2')
+
+    def test_fix_job_with_duplicate_solution_content_ids_updates_voiceovers(
+        self,
+    ) -> None:
+        """Test that duplicate solution IDs fan out voiceovers on new version."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id', title='Test Exploration', category='Test'
+        )
+
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+
+        exploration.add_states(['State2'])
+        state1 = exploration.states['Introduction']
+        state2 = exploration.states['State2']
+
+        state1.update_interaction_id('TextInput')
+        state1.update_interaction_customization_args(
+            {
+                'placeholder': {
+                    'value': {
+                        'content_id': content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG
+                        ),
+                        'unicode_str': '',
+                    }
+                },
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False},
+            }
+        )
+        state2.update_interaction_id('TextInput')
+        state2.update_interaction_customization_args(
+            {
+                'placeholder': {
+                    'value': {
+                        'content_id': content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG
+                        ),
+                        'unicode_str': '',
+                    }
+                },
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False},
+            }
+        )
+
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index
+        )
+
+        duplicate_solution_content_id = 'solution_1'
+        solution_dict = {
+            'answer_is_exclusive': True,
+            'correct_answer': 'answer',
+            'explanation': {
+                'content_id': duplicate_solution_content_id,
+                'html': '<p>Solution explanation</p>',
+            },
+        }
+
+        assert state1.interaction.id is not None
+        solution_1 = state_domain.Solution.from_dict(
+            state1.interaction.id, solution_dict
+        )
+        solution_2 = state_domain.Solution.from_dict(
+            state2.interaction.id, solution_dict
+        )
+        state1.update_interaction_solution(solution_1)
+        state2.update_interaction_solution(solution_2)
+
+        exp_services.save_new_exploration('owner_id', exploration)
+
+        manual_voiceover = state_domain.Voiceover.from_dict(
+            {
+                'filename': 'solution.mp3',
+                'file_size_bytes': 1234,
+                'needs_update': False,
+                'duration_secs': 4.2,
+            }
+        )
+        entity_voiceovers = voiceover_domain.EntityVoiceovers(
+            entity_id='exp_id',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_version=1,
+            language_accent_code='en-US',
+            voiceovers_mapping={
+                duplicate_solution_content_id: {
+                    feconf.VoiceoverType.MANUAL.value: manual_voiceover,
+                    feconf.VoiceoverType.AUTO.value: None,
+                }
+            },
+            automated_voiceovers_audio_offsets_msecs={},
+        )
+        voiceover_services.save_entity_voiceovers(entity_voiceovers)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Fixed exploration exp_id (version 1) - regenerated content '
+                    'IDs: [\'solution_1 -> content_4 in State2\']'
+                )
+            ]
+        )
+
+        old_entity_voiceovers = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                'exp_id', feconf.ENTITY_TYPE_EXPLORATION, 1
+            )
+        )
+        new_entity_voiceovers = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                'exp_id', feconf.ENTITY_TYPE_EXPLORATION, 2
+            )
+        )
+
+        self.assertEqual(len(old_entity_voiceovers), 1)
+        self.assertEqual(len(new_entity_voiceovers), 1)
+        self.assertEqual(
+            set(old_entity_voiceovers[0].voiceovers_mapping.keys()),
+            {duplicate_solution_content_id},
+        )
+        self.assertEqual(
+            set(new_entity_voiceovers[0].voiceovers_mapping.keys()),
+            {duplicate_solution_content_id, 'content_4'},
+        )
+        self.assertEqual(
+            new_entity_voiceovers[0]
+            .voiceovers_mapping['content_4'][feconf.VoiceoverType.MANUAL.value]
+            .filename,
+            'solution.mp3',
+        )
 
 
 class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
