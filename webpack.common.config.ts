@@ -44,6 +44,17 @@ var defaultMeta = {
     'the community to create or try an exploration today!',
 };
 
+// Helper function to provide analytics constants to HTML templates
+function getTemplateParameters() {
+  return {
+    CAN_SEND_ANALYTICS_EVENTS:
+      analyticsConstants.CAN_SEND_ANALYTICS_EVENTS || false,
+    GA_ANALYTICS_ID: analyticsConstants.GA_ANALYTICS_ID || '',
+    GTM_ANALYTICS_ID: analyticsConstants.GTM_ANALYTICS_ID || '',
+    SITE_NAME_FOR_ANALYTICS: analyticsConstants.SITE_NAME_FOR_ANALYTICS || '',
+  };
+}
+
 module.exports = {
   resolve: {
     modules: [
@@ -88,6 +99,7 @@ module.exports = {
       template: commonPrefix + '/pages/oppia-root/oppia-root.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
+      templateParameters: getTemplateParameters(),
     }),
     new HtmlWebpackPlugin({
       chunks: ['lightweight_oppia_root'],
@@ -99,6 +111,7 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false,
       lightweight: true,
+      templateParameters: getTemplateParameters(),
     }),
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],

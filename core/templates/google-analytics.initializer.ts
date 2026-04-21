@@ -44,6 +44,8 @@ export function initializeGoogleAnalytics() {
       gtag('config', analyticsConstants.GA_ANALYTICS_ID, {
         'anonymize_ip': true,
         'forceSSL': true,
+        // Enable GA4 DebugView events on local/test setups.
+        'debug_mode': analyticsConstants.SITE_NAME_FOR_ANALYTICS === 'localhost',
       });
     }
 

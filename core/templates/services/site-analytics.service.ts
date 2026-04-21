@@ -52,16 +52,12 @@ export class SiteAnalyticsService {
       SiteAnalyticsService.googleAnalyticsIsInitialized = true;
     }
 
-    this.userInfoInitializationPromise = this._initializeLoginStatus();
+    this._initializeLoginStatus();
   }
 
   private async _initializeLoginStatus(): Promise<void> {
-    try {
-      await this.userService.getUserInfoAsync();
-    } finally {
-      this.isUserInfoInitialized = true;
-      this._pushLoginStatusToDataLayer();
-    }
+    await this.userService.getUserInfoAsync();
+    this._pushLoginStatusToDataLayer();
   }
 
   private _pushLoginStatusToDataLayer(): void {
@@ -83,19 +79,18 @@ export class SiteAnalyticsService {
     eventName: string,
     eventParameters: Record<string, string | number | boolean> = {}
   ): void {
-    // If user info has not loaded yet and isLoggedIn() still reports false,
-    // delay sending the event to avoid mislabeling logged-in users.
-    if (!this.isUserInfoInitialized && !this.userService.isLoggedIn()) {
-      this.userInfoInitializationPromise.then(() => {
-        this._sendEventToGoogleAnalytics(eventName, eventParameters);
-      });
-      return;
-    }
+    const loginStatus = this._getLoginStatus();
 
-    this.windowRef.nativeWindow.gtag('event', eventName, {
+    const updatedEventParameters = {
       ...eventParameters,
-      login_status: this._getLoginStatus(),
-    });
+      login_status: loginStatus,
+    };
+
+    this.windowRef.nativeWindow.gtag(
+      'event',
+      eventName,
+      updatedEventParameters
+    );
   }
 
   // The srcElement refers to the element on the page that is clicked.
