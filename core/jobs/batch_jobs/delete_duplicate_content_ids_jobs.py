@@ -33,17 +33,16 @@ from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
+from core.storage.base_model import gae_models as base_models
 
 import apache_beam as beam
 from typing import Any, Dict, List, Set, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services, exp_models, voiceover_models
+    from mypy_imports import datastore_services, exp_models
 
-(exp_models, voiceover_models) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.VOICEOVER]
-)
+(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -185,7 +184,19 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
     @staticmethod
     def _check_and_fix_duplicate_content_ids(
         exploration: exp_domain.Exploration,
-    ) -> Dict[str, Any] | None:
+    ) -> (
+        Dict[
+            str,
+            Union[
+                str,
+                int,
+                List[str],
+                base_models.BaseModel,
+                List[base_models.BaseModel],
+            ],
+        ]
+        | None
+    ):
         """Check and fix duplicate content IDs in an exploration.
 
         Args:
@@ -280,7 +291,7 @@ def _create_updated_entity_voiceovers_models(
     old_version: int,
     new_version: int,
     content_id_replacements: Dict[str, List[str]],
-) -> List[Any]:
+) -> List[base_models.BaseModel]:
     """Create updated voiceover models for a migrated exploration version.
 
     Args:
@@ -295,7 +306,7 @@ def _create_updated_entity_voiceovers_models(
         list(EntityVoiceoversModel). The voiceover models for the new
         exploration version.
     """
-    updated_voiceover_models = []
+    updated_voiceover_models: List[base_models.BaseModel] = []
     entity_voiceovers_list = (
         voiceover_services.get_entity_voiceovers_for_given_exploration(
             exploration_id,

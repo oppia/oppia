@@ -216,7 +216,7 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         )
 
         duplicate_solution_content_id = 'solution_1'
-        solution_dict = {
+        solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
             'correct_answer': 'answer',
             'explanation': {
@@ -226,6 +226,7 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         }
 
         assert state1.interaction.id is not None
+        assert state2.interaction.id is not None
         solution_1 = state_domain.Solution.from_dict(
             state1.interaction.id, solution_dict
         )
@@ -290,10 +291,12 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
             set(new_entity_voiceovers[0].voiceovers_mapping.keys()),
             {duplicate_solution_content_id, 'content_4'},
         )
+        new_manual_voiceover = new_entity_voiceovers[0].voiceovers_mapping[
+            'content_4'
+        ][feconf.VoiceoverType.MANUAL.value]
+        self.assertIsNotNone(new_manual_voiceover)
         self.assertEqual(
-            new_entity_voiceovers[0]
-            .voiceovers_mapping['content_4'][feconf.VoiceoverType.MANUAL.value]
-            .filename,
+            cast(state_domain.Voiceover, new_manual_voiceover).filename,
             'solution.mp3',
         )
 
