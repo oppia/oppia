@@ -3,12 +3,12 @@ Selected Misconception: {{ selectedMisconception && selectedMisconception.getNam
 <div *ngFor="let member of misconceptionsBySkill | keyvalue" class="misconception-list-container">
   <div *ngFor="let misconception of member.value">
     <button class="btn btn-secondary misconception-button" (click)="selectMisconception(misconception, member.key)"
-            [ngClass]="{'misconception-button-selected': selectedMisconceptionSkillId === member.key && selectedMisconception.getId() === misconception.getId()}">
+            [ngClass]="{'misconception-button-selected': selectedMisconceptionSkillId === member.key && selectedMisconception?.getId() === misconception.getId()}">
       <strong class="d-inline e2e-test-misconception-title">{{ misconception.isMandatory() ? '' : ' (Optional) ' }}{{ misconception.getName() }}</strong>
       <oppia-rte-output-display class="misconception-notes-container" [rteString]="misconception.getNotes()">
       </oppia-rte-output-display>
     </button>
-    <div *ngIf="selectedMisconceptionSkillId === member.key && selectedMisconception.getId() === misconception.getId()"
+    <div *ngIf="selectedMisconceptionSkillId === member.key && selectedMisconception?.getId() === misconception.getId()"
          class="misconception-info-container">
       <label class="misconception-label"> Note to creators: </label>
       <oppia-rte-output-display [rteString]="misconception.getNotes() || 'None'">
@@ -19,7 +19,14 @@ Selected Misconception: {{ selectedMisconception && selectedMisconception.getNam
     </div>
   </div>
 </div>
-<div (click)="toggleMisconceptionFeedbackUsage()" (keydown.space)="toggleMisconceptionFeedbackUsage()" tabindex="0" class="misconception-feedback-usage-container">
+<div>
+  <button class="btn btn-secondary misconception-button e2e-test-no-misconception-button"
+          (click)="selectNoMisconception()"
+          [ngClass]="{'misconception-button-selected': selectedMisconception === null}">
+    <strong class="d-inline">No misconception</strong>
+  </button>
+</div>
+<div *ngIf="selectedMisconception !== null" (click)="toggleMisconceptionFeedbackUsage()" (keydown.space)="toggleMisconceptionFeedbackUsage()" tabindex="0" class="misconception-feedback-usage-container">
   <i *ngIf="!misconceptionFeedbackIsUsed" class="material-icons md-18 misconception-feedback-usage-checkbox">&#xE835;</i>
   <i *ngIf="misconceptionFeedbackIsUsed" class="material-icons md-18 misconception-feedback-usage-checkbox">&#xE834;</i>
   Use misconception feedback as answer group feedback.

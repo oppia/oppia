@@ -29,6 +29,7 @@ import {ExplorationRightsService} from './exploration-rights.service';
 import {
   ExplorationRightsBackendApiService,
   ExplorationRightsBackendData,
+  ModeratorRightsBackendData,
 } from './exploration-rights-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
 import {HttpErrorResponse} from '@angular/common/http';
@@ -529,24 +530,39 @@ describe('Exploration rights service', () => {
   }));
 
   it('should save moderator change to backend', fakeAsync(() => {
+    const moderatorServiceData: ModeratorRightsBackendData = {
+      rights_dict: cloneDeep(serviceData.rights),
+    };
     spyOn(
       explorationRightsBackendApiService,
       'saveModeratorChangeToBackendAsyncPutData'
-    ).and.returnValue(Promise.resolve(serviceData));
+    ).and.returnValue(Promise.resolve(moderatorServiceData));
 
     ers.saveModeratorChangeToBackendAsync('');
     tick();
 
     expect(clearWarningsSpy).toHaveBeenCalled();
-    expect(ers.ownerNames).toEqual(serviceData.rights.owner_names);
-    expect(ers.editorNames).toEqual(serviceData.rights.editor_names);
-    expect(ers.voiceArtistNames).toEqual(serviceData.rights.voice_artist_names);
-    expect(ers.viewerNames).toEqual(serviceData.rights.viewer_names);
+    expect(ers.ownerNames).toEqual(
+      moderatorServiceData.rights_dict.owner_names
+    );
+    expect(ers.editorNames).toEqual(
+      moderatorServiceData.rights_dict.editor_names
+    );
+    expect(ers.voiceArtistNames).toEqual(
+      moderatorServiceData.rights_dict.voice_artist_names
+    );
+    expect(ers.viewerNames).toEqual(
+      moderatorServiceData.rights_dict.viewer_names
+    );
     expect(ers.isPrivate()).toEqual(true);
-    expect(ers.clonedFrom()).toEqual(serviceData.rights.cloned_from);
-    expect(ers.isCommunityOwned()).toBe(serviceData.rights.community_owned);
+    expect(ers.clonedFrom()).toEqual(
+      moderatorServiceData.rights_dict.cloned_from
+    );
+    expect(ers.isCommunityOwned()).toBe(
+      moderatorServiceData.rights_dict.community_owned
+    );
     expect(ers.viewableIfPrivate()).toBe(
-      serviceData.rights.viewable_if_private
+      moderatorServiceData.rights_dict.viewable_if_private
     );
   }));
 
