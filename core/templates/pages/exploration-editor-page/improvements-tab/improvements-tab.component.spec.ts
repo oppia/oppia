@@ -41,13 +41,13 @@ describe('Improvements tab', () => {
   let explorationImprovementsService: ExplorationImprovementsService;
   let routerService: RouterService;
   let taskRegistryService: ExplorationImprovementsTaskRegistryService;
-  let expStatsSpy;
-  let hbrTasksSpy;
-  let iflTasksSpy;
-  let ngrTasksSpy;
-  let siaTasksSpy;
-  let stateTasksSpy;
-  let allStateTasksSpy;
+  let expStatsSpy: jasmine.Spy;
+  let hbrTasksSpy: jasmine.Spy;
+  let iflTasksSpy: jasmine.Spy;
+  let ngrTasksSpy: jasmine.Spy;
+  let siaTasksSpy: jasmine.Spy;
+  let stateTasksSpy: jasmine.Spy;
+  let allStateTasksSpy: jasmine.Spy;
 
   class MockNgbModal {
     open() {
@@ -301,7 +301,9 @@ describe('Improvements tab', () => {
           supportingStats: {stateStats: emptyStateStats},
         },
       };
-      stateTasksSpy.and.callFake(stateName => stateTasks[stateName]);
+      stateTasksSpy.and.callFake(
+        (stateName: string) => stateTasks[stateName as keyof typeof stateTasks]
+      );
 
       component.ngOnInit();
       flushMicrotasks();
@@ -342,13 +344,13 @@ describe('Improvements tab', () => {
       component.ngOnInit();
       flushMicrotasks();
 
-      expect(component.isStateTasksVisible('Introduction')).toBeTrue();
-      expect(component.isStateTasksVisible('End')).toBeTrue();
+      expect(component.isStateTasksVisible('Introduction')).toBe(true);
+      expect(component.isStateTasksVisible('End')).toBe(true);
 
       component.toggleStateTasks('End');
 
-      expect(component.isStateTasksVisible('Introduction')).toBeTrue();
-      expect(component.isStateTasksVisible('End')).toBeFalse();
+      expect(component.isStateTasksVisible('Introduction')).toBe(true);
+      expect(component.isStateTasksVisible('End')).toBe(false);
     }));
 
     describe('Exploration-health', () => {
