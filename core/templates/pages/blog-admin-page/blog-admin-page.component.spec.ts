@@ -182,7 +182,8 @@ describe('Blog Admin Page component ', () => {
       flushMicrotasks();
 
       expect(addSuccessMessageSpy).toHaveBeenCalledWith(
-        'Role of username successfully updated to BLOG_ADMIN'
+        'Role of username successfully updated to BLOG_ADMIN',
+        10000
       );
       expect(finishTaskSpy).toHaveBeenCalled();
     }));
@@ -273,7 +274,7 @@ describe('Blog Admin Page component ', () => {
 
       flushMicrotasks();
 
-      expect(addSuccessMessageSpy).toHaveBeenCalledWith('Success.');
+      expect(addSuccessMessageSpy).toHaveBeenCalledWith('Success.', 10000);
       expect(finishTaskSpy).toHaveBeenCalled();
     }));
 
@@ -351,7 +352,8 @@ describe('Blog Admin Page component ', () => {
       tick();
 
       expect(addSuccessMessageSpy).toHaveBeenCalledWith(
-        'Data saved successfully.'
+        'Data saved successfully.',
+        10000
       );
     }));
 
