@@ -158,6 +158,8 @@
     "bootstrap": "^5.3.3",
     "browserify-zlib": "^0.2.0",
     "chai": "^4.2.0",
+    "ckeditor4": "4.16.1",
+    "ckeditor4-bootstrapck": "https://github.com/Kunstmaan/BootstrapCK4-Skin/archive/v1.0.0.tar.gz",
     "codemirror": "^5.61.0",
     "codemirror-v5.17.0": "npm:codemirror@5.17.0",
     "cropperjs": "^1.5.6",

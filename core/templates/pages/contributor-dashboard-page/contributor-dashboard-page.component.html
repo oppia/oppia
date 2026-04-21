@@ -185,7 +185,7 @@
     display: flex;
     flex-direction: row;
     padding: auto 20px;
-    padding-bottom: 20px;
+    padding-bottom: 30px;
     padding-left: 20px;
     width: 100%;
   }
@@ -251,11 +251,16 @@
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 24px;
     height: 30%;
+    min-width: 0;
     padding-top: 10px;
-    position: relative;
   }
   .oppia-short-contributor-username-container {
     min-width: 100px;
+  }
+  .oppia-short-contributor-username-container h1,
+  .oppia-long-contributor-username-container h1 {
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
   .oppia-review-right-details-container {
     font-size: 18px;
@@ -266,11 +271,11 @@
   }
   .oppia-short-contributor-username-container::before,
   .oppia-long-contributor-username-container::before {
-    bottom: 65%;
     color: #4a4a4a;
     content: attr(data-tab-name);
+    display: block;
     font-size: 16px;
-    position: absolute;
+    line-height: 1.2;
   }
   .oppia-mascot-avatar-container,
   .oppia-profile-details-container {
