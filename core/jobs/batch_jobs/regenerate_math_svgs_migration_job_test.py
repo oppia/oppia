@@ -18,16 +18,17 @@
 
 from __future__ import annotations
 
+import json as json_module
+import logging
+import tempfile
+from unittest import mock
+
 from core import feconf
 from core.domain import exp_domain, exp_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import regenerate_math_svgs_migration_job
 from core.jobs.types import job_run_result
 from core.platform import models
-from unittest import mock
-import logging
-import tempfile
-import json as json_module
 
 from typing import Dict, Final, Type
 
@@ -175,7 +176,7 @@ class RegenerateMathSvgsJobTests(job_test_utils.JobTestBase):
             [
                 job_run_result.JobRunResult(
                     stdout='EXPLORATION PROCESSED SUCCESS: 1'
-                ),
+                ),  # pylint: disable=protected-access
                 job_run_result.JobRunResult(
                     stdout='EXPLORATION MIGRATED SUCCESS: 1'
                 ),
@@ -193,8 +194,7 @@ class RegenerateMathSvgsJobTests(job_test_utils.JobTestBase):
         processed but not migrated — the filename is left as-is.
         """
         _create_exploration_with_html(self.EXP_ID, HTML_WITH_UNKNOWN_MATH_TAG)
-
-        self.assert_job_output_is(
+        self.assert_job_output_is(  # pylint: disable=protected-access
             [
                 job_run_result.JobRunResult(
                     stdout='EXPLORATION PROCESSED SUCCESS: 1'
@@ -215,7 +215,7 @@ class RegenerateMathSvgsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is(
             [
-                job_run_result.JobRunResult(
+                job_run_result.JobRunResult(  # pylint: disable=protected-access
                     stdout='EXPLORATION PROCESSED SUCCESS: 1'
                 ),
                 job_run_result.JobRunResult(
@@ -236,8 +236,9 @@ class RegenerateMathSvgsJobTests(job_test_utils.JobTestBase):
         ]
         self.assertNotIn(NEW_SVG_FILENAME, unchanged_html)
 
-    def test_run_loads_svg_mapping_when_empty(self) -> None:
-        """Covers 397->391 and 400->404."""
+    def test_run_loads_svg_mapping_when_empty(
+        self,
+    ) -> None:  # pylint: disable=protected-access
         regenerate_math_svgs_migration_job.SVG_FILENAME_MAPPING.clear()
         _create_exploration_with_html(self.EXP_ID, HTML_WITH_KNOWN_MATH_TAG)
         with mock.patch(
@@ -245,7 +246,7 @@ class RegenerateMathSvgsJobTests(job_test_utils.JobTestBase):
             '._load_svg_mapping',
             return_value={OLD_SVG_FILENAME: NEW_SVG_FILENAME},
         ):
-            self.assert_job_output_is(
+            self.assert_job_output_is(  # pylint: disable=protected-access
                 [
                     job_run_result.JobRunResult(
                         stdout='EXPLORATION PROCESSED SUCCESS: 1'
@@ -257,8 +258,6 @@ class RegenerateMathSvgsJobTests(job_test_utils.JobTestBase):
             )
 
     def test_run_skips_loading_svg_mapping_when_already_populated(self) -> None:
-        """Covers 397->391: if not SVG_FILENAME_MAPPING false branch."""
-        # Mapping is already set in setUp, so _load_svg_mapping should NOT be called.
         _create_exploration_with_html(self.EXP_ID, HTML_WITH_KNOWN_MATH_TAG)
         with mock.patch(
             'core.jobs.batch_jobs.regenerate_math_svgs_migration_job'
@@ -316,8 +315,7 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
             result = (
                 regenerate_math_svgs_migration_job._load_svg_mapping()
             )  # pylint: disable=protected-access
-
-        self.assertEqual(result, {OLD_SVG_FILENAME: NEW_SVG_FILENAME})
+            self.assertEqual(result, {OLD_SVG_FILENAME: NEW_SVG_FILENAME})
 
     def test_load_svg_mapping_skips_entries_with_empty_filenames(
         self,
@@ -345,8 +343,7 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
             result = (
                 regenerate_math_svgs_migration_job._load_svg_mapping()
             )  # pylint: disable=protected-access
-
-        self.assertEqual(result, {OLD_SVG_FILENAME: NEW_SVG_FILENAME})
+            self.assertEqual(result, {OLD_SVG_FILENAME: NEW_SVG_FILENAME})
 
     def test_unescape_html_converts_entities(self) -> None:
         """_unescape_html correctly unescapes HTML entities."""
@@ -372,6 +369,7 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
                 {OLD_SVG_FILENAME: NEW_SVG_FILENAME},
             )
         )
+
         self.assertEqual(count, 1)
         self.assertIn(NEW_SVG_FILENAME, updated_html)
 
@@ -388,6 +386,7 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
                     html, {}
                 )
             )
+
         self.assertEqual(count, 0)
         self.assertTrue(any('Could not parse' in log for log in logs))
 
@@ -423,7 +422,6 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
 
     def test_update_html_in_dict_ignores_non_dict_non_list(self) -> None:
         original = 'just a string'
-        # Call must complete without error and not modify anything
         regenerate_math_svgs_migration_job._update_html_in_dict(  # pylint: disable=protected-access
             original, {OLD_SVG_FILENAME: NEW_SVG_FILENAME}, 0
         )
@@ -433,7 +431,7 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
         obj = [
             {'html': HTML_WITH_KNOWN_MATH_TAG},
             {'html': HTML_WITHOUT_MATH},
-            'just a string',  # hits the non-dict/non-list branch mid-loop
+            'just a string',
         ]
         regenerate_math_svgs_migration_job._update_html_in_dict(  # pylint: disable=protected-access
             obj, {OLD_SVG_FILENAME: NEW_SVG_FILENAME}, 0
@@ -744,9 +742,9 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
 
     def test_unescape_html_handles_double_escaped_quotes(self) -> None:
         double_escaped = '&amp;quot;hello&amp;quot;'
-        result = regenerate_math_svgs_migration_job._unescape_html(
+        result = regenerate_math_svgs_migration_job._unescape_html(  # pylint: disable=protected-access
             double_escaped
-        )  # pylint: disable=protected-access
+        )
         self.assertEqual(result, '"hello"')
 
     def test_update_exploration_model_with_no_states(self) -> None:
@@ -754,6 +752,7 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
         result = regenerate_math_svgs_migration_job._update_exploration_model(  # pylint: disable=protected-access
             exp_model, {OLD_SVG_FILENAME: NEW_SVG_FILENAME}
         )
+
         self.assertTrue(result.is_ok())
         _, count = result.unwrap()
         self.assertEqual(count, 0)
@@ -775,6 +774,7 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
         result = regenerate_math_svgs_migration_job._update_exploration_model(  # pylint: disable=protected-access
             exp_model, {OLD_SVG_FILENAME: NEW_SVG_FILENAME}
         )
+
         self.assertTrue(result.is_ok())
         _, count = result.unwrap()
         self.assertEqual(count, 0)
@@ -863,7 +863,7 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
     def test_update_math_tags_skips_tag_without_math_content_attribute(
         self,
     ) -> None:
-        html = '<oppia-noninteractive-math>' '</oppia-noninteractive-math>'
+        html = '<oppia-noninteractive-math></oppia-noninteractive-math>'
         _, count = (
             regenerate_math_svgs_migration_job._update_math_tags_in_html(  # pylint: disable=protected-access
                 html, {OLD_SVG_FILENAME: NEW_SVG_FILENAME}
@@ -952,8 +952,6 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
         )
         exp_model = exp_models.ExplorationModel.get(exp_id)
         init_state = exp_model.init_state_name
-        # Clear content html and all other fields to ensure we reach
-        # the default_outcome block without returning early.
         exp_model.states[init_state]['content']['html'] = ''
         exp_model.states[init_state]['interaction']['answer_groups'] = []
         exp_model.states[init_state]['hints'] = []
@@ -974,7 +972,6 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
     def test_update_exploration_model_multiple_states_with_solution(
         self,
     ) -> None:
-        """Covers 231->178: outer state loop back-edge after solution processed."""
         states = {
             'Introduction': {
                 'content': {'html': ''},
@@ -1015,7 +1012,6 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
     def test_update_exploration_model_hint_loop_continues_after_no_math(
         self,
     ) -> None:
-        """Covers 219->217: hint loop back-edge when first hint has no math."""
         states = {
             'Introduction': {
                 'content': {'html': ''},
@@ -1049,43 +1045,9 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
         _, count = result.unwrap()
         self.assertGreater(count, 0)
 
-    def test_exploration_has_math_in_second_hint_not_first(self) -> None:
-        """Covers 406->404: hint loop back-edge in _exploration_has_math_content."""
-        exp_id = 'exp_math_in_second_hint'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            exp_id, title='Test', category='Test'
-        )
-        exp_services.save_new_exploration(
-            feconf.SYSTEM_COMMITTER_ID, exploration
-        )
-        exp_model = exp_models.ExplorationModel.get(exp_id)
-        init_state = exp_model.init_state_name
-        exp_model.states[init_state]['content']['html'] = ''
-        exp_model.states[init_state]['interaction']['answer_groups'] = []
-        exp_model.states[init_state]['interaction']['default_outcome'] = None
-        exp_model.states[init_state]['hints'] = [
-            {
-                'hint_content': {
-                    'html': HTML_WITHOUT_MATH,
-                    'content_id': 'hint_1',
-                }
-            },
-            {
-                'hint_content': {
-                    'html': HTML_WITH_KNOWN_MATH_TAG,
-                    'content_id': 'hint_2',
-                }
-            },
-        ]
-        result = regenerate_math_svgs_migration_job._exploration_has_math_content(  # pylint: disable=protected-access
-            exp_model
-        )
-        self.assertTrue(result)
-
     def test_update_exploration_model_two_states_first_has_no_solution(
         self,
     ) -> None:
-        """Covers 231->178: solution is None, outer loop continues to next state."""
         states = {
             'Introduction': {
                 'content': {'html': HTML_WITH_KNOWN_MATH_TAG},
@@ -1119,7 +1081,6 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
         self.assertGreater(count, 0)
 
     def test_exploration_has_math_in_second_hint_not_first(self) -> None:
-        """Covers 406->404: hint loop back-edge in _exploration_has_math_content."""
         exp_id = 'exp_math_in_second_hint'
         exploration = exp_domain.Exploration.create_default_exploration(
             exp_id, title='Test', category='Test'
