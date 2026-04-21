@@ -164,7 +164,8 @@ def _save_activity_rights(
             committer_id, activity_rights, commit_message, commit_cmds
         )
         return
-    elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+    else:
+        assert activity_type == constants.ACTIVITY_TYPE_COLLECTION
         model = collection_models.CollectionRightsModel.get(
             activity_rights.id, strict=True
         )
@@ -276,7 +277,8 @@ def _update_activity_summary(
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
         assert isinstance(activity_rights, exp_rights_domain.ExplorationRights)
         _update_exploration_summary(activity_rights)
-    elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+    else:
+        assert activity_type == constants.ACTIVITY_TYPE_COLLECTION
         _update_collection_summary(activity_rights)
 
 
@@ -418,7 +420,8 @@ def _get_activity_rights_where_user_is_owner(
                 exp_models.ExplorationRightsModel.owner_ids == user_id
             )
         ).fetch()
-    elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+    else:
+        assert activity_type == constants.ACTIVITY_TYPE_COLLECTION
         activity_rights_models = collection_models.CollectionRightsModel.query(
             datastore_services.any_of(
                 collection_models.CollectionRightsModel.owner_ids == user_id
@@ -1155,7 +1158,8 @@ def _assign_role(
             activity_rights.viewer_ids.remove(assignee_id)
             old_role = rights_domain.ROLE_VIEWER
 
-    elif new_role == rights_domain.ROLE_VIEWER:
+    else:
+        assert new_role == rights_domain.ROLE_VIEWER
 
         if (
             activity_rights.is_owner(assignee_id)
@@ -1382,7 +1386,8 @@ def _change_activity_status(
     activity_rights.status = new_status
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
         cmd_type = rights_domain.CMD_CHANGE_EXPLORATION_STATUS
-    elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+    else:
+        assert activity_type == constants.ACTIVITY_TYPE_COLLECTION
         cmd_type = rights_domain.CMD_CHANGE_COLLECTION_STATUS
     commit_cmds = [
         {'cmd': cmd_type, 'old_status': old_status, 'new_status': new_status}

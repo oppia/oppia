@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 
 from core import feconf, utils
 from core.constants import constants
@@ -105,6 +106,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     ) -> None:
         with self.assertRaisesRegex(utils.ValidationError, 'Invalid skill id'):
             skill_domain.Skill.require_valid_skill_id('abc')
+
+    def test_skill_id_validation_passes_with_valid_skill_id(self) -> None:
+        skill_domain.Skill.require_valid_skill_id('skillid12345')
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
@@ -369,6 +373,24 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         )
         self.skill.update_explanation(new_explanation)
         self.skill.validate()
+        self.assertEqual(self.skill.skill_contents.explanation, new_explanation)
+
+    def test_update_explanation_with_none_existing_explanation(self) -> None:
+        # Here we use MyPy ignore because the explanation field is typed as
+        # SubtitledHtml (not Optional), but update_explanation handles a falsy
+        # explanation at runtime to cover that branch.
+        self.skill.skill_contents.explanation = None  # type: ignore[assignment]
+        new_explanation = state_domain.SubtitledHtml(
+            '4', '<p>New Explanation</p>'
+        )
+        self.skill.update_explanation(new_explanation)
+        self.assertEqual(self.skill.skill_contents.explanation, new_explanation)
+
+    def test_update_explanation_with_different_content_id(self) -> None:
+        new_explanation = state_domain.SubtitledHtml(
+            '4', '<p>New Explanation</p>'
+        )
+        self.skill.update_explanation(new_explanation)
         self.assertEqual(self.skill.skill_contents.explanation, new_explanation)
 
     def test_update_rubric(self) -> None:
@@ -836,6 +858,25 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             self.skill.to_dict(),
             skill_domain.Skill.deserialize(self.skill.serialize()).to_dict(),
         )
+
+    def test_serialize_with_none_created_on_and_last_updated(self) -> None:
+        self.skill.created_on = None
+        self.skill.last_updated = None
+        serialized = self.skill.serialize()
+        skill_dict = json.loads(serialized)
+        self.assertNotIn('created_on', skill_dict)
+        self.assertNotIn('last_updated', skill_dict)
+
+    def test_convert_skill_contents_v4_dict_to_v5_dict(self) -> None:
+        skill_contents_dict: skill_domain.SkillContentsDict = (
+            self.skill.skill_contents.to_dict()
+        )
+        result = skill_domain.Skill._convert_skill_contents_v4_dict_to_v5_dict(  # pylint: disable=protected-access
+            skill_contents_dict
+        )
+        self.assertIn('explanation', result)
+        self.assertIn('recorded_voiceovers', result)
+        self.assertIn('written_translations', result)
 
     def test_generate_skill_misconception_id(self) -> None:
         """Checks that skill misconception id is generated correctly."""

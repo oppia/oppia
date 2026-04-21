@@ -709,6 +709,46 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             None,
         )
 
+    def test_delete_question_when_question_model_does_not_exist(
+        self,
+    ) -> None:
+        # Hard-delete the underlying model so get_by_id returns None,
+        # covering the `if question_model is not None` False branch.
+        question_models.QuestionModel.delete_multi(
+            [self.question_id],
+            self.editor_id,
+            feconf.COMMIT_MESSAGE_QUESTION_DELETED,
+            force_deletion=True,
+        )
+        self.assertIsNone(
+            question_models.QuestionModel.get_by_id(self.question_id)
+        )
+        question_services.delete_question(
+            self.editor_id, self.question_id, force_deletion=True
+        )
+        self.assertIsNone(
+            question_models.QuestionModel.get_by_id(self.question_id)
+        )
+
+    def test_apply_change_list_with_non_update_property_cmd(self) -> None:
+        # A change with cmd != CMD_UPDATE_QUESTION_PROPERTY should be
+        # silently skipped, covering the False branch of that `if`.
+        change_list = [
+            question_domain.QuestionChange(
+                {
+                    'cmd': (
+                        question_domain.CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION
+                    ),
+                    'from_version': 44,
+                    'to_version': 45,
+                }
+            )
+        ]
+        question = question_services.apply_change_list(
+            self.question_id, change_list
+        )
+        self.assertEqual(question.id, self.question_id)
+
     def test_update_question(self) -> None:
         new_question_data = self._create_valid_question_data(
             'DEF', self.content_id_generator

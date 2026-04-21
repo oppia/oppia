@@ -218,6 +218,19 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             )
         )
 
+    def test_check_can_modify_core_activity_roles_owned_action_but_not_owner(
+        self,
+    ) -> None:
+        # user_a has ACTION_MODIFY_CORE_ROLES_FOR_OWNED_ACTIVITY but is not
+        # the owner of exp_id, so the function should return False.
+        self.save_new_valid_exploration(self.EXP_ID, self.user_id_b)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertFalse(
+            rights_manager.check_can_modify_core_activity_roles(
+                self.user_a, exp_rights
+            )
+        )
+
     def test_non_splash_page_demo_exploration(self) -> None:
         # Note: there is no difference between permissions for demo
         # explorations, whether or not they are on the splash page.
@@ -1287,6 +1300,188 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertEqual(activity_rights_list[0].id, 'exp1')
         self.assertTrue(activity_rights_list[0].is_owner(owner_id))
 
+    def test_get_exploration_rights_where_user_is_owner(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID, self.user_id_a)
+        owned = rights_manager.get_exploration_rights_where_user_is_owner(
+            self.user_id_a
+        )
+        self.assertEqual(len(owned), 1)
+        self.assertEqual(owned[0].id, self.EXP_ID)
+
+    def test_exploration_status_helpers(self) -> None:
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, title='A title', category='A category'
+        )
+        exp_services.save_new_exploration(self.user_id_a, exp)
+        self.assertTrue(rights_manager.is_exploration_private(self.EXP_ID))
+        self.assertFalse(rights_manager.is_exploration_public(self.EXP_ID))
+        self.assertFalse(rights_manager.is_exploration_cloned(self.EXP_ID))
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+        self.assertFalse(rights_manager.is_exploration_private(self.EXP_ID))
+        self.assertTrue(rights_manager.is_exploration_public(self.EXP_ID))
+
+    def test_check_can_functions_return_false_for_none_activity_rights(
+        self,
+    ) -> None:
+        self.assertFalse(
+            rights_manager.check_can_access_activity(self.user_a, None)
+        )
+        self.assertFalse(
+            rights_manager.check_can_edit_activity(self.user_a, None)
+        )
+        self.assertFalse(
+            rights_manager.check_can_voiceover_activity(self.user_a, None)
+        )
+        self.assertFalse(
+            rights_manager.check_can_delete_activity(self.user_a, None)
+        )
+        self.assertFalse(
+            rights_manager.check_can_release_ownership(self.user_a, None)
+        )
+        self.assertFalse(
+            rights_manager.check_can_publish_activity(self.user_a, None)
+        )
+        self.assertFalse(
+            rights_manager.check_can_unpublish_activity(self.user_a, None)
+        )
+
+    def test_check_can_edit_activity_returns_false_without_edit_action(
+        self,
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        self.save_new_valid_exploration(self.EXP_ID, self.user_id_a)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertFalse(
+            rights_manager.check_can_edit_activity(guest_user, exp_rights)
+        )
+
+    def test_check_can_voiceover_activity_returns_false_without_edit_action(
+        self,
+    ) -> None:
+        guest_user = user_services.get_user_actions_info(None)
+        self.save_new_valid_exploration(self.EXP_ID, self.user_id_a)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertFalse(
+            rights_manager.check_can_voiceover_activity(guest_user, exp_rights)
+        )
+
+    def test_check_can_modify_core_roles_returns_false_for_community_owned(
+        self,
+    ) -> None:
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, title='A title', category='A category'
+        )
+        exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+        rights_manager.release_ownership_of_exploration(
+            self.user_a, self.EXP_ID
+        )
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertFalse(
+            rights_manager.check_can_modify_core_activity_roles(
+                self.user_a, exp_rights
+            )
+        )
+
+    def test_check_can_modify_core_roles_returns_false_without_owned_action(
+        self,
+    ) -> None:
+        # Use a mock user with no actions to force the outer `if` at the
+        # ACTION_MODIFY_CORE_ROLES_FOR_OWNED_ACTIVITY check to be False.
+        mock_user = unittest.mock.MagicMock(spec=user_domain.UserActionsInfo)
+        mock_user.user_id = self.user_id_a
+        mock_user.actions = []
+        self.save_new_valid_exploration(self.EXP_ID, self.user_id_a)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertFalse(
+            rights_manager.check_can_modify_core_activity_roles(
+                mock_user, exp_rights
+            )
+        )
+
+    def test_check_can_publish_returns_false_for_cloned_activity(
+        self,
+    ) -> None:
+        mock_rights = unittest.mock.MagicMock()
+        mock_rights.cloned_from = 'some_exploration_id'
+        self.assertFalse(
+            rights_manager.check_can_publish_activity(self.user_a, mock_rights)
+        )
+
+    def test_check_can_publish_returns_false_without_publish_action(
+        self,
+    ) -> None:
+        # Use a mock user with no actions to force the outer `if` at the
+        # ACTION_PUBLISH_OWNED_ACTIVITY check to be False.
+        mock_user = unittest.mock.MagicMock(spec=user_domain.UserActionsInfo)
+        mock_user.user_id = self.user_id_b
+        mock_user.actions = []
+        self.save_new_valid_exploration(self.EXP_ID, self.user_id_a)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertFalse(
+            rights_manager.check_can_publish_activity(mock_user, exp_rights)
+        )
+
+    def test_check_can_unpublish_returns_false_for_community_owned(
+        self,
+    ) -> None:
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, title='A title', category='A category'
+        )
+        exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+        rights_manager.release_ownership_of_exploration(
+            self.user_a, self.EXP_ID
+        )
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertFalse(
+            rights_manager.check_can_unpublish_activity(
+                self.user_moderator, exp_rights
+            )
+        )
+
+    def test_release_ownership_raises_for_unauthorized_user(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID, self.user_id_a)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+        with self.assertRaisesRegex(
+            Exception,
+            'The ownership of this exploration cannot be released.',
+        ):
+            rights_manager.release_ownership_of_exploration(
+                self.user_b, self.EXP_ID
+            )
+
+    def test_publish_raises_for_unauthorized_user(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID, self.user_id_a)
+        with self.assertRaisesRegex(
+            Exception, 'This exploration cannot be published.'
+        ):
+            rights_manager.publish_exploration(self.user_b, self.EXP_ID)
+
+    def test_unpublish_raises_for_unauthorized_user(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID, self.user_id_a)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+        with self.assertRaisesRegex(
+            Exception, 'This exploration cannot be unpublished.'
+        ):
+            rights_manager.unpublish_exploration(self.user_a, self.EXP_ID)
+
+    def test_republish_does_not_reset_first_published_msec(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID, self.user_id_a)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+        rights_manager.unpublish_exploration(self.user_moderator, self.EXP_ID)
+        first_published = rights_manager.get_exploration_rights(
+            self.EXP_ID
+        ).first_published_msec
+        self.assertIsNotNone(first_published)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+        self.assertEqual(
+            rights_manager.get_exploration_rights(
+                self.EXP_ID
+            ).first_published_msec,
+            first_published,
+        )
+
 
 class CollectionRightsTests(test_utils.GenericTestBase):
     """Test that rights for actions on collections work as expected."""
@@ -2131,6 +2326,20 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.assertEqual(len(owned_rights), 1)
         self.assertEqual(owned_rights[0].id, 'col1')
         self.assertTrue(owned_rights[0].is_owner(self.user_id_a))
+
+    def test_collection_status_helpers(self) -> None:
+        self.save_new_valid_collection(self.COLLECTION_ID, self.user_id_a)
+        self.assertTrue(
+            rights_manager.is_collection_private(self.COLLECTION_ID)
+        )
+        self.assertFalse(
+            rights_manager.is_collection_public(self.COLLECTION_ID)
+        )
+        rights_manager.publish_collection(self.user_a, self.COLLECTION_ID)
+        self.assertFalse(
+            rights_manager.is_collection_private(self.COLLECTION_ID)
+        )
+        self.assertTrue(rights_manager.is_collection_public(self.COLLECTION_ID))
 
 
 class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
