@@ -210,6 +210,7 @@ _PARSER.add_argument(
     ),
 )
 
+
 def run_webpack_compilation(source_maps: bool = False) -> None:
     """Runs webpack compilation.
 
@@ -532,8 +533,6 @@ def process_html(
     write_to_file_stream(
         target_file_stream, REMOVE_WS(' ', source_file_stream.read())
     )
-
-
 
 
 def build_using_ng() -> None:

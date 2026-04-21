@@ -96,7 +96,6 @@ class BuildTests(test_utils.GenericTestBase):
                 INVALID_FILENAME,
             )
 
-
     def test_insert_hash(self) -> None:
         """Test _insert_hash returns correct filenames with provided hashes."""
         self.assertEqual(
@@ -961,38 +960,6 @@ class BuildTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(OSError, error_message):
             build.safe_delete_file(non_existent_filepaths[0])
 
-    def test_minify_third_party_libs(self) -> None:
-
-        def _mock_safe_delete_file(unused_filepath: str) -> None:
-            """Mocks build.safe_delete_file()."""
-            pass
-
-        self.assertFalse(
-            os.path.isfile(
-                'core/tests/data/third_party/css/third_party.min.css'
-            )
-        )
-
-        with self.swap(build, 'safe_delete_file', _mock_safe_delete_file):
-            build.minify_third_party_libs('core/tests/data/third_party')
-
-        self.assertTrue(
-            os.path.isfile(
-                'core/tests/data/third_party/css/third_party.min.css'
-            )
-        )
-
-        self.assertLess(
-            os.path.getsize(
-                'core/tests/data/third_party/css/third_party.min.css'
-            ),
-            os.path.getsize('core/tests/data/third_party/css/third_party.css'),
-        )
-
-        build.safe_delete_file(
-            'core/tests/data/third_party/css/third_party.min.css'
-        )
-
     def test_clean(self) -> None:
         check_function_calls = {
             'safe_delete_directory_tree_gets_called': 0,
@@ -1147,79 +1114,6 @@ class BuildTests(test_utils.GenericTestBase):
         )
         with assert_raises_regexp_context_manager:
             build.main(args=['--maintenance_mode'])
-
-    def test_cannot_minify_third_party_libs_in_dev_mode(self) -> None:
-        check_function_calls = {
-            'ensure_files_exist_gets_called': False,
-            'clean_gets_called': False,
-        }
-        expected_check_function_calls = {
-            'ensure_files_exist_gets_called': False,
-            'clean_gets_called': True,
-        }
-
-        def mock_ensure_files_exist(unused_filepaths: List[str]) -> None:
-            check_function_calls['ensure_files_exist_gets_called'] = True
-
-        def mock_clean() -> None:
-            check_function_calls['clean_gets_called'] = True
-
-        ensure_files_exist_swap = self.swap(
-            build, '_ensure_files_exist', mock_ensure_files_exist
-        )
-        clean_swap = self.swap(build, 'clean', mock_clean)
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(
-            Exception,
-            'minify_third_party_libs_only is no longer supported.',
-        )
-        with ensure_files_exist_swap, assert_raises_regexp_context_manager:
-            with clean_swap:
-                build.main(args=['--minify_third_party_libs_only'])
-
-        self.assertEqual(check_function_calls, expected_check_function_calls)
-
-    def test_only_minify_third_party_libs_in_dev_mode(self) -> None:
-        check_function_calls = {
-            'ensure_files_exist_gets_called': False,
-            'ensure_modify_constants_gets_called': False,
-            'clean_gets_called': False,
-        }
-        expected_check_function_calls = {
-            'ensure_files_exist_gets_called': False,
-            'ensure_modify_constants_gets_called': False,
-            'clean_gets_called': True,
-        }
-
-        def mock_ensure_files_exist(unused_filepaths: List[str]) -> None:
-            check_function_calls['ensure_files_exist_gets_called'] = True
-
-        def mock_modify_constants(
-            unused_prod_env: bool,
-            maintenance_mode: bool,  # pylint: disable=unused-argument
-        ) -> None:  # pylint: disable=unused-argument
-            check_function_calls['ensure_modify_constants_gets_called'] = True
-
-        def mock_clean() -> None:
-            check_function_calls['clean_gets_called'] = True
-
-        ensure_files_exist_swap = self.swap(
-            build, '_ensure_files_exist', mock_ensure_files_exist
-        )
-        modify_constants_swap = self.swap(
-            common, 'modify_constants', mock_modify_constants
-        )
-        clean_swap = self.swap(build, 'clean', mock_clean)
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(
-            Exception,
-            'minify_third_party_libs_only is no longer supported.',
-        )
-        with ensure_files_exist_swap, modify_constants_swap, clean_swap:
-            with assert_raises_regexp_context_manager:
-                build.main(
-                    args=['--prod_env', '--minify_third_party_libs_only']
-                )
-
-        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_build_using_webpack_command(self) -> None:
 
