@@ -90,6 +90,58 @@ describe('Automatic voiceover highlight service', () => {
     ).toEqual(highlightIdToSentenceWithoutSpacesMap);
   });
 
+  it('should be able to highlight sentences with semi-colon', () => {
+    let automatedVoiceoversAudioOffsetsMsecs = {
+      content0: [
+        {token: 'Nic', audioOffsetMsecs: 0.0},
+        {token: 'took', audioOffsetMsecs: 100.0},
+        {token: 'Jaime', audioOffsetMsecs: 200.0},
+        {token: 'to', audioOffsetMsecs: 300.0},
+        {token: 'the', audioOffsetMsecs: 400.0},
+        {token: 'arcade', audioOffsetMsecs: 500.0},
+      ],
+    };
+
+    let highlightIdToSentenceMap = {
+      highlightId1: 'Nic took Jaime; to the arcade',
+    };
+    automaticVoiceoverHighlightService.languageCode = 'en';
+    automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+      automatedVoiceoversAudioOffsetsMsecs
+    );
+    automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
+      highlightIdToSentenceMap
+    );
+    automaticVoiceoverHighlightService.setActiveContentId('content0');
+
+    automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
+
+    let exptectedSentenceHighlightIntervalList = [
+      {
+        highlightSentenceId: 'highlightId1',
+        startTimeInSecs: 0.1,
+        endTimeInSecs: 0.5,
+      },
+    ];
+
+    expect(
+      automaticVoiceoverHighlightService.sentenceHighlightIntervalList
+    ).toEqual(exptectedSentenceHighlightIntervalList);
+  });
+
+  it('should return unmodified sentence correctly', () => {
+    automaticVoiceoverHighlightService.highlightIdToSentenceMap = {
+      highlightId1: 'This is a sentence with no special characters.',
+      highlightId2: 'This is a sentence with a semicolon; in between.',
+    };
+
+    expect(
+      automaticVoiceoverHighlightService.getUnmodifiedSentenceByHighlightId(
+        'highlightId1'
+      )
+    ).toBe('This is a sentence with no special characters.');
+  });
+
   it('should get sentence to highlight interval list', () => {
     let automatedVoiceoversAudioOffsetsMsecs = {
       content0: [
