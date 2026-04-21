@@ -39,9 +39,7 @@ import tarfile
 from scripts import (
     install_python_dev_dependencies,  # pylint: disable=wrong-import-position, wrong-import-order
 )
-from scripts import (
-    install_python_prod_dependencies,
-)
+from scripts import install_python_prod_dependencies
 
 from typing import Final
 

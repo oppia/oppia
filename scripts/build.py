@@ -44,7 +44,6 @@ from typing import (
     Sequence,
     TextIO,
     Tuple,
-    TypedDict,
 )
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
