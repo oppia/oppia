@@ -36,15 +36,7 @@ from scripts import (
 )
 
 import rcssmin
-from typing import (
-    Deque,
-    Dict,
-    List,
-    Optional,
-    Sequence,
-    TextIO,
-    Tuple,
-)
+from typing import Deque, Dict, List, Optional, Sequence, TextIO, Tuple
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
