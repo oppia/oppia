@@ -1752,6 +1752,27 @@ class LearnerGroupUserDetails:
 class LearnerGroupsUser:
     """Domain object for learner groups user."""
 
+    CURRENT_SCHEMA_VERSION = 1
+
+    @classmethod
+    def _get_duplicates(cls, item_list: List[str]) -> List[str]:
+        """Returns a list of duplicate items in the given list.
+
+        Args:
+            item_list: list(str). The list of items to check.
+
+        Returns:
+            list(str). The list of duplicate items.
+        """
+        seen = set()
+        duplicates = set()
+        for item in item_list:
+            if item in seen:
+                duplicates.add(item)
+            seen.add(item)
+        return list(duplicates)
+
+
     def __init__(
         self,
         user_id: str,
@@ -1800,14 +1821,20 @@ class LearnerGroupsUser:
             ),
         }
     def validate(self) -> None:
-        """Validates the LearnerGroupsUser domain object."""
+        """Validates the LearnerGroupsUser domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the LearnerGroupsUser
+                are invalid.
+        """
         if not isinstance(self.user_id, str):
             raise utils.ValidationError(
                 'Expected user_id to be a string, received %s' % self.user_id
             )
         if not self.user_id:
             raise utils.ValidationError(
-                'Expected user_id to be a non-empty string, received %s' % self.user_id
+                'Expected user_id to be a non-empty string, received %s' % (
+                    self.user_id)
             )
 
         if not isinstance(self.invited_to_learner_groups_ids, list):
@@ -1826,15 +1853,11 @@ class LearnerGroupsUser:
         if len(self.invited_to_learner_groups_ids) != len(
             set(self.invited_to_learner_groups_ids)
         ):
-            seen = set()
-            duplicates = set()
-            for group_id in self.invited_to_learner_groups_ids:
-                if group_id in seen:
-                    duplicates.add(group_id)
-                seen.add(group_id)
+            duplicates = self._get_duplicates(
+                self.invited_to_learner_groups_ids)
             raise utils.ValidationError(
                 'Expected invited_to_learner_groups_ids to not contain '
-                'duplicate values, found duplicates: %s' % list(duplicates)
+                'duplicate values, found duplicates: %s' % duplicates
             )
 
         if not isinstance(self.learner_groups_user_details, list):
@@ -1861,15 +1884,10 @@ class LearnerGroupsUser:
             joined_group_ids.append(learner_group_details.group_id)
 
         if len(joined_group_ids) != len(set(joined_group_ids)):
-            seen = set()
-            duplicates = set()
-            for group_id in joined_group_ids:
-                if group_id in seen:
-                    duplicates.add(group_id)
-                seen.add(group_id)
+            duplicates = self._get_duplicates(joined_group_ids)
             raise utils.ValidationError(
                 'Expected learner_groups_user_details to not contain '
-                'duplicate group_ids, found duplicates: %s' % list(duplicates)
+                'duplicate group_ids, found duplicates: %s' % duplicates
             )
 
         for group_id in joined_group_ids:
@@ -1892,6 +1910,16 @@ class LearnerGroupsUser:
             raise utils.ValidationError(
                 'Expected learner_groups_user_details_schema_version to be a '
                 'positive integer, received %s' % (
+                    self.learner_groups_user_details_schema_version)
+            )
+
+        if self.learner_groups_user_details_schema_version > (
+            self.CURRENT_SCHEMA_VERSION
+        ):
+            raise utils.ValidationError(
+                'Expected learner_groups_user_details_schema_version to be '
+                'at most %s, received %s' % (
+                    self.CURRENT_SCHEMA_VERSION,
                     self.learner_groups_user_details_schema_version)
             )
 class TranslationCoordinatorStatsDict(TypedDict):

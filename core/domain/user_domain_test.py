@@ -172,30 +172,62 @@ class UserSettingsTests(test_utils.GenericTestBase):
     # codebase we plan to get rid of the tests that intentionally test wrong
     # inputs that we can normally catch by typing.
     def test_validate_non_str_user_id_raises_exception(self) -> None:
-        self.learner_groups_user.user_id = 123  # type: ignore[assignment]
+        self.user_settings.user_id = 123  # type: ignore[assignment]
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected user_id to be a string, received 123'
+            utils.ValidationError, 'Expected user_id to be a string'
         ):
-            self.learner_groups_user.validate() #
+            self.user_settings.validate()
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type the
-    # codebase we plan to get rid of the tests that intentionally test wrong
-    # inputs that we can normally catch by typing.
-    def test_validate_non_int_schema_version_raises_exception(self) -> None:
-        self.learner_groups_user.learner_groups_user_details_schema_version = '1'  # type: ignore[assignment]
+    def test_validate_wrong_format_user_id_raises_exception(self) -> None:
+        self.user_settings.user_id = 'uid_%s' % ('a' * 31)
         with self.assertRaisesRegex(
-            utils.ValidationError, 
-            'Expected learner_groups_user_details_schema_version to be an integer, received 1'
+            utils.ValidationError, 'The user ID is in a wrong format.'
         ):
-            self.learner_groups_user.validate() #
+            self.user_settings.validate()
 
-    def test_validate_negative_schema_version_raises_exception(self) -> None:
-        self.learner_groups_user.learner_groups_user_details_schema_version = -1
+        self.user_settings.user_id = 'a' * 36
         with self.assertRaisesRegex(
-            utils.ValidationError, 
-            'Expected learner_groups_user_details_schema_version to be a positive integer, received -1'
+            utils.ValidationError, 'The user ID is in a wrong format.'
         ):
-            self.learner_groups_user.validate() #
+            self.user_settings.validate()
+
+    def test_validate_invalid_banned_value_type_raises_exception(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        self.user_settings.banned = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected banned to be a bool'
+        ):
+            self.user_settings.validate()
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        self.user_settings.banned = '123'  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected banned to be a bool'
+        ):
+            self.user_settings.validate()
+
+    def test_validate_invalid_roles_value_type_raises_exception(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        self.user_settings.roles = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected roles to be a list'
+        ):
+            self.user_settings.validate()
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        self.user_settings.roles = True  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected roles to be a list'
+        ):
+            self.user_settings.validate()
 
     def test_validate_banned_user_with_roles_raises_exception(self) -> None:
         self.user_settings.roles = ['FULL_USER']
@@ -1982,7 +2014,14 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
             'to be a positive integer, received 0'
         ):
             learner_group_user.validate()
-
+        # Test schema version greater than current schema version.
+        learner_group_user.learner_groups_user_details_schema_version = 2
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected learner_groups_user_details_schema_version to be '
+            'at most 1, received 2'
+        ):
+            learner_group_user.validate()
 class TranslationCoordinatorStatsUnitTests(test_utils.GenericTestBase):
     """Tests for the TranslationCoordinatorStats class."""
 
