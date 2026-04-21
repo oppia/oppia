@@ -294,11 +294,9 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         new_manual_voiceover = new_entity_voiceovers[0].voiceovers_mapping[
             'content_4'
         ][feconf.VoiceoverType.MANUAL.value]
-        self.assertIsNotNone(new_manual_voiceover)
-        self.assertEqual(
-            cast(state_domain.Voiceover, new_manual_voiceover).filename,
-            'solution.mp3',
-        )
+        if new_manual_voiceover is None:
+            self.fail('Expected a manual voiceover for content_4.')
+        self.assertEqual(new_manual_voiceover.filename, 'solution.mp3')
 
 
 class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
