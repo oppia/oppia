@@ -126,7 +126,8 @@ export class BlogAdminPageComponent implements OnInit {
             'Role of ' +
               formResponse.username +
               ' successfully updated to ' +
-              formResponse.newRole
+              formResponse.newRole,
+            10000
           );
           this.refreshFormData();
         },
@@ -145,7 +146,7 @@ export class BlogAdminPageComponent implements OnInit {
     this.adminTaskManagerService.startTask();
     this.backendApiService.removeBlogEditorAsync(formResponse.username).then(
       () => {
-        this.alertsService.addSuccessMessage('Success.');
+        this.alertsService.addSuccessMessage('Success.', 10000);
         this.refreshFormData();
       },
       error => {
@@ -194,7 +195,10 @@ export class BlogAdminPageComponent implements OnInit {
       )
       .then(
         () => {
-          this.alertsService.addSuccessMessage('Data saved successfully.');
+          this.alertsService.addSuccessMessage(
+            'Data saved successfully.',
+            10000
+          );
           this.adminTaskManagerService.finishTask();
         },
         errorResponse => {

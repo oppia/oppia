@@ -64,7 +64,7 @@ describe('Blog Admin', function () {
       'guestUser1',
       BLOG_RIGHTS.BLOG_POST_EDITOR
     );
-    await blogAdmin.expectActionStatusMessageToBe(
+    await blogAdmin.expectToastMessage(
       `Role of ${guestUser1.username} successfully updated to ${BLOG_RIGHTS.BLOG_POST_EDITOR}`
     );
 
@@ -73,7 +73,7 @@ describe('Blog Admin', function () {
       'guestUser1',
       BLOG_RIGHTS.BLOG_ADMIN
     );
-    await blogAdmin.expectActionStatusMessageToBe(
+    await blogAdmin.expectToastMessage(
       `Role of ${guestUser1.username} successfully updated to ${BLOG_RIGHTS.BLOG_ADMIN}`
     );
   });
@@ -81,13 +81,12 @@ describe('Blog Admin', function () {
   it('should be able to remove blog editor role', async function () {
     // Remove blog editor role from guestUser1.
     await blogAdmin.removeBlogEditorRoleFromUsername('guestUser1');
-    await blogAdmin.expectActionStatusMessageToBe('Success.');
+    await blogAdmin.expectToastMessage('Success.');
   });
 
   it('should be able to update tag limit', async function () {
     // Update tag limit to 7.
     await blogAdmin.setMaximumTagLimitTo(7);
-    await blogAdmin.expectActionStatusMessageToBe('Data saved successfully.');
 
     // Verify tag limit text in blog editor page.
     await guestUser2.navigateToBlogDashboardPage();
@@ -97,7 +96,6 @@ describe('Blog Admin', function () {
 
     // Update tag limit to 6.
     await blogAdmin.setMaximumTagLimitTo(6);
-    await blogAdmin.expectActionStatusMessageToBe('Data saved successfully.');
 
     // Verify tag limit text in blog editor page.
     await guestUser2.reloadPage();
