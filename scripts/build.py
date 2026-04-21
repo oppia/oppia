@@ -198,6 +198,17 @@ _PARSER.add_argument(
     dest='source_maps',
     help='Build webpack with source maps.',
 )
+_PARSER.add_argument(
+    '--skip_ng_build',
+    action='store_true',
+    default=False,
+    dest='skip_ng_build',
+    help=(
+        'Skip the Angular ng build and CSS hash injection steps. '
+        'Used by run_frontend_tests when running minified tests, '
+        'since karma does not use the Angular dist output.'
+    ),
+)
 
 
 class DependencyBundleDict(TypedDict):
@@ -1665,8 +1676,13 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
         else:
             build_using_webpack(WEBPACK_PROD_CONFIG)
-        build_using_ng()
-        inject_angular_css_hashes()
+        # The Angular ng build and CSS hash injection are skipped when
+        # --skip_ng_build is set (e.g., for minified karma tests) because
+        # karma does not serve the Angular dist output — it has its own
+        # compilation pipeline.
+        if not options.skip_ng_build:
+            build_using_ng()
+            inject_angular_css_hashes()
         generate_app_yaml(deploy_mode=options.deploy_mode)
         generate_build_directory(hashes)
 

@@ -49,7 +49,6 @@ tmpcompiledjs*
 uploads/*
 env/
 venv/
-.venv/
 *.db
 .DS_Store
 .idea
