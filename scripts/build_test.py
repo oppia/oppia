@@ -96,45 +96,6 @@ class BuildTests(test_utils.GenericTestBase):
                 INVALID_FILENAME,
             )
 
-    def test_join_files(self) -> None:
-        """Determine third_party.js contains the content of the first 10 JS
-        files in /third_party/static.
-        """
-        third_party_js_stream = io.StringIO()
-        # Get all filepaths from dependencies.json.
-        dependency_filepaths = build.get_dependencies_filepaths()
-        # Join and write all JS files in /third_party/static to file_stream.
-        build._join_files(  # pylint: disable=protected-access
-            dependency_filepaths['js'], third_party_js_stream
-        )
-        counter = 0
-        # Only checking first 10 files.
-        js_file_count = 10
-        for js_filepath in dependency_filepaths['js']:
-            if counter == js_file_count:
-                break
-            with open(js_filepath, 'r', encoding='utf-8') as js_file:
-                # Assert that each line is copied over to file_stream object.
-                for line in js_file:
-                    self.assertIn(line, third_party_js_stream.getvalue())
-            counter += 1
-
-    def test_generate_copy_tasks_for_fonts(self) -> None:
-        """Test _generate_copy_tasks_for_fonts ensures that the number of copy
-        tasks matches the number of font files.
-        """
-        copy_tasks: Deque[threading.Thread] = collections.deque()
-        # Get all filepaths from dependencies.json.
-        dependency_filepaths = build.get_dependencies_filepaths()
-        # Setup a sandbox folder for copying fonts.
-        test_target = os.path.join('target', 'fonts', '')
-
-        self.assertEqual(len(copy_tasks), 0)
-        copy_tasks += build._generate_copy_tasks_for_fonts(  # pylint: disable=protected-access
-            dependency_filepaths['fonts'], test_target
-        )
-        # Asserting the same number of copy tasks and number of font files.
-        self.assertEqual(len(copy_tasks), len(dependency_filepaths['fonts']))
 
     def test_insert_hash(self) -> None:
         """Test _insert_hash returns correct filenames with provided hashes."""

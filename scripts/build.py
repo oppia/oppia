@@ -85,7 +85,7 @@ WEBPACK_DIRNAMES_TO_DIRPATHS = {
 # interprets the paths in this file as URLs.
 HASHES_JSON_FILENAME = 'hashes.json'
 HASHES_JSON_FILEPATH = os.path.join('assets', HASHES_JSON_FILENAME)
-DEPENDENCIES_FILE_PATH = os.path.join('dependencies.json')
+
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
 
@@ -209,15 +209,6 @@ _PARSER.add_argument(
         'since karma does not use the Angular dist output.'
     ),
 )
-
-
-class DependencyBundleDict(TypedDict):
-    """Dictionary that represents dependency bundle."""
-
-    js: List[str]
-    css: List[str]
-    fontsPath: str
-
 
 def run_webpack_compilation(source_maps: bool = False) -> None:
     """Runs webpack compilation.
@@ -543,179 +534,6 @@ def process_html(
     )
 
 
-def get_dependency_directory(dependency: Dict[str, str]) -> str:
-    """Get dependency directory from dependency dictionary.
-
-    Args:
-        dependency: dict(str, str). Dictionary representing single dependency
-            from dependencies.json.
-
-    Returns:
-        str. Dependency directory.
-    """
-    if 'targetDir' in dependency:
-        dependency_dir = dependency['targetDir']
-    else:
-        dependency_dir = dependency['targetDirPrefix'] + dependency['version']
-    return os.path.join(THIRD_PARTY_STATIC_DIR, dependency_dir)
-
-
-def get_css_filepaths(
-    dependency_bundle: DependencyBundleDict, dependency_dir: str
-) -> List[str]:
-    """Gets dependency css filepaths.
-
-    Args:
-        dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            - 'js': List of paths to js files that need to be copied.
-            - 'css': List of paths to css files that need to be copied.
-            - 'fontsPath': Path to folder containing fonts that need to be
-                copied.
-        dependency_dir: str. Path to directory where the files that need to
-            be copied are located.
-
-    Returns:
-        list(str). List of paths to css files that need to be copied.
-    """
-    css_files = dependency_bundle.get('css', [])
-    return [os.path.join(dependency_dir, css_file) for css_file in css_files]
-
-
-def get_js_filepaths(
-    dependency_bundle: DependencyBundleDict, dependency_dir: str
-) -> List[str]:
-    """Gets dependency js filepaths.
-
-    Args:
-        dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            - 'js': List of paths to js files that need to be copied.
-            - 'css': List of paths to css files that need to be copied.
-            - 'fontsPath': Path to folder containing fonts that need to be
-                copied.
-        dependency_dir: str. Path to directory where the files that need to
-            be copied are located.
-
-    Returns:
-        list(str). List of paths to js files that need to be copied.
-    """
-    js_files = dependency_bundle.get('js', [])
-    return [os.path.join(dependency_dir, js_file) for js_file in js_files]
-
-
-def get_font_filepaths(
-    dependency_bundle: DependencyBundleDict, dependency_dir: str
-) -> List[str]:
-    """Gets dependency font filepaths.
-
-    Args:
-        dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            - 'js': List of paths to js files that need to be copied.
-            - 'css': List of paths to css files that need to be copied.
-            - 'fontsPath': Path to folder containing fonts that need to be
-                copied.
-        dependency_dir: str. Path to directory where the files that need to
-            be copied are located.
-
-    Returns:
-        list(str). List of paths to font files that need to be copied.
-    """
-    if 'fontsPath' not in dependency_bundle:
-        # Skip dependency bundles in dependencies.json that do not have
-        # fontsPath property.
-        return []
-    fonts_path = dependency_bundle['fontsPath']
-    # Obtain directory path to /font inside dependency folder.
-    # E.g. third_party/static/bootstrap-3.3.4/fonts/.
-    font_dir = os.path.join(dependency_dir, fonts_path)
-    font_filepaths = []
-    # Walk the directory and add all font files to list.
-    for root, _, filenames in os.walk(font_dir):
-        for filename in filenames:
-            font_filepaths.append(os.path.join(root, filename))
-    return font_filepaths
-
-
-def get_dependencies_filepaths() -> Dict[str, List[str]]:
-    """Extracts dependencies filepaths from dependencies.json file into
-    a dictionary.
-
-    Returns:
-        dict(str, list(str)). A dict mapping file types to lists of filepaths.
-        The dict has three keys: 'js', 'css' and 'fonts'. Each of the
-        corresponding values is a full list of dependency file paths of the
-        given type.
-    """
-    filepaths: Dict[str, List[str]] = {'js': [], 'css': [], 'fonts': []}
-    with open(DEPENDENCIES_FILE_PATH, 'r', encoding='utf-8') as json_file:
-        dependencies_json = json.loads(
-            json_file.read(), object_pairs_hook=collections.OrderedDict
-        )
-    frontend_dependencies = dependencies_json['frontendDependencies']
-    for dependency in frontend_dependencies.values():
-        if 'bundle' in dependency:
-            dependency_dir = get_dependency_directory(dependency)
-            filepaths['css'].extend(
-                get_css_filepaths(dependency['bundle'], dependency_dir)
-            )
-            filepaths['js'].extend(
-                get_js_filepaths(dependency['bundle'], dependency_dir)
-            )
-            filepaths['fonts'].extend(
-                get_font_filepaths(dependency['bundle'], dependency_dir)
-            )
-
-    _ensure_files_exist(filepaths['js'])
-    _ensure_files_exist(filepaths['css'])
-    _ensure_files_exist(filepaths['fonts'])
-    return filepaths
-
-
-def minify_third_party_libs(third_party_directory_path: str) -> None:
-    """Minify third_party.js and third_party.css and remove un-minified
-    files.
-    """
-
-    third_party_css_filepath = os.path.join(
-        third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH
-    )
-
-    minified_third_party_css_filepath = os.path.join(
-        third_party_directory_path, MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH
-    )
-
-    _minify_css(third_party_css_filepath, minified_third_party_css_filepath)
-    # Clean up un-minified third_party.js and third_party.css.
-    safe_delete_file(third_party_css_filepath)
-
-
-def build_third_party_libs(third_party_directory_path: str) -> None:
-    """Joins all third party css files into single css file and js files into
-    single js file. Copies both files and all fonts into third party folder.
-    """
-
-    print('Building third party libs at %s' % third_party_directory_path)
-
-    third_party_css_filepath = os.path.join(
-        third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH
-    )
-    webfonts_dir = os.path.join(
-        third_party_directory_path, WEBFONTS_RELATIVE_DIRECTORY_PATH
-    )
-
-    dependency_filepaths = get_dependencies_filepaths()
-
-    common.ensure_directory_exists(os.path.dirname(third_party_css_filepath))
-    with open(
-        third_party_css_filepath, 'w+', encoding='utf-8'
-    ) as third_party_css_file:
-        _join_files(dependency_filepaths['css'], third_party_css_file)
-
-    common.ensure_directory_exists(webfonts_dir)
-    _execute_tasks(
-        _generate_copy_tasks_for_fonts(
-            dependency_filepaths['fonts'], webfonts_dir
-        )
-    )
 
 
 def build_using_ng() -> None:
