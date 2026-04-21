@@ -28,7 +28,10 @@ import {
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {HistoryTabComponent} from './history-tab.component';
+import {
+  HistoryTabComponent,
+  VersionMetadataWithTooltip,
+} from './history-tab.component';
 import {HistoryTabBackendApiService} from '../services/history-tab-backend-api.service';
 import {CompareVersionsService} from './services/compare-versions.service';
 import {ExplorationDataService} from '../services/exploration-data.service';
@@ -38,7 +41,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 class MockNgbModalRef {
   componentInstance: {
     version: null;
-  };
+  } = {version: null};
 }
 
 class MockNgbModal {
@@ -135,8 +138,20 @@ describe('History tab component', () => {
       v2Metadata: null,
     };
     component.compareVersionMetadata = {
-      earlierVersion: 2,
-      laterVersion: 3,
+      earlierVersion: {
+        versionNumber: 2,
+        committerId: '',
+        createdOnMsecsStr: '',
+        commitMessage: '',
+        tooltipText: '',
+      },
+      laterVersion: {
+        versionNumber: 3,
+        committerId: '',
+        createdOnMsecsStr: '',
+        commitMessage: '',
+        tooltipText: '',
+      },
     };
     component.selectedVersionsArray = [1, 4];
     component.ngOnInit();
@@ -197,24 +212,24 @@ describe('History tab component', () => {
         version_number: 1,
         committer_id: 'committer_id',
         created_on_ms: 10,
-        commit_cmds: null,
-        commit_type: null,
+        commit_cmds: [],
+        commit_type: '',
         commit_message: 'message',
       },
       {
         version_number: 1,
         committer_id: 'committer_id',
         created_on_ms: 10,
-        commit_cmds: null,
-        commit_type: null,
+        commit_cmds: [],
+        commit_type: '',
         commit_message: 'message',
       },
       {
         version_number: 1,
         committer_id: 'committer_id',
         created_on_ms: 10,
-        commit_cmds: null,
-        commit_type: null,
+        commit_cmds: [],
+        commit_type: '',
         commit_message: 'message',
       },
     ];
@@ -459,7 +474,8 @@ describe('History tab component', () => {
         commit_cmds: [],
       },
     ];
-    component.totalExplorationVersionMetadata = snapshots;
+    component.totalExplorationVersionMetadata =
+      snapshots as unknown as VersionMetadataWithTooltip[];
     component.username = '';
     component.filterByUsername();
     expect(component.explorationVersionMetadata).toEqual(snapshots);
@@ -509,14 +525,39 @@ describe('History tab component', () => {
         commit_cmds: [],
       },
     ];
-    component.explorationVersionMetadata = snapshots;
+    component.explorationVersionMetadata =
+      snapshots as unknown as VersionMetadataWithTooltip[];
     component.reverseDateOrder();
-    expect(component.explorationVersionMetadata[0].version_number).toEqual(3);
-    expect(component.explorationVersionMetadata[2].version_number).toEqual(1);
+    expect(
+      (
+        component.explorationVersionMetadata[0] as unknown as {
+          version_number: number;
+        }
+      ).version_number
+    ).toEqual(3);
+    expect(
+      (
+        component.explorationVersionMetadata[2] as unknown as {
+          version_number: number;
+        }
+      ).version_number
+    ).toEqual(1);
 
     component.reverseDateOrder();
-    expect(component.explorationVersionMetadata[0].version_number).toEqual(1);
-    expect(component.explorationVersionMetadata[2].version_number).toEqual(3);
+    expect(
+      (
+        component.explorationVersionMetadata[0] as unknown as {
+          version_number: number;
+        }
+      ).version_number
+    ).toEqual(1);
+    expect(
+      (
+        component.explorationVersionMetadata[2] as unknown as {
+          version_number: number;
+        }
+      ).version_number
+    ).toEqual(3);
   });
 
   it('should find the versions to compare', fakeAsync(() => {
@@ -530,27 +571,31 @@ describe('History tab component', () => {
     component.totalExplorationVersionMetadata = [
       {
         committerId: '1',
-        createdOnMsecsStr: 10,
+        createdOnMsecsStr: '10',
         commitMessage: 'commit message 1',
         versionNumber: 1,
+        tooltipText: '',
       },
       {
         committerId: '2',
-        createdOnMsecsStr: 10,
+        createdOnMsecsStr: '10',
         commitMessage: 'commit message 2',
         versionNumber: 2,
+        tooltipText: '',
       },
       {
         committerId: '3',
-        createdOnMsecsStr: 10,
+        createdOnMsecsStr: '10',
         commitMessage: 'commit message 3',
         versionNumber: 3,
+        tooltipText: '',
       },
       {
         committerId: '4',
-        createdOnMsecsStr: 10,
+        createdOnMsecsStr: '10',
         commitMessage: 'commit message 4',
         versionNumber: 4,
+        tooltipText: '',
       },
     ];
     component.changeCompareVersion();
