@@ -6466,6 +6466,7 @@ export class LoggedOutUser extends BaseUser {
    * Expect play button icon is visible and in the "play" state.
    */
   async expectPlayButtonVisible(): Promise<void> {
+    await this.waitForAngularStability();
     await this.expectElementToBeVisible(playButtonSelector, true);
   }
 
