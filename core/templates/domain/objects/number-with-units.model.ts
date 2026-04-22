@@ -211,7 +211,7 @@ export class NumberWithUnits {
         const keys = Object.keys(
           ObjectsDomainConstants.CURRENCY_UNITS
         ) as CurrencyUnitsKeys;
-        const normalizedRawInput = rawInput.toLowerCase();
+        const normalizedRawInput = rawInput.trim().toLowerCase();
         let matchingCurrencyFrontUnit: string | null = null;
         for (let i = 0; i < keys.length; i++) {
           const frontUnits =
@@ -234,7 +234,8 @@ export class NumberWithUnits {
             ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_VALUE
           );
         }
-        const ind = rawInput.search(/[0-9]/);
+        const digitMatch = rawInput.match(/[0-9]/);
+        const ind = digitMatch?.index ?? -1;
         if (ind === -1) {
           throw new Error(
             // eslint-disable-next-line max-len
