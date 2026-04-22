@@ -62,6 +62,7 @@ describe('Admin dev mode activities tab', () => {
     0,
     0,
     true,
+    true,
     false,
     null,
     'thumbnail.svg',
