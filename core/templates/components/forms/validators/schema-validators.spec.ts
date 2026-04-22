@@ -16,14 +16,22 @@
  * @fileoverview Tests for schema-validators.
  */
 
-import {AbstractControl, ValidationErrors} from '@angular/forms';
+import {
+  AbstractControl,
+  AsyncValidatorFn,
+  ValidationErrors,
+  ValidatorFn,
+} from '@angular/forms';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {SchemaValidators} from './schema-validators';
 
 class MockFormControl extends AbstractControl {
   value: SchemaDefaultValue = '1';
 
-  constructor(validator: any = null, asyncValidator: any = null) {
+  constructor(
+    validator: ValidatorFn | ValidatorFn[] | null = null,
+    asyncValidator: AsyncValidatorFn | AsyncValidatorFn[] | null = null
+  ) {
     super(validator, asyncValidator);
   }
 
@@ -61,7 +69,9 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.hasLengthAtLeast(args);
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue as any);
+        control.setValue(
+          testCase.controlValue as unknown as SchemaDefaultValue
+        );
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
           expect(errorsReturned).toBeNull();
@@ -104,7 +114,9 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.hasLengthAtMost(args);
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue as any);
+        control.setValue(
+          testCase.controlValue as unknown as SchemaDefaultValue
+        );
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
           expect(errorsReturned).toBeNull();
@@ -226,7 +238,9 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.isFloat();
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue as any);
+        control.setValue(
+          testCase.controlValue as unknown as SchemaDefaultValue
+        );
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
           expect(errorsReturned).toBeNull();
@@ -413,7 +427,9 @@ describe('Schema validators', () => {
         {controlValue: 'special\\chars', expectedResult: false},
       ];
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue as any);
+        control.setValue(
+          testCase.controlValue as unknown as SchemaDefaultValue
+        );
         expect(filter(control)).toEqual(errorMsg);
       });
     });

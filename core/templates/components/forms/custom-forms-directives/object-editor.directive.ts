@@ -38,6 +38,7 @@ import {
   Output,
   SimpleChange,
   SimpleChanges,
+  Type,
   ViewContainerRef,
 } from '@angular/core';
 import {
@@ -181,7 +182,7 @@ export class ObjectEditorComponent
   @Input() modalId!: symbol;
   @Input() objType!: string;
   @Input() schema!: SchemaDefaultValue;
-  @Input() form!: any;
+  @Input() form!: unknown;
   @Output() validityChange: EventEmitter<void> = new EventEmitter();
   get value(): SchemaDefaultValue {
     return this._value;
@@ -263,7 +264,9 @@ export class ObjectEditorComponent
       }
       const componentFactory =
         this.componentFactoryResolver.resolveComponentFactory(
-          EDITORS[editorName as keyof typeof EDITORS] as any
+          EDITORS[
+            editorName as keyof typeof EDITORS
+          ] as unknown as Type<unknown>
         );
       this.viewContainerRef.clear();
       // Unknown is type is used because it is default property of
@@ -319,7 +322,12 @@ export class ObjectEditorComponent
                 }
               }
               if (this.form) {
-                this.form.$setValidity(errorKey, errorsMap[errorKey]);
+                (
+                  this.form as Record<
+                    string,
+                    (errorKey: string, isValid: boolean) => void
+                  >
+                ).$setValidity(errorKey, errorsMap[errorKey]);
                 this.validityChange.emit();
               }
             }

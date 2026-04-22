@@ -49,7 +49,7 @@ class MockWindowRef {
       },
     },
     history: {
-      pushState(data: any, title: string, url?: string | null) {},
+      pushState(data: unknown, title: string, url?: string | null) {},
     },
   };
 }
@@ -139,7 +139,8 @@ describe('OppiaAngularRootComponent', function () {
   });
 
   it('should set OppiaAngularRootComponent.pageContextService if not set', () => {
-    OppiaAngularRootComponent.pageContextService = undefined as any;
+    OppiaAngularRootComponent.pageContextService =
+      undefined as unknown as PageContextService;
     expect(OppiaAngularRootComponent.pageContextService).toBeUndefined();
 
     component.ngAfterViewInit();
