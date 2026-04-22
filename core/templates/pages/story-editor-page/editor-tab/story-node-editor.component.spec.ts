@@ -44,7 +44,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
 
 class MockNgbModalRef {
-  componentInstance: {
+  componentInstance!: {
     skillSummaries: null;
     skillsInSameTopicCount: null;
     categorizedSkills: null;
@@ -67,7 +67,7 @@ class MockTopicsAndSkillsDashboardBackendApiService {
 }
 
 class MockSkillBackendApiService {
-  fetchMultiSkillsAsync = skillIds => {
+  fetchMultiSkillsAsync = (skillIds: string[]) => {
     // The skillId ='2' case is used to test the case when the
     // SkillBackendApiService rejects the request.
     if (skillIds[0] === '2') {
@@ -81,7 +81,6 @@ class MockSkillBackendApiService {
           [],
           new ConceptCard(
             new SubtitledHtml('', '1'),
-            [],
             RecordedVoiceovers.createEmpty()
           ),
           'en',
@@ -98,7 +97,6 @@ class MockSkillBackendApiService {
           [],
           new ConceptCard(
             new SubtitledHtml('', '1'),
-            [],
             RecordedVoiceovers.createEmpty()
           ),
           'en',
@@ -115,7 +113,6 @@ class MockSkillBackendApiService {
           [],
           new ConceptCard(
             new SubtitledHtml('', '1'),
-            [],
             RecordedVoiceovers.createEmpty()
           ),
           'en',
@@ -202,6 +199,9 @@ describe('Story node editor component', () => {
       version: 1,
       corresponding_topic_id: 'topic_id',
       url_fragment: 'story_title',
+      thumbnail_filename: 'fileName',
+      thumbnail_bg_color: 'blue',
+      meta_tag_content: 'meta',
       story_contents: {
         initial_node_id: 'node_2',
         nodes: [
@@ -215,6 +215,13 @@ describe('Story node editor component', () => {
             outline: 'Outline',
             exploration_id: null,
             outline_is_finalized: false,
+            thumbnail_filename: 'thumbanail_file',
+            thumbnail_bg_color: '#FFFFFF',
+            status: 'Published',
+            last_modified_msecs: 1,
+            first_publication_date_msecs: 1,
+            unpublishing_reason: null,
+            planned_publication_date_msecs: null,
           },
           {
             id: 'node_1',
@@ -227,6 +234,12 @@ describe('Story node editor component', () => {
             exploration_id: null,
             outline_is_finalized: false,
             planned_publication_date_msecs: 168960000000,
+            thumbnail_filename: 'thumbanail_file',
+            thumbnail_bg_color: '#FFFFFF',
+            status: 'Published',
+            last_modified_msecs: 1,
+            first_publication_date_msecs: 1,
+            unpublishing_reason: null,
           },
           {
             id: 'node_2',
@@ -238,6 +251,13 @@ describe('Story node editor component', () => {
             outline: 'Outline 2',
             exploration_id: 'exp_1',
             outline_is_finalized: true,
+            thumbnail_filename: 'thumbanail_file',
+            thumbnail_bg_color: '#FFFFFF',
+            status: 'Published',
+            last_modified_msecs: 1,
+            first_publication_date_msecs: 1,
+            unpublishing_reason: null,
+            planned_publication_date_msecs: null,
           },
           {
             id: 'break',
@@ -249,6 +269,13 @@ describe('Story node editor component', () => {
             outline: 'Outline 2',
             exploration_id: 'exp_1',
             outline_is_finalized: true,
+            thumbnail_filename: 'thumbanail_file',
+            thumbnail_bg_color: '#FFFFFF',
+            status: 'Published',
+            last_modified_msecs: 1,
+            first_publication_date_msecs: 1,
+            unpublishing_reason: null,
+            planned_publication_date_msecs: null,
           },
         ],
         next_node_id: 'node_3',
@@ -394,7 +421,7 @@ describe('Story node editor component', () => {
 
     component.togglePreview();
 
-    expect(component.chapterPreviewCardIsShown).toBeTrue();
+    expect(component.chapterPreviewCardIsShown).toBe(true);
   });
 
   it('should untoggle chapter preview card', () => {
@@ -402,7 +429,7 @@ describe('Story node editor component', () => {
 
     component.togglePreview();
 
-    expect(component.chapterPreviewCardIsShown).toBeFalse();
+    expect(component.chapterPreviewCardIsShown).toBe(false);
   });
 
   it('should toggle prereq skill list', () => {
@@ -410,7 +437,7 @@ describe('Story node editor component', () => {
 
     component.togglePrerequisiteSkillsList();
 
-    expect(component.prerequisiteSkillIsShown).toBeFalse();
+    expect(component.prerequisiteSkillIsShown).toBe(false);
   });
 
   it('should toggle acquired skill list', () => {
@@ -418,7 +445,7 @@ describe('Story node editor component', () => {
 
     component.toggleAcquiredSkillsList();
 
-    expect(component.acquiredSkillIsShown).toBeFalse();
+    expect(component.acquiredSkillIsShown).toBe(false);
   });
 
   it('should call StoryUpdate service to set story thumbnail filename', () => {
@@ -486,20 +513,20 @@ describe('Story node editor component', () => {
 
     expect(unfinalizeSpy).toHaveBeenCalled();
     expect(finalizeSpy).not.toHaveBeenCalled();
-    expect(component.outlineIsFinalized).toBeFalse();
+    expect(component.outlineIsFinalized).toBe(false);
     expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
   });
 
   it('should return true from canFinalize if editableOutline has content', () => {
     component.editableOutline = 'Some outline text';
 
-    expect(component.canFinalize()).toBeTrue();
+    expect(component.canFinalize()).toBe(true);
   });
 
   it('should return false from canFinalize if editableOutline has no content', () => {
     component.editableOutline = '';
 
-    expect(component.canFinalize()).toBeFalse();
+    expect(component.canFinalize()).toBe(false);
   });
 
   it('should call StoryUpdate service to update outline', () => {
@@ -547,7 +574,7 @@ describe('Story node editor component', () => {
       storyUpdateService.setStoryNodePlannedPublicationDateMsecs
     ).toHaveBeenCalledTimes(0);
     expect(component.plannedPublicationDate).toBe(null);
-    expect(component.plannedPublicationDateIsInPast).toBeTrue();
+    expect(component.plannedPublicationDateIsInPast).toBe(true);
 
     let futureDateString = '2037-04-20';
     component.updatePlannedPublicationDate(futureDateString);
@@ -558,13 +585,13 @@ describe('Story node editor component', () => {
       futureDate.getTime()
     );
     expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
-    expect(component.plannedPublicationDateIsInPast).toBeFalse();
+    expect(component.plannedPublicationDateIsInPast).toBe(false);
 
     component.updatePlannedPublicationDate('');
     expect(storySpy).toHaveBeenCalled();
     expect(currentNodeIsPublishableSpy).toHaveBeenCalled();
     expect(component.plannedPublicationDate).toBe(null);
-    expect(component.plannedPublicationDateIsInPast).toBeFalse();
+    expect(component.plannedPublicationDateIsInPast).toBe(false);
 
     component.plannedPublicationDate = new Date();
     component.updatePlannedPublicationDate(oldDateString);
@@ -607,12 +634,14 @@ describe('Story node editor component', () => {
   });
 
   it('should open add skill modal for adding prerequisite skill', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve('success'),
-      } as NgbModalRef;
-    });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+      (dlg: unknown, opt: unknown) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve('success'),
+        } as NgbModalRef;
+      }
+    );
 
     component.addPrerequisiteSkillId();
 
@@ -631,7 +660,7 @@ describe('Story node editor component', () => {
       let alertsSpy = spyOn(alertsService, 'addInfoMessage').and.returnValue(
         null
       );
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
         return {
           componentInstance: MockNgbModalRef,
           result: Promise.resolve({
@@ -657,12 +686,14 @@ describe('Story node editor component', () => {
     spyOn(storyUpdateService, 'addAcquiredSkillIdToNode').and.callFake(
       () => {}
     );
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve('success'),
-      } as NgbModalRef;
-    });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+      (dlg: unknown, opt: unknown) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve('success'),
+        } as NgbModalRef;
+      }
+    );
 
     component.addAcquiredSkillId();
     tick();
@@ -680,7 +711,7 @@ describe('Story node editor component', () => {
       let alertsSpy = spyOn(alertsService, 'addInfoMessage').and.returnValue(
         null
       );
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
         return {
           componentInstance: MockNgbModalRef,
           result: Promise.resolve('success'),
@@ -968,7 +999,7 @@ describe('Story node editor component', () => {
           },
         };
       },
-    };
+    } as unknown as Story;
 
     mockEventEmitterLast.emit();
     tick();

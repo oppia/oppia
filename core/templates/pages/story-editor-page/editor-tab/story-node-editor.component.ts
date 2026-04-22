@@ -30,7 +30,10 @@ import {CuratedExplorationValidationService} from 'domain/exploration/curated-ex
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {StoryUpdateService} from 'domain/story/story-update.service';
 import {Story} from 'domain/story/story.model';
-import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {
+  TopicsAndSkillsDashboardBackendApiService,
+  CategorizedSkills,
+} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {Subscription} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -38,23 +41,24 @@ import {PageTitleService} from 'services/page-title.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {StoryEditorStateService} from '../services/story-editor-state.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
 
 @Component({
   selector: 'oppia-story-node-editor',
   templateUrl: './story-node-editor.component.html',
 })
 export class StoryNodeEditorComponent implements OnInit, OnDestroy {
-  @Input() nodeId: string;
-  @Input() outline: string;
-  @Input() description: string;
-  @Input() explorationId: string;
-  @Input() thumbnailFilename: string;
-  @Input() thumbnailBgColor: string;
-  @Input() outlineIsFinalized: boolean;
-  @Input() destinationNodeIds: string[];
-  @Input() prerequisiteSkillIds: string[];
-  @Input() acquiredSkillIds: string[];
-  @Input() plannedPublicationDateMsecs: number;
+  @Input() nodeId!: string;
+  @Input() outline!: string;
+  @Input() description!: string;
+  @Input() explorationId!: string | null;
+  @Input() thumbnailFilename!: string;
+  @Input() thumbnailBgColor!: string;
+  @Input() outlineIsFinalized!: boolean;
+  @Input() destinationNodeIds!: string[];
+  @Input() prerequisiteSkillIds!: string[];
+  @Input() acquiredSkillIds!: string[];
+  @Input() plannedPublicationDateMsecs!: number;
 
   MAX_CHARS_IN_EXPLORATION_TITLE = AppConstants.MAX_CHARS_IN_EXPLORATION_TITLE;
   MAX_CHARS_IN_CHAPTER_DESCRIPTION =
@@ -63,8 +67,8 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   mainChapterCardIsShown = true;
   explorationInputButtonsAreShown = false;
   chapterOutlineButtonsAreShown = false;
-  acquiredSkillIdToSummaryMap = {};
-  prerequisiteSkillIdToSummaryMap = {};
+  acquiredSkillIdToSummaryMap: Record<string, string> = {};
+  prerequisiteSkillIdToSummaryMap: Record<string, string> = {};
   chapterOutlineIsShown: boolean = false;
   chapterTodoCardIsShown: boolean = false;
   prerequisiteSkillIsShown: boolean = false;
@@ -72,26 +76,26 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   explorationIdPattern = /^[a-zA-Z0-9_-]+$/;
   expIdCanBeSaved = true;
 
-  story: Story;
-  storyNodeIds: string[];
-  nodeIdToTitleMap: Object;
+  story!: Story;
+  storyNodeIds!: string[];
+  nodeIdToTitleMap!: Record<string, string>;
   skillInfoHasLoaded = false;
   allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter;
-  isStoryPublished: () => boolean;
-  currentTitle: string;
-  editableTitle: string;
-  currentDescription: string;
-  editableDescription: string;
-  editableThumbnailFilename: string;
-  editableThumbnailBgColor: string;
-  oldOutline: string;
-  editableOutline: string;
-  currentExplorationId: string;
-  expIdIsValid: boolean;
-  invalidExpErrorIsShown: boolean;
-  nodeTitleEditorIsShown: boolean;
-  plannedPublicationDate: Date | null;
-  editablePlannedPublicationDate: Date | null;
+  isStoryPublished!: () => boolean;
+  currentTitle!: string;
+  editableTitle!: string;
+  currentDescription!: string;
+  editableDescription!: string;
+  editableThumbnailFilename!: string;
+  editableThumbnailBgColor!: string;
+  oldOutline!: string;
+  editableOutline!: string;
+  currentExplorationId: string | null = null;
+  expIdIsValid!: boolean;
+  invalidExpErrorIsShown!: boolean;
+  nodeTitleEditorIsShown!: boolean;
+  plannedPublicationDate!: Date | null;
+  editablePlannedPublicationDate!: Date | null;
   plannedPublicationDateIsInPast: boolean = false;
 
   OUTLINE_SCHEMA = {
@@ -103,12 +107,12 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     },
   };
 
-  private _categorizedSkills = {};
-  private _untriagedSkillSummaries = {};
+  private _categorizedSkills: CategorizedSkills = {};
+  private _untriagedSkillSummaries: SkillSummary[] = [];
 
   subscriptions = new Subscription();
-  newNodeId: string;
-  availableNodes;
+  newNodeId: string | null = null;
+  availableNodes: {id: string; text: string}[] = [];
 
   constructor(
     private alertsService: AlertsService,
@@ -203,7 +207,8 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
   checkCanSaveExpId(): void {
     this.expIdCanBeSaved =
-      this.explorationIdPattern.test(this.explorationId) || !this.explorationId;
+      this.explorationIdPattern.test(this.explorationId || '') ||
+      !this.explorationId;
     this.invalidExpErrorIsShown = false;
   }
 
@@ -462,7 +467,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     let allowSkillsFromOtherTopics = false;
     let skillsInSameTopicCount = 0;
     let topicName = this.storyEditorStateService.getTopicName();
-    let categorizedSkillsInTopic = {};
+    let categorizedSkillsInTopic: CategorizedSkills = {};
     categorizedSkillsInTopic[topicName] = this._categorizedSkills[topicName];
     let modalRef: NgbModalRef = this.ngbModal.open(SelectSkillModalComponent, {
       backdrop: 'static',

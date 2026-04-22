@@ -225,7 +225,7 @@ describe('Question Misconception Editor Component', () => {
       misconceptionSkillId: 'abc',
       feedbackIsUsed: false,
     };
-    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+    spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
       return {
         componentInstance: MockNgbModalRef,
         result: Promise.resolve(mockResultObject),
