@@ -33,7 +33,7 @@ import {StoryEditorNavigationService} from '../services/story-editor-navigation.
 import {StoryEditorComponent} from './story-editor.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {StoryEditorStateService} from '../services/story-editor-state.service';
-import {Story} from 'domain/story/story.model';
+import {Story, StoryBackendDict} from 'domain/story/story.model';
 import {NewChapterTitleModalComponent} from '../modal-templates/new-chapter-title-modal.component';
 import {DeleteChapterModalComponent} from '../modal-templates/delete-chapter-modal.component';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
@@ -42,7 +42,7 @@ import {PlatformFeatureService} from '../../../services/platform-feature.service
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 
 class MockNgbModalRef {
-  componentInstance: {
+  componentInstance!: {
     body: 'xyz';
   };
 }
@@ -75,7 +75,7 @@ describe('Story Editor Component having three story nodes', () => {
   let storyUpdateService: StoryUpdateService;
   let storyEditorStateService: StoryEditorStateService;
   let windowRef: WindowRef;
-  let fetchSpy;
+  let fetchSpy!: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -124,6 +124,9 @@ describe('Story Editor Component having three story nodes', () => {
       version: 1,
       corresponding_topic_id: 'topic_id',
       url_fragment: 'story_title',
+      thumbnail_filename: 'story_thumbnail',
+      thumbnail_bg_color: '#FFFFFF',
+      meta_tag_content: 'sample meta tag content',
       story_contents: {
         initial_node_id: 'node_2',
         nodes: [
@@ -142,6 +145,8 @@ describe('Story Editor Component having three story nodes', () => {
             last_modified_msecs: 20,
             first_publication_date_msecs: 10,
             unpublishing_reason: 'Bad Content',
+            thumbnail_filename: 'thumbanail_file',
+            thumbnail_bg_color: '#FFFFFF',
           },
           {
             id: 'node_2',
@@ -158,6 +163,8 @@ describe('Story Editor Component having three story nodes', () => {
             last_modified_msecs: 20,
             first_publication_date_msecs: 10,
             unpublishing_reason: null,
+            thumbnail_filename: 'thumbanail_file',
+            thumbnail_bg_color: '#FFFFFF',
           },
           {
             id: 'node_3',
@@ -174,6 +181,8 @@ describe('Story Editor Component having three story nodes', () => {
             last_modified_msecs: 20,
             first_publication_date_msecs: 10,
             unpublishing_reason: null,
+            thumbnail_filename: 'thumbanail_file',
+            thumbnail_bg_color: '#FFFFFF',
           },
         ],
         next_node_id: 'node_3',
@@ -242,11 +251,11 @@ describe('Story Editor Component having three story nodes', () => {
       first_publication_date_msecs: 200,
       unpublishing_reason: null,
     });
-    expect(component.isDragAndDropDisabled(node)).toBeTrue();
+    expect(component.isDragAndDropDisabled(node)).toBe(true);
 
     node.setStatus('Draft');
     spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1200);
-    expect(component.isDragAndDropDisabled(node)).toBeFalse();
+    expect(component.isDragAndDropDisabled(node)).toBe(false);
   });
 
   it('should change list order', fakeAsync(() => {
@@ -537,7 +546,9 @@ describe('Story Editor Component having three story nodes', () => {
       meta_tag_content: 'meta',
     };
     spyOn(component, '_initEditor').and.stub();
-    component.story = Story.createFromBackendDict(sampleStoryBackendObject);
+    component.story = Story.createFromBackendDict(
+      sampleStoryBackendObject as unknown as StoryBackendDict
+    );
     let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
       return {
         componentInstance: MockComponentInstance,
@@ -605,8 +616,12 @@ describe('Story Editor Component having three story nodes', () => {
       spyOn(
         storyEditorStateService,
         'updateExistenceOfStoryUrlFragment'
-      ).and.callFake((newUrlFragment, successCallback, errorCallback) =>
-        errorCallback()
+      ).and.callFake(
+        (
+          newUrlFragment: string,
+          successCallback: () => void,
+          errorCallback: () => void
+        ) => errorCallback()
       );
       component.updateStoryUrlFragment('story-url fragment');
       expect(storyUrlFragmentSpy).not.toHaveBeenCalled();
@@ -617,7 +632,7 @@ describe('Story Editor Component having three story nodes', () => {
     let storyUpdateSpy = spyOn(
       storyEditorStateService,
       'updateExistenceOfStoryUrlFragment'
-    ).and.callFake((urlFragment, callback) => callback());
+    ).and.callFake((urlFragment: string, callback: () => void) => callback());
 
     component.updateStoryUrlFragment('story_second');
 
@@ -661,12 +676,14 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should show modal if there are unsaved changes on leaving', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(10);
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve(),
-      } as NgbModalRef;
-    });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+      (dlg: unknown, opt: unknown) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      }
+    );
 
     component.returnToTopicEditorPage();
 
@@ -675,12 +692,14 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should show modal if there are unsaved changes and click reject', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(10);
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.reject(),
-      } as NgbModalRef;
-    });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+      (dlg: unknown, opt: unknown) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.reject(),
+        } as NgbModalRef;
+      }
+    );
 
     component.returnToTopicEditorPage();
     expect(modalSpy).toHaveBeenCalled();

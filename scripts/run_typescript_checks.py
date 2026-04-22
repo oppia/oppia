@@ -187,8 +187,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/splash-page/splash-page.module.ts',
     'core/templates/pages/story-editor-page/chapter-editor/chapter-editor-tab.component.spec.ts',
     'core/templates/pages/story-editor-page/chapter-editor/chapter-editor-tab.component.ts',
-    'core/templates/pages/story-editor-page/editor-tab/story-editor.component.spec.ts',
-    'core/templates/pages/story-editor-page/editor-tab/story-editor.component.ts',
     'core/templates/pages/story-editor-page/editor-tab/story-node-editor.component.spec.ts',
     'core/templates/pages/story-editor-page/editor-tab/story-node-editor.component.ts',
     'core/templates/pages/story-editor-page/modal-templates/new-chapter-title-modal.component.spec.ts',

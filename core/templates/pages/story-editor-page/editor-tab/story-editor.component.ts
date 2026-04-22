@@ -45,34 +45,34 @@ import constants from 'assets/constants';
   templateUrl: './story-editor.component.html',
 })
 export class StoryEditorComponent implements OnInit, OnDestroy {
-  story: Story;
-  storyContents: StoryContents;
-  disconnectedNodes: string[];
-  linearNodesList: StoryNode[];
-  nodes: StoryNode[];
+  story!: Story;
+  storyContents!: StoryContents;
+  disconnectedNodes!: string[];
+  linearNodesList!: StoryNode[];
+  nodes!: StoryNode[];
   allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story;
 
-  initialNodeId: string;
-  notesEditorIsShown: boolean;
-  storyTitleEditorIsShown: boolean;
-  editableTitle: string;
-  editableUrlFragment: string;
-  editableMetaTagContent: string;
-  initialStoryUrlFragment: string;
-  editableNotes: string;
-  editableDescription: string;
-  editableDescriptionIsEmpty: boolean;
-  storyDescriptionChanged: boolean;
-  storyUrlFragmentExists: boolean;
-  idOfNodeToEdit: string;
-  dragStartIndex: number;
-  nodeBeingDragged: StoryNode;
-  mainStoryCardIsShown: boolean;
-  storyPreviewCardIsShown: boolean;
-  chaptersListIsShown: boolean;
-  selectedChapterIndex: number;
-  chapterIsPublishable: boolean[];
-  selectedChapterIndexInPublishUptoDropdown: number;
+  initialNodeId!: string;
+  notesEditorIsShown!: boolean;
+  storyTitleEditorIsShown!: boolean;
+  editableTitle!: string;
+  editableUrlFragment!: string;
+  editableMetaTagContent!: string;
+  initialStoryUrlFragment!: string;
+  editableNotes!: string;
+  editableDescription!: string;
+  editableDescriptionIsEmpty!: boolean;
+  storyDescriptionChanged!: boolean;
+  storyUrlFragmentExists!: boolean;
+  idOfNodeToEdit!: string;
+  dragStartIndex!: number;
+  nodeBeingDragged!: StoryNode;
+  mainStoryCardIsShown!: boolean;
+  storyPreviewCardIsShown!: boolean;
+  chaptersListIsShown!: boolean;
+  selectedChapterIndex!: number;
+  chapterIsPublishable!: boolean[];
+  selectedChapterIndexInPublishUptoDropdown!: number;
   publishedChaptersDropErrorIsShown: boolean = false;
   NOTES_SCHEMA = {
     type: 'html',
@@ -81,7 +81,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
       startupFocusEnabled: false,
     },
   };
-  generatedUrlPrefix: string;
+  generatedUrlPrefix!: string;
 
   constructor(
     private alertsService: AlertsService,
@@ -118,7 +118,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
       this.storyContents = this.story.getStoryContents();
     }
     if (this.storyContents) {
-      this.setNodeToEdit(this.storyContents.getInitialNodeId());
+      this.setNodeToEdit(this.storyContents.getInitialNodeId() ?? '');
     }
     this._initEditor();
   }
@@ -196,7 +196,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
       this.nodes = [];
       if (this.storyContents && this.storyContents.getNodes().length > 0) {
         this.nodes = this.storyContents.getNodes();
-        this.initialNodeId = this.storyContents.getInitialNodeId();
+        this.initialNodeId = this.storyContents.getInitialNodeId() ?? '';
         this.linearNodesList = this.storyContents.getLinearNodesList();
         this.chapterIsPublishable = [];
         this.linearNodesList.forEach((node, index) => {
@@ -292,7 +292,9 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
         this._initEditor();
         // If the first node is added, open it just after creation.
         if (this.story.getStoryContents().getNodes().length === 1) {
-          this.setNodeToEdit(this.story.getStoryContents().getInitialNodeId());
+          this.setNodeToEdit(
+            this.story.getStoryContents().getInitialNodeId() ?? ''
+          );
         } else {
           let nodesArray = this.story.getStoryContents().getNodes();
           let nodesLength = nodesArray.length;
