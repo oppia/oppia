@@ -1857,6 +1857,9 @@ export class ExplorationEditor extends BaseUser {
         );
         break;
       case INTERACTION_TYPES.TEXT_INPUT:
+        await this.page.waitForSelector(responseModalBodySelector, {
+          visible: true,
+        });
         await this.clickOnElementWithSelector(addResponseOptionButton);
         await this.page.waitForSelector(textInputInteractionOption);
         await this.page.type(textInputInteractionOption, answer);

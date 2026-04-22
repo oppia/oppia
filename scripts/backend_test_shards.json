@@ -61,7 +61,8 @@
         "core.domain.cloud_task_domain_test",
         "core.jobs.batch_jobs.exploration_voiceover_sync_jobs_test",
         "core.jobs.batch_jobs.cloud_task_run_migration_jobs_test",
-        "core.jobs.batch_jobs.voiceover_synthesis_jobs_test"
+        "core.jobs.batch_jobs.voiceover_synthesis_jobs_test",
+        "core.jobs.batch_jobs.synthesize_voiceover_by_language_accent_jobs_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
