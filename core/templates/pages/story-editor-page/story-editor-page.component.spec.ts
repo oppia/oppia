@@ -16,8 +16,12 @@
  * @fileoverview Unit tests for story editor page component.
  */
 
-import {EventEmitter} from '@angular/core';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {EventEmitter, Type} from '@angular/core';
+import {
+  NgbModal,
+  NgbModalRef,
+  NgbModalOptions,
+} from '@ng-bootstrap/ng-bootstrap';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {EntityEditorBrowserTabsInfo} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
@@ -44,7 +48,7 @@ import {StoryEditorNavigationService} from './services/story-editor-navigation.s
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 class MockNgbModalRef {
-  componentInstance: {
+  componentInstance!: {
     body: 'xyz';
   };
 }
@@ -312,12 +316,14 @@ describe('Story Editor Page Component', () => {
 
   it('should return to topic editor page when closing confirmation modal', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve(),
-      } as NgbModalRef;
-    });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+      (dlg: Type<unknown>, opt: NgbModalOptions) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      }
+    );
 
     component.returnToTopicEditorPage();
 
@@ -326,12 +332,14 @@ describe('Story Editor Page Component', () => {
 
   it('should return to topic editor page when dismissing confirmation modal', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.reject(),
-      } as NgbModalRef;
-    });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+      (dlg: Type<unknown>, opt: NgbModalOptions) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.reject(),
+        } as NgbModalRef;
+      }
+    );
 
     component.returnToTopicEditorPage();
 

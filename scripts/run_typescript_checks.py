@@ -190,8 +190,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/story-editor-page/modal-templates/new-chapter-title-modal.component.spec.ts',
     'core/templates/pages/story-editor-page/navbar/story-editor-navbar.component.spec.ts',
     'core/templates/pages/story-editor-page/services/story-editor-state.service.spec.ts',
-    'core/templates/pages/story-editor-page/story-editor-page.component.spec.ts',
-    'core/templates/pages/story-editor-page/story-editor-page.component.ts',
     'core/templates/pages/subtopic-viewer-page/navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component.spec.ts',
     'core/templates/pages/subtopic-viewer-page/subtopic-viewer-auth.guard.spec.ts',
     'core/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.spec.ts',

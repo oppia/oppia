@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for the story node editor directive.
  */
-import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {EventEmitter, NO_ERRORS_SCHEMA, Type} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -24,7 +24,11 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbModal,
+  NgbModalOptions,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ConceptCard} from 'domain/skill/concept-card.model';
@@ -635,7 +639,7 @@ describe('Story node editor component', () => {
 
   it('should open add skill modal for adding prerequisite skill', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: unknown, opt: unknown) => {
+      (dlg: Type<unknown>, opt: NgbModalOptions) => {
         return {
           componentInstance: MockNgbModalRef,
           result: Promise.resolve('success'),
@@ -660,17 +664,19 @@ describe('Story node editor component', () => {
       let alertsSpy = spyOn(alertsService, 'addInfoMessage').and.returnValue(
         null
       );
-      spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve({
-            summary: {
-              id: 'id',
-              description: 'description',
-            },
-          }),
-        } as NgbModalRef;
-      });
+      spyOn(ngbModal, 'open').and.callFake(
+        (dlg: Type<unknown>, opt: NgbModalOptions) => {
+          return {
+            componentInstance: MockNgbModalRef,
+            result: Promise.resolve({
+              summary: {
+                id: 'id',
+                description: 'description',
+              },
+            }),
+          } as NgbModalRef;
+        }
+      );
 
       component.addPrerequisiteSkillId();
       tick();
@@ -687,7 +693,7 @@ describe('Story node editor component', () => {
       () => {}
     );
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: unknown, opt: unknown) => {
+      (dlg: Type<unknown>, opt: NgbModalOptions) => {
         return {
           componentInstance: MockNgbModalRef,
           result: Promise.resolve('success'),
@@ -711,12 +717,14 @@ describe('Story node editor component', () => {
       let alertsSpy = spyOn(alertsService, 'addInfoMessage').and.returnValue(
         null
       );
-      spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve('success'),
-        } as NgbModalRef;
-      });
+      spyOn(ngbModal, 'open').and.callFake(
+        (dlg: Type<unknown>, opt: NgbModalOptions) => {
+          return {
+            componentInstance: MockNgbModalRef,
+            result: Promise.resolve('success'),
+          } as NgbModalRef;
+        }
+      );
 
       component.addAcquiredSkillId();
       tick();

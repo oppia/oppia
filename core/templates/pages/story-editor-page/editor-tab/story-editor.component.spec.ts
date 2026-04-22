@@ -17,7 +17,7 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {EventEmitter, NO_ERRORS_SCHEMA, Type} from '@angular/core';
 import {
   ComponentFixture,
   TestBed,
@@ -25,7 +25,11 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbModal,
+  NgbModalOptions,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {StoryUpdateService} from 'domain/story/story-update.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -677,7 +681,7 @@ describe('Story Editor Component having three story nodes', () => {
   it('should show modal if there are unsaved changes on leaving', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(10);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: unknown, opt: unknown) => {
+      (dlg: Type<unknown>, opt: NgbModalOptions) => {
         return {
           componentInstance: MockNgbModalRef,
           result: Promise.resolve(),
@@ -693,7 +697,7 @@ describe('Story Editor Component having three story nodes', () => {
   it('should show modal if there are unsaved changes and click reject', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(10);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: unknown, opt: unknown) => {
+      (dlg: Type<unknown>, opt: NgbModalOptions) => {
         return {
           componentInstance: MockNgbModalRef,
           result: Promise.reject(),
