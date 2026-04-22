@@ -114,8 +114,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/exploration-editor-page/editor-tab/state-name-editor/state-name-editor.component.spec.ts',
     'core/templates/pages/exploration-editor-page/editor-tab/state-version-history/state-version-history.component.spec.ts',
     'core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/teach-oppia-modal.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/exploration-editor-page.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/exploration-editor-page.component.ts',
     'core/templates/pages/exploration-editor-page/history-tab/services/compare-versions.service.spec.ts',
     'core/templates/pages/exploration-editor-page/modal-templates/exploration-modify-translations-modal.component.spec.ts',
     'core/templates/pages/exploration-editor-page/modal-templates/state-version-history-modal.component.spec.ts',

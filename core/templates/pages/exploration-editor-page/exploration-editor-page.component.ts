@@ -115,26 +115,26 @@ interface ExplorationData extends ExplorationBackendDict {
 export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  explorationIsLinkedToStory: boolean;
-  screenIsLarge: boolean;
-  explorationId: string;
-  explorationUrl: string;
-  revertExplorationUrl: string;
-  checkRevertExplorationValidUrl: string;
-  explorationDownloadUrl: string;
-  improvementsTabIsEnabled: boolean;
+  explorationIsLinkedToStory!: boolean;
+  screenIsLarge!: boolean;
+  explorationId!: string;
+  explorationUrl!: string;
+  revertExplorationUrl!: string;
+  checkRevertExplorationValidUrl!: string;
+  explorationDownloadUrl!: string;
+  improvementsTabIsEnabled!: boolean;
   reconnectedMessageTimeoutMilliseconds: number = 4000;
   disconnectedMessageTimeoutMilliseconds: number = 5000;
   autosaveIsInProgress: boolean = false;
   connectedToInternet: boolean = true;
   explorationEditorPageHasInitialized: boolean = false;
-  activeThread: string;
-  warningsAreShown: boolean;
-  currentUserIsCurriculumAdmin: boolean;
-  currentUserIsModerator: boolean;
-  currentUser: string;
-  currentVersion: number;
-  areExplorationWarningsVisible: boolean;
+  activeThread!: string;
+  warningsAreShown!: boolean;
+  currentUserIsCurriculumAdmin!: boolean;
+  currentUserIsModerator!: boolean;
+  currentUser!: string;
+  currentVersion!: number;
+  areExplorationWarningsVisible!: boolean;
   isModalOpenable: boolean = true;
   modifyTranslationsFeatureFlagIsEnabled: boolean = false;
 
@@ -209,7 +209,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     this.areExplorationWarningsVisible = !this.areExplorationWarningsVisible;
   }
 
-  getExplorationUrl(explorationId: string): string {
+  getExplorationUrl(explorationId: string | null): string {
     return explorationId ? '/explore/' + explorationId : '';
   }
 
@@ -245,12 +245,13 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         explorationData.states,
         (explorationData as ExplorationData).exploration_is_linked_to_story
       );
+      const explorationVersion = explorationData.version ?? 0;
       this.entityTranslationsService.init(
         this.explorationId,
         'exploration',
-        explorationData.version
+        explorationVersion
       );
-      this.pageContextService.setExplorationVersion(explorationData.version);
+      this.pageContextService.setExplorationVersion(explorationVersion);
 
       const languageCode =
         this.entityVoiceoversService.languageCode ||
@@ -258,7 +259,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       this.entityVoiceoversService.init(
         this.explorationId,
         'exploration',
-        explorationData.version,
+        explorationVersion,
         languageCode
       );
       this.entityVoiceoversService.fetchEntityVoiceovers();
@@ -298,7 +299,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       this.currentUserIsCurriculumAdmin = userInfo.isCurriculumAdmin();
       this.currentUserIsModerator = userInfo.isModerator();
       this.currentUser = (explorationData as ExplorationData).user;
-      this.currentVersion = explorationData.version;
+      this.currentVersion = explorationVersion;
 
       this.explorationRightsService.init(
         (explorationData as ExplorationData).rights.owner_names,
@@ -328,26 +329,26 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           }
         });
 
-      this.versionHistoryService.init(explorationData.version);
+      this.versionHistoryService.init(explorationVersion);
 
       this.graphDataService.recompute();
 
+      const activeStateName = this.stateEditorService.getActiveStateName();
       if (
-        !this.stateEditorService.getActiveStateName() ||
-        !this.explorationStatesService.getState(
-          this.stateEditorService.getActiveStateName()
-        )
+        !activeStateName ||
+        !this.explorationStatesService.getState(activeStateName)
       ) {
         this.stateEditorService.setActiveStateName(
           this.explorationInitStateNameService.displayed as string
         );
       }
 
+      const currentStatePath =
+        this.routerService.getCurrentStateFromLocationPath();
       if (
         !this.routerService.isLocationSetToNonStateEditorTab() &&
-        !explorationData.states.hasOwnProperty(
-          this.routerService.getCurrentStateFromLocationPath()
-        )
+        currentStatePath &&
+        !explorationData.states.hasOwnProperty(currentStatePath)
       ) {
         if (this.threadDataBackendApiService.getOpenThreadsCount() > 0) {
           this.routerService.navigateToFeedbackTab();
@@ -391,14 +392,14 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
             // if they exist.
             this.populateEntityTranslationsWithDraftChanges(
               explorationData.draft_changes,
-              explorationData.version
+              explorationVersion
             );
           });
       } else {
         // Simply populate draft changes for the translation tab in case the feature flag is not enabled.
         this.populateEntityTranslationsWithDraftChanges(
           explorationData.draft_changes,
-          explorationData.version
+          explorationVersion
         );
       }
 
@@ -426,10 +427,10 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         forceRefresh: true,
       });
 
+      const activeStateName2 = this.stateEditorService.getActiveStateName();
       if (
-        this.explorationStatesService.getState(
-          this.stateEditorService.getActiveStateName()
-        )
+        activeStateName2 &&
+        this.explorationStatesService.getState(activeStateName2)
       ) {
         this.stateEditorRefreshService.onRefreshStateEditor.emit();
       }
@@ -546,9 +547,11 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       '.exploration-editor-content'
     );
 
-    mainContentElement.tabIndex = -1;
-    mainContentElement.scrollIntoView();
-    mainContentElement.focus();
+    if (mainContentElement) {
+      mainContentElement.tabIndex = -1;
+      mainContentElement.scrollIntoView();
+      mainContentElement.focus();
+    }
   }
 
   startEditorTutorial(): void {
