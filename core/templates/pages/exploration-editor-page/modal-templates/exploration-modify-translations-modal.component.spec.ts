@@ -21,8 +21,10 @@ import {
   ComponentFixture,
   waitForAsync,
   TestBed,
+  discardPeriodicTasks,
   tick,
   fakeAsync,
+  flush,
 } from '@angular/core/testing';
 import {
   NgbActiveModal,
@@ -258,6 +260,9 @@ describe('Modify Translations Modal Component', function () {
       'hi',
       changedTranslation
     );
+
+    flush();
+    discardPeriodicTasks();
   }));
 
   it('should mark as needing update in the change list for unchecked translations', fakeAsync(() => {
@@ -289,6 +294,9 @@ describe('Modify Translations Modal Component', function () {
     expect(
       changeListService.markTranslationAsNeedingUpdateForLanguage
     ).toHaveBeenCalledWith(component.contentId, 'hi');
+
+    flush();
+    discardPeriodicTasks();
   }));
 
   it('should dismiss the modal when cancel is called', () => {

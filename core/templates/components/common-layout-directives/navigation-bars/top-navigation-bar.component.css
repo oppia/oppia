@@ -66,19 +66,19 @@
   padding: 0;
 }
 .oppia-top-navigation-bar .get-involved-dropdown .language {
-  color: #f2994a;
+  color: #c76a14;
   font-size: 18px;
 }
 .oppia-top-navigation-bar .get-involved-dropdown .volunteer {
-  color: #2d9cdb;
+  color: #0070b8;
   font-size: 18px;
 }
 .oppia-top-navigation-bar .get-involved-dropdown .contact {
-  color: #b4bbc3;
+  color: #757575;
   font-size: 18px;
 }
 .oppia-top-navigation-bar .get-involved-dropdown .fav {
-  color: #eb5757;
+  color: #d32f2f;
   font-size: 18px;
 }
 .oppia-top-navigation-bar .get-involved-dropdown .des {
@@ -229,7 +229,7 @@
 }
 .oppia-top-navigation-bar .about-dropdown-menu .about-link:hover,
 .oppia-top-navigation-bar .about-dropdown-menu .about-link:focus {
-  color: #009688 !important;
+  color: #00645c !important;
 }
 .oppia-top-navigation-bar .nav-item-left-head {
   color: #333;
@@ -239,7 +239,7 @@
   line-height: 18.75px;
 }
 .oppia-top-navigation-bar .learn-dropdown-menu .nav-content {
-  color: #767676;
+  color: #555;
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
   font-weight: 400;
@@ -383,7 +383,7 @@
   margin-top: -5px;
 }
 .oppia-top-navigation-bar .oppia-launch-icon {
-  color: #009688;
+  color: #00645c;
   font-size: 22px;
 }
 .oppia-top-navigation-bar .oppia-user-avatar-icon {
@@ -416,10 +416,10 @@
 }
 
 .oppia-top-navigation-bar .oppia-navbar-dropdown .nav-link {
-  color: #009688;
+  color: #00645c;
 }
 .oppia-top-navigation-bar .oppia-navbar-dropdown .nav-link:hover {
-  color: #888;
+  color: #333;
 }
 
 .oppia-top-navigation-bar .oppia-signin-text {
@@ -477,10 +477,9 @@
   padding-right: 6px;
 }
 .oppia-top-navigation-bar .oppia-navbar-tab-content-desc {
-  color: #767676;
+  color: #555;
   line-height: 20px;
   margin-left: 28px;
-  opacity: 0.9;
 }
 .oppia-top-navigation-bar .oppia-navbar-dropdown-right {
   left: 0;
