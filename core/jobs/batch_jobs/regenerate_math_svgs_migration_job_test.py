@@ -30,7 +30,7 @@ from core.jobs.batch_jobs import regenerate_math_svgs_migration_job
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Dict, Final, Type
+from typing import Any, Dict, Final, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -436,7 +436,9 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
         regenerate_math_svgs_migration_job._update_html_in_dict(  # pylint: disable=protected-access
             obj, {OLD_SVG_FILENAME: NEW_SVG_FILENAME}, 0
         )
-        self.assertIn(NEW_SVG_FILENAME, obj[0]['html'])
+        first_item = obj[0]
+        assert isinstance(first_item, dict)
+        self.assertIn(NEW_SVG_FILENAME, first_item['html'])
 
     def test_exploration_has_math_content_in_content_html(self) -> None:
         """Returns True when math is in state content HTML."""
@@ -562,7 +564,10 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
     def _make_mock_exp_model(
         self,
         exp_id: str,
-        states_dict: dict,
+        states_dict: Dict[str, Any],
+        # Here we use type Any because the states
+        # structure is nested and heterogeneous. The test only passes it through
+        # a mock, so stricter typing is unnecessary here.
     ) -> mock.MagicMock:
         """Returns a mock ExplorationModel with controlled states."""
         exp_model = mock.MagicMock()
@@ -602,9 +607,9 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
         self.assertTrue(result.is_ok())
         _, count = result.unwrap()
         self.assertGreater(count, 0)
-        self.assertIn(
-            NEW_SVG_FILENAME, states['Introduction']['content']['html']
-        )
+        content = states['Introduction']['content']
+        assert isinstance(content, dict)
+        self.assertIn(NEW_SVG_FILENAME, content['html'])
 
     def test_update_exploration_model_updates_hints(self) -> None:
         states = {
