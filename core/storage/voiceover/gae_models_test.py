@@ -22,6 +22,8 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Dict, List, Union
+
 MYPY = False
 if MYPY:  # pragma: no cover
     # Here, 'state_domain' is imported only for type checking.
@@ -283,7 +285,7 @@ class CachedAutomaticVoiceoversModelTests(test_utils.GenericTestBase):
             plaintext
         )
         voiceover_filename = 'en-IN-content_1-qwerty.mp3'
-        audio_offset_list = [
+        audio_offset_list: List[Dict[str, Union[str, float]]] = [
             {'token': 'This', 'audio_offset_msecs': 0.0},
             {'token': 'is', 'audio_offset_msecs': 100.0},
             {'token': 'a', 'audio_offset_msecs': 200.0},
@@ -292,19 +294,13 @@ class CachedAutomaticVoiceoversModelTests(test_utils.GenericTestBase):
             {'token': '!', 'audio_offset_msecs': 450.0},
         ]
 
-        cached_model_id = (
-            voiceover_models.CachedAutomaticVoiceoversModel.generate_id(
-                language_accent_code, hash_code, provider
+        cached_model = (
+            voiceover_models.CachedAutomaticVoiceoversModel.create_cache_model(
+                language_accent_code=language_accent_code,
+                plaintext=plaintext,
+                voiceover_filename=voiceover_filename,
+                audio_offset_list=audio_offset_list,
             )
-        )
-        cached_model = voiceover_models.CachedAutomaticVoiceoversModel(
-            id=cached_model_id,
-            language_accent_code=language_accent_code,
-            provider=provider,
-            hash_code=hash_code,
-            plaintext=plaintext,
-            voiceover_filename=voiceover_filename,
-            audio_offset_list=audio_offset_list,
         )
 
         cached_model.update_timestamps()

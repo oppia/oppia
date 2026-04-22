@@ -110,6 +110,83 @@ describe('Blog Post Search Service', () => {
     });
   });
 
+  describe('lastQuery accessor', () => {
+    const testQuery = 'test query string';
+
+    it('should correctly get the value of lastQuery (getter)', () => {
+      searchService.lastQuery = testQuery;
+
+      expect(searchService.lastQuery).toBe(testQuery);
+    });
+
+    it('should correctly set the value of lastQuery (setter)', () => {
+      searchService.lastQuery = testQuery;
+
+      expect(searchService.lastQuery).toBe(testQuery);
+    });
+  });
+
+  describe('searchOffset accessors', () => {
+    const testOffset = 25;
+    const nullOffset = null;
+
+    it('should correctly get and set a number value for searchOffset', () => {
+      searchService.searchOffset = testOffset;
+
+      expect(searchService.searchOffset).toBe(testOffset);
+    });
+
+    it('should correctly get and set null for searchOffset', () => {
+      searchService.searchOffset = nullOffset;
+
+      expect(searchService.searchOffset).toBe(nullOffset);
+    });
+  });
+
+  describe('lastSelectedtags accessors', () => {
+    const testTags = ['tag1', 'tag2', 'tag3'];
+
+    it('should correctly get the array of lastSelectedtags', () => {
+      searchService.lastSelectedtags = testTags;
+
+      expect(searchService.lastSelectedtags).toEqual(testTags);
+    });
+
+    it('should correctly set a new array for lastSelectedtags', () => {
+      const newTags = ['newTag'];
+      searchService.lastSelectedtags = newTags;
+
+      expect(searchService.lastSelectedtags).toEqual(newTags);
+    });
+  });
+
+  describe('isCurrentlyFetchingResults accessors', () => {
+    it('should correctly get and set the value to true', () => {
+      searchService.isCurrentlyFetchingResults = true;
+
+      expect(searchService.isCurrentlyFetchingResults).toBe(true);
+    });
+
+    it('should correctly get and set the value to false', () => {
+      searchService.isCurrentlyFetchingResults = false;
+
+      expect(searchService.isCurrentlyFetchingResults).toBe(false);
+    });
+  });
+
+  describe('resetSearchState', () => {
+    it('should reset all search service state properties', () => {
+      searchService.searchOffset = 15;
+      searchService.lastQuery = 'search query';
+
+      searchService.resetSearchState();
+
+      expect(searchService.lastQuery).toBe('');
+      expect(searchService.lastSelectedtags).toEqual([]);
+      expect(searchService.isCurrentlyFetchingResults).toBe(false);
+    });
+  });
+
   describe('getSearchUrlQueryString', () => {
     it('should successfully get search url query string', () => {
       const searchQuery = 'blog search';
@@ -167,6 +244,7 @@ describe('Blog Post Search Service', () => {
         searchOffset: 2,
         blogPostSummariesList: [],
         listOfDefaultTags: [],
+        totalMatchingBlogPosts: 0,
       };
       testSubscriptions = new Subscription();
       testSubscriptions.add(
@@ -226,6 +304,7 @@ describe('Blog Post Search Service', () => {
         searchOffset: 1,
         blogPostSummariesList: [],
         listOfDefaultTags: [],
+        totalMatchingBlogPosts: 0,
       };
 
       it('should successfully load more data', fakeAsync(() => {
@@ -272,6 +351,7 @@ describe('Blog Post Search Service', () => {
           searchOffset: null,
           blogPostSummariesList: [],
           listOfDefaultTags: [],
+          totalMatchingBlogPosts: 0,
         };
         spyOn(
           blogHomePageBackendApiService,

@@ -232,10 +232,6 @@ export class StateHintsEditorComponent implements OnInit {
     this.hintCardIsShown = true;
     this.stateHintsService.setActiveHintIndex(null);
     this.canEdit = this.editabilityService.isEditable();
-    // When the page is scrolled so that the top of the page is above
-    // the browser viewport, there are some bugs in the positioning of
-    // the helper. This is a bug in jQueryUI that has not been fixed
-    // yet. For more details, see http://stackoverflow.com/q/5791886
     this.stateEditorService.updateStateHintsEditorInitialised();
   }
 }

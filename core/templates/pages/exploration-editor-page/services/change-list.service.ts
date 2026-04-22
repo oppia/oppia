@@ -61,9 +61,11 @@ export type StatePropertyValues =
   | boolean
   | Hint[]
   | InteractionCustomizationArgs
+  | null
   | Outcome
   | ParamChange[]
   | string
+  | string[]
   | SubtitledHtml
   | BaseTranslatableObject;
 export type StatePropertyDictValues =
@@ -74,6 +76,7 @@ export type StatePropertyDictValues =
   | OutcomeBackendDict
   | ParamChangeBackendDict[]
   | string
+  | string[]
   | SubtitledHtmlBackendDict;
 export type StatePropertyNames =
   | 'answer_groups'
@@ -338,6 +341,14 @@ export class ChangeListService {
     return this.explorationChangeList.every(
       change => change.cmd === 'update_voiceovers'
     );
+  }
+
+  doesChangeListAffectAutoVoiceovers(): boolean {
+    // The following commands affect auto generated voiceovers.
+    let changeCmds = ['edit_state_property', 'edit_translation'];
+    return this.explorationChangeList.some(change => {
+      return changeCmds.includes(change.cmd);
+    });
   }
 
   getTranslationChangeList(): ExplorationChange[] {

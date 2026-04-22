@@ -37,6 +37,15 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {MatTableModule} from '@angular/material/table';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {CloudTaskRun} from 'domain/cloud-task/cloud-task-run.model';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    EnableBackgroundVoiceoverSynthesis: {
+      isEnabled: true,
+    },
+  };
+}
 
 class MockNgbModal {
   open() {
@@ -52,6 +61,7 @@ describe('Voiceover Admin Page component ', () => {
   let voiceoverBackendApiService: VoiceoverBackendApiService;
   let ngbModal: NgbModal;
   let languageUtilService: LanguageUtilService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -70,6 +80,10 @@ describe('Voiceover Admin Page component ', () => {
         {
           provide: NgbModal,
           useClass: MockNgbModal,
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -308,6 +322,8 @@ describe('Voiceover Admin Page component ', () => {
         'hi-IN': true,
       },
     });
+    flush();
+    discardPeriodicTasks();
   }));
 
   it('should not update cloud supported language accent codes when modal is cancelled', () => {
@@ -387,6 +403,23 @@ describe('Voiceover Admin Page component ', () => {
     expect(component.cloudTaskRunList).toEqual(cloudTaskRun);
   }));
 
+  it('should be able to handle reject callback while fetching voiceover regeneration records', fakeAsync(() => {
+    component.range.value.start = new Date('2025-01-01T00:00:00Z');
+    component.range.value.end = new Date('2025-01-01T00:00:00Z');
+    component.cloudTaskRunList = [];
+
+    spyOn(
+      voiceoverBackendApiService,
+      'fetchVoiceoverRegenerationRecordAsync'
+    ).and.returnValue(Promise.reject());
+
+    component.fetchVoiceoverRegenerationRecord();
+    tick();
+    flush();
+
+    expect(component.cloudTaskRunList).toEqual([]);
+  }));
+
   it('should be able to open cloud regeneration record modal', () => {
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {},
@@ -395,5 +428,106 @@ describe('Voiceover Admin Page component ', () => {
 
     component.openCloudTaskRunDetailModal('cloudTaskRunId');
     expect(ngbModal.open).toHaveBeenCalled();
+  });
+
+  it('should be able to successfully close the exploration data response container', () => {
+    component.isExplorationDataResponseContainerShown = true;
+    component.explorationIDForVoiceoverRegeneration = 'exp123';
+    component.explorationTitleForVoiceoverRegeneration = 'Test Exploration';
+
+    component.closeExpDataResponseContainer();
+
+    expect(component.isExplorationDataResponseContainerShown).toBe(false);
+    expect(component.explorationIDForVoiceoverRegeneration).toBe('');
+    expect(component.explorationTitleForVoiceoverRegeneration).toBeNull();
+  });
+
+  it('should be able to update language accent for voiceover regeneration', () => {
+    component.selectedLanguageAccentForExplorationVoiceoverRegeneration = null;
+
+    component.updateLanguageAccentForVoiceoverRegenerationChoice('en-US');
+
+    expect(
+      component.selectedLanguageAccentForExplorationVoiceoverRegeneration
+    ).toBe('en-US');
+  });
+
+  it('should be able to generate voiceover for an exploration', fakeAsync(() => {
+    spyOn(
+      voiceoverBackendApiService,
+      'regenerateVoiceoversForExplorationAsync'
+    );
+
+    component.explorationIDForVoiceoverRegeneration = 'exp123';
+    component.selectedLanguageAccentForExplorationVoiceoverRegeneration =
+      'en-US';
+
+    component.generateVoiceoversForExploration();
+    tick();
+    flush();
+    discardPeriodicTasks();
+
+    expect(
+      voiceoverBackendApiService.regenerateVoiceoversForExplorationAsync
+    ).toHaveBeenCalledWith('exp123', 'en-US');
+  }));
+
+  it('should be able to fetch exploration data for voiceover regeneration', fakeAsync(() => {
+    let response = {
+      explorationData: {
+        explorationTitle: 'Test Exploration',
+        autogeneratableLanguageAccentCodes: ['en-US', 'hi-IN'],
+      },
+      responseMessage: null,
+    };
+    spyOn(
+      voiceoverBackendApiService,
+      'fetchExplorationDataForVoiceoverAsync'
+    ).and.returnValue(Promise.resolve(response));
+    component.languageAccentCodesToDescriptionsMasterList = {
+      'en-US': 'English (United States)',
+      'hi-IN': 'Hindi (India)',
+    };
+
+    component.autogeneratableLanguageAccentCodes = [];
+    component.explorationTitleForVoiceoverRegeneration = null;
+    component.explorationIDForVoiceoverRegeneration = 'exp123';
+
+    component.fetchExplorationDataForVoiceoverRegeneration();
+    tick();
+    flush();
+
+    expect(component.autogeneratableLanguageAccentCodes).toEqual([
+      'en-US',
+      'hi-IN',
+    ]);
+    expect(component.explorationTitleForVoiceoverRegeneration).toBe(
+      'Test Exploration'
+    );
+  }));
+
+  it('should get frontend function id text', () => {
+    const functionId1 = 'regenerate_voiceovers_on_exploration_update';
+    const expectedText1 = 'Exploration content updated';
+    expect(component.getFunctionIdText(functionId1)).toBe(expectedText1);
+
+    const functionId2 = 'regenerate_voiceovers_on_exploration_added_to_topic';
+    const expectedText2 = 'Exploration added to topic';
+    expect(component.getFunctionIdText(functionId2)).toBe(expectedText2);
+
+    const functionId3 =
+      'regenerate_voiceovers_of_exploration_for_given_language_accent';
+    const expectedText3 = 'Regeneration from voiceover admin page';
+    expect(component.getFunctionIdText(functionId3)).toBe(expectedText3);
+
+    const functionId4 = 'regenerate_voiceovers_for_batch_contents';
+    const expectedText4 = 'Batch regeneration details';
+    expect(component.getFunctionIdText(functionId4)).toBe(expectedText4);
+
+    const functionId5 = 'regenerate_voiceovers_after_accepting_suggestion';
+    const expectedText5 = 'Regeneration after accepting translation';
+    expect(component.getFunctionIdText(functionId5)).toBe(expectedText5);
+
+    expect(component.getFunctionIdText('unknown_function_id')).toBe('');
   });
 });

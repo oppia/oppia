@@ -57,7 +57,7 @@
       <div class="recommendation-card">
         <svg width="192" height="150" class="recommendation-card-svg">
           <title>Study Guide</title>
-          <a [attr.href]="getStudyTabUrl()">
+          <a [attr.href]="getStudyTabUrl()" class="e2e-test-study-guide-recommendation-link" >
             <rect width="192"
                   height="150"
                   [attr.fill]="'#be563c'">
@@ -72,7 +72,7 @@
           </a>
         </svg>
       </div>
-      <p class="fst-italic">
+      <p class="fst-italic e2e-test-study-guide-recommendation-text">
         {{ 'I18N_END_CHAPTER_STUDY_GUIDE_TEXT' | translate }}
       </p>
     </div>

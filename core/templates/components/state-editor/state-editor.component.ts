@@ -203,7 +203,7 @@ export class StateEditorComponent implements OnInit, OnDestroy {
 
     this.directiveSubscriptions.add(
       this.stateEditorService.onStateEditorInitialized.subscribe(stateData => {
-        if (stateData === undefined || $.isEmptyObject(stateData)) {
+        if (!stateData || Object.keys(stateData).length === 0) {
           throw new Error(
             'Expected stateData to be defined but ' + 'received ' + stateData
           );
@@ -226,9 +226,11 @@ export class StateEditorComponent implements OnInit, OnDestroy {
           this.stateName,
           stateData.interaction.hints
         );
+        // TODO(#25231): InteractionBackendDict.id should use
+        // InteractionSpecsKey instead of string.
         this.stateInteractionIdService.init(
           this.stateName,
-          stateData.interaction.id
+          stateData.interaction.id as InteractionSpecsKey
         );
         this.stateCustomizationArgsService.init(
           this.stateName,
