@@ -486,7 +486,7 @@ export class ExplorationStatesService {
       this.changeListService.editStateProperty(
         stateName,
         backendName,
-        newBackendValue as StatePropertyValues,
+        newBackendValue,
         oldBackendValue
       );
 
@@ -513,9 +513,12 @@ export class ExplorationStatesService {
 
   private _getBackendValue(
     backendName: StatePropertyNames,
-    value: StatePropertyValues
+    value: StatePropertyValues | null
   ): StatePropertyDictValues {
     if (this._isBackendConversionName(backendName)) {
+      if (value === null) {
+        return null as unknown as StatePropertyDictValues;
+      }
       return this.convertToBackendRepresentation(value, backendName);
     }
 
