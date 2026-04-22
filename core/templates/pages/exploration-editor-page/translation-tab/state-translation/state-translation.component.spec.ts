@@ -227,7 +227,7 @@ describe('State translation component', () => {
       param_changes: [],
       solicit_answer_details: false,
     },
-  } as StateObjectsBackendDict;
+  } as unknown as StateObjectsBackendDict;
 
   let refreshStateTranslationEmitter = new EventEmitter();
 
@@ -301,14 +301,17 @@ describe('State translation component', () => {
     explorationStatesService.init(explorationState1, false);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
-    entityTranslationsService.entityTranslation =
-      EntityTranslation.createFromBackendDict({
-        entity_id: 'exp1',
-        entity_type: 'exploration',
-        entity_version: 5,
-        language_code: 'hi',
-        translations: {},
-      });
+    (
+      entityTranslationsService as unknown as {
+        entityTranslation: EntityTranslation;
+      }
+    ).entityTranslation = EntityTranslation.createFromBackendDict({
+      entity_id: 'exp1',
+      entity_type: 'exploration',
+      entity_version: 5,
+      language_code: 'hi',
+      translations: {},
+    });
 
     spyOnProperty(
       stateEditorService,
@@ -693,8 +696,9 @@ describe('State translation component', () => {
             AnswerGroup.createNew(
               [],
               Outcome.createNew('unused', '1', 'Feedback text', []),
-              Outcome.createNew('unused', '1', 'Feedback text', []),
-              null,
+              // Outcome.createNew('unused', '1', 'Feedback text', []),
+              // null,
+              [],
               '0'
             ),
             '1',
@@ -832,7 +836,7 @@ describe('State translation component', () => {
       param_changes: [],
       solicit_answer_details: false,
     },
-  } as StateObjectsBackendDict;
+  } as unknown as StateObjectsBackendDict;
 
   let refreshStateTranslationEmitter = new EventEmitter();
   let showTranslationTabBusyModalEmitter = new EventEmitter();
@@ -908,14 +912,17 @@ describe('State translation component', () => {
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
-    entityTranslationsService.entityTranslation =
-      EntityTranslation.createFromBackendDict({
-        entity_id: 'exp1',
-        entity_type: 'exploration',
-        entity_version: 5,
-        language_code: 'hi',
-        translations: {},
-      });
+    (
+      entityTranslationsService as unknown as {
+        entityTranslation: EntityTranslation;
+      }
+    ).entityTranslation = EntityTranslation.createFromBackendDict({
+      entity_id: 'exp1',
+      entity_type: 'exploration',
+      entity_version: 5,
+      language_code: 'hi',
+      translations: {},
+    });
     spyOnProperty(
       stateEditorService,
       'onRefreshStateTranslation'
@@ -1245,7 +1252,7 @@ describe('State translation component', () => {
       param_changes: [],
       solicit_answer_details: false,
     },
-  } as StateObjectsBackendDict;
+  } as unknown as StateObjectsBackendDict;
 
   let explorationState2 = {
     Introduction: {
@@ -1309,7 +1316,7 @@ describe('State translation component', () => {
       param_changes: [],
       solicit_answer_details: false,
     },
-  } as StateObjectsBackendDict;
+  } as unknown as StateObjectsBackendDict;
 
   let refreshStateTranslationEmitter = new EventEmitter();
 
@@ -1385,14 +1392,17 @@ describe('State translation component', () => {
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
-    entityTranslationsService.entityTranslation =
-      EntityTranslation.createFromBackendDict({
-        entity_id: 'exp1',
-        entity_type: 'exploration',
-        entity_version: 5,
-        language_code: 'hi',
-        translations: {},
-      });
+    (
+      entityTranslationsService as unknown as {
+        entityTranslation: EntityTranslation;
+      }
+    ).entityTranslation = EntityTranslation.createFromBackendDict({
+      entity_id: 'exp1',
+      entity_type: 'exploration',
+      entity_version: 5,
+      language_code: 'hi',
+      translations: {},
+    });
 
     spyOnProperty(
       stateEditorService,
@@ -1441,9 +1451,13 @@ describe('State translation component', () => {
   });
 
   it('should update correct translation with updateTranslatedContent', () => {
-    component.activeTranslatedContent = new TranslatedContent();
+    component.activeTranslatedContent = new TranslatedContent(
+      '',
+      'html',
+      false
+    );
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
-      new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
+      new EntityTranslation('entityId', 'entityType', 5, 'hi', {
         content_0: new TranslatedContent('Translated HTML', 'html', true),
       });
 
@@ -1530,7 +1544,7 @@ describe('State translation component', () => {
 
   it('should return translation html when translation available', () => {
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
-      new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
+      new EntityTranslation('entityId', 'entityType', 5, 'hi', {
         content_0: new TranslatedContent('Translated HTML', 'html', true),
       });
 
@@ -1543,7 +1557,7 @@ describe('State translation component', () => {
 
   it('should return unicode when translation is empty in voiceover mode', () => {
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
-      new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
+      new EntityTranslation('entityId', 'entityType', 5, 'hi', {
         content_0: new TranslatedContent('Translated unicode', 'unicode', true),
       });
     let subtitledObject = SubtitledUnicode.createFromBackendDict({
@@ -1556,7 +1570,7 @@ describe('State translation component', () => {
 
   it('should return translation html when translation no available', () => {
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
-      new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
+      new EntityTranslation('entityId', 'entityType', 5, 'hi', {
         content_1: new TranslatedContent('Translated HTML', 'html', true),
       });
 
@@ -1569,7 +1583,7 @@ describe('State translation component', () => {
 
   it('should return translated unicode in voiceover mode when translation exist', () => {
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
-      new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
+      new EntityTranslation('entityId', 'entityType', 5, 'hi', {
         content_1: new TranslatedContent('Translated UNICODE', 'unicode', true),
       });
     let subtitledObject = SubtitledUnicode.createFromBackendDict({
@@ -1748,7 +1762,7 @@ describe('State translation component', () => {
 
     it('should return correct index for card of type custom args', () => {
       component.interactionCustomizationArgTranslatableContent =
-        mockinteractionCustomizationArgTranslatableContent;
+        mockinteractionCustomizationArgTranslatableContent as unknown as typeof component.interactionCustomizationArgTranslatableContent;
       component.activeTab = 'ca';
       component.initActiveContentId = 'ca_1';
 
@@ -1915,7 +1929,7 @@ describe('State translation component', () => {
       param_changes: [],
       solicit_answer_details: false,
     },
-  } as StateObjectsBackendDict;
+  } as unknown as StateObjectsBackendDict;
 
   let explorationState4 = {
     Introduction: {
@@ -1948,7 +1962,7 @@ describe('State translation component', () => {
       param_changes: [],
       solicit_answer_details: false,
     },
-  } as StateObjectsBackendDict;
+  } as unknown as StateObjectsBackendDict;
 
   let refreshStateTranslationEmitter = new EventEmitter();
 
@@ -2108,7 +2122,7 @@ describe('State translation component', () => {
         component.TAB_ID_CONTENT = 'some_id';
         component.stateInteractionId = null;
 
-        expect(component.isDisabled('any')).toBeTrue();
+        expect(component.isDisabled('any')).toBe(true);
       });
 
       it('should correctly identify RTL languages', () => {

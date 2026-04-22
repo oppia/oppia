@@ -62,45 +62,45 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
   templateUrl: './state-translation.component.html',
 })
 export class StateTranslationComponent implements OnInit, OnDestroy {
-  @Input() isTranslationTabBusy: boolean;
+  @Input() isTranslationTabBusy!: boolean;
 
   directiveSubscriptions = new Subscription();
 
   INTERACTION_SPECS = INTERACTION_SPECS;
-  activatedTabId: string;
-  activeAnswerGroupIndex: number;
-  stateAnswerGroups: AnswerGroup[];
-  RULE_INPUT_TYPES_TO_DATA_FORMATS: object;
-  TAB_ID_RULE_INPUTS: string;
-  stateContent: SubtitledHtml;
-  stateSolution: Solution | SubtitledHtml;
-  interactionPreviewHtml: string;
-  stateInteractionCustomizationArgs: InteractionCustomizationArgs;
-  activeCustomizationArgContentIndex: number;
-  activeRuleContentIndex: number;
-  activeHintIndex: number;
-  stateHints: Hint[];
-  stateName: string;
-  needsUpdateTooltipMessage: string;
-  stateInteractionId: string;
-  TAB_ID_CUSTOMIZATION_ARGS: string;
-  TAB_ID_SOLUTION: string;
-  TAB_ID_FEEDBACK: string;
-  TAB_ID_HINTS: string;
-  TAB_ID_CONTENT: string;
-  stateDefaultOutcome: Outcome;
-  answerChoices: AnswerChoice[];
-  activeTranslatedContent: TranslatedContent;
-  activeTab: string;
-  initActiveContentId: string | null;
-  initActiveIndex: number;
-  interactionRuleTranslatableContents: {
+  activatedTabId!: string;
+  activeAnswerGroupIndex!: number | null;
+  stateAnswerGroups!: AnswerGroup[];
+  RULE_INPUT_TYPES_TO_DATA_FORMATS!: Record<string, string>;
+  TAB_ID_RULE_INPUTS!: string;
+  stateContent!: SubtitledHtml;
+  stateSolution!: Solution | SubtitledHtml;
+  interactionPreviewHtml!: string;
+  stateInteractionCustomizationArgs!: InteractionCustomizationArgs;
+  activeCustomizationArgContentIndex!: number;
+  activeRuleContentIndex!: number;
+  activeHintIndex!: number | null;
+  stateHints!: Hint[];
+  stateName!: string;
+  needsUpdateTooltipMessage!: string;
+  stateInteractionId!: string | null;
+  TAB_ID_CUSTOMIZATION_ARGS!: string;
+  TAB_ID_SOLUTION!: string;
+  TAB_ID_FEEDBACK!: string;
+  TAB_ID_HINTS!: string;
+  TAB_ID_CONTENT!: string;
+  stateDefaultOutcome!: Outcome;
+  answerChoices!: AnswerChoice[] | null;
+  activeTranslatedContent!: TranslatedContent | null;
+  activeTab!: string;
+  initActiveContentId: string | null = null;
+  initActiveIndex!: number;
+  interactionRuleTranslatableContents!: {
     rule: Rule;
     inputName: string;
     contentId: string;
   }[];
 
-  interactionCustomizationArgTranslatableContent: {
+  interactionCustomizationArgTranslatableContent!: {
     name: string;
     content: SubtitledUnicode | SubtitledHtml;
   }[];
@@ -144,6 +144,9 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       return subtitledHtml.html;
     }
 
+    if (!subtitledHtml.contentId) {
+      return subtitledHtml.html;
+    }
     let translationContent =
       this.entityTranslationsService.languageCodeToLatestEntityTranslations[
         langCode
@@ -169,6 +172,9 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       return SubtitledUnicode.unicode;
     }
 
+    if (!SubtitledUnicode.contentId) {
+      return SubtitledUnicode.unicode;
+    }
     let translationContent =
       this.entityTranslationsService.languageCodeToLatestEntityTranslations[
         langCode
@@ -262,10 +268,12 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       activeDataFormat = this.RULE_INPUT_TYPES_TO_DATA_FORMATS[inputType];
       this.activeRuleContentIndex = 0;
     }
-    this.translationTabActiveContentIdService.setActiveContent(
-      activeContentId,
-      activeDataFormat
-    );
+    if (activeContentId) {
+      this.translationTabActiveContentIdService.setActiveContent(
+        activeContentId,
+        activeDataFormat
+      );
+    }
     this.activatedTabId = tabId;
     this.updateTranslatedContent();
   }
@@ -277,29 +285,33 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         this.entityTranslationsService.languageCodeToLatestEntityTranslations[
           langCode
         ];
-      if (entityTranslations) {
-        this.activeTranslatedContent = entityTranslations.getWrittenTranslation(
-          this.translationTabActiveContentIdService.getActiveContentId()
-        );
+      const contentId =
+        this.translationTabActiveContentIdService.getActiveContentId();
+      if (entityTranslations && contentId) {
+        this.activeTranslatedContent =
+          entityTranslations.getWrittenTranslation(contentId);
       }
     }
   }
 
   getHumanReadableRuleInputValues(
-    inputValue: {normalizedStrSet: string[]; unicodeStrSet: string[]},
+    inputValue: {
+      normalizedStrSet: string[] | null;
+      unicodeStrSet: string[] | null;
+    } | null,
     inputType: string
   ): string {
     if (inputType === 'TranslatableSetOfNormalizedString') {
-      return '[' + inputValue.normalizedStrSet.join(', ') + ']';
+      return '[' + (inputValue?.normalizedStrSet || []).join(', ') + ']';
     } else if (inputType === 'TranslatableSetOfUnicodeString') {
-      return '[' + inputValue.unicodeStrSet.join(', ') + ']';
+      return '[' + (inputValue?.unicodeStrSet || []).join(', ') + ']';
     } else {
       throw new Error(`The ${inputType} type is not implemented.`);
     }
   }
 
   summarizeDefaultOutcome(
-    defaultOutcome: Outcome,
+    defaultOutcome: Outcome | null,
     interactionId: string,
     answerGroupCount: number,
     shortenRule: string
@@ -311,8 +323,16 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     let summary = '';
     let hasFeedback = defaultOutcome.hasNonemptyFeedback();
 
-    if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
-      summary = INTERACTION_SPECS[interactionId].default_outcome_heading;
+    const specs = INTERACTION_SPECS as unknown as Record<
+      string,
+      {
+        is_linear: boolean;
+        default_outcome_heading: string | null;
+        is_terminal: boolean;
+      }
+    >;
+    if (interactionId && specs[interactionId].is_linear) {
+      summary = specs[interactionId].default_outcome_heading || '';
     } else if (answerGroupCount > 0) {
       summary = 'All other answers';
     } else {
@@ -339,7 +359,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   summarizeAnswerGroup(
     answerGroup: AnswerGroup,
     interactionId: string,
-    answerChoices: AnswerChoice[],
+    answerChoices: AnswerChoice[] | null,
     shortenRule: boolean
   ): string {
     let summary = '';
@@ -382,11 +402,15 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     // interaction. An exception is if the interaction contains
     // translatable customization arguments -- e.g. Continue
     // interaction's placeholder.
+    const specs = INTERACTION_SPECS as Record<
+      string,
+      {is_linear: boolean; is_terminal: boolean}
+    >;
     if (
       tabId !== this.TAB_ID_CUSTOMIZATION_ARGS &&
       (!this.stateInteractionId ||
-        INTERACTION_SPECS[this.stateInteractionId].is_linear ||
-        INTERACTION_SPECS[this.stateInteractionId].is_terminal)
+        specs[this.stateInteractionId].is_linear ||
+        specs[this.stateInteractionId].is_terminal)
     ) {
       return true;
     } else if (tabId === this.TAB_ID_FEEDBACK) {
@@ -412,6 +436,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     } else if (tabId === this.TAB_ID_RULE_INPUTS) {
       return this.interactionRuleTranslatableContents.length === 0;
     }
+    return false;
   }
 
   changeActiveHintIndex(newIndex: number): void {
@@ -426,10 +451,12 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
     this.activeHintIndex = newIndex;
     let activeContentId = this.stateHints[newIndex].hintContent.contentId;
-    this.translationTabActiveContentIdService.setActiveContent(
-      activeContentId,
-      TRANSLATION_DATA_FORMAT_HTML
-    );
+    if (activeContentId) {
+      this.translationTabActiveContentIdService.setActiveContent(
+        activeContentId,
+        TRANSLATION_DATA_FORMAT_HTML
+      );
+    }
     this.updateTranslatedContent();
   }
 
@@ -476,10 +503,12 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       activeDataFormat = TRANSLATION_DATA_FORMAT_HTML;
     }
 
-    this.translationTabActiveContentIdService.setActiveContent(
-      activeContentId,
-      activeDataFormat
-    );
+    if (activeContentId && activeDataFormat) {
+      this.translationTabActiveContentIdService.setActiveContent(
+        activeContentId,
+        activeDataFormat
+      );
+    }
     this.activeCustomizationArgContentIndex = newIndex;
     this.updateTranslatedContent();
   }
@@ -491,7 +520,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     }
 
     if (this.activeAnswerGroupIndex !== newIndex) {
-      let activeContentId = null;
+      let activeContentId: string | null = null;
       this.activeAnswerGroupIndex = newIndex;
       if (newIndex === this.stateAnswerGroups.length) {
         activeContentId = this.stateDefaultOutcome.feedback.contentId;
@@ -500,10 +529,12 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
           this.stateAnswerGroups[newIndex].outcome.feedback.contentId;
       }
 
-      this.translationTabActiveContentIdService.setActiveContent(
-        activeContentId,
-        TRANSLATION_DATA_FORMAT_HTML
-      );
+      if (activeContentId) {
+        this.translationTabActiveContentIdService.setActiveContent(
+          activeContentId,
+          TRANSLATION_DATA_FORMAT_HTML
+        );
+      }
     }
     this.updateTranslatedContent();
   }
@@ -514,6 +545,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         this.translationStatusService.getActiveStateComponentStatusColor(tabId);
       return {'border-top-color': color};
     }
+    return {};
   }
 
   tabNeedUpdatesStatus(tabId: string): boolean {
@@ -522,6 +554,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         tabId
       );
     }
+    return false;
   }
 
   contentIdNeedUpdates(contentId: string): boolean {
@@ -547,6 +580,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     } else if (subtitledContent instanceof SubtitledUnicode) {
       return subtitledContent.unicode;
     }
+    return '';
   }
 
   getInteractionRuleTranslatableContents(): {
@@ -558,7 +592,11 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       .map(answerGroup => answerGroup.rules)
       .flat();
 
-    const interactionRuleTranslatableContent = [];
+    const interactionRuleTranslatableContent: {
+      rule: Rule;
+      inputName: string;
+      contentId: string;
+    }[] = [];
     allRules.forEach(rule => {
       Object.keys(rule.inputs).forEach(inputName => {
         const ruleInput = rule.inputs[inputName];
@@ -567,11 +605,13 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         // as a key.
         if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
           const contentId = (ruleInput as BaseTranslatableObject).contentId;
-          interactionRuleTranslatableContent.push({
-            rule,
-            inputName,
-            contentId,
-          });
+          if (contentId) {
+            interactionRuleTranslatableContent.push({
+              rule,
+              inputName,
+              contentId,
+            });
+          }
         }
       });
     });
@@ -582,9 +622,12 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   getInteractionCustomizationArgTranslatableContents(
     customizationArgs: InteractionCustomizationArgs
   ): {name: string; content: SubtitledUnicode | SubtitledHtml}[] {
-    const translatableContents = [];
+    const translatableContents: {
+      name: string;
+      content: SubtitledUnicode | SubtitledHtml;
+    }[] = [];
 
-    const camelCaseToSentenceCase = s => {
+    const camelCaseToSentenceCase = (s: string): string => {
       // Lowercase the first letter (edge case for UpperCamelCase).
       s = s.charAt(0).toLowerCase() + s.slice(1);
       // Add a space in front of capital letters.
@@ -614,7 +657,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         Object.keys(value).forEach(key =>
           traverseValueAndRetrieveSubtitledContent(
             `${name} > ${camelCaseToSentenceCase(key)}`,
-            value[key]
+            (value as Record<string, unknown>)[key] as Object
           )
         );
       }
@@ -623,21 +666,19 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     Object.keys(customizationArgs).forEach(caName =>
       traverseValueAndRetrieveSubtitledContent(
         camelCaseToSentenceCase(caName),
-        customizationArgs[caName].value
+        (customizationArgs as Record<string, {value: Object}>)[caName].value
       )
     );
 
     return translatableContents;
   }
 
-  getActiveTab(): string {
+  getActiveTab(): string | null {
     this.initActiveContentId = this.stateEditorService.getInitActiveContentId();
     if (!this.initActiveContentId) {
       return null;
     }
-    const tabName = this.stateEditorService
-      .getInitActiveContentId()
-      .split('_')[0];
+    const tabName = this.initActiveContentId.split('_')[0];
     return tabName === 'default' ? this.TAB_ID_FEEDBACK : tabName;
   }
 
@@ -666,7 +707,11 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   }
 
   initStateTranslation(): void {
-    this.stateName = this.stateEditorService.getActiveStateName();
+    const activeStateName = this.stateEditorService.getActiveStateName();
+    if (!activeStateName) {
+      return;
+    }
+    this.stateName = activeStateName;
     this.stateContent = this.explorationStatesService.getStateContentMemento(
       this.stateName
     );
@@ -685,7 +730,8 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         this.stateName
       );
     this.stateInteractionId =
-      this.explorationStatesService.getInteractionIdMemento(this.stateName);
+      this.explorationStatesService.getInteractionIdMemento(this.stateName) ??
+      '';
     this.stateInteractionCustomizationArgs =
       this.explorationStatesService.getInteractionCustomizationArgsMemento(
         this.stateName
@@ -755,7 +801,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     this.stateHints = [];
     this.stateAnswerGroups = [];
 
-    this.activeTab = this.getActiveTab();
+    this.activeTab = this.getActiveTab() ?? this.TAB_ID_CONTENT;
 
     this.directiveSubscriptions.add(
       this.stateEditorService.onRefreshStateTranslation.subscribe(() =>
