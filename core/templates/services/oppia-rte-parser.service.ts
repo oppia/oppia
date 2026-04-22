@@ -47,7 +47,7 @@ export class OppiaRteNode {
   children: (OppiaRteNode | TextNode)[] = [];
   parent: OppiaRteNode | null = null;
   nodeType: '' | 'component';
-  portal: TemplatePortal;
+  portal!: TemplatePortal;
   constructor(
     public readonly selector: string,
     public attrs: Record<string, string> = {}
@@ -55,7 +55,7 @@ export class OppiaRteNode {
     let t: '' | 'component' = '';
     if (this.selector.startsWith('oppia-noninteractive-')) {
       t = 'component';
-      if (selectorToComponentClassMap[this.selector] === undefined) {
+      if ((selectorToComponentClassMap as any)[this.selector] === undefined) {
         throw new Error('Unexpected tag encountered: ' + selector);
       }
     }
@@ -94,7 +94,7 @@ export class OppiaRteParserService {
       // Create attributes Object from NamedNodeMap.
       for (let i = 0; i < node.attributes.length; i++) {
         attrs[this._convertKebabCaseToCamelCase(node.attributes[i].nodeName)] =
-          node.attributes[i].nodeValue;
+          node.attributes[i].nodeValue || '';
       }
 
       // Check if it an RTE component.
@@ -105,7 +105,7 @@ export class OppiaRteParserService {
       // Check if it is a text node.
       if (Object.keys(node.children).length === 0) {
         const childNode = new OppiaRteNode(tagName, attrs);
-        childNode.children.push(new TextNode(node.textContent));
+        childNode.children.push(new TextNode(node.textContent || ''));
         return childNode;
       }
 
@@ -113,7 +113,10 @@ export class OppiaRteParserService {
       const childNode = new OppiaRteNode(tagName, attrs);
       for (let child = 0; child < max; child++) {
         if (node.childNodes[child].nodeType === 3) {
-          const text = node.childNodes[child].nodeValue.replace(/[\t\n]/g, '');
+          const text = (node.childNodes[child].nodeValue || '').replace(
+            /[\t\n]/g,
+            ''
+          );
           childNode.children.push(new TextNode(text));
           continue;
         }

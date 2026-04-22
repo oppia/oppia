@@ -41,10 +41,10 @@ import '../static/multiple_choice_input.css';
 })
 export class InteractiveMultipleChoiceInputComponent implements OnInit {
   COMPONENT_NAME_RULE_INPUT!: string;
-  @Input() choicesWithValue: string;
-  @Input() showChoicesInShuffledOrderWithValue: string;
-  choices: ChoiceWithIndex[];
-  answer;
+  @Input() choicesWithValue!: string;
+  @Input() showChoicesInShuffledOrderWithValue!: string;
+  choices!: ChoiceWithIndex[];
+  answer!: number | null;
   displayedCard!: StateCard;
   errorMessageI18nKey: string = '';
   recordedVoiceovers!: RecordedVoiceovers;

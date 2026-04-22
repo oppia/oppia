@@ -28,15 +28,17 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
   templateUrl: './music-notes-input-response.component.html',
 })
 export class ResponseMusicNotesInput implements OnInit {
-  @Input() answer;
-  displayedAnswer: string;
+  @Input() answer!: any;
+  displayedAnswer!: string;
 
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
-    let _answer = this.htmlEscaperService.escapedJsonToObj(this.answer);
-    let _notes = [];
-    for (let i = 0; i < Object.keys(_answer).length; i++) {
+    let _answer = this.htmlEscaperService.escapedJsonToObj(this.answer) as {
+      readableNoteName: string;
+    }[];
+    let _notes: string[] = [];
+    for (let i = 0; i < _answer.length; i++) {
       if (_answer[i].readableNoteName) {
         _notes.push(_answer[i].readableNoteName);
       }

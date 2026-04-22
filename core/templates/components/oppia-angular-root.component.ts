@@ -171,19 +171,29 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   @Output() public initialized: EventEmitter<void> = new EventEmitter();
   direction: string = 'ltr';
 
-  static classroomBackendApiService: ClassroomBackendApiService;
-  static pageContextService: PageContextService;
-  static i18nLanguageCodeService: I18nLanguageCodeService;
-  static ngZone: NgZone;
-  static pageTitleService: PageTitleService;
-  static profilePageBackendApiService: ProfilePageBackendApiService;
+  static classroomBackendApiService: ClassroomBackendApiService =
+    null as unknown as ClassroomBackendApiService;
+  static pageContextService: PageContextService =
+    null as unknown as PageContextService;
+  static i18nLanguageCodeService: I18nLanguageCodeService =
+    null as unknown as I18nLanguageCodeService;
+  static ngZone: NgZone = null as unknown as NgZone;
+  static pageTitleService: PageTitleService =
+    null as unknown as PageTitleService;
+  static profilePageBackendApiService: ProfilePageBackendApiService =
+    null as unknown as ProfilePageBackendApiService;
   static rteElementsAreInitialized: boolean = false;
-  static rteHelperService: RteHelperService;
-  static ratingComputationService: RatingComputationService;
-  static reviewTestBackendApiService: ReviewTestBackendApiService;
-  static storyViewerBackendApiService: StoryViewerBackendApiService;
-  static ajsValueProvider: (key: string, value: unknown) => void;
-  static injector: Injector;
+  static rteHelperService: RteHelperService =
+    null as unknown as RteHelperService;
+  static ratingComputationService: RatingComputationService =
+    null as unknown as RatingComputationService;
+  static reviewTestBackendApiService: ReviewTestBackendApiService =
+    null as unknown as ReviewTestBackendApiService;
+  static storyViewerBackendApiService: StoryViewerBackendApiService =
+    null as unknown as StoryViewerBackendApiService;
+  static ajsValueProvider: (key: string, value: unknown) => void =
+    null as unknown as (key: string, value: unknown) => void;
+  static injector: Injector = null as unknown as Injector;
 
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
