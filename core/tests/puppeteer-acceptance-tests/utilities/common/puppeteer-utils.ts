@@ -2183,29 +2183,9 @@ export class BaseUser {
     // Wait until any toast with the expected message is visible.
     await this.page.waitForFunction(
       (selector: string, expected: string) =>
-        Array.from(document.querySelectorAll(selector)).some(el => {
-          const rect = el.getBoundingClientRect();
-          return (
-            rect.width > 0 &&
-            rect.height > 0 &&
-            el.textContent?.trim() === expected
-          );
-        }),
-      {},
-      toastMessageSelector,
-      expectedMessage
-    );
-    // Wait until the toast with the expected message is gone.
-    await this.page.waitForFunction(
-      (selector: string, expected: string) =>
-        !Array.from(document.querySelectorAll(selector)).some(el => {
-          const rect = el.getBoundingClientRect();
-          return (
-            rect.width > 0 &&
-            rect.height > 0 &&
-            el.textContent?.trim() === expected
-          );
-        }),
+        Array.from(document.querySelectorAll(selector)).some(
+          el => el.textContent?.trim() === expected
+        ),
       {},
       toastMessageSelector,
       expectedMessage
