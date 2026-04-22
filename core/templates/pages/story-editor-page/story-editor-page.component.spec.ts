@@ -157,7 +157,10 @@ describe('Story Editor Page Component', () => {
   class MockWindowRef {
     nativeWindow = {
       open: (url: string) => {},
-      addEventListener: (value1, value2) => {},
+      addEventListener: (
+        value1: string,
+        value2: EventListenerOrEventListenerObject
+      ) => {},
     };
   }
 
@@ -231,6 +234,11 @@ describe('Story Editor Page Component', () => {
             description: 'Description',
             thumbnail_filename: 'img.png',
             thumbnail_bg_color: '#a33f40',
+            status: 'Published',
+            planned_publication_date_msecs: 0,
+            last_modified_msecs: 0,
+            first_publication_date_msecs: 0,
+            unpublishing_reason: null,
           },
           {
             id: 'node_3',
@@ -244,6 +252,11 @@ describe('Story Editor Page Component', () => {
             description: 'Description',
             thumbnail_filename: 'img.png',
             thumbnail_bg_color: '#a33f40',
+            status: 'Published',
+            planned_publication_date_msecs: 0,
+            last_modified_msecs: 0,
+            first_publication_date_msecs: 0,
+            unpublishing_reason: null,
           },
         ],
         next_node_id: 'node_4',
@@ -251,9 +264,10 @@ describe('Story Editor Page Component', () => {
       language_code: 'en',
       version: 1,
       corresponding_topic_id: '2',
-      thumbnail_bg_color: null,
-      thumbnail_filename: null,
+      thumbnail_bg_color: '#FFFFFF',
+      thumbnail_filename: 'img.png',
       url_fragment: 'story-url-fragment',
+      meta_tag_content: 'sample meta tag content',
     } as StoryBackendDict);
 
     spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
@@ -303,7 +317,7 @@ describe('Story Editor Page Component', () => {
       spyOn(pageTitleService, 'setDocumentTitle');
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(10);
       spyOn(preventPageUnloadEventService, 'addListener').and.callFake(
-        callback => callback()
+        (callback: () => boolean) => callback()
       );
 
       component.ngOnInit();
@@ -510,7 +524,7 @@ describe('Story Editor Page Component', () => {
       spyOn(pageTitleService, 'setDocumentTitle');
       component.ngOnInit();
 
-      let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo =
+      let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null =
         localStorageService.getEntityEditorBrowserTabsInfo(
           EntityEditorBrowserTabsInfoDomainConstants.OPENED_STORY_EDITOR_BROWSER_TABS,
           story.getId()
@@ -527,7 +541,7 @@ describe('Story Editor Page Component', () => {
         );
 
       expect(storyEditorBrowserTabsInfo).toBeDefined();
-      expect(storyEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
+      expect(storyEditorBrowserTabsInfo!.getNumberOfOpenedTabs()).toEqual(1);
 
       // Opening the second tab.
       storyEditorStateService.onStoryInitialized.emit();
@@ -537,7 +551,7 @@ describe('Story Editor Page Component', () => {
           story.getId()
         );
 
-      expect(storyEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
+      expect(storyEditorBrowserTabsInfo!.getNumberOfOpenedTabs()).toEqual(2);
     }
   );
 
@@ -549,7 +563,7 @@ describe('Story Editor Page Component', () => {
       spyOn(pageTitleService, 'setDocumentTitle');
       component.ngOnInit();
 
-      let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo =
+      let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null =
         localStorageService.getEntityEditorBrowserTabsInfo(
           EntityEditorBrowserTabsInfoDomainConstants.OPENED_STORY_EDITOR_BROWSER_TABS,
           story.getId()
@@ -565,7 +579,7 @@ describe('Story Editor Page Component', () => {
           story.getId()
         );
 
-      expect(storyEditorBrowserTabsInfo.getLatestVersion()).toEqual(1);
+      expect(storyEditorBrowserTabsInfo!.getLatestVersion()).toEqual(1);
 
       // Save some changes on the story and increasing its version.
       story._version = 2;
@@ -576,7 +590,7 @@ describe('Story Editor Page Component', () => {
           story.getId()
         );
 
-      expect(storyEditorBrowserTabsInfo.getLatestVersion()).toEqual(2);
+      expect(storyEditorBrowserTabsInfo!.getLatestVersion()).toEqual(2);
     }
   );
 
@@ -594,23 +608,23 @@ describe('Story Editor Page Component', () => {
       // Opening of the second tab.
       storyEditorStateService.onStoryInitialized.emit();
 
-      let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo =
+      let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null =
         localStorageService.getEntityEditorBrowserTabsInfo(
           EntityEditorBrowserTabsInfoDomainConstants.OPENED_STORY_EDITOR_BROWSER_TABS,
           story.getId()
         );
 
       // Making some unsaved changes on the editor page.
-      storyEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
+      storyEditorBrowserTabsInfo!.setSomeTabHasUnsavedChanges(true);
       localStorageService.updateEntityEditorBrowserTabsInfo(
-        storyEditorBrowserTabsInfo,
+        storyEditorBrowserTabsInfo!,
         EntityEditorBrowserTabsInfoDomainConstants.OPENED_STORY_EDITOR_BROWSER_TABS
       );
 
-      expect(
-        storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
-      ).toBeTrue();
-      expect(storyEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
+      expect(storyEditorBrowserTabsInfo!.doesSomeTabHaveUnsavedChanges()).toBe(
+        true
+      );
+      expect(storyEditorBrowserTabsInfo!.getNumberOfOpenedTabs()).toEqual(2);
 
       component.onClosingStoryEditorBrowserTab();
       storyEditorBrowserTabsInfo =
@@ -619,13 +633,13 @@ describe('Story Editor Page Component', () => {
           story.getId()
         );
 
-      expect(storyEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
+      expect(storyEditorBrowserTabsInfo!.getNumberOfOpenedTabs()).toEqual(1);
 
       // Since the tab containing unsaved changes is closed, the value of
       // unsaved changes status will become false.
-      expect(
-        storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
-      ).toBeFalse();
+      expect(storyEditorBrowserTabsInfo!.doesSomeTabHaveUnsavedChanges()).toBe(
+        false
+      );
     }
   );
 
