@@ -106,6 +106,7 @@ describe('State version history component', () => {
         id: 'TextInput',
       },
       linked_skill_id: null,
+      inapplicable_skill_misconception_ids: null,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
@@ -154,7 +155,7 @@ describe('State version history component', () => {
       'canShowBackwardStateDiffData'
     ).and.returnValue(true);
 
-    expect(component.canShowExploreVersionHistoryButton()).toBeTrue();
+    expect(component.canShowExploreVersionHistoryButton()).toBe(true);
   });
 
   it(

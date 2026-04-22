@@ -29,6 +29,10 @@ import {PencilCodeEditorCustomizationArgs} from 'interactions/customization-args
 import {PencilCodeEditorRulesService} from './pencil-code-editor-rules.service';
 import {PencilCodeResetConfirmation} from './pencil-code-reset-confirmation.component';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {
+  InsertScriptService,
+  KNOWN_SCRIPTS,
+} from 'services/insert-script.service';
 import {Subscription} from 'rxjs';
 
 @Component({
@@ -56,7 +60,8 @@ export class PencilCodeEditor implements OnInit, OnDestroy {
     private interactionAttributesExtractorService: InteractionAttributesExtractorService,
     private ngbModal: NgbModal,
     private playerPositionService: PlayerPositionService,
-    private pencilCodeEditorRulesService: PencilCodeEditorRulesService
+    private pencilCodeEditorRulesService: PencilCodeEditorRulesService,
+    private insertScriptService: InsertScriptService
   ) {}
 
   private _getAttributes() {
@@ -100,176 +105,180 @@ export class PencilCodeEditor implements OnInit, OnDestroy {
       })
     );
 
-    // The iframe may not be immediately available due to asynchronous rendering.
-    // To handle this, we retry checking for its presence up to `maxRetries` times.
-    // If the iframe does not appear within the retry limit, we display an error message.
+    this.insertScriptService.loadScript(KNOWN_SCRIPTS.PENCILCODE, () => {
+      // The iframe may not be immediately available due to asynchronous rendering.
+      // To handle this, we retry checking for its presence up to `maxRetries` times.
+      // If the iframe does not appear within the retry limit, we display an error message.
 
-    const maxRetries = 10;
-    let retryCount = 0;
+      const maxRetries = 10;
+      let retryCount = 0;
 
-    const checkIframe = () => {
-      let iframeElements = this.elementRef.nativeElement.querySelectorAll(
-        '.pencil-code-editor-iframe'
-      );
+      const checkIframe = () => {
+        let iframeElements = this.elementRef.nativeElement.querySelectorAll(
+          '.pencil-code-editor-iframe'
+        );
 
-      if (iframeElements.length > 0) {
-        this.iframeDiv = iframeElements[0] as HTMLElement;
-        this.pce = new PencilCodeEmbed(this.iframeDiv);
-      } else if (retryCount < maxRetries) {
-        retryCount++;
-        setTimeout(checkIframe, 200);
-      } else {
-        this.pencilCodeEditorIsLoaded = true;
-      }
-    };
+        if (iframeElements.length > 0) {
+          this.iframeDiv = iframeElements[0] as HTMLElement;
+          this.pce = new PencilCodeEmbed(this.iframeDiv);
+        } else if (retryCount < maxRetries) {
+          retryCount++;
+          setTimeout(checkIframe, 200);
+          return;
+        } else {
+          this.pencilCodeEditorIsLoaded = true;
+          return;
+        }
 
-    checkIframe();
+        this.interactionIsActive = this.lastAnswer === null;
 
-    this.interactionIsActive = this.lastAnswer === null;
+        const {initialCode} =
+          this.interactionAttributesExtractorService.getValuesFromAttributes(
+            'PencilCodeEditor',
+            this._getAttributes()
+          ) as PencilCodeEditorCustomizationArgs;
+        this.someInitialCode = this.interactionIsActive
+          ? initialCode.value
+          : this.lastAnswer?.code || '';
 
-    const {initialCode} =
-      this.interactionAttributesExtractorService.getValuesFromAttributes(
-        'PencilCodeEditor',
-        this._getAttributes()
-      ) as PencilCodeEditorCustomizationArgs;
-    this.someInitialCode = this.interactionIsActive
-      ? initialCode.value
-      : this.lastAnswer?.code || '';
+        this.pce.beginLoad(this.someInitialCode);
+        this.pce.on('load', () => {
+          // Hides the error console at the bottom right, and prevents it
+          // from showing up even if the code has an error. Also, hides the
+          // turtle, and redefines say() to also write the text on the
+          // screen.
+          this.pce.setupScript([
+            {
+              code: [
+                'window.onerror = function() {',
+                '  return true;',
+                '};',
+                'debug.hide();',
+                'window.removeEventListener("error", debug)',
+                '',
+                'ht();',
+                '',
+                'oldsay = window.say',
+                'say = function(x) {',
+                '  write(x);',
+                '  oldsay(x);',
+                '};',
+              ].join('\n'),
+              type: 'text/javascript',
+            },
+          ]);
 
-    this.pce.beginLoad(this.someInitialCode);
-    this.pce.on('load', () => {
-      // Hides the error console at the bottom right, and prevents it
-      // from showing up even if the code has an error. Also, hides the
-      // turtle, and redefines say() to also write the text on the
-      // screen.
-      this.pce.setupScript([
-        {
-          code: [
-            'window.onerror = function() {',
-            '  return true;',
-            '};',
-            'debug.hide();',
-            'window.removeEventListener("error", debug)',
-            '',
-            'ht();',
-            '',
-            'oldsay = window.say',
-            'say = function(x) {',
-            '  write(x);',
-            '  oldsay(x);',
-            '};',
-          ].join('\n'),
-          type: 'text/javascript',
-        },
-      ]);
-
-      this.pce.showEditor();
-      this.pce.hideToggleButton();
-      if (this.interactionIsActive) {
-        this.pce.setEditable();
-      } else {
-        this.pce.hideMiddleButton();
-        this.pce.setReadOnly();
-      }
-
-      // Pencil Code automatically takes the focus on load, so we clear
-      // it.
-      this.focusManagerService.clearFocus();
-    });
-
-    let errorIsHappening = false;
-    let hasSubmittedAnswer = false;
-
-    this.pce.on('startExecute', () => {
-      hasSubmittedAnswer = false;
-    });
-
-    // Handles submission of the user's code execution result.
-    // Used in both 'execute' and 'registerCurrentInteraction()' to ensure consistency.
-    let submitInteractionAnswer = () => {
-      // Prevents submission if an error has occurred or an answer has already been submitted.
-      if (errorIsHappening || hasSubmittedAnswer) {
-        return;
-      }
-
-      // Evaluates the code inside the Pencil Code iframe's context.
-      // The first argument 'document.body.innerHTML' retrieves the current
-      // HTML output generated by the user's code execution.
-      // PencilCode sanitizes user input, ensuring security.
-      this.pce.eval(
-        'document.body.innerHTML', // disable-bad-pattern-check
-        (pencilCodeHtml: string) => {
-          // Normalize the user's inputted code (e.g., replace tabs with spaces).
-          let normalizedCode = this.getNormalizedCode();
-
-          // Extract all div elements from the executed output to get the textual content.
-          let temp = document.createElement('div');
-
-          // `pencilCodeHtml` is a string representing the raw HTML content inside
-          // the output frame. We convert it into an element to access and extract
-          // textual content from all the `div` elements present.
-          // eslint-disable-next-line oppia/no-inner-html
-          temp.innerHTML = pencilCodeHtml;
-
-          let output: string = '';
-          let htmlObject = temp.querySelectorAll('div');
-
-          // Loop through each div element to extract its inner text.
-          for (let i = 0; i < htmlObject.length; i++) {
-            // eslint-disable-next-line oppia/no-inner-html
-            output += htmlObject[i].innerHTML + '\n';
+          this.pce.showEditor();
+          this.pce.hideToggleButton();
+          if (this.interactionIsActive) {
+            this.pce.setEditable();
+          } else {
+            this.pce.hideMiddleButton();
+            this.pce.setReadOnly();
           }
 
-          // Mark the answer as submitted to prevent duplicate submissions.
+          // Pencil Code automatically takes the focus on load, so we clear
+          // it.
+          this.focusManagerService.clearFocus();
+        });
+
+        let errorIsHappening = false;
+        let hasSubmittedAnswer = false;
+
+        this.pce.on('startExecute', () => {
+          hasSubmittedAnswer = false;
+        });
+
+        // Handles submission of the user's code execution result.
+        // Used in both 'execute' and 'registerCurrentInteraction()' to ensure consistency.
+        let submitInteractionAnswer = () => {
+          // Prevents submission if an error has occurred or an answer has already been submitted.
+          if (errorIsHappening || hasSubmittedAnswer) {
+            return;
+          }
+
+          // Evaluates the code inside the Pencil Code iframe's context.
+          // The first argument 'document.body.innerHTML' retrieves the current
+          // HTML output generated by the user's code execution.
+          // PencilCode sanitizes user input, ensuring security.
+          this.pce.eval(
+            'document.body.innerHTML', // disable-bad-pattern-check
+            (pencilCodeHtml: string) => {
+              // Normalize the user's inputted code (e.g., replace tabs with spaces).
+              let normalizedCode = this.getNormalizedCode();
+
+              // Extract all div elements from the executed output to get the textual content.
+              let temp = document.createElement('div');
+
+              // `pencilCodeHtml` is a string representing the raw HTML content inside
+              // the output frame. We convert it into an element to access and extract
+              // textual content from all the `div` elements present.
+              // eslint-disable-next-line oppia/no-inner-html
+              temp.innerHTML = pencilCodeHtml;
+
+              let output: string = '';
+              let htmlObject = temp.querySelectorAll('div');
+
+              // Loop through each div element to extract its inner text.
+              for (let i = 0; i < htmlObject.length; i++) {
+                // eslint-disable-next-line oppia/no-inner-html
+                output += htmlObject[i].innerHTML + '\n';
+              }
+
+              // Mark the answer as submitted to prevent duplicate submissions.
+              hasSubmittedAnswer = true;
+
+              // Submit the extracted code and its output to the current interaction service,
+              // which handles storing the response and validating it against rules.
+              this.currentInteractionService.onSubmit(
+                {
+                  code: normalizedCode,
+                  output: output || '',
+                  evaluation: '',
+                  error: '',
+                },
+                this.pencilCodeEditorRulesService
+              );
+            },
+            // Execute evaluation within the iframe context.
+            true
+          );
+        };
+
+        this.pce.on('execute', submitInteractionAnswer);
+
+        this.pce.on('error', (error: {message: string}) => {
+          if (hasSubmittedAnswer) {
+            return;
+          }
+          let normalizedCode = this.getNormalizedCode();
+
+          errorIsHappening = true;
           hasSubmittedAnswer = true;
 
-          // Submit the extracted code and its output to the current interaction service,
-          // which handles storing the response and validating it against rules.
           this.currentInteractionService.onSubmit(
             {
               code: normalizedCode,
-              output: output || '',
+              output: '',
               evaluation: '',
-              error: '',
+              error: error.message,
             },
             this.pencilCodeEditorRulesService
           );
-        },
-        // Execute evaluation within the iframe context.
-        true
-      );
-    };
 
-    this.pce.on('execute', submitInteractionAnswer);
+          setTimeout(() => {
+            errorIsHappening = false;
+          }, 1000);
+        });
 
-    this.pce.on('error', (error: {message: string}) => {
-      if (hasSubmittedAnswer) {
-        return;
-      }
-      let normalizedCode = this.getNormalizedCode();
+        this.currentInteractionService.registerCurrentInteraction(
+          submitInteractionAnswer,
+          null
+        );
+      };
 
-      errorIsHappening = true;
-      hasSubmittedAnswer = true;
-
-      this.currentInteractionService.onSubmit(
-        {
-          code: normalizedCode,
-          output: '',
-          evaluation: '',
-          error: error.message,
-        },
-        this.pencilCodeEditorRulesService
-      );
-
-      setTimeout(() => {
-        errorIsHappening = false;
-      }, 1000);
+      checkIframe();
     });
-
-    this.currentInteractionService.registerCurrentInteraction(
-      submitInteractionAnswer,
-      null
-    );
   }
 
   ngOnDestroy(): void {
