@@ -217,6 +217,68 @@ describe('Exploration Html Formatter Service', () => {
     }
   );
 
+  it(
+    'should not replace slash with division sign in answer HTML for ' +
+      'NumericExpressionInput when useFractionForDivision is true',
+    () => {
+      const interactionId = 'NumericExpressionInput';
+      const answer = '2/5';
+      const interactionCustomizationArgs = {
+        useFractionForDivision: true,
+        placeholder: {value: new SubtitledUnicode('', '')},
+      };
+      const expectedHtmlTag =
+        '<oppia-response-numeric-expression-input ' +
+        'answer="&amp;quot;2/5&amp;quot;">' +
+        '</oppia-response-numeric-expression-input>';
+
+      expect(
+        ehfs.getAnswerHtml(answer, interactionId, interactionCustomizationArgs)
+      ).toBe(expectedHtmlTag);
+    }
+  );
+
+  it(
+    'should support object-shaped useFractionForDivision in answer HTML ' +
+      'for NumericExpressionInput',
+    () => {
+      const interactionId = 'NumericExpressionInput';
+      const answer = '2/5';
+      const interactionCustomizationArgs = {
+        useFractionForDivision: {value: false},
+        placeholder: {value: new SubtitledUnicode('', '')},
+      };
+      const expectedHtmlTag =
+        '<oppia-response-numeric-expression-input ' +
+        'answer="&amp;quot;2÷5&amp;quot;">' +
+        '</oppia-response-numeric-expression-input>';
+
+      // This throws "Type '{ value: boolean; }' is not assignable to type
+      // 'boolean'". We need to suppress this error because runtime data can
+      // still be object-shaped for this customization arg.
+      // @ts-expect-error
+      expect(
+        ehfs.getAnswerHtml(answer, interactionId, interactionCustomizationArgs)
+      ).toBe(expectedHtmlTag);
+    }
+  );
+
+  it('should not replace answer when NumericExpressionInput answer is non-string', () => {
+    const interactionId = 'NumericExpressionInput';
+    const answer = 5;
+    const interactionCustomizationArgs = {
+      useFractionForDivision: false,
+      placeholder: {value: new SubtitledUnicode('', '')},
+    };
+    const expectedHtmlTag =
+      '<oppia-response-numeric-expression-input ' +
+      'answer="5"></oppia-response-numeric-expression-input>';
+
+    expect(
+      ehfs.getAnswerHtml(answer, interactionId, interactionCustomizationArgs)
+    ).toBe(expectedHtmlTag);
+  });
+
   it('should throw error when interaction id is null', () => {
     expect(() => {
       ehfs.getAnswerHtml('sampleAnswer', null, {});
@@ -263,6 +325,35 @@ describe('Exploration Html Formatter Service', () => {
         'answer="&amp;quot;2÷5&amp;quot;">' +
         '</oppia-short-response-numeric-expression-input>';
 
+      expect(
+        ehfs.getShortAnswerHtml(
+          answer,
+          interactionId,
+          interactionCustomizationArgs
+        )
+      ).toBe(expectedHtmlTag);
+    }
+  );
+
+  it(
+    'should support object-shaped useFractionForDivision in short answer HTML ' +
+      'for NumericExpressionInput',
+    () => {
+      const interactionId = 'NumericExpressionInput';
+      const answer = '2/5';
+      const interactionCustomizationArgs = {
+        useFractionForDivision: {value: true},
+        placeholder: {value: new SubtitledUnicode('', '')},
+      };
+      const expectedHtmlTag =
+        '<oppia-short-response-numeric-expression-input ' +
+        'answer="&amp;quot;2/5&amp;quot;">' +
+        '</oppia-short-response-numeric-expression-input>';
+
+      // This throws "Type '{ value: boolean; }' is not assignable to type
+      // 'boolean'". We need to suppress this error because runtime data can
+      // still be object-shaped for this customization arg.
+      // @ts-expect-error
       expect(
         ehfs.getShortAnswerHtml(
           answer,
