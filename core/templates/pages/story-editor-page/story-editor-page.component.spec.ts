@@ -699,4 +699,11 @@ describe('Story Editor Page Component', () => {
       ).toHaveBeenCalled();
     }
   );
+
+  it('should return empty navbar text when active tab is not recognized', () => {
+    spyOn(storyEditorNavigationService, 'getActiveTab').and.returnValue(
+      'invalid_tab'
+    );
+    expect(component.getNavbarText()).toBe('');
+  });
 });
