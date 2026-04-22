@@ -273,6 +273,15 @@ export class AutomaticVoiceoverHighlightService {
 
       if (currentSentence?.startsWith(token)) {
         currentSentence = currentSentence.slice(token.length);
+      } else if (
+        currentSentence?.startsWith(';') &&
+        currentSentence?.startsWith(';' + token)
+      ) {
+        // During voiceover synthesis in the backend, HTML tags are explicitly
+        // delimited using '; '. Therefore, if the content itself contains a
+        // semicolon, it must be handled carefully here to ensure sentence
+        // matching works correctly.
+        currentSentence = currentSentence.slice(token.length + 1);
       } else {
         if (token.length > currentSentence.length) {
           remainingSentence = currentSentence;
