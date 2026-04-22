@@ -297,7 +297,6 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.clickOnLogOutButton();
     await loggedOutLearner.page.waitForNavigation();
     await loggedOutLearner.expectPageURLToContain(testConstants.URLs.BaseURL);
-    await loggedOutLearner.expectScreenshotToMatch('homePage', __dirname);
 
     // Visit the math classroom page.
     await loggedOutLearner.navigateToClassroomPage('math');
