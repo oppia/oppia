@@ -298,6 +298,134 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
             self.fail('Expected a manual voiceover for content_4.')
         self.assertEqual(new_manual_voiceover.filename, 'solution.mp3')
 
+    def test_fix_job_with_duplicate_content_id_in_three_states(self) -> None:
+        """Test that multiple later duplicates reuse replacement tracking."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id', title='Test Exploration', category='Test'
+        )
+
+        exploration.add_states(['State2', 'State3'])
+        state1 = exploration.states['Introduction']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+
+        # Create generator after states are added, to account for all default
+        # content IDs created by the states.
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+
+        duplicate_content_id = content_id_generator.generate(
+            translation_domain.ContentType.CONTENT
+        )
+        state1.content.content_id = duplicate_content_id
+        state2.content.content_id = duplicate_content_id
+        state3.content.content_id = duplicate_content_id
+
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index
+        )
+
+        exp_services.save_new_exploration('owner_id', exploration)
+
+        result = delete_duplicate_content_ids_jobs.FixExplorationsWithDuplicateContentIdsJob._check_and_fix_duplicate_content_ids(  # pylint: disable=protected-access
+            exploration
+        )
+
+        self.assertIsNotNone(result)
+        if result is None:
+            return
+
+        # Here we use cast because the helper result uses a broad Union type,
+        # but this key is known to always contain the list of replacement logs.
+        fixed_content_ids = cast(List[str], result['fixed_content_ids'])
+        self.assertEqual(len(fixed_content_ids), 2)
+        self.assertTrue(
+            any('State2' in content_id for content_id in fixed_content_ids)
+        )
+        self.assertTrue(
+            any('State3' in content_id for content_id in fixed_content_ids)
+        )
+
+
+class CreateUpdatedEntityVoiceoversModelsTests(test_utils.GenericTestBase):
+    """Tests for voiceover model fan-out helper."""
+
+    def test_create_updated_voiceovers_models_copies_offsets_and_skips_missing(
+        self,
+    ) -> None:
+        """Test that copied models fan out offsets only for matching IDs."""
+        manual_voiceover = state_domain.Voiceover.from_dict(
+            {
+                'filename': 'solution.mp3',
+                'file_size_bytes': 1234,
+                'needs_update': False,
+                'duration_secs': 4.2,
+            }
+        )
+        entity_voiceovers = voiceover_domain.EntityVoiceovers(
+            entity_id='exp_id',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_version=1,
+            language_accent_code='en-US',
+            voiceovers_mapping={
+                'solution_1': {
+                    feconf.VoiceoverType.MANUAL.value: manual_voiceover,
+                    feconf.VoiceoverType.AUTO.value: None,
+                }
+            },
+            automated_voiceovers_audio_offsets_msecs={
+                'solution_1': [
+                    {
+                        'token': 'audio_bar',
+                        'audio_offset_msecs': 100.0,
+                    }
+                ]
+            },
+        )
+        voiceover_services.save_entity_voiceovers(entity_voiceovers)
+
+        updated_models = delete_duplicate_content_ids_jobs._create_updated_entity_voiceovers_models(  # pylint: disable=protected-access
+            'exp_id',
+            1,
+            2,
+            {
+                'solution_1': ['content_4'],
+                'missing_content_id': ['content_5'],
+            },
+        )
+
+        self.assertEqual(len(updated_models), 1)
+        with datastore_services.get_ndb_context():
+            for updated_model in updated_models:
+                updated_model.update_timestamps()
+                updated_model.put()
+
+        migrated_entity_voiceovers = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                'exp_id', feconf.ENTITY_TYPE_EXPLORATION, 2
+            )
+        )
+        self.assertEqual(len(migrated_entity_voiceovers), 1)
+        self.assertIn(
+            'content_4', migrated_entity_voiceovers[0].voiceovers_mapping
+        )
+        self.assertIn(
+            'content_4',
+            migrated_entity_voiceovers[
+                0
+            ].automated_voiceovers_audio_offsets_msecs,
+        )
+        self.assertNotIn(
+            'content_5', migrated_entity_voiceovers[0].voiceovers_mapping
+        )
+        self.assertNotIn(
+            'content_5',
+            migrated_entity_voiceovers[
+                0
+            ].automated_voiceovers_audio_offsets_msecs,
+        )
+
 
 class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
     job_test_utils.JobTestBase
@@ -560,3 +688,120 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(state.content.content_id, 'keep_me')
+
+    def test_replace_content_id_in_state_skips_missing_or_unmatched_fields(
+        self,
+    ) -> None:
+        class FakeContent:
+            """Simple object carrying a content_id used in tests."""
+
+            def __init__(self, content_id: str) -> None:
+                self.content_id = content_id
+
+        class FakeCustomizationArg:
+            """Customization arg stub whose value should remain untouched."""
+
+            # Here we use type Any because customization args can hold lists,
+            # dicts, primitives, or nested domain-like objects.
+            def __init__(self, value: Any, content_ids: List[str]) -> None:
+                self.value = value
+                self._content_ids = content_ids
+
+            def get_content_ids(self) -> List[str]:
+                """Return referenced content IDs."""
+                return list(self._content_ids)
+
+        class FakeOutcomeWithoutFeedback:
+            """Outcome stub with no feedback attribute."""
+
+            pass
+
+        class FakeOutcomeWithFeedback:
+            """Outcome stub exposing feedback content."""
+
+            def __init__(self, content_id: str) -> None:
+                self.feedback = FakeContent(content_id)
+
+        class FakeAnswerGroup:
+            """Answer group stub holding an arbitrary outcome."""
+
+            def __init__(
+                self,
+                outcome: Union[
+                    FakeOutcomeWithoutFeedback, FakeOutcomeWithFeedback
+                ],
+            ) -> None:
+                self.outcome = outcome
+
+        class FakeHintWithoutContent:
+            """Hint stub with no hint_content attribute."""
+
+            pass
+
+        class FakeHintWithContent:
+            """Hint stub exposing hint_content."""
+
+            def __init__(self, content_id: str) -> None:
+                self.hint_content = FakeContent(content_id)
+
+        class FakeSolution:
+            """Solution stub exposing explanation content."""
+
+            def __init__(self, content_id: str) -> None:
+                self.explanation = FakeContent(content_id)
+
+        class FakeInteraction:
+            """Interaction stub covering false-path traversal branches."""
+
+            def __init__(self) -> None:
+                self.customization_args = {
+                    'numeric_arg': FakeCustomizationArg(7, ['old_id'])
+                }
+                self.answer_groups = [
+                    FakeAnswerGroup(FakeOutcomeWithoutFeedback()),
+                    FakeAnswerGroup(FakeOutcomeWithFeedback('different_id')),
+                ]
+                self.default_outcome = None
+                self.hints = [
+                    FakeHintWithoutContent(),
+                    FakeHintWithContent('different_id'),
+                ]
+                self.solution = FakeSolution('different_id')
+
+        class FakeState:
+            """State stub bundling content and interaction."""
+
+            def __init__(self) -> None:
+                self.content = FakeContent('different_id')
+                self.interaction = FakeInteraction()
+
+        state = FakeState()
+
+        # Here we use cast because FakeState mimics State without inheriting
+        # from it; the helper expects a State instance.
+        delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
+            cast(state_domain.State, state), 'old_id', 'new_id'
+        )
+
+        self.assertEqual(state.content.content_id, 'different_id')
+        # Here we use cast because this assertion intentionally checks the
+        # second answer group that is constructed with feedback.
+        self.assertEqual(
+            cast(
+                FakeOutcomeWithFeedback,
+                state.interaction.answer_groups[1].outcome,
+            ).feedback.content_id,
+            'different_id',
+        )
+        # Here we use cast because this assertion intentionally checks the
+        # second hint which is constructed with hint_content.
+        self.assertEqual(
+            cast(
+                FakeHintWithContent, state.interaction.hints[1]
+            ).hint_content.content_id,
+            'different_id',
+        )
+        self.assertEqual(
+            state.interaction.solution.explanation.content_id,
+            'different_id',
+        )
