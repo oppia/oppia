@@ -43,7 +43,7 @@ export class InteractionDisplayComponent {
   @Input() classStr!: string;
   // TODO(#13015): Remove use of unknown as a type.
   // The passed htmlData sometimes accesses property from parent scope.
-  @Input() parentScope!: unknown;
+  @Input() parentScope!: any;
 
   @ViewChild('interactionContainer', {
     read: ViewContainerRef,
@@ -64,24 +64,26 @@ export class InteractionDisplayComponent {
       let domparser = new DOMParser();
       let dom = domparser.parseFromString(this.htmlData, 'text/html');
 
+      const firstChild = dom.body.firstElementChild;
       if (
-        dom.body.firstElementChild &&
-        TAG_TO_INTERACTION_MAPPING[dom.body.firstElementChild.tagName]
+        firstChild &&
+        (TAG_TO_INTERACTION_MAPPING as any)[firstChild.tagName]
       ) {
-        let interaction =
-          TAG_TO_INTERACTION_MAPPING[dom.body.firstElementChild.tagName];
+        let interaction = (TAG_TO_INTERACTION_MAPPING as any)[
+          firstChild.tagName
+        ];
 
         const componentFactory =
           this.componentFactoryResolver.resolveComponentFactory(interaction);
         const componentRef =
           this.viewContainerRef.createComponent(componentFactory);
 
-        let attributes = dom.body.firstElementChild.attributes;
+        let attributes = firstChild.attributes;
 
         Array.from(attributes).forEach(attribute => {
           let attributeNameInCamelCase = camelCaseFromHyphen(attribute.name);
 
-          let attributeValue = attribute.value;
+          let attributeValue: any = attribute.value;
 
           // Properties enclosed with [] needs to be resolved from parent scope.
           // NOTE TO DEVELOPERS: The variables in this case are keyed by the
@@ -103,7 +105,8 @@ export class InteractionDisplayComponent {
             );
           }
 
-          componentRef.instance[attributeNameInCamelCase] = attributeValue;
+          (componentRef.instance as any)[attributeNameInCamelCase] =
+            attributeValue;
         });
 
         componentRef.changeDetectorRef.detectChanges();

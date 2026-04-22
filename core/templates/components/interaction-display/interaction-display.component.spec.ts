@@ -67,7 +67,7 @@ describe('Interaction display', () => {
 
     componentInstance.viewContainerRef = {
       createComponent: null,
-    } as ViewContainerRef;
+    } as unknown as ViewContainerRef;
     spyOn(componentFactoryResolver, 'resolveComponentFactory');
     spyOn(componentInstance.viewContainerRef, 'createComponent')
       // Unknown type is used here because the type of the component
@@ -108,7 +108,7 @@ describe('Interaction display', () => {
 
     componentInstance.viewContainerRef = {
       createComponent: null,
-    } as ViewContainerRef;
+    } as unknown as ViewContainerRef;
     componentInstance.parentScope = {
       lastAnswer,
     };
@@ -140,7 +140,7 @@ describe('Interaction display', () => {
   it('should rebuild interaction if htmlData is updated', () => {
     componentInstance.viewContainerRef = {
       clear: () => {},
-    } as ViewContainerRef;
+    } as unknown as ViewContainerRef;
     spyOn(componentInstance, 'buildInteraction');
 
     componentInstance.ngOnChanges({

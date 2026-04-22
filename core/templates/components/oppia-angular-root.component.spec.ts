@@ -49,7 +49,7 @@ class MockWindowRef {
       },
     },
     history: {
-      pushState(data, title: string, url?: string | null) {},
+      pushState(data: any, title: string, url?: string | null) {},
     },
   };
 }
@@ -85,7 +85,7 @@ describe('OppiaAngularRootComponent', function () {
         {
           provide: DocumentAttributeCustomizationService,
           useValue: {
-            addAttribute: (attr, code) => {},
+            addAttribute: (attr: string, code: string) => {},
           },
         },
         {
@@ -110,7 +110,7 @@ describe('OppiaAngularRootComponent', function () {
   }));
 
   it('should only intialize rteElements once', () => {
-    expect(OppiaAngularRootComponent.rteElementsAreInitialized).toBeTrue();
+    expect(OppiaAngularRootComponent.rteElementsAreInitialized).toBe(true);
     const componentInstance = TestBed.createComponent(
       OppiaAngularRootComponent
     ).componentInstance;
@@ -139,7 +139,7 @@ describe('OppiaAngularRootComponent', function () {
   });
 
   it('should set OppiaAngularRootComponent.pageContextService if not set', () => {
-    OppiaAngularRootComponent.pageContextService = undefined;
+    OppiaAngularRootComponent.pageContextService = undefined as any;
     expect(OppiaAngularRootComponent.pageContextService).toBeUndefined();
 
     component.ngAfterViewInit();

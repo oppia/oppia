@@ -84,12 +84,19 @@ import {ServicesConstants} from 'services/services.constants';
 // TODO(#16309): Fix relative imports.
 import '../third-party-imports/ckeditor.import';
 
+// @ts-ignore
 import {NoninteractiveCollapsible} from 'rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
+// @ts-ignore
 import {NoninteractiveImage} from 'rich_text_components/Image/directives/oppia-noninteractive-image.component';
+// @ts-ignore
 import {NoninteractiveLink} from 'rich_text_components/Link/directives/oppia-noninteractive-link.component';
+// @ts-ignore
 import {NoninteractiveMath} from 'rich_text_components/Math/directives/oppia-noninteractive-math.component';
+// @ts-ignore
 import {NoninteractiveSkillreview} from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
+// @ts-ignore
 import {NoninteractiveTabs} from 'rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
+// @ts-ignore
 import {NoninteractiveVideo} from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
 import {CkEditorInitializerService} from './ck-editor-helpers/ck-editor-4-widgets.initializer';
 import {HtmlEscaperService} from 'services/html-escaper.service';
@@ -99,6 +106,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {UrlService} from 'services/contextual/url.service';
 import {I18nService} from 'i18n/i18n.service';
 import {RteHelperService} from 'services/rte-helper.service';
+// @ts-ignore
 import {NoninteractiveWorkedexample} from 'rich_text_components/Workedexample/directives/oppia-noninteractive-workedexample.component';
 
 const componentMap = {
@@ -131,7 +139,7 @@ const componentMap = {
 export const registerCustomElements = (injector: Injector): void => {
   for (const rteKey of Object.keys(ServicesConstants.RTE_COMPONENT_SPECS)) {
     const rteElement = createCustomElement(
-      componentMap[rteKey].component_class,
+      (componentMap as any)[rteKey].component_class,
       {injector}
     );
     // Check if the custom elements have been previously defined. We can't
@@ -142,14 +150,14 @@ export const registerCustomElements = (injector: Injector): void => {
     if (
       customElements.get(
         'oppia-noninteractive-ckeditor-' +
-          ServicesConstants.RTE_COMPONENT_SPECS[rteKey].frontend_id
+          (ServicesConstants.RTE_COMPONENT_SPECS as any)[rteKey].frontend_id
       ) !== undefined
     ) {
       continue;
     }
     customElements.define(
       'oppia-noninteractive-ckeditor-' +
-        ServicesConstants.RTE_COMPONENT_SPECS[rteKey].frontend_id,
+        (ServicesConstants.RTE_COMPONENT_SPECS as any)[rteKey].frontend_id,
       rteElement
     );
   }
@@ -170,11 +178,11 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static pageTitleService: PageTitleService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
   static rteElementsAreInitialized: boolean = false;
-  static rteHelperService;
+  static rteHelperService: RteHelperService;
   static ratingComputationService: RatingComputationService;
   static reviewTestBackendApiService: ReviewTestBackendApiService;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
-  static ajsValueProvider: (string, unknown) => void;
+  static ajsValueProvider: (key: string, value: unknown) => void;
   static injector: Injector;
 
   constructor(
@@ -209,7 +217,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     }
     this.ngZone.runOutsideAngular(() => {
       CkEditorInitializerService.ckEditorInitializer(
-        OppiaAngularRootComponent.rteHelperService,
+        OppiaAngularRootComponent.rteHelperService as any,
         this.htmlEscaperService,
         this.pageContextService,
         this.ngZone

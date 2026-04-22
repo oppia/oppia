@@ -108,16 +108,16 @@ export type RteComponentId = {
   templateUrl: './rte-helper-modal.component.html',
 })
 export class RteHelperModalComponent {
-  @Input() componentId: RteComponentId;
-  @Input() customizationArgSpecs: CustomizationArgsSpecsType;
-  @Input() attrsCustomizationArgsDict: CustomizationArgsForRteType;
-  @Input() componentIsNewlyCreated: boolean;
+  @Input() componentId!: RteComponentId;
+  @Input() customizationArgSpecs!: CustomizationArgsSpecsType;
+  @Input() attrsCustomizationArgsDict!: CustomizationArgsForRteType;
+  @Input() componentIsNewlyCreated!: boolean;
   modalIsLoading: boolean = true;
-  errorMessage: string;
+  errorMessage!: string;
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
   @ViewChild('schemaForm') schemaForm!: NgForm;
-  public customizationArgsForm: FormGroup;
-  customizationArgsFormSubscription: Subscription;
+  public customizationArgsForm!: FormGroup;
+  customizationArgsFormSubscription!: Subscription;
   COMPONENT_ID_COLLAPSIBLE = 'collapsible';
   COMPONENT_ID_COLLAPSIBLE_HEADING = 'collapsible_heading';
   COMPONENT_ID_COLLAPSIBLE_CONTENT = 'collapsible_content';
@@ -211,8 +211,8 @@ export class RteHelperModalComponent {
     }
 
     const formGroupControls = {};
-    this.customizationArgSpecs.forEach((_, index) => {
-      formGroupControls[index] = this.fb.control(
+    this.customizationArgSpecs.forEach((_: unknown, index: number) => {
+      (formGroupControls as Record<number, unknown>)[index] = this.fb.control(
         this.tmpCustomizationArgs[index].value
       );
     });
@@ -243,7 +243,7 @@ export class RteHelperModalComponent {
     this.customizationArgsFormSubscription.unsubscribe();
   }
 
-  onCustomizationArgsFormChange(value: number | string | boolean): void {
+  onCustomizationArgsFormChange(value: any): void {
     this.clearRteErrorMessage();
     if (this.componentId === this.COMPONENT_ID_MATH) {
       let rawLatex: string = value[0].raw_latex;
@@ -452,7 +452,10 @@ export class RteHelperModalComponent {
    * @returns The character limit for the component
    */
   getCharacterLimit(componentId: string): number {
-    return this.CHARACTER_LIMITS[componentId] || this.CHARACTER_LIMITS.default;
+    return (
+      (this.CHARACTER_LIMITS as Record<string, number>)[componentId] ||
+      this.CHARACTER_LIMITS.default
+    );
   }
 
   isErrorMessageNonempty(): boolean {
@@ -472,7 +475,7 @@ export class RteHelperModalComponent {
 
   save(): void {
     for (let index in this.customizationArgsForm.value) {
-      this.tmpCustomizationArgs[index].value =
+      (this.tmpCustomizationArgs as any)[index].value =
         this.customizationArgsForm.value[index];
     }
     this.externalRteSaveService.onExternalRteSave.emit();
@@ -521,7 +524,7 @@ export class RteHelperModalComponent {
         const HUNDRED_KB_IN_BYTES = 100 * 1024;
         maxAllowedFileSize = HUNDRED_KB_IN_BYTES;
       }
-      if (resampledFile.size > maxAllowedFileSize) {
+      if (resampledFile && resampledFile.size > maxAllowedFileSize) {
         this.alertsService.addInfoMessage(
           `The SVG file generated exceeds ${maxAllowedFileSize / 1024}` +
             ' KB. Please split the expression into smaller ones.' +
@@ -536,9 +539,9 @@ export class RteHelperModalComponent {
         this.pageContextService.getImageSaveDestination() ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       ) {
-        this.imageLocalStorageService.saveImage(svgFileName, svgFile);
+        this.imageLocalStorageService.saveImage(svgFileName, svgFile as string);
         const mathContentDict = {
-          raw_latex: tmpCustomizationArgs[0].value.raw_latex,
+          raw_latex: tmpCustomizationArgs[0].value.raw_latex as string,
           svg_filename: svgFileName,
         };
         const caName = tmpCustomizationArgs[0].name;
@@ -548,15 +551,15 @@ export class RteHelperModalComponent {
       }
       this.assetsBackendApiService
         .saveMathExpressionImage(
-          resampledFile,
+          resampledFile as Blob,
           svgFileName,
-          this.pageContextService.getEntityType(),
+          this.pageContextService.getEntityType() as string,
           this.pageContextService.getEntityId()
         )
         .then(
           response => {
             const mathContentDict = {
-              raw_latex: tmpCustomizationArgs[0].value.raw_latex,
+              raw_latex: tmpCustomizationArgs[0].value.raw_latex as string,
               svg_filename: response.filename,
             };
             const caName = tmpCustomizationArgs[0].name;
