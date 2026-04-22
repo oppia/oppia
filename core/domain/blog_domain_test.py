@@ -872,3 +872,41 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
             ' received %s' % self.author_details.author_bio,
         ):
             self.author_details.validate()
+
+
+class BlogPostReadEventLogEntryTests(test_utils.GenericTestBase):
+    """Tests for BlogPostReadEventLogEntry domain object."""
+
+    def test_valid_entry_passes_validation(self) -> None:
+        """Tests that a valid entry passes validation."""
+        entry = blog_domain.BlogPostReadEventLogEntry(
+            blog_post_id='valid_id',
+            created_on=datetime.datetime.utcnow()
+        )
+        entry.validate()
+
+    def test_validate_raises_if_blog_post_id_not_string(self) -> None:
+        """Tests that validate raises if blog_post_id is not a string."""
+        entry = blog_domain.BlogPostReadEventLogEntry(
+            blog_post_id=123,
+            created_on=datetime.datetime.utcnow()
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected blog_post_id to be a string'
+        ):
+            entry.validate()
+
+    def test_validate_raises_if_blog_post_id_is_empty(self) -> None:
+        """Tests that validate raises if blog_post_id is empty."""
+        entry = blog_domain.BlogPostReadEventLogEntry(
+            blog_post_id='',
+            created_on=datetime.datetime.utcnow()
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected blog_post_id to be non-empty'
+        ):
+            entry.validate()
+
+

@@ -848,3 +848,30 @@ class BlogAuthorDetails:
                 'Expected Author Bio to be a string,'
                 ' received %s' % self.author_bio
             )
+
+
+class BlogPostReadEventLogEntry:
+    """Domain object for a blog post read event log entry."""
+
+    def __init__(self, blog_post_id, created_on):
+        """Initializes a BlogPostReadEventLogEntry domain object.
+
+        Args:
+            blog_post_id: str. The unique ID of the blog post that was read.
+            created_on: datetime.datetime. The timestamp when the read event
+                occurred.
+        """
+        self.blog_post_id = blog_post_id
+        self.created_on = created_on
+
+    def validate(self):
+        """Validates the blog post read event log entry."""
+        if not isinstance(self.blog_post_id, str):
+            raise utils.ValidationError(
+                'Expected blog_post_id to be a string, received %s'
+                % self.blog_post_id)
+        if not self.blog_post_id:
+            raise utils.ValidationError(
+                'Expected blog_post_id to be non-empty.')
+
+
