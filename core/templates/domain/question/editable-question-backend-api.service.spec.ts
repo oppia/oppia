@@ -21,7 +21,7 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import {Question} from 'domain/question/question.model';
+import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {
   EditableQuestionBackendApiService,
   SkillLinkageModificationsArray,
@@ -89,7 +89,10 @@ describe('EditableQuestionBackendApiService', () => {
     associated_skill_dicts: [],
   };
 
-  const sampleDataResultsObjects = {
+  const sampleDataResultsObjects: {
+    questionObject: Question | null;
+    associated_skill_dicts: unknown[];
+  } = {
     questionObject: null,
     associated_skill_dicts: [],
   };
@@ -237,7 +240,7 @@ describe('EditableQuestionBackendApiService', () => {
   it('should update a question after fetching it from the backend', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
-    let question;
+    let question!: QuestionBackendDict;
 
     editableQuestionBackendApiService.fetchQuestionAsync('0').then(data => {
       question = data.questionObject.toBackendDict(false);
@@ -254,15 +257,15 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     question.question_state_data.content.html = 'New Question Content';
-    question.version = '2';
+    question.version = 2;
     const questionWrapper = {
       questionDict: question,
     };
 
     editableQuestionBackendApiService
       .updateQuestionAsync(
-        question.id,
-        question.version,
+        question.id ?? '',
+        String(question.version),
         'Question Data is updated',
         []
       )

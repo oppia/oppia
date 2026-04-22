@@ -20,6 +20,7 @@
 import {TruncateInputBasedOnInteractionAnswerTypePipe} from './truncate-input-based-on-interaction-answer-type.pipe';
 import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import {CodeReplAnswer} from 'interactions/answer-defs';
 
 describe('Testing TruncateInputBasedOnInteractionAnswerTypePipe', () => {
   let pipe: TruncateInputBasedOnInteractionAnswerTypePipe;
@@ -31,10 +32,10 @@ describe('Testing TruncateInputBasedOnInteractionAnswerTypePipe', () => {
   });
 
   it('should correctly truncate input data', () => {
-    let data = {
+    const data: CodeReplAnswer = {
       code: 'Hey oppia  users!',
-      output: null,
-      evaluation: null,
+      output: '',
+      evaluation: '',
       error: 'error',
     };
 

@@ -29,13 +29,13 @@ import {StudyGuideSection} from './study-guide-sections.model';
 
 describe('Topic update service', function () {
   let topicUpdateService: TopicUpdateService;
-  let undoRedoService: UndoRedoService = null;
-  let _sampleTopic = null;
-  let _firstSkillSummary = null;
-  let _secondSkillSummary = null;
-  let _thirdSkillSummary = null;
-  let _sampleSubtopicPage = null;
-  let _sampleStudyGuide = null;
+  let undoRedoService: UndoRedoService;
+  let _sampleTopic: Topic;
+  let _firstSkillSummary: ShortSkillSummary;
+  let _secondSkillSummary: ShortSkillSummary;
+  let _thirdSkillSummary: ShortSkillSummary;
+  let _sampleSubtopicPage: SubtopicPage;
+  let _sampleStudyGuide: StudyGuide;
 
   let sampleTopicBackendObject = {
     topicDict: {

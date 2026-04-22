@@ -27,7 +27,6 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 @NgModule({
   imports: [CommonModule, MatProgressSpinnerModule],
   declarations: [RolesAndActionsVisualizerComponent],
-  entryComponents: [RolesAndActionsVisualizerComponent],
   exports: [RolesAndActionsVisualizerComponent],
 })
 export class AdminBlogAdminCommonModule {}
