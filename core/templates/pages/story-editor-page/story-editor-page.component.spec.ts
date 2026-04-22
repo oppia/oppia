@@ -541,7 +541,11 @@ describe('Story Editor Page Component', () => {
         );
 
       expect(storyEditorBrowserTabsInfo).toBeDefined();
-      expect(storyEditorBrowserTabsInfo!.getNumberOfOpenedTabs()).toEqual(1);
+      expect(
+        (
+          storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+        ).getNumberOfOpenedTabs()
+      ).toEqual(1);
 
       // Opening the second tab.
       storyEditorStateService.onStoryInitialized.emit();
@@ -551,7 +555,11 @@ describe('Story Editor Page Component', () => {
           story.getId()
         );
 
-      expect(storyEditorBrowserTabsInfo!.getNumberOfOpenedTabs()).toEqual(2);
+      expect(
+        (
+          storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+        ).getNumberOfOpenedTabs()
+      ).toEqual(2);
     }
   );
 
@@ -579,7 +587,11 @@ describe('Story Editor Page Component', () => {
           story.getId()
         );
 
-      expect(storyEditorBrowserTabsInfo!.getLatestVersion()).toEqual(1);
+      expect(
+        (
+          storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+        ).getLatestVersion()
+      ).toEqual(1);
 
       // Save some changes on the story and increasing its version.
       story._version = 2;
@@ -590,7 +602,11 @@ describe('Story Editor Page Component', () => {
           story.getId()
         );
 
-      expect(storyEditorBrowserTabsInfo!.getLatestVersion()).toEqual(2);
+      expect(
+        (
+          storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+        ).getLatestVersion()
+      ).toEqual(2);
     }
   );
 
@@ -615,16 +631,24 @@ describe('Story Editor Page Component', () => {
         );
 
       // Making some unsaved changes on the editor page.
-      storyEditorBrowserTabsInfo!.setSomeTabHasUnsavedChanges(true);
+      (
+        storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+      ).setSomeTabHasUnsavedChanges(true);
       localStorageService.updateEntityEditorBrowserTabsInfo(
-        storyEditorBrowserTabsInfo!,
+        storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo,
         EntityEditorBrowserTabsInfoDomainConstants.OPENED_STORY_EDITOR_BROWSER_TABS
       );
 
-      expect(storyEditorBrowserTabsInfo!.doesSomeTabHaveUnsavedChanges()).toBe(
-        true
-      );
-      expect(storyEditorBrowserTabsInfo!.getNumberOfOpenedTabs()).toEqual(2);
+      expect(
+        (
+          storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+        ).doesSomeTabHaveUnsavedChanges()
+      ).toBe(true);
+      expect(
+        (
+          storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+        ).getNumberOfOpenedTabs()
+      ).toEqual(2);
 
       component.onClosingStoryEditorBrowserTab();
       storyEditorBrowserTabsInfo =
@@ -633,13 +657,19 @@ describe('Story Editor Page Component', () => {
           story.getId()
         );
 
-      expect(storyEditorBrowserTabsInfo!.getNumberOfOpenedTabs()).toEqual(1);
+      expect(
+        (
+          storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+        ).getNumberOfOpenedTabs()
+      ).toEqual(1);
 
       // Since the tab containing unsaved changes is closed, the value of
       // unsaved changes status will become false.
-      expect(storyEditorBrowserTabsInfo!.doesSomeTabHaveUnsavedChanges()).toBe(
-        false
-      );
+      expect(
+        (
+          storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+        ).doesSomeTabHaveUnsavedChanges()
+      ).toBe(false);
     }
   );
 
