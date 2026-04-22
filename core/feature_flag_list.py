@@ -98,7 +98,6 @@ class FeatureNames(enum.Enum):
     ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE = (
         'enable_financial_literacy_campaign_banner_test_mode'
     )
-    DEVELOPER_NOTES = 'developer_notes'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -142,7 +141,6 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
     FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE,
-    FeatureNames.DEVELOPER_NOTES,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -182,7 +180,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
         (
             'This is a dummy feature flag for the e2e tests.',
             feature_flag_domain.ServerMode.PROD,
-            '',
+            'This flag does nothing and exists for end-to-end test coverage.',
         )
     ),
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value: (
@@ -363,13 +361,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE: Dict[
             'This flag enables the financial literacy campaign banner for the fundraising campaign in test mode.',
             feature_flag_domain.ServerMode.TEST,
             '',
-        )
-    ),
-    FeatureNames.DEVELOPER_NOTES.value: (
-        (
-            'This flag enables the developer notes feature.',
-            feature_flag_domain.ServerMode.TEST,
-            'This flag is used to test the developer notes feature.',
         )
     ),
 }
