@@ -273,6 +273,19 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
     with open(APP_DEV_YAML_FILEPATH, 'r', encoding='utf-8') as yaml_file:
         content += yaml_file.read()
 
+    def replace_content_or_fail(
+        source_content: str,
+        pattern: str,
+        replacement: str,
+        error_message: str,
+    ) -> str:
+        updated_content, num_replacements = re.subn(
+            pattern, replacement, source_content, flags=re.MULTILINE
+        )
+        if num_replacements != 1:
+            raise Exception(error_message)
+        return updated_content
+
     if deploy_mode:
         # The version: default line is required to run jobs on a local server (
         # both in prod & non-prod env). This line is not required when app.yaml
@@ -288,6 +301,31 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
                     'removed does not exist.' % env_variable
                 )
             content = re.sub('  %s: ".*"\n' % env_variable, '', content)
+    # In app_dev.yaml, CKEditor is served from the Angular dev build output
+    # (dist/oppia-angular/). For app.yaml (used in prod mode), it must point
+    # to the prod build output (dist/oppia-angular-prod/).
+    #
+    # Some unit tests use minimal mock app_dev.yaml files that do not define
+    # CKEditor handlers. In that case we skip this rewrite. When CKEditor
+    # handlers are present, we still require exactly one replacement.
+    if '/third_party/ckeditor' in content:
+        content = replace_content_or_fail(
+            content,
+            r'^[ \t]*static_dir:[ \t]*dist/oppia-angular(?:/browser)?/third_party/ckeditor[ \t]*\r?$',
+            '  static_dir: dist/oppia-angular-prod/third_party/ckeditor',
+            'CKEditor static_dir entry was not found in app.yaml content.',
+        )
+    if '/third_party/ckeditor-bootstrapck' in content:
+        content = replace_content_or_fail(
+            content,
+            (
+                r'^[ \t]*static_dir:[ \t]*'
+                r'dist/oppia-angular(?:/browser)?/third_party/ckeditor-bootstrapck'
+                r'[ \t]*\r?$'
+            ),
+            '  static_dir: dist/oppia-angular-prod/third_party/ckeditor-bootstrapck',
+            'CKEditor bootstrapck static_dir entry was not found in app.yaml content.',
+        )
     # In app_dev.yaml, MathJax is served from the Angular dev build output
     # (dist/oppia-angular/). For app.yaml (used in prod mode), it must point
     # to the prod build output (dist/oppia-angular-prod/).

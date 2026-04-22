@@ -35,6 +35,7 @@ import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
 } from 'domain/exploration/written-translation.model';
+import {AppConstants} from 'app.constants';
 
 interface LanguageCodeToContentTranslations {
   [languageCode: string]: TranslatedContent;
@@ -156,6 +157,10 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
         ].updateTranslation(this.contentId, updatedTranslatedContent);
       }
     }
+    this.changeListService.markVoiceoversAsNeedingUpdate(
+      this.contentId,
+      AppConstants.DEFAULT_LANGUAGE_CODE
+    );
     this.ngbActiveModal.close();
   }
 
