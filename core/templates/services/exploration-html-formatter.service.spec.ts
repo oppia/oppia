@@ -197,6 +197,26 @@ describe('Exploration Html Formatter Service', () => {
     ).toBe(expectedHtmlTag);
   });
 
+  it(
+    'should set division sign in answer HTML for ' + 'NumericExpressionInput',
+    () => {
+      const interactionId = 'NumericExpressionInput';
+      const answer = '2/5';
+      const interactionCustomizationArgs = {
+        useFractionForDivision: false,
+        placeholder: {value: new SubtitledUnicode('', '')},
+      };
+      const expectedHtmlTag =
+        '<oppia-response-numeric-expression-input ' +
+        'answer="&amp;quot;2÷5&amp;quot;">' +
+        '</oppia-response-numeric-expression-input>';
+
+      expect(
+        ehfs.getAnswerHtml(answer, interactionId, interactionCustomizationArgs)
+      ).toBe(expectedHtmlTag);
+    }
+  );
+
   it('should throw error when interaction id is null', () => {
     expect(() => {
       ehfs.getAnswerHtml('sampleAnswer', null, {});
@@ -227,4 +247,29 @@ describe('Exploration Html Formatter Service', () => {
       )
     ).toBe(expectedHtmlTag);
   });
+
+  it(
+    'should set division sign in short answer HTML for ' +
+      'NumericExpressionInput',
+    () => {
+      const interactionId = 'NumericExpressionInput';
+      const answer = '2/5';
+      const interactionCustomizationArgs = {
+        useFractionForDivision: false,
+        placeholder: {value: new SubtitledUnicode('', '')},
+      };
+      const expectedHtmlTag =
+        '<oppia-short-response-numeric-expression-input ' +
+        'answer="&amp;quot;2÷5&amp;quot;">' +
+        '</oppia-short-response-numeric-expression-input>';
+
+      expect(
+        ehfs.getShortAnswerHtml(
+          answer,
+          interactionId,
+          interactionCustomizationArgs
+        )
+      ).toBe(expectedHtmlTag);
+    }
+  );
 });
