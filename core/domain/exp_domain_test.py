@@ -3011,10 +3011,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             self.new_exploration.validate(strict=True)
 
 
-
-# unit tests. Also, all validation errors should be covered in the tests.
-
-
 class ExplorationDomainValidationTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
