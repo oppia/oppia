@@ -49,6 +49,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     blog_post_search_indexing_jobs,
     blog_validation_jobs,
     cleanup_duplicate_translation_suggestions_jobs,
+    cloud_task_run_migration_jobs,
     collection_info_jobs,
     contributor_admin_stats_jobs,
     delete_duplicate_content_ids_jobs,
@@ -68,12 +69,14 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     subtopic_migration_jobs,
     suggestion_migration_jobs,
     suggestion_stats_computation_jobs,
+    synthesize_voiceover_by_language_accent_jobs,
     topic_migration_jobs,
     translation_audit_jobs,
     translation_migration_jobs,
     user_bios_change_jobs,
     user_stats_computation_jobs,
     user_validation_jobs,
+    voiceover_synthesis_jobs,
 )
 
 from typing import List, Type

@@ -263,9 +263,8 @@ export class RouterService {
 
   navigateToMainTab(stateName: string | null): void {
     this._savePendingChanges();
-    // let oldState = decodeURI(this._getCurrentStateFromLocationPath());
-    const currentPath = this._getCurrentStateFromLocationPath();
-    const oldState = currentPath !== null ? decodeURI(currentPath) : null;
+    let oldState = this._getCurrentStateFromLocationPath();
+    oldState = oldState ? decodeURI(oldState) : null;
 
     if (oldState === '/' + stateName) {
       return;
@@ -345,7 +344,7 @@ export class RouterService {
 
   navigateToTranslationTab(stateName: string | null = null): void {
     this._savePendingChanges();
-    if (stateName) {
+    if (stateName !== null) {
       this.stateEditorService.setActiveStateName(stateName);
     }
     this._actuallyNavigate(this.SLUG_TRANSLATION, stateName);
