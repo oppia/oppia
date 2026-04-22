@@ -670,7 +670,7 @@ export class SvgEditorComponent implements OnInit {
             // Detects the background color from the rectangle.
             if (
               obj.get('type') === 'rect' &&
-              this.isFullRectangle(elements[index])
+              this.isFullRectangle(elements[index] as SVGRectElement)
             ) {
               this.canvas.setBackgroundColor(
                 obj.get('fill') as string,
@@ -692,11 +692,7 @@ export class SvgEditorComponent implements OnInit {
           this.groupCount += 1;
         });
         this.centerContent();
-      }) as (
-        objects: fabric.Object[],
-        options: fabric.IObjectOptions,
-        elements: SVGElement[]
-      ) => void);
+      }) as (results: fabric.Object[], options: unknown) => void);
       this.changeDetectorRef.detectChanges();
     });
   }
@@ -1023,7 +1019,7 @@ export class SvgEditorComponent implements OnInit {
       // cavasObjects array.
       this.drawMode = this.DRAW_MODE_NONE;
       // Adding a new path so that the bbox is computed correctly.
-      const curve = new fabric.Path(path, {
+      const curve = new fabric.Path(path as unknown as string, {
         stroke: this.fabricjsOptions.stroke,
         fill: this.fabricjsOptions.fill,
         strokeWidth: this.getSize(),
@@ -1679,15 +1675,17 @@ export class SvgEditorComponent implements OnInit {
         var curve = this.getQuadraticBezierCurve() as unknown as {
           path: (number | string)[][];
         };
-        if (e.target.name === 'p0') {
-          (curve.path[0] as number[])[1] = pt.left;
-          (curve.path[0] as number[])[2] = pt.top;
-        } else if (e.target.name === 'p1') {
-          (curve.path[1] as number[])[1] = pt.left;
-          (curve.path[1] as number[])[2] = pt.top;
-        } else if (e.target.name === 'p2') {
-          (curve.path[1] as number[])[3] = pt.left;
-          (curve.path[1] as number[])[4] = pt.top;
+        if (pt && pt.left !== undefined && pt.top !== undefined) {
+          if (e.target && e.target.name === 'p0') {
+            (curve.path[0] as number[])[1] = pt.left;
+            (curve.path[0] as number[])[2] = pt.top;
+          } else if (e.target && e.target.name === 'p1') {
+            (curve.path[1] as number[])[1] = pt.left;
+            (curve.path[1] as number[])[2] = pt.top;
+          } else if (e.target && e.target.name === 'p2') {
+            (curve.path[1] as number[])[3] = pt.left;
+            (curve.path[1] as number[])[4] = pt.top;
+          }
         }
         this.canvas.renderAll();
       }

@@ -501,7 +501,7 @@ export class MusicNotesInputComponent
         const note = {
           baseNoteMidiNumber:
             this.NOTE_NAMES_TO_MIDI_VALUES[
-              lineValue as keyof typeof this.NOTE_NAMES_TO_MIDI_VALUES
+              lineValue as keyof typeof InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES
             ],
           offset: parseInt(noteType, 10),
           noteId,
@@ -742,8 +742,8 @@ export class MusicNotesInputComponent
     let correspondingNoteName: string | null = null;
     for (let noteName in this.NOTE_NAMES_TO_MIDI_VALUES) {
       if (
-        this.NOTE_NAMES_TO_MIDI_VALUES[
-          noteName as keyof typeof this.NOTE_NAMES_TO_MIDI_VALUES
+        InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES[
+          noteName as keyof typeof InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES
         ] === midiNumber
       ) {
         correspondingNoteName = noteName;
@@ -798,7 +798,7 @@ export class MusicNotesInputComponent
       return {
         baseNoteMidiNumber:
           this.NOTE_NAMES_TO_MIDI_VALUES[
-            readableNoteName as keyof typeof this.NOTE_NAMES_TO_MIDI_VALUES
+            readableNoteName as keyof typeof InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES
           ],
         offset: 0,
       };
@@ -818,7 +818,7 @@ export class MusicNotesInputComponent
         baseNoteMidiNumber:
           this.NOTE_NAMES_TO_MIDI_VALUES[
             (readableNoteName[0] +
-              readableNoteName[2]) as keyof typeof this.NOTE_NAMES_TO_MIDI_VALUES
+              readableNoteName[2]) as keyof typeof InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES
           ],
         offset: offset === null ? 0 : offset,
       };

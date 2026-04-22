@@ -48,6 +48,7 @@ import {
   InteractionData,
 } from 'interactions/customization-args-defs';
 import {Solution} from 'domain/exploration/solution.model';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {State} from 'domain/state/state.model';

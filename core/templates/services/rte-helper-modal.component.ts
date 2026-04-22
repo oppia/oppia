@@ -56,7 +56,7 @@ type ConvertStringLiteralsToString<T> = T extends string
 // then indexes into the object using [number] to represent any index in the
 // array.
 export type CustomizationArgsSpecsType = {
-  [K in keyof ComponentSpecsType]: ComponentSpecsType[K]['customization_arg_specs'][number][];
+  [K in keyof ComponentSpecsType]: readonly ComponentSpecsType[K]['customization_arg_specs'][number][];
   // Finally, use [keyof ComponentSpecsType] to create a union of all the array
   // types.
 }[keyof ComponentSpecsType];
@@ -246,9 +246,16 @@ export class RteHelperModalComponent {
   onCustomizationArgsFormChange(value: Record<string, unknown>): void {
     this.clearRteErrorMessage();
     if (this.componentId === this.COMPONENT_ID_MATH) {
-      let rawLatex: string = value[0].raw_latex;
-      let mathExpressionSvgIsBeingProcessed: boolean =
-        value[0].mathExpressionSvgIsBeingProcessed;
+      let rawLatex: string = (
+        value[0] as {
+          raw_latex: string;
+        }
+      ).raw_latex;
+      let mathExpressionSvgIsBeingProcessed: boolean = (
+        value[0] as {
+          mathExpressionSvgIsBeingProcessed: boolean;
+        }
+      ).mathExpressionSvgIsBeingProcessed;
       if (mathExpressionSvgIsBeingProcessed || rawLatex === '') {
         this.updateRteErrorMessage(
           'Waiting for math expression SVG to be processed...'
@@ -256,8 +263,8 @@ export class RteHelperModalComponent {
         return;
       }
     } else if (this.componentId === this.COMPONENT_ID_VIDEO) {
-      let start: number = value[1];
-      let end: number = value[2];
+      let start: number = value[1] as number;
+      let end: number = value[2] as number;
       if (value[0] === '') {
         this.updateRteErrorMessage(
           'Please ensure that the Youtube URL or id is valid.'
@@ -273,15 +280,19 @@ export class RteHelperModalComponent {
       }
     } else if (this.componentId === this.COMPONENT_ID_TABS) {
       // Value[0] corresponds to all tab contents and titles.
-      for (let tabIndex = 0; tabIndex < value[0].length; tabIndex++) {
-        if (value[0][tabIndex].title === '') {
+      const tabs = value[0] as {
+        title: string;
+        content: string;
+      }[];
+      for (let tabIndex = 0; tabIndex < tabs.length; tabIndex++) {
+        if (tabs[tabIndex].title === '') {
           this.updateRteErrorMessage(
             'Please ensure that the title of tab ' +
               (tabIndex + 1) +
               ' is filled.'
           );
           break;
-        } else if (value[0][tabIndex].content === '') {
+        } else if (tabs[tabIndex].content === '') {
           this.updateRteErrorMessage(
             'Please ensure that the content of tab ' +
               (tabIndex + 1) +
@@ -292,7 +303,7 @@ export class RteHelperModalComponent {
           // Check content length.
           if (
             this.isContentLengthExceeded(
-              value[0][tabIndex].content,
+              tabs[tabIndex].content,
               this.COMPONENT_ID_TABS_CONTENT
             )
           ) {
@@ -305,7 +316,7 @@ export class RteHelperModalComponent {
           // Check title length.
           if (
             this.isContentLengthExceeded(
-              value[0][tabIndex].title,
+              tabs[tabIndex].title,
               this.COMPONENT_ID_TABS_HEADING
             )
           ) {
@@ -319,8 +330,8 @@ export class RteHelperModalComponent {
         }
       }
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
-      let url: string = value[0];
-      let text: string = value[1];
+      let url: string = value[0] as string;
+      let text: string = value[1] as string;
 
       // Check URL and text lengths.
       if (this.isContentLengthExceeded(url, this.COMPONENT_ID_LINK)) {
@@ -374,7 +385,7 @@ export class RteHelperModalComponent {
       if (
         value[0] &&
         this.isContentLengthExceeded(
-          value[0],
+          value[0] as string,
           this.COMPONENT_ID_COLLAPSIBLE_HEADING
         )
       ) {
@@ -387,7 +398,7 @@ export class RteHelperModalComponent {
       if (
         value[1] &&
         this.isContentLengthExceeded(
-          value[1],
+          value[1] as string,
           this.COMPONENT_ID_COLLAPSIBLE_CONTENT
         )
       ) {
@@ -399,7 +410,10 @@ export class RteHelperModalComponent {
     } else if (this.componentId === this.COMPONENT_ID_WORKEDEXAMPLE) {
       if (
         value[0] &&
-        this.isContentLengthExceeded(value[0], this.COMPONENT_ID_WORKEDEXAMPLE)
+        this.isContentLengthExceeded(
+          value[0] as string,
+          this.COMPONENT_ID_WORKEDEXAMPLE
+        )
       ) {
         this.updateRteErrorMessage(
           `The question is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
@@ -413,7 +427,10 @@ export class RteHelperModalComponent {
 
       if (
         value[1] &&
-        this.isContentLengthExceeded(value[1], this.COMPONENT_ID_WORKEDEXAMPLE)
+        this.isContentLengthExceeded(
+          value[1] as string,
+          this.COMPONENT_ID_WORKEDEXAMPLE
+        )
       ) {
         this.updateRteErrorMessage(
           `The answer is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
@@ -480,7 +497,7 @@ export class RteHelperModalComponent {
           name: string;
           value: unknown;
         }[]
-      )[index].value = this.customizationArgsForm.value[index];
+      )[Number(index)].value = this.customizationArgsForm.value[index];
     }
     this.externalRteSaveService.onExternalRteSave.emit();
 

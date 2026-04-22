@@ -408,11 +408,11 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     }
 
     const interactionId = this.question.getStateData().interaction.id;
-    return (
+    return Boolean(
       interactionId &&
-      (INTERACTION_SPECS as Record<string, {can_have_solution: boolean}>)[
-        interactionId
-      ].can_have_solution
+        (INTERACTION_SPECS as Record<string, {can_have_solution: boolean}>)[
+          interactionId
+        ].can_have_solution
     );
   }
 

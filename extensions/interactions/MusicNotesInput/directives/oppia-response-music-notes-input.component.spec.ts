@@ -56,7 +56,7 @@ describe('Response music notes input component ', () => {
             den: 1,
           },
         },
-      ];
+      ] as unknown as string;
     });
 
     it('should initialise the component when submits answer', () => {
@@ -69,7 +69,7 @@ describe('Response music notes input component ', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(ResponseMusicNotesInput);
       component = fixture.componentInstance;
-      component.answer = [];
+      component.answer = [] as unknown as string;
     });
 
     it('should initialise the component when submits answer', () => {

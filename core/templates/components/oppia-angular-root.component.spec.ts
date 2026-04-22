@@ -26,6 +26,7 @@ import {
 } from './oppia-angular-root.component';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {Injector, NO_ERRORS_SCHEMA} from '@angular/core';
+import {PageContextService} from 'services/page-context.service';
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore

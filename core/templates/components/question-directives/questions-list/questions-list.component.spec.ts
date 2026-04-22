@@ -39,7 +39,9 @@ import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
 import {Skill} from 'domain/skill/skill.model';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {State} from 'domain/state/state.model';
+import {CategorizedSkills} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {SkillEditorRoutingService} from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import {AlertsService} from 'services/alerts.service';
@@ -161,7 +163,7 @@ describe('Questions List Component', () => {
                 missing_prerequisite_skill_id: null,
               },
               rule_specs: [],
-              training_data: null as unknown as string,
+              training_data: [],
               tagged_skill_misconception_id: null,
             },
           ],
