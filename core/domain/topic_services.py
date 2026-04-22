@@ -386,6 +386,8 @@ def _handle_remove_skill_id_from_subtopic(
         remove_skill_id_from_subtopic_cmd.subtopic_id,
         remove_skill_id_from_subtopic_cmd.skill_id,
     )
+
+
 def _collect_study_guide_changes(
     change: change_domain.BaseChange,
     topic: topic_domain.Topic,
@@ -408,7 +410,7 @@ def _collect_study_guide_changes(
     """
     # Remove union and StudyGuideChange once the study
     # guide logic when updating a subtopic page is
-    # removed from line 574.
+    # removed from line 576.
     update_study_guide_property_cmd: Union[
         study_guide_domain.UpdateStudyGuidePropertyCmd,
         study_guide_domain.StudyGuideChange,
