@@ -60,35 +60,6 @@ class RecoverOrphanedTranslationsJob(base_jobs.JobBase):
     DATASTORE_UPDATES_ALLOWED = True
 
     @staticmethod
-    def _key_translation_model(
-        model: translation_models.EntityTranslationsModel,
-    ) -> Tuple[str, translation_models.EntityTranslationsModel]:
-        """Keys a translation model by its entity_id for grouping.
-
-        Args:
-            model: EntityTranslationsModel. The translation model.
-
-        Returns:
-            tuple(str, EntityTranslationsModel). A key-value pair with
-            the entity_id as the key.
-        """
-        return (model.entity_id, model)
-
-    @staticmethod
-    def _key_exploration_model(
-        model: exp_models.ExplorationModel,
-    ) -> Tuple[str, int]:
-        """Keys an exploration model by its ID, with the version as value.
-
-        Args:
-            model: ExplorationModel. The exploration model.
-
-        Returns:
-            tuple(str, int). A key-value pair of (exploration_id, version).
-        """
-        return (model.id, model.version)
-
-    @staticmethod
     def _merge_and_forward_propagate(
         element: Tuple[
             str,
@@ -198,7 +169,8 @@ class RecoverOrphanedTranslationsJob(base_jobs.JobBase):
             >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(include_deleted=False)
             )
-            | 'Key explorations by ID' >> beam.Map(self._key_exploration_model)
+            | 'Key explorations by ID'
+            >> beam.Map(lambda model: (model.id, model.version))
         )
 
         translation_models_pcoll = (
@@ -211,7 +183,7 @@ class RecoverOrphanedTranslationsJob(base_jobs.JobBase):
                 )
             )
             | 'Key translations by entity_id'
-            >> beam.Map(self._key_translation_model)
+            >> beam.Map(lambda model: (model.entity_id, model))
         )
 
         grouped = {
