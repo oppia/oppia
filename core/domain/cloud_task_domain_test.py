@@ -107,6 +107,30 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
 
         self.assertEqual(cloud_task_run.to_dict(), cloud_task_run_dict)
 
+    def test_should_convert_datetime_fields_with_timezone_info(self) -> None:
+        cloud_task_run = cloud_task_domain.CloudTaskRun(
+            task_run_id='cloud_task_run_id',
+            cloud_task_name='projects/dev-project-id/locations/us-central/'
+            'queues/test_queue_name/tasks/task_id',
+            task_id='task_id',
+            queue_id='test_queue_name',
+            latest_job_state='running',
+            function_id='delete_exps_from_user_models',
+            exception_messages_for_failed_runs=[],
+            current_retry_attempt=0,
+            last_updated=datetime.datetime(2026, 1, 2, 3, 4, 5),
+            created_on=datetime.datetime(2026, 1, 2, 3, 4, 6),
+        )
+
+        cloud_task_run_dict = cloud_task_run.to_dict_with_timezone_info()
+
+        self.assertEqual(
+            cloud_task_run_dict['last_updated'], '2026-01-02T03:04:05+00:00'
+        )
+        self.assertEqual(
+            cloud_task_run_dict['created_on'], '2026-01-02T03:04:06+00:00'
+        )
+
 
 class VoiceoverRegenerationJobTests(test_utils.GenericTestBase):
     """Unit tests for VoiceoverRegenerationJob domain object."""

@@ -175,6 +175,51 @@ def save_new_topic(committer_id: str, topic: topic_domain.Topic) -> None:
     )
 
 
+def _collect_study_guide_changes(
+    change: change_domain.BaseChange,
+    topic: topic_domain.Topic,
+    topic_id: str,
+    existing_study_guide_ids_to_be_modified: List[int],
+    modified_study_guide_change_cmds: Dict[
+        str, List[study_guide_domain.StudyGuideChange]
+    ],
+) -> None:
+    """Collects study guide preprocessing changes from a change command.
+
+    Args:
+        change: BaseChange. Incoming change command with study guide updates.
+        topic: Topic. The topic object being updated.
+        topic_id: str. ID of the topic.
+        existing_study_guide_ids_to_be_modified: list(int). List tracking ids
+            of study guides to be fetched and modified.
+        modified_study_guide_change_cmds: dict(str, list(StudyGuideChange)).
+            Study guide change commands grouped by study guide id.
+    """
+    # Remove union and StudyGuideChange once the study
+    # guide logic when updating a subtopic page is
+    # removed from line 363.
+    update_study_guide_property_cmd: Union[
+        study_guide_domain.UpdateStudyGuidePropertyCmd,
+        study_guide_domain.StudyGuideChange,
+    ]
+    # Here we use cast because we are narrowing down the type from
+    # TopicChange to a specific change command.
+    update_study_guide_property_cmd = cast(
+        study_guide_domain.UpdateStudyGuidePropertyCmd, change
+    )
+
+    if update_study_guide_property_cmd.subtopic_id < topic.next_subtopic_id:
+        existing_study_guide_ids_to_be_modified.append(
+            update_study_guide_property_cmd.subtopic_id
+        )
+        study_guide_id = study_guide_domain.StudyGuide.get_study_guide_id(
+            topic_id, update_study_guide_property_cmd.subtopic_id
+        )
+        modified_study_guide_change_cmds[study_guide_id].append(
+            update_study_guide_property_cmd
+        )
+
+
 def apply_change_list(
     topic_id: str,
     change_list: Sequence[change_domain.BaseChange],
@@ -268,34 +313,13 @@ def apply_change_list(
 
     for change in change_list:
         if change.cmd == study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY:
-            # Remove union and StudyGuideChange once the study
-            # guide logic when updating a subtopic page is
-            # removed from line 337.
-            update_study_guide_property_cmd: Union[
-                study_guide_domain.UpdateStudyGuidePropertyCmd,
-                study_guide_domain.StudyGuideChange,
-            ]
-            # Here we use cast because we are narrowing down the type from
-            # TopicChange to a specific change command.
-            update_study_guide_property_cmd = cast(
-                study_guide_domain.UpdateStudyGuidePropertyCmd, change
+            _collect_study_guide_changes(
+                change,
+                topic,
+                topic_id,
+                existing_study_guide_ids_to_be_modified,
+                modified_study_guide_change_cmds,
             )
-
-            if (
-                update_study_guide_property_cmd.subtopic_id
-                < topic.next_subtopic_id
-            ):
-                existing_study_guide_ids_to_be_modified.append(
-                    update_study_guide_property_cmd.subtopic_id
-                )
-                study_guide_id = (
-                    study_guide_domain.StudyGuide.get_study_guide_id(
-                        topic_id, update_study_guide_property_cmd.subtopic_id
-                    )
-                )
-                modified_study_guide_change_cmds[study_guide_id].append(
-                    update_study_guide_property_cmd
-                )
         # Remove this entire if block once study guides become standard.
         if change.cmd == subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY:
             # Here we use cast because we are narrowing down the type from
