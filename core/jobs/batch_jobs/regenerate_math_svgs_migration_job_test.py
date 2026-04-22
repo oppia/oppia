@@ -313,8 +313,8 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
             temp_path,
         ):
             result = (
-                regenerate_math_svgs_migration_job._load_svg_mapping()
-            )  # pylint: disable=protected-access
+                regenerate_math_svgs_migration_job._load_svg_mapping()  # pylint: disable=protected-access
+            )
             self.assertEqual(result, {OLD_SVG_FILENAME: NEW_SVG_FILENAME})
 
     def test_load_svg_mapping_skips_entries_with_empty_filenames(
@@ -341,24 +341,24 @@ class RegenerateMathSvgsMigrationJobHelperFunctionTests(
             temp_path,
         ):
             result = (
-                regenerate_math_svgs_migration_job._load_svg_mapping()
-            )  # pylint: disable=protected-access
+                regenerate_math_svgs_migration_job._load_svg_mapping()  # pylint: disable=protected-access
+            )
             self.assertEqual(result, {OLD_SVG_FILENAME: NEW_SVG_FILENAME})
 
     def test_unescape_html_converts_entities(self) -> None:
         """_unescape_html correctly unescapes HTML entities."""
         escaped = '&quot;hello&quot; &amp; &lt;world&gt;'
-        result = regenerate_math_svgs_migration_job._unescape_html(
+        result = regenerate_math_svgs_migration_job._unescape_html(  # pylint: disable=protected-access
             escaped
-        )  # pylint: disable=protected-access
+        )
         self.assertEqual(result, '"hello" & <world>')
 
     def test_escape_html_escapes_special_chars(self) -> None:
         """_escape_html correctly escapes special characters."""
         plain = '"hello" & world'
-        result = regenerate_math_svgs_migration_job._escape_html(
+        result = regenerate_math_svgs_migration_job._escape_html(  # pylint: disable=protected-access
             plain
-        )  # pylint: disable=protected-access
+        )
         self.assertEqual(result, '&quot;hello&quot; &amp; world')
 
     def test_update_math_tags_replaces_known_filename(self) -> None:
