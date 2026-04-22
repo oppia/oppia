@@ -46,7 +46,10 @@ import {
 import {Question} from 'domain/question/question.model';
 import {State} from 'domain/state/state.model';
 import {Rubric} from 'domain/skill/rubric.model';
-import {EditableQuestionBackendApiService} from 'domain/question/editable-question-backend-api.service';
+import {
+  EditableQuestionBackendApiService,
+  ImageData,
+} from 'domain/question/editable-question-backend-api.service';
 import {
   CategorizedSkills,
   SelectSkillModalComponent,
@@ -407,7 +410,9 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     const interactionId = this.question.getStateData().interaction.id;
     return (
       interactionId &&
-      (INTERACTION_SPECS as any)[interactionId].can_have_solution
+      (INTERACTION_SPECS as Record<string, {can_have_solution: boolean}>)[
+        interactionId
+      ].can_have_solution
     );
   }
 
@@ -530,7 +535,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
           this.newQuestionSkillIds,
           this.newQuestionSkillDifficulties,
           this.question.toBackendDict(true),
-          imagesData as any
+          imagesData as unknown as ImageData[]
         )
         .then(
           response => {

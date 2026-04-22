@@ -239,7 +239,7 @@ export class SvgEditorComponent implements OnInit {
     this.imageSaveDestination =
       this.pageContextService.getImageSaveDestination();
     this.entityId = this.pageContextService.getEntityId();
-    this.entityType = this.pageContextService.getEntityType()!;
+    this.entityType = this.pageContextService.getEntityType() ?? '';
     const domReady = new Promise((resolve, reject) => {
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', resolve);
@@ -306,9 +306,13 @@ export class SvgEditorComponent implements OnInit {
     ) {
       const imageUrl =
         this.imageLocalStorageService.getRawImageData(svgFileName);
+      if (imageUrl === null) {
+        throw new Error('Image not found in storage');
+      }
       return {
-        safeUrl: this.svgSanitizerService.getTrustedSvgResourceUrl(imageUrl!)!,
-        unsafeUrl: imageUrl!,
+        safeUrl:
+          this.svgSanitizerService.getTrustedSvgResourceUrl(imageUrl) ?? '',
+        unsafeUrl: imageUrl,
       };
     }
     const encodedFilepath = window.encodeURIComponent(svgFileName);
@@ -343,7 +347,7 @@ export class SvgEditorComponent implements OnInit {
       this.diagramWidth = dimensions.width;
       this.diagramHeight = dimensions.height;
       let svgDataUrl = this.imageLocalStorageService.getRawImageData(
-        this.data.savedSvgFileName!
+        this.data.savedSvgFileName ?? ''
       );
       if (
         this.imageSaveDestination ===
@@ -465,8 +469,9 @@ export class SvgEditorComponent implements OnInit {
 
     if (this.isSvgTagValid(svgString)) {
       this.savedSvgDiagram = svgString;
-      resampledFile =
-        this.imageUploadHelperService.convertImageDataToImageFile(svgDataURI)!;
+      resampledFile = this.imageUploadHelperService.convertImageDataToImageFile(
+        svgDataURI
+      ) as Blob;
       if (
         this.imageSaveDestination ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
@@ -586,7 +591,8 @@ export class SvgEditorComponent implements OnInit {
     });
 
     value =
-      (obj as any)['text-transform'] === 'uppercase'
+      (obj as unknown as Record<string, string>)['text-transform'] ===
+      'uppercase'
         ? value.toUpperCase()
         : value;
 
@@ -650,8 +656,8 @@ export class SvgEditorComponent implements OnInit {
       this.initializeFabricJs();
       fabric.loadSVGFromString(this.savedSvgDiagram, ((
         objects: fabric.Object[],
-        options: any,
-        elements: any
+        options: fabric.IObjectOptions,
+        elements: SVGElement[]
       ) => {
         let groupedObjects: fabric.Object[][] = [];
         objects.forEach((obj: fabric.Object, index: number) => {
@@ -686,7 +692,11 @@ export class SvgEditorComponent implements OnInit {
           this.groupCount += 1;
         });
         this.centerContent();
-      }) as any);
+      }) as (
+        objects: fabric.Object[],
+        options: fabric.IObjectOptions,
+        elements: SVGElement[]
+      ) => void);
       this.changeDetectorRef.detectChanges();
     });
   }
@@ -858,8 +868,8 @@ export class SvgEditorComponent implements OnInit {
     this.polyOptions.lineCounter = 0;
   }
 
-  private setPolyStartingPoint(options: any): void {
-    var mouse = this.canvas.getPointer(options.e);
+  private setPolyStartingPoint(options: fabric.IEvent): void {
+    const mouse = this.canvas.getPointer(options.e);
     this.polyOptions.x = mouse.x;
     this.polyOptions.y = mouse.y;
   }
@@ -1001,7 +1011,7 @@ export class SvgEditorComponent implements OnInit {
       const path = this.canvas
         .getObjects()
         .slice(-1)[0]
-        .get('path' as keyof fabric.Object);
+        .get('path' as keyof fabric.Object) as (string | number)[][];
       this.canvas.remove(this.canvas.getObjects().slice(-1)[0]);
       this.canvas.getObjects().forEach(item => {
         item.set({
@@ -1221,11 +1231,11 @@ export class SvgEditorComponent implements OnInit {
       objects.forEach(obj => {
         obj.set({
           id: 'group' + this.groupCount,
-        } as any);
+        } as fabric.IObjectOptions & {id: string});
         obj.toSVG = this.createCustomToSVG(
           obj.toSVG,
           obj.type || '',
-          (obj as any).id,
+          (obj as unknown as {id: string}).id,
           obj
         );
       });
@@ -1322,8 +1332,8 @@ export class SvgEditorComponent implements OnInit {
 
   onUndo(): void {
     this.canvas.discardActiveObject();
-    if (this.objectUndoStack.length > 0) {
-      var undoObj = this.objectUndoStack.pop()!;
+    const undoObj = this.objectUndoStack.pop();
+    if (undoObj) {
       if (undoObj.action === 'add') {
         var shape = this.canvasObjects.pop();
         if (shape) {
@@ -1358,8 +1368,8 @@ export class SvgEditorComponent implements OnInit {
 
   onRedo(): void {
     this.canvas.discardActiveObject();
-    if (this.objectRedoStack.length > 0) {
-      var redoObj = this.objectRedoStack.pop()!;
+    const redoObj = this.objectRedoStack.pop();
+    if (redoObj) {
       this.undoStackPush(redoObj);
       if (redoObj.action === 'add') {
         this.isRedo = true;
@@ -1367,8 +1377,8 @@ export class SvgEditorComponent implements OnInit {
         // event function.
         this.canvas.add(redoObj.object);
       } else {
-        var shape = redoObj.object;
-        var index = this.canvasObjects.indexOf(shape);
+        const shape = redoObj.object;
+        let index = this.canvasObjects.indexOf(shape);
         this.canvasObjects.splice(index, 1);
         index = this.canvas._objects.indexOf(shape);
         this.canvas._objects.splice(index, 1);
@@ -1556,32 +1566,37 @@ export class SvgEditorComponent implements OnInit {
         element.setAttribute('title', 'Transparency Slider');
       });
     };
-    let onChange = (color: any) => {
+    const onChange = (color: {rgbaString: string; rgba: number[]}) => {
       if (parent) {
         parent.style.background = color.rgbaString;
       }
-      var topAlphaSquare = document.getElementById('top-' + value + '-alpha');
-      var bottomAlphaSquare = document.getElementById(
+      const topAlphaSquare = document.getElementById('top-' + value + '-alpha');
+      const bottomAlphaSquare = document.getElementById(
         'bottom-' + value + '-alpha'
       );
-      var opacity = 1 - color.rgba[3];
+      const opacity = 1 - color.rgba[3];
       if (topAlphaSquare) {
         topAlphaSquare.style.opacity = opacity.toString();
       }
       if (bottomAlphaSquare) {
         bottomAlphaSquare.style.opacity = opacity.toString();
       }
-      (this.fabricjsOptions as any)[value] = color.rgbaString;
-      (onChangeFunc as any)[value]();
+      (this.fabricjsOptions as Record<string, string | boolean>)[value] =
+        color.rgbaString;
+      (onChangeFunc as Record<string, () => void>)[value]();
     };
     var picker = new Picker({
-      parent: parent!,
-      color: (this.fabricjsOptions as any)[value],
+      parent: parent as HTMLElement,
+      color: (this.fabricjsOptions as Record<string, string | boolean>)[
+        value
+      ] as string,
       onOpen: onOpen,
       onChange: onChange,
     });
     if (parent) {
-      parent.style.background = (this.fabricjsOptions as any)[value];
+      parent.style.background = (
+        this.fabricjsOptions as Record<string, string | boolean>
+      )[value] as string;
     }
     if (value === 'stroke') {
       this.strokePicker = picker;
@@ -1656,7 +1671,7 @@ export class SvgEditorComponent implements OnInit {
       }
     });
 
-    this.canvas.on('object:moving', (e: any) => {
+    this.canvas.on('object:moving', (e: fabric.IEvent) => {
       // Detects the movement in the control points when
       // drawing the bezier curve.
       if (this.drawMode === this.DRAW_MODE_BEZIER) {

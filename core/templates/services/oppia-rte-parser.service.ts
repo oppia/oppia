@@ -55,7 +55,11 @@ export class OppiaRteNode {
     let t: '' | 'component' = '';
     if (this.selector.startsWith('oppia-noninteractive-')) {
       t = 'component';
-      if ((selectorToComponentClassMap as any)[this.selector] === undefined) {
+      if (
+        selectorToComponentClassMap[
+          this.selector as keyof typeof selectorToComponentClassMap
+        ] === undefined
+      ) {
         throw new Error('Unexpected tag encountered: ' + selector);
       }
     }

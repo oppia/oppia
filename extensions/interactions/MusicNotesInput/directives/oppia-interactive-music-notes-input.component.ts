@@ -499,9 +499,10 @@ export class MusicNotesInputComponent
         }
 
         const note = {
-          baseNoteMidiNumber: (this.NOTE_NAMES_TO_MIDI_VALUES as any)[
-            lineValue
-          ],
+          baseNoteMidiNumber:
+            this.NOTE_NAMES_TO_MIDI_VALUES[
+              lineValue as keyof typeof this.NOTE_NAMES_TO_MIDI_VALUES
+            ],
           offset: parseInt(noteType, 10),
           noteId,
           noteStart: {num: 0, den: 1},
@@ -601,7 +602,7 @@ export class MusicNotesInputComponent
         for (let i = 0; i < this.noteSequence.length; i++) {
           let noteComparison = this.compareNoteStarts(
             this.noteSequence[i],
-            newNoteToCheck!
+            newNoteToCheck
           );
           if (noteComparison === 0) {
             return true;
@@ -658,7 +659,9 @@ export class MusicNotesInputComponent
   // Converts the midiValue of a droppable line that a note is on
   // into a top position.
   getVerticalPosition(baseNoteMidiNumber: number): number {
-    return (this.getStaffLinePositions() as any)[baseNoteMidiNumber];
+    return (this.getStaffLinePositions() as Record<number, number>)[
+      baseNoteMidiNumber
+    ];
   }
 
   /**
@@ -738,7 +741,11 @@ export class MusicNotesInputComponent
   _getCorrespondingNoteName(midiNumber: string | number): string {
     let correspondingNoteName: string | null = null;
     for (let noteName in this.NOTE_NAMES_TO_MIDI_VALUES) {
-      if ((this.NOTE_NAMES_TO_MIDI_VALUES as any)[noteName] === midiNumber) {
+      if (
+        this.NOTE_NAMES_TO_MIDI_VALUES[
+          noteName as keyof typeof this.NOTE_NAMES_TO_MIDI_VALUES
+        ] === midiNumber
+      ) {
         correspondingNoteName = noteName;
         break;
       }
@@ -789,9 +796,10 @@ export class MusicNotesInputComponent
     if (readableNoteName.length === 2) {
       // This is a natural note.
       return {
-        baseNoteMidiNumber: (this.NOTE_NAMES_TO_MIDI_VALUES as any)[
-          readableNoteName
-        ],
+        baseNoteMidiNumber:
+          this.NOTE_NAMES_TO_MIDI_VALUES[
+            readableNoteName as keyof typeof this.NOTE_NAMES_TO_MIDI_VALUES
+          ],
         offset: 0,
       };
     } else if (readableNoteName.length === 3) {
@@ -807,10 +815,12 @@ export class MusicNotesInputComponent
       }
 
       return {
-        baseNoteMidiNumber: (this.NOTE_NAMES_TO_MIDI_VALUES as any)[
-          readableNoteName[0] + readableNoteName[2]
-        ],
-        offset: offset!,
+        baseNoteMidiNumber:
+          this.NOTE_NAMES_TO_MIDI_VALUES[
+            (readableNoteName[0] +
+              readableNoteName[2]) as keyof typeof this.NOTE_NAMES_TO_MIDI_VALUES
+          ],
+        offset: offset === null ? 0 : offset,
       };
     } else {
       // This is not a valid readableNote.

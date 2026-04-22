@@ -243,7 +243,7 @@ export class RteHelperModalComponent {
     this.customizationArgsFormSubscription.unsubscribe();
   }
 
-  onCustomizationArgsFormChange(value: any): void {
+  onCustomizationArgsFormChange(value: Record<string, unknown>): void {
     this.clearRteErrorMessage();
     if (this.componentId === this.COMPONENT_ID_MATH) {
       let rawLatex: string = value[0].raw_latex;
@@ -475,8 +475,12 @@ export class RteHelperModalComponent {
 
   save(): void {
     for (let index in this.customizationArgsForm.value) {
-      (this.tmpCustomizationArgs as any)[index].value =
-        this.customizationArgsForm.value[index];
+      (
+        this.tmpCustomizationArgs as {
+          name: string;
+          value: unknown;
+        }[]
+      )[index].value = this.customizationArgsForm.value[index];
     }
     this.externalRteSaveService.onExternalRteSave.emit();
 

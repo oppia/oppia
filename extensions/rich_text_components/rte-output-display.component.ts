@@ -386,7 +386,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // specific to the language.
     // The following line retrieves the punctuation marks for the current language.
     const punctuationsForCurrentLanguage = (
-      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS as any
+      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS as Record<
+        string,
+        string
+      >
     )[languageCode];
 
     // The regex below is used to split sentences from the lesson content.
@@ -698,16 +701,22 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     }
     if (node.nodeType === 'component') {
       return new TemplatePortal(
-        (this as any)[
+        (this as unknown as Record<string, TemplateRef<unknown>>)[
           node.selector.split('oppia-noninteractive-')[1] + 'TagPortal'
         ],
         this._viewContainerRef,
         {$implicit: node.attrs}
       );
     }
-    if ((this as any)[node.selector + 'TagPortal'] !== undefined) {
+    if (
+      (this as unknown as Record<string, TemplateRef<unknown>>)[
+        node.selector + 'TagPortal'
+      ] !== undefined
+    ) {
       return new TemplatePortal(
-        (this as any)[node.selector + 'TagPortal'],
+        (this as unknown as Record<string, TemplateRef<unknown>>)[
+          node.selector + 'TagPortal'
+        ],
         this._viewContainerRef,
         {$implicit: node}
       );
