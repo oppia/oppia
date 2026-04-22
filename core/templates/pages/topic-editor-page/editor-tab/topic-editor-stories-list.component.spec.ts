@@ -25,16 +25,22 @@ import {
   TestBed,
   tick,
 } from '@angular/core/testing';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbModal,
+  NgbModalOptions,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {TopicUpdateService} from 'domain/topic/topic-update.service';
 import {TopicEditorStoriesListComponent} from './topic-editor-stories-list.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
+import {Type} from '@angular/core';
+import {Topic} from 'domain/topic/topic-object.model';
 
 class MockNgbModalRef {
-  componentInstance: {
+  componentInstance!: {
     body: 'xyz';
   };
 }
@@ -50,7 +56,7 @@ class MockPlatformFeatureService {
 describe('topicEditorStoriesList', () => {
   let component: TopicEditorStoriesListComponent;
   let fixture: ComponentFixture<TopicEditorStoriesListComponent>;
-  let storySummaries;
+  let storySummaries: StorySummary[];
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let topicUpdateService: TopicUpdateService;
   let undoRedoService: UndoRedoService;
@@ -127,8 +133,14 @@ describe('topicEditorStoriesList', () => {
   it('should change list order properly', () => {
     spyOn(topicUpdateService, 'rearrangeCanonicalStory').and.stub();
 
-    component.storySummaries = [null, null, null];
-    component.topic = null;
+    component.storySummaries = [
+      {} as StorySummary,
+      {} as StorySummary,
+      {} as StorySummary,
+    ];
+    component.topic = {
+      getId: () => 'topic_id',
+    } as Topic;
     component.drop({
       previousIndex: 1,
       currentIndex: 2,
@@ -198,12 +210,14 @@ describe('topicEditorStoriesList', () => {
     'should open save changes modal when user tries to open story editor' +
       ' without saving changes',
     () => {
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve(),
-        } as NgbModalRef;
-      });
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+        (dlg: Type<unknown>, opt: NgbModalOptions) => {
+          return {
+            componentInstance: MockNgbModalRef,
+            result: Promise.resolve(),
+          } as NgbModalRef;
+        }
+      );
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
       component.openStoryEditor('storyId');
@@ -215,12 +229,14 @@ describe('topicEditorStoriesList', () => {
   it(
     'should close save changes modal when closes the saves changes' + ' modal',
     () => {
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.reject(),
-        } as NgbModalRef;
-      });
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+        (dlg: Type<unknown>, opt: NgbModalOptions) => {
+          return {
+            componentInstance: MockNgbModalRef,
+            result: Promise.reject(),
+          } as NgbModalRef;
+        }
+      );
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
       component.openStoryEditor('storyId');

@@ -193,8 +193,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/subtopic-viewer-page/navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component.spec.ts',
     'core/templates/pages/subtopic-viewer-page/subtopic-viewer-auth.guard.spec.ts',
     'core/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.spec.ts',
-    'core/templates/pages/topic-editor-page/editor-tab/topic-editor-stories-list.component.spec.ts',
-    'core/templates/pages/topic-editor-page/editor-tab/topic-editor-stories-list.component.ts',
     'core/templates/pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component.spec.ts',
     'core/templates/pages/topic-editor-page/preview-tab/topic-preview-tab.component.spec.ts',
     'core/templates/pages/topic-editor-page/subtopic-editor/add-study-guide-section.component.spec.ts',
