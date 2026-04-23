@@ -25,4 +25,10 @@ export const SvgEditorConstants = {
   MAX_SVG_DIAGRAM_HEIGHT: 450,
   MIN_SVG_DIAGRAM_WIDTH: 30,
   MIN_SVG_DIAGRAM_HEIGHT: 30,
+  // The toolbar height accounts for the space taken by the dimension inputs,
+  // tool buttons, and padding above the canvas area. This value (62px) was
+  // measured from the rendered editor toolbar and is used to ensure the
+  // svg-editor container has enough minimum height to display both the
+  // toolbar and the full canvas without clipping.
+  SVG_EDITOR_TOOLBAR_HEIGHT_PX: 62,
 } as const;

@@ -355,11 +355,16 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     }
   }
 
-  saveTaggedMisconception(taggedMisconception: TaggedMisconception): void {
-    const {skillId, misconceptionId} = taggedMisconception;
+  saveTaggedMisconception(
+    taggedMisconception: TaggedMisconception | null
+  ): void {
+    const taggedSkillMisconceptionId =
+      taggedMisconception !== null
+        ? `${taggedMisconception.skillId}-${taggedMisconception.misconceptionId}`
+        : null;
     this.responsesService.updateActiveAnswerGroup(
       {
-        taggedSkillMisconceptionId: skillId + '-' + misconceptionId,
+        taggedSkillMisconceptionId,
       } as AnswerGroup,
       newAnswerGroups => {
         this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
