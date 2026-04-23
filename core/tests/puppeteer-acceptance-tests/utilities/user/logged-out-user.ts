@@ -2085,27 +2085,17 @@ export class LoggedOutUser extends BaseUser {
     }
     const newTabPage = await newTarget.page();
 
-    // Wait for the new page to stabilize before closing to prevent the
-    // puppeteer-screen-recorder from crashing. Using waitForSelector
-    // rather than fixed timeout as per best practices.
-    await newTabPage?.waitForNetworkIdle({timeout: 2000}).catch(() => {});
-    await newTabPage?.waitForSelector('body', {visible: true}).catch(() => {});
+    // Wait for the new page to navigate to the correct domain per reviewer request
+    await newTabPage?.waitForFunction(
+      domain => window.location.href.includes(domain),
+      {timeout: 10000},
+      expectedDestinationDomain
+    );
 
-    try {
-      expect(newTabPage).toBeDefined();
-      const currentUrl = newTabPage?.url() || '';
-
-      if (expectedDestinationDomain === 'x.com') {
-        expect(
-          currentUrl.includes('x.com') || currentUrl.includes('twitter.com')
-        ).toBe(true);
-      } else {
-        expect(currentUrl).toContain(expectedDestinationDomain);
-      }
-      expect(currentUrl).toContain(expectedAccountId);
-    } finally {
-      await newTabPage?.close();
-    }
+    expect(newTabPage).toBeDefined();
+    expect(newTabPage?.url()).toContain(expectedDestinationDomain);
+    expect(newTabPage?.url()).toContain(expectedAccountId);
+    await newTabPage?.close();
   }
 
   /**
