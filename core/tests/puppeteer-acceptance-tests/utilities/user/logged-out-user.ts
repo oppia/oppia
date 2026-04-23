@@ -2676,11 +2676,50 @@ export class LoggedOutUser extends BaseUser {
    */
   async isDonorBoxVisbleOnDonatePage(): Promise<void> {
     const donorBox = await this.page.waitForSelector(donorBoxIframe);
+    if (!this.isViewportAtMobileWidth()) {
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          if (!element) {
+            return false;
+          }
+          const rect = element.getBoundingClientRect();
+          return rect.width > 0 && rect.height > 0;
+        },
+        {},
+        donorBoxIframe
+      );
+      await this.waitForDonorBoxFrameToLoad();
+    }
     if (!donorBox) {
       throw new Error('The donor box is not visible on the donate page.');
     } else {
       showMessage('The donor box is visible on the donate page.');
     }
+  }
+
+  /**
+   * Waits for the DonorBox iframe to load its frame URL.
+   * This avoids taking screenshots before the external content renders.
+   */
+  private async waitForDonorBoxFrameToLoad(): Promise<void> {
+    const maxWaitMsecs = 20000;
+    const pollIntervalMsecs = 500;
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < maxWaitMsecs) {
+      const donorBoxFrame = this.page
+        .frames()
+        .find(frame => frame.url().includes('donorbox.org'));
+      if (donorBoxFrame) {
+        return;
+      }
+      await this.page.waitForTimeout(pollIntervalMsecs);
+    }
+
+    throw new Error(
+      'The DonorBox iframe did not finish loading within the expected time.'
+    );
   }
 
   /**

@@ -16,7 +16,7 @@
 }
 
 .home-tab .greeting {
-  color: #00645c;
+  color: #004d45;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 32px;
 }
@@ -51,7 +51,7 @@
 .home-tab .continue-where-you-left-off .continue-where-you-left-off-heading,
 .home-tab .suggested-for-you .suggested-for-you-heading,
 .home-tab .empty-suggested-for-you .suggested-for-you-heading {
-  color: #00645c;
+  color: #004d45;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 24px;
   margin: 0;
@@ -62,7 +62,7 @@
   padding-top: 32px;
 }
 .home-tab .suggested-for-you .classroom-card {
-  background-color: #eee ;
+  background-color: #eee;
   border-radius: 4px;
   float: right;
   height: 210px;
@@ -86,7 +86,7 @@
   display: inline-block;
 }
 #setting-a-goal-link {
-  color: #00645c;
+  color: #004d45;
   font-weight: bold;
 }
 .home-tab .empty-suggested-for-you-section {
