@@ -56,7 +56,7 @@ type ConvertStringLiteralsToString<T> = T extends string
 // then indexes into the object using [number] to represent any index in the
 // array.
 export type CustomizationArgsSpecsType = {
-  [K in keyof ComponentSpecsType]: readonly ComponentSpecsType[K]['customization_arg_specs'][number][];
+  [K in keyof ComponentSpecsType]: ComponentSpecsType[K]['customization_arg_specs'][number][];
   // Finally, use [keyof ComponentSpecsType] to create a union of all the array
   // types.
 }[keyof ComponentSpecsType];
@@ -108,16 +108,16 @@ export type RteComponentId = {
   templateUrl: './rte-helper-modal.component.html',
 })
 export class RteHelperModalComponent {
-  @Input() componentId!: RteComponentId;
-  @Input() customizationArgSpecs!: CustomizationArgsSpecsType;
-  @Input() attrsCustomizationArgsDict!: CustomizationArgsForRteType;
-  @Input() componentIsNewlyCreated!: boolean;
+  @Input() componentId: RteComponentId;
+  @Input() customizationArgSpecs: CustomizationArgsSpecsType;
+  @Input() attrsCustomizationArgsDict: CustomizationArgsForRteType;
+  @Input() componentIsNewlyCreated: boolean;
   modalIsLoading: boolean = true;
-  errorMessage!: string;
+  errorMessage: string;
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
   @ViewChild('schemaForm') schemaForm!: NgForm;
-  public customizationArgsForm!: FormGroup;
-  customizationArgsFormSubscription!: Subscription;
+  public customizationArgsForm: FormGroup;
+  customizationArgsFormSubscription: Subscription;
   COMPONENT_ID_COLLAPSIBLE = 'collapsible';
   COMPONENT_ID_COLLAPSIBLE_HEADING = 'collapsible_heading';
   COMPONENT_ID_COLLAPSIBLE_CONTENT = 'collapsible_content';
@@ -211,8 +211,8 @@ export class RteHelperModalComponent {
     }
 
     const formGroupControls = {};
-    this.customizationArgSpecs.forEach((_: unknown, index: number) => {
-      (formGroupControls as Record<number, unknown>)[index] = this.fb.control(
+    this.customizationArgSpecs.forEach((_, index) => {
+      formGroupControls[index] = this.fb.control(
         this.tmpCustomizationArgs[index].value
       );
     });
@@ -243,19 +243,12 @@ export class RteHelperModalComponent {
     this.customizationArgsFormSubscription.unsubscribe();
   }
 
-  onCustomizationArgsFormChange(value: Record<string, unknown>): void {
+  onCustomizationArgsFormChange(value: number | string | boolean): void {
     this.clearRteErrorMessage();
     if (this.componentId === this.COMPONENT_ID_MATH) {
-      let rawLatex: string = (
-        value[0] as {
-          raw_latex: string;
-        }
-      ).raw_latex;
-      let mathExpressionSvgIsBeingProcessed: boolean = (
-        value[0] as {
-          mathExpressionSvgIsBeingProcessed: boolean;
-        }
-      ).mathExpressionSvgIsBeingProcessed;
+      let rawLatex: string = value[0].raw_latex;
+      let mathExpressionSvgIsBeingProcessed: boolean =
+        value[0].mathExpressionSvgIsBeingProcessed;
       if (mathExpressionSvgIsBeingProcessed || rawLatex === '') {
         this.updateRteErrorMessage(
           'Waiting for math expression SVG to be processed...'
@@ -263,8 +256,8 @@ export class RteHelperModalComponent {
         return;
       }
     } else if (this.componentId === this.COMPONENT_ID_VIDEO) {
-      let start: number = value[1] as number;
-      let end: number = value[2] as number;
+      let start: number = value[1];
+      let end: number = value[2];
       if (value[0] === '') {
         this.updateRteErrorMessage(
           'Please ensure that the Youtube URL or id is valid.'
@@ -280,19 +273,15 @@ export class RteHelperModalComponent {
       }
     } else if (this.componentId === this.COMPONENT_ID_TABS) {
       // Value[0] corresponds to all tab contents and titles.
-      const tabs = value[0] as {
-        title: string;
-        content: string;
-      }[];
-      for (let tabIndex = 0; tabIndex < tabs.length; tabIndex++) {
-        if (tabs[tabIndex].title === '') {
+      for (let tabIndex = 0; tabIndex < value[0].length; tabIndex++) {
+        if (value[0][tabIndex].title === '') {
           this.updateRteErrorMessage(
             'Please ensure that the title of tab ' +
               (tabIndex + 1) +
               ' is filled.'
           );
           break;
-        } else if (tabs[tabIndex].content === '') {
+        } else if (value[0][tabIndex].content === '') {
           this.updateRteErrorMessage(
             'Please ensure that the content of tab ' +
               (tabIndex + 1) +
@@ -303,7 +292,7 @@ export class RteHelperModalComponent {
           // Check content length.
           if (
             this.isContentLengthExceeded(
-              tabs[tabIndex].content,
+              value[0][tabIndex].content,
               this.COMPONENT_ID_TABS_CONTENT
             )
           ) {
@@ -316,7 +305,7 @@ export class RteHelperModalComponent {
           // Check title length.
           if (
             this.isContentLengthExceeded(
-              tabs[tabIndex].title,
+              value[0][tabIndex].title,
               this.COMPONENT_ID_TABS_HEADING
             )
           ) {
@@ -330,8 +319,8 @@ export class RteHelperModalComponent {
         }
       }
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
-      let url: string = value[0] as string;
-      let text: string = value[1] as string;
+      let url: string = value[0];
+      let text: string = value[1];
 
       // Check URL and text lengths.
       if (this.isContentLengthExceeded(url, this.COMPONENT_ID_LINK)) {
@@ -385,7 +374,7 @@ export class RteHelperModalComponent {
       if (
         value[0] &&
         this.isContentLengthExceeded(
-          value[0] as string,
+          value[0],
           this.COMPONENT_ID_COLLAPSIBLE_HEADING
         )
       ) {
@@ -398,7 +387,7 @@ export class RteHelperModalComponent {
       if (
         value[1] &&
         this.isContentLengthExceeded(
-          value[1] as string,
+          value[1],
           this.COMPONENT_ID_COLLAPSIBLE_CONTENT
         )
       ) {
@@ -410,10 +399,7 @@ export class RteHelperModalComponent {
     } else if (this.componentId === this.COMPONENT_ID_WORKEDEXAMPLE) {
       if (
         value[0] &&
-        this.isContentLengthExceeded(
-          value[0] as string,
-          this.COMPONENT_ID_WORKEDEXAMPLE
-        )
+        this.isContentLengthExceeded(value[0], this.COMPONENT_ID_WORKEDEXAMPLE)
       ) {
         this.updateRteErrorMessage(
           `The question is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
@@ -427,10 +413,7 @@ export class RteHelperModalComponent {
 
       if (
         value[1] &&
-        this.isContentLengthExceeded(
-          value[1] as string,
-          this.COMPONENT_ID_WORKEDEXAMPLE
-        )
+        this.isContentLengthExceeded(value[1], this.COMPONENT_ID_WORKEDEXAMPLE)
       ) {
         this.updateRteErrorMessage(
           `The answer is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
@@ -469,10 +452,7 @@ export class RteHelperModalComponent {
    * @returns The character limit for the component
    */
   getCharacterLimit(componentId: string): number {
-    return (
-      (this.CHARACTER_LIMITS as Record<string, number>)[componentId] ||
-      this.CHARACTER_LIMITS.default
-    );
+    return this.CHARACTER_LIMITS[componentId] || this.CHARACTER_LIMITS.default;
   }
 
   isErrorMessageNonempty(): boolean {
@@ -492,12 +472,8 @@ export class RteHelperModalComponent {
 
   save(): void {
     for (let index in this.customizationArgsForm.value) {
-      (
-        this.tmpCustomizationArgs as {
-          name: string;
-          value: unknown;
-        }[]
-      )[Number(index)].value = this.customizationArgsForm.value[index];
+      this.tmpCustomizationArgs[index].value =
+        this.customizationArgsForm.value[index];
     }
     this.externalRteSaveService.onExternalRteSave.emit();
 
@@ -545,7 +521,7 @@ export class RteHelperModalComponent {
         const HUNDRED_KB_IN_BYTES = 100 * 1024;
         maxAllowedFileSize = HUNDRED_KB_IN_BYTES;
       }
-      if (resampledFile && resampledFile.size > maxAllowedFileSize) {
+      if (resampledFile.size > maxAllowedFileSize) {
         this.alertsService.addInfoMessage(
           `The SVG file generated exceeds ${maxAllowedFileSize / 1024}` +
             ' KB. Please split the expression into smaller ones.' +
@@ -560,9 +536,9 @@ export class RteHelperModalComponent {
         this.pageContextService.getImageSaveDestination() ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       ) {
-        this.imageLocalStorageService.saveImage(svgFileName, svgFile as string);
+        this.imageLocalStorageService.saveImage(svgFileName, svgFile);
         const mathContentDict = {
-          raw_latex: tmpCustomizationArgs[0].value.raw_latex as string,
+          raw_latex: tmpCustomizationArgs[0].value.raw_latex,
           svg_filename: svgFileName,
         };
         const caName = tmpCustomizationArgs[0].name;
@@ -572,15 +548,15 @@ export class RteHelperModalComponent {
       }
       this.assetsBackendApiService
         .saveMathExpressionImage(
-          resampledFile as Blob,
+          resampledFile,
           svgFileName,
-          this.pageContextService.getEntityType() as string,
+          this.pageContextService.getEntityType(),
           this.pageContextService.getEntityId()
         )
         .then(
           response => {
             const mathContentDict = {
-              raw_latex: tmpCustomizationArgs[0].value.raw_latex as string,
+              raw_latex: tmpCustomizationArgs[0].value.raw_latex,
               svg_filename: response.filename,
             };
             const caName = tmpCustomizationArgs[0].name;

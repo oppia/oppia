@@ -51,12 +51,10 @@ export class RteHelperService {
     return cloneDeep(_RICH_TEXT_COMPONENTS);
   }
 
-  isInlineComponent(richTextComponent: string): boolean {
-    return (
-      (AppConstants.INLINE_RTE_COMPONENTS as readonly string[]).indexOf(
-        richTextComponent
-      ) !== -1
-    );
+  isInlineComponent(
+    richTextComponent: (typeof AppConstants.INLINE_RTE_COMPONENTS)[number]
+  ): boolean {
+    return AppConstants.INLINE_RTE_COMPONENTS.indexOf(richTextComponent) !== -1;
   }
 
   // The refocusFn arg is a function that restores focus to the text editor
@@ -64,10 +62,10 @@ export class RteHelperService {
   // before the modal was opened.
   openCustomizationModal(
     componentIsNewlyCreated: boolean,
-    componentId: string,
+    componentId: RteComponentId,
     customizationArgSpecs: CustomizationArgsSpecsType,
-    attrsCustomizationArgsDict: Partial<CustomizationArgsForRteType>,
-    onSubmitCallback?: (arg0: Partial<CustomizationArgsForRteType>) => void,
+    attrsCustomizationArgsDict: CustomizationArgsForRteType,
+    onSubmitCallback?: (arg0: unknown) => void,
     onDismissCallback?: (widgetShouldBeRemoved: boolean) => void
   ): void {
     document.execCommand('enableObjectResizing', false);
@@ -76,10 +74,10 @@ export class RteHelperService {
     });
     modalRef.componentInstance.componentIsNewlyCreated =
       componentIsNewlyCreated;
-    modalRef.componentInstance.componentId = componentId as RteComponentId;
+    modalRef.componentInstance.componentId = componentId;
     modalRef.componentInstance.customizationArgSpecs = customizationArgSpecs;
     modalRef.componentInstance.attrsCustomizationArgsDict =
-      attrsCustomizationArgsDict as CustomizationArgsForRteType;
+      attrsCustomizationArgsDict;
     modalRef.result.then(
       result => {
         if (onSubmitCallback) {

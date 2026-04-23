@@ -20,44 +20,41 @@
 import {NgZone} from '@angular/core';
 import {PageContextService} from 'services/page-context.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
-import {
-  CustomizationArgsForRteType,
-  CustomizationArgsSpecsType,
-} from 'services/rte-helper-modal.component';
+import {CustomizationArgsForRteType} from 'services/rte-helper-modal.component';
 
 export interface CustomizationArgSpec {
-  readonly name: string;
-  readonly default_value: string | number | boolean | object;
-  readonly default_value_obtainable_from_highlight: boolean;
-  readonly description: string;
-  readonly schema: unknown;
+  name: string;
+  default_value: string | number | boolean | object;
+  default_value_obtainable_from_highlight: boolean;
 }
 
 export interface RteComponentSpecs {
-  readonly backendId: string;
-  readonly customizationArgSpecs: readonly {
-    readonly name: string;
-    readonly default_value: string | number | boolean | object;
-    readonly default_value_obtainable_from_highlight: boolean;
-    readonly description: string;
-    readonly schema: unknown;
+  backendId: string;
+  customizationArgSpecs: {
+    name: string;
+    value: string;
+    default_value: string;
+    default_value_obtainable_from_highlight: boolean;
   }[];
-  readonly id: string;
-  readonly iconDataUrl: string;
-  readonly isComplex: boolean;
-  readonly isBlockElement: boolean;
-  readonly requiresFs: boolean;
-  readonly requiresInternet?: boolean;
-  readonly tooltip: string;
+  id: string;
+  iconDataUrl: string;
+  isComplex: boolean;
+  isBlockElement: boolean;
+  requiresFs: boolean;
+  requiresInternet?: boolean;
+  tooltip: string;
 }
 
 export interface RteHelperService {
+  createCustomizationArgDictFromAttrs: (
+    attrs: Record<string, string>
+  ) => Record<string, string>;
   getRichTextComponents: () => RteComponentSpecs[];
   isInlineComponent: (arg0: string) => boolean;
   openCustomizationModal: (
     componentIsNewlyCreated: boolean,
     componentId: string,
-    customizationArgSpecs: CustomizationArgsSpecsType,
+    customizationArgSpecs: CustomizationArgSpec[],
     attrsCustomizationArgsDict: Partial<CustomizationArgsForRteType>,
     onSubmitCallback: (
       customizationArgsDict: Partial<CustomizationArgsForRteType>
@@ -174,7 +171,7 @@ export class CkEditorInitializerService {
                 rteHelperService.openCustomizationModal(
                   componentIsNewlyCreated,
                   componentId,
-                  customizationArgSpecs as unknown as CustomizationArgsSpecsType,
+                  customizationArgSpecs,
                   customizationArgs,
                   function (
                     customizationArgsDict: Partial<CustomizationArgsForRteType>

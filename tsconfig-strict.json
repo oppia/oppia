@@ -26,9 +26,6 @@
       "app.constants": [
         "core/templates/app.constants"
       ],
-      "base-components/*": [
-        "core/templates/base-components/*"
-      ],
       "components/*": [
         "core/templates/components/*"
       ],
@@ -56,17 +53,8 @@
       "modules/*": [
         "core/templates/modules/*"
       ],
-      "objects/*": [
-        "extensions/objects/*"
-      ],
       "pages/*": [
         "core/templates/pages/*"
-      ],
-      "path": [
-        "./node_modules/path-browserify"
-      ],
-      "rich_text_components/*": [
-        "extensions/rich_text_components/*"
       ],
       "services/*": [
         "core/templates/services/*"
@@ -74,26 +62,11 @@
       "static/*": [
         "third_party/static/*"
       ],
-      "stream": [
-        "./node_modules/stream-browserify"
-      ],
       "tests/*": [
         "core/templates/tests/*"
       ],
-      "third-party-imports/*": [
-        "core/templates/third-party-imports/*"
-      ],
       "utility/*": [
         "core/templates/utility/*"
-      ],
-      "value_generators/*": [
-        "extensions/value_generators/*"
-      ],
-      "visualizations/*": [
-        "extensions/visualizations/*"
-      ],
-      "zlib": [
-        "./node_modules/browserify-zlib"
       ]
     },
     "resolveJsonModule": true,

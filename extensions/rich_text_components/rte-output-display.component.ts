@@ -56,36 +56,36 @@ type PortalTree = (TemplatePortal<unknown> | PortalTree)[];
 })
 export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   // Native HTML elements.
-  @ViewChild('p') pTagPortal!: TemplateRef<unknown>;
-  @ViewChild('h1') h1TagPortal!: TemplateRef<unknown>;
-  @ViewChild('span') spanTagPortal!: TemplateRef<unknown>;
-  @ViewChild('ol') olTagPortal!: TemplateRef<unknown>;
-  @ViewChild('li') liTagPortal!: TemplateRef<unknown>;
-  @ViewChild('ul') ulTagPortal!: TemplateRef<unknown>;
-  @ViewChild('pre') preTagPortal!: TemplateRef<unknown>;
-  @ViewChild('strong') strongTagPortal!: TemplateRef<unknown>;
-  @ViewChild('blockquote') blockquoteTagPortal!: TemplateRef<unknown>;
-  @ViewChild('em') emTagPortal!: TemplateRef<unknown>;
-  @ViewChild('text') textTagPortal!: TemplateRef<unknown>;
+  @ViewChild('p') pTagPortal: TemplateRef<unknown>;
+  @ViewChild('h1') h1TagPortal: TemplateRef<unknown>;
+  @ViewChild('span') spanTagPortal: TemplateRef<unknown>;
+  @ViewChild('ol') olTagPortal: TemplateRef<unknown>;
+  @ViewChild('li') liTagPortal: TemplateRef<unknown>;
+  @ViewChild('ul') ulTagPortal: TemplateRef<unknown>;
+  @ViewChild('pre') preTagPortal: TemplateRef<unknown>;
+  @ViewChild('strong') strongTagPortal: TemplateRef<unknown>;
+  @ViewChild('blockquote') blockquoteTagPortal: TemplateRef<unknown>;
+  @ViewChild('em') emTagPortal: TemplateRef<unknown>;
+  @ViewChild('text') textTagPortal: TemplateRef<unknown>;
   // Oppia Non interactive.
-  @ViewChild('collapsible') collapsibleTagPortal!: TemplateRef<unknown>;
-  @ViewChild('image') imageTagPortal!: TemplateRef<unknown>;
-  @ViewChild('link') linkTagPortal!: TemplateRef<unknown>;
-  @ViewChild('math') mathTagPortal!: TemplateRef<unknown>;
-  @ViewChild('skillreview') skillreviewTagPortal!: TemplateRef<unknown>;
-  @ViewChild('svgdiagram') svgdiagramTagPortal!: TemplateRef<unknown>;
-  @ViewChild('tabs') tabsTagPortal!: TemplateRef<unknown>;
-  @ViewChild('video') videoTagPortal!: TemplateRef<unknown>;
-  @ViewChild('workedexample') workedexampleTagPortal!: TemplateRef<unknown>;
-  @ViewChild('br') brTagPortal!: TemplateRef<unknown>;
-  @Input() rteString!: string;
+  @ViewChild('collapsible') collapsibleTagPortal: TemplateRef<unknown>;
+  @ViewChild('image') imageTagPortal: TemplateRef<unknown>;
+  @ViewChild('link') linkTagPortal: TemplateRef<unknown>;
+  @ViewChild('math') mathTagPortal: TemplateRef<unknown>;
+  @ViewChild('skillreview') skillreviewTagPortal: TemplateRef<unknown>;
+  @ViewChild('svgdiagram') svgdiagramTagPortal: TemplateRef<unknown>;
+  @ViewChild('tabs') tabsTagPortal: TemplateRef<unknown>;
+  @ViewChild('video') videoTagPortal: TemplateRef<unknown>;
+  @ViewChild('workedexample') workedexampleTagPortal: TemplateRef<unknown>;
+  @ViewChild('br') brTagPortal: TemplateRef<unknown>;
+  @Input() rteString: string;
   @Input() rteStringContext!: string;
   @Input() altTextIsDisplayed: boolean = false;
   node: OppiaRteNode | string = '';
   show = false;
   portalTree: PortalTree = [];
 
-  highlightIdToSentenceText: Record<string, string> = {};
+  highlightIdToSentenceText = {};
   wrapped = false;
   previousHighlightedElementId!: string | undefined;
   // The background color of the sentence being played in the audio player.
@@ -164,13 +164,13 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       node.nodeName === 'OPPIA-NONINTERACTIVE-SKILLREVIEW' ||
       node.nodeName === 'OPPIA-NONINTERACTIVE-LINK'
     ) {
-      const encodedText =
-        (node as Element).getAttribute('text-with-value') || '';
+      const encodedText = (node as Element).getAttribute('text-with-value');
       const decodedText = this.decodeHtmlEntities(encodedText);
       return JSON.parse(decodedText);
     } else if (node.nodeName === 'OPPIA-NONINTERACTIVE-MATH') {
-      const encodedMathContent =
-        (node as Element).getAttribute('math_content-with-value') || '';
+      const encodedMathContent = (node as Element).getAttribute(
+        'math_content-with-value'
+      );
       const decodedMathContent = this.decodeHtmlEntities(encodedMathContent);
       const latexText = JSON.parse(decodedMathContent)?.raw_latex;
       return this.parseAndConvertLatex(latexText);
@@ -237,7 +237,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           return [node];
         }
 
-        let currentElementReplicaNodes: HTMLElement[] = [];
+        let currentElementReplicaNodes = [];
         updatedChildNodes.forEach(child => {
           let tempElementNode = document.createElement(currentNodeName);
           tempElementNode.appendChild(child);
@@ -385,12 +385,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // Sentences in the lesson content are separated using punctuation marks
     // specific to the language.
     // The following line retrieves the punctuation marks for the current language.
-    const punctuationsForCurrentLanguage = (
-      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS as Record<
-        string,
-        string
-      >
-    )[languageCode];
+    const punctuationsForCurrentLanguage =
+      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS[
+        languageCode
+      ];
 
     // The regex below is used to split sentences from the lesson content.
     const sentenceRegex = new RegExp(
@@ -442,11 +440,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       this.rteString = this.wrapSentencesInSpansForHighlighting(this.rteString);
 
       this.automaticVoiceoverHighlightService.setActiveContentId(
-        this.getActiveContentId() || ''
+        this.getActiveContentId()
       );
       this.automaticVoiceoverHighlightService.languageCode =
-        this.localStorageService.getLastSelectedTranslationLanguageCode() ||
-        AppConstants.DEFAULT_LANGUAGE_CODE;
+        this.localStorageService.getLastSelectedTranslationLanguageCode();
       this.automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
         this.highlightIdToSentenceText
       );
@@ -492,10 +489,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
               continue;
             }
             if (preNode.childNodes[i].nodeType === 3) {
-              if (
-                (preNode.childNodes[i].nodeValue || '').replace(/\s/g, '') ===
-                ''
-              ) {
+              if (preNode.childNodes[i].nodeValue.replace(/\s/g, '') === '') {
                 preNode.removeChild(preNode.childNodes[i]);
                 i--;
               }
@@ -550,7 +544,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     const entityVoiceovers =
       this.entityVoiceoversService.getActiveEntityVoiceovers();
     const manualVoiceover = entityVoiceovers?.getManualVoiceover(
-      activeContentId || ''
+      activeContentId
     ) as Voiceover;
 
     return !!manualVoiceover && manualVoiceover.needsUpdate === false;
@@ -567,7 +561,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
   removePreviousHighlightedElement(): void {
     let previousHighlightedElements = document.getElementsByClassName(
-      this.previousHighlightedElementId || ''
+      this.previousHighlightedElementId
     );
     for (let i = 0; i < previousHighlightedElements.length; i++) {
       let previousHighlightedElement = previousHighlightedElements[
@@ -602,7 +596,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
       let previousHighlightedElement =
         this.getElementMatchingClassAndTextContent(
-          this.previousHighlightedElementId || ''
+          this.previousHighlightedElementId
         );
 
       let currentElementIdToHighlight =
@@ -616,16 +610,14 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         this.previousHighlightedElementId === currentElementIdToHighlight &&
         previousHighlightedElement?.textContent ===
           this.automaticVoiceoverHighlightService.getUnmodifiedSentenceByHighlightId(
-            currentElementIdToHighlight || ''
+            currentElementIdToHighlight
           )
       ) {
         return;
       }
 
       let currentElementToHighlight =
-        this.getElementMatchingClassAndTextContent(
-          currentElementIdToHighlight || ''
-        );
+        this.getElementMatchingClassAndTextContent(currentElementIdToHighlight);
 
       // Highlights the current sentence being played in the audio player.
       if (currentElementToHighlight) {
@@ -663,7 +655,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     return null;
   }
 
-  getActiveContentId(): string | null {
+  getActiveContentId(): string {
     // The below if-else block is used to get the active content ID based on the
     // current page.
     if (
@@ -693,7 +685,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
   private _getTemplatePortal(
     node: OppiaRteNode | TextNode
-  ): TemplatePortal<unknown> | undefined {
+  ): TemplatePortal<unknown> {
     if ('value' in node) {
       return new TemplatePortal(this.textTagPortal, this._viewContainerRef, {
         $implicit: node,
@@ -701,22 +693,14 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     }
     if (node.nodeType === 'component') {
       return new TemplatePortal(
-        (this as unknown as Record<string, TemplateRef<unknown>>)[
-          node.selector.split('oppia-noninteractive-')[1] + 'TagPortal'
-        ],
+        this[node.selector.split('oppia-noninteractive-')[1] + 'TagPortal'],
         this._viewContainerRef,
         {$implicit: node.attrs}
       );
     }
-    if (
-      (this as unknown as Record<string, TemplateRef<unknown>>)[
-        node.selector + 'TagPortal'
-      ] !== undefined
-    ) {
+    if (this[node.selector + 'TagPortal'] !== undefined) {
       return new TemplatePortal(
-        (this as unknown as Record<string, TemplateRef<unknown>>)[
-          node.selector + 'TagPortal'
-        ],
+        this[node.selector + 'TagPortal'],
         this._viewContainerRef,
         {$implicit: node}
       );
@@ -758,7 +742,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       (this.rteStringContext === 'feedback' ||
         this.rteStringContext === 'supplemental-card');
 
-    return Boolean(isContentSectionActive || isFeedbackSectionActive);
+    return isContentSectionActive || isFeedbackSectionActive;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -795,7 +779,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         }
       }
 
-      textNodes.forEach(node => node.parentElement?.removeChild(node));
+      textNodes.forEach(node => node.parentElement.removeChild(node));
 
       this._updateNode();
 
