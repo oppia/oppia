@@ -154,9 +154,9 @@ export class TranslateTextService {
     this.stateNamesList = [];
     this.stateAndContent = [];
     this.activeIndex = this.STARTING_INDEX;
-    this.activeContentId = null;
-    this.activeStateName = null;
-    this.activeContentText = null;
+    this.activeContentId = '';
+    this.activeStateName = '';
+    this.activeContentText = '';
     this.activeContentStatus = this.PENDING as Status;
     this.activeExpId = expId;
     this.translateTextBackendApiService

@@ -153,12 +153,14 @@ export class ContributorBadgesComponent {
             reviews: stat.reviewed_translations_count,
             corrections: stat.accepted_translations_with_reviewer_edits_count,
           };
-          this.reviewableLanguages.push(languageDescription);
         } else {
           this.totalTranslationStats[languageDescription].reviews +=
             stat.reviewed_translations_count;
           this.totalTranslationStats[languageDescription].corrections +=
             stat.accepted_translations_with_reviewer_edits_count;
+        }
+        if (!this.reviewableLanguages.includes(languageDescription)) {
+          this.reviewableLanguages.push(languageDescription);
         }
       });
     }

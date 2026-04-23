@@ -1613,6 +1613,27 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
 class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
     """Tests for TopicUrlFragmentHandler."""
 
+    def test_normal_user_cannot_access_topic_url_fragment_handler(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+
+        self.get_json(
+            '%s/%s' % (feconf.TOPIC_URL_FRAGMENT_HANDLER, 'test'),
+            expected_status_int=401,
+        )
+
+        self.logout()
+
+    def test_topic_manager_can_access_topic_url_fragment_handler(self) -> None:
+        self.login(self.TOPIC_MANAGER_EMAIL)
+
+        json_response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_URL_FRAGMENT_HANDLER, 'unique-fragment')
+        )
+
+        self.assertEqual(json_response['topic_url_fragment_exists'], False)
+
+        self.logout()
+
     def test_topic_url_fragment_handler_when_unique(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
