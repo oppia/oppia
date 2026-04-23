@@ -2774,7 +2774,7 @@ class StoryProgress:
                 )
             if not node:
                 raise utils.ValidationError(
-                    'Expected each node in \'completed_node_ids\' to be a non-empty string,'
+                    'Expected each node in \'completed_node_ids\' to be a non-empty string, '
                     'received empty string'
                 )
             if node in seen_nodes:

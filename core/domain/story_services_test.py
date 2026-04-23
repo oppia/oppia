@@ -3312,15 +3312,36 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         )
 
     def test_save_story_progress(self) -> None:
-        """Test saving a StoryProgress domain object to the datastore."""
+        """Test saving a StoryProgress domain object to the datastore
+        where the datastore model differs from the domain object."""
         story_progress = story_domain.StoryProgress(
             self.USER_ID, self.STORY_1_ID, [self.NODE_ID_1, self.NODE_ID_2]
         )
 
-        story_services.save_story_progress(story_progress)
+        model = user_models.StoryProgressModel(
+            id=f'{story_progress.user_id}.{story_progress.story_id}'
+        )
 
-        model = self._get_progress_model(self.USER_ID, self.STORY_1_ID)
         self.assertIsNotNone(model)
+        print("before: ", model)
+        model = story_services.save_story_progress(story_progress)
+
+        self.assertEqual(model.user_id, story_progress.user_id)
+        self.assertEqual(model.story_id, story_progress.story_id)
+        self.assertEqual(
+            model.completed_node_ids, story_progress.completed_node_ids
+        )
+        print("after: ", model)
+
+    def test_story_progress_model_is_none(self) -> None:
+        """Test populating StoryProgress datastore model fields when the model is None."""
+        story_progress = story_domain.StoryProgress(
+            self.USER_ID, self.STORY_1_ID, [self.NODE_ID_1, self.NODE_ID_2]
+        )
+        model = story_services.populate_story_progress_model_fields(
+            None, story_progress
+        )
+
         assert model is not None
         self.assertEqual(model.user_id, self.USER_ID)
         self.assertEqual(model.story_id, self.STORY_1_ID)

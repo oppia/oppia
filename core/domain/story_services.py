@@ -1194,7 +1194,9 @@ def populate_story_progress_model_fields(
     return model
 
 
-def save_story_progress(story_progress: story_domain.StoryProgress) -> None:
+def save_story_progress(
+    story_progress: story_domain.StoryProgress,
+) -> user_models.StoryProgressModel:
     """Save a StoryProgress domain object as a StoryProgressModel
     entity in the datastore.
 
@@ -1202,11 +1204,13 @@ def save_story_progress(story_progress: story_domain.StoryProgress) -> None:
         story_progress: StoryProgress. The story progress object to be saved
             in the datastore.
     """
-    existing_story_progress_model = user_models.StoryProgressModel.get_by_id(
-        f'{story_progress.user_id}.{story_progress.story_id}'
+    existing_story_progress_model = user_models.StoryProgressModel(
+        id=f'{story_progress.user_id}.{story_progress.story_id}'
     )
     story_progress_model = populate_story_progress_model_fields(
         existing_story_progress_model, story_progress
     )
     story_progress_model.update_timestamps()
     story_progress_model.put()
+
+    return story_progress_model

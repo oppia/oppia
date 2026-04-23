@@ -2883,3 +2883,23 @@ class StoryProgressTests(test_utils.GenericTestBase):
             story_domain.StoryProgress(
                 'user', 'story', ['node', 'node']
             ).validate()
+
+    def test_each_node_is_string(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected each node in \'completed_node_ids\' to be a string, received ',
+        ):
+            story_domain.StoryProgress(
+                'user', 'story', [None]
+            ).validate()  # type: ignore[arg-type]
+
+    def test_each_node_cannot_be_empty(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected each node in \'completed_node_ids\' to be a non-empty string, '
+            'received empty string',
+        ):
+            story_domain.StoryProgress('user', 'story', ['']).validate()
