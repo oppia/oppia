@@ -111,6 +111,13 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         delete_duplicate_content_ids_jobs.FixExplorationsWithDuplicateContentIdsJob
     )
 
+    def test_fix_job_skips_empty_exploration_model_list(self) -> None:
+        """Test that the helper returns None when no exploration models exist."""
+        result = delete_duplicate_content_ids_jobs.FixExplorationsWithDuplicateContentIdsJob._check_and_fix_duplicate_content_ids(  # pylint: disable=protected-access
+            ('exp_id', {'exploration': [], 'voiceovers': []})
+        )
+        self.assertIsNone(result)
+
     def test_fix_job_with_no_duplicates(self) -> None:
         """Test that the job does nothing when there are no duplicates."""
 
