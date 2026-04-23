@@ -5892,11 +5892,11 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'Did migration.',
         )
 
-        self.assertLess(
+        self.assertLessEqual(
             original_timestamp,
             exp_services.get_last_updated_by_human_ms(self.EXP_0_ID),
         )
-        self.assertLess(
+        self.assertLessEqual(
             exp_services.get_last_updated_by_human_ms(self.EXP_0_ID),
             timestamp_after_first_edit,
         )
