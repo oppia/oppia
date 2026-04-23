@@ -132,7 +132,7 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         try:
             filename = urllib.parse.unquote(encoded_filename)
-            file_format = filename[(filename.rfind('.') + 1) :]
+            file_format = filename[(filename.rfind('.') + 1):]
 
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
@@ -145,6 +145,59 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
             fs = fs_services.GcsFileSystem(page_context, page_identifier)
             raw = fs.get('%s/%s' % (asset_type, filename))
+
+            self.response.cache_control.no_cache = None
+            self.response.cache_control.public = True
+            self.response.cache_control.max_age = 600
+            self.response.body_file = io.BytesIO(raw)
+        except Exception as e:
+            logging.exception('File not found: %s. %s' % (encoded_filename, e))
+            raise self.NotFoundException
+
+
+class UserProfileImageDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handles user profile image retrieval (only in dev -- in production,
+    images are served from GCS).
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'username': {'schema': {'type': 'basestring'}},
+        'encoded_filename': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [
+                    {'id': 'is_regex_matched', 'regex_pattern': r'[-\w]+[.]\w+'}
+                ],
+            }
+        },
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self, username: str, encoded_filename: str) -> None:
+        """Returns a user profile image file.
+
+        Args:
+            username: str. The username of the user whose profile image
+                is being requested.
+            encoded_filename: str. The profile image filename. This
+                string is encoded in the frontend using encodeURIComponent().
+
+        Raises:
+            NotFoundException. The page cannot be found.
+        """
+        if not constants.EMULATOR_MODE:
+            raise self.NotFoundException
+
+        try:
+            filename = urllib.parse.unquote(encoded_filename)
+            file_format = filename[(filename.rfind('.') + 1):]
+            content_type = 'image/%s' % file_format
+            self.response.headers['Content-Type'] = content_type
+
+            fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_USER, username)
+            raw = fs.get(filename)
 
             self.response.cache_control.no_cache = None
             self.response.cache_control.public = True
@@ -257,7 +310,7 @@ class PromoBarHandler(
 
 
 class FaviconHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """Handles favicon image redirection·"""
+    """Handles favicon image redirection\xb7"""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -270,7 +323,7 @@ class FaviconHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
 
 class RobotsTxtHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """Handles robots.txt redirection·"""
+    """Handles robots.txt redirection\xb7"""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -283,7 +336,7 @@ class RobotsTxtHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
 
 class CopyrightImagesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """Handles copyrighted images redirection·"""
+    """Handles copyrighted images redirection\xb7"""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
