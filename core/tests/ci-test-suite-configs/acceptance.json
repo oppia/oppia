@@ -551,6 +551,10 @@
     {
       "name": "logged-out-user/select-and-play-topic-from-classroom-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/select-and-play-topic-from-classroom-page.spec.ts"
+    },
+    {
+      "name": "logged-in-user/wipeout",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/wipeout.spec.ts"
     }
   ]
 }

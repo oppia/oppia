@@ -252,6 +252,8 @@ const explorationFeedbackTabContentSelector =
   '.e2e-test-exploration-feedback-card';
 
 const editRolesButtonSelector = '.oppia-edit-roles-btn-container';
+const communityOwnedIndicatorSelector = '.e2e-test-is-community-owned';
+const ownerRoleNamesSelector = '.e2e-test-owner-role-names';
 const stateContentEditorSelector =
   '.e2e-test-edit-content.oppia-editable-section';
 const tagFilterDropdownSelector = '.e2e-test-tag-filter-selection-dropdown';
@@ -3491,6 +3493,46 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.page.waitForSelector(saveRoleButton, {hidden: true});
     showMessage(`${username} has been added as playtester.`);
+  }
+
+  /**
+   * Expects the exploration to be marked as community-owned in the settings tab.
+   * The `.e2e-test-is-community-owned` element only appears when the exploration
+   * has no owners (i.e., the sole owner deleted their account) and is public.
+   */
+  async expectExplorationToBeCommunityOwned(): Promise<void> {
+    const element = await this.page.$(communityOwnedIndicatorSelector);
+    if (!element) {
+      throw new Error(
+        'Expected exploration to be community-owned, but the ' +
+          'community-owned indicator was not found on the page.'
+      );
+    }
+    showMessage('Exploration is community-owned as expected.');
+  }
+
+  /**
+   * Expects the managers list in the settings tab to contain the given username.
+   * @param {string} username - The username to look for in the managers list.
+   */
+  async expectManagersListToContain(username: string): Promise<void> {
+    await this.page.waitForSelector(ownerRoleNamesSelector, {visible: true});
+    const managerElements = await this.page.$$(ownerRoleNamesSelector);
+    const managerNames = await Promise.all(
+      managerElements.map(el =>
+        this.page.evaluate(
+          e => (e.querySelector('span') as HTMLElement)?.textContent?.trim() ?? '',
+          el
+        )
+      )
+    );
+    if (!managerNames.includes(username)) {
+      throw new Error(
+        `Expected managers list to contain "${username}", ` +
+          `but found: [${managerNames.join(', ')}]`
+      );
+    }
+    showMessage(`Managers list contains "${username}" as expected.`);
   }
 
   /**
