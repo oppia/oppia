@@ -396,7 +396,7 @@ class EditableSubtopicPageDataHandler(
                 'The subtopic page with the given id doesn\'t exist.'
             )
 
-        self.values.update({'subtopic_page': subtopic_page.to_dict()})
+        self.values.update({'subtopic_page_dict': subtopic_page.to_dict()})
 
         self.render_json(self.values)
 
@@ -450,7 +450,7 @@ class EditableStudyGuideDataHandler(
                 'The study guide with the given id doesn\'t exist.'
             )
 
-        self.values.update({'study_guide': study_guide.to_dict()})
+        self.values.update({'study_guide_dict': study_guide.to_dict()})
 
         self.render_json(self.values)
 
@@ -981,7 +981,7 @@ class TopicUrlFragmentHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.can_create_topic
+    @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self, topic_url_fragment: str) -> None:
         """Handler that receives a topic url fragment and checks whether
         a topic with the same url fragment exists.

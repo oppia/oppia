@@ -35,6 +35,7 @@ import {FeaturedTranslationLanguage} from 'domain/opportunity/featured-translati
 import {
   ExplorationOpportunitySummary,
   TranslationCountsDict,
+  ExplorationOpportunitySummaryBackendDict,
 } from 'domain/opportunity/exploration-opportunity-summary.model';
 
 describe('Contribution Opportunities backend API service', function () {
@@ -55,7 +56,7 @@ describe('Contribution Opportunities backend API service', function () {
     next_cursor: '6',
     more: true,
   };
-  const translationOpportunities = [
+  const translationOpportunities: ExplorationOpportunitySummaryBackendDict[] = [
     {
       id: 'exp_id_1',
       topic_name: 'Topic 1',
@@ -70,6 +71,7 @@ describe('Contribution Opportunities backend API service', function () {
       } as TranslationCountsDict,
       language_code: 'hi',
       is_pinned: true,
+      reviewer_only_content_count: 0,
     },
     {
       id: 'exp_id_2',
@@ -85,6 +87,7 @@ describe('Contribution Opportunities backend API service', function () {
       } as TranslationCountsDict,
       language_code: 'da',
       is_pinned: false,
+      reviewer_only_content_count: 0,
     },
   ];
   const translationOpportunityResponse = {
