@@ -1203,6 +1203,9 @@ def save_story_progress(
     Args:
         story_progress: StoryProgress. The story progress object to be saved
             in the datastore.
+
+    Returns:
+        StoryProgressModel. Model that has been saved in the datastore.
     """
     existing_story_progress_model = user_models.StoryProgressModel(
         id=f'{story_progress.user_id}.{story_progress.story_id}'
