@@ -253,10 +253,6 @@ describe('Exploration Html Formatter Service', () => {
         'answer="&amp;quot;2÷5&amp;quot;">' +
         '</oppia-response-numeric-expression-input>';
 
-      // This throws "Type '{ value: boolean; }' is not assignable to type
-      // 'boolean'". We need to suppress this error because runtime data can
-      // still be object-shaped for this customization arg.
-      // @ts-expect-error
       expect(
         ehfs.getAnswerHtml(answer, interactionId, interactionCustomizationArgs)
       ).toBe(expectedHtmlTag);
@@ -350,10 +346,6 @@ describe('Exploration Html Formatter Service', () => {
         'answer="&amp;quot;2/5&amp;quot;">' +
         '</oppia-short-response-numeric-expression-input>';
 
-      // This throws "Type '{ value: boolean; }' is not assignable to type
-      // 'boolean'". We need to suppress this error because runtime data can
-      // still be object-shaped for this customization arg.
-      // @ts-expect-error
       expect(
         ehfs.getShortAnswerHtml(
           answer,
