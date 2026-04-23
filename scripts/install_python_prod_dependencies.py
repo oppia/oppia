@@ -26,6 +26,7 @@ import subprocess
 import sys
 
 from scripts import install_python_dev_dependencies
+from scripts import pip_install_cache
 
 from packaging import version
 from typing import Dict, Final, List, Optional, Set, Tuple
@@ -732,6 +733,16 @@ def main() -> None:
     mismatches.
     """
     verify_pip_is_installed()
+
+    # Skip the slow pip-compile and install steps if the requirements source
+    # files have not changed since the last successful install. See #23864.
+    if pip_install_cache.installation_is_current():
+        print(
+            'Skipping pip install: requirements.in is unchanged since last '
+            'install (pip_requirements_checksums.json is up to date).'
+        )
+        return
+
     print('Regenerating "requirements.txt" file...')
     install_python_dev_dependencies.compile_pip_requirements(
         'requirements.in', 'requirements.txt'
@@ -746,6 +757,9 @@ def main() -> None:
         print(
             'All third-party Python libraries are already installed correctly.'
         )
+
+    # Persist the new hash so the next run can skip installation.
+    pip_install_cache.save_hash(pip_install_cache.compute_requirements_hash())
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
