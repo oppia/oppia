@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import copy
 
-from core import feconf
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -36,14 +35,15 @@ from core.platform import models
 from core.storage.base_model import gae_models as base_models
 
 import apache_beam as beam
-from typing import Any, Dict, List, Set, Union
+from typing import Any, Dict, List, Set, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services, exp_models
+    from mypy_imports import exp_models, voiceover_models
 
-(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
-datastore_services = models.Registry.import_datastore_services()
+(exp_models, voiceover_models) = models.Registry.import_models(
+    [models.Names.EXPLORATION, models.Names.VOICEOVER]
+)
 
 
 class IdentifyExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
@@ -146,14 +146,41 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             fixing explorations with duplicate content IDs.
         """
 
-        fixed_explorations = (
+        exploration_model_pcoll = (
             self.pipeline
             | 'Get all exploration models'
             >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(include_deleted=False)
             )
-            | 'Transform to exploration domain objects'
-            >> beam.Map(exp_fetchers.get_exploration_from_model)
+        )
+
+        entity_voiceovers_model_pcoll = (
+            self.pipeline
+            | 'Get all entity voiceover models'
+            >> ndb_io.GetModels(
+                voiceover_models.EntityVoiceoversModel.get_all()
+            )
+        )
+
+        exp_id_to_exploration_model = (
+            exploration_model_pcoll
+            | 'Key exploration model by ID'
+            >> beam.Map(lambda model: (model.id, model))
+        )
+
+        exp_id_to_voiceover_model = (
+            entity_voiceovers_model_pcoll
+            | 'Key voiceover model by entity ID'
+            >> beam.Map(lambda model: (model.entity_id, model))
+        )
+
+        combined_models = {
+            'exploration': exp_id_to_exploration_model,
+            'voiceovers': exp_id_to_voiceover_model,
+        } | 'Join explorations with voiceover models' >> beam.CoGroupByKey()
+
+        fixed_explorations = (
+            combined_models
             | 'Check for duplicate content IDs'
             >> beam.Map(self._check_and_fix_duplicate_content_ids)
             | 'Filter fixed explorations'
@@ -181,9 +208,14 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             )
         )
 
+    # Here we use type Any because CoGroupByKey produces a dictionary with
+    # string keys mapping to sequences of different model types (exploration
+    # and voiceovers), and the exact element types vary by key, requiring a
+    # flexible type that can represent both lists of exploration models and
+    # lists of voiceover models simultaneously.
     @staticmethod
     def _check_and_fix_duplicate_content_ids(
-        exploration: exp_domain.Exploration,
+        combined_models: Tuple[str, Dict[str, Any]],
     ) -> (
         Dict[
             str,
@@ -200,13 +232,28 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
         """Check and fix duplicate content IDs in an exploration.
 
         Args:
-            exploration: exp_domain.Exploration. The exploration domain object
-                to check and fix.
+            combined_models: tuple(str, dict). A tuple where the first element
+                is the exploration ID and the second element is a dictionary
+                with keys 'exploration' and 'voiceovers' mapping to lists of
+                corresponding models.
 
         Returns:
             dict|None. Dict containing fix results if duplicates were found and
             fixed, None otherwise.
         """
+        exploration_model_list = list(combined_models[1]['exploration'])
+        voiceover_model_list = combined_models[1]['voiceovers']
+
+        if not exploration_model_list:
+            return None
+
+        # Here we use cast because CoGroupByKey produces sequences of Any,
+        # but 'exploration' values are always ExplorationModel instances.
+        exploration_model = cast(
+            exp_models.ExplorationModel, exploration_model_list[0]
+        )
+        exploration = exp_fetchers.get_exploration_from_model(exploration_model)
+
         all_content_ids: List[str] = []
         state_to_content_ids: Dict[str, List[str]] = {}
 
@@ -262,60 +309,65 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
         exploration.next_content_id_index = (
             content_id_generator.next_content_id_index
         )
+
+        # Here we use cast because CoGroupByKey produces sequences of Any,
+        # but 'voiceovers' values are always EntityVoiceoversModel instances.
+        all_voiceover_models = cast(
+            List[voiceover_models.EntityVoiceoversModel],
+            list(voiceover_model_list),
+        )
+        current_voiceover_models = [
+            vm
+            for vm in all_voiceover_models
+            if vm.entity_version == exploration.version
+        ]
+
         updated_voiceover_models = _create_updated_entity_voiceovers_models(
-            exploration.id,
-            exploration.version,
+            current_voiceover_models,
             exploration.version + 1,
             content_id_replacements,
         )
 
-        with datastore_services.get_ndb_context():
-            updated_model = exp_models.ExplorationModel.get(exploration.id)
-            updated_model.states = exploration.to_dict()['states']
-            updated_model.next_content_id_index = (
-                exploration.next_content_id_index
-            )
-            updated_model.version += 1
+        exploration_model.states = exploration.to_dict()['states']
+        exploration_model.next_content_id_index = (
+            exploration.next_content_id_index
+        )
+        exploration_model.version += 1
 
-            return {
-                'exp_id': exploration.id,
-                'version': exploration.version,
-                'fixed_content_ids': fixed_content_ids,
-                'fixed_model': updated_model,
-                'fixed_voiceover_models': updated_voiceover_models,
-            }
+        return {
+            'exp_id': exploration.id,
+            'version': exploration.version,
+            'fixed_content_ids': fixed_content_ids,
+            'fixed_model': exploration_model,
+            'fixed_voiceover_models': updated_voiceover_models,
+        }
 
 
 def _create_updated_entity_voiceovers_models(
-    exploration_id: str,
-    old_version: int,
+    entity_voiceover_models: List[voiceover_models.EntityVoiceoversModel],
     new_version: int,
     content_id_replacements: Dict[str, List[str]],
 ) -> List[base_models.BaseModel]:
     """Create updated voiceover models for a migrated exploration version.
 
     Args:
-        exploration_id: str. The exploration ID being fixed.
-        old_version: int. The current exploration version before the fix.
+        entity_voiceover_models: list(EntityVoiceoversModel). The existing
+            voiceover models for the exploration's current version.
         new_version: int. The new exploration version after the fix.
         content_id_replacements: dict(str, list(str)). Mapping from each old
-            duplicate content ID to the new content IDs generated for later
-            states.
+            duplicate content ID to the list of newly generated content IDs
+            that replaced it in the states where it was a duplicate.
 
     Returns:
         list(EntityVoiceoversModel). The voiceover models for the new
         exploration version.
     """
     updated_voiceover_models: List[base_models.BaseModel] = []
-    entity_voiceovers_list = (
-        voiceover_services.get_entity_voiceovers_for_given_exploration(
-            exploration_id,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            old_version,
-        )
-    )
 
-    for entity_voiceovers in entity_voiceovers_list:
+    for voiceover_model in entity_voiceover_models:
+        entity_voiceovers = voiceover_services.get_entity_voiceovers_from_model(
+            voiceover_model
+        )
         new_voiceovers_mapping = copy.deepcopy(
             entity_voiceovers.voiceovers_mapping
         )
@@ -335,6 +387,9 @@ def _create_updated_entity_voiceovers_models(
                 in entity_voiceovers.automated_voiceovers_audio_offsets_msecs
             ):
                 for new_content_id in new_content_ids:
+                    # Each new content ID represents the same content in a
+                    # different state, so they all share the same audio offset
+                    # (timing information for synchronized playback).
                     new_audio_offsets[new_content_id] = copy.deepcopy(
                         entity_voiceovers.automated_voiceovers_audio_offsets_msecs[
                             old_content_id

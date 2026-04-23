@@ -38,9 +38,11 @@ from typing import Any, Dict, List, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    pass
+    from mypy_imports import exp_models, voiceover_models
 
-(exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
+(exp_models, voiceover_models) = models.Registry.import_models(
+    [models.Names.EXPLORATION, models.Names.VOICEOVER]
+)
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -328,8 +330,11 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
 
         exp_services.save_new_exploration('owner_id', exploration)
 
+        with datastore_services.get_ndb_context():
+            exploration_model = exp_models.ExplorationModel.get_by_id('exp_id')
+
         result = delete_duplicate_content_ids_jobs.FixExplorationsWithDuplicateContentIdsJob._check_and_fix_duplicate_content_ids(  # pylint: disable=protected-access
-            exploration
+            ('exp_id', {'exploration': [exploration_model], 'voiceovers': []})
         )
 
         self.assertIsNotNone(result)
@@ -385,9 +390,18 @@ class CreateUpdatedEntityVoiceoversModelsTests(test_utils.GenericTestBase):
         )
         voiceover_services.save_entity_voiceovers(entity_voiceovers)
 
+        with datastore_services.get_ndb_context():
+            voiceover_model = voiceover_models.EntityVoiceoversModel.get_by_id(
+                voiceover_models.EntityVoiceoversModel.generate_id(
+                    feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 1, 'en-US'
+                )
+            )
+        self.assertIsNotNone(voiceover_model)
+        if voiceover_model is None:
+            return
+
         updated_models = delete_duplicate_content_ids_jobs._create_updated_entity_voiceovers_models(  # pylint: disable=protected-access
-            'exp_id',
-            1,
+            [voiceover_model],
             2,
             {
                 'solution_1': ['content_4'],
