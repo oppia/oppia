@@ -174,7 +174,9 @@ export class QuestionUpdateService {
       oldValue,
       (changeDict: QuestionChange, domainObject: DomainObject) => {
         const question = domainObject as Question;
-        const val = this._getNewPropertyValueFromChangeDict(changeDict) as number;
+        const val = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as number;
         question.setNextContentIdIndex(val);
       },
       (changeDict: QuestionChange, domainObject: DomainObject) => {
