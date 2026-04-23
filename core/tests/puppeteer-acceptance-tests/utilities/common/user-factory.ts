@@ -16,6 +16,9 @@
  * @fileoverview Utility File for declaring and initializing users.
  */
 
+import fs from 'fs';
+import path from 'path';
+
 import {SuperAdminFactory, SuperAdmin} from '../user/super-admin';
 import {BaseUserFactory, BaseUser} from './puppeteer-utils';
 import {
@@ -365,6 +368,31 @@ export class UserFactory {
    * This function closes all the browsers opened by different users.
    */
   static closeAllBrowsers = async function (): Promise<void> {
+    const configFile = path.resolve(
+      __dirname,
+      '../../jest-runtime-config.json'
+    );
+    if (activeUsers.length === 0 && fs.existsSync(configFile)) {
+      try {
+        const configData = JSON.parse(fs.readFileSync(configFile, 'utf-8'));
+        if (configData.testFailureDetected) {
+          fs.unlinkSync(configFile);
+          const fallbackUser = BaseUser.instances[0];
+          if (fallbackUser) {
+            await fallbackUser.captureScreenshotsForFailedTest();
+          } else {
+            showMessage(
+              'Test failed but no browser instances were available to capture screenshots.'
+            );
+          }
+        }
+      } catch (error) {
+        showMessage(
+          `Error while handling screenshot capture for failed test: ${error}`
+        );
+      }
+    }
+
     showMessage(`Closing browsers for ${activeUsers.length} users.`);
     await Promise.all(
       activeUsers.map(async user => {
