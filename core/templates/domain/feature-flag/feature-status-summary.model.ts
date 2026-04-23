@@ -39,6 +39,7 @@ export enum FeatureNames {
   EnableMultipleClassrooms = 'enable_multiple_classrooms',
   RedesignedTopicViewerPage = 'redesigned_topic_viewer_page',
   AutomaticVoiceoverRegenerationFromExp = 'automatic_voiceover_regeneration_from_exp',
+  HighlightSentencesDuringAutomaticVoiceoverPlayback = 'highlight_sentences_during_automatic_voiceover_playback',
   ShowVoiceoverTabForNonCuratedExplorations = 'show_voiceover_tab_for_non_curated_explorations',
   ShowRestructuredStudyGuides = 'show_restructured_study_guides',
   EnableTranslationOppsWithNewOppModels = 'enable_translation_opps_with_new_opp_models',
