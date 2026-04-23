@@ -20,11 +20,13 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import hashlib
+import json
 import os
 import subprocess
 import sys
 
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 INSTALLATION_TOOL_VERSIONS = {
     'pip': '25.3',
@@ -33,6 +35,7 @@ INSTALLATION_TOOL_VERSIONS = {
 }
 REQUIREMENTS_DEV_FILE_PATH = 'requirements_dev.in'
 COMPILED_REQUIREMENTS_DEV_FILE_PATH = 'requirements_dev.txt'
+PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH = 'pip_requirements_checksums.json'
 
 _PARSER = argparse.ArgumentParser('Install Python development dependencies')
 _PARSER.add_argument(
@@ -116,6 +119,93 @@ def install_dev_dependencies() -> None:
     )
 
 
+def _get_file_checksum(file_path: str) -> str:
+    """Returns the SHA256 checksum of the given file.
+
+    Args:
+        file_path: str. Path to the file whose checksum should be calculated.
+
+    Returns:
+        str. The SHA256 checksum of the file.
+    """
+    hash_obj = hashlib.sha256()
+    with open(file_path, 'rb') as f:
+        for chunk in iter(lambda: f.read(4096), b''):
+            hash_obj.update(chunk)
+    return hash_obj.hexdigest()
+
+
+def _read_pip_requirements_checksums() -> Dict[str, str]:
+    """Reads the cached requirements file checksums."""
+    if not os.path.exists(PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH):
+        return {}
+
+    try:
+        with open(
+            PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH, 'r', encoding='utf-8'
+        ) as f:
+            checksum_dict = json.load(f)
+    except json.JSONDecodeError:
+        return {}
+
+    if not isinstance(checksum_dict, dict):
+        return {}
+
+    return {
+        str(requirements_path): str(checksum)
+        for requirements_path, checksum in checksum_dict.items()
+    }
+
+
+def _write_pip_requirements_checksums(checksum_dict: Dict[str, str]) -> None:
+    """Writes the cached requirements file checksums."""
+    with open(PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH, 'w', encoding='utf-8') as f:
+        json.dump(checksum_dict, f, indent=2, sort_keys=True)
+        f.write('\n')
+
+
+def should_skip_dependency_install(
+    requirements_path: str, compiled_path: str
+) -> bool:
+    """Checks whether dependency installation can be skipped.
+
+    Dependency installation is skipped only after a previous successful
+    installation recorded a checksum matching the current requirements input
+    file.
+
+    Args:
+        requirements_path: str. Path to the requirements input file.
+        compiled_path: str. Path to the compiled requirements file.
+
+    Returns:
+        bool. Whether dependency installation can be skipped.
+    """
+    if not os.path.exists(compiled_path):
+        return False
+
+    checksum_dict = _read_pip_requirements_checksums()
+    return checksum_dict.get(requirements_path) == _get_file_checksum(
+        requirements_path
+    )
+
+
+def update_pip_requirements_checksum(requirements_path: str) -> None:
+    """Updates the cached checksum for a requirements input file."""
+    checksum_dict = _read_pip_requirements_checksums()
+    checksum_dict[requirements_path] = _get_file_checksum(requirements_path)
+    _write_pip_requirements_checksums(checksum_dict)
+
+
+def remove_pip_requirements_checksum(requirements_path: str) -> None:
+    """Removes the cached checksum for a requirements input file."""
+    checksum_dict = _read_pip_requirements_checksums()
+    if requirements_path not in checksum_dict:
+        return
+
+    del checksum_dict[requirements_path]
+    _write_pip_requirements_checksums(checksum_dict)
+
+
 def uninstall_dev_dependencies() -> None:
     """Uninstall dev dependencies from COMPILED_REQUIREMENTS_DEV_FILE_PATH."""
     subprocess.run(
@@ -193,12 +283,19 @@ def main(cli_args: Optional[List[str]] = None) -> None:
     """Install all dev dependencies."""
     args = _PARSER.parse_args(cli_args)
     check_python_env_is_suitable()
+
+    if not args.uninstall and should_skip_dependency_install(
+        REQUIREMENTS_DEV_FILE_PATH, COMPILED_REQUIREMENTS_DEV_FILE_PATH
+    ):
+        return
+
     install_installation_tools()
     diff = compile_pip_requirements(
         REQUIREMENTS_DEV_FILE_PATH, COMPILED_REQUIREMENTS_DEV_FILE_PATH
     )
     if args.uninstall:
         uninstall_dev_dependencies()
+        remove_pip_requirements_checksum(REQUIREMENTS_DEV_FILE_PATH)
     else:
         install_dev_dependencies()
         if args.assert_compiled and diff:
@@ -210,6 +307,7 @@ def main(cli_args: Optional[List[str]] = None) -> None:
                 'command: python -m scripts.install_python_dev_dependencies'
                 % diff
             )
+        update_pip_requirements_checksum(REQUIREMENTS_DEV_FILE_PATH)
 
 
 # This code cannot be covered by tests since it only runs when this file

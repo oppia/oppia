@@ -24,6 +24,7 @@ import io
 import os
 import subprocess
 import sys
+import tempfile
 
 from core.tests import test_utils
 from scripts import install_python_dev_dependencies
@@ -32,6 +33,26 @@ from typing import Dict, Generator, List, Optional
 
 
 class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.checksum_temp_dir = tempfile.TemporaryDirectory()
+        self.original_pip_requirements_checksums_file_path = (
+            install_python_dev_dependencies.PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH
+        )
+        install_python_dev_dependencies.PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH = (
+            os.path.join(
+                self.checksum_temp_dir.name,
+                'pip_requirements_checksums.json',
+            )
+        )
+
+    def tearDown(self) -> None:
+        install_python_dev_dependencies.PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH = (
+            self.original_pip_requirements_checksums_file_path
+        )
+        self.checksum_temp_dir.cleanup()
+        super().tearDown()
 
     @contextlib.contextmanager
     def sys_real_prefix_context(
@@ -324,6 +345,98 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             )
         self.assertTrue(change)
 
+    def test_should_skip_dependency_install_uses_cached_checksum(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            requirements_path = os.path.join(temp_dir, 'requirements.in')
+            compiled_path = os.path.join(temp_dir, 'requirements.txt')
+            checksum_path = os.path.join(
+                temp_dir, 'pip_requirements_checksums.json'
+            )
+            with open(requirements_path, 'w', encoding='utf-8') as f:
+                f.write('flask==1.0.0\n')
+            with open(compiled_path, 'w', encoding='utf-8') as f:
+                f.write('flask==1.0.0\n')
+
+            checksum_path_swap = self.swap(
+                install_python_dev_dependencies,
+                'PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH',
+                checksum_path,
+            )
+
+            with checksum_path_swap:
+                self.assertFalse(
+                    install_python_dev_dependencies.should_skip_dependency_install(
+                        requirements_path, compiled_path
+                    )
+                )
+                install_python_dev_dependencies.update_pip_requirements_checksum(
+                    requirements_path
+                )
+                self.assertTrue(
+                    install_python_dev_dependencies.should_skip_dependency_install(
+                        requirements_path, compiled_path
+                    )
+                )
+
+                with open(requirements_path, 'w', encoding='utf-8') as f:
+                    f.write('flask==2.0.0\n')
+                self.assertFalse(
+                    install_python_dev_dependencies.should_skip_dependency_install(
+                        requirements_path, compiled_path
+                    )
+                )
+
+    def test_main_skips_install_when_requirements_checksum_matches(
+        self,
+    ) -> None:
+        install_tools_calls = []
+        compile_calls = []
+        install_dependencies_calls = []
+
+        def mock_install_tools() -> None:
+            install_tools_calls.append(True)
+
+        def mock_compile(*_args: str) -> bool:
+            compile_calls.append(True)
+            return False
+
+        def mock_install_dependencies() -> None:
+            install_dependencies_calls.append(True)
+
+        assert_swap = self.swap(
+            install_python_dev_dependencies,
+            'check_python_env_is_suitable',
+            lambda: None,
+        )
+        skip_swap = self.swap(
+            install_python_dev_dependencies,
+            'should_skip_dependency_install',
+            lambda *_args: True,
+        )
+        install_tools_swap = self.swap(
+            install_python_dev_dependencies,
+            'install_installation_tools',
+            mock_install_tools,
+        )
+        compile_swap = self.swap(
+            install_python_dev_dependencies,
+            'compile_pip_requirements',
+            mock_compile,
+        )
+        install_dependencies_swap = self.swap(
+            install_python_dev_dependencies,
+            'install_dev_dependencies',
+            mock_install_dependencies,
+        )
+
+        with assert_swap, skip_swap, install_tools_swap, compile_swap:
+            with install_dependencies_swap:
+                install_python_dev_dependencies.main([])
+
+        self.assertEqual(install_tools_calls, [])
+        self.assertEqual(compile_calls, [])
+        self.assertEqual(install_dependencies_calls, [])
+
     def test_main_passes_with_no_assert_and_no_change(self) -> None:
         def mock_func() -> None:
             pass
@@ -351,7 +464,6 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             'install_dev_dependencies',
             mock_func,
         )
-
         with assert_swap, install_tools_swap, compile_swap:
             with install_dependencies_swap:
                 install_python_dev_dependencies.main([])
@@ -380,7 +492,6 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             'uninstall_dev_dependencies',
             lambda: None,
         )
-
         with assert_swap, install_tools_swap, compile_swap:
             with uninstall_dependencies_swap:
                 install_python_dev_dependencies.main(['--uninstall'])
@@ -412,7 +523,6 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             'install_dev_dependencies',
             mock_func,
         )
-
         with assert_swap, install_tools_swap, compile_swap:
             with install_dependencies_swap:
                 install_python_dev_dependencies.main(['--assert_compiled'])
@@ -444,7 +554,6 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             'install_dev_dependencies',
             mock_func,
         )
-
         with assert_swap, install_tools_swap, compile_swap:
             with install_dependencies_swap:
                 install_python_dev_dependencies.main([])
@@ -476,7 +585,6 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             'install_dev_dependencies',
             mock_func,
         )
-
         error_regex = (
             'The Python development requirements file '
             'requirements_dev.txt was changed'

@@ -731,6 +731,11 @@ def main() -> None:
     mismatches, regenerate the 'requirements.txt' file and correct the
     mismatches.
     """
+    if install_python_dev_dependencies.should_skip_dependency_install(
+        'requirements.in', 'requirements.txt'
+    ) and os.path.isdir(common.THIRD_PARTY_PYTHON_LIBS_DIR):
+        return
+
     verify_pip_is_installed()
     print('Regenerating "requirements.txt" file...')
     install_python_dev_dependencies.compile_pip_requirements(
@@ -746,6 +751,10 @@ def main() -> None:
         print(
             'All third-party Python libraries are already installed correctly.'
         )
+
+    install_python_dev_dependencies.update_pip_requirements_checksum(
+        'requirements.in'
+    )
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

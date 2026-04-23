@@ -30,7 +30,12 @@ import sys
 import tempfile
 
 from core.tests import test_utils
-from scripts import common, install_python_prod_dependencies, scripts_test_utils
+from scripts import (
+    common,
+    install_python_dev_dependencies,
+    install_python_prod_dependencies,
+    scripts_test_utils,
+)
 
 from typing import Dict, List, Optional, Set, Tuple
 
@@ -87,6 +92,16 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
+        self.checksum_temp_dir = tempfile.TemporaryDirectory()
+        self.original_pip_requirements_checksums_file_path = (
+            install_python_dev_dependencies.PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH
+        )
+        install_python_dev_dependencies.PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH = (
+            os.path.join(
+                self.checksum_temp_dir.name,
+                'pip_requirements_checksums.json',
+            )
+        )
         self.print_arr: List[str] = []
 
         def mock_print(msg: str) -> None:
@@ -160,6 +175,13 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_check_call_error
         )
 
+    def tearDown(self) -> None:
+        install_python_dev_dependencies.PIP_REQUIREMENTS_CHECKSUMS_FILE_PATH = (
+            self.original_pip_requirements_checksums_file_path
+        )
+        self.checksum_temp_dir.cleanup()
+        super().tearDown()
+
     def get_git_version_string(self, name: str, sha1_piece: str) -> str:
         """Utility function for constructing a GitHub URL for testing.
 
@@ -173,6 +195,21 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         """
         sha1 = ''.join(itertools.islice(itertools.cycle(sha1_piece), 40))
         return 'git+git://github.com/oppia/%s@%s' % (name, sha1)
+
+    def test_main_skips_install_when_requirements_checksum_matches(
+        self,
+    ) -> None:
+        skip_swap = self.swap(
+            install_python_dev_dependencies,
+            'should_skip_dependency_install',
+            lambda *_args: True,
+        )
+        isdir_swap = self.swap(os.path, 'isdir', lambda *_args: True)
+
+        with skip_swap, isdir_swap:
+            install_python_prod_dependencies.main()
+
+        self.assertEqual(self.cmd_token_list, [])
 
     def test_invalid_git_dependency_raises_an_exception(self) -> None:
         swap_requirements = self.swap(
