@@ -737,6 +737,10 @@ URLS = [
         r'%s' % feconf.BLOG_SEARCH_DATA_URL, blog_homepage.BlogPostSearchHandler
     ),
     get_redirect_route(
+        r'/assetsdevhandler/user/<username>/assets/<encoded_filename>',
+        resources.UserProfileImageDevHandler,
+    ),
+    get_redirect_route(
         r'/assetsdevhandler/<page_context>/<page_identifier>/'
         'assets/<asset_type:(image|audio|thumbnail)>/<encoded_filename>',
         resources.AssetDevHandler,
