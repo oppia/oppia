@@ -2087,7 +2087,7 @@ export class LoggedOutUser extends BaseUser {
 
     // Wait for the new page to navigate to the correct domain per reviewer request.
     await newTabPage?.waitForFunction(
-      domain => window.location.href.includes(domain),
+      (domain: string) => window.location.href.includes(domain),
       {timeout: 10000},
       expectedDestinationDomain
     );
