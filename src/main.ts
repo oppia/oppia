@@ -19,10 +19,10 @@
 import 'pages/common-imports';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {enableProdMode} from '@angular/core';
-import {LighweightAppModule} from 'pages/lightweight-oppia-root/app.module';
+import {AppModule} from 'pages/oppia-root/app.module';
 
 enableProdMode();
 
 platformBrowserDynamic()
-  .bootstrapModule(LighweightAppModule)
+  .bootstrapModule(AppModule)
   .catch(err => console.error(err));

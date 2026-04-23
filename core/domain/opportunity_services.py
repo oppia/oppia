@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import collections
-import datetime
 import logging
 
 from core import feature_flag_list, feconf
@@ -280,6 +279,16 @@ def create_exp_opportunity_summary(
         )
     )
 
+    return exploration_opportunity_summary
+
+
+def generate_voiceovers_async_for_exp_linked_to_topic(exp_id: str) -> None:
+    """Triggers asynchronous voiceover generation for the specified exploration.
+
+    Args:
+        exp_id: str. The ID of the exploration for which voiceovers should be
+            generated.
+    """
     # Asynchronously regenerates voiceovers for exploration contents in English
     # and other available translations when the exploration is linked to a
     # story.
@@ -292,11 +301,8 @@ def create_exp_opportunity_summary(
                 'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION'
             ],
             taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
-            exploration.id,
-            datetime.datetime.utcnow().isoformat(),
-            feconf.SYSTEM_COMMITTER_ID,
+            exp_id,
         )
-    return exploration_opportunity_summary
 
 
 def _compute_exploration_incomplete_translation_languages(
@@ -358,6 +364,7 @@ def _create_exploration_opportunities(
         exploration_opportunity_summary_list.append(
             create_exp_opportunity_summary(topic, story, exploration)
         )
+        generate_voiceovers_async_for_exp_linked_to_topic(exploration.id)
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list
     )

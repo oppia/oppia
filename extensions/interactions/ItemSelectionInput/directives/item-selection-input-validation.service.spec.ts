@@ -203,14 +203,57 @@ describe('ItemSelectionInputValidationService', () => {
     ];
   });
 
-  it('should be able to perform basic validation', () => {
-    var warnings = validatorService.getAllWarnings(
+  var getWarnings = function () {
+    return validatorService.getAllWarnings(
       currentState,
       customizationArguments,
       goodAnswerGroups,
       goodDefaultOutcome
     );
+  };
+
+  it('should be able to perform basic validation', () => {
+    var warnings = getWarnings();
     expect(warnings).toEqual([]);
+  });
+
+  it('should return warning when minimum allowed selections is negative', () => {
+    customizationArguments.minAllowableSelectionCount.value = -1;
+    customizationArguments.maxAllowableSelectionCount.value = 2;
+
+    var warnings = getWarnings();
+    expect(warnings).toContain(
+      jasmine.objectContaining({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'The minimum/maximum number of selections cannot be negative.',
+      })
+    );
+  });
+
+  it('should return warning when maximum allowed selections is negative', () => {
+    customizationArguments.minAllowableSelectionCount.value = 2;
+    customizationArguments.maxAllowableSelectionCount.value = -1;
+
+    var warnings = getWarnings();
+    expect(warnings).toContain(
+      jasmine.objectContaining({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'The minimum/maximum number of selections cannot be negative.',
+      })
+    );
+  });
+
+  it('should return warning when both minimum and maximum allowed selections are negative', () => {
+    customizationArguments.minAllowableSelectionCount.value = -5;
+    customizationArguments.maxAllowableSelectionCount.value = -2;
+
+    var warnings = getWarnings();
+    expect(warnings).toContain(
+      jasmine.objectContaining({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'The minimum/maximum number of selections cannot be negative.',
+      })
+    );
   });
 
   it(
