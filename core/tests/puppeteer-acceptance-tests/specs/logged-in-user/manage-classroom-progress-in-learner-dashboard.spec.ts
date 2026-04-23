@@ -103,7 +103,8 @@ describe('Logged-in User', function () {
         'logged_in_user1@example.com'
       );
     },
-    20 * 60 * 1000 // 20 minutes.
+    // Setup takes about 20 minutes to complete.
+    20 * 60 * 1000
   );
 
   /**
