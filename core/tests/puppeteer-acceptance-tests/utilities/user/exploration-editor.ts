@@ -4316,7 +4316,7 @@ export class ExplorationEditor extends BaseUser {
       window.location.href.includes('#/preview/')
     );
     await this.waitForPageToFullyLoad();
-    await this.page.waitForTimeout(2000);
+    await this.page.waitForSelector(previewTabContainer, {visible: true});
     await this.waitForPageToFullyLoad();
   }
 
