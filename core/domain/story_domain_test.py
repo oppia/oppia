@@ -2893,8 +2893,8 @@ class StoryProgressTests(test_utils.GenericTestBase):
             'Expected each node in \'completed_node_ids\' to be a string, received ',
         ):
             story_domain.StoryProgress(
-                'user', 'story', [None]
-            ).validate()  # type: ignore[arg-type]
+                'user', 'story', [None]  # type: ignore[list-item]
+            ).validate()
 
     def test_each_node_cannot_be_empty(self) -> None:
         with self.assertRaisesRegex(
