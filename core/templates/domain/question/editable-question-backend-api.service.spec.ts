@@ -38,6 +38,7 @@ describe('EditableQuestionBackendApiService', () => {
       id: '0',
       question_state_data: {
         content: {
+          content_id: 'content_0',
           html: 'Question 1',
         },
         interaction: {
@@ -59,14 +60,18 @@ describe('EditableQuestionBackendApiService', () => {
             dest: null,
             dest_if_really_stuck: null,
             feedback: {
+              content_id: 'default_outcome_0',
               html: 'Correct Answer',
             },
             param_changes: [],
             labelled_as_correct: true,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
           },
           hints: [
             {
               hint_content: {
+                content_id: 'hint_0',
                 html: 'Hint 1',
               },
             },
@@ -75,6 +80,7 @@ describe('EditableQuestionBackendApiService', () => {
             correct_answer: 'This is the correct answer',
             answer_is_exclusive: false,
             explanation: {
+              content_id: 'solution_0',
               html: 'Solution explanation',
             },
           },
@@ -82,9 +88,17 @@ describe('EditableQuestionBackendApiService', () => {
         },
         param_changes: [],
         solicit_answer_details: false,
+        classifier_model_id: null,
+        card_is_checkpoint: false,
+        linked_skill_id: null,
+        inapplicable_skill_misconception_ids: [],
       },
       language_code: 'en',
       version: 1,
+      question_state_data_schema_version: 1,
+      linked_skill_ids: [],
+      inapplicable_skill_misconception_ids: [],
+      next_content_id_index: 1,
     },
     associated_skill_dicts: [],
   };
@@ -136,9 +150,13 @@ describe('EditableQuestionBackendApiService', () => {
     const skillsId = ['0', '01', '02'];
     const skillDifficulties = [1, 1, 2];
     const questionObject = sampleDataResultsObjects.questionObject;
+    if (questionObject === null) {
+      throw new Error('Question object should not be null');
+    }
+    const questionDict = questionObject.toBackendDict(true);
 
     editableQuestionBackendApiService
-      .createQuestionAsync(skillsId, skillDifficulties, questionObject, [
+      .createQuestionAsync(skillsId, skillDifficulties, questionDict, [
         imageData,
       ])
       .then(successHandler, failHandler);
@@ -161,6 +179,10 @@ describe('EditableQuestionBackendApiService', () => {
     const skillsId = ['0', '01', '02'];
     const skillDifficulties = [1, 1, 2];
     const questionObject = sampleDataResultsObjects.questionObject;
+    if (questionObject === null) {
+      throw new Error('Question object should not be null');
+    }
+    const questionDict = questionObject.toBackendDict(true);
     const imageBlob = new Blob(['data:image/png;base64,xyz'], {
       type: 'image/png',
     });
@@ -170,7 +192,7 @@ describe('EditableQuestionBackendApiService', () => {
     };
 
     editableQuestionBackendApiService
-      .createQuestionAsync(skillsId, skillDifficulties, questionObject, [
+      .createQuestionAsync(skillsId, skillDifficulties, questionDict, [
         imageData,
       ])
       .then(successHandler, failHandler);
@@ -315,6 +337,7 @@ describe('EditableQuestionBackendApiService', () => {
       {
         id: 'skillId',
         task: 'remove',
+        difficulty: 0.3,
       },
     ];
 
@@ -342,6 +365,7 @@ describe('EditableQuestionBackendApiService', () => {
       {
         id: 'skillId',
         task: 'remove',
+        difficulty: 0.3,
       },
     ];
 
