@@ -522,7 +522,9 @@ export class ExplorationEditor extends BaseUser {
   async removeFeedbackResponseInPreviewTab(): Promise<void> {
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector);
     // Wait for the response modal animation to finish, else it causes flakiness.
-    await this.page.waitForTimeout(2000);
+    await this.page.waitForSelector(feedbackResponseRemoveSelector, {
+      visible: true,
+    });
     await this.clickOnElementWithSelector(feedbackResponseRemoveSelector);
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector, false);
   }
