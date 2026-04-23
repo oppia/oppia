@@ -197,7 +197,7 @@ def _collect_study_guide_changes(
     """
     # Remove union and StudyGuideChange once the study
     # guide logic when updating a subtopic page is
-    # removed from line 363.
+    # removed from line 478.
     update_study_guide_property_cmd: Union[
         study_guide_domain.UpdateStudyGuidePropertyCmd,
         study_guide_domain.StudyGuideChange,
