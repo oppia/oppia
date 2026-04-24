@@ -387,10 +387,10 @@ class PinnedOpportunity:
             ValidationError. One or more attributes of the object are invalid.
         """
         if not self.language_code:
-            raise utils.ValidationError("language_code is required")
+            raise utils.ValidationError('language_code is required')
 
         if not isinstance(self.language_code, str):
-            raise utils.ValidationError("expected language_code to be a string")
+            raise utils.ValidationError('expected language_code to be a string')
 
         allowed_language_codes = [
             language['id'] for language in (constants.SUPPORTED_AUDIO_LANGUAGES)

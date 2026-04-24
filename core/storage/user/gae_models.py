@@ -3722,6 +3722,7 @@ class UsernameChangeAudit(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     def export_data(
+        self,
         user_id: str,
     ) -> Dict[str, str, str]:
         """Exports the data from UsernameChangeAuditModel into dict format for Takeout.

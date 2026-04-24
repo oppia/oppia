@@ -1853,7 +1853,7 @@ class TranslationCoordinatorStats:
 
 
 class UsernameChangeAudit:
-    """Domain Object for the UsernameChangeAuditModel"""
+    """Domain Object for the UsernameChangeAuditModel."""
 
     def __init__(
         self, committer_id: str, old_username: str, new_username: str
