@@ -36,16 +36,7 @@ from scripts import (
 )
 
 import rcssmin
-from typing import (
-    Deque,
-    Dict,
-    List,
-    Optional,
-    Sequence,
-    TextIO,
-    Tuple,
-    TypedDict,
-)
+from typing import Deque, Dict, List, Optional, Sequence, TextIO, Tuple
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -85,7 +76,7 @@ WEBPACK_DIRNAMES_TO_DIRPATHS = {
 # interprets the paths in this file as URLs.
 HASHES_JSON_FILENAME = 'hashes.json'
 HASHES_JSON_FILEPATH = os.path.join('assets', HASHES_JSON_FILENAME)
-DEPENDENCIES_FILE_PATH = os.path.join('dependencies.json')
+
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
 
@@ -163,9 +154,9 @@ MAX_OLD_SPACE_SIZE_FOR_WEBPACK_BUILD = 8192
 
 _PARSER = argparse.ArgumentParser(
     description="""
-Creates a third-party directory where all the JS and CSS dependencies are
-built and stored. Depending on the options passed to the script, might also
-minify third-party libraries and/or generate a build directory.
+Builds the production version of Oppia. Generates hashes for assets,
+minifies files, and creates the build directory. Angular CLI handles
+CSS bundling including third-party dependencies.
 """
 )
 
@@ -198,14 +189,17 @@ _PARSER.add_argument(
     dest='source_maps',
     help='Build webpack with source maps.',
 )
-
-
-class DependencyBundleDict(TypedDict):
-    """Dictionary that represents dependency bundle."""
-
-    js: List[str]
-    css: List[str]
-    fontsPath: str
+_PARSER.add_argument(
+    '--skip_ng_build',
+    action='store_true',
+    default=False,
+    dest='skip_ng_build',
+    help=(
+        'Skip the Angular ng build and CSS hash injection steps. '
+        'Used by run_frontend_tests when running minified tests, '
+        'since karma does not use the Angular dist output.'
+    ),
+)
 
 
 def run_webpack_compilation(source_maps: bool = False) -> None:
@@ -532,181 +526,6 @@ def process_html(
     )
 
 
-def get_dependency_directory(dependency: Dict[str, str]) -> str:
-    """Get dependency directory from dependency dictionary.
-
-    Args:
-        dependency: dict(str, str). Dictionary representing single dependency
-            from dependencies.json.
-
-    Returns:
-        str. Dependency directory.
-    """
-    if 'targetDir' in dependency:
-        dependency_dir = dependency['targetDir']
-    else:
-        dependency_dir = dependency['targetDirPrefix'] + dependency['version']
-    return os.path.join(THIRD_PARTY_STATIC_DIR, dependency_dir)
-
-
-def get_css_filepaths(
-    dependency_bundle: DependencyBundleDict, dependency_dir: str
-) -> List[str]:
-    """Gets dependency css filepaths.
-
-    Args:
-        dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            - 'js': List of paths to js files that need to be copied.
-            - 'css': List of paths to css files that need to be copied.
-            - 'fontsPath': Path to folder containing fonts that need to be
-                copied.
-        dependency_dir: str. Path to directory where the files that need to
-            be copied are located.
-
-    Returns:
-        list(str). List of paths to css files that need to be copied.
-    """
-    css_files = dependency_bundle.get('css', [])
-    return [os.path.join(dependency_dir, css_file) for css_file in css_files]
-
-
-def get_js_filepaths(
-    dependency_bundle: DependencyBundleDict, dependency_dir: str
-) -> List[str]:
-    """Gets dependency js filepaths.
-
-    Args:
-        dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            - 'js': List of paths to js files that need to be copied.
-            - 'css': List of paths to css files that need to be copied.
-            - 'fontsPath': Path to folder containing fonts that need to be
-                copied.
-        dependency_dir: str. Path to directory where the files that need to
-            be copied are located.
-
-    Returns:
-        list(str). List of paths to js files that need to be copied.
-    """
-    js_files = dependency_bundle.get('js', [])
-    return [os.path.join(dependency_dir, js_file) for js_file in js_files]
-
-
-def get_font_filepaths(
-    dependency_bundle: DependencyBundleDict, dependency_dir: str
-) -> List[str]:
-    """Gets dependency font filepaths.
-
-    Args:
-        dependency_bundle: dict(str, list(str) | str). The dict has three keys:
-            - 'js': List of paths to js files that need to be copied.
-            - 'css': List of paths to css files that need to be copied.
-            - 'fontsPath': Path to folder containing fonts that need to be
-                copied.
-        dependency_dir: str. Path to directory where the files that need to
-            be copied are located.
-
-    Returns:
-        list(str). List of paths to font files that need to be copied.
-    """
-    if 'fontsPath' not in dependency_bundle:
-        # Skip dependency bundles in dependencies.json that do not have
-        # fontsPath property.
-        return []
-    fonts_path = dependency_bundle['fontsPath']
-    # Obtain directory path to /font inside dependency folder.
-    # E.g. third_party/static/bootstrap-3.3.4/fonts/.
-    font_dir = os.path.join(dependency_dir, fonts_path)
-    font_filepaths = []
-    # Walk the directory and add all font files to list.
-    for root, _, filenames in os.walk(font_dir):
-        for filename in filenames:
-            font_filepaths.append(os.path.join(root, filename))
-    return font_filepaths
-
-
-def get_dependencies_filepaths() -> Dict[str, List[str]]:
-    """Extracts dependencies filepaths from dependencies.json file into
-    a dictionary.
-
-    Returns:
-        dict(str, list(str)). A dict mapping file types to lists of filepaths.
-        The dict has three keys: 'js', 'css' and 'fonts'. Each of the
-        corresponding values is a full list of dependency file paths of the
-        given type.
-    """
-    filepaths: Dict[str, List[str]] = {'js': [], 'css': [], 'fonts': []}
-    with open(DEPENDENCIES_FILE_PATH, 'r', encoding='utf-8') as json_file:
-        dependencies_json = json.loads(
-            json_file.read(), object_pairs_hook=collections.OrderedDict
-        )
-    frontend_dependencies = dependencies_json['frontendDependencies']
-    for dependency in frontend_dependencies.values():
-        if 'bundle' in dependency:
-            dependency_dir = get_dependency_directory(dependency)
-            filepaths['css'].extend(
-                get_css_filepaths(dependency['bundle'], dependency_dir)
-            )
-            filepaths['js'].extend(
-                get_js_filepaths(dependency['bundle'], dependency_dir)
-            )
-            filepaths['fonts'].extend(
-                get_font_filepaths(dependency['bundle'], dependency_dir)
-            )
-
-    _ensure_files_exist(filepaths['js'])
-    _ensure_files_exist(filepaths['css'])
-    _ensure_files_exist(filepaths['fonts'])
-    return filepaths
-
-
-def minify_third_party_libs(third_party_directory_path: str) -> None:
-    """Minify third_party.js and third_party.css and remove un-minified
-    files.
-    """
-
-    third_party_css_filepath = os.path.join(
-        third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH
-    )
-
-    minified_third_party_css_filepath = os.path.join(
-        third_party_directory_path, MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH
-    )
-
-    _minify_css(third_party_css_filepath, minified_third_party_css_filepath)
-    # Clean up un-minified third_party.js and third_party.css.
-    safe_delete_file(third_party_css_filepath)
-
-
-def build_third_party_libs(third_party_directory_path: str) -> None:
-    """Joins all third party css files into single css file and js files into
-    single js file. Copies both files and all fonts into third party folder.
-    """
-
-    print('Building third party libs at %s' % third_party_directory_path)
-
-    third_party_css_filepath = os.path.join(
-        third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH
-    )
-    webfonts_dir = os.path.join(
-        third_party_directory_path, WEBFONTS_RELATIVE_DIRECTORY_PATH
-    )
-
-    dependency_filepaths = get_dependencies_filepaths()
-
-    common.ensure_directory_exists(os.path.dirname(third_party_css_filepath))
-    with open(
-        third_party_css_filepath, 'w+', encoding='utf-8'
-    ) as third_party_css_file:
-        _join_files(dependency_filepaths['css'], third_party_css_file)
-
-    common.ensure_directory_exists(webfonts_dir)
-    _execute_tasks(
-        _generate_copy_tasks_for_fonts(
-            dependency_filepaths['fonts'], webfonts_dir
-        )
-    )
-
-
 def build_using_ng() -> None:
     """Execute angular build process. This runs the angular compiler and
     generates an ahead of time compiled bundle. This bundle can be found in the
@@ -721,6 +540,182 @@ def build_using_ng() -> None:
     assert (
         get_file_count('dist/oppia-angular-prod') > 0
     ), 'angular generated bundle should be non-empty'
+
+
+def inject_angular_css_hashes() -> None:
+    """Inject Angular CLI generated CSS filenames into webpack HTML templates.
+
+    This function scans the dist/oppia-angular-prod directory for Angular CSS
+    output files and updates HTML files in backend_prod_files/webpack_bundles/
+    when hashed CSS filenames are present.
+
+    If CSS filenames are deterministic (styles.css and vendor-styles.css), no
+    HTML rewrite is needed and this function becomes a no-op.
+
+    This runs after build_using_ng() to ensure the Angular CLI build has
+    completed and CSS files exist.
+    """
+    print('Injecting Angular CSS filenames into webpack templates')
+
+    # Find styles files generated by Angular CLI.
+    dist_dir = 'dist/oppia-angular-prod'
+    if not os.path.exists(dist_dir):
+        raise RuntimeError(
+            '%s does not exist. Angular CLI build may have failed.' % dist_dir
+        )
+
+    dist_files = os.listdir(dist_dir)
+    styles_files = [
+        f for f in dist_files if f.startswith('styles.') and f.endswith('.css')
+    ]
+    deterministic_styles_exists = 'styles.css' in dist_files
+
+    if not styles_files and not deterministic_styles_exists:
+        raise RuntimeError(
+            'No styles.css or styles.*.css file found in %s. '
+            'Angular CLI build may have failed.' % dist_dir
+        )
+
+    if len(styles_files) > 1:
+        raise RuntimeError(
+            'Multiple styles.*.css files found in %s: %s. '
+            'Expected exactly one.' % (dist_dir, styles_files)
+        )
+
+    hashed_styles_filename = styles_files[0] if styles_files else None
+    if hashed_styles_filename:
+        print('Found Angular hashed styles file: %s' % hashed_styles_filename)
+    else:
+        print('Found deterministic Angular styles file: styles.css')
+
+    vendor_styles_files = [
+        f
+        for f in dist_files
+        if f.startswith('vendor-styles.') and f.endswith('.css')
+    ]
+    deterministic_vendor_styles_exists = 'vendor-styles.css' in dist_files
+
+    hashed_vendor_styles_filename = None
+    if len(vendor_styles_files) > 1:
+        raise RuntimeError(
+            'Multiple vendor-styles.*.css files found in %s: %s. '
+            'Expected at most one.' % (dist_dir, vendor_styles_files)
+        )
+    if len(vendor_styles_files) == 1:
+        hashed_vendor_styles_filename = vendor_styles_files[0]
+        print(
+            'Found Angular hashed vendor styles file: %s'
+            % hashed_vendor_styles_filename
+        )
+    elif deterministic_vendor_styles_exists:
+        print(
+            'Found deterministic Angular vendor styles file: vendor-styles.css'
+        )
+
+    # Deterministic CSS names already match template references.
+    if hashed_styles_filename is None and hashed_vendor_styles_filename is None:
+        print('Angular CSS files are deterministic. Skipping HTML CSS rewrite.')
+        return
+
+    # Update all HTML files in backend_prod_files/webpack_bundles/.
+    webpack_bundles_dir = 'backend_prod_files/webpack_bundles'
+    if not os.path.exists(webpack_bundles_dir):
+        print(
+            'Warning: %s does not exist. Skipping CSS hash injection.'
+            % webpack_bundles_dir
+        )
+        return
+
+    html_files = [
+        f for f in os.listdir(webpack_bundles_dir) if f.endswith('.html')
+    ]
+
+    updated_count = 0
+    for html_file in html_files:
+        html_path = os.path.join(webpack_bundles_dir, html_file)
+
+        with open(html_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Replace placeholder references with hashed filenames when present.
+        old_reference = '/dist/oppia-angular-prod/styles.css'
+        new_reference = None
+        if hashed_styles_filename:
+            new_reference = '/dist/oppia-angular-prod/' + hashed_styles_filename
+
+        old_vendor_reference = '/dist/oppia-angular-prod/vendor-styles.css'
+        new_vendor_reference = None
+        if hashed_vendor_styles_filename:
+            new_vendor_reference = (
+                '/dist/oppia-angular-prod/' + hashed_vendor_styles_filename
+            )
+
+        updated_content = content
+        if old_reference in content and new_reference:
+            updated_content = updated_content.replace(
+                old_reference, new_reference
+            )
+
+        if old_vendor_reference in updated_content and new_vendor_reference:
+            updated_content = updated_content.replace(
+                old_vendor_reference, new_vendor_reference
+            )
+
+        if updated_content != content:
+            with open(html_path, 'w', encoding='utf-8') as f:
+                f.write(updated_content)
+
+            print('Updated %s with Angular CSS hash' % html_file)
+            updated_count += 1
+
+    print('Updated %d HTML files with Angular CSS filenames' % updated_count)
+
+    # Update assets/hashes.json to include Angular CSS hashes.
+    hashes = {}
+    if os.path.exists(HASHES_JSON_FILEPATH):
+        with open(HASHES_JSON_FILEPATH, 'r', encoding='utf-8') as f:
+            hashes = json.loads(f.read())
+
+    hashes_updated = False
+
+    if hashed_styles_filename:
+        # Extract the hash from the filename (e.g., styles.abc123.css -> abc123).
+        hash_match = re.match(
+            r'styles\.([a-f0-9]+)\.css', hashed_styles_filename
+        )
+        if hash_match:
+            styles_hash = hash_match.group(1)
+
+            # Add Angular CSS hash.
+            hashes['angular_styles'] = styles_hash
+            hashes_updated = True
+            print('Added Angular CSS hash to hashes.json: %s' % styles_hash)
+        else:
+            print(
+                'Warning: Could not extract hash from %s'
+                % hashed_styles_filename
+            )
+
+    if hashed_vendor_styles_filename:
+        vendor_hash_match = re.match(
+            r'vendor-styles\.([a-f0-9]+)\.css', hashed_vendor_styles_filename
+        )
+        if vendor_hash_match:
+            vendor_styles_hash = vendor_hash_match.group(1)
+            hashes['angular_vendor_styles'] = vendor_styles_hash
+            hashes_updated = True
+            print(
+                'Added Angular vendor CSS hash to hashes.json: %s'
+                % vendor_styles_hash
+            )
+        else:
+            print(
+                'Warning: Could not extract hash from %s'
+                % hashed_vendor_styles_filename
+            )
+
+    if hashes_updated:
+        common.write_hashes_json_file(hashes)
 
 
 def build_using_webpack(config_path: str) -> None:
@@ -1316,8 +1311,7 @@ def _verify_hashes(
 ) -> None:
     """Verify a few metrics after build process finishes:
         1) The hashes in filenames belongs to the hash dict.
-        2) hashes.json, third_party.min.css and third_party.min.js are built and
-        hashes are inserted.
+        2) hashes.json is built and hash is inserted.
 
     Args:
         output_dirnames: list(str). List of directory paths that contain
@@ -1330,33 +1324,17 @@ def _verify_hashes(
     for built_dir in output_dirnames:
         for root, _, filenames in os.walk(built_dir):
             for filename in filenames:
-                parent_dir = os.path.basename(root)
-                converted_filepath = os.path.join(
-                    THIRD_PARTY_GENERATED_DEV_DIR, parent_dir, filename
+                relative_filepath = os.path.relpath(
+                    os.path.join(root, filename), start=built_dir
                 )
-                if hash_should_be_inserted(converted_filepath):
-                    # Obtain the same filepath format as the hash dict's key.
-                    relative_filepath = os.path.relpath(
-                        os.path.join(root, filename), start=built_dir
-                    )
+                if hash_should_be_inserted(relative_filepath):
                     _verify_filepath_hash(relative_filepath, file_hashes)
 
     hash_final_filename = _insert_hash(
         HASHES_JSON_FILENAME, file_hashes[HASHES_JSON_FILENAME]
     )
-    third_party_css_final_filename = _insert_hash(
-        MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH,
-        file_hashes[MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH],
-    )
 
-    _ensure_files_exist(
-        [
-            os.path.join(ASSETS_OUT_DIR, hash_final_filename),
-            os.path.join(
-                THIRD_PARTY_GENERATED_OUT_DIR, third_party_css_final_filename
-            ),
-        ]
-    )
+    _ensure_files_exist([os.path.join(ASSETS_OUT_DIR, hash_final_filename)])
 
 
 def generate_hashes() -> Dict[str, str]:
@@ -1372,7 +1350,6 @@ def generate_hashes() -> Dict[str, str]:
         ASSETS_DEV_DIR,
         EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
-        THIRD_PARTY_GENERATED_DEV_DIR,
     ]
     for hash_dir in hash_dirs:
         hashes.update(get_file_hashes(hash_dir))
@@ -1415,14 +1392,12 @@ def generate_build_directory(hashes: Dict[str, str]) -> None:
         ASSETS_DEV_DIR,
         EXTENSIONS_DIRNAMES_TO_DIRPATHS['staging_dir'],
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['staging_dir'],
-        THIRD_PARTY_GENERATED_DEV_DIR,
         WEBPACK_DIRNAMES_TO_DIRPATHS['staging_dir'],
     ]
     copy_output_dirs = [
         ASSETS_OUT_DIR,
         EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir'],
-        THIRD_PARTY_GENERATED_OUT_DIR,
         WEBPACK_DIRNAMES_TO_DIRPATHS['out_dir'],
     ]
     assert len(copy_input_dirs) == len(copy_output_dirs)
@@ -1435,15 +1410,9 @@ def generate_build_directory(hashes: Dict[str, str]) -> None:
 
     _verify_hashes(copy_output_dirs, hashes)
 
-    source_dirs_for_assets = [ASSETS_DEV_DIR, THIRD_PARTY_GENERATED_DEV_DIR]
-    output_dirs_for_assets = [ASSETS_OUT_DIR, THIRD_PARTY_GENERATED_OUT_DIR]
+    source_dirs_for_assets = [ASSETS_DEV_DIR]
+    output_dirs_for_assets = [ASSETS_OUT_DIR]
     _compare_file_count(source_dirs_for_assets, output_dirs_for_assets)
-
-    source_dirs_for_third_party = [THIRD_PARTY_GENERATED_DEV_DIR]
-    output_dirs_for_third_party = [THIRD_PARTY_GENERATED_OUT_DIR]
-    _compare_file_count(
-        source_dirs_for_third_party, output_dirs_for_third_party
-    )
 
     source_dirs_for_webpack = [WEBPACK_DIRNAMES_TO_DIRPATHS['staging_dir']]
     output_dirs_for_webpack = [WEBPACK_DIRNAMES_TO_DIRPATHS['out_dir']]
@@ -1498,21 +1467,10 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     # Clean up the existing generated folders.
     clean()
 
-    # Regenerate /third_party/generated from scratch.
-    safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
-    build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
-
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.
     if options.minify_third_party_libs_only:
-        if options.prod_env:
-            minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
-            return
-        else:
-            raise Exception(
-                'minify_third_party_libs_only should not be '
-                'set in non-prod env.'
-            )
+        raise Exception('minify_third_party_libs_only is no longer supported.')
 
     common.modify_constants(
         prod_env=options.prod_env,
@@ -1520,14 +1478,19 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         maintenance_mode=options.maintenance_mode,
     )
     if options.prod_env:
-        minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()
         generate_python_package()
         if options.source_maps:
             build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
         else:
             build_using_webpack(WEBPACK_PROD_CONFIG)
-        build_using_ng()
+        # The Angular ng build and CSS hash injection are skipped when
+        # --skip_ng_build is set (e.g., for minified karma tests) because
+        # karma does not serve the Angular dist output — it has its own
+        # compilation pipeline.
+        if not options.skip_ng_build:
+            build_using_ng()
+            inject_angular_css_hashes()
         generate_app_yaml(deploy_mode=options.deploy_mode)
         generate_build_directory(hashes)
 

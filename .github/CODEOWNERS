@@ -770,7 +770,6 @@
 /requirements.in @oppia/dependency-reviewers
 /requirements_dev.txt @oppia/dependency-reviewers
 /requirements_dev.in @oppia/dependency-reviewers
-/dependencies.json @oppia/dependency-reviewers
 /package.json @oppia/dependency-reviewers
 /yarn.lock @oppia/dependency-reviewers
 /scripts/install_third_party_libs.py @oppia/dev-workflow-reviewers
