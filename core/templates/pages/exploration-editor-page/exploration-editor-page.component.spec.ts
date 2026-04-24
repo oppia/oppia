@@ -75,6 +75,7 @@ import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {LanguageCodeToEntityTranslations} from '../../services/entity-translations.services';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {TranslatedContentBackendDict} from 'domain/exploration/translated-content.model.ts';
 
 class MockNgbModalRef {
   componentInstance = {};
@@ -850,7 +851,7 @@ describe('Exploration editor page component', () => {
               translation: '<p>This is content 1.</p>',
               dataFormat: 'html',
               needsUpdate: true,
-            } as any,
+            } as unknown as TranslatedContentBackendDict,
           },
         }),
       };

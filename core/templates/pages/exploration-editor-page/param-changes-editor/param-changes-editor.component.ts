@@ -102,7 +102,7 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     let newParamChange = ParamChange.createDefault(newParamName);
     // Add the new param name to this.paramNameChoices, if necessary,
     // so that it shows up in the dropdown.
-    // TODO: Update ParamSpecs.addParamIfNew to accept a nullable second
+    // TODO(#23496): Update ParamSpecs.addParamIfNew to accept a nullable second
     // parameter; the call sites have always passed null at runtime.
     if (
       (this.explorationParamSpecsService.displayed as ParamSpecs).addParamIfNew(

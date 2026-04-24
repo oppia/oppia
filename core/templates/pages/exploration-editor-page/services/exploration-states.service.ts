@@ -96,7 +96,7 @@ export class ExplorationStatesService {
   contentChangesCanAffectTranslations: boolean = true;
 
   stateInteractionSavedCallbacks: ((state: State) => void)[] = [];
-  private _states!: States;
+  private _states: States | null = null;
   private _refreshGraphEventEmitter: EventEmitter<string> = new EventEmitter();
 
   constructor(
