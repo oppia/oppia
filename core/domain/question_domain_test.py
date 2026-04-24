@@ -2567,9 +2567,6 @@ class QuestionCommitLogEntryDomainTest(test_utils.GenericTestBase):
         )
         self.assertEqual(expected_object_dict, observed_object.to_dict())
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type the
-    # codebase we plan to get rid of the tests that intentionally test wrong
-    # inputs that we can normally catch by typing.
     def test_validation_with_empty_question_id_raises_error(self) -> None:
         """Test that an empty question_id raises a ValidationError."""
         entry = question_domain.QuestionCommitLogEntry(

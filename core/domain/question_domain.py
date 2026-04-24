@@ -23,8 +23,6 @@ import copy
 import datetime
 import re
 
-# added code
-from typing import TypedDict
 from core import feconf, schema_utils, utils
 from core.constants import constants
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from
