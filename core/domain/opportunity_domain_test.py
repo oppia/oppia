@@ -404,6 +404,14 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
             },
         )
 
+    def test_invalid_language_code_raises_error(self) -> None:
+        with self.assertRaises(test_utils.ValidationError):
+            opportunity_domain.PinnedOpportunity(
+                language_code='invalid',
+                topic_id='topic_id_1',
+                opportunity_id='opportunity_id1',
+            ).validate()
+
 
 class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
     """Tests for the TranslationOpportunity domain object."""

@@ -3637,3 +3637,103 @@ class PinnedOpportunityModel(base_models.BaseModel):
         multiple languages and topics relevant to a user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
+
+class UsernameChangeAudit(base_models.BaseModel):
+    """Model for storing pinned opportunities in the
+    contributor dashboard for a user.
+
+    The ID of each instance is the combination of user_id,
+    language_code, and topic_id.
+    """
+
+    committer_id = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+    old_username = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+    new_username = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+
+    @classmethod
+    def _generate_id(
+        cls, committer_id: str, old_username: str, new_username: str
+    ) -> str:
+        """Generates the ID for the instance of UsernameChangeAuditModel class.
+
+        Args:
+            committer_id: str. The ID of the user changing their username.
+            old_username: str. The old username of the user.
+            new_username: str. The new username of the user.
+
+        Returns:
+            str. The ID for this entity, in the form
+            committer_id.old_username.new_username.
+        """
+        return '%s.%s.%s' % (committer_id, old_username, new_username)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model contains data to delete corresponding to a user: id field."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model is exported as multiple instances per user, since a user
+        can change their username multiple times.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data to export corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'committer_id': base_models.EXPORT_POLICY.EXPORTED,
+                'old_username': base_models.EXPORT_POLICY.EXPORTED,
+                'new_username': base_models.EXPORT_POLICY.EXPORTED,
+            },
+        )
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instance of UsernameChangeAuditModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether UsernameChangeAuditModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.get_by_id(user_id) is not None
+
+    def export_data(
+        user_id: str,
+    ) -> Dict[str, Union[str, float, bool, List[str], None]]:
+        """Exports the data from UsernameChangeAuditModel into dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from UsernameChangeAuditModel.
+        """
+        user = UsernameChangeAudit.get(user_id)
+        return {
+            'old_username': user.old_username,
+            'new_username': user.new_username,
+        }

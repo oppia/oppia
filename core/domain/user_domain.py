@@ -1865,28 +1865,19 @@ class UsernameChangeAudit:
     def validate(self) -> None:
         """Validates the UsernameChangeAudit Domain Object."""
         if not isinstance(self.committer_id, str):
-            raise utils.ValidationError(
-                'Expected committer_id to be a string, received %s'
-                % self.committer_id
-            )
+            raise utils.ValidationError('Expected committer_id to be a string')
 
         if not self.committer_id:
-            raise utils.ValidationError('No committer id specified.')
+            raise utils.ValidationError('No committer id specified')
 
         if not isinstance(self.old_username, str):
-            raise utils.ValidationError(
-                'Expected old_username to be a string, received %s'
-                % self.old_username
-            )
+            raise utils.ValidationError('Expected old username to be a string')
 
         if not self.old_username:
-            raise utils.ValidationError('No old username specified.')
+            raise utils.ValidationError('No old username specified')
 
-        if not isinstance(self.committer_id, str):
-            raise utils.ValidationError(
-                'Expected new_username to be a string, received %s'
-                % self.new_username
-            )
+        if not isinstance(self.new_username, str):
+            raise utils.ValidationError('Expected new username to be a string')
 
         if not self.new_username:
-            raise utils.ValidationError('No new username specified.')
+            raise utils.ValidationError('No new username specified')

@@ -380,6 +380,40 @@ class PinnedOpportunity:
         self.topic_id = topic_id
         self.opportunity_id = opportunity_id
 
+    def validate(self) -> None:
+        """Validates various properties of the object.
+
+        Raises:
+            ValidationError. One or more attributes of the object are invalid.
+        """
+        if not self.language_code:
+            raise utils.ValidationError("language_code is required")
+
+        allowed_language_codes = [
+            language['id'] for language in (constants.SUPPORTED_AUDIO_LANGUAGES)
+        ]
+        if self.language_code not in allowed_language_codes:
+            raise utils.ValidationError(
+                'Invalid language_code: %s' % self.language_code
+            )
+
+        if not isinstance(self.topic_id, str):
+            raise utils.ValidationError(
+                'Expected topic_id to be a string, received %s' % self.topic_id
+            )
+
+        if not self.topic_id:
+            raise utils.ValidationError('No topic id specified.')
+
+        if not isinstance(self.opportunity_id, str):
+            raise utils.ValidationError(
+                'Expected opportunity_id to be a string, received %s'
+                % self.opportunity_id
+            )
+
+        if not self.opportunity_id:
+            raise utils.ValidationError('No opportunity id specified.')
+
     @classmethod
     def from_dict(
         cls,
