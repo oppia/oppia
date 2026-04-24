@@ -3723,6 +3723,8 @@ class UsernameChangeAudit(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @staticmethod
+    # Here we use type Any because the export format may include multiple
+    # field types that cannot be strictly typed in advance.
     def export_data(user_id: str) -> Dict[str, Any]:
         """Exports the data from UsernameChangeAuditModel into dict format for Takeout.
 
