@@ -261,6 +261,9 @@ oppia-library-page .oppia-search-bar-container {
   margin: 0 auto 0 auto;
   width: 100%;
 }
+oppia-library-page .oppia-search-results-bar-container {
+  margin-bottom: 20px;
+}
 
 oppia-library-page .classroom-cards-wrapper {
   align-items: center;
@@ -629,6 +632,9 @@ oppia-library-page .community-library-breadcrumbs-container {
   }
   oppia-library-page .oppia-search-bar-container {
     margin-bottom: 90px;
+  }
+  oppia-library-page .oppia-search-results-bar-container {
+    margin-bottom: 100px;
   }
   .oppia-library-group {
     border-top: 3px solid white;
