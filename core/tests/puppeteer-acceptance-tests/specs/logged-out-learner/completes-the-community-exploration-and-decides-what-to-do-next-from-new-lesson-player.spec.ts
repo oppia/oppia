@@ -241,7 +241,7 @@ describe('Logged-Out Learner', function () {
       }
     },
     // Setup takes more time than default.
-    1800000
+    2400000
   );
 
   it('should be able visit the community library', async function () {

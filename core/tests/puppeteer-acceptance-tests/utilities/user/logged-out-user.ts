@@ -7326,7 +7326,9 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickOnLessonResumeButton(): Promise<void> {
     // Click on the 'Yes, resume the lesson' button.
-    await this.page.waitForSelector(resumeLessonButtonSelector);
+    await this.page.waitForSelector(resumeLessonButtonSelector, {
+      visible: true,
+    });
     await this.page.click(resumeLessonButtonSelector);
   }
 

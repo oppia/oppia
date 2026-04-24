@@ -289,7 +289,7 @@ describe('Logged-Out Learner', function () {
       await loggedOutLearner.clickOnLessonResumeButton();
     },
     // Setup takes more time than default.
-    1800000
+    2400000
   );
 
   it('should be able to visit the next lesson', async function () {
@@ -297,6 +297,8 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.clickOnLogOutButton();
     await loggedOutLearner.page.waitForNavigation();
     await loggedOutLearner.expectPageURLToContain(testConstants.URLs.BaseURL);
+    await loggedOutLearner.waitForPageToFullyLoad();
+    await loggedOutLearner.expectScreenshotToMatch('homePage', __dirname);
 
     // Visit the math classroom page.
     await loggedOutLearner.navigateToClassroomPage('math');
