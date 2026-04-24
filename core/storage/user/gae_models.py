@@ -27,6 +27,7 @@ from core.constants import constants
 from core.platform import models
 
 from typing import (
+    Any,
     Dict,
     Final,
     List,
@@ -3721,10 +3722,8 @@ class UsernameChangeAudit(base_models.BaseModel):
         """
         return cls.get_by_id(user_id) is not None
 
-    def export_data(
-        self,
-        user_id: str,
-    ) -> Dict[str, str, str]:
+    @staticmethod
+    def export_data(user_id: str) -> Dict[str, Any]:
         """Exports the data from UsernameChangeAuditModel into dict format for Takeout.
 
         Args:
@@ -3734,6 +3733,9 @@ class UsernameChangeAudit(base_models.BaseModel):
             dict. Dictionary of the data from UsernameChangeAuditModel.
         """
         user = UsernameChangeAudit.get(user_id)
+        if user is None:
+            return {}
+
         return {
             'old_username': user.old_username,
             'new_username': user.new_username,

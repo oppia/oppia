@@ -27,7 +27,7 @@ from core.domain import auth_services, user_domain, user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List, Optional, TypedDict
+from typing import cast, List, Optional, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1971,7 +1971,7 @@ class UsernameChangeAuditTest(test_utils.GenericTestBase):
 
     def test_invalid_committer_id_type(self) -> None:
         obj = user_domain.UsernameChangeAudit(
-            committer_id=123,
+            committer_id=cast(str, 123),
             old_username='old_name',
             new_username='new_name',
         )
@@ -1994,7 +1994,7 @@ class UsernameChangeAuditTest(test_utils.GenericTestBase):
     def test_invalid_old_username(self) -> None:
         obj = user_domain.UsernameChangeAudit(
             committer_id='123',
-            old_username=123,
+            old_username=cast(str, 123),
             new_username='new_name',
         )
         with self.assertRaisesRegex(
@@ -2017,7 +2017,7 @@ class UsernameChangeAuditTest(test_utils.GenericTestBase):
         obj = user_domain.UsernameChangeAudit(
             committer_id='123',
             old_username='old_name',
-            new_username=123,
+            new_username=cast(str, 123),
         )
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected new username to be a string'

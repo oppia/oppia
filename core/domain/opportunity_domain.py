@@ -406,8 +406,7 @@ class PinnedOpportunity:
 
         if not isinstance(self.opportunity_id, str):
             raise utils.ValidationError(
-                'Expected opportunity_id to be a string, received %s'
-                % self.opportunity_id
+                'Expected opportunity_id to be a string'
             )
 
         if not self.opportunity_id:
