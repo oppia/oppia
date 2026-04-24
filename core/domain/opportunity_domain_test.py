@@ -20,10 +20,10 @@ from __future__ import annotations
 
 import re
 
+from core import utils
 from core.constants import constants
 from core.domain import opportunity_domain
 from core.tests import test_utils
-from core import utils
 
 
 class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
