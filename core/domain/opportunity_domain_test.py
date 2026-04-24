@@ -451,10 +451,11 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected topic_id to be a string'
         ):
+            # Here use cast because we intentionally pass invalid types to test runtime validation.
+            top_id = cast(str, 123)
             opportunity_domain.PinnedOpportunity(
                 language_code='en',
-                # Here use cast because intentionally passing invalid types to test runtime validation.
-                topic_id=cast(str, 123),
+                topic_id=top_id,
                 opportunity_id='opportunity_id1',
             ).validate()
 
@@ -462,9 +463,10 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError, 'expected language_code to be a string'
         ):
+            # Here use cast because we intentionally pass invalid types to test runtime validation.
+            lang_code = cast(str, 123)
             opportunity_domain.PinnedOpportunity(
-                # Here use cast because we intentionally pass invalid types to test runtime validation.
-                language_code=cast(str, 123),
+                language_code=lang_code,
                 topic_id='topic_id',
                 opportunity_id='opportunity_id1',
             ).validate()
@@ -473,11 +475,12 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected opportunity_id to be a string'
         ):
+            # Here use cast because we intentionally pass invalid types to test runtime validation.
+            opp_id = cast(str, 123)
             opportunity_domain.PinnedOpportunity(
                 language_code='en',
                 topic_id='topic_id',
-                # Here use cast because we intentionally pass invalid types to test runtime validation.
-                opportunity_id=cast(str, 123),
+                opportunity_id=opp_id,
             ).validate()
 
 

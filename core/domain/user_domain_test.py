@@ -1970,9 +1970,10 @@ class UsernameChangeAuditTest(test_utils.GenericTestBase):
         obj.validate()
 
     def test_invalid_committer_id_type(self) -> None:
+        # Here use cast because we intentionally pass invalid types to test runtime validation.
+        comm_id = cast(str, 123)
         obj = user_domain.UsernameChangeAudit(
-            # Here use cast because we intentionally pass invalid types to test runtime validation.
-            committer_id=cast(str, 123),
+            committer_id=comm_id,
             old_username='old_name',
             new_username='new_name',
         )
@@ -1993,10 +1994,11 @@ class UsernameChangeAuditTest(test_utils.GenericTestBase):
             obj.validate()
 
     def test_invalid_old_username(self) -> None:
+        # Here use cast because we intentionally pass invalid types to test runtime validation.
+        old_use = cast(str, 123)
         obj = user_domain.UsernameChangeAudit(
             committer_id='123',
-            # Here use cast because we intentionally pass invalid types to test runtime validation.
-            old_username=cast(str, 123),
+            old_username=old_use,
             new_username='new_name',
         )
         with self.assertRaisesRegex(
@@ -2016,11 +2018,12 @@ class UsernameChangeAuditTest(test_utils.GenericTestBase):
             obj.validate()
 
     def test_invalid_new_username(self) -> None:
+        # Here use cast because we intentionally pass invalid types to test runtime validation.
+        new_use = cast(str, 123)
         obj = user_domain.UsernameChangeAudit(
             committer_id='123',
             old_username='old_name',
-            # Here use cast because we intentionally pass invalid types to test runtime validation.
-            new_username=cast(str, 123),
+            new_username=new_use,
         )
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected new username to be a string'
