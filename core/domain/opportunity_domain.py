@@ -389,18 +389,17 @@ class PinnedOpportunity:
         if not self.language_code:
             raise utils.ValidationError("language_code is required")
 
+        if not isinstance(self.language_code, str):
+            raise utils.ValidationError("expected language_code to be a string")
+
         allowed_language_codes = [
             language['id'] for language in (constants.SUPPORTED_AUDIO_LANGUAGES)
         ]
         if self.language_code not in allowed_language_codes:
-            raise utils.ValidationError(
-                'Invalid language_code: %s' % self.language_code
-            )
+            raise utils.ValidationError('Invalid language_code')
 
         if not isinstance(self.topic_id, str):
-            raise utils.ValidationError(
-                'Expected topic_id to be a string, received %s' % self.topic_id
-            )
+            raise utils.ValidationError('Expected topic_id to be a string')
 
         if not self.topic_id:
             raise utils.ValidationError('No topic id specified.')

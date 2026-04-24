@@ -23,6 +23,7 @@ import re
 from core.constants import constants
 from core.domain import opportunity_domain
 from core.tests import test_utils
+from core import utils
 
 
 class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
@@ -405,10 +406,62 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
         )
 
     def test_invalid_language_code_raises_error(self) -> None:
-        with self.assertRaises(test_utils.ValidationError):
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Invalid language_code'
+        ):
             opportunity_domain.PinnedOpportunity(
                 language_code='invalid',
                 topic_id='topic_id_1',
+                opportunity_id='opportunity_id1',
+            ).validate()
+
+    def test_empty_language_code_raises_error(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'language_code is required'
+        ):
+            opportunity_domain.PinnedOpportunity(
+                language_code='',
+                topic_id='topic_id_1',
+                opportunity_id='opportunity_id_1',
+            ).validate()
+
+    def test_empty_topic_id_raises_error(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'No topic id specified'
+        ):
+            opportunity_domain.PinnedOpportunity(
+                language_code='en',
+                topic_id='',
+                opportunity_id='opportunity_id1',
+            ).validate()
+
+    def test_empty_opportunity_id_raises_error(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'No opportunity id specified'
+        ):
+            opportunity_domain.PinnedOpportunity(
+                language_code='en',
+                topic_id='topic_id_1',
+                opportunity_id='',
+            ).validate()
+
+    def test_invalid_topic_id_type(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected topic_id to be a string'
+        ):
+            opportunity_domain.PinnedOpportunity(
+                language_code='en',
+                topic_id=123,
+                opportunity_id='opportunity_id1',
+            ).validate()
+
+    def test_invalid_language_code_type(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'expected language_code to be a string'
+        ):
+            opportunity_domain.PinnedOpportunity(
+                language_code=123,
+                topic_id="topic_id",
                 opportunity_id='opportunity_id1',
             ).validate()
 
