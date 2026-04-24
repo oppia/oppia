@@ -25,8 +25,6 @@ from core.constants import constants
 from core.domain import opportunity_domain
 from core.tests import test_utils
 
-# from typing import cast
-
 
 class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
     """Test the ExplorationOpportunitySummary domain."""
