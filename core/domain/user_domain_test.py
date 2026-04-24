@@ -27,7 +27,7 @@ from core.domain import auth_services, user_domain, user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List, Optional, TypedDict, cast
+from typing import List, Optional, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
