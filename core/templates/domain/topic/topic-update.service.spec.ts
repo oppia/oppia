@@ -825,32 +825,32 @@ describe('Topic update service', function () {
       sampleTopicBackendObject.topicDict as TopicBackendDict,
       sampleTopicBackendObject.skillIdToDescriptionDict
     );
-    let skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    let skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
     expect(skills.length).toEqual(3);
     expect(skills[0].getId()).toEqual('skill_id_1');
     expect(skills[1].getId()).toEqual('skill_id_2');
     expect(skills[2].getId()).toEqual('skill_id_3');
 
     topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 1, 0);
-    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_2');
     expect(skills[1].getId()).toEqual('skill_id_1');
     expect(skills[2].getId()).toEqual('skill_id_3');
 
     topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 2, 1);
-    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_2');
     expect(skills[1].getId()).toEqual('skill_id_3');
     expect(skills[2].getId()).toEqual('skill_id_1');
 
     topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 2, 0);
-    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_1');
     expect(skills[1].getId()).toEqual('skill_id_2');
     expect(skills[2].getId()).toEqual('skill_id_3');
 
     undoRedoService.undoChange(_sampleTopic);
-    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_2');
     expect(skills[1].getId()).toEqual('skill_id_3');
     expect(skills[2].getId()).toEqual('skill_id_1');
@@ -998,7 +998,7 @@ describe('Topic update service', function () {
           _sampleTopic,
           1,
           null,
-          undefined
+          ShortSkillSummary.create('skill_1', 'Description 1')
         );
       }).toThrowError('New subtopic cannot be null');
       expect(undoRedoService.getCommittableChangeList()).toEqual([]);

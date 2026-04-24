@@ -733,7 +733,7 @@ export class TopicUpdateService {
   moveSkillToSubtopic(
     topic: Topic,
     oldSubtopicId: number | null,
-    newSubtopicId: number,
+    newSubtopicId: number | null,
     skillSummary: ShortSkillSummary
   ): void {
     if (!newSubtopicId) {
