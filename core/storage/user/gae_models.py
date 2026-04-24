@@ -3723,7 +3723,7 @@ class UsernameChangeAudit(base_models.BaseModel):
 
     def export_data(
         user_id: str,
-    ) -> Dict[str, Union[str, float, bool, List[str], None]]:
+    ) -> Dict[str, str, str]:
         """Exports the data from UsernameChangeAuditModel into dict format for Takeout.
 
         Args:

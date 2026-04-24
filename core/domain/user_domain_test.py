@@ -26,6 +26,7 @@ from core.constants import constants
 from core.domain import auth_services, user_domain, user_services
 from core.platform import models
 from core.tests import test_utils
+from core.domain import user_domain
 
 from typing import List, Optional, TypedDict
 
@@ -1958,15 +1959,12 @@ class UserContributionRightsUnitTest(test_utils.GenericTestBase):
         )
 
 
-from core.domain import user_domain
-
-
 class UsernameChangeAuditTest(test_utils.GenericTestBase):
     """Tests for the UsernameChangeAudit"""
 
     def test_valid_obj(self) -> None:
         obj = user_domain.UsernameChangeAudit(
-            committer_id="123",
+            committer_id='123',
             old_username='old_name',
             new_username='new_name',
         )
@@ -1985,7 +1983,7 @@ class UsernameChangeAuditTest(test_utils.GenericTestBase):
 
     def test_empty_committer_id(self) -> None:
         obj = user_domain.UsernameChangeAudit(
-            committer_id="",
+            committer_id='',
             old_username='old_name',
             new_username='new_name',
         )
@@ -1996,7 +1994,7 @@ class UsernameChangeAuditTest(test_utils.GenericTestBase):
 
     def test_invalid_old_username(self) -> None:
         obj = user_domain.UsernameChangeAudit(
-            committer_id="123",
+            committer_id='123',
             old_username=123,
             new_username='new_name',
         )
@@ -2007,7 +2005,7 @@ class UsernameChangeAuditTest(test_utils.GenericTestBase):
 
     def test_empty_old_username(self) -> None:
         obj = user_domain.UsernameChangeAudit(
-            committer_id="123",
+            committer_id='123',
             old_username='',
             new_username='new_name',
         )
@@ -2018,7 +2016,7 @@ class UsernameChangeAuditTest(test_utils.GenericTestBase):
 
     def test_invalid_new_username(self) -> None:
         obj = user_domain.UsernameChangeAudit(
-            committer_id="123",
+            committer_id='123',
             old_username='old_name',
             new_username=123,
         )
@@ -2029,7 +2027,7 @@ class UsernameChangeAuditTest(test_utils.GenericTestBase):
 
     def test_empty_new_username(self) -> None:
         obj = user_domain.UsernameChangeAudit(
-            committer_id="123",
+            committer_id='123',
             old_username='old_name',
             new_username='',
         )
