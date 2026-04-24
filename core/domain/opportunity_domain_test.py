@@ -451,9 +451,8 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected topic_id to be a string'
         ):
-            topic_id = cast(
-                str, 123
-            )  # Here use cast because we intentionally pass invalid types to test runtime validation.
+            # Here use cast because we intentionally pass invalid types to test runtime validation.
+            topic_id = cast(str, 123)
             opportunity_domain.PinnedOpportunity(
                 language_code='en',
                 topic_id=topic_id,
