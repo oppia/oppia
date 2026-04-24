@@ -2541,3 +2541,101 @@ class MergedQuestionSkillLinkDomainTest(test_utils.GenericTestBase):
             'testquestion', ['testskill'], ['testskilldescription'], [0.5]
         )
         self.assertEqual(expected_object_dict, observed_object.to_dict())
+
+class QuestionCommitLogEntryDomainTest(test_utils.GenericTestBase):
+    """Tests for the QuestionCommitLogEntry domain object."""
+
+    def test_valid_entry_does_not_raise(self) -> None:
+        """Test that a valid QuestionCommitLogEntry does not raise."""
+        entry = question_domain.QuestionCommitLogEntry(
+            question_id='question_id_1',
+            question_version=1,
+        )
+        # Should not raise.
+        entry.validate()
+
+    def test_to_dict(self) -> None:
+        """Test to verify to_dict method of the QuestionCommitLogEntry
+        domain object.
+        """
+        expected_object_dict = {
+            'question_id': 'question_id_1',
+            'question_version': 1,
+        }
+        observed_object = question_domain.QuestionCommitLogEntry(
+            'question_id_1', 1
+        )
+        self.assertEqual(expected_object_dict, observed_object.to_dict())
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validation_with_empty_question_id_raises_error(self) -> None:
+        """Test that an empty question_id raises a ValidationError."""
+        entry = question_domain.QuestionCommitLogEntry(
+            question_id='',
+            question_version=1,
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected question_id to be a non-empty string, received ',
+        ):
+            entry.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validation_with_non_string_question_id_raises_error(
+        self,
+    ) -> None:
+        """Test that a non-string question_id raises a ValidationError."""
+        entry = question_domain.QuestionCommitLogEntry(
+            question_id=123,  # type: ignore[arg-type]
+            question_version=1,
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected question_id to be a non-empty string, received 123',
+        ):
+            entry.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validation_with_non_integer_question_version_raises_error(
+        self,
+    ) -> None:
+        """Test that a non-integer question_version raises a ValidationError."""
+        entry = question_domain.QuestionCommitLogEntry(
+            question_id='question_id_1',
+            question_version='1',  # type: ignore[arg-type]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected question_version to be an integer, received 1',
+        ):
+            entry.validate()
+
+    def test_validation_with_non_positive_question_version_raises_error(
+        self,
+    ) -> None:
+        """Test that a question_version less than 1 raises a ValidationError."""
+        entry_with_zero = question_domain.QuestionCommitLogEntry(
+            question_id='question_id_1',
+            question_version=0,
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected question_version to be a positive integer, received 0',
+        ):
+            entry_with_zero.validate()
+
+        entry_with_negative = question_domain.QuestionCommitLogEntry(
+            question_id='question_id_1',
+            question_version=-1,
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected question_version to be a positive integer, received -1',
+        ):
+            entry_with_negative.validate()

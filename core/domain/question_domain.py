@@ -23,6 +23,8 @@ import copy
 import datetime
 import re
 
+# added code
+from typing import TypedDict
 from core import feconf, schema_utils, utils
 from core.constants import constants
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from
@@ -2538,4 +2540,71 @@ class MergedQuestionSkillLink:
             'skill_ids': self.skill_ids,
             'skill_descriptions': self.skill_descriptions,
             'skill_difficulties': self.skill_difficulties,
+        }
+
+class QuestionCommitLogEntryDict(TypedDict):
+    """Dictionary representing the QuestionCommitLogEntry domain object."""
+
+    question_id: str
+    question_version: int
+
+
+class QuestionCommitLogEntry:
+    """Domain object for a question commit log entry.
+
+    Attributes:
+        question_id: str. The ID of the question.
+        question_version: int. The version of the question.
+    """
+
+    def __init__(
+        self,
+        question_id: str,
+        question_version: int,
+    ) -> None:
+        """Constructs a QuestionCommitLogEntry domain object.
+
+        Args:
+            question_id: str. The ID of the question.
+            question_version: int. The version of the question.
+        """
+        self.question_id = question_id
+        self.question_version = question_version
+
+    def validate(self) -> None:
+        """Validates the QuestionCommitLogEntry domain object before it is
+        saved.
+
+        Raises:
+            utils.ValidationError. The question_id is not a non-empty string.
+            utils.ValidationError. The question_version is not a positive
+                integer.
+        """
+        if not isinstance(self.question_id, str) or not self.question_id:
+            raise utils.ValidationError(
+                'Expected question_id to be a non-empty string, received %s'
+                % self.question_id
+            )
+
+        if not isinstance(self.question_version, int):
+            raise utils.ValidationError(
+                'Expected question_version to be an integer, received %s'
+                % self.question_version
+            )
+
+        if self.question_version < 1:
+            raise utils.ValidationError(
+                'Expected question_version to be a positive integer, '
+                'received %s' % self.question_version
+            )
+
+    def to_dict(self) -> QuestionCommitLogEntryDict:
+        """Returns a dictionary representation of this domain object.
+
+        Returns:
+            dict. A dict representing this QuestionCommitLogEntry object.
+        """
+        return {
+            'question_id': self.question_id,
+            'question_version': self.question_version,
         }
