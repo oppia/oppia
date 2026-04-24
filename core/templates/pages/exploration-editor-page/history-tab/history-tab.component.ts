@@ -83,7 +83,7 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
 
   username!: string;
   displayedCurrentPageNumber!: number;
-  versionNumbersToDisplay!: number;
+  versionNumbersToDisplay: number = 0;
   VERSIONS_PER_PAGE: number = 10;
   startingIndex!: number;
   endIndex!: number;
@@ -454,7 +454,9 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
   }
 
   reverseDateOrder(): void {
-    this.explorationVersionMetadata.reverse();
+    if (this.explorationVersionMetadata) {
+      this.explorationVersionMetadata.reverse();
+    }
   }
 
   showExplorationMetadataDiffModal(): void {

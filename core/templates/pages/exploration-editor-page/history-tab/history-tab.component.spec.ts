@@ -171,10 +171,10 @@ describe('History tab component', () => {
       '/createhandler/download/exp1'
     );
 
-    expect(component.explorationVersionMetadata).toBe(null);
+    expect(component.explorationVersionMetadata).toEqual([]);
     expect(component.versionCheckboxArray).toEqual([]);
     expect(component.displayedCurrentPageNumber).toBe(1);
-    expect(component.versionNumbersToDisplay).toEqual([]);
+    expect(component.versionNumbersToDisplay).toBe(0);
   });
 
   it(

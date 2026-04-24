@@ -392,14 +392,14 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
             // if they exist.
             this.populateEntityTranslationsWithDraftChanges(
               explorationData.draft_changes,
-              explorationVersion
+              explorationData.version as number
             );
           });
       } else {
         // Simply populate draft changes for the translation tab in case the feature flag is not enabled.
         this.populateEntityTranslationsWithDraftChanges(
           explorationData.draft_changes,
-          explorationVersion
+          explorationData.version as number
         );
       }
 

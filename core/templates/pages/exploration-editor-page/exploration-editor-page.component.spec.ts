@@ -844,7 +844,7 @@ describe('Exploration editor page component', () => {
         hi: EntityTranslation.createFromBackendDict({
           entity_id: 'exp1',
           entity_type: 'exploration',
-          entity_version: 5,
+          entity_version: explorationData.version as unknown as number,
           language_code: 'hi',
           translations: {
             content1: {
@@ -989,7 +989,7 @@ describe('Exploration editor page component', () => {
       let entityTranslation = EntityTranslation.createFromBackendDict({
         entity_id: explorationId,
         entity_type: 'exploration',
-        entity_version: 5,
+        entity_version: explorationData.version as unknown as number,
         language_code: 'fr',
         translations: {
           content0: {
@@ -1009,7 +1009,7 @@ describe('Exploration editor page component', () => {
       expect(EntityTranslation.createFromBackendDict).toHaveBeenCalledWith({
         entity_id: explorationId,
         entity_type: 'exploration',
-        entity_version: explorationData.version,
+        entity_version: explorationData.version as unknown as number,
         language_code: 'fr',
         translations: {},
       });
@@ -1039,7 +1039,7 @@ describe('Exploration editor page component', () => {
       let entityTranslation = EntityTranslation.createFromBackendDict({
         entity_id: explorationId,
         entity_type: 'exploration',
-        entity_version: 5,
+        entity_version: explorationData.version as unknown as number,
         language_code: 'fr',
         translations: {
           content0: {
