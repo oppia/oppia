@@ -461,7 +461,7 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
         ):
             opportunity_domain.PinnedOpportunity(
                 language_code=123,
-                topic_id="topic_id",
+                topic_id='topic_id',
                 opportunity_id='opportunity_id1',
             ).validate()
 
