@@ -783,6 +783,67 @@ class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
         )
         self.assertItemsEqual(autogeneratable_accents_for_hindi, [])
 
+    def test_get_new_auto_voiceover_accent_returns_new_enabled_accent(
+        self,
+    ) -> None:
+        existing_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+            'hi': {'hi-IN': False},
+        }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=existing_language_accent_mapping
+        )
+        updated_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True, 'en-IN': True},
+            'hi': {'hi-IN': False},
+        }
+
+        new_accent_code = voiceover_services.get_new_auto_voiceover_accent(
+            updated_language_accent_mapping
+        )
+
+        self.assertEqual(new_accent_code, 'en-IN')
+
+    def test_get_new_auto_voiceover_accent_returns_enabled_existing_accent(
+        self,
+    ) -> None:
+        existing_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+            'hi': {'hi-IN': False},
+        }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=existing_language_accent_mapping
+        )
+        updated_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+            'hi': {'hi-IN': True},
+        }
+
+        new_accent_code = voiceover_services.get_new_auto_voiceover_accent(
+            updated_language_accent_mapping
+        )
+
+        self.assertEqual(new_accent_code, 'hi-IN')
+
+    def test_get_new_auto_voiceover_accent_returns_none_when_no_new_enabled_accent(
+        self,
+    ) -> None:
+        existing_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+        }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=existing_language_accent_mapping
+        )
+        updated_language_accent_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True, 'en-IN': False},
+        }
+
+        new_accent_code = voiceover_services.get_new_auto_voiceover_accent(
+            updated_language_accent_mapping
+        )
+
+        self.assertIsNone(new_accent_code)
+
 
 class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
     """Unit tests to validate the language-accent information saved as
@@ -932,6 +993,31 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
                 language_accent_code
             ),
             expected_language_code,
+        )
+
+    def test_validate_language_accent_code_for_autogeneration(self) -> None:
+        invalid_accent_code = 'en-XX'
+        self.assertFalse(
+            voiceover_services.is_accent_code_valid_for_autogeneration(
+                invalid_accent_code
+            )
+        )
+
+        # Here we use MyPy ignore because here we assign type int to
+        # type str. This is done to test the validation of the
+        # is_accent_code_valid_for_autogeneration method.
+        invalid_accent_code = 5  # type: ignore[assignment]
+        self.assertFalse(
+            voiceover_services.is_accent_code_valid_for_autogeneration(
+                invalid_accent_code
+            )
+        )
+
+        valid_accent_code = 'en-US'
+        self.assertTrue(
+            voiceover_services.is_accent_code_valid_for_autogeneration(
+                valid_accent_code
+            )
         )
 
 
