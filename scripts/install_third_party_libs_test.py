@@ -34,7 +34,6 @@ from typing import Final, List, Optional, Tuple, Type
 from . import (
     clean,
     common,
-    install_dependencies_json_packages,
     install_python_prod_dependencies,
     install_third_party_libs,
     pre_commit_hook,
@@ -227,11 +226,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'install_elasticsearch_dev_server',
             mock_install_elasticsearch_dev_server,
         )
-        swap_install_python_prod_main = self.swap(
-            install_python_prod_dependencies, 'main', mock_external_script_call
-        )
         swap_install_json_deps_main = self.swap(
-            install_dependencies_json_packages,
+            install_python_prod_dependencies,
             'main',
             mock_external_script_call,
         )
@@ -246,12 +242,11 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         )
 
         with self.check_call_swap, self.Popen_swap, swap_install_redis_cli:
-            with swap_install_gcloud_sdk, swap_install_python_prod_main:
+            with swap_install_gcloud_sdk, swap_install_json_deps_main:
                 with pre_commit_hook_main_swap, pre_push_hook_main_swap:
                     with swap_isdir, swap_mkdir, swap_copytree:
                         with swap_install_elasticsearch_dev_server:
-                            with swap_install_json_deps_main:
-                                install_third_party_libs.main()
+                            install_third_party_libs.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 

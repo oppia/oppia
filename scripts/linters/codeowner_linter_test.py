@@ -67,7 +67,7 @@ INVALID_FILEPATH_WITH_BLANKET_CODEOWNER_ONLY: Final = os.path.join(
 
 
 CODEOWNER_IMPORTANT_PATHS: Final = [
-    '/dependencies.json',
+    '/requirements.txt',
     '/package.json',
     '/yarn.lock',
     '/scripts/install_third_party_libs.py',
@@ -84,7 +84,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
 
         def mock_listdir(unused_arg: str) -> List[str]:
             return [
-                'dependencies.json',
+                'requirements.txt',
                 'package.json',
                 'yarn.lock',
                 'scripts/install_third_party_libs.py',
@@ -96,7 +96,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             unused_arg: str,
         ) -> List[str]:
             return [
-                'dependencies.json',
+                'requirements.txt',
                 'package.json',
                 'yarn.lock',
                 'scripts/install_third_party_libs.py',
