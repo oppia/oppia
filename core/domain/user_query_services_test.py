@@ -239,3 +239,111 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
                 new_user_bulk_email_model.sent_email_model_ids[0]
             )
         )
+
+    def test_send_email_to_qualified_users_without_max_recipients(
+        self,
+    ) -> None:
+        send_bulk_email_swap = self.swap_with_checks(
+            email_services,
+            'send_bulk_mail',
+            lambda *_: None,
+            expected_args=[
+                (
+                    '%s <%s>'
+                    % (
+                        self.CURRICULUM_ADMIN_USERNAME,
+                        self.CURRICULUM_ADMIN_EMAIL,
+                    ),
+                    [self.NEW_USER_EMAIL, self.CURRICULUM_ADMIN_EMAIL],
+                    'subject',
+                    'body',
+                    'body',
+                    None,
+                )
+            ],
+        )
+
+        with send_bulk_email_swap:
+            user_query_services.send_email_to_qualified_users(
+                self.USER_QUERY_1_ID,
+                'subject',
+                'body',
+                feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION,
+                None,
+            )
+
+        new_user_bulk_email_model = user_models.UserBulkEmailsModel.get(
+            self.new_user_id
+        )
+        admin_user_bulk_email_model = user_models.UserBulkEmailsModel.get(
+            self.admin_user_id
+        )
+
+        assert new_user_bulk_email_model is not None
+        assert admin_user_bulk_email_model is not None
+        self.assertEqual(len(new_user_bulk_email_model.sent_email_model_ids), 1)
+        self.assertEqual(
+            len(admin_user_bulk_email_model.sent_email_model_ids), 1
+        )
+        self.assertIsNotNone(
+            email_models.BulkEmailModel.get(
+                new_user_bulk_email_model.sent_email_model_ids[0]
+            )
+        )
+        self.assertIsNotNone(
+            email_models.BulkEmailModel.get(
+                admin_user_bulk_email_model.sent_email_model_ids[0]
+            )
+        )
+
+    def test_send_email_to_qualified_users_appends_to_existing_bulk_email(
+        self,
+    ) -> None:
+        user_models.UserBulkEmailsModel(
+            id=self.new_user_id, sent_email_model_ids=['old_email_model_id']
+        ).put()
+
+        send_bulk_email_swap = self.swap_with_checks(
+            email_services,
+            'send_bulk_mail',
+            lambda *_: None,
+            expected_args=[
+                (
+                    '%s <%s>'
+                    % (
+                        self.CURRICULUM_ADMIN_USERNAME,
+                        self.CURRICULUM_ADMIN_EMAIL,
+                    ),
+                    [self.NEW_USER_EMAIL],
+                    'subject',
+                    'body',
+                    'body',
+                    None,
+                )
+            ],
+        )
+
+        with send_bulk_email_swap:
+            user_query_services.send_email_to_qualified_users(
+                self.USER_QUERY_1_ID,
+                'subject',
+                'body',
+                feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION,
+                1,
+            )
+
+        updated_bulk_email_model = user_models.UserBulkEmailsModel.get(
+            self.new_user_id
+        )
+
+        assert updated_bulk_email_model is not None
+        self.assertEqual(
+            updated_bulk_email_model.sent_email_model_ids[0],
+            'old_email_model_id',
+        )
+        self.assertEqual(len(updated_bulk_email_model.sent_email_model_ids), 2)
+        self.assertIsNotNone(
+            email_models.BulkEmailModel.get(
+                updated_bulk_email_model.sent_email_model_ids[1]
+            )
+        )
