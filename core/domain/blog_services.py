@@ -412,6 +412,26 @@ def get_blog_post_rights(
     return get_blog_post_rights_from_model(model)
 
 
+def get_total_number_of_matching_blog_posts(
+    query_string: str, tags: List[str]
+) -> int:
+    """Returns the total number of blog posts matching the search query and tags."""
+    valid_blog_post_ids: List[str] = []
+    search_offset: Optional[int] = None
+
+    for _ in range(MAX_ITERATIONS):
+        remaining_to_fetch = 1000
+
+        batch_ids, search_offset = get_blog_post_ids_matching_query(
+            query_string, tags, size=remaining_to_fetch, offset=search_offset
+        )
+        valid_blog_post_ids.extend(batch_ids)
+
+        if search_offset is None:
+            break
+    return len(valid_blog_post_ids)
+
+
 def get_published_blog_post_summaries_by_user_id(
     user_id: str, max_limit: int, offset: int = 0
 ) -> List[blog_domain.BlogPostSummary]:
@@ -459,7 +479,7 @@ def does_blog_post_with_url_fragment_exist(url_fragment: str) -> bool:
         url_fragment: str. The url fragment for the blog post.
 
     Returns:
-        bool. Whether the the url fragment for the blog post exists.
+        bool. Whether the url fragment for the blog post exists.
 
     Raises:
         Exception. Blog Post URL fragment is not a string.
@@ -934,15 +954,26 @@ def index_blog_post_summaries_given_ids(blog_post_ids: List[str]) -> None:
         blog_post_ids: list(str). List of ids of the blog post summaries to be
             indexed.
     """
+
     blog_post_summaries = get_blog_post_summary_models_by_ids(blog_post_ids)
-    if len(blog_post_summaries) > 0:
-        search_services.index_blog_post_summaries(
-            [
-                blog_post_summary
-                for blog_post_summary in blog_post_summaries
-                if blog_post_summary is not None
-            ]
-        )
+    blog_post_models = blog_models.BlogPostModel.get_multi(blog_post_ids)
+    blog_post_content_id_to_content_map = {}
+    for model in blog_post_models:
+        if model:
+            blog_post_content_id_to_content_map[model.id] = (
+                html_cleaner.strip_html_tags(model.content)
+            )
+    valid_summaries = []
+    for summary in blog_post_summaries:
+        if summary is not None:
+            if summary.id in blog_post_content_id_to_content_map:
+                summary.summary = blog_post_content_id_to_content_map[
+                    summary.id
+                ]
+
+            valid_summaries.append(summary)
+    if len(valid_summaries) > 0:
+        search_services.index_blog_post_summaries(valid_summaries)
 
 
 def get_blog_post_ids_matching_query(

@@ -69,6 +69,9 @@ class FeatureNames(enum.Enum):
     SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS = (
         'show_voiceover_tab_for_non_curated_explorations'
     )
+    HIGHLIGHT_SENTENCES_DURING_AUTOMATIC_VOICEOVER_PLAYBACK = (
+        'highlight_sentences_during_automatic_voiceover_playback'
+    )
     SHOW_RESTRUCTURED_STUDY_GUIDES = 'show_restructured_study_guides'
     ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS = (
         'enable_translation_opps_with_new_opp_models'
@@ -83,6 +86,19 @@ class FeatureNames(enum.Enum):
         'enable_background_voiceover_synthesis'
     )
     ENABLE_READY_FOR_REVIEW_TEST = 'enable_ready_for_review_test'
+    ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER = (
+        'enable_financial_literacy_campaign_banner'
+    )
+    # A separate flag is used for testing the financial literacy campaign banner with early dates.
+    # This allows testing the feature before the actual campaign dates that will
+    # be used in production. Without a separate test flag, we would need to change
+    # the campaign date values for testing and then update them again before
+    # releasing to production. That process would require additional PRs,
+    # cherry-picks, or hotfixes. Using a dedicated test-mode flag avoids that
+    # overhead and keeps testing and production configurations separate.
+    ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE = (
+        'enable_financial_literacy_campaign_banner_test_mode'
+    )
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -123,8 +139,10 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+    FeatureNames.HIGHLIGHT_SENTENCES_DURING_AUTOMATIC_VOICEOVER_PLAYBACK,
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
     FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
+    FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -136,8 +154,8 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
-    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
+    FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER,
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -154,6 +172,7 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
     FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST,
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
+    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
 ]
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
@@ -285,17 +304,18 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.DEV,
         )
     ),
-    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT.value: (
-        (
-            'Allows creators to add worked examples to the review material '
-            'section of skills and explanation of the study guides.',
-            feature_flag_domain.ServerMode.PROD,
-        )
-    ),
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS.value: (
         (
             'This flag allows learners to see the regenerated voiceovers '
             'in the exploration player.',
+            feature_flag_domain.ServerMode.TEST,
+        )
+    ),
+    FeatureNames.HIGHLIGHT_SENTENCES_DURING_AUTOMATIC_VOICEOVER_PLAYBACK.value: (
+        (
+            'This flag enables the highlighting of sentences during the '
+            'automatic voiceover playback in the exploration player and '
+            'editor pages.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
@@ -310,6 +330,18 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag enables ready_for_review_test, which controls the learner’s redirection to the Review Test upon lesson completion.',
             feature_flag_domain.ServerMode.DEV,
+        )
+    ),
+    FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER.value: (
+        (
+            'This flag enables the financial literacy campaign banner for the fundraising campaign.',
+            feature_flag_domain.ServerMode.PROD,
+        )
+    ),
+    FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE.value: (
+        (
+            'This flag enables the financial literacy campaign banner for the fundraising campaign in test mode.',
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
 }

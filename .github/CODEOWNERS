@@ -55,7 +55,6 @@
 /core/templates/modules/ @oppia/lace-frontend-reviewers
 /core/templates/pages/common-imports.ts @oppia/lace-frontend-reviewers
 /core/templates/pages/oppia-root/ @oppia/lace-frontend-reviewers
-/core/templates/pages/lightweight-oppia-root/ @oppia/lace-frontend-reviewers
 /core/templates/i18n/ @oppia/lace-frontend-reviewers
 /core/templates/services/contextual/logger.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/contextual/logger.service.spec.ts @oppia/lace-frontend-reviewers
@@ -93,7 +92,7 @@
 /core/templates/services/assets-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/entity-translations.services.ts @oppia/lace-frontend-reviewers
 /core/templates/services/entity-voiceovers.services.ts @oppia/lace-frontend-reviewers
-/core/templates/services/voiceover-regeneration-task-mapping-service.ts @oppia/lace-frontend-reviewers
+/core/templates/services/voiceover-regeneration-job-service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/voiceover-language-management-service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/automatic-voiceover-highlight-service.ts @oppia/lace-frontend-reviewers
 
@@ -304,6 +303,10 @@
 /core/templates/domain/promo_bar/ @oppia/lace-frontend-reviewers
 /core/templates/filters/ @oppia/lace-frontend-reviewers
 /core/templates/services/attribution.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/campaign-banner/campaign-banner.component*.ts @oppia/lace-frontend-reviewers
+/core/templates/components/campaign-banner/campaign-banner.component.html @oppia/lace-frontend-reviewers
+/core/templates/components/campaign-banner/campaign-banner.component.css @oppia/lace-frontend-reviewers
+/core/templates/components/campaign-banner/campaign-banner-module.ts  @oppia/lace-frontend-reviewers
 
 
 # Global frontend services
@@ -319,6 +322,7 @@
 /core/templates/services/page-title.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/prevent-page-unload-event.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/promo-bar-backend-api.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/sign-in-event.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/site-analytics.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/utils.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/stateful/background-mask.service*.ts @oppia/lace-frontend-reviewers
@@ -766,7 +770,6 @@
 /requirements.in @oppia/dependency-reviewers
 /requirements_dev.txt @oppia/dependency-reviewers
 /requirements_dev.in @oppia/dependency-reviewers
-/dependencies.json @oppia/dependency-reviewers
 /package.json @oppia/dependency-reviewers
 /yarn.lock @oppia/dependency-reviewers
 /scripts/install_third_party_libs.py @oppia/dev-workflow-reviewers
