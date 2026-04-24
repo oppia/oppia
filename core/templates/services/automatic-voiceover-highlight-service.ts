@@ -74,10 +74,6 @@ export class AutomaticVoiceoverHighlightService {
     this.removeSpacesAndTransformMathSymbols();
   }
 
-  getUnmodifiedSentenceByHighlightId(highlightId: string): string {
-    return this.highlightIdToSentenceMap[highlightId];
-  }
-
   removeSpacesAndTransformMathSymbols(): void {
     for (let highlightSentenceId in this.highlightIdToSentenceMap) {
       let sentence = this.highlightIdToSentenceMap[highlightSentenceId];
