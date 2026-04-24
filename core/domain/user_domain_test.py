@@ -26,7 +26,6 @@ from core.constants import constants
 from core.domain import auth_services, user_domain, user_services
 from core.platform import models
 from core.tests import test_utils
-from core.domain import user_domain
 
 from typing import List, Optional, TypedDict
 
