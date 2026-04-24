@@ -642,6 +642,24 @@ export class SiteAnalyticsService {
     });
   }
 
+  registerCampaignBannerDonateButtonClick(): void {
+    this._sendEventToGoogleAnalytics(
+      'financial_literacy_campaign_banner_donate_button_click',
+      {
+        page_path: this.windowRef.nativeWindow.location.pathname,
+      }
+    );
+  }
+
+  registerCampaignBannerVisibility(): void {
+    this._sendEventToGoogleAnalytics(
+      'financial_literacy_campaign_banner_shown',
+      {
+        page_path: this.windowRef.nativeWindow.location.pathname,
+      }
+    );
+  }
+
   registerClickFooterButtonEvent(
     buttonName: NavbarAndFooterGATrackingPages
   ): void {
