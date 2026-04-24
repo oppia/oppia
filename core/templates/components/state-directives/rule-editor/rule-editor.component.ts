@@ -249,23 +249,31 @@ export class RuleEditorComponent
         break;
       }
       let varName = match[1];
-      let varType: string | null = null;
+      let varType = '';
       if (match[2]) {
         varType = match[2].substring(1);
       }
-      this.rule.inputTypes[varName] = varType as string;
+      this.rule.inputTypes[varName] = varType;
 
       // TODO(sll): Find a more robust way of doing this. For example,
       // we could associate a particular varName with answerChoices
       // depending on the interaction. This varName would take its
       // default value from answerChoices, but other variables would
       // take their default values from the DEFAULT_OBJECT_VALUES dict.
-      if (isEqual(DEFAULT_OBJECT_VALUES[varType], [])) {
+      if (
+        varType in DEFAULT_OBJECT_VALUES &&
+        isEqual(
+          DEFAULT_OBJECT_VALUES[varType as keyof typeof DEFAULT_OBJECT_VALUES],
+          []
+        )
+      ) {
         this.rule.inputs[varName] = [];
       } else if (answerChoices && answerChoices.length > 0) {
         this.rule.inputs[varName] = cloneDeep(answerChoices[0].val);
-      } else {
-        this.rule.inputs[varName] = cloneDeep(DEFAULT_OBJECT_VALUES[varType]);
+      } else if (varType in DEFAULT_OBJECT_VALUES) {
+        this.rule.inputs[varName] = cloneDeep(
+          DEFAULT_OBJECT_VALUES[varType as keyof typeof DEFAULT_OBJECT_VALUES]
+        );
       }
 
       tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');

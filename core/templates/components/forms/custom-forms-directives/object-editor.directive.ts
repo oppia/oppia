@@ -49,161 +49,44 @@ import {
   ValidationErrors,
   Validator,
 } from '@angular/forms';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {AlgebraicExpressionEditorComponent} from 'objects/templates/algebraic-expression-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {BooleanEditorComponent} from 'objects/templates/boolean-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {CodeStringEditorComponent} from 'objects/templates/code-string-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {CoordTwoDimEditorComponent} from 'objects/templates/coord-two-dim-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {AllowedVariablesEditorComponent} from 'objects/templates/allowed-variables-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {DragAndDropPositiveIntEditorComponent} from 'objects/templates/drag-and-drop-positive-int-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {FilepathEditorComponent} from 'objects/templates/filepath-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {FractionEditorComponent} from 'objects/templates/fraction-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {GraphEditorComponent} from 'objects/templates/graph-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {HtmlEditorComponent} from 'objects/templates/html-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {ImageWithRegionsEditorComponent} from 'objects/templates/image-with-regions-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {ListOfSetsOfTranslatableHtmlContentIdsEditorComponent} from 'objects/templates/list-of-sets-of-translatable-html-content-ids-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {ListOfTabsEditorComponent} from 'objects/templates/list-of-tabs-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {ListOfUnicodeStringEditorComponent} from 'objects/templates/list-of-unicode-string-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {MathEquationEditorComponent} from 'objects/templates/math-equation-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {MathExpressionContentEditorComponent} from 'objects/templates/math-expression-content-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {MusicPhraseEditorComponent} from 'objects/templates/music-phrase-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {NonnegativeIntEditorComponent} from 'objects/templates/nonnegative-int-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {NormalizedStringEditorComponent} from 'objects/templates/normalized-string-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {NumberWithUnitsEditorComponent} from 'objects/templates/number-with-units-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {NumericExpressionEditorComponent} from 'objects/templates/numeric-expression-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {ParameterNameEditorComponent} from 'objects/templates/parameter-name-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {PositionOfTermsEditorComponent} from 'objects/templates/position-of-terms-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {PositiveIntEditorComponent} from 'objects/templates/positive-int-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {RatioExpressionEditorComponent} from 'objects/templates/ratio-expression-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {RealEditorComponent} from 'objects/templates/real-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {SanitizedUrlEditorComponent} from 'objects/templates/sanitized-url-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {SetOfAlgebraicIdentifierEditorComponent} from 'objects/templates/set-of-algebraic-identifier-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {SetOfTranslatableHtmlContentIdsEditorComponent} from 'objects/templates/set-of-translatable-html-content-ids-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {SetOfUnicodeStringEditorComponent} from 'objects/templates/set-of-unicode-string-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {SkillSelectorEditorComponent} from 'objects/templates/skill-selector-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {SubtitledHtmlEditorComponent} from 'objects/templates/subtitled-html-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {SubtitledUnicodeEditorComponent} from 'objects/templates/subtitled-unicode-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {SvgEditorComponent} from 'objects/templates/svg-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {TranslatableHtmlContentIdEditorComponent} from 'objects/templates/translatable-html-content-id.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {TranslatableSetOfNormalizedStringEditorComponent} from 'objects/templates/translatable-set-of-normalized-string-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {TranslatableSetOfUnicodeStringEditorComponent} from 'objects/templates/translatable-set-of-unicode-string-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {UnicodeStringEditorComponent} from 'objects/templates/unicode-string-editor.component';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
 import {IntEditorComponent} from 'objects/templates/int-editor.component';
 import {LoggerService} from 'services/contextual/logger.service';
 import {ComponentRef} from '@angular/core';

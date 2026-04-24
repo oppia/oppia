@@ -65,15 +65,18 @@ describe('Interaction display', () => {
       },
     };
 
-    componentInstance.viewContainerRef = {
-      createComponent: null,
-    } as unknown as ViewContainerRef;
+    componentInstance.viewContainerRef = jasmine.createSpyObj<ViewContainerRef>(
+      'ViewContainerRef',
+      ['createComponent', 'clear']
+    );
     spyOn(componentFactoryResolver, 'resolveComponentFactory');
-    spyOn(componentInstance.viewContainerRef, 'createComponent')
-      // Unknown type is used here because the type of the component
-      // is not known. This is because the component is dynamically
-      // created.
-      .and.returnValue(mockComponentRef as ComponentRef<unknown>);
+    (
+      componentInstance.viewContainerRef.createComponent as jasmine.Spy
+    )// Unknown type is used here because the type of the component
+    // is not known. This is because the component is dynamically
+    // created.
+    .and
+      .returnValue(mockComponentRef as ComponentRef<unknown>);
 
     componentInstance.buildInteraction();
 
@@ -106,19 +109,22 @@ describe('Interaction display', () => {
       },
     };
 
-    componentInstance.viewContainerRef = {
-      createComponent: null,
-    } as unknown as ViewContainerRef;
+    componentInstance.viewContainerRef = jasmine.createSpyObj<ViewContainerRef>(
+      'ViewContainerRef',
+      ['createComponent', 'clear']
+    );
     componentInstance.parentScope = {
       lastAnswer,
     };
 
     spyOn(componentFactoryResolver, 'resolveComponentFactory');
-    spyOn(componentInstance.viewContainerRef, 'createComponent')
-      // Unknown type is used here because the type of the component
-      // is not known. This is because the component is dynamically
-      // created.
-      .and.returnValue(mockComponentRef as ComponentRef<unknown>);
+    (
+      componentInstance.viewContainerRef.createComponent as jasmine.Spy
+    )// Unknown type is used here because the type of the component
+    // is not known. This is because the component is dynamically
+    // created.
+    .and
+      .returnValue(mockComponentRef as ComponentRef<unknown>);
 
     componentInstance.buildInteraction();
 
@@ -138,9 +144,10 @@ describe('Interaction display', () => {
   });
 
   it('should rebuild interaction if htmlData is updated', () => {
-    componentInstance.viewContainerRef = {
-      clear: () => {},
-    } as unknown as ViewContainerRef;
+    componentInstance.viewContainerRef = jasmine.createSpyObj<ViewContainerRef>(
+      'ViewContainerRef',
+      ['clear']
+    );
     spyOn(componentInstance, 'buildInteraction');
 
     componentInstance.ngOnChanges({
