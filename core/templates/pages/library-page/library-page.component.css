@@ -742,3 +742,7 @@ oppia-library-page .oppia-exp-summary-tiles-container {
     max-width: 96vw;
   }
 }
+
+.oppia-library-container .title-section-mask {
+  pointer-events: none;
+}
