@@ -69,7 +69,6 @@ import {
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
-import constants from 'assets/constants';
 import {AppConstants} from 'app.constants';
 
 interface ContentsMapping {
@@ -291,7 +290,7 @@ export class ExplorationStatesService {
     this.changeListService.markTranslationsAsNeedingUpdate(contentId);
     this.changeListService.markVoiceoversAsNeedingUpdate(
       contentId,
-      constants.DEFAULT_LANGUAGE_CODE
+      AppConstants.DEFAULT_LANGUAGE_CODE
     );
   }
 
