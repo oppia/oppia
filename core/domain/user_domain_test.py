@@ -1970,9 +1970,8 @@ class UsernameChangeAuditTest(test_utils.GenericTestBase):
         obj.validate()
 
     def test_invalid_committer_id_type(self) -> None:
-        comm_id = cast(
-            str, 123
-        )  # Here use cast because we intentionally pass invalid types to test runtime validation.
+        # Here use cast because we intentionally pass invalid types to test runtime validation.
+        comm_id = cast(str, 123)
         obj = user_domain.UsernameChangeAudit(
             committer_id=comm_id,
             old_username='old_name',
@@ -1995,9 +1994,8 @@ class UsernameChangeAuditTest(test_utils.GenericTestBase):
             obj.validate()
 
     def test_invalid_old_username(self) -> None:
-        old_use = cast(
-            str, 123
-        )  # Here use cast because we intentionally pass invalid types to test runtime validation.
+        # Here use cast because we intentionally pass invalid types to test runtime validation.
+        old_use = cast(str, 123)
         obj = user_domain.UsernameChangeAudit(
             committer_id='123',
             old_username=old_use,
@@ -2020,9 +2018,8 @@ class UsernameChangeAuditTest(test_utils.GenericTestBase):
             obj.validate()
 
     def test_invalid_new_username(self) -> None:
-        new_use = cast(
-            str, 123
-        )  # Here use cast because we intentionally pass invalid types to test runtime validation.
+        # Here use cast because we intentionally pass invalid types to test runtime validation.
+        new_use = cast(str, 123)
         obj = user_domain.UsernameChangeAudit(
             committer_id='123',
             old_username='old_name',
