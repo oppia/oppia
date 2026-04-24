@@ -72,6 +72,9 @@ export class LearnerAnswerDetails {
     var createdOnValues = this.learnerAnswerInfoData
       .map(info => info.getCreatedOn())
       .filter((value): value is number => value !== null);
+    if (createdOnValues.length === 0) {
+      return 0;
+    }
     return Math.max(...createdOnValues);
   }
 }
