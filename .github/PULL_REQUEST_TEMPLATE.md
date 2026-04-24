@@ -15,7 +15,7 @@ If there is no corresponding issue number, fill in N/A where it says [fill_in_nu
 
 Please follow the [instructions for making a code change](https://github.com/oppia/oppia/wiki/Make-a-pull-request).
 
-- [ ] I have linked the issue that this PR fixes in the "Development" section of the sidebar.
+- [ ] I have referenced the correct issue in the PR (or used `N/A` if there is no corresponding issue).
 - [ ] I have checked the "Files Changed" tab and confirmed that the changes are what I want to make.
 - [ ] I have written tests for my code.
 - [ ] The **PR title** starts with "Fix #bugnum: " or "Fix part of #bugnum: ...", followed by a short, clear summary of the changes.

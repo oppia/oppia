@@ -1,0 +1,95 @@
+# Jobs for determining whether a PR description references one or more issues
+# using the expected format, then moving invalid PRs to draft with guidance.
+
+name: Verify PR Issue References
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - edited
+      - ready_for_review
+permissions: read-all
+
+jobs:
+  validate_pr_issue_references:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Scan PR for issue references
+        id: step-1
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prDescription = context.payload.pull_request.body || '';
+            const issueReferencesRegex = /\b(?:This PR\s+)?Fixes(?: part of)?\s+#(\d+)/gim;
+            const invalidIssueReferencesRegex = /\b(?:This PR\s+)?Fix(?: part of)?\s+#(\d+)/gim;
+            const prNumber = context.payload.pull_request.number;
+            const hasNotApplicableIssueReference = /#N\/A\b/i.test(prDescription);
+
+            const issueNumbers = [
+              ...prDescription.matchAll(issueReferencesRegex)
+            ].map((match) => match[1]);
+
+            const invalidIssueNumbers = [
+              ...prDescription.matchAll(invalidIssueReferencesRegex)
+            ].map((match) => match[1]);
+            core.setOutput('failure_message', '');
+
+            core.info(
+              `PR #${prNumber} references issue(s): ` +
+              `${JSON.stringify(issueNumbers)}. Invalid reference(s): ` +
+              `${JSON.stringify(invalidIssueNumbers)}. Has N/A reference: ` +
+              `${hasNotApplicableIssueReference}.`
+            );
+
+            if (invalidIssueNumbers.length > 0) {
+              const issueRefs = invalidIssueNumbers.map(
+                (issueNumber) => `#${issueNumber}`
+              ).join(', ');
+              core.setOutput(
+                'failure_message',
+                `the PR description should not use ` +
+                `'Fix #<issue>' or 'Fix part of #<issue>' syntax. ` +
+                `Use 'Fixes' and 'Fixes part of' instead, for: ${issueRefs}`
+              );
+            } else if (issueNumbers.length === 0) {
+              core.setOutput(
+                'failure_message',
+                hasNotApplicableIssueReference ? '' : (
+                  `the PR description must reference at least one issue using ` +
+                  `'Fixes #<issue>' or 'Fixes part of #<issue>' (or use ` +
+                  `#N/A when there is no corresponding issue)`
+                )
+              );
+            }
+
+      - name: Move PR to draft and add comment
+        if: ${{ steps.step-1.outputs.failure_message != '' }}
+        uses: actions/github-script@v6
+        env:
+          FAILURE_MESSAGE: ${{ steps.step-1.outputs.failure_message }}
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const failureMessage =
+              `@${pr.user.login} this PR is being marked as draft because ` +
+              `${process.env.FAILURE_MESSAGE}.`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body: failureMessage
+            });
+            await github.graphql(
+              'mutation($id: ID!) {' +
+              ' convertPullRequestToDraft(input: {pullRequestId: $id}) {' +
+              '   clientMutationId' +
+              ' }' +
+              '}',
+              {id: pr.node_id}
+            );
+            core.setFailed(failureMessage);
