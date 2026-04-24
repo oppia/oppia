@@ -2540,6 +2540,7 @@ class MergedQuestionSkillLink:
             'skill_difficulties': self.skill_difficulties,
         }
 
+
 class QuestionCommitLogEntryDict(TypedDict):
     """Dictionary representing the QuestionCommitLogEntry domain object."""
 

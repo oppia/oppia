@@ -2542,6 +2542,7 @@ class MergedQuestionSkillLinkDomainTest(test_utils.GenericTestBase):
         )
         self.assertEqual(expected_object_dict, observed_object.to_dict())
 
+
 class QuestionCommitLogEntryDomainTest(test_utils.GenericTestBase):
     """Tests for the QuestionCommitLogEntry domain object."""
 
