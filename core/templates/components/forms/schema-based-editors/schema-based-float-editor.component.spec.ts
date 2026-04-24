@@ -117,11 +117,6 @@ describe('Schema based float editor component', function () {
   }));
 
   it('should allow exponential notation by default when uiConfig is missing', fakeAsync(() => {
-    component.uiConfig = {} as {
-      checkRequireNonnegativeInput: boolean;
-      checkAllowExponentialNotation: boolean;
-    };
-
     component.ngOnInit();
     tick(50);
 
