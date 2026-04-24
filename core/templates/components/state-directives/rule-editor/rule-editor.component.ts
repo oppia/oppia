@@ -29,11 +29,18 @@ import {
 } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
-import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
+import {
+  EventBusGroup,
+  EventBusService,
+  Newable,
+} from 'app-events/event-bus.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {PopulateRuleContentIdsService} from 'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
+// This throws "TS2307". We need to suppress this error because
+// object-editor templates are not strictly typed yet.
+// @ts-ignore
 import DEFAULT_OBJECT_VALUES from 'objects/object_defaults.json';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {Rule} from 'domain/exploration/rule.model';
@@ -62,19 +69,19 @@ export interface RuleDescriptionFragment {
 export class RuleEditorComponent
   implements OnInit, OnDestroy, AfterViewChecked
 {
-  @Input() isEditable: boolean;
-  @Input() isEditingRuleInline: boolean;
+  @Input() isEditable!: boolean;
+  @Input() isEditingRuleInline!: boolean;
   @Output() onCancelRuleEdit = new EventEmitter<void>();
   @Output() onSaveRule = new EventEmitter<void>();
-  @Input() rule: Rule;
-  @Input() modalId: symbol;
+  @Input() rule!: Rule;
+  @Input() modalId!: symbol;
 
-  ruleDescriptionFragments: RuleDescriptionFragment[];
-  currentInteractionId: string;
-  ruleDescriptionChoices: Choice[];
-  isInvalid: boolean;
+  ruleDescriptionFragments!: RuleDescriptionFragment[];
+  currentInteractionId!: string;
+  ruleDescriptionChoices!: Choice[];
+  isInvalid: boolean = false;
   eventBusGroup: EventBusGroup;
-  editRuleForm: object;
+  editRuleForm: object = {};
 
   constructor(
     private eventBusService: EventBusService,
@@ -93,20 +100,23 @@ export class RuleEditorComponent
       return '';
     }
 
-    let ruleDescription =
-      INTERACTION_SPECS[this.currentInteractionId].rule_descriptions[
-        this.rule.type
-      ];
+    let ruleDescription = (
+      INTERACTION_SPECS as unknown as Record<
+        string,
+        {rule_descriptions: Record<string, string>}
+      >
+    )[this.currentInteractionId].rule_descriptions[this.rule.type];
 
     let PATTERN = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
     let finalInputArray = ruleDescription.split(PATTERN);
 
-    let result = [];
+    let result: RuleDescriptionFragment[] = [];
     for (let i = 0; i < finalInputArray.length; i += 3) {
       result.push({
         // Omit the leading noneditable string.
         text: i !== 0 ? finalInputArray[i] : '',
         type: 'noneditable',
+        varName: '',
       });
       if (i === finalInputArray.length - 1) {
         break;
@@ -127,6 +137,7 @@ export class RuleEditorComponent
             result.push({
               type: 'checkboxes',
               varName: finalInputArray[i + 1],
+              text: '',
             });
           } else if (
             finalInputArray[2] === 'ListOfSetsOfTranslatableHtmlContentIds'
@@ -138,6 +149,7 @@ export class RuleEditorComponent
             result.push({
               type: 'dropdown',
               varName: finalInputArray[i + 1],
+              text: '',
             });
           } else if (finalInputArray[i + 2] === 'TranslatableHtmlContentId') {
             this.ruleDescriptionChoices = answerChoices.map(function (choice) {
@@ -149,6 +161,7 @@ export class RuleEditorComponent
             result.push({
               type: 'dragAndDropHtmlStringSelect',
               varName: finalInputArray[i + 1],
+              text: '',
             });
           } else if (finalInputArray[i + 2] === 'DragAndDropPositiveInt') {
             this.ruleDescriptionChoices = answerChoices.map(function (choice) {
@@ -160,6 +173,7 @@ export class RuleEditorComponent
             result.push({
               type: 'dragAndDropPositiveIntSelect',
               varName: finalInputArray[i + 1],
+              text: '',
             });
           } else {
             this.ruleDescriptionChoices = answerChoices.map(function (choice) {
@@ -171,6 +185,7 @@ export class RuleEditorComponent
             result.push({
               type: 'select',
               varName: finalInputArray[i + 1],
+              text: '',
             });
             if (!this.rule.inputs[finalInputArray[i + 1]]) {
               this.rule.inputs[finalInputArray[i + 1]] =
@@ -182,12 +197,14 @@ export class RuleEditorComponent
           result.push({
             text: ' [Error: No choices available] ',
             type: 'noneditable',
+            varName: '',
           });
         }
       } else {
         result.push({
           type: finalInputArray[i + 2],
           varName: finalInputArray[i + 1],
+          text: '',
         });
       }
     }
@@ -227,15 +244,16 @@ export class RuleEditorComponent
     // Finds the parameters and sets them in ctrl.rule.inputs.
     let PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     while (true) {
-      if (!tmpRuleDescription.match(PATTERN)) {
+      let match = tmpRuleDescription.match(PATTERN);
+      if (!match) {
         break;
       }
-      let varName = tmpRuleDescription.match(PATTERN)[1];
-      let varType = null;
-      if (tmpRuleDescription.match(PATTERN)[2]) {
-        varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
+      let varName = match[1];
+      let varType: string | null = null;
+      if (match[2]) {
+        varType = match[2].substring(1);
       }
-      this.rule.inputTypes[varName] = varType;
+      this.rule.inputTypes[varName] = varType as string;
 
       // TODO(sll): Find a more robust way of doing this. For example,
       // we could associate a particular varName with answerChoices
@@ -288,11 +306,14 @@ export class RuleEditorComponent
      */
     if (this.isEditingRuleInline) {
       this.modalId = Symbol();
-      this.eventBusGroup.on(ObjectFormValidityChangeEvent, event => {
-        if (event.message.modalId === this.modalId) {
-          this.isInvalid = event.message.value;
+      this.eventBusGroup.on(
+        ObjectFormValidityChangeEvent as unknown as Newable<ObjectFormValidityChangeEvent>,
+        (event: ObjectFormValidityChangeEvent) => {
+          if (event.message.modalId === this.modalId) {
+            this.isInvalid = event.message.value;
+          }
         }
-      });
+      );
     }
     this.currentInteractionId = this.stateInteractionIdService.savedMemento;
     this.editRuleForm = {};
@@ -306,12 +327,12 @@ export class RuleEditorComponent
     // could not able to assign this.rule.inputTypes.x default values.
     if (this.rule.inputTypes.x === 'ListOfSetsOfTranslatableHtmlContentIds') {
       if (
-        this.rule.inputs.x[0] === undefined ||
-        this.rule.inputs.x[0]?.length === 0
+        (this.rule.inputs.x as string[][])[0] === undefined ||
+        (this.rule.inputs.x as string[][])[0]?.length === 0
       ) {
-        let box = [];
+        let box: string[][] = [];
         this.ruleDescriptionChoices.map(choice => {
-          box.push([choice.val]);
+          box.push([choice.val as string]);
         });
         this.rule.inputs.x = box;
       }

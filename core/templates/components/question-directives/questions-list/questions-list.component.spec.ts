@@ -330,7 +330,7 @@ describe('Questions List Component', () => {
         })
       );
 
-      expect(component.misconceptionIdsForSelectedSkill).toEqual(undefined);
+      expect(component.misconceptionIdsForSelectedSkill).toBeUndefined();
 
       component.ngOnInit();
       tick();
@@ -378,7 +378,7 @@ describe('Questions List Component', () => {
         })
       );
 
-      expect(component.difficultyCount).toEqual(undefined);
+      expect(component.difficultyCount).toBeUndefined();
 
       component.ngOnInit();
       tick();
@@ -413,7 +413,7 @@ describe('Questions List Component', () => {
   it('should get selected skill id when a question is created', () => {
     // When modal is not shown, then newQuestionSkillIds get the values of
     // skillIds.
-    expect(component.newQuestionSkillIds).toEqual(undefined);
+    expect(component.newQuestionSkillIds).toBeUndefined();
 
     component.selectSkillModalIsShown = true;
     component.createQuestion();
@@ -463,7 +463,7 @@ describe('Questions List Component', () => {
       SkillDifficulty.create('skillId1', '', 1),
     ];
 
-    expect(component.misconceptionsBySkill).toEqual(undefined);
+    expect(component.misconceptionsBySkill).toBeUndefined();
 
     component.createQuestion();
     tick();
@@ -1421,7 +1421,7 @@ describe('Questions List Component', () => {
       undefined
     );
 
-    expect(component.getQuestionSummariesForOneSkill()).toEqual(undefined);
+    expect(component.getQuestionSummariesForOneSkill()).toBeUndefined();
   });
 
   it('should not toggle difficulty card if window is not narrow', () => {

@@ -113,7 +113,10 @@ import {NoninteractiveTabs} from 'rich_text_components/Tabs/directives/oppia-non
 // rte-text-components are not strictly typed yet.
 // @ts-ignore
 import {NoninteractiveVideo} from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
-import {CkEditorInitializerService} from './ck-editor-helpers/ck-editor-4-widgets.initializer';
+import {
+  CkEditorInitializerService,
+  RteHelperService as RteHelperServiceLocal,
+} from './ck-editor-helpers/ck-editor-4-widgets.initializer';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {MetaTagCustomizationService} from 'services/contextual/meta-tag-customization.service';
 import {AppConstants} from 'app.constants';
@@ -215,7 +218,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static profilePageBackendApiService: ProfilePageBackendApiService =
     null as unknown as ProfilePageBackendApiService;
   static rteElementsAreInitialized: boolean = false;
-  static rteHelperService: RteHelperService =
+  static rteHelperService: RteHelperService | unknown =
     null as unknown as RteHelperService;
   static ratingComputationService: RatingComputationService =
     null as unknown as RatingComputationService;
@@ -259,7 +262,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     }
     this.ngZone.runOutsideAngular(() => {
       CkEditorInitializerService.ckEditorInitializer(
-        OppiaAngularRootComponent.rteHelperService as unknown as RteHelperService,
+        OppiaAngularRootComponent.rteHelperService as unknown as RteHelperServiceLocal,
         this.htmlEscaperService,
         this.pageContextService,
         this.ngZone

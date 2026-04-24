@@ -29,6 +29,7 @@ import {StateInteractionEditorComponent} from './state-interaction-editor.compon
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {State} from 'domain/state/state.model';
 import {Interaction} from 'domain/exploration/interaction.model';
+import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {EditabilityService} from 'services/editability.service';
@@ -45,15 +46,15 @@ import {InteractionDetailsCacheService} from 'pages/exploration-editor-page/edit
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 
 class MockNgbModal {
-  modal: string;
+  modal: string = '';
   success: boolean = true;
-  open(content, options) {
+  open(content: unknown, options: unknown) {
     if (this.modal === 'add_interaction') {
       return {
         result: {
           componentInstance: {},
           then: (
-            successCallback: (result) => void,
+            successCallback: (result: unknown) => void,
             cancelCallback: () => void
           ) => {
             if (this.success) {
@@ -167,7 +168,9 @@ describe('State Interaction component', () => {
 
       component.ngOnInit();
       tick();
-      stateEditorService.onStateEditorInitialized.emit(undefined);
+      stateEditorService.onStateEditorInitialized.emit(
+        undefined as unknown as State
+      );
       tick();
 
       expect(component.interactionIsDisabled).toBe(false);
@@ -187,12 +190,20 @@ describe('State Interaction component', () => {
         'shivam',
         'id',
         'some',
-        null,
-        new Interaction([], [], null, null, [], 'id', null),
-        null,
-        null,
+        SubtitledHtml.createDefault('html', 'content_id'),
+        new Interaction(
+          [],
+          [],
+          {} as unknown as InteractionCustomizationArgs,
+          null,
+          [],
+          'id',
+          null
+        ),
+        [],
         true,
-        true
+        true,
+        null
       );
 
       component.ngOnInit();
@@ -224,7 +235,7 @@ describe('State Interaction component', () => {
       explorationHtmlFormatterService,
       'getInteractionHtml'
     ).and.returnValue('htmlValue');
-    stateInteractionIdService.savedMemento = 'interactionID';
+    stateInteractionIdService.savedMemento = 'TextInput';
 
     component.toggleInteractionEditor();
 
@@ -239,7 +250,7 @@ describe('State Interaction component', () => {
     mockNgbModal.modal = 'delete_interaction';
 
     spyOn(stateSolutionService, 'saveDisplayedValue').and.stub();
-    spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
+    spyOn(mockNgbModal, 'open').and.callFake((dlg: string, opt: string) => {
       return {
         result: Promise.resolve('success'),
       } as NgbModalRef;
@@ -255,7 +266,7 @@ describe('State Interaction component', () => {
     mockNgbModal.modal = 'delete_interaction';
 
     spyOn(stateSolutionService, 'saveDisplayedValue').and.stub();
-    spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
+    spyOn(mockNgbModal, 'open').and.callFake((dlg: string, opt: string) => {
       return {
         result: Promise.reject('success'),
       } as NgbModalRef;
@@ -285,7 +296,7 @@ describe('State Interaction component', () => {
     component.interactionIsDisabled = false;
     component.updateDefaultTerminalStateContentIfEmpty();
 
-    spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
+    spyOn(mockNgbModal, 'open').and.callFake((dlg: string, opt: string) => {
       return {
         componentInstance: {},
         result: Promise.reject('reject'),
@@ -387,7 +398,7 @@ describe('State Interaction component', () => {
     };
 
     mockNgbModal.modal = 'add_interaction';
-    spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
+    spyOn(mockNgbModal, 'open').and.callFake((dlg: string, opt: string) => {
       return {
         componentInstance: {},
         result: Promise.resolve('success'),
@@ -413,7 +424,7 @@ describe('State Interaction component', () => {
 
   it('should through error when state is undefined', () => {
     expect(() => {
-      component.throwError(undefined);
+      component.throwError(undefined as unknown as State);
     }).toThrowError('Expected stateData to be defined but received undefined');
   });
 });

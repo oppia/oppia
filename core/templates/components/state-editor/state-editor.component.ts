@@ -211,49 +211,54 @@ export class StateEditorComponent implements OnInit, OnDestroy {
         this.stateData = stateData;
         this.stateName = this.stateEditorService.getActiveStateName();
         this.stateEditorService.setInteraction(stateData.interaction);
-        this.stateEditorService.setLinkedSkillId(stateData.linkedSkillId);
+        this.stateEditorService.setLinkedSkillId(
+          stateData.linkedSkillId as string
+        );
         if (!this.stateEditorService.isInQuestionMode()) {
           this.stateEditorService.setInapplicableSkillMisconceptionIds(
-            stateData.inapplicableSkillMisconceptionIds
+            stateData.inapplicableSkillMisconceptionIds as string[]
           );
         }
-        this.stateContentService.init(this.stateName, stateData.content);
+        this.stateContentService.init(
+          this.stateName as string,
+          stateData.content
+        );
         this.stateLinkedSkillIdService.init(
-          this.stateName,
+          this.stateName as string,
           stateData.linkedSkillId
         );
         this.stateHintsService.init(
-          this.stateName,
+          this.stateName as string,
           stateData.interaction.hints
         );
         // TODO(#25231): InteractionBackendDict.id should use
         // InteractionSpecsKey instead of string.
         this.stateInteractionIdService.init(
-          this.stateName,
+          this.stateName as string,
           stateData.interaction.id as InteractionSpecsKey
         );
         this.stateCustomizationArgsService.init(
-          this.stateName,
+          this.stateName as string,
           stateData.interaction.customizationArgs
         );
         this.stateNameService.init();
         this.stateParamChangesService.init(
-          this.stateName,
+          this.stateName as string,
           stateData.paramChanges
         );
         this.stateSolicitAnswerDetailsService.init(
-          this.stateName,
+          this.stateName as string,
           stateData.solicitAnswerDetails
         );
         this.stateCardIsCheckpointService.init(
-          this.stateName,
+          this.stateName as string,
           stateData.cardIsCheckpoint
         );
         this.stateSolutionService.init(
-          this.stateName,
+          this.stateName as string,
           stateData.interaction.solution
         );
-        this.updateInteractionVisibility(stateData.interaction.id);
+        this.updateInteractionVisibility(stateData.interaction.id || '');
         this.servicesInitialized = true;
       })
     );
