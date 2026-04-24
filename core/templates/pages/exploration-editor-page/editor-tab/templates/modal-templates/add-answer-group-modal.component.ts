@@ -230,7 +230,8 @@ export class AddAnswerGroupModalComponent
       this.currentInteractionId === 'NumericInput' &&
       this.tmpRule.type === 'IsWithinTolerance'
     ) {
-      return (this.tmpRule.inputs.tol as number) >= 0;
+      const tolerance = this.tmpRule.inputs.tol;
+      return typeof tolerance === 'number' ? tolerance >= 0 : true;
     }
     return true;
   }

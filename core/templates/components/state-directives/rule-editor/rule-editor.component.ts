@@ -337,7 +337,8 @@ export class RuleEditorComponent
       this.currentInteractionId === 'NumericInput' &&
       this.rule.type === 'IsWithinTolerance'
     ) {
-      return (this.rule.inputs.tol as number) >= 0;
+      const tolerance = this.rule.inputs.tol;
+      return typeof tolerance === 'number' ? tolerance >= 0 : true;
     }
     return true;
   }
