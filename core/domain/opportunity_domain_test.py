@@ -463,7 +463,7 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
             utils.ValidationError, 'expected language_code to be a string'
         ):
             opportunity_domain.PinnedOpportunity(
-                # Here use cast because intentionally passing invalid types to test runtime validation.
+                # Here use cast because we intentionally pass invalid types to test runtime validation.
                 language_code=cast(str, 123),
                 topic_id='topic_id',
                 opportunity_id='opportunity_id1',
@@ -476,7 +476,7 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
             opportunity_domain.PinnedOpportunity(
                 language_code='en',
                 topic_id='topic_id',
-                # Here use cast because intentionally passing invalid types to test runtime validation.
+                # Here use cast because we intentionally pass invalid types to test runtime validation.
                 opportunity_id=cast(str, 123),
             ).validate()
 
