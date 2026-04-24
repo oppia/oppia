@@ -27,7 +27,7 @@ from core.domain import auth_services, user_domain, user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List, Optional, TypedDict
+from typing import List, Optional, TypedDict, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1970,8 +1970,10 @@ class UsernameChangeAuditTest(test_utils.GenericTestBase):
         obj.validate()
 
     def test_invalid_committer_id_type(self) -> None:
+        # Here we use cast because we intentionally pass invalid types to test runtime validation.
+        committer_id = cast(str, 123)
         obj = user_domain.UsernameChangeAudit(
-            committer_id=123,
+            committer_id=committer_id,
             old_username='old_name',
             new_username='new_name',
         )
@@ -1992,9 +1994,11 @@ class UsernameChangeAuditTest(test_utils.GenericTestBase):
             obj.validate()
 
     def test_invalid_old_username(self) -> None:
+        # Here we use cast because we intentionally pass invalid types to test runtime validation.
+        old_username = cast(str, 123)
         obj = user_domain.UsernameChangeAudit(
             committer_id='123',
-            old_username=123,
+            old_username=old_username,
             new_username='new_name',
         )
         with self.assertRaisesRegex(
@@ -2014,10 +2018,12 @@ class UsernameChangeAuditTest(test_utils.GenericTestBase):
             obj.validate()
 
     def test_invalid_new_username(self) -> None:
+        # Here we use cast because we intentionally pass invalid types to test runtime validation.
+        new_username = cast(str, 123)
         obj = user_domain.UsernameChangeAudit(
             committer_id='123',
             old_username='old_name',
-            new_username=123,
+            new_username=new_username,
         )
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected new username to be a string'
