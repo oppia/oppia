@@ -453,6 +453,7 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
         ):
             opportunity_domain.PinnedOpportunity(
                 language_code='en',
+                # Using cast to intentionally pass invalid types to test runtime validation.
                 topic_id=cast(str, 123),
                 opportunity_id='opportunity_id1',
             ).validate()
@@ -462,17 +463,18 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
             utils.ValidationError, 'expected language_code to be a string'
         ):
             opportunity_domain.PinnedOpportunity(
+                # Using cast to intentionally pass invalid types to test runtime validation.
                 language_code=cast(str, 123),
                 topic_id='topic_id',
                 opportunity_id='opportunity_id1',
             ).validate()
 
-    def test_invalid_language_code_type(self) -> None:
+    def test_invalid_opportunity_id_type(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected opportunity_id to be a string'
         ):
             opportunity_domain.PinnedOpportunity(
-                language_code="en",
+                language_code='en',
                 topic_id='topic_id',
                 opportunity_id=cast(str, 123),
             ).validate()
