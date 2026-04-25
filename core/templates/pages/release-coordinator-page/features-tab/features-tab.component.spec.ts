@@ -111,7 +111,7 @@ describe('Release coordinator page feature tab', function () {
         FeatureFlag.createFromBackendDict({
           description: 'This is a dummy feature flag.',
           developer_notes:
-            'When disabling this flag, regenerate summary models.',
+            'This flag does nothing and exists for end-to-end test coverage.',
           feature_stage: FeatureStage.DEV,
           name: 'dummy_feature_flag_for_e2e_tests',
           force_enable_for_all_users: false,
@@ -149,7 +149,7 @@ describe('Release coordinator page feature tab', function () {
       'dummy_feature_flag_for_e2e_tests'
     );
     expect(component.featureFlagViewModels[0].developerNotes).toEqual(
-      'When disabling this flag, regenerate summary models.'
+      'This flag does nothing and exists for end-to-end test coverage.'
     );
   });
 
