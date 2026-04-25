@@ -69,6 +69,9 @@ class FeatureNames(enum.Enum):
     SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS = (
         'show_voiceover_tab_for_non_curated_explorations'
     )
+    HIGHLIGHT_SENTENCES_DURING_AUTOMATIC_VOICEOVER_PLAYBACK = (
+        'highlight_sentences_during_automatic_voiceover_playback'
+    )
     SHOW_RESTRUCTURED_STUDY_GUIDES = 'show_restructured_study_guides'
     ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS = (
         'enable_translation_opps_with_new_opp_models'
@@ -136,6 +139,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+    FeatureNames.HIGHLIGHT_SENTENCES_DURING_AUTOMATIC_VOICEOVER_PLAYBACK,
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
     FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE,
@@ -304,6 +308,14 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag allows learners to see the regenerated voiceovers '
             'in the exploration player.',
+            feature_flag_domain.ServerMode.TEST,
+        )
+    ),
+    FeatureNames.HIGHLIGHT_SENTENCES_DURING_AUTOMATIC_VOICEOVER_PLAYBACK.value: (
+        (
+            'This flag enables the highlighting of sentences during the '
+            'automatic voiceover playback in the exploration player and '
+            'editor pages.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),

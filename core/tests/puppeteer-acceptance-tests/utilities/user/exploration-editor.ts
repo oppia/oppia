@@ -74,7 +74,7 @@ const multipleChoiceResponseDropdown =
 const multipleChoiceResponseOption = 'mat-option.e2e-test-html-select-selector';
 const textInputInteractionButton = 'div.e2e-test-interaction-tile-TextInput';
 const textInputInteractionOption =
-  'tr#e2e-test-schema-based-list-editor-table-row';
+  'tr[id^="e2e-test-schema-based-list-editor-table-row"]';
 const textInputField = '.e2e-test-text-input';
 
 const saveDraftButton = 'button.e2e-test-save-draft-button';
@@ -1878,6 +1878,9 @@ export class ExplorationEditor extends BaseUser {
         );
         break;
       case INTERACTION_TYPES.TEXT_INPUT:
+        await this.page.waitForSelector(responseModalBodySelector, {
+          visible: true,
+        });
         await this.clickOnElementWithSelector(addResponseOptionButton);
         await this.page.waitForSelector(textInputInteractionOption);
         await this.page.type(textInputInteractionOption, answer);
