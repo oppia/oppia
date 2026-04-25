@@ -439,7 +439,6 @@ describe('States', () => {
       State.createFromBackendDict('first state', newState)
     );
 
-    // ✅ FIXED syntax
     expect(newStates.getFinalStateNames()).toEqual(['new state']);
   });
 
