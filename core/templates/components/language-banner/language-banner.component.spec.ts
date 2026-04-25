@@ -85,7 +85,7 @@ describe('LanguageBannerComponent', () => {
 
     userService = TestBed.inject(UserService);
     cookieService = TestBed.inject(CookieService);
-    router = TestBed.inject(Router) as unknown as MockRouter;
+    router = TestBed.inject(Router) as MockRouter;
 
     cookieService.put(
       COOKIE_NAME_COOKIES_ACKNOWLEDGED,
@@ -132,8 +132,12 @@ describe('LanguageBannerComponent', () => {
   }));
 
   it('should not display banner if user is logged in', fakeAsync(() => {
+    const mockUserInfo = jasmine.createSpyObj<UserInfo>('UserInfo', [
+      'isLoggedIn',
+    ]);
+    mockUserInfo.isLoggedIn.and.returnValue(true);
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve({isLoggedIn: () => true} as unknown as UserInfo)
+      Promise.resolve(mockUserInfo)
     );
 
     component.ngOnInit();

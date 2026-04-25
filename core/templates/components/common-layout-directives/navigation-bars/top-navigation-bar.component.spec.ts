@@ -541,11 +541,11 @@ describe('TopNavigationBarComponent', () => {
 
   it("should hide navbar if it's height more than 60px", fakeAsync(() => {
     spyOn(wds, 'isWindowNarrow').and.returnValues(false, true);
+    const mockElement = document.createElement('div');
+    Object.defineProperty(mockElement, 'clientHeight', {value: 61});
     spyOn(document, 'querySelector')
       .withArgs('div.collapse.navbar-collapse')
-      .and.returnValue({
-        clientHeight: 61,
-      } as unknown as Element);
+      .and.returnValue(mockElement);
 
     component.navElementsVisibilityStatus = {
       I18N_TOPNAV_DONATE: true,

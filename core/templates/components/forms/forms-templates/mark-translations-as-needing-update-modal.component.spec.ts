@@ -55,21 +55,13 @@ class MockPlatformFeatureService {
   };
 }
 
-export class MockNgbModalRef {
-  componentInstance = {
-    contentId: null,
-    contentValue: null,
-  };
-  result!: Promise<void>;
-}
-
 describe('Mark Translations As Needing Update Modal Component', () => {
   let component: MarkTranslationsAsNeedingUpdateModalComponent;
   let fixture: ComponentFixture<MarkTranslationsAsNeedingUpdateModalComponent>;
   let ngbActiveModal: NgbActiveModal;
   let ngbModal: NgbModal;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
-  let ngbModalRef: MockNgbModalRef = new MockNgbModalRef();
+  let ngbModalRef: NgbModalRef;
   let entityTranslationsService: EntityTranslationsService;
 
   beforeEach(waitForAsync(() => {
@@ -144,10 +136,11 @@ describe('Mark Translations As Needing Update Modal Component', () => {
   it('should open the ModifyTranslations modal', fakeAsync(() => {
     component.contentId = 'content1';
     component.contentValue = 'Content value';
-    ngbModalRef.result = Promise.resolve();
-    const modalSpy = spyOn(ngbModal, 'open').and.returnValue(
-      ngbModalRef as unknown as NgbModalRef
-    );
+    ngbModalRef = {
+      componentInstance: {contentId: null, contentValue: null},
+      result: Promise.resolve(),
+    } as NgbModalRef;
+    const modalSpy = spyOn(ngbModal, 'open').and.returnValue(ngbModalRef);
     spyOn(component, 'doesContentHaveDisplayableTranslations').and.returnValue(
       true
     );
@@ -167,10 +160,8 @@ describe('Mark Translations As Needing Update Modal Component', () => {
 
   it('should cancel ModifyTranslations modal', () => {
     component.contentId = 'content1';
-    ngbModalRef.result = Promise.reject().catch(() => undefined);
-    const modalSpy = spyOn(ngbModal, 'open').and.returnValue(
-      ngbModalRef as unknown as NgbModalRef
-    );
+    ngbModalRef.result = Promise.reject().catch(() => {});
+    const modalSpy = spyOn(ngbModal, 'open').and.returnValue(ngbModalRef);
     spyOn(component, 'doesContentHaveDisplayableTranslations').and.returnValue(
       true
     );

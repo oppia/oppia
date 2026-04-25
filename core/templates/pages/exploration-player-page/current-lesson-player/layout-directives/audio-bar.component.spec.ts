@@ -469,9 +469,6 @@ describe('Audio Bar Component', () => {
 
       component.voiceoverToBePlayed = undefined;
       component.updateDisplayableLanguageAccentDescription();
-      // Fix: If you must assign undefined to Voiceover, use 'as unknown as Voiceover'.
-      // component.voiceoverToBePlayed = undefined as unknown as Voiceover;
-      // Fix: Remove 'auto: undefined' from any mapping.
       expect(
         (component.voiceoverToBePlayed as Voiceover | undefined)?.filename
       ).toEqual('b.mp3');
