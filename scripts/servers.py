@@ -741,6 +741,7 @@ def managed_portserver() -> Iterator[psutil.Process]:
                         'Portserver failed to shut down after 10 seconds.'
                     )
                     try:
+                        proc.terminate()
                         proc.kill()
                         proc.wait(timeout=5)
                     except Exception as e:
