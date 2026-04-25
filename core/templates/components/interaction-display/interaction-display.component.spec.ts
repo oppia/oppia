@@ -19,11 +19,17 @@
 import {
   ComponentFactoryResolver,
   ComponentRef,
+  ElementRef,
   SimpleChange,
   ViewContainerRef,
 } from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {InteractionDisplayComponent} from './interaction-display.component';
+
+interface MockInteractionComponent {
+  placeholderWithValue: string;
+  lastAnswer?: string;
+}
 
 describe('Interaction display', () => {
   let fixture: ComponentFixture<InteractionDisplayComponent>;
@@ -52,31 +58,28 @@ describe('Interaction display', () => {
 
     let setAttributeSpy = jasmine.createSpy('setAttribute');
     let mockComponentRef = {
-      changeDetectorRef: {
-        detectChanges: () => {},
-      },
-      location: {
-        nativeElement: {
-          setAttribute: setAttributeSpy,
-        },
-      },
       instance: {
         placeholderWithValue: '',
       },
-    };
+      location: new ElementRef({
+        setAttribute: setAttributeSpy,
+      }),
+      changeDetectorRef: jasmine.createSpyObj('ChangeDetectorRef', [
+        'detectChanges',
+      ]),
+    } as jasmine.SpyObj<ComponentRef<MockInteractionComponent>>;
 
     componentInstance.viewContainerRef = jasmine.createSpyObj<ViewContainerRef>(
       'ViewContainerRef',
       ['createComponent', 'clear']
     );
     spyOn(componentFactoryResolver, 'resolveComponentFactory');
+
+    // The type of the component is not known because it is
+    // dynamically created based on the interaction type.
     (
       componentInstance.viewContainerRef.createComponent as jasmine.Spy
-    )// Unknown type is used here because the type of the component
-    // is not known. This is because the component is dynamically
-    // created.
-    .and
-      .returnValue(mockComponentRef as ComponentRef<unknown>);
+    ).and.returnValue(mockComponentRef);
 
     componentInstance.buildInteraction();
 
@@ -95,19 +98,17 @@ describe('Interaction display', () => {
 
     let setAttributeSpy = jasmine.createSpy('setAttribute');
     let mockComponentRef = {
-      changeDetectorRef: {
-        detectChanges: () => {},
-      },
-      location: {
-        nativeElement: {
-          setAttribute: setAttributeSpy,
-        },
-      },
       instance: {
         placeholderWithValue: '',
         lastAnswer: '',
       },
-    };
+      location: new ElementRef({
+        setAttribute: setAttributeSpy,
+      }),
+      changeDetectorRef: jasmine.createSpyObj('ChangeDetectorRef', [
+        'detectChanges',
+      ]),
+    } as jasmine.SpyObj<ComponentRef<MockInteractionComponent>>;
 
     componentInstance.viewContainerRef = jasmine.createSpyObj<ViewContainerRef>(
       'ViewContainerRef',
@@ -118,13 +119,12 @@ describe('Interaction display', () => {
     };
 
     spyOn(componentFactoryResolver, 'resolveComponentFactory');
+
+    // The type of the component is not known because it is
+    // dynamically created based on the interaction type.
     (
       componentInstance.viewContainerRef.createComponent as jasmine.Spy
-    )// Unknown type is used here because the type of the component
-    // is not known. This is because the component is dynamically
-    // created.
-    .and
-      .returnValue(mockComponentRef as ComponentRef<unknown>);
+    ).and.returnValue(mockComponentRef);
 
     componentInstance.buildInteraction();
 
