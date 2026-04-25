@@ -19,24 +19,22 @@
 import {TestBed} from '@angular/core/testing';
 
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {State} from 'domain/state/state.model';
+import {State, StateBackendDict} from 'domain/state/state.model';
 import {States} from 'domain/exploration/states.model';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
-
-import {State} from 'domain/state/state.model';
 
 describe('States', () => {
-  let statesDict: Record<string, State> | null = null;
-  let newState: State | null = null;
-  let newState2: State | null = null;
-  let secondState: State | null = null;
-  let statesWithCyclicOutcomeDict: Record<string, State> | null = null;
-  let stateDictToDelete: Record<string, State> | null = null;
+  let statesDict: Record<string, StateBackendDict>;
+  let newState: StateBackendDict;
+  let newState2: StateBackendDict;
+  let secondState: StateBackendDict;
+  let statesWithCyclicOutcomeDict: Record<string, StateBackendDict>;
+  let stateDictToDelete: Record<string, StateBackendDict>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe],
     });
+
     spyOnProperty(State, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
       classifier_model_id: null,
       content: {
@@ -44,18 +42,18 @@ describe('States', () => {
         html: '',
       },
       interaction: {
+        id: 'TextInput',
         answer_groups: [],
         confirmed_unclassified_answers: [],
         customization_args: {
-          rows: {
-            value: 1,
-          },
+          rows: {value: 1},
           placeholder: {
-            value: new SubtitledUnicode('Type your answer here.', ''),
+            value: {
+              content_id: 'placeholder',
+              unicode_str: 'Type your answer here.',
+            },
           },
-          catchMisspellings: {
-            value: false,
-          },
+          catchMisspellings: {value: false},
         },
         default_outcome: {
           dest: '(untitled state)',
@@ -71,7 +69,6 @@ describe('States', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput',
       },
       linked_skill_id: null,
       param_changes: [],
@@ -104,10 +101,13 @@ describe('States', () => {
           missing_prerequisite_skill_id: null,
         },
         hints: [],
+        solution: null,
       },
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      card_is_checkpoint: false,
+      inapplicable_skill_misconception_ids: null,
     };
 
     newState2 = {
@@ -117,18 +117,18 @@ describe('States', () => {
         html: '',
       },
       interaction: {
+        id: 'TextInput',
         answer_groups: [],
         confirmed_unclassified_answers: [],
         customization_args: {
-          rows: {
-            value: 1,
-          },
+          rows: {value: 1},
           placeholder: {
-            value: new SubtitledUnicode('Type your answer here.', ''),
+            value: {
+              content_id: 'placeholder_2',
+              unicode_str: 'Type your answer here.',
+            },
           },
-          catchMisspellings: {
-            value: false,
-          },
+          catchMisspellings: {value: false},
         },
         default_outcome: {
           dest: 'new state',
@@ -143,19 +143,23 @@ describe('States', () => {
           missing_prerequisite_skill_id: null,
         },
         hints: [],
-        id: 'TextInput',
+        solution: null,
       },
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      card_is_checkpoint: false,
+      inapplicable_skill_misconception_ids: null,
     };
 
     secondState = {
+      classifier_model_id: null,
       content: {
         content_id: 'content',
         html: 'more content',
       },
       interaction: {
+        id: 'TextInput',
         answer_groups: [],
         confirmed_unclassified_answers: [],
         customization_args: {
@@ -166,9 +170,7 @@ describe('States', () => {
             },
           },
           rows: {value: 1},
-          catchMisspellings: {
-            value: false,
-          },
+          catchMisspellings: {value: false},
         },
         default_outcome: {
           dest: 'new state',
@@ -191,11 +193,12 @@ describe('States', () => {
             html: '<p>This is an explanation.</p>',
           },
         },
-        id: 'TextInput',
       },
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      card_is_checkpoint: false,
+      inapplicable_skill_misconception_ids: null,
     };
 
     statesDict = {
@@ -204,6 +207,7 @@ describe('States', () => {
 
     statesWithCyclicOutcomeDict = {
       'first state': {
+        classifier_model_id: null,
         content: {
           content_id: 'content',
           html: 'content',
@@ -234,8 +238,11 @@ describe('States', () => {
                   inputs: {x: 10},
                 },
               ],
+              training_data: [],
+              tagged_skill_misconception_id: null,
             },
           ],
+          confirmed_unclassified_answers: [],
           default_outcome: {
             dest: 'second state',
             dest_if_really_stuck: 'second state',
@@ -251,10 +258,15 @@ describe('States', () => {
           hints: [],
           solution: null,
         },
+        linked_skill_id: null,
         param_changes: [],
         solicit_answer_details: false,
+        card_is_checkpoint: false,
+        inapplicable_skill_misconception_ids: null,
       },
+
       'second state': {
+        classifier_model_id: null,
         content: {
           content_id: 'content',
           html: 'content',
@@ -285,8 +297,11 @@ describe('States', () => {
                   inputs: {x: 10},
                 },
               ],
+              training_data: [],
+              tagged_skill_misconception_id: null,
             },
           ],
+          confirmed_unclassified_answers: [],
           default_outcome: {
             dest: 'first state',
             dest_if_really_stuck: 'first state',
@@ -302,18 +317,23 @@ describe('States', () => {
           hints: [],
           solution: null,
         },
+        linked_skill_id: null,
         param_changes: [],
         solicit_answer_details: false,
+        card_is_checkpoint: false,
+        inapplicable_skill_misconception_ids: null,
       },
     };
 
     stateDictToDelete = {
       'first state': {
+        classifier_model_id: null,
         content: {
           content_id: 'content',
           html: 'content',
         },
         interaction: {
+          id: 'TextInput',
           answer_groups: [
             {
               outcome: {
@@ -326,6 +346,7 @@ describe('States', () => {
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
               },
               rule_specs: [
                 {
@@ -333,6 +354,8 @@ describe('States', () => {
                   inputs: {x: 20},
                 },
               ],
+              training_data: [],
+              tagged_skill_misconception_id: null,
             },
           ],
           confirmed_unclassified_answers: [],
@@ -344,9 +367,7 @@ describe('States', () => {
               },
             },
             rows: {value: 1},
-            catchMisspellings: {
-              value: false,
-            },
+            catchMisspellings: {value: false},
           },
           default_outcome: {
             dest: 'new state',
@@ -357,6 +378,8 @@ describe('States', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
           },
           hints: [
             {
@@ -372,12 +395,15 @@ describe('States', () => {
               },
             },
           ],
-          id: 'TextInput',
+          solution: null,
         },
         linked_skill_id: null,
         param_changes: [],
         solicit_answer_details: false,
+        card_is_checkpoint: false,
+        inapplicable_skill_misconception_ids: null,
       },
+
       'second state': secondState,
     };
   });
@@ -386,8 +412,10 @@ describe('States', () => {
     'should create a new state given a state name and set ' +
       'that state to a terminal state',
     () => {
-      let newStates = States.createFromBackendDict(statesDict);
+      const newStates = States.createFromBackendDict(statesDict);
+
       newStates.addState('new state', 'content_5', 'default_outcome_6');
+
       expect(newStates.hasState('new state')).toBe(true);
       expect(newStates.getStateNames()).toEqual(['first state', 'new state']);
       expect(Object.keys(newStates.getStateObjects()).length).toBe(2);
@@ -396,6 +424,7 @@ describe('States', () => {
         'new state',
         State.createFromBackendDict('new state', newState)
       );
+
       expect(newStates.getState('new state')).toEqual(
         State.createFromBackendDict('new state', newState)
       );
@@ -403,18 +432,22 @@ describe('States', () => {
   );
 
   it('should correctly retrieve the terminal states', () => {
-    let newStates = States.createFromBackendDict(statesDict);
+    const newStates = States.createFromBackendDict(statesDict);
 
     newStates.setState(
       'first state',
       State.createFromBackendDict('first state', newState)
     );
+
+    // ✅ FIXED syntax
     expect(newStates.getFinalStateNames()).toEqual(['new state']);
   });
 
   it('should correctly delete a state', () => {
-    let states = States.createFromBackendDict(stateDictToDelete);
+    const states = States.createFromBackendDict(stateDictToDelete);
+
     states.deleteState('first state');
+
     expect(states).toEqual(
       States.createFromBackendDict({
         'second state': secondState,
@@ -425,8 +458,10 @@ describe('States', () => {
   it('should return all State objects using getStates()', () => {
     const states = States.createFromBackendDict(statesDict);
     const stateObjects = states.getStates();
+
     expect(Array.isArray(stateObjects)).toBe(true);
     expect(stateObjects.length).toBe(Object.keys(statesDict).length);
+
     expect(stateObjects[0]).toEqual(
       State.createFromBackendDict('first state', newState2)
     );
@@ -436,16 +471,15 @@ describe('States', () => {
     "should correctly set any states' interaction.defaultOutcomes that " +
       'point to a deleted or renamed state name',
     () => {
-      let states = States.createFromBackendDict(statesWithCyclicOutcomeDict);
+      const states = States.createFromBackendDict(statesWithCyclicOutcomeDict);
+
       states.renameState('first state', 'third state');
       states.deleteState('second state');
+
       expect(states).toEqual(
         States.createFromBackendDict({
           'third state': {
-            classifier_model_id: undefined,
-            card_is_checkpoint: undefined,
-            linked_skill_id: undefined,
-            inapplicable_skill_misconception_ids: undefined,
+            classifier_model_id: null,
             content: {
               content_id: 'content',
               html: 'content',
@@ -456,7 +490,6 @@ describe('States', () => {
                 choices: {value: []},
                 showChoicesInShuffledOrder: {value: false},
               },
-              confirmed_unclassified_answers: undefined,
               answer_groups: [
                 {
                   outcome: {
@@ -477,10 +510,11 @@ describe('States', () => {
                       inputs: {x: 10},
                     },
                   ],
-                  training_data: undefined,
-                  tagged_skill_misconception_id: undefined,
+                  training_data: [],
+                  tagged_skill_misconception_id: null,
                 },
               ],
+              confirmed_unclassified_answers: [],
               default_outcome: {
                 dest: 'third state',
                 dest_if_really_stuck: 'third state',
@@ -496,8 +530,11 @@ describe('States', () => {
               hints: [],
               solution: null,
             },
+            linked_skill_id: null,
             param_changes: [],
             solicit_answer_details: false,
+            card_is_checkpoint: false,
+            inapplicable_skill_misconception_ids: null,
           },
         })
       );

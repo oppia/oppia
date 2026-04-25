@@ -22,6 +22,7 @@ import {
   TRANSLATION_DATA_FORMAT_UNICODE,
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
+  DataFormatToDefaultValuesKey,
 } from 'domain/exploration/written-translation.model';
 
 describe('WrittenTranslation object factory', () => {
