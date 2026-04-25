@@ -37,17 +37,17 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageContextService} from 'services/page-context.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
-type MockLocation = {
+interface MockLocation {
   href: string;
   origin: string;
   pathname: string;
   protocol: string;
   host: string;
-};
+}
 
-type MockWindow = {
+interface MockWindow {
   location: MockLocation;
-};
+}
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe implements PipeTransform {

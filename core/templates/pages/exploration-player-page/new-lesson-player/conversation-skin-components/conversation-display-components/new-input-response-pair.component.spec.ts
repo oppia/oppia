@@ -25,7 +25,6 @@ import {PlayerTranscriptService} from '../../../services/player-transcript.servi
 import {NewInputResponsePairComponent} from './new-input-response-pair.component';
 import {MockTranslatePipe} from '../../../../../tests/unit-test-utils';
 import {NgbModule, NgbPopover} from '@ng-bootstrap/ng-bootstrap';
-import {RecordedVoiceovers} from '../../../../../domain/exploration/recorded-voiceovers.model';
 import {StateCard} from '../../../../../domain/state_card/state-card.model';
 import {Interaction} from '../../../../../domain/exploration/interaction.model';
 import {AppConstants} from '../../../../../app.constants';
