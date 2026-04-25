@@ -220,6 +220,118 @@ def _collect_study_guide_changes(
         )
 
 
+def _apply_subtopic_page_change(
+    change: change_domain.BaseChange,
+    topic_id: str,
+    deleted_subtopic_ids: List[int],
+    modified_subtopic_pages: Dict[str, subtopic_page_domain.SubtopicPage],
+    modified_study_guides: Dict[str, study_guide_domain.StudyGuide],
+    modified_subtopic_change_cmds: Dict[
+        str, List[subtopic_page_domain.SubtopicPageChange]
+    ],
+) -> None:
+    """Applies a subtopic page property change to the subtopic pages collection.
+
+    Handles two property types:
+    - SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML: Updates page contents and
+      syncs with study guide if it exists.
+    - SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO: Updates page audio contents.
+
+    Args:
+        change: BaseChange. The subtopic page change command.
+        topic_id: str. ID of the topic.
+        deleted_subtopic_ids: list(int). IDs of deleted subtopics.
+        modified_subtopic_pages: dict(str, SubtopicPage). Dictionary of
+            modified subtopic pages keyed by page ID.
+        modified_study_guides: dict(str, StudyGuide). Dictionary of modified
+            study guides keyed by guide ID.
+        modified_subtopic_change_cmds: dict(str, list(SubtopicPageChange)).
+            Change commands for each subtopic page keyed by page ID.
+
+    Raises:
+        Exception. The subtopic with the given ID doesn't exist.
+    """
+    # Ruling out the possibility of any other type for mypy type checking.
+    assert isinstance(change.subtopic_id, int)
+    subtopic_page_id = (
+        subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+            topic_id, change.subtopic_id
+        )
+    )
+    study_guide_id = (
+        study_guide_domain.StudyGuide.get_study_guide_id(
+            topic_id, change.subtopic_id
+        )
+    )
+    if (modified_subtopic_pages[subtopic_page_id] is None) or (
+        change.subtopic_id in deleted_subtopic_ids
+    ):
+        raise Exception(
+            'The subtopic with id %s doesn\'t exist'
+            % (change.subtopic_id)
+        )
+
+    if (
+        change.property_name
+        == subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
+    ):
+        # Here we use cast because this 'if'
+        # condition forces change to have type
+        # UpdateSubtopicPagePropertyPageContentsHtmlCmd.
+        update_subtopic_page_contents_html_cmd = cast(
+            subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsHtmlCmd,  # pylint: disable=line-too-long
+            change,
+        )
+        # Here we use cast because this 'if'
+        # condition will force change to have type
+        # UpdateStudyGuidePropertySectionsContentCmd
+        # once the subtopic is deprecated.
+        update_study_guide_sections_content_cmd = cast(
+            study_guide_domain.UpdateStudyGuidePropertySectionsContentCmd,  # pylint: disable=line-too-long
+            change,
+        )
+        page_contents = state_domain.SubtitledHtml.from_dict(
+            update_subtopic_page_contents_html_cmd.new_value
+        )
+        page_contents.validate()
+        modified_subtopic_pages[
+            subtopic_page_id
+        ].update_page_contents_html(page_contents)
+        # Only update study guide if it exists.
+        if study_guide_id in modified_study_guides:
+            (
+                modified_study_guides[
+                    study_guide_id
+                ].update_section_content
+            )(
+                (
+                    update_study_guide_sections_content_cmd.new_value.get(
+                        'html'
+                    )
+                ),
+                'section_content_1',
+            )
+
+    elif (
+        change.property_name
+        == subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO
+    ):
+        # Here we use cast because this 'elif'
+        # condition forces change to have type
+        # UpdateSubtopicPagePropertyPageContentsAudioCmd.
+        update_subtopic_page_contents_audio_cmd = cast(
+            subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsAudioCmd,  # pylint: disable=line-too-long
+            change,
+        )
+        modified_subtopic_pages[
+            subtopic_page_id
+        ].update_page_contents_audio(
+            state_domain.RecordedVoiceovers.from_dict(
+                update_subtopic_page_contents_audio_cmd.new_value
+            )
+        )
+
+
 def apply_change_list(
     topic_id: str,
     change_list: Sequence[change_domain.BaseChange],
@@ -837,86 +949,14 @@ def apply_change_list(
                 change.cmd
                 == subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY
             ):
-                # Ruling out the possibility of any other type for mypy
-                # type checking.
-                assert isinstance(change.subtopic_id, int)
-                subtopic_page_id = (
-                    subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-                        topic_id, change.subtopic_id
-                    )
+                _apply_subtopic_page_change(
+                    change,
+                    topic_id,
+                    deleted_subtopic_ids,
+                    modified_subtopic_pages,
+                    modified_study_guides,
+                    modified_subtopic_change_cmds,
                 )
-                study_guide_id = (
-                    study_guide_domain.StudyGuide.get_study_guide_id(
-                        topic_id, change.subtopic_id
-                    )
-                )
-                if (modified_subtopic_pages[subtopic_page_id] is None) or (
-                    change.subtopic_id in deleted_subtopic_ids
-                ):
-                    raise Exception(
-                        'The subtopic with id %s doesn\'t exist'
-                        % (change.subtopic_id)
-                    )
-
-                if (
-                    change.property_name
-                    == subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
-                ):
-                    # Here we use cast because this 'if'
-                    # condition forces change to have type
-                    # UpdateSubtopicPagePropertyPageContentsHtmlCmd.
-                    update_subtopic_page_contents_html_cmd = cast(
-                        subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsHtmlCmd,  # pylint: disable=line-too-long
-                        change,
-                    )
-                    # Here we use cast because this 'if'
-                    # condition will force change to have type
-                    # UpdateStudyGuidePropertySectionsContentCmd
-                    # once the subtopic is deprecated.
-                    update_study_guide_sections_content_cmd = cast(
-                        study_guide_domain.UpdateStudyGuidePropertySectionsContentCmd,  # pylint: disable=line-too-long
-                        change,
-                    )
-                    page_contents = state_domain.SubtitledHtml.from_dict(
-                        update_subtopic_page_contents_html_cmd.new_value
-                    )
-                    page_contents.validate()
-                    modified_subtopic_pages[
-                        subtopic_page_id
-                    ].update_page_contents_html(page_contents)
-                    # Only update study guide if it exists.
-                    if study_guide_id in modified_study_guides:
-                        (
-                            modified_study_guides[
-                                study_guide_id
-                            ].update_section_content
-                        )(
-                            (
-                                update_study_guide_sections_content_cmd.new_value.get(
-                                    'html'
-                                )
-                            ),
-                            'section_content_1',
-                        )
-
-                elif (
-                    change.property_name
-                    == subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO
-                ):
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # UpdateSubtopicPagePropertyPageContentsAudioCmd.
-                    update_subtopic_page_contents_audio_cmd = cast(
-                        subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsAudioCmd,  # pylint: disable=line-too-long
-                        change,
-                    )
-                    modified_subtopic_pages[
-                        subtopic_page_id
-                    ].update_page_contents_audio(
-                        state_domain.RecordedVoiceovers.from_dict(
-                            update_subtopic_page_contents_audio_cmd.new_value
-                        )
-                    )
             elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:
                 # Here we use cast because we are narrowing down the type from
                 # TopicChange to a specific change command.
