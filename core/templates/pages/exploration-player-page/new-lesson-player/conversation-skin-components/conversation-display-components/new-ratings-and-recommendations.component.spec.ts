@@ -205,7 +205,8 @@ describe('New Ratings and recommendations component', () => {
         {} as LearnerExplorationSummary,
         false,
         'bg_color_1',
-        'filename_1'
+        'filename_1',
+        'published'
       );
       const readOnlyStoryNode2 = new ReadOnlyStoryNode(
         'node_2',
@@ -220,7 +221,8 @@ describe('New Ratings and recommendations component', () => {
         {} as LearnerExplorationSummary,
         false,
         'bg_color_2',
-        'filename_2'
+        'filename_2',
+        'published'
       );
 
       expect(componentInstance.inStoryMode).toBe(undefined);
@@ -288,11 +290,13 @@ describe('New Ratings and recommendations component', () => {
             {},
             true,
             'metatag',
-            'page_title_fragment'
+            'page_title_fragment',
+            null
           )
         )
       );
 
+      // @ts-ignore
       componentInstance.questionPlayerConfig = null;
 
       componentInstance.ngOnInit();
@@ -334,7 +338,8 @@ describe('New Ratings and recommendations component', () => {
       {} as LearnerExplorationSummary,
       false,
       'bg_color_1',
-      'filename_1'
+      'filename_1',
+      'published'
     );
 
     spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(true);
@@ -363,7 +368,8 @@ describe('New Ratings and recommendations component', () => {
           {},
           true,
           'metatag',
-          'page_title_fragment'
+          'page_title_fragment',
+          null
         )
       )
     );

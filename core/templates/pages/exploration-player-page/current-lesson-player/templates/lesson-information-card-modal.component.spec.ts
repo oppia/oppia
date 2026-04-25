@@ -529,7 +529,7 @@ describe('Lesson Information card modal component', () => {
 
     componentInstance.closeSaveProgressMenu();
 
-    expect(componentInstance.saveProgressMenuIsShown).toBeFalse();
+    expect(componentInstance.saveProgressMenuIsShown).toBeFalsy();
   });
 
   it('should return 0% when no checkpoints are completed', () => {
@@ -568,7 +568,7 @@ describe('Lesson Information card modal component', () => {
     for (let i = 0; i < numCards; i++) {
       cards.push({
         getStateName: jasmine.createSpy('getStateName').and.returnValue(i),
-      });
+      } as unknown as StateCard);
     }
 
     spyOn(playerTranscriptService, 'getCard').and.callFake((index: number) => {

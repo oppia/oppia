@@ -156,7 +156,6 @@ describe('NewInputResponsePairComponent', () => {
             },
           },
         }),
-        RecordedVoiceovers.createEmpty(),
         'content'
       )
     );
@@ -182,7 +181,7 @@ describe('NewInputResponsePairComponent', () => {
         isHint: true,
       };
 
-      expect(component.isVideoRteElementPresentInResponse()).toBeFalse();
+      expect(component.isVideoRteElementPresentInResponse()).toBeFalsy();
     }
   );
 

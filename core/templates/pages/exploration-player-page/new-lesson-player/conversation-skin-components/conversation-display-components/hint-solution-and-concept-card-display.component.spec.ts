@@ -183,7 +183,6 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       '<p>Content</p>',
       '<interaction></interaction>',
       Interaction.createFromBackendDict(defaultInteractionBackendDict),
-      RecordedVoiceovers.createEmpty(),
       'content'
     );
   });
@@ -199,7 +198,9 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
 
     component.ngOnInit();
 
-    expect(component._editorPreviewMode).toBe(false);
+    expect(
+      (component as unknown as {_editorPreviewMode: boolean})._editorPreviewMode
+    ).toBeFalsy();
     expect(component.iframed).toBe(false);
     expect(component.hintIndexes).toEqual([0, 1]);
   });
@@ -213,7 +214,9 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
 
     component.ngOnInit();
 
-    expect(component._editorPreviewMode).toBe(true);
+    expect(
+      (component as unknown as {_editorPreviewMode: boolean})._editorPreviewMode
+    ).toBeTruthy();
     expect(component.iframed).toBe(true);
   });
 
@@ -244,7 +247,6 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       'Content html',
       'Interaction html',
       interaction,
-      RecordedVoiceovers.createEmpty(),
       'content'
     );
     spyOn(component, 'resetLocalHintsArray');
@@ -264,7 +266,6 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       'Content html',
       'Interaction html',
       interaction,
-      RecordedVoiceovers.createEmpty(),
       'content'
     );
     spyOn(component, 'resetLocalHintsArray');
@@ -306,7 +307,6 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
         '<p>Content</p>',
         '<interaction></interaction>',
         {} as Interaction,
-        RecordedVoiceovers.createEmpty(),
         'content'
       );
       spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(1);
@@ -421,7 +421,6 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
           hints: [],
           solution: null,
         }),
-        RecordedVoiceovers.createEmpty(),
         'content'
       );
 
@@ -574,7 +573,8 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
   );
 
   it('should not record solution hit in editor preview mode', fakeAsync(() => {
-    component._editorPreviewMode = true;
+    (component as unknown as {_editorPreviewMode: boolean})._editorPreviewMode =
+      true;
     spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
       true
     );
@@ -594,7 +594,8 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
   }));
 
   it('should not record solution hit in question mode', fakeAsync(() => {
-    component._editorPreviewMode = false;
+    (component as unknown as {_editorPreviewMode: boolean})._editorPreviewMode =
+      false;
     spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
       true
     );
