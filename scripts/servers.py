@@ -746,7 +746,7 @@ def managed_portserver() -> Iterator[psutil.Process]:
                     except Exception as e:
                         logging.error('Failed to force kill Portserver: %s' % e)
 
-            # Ensure process is not still running
+            # Ensure process is not still running.
             try:
                 if proc.is_running():
                     proc.kill()
