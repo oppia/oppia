@@ -85,7 +85,6 @@
                   <i class="fa fa-bars oppia-admin-page-dropdown-icon"></i>
                 </a>
                 <ul ngbDropdownMenu class="dropdown-menu dropdown-menu oppia-navbar-dropdown"
-                    role="menu"
                     (mouseenter)="activateDropdownMenu()"
                     (mouseleave)="deactivateDropdownMenu()">
                   <li *ngFor="let tab of ADMIN_TAB_URLS | keyvalue">
@@ -161,7 +160,6 @@
                   </div>
                 </a>
                 <ul ngbDropdownMenu class="dropdown-menu dropdown-menu oppia-navbar-dropdown"
-                    role="menu"
                     (mouseenter)="activateProfileDropdown()"
                     (mouseleave)="deactivateProfileDropdown()">
                   <li>
