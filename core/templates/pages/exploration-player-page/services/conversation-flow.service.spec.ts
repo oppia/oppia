@@ -1578,6 +1578,9 @@ describe('Conversation flow service', () => {
       });
       spyOn(conversationFlowService, 'setNextStateCard');
       spyOn(conversationFlowService, 'showPendingCard');
+      spyOn(conversationFlowService, 'isLearnAgainButton').and.returnValue(
+        false
+      );
 
       conversationFlowService.showUpcomingCard();
 
@@ -1613,6 +1616,9 @@ describe('Conversation flow service', () => {
       });
       spyOn(conversationFlowService, 'setNextStateCard');
       spyOn(conversationFlowService, 'showPendingCard');
+      spyOn(conversationFlowService, 'isLearnAgainButton').and.returnValue(
+        false
+      );
 
       conversationFlowService.showUpcomingCard();
 
