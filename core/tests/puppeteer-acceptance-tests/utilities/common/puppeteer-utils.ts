@@ -1224,7 +1224,7 @@ export class BaseUser {
     // Disable all CSS transitions and animations before taking the
     // screenshot to prevent snapshot mismatches caused by transitions
     // being mid-way when the screenshot is captured.
-    await currentPage.addStyleTag({
+    const styleHandle = await currentPage.addStyleTag({
       content: `
         *, *::before, *::after {
           transition: none !important;
@@ -1313,6 +1313,9 @@ export class BaseUser {
         ' folder name should be something like new-snapshots_(suite-name)_desktop_original.' +
         ' The new screenshot(s) should end with "-received". When replacing the screenshot(s), make sure to change the postfix "-received" to "-snap".';
       throw new Error(errorMessage);
+    } finally {
+      // Remove the injected style tag so it doesn't affect subsequent actions.
+      await currentPage.evaluate(el => el.remove(), styleHandle);
     }
   }
 
