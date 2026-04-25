@@ -351,3 +351,53 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
 
         self.assertTrue(parser.failed)
         self.assertTrue(any('class' in msg for msg in parser.error_messages))
+
+    def test_custom_parser_disallows_new_embedded_style_tags(self) -> None:
+        file_content = (
+            '<div>\n'
+            '  <style>\n'
+            '    .test {\n'
+            '      color: red;\n'
+            '    }\n'
+            '  </style>\n'
+            '</div>\n'
+        )
+        parser = html_linter.CustomHTMLParser(
+            filepath='core/templates/test.component.html',
+            file_lines=tuple(file_content.splitlines(keepends=True)),
+        )
+
+        parser.feed(file_content)
+
+        self.assertTrue(parser.failed)
+        self.assertEqual(
+            [
+                'core/templates/test.component.html --> Embedded style tags '
+                'are not allowed in HTML templates. Move the CSS to the '
+                'component stylesheet.'
+            ],
+            parser.error_messages,
+        )
+
+    def test_custom_parser_allows_legacy_embedded_style_tags(self) -> None:
+        file_content = (
+            '<div>\n'
+            '  <style>\n'
+            '    .test {\n'
+            '      color: red;\n'
+            '    }\n'
+            '  </style>\n'
+            '</div>\n'
+        )
+        parser = html_linter.CustomHTMLParser(
+            filepath=(
+                'core/templates/components/common-layout-directives/'
+                'common-elements/background-banner.component.html'
+            ),
+            file_lines=tuple(file_content.splitlines(keepends=True)),
+        )
+
+        parser.feed(file_content)
+
+        self.assertFalse(parser.failed)
+        self.assertEqual([], parser.error_messages)
