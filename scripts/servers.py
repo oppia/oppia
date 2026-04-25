@@ -740,6 +740,24 @@ def managed_portserver() -> Iterator[psutil.Process]:
                     logging.error(
                         'Portserver failed to shut down after 10 seconds.'
                     )
+                    try:
+                        proc.kill()
+                        proc.wait(timeout=5)
+                    except Exception as e:
+                        logging.error('Failed to force kill Portserver: %s' % e)
+
+            # Ensure process is not still running
+            try:
+                if proc.is_running():
+                    proc.kill()
+            except Exception as e:
+                logging.error('Final kill attempt failed: %s' % e)
+
+            try:
+                if os.path.exists(common.PORTSERVER_SOCKET_FILEPATH):
+                    os.remove(common.PORTSERVER_SOCKET_FILEPATH)
+            except Exception as e:
+                logging.error('Failed to remove portserver socket file: %s' % e)
 
 
 @contextlib.contextmanager
