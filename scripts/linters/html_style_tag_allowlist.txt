@@ -293,6 +293,7 @@ core/templates/pages/story-editor-page/story-editor-page.component.html
 core/templates/pages/story-editor-page/story-preview-tab/story-preview-tab.component.html
 core/templates/pages/story-viewer-page/navbar-breadcrumb/story-viewer-navbar-breadcrumb.component.html
 core/templates/pages/story-viewer-page/navbar-pre-logo-action/story-viewer-navbar-pre-logo-action.component.html
+core/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.html
 core/templates/pages/subtopic-viewer-page/navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component.html
 core/templates/pages/terms-page/terms-page.component.html
 core/templates/pages/thanks-page/thanks-page.component.html
