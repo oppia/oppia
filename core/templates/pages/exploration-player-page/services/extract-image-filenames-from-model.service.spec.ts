@@ -820,7 +820,7 @@ describe('Extracting Image file names in the state service', () => {
         auto_tts_enabled: false,
         edits_allowed: true,
       },
-    };
+    } as unknown as ExplorationBackendDict;
 
     ImageFilenamesInExploration = {
       'State 1': [],

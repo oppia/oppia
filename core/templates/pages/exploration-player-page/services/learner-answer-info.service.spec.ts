@@ -160,6 +160,7 @@ describe('Learner answer info service', () => {
       solicit_answer_details: true,
       card_is_checkpoint: false,
       linked_skill_id: null,
+      inapplicable_skill_misconception_ids: [],
       classifier_model_id: '',
     };
 
@@ -171,7 +172,9 @@ describe('Learner answer info service', () => {
     firstState = State.createFromBackendDict('new state', stateDict);
     secondState = State.createFromBackendDict('fake state', stateDict);
     thirdState = State.createFromBackendDict('demo state', stateDict);
-    tirs = TestBed.inject(TextInputRulesService);
+    tirs = TestBed.inject(
+      TextInputRulesService
+    ) as unknown as InteractionRulesService;
 
     spyOn(
       answerClassificationService,
@@ -200,8 +203,7 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs,
-        false
+        tirs
       );
     });
 
@@ -230,8 +232,7 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs,
-        false
+        tirs
       );
     });
 
@@ -247,8 +248,7 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs,
-        false
+        tirs
       );
       expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
         false
@@ -263,8 +263,7 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs,
-        false
+        tirs
       );
     });
 
@@ -282,8 +281,7 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs,
-        false
+        tirs
       );
     });
     it('should return can ask learner for answer info false', () => {
@@ -299,8 +297,7 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs,
-        false
+        tirs
       );
     });
 
@@ -323,16 +320,14 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs,
-        false
+        tirs
       );
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details 1');
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10',
         secondState,
         mockAnswer,
-        tirs,
-        false
+        tirs
       );
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details 1');
     });
@@ -342,8 +337,7 @@ describe('Learner answer info service', () => {
         '10',
         thirdState,
         mockAnswer,
-        tirs,
-        false
+        tirs
       );
       expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
         false

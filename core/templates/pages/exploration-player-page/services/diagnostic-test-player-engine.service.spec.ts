@@ -56,7 +56,9 @@ describe('Diagnostic test engine service', () => {
       DiagnosticTestPlayerEngineService
     );
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
-    textInputService = TestBed.inject(TextInputRulesService);
+    textInputService = TestBed.inject(
+      TextInputRulesService
+    ) as unknown as InteractionRulesService;
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     alertsService = TestBed.inject(AlertsService);
     expressionInterpolationService = TestBed.inject(
@@ -142,6 +144,7 @@ describe('Diagnostic test engine service', () => {
         },
         linked_skill_id: null,
         card_is_checkpoint: true,
+        inapplicable_skill_misconception_ids: [],
       },
       question_state_data_schema_version: 2,
       language_code: '',
@@ -712,7 +715,7 @@ describe('Diagnostic test engine service', () => {
 
     expect(
       diagnosticTestPlayerEngineService.isDiagnosticTestFinished()
-    ).toBeFalse();
+    ).toBeFalsy();
 
     // Submitting the correct answer.
     diagnosticTestPlayerEngineService.submitAnswer(
@@ -724,7 +727,7 @@ describe('Diagnostic test engine service', () => {
 
     expect(
       diagnosticTestPlayerEngineService.isDiagnosticTestFinished()
-    ).toBeTrue();
+    ).toBeTruthy();
   }));
 
   it(
@@ -809,7 +812,7 @@ describe('Diagnostic test engine service', () => {
 
       expect(
         diagnosticTestPlayerEngineService.isDiagnosticTestFinished()
-      ).toBeFalse();
+      ).toBeFalsy();
 
       expect(diagnosticTestPlayerEngineService.getCurrentTopicId()).toEqual(
         'topicId2'
@@ -836,7 +839,7 @@ describe('Diagnostic test engine service', () => {
       // the test so the test should be terminated.
       expect(
         diagnosticTestPlayerEngineService.isDiagnosticTestFinished()
-      ).toBeTrue();
+      ).toBeTruthy();
     })
   );
 

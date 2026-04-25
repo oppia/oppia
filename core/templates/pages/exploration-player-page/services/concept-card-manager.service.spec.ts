@@ -29,8 +29,8 @@ import {ExplorationEngineService} from './exploration-engine.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {State} from '../../../domain/state/state.model';
 import {Interaction} from '../../../domain/exploration/interaction.model';
-import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 
 class MockNgbModalRef {
   componentInstance = {
@@ -133,7 +133,6 @@ describe('ConceptCardManager service', () => {
           },
         },
       }),
-      RecordedVoiceovers.createEmpty(),
       'content'
     );
 
@@ -175,7 +174,6 @@ describe('ConceptCardManager service', () => {
         ],
         solution: null,
       }),
-      RecordedVoiceovers.createEmpty(),
       'content'
     );
 
@@ -185,7 +183,7 @@ describe('ConceptCardManager service', () => {
       }),
       getWorkedExamples: () => [],
       getSkillDescription: () => 'Test skill',
-    } as ConceptCard;
+    } as unknown as ConceptCard;
   });
 
   it('should show concept card icon at the right time', fakeAsync(() => {
@@ -209,12 +207,14 @@ describe('ConceptCardManager service', () => {
   }));
 
   it('should open concept card modal', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve(),
-      } as NgbModalRef;
-    });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+      (_dlg: unknown, _opt: unknown) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      }
+    );
     ccms.openConceptCardModal('linkedSkillId');
     expect(modalSpy).toHaveBeenCalled();
   });
@@ -315,9 +315,13 @@ describe('ConceptCardManager service', () => {
             value: 1,
           },
           placeholder: {
-            value: 'Enter text here',
+            value: {
+              content_id: 'ca_placeholder_0',
+              unicode_str: 'Enter text here',
+            },
           },
-        },
+          catchMisspellings: {value: false},
+        } as InteractionCustomizationArgs,
         answer_groups: [],
         default_outcome: null,
       },
