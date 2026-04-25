@@ -19,7 +19,28 @@
 
 import analyticsConstants from 'analytics-constants';
 
+const GTAG_SCRIPT_BASE_URL = 'https://www.googletagmanager.com/gtag/js?id=';
+const GTM_SCRIPT_BASE_URL = 'https://www.googletagmanager.com/gtm.js?id=';
+
 initializeGoogleAnalytics();
+
+function ensureScriptIsLoaded(scriptUrl: string): void {
+  const scriptElement = window.document.querySelector(
+    `script[src="${scriptUrl}"]`
+  );
+  if (scriptElement !== null) {
+    return;
+  }
+
+  const analyticsScriptElement = window.document.createElement('script');
+  analyticsScriptElement.async = true;
+  analyticsScriptElement.src = scriptUrl;
+  const headElement = window.document.head;
+  if (headElement === null) {
+    return;
+  }
+  headElement.appendChild(analyticsScriptElement);
+}
 
 export function initializeGoogleAnalytics() {
   if (!analyticsConstants.CAN_SEND_ANALYTICS_EVENTS) {
@@ -35,6 +56,9 @@ export function initializeGoogleAnalytics() {
     }
 
     if (analyticsConstants.GA_ANALYTICS_ID) {
+      ensureScriptIsLoaded(
+        `${GTAG_SCRIPT_BASE_URL}${analyticsConstants.GA_ANALYTICS_ID}`
+      );
       // The following is for gtag.js. Reference doc:
       // https://developers.google.com/analytics/devguides/collection/gtagjs
       gtag('set', 'linker', {
@@ -50,6 +74,9 @@ export function initializeGoogleAnalytics() {
     }
 
     if (analyticsConstants.GTM_ANALYTICS_ID) {
+      ensureScriptIsLoaded(
+        `${GTM_SCRIPT_BASE_URL}${analyticsConstants.GTM_ANALYTICS_ID}`
+      );
       // The following is for Google Tag Manager (gtm.js).
       window.dataLayer.push({
         'gtm.start': new Date().getTime(),
