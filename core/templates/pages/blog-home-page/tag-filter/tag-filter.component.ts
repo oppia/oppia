@@ -52,6 +52,7 @@ export class TagFilterComponent implements OnInit {
   @Input() smallScreenViewIsActive: boolean = false;
   @Input() selectedTags: string[] = [];
   @Output() selectionsChange: EventEmitter<string[]> = new EventEmitter();
+  @Output() tagFilterInputChange: EventEmitter<string> = new EventEmitter();
 
   separatorKeysCodes: number[] = [ENTER, COMMA];
   tagFilter = new FormControl('');
@@ -109,6 +110,17 @@ export class TagFilterComponent implements OnInit {
 
   ngOnInit(): void {
     this.refreshSearchDropDownTags();
+
+    this.tagFilter.valueChanges
+      .pipe(
+        startWith(this.tagFilter.value),
+        map(value => value.trim() ?? ''),
+        distinctUntilChanged()
+      )
+      .subscribe(value => {
+        this.tagFilterInputChange.emit(value);
+      });
+
     this.filteredTags
       .pipe(
         debounceTime(BlogHomePageConstants.DEBOUNCE_TIME),
