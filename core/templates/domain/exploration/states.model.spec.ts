@@ -439,7 +439,7 @@ describe('States', () => {
       State.createFromBackendDict('first state', newState)
     );
 
-    expect(newStates.getFinalStateNames()).toEqual(['new state']);
+    expect(newStates.getFinalStateNames()).toEqual(['first state']);
   });
 
   it('should correctly delete a state', () => {

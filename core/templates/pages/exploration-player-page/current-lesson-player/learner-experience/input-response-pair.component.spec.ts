@@ -73,8 +73,7 @@ describe('InputResponsePairComponent', () => {
       true
     );
 
-    // Fix argument count: remove extra argument from StateCard constructor.
-    StateCard.createNewCard(
+    const card = StateCard.createNewCard(
       'State 1',
       '<p>Content</p>',
       '<interaction></interaction>',
@@ -154,13 +153,24 @@ describe('InputResponsePairComponent', () => {
     spyOn(explorationHtmlFormatter, 'getAnswerHtml').and.returnValue(
       '<p> HTML Answer </p>'
     );
-    // Mock getCard to return a StateCard with a valid Interaction.
     spyOn(playerTranscriptService, 'getCard').and.returnValue(
       new StateCard(
         'State 1',
         '<p>Content</p>',
         '<interaction></interaction>',
-        {id: 'TextInput', customizationArgs: {}} as Interaction,
+        Interaction.createFromBackendDict({
+          id: 'TextInput',
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            rows: {value: 1},
+            placeholder: {value: {content_id: null, unicode_str: ''}},
+            catchMisspellings: {value: false},
+          },
+          default_outcome: null,
+          hints: [],
+          solution: null,
+        }),
         [],
         'content'
       )
@@ -194,13 +204,23 @@ describe('InputResponsePairComponent', () => {
     spyOn(explorationHtmlFormatter, 'getShortAnswerHtml').and.returnValue(
       'Short Answer'
     );
-    // Mock getCard to return a StateCard with a valid Interaction.
     spyOn(playerTranscriptService, 'getCard').and.returnValue(
       new StateCard(
         'State 1',
         '<p>Content</p>',
         '<interaction></interaction>',
-        {id: 'TextInput', customizationArgs: {}} as Interaction,
+        Interaction.createFromBackendDict({
+          id: 'DragAndDropSortInput',
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            choices: {value: [{content_id: null, html: ''}]},
+            allowMultipleItemsInSamePosition: {value: false},
+          },
+          default_outcome: null,
+          hints: [],
+          solution: null,
+        }),
         [],
         'content'
       )
@@ -314,6 +334,27 @@ describe('InputResponsePairComponent', () => {
     spyOn(explorationHtmlFormatter, 'getShortAnswerHtml').and.returnValue(
       'Short Answer'
     );
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(
+      new StateCard(
+        'State 1',
+        '<p>Content</p>',
+        '<interaction></interaction>',
+        Interaction.createFromBackendDict({
+          id: 'DragAndDropSortInput',
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            choices: {value: [{content_id: null, html: ''}]},
+            allowMultipleItemsInSamePosition: {value: false},
+          },
+          default_outcome: null,
+          hints: [],
+          solution: null,
+        }),
+        [],
+        'content'
+      )
+    );
 
     component.data = {
       learnerInput: '',
@@ -337,6 +378,27 @@ describe('InputResponsePairComponent', () => {
   it('should verify that the popup content its not null', () => {
     spyOn(explorationHtmlFormatter, 'getAnswerHtml').and.returnValue(
       '<p> HTML Answer </p>'
+    );
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(
+      new StateCard(
+        'State 1',
+        '<p>Content</p>',
+        '<interaction></interaction>',
+        Interaction.createFromBackendDict({
+          id: 'DragAndDropSortInput',
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            choices: {value: [{content_id: null, html: ''}]},
+            allowMultipleItemsInSamePosition: {value: false},
+          },
+          default_outcome: null,
+          hints: [],
+          solution: null,
+        }),
+        [],
+        'content'
+      )
     );
 
     component.data = {
