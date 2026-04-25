@@ -7112,10 +7112,9 @@ export class LoggedOutUser extends BaseUser {
   async selectLanguages(languages: string[]): Promise<void> {
     await this.clickOnElementWithSelector(languageFilterDropdownToggler);
 
-    for (const language of languages) {
+    for (const _ of languages) {
       const options = await this.page.$$(unselectedFilterOptionsSelector);
       for (const option of options) {
-        const text = await option.evaluate(el => el.textContent?.trim());
         await this.clickOnElement(option);
         break;
       }
