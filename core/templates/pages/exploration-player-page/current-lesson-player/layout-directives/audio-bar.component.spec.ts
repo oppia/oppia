@@ -367,7 +367,7 @@ describe('Audio Bar Component', () => {
       let contentIdToVoiceoversMappingBackendDict = {
         content0: {
           manual: manualVoiceoverBackendDict,
-          // Remove 'auto: undefined' to satisfy type
+          // Remove 'auto: undefined' to satisfy type.
         },
       };
       let entityId = 'exploration_1';
@@ -409,7 +409,7 @@ describe('Audio Bar Component', () => {
       component.voiceoverToBePlayed = undefined;
       component.updateDisplayableLanguageAccentDescription();
 
-      // Fix: Only cast to Voiceover if not undefined
+      // Fix: Only cast to Voiceover if not undefined.
       expect(
         (component.voiceoverToBePlayed as Voiceover | undefined)?.filename
       ).toEqual('a.mp3');
@@ -469,9 +469,9 @@ describe('Audio Bar Component', () => {
 
       component.voiceoverToBePlayed = undefined;
       component.updateDisplayableLanguageAccentDescription();
-      // Fix: If you must assign undefined to Voiceover, use 'as unknown as Voiceover'
+      // Fix: If you must assign undefined to Voiceover, use 'as unknown as Voiceover'.
       // component.voiceoverToBePlayed = undefined as unknown as Voiceover;
-      // Fix: Remove 'auto: undefined' from any mapping
+      // Fix: Remove 'auto: undefined' from any mapping.
       expect(
         (component.voiceoverToBePlayed as Voiceover | undefined)?.filename
       ).toEqual('b.mp3');

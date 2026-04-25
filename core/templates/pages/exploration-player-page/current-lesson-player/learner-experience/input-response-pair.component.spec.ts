@@ -25,7 +25,6 @@ import {PlayerTranscriptService} from '../../services/player-transcript.service'
 import {InputResponsePairComponent} from './input-response-pair.component';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {NgbModule, NgbPopover} from '@ng-bootstrap/ng-bootstrap';
-import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
 import {StateCard} from '../../../../domain/state_card/state-card.model';
 import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {AppConstants} from '../../../../app.constants';
@@ -74,8 +73,8 @@ describe('InputResponsePairComponent', () => {
       true
     );
 
-    // Fix argument count: remove extra argument from StateCard constructor
-    const card = StateCard.createNewCard(
+    // Fix argument count: remove extra argument from StateCard constructor.
+    StateCard.createNewCard(
       'State 1',
       '<p>Content</p>',
       '<interaction></interaction>',
@@ -155,6 +154,17 @@ describe('InputResponsePairComponent', () => {
     spyOn(explorationHtmlFormatter, 'getAnswerHtml').and.returnValue(
       '<p> HTML Answer </p>'
     );
+    // Mock getCard to return a StateCard with a valid Interaction.
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(
+      new StateCard(
+        'State 1',
+        '<p>Content</p>',
+        '<interaction></interaction>',
+        {id: 'TextInput', customizationArgs: {}} as Interaction,
+        [],
+        'content'
+      )
+    );
     component.data = {
       learnerInput: '',
       oppiaResponse: 'oppia-noninteractive-video-response',
@@ -183,6 +193,17 @@ describe('InputResponsePairComponent', () => {
   it('should get a short summary of the answer', () => {
     spyOn(explorationHtmlFormatter, 'getShortAnswerHtml').and.returnValue(
       'Short Answer'
+    );
+    // Mock getCard to return a StateCard with a valid Interaction.
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(
+      new StateCard(
+        'State 1',
+        '<p>Content</p>',
+        '<interaction></interaction>',
+        {id: 'TextInput', customizationArgs: {}} as Interaction,
+        [],
+        'content'
+      )
     );
     component.data = {
       // This throws "Type '{ answerDetails: string; }' is not assignable to

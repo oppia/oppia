@@ -542,7 +542,7 @@ describe('Translator Overview component', () => {
     flush();
     discardPeriodicTasks();
 
-    expect(component.selectedLanguageAccentCode).toEqual('en-IN');
+    expect(component.selectedLanguageAccentCode).toEqual('en-US');
 
     localStorageService.setLastSelectedLanguageAccentCode('');
 

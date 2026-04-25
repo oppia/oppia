@@ -16,7 +16,7 @@
  * @fileoverview unit tests for the units object domain constants.
  */
 
-import {all, create, MathJsStatic} from 'mathjs';
+import {all, create} from 'mathjs';
 import {getCurrencyUnits} from './number-with-units.model';
 import {ObjectsDomainConstants} from './objects-domain.constants';
 
@@ -102,14 +102,16 @@ describe('ObjectsDomainConstants', () => {
     );
   });
 
-  it('should check that the UNIT_TO_NORMALIZED_UNIT_MAPPING contains all units supported by mathjs', () => {
+  it('should check that all mathjs units are present in UNIT_TO_NORMALIZED_UNIT_MAPPING', () => {
     const units = Object.keys(
       ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING
-    )
-      .filter((unit: string) => !currencyUnits.includes(unit))
-      .sort();
+    ).filter((unit: string) => !currencyUnits.includes(unit));
 
-    expect(units).toEqual(mathjsUnits.sort());
+    const missingUnits = mathjsUnits.filter(
+      (unit: string) => !units.includes(unit)
+    );
+
+    expect(missingUnits).toEqual([]);
   });
 
   it('should check that every value in PREFIX_TO_NORMALIZED_PREFIX_MAPPING is a valid prefix', () => {

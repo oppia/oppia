@@ -83,9 +83,11 @@ describe('WrittenTranslation object factory', () => {
   });
 
   it('should throw error for an invalid data format on creation', () => {
-    expect(() => WrittenTranslation.createNew('invalid' as any)).toThrowError(
-      /Invalid translation data format: invalid/
-    );
+    expect(() =>
+      WrittenTranslation.createNew(
+        'invalid' as unknown as DataFormatToDefaultValuesKey
+      )
+    ).toThrowError(/Invalid translation data format: invalid/);
   });
 
   it('should throw error if the wrong setter is used', () => {

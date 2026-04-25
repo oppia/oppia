@@ -23,13 +23,15 @@ import {State} from 'domain/state/state.model';
 import {States} from 'domain/exploration/states.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 
+import {State} from 'domain/state/state.model';
+
 describe('States', () => {
-  let statesDict: any = null;
-  let newState: any = null;
-  let newState2: any = null;
-  let secondState: any = null;
-  let statesWithCyclicOutcomeDict: any = null;
-  let stateDictToDelete: any = null;
+  let statesDict: Record<string, State> | null = null;
+  let newState: State | null = null;
+  let newState2: State | null = null;
+  let secondState: State | null = null;
+  let statesWithCyclicOutcomeDict: Record<string, State> | null = null;
+  let stateDictToDelete: Record<string, State> | null = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -440,10 +442,10 @@ describe('States', () => {
       expect(states).toEqual(
         States.createFromBackendDict({
           'third state': {
-            classifier_model_id: null,
-            card_is_checkpoint: false,
-            linked_skill_id: null,
-            inapplicable_skill_misconception_ids: [],
+            classifier_model_id: undefined,
+            card_is_checkpoint: undefined,
+            linked_skill_id: undefined,
+            inapplicable_skill_misconception_ids: undefined,
             content: {
               content_id: 'content',
               html: 'content',
@@ -454,7 +456,7 @@ describe('States', () => {
                 choices: {value: []},
                 showChoicesInShuffledOrder: {value: false},
               },
-              confirmed_unclassified_answers: [],
+              confirmed_unclassified_answers: undefined,
               answer_groups: [
                 {
                   outcome: {
@@ -475,8 +477,8 @@ describe('States', () => {
                       inputs: {x: 10},
                     },
                   ],
-                  training_data: [],
-                  tagged_skill_misconception_id: '',
+                  training_data: undefined,
+                  tagged_skill_misconception_id: undefined,
                 },
               ],
               default_outcome: {

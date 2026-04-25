@@ -37,7 +37,6 @@ import {FormsModule} from '@angular/forms';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {StateCard} from '../../../../domain/state_card/state-card.model';
-import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
 import {
   SwitchContentLanguageRefreshRequiredModalComponent,
   // eslint-disable-next-line max-len

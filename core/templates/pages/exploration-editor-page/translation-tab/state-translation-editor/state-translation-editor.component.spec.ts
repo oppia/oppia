@@ -194,25 +194,25 @@ describe('State Translation Editor Component', () => {
         MarkAudioAsNeedingUpdateModalComponent,
         {
           backdrop: 'static',
-        },
-        undefined
+        }
       );
     });
 
     it('should not open the modal if voiceover already needs update', () => {
-      (state as any).recordedVoiceovers =
-        RecordedVoiceovers.createFromBackendDict({
-          voiceovers_mapping: {
-            content1: {
-              hi: {
-                filename: 'filename1.mp3',
-                file_size_bytes: 100,
-                needs_update: true,
-                duration_secs: 10,
-              },
+      (
+        state as unknown as {recordedVoiceovers: RecordedVoiceovers}
+      ).recordedVoiceovers = RecordedVoiceovers.createFromBackendDict({
+        voiceovers_mapping: {
+          content1: {
+            hi: {
+              filename: 'filename1.mp3',
+              file_size_bytes: 100,
+              needs_update: true,
+              duration_secs: 10,
             },
           },
-        });
+        },
+      });
       spyOn(ngbModal, 'open');
 
       component.onSaveTranslationButtonClicked();
@@ -249,8 +249,7 @@ describe('State Translation Editor Component', () => {
 
       expect(ngbModal.open).toHaveBeenCalledWith(
         MarkAudioAsNeedingUpdateModalComponent,
-        {backdrop: 'static'},
-        undefined
+        {backdrop: 'static'}
       );
     });
 

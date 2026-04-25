@@ -46,7 +46,6 @@ import {SchemaFormSubmittedService} from '../../../../services/schema-form-submi
 import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {Interaction} from '../../../../domain/exploration/interaction.model';
-import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
 
 describe('Progress nav component', () => {
   let fixture: ComponentFixture<ProgressNavComponent>;

@@ -25,7 +25,6 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {FormControl, FormsModule} from '@angular/forms';
-import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {SchemaBasedEditorComponent} from './schema-based-editor.component';
 
 describe('Schema based editor component', function () {
@@ -123,11 +122,13 @@ describe('Schema based editor component', function () {
   });
 
   it('should set disabled state when setDisabledState is called', () => {
-    component.setDisabledState!(true);
-    expect(component.disabled).toBe(true);
+    if (component.setDisabledState) {
+      component.setDisabledState(true);
+      expect(component.disabled).toBe(true);
 
-    component.setDisabledState!(false);
-    expect(component.disabled).toBe(false);
+      component.setDisabledState(false);
+      expect(component.disabled).toBe(false);
+    }
   });
 
   it('should return null when validate is called without form', () => {

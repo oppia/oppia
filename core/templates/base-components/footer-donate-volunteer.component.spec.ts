@@ -125,7 +125,12 @@ describe('FooterDonateVolunteerComponent', () => {
   it('should prevent default navigation for Donate link', fakeAsync(() => {
     const donateLink = document.createElement('a');
     donateLink.setAttribute('href', '/donate');
-    (component as any).el.nativeElement.appendChild(donateLink);
+    (
+      component as FooterDonateVolunteerComponent & {
+        el: ElementRef;
+        renderer: Renderer2;
+      }
+    ).el.nativeElement.appendChild(donateLink);
     component.ngAfterViewInit();
     tick();
     const event = new MouseEvent('click', {
@@ -143,7 +148,12 @@ describe('FooterDonateVolunteerComponent', () => {
   it('should prevent default navigation for Volunteer link', fakeAsync(() => {
     const volunteerLink = document.createElement('a');
     volunteerLink.setAttribute('href', '/volunteer');
-    (component as any).el.nativeElement.appendChild(volunteerLink);
+    (
+      component as FooterDonateVolunteerComponent & {
+        el: ElementRef;
+        renderer: Renderer2;
+      }
+    ).el.nativeElement.appendChild(volunteerLink);
     component.ngAfterViewInit();
     tick();
     const event = new MouseEvent('click', {
@@ -163,10 +173,25 @@ describe('FooterDonateVolunteerComponent', () => {
     donateLink.setAttribute('href', '/donate');
     const volunteerLink = document.createElement('a');
     volunteerLink.setAttribute('href', '/volunteer');
-    (component as any).el.nativeElement.appendChild(donateLink);
-    (component as any).el.nativeElement.appendChild(volunteerLink);
+    (
+      component as FooterDonateVolunteerComponent & {
+        el: ElementRef;
+        renderer: Renderer2;
+      }
+    ).el.nativeElement.appendChild(donateLink);
+    (
+      component as FooterDonateVolunteerComponent & {
+        el: ElementRef;
+        renderer: Renderer2;
+      }
+    ).el.nativeElement.appendChild(volunteerLink);
     const rendererListenSpy = spyOn(
-      (component as any).renderer,
+      (
+        component as FooterDonateVolunteerComponent & {
+          el: ElementRef;
+          renderer: Renderer2;
+        }
+      ).renderer,
       'listen'
     ).and.callThrough();
     component.ngAfterViewInit();
