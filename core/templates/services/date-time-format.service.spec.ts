@@ -44,7 +44,6 @@ describe('datetimeformatter', () => {
     // suppress this error because the actual 'Date' has more properties than
     // 'MockDateContructor'. We have only defined the properties we need in
     // 'MockDateContructor'.
-    // @ts-expect-error
     spyOn(window, 'Date').and.callFake(MockDateContructor);
   });
 
