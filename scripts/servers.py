@@ -753,12 +753,6 @@ def managed_portserver() -> Iterator[psutil.Process]:
             except Exception as e:
                 logging.error('Final kill attempt failed: %s' % e)
 
-            try:
-                if os.path.exists(common.PORTSERVER_SOCKET_FILEPATH):
-                    os.remove(common.PORTSERVER_SOCKET_FILEPATH)
-            except Exception as e:
-                logging.error('Failed to remove portserver socket file: %s' % e)
-
 
 @contextlib.contextmanager
 def managed_webdriverio_server(
