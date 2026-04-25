@@ -73,12 +73,12 @@ describe('InputResponsePairComponent', () => {
       true
     );
 
-    const card = StateCard.createNewCard(
+    StateCard.createNewCard(
       'State 1',
       '<p>Content</p>',
       '<interaction></interaction>',
       Interaction.createFromBackendDict({
-        id: 'GraphInput',
+        id: 'TextInput',
         answer_groups: [
           {
             outcome: {
@@ -100,25 +100,17 @@ describe('InputResponsePairComponent', () => {
         ],
         default_outcome: null,
         customization_args: {
-          rows: {
-            value: true,
-          },
+          rows: {value: 1},
           placeholder: {
-            value: 1,
+            value: {
+              content_id: 'placeholder',
+              unicode_str: 'Type here',
+            },
           },
-          catchMisspellings: {
-            value: false,
-          },
+          catchMisspellings: {value: false},
         },
         hints: [],
-        solution: {
-          answer_is_exclusive: true,
-          correct_answer: 'test_answer',
-          explanation: {
-            content_id: '2',
-            html: 'test_explanation1',
-          },
-        },
+        solution: null,
         confirmed_unclassified_answers: [],
       }),
       'content'

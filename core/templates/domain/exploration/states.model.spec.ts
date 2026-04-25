@@ -160,7 +160,30 @@ describe('States', () => {
       },
       interaction: {
         id: 'TextInput',
-        answer_groups: [],
+        answer_groups: [
+          {
+            outcome: {
+              dest: 'new state',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_1',
+                html: '<p>Good.</p>',
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+            },
+            rule_specs: [
+              {
+                rule_type: 'Equals',
+                inputs: {x: 42},
+              },
+            ],
+            training_data: [],
+            tagged_skill_misconception_id: null,
+          },
+        ],
         confirmed_unclassified_answers: [],
         customization_args: {
           placeholder: {
@@ -267,6 +290,7 @@ describe('States', () => {
 
       'second state': {
         classifier_model_id: null,
+        inapplicable_skill_misconception_ids: null,
         content: {
           content_id: 'content',
           html: 'content',
@@ -281,7 +305,7 @@ describe('States', () => {
             {
               outcome: {
                 dest: 'first state',
-                dest_if_really_stuck: 'first state',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_1',
                   html: '',
@@ -321,10 +345,8 @@ describe('States', () => {
         param_changes: [],
         solicit_answer_details: false,
         card_is_checkpoint: false,
-        inapplicable_skill_misconception_ids: null,
       },
     };
-
     stateDictToDelete = {
       'first state': {
         classifier_model_id: null,
@@ -462,7 +484,10 @@ describe('States', () => {
     expect(stateObjects.length).toBe(Object.keys(statesDict).length);
 
     expect(stateObjects[0]).toEqual(
-      State.createFromBackendDict('first state', newState2)
+      State.createFromBackendDict('first state', {
+        ...newState2,
+        inapplicable_skill_misconception_ids: null,
+      })
     );
   });
 
