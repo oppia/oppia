@@ -160,6 +160,10 @@ describe('Mark Translations As Needing Update Modal Component', () => {
 
   it('should cancel ModifyTranslations modal', () => {
     component.contentId = 'content1';
+    ngbModalRef = {
+      componentInstance: {},
+      result: undefined,
+    } as unknown as NgbModalRef;
     ngbModalRef.result = Promise.reject().catch(() => {});
     const modalSpy = spyOn(ngbModal, 'open').and.returnValue(ngbModalRef);
     spyOn(component, 'doesContentHaveDisplayableTranslations').and.returnValue(
