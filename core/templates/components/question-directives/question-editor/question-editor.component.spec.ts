@@ -146,6 +146,7 @@ describe('Question Editor Component', () => {
         solicit_answer_details: false,
         card_is_checkpoint: false,
         linked_skill_id: null,
+        inapplicable_skill_misconception_ids: null,
       },
       next_content_id_index: 1,
       inapplicable_skill_misconception_ids: [],
@@ -158,7 +159,7 @@ describe('Question Editor Component', () => {
     component.questionStateData = question.getStateData();
 
     spyOn(questionUpdateService, 'setQuestionStateData').and.callFake(
-      (question, update) => {
+      (question: Question, update: () => void) => {
         update();
       }
     );

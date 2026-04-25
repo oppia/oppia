@@ -57,16 +57,16 @@ describe('Schema based editor component', function () {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = function (value: SchemaDefaultValue) {
-      return value;
-    };
-    component.registerOnChange(mockFunction);
-    component.registerOnTouched();
+    const onChangeSpy = jasmine.createSpy('onChange');
+    component.registerOnChange(onChangeSpy);
+    component.registerOnTouched(() => {});
 
     expect(component).toBeDefined();
     expect(component.validate(new FormControl(1))).toEqual(null);
-    expect(component.onChange).toEqual(mockFunction);
-    expect(component.onChange(19)).toEqual(19);
+
+    component.localValue = 19;
+
+    expect(onChangeSpy).toHaveBeenCalledWith(19);
   }));
 
   it('should write value', () => {
@@ -123,11 +123,11 @@ describe('Schema based editor component', function () {
   });
 
   it('should set disabled state when setDisabledState is called', () => {
-    component.setDisabledState(true);
-    expect(component.disabled).toBeTrue();
+    component.setDisabledState!(true);
+    expect(component.disabled).toBe(true);
 
-    component.setDisabledState(false);
-    expect(component.disabled).toBeFalse();
+    component.setDisabledState!(false);
+    expect(component.disabled).toBe(false);
   });
 
   it('should return null when validate is called without form', () => {

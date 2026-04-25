@@ -53,6 +53,7 @@ describe('Read only exploration backend API service', () => {
           solicit_answer_details: true,
           card_is_checkpoint: true,
           linked_skill_id: null,
+          inapplicable_skill_misconception_ids: [],
           content: {
             html: '',
             content_id: 'content',

@@ -67,7 +67,7 @@ describe('Translation topic service', () => {
         'Invalid active topic name: Topic 3'
       );
 
-      translationTopicService.setActiveTopicName(null);
+      translationTopicService.setActiveTopicName(null as unknown as string);
       tick();
       expect(translationTopicService.getActiveTopicName()).toBeUndefined();
     }));

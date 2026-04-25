@@ -72,7 +72,6 @@ describe('Topic creation backend api service', () => {
     // is not assignable to parameter of type 'PromiseLike<string>'.".
     // We need to suppress this error because we need to mock the
     // `getTokenAsync` function for testing purposes.
-    // @ts-expect-error
     spyOn(csrfService, 'getTokenAsync').and.returnValue(async () => {
       return new Promise(resolve => {
         resolve('sample-csrf-token');

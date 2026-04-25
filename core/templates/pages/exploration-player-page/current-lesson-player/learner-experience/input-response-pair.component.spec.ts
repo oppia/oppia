@@ -74,69 +74,56 @@ describe('InputResponsePairComponent', () => {
       true
     );
 
-    spyOn(playerTranscriptService, 'getCard').and.returnValue(
-      StateCard.createNewCard(
-        'State 2',
-        '<p>Content</p>',
-        '<interaction></interaction>',
-        Interaction.createFromBackendDict({
-          id: 'GraphInput',
-          answer_groups: [
-            {
-              outcome: {
-                dest: 'State',
-                dest_if_really_stuck: null,
-                feedback: {
-                  html: '',
-                  content_id: 'This is a new feedback text',
-                },
-                refresher_exploration_id: 'test',
-                missing_prerequisite_skill_id: 'test_skill_id',
-                labelled_as_correct: true,
-                param_changes: [],
+    // Fix argument count: remove extra argument from StateCard constructor
+    const card = StateCard.createNewCard(
+      'State 1',
+      '<p>Content</p>',
+      '<interaction></interaction>',
+      Interaction.createFromBackendDict({
+        id: 'GraphInput',
+        answer_groups: [
+          {
+            outcome: {
+              dest: 'State',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: '1',
+                html: '',
               },
-              rule_specs: [],
-              training_data: [],
-              tagged_skill_misconception_id: '',
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
             },
-          ],
-          default_outcome: {
-            dest: 'Hola',
-            dest_if_really_stuck: null,
-            feedback: {
-              content_id: '',
-              html: '',
-            },
-            labelled_as_correct: true,
-            param_changes: [],
-            refresher_exploration_id: 'test',
-            missing_prerequisite_skill_id: 'test_skill_id',
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: null,
           },
-          confirmed_unclassified_answers: [],
-          customization_args: {
-            rows: {
-              value: true,
-            },
-            placeholder: {
-              value: 1,
-            },
-            catchMisspellings: {
-              value: false,
-            },
+        ],
+        default_outcome: null,
+        customization_args: {
+          rows: {
+            value: true,
           },
-          hints: [],
-          solution: {
-            answer_is_exclusive: true,
-            correct_answer: 'test_answer',
-            explanation: {
-              content_id: '2',
-              html: 'test_explanation1',
-            },
+          placeholder: {
+            value: 1,
           },
-        }),
-        RecordedVoiceovers.createEmpty(),
-        'content'
-      )
+          catchMisspellings: {
+            value: false,
+          },
+        },
+        hints: [],
+        solution: {
+          answer_is_exclusive: true,
+          correct_answer: 'test_answer',
+          explanation: {
+            content_id: '2',
+            html: 'test_explanation1',
+          },
+        },
+        confirmed_unclassified_answers: [],
+      }),
+      'content'
     );
   });
 
@@ -160,7 +147,7 @@ describe('InputResponsePairComponent', () => {
         isHint: true,
       };
 
-      expect(component.isVideoRteElementPresentInResponse()).toBeFalse();
+      expect(component.isVideoRteElementPresentInResponse()).toBeFalsy();
     }
   );
 

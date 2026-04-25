@@ -280,32 +280,20 @@ describe('Content language selector component', () => {
               dest: 'State',
               dest_if_really_stuck: null,
               feedback: {
+                content_id: '1',
                 html: '',
-                content_id: 'This is a new feedback text',
               },
-              refresher_exploration_id: 'test',
-              missing_prerequisite_skill_id: 'test_skill_id',
-              labelled_as_correct: true,
+              labelled_as_correct: false,
               param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
             },
             rule_specs: [],
             training_data: [],
-            tagged_skill_misconception_id: '',
+            tagged_skill_misconception_id: null,
           },
         ],
-        default_outcome: {
-          dest: 'Hola',
-          dest_if_really_stuck: null,
-          feedback: {
-            content_id: '',
-            html: '',
-          },
-          labelled_as_correct: true,
-          param_changes: [],
-          refresher_exploration_id: 'test',
-          missing_prerequisite_skill_id: 'test_skill_id',
-        },
-        confirmed_unclassified_answers: [],
+        default_outcome: null,
         customization_args: {
           rows: {
             value: true,
@@ -323,8 +311,8 @@ describe('Content language selector component', () => {
             html: 'test_explanation1',
           },
         },
+        confirmed_unclassified_answers: [],
       }),
-      RecordedVoiceovers.createEmpty(),
       'content'
     );
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
@@ -369,31 +357,20 @@ describe('Content language selector component', () => {
                 dest: 'State',
                 dest_if_really_stuck: null,
                 feedback: {
+                  content_id: '1',
                   html: '',
-                  content_id: 'This is a new feedback text',
                 },
-                refresher_exploration_id: 'test',
-                missing_prerequisite_skill_id: 'test_skill_id',
-                labelled_as_correct: true,
+                labelled_as_correct: false,
                 param_changes: [],
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
               },
               rule_specs: [],
               training_data: [],
-              tagged_skill_misconception_id: '',
+              tagged_skill_misconception_id: null,
             },
           ],
-          default_outcome: {
-            dest: 'Hola',
-            dest_if_really_stuck: null,
-            feedback: {
-              content_id: '',
-              html: '',
-            },
-            labelled_as_correct: true,
-            param_changes: [],
-            refresher_exploration_id: 'test',
-            missing_prerequisite_skill_id: 'test_skill_id',
-          },
+          default_outcome: null,
           confirmed_unclassified_answers: [],
           customization_args: {
             rows: {
@@ -413,7 +390,6 @@ describe('Content language selector component', () => {
             },
           },
         }),
-        RecordedVoiceovers.createEmpty(),
         'content'
       );
       card.addInputResponsePair({

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for objects domain.
+  UNIT_TO_NORMALIZED_UNIT_MAPPING: {
  */
 
 export const ObjectsDomainConstants = {

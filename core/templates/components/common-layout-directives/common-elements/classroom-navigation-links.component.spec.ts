@@ -35,8 +35,8 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 describe('ClassroomNavigationLinksComponent', () => {
   let component: ClassroomNavigationLinksComponent;
   let fixture: ComponentFixture<ClassroomNavigationLinksComponent>;
-  let classroomBackendApiService: ClassroomBackendApiService;
-  let assetsBackendApiService: AssetsBackendApiService;
+  let classroomBackendApiService: jasmine.SpyObj<ClassroomBackendApiService>;
+  let assetsBackendApiService: jasmine.SpyObj<AssetsBackendApiService>;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let siteAnalyticsService: SiteAnalyticsService;
 
@@ -104,8 +104,12 @@ describe('ClassroomNavigationLinksComponent', () => {
       ],
     }).compileComponents();
 
-    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
-    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+    classroomBackendApiService = TestBed.inject(
+      ClassroomBackendApiService
+    ) as jasmine.SpyObj<ClassroomBackendApiService>;
+    assetsBackendApiService = TestBed.inject(
+      AssetsBackendApiService
+    ) as jasmine.SpyObj<AssetsBackendApiService>;
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
@@ -121,14 +125,14 @@ describe('ClassroomNavigationLinksComponent', () => {
     );
 
     expect(component.classroomSummaries.length).toEqual(0);
-    expect(component.isLoading).toBeTrue();
+    expect(component.isLoading).toBe(true);
 
     component.ngOnInit();
     tick();
 
     // It should store all public classrooms.
     expect(component.classroomSummaries.length).toEqual(3);
-    expect(component.isLoading).toBeFalse();
+    expect(component.isLoading).toBe(false);
   }));
 
   it('should get classroom thumbnail', () => {
@@ -175,7 +179,7 @@ describe('ClassroomNavigationLinksComponent', () => {
     const result =
       component.isHackyClassroomNameTranslationDisplayed(classroomName);
 
-    expect(result).toBeTrue();
+    expect(result).toBe(true);
     expect(
       i18nLanguageCodeService.isClassroomnNameTranslationAvailable
     ).toHaveBeenCalledWith(classroomName);
@@ -204,7 +208,7 @@ describe('ClassroomNavigationLinksComponent', () => {
       classroomBackendApiService.getAllClassroomsSummaryAsync
     ).not.toHaveBeenCalled();
     expect(component.classroomSummaries).toEqual([]);
-    expect(component.isLoading).toBeTrue();
+    expect(component.isLoading).toBe(true);
   }));
 
   it('should return the correct number of classrooms from getClassroomCount', () => {

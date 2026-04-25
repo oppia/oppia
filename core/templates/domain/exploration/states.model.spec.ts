@@ -24,12 +24,12 @@ import {States} from 'domain/exploration/states.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 
 describe('States', () => {
-  let statesDict = null;
-  let newState = null;
-  let newState2 = null;
-  let secondState = null;
-  let statesWithCyclicOutcomeDict = null;
-  let stateDictToDelete = null;
+  let statesDict: any = null;
+  let newState: any = null;
+  let newState2: any = null;
+  let secondState: any = null;
+  let statesWithCyclicOutcomeDict: any = null;
+  let stateDictToDelete: any = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -177,6 +177,8 @@ describe('States', () => {
           },
           labelled_as_correct: false,
           param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
         },
         hints: [],
         solution: {
@@ -222,6 +224,7 @@ describe('States', () => {
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
               },
               rule_specs: [
                 {
@@ -240,6 +243,8 @@ describe('States', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
           },
           hints: [],
           solution: null,
@@ -270,6 +275,7 @@ describe('States', () => {
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
               },
               rule_specs: [
                 {
@@ -288,6 +294,8 @@ describe('States', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
           },
           hints: [],
           solution: null,
@@ -399,7 +407,7 @@ describe('States', () => {
       'first state',
       State.createFromBackendDict('first state', newState)
     );
-    expect(newStates.getFinalStateNames()).toEqual['new state'];
+    expect(newStates.getFinalStateNames()).toEqual(['new state']);
   });
 
   it('should correctly delete a state', () => {
@@ -432,6 +440,10 @@ describe('States', () => {
       expect(states).toEqual(
         States.createFromBackendDict({
           'third state': {
+            classifier_model_id: null,
+            card_is_checkpoint: false,
+            linked_skill_id: null,
+            inapplicable_skill_misconception_ids: [],
             content: {
               content_id: 'content',
               html: 'content',
@@ -442,6 +454,7 @@ describe('States', () => {
                 choices: {value: []},
                 showChoicesInShuffledOrder: {value: false},
               },
+              confirmed_unclassified_answers: [],
               answer_groups: [
                 {
                   outcome: {
@@ -454,6 +467,7 @@ describe('States', () => {
                     labelled_as_correct: false,
                     param_changes: [],
                     refresher_exploration_id: null,
+                    missing_prerequisite_skill_id: null,
                   },
                   rule_specs: [
                     {
@@ -461,6 +475,8 @@ describe('States', () => {
                       inputs: {x: 10},
                     },
                   ],
+                  training_data: [],
+                  tagged_skill_misconception_id: '',
                 },
               ],
               default_outcome: {
@@ -472,6 +488,8 @@ describe('States', () => {
                 },
                 labelled_as_correct: false,
                 param_changes: [],
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
               },
               hints: [],
               solution: null,

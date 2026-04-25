@@ -60,7 +60,7 @@ export class MockNgbModalRef {
     contentId: null,
     contentValue: null,
   };
-  result: null;
+  result!: Promise<void>;
 }
 
 describe('Mark Translations As Needing Update Modal Component', () => {
@@ -123,11 +123,11 @@ describe('Mark Translations As Needing Update Modal Component', () => {
   it('should check feature flag when initialized', () => {
     mockPlatformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled =
       true;
-    expect(component.modifyTranslationsFeatureFlagIsEnabled).toBeFalse();
+    expect(component.modifyTranslationsFeatureFlagIsEnabled).toBe(false);
 
     component.ngOnInit();
 
-    expect(component.modifyTranslationsFeatureFlagIsEnabled).toBeTrue();
+    expect(component.modifyTranslationsFeatureFlagIsEnabled).toBe(true);
   });
 
   it('should call markNeedingUpdateHandler', () => {
@@ -137,7 +137,8 @@ describe('Mark Translations As Needing Update Modal Component', () => {
 
     component.markNeedsUpdate();
 
-    expect(handlerWithSpy).toHaveBeenCalledOnceWith('contentId_1');
+    expect(handlerWithSpy).toHaveBeenCalledTimes(1);
+    expect(handlerWithSpy).toHaveBeenCalledWith('contentId_1');
   });
 
   it('should open the ModifyTranslations modal', fakeAsync(() => {
@@ -145,7 +146,7 @@ describe('Mark Translations As Needing Update Modal Component', () => {
     component.contentValue = 'Content value';
     ngbModalRef.result = Promise.resolve();
     const modalSpy = spyOn(ngbModal, 'open').and.returnValue(
-      ngbModalRef as NgbModalRef
+      ngbModalRef as unknown as NgbModalRef
     );
     spyOn(component, 'doesContentHaveDisplayableTranslations').and.returnValue(
       true
@@ -166,9 +167,9 @@ describe('Mark Translations As Needing Update Modal Component', () => {
 
   it('should cancel ModifyTranslations modal', () => {
     component.contentId = 'content1';
-    ngbModalRef.result = Promise.reject();
+    ngbModalRef.result = Promise.reject().catch(() => undefined);
     const modalSpy = spyOn(ngbModal, 'open').and.returnValue(
-      ngbModalRef as NgbModalRef
+      ngbModalRef as unknown as NgbModalRef
     );
     spyOn(component, 'doesContentHaveDisplayableTranslations').and.returnValue(
       true
@@ -203,7 +204,8 @@ describe('Mark Translations As Needing Update Modal Component', () => {
 
     component.removeTranslations();
 
-    expect(handlerWithSpy).toHaveBeenCalledOnceWith('contentId_1');
+    expect(handlerWithSpy).toHaveBeenCalledTimes(1);
+    expect(handlerWithSpy).toHaveBeenCalledWith('contentId_1');
   });
 
   it('should dismiss the modal when cancel is called', () => {

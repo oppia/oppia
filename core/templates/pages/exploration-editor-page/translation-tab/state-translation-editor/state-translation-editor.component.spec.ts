@@ -177,10 +177,11 @@ describe('State Translation Editor Component', () => {
           content_0: {
             manual: manualVoiceover1,
           },
-        }
+        },
+        {}
       );
 
-      entityVoiceoversService.init('exp_id', 'exploration', 5);
+      entityVoiceoversService.init('exp_id', 'exploration', 5, 'hi');
       entityVoiceoversService.setLanguageCode('hi');
       entityVoiceoversService.setActiveLanguageAccentCode('hi-IN');
       entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
@@ -193,23 +194,25 @@ describe('State Translation Editor Component', () => {
         MarkAudioAsNeedingUpdateModalComponent,
         {
           backdrop: 'static',
-        }
+        },
+        undefined
       );
     });
 
     it('should not open the modal if voiceover already needs update', () => {
-      state.recordedVoiceovers = RecordedVoiceovers.createFromBackendDict({
-        voiceovers_mapping: {
-          content1: {
-            hi: {
-              filename: 'filename1.mp3',
-              file_size_bytes: 100,
-              needs_update: true,
-              duration_secs: 10,
+      (state as any).recordedVoiceovers =
+        RecordedVoiceovers.createFromBackendDict({
+          voiceovers_mapping: {
+            content1: {
+              hi: {
+                filename: 'filename1.mp3',
+                file_size_bytes: 100,
+                needs_update: true,
+                duration_secs: 10,
+              },
             },
           },
-        },
-      });
+        });
       spyOn(ngbModal, 'open');
 
       component.onSaveTranslationButtonClicked();
@@ -229,10 +232,11 @@ describe('State Translation Editor Component', () => {
           content_0: {
             manual: manualVoiceover1,
           },
-        }
+        },
+        {}
       );
 
-      entityVoiceoversService.init('exp_id', 'exploration', 5);
+      entityVoiceoversService.init('exp_id', 'exploration', 5, 'hi');
       entityVoiceoversService.setLanguageCode('hi');
       entityVoiceoversService.setActiveLanguageAccentCode('hi-IN');
       entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
@@ -245,7 +249,8 @@ describe('State Translation Editor Component', () => {
 
       expect(ngbModal.open).toHaveBeenCalledWith(
         MarkAudioAsNeedingUpdateModalComponent,
-        {backdrop: 'static'}
+        {backdrop: 'static'},
+        undefined
       );
     });
 
@@ -266,7 +271,7 @@ describe('State Translation Editor Component', () => {
         entityTranslationsService.languageCodeToLatestEntityTranslations.hi.translationMapping.hasOwnProperty(
           'content1'
         )
-      ).toBeTrue();
+      ).toBeTruthy();
 
       component.activeWrittenTranslation = TranslatedContent.createNew('html');
       component.activeWrittenTranslation.translation = '';
@@ -277,7 +282,7 @@ describe('State Translation Editor Component', () => {
         entityTranslationsService.languageCodeToLatestEntityTranslations.hi.translationMapping.hasOwnProperty(
           'content1'
         )
-      ).toBeFalse();
+      ).toBeFalsy();
     });
 
     it('should refresh the translation status', () => {
