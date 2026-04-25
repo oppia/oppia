@@ -197,7 +197,7 @@ def _collect_study_guide_changes(
     """
     # Remove union and StudyGuideChange once the study
     # guide logic when updating a subtopic page is
-    # removed from line 478.
+    # removed from line 482.
     update_study_guide_property_cmd: Union[
         study_guide_domain.UpdateStudyGuidePropertyCmd,
         study_guide_domain.StudyGuideChange,
@@ -230,7 +230,11 @@ def _apply_study_guide_change(
         str, List[subtopic_page_domain.SubtopicPageChange]
     ],
 ) -> None:
-    """Applies study guide updates from the second mutation loop.
+    """Applies a study guide property update for an existing subtopic.
+
+    For section updates, this validates and updates the study guide sections,
+    then keeps the linked subtopic page in sync by updating its HTML and
+    recording the matching subtopic page change command.
 
     Args:
         change: BaseChange. Incoming study guide update command.
