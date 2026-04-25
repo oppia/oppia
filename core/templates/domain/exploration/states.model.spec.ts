@@ -491,6 +491,94 @@ describe('States', () => {
     );
   });
 
+  it('should update destIfReallyStuck in answer groups when renaming a state', () => {
+    const statesDictWithStuck = {
+      'old state': {
+        classifier_model_id: null,
+        content: {content_id: 'content', html: ''},
+        interaction: {
+          id: 'TextInput',
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'other state',
+                dest_if_really_stuck: 'old state',
+                feedback: {content_id: 'feedback_1', html: ''},
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
+              },
+              rule_specs: [{rule_type: 'Equals', inputs: {x: 1}}],
+              training_data: [],
+              tagged_skill_misconception_id: null,
+            },
+          ],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            rows: {value: 1},
+            placeholder: {value: {content_id: 'placeholder', unicode_str: ''}},
+            catchMisspellings: {value: false},
+          },
+          default_outcome: {
+            dest: 'other state',
+            dest_if_really_stuck: null,
+            feedback: {content_id: 'default_outcome', html: ''},
+            param_changes: [],
+            labelled_as_correct: false,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
+          },
+          hints: [],
+          solution: null,
+        },
+        linked_skill_id: null,
+        param_changes: [],
+        solicit_answer_details: false,
+        card_is_checkpoint: false,
+        inapplicable_skill_misconception_ids: null,
+      },
+      'other state': {
+        classifier_model_id: null,
+        content: {content_id: 'content', html: ''},
+        interaction: {
+          id: 'TextInput',
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            rows: {value: 1},
+            placeholder: {value: {content_id: 'placeholder', unicode_str: ''}},
+            catchMisspellings: {value: false},
+          },
+          default_outcome: {
+            dest: 'old state',
+            dest_if_really_stuck: null,
+            feedback: {content_id: 'default_outcome', html: ''},
+            param_changes: [],
+            labelled_as_correct: false,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
+          },
+          hints: [],
+          solution: null,
+        },
+        linked_skill_id: null,
+        param_changes: [],
+        solicit_answer_details: false,
+        card_is_checkpoint: false,
+        inapplicable_skill_misconception_ids: null,
+      },
+    };
+
+    const states = States.createFromBackendDict(statesDictWithStuck);
+    states.renameState('old state', 'new state');
+    // The answer group outcome's destIfReallyStuck should now be 'new state'.
+    expect(
+      states.getState('new state').interaction.answerGroups[0].outcome
+        .destIfReallyStuck
+    ).toBe('new state');
+  });
+
   it(
     "should correctly set any states' interaction.defaultOutcomes that " +
       'point to a deleted or renamed state name',
