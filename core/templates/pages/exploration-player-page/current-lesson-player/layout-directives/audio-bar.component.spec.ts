@@ -367,7 +367,6 @@ describe('Audio Bar Component', () => {
       let contentIdToVoiceoversMappingBackendDict = {
         content0: {
           manual: manualVoiceoverBackendDict,
-          // Remove 'auto: undefined' to satisfy type.
         },
       };
       let entityId = 'exploration_1';
