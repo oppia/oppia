@@ -27,6 +27,7 @@ import {UserService} from 'services/user.service';
 @Component({
   selector: 'oppia-release-coordinator-navbar',
   templateUrl: './release-coordinator-navbar.component.html',
+  styleUrls: ['./release-coordinator-navbar.component.css']
 })
 export class ReleaseCoordinatorNavbarComponent implements OnInit {
   @Output() activeTabChange = new EventEmitter();

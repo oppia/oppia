@@ -35,6 +35,7 @@ import {LearnerLocalNavBackendApiService} from '../../services/learner-local-nav
 @Component({
   selector: 'oppia-learner-local-nav',
   templateUrl: './learner-local-nav.component.html',
+  styleUrls: ['./learner-local-nav.component.css']
 })
 export class LearnerLocalNavComponent implements OnInit {
   canEdit: boolean = false;

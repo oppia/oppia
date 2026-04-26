@@ -40,6 +40,7 @@ import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-red
 @Component({
   selector: 'oppia-skill-editor-page',
   templateUrl: './skill-editor-page.component.html',
+  styleUrls: ['./skill-editor-page.component.css']
 })
 export class SkillEditorPageComponent implements OnInit {
   constructor(

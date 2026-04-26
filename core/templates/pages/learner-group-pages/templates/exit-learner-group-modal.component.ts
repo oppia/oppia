@@ -23,6 +23,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 @Component({
   selector: 'oppia-exit-learner-group-modal',
   templateUrl: './exit-learner-group-modal.component.html',
+  styleUrls: ['./exit-learner-group-modal.component.css']
 })
 export class ExitLearnerGroupModalComponent extends ConfirmOrCancelModal {
   learnerGroupTitle!: string;

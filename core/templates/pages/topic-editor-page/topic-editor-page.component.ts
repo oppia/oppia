@@ -36,6 +36,7 @@ import {TopicEditorStateService} from './services/topic-editor-state.service';
 @Component({
   selector: 'oppia-topic-editor-page',
   templateUrl: './topic-editor-page.component.html',
+  styleUrls: ['./topic-editor-page.component.css']
 })
 export class TopicEditorPageComponent implements OnInit, OnDestroy {
   topic: Topic | null = null;

@@ -43,6 +43,7 @@ import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
 @Component({
   selector: 'oppia-question-suggestion-editor-modal',
   templateUrl: './question-suggestion-editor-modal.component.html',
+  styleUrls: ['./question-suggestion-editor-modal.component.css']
 })
 export class QuestionSuggestionEditorModalComponent
   extends ConfirmOrCancelModal

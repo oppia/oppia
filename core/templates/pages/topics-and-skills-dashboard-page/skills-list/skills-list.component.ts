@@ -51,6 +51,7 @@ interface MergeModalResult {
 @Component({
   selector: 'oppia-skills-list',
   templateUrl: './skills-list.component.html',
+  styleUrls: ['./skills-list.component.css']
 })
 export class SkillsListComponent {
   // These properties below are initialized using Angular lifecycle hooks

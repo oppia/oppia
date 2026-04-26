@@ -1,0 +1,277 @@
+.list-view-item {
+    background: #fff;
+    box-shadow: none;
+    margin-top: 50px;
+  }
+  .topics-list-mobile {
+    display: none;
+  }
+  .dashboard-table-index-column, .dashboard-table-index-col {
+    width: 5%;
+  }
+  .dashboard-table-name-column {
+    width: 35%;
+  }
+  .dashboard-table-story-column {
+    width: 10%;
+  }
+  .dashboard-table-subtopic-column, .dashboard-table-subtopic-col {
+    width: 10%;
+  }
+  .dashboard-table-skill-column, .dashboard-table-skill-col {
+    width: 10%;
+  }
+  .dashboard-table-status-column {
+    width: 8%;
+  }
+  .dashboard-table-name-col {
+    width: 20%;
+  }
+  .dashboard-table-added-stories-col {
+    width: 12%;
+  }
+  .dashboard-table-published-stories-col, .dashboard-table-notifications-col {
+    width: 17%;
+  }
+  .dashboard-table-status-col {
+    width: 10%;
+  }
+  .dashboard-table {
+    font-size: 15px;
+    width: 100%;
+  }
+  .topic-list-status {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+  }
+  .topic-status {
+    margin-right: 15px;
+  }
+  .topic-edit-box-icon {
+    cursor: pointer;
+    margin: 0 10%;
+  }
+  .topic-edit-options {
+    background-color: #fff;
+    border: 1px solid #000;
+    display: flex;
+    flex-wrap: wrap;
+    position: absolute;
+    right: 0;
+    top: 40px;
+    width: 120px;
+  }
+  .topic-edit-options a {
+    display: block;
+    padding: 5px;
+    padding-left: 10px;
+    text-align: left;
+    text-decoration: none;
+    width: 100%;
+  }
+
+  .topic-edit-options div {
+    display: block;
+    width: 100%;
+  }
+
+  .topic-edit-options span {
+    padding-left: 8px;
+  }
+  .topic-primary-information-container {
+    height: 100%;
+    overflow: auto;
+  }
+  .topic-action-cell {
+    position: relative;
+  }
+  .topic-action-cell .topic-edit-options {
+    left: auto;
+    right: 0;
+  }
+  .topic-edit-options-edit {
+    border-bottom: 1px solid #000;
+    color: inherit;
+    text-decoration: none;
+  }
+  .topic-edit-options a:hover,
+  .topic-edit-options a:active,
+  .topic-edit-options a:visited {
+    background-color: #e6e6e6;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .dashboard-table .dashboard-table-headings {
+    border-bottom: 2px solid #bbb;
+    padding-bottom: 0.7em;
+    text-align: center;
+  }
+
+  .dashboard-table .dashboard-table-headings p {
+    display: inline;
+  }
+  .dashboard-table #dashboard-table-headings-details {
+    display: inline-block;
+    text-align: left;
+    width: 100%;
+  }
+
+  .topic-name {
+    color: inherit;
+    font-size: 17px;
+    font-weight: bold;
+    margin-left: 2px;
+    text-decoration: none;
+  }
+
+  .topic-name:focus {
+    border-radius: 2px;
+    box-shadow: 0 0 0 2px #0844aa;
+    outline: none;
+  }
+
+  .topic-classroom {
+    font-size: 13px;
+    font-style: italic;
+    margin: 4px 0;
+    text-transform: capitalize;
+  }
+  .topic-description {
+    font-size: 15px;
+  }
+  .list-summary,
+  .list-summary:active,
+  .list-summary:visited {
+    color: inherit;
+    display: block;
+    text-decoration: none;
+  }
+
+  .list-item {
+    height: 150px;
+    text-align: left;
+    vertical-align: baseline;
+  }
+
+  .list-item td {
+    padding-top: 15px;
+  }
+
+  .list-item:not(:last-child) {
+    border-bottom: 1px solid #bbb;
+  }
+
+  .oppia-editor-warnings-indicator {
+    bottom: 13px;
+    left: 15px;
+  }
+
+  .oppia-editor-warnings-error-color {
+    border-color: transparent transparent #ffbe63 transparent;
+  }
+
+  .list-summary span {
+    line-height: normal;
+    vertical-align: middle;
+    word-break: break-word;
+  }
+
+  .tooltip {
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    .topics-list-mobile {
+      display: block;
+      margin: 0 auto;
+      width: 95%;
+    }
+    .dashboard-table {
+      display: none;
+    }
+    .topic-item {
+      border-bottom: 1px solid #c0bebe;
+      margin: 20px 0;
+      padding: 10px 0;
+    }
+    .list-view-item {
+      margin: 0;
+    }
+    .topic-item-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .topic-item-classroom span {
+      color: #707070;
+    }
+    .topic-item-classroom-header {
+      color: inherit;
+      font-weight: bold;
+    }
+    .topic-item-description {
+      margin: 10px 0;
+    }
+    .topic-item-topic-description {
+      margin-bottom: 20px;
+    }
+    .topic-item-description-header {
+      color: inherit;
+      font-weight: bold;
+    }
+    .topic-item-topic-status {
+      margin-top: 10px;
+    }
+    .topic-item-topic-status-header {
+      color: inherit;
+      font-weight: bold;
+    }
+    .topic-item-entities {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      text-align: center;
+    }
+    .topic-item-topic-entity-header {
+      color: inherit;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    .topic-item-options {
+      position: relative;
+    }
+    .topic-item-name a {
+      color: inherit;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    .topic-item-entity {
+      border-right: 2px solid #0844aa;
+      display: inline-block;
+      width: 25%;
+    }
+    .topic-item-topic-entity {
+      display: inline-block;
+      width: 50%;
+    }
+    .published-stories-entity {
+      border-right: 2px solid #0844aa;
+    }
+    .topic-item-status {
+      align-items: center;
+      border-right: none;
+      display: flex;
+      justify-content: center;
+    }
+    .topic-item-name-box {
+      max-width: 90%;
+    }
+    .topic-edit-options {
+      left: auto;
+      right: 10px;
+      top: 30px;
+    }
+  }

@@ -1,0 +1,13 @@
+.btn-primary {
+    background-color: #00645c;
+    border: solid 1px #00645c;
+    margin-right: 20px;
+    padding: 6px 16px;
+  }
+
+  .btn-danger {
+    background: #fff;
+    border: solid 1px #a53417;
+    color: #a53417;
+    padding: 6px 16px;
+  }

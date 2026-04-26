@@ -28,6 +28,7 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 @Component({
   selector: 'oppia-card-display',
   templateUrl: './card-display.component.html',
+  styleUrls: ['./card-display.component.css']
 })
 export class CardDisplayComponent implements AfterContentInit {
   @Input() headingI18n!: string;

@@ -37,6 +37,7 @@ import {
 @Component({
   selector: 'oppia-create-new-subtopic-modal',
   templateUrl: './create-new-subtopic-modal.component.html',
+  styleUrls: ['./create-new-subtopic-modal.component.css']
 })
 export class CreateNewSubtopicModalComponent
   extends ConfirmOrCancelModal

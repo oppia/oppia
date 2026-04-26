@@ -37,6 +37,7 @@ import {AppConstants} from 'app.constants';
 @Component({
   selector: 'oppia-rearrange-skills-in-subtopics-modal',
   templateUrl: './rearrange-skills-in-subtopics-modal.component.html',
+  styleUrls: ['./rearrange-skills-in-subtopics-modal.component.css']
 })
 export class RearrangeSkillsInSubtopicsModalComponent
   extends ConfirmOrCancelModal

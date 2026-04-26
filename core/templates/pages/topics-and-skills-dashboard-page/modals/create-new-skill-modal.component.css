@@ -1,0 +1,60 @@
+.create-new-skill-modal-header i {
+    display: none;
+  }
+  .create-new-skill-modal .skill-description-header {
+    margin-bottom: 6px;
+    margin-top: 1em;
+    width: 100%;
+  }
+
+  .create-new-skill-modal .oppia-rule-details-header {
+    margin-bottom: 0.5em;
+    margin-top: 1em;
+    width: 100%;
+  }
+
+  .create-new-skill-modal .skill-description-error-message {
+    color: red;
+    display: block;
+    font-size: 0.8em;
+  }
+
+  @media screen and (max-width: 768px) {
+    .create-new-skill-modal .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+    }
+    .create-new-skill-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+      height: 100vh;
+    }
+    .create-new-skill-modal .modal-body {
+      height: 80vh;
+    }
+    .create-new-skill-modal .modal-header {
+      align-items: center;
+      background-color: #00609c;
+      display: flex;
+    }
+    .create-new-skill-modal .modal-header h3 {
+      color: #fff;
+    }
+    .create-new-skill-modal .modal-close-button {
+      color: #fff;
+      display: block;
+      font-size: 20px;
+    }
+    .create-new-skill-modal .skill-description-box {
+      margin: 40px 0;
+    }
+    .create-new-skill-modal .skill-review-material-box {
+      margin: 40px 0;
+    }
+    .create-new-skill-modal .oppia-input-box-subtitle {
+      margin-bottom: 15px;
+    }
+  }

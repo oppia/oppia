@@ -31,6 +31,7 @@ export interface FlagExplorationModalResult {
 @Component({
   selector: 'oppia-flag-exploration-modal',
   templateUrl: './flag-exploration-modal.component.html',
+  styleUrls: ['./flag-exploration-modal.component.css']
 })
 export class FlagExplorationModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks

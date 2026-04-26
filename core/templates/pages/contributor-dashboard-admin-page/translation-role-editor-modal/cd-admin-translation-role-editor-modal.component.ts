@@ -26,6 +26,7 @@ import constants from 'assets/constants';
 @Component({
   selector: 'cd-admin-translation-role-editor-modal',
   templateUrl: './cd-admin-translation-role-editor-modal.component.html',
+  styleUrls: ['./cd-admin-translation-role-editor-modal.component.css']
 })
 export class CdAdminTranslationRoleEditorModal implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

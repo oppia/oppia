@@ -1,0 +1,26 @@
+.oppia-editor-change-profile-picture-container .oppia-profile-picture-crop-area {
+    background: #e4e4e4;
+    height: 350px;
+    margin-top: 20px;
+    max-width: 100%;
+    position: relative;
+    width: 500px;
+  }
+  .oppia-editor-change-profile-picture-container .oppia-profile-picture-reset-button {
+    position: absolute;
+    right: -36px;
+    top: 0;
+  }
+  .oppia-editor-change-profile-picture-container .oppia-profile-image-uploader-container {
+    min-height: 300px;
+  }
+  .oppia-editor-change-profile-picture-container .oppia-form-error-text {
+    margin-top: 15px;
+  }
+  .oppia-unsupported-svg-tag-attribute-error {
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+    color: #8a6d3b;
+    margin-top: 15px;
+    padding: 10px;
+  }

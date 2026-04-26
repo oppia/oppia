@@ -20,6 +20,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 @Component({
   selector: 'oppia-classroom-button',
   templateUrl: './classroom-button.component.html',
+  styleUrls: ['./classroom-button.component.css']
 })
 export class ClassroomButtonComponent {
   @Input() classroom!: string;

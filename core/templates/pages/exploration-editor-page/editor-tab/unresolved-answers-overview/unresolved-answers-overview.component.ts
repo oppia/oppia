@@ -34,6 +34,7 @@ import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 @Component({
   selector: 'oppia-unresolved-answers-overview',
   templateUrl: './unresolved-answers-overview.component.html',
+  styleUrls: ['./unresolved-answers-overview.component.css']
 })
 export class UnresolvedAnswersOverviewComponent implements OnInit {
   // These properties below are initialized using Angular lifecycle hooks

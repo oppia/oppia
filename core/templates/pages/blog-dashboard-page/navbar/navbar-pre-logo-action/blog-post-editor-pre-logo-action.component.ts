@@ -24,6 +24,7 @@ import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-
 @Component({
   selector: 'oppia-blog-post-editor-pre-logo-action',
   templateUrl: './blog-post-editor-pre-logo-action.component.html',
+  styleUrls: ['./blog-post-editor-pre-logo-action.component.css']
 })
 export class BlogPostEditorNavbarPreLogoActionComponent
   implements OnInit, OnDestroy

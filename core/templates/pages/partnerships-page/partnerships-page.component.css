@@ -1,0 +1,605 @@
+.content-container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .oppia-partnerships-banner {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: space-between;
+    margin: 60px 40px;
+  }
+
+  .oppia-partnerships-banner-content {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .oppia-partnerships-h1 {
+    color: #033e39;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 2.5em;
+  }
+
+  .oppia-partnerships-h3 {
+    color: #047c74;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 1.6em;
+  }
+
+  .oppia-partnerships-h4 {
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 1.3em;
+  }
+
+  .oppia-partnerships-list {
+    font-size: 1.1em;
+  }
+
+  .oppia-partnerships-emphasized {
+    color: #047c74;
+    font-weight: bold;
+  }
+
+  @media screen and (max-width: 600px) {
+    .oppia-partnerships-banner {
+      flex-direction: column;
+      margin: 60px 20px;
+    }
+
+    .oppia-partnerships-banner-content {
+      align-items: center;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .oppia-partnerships-h1 {
+      font-size: 1.5em;
+    }
+
+    .oppia-partnerships-h3 {
+      font-size: 1.1em;
+    }
+
+    .oppia-partnerships-h4 {
+      font-size: 1em;
+    }
+
+    .oppia-partnerships-list {
+      font-size: 0.8em;
+    }
+  }
+
+  .oppia-partnerships-process {
+    background-color: #eef5fb;
+    padding: 2em 0;
+    text-align: center;
+  }
+
+  .oppia-partnerships-process-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin: 0 15em;
+  }
+
+  .oppia-partnerships-process-subcontainer {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    justify-content: center;
+    max-width: 1000px;
+  }
+
+  .oppia-partnerships-process-content {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .oppia-partnerships-process-icon {
+    height: auto;
+    margin: 0.6em auto;
+    width: 80px;
+  }
+
+  @media screen and (max-width: 900px) {
+    .oppia-partnerships-process-container {
+      margin: 0 8em;
+    }
+
+    .oppia-partnerships-process-subcontainer p {
+      font-size: 0.8em;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .oppia-partnerships-process-container {
+      margin: 0 4em;
+    }
+
+    .oppia-partnerships-process-subcontainer {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .oppia-partnerships-process-icon {
+      width: 40px;
+    }
+  }
+
+  .partering-with-oppia {
+    padding: 3em 0;
+    text-align: center;
+  }
+
+  .partnering-with-oppia-container {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    justify-content: space-between;
+    margin: 3em 8em;
+  }
+
+  .partering-with-oppia-image {
+    height: auto;
+    width: 50%;
+  }
+
+  .partering-with-oppia-content {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 40%;
+  }
+
+  @media only screen and (max-width: 768px) {
+    .partering-with-oppia-image {
+      width: 80%;
+    }
+
+    .partering-with-oppia-content {
+      align-items: center;
+      width: 100%;
+    }
+
+    .partnering-with-oppia-container {
+      align-items: center;
+      flex-direction: column;
+      margin: 3em 2em;
+    }
+
+    .partering-with-oppia-content p {
+      font-size: 0.8em;
+    }
+  }
+
+  .oppia-partners-video {
+    padding: 3em 0;
+    text-align: center;
+  }
+
+  .oppia-partners-video-iframe {
+    height: 500px;
+    max-width: 1000px;
+    width: 80%;
+  }
+
+  @media screen and (max-width: 900px) {
+    .oppia-partners-video-iframe {
+      height: 400px;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .oppia-partners-video-iframe {
+      height: 300px;
+    }
+  }
+
+  .oppia-partners {
+    padding: 3em 0;
+    text-align: center;
+  }
+
+  .oppia-partners-content {
+    font-size: 1.1em;
+    margin: 0 15em;
+    text-align: center;
+  }
+
+  .partners {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: center;
+    margin: 3em auto;
+    padding: 0 1em;
+    width: 100%;
+  }
+
+  .partner-logo {
+    height: 100px;
+    width: auto;
+  }
+
+  @media screen and (max-width: 900px) {
+    .oppia-partners-content {
+      font-size: 0.8em;
+      margin: 0 8em;
+    }
+
+    .partners {
+      margin: 3em auto;
+    }
+
+    .partner-logo {
+      height: 80px;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .oppia-partners-content {
+      font-size: 0.8em;
+      margin: 0 4em;
+    }
+
+    .partners {
+      margin: 3em auto;
+    }
+
+    .partner-logo {
+      height: 60px;
+    }
+  }
+
+  .partners-stories {
+    background-color: #eef5fb;
+    padding: 3em 0;
+    text-align: center;
+  }
+
+  .partners-col {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    justify-content: center;
+    margin: 0 5em;
+  }
+
+  .partner-container {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 55px;
+    justify-content: center;
+  }
+
+  .partner-container mat-card-content h4 {
+    color: #047c74;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 1.3em;
+  }
+
+  .partner-container mat-card-content {
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid var(--Dark-Green, #003c34);
+    border-radius: 4px;
+    box-shadow: 0 0 10 0 rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    height: 500px;
+    justify-content: center;
+    padding: 3em 1em 2em;
+  }
+
+  .partner-container mat-card-content img {
+    height: 100px;
+    margin: 3em 0 3em;
+    width: auto;
+  }
+
+  .partner-container mat-card-content p {
+    flex-grow: 1;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 1.1em;
+    max-width: 500px;
+    min-height: 100px;
+    padding: 0 2em;
+    text-align: center;
+  }
+
+  .partner-container mat-card-content a {
+    color: #047c74;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-top: auto;
+    text-decoration: none;
+  }
+
+  :host {
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        filter: invert(50%);
+        margin: 0 10px;
+    }
+
+    .carousel-control-prev-icon {
+      margin-left: -5em;
+    }
+
+    .carousel-control-next-icon {
+      margin-right: -5em;
+    }
+
+    .partnerships-page-button {
+      height: 40px;
+      max-width: 90%;
+      width: 300px;
+    }
+  }
+
+  @media screen and (max-width: 900px) {
+    .partner-container mat-card-content img {
+      height: 80px;
+      margin: 2em 0 2em;
+      width: auto;
+    }
+
+    .partner-container mat-card-content {
+      min-height: 400px;
+      padding: 2em 1em;
+    }
+
+    .partner-container mat-card-content p {
+      font-size: 0.8em;
+      max-width: 400px;
+      min-height: 80px;
+    }
+
+    .partner-container mat-card-content a {
+      font-size: 0.8em;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .partner-container mat-card-content img {
+      height: 60px;
+      margin: 2em 0 2em;
+    }
+
+    .partner-container mat-card-content {
+      min-height: 300px;
+      padding: 2em 1em;
+    }
+
+    .partner-container mat-card-content p {
+      font-size: 0.8em;
+      max-width: 300px;
+      min-height: 60px;
+    }
+
+    .partner-container mat-card-content a {
+      font-size: 0.8em;
+    }
+  }
+
+  @media (max-width: 599px) {
+    .hide-xs {
+      display: none ;
+    }
+  }
+
+  @media (min-width: 600px) {
+    .hide-gt-xs {
+      display: none;
+    }
+  }
+
+  @media (min-width: 600px) and (max-width: 959px) {
+    .hide-sm {
+      display: none;
+    }
+  }
+
+  @media (min-width: 960px) {
+    .hide-gt-sm {
+      display: none;
+    }
+  }
+
+  .learner-stories {
+    padding: 3em 0;
+    text-align: center;
+  }
+
+  .learners-container mat-card-content {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+    padding: 3em 1em 2em;
+  }
+
+  .learners-container mat-card-content img {
+    height: auto;
+    max-width: 310px;
+    padding: 0 3em;
+    width: 100%;
+  }
+
+  .learner-content {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 800px;
+  }
+
+  .learner-content h4 {
+    color: #000;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 1.3em;
+  }
+
+  .learner-content p {
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 1.1em;
+    padding: 0 2em;
+    text-align: center;
+  }
+
+  @media only screen and (max-width: 768px) {
+    .learners-container mat-card-content {
+      padding: 2em 1em;
+    }
+
+    .learners-container mat-card-content img {
+      max-width: 210px;
+      padding: 0 1em;
+      width: 100%;
+    }
+
+    .learner-content h4 {
+      font-size: 1em;
+    }
+
+    .learner-content p {
+      font-size: 0.8em;
+      padding: 1em;
+    }
+
+    .learners-container {
+      margin: 0 2em;
+    }
+  }
+
+  @media only screen and (max-width: 600px) {
+    .learners-container mat-card-content {
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .learners-container mat-card-content img {
+      max-width: 310px;
+      padding: 0;
+    }
+
+    .learner-content h4,
+    .learner-content p {
+      text-align: center;
+    }
+  }
+
+  .oppia-partnerships-cta {
+    background-color: #eef5fb;
+    padding: 5em 0;
+    text-align: center;
+  }
+
+  .oppia-partnerships-cta-container {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    justify-content: center;
+    margin: 3em auto;
+    max-width: 1000px;
+    padding: 0 1em;
+  }
+
+  .oppia-partnerships-cta-subcontainer {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+    padding: 0 1em;
+    width: 100%;
+  }
+
+  @media screen and (max-width: 900px) {
+    .oppia-partnerships-cta-subcontainer p {
+      font-size: 0.8em;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .oppia-partnerships-cta-container {
+      flex-direction: column;
+    }
+
+    .oppia-partnerships-cta-subcontainer {
+      width: 100%;
+    }
+  }
+
+  .oppia-partnerships-faqs {
+    background-color: #e8e7e3;
+    max-width: 1000px;
+    padding: 5em 0;
+    text-align: center;
+  }
+
+  .oppia-partnerships-faqs h3 {
+    margin-bottom: 2.5em;
+  }
+
+  .oppia-partnerships-faq-card {
+    background-color: #e8e7e3;
+    margin: 1.5em auto;
+    width: 75%;
+  }
+
+  .oppia-partnerships-faq-card mat-expansion-panel {
+    background-color: #e8e7e3;
+    border: none;
+    box-shadow: none;
+  }
+
+  .oppia-partnerships-faq-card mat-divider {
+    background-color: #047c74;
+    height: 2px;
+  }
+
+  .oppia-partnerships-faq-card mat-expansion-panel-header {
+    background-color: #e8e7e3;
+  }
+
+  .oppia-partnerships-faq-card mat-panel-title {
+    color: #047c74;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 1.3em;
+  }
+
+  .oppia-partnerships-faq-card p {
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 1.1em;
+    margin: 1em auto;
+    text-align: start;
+  }
+
+  @media screen and (max-width: 900px) {
+    .oppia-partnerships-faq-card mat-panel-title {
+      font-size: 0.7em;
+    }
+
+    .oppia-partnerships-faq-card p {
+      font-size: 0.8em;
+    }
+  }

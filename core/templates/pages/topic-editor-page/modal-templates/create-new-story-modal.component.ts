@@ -29,6 +29,7 @@ import {TopicEditorStateService} from '../services/topic-editor-state.service';
 @Component({
   selector: 'oppia-create-new-story-modal',
   templateUrl: './create-new-story-modal.component.html',
+  styleUrls: ['./create-new-story-modal.component.css']
 })
 export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
   constructor(

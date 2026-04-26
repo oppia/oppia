@@ -32,6 +32,7 @@ import {UserExplorationPermissionsService} from '../services/user-exploration-pe
 @Component({
   selector: 'exploration-save-and-publish-buttons',
   templateUrl: './exploration-save-and-publish-buttons.component.html',
+  styleUrls: ['./exploration-save-and-publish-buttons.component.css']
 })
 export class ExplorationSaveAndPublishButtonsComponent
   implements OnInit, OnDestroy

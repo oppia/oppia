@@ -1,0 +1,16 @@
+oppia-blog-author-details-editor {
+    padding: 3.5rem;
+  }
+
+  .blog-author-editor {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 18px;
+    line-height: 20px;
+    text-align: left;
+  }
+
+  .oppia-bio-border {
+    border-color: #ced4da;
+    outline: none;
+  }

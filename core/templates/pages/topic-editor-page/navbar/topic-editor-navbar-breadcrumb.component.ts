@@ -26,6 +26,7 @@ import {TopicRights} from 'domain/topic/topic-rights.model';
 @Component({
   selector: 'oppia-topic-editor-navbar-breadcrumb',
   templateUrl: './topic-editor-navbar-breadcrumb.component.html',
+  styleUrls: ['./topic-editor-navbar-breadcrumb.component.css']
 })
 export class TopicEditorNavbarBreadcrumbComponent {
   // This property is initialized using Angular lifecycle hooks

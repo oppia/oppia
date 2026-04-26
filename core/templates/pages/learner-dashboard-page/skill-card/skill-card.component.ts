@@ -29,6 +29,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 @Component({
   selector: 'oppia-skill-card',
   templateUrl: './skill-card.component.html',
+  styleUrls: ['./skill-card.component.css']
 })
 export class SkillCardComponent {
   @Input() topic!: LearnerTopicSummary;

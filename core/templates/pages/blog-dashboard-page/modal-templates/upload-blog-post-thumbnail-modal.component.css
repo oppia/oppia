@@ -1,0 +1,18 @@
+.oppia-blog-post-thumbnail-uploader-container {
+    min-height: 300px;
+  }
+
+  .image-upload-rules {
+    color: #555;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 18px;
+    text-align: left;
+  }
+
+  @media(max-width: 768px) {
+    .oppia-blog-post-thumbnail-uploader-container {
+      height: 80px;
+      width: 164px;
+    }
+  }

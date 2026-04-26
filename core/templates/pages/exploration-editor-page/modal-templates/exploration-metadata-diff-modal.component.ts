@@ -39,6 +39,7 @@ interface mergeviewOptions {
 @Component({
   selector: 'oppia-exploration-metadata-diff',
   templateUrl: './exploration-metadata-diff-modal.component.html',
+  styleUrls: ['./exploration-metadata-diff-modal.component.css']
 })
 export class ExplorationMetadataDiffModalComponent
   extends ConfirmOrCancelModal

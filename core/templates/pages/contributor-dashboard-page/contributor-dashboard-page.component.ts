@@ -35,6 +35,7 @@ import {UserService} from 'services/user.service';
 @Component({
   selector: 'contributor-dashboard-page',
   templateUrl: './contributor-dashboard-page.component.html',
+  styleUrls: ['./contributor-dashboard-page.component.css']
 })
 export class ContributorDashboardPageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

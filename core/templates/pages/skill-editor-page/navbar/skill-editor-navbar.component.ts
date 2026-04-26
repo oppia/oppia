@@ -35,6 +35,7 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
 @Component({
   selector: 'oppia-skill-editor-navbar',
   templateUrl: './skill-editor-navbar.component.html',
+  styleUrls: ['./skill-editor-navbar.component.css']
 })
 export class SkillEditorNavabarComponent implements OnInit {
   // These properties below are initialized using Angular lifecycle hooks

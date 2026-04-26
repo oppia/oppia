@@ -25,6 +25,7 @@ import {AppConstants} from 'app.constants';
 @Component({
   selector: 'oppia-classroom-summary-tile',
   templateUrl: './classroom-summary-tile.component.html',
+  styleUrls: ['./classroom-summary-tile.component.css']
 })
 export class ClassroomSummaryTileComponent {
   // These properties are initialized using Angular lifecycle hooks

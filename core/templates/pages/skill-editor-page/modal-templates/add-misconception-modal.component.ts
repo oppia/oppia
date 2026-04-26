@@ -33,6 +33,7 @@ interface MisconceptionFormSchema {
 @Component({
   selector: 'oppia-add-misconception-modal',
   templateUrl: './add-misconception-modal.component.html',
+  styleUrls: ['./add-misconception-modal.component.css']
 })
 export class AddMisconceptionModalComponent
   extends ConfirmOrCancelModal

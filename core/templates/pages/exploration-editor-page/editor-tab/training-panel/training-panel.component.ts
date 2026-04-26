@@ -37,6 +37,7 @@ interface ClassificationInterface {
 @Component({
   selector: 'oppia-training-panel',
   templateUrl: './training-panel.component.html',
+  styleUrls: ['./training-panel.component.css']
 })
 export class TrainingPanelComponent implements OnInit {
   // These properties below are initialized using Angular lifecycle hooks

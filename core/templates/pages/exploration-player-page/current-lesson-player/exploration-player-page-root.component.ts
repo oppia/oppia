@@ -21,6 +21,7 @@ import {Component, ViewEncapsulation} from '@angular/core';
 @Component({
   selector: 'oppia-exploration-player-page-root',
   templateUrl: './exploration-player-page-root.component.html',
+  styleUrls: ['./exploration-player-page-root.component.css']
   encapsulation: ViewEncapsulation.None,
 })
 export class ExplorationPlayerPageRootComponent {}

@@ -39,6 +39,7 @@ interface HintFormSchema {
 @Component({
   selector: 'oppia-add-hint-modal',
   templateUrl: './add-hint-modal.component.html',
+  styleUrls: ['./add-hint-modal.component.css']
 })
 export class AddHintModalComponent
   extends ConfirmOrCancelModal

@@ -25,6 +25,7 @@ import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 @Component({
   selector: 'oppia-update-classrooms-order-modal',
   templateUrl: './update-classrooms-order-modal.component.html',
+  styleUrls: ['./update-classrooms-order-modal.component.css']
 })
 export class UpdateClassroomsOrderModalComponent extends ConfirmOrCancelModal {
   constructor(private ngbActiveModal: NgbActiveModal) {

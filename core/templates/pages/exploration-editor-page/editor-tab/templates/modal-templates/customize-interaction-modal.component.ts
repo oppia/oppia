@@ -117,6 +117,7 @@ const isInteractionValidationServiceName = (
 @Component({
   selector: 'oppia-customize-interaction',
   templateUrl: './customize-interaction-modal.component.html',
+  styleUrls: ['./customize-interaction-modal.component.css']
 })
 export class CustomizeInteractionModalComponent
   extends ConfirmOrCancelModal

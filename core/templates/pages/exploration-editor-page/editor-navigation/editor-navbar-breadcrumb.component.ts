@@ -27,6 +27,7 @@ import {RouterService} from '../services/router.service';
 @Component({
   selector: 'oppia-editor-navbar-breadcrumb',
   templateUrl: './editor-navbar-breadcrumb.component.html',
+  styleUrls: ['./editor-navbar-breadcrumb.component.css']
 })
 export class EditorNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

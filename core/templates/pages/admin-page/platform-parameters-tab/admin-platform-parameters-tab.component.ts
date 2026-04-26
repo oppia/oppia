@@ -46,6 +46,7 @@ type FilterType = keyof typeof PlatformParameterFilterType;
 @Component({
   selector: 'oppia-admin-platform-parameters-tab',
   templateUrl: './admin-platform-parameters-tab.component.html',
+  styleUrls: ['./admin-platform-parameters-tab.component.css']
 })
 export class AdminPlatformParametersTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();

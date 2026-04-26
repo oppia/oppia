@@ -24,6 +24,7 @@ import {SignupPageBackendApiService} from '../../signup-page/services/signup-pag
 @Component({
   selector: 'oppia-username-input-modal',
   templateUrl: './username-input-modal.component.html',
+  styleUrls: ['./username-input-modal.component.css']
 })
 export class UsernameInputModal implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

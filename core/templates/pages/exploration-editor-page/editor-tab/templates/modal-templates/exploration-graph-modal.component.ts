@@ -26,6 +26,7 @@ import {GraphData} from 'services/compute-graph.service';
 @Component({
   selector: 'oppia-exploration-graph-modal',
   templateUrl: './exploration-graph-modal.component.html',
+  styleUrls: ['./exploration-graph-modal.component.css']
 })
 export class ExplorationGraphModalComponent
   extends ConfirmOrCancelModal

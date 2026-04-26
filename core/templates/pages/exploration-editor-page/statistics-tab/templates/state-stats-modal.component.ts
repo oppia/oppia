@@ -40,6 +40,7 @@ interface PieChartOpitons {
 @Component({
   selector: 'oppia-state-stats-modal',
   templateUrl: './state-stats-modal.component.html',
+  styleUrls: ['./state-stats-modal.component.css']
 })
 export class StateStatsModalComponent
   extends ConfirmOrCancelModal

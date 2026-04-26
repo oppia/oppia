@@ -31,6 +31,7 @@ import constants from 'assets/constants';
 @Component({
   selector: 'oppia-topics-list',
   templateUrl: './topics-list.component.html',
+  styleUrls: ['./topics-list.component.css']
 })
 export class TopicsListComponent {
   // These properties are initialized using Angular lifecycle hooks

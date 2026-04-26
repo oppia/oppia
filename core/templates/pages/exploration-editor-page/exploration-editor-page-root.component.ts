@@ -23,6 +23,7 @@ import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 @Component({
   selector: 'oppia-exploration-editor-page-root',
   templateUrl: './exploration-editor-page-root.component.html',
+  styleUrls: ['./exploration-editor-page-root.component.css']
 })
 export class ExplorationEditorPageRootComponent extends BaseRootComponent {
   title: string =

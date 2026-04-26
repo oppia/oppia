@@ -1,0 +1,24 @@
+.oppia-delete-topic-container .oppia-delete-topic-text-container {
+    color: #666;
+  }
+  .oppia-delete-topic-container .oppia-topic-name-text {
+    color: #000;
+  }
+
+  @media screen and (max-width: 768px) {
+    .delete-topic-modal .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0 auto;
+      padding: 0;
+      width: 95vw;
+    }
+    .delete-topic-modal .modal-header {
+      padding: 10px 15px;
+    }
+    .delete-topic-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+      top: 20vh;
+    }
+  }

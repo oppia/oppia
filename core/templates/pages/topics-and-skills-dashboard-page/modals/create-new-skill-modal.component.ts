@@ -35,6 +35,7 @@ import {ValidatorsService} from 'services/validators.service';
 @Component({
   selector: 'oppia-create-new-skill-modal',
   templateUrl: './create-new-skill-modal.component.html',
+  styleUrls: ['./create-new-skill-modal.component.css']
 })
 export class CreateNewSkillModalComponent {
   rubrics = [

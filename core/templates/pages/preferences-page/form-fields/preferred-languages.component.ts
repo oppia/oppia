@@ -36,6 +36,7 @@ import {LanguageIdAndText} from 'domain/utilities/language-util.service';
 @Component({
   selector: 'oppia-preferred-languages',
   templateUrl: './preferred-languages.component.html',
+  styleUrls: ['./preferred-languages.component.css']
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

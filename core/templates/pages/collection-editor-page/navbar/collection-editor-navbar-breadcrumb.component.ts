@@ -33,6 +33,7 @@ import {CollectionEditorStateService} from '../services/collection-editor-state.
 @Component({
   selector: 'collection-editor-navbar-breadcrumb',
   templateUrl: './collection-editor-navbar-breadcrumb.component.html',
+  styleUrls: ['./collection-editor-navbar-breadcrumb.component.css']
 })
 export class CollectionEditorNavbarBreadcrumbComponent {
   // These properties are initialized using Angular lifecycle hooks

@@ -26,6 +26,7 @@ import {ClassroomAdminDataService} from '../services/classroom-admin-data.servic
 @Component({
   selector: 'oppia-create-new-classroom-modal',
   templateUrl: './create-new-classroom-modal.component.html',
+  styleUrls: ['./create-new-classroom-modal.component.css']
 })
 export class CreateNewClassroomModalComponent extends ConfirmOrCancelModal {
   constructor(

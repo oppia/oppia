@@ -111,6 +111,7 @@ interface ExplorationData extends ExplorationBackendDict {
 @Component({
   selector: 'exploration-editor-page',
   templateUrl: './exploration-editor-page.component.html',
+  styleUrls: ['./exploration-editor-page.component.css']
 })
 export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

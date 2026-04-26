@@ -46,6 +46,7 @@ interface Container {
 @Component({
   selector: 'oppia-misconception-editor',
   templateUrl: './misconception-editor.component.html',
+  styleUrls: ['./misconception-editor.component.css']
 })
 export class MisconceptionEditorComponent implements OnInit {
   @Output() onMisconceptionChange = new EventEmitter<void>();

@@ -44,6 +44,7 @@ interface LanguageCodeToContentTranslations {
 @Component({
   selector: 'oppia-exploration-modify-translations-modal',
   templateUrl: './exploration-modify-translations-modal.component.html',
+  styleUrls: ['./exploration-modify-translations-modal.component.css']
 })
 export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   @Input() contentId!: string;

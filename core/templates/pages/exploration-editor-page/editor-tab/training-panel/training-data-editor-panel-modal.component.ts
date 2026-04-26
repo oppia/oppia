@@ -78,6 +78,7 @@ interface TrainingData {
 @Component({
   selector: 'training-data-editor-panel',
   templateUrl: './training-data-editor-panel-modal.component.html',
+  styleUrls: ['./training-data-editor-panel-modal.component.css']
 })
 export class TrainingDataEditorPanelComponent
   extends ConfirmOrCancelModal

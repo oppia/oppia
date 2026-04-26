@@ -41,6 +41,7 @@ interface MergeviewOptions {
 @Component({
   selector: 'oppia-state-version-history-modal',
   templateUrl: './state-version-history-modal.component.html',
+  styleUrls: ['./state-version-history-modal.component.css']
 })
 export class StateVersionHistoryModalComponent
   extends ConfirmOrCancelModal

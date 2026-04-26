@@ -43,6 +43,7 @@ interface Options {
 @Component({
   selector: 'translation-language-selector',
   templateUrl: './translation-language-selector.component.html',
+  styleUrls: ['./translation-language-selector.component.css']
 })
 export class TranslationLanguageSelectorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

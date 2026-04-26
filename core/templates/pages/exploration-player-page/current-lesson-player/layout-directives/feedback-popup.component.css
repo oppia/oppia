@@ -1,0 +1,46 @@
+.oppia-feedback-popover-bottom-container {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+  }
+  .oppia-feedback-popover-textarea {
+    border: 1px solid rgba(0,0,0,0.2);
+    font-size: 0.9em;
+    margin-top: 4px;
+    padding: 4px;
+    resize: none;
+    width: 250px;
+  }
+  .oppia-close-popover-button {
+    position: absolute;
+  }
+  input {
+    margin-right: 5px;
+    position: relative;
+    top: -3px;
+    vertical-align: bottom;
+  }
+  label {
+    font-weight: normal;
+  }
+  .oppia-feedback-popup-container .fa-times {
+    font-size: 18px;
+  }
+  .oppia-feedback-popup-container {
+    min-width: 200px;
+  }
+  .oppia-exploration-feedback-submit-btn {
+    margin-top: 6px;
+    z-index: 30;
+  }
+  .oppia-checkbox {
+    font-size: 0.9em;
+    margin: 12px 0 4px 0;
+  }
+  .btn:disabled {
+   color: white;
+  }
+  .btn:enabled {
+  background-color: #218838;
+  color: white;
+  }

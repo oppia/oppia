@@ -56,6 +56,7 @@ import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-h
 @Component({
   selector: 'oppia-translator-overview',
   templateUrl: './translator-overview.component.html',
+  styleUrls: ['./translator-overview.component.css']
 })
 export class TranslatorOverviewComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

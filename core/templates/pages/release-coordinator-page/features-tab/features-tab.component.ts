@@ -53,6 +53,7 @@ interface FeatureFlagViewModel extends FeatureFlag {
 @Component({
   selector: 'features-tab',
   templateUrl: './features-tab.component.html',
+  styleUrls: ['./features-tab.component.css']
 })
 export class FeaturesTabComponent implements OnInit {
   @ViewChildren('userGroupInput') userGroupInputs!: QueryList<ElementRef>;

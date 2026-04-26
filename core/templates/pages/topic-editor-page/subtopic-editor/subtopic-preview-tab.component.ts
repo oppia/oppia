@@ -33,6 +33,7 @@ import {PageContextService} from 'services/page-context.service';
 @Component({
   selector: 'oppia-subtopic-preview-tab',
   templateUrl: './subtopic-preview-tab.component.html',
+  styleUrls: ['./subtopic-preview-tab.component.css']
 })
 export class SubtopicPreviewTab {
   directiveSubscriptions = new Subscription();

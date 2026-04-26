@@ -25,6 +25,7 @@ import {AlertsService} from 'services/alerts.service';
 @Component({
   selector: 'oppia-topic-manager-role-editor-modal',
   templateUrl: './topic-manager-role-editor-modal.component.html',
+  styleUrls: ['./topic-manager-role-editor-modal.component.css']
 })
 export class TopicManagerRoleEditorModalComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

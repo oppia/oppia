@@ -27,6 +27,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 @Component({
   selector: 'oppia-skill-rubrics-editor',
   templateUrl: './skill-rubrics-editor.component.html',
+  styleUrls: ['./skill-rubrics-editor.component.css']
 })
 export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

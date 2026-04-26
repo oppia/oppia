@@ -91,6 +91,7 @@ interface OpacityMap {
 @Component({
   selector: 'state-graph-visualization',
   templateUrl: './state-graph-visualization.component.html',
+  styleUrls: ['./state-graph-visualization.component.css']
 })
 export class StateGraphVisualization implements OnInit, OnDestroy {
   // Function called when node is clicked. Should take a parameter

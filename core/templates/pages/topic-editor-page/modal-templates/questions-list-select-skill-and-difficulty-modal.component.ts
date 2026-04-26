@@ -34,6 +34,7 @@ interface Summary {
   selector: 'oppia-questions-list-select-skill-and-difficulty-modal',
   templateUrl:
     './questions-list-select-skill-and-difficulty-modal.component.html',
+  styleUrls: ['./questions-list-select-skill-and-difficulty-modal.component.css']
 })
 export class QuestionsListSelectSkillAndDifficultyModalComponent
   extends ConfirmOrCancelModal

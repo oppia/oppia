@@ -31,6 +31,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 @Component({
   selector: 'oppia-exploration-save-modal',
   templateUrl: './exploration-save-modal.component.html',
+  styleUrls: ['./exploration-save-modal.component.css']
 })
 export class ExplorationSaveModalComponent extends ConfirmOrCancelModal {
   earlierVersionHeader: string = 'Last saved';

@@ -27,6 +27,7 @@ interface Language {
 @Component({
   selector: 'oppia-preferred-language-selector',
   templateUrl: './preferred-language-selector.component.html',
+  styleUrls: ['./preferred-language-selector.component.css']
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

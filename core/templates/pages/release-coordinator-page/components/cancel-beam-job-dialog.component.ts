@@ -28,6 +28,7 @@ import {of} from 'rxjs';
 @Component({
   selector: 'cancel-beam-job-dialog',
   templateUrl: './cancel-beam-job-dialog.component.html',
+  styleUrls: ['./cancel-beam-job-dialog.component.css']
 })
 export class CancelBeamJobDialogComponent {
   isRunning = false;

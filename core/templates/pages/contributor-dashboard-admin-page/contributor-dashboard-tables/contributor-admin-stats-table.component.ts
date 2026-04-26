@@ -34,6 +34,7 @@ import isEqual from 'lodash/isEqual';
 @Component({
   selector: 'contributor-admin-stats-table',
   templateUrl: './contributor-admin-stats-table.component.html',
+  styleUrls: ['./contributor-admin-stats-table.component.css']
   animations: [
     trigger('detailExpand', [
       state(

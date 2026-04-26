@@ -22,6 +22,7 @@ import {ExplorationObjectiveService} from 'pages/exploration-editor-page/service
 @Component({
   selector: 'oppia-exploration-objective-editor',
   templateUrl: './exploration-objective-editor.component.html',
+  styleUrls: ['./exploration-objective-editor.component.css']
 })
 export class ExplorationObjectiveEditorComponent {
   // These properties below are initialized using Angular lifecycle hooks

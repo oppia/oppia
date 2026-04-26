@@ -28,6 +28,7 @@ import {CollectionLinearizerService} from '../services/collection-linearizer.ser
 @Component({
   selector: 'oppia-collection-node-editor',
   templateUrl: './collection-node-editor.component.html',
+  styleUrls: ['./collection-node-editor.component.css']
 })
 export class CollectionNodeEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

@@ -23,6 +23,7 @@ import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-
 @Component({
   selector: 'oppia-blog-dashboard-navbar-breadcrumb',
   templateUrl: './blog-dashboard-navbar-breadcrumb.component.html',
+  styleUrls: ['./blog-dashboard-navbar-breadcrumb.component.css']
 })
 export class BlogDashboardNavbarBreadcrumbComponent
   implements OnInit, OnDestroy

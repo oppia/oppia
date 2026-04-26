@@ -1,0 +1,30 @@
+button:focus {
+    border: unset;
+    outline: unset;
+  }
+@media(max-width: 768px) {
+    .collapse:not(.show) {
+        display: flex;
+    }
+    .navbar-brand {
+        display: none;
+    }
+    .oppia-navbar-brand-name.d-none {
+        /* !important is necessary otherwise d-none class of base components is not overwritten(!important
+        is being used there). */
+        display: flex !important;
+        margin-left: -10px;
+    }
+    .ng-cloak {
+        display: flex !important;
+        flex-direction: row;
+    }
+    .float-start {
+        margin-left: 5%;
+    }
+}
+@media (max-width: 500px) {
+    .float-start {
+        margin-left: 2%;
+    }
+}

@@ -33,6 +33,7 @@ import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 @Component({
   selector: 'oppia-topic-questions-tab',
   templateUrl: './topic-questions-tab.component.html',
+  styleUrls: ['./topic-questions-tab.component.css']
 })
 export class TopicQuestionsTabComponent
   implements OnInit, AfterViewInit, OnDestroy

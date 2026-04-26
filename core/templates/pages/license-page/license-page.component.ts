@@ -21,6 +21,6 @@ import {Component} from '@angular/core';
 @Component({
   selector: 'oppia-license-page',
   templateUrl: './license-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./license-page.component.css'],
 })
 export class LicensePageComponent {}

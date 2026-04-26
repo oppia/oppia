@@ -24,6 +24,7 @@ import {Subtopic} from 'domain/topic/subtopic.model';
 @Component({
   selector: 'oppia-change-subtopic-assignment-modal',
   templateUrl: './change-subtopic-assignment-modal.component.html',
+  styleUrls: ['./change-subtopic-assignment-modal.component.css']
 })
 export class ChangeSubtopicAssignmentModalComponent
   extends ConfirmOrCancelModal

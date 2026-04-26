@@ -36,6 +36,7 @@ import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model
 @Component({
   selector: 'oppia-feedback-tab',
   templateUrl: './feedback-tab.component.html',
+  styleUrls: ['./feedback-tab.component.css']
 })
 export class FeedbackTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

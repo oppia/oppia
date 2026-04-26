@@ -128,6 +128,7 @@ const COMMIT_TIMEOUT_DURATION = 30000;
 @Component({
   selector: 'oppia-contributions-and-review',
   templateUrl: './contributions-and-review.component.html',
+  styleUrls: ['./contributions-and-review.component.css']
 })
 export class ContributionsAndReview implements OnInit, OnDestroy {
   @Input() activeTopicName: string;

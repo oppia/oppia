@@ -53,6 +53,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 @Component({
   selector: 'oppia-blog-post-editor',
   templateUrl: './blog-post-editor.component.html',
+  styleUrls: ['./blog-post-editor.component.css']
 })
 export class BlogPostEditorComponent implements OnInit {
   @ViewChild('titleInput') titleInput!: ElementRef;

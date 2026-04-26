@@ -27,6 +27,7 @@ import {AppConstants} from 'app.constants';
 @Component({
   selector: 'oppia-admin-navbar',
   templateUrl: './admin-navbar.component.html',
+  styleUrls: ['./admin-navbar.component.css']
 })
 export class AdminNavbarComponent implements OnInit {
   // This property is initialized using Angular lifecycle hooks

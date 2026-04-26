@@ -26,6 +26,7 @@ import {UserService} from 'services/user.service';
 @Component({
   selector: 'oppia-classroom-admin-navbar',
   templateUrl: './classroom-admin-navbar.component.html',
+  styleUrls: ['./classroom-admin-navbar.component.css']
 })
 export class ClassroomAdminNavbarComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

@@ -96,6 +96,7 @@ interface ActiveContributionDict {
 @Component({
   selector: 'oppia-question-suggestion-review-modal',
   templateUrl: './question-suggestion-review.component.html',
+  styleUrls: ['./question-suggestion-review.component.css']
 })
 export class QuestionSuggestionReviewModalComponent
   extends ConfirmOrCancelModal

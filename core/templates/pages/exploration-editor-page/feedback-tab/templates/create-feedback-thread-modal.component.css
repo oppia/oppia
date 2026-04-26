@@ -1,0 +1,7 @@
+.oppia-feedback-modal-input {
+    min-height: 35px;
+  }
+  .oppia-feedback-modal-textarea {
+    margin-top: 5px;
+    min-height: 175px;
+  }

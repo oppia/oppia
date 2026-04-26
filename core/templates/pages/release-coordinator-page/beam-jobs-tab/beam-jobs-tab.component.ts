@@ -50,6 +50,7 @@ import {AlertsService} from 'services/alerts.service';
 @Component({
   selector: 'oppia-beam-jobs-tab',
   templateUrl: './beam-jobs-tab.component.html',
+  styleUrls: ['./beam-jobs-tab.component.css']
 })
 export class BeamJobsTabComponent implements OnInit, OnDestroy {
   static readonly BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS = 15000;

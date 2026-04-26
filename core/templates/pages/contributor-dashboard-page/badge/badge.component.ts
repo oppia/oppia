@@ -28,7 +28,7 @@ interface ContributionSubTypeTexts {
 @Component({
   selector: 'badge',
   templateUrl: './badge.component.html',
-  styleUrls: [],
+  styleUrls: ['./badge.component.css'],
 })
 export class BadgeComponent {
   @Input() contributionType!: string;

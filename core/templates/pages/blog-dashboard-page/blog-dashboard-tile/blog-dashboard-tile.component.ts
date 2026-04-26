@@ -29,6 +29,7 @@ import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 @Component({
   selector: 'oppia-blog-dashboard-tile',
   templateUrl: './blog-dashboard-tile.component.html',
+  styleUrls: ['./blog-dashboard-tile.component.css']
 })
 export class BlogDashboardTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

@@ -57,6 +57,7 @@ interface ListSchema {
 @Component({
   selector: 'oppia-state-translation-editor',
   templateUrl: './state-translation-editor.component.html',
+  styleUrls: ['./state-translation-editor.component.css']
 })
 export class StateTranslationEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

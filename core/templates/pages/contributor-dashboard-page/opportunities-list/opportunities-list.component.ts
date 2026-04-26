@@ -33,7 +33,7 @@ type ExplorationOpportunitiesFetcherFunction = () => Promise<{
 @Component({
   selector: 'oppia-opportunities-list',
   templateUrl: './opportunities-list.component.html',
-  styleUrls: [],
+  styleUrls: ['./opportunities-list.component.css'],
 })
 export class OpportunitiesListComponent {
   // These properties are initialized using Angular lifecycle hooks

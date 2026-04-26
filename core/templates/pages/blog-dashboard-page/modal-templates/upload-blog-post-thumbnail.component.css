@@ -1,0 +1,65 @@
+.oppia-thumbnail-picture-crop-area {
+    background: #e4e4e4;
+    height: 350px;
+    margin-top: 20px;
+    max-width: 100%;
+    position: relative;
+    width: 500px;
+  }
+
+  .oppia-thumbnail-picture-reset-button {
+    font-size: 16px;
+    position: absolute;
+    right: -37px;
+    top: -1px;
+  }
+
+  .oppia-form-error-text {
+    margin-top: 15px;
+  }
+
+  .blog-post-thumbnail-image-uploader /deep/ .image-uploader-drop-area {
+    border: #666 dashed;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 0;
+    width: 300px;
+  }
+
+  .oppia-unsupported-svg-tag-attribute-error {
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+    color: #8a6d3b;
+    margin-top: 15px;
+    padding: 10px;
+  }
+
+  @media(max-width: 768px) {
+    .blog-post-thumbnail-image-uploader /deep/ .image-uploader-drop-area {
+      height: auto;
+      width: 164px;
+    }
+
+    .oppia-thumbnail-picture-reset-button {
+      right: -40px;
+      width: 40px;
+    }
+
+    .narrow-image-uploader {
+      padding-left: 0;
+      padding-top: 10px;
+    }
+
+    .btn-secondary.e2e-test-photo-upload-cancel,
+    .btn-success.e2e-test-photo-upload-submit {
+      align-items: center;
+      display: flex;
+      font-size: 12px;
+      height: 45px;
+      justify-content: center;
+      padding: 7px;
+      text-align: center;
+      white-space: nowrap;
+      width: 130px;
+    }
+  }

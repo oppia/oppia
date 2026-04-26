@@ -37,6 +37,7 @@ import {map, startWith} from 'rxjs/operators';
 @Component({
   selector: 'oppia-subject-interests',
   templateUrl: './subject-interests.component.html',
+  styleUrls: ['./subject-interests.component.css']
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

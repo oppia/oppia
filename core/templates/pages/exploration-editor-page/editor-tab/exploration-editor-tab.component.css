@@ -1,0 +1,35 @@
+.exp-editor-content-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .exp-editor-main-editor {
+    margin-right: 3%;
+    width: 40%;
+  }
+  .exp-editor-overview {
+    width: 30%;
+  }
+  .exp-editor-overview-content {
+    margin-top: 40px;
+  }
+  .tutorial-help-link {
+    font-weight: bold;
+    text-decoration: underline;
+  }
+  @media screen and (max-width: 768px) {
+    .exp-editor-main-editor {
+      margin-right: 0;
+      width: 100%;
+    }
+    .exp-state-version-history {
+      display: none;
+    }
+  }
+  mat-checkbox.checkpoint-selection-checkbox.md-icon {
+    border-color: #0d48a1;
+    top: 2px;
+  }
+  mat-checkbox.checkpoint-selection-checkbox.md-checked .md-icon {
+    background-color: rgba(71, 151, 136, 1);
+  }

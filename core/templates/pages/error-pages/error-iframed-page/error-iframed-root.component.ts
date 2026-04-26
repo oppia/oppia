@@ -23,6 +23,7 @@ import {MetaTagData} from 'pages/base-root.component';
 @Component({
   selector: 'oppia-error-iframed-page-root',
   templateUrl: './error-iframed-root.component.html',
+  styleUrls: ['./error-iframed-root.component.css']
 })
 export class ErrorIframedPageRootComponent {
   title: string =

@@ -111,6 +111,7 @@ enum ExpansionTabType {
 @Component({
   selector: 'oppia-translation-suggestion-review-modal',
   templateUrl: './translation-suggestion-review-modal.component.html',
+  styleUrls: ['./translation-suggestion-review-modal.component.css']
 })
 export class TranslationSuggestionReviewModalComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

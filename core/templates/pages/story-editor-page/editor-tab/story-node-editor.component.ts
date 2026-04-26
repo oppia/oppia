@@ -42,6 +42,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 @Component({
   selector: 'oppia-story-node-editor',
   templateUrl: './story-node-editor.component.html',
+  styleUrls: ['./story-node-editor.component.css']
 })
 export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   @Input() nodeId: string;

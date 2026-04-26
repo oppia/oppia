@@ -39,6 +39,7 @@ export interface TopicNameToTopicAssignments {
 @Component({
   selector: 'oppia-unassign-skill-from-topics-modal',
   templateUrl: './unassign-skill-from-topics-modal.component.html',
+  styleUrls: ['./unassign-skill-from-topics-modal.component.css']
 })
 export class UnassignSkillFromTopicsModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks

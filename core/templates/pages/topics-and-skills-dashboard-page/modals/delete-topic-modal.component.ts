@@ -23,6 +23,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 @Component({
   selector: 'oppia-delete-topic-modal',
   templateUrl: './delete-topic-modal.component.html',
+  styleUrls: ['./delete-topic-modal.component.css']
 })
 export class DeleteTopicModalComponent extends ConfirmOrCancelModal {
   // This property is initialized using Angular lifecycle hooks

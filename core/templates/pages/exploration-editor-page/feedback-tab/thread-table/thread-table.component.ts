@@ -25,6 +25,7 @@ import {ThreadStatusDisplayService} from '../services/thread-status-display.serv
 @Component({
   selector: 'oppia-thread-table',
   templateUrl: './thread-table.component.html',
+  styleUrls: ['./thread-table.component.css']
 })
 export class ThreadTableComponent {
   @Output() rowClick: EventEmitter<string> = new EventEmitter();

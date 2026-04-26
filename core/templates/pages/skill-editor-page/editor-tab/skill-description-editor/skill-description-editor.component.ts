@@ -34,6 +34,7 @@ import {ValidatorsService} from 'services/validators.service';
 @Component({
   selector: 'oppia-skill-description-editor',
   templateUrl: './skill-description-editor.component.html',
+  styleUrls: ['./skill-description-editor.component.css']
 })
 export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
   @Output() onSaveDescription = new EventEmitter<void>();

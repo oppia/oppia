@@ -26,6 +26,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 @Component({
   selector: 'oppia-post-publish-modal',
   templateUrl: './post-publish-modal.component.html',
+  styleUrls: ['./post-publish-modal.component.css']
 })
 export class PostPublishModalComponent
   extends ConfirmOrCancelModal

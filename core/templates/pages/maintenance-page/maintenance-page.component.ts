@@ -23,7 +23,7 @@ import {DocumentAttributeCustomizationService} from 'services/contextual/documen
 @Component({
   selector: 'oppia-maintenance-page',
   templateUrl: './maintenance-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./maintenance-page.component.css'],
 })
 export class MaintenancePageComponent implements OnInit {
   currentLang: string = 'en';

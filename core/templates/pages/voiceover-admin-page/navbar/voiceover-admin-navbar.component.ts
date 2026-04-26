@@ -25,6 +25,7 @@ import {UserService} from 'services/user.service';
 @Component({
   selector: 'oppia-voiceover-admin-navbar',
   templateUrl: './voiceover-admin-navbar.component.html',
+  styleUrls: ['./voiceover-admin-navbar.component.css']
 })
 export class VoiceoverAdminNavbarComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

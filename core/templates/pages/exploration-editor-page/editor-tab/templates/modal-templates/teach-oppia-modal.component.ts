@@ -53,6 +53,7 @@ export interface UnresolvedAnswer {
 @Component({
   selector: 'oppia-teach-oppia-modal',
   templateUrl: './teach-oppia-modal.component.html',
+  styleUrls: ['./teach-oppia-modal.component.css']
 })
 export class TeachOppiaModalComponent
   extends ConfirmOrCancelModal

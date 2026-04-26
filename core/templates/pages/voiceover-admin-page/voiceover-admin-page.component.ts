@@ -51,6 +51,7 @@ export interface LanguageAccentDescriptionToCode {
 @Component({
   selector: 'oppia-voiceover-admin-page',
   templateUrl: './voiceover-admin-page.component.html',
+  styleUrls: ['./voiceover-admin-page.component.css']
   providers: [NativeDateAdapter],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

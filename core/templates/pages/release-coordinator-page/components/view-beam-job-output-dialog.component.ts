@@ -30,6 +30,7 @@ import {AlertsService} from 'services/alerts.service';
 @Component({
   selector: 'view-beam-job-output-dialog',
   templateUrl: './view-beam-job-output-dialog.component.html',
+  styleUrls: ['./view-beam-job-output-dialog.component.css']
 })
 export class ViewBeamJobOutputDialogComponent implements OnInit, OnDestroy {
   selectedTab = new FormControl(0);

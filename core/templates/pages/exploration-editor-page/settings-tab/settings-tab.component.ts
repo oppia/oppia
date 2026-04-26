@@ -73,6 +73,7 @@ import {MetadataVersionHistoryModalComponent} from '../modal-templates/metadata-
 @Component({
   selector: 'oppia-settings-tab',
   templateUrl: './settings-tab.component.html',
+  styleUrls: ['./settings-tab.component.css']
 })
 export class SettingsTabComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

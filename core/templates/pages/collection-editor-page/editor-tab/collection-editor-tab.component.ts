@@ -25,6 +25,7 @@ import {CollectionLinearizerService} from '../services/collection-linearizer.ser
 @Component({
   selector: 'oppia-collection-editor-tab',
   templateUrl: './collection-editor-tab.component.html',
+  styleUrls: ['./collection-editor-tab.component.css']
 })
 export class CollectionEditorTabComponent {
   // This property is initialized using Angular lifecycle hooks

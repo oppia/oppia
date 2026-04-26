@@ -25,6 +25,7 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 @Component({
   selector: 'oppia-classroom-card',
   templateUrl: './classroom-card.component.html',
+  styleUrls: ['./classroom-card.component.css']
 })
 export class ClassroomCardComponent {
   // These properties are initialized using Angular lifecycle hooks

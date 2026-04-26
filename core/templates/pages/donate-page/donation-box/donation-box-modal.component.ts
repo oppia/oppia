@@ -22,6 +22,7 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'donation-box-modal',
   templateUrl: './donation-box-modal.component.html',
+  styleUrls: ['./donation-box-modal.component.css']
 })
 export class DonationBoxModalComponent {
   constructor(private activeModal: NgbActiveModal) {}

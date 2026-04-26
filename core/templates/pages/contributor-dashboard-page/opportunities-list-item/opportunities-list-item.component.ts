@@ -42,7 +42,7 @@ export interface ExplorationOpportunity {
 @Component({
   selector: 'oppia-opportunities-list-item',
   templateUrl: './opportunities-list-item.component.html',
-  styleUrls: [],
+  styleUrls: ['./opportunities-list-item.component.css'],
 })
 export class OpportunitiesListItemComponent {
   constructor(private windowDimensionsService: WindowDimensionsService) {}

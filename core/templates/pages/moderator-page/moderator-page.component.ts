@@ -33,6 +33,7 @@ import {
 @Component({
   selector: 'oppia-moderator-page',
   templateUrl: './moderator-page.component.html',
+  styleUrls: ['./moderator-page.component.css']
 })
 export class ModeratorPageComponent {
   allCommits: CommitMessage[] = [];

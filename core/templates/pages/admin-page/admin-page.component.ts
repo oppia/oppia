@@ -24,6 +24,7 @@ import {AdminRouterService} from './services/admin-router.service';
 @Component({
   selector: 'oppia-admin-page',
   templateUrl: './admin-page.component.html',
+  styleUrls: ['./admin-page.component.css']
 })
 export class AdminPageComponent {
   statusMessage = '';

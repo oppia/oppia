@@ -32,6 +32,7 @@ import {QuestionPlayerConfig} from 'pages/exploration-player-page/current-lesson
 @Component({
   selector: 'review-test-page',
   templateUrl: './review-test-page.component.html',
+  styleUrls: ['./review-test-page.component.css']
 })
 export class ReviewTestPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

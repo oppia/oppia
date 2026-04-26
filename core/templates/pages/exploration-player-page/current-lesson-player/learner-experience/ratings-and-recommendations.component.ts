@@ -61,6 +61,7 @@ export interface QuestionPlayerConfig {
 @Component({
   selector: 'oppia-ratings-and-recommendations',
   templateUrl: './ratings-and-recommendations.component.html',
+  styleUrls: ['./ratings-and-recommendations.component.css']
 })
 export class RatingsAndRecommendationsComponent {
   // These properties are initialized using Angular lifecycle hooks

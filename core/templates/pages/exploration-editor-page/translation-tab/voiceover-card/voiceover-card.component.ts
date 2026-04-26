@@ -58,6 +58,7 @@ import {VoiceoverRegenerationJobService} from 'services/voiceover-regeneration-j
 @Component({
   selector: 'oppia-voiceover-card',
   templateUrl: './voiceover-card.component.html',
+  styleUrls: ['./voiceover-card.component.css']
 })
 export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
   @ViewChild('visualized') visualized!: ElementRef<Element>;

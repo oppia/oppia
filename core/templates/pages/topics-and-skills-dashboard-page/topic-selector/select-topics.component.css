@@ -1,0 +1,19 @@
+.fixed-search-bar {
+    padding: 10px;
+    position: sticky;
+  }
+
+  .scrollable-content {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .selected-topics-list {
+    border-radius: 3px;
+    margin-bottom: 15px;
+    padding: 5px 0;
+  }
+
+  .topic-search-icon {
+    padding-left: 5px;
+  }

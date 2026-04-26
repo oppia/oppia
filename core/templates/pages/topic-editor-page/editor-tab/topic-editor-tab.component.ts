@@ -49,6 +49,7 @@ import {RearrangeSkillsInSubtopicsModalComponent} from '../modal-templates/rearr
 @Component({
   selector: 'oppia-topic-editor-tab',
   templateUrl: './topic-editor-tab.component.html',
+  styleUrls: ['./topic-editor-tab.component.css']
 })
 export class TopicEditorTabComponent implements OnInit, OnDestroy {
   skillCreationIsAllowed!: boolean;

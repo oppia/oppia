@@ -34,6 +34,7 @@ import analyticsConstants from 'analytics-constants';
 @Component({
   selector: 'oppia-signup-page',
   templateUrl: './signup-page.component.html',
+  styleUrls: ['./signup-page.component.css']
 })
 export class SignupPageComponent {
   // These properties are initialized using Angular lifecycle hooks

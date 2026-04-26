@@ -23,6 +23,7 @@ import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 @Component({
   selector: 'oppia-email-dashboard-page-root',
   templateUrl: './email-dashboard-page-root.component.html',
+  styleUrls: ['./email-dashboard-page-root.component.css']
 })
 export class EmailDashboardPageRootComponent extends BaseRootComponent {
   title: string =

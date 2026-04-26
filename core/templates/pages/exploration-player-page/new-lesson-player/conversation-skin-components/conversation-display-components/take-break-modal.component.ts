@@ -22,7 +22,7 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'take-break-modal',
   templateUrl: './take-break-modal.component.html',
-  styleUrls: [],
+  styleUrls: ['./take-break-modal.component.css'],
 })
 export class TakeBreakModalComponent {
   constructor(private activeModal: NgbActiveModal) {}

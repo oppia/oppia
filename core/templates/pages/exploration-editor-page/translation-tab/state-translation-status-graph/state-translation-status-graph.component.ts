@@ -26,6 +26,7 @@ import {TranslationStatusService} from '../services/translation-status.service';
 @Component({
   selector: 'oppia-state-translation-status-graph',
   templateUrl: './state-translation-status-graph.component.html',
+  styleUrls: ['./state-translation-status-graph.component.css']
 })
 export class StateTranslationStatusGraphComponent {
   // This property is initialized using Angular lifecycle hooks

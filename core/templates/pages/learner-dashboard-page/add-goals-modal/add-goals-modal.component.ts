@@ -21,6 +21,7 @@ import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 @Component({
   selector: 'oppia-add-goals-modal',
   templateUrl: './add-goals-modal.component.html',
+  styleUrls: ['./add-goals-modal.component.css']
 })
 export class AddGoalsModalComponent {
   checkedTopics: Set<string>;

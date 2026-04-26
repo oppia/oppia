@@ -30,6 +30,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 @Component({
   selector: 'oppia-goal-list',
   templateUrl: './goal-list.component.html',
+  styleUrls: ['./goal-list.component.css']
 })
 export class GoalListComponent implements OnInit {
   @Input() goalTopic!: LearnerTopicSummary;

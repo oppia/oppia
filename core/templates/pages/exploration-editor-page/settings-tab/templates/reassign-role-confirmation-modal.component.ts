@@ -23,6 +23,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 @Component({
   selector: 'oppia-remove-role-confirmation-modal',
   templateUrl: './reassign-role-confirmation-modal.component.html',
+  styleUrls: ['./reassign-role-confirmation-modal.component.css']
 })
 export class ReassignRoleConfirmationModalComponent extends ConfirmOrCancelModal {
   @Input() username!: string;

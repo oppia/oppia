@@ -35,6 +35,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 @Component({
   selector: 'oppia-blog-dashboard-page',
   templateUrl: './blog-dashboard-page.component.html',
+  styleUrls: ['./blog-dashboard-page.component.css']
 })
 export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

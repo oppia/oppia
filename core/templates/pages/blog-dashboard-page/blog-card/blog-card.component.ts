@@ -30,6 +30,7 @@ import {UserService} from 'services/user.service';
 @Component({
   selector: 'oppia-blog-card',
   templateUrl: './blog-card.component.html',
+  styleUrls: ['./blog-card.component.css']
 })
 export class BlogCardComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

@@ -1,0 +1,89 @@
+.topic-preview-container {
+    background-color: #fff;
+    margin: 0 auto;
+    position: relative;
+    top: 50px;
+    width: 50%;
+  }
+  .topic-preview-parent {
+    margin-top: -40px;
+  }
+  .topic-preview-nav {
+    background-color: #00645c;
+    box-shadow: 0 2px 8px #000000cf;
+    margin: 0 auto;
+    position: relative;
+    top: 50px;
+    width: 50%;
+    z-index: 2;
+  }
+  .topic-preview-navbar-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .topic-preview-nav-active {
+    border-bottom: 4px solid #fff;
+  }
+  .topic-preview-navbar-tab {
+    cursor: pointer;
+    display: inline-block;
+    flex: 1;
+    height: 100%;
+    padding: 20px 0;
+    text-align: center;
+  }
+  .topic-preview-icon img {
+    height: 40px;
+  }
+  .topic-preview-text {
+    color: #fff;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 20px;
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+  .topic-preview-container mat-card {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 0 rgba(0,0,0,0.24);
+    margin-top: 0;
+  }
+  .topic-preview-parent .topic-preview-container mat-card {
+    box-shadow: none;
+  }
+  .topic-preview-tab-content {
+    margin: 0;
+    padding: 0;
+  }
+  .topic-preview-tab-content > mat-card.oppia-page-card {
+    margin-bottom: 0;
+    margin-top: 0;
+    width: 100%;
+  }
+  @media screen and (max-width: 1000px) {
+    .topic-preview-container {
+      width: 70%;
+   }
+   .topic-preview-nav {
+      width: 70%;
+    }
+  }
+  @media screen and (max-width: 800px) {
+    .topic-preview-container {
+      width: 80%;
+    }
+    .topic-preview-parent .background-banner-position {
+      top: 30px;
+    }
+    .topic-preview-nav {
+      width: 80%;
+    }
+  }
+  @media screen and (max-width: 650px) {
+    .topic-preview-container {
+      margin-top: 80px;
+      width: 100%;
+    }
+    .topic-preview-nav {
+      width: 100%;
+    }
+  }

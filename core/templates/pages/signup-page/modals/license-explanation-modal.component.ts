@@ -24,6 +24,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 @Component({
   selector: 'oppia-license-explanation-modal',
   templateUrl: './license-explanation-modal.component.html',
+  styleUrls: ['./license-explanation-modal.component.css']
 })
 export class LicenseExplanationModalComponent extends ConfirmOrCancelModal {
   SITE_NAME = AppConstants.SITE_NAME;

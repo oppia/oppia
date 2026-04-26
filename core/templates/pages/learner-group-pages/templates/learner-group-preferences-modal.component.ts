@@ -24,6 +24,7 @@ import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
 @Component({
   selector: 'oppia-learner-group-preferences-modal',
   templateUrl: './learner-group-preferences-modal.component.html',
+  styleUrls: ['./learner-group-preferences-modal.component.css']
 })
 export class LearnerGroupPreferencesModalComponent extends ConfirmOrCancelModal {
   learnerGroup!: LearnerGroupData;

@@ -23,6 +23,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 @Component({
   selector: 'oppia-syllabus-addition-success-modal',
   templateUrl: './syllabus-addition-success-modal.component.html',
+  styleUrls: ['./syllabus-addition-success-modal.component.css']
 })
 export class SyllabusAdditionSuccessModalComponent extends ConfirmOrCancelModal {
   itemsAddedCount!: number;

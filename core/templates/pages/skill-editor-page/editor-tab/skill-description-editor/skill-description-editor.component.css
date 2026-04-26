@@ -1,0 +1,15 @@
+span.skill-description-error-message {
+    color: #f00;
+    display: block;
+    font-size: 0.8em;
+  }
+
+  .skill-editor-spacing {
+    margin-bottom: 1em;
+  }
+
+  @media screen and (max-width: 768px) {
+    skill-description-editor .skill-description-container {
+      padding: 0;
+    }
+  }

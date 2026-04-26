@@ -1,0 +1,68 @@
+.CodeMirror-merge-copy {
+    display: none;
+  }
+  .CodeMirror-merge-r-deleted {
+    text-decoration: underline #90ee90 2px;
+    text-decoration-skip-ink: none;
+  }
+  .CodeMirror-merge-r-inserted {
+    text-decoration: underline red 2px;
+    text-decoration-skip-ink: none;
+  }
+  .CodeMirror-merge, .CodeMirror-merge .CodeMirror {
+    height: 55vh;
+  }
+  .state-diff-modal .modal-dialog {
+    max-width: 1200px;
+    width: 90%;
+  }
+  .modal-body {
+    height: 405px;
+    margin-top: -30px;
+    overflow: auto;
+  }
+  .state-diff-modal .colgroup-1 {
+    width: 47%;
+    word-wrap: break-word;
+  }
+  .state-diff-modal .colgroup-2 {
+    width: 6%;
+  }
+  .state-diff-modal .colgroup-3 {
+    width: 47%;
+    word-wrap: break-word;
+  }
+  .state-diff-modal .oppia-click-arrows-text {
+    margin-bottom: 20px;
+  }
+  .colgroup-1 {
+    padding: 15px;
+  }
+  .colgroup-3 {
+    padding: 15px;
+  }
+  .interstitial-loading {
+    align-items: center;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    width: 100%;
+  }
+  .spinner-border {
+    height: 4rem;
+    width: 4rem;
+  }
+  .error-message {
+    color: #f00;
+    display: inline-block;
+    font-size: 1.3rem;
+    max-width: 250px;
+    padding: 10px;
+  }
+  .modal-footer {
+    display: flex;
+    justify-content: flex-start;
+  }
+  .next-commit {
+    margin-left: auto;
+  }

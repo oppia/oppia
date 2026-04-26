@@ -23,6 +23,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 @Component({
   selector: 'oppia-remove-item-modal',
   templateUrl: './remove-item-modal.component.html',
+  styleUrls: ['./remove-item-modal.component.css']
 })
 export class RemoveItemModalComponent extends ConfirmOrCancelModal {
   confirmationTitle!: string;

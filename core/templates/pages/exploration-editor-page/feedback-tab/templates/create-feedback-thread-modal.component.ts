@@ -24,6 +24,7 @@ import {AlertsService} from 'services/alerts.service';
 @Component({
   selector: 'oppia-create-feedback-thread-modal',
   templateUrl: './create-feedback-thread-modal.component.html',
+  styleUrls: ['./create-feedback-thread-modal.component.css']
 })
 export class CreateFeedbackThreadModalComponent
   extends ConfirmOrCancelModal

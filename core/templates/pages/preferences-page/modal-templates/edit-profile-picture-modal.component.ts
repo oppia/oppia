@@ -34,6 +34,7 @@ require('cropperjs/dist/cropper.min.css');
 @Component({
   selector: 'oppia-edit-profile-picture-modal',
   templateUrl: './edit-profile-picture-modal.component.html',
+  styleUrls: ['./edit-profile-picture-modal.component.css']
 })
 export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   // 'uploadedImage' will be null if the uploaded svg is invalid or not trusted.

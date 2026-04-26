@@ -42,6 +42,7 @@ import {Story} from 'domain/story/story.model';
 @Component({
   selector: 'oppia-story-editor-page',
   templateUrl: './story-editor-page.component.html',
+  styleUrls: ['./story-editor-page.component.css']
 })
 export class StoryEditorPageComponent implements OnInit, OnDestroy {
   warningsAreShown: boolean;

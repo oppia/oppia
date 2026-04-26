@@ -23,6 +23,7 @@ import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 @Component({
   selector: 'oppia-contributor-dashboard-page-root',
   templateUrl: './contributor-dashboard-page-root.component.html',
+  styleUrls: ['./contributor-dashboard-page-root.component.css']
 })
 export class ContributorDashboardPageRootComponent extends BaseRootComponent {
   title: string =

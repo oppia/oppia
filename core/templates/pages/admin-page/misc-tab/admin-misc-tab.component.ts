@@ -26,6 +26,7 @@ import {AdminTaskManagerService} from '../services/admin-task-manager.service';
 @Component({
   selector: 'oppia-admin-misc-tab',
   templateUrl: './admin-misc-tab.component.html',
+  styleUrls: ['./admin-misc-tab.component.css']
 })
 export class AdminMiscTabComponent implements OnInit {
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();

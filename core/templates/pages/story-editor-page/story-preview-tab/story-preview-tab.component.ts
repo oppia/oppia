@@ -37,6 +37,7 @@ interface IconsArray {
 @Component({
   selector: 'oppia-story-preview-tab',
   templateUrl: './story-preview-tab.component.html',
+  styleUrls: ['./story-preview-tab.component.css']
 })
 export class StoryPreviewTabComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

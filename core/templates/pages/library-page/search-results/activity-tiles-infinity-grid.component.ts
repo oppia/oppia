@@ -26,6 +26,7 @@ import {SearchService} from 'services/search.service';
 @Component({
   selector: 'oppia-activity-tiles-infinity-grid',
   templateUrl: './activity-tiles-infinity-grid.component.html',
+  styleUrls: ['./activity-tiles-infinity-grid.component.css']
 })
 export class ActivityTilesInfinityGridComponent {
   // This property is initialized using Angular lifecycle hooks

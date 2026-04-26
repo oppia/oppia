@@ -59,6 +59,7 @@ interface SolutionInterface {
 @Component({
   selector: 'oppia-add-or-update-solution-modal',
   templateUrl: './add-or-update-solution-modal.component.html',
+  styleUrls: ['./add-or-update-solution-modal.component.css']
 })
 export class AddOrUpdateSolutionModalComponent
   extends ConfirmOrCancelModal

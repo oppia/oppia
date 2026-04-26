@@ -43,6 +43,7 @@ import {AddStudyGuideSectionModalComponent} from 'pages/topic-editor-page/subtop
 @Component({
   selector: 'oppia-subtopic-editor-tab',
   templateUrl: './subtopic-editor-tab.component.html',
+  styleUrls: ['./subtopic-editor-tab.component.css']
 })
 export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   hostname!: string;

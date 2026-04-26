@@ -28,6 +28,7 @@ import {UserService} from 'services/user.service';
 @Component({
   selector: 'oppia-search-results',
   templateUrl: './search-results.component.html',
+  styleUrls: ['./search-results.component.css']
 })
 export class SearchResultsComponent {
   directiveSubscriptions = new Subscription();

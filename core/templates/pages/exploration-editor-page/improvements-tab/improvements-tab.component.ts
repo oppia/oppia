@@ -34,6 +34,7 @@ import {RouterService} from '../services/router.service';
 @Component({
   selector: 'oppia-improvements-tab',
   templateUrl: './improvements-tab.component.html',
+  styleUrls: ['./improvements-tab.component.css']
 })
 export class ImprovementsTabComponent implements OnInit {
   stateRetentions: Map<string, number>;

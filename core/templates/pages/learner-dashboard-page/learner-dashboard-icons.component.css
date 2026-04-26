@@ -1,0 +1,10 @@
+.library-incomplete-activity-tooltip .tooltip-inner {
+    max-width: none;
+    white-space: nowrap;
+  }
+  .dropdown-toggle:after {
+    display: none;
+  }
+  .oppia-learner-dashboard-icon.dropdown {
+    color: black
+  }

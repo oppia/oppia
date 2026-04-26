@@ -40,6 +40,7 @@ import {UserExplorationPermissionsService} from '../services/user-exploration-pe
 @Component({
   selector: 'oppia-editor-navigation',
   templateUrl: './editor-navigation.component.html',
+  styleUrls: ['./editor-navigation.component.css']
 })
 export class EditorNavigationComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

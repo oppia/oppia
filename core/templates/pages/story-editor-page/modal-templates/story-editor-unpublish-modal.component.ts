@@ -23,6 +23,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 @Component({
   selector: 'oppia-story-editor-unpublish-modal',
   templateUrl: './story-editor-unpublish-modal.component.html',
+  styleUrls: ['./story-editor-unpublish-modal.component.css']
 })
 export class StoryEditorUnpublishModalComponent {
   constructor(

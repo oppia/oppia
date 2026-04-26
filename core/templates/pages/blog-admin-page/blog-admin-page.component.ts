@@ -53,6 +53,7 @@ type PlatformParameterValuesRecord = Record<
 @Component({
   selector: 'oppia-blog-admin-page',
   templateUrl: './blog-admin-page.component.html',
+  styleUrls: ['./blog-admin-page.component.css']
 })
 export class BlogAdminPageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

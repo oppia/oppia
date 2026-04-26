@@ -26,6 +26,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 @Component({
   selector: 'oppia-welcome-translation-modal',
   templateUrl: './welcome-translation-modal.component.html',
+  styleUrls: ['./welcome-translation-modal.component.css']
 })
 export class WelcomeTranslationModalComponent
   extends ConfirmOrCancelModal

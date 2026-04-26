@@ -25,6 +25,7 @@ import {PageContextService} from 'services/page-context.service';
 @Component({
   selector: 'oppia-add-audio-translation-modal',
   templateUrl: './add-audio-translation-modal.component.html',
+  styleUrls: ['./add-audio-translation-modal.component.css']
 })
 export class AddAudioTranslationModalComponent
   extends ConfirmOrCancelModal

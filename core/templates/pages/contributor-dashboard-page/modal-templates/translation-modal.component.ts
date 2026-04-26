@@ -101,6 +101,7 @@ export interface ImageDetails {
 @Component({
   selector: 'oppia-translation-modal',
   templateUrl: './translation-modal.component.html',
+  styleUrls: ['./translation-modal.component.css']
 })
 export class TranslationModalComponent {
   // These properties below are initialized using Angular lifecycle hooks

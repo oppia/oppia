@@ -1,0 +1,32 @@
+.unassign-info-text {
+    margin-bottom: 5px;
+  }
+  .topic-name-checkbox {
+    margin-bottom: 5px;
+    margin-left: 20px;
+    margin-top: 5px;
+  }
+  .topic-name {
+    margin-left: 10px;
+  }
+  .loading-spinner {
+    margin-left: 45%;
+  }
+  @media screen and (max-width: 768px) {
+    .unassign-skill-from-topics-modal .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0 auto;
+      padding: 0;
+      width: 95vw;
+    }
+    .unassign-skill-from-topics-modal .modal-header {
+      display: inline-block;
+      padding: 10px 15px;
+    }
+    .unassign-skill-from-topics-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+      top: 20vh;
+    }
+  }

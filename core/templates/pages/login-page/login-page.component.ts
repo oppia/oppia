@@ -30,6 +30,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 @Component({
   selector: 'login-page',
   templateUrl: './login-page.component.html',
+  styleUrls: ['./login-page.component.css']
 })
 export class LoginPageComponent implements OnInit {
   email = new FormControl('', [Validators.email]);

@@ -24,6 +24,7 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 @Component({
   selector: 'oppia-help-modal',
   templateUrl: './help-modal.component.html',
+  styleUrls: ['./help-modal.component.css']
 })
 export class HelpModalComponent implements OnInit {
   EDITOR_TUTORIAL_MODE: string = 'editor';

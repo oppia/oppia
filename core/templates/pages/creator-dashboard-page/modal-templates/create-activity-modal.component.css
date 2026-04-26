@@ -1,0 +1,48 @@
+.oppia-create-activity-modal .modal-body {
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    height: 100%;
+    margin: 0 auto;
+    top: 7%;
+    width: 95%;
+  }
+
+  .oppia-create-activity-modal h1 {
+    color: #015c53;
+  }
+
+  .oppia-create-activity-modal p {
+    font-size: 0.9em;
+    margin-bottom: 6px;
+    margin-top: 0;
+  }
+
+  .oppia-create-activity-modal button {
+    background-color: #015c53;
+    border-radius: 4px;
+    color: #fff;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+    text-transform: uppercase;
+    width: 100%;
+  }
+
+  .oppia-create-activity-modal button:hover,
+  .oppia-create-activity-modal button:focus,
+  .oppia-create-activity-modal button:active {
+    background-color: rgba(5, 190, 178, 1);
+    color: #fff;
+  }
+
+  .oppia-create-activity-modal img {
+    max-height: 300px;
+    padding-top: 10px;
+    width: 100%;
+  }
+
+  @media (max-width: 770px) {
+    .oppia-create-activity-modal .modal-body {
+      top: 5%;
+    }
+  }

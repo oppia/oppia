@@ -52,6 +52,7 @@ import {Voiceover} from 'domain/exploration/voiceover.model';
 @Component({
   selector: 'oppia-preview-tab',
   templateUrl: './preview-tab.component.html',
+  styleUrls: ['./preview-tab.component.css']
 })
 export class PreviewTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

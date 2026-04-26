@@ -96,7 +96,7 @@ interface QuestionReviewStats extends Stat {
 @Component({
   selector: 'contributor-stats',
   templateUrl: './contributor-stats.component.html',
-  styleUrls: [],
+  styleUrls: ['./contributor-stats.component.css'],
 })
 export class ContributorStatsComponent {
   @Input() type!: string;

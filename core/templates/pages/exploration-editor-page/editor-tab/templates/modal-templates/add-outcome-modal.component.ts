@@ -25,6 +25,7 @@ import {Outcome} from 'domain/exploration/outcome.model';
 @Component({
   selector: 'oppia-add-outcome-modal',
   templateUrl: './add-outcome-modal.component.html',
+  styleUrls: ['./add-outcome-modal.component.css']
 })
 export class AddOutcomeModalComponent
   extends ConfirmOrCancelModal

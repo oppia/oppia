@@ -24,6 +24,7 @@ import {DeleteAccountModalComponent} from './templates/delete-account-modal.comp
 @Component({
   selector: 'oppia-delete-account-page',
   templateUrl: './delete-account-page.component.html',
+  styleUrls: ['./delete-account-page.component.css']
 })
 export class DeleteAccountPageComponent {
   constructor(

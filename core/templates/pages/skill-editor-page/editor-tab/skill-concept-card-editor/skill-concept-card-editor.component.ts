@@ -36,6 +36,7 @@ interface BindableFieldDict {
 @Component({
   selector: 'oppia-skill-concept-card-editor',
   templateUrl: './skill-concept-card-editor.component.html',
+  styleUrls: ['./skill-concept-card-editor.component.css']
 })
 export class SkillConceptCardEditorComponent implements OnInit {
   @Output() getConceptCardChange: EventEmitter<void> = new EventEmitter();

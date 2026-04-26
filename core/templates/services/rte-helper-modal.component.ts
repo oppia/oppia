@@ -106,6 +106,7 @@ export type RteComponentId = {
 @Component({
   selector: 'oppia-rte-helper-modal',
   templateUrl: './rte-helper-modal.component.html',
+  styleUrls: ['./rte-helper-modal.component.css']
 })
 export class RteHelperModalComponent {
   @Input() componentId: RteComponentId;

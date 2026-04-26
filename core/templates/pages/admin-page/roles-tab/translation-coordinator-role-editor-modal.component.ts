@@ -25,6 +25,7 @@ import {AlertsService} from 'services/alerts.service';
 @Component({
   selector: 'oppia-translation-coordinator-role-editor-modal',
   templateUrl: './translation-coordinator-role-editor-modal.component.html',
+  styleUrls: ['./translation-coordinator-role-editor-modal.component.css']
 })
 export class TranslationCoordinatorRoleEditorModalComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

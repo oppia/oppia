@@ -30,6 +30,7 @@ import {PlayerTranscriptService} from '../../services/player-transcript.service'
 @Component({
   selector: 'oppia-display-hint-modal',
   templateUrl: './display-hint-modal.component.html',
+  styleUrls: ['./display-hint-modal.component.css']
 })
 export class DisplayHintModalComponent {
   // These properties are initialized using Angular lifecycle hooks

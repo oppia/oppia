@@ -43,6 +43,7 @@ interface Options {
 @Component({
   selector: 'review-translation-language-selector',
   templateUrl: './review-translation-language-selector.component.html',
+  styleUrls: ['./review-translation-language-selector.component.css']
 })
 export class ReviewTranslationLanguageSelectorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

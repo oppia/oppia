@@ -30,6 +30,7 @@ import {AppConstants} from 'app.constants';
 @Component({
   selector: 'start-new-beam-job-dialog',
   templateUrl: './start-new-beam-job-dialog.component.html',
+  styleUrls: ['./start-new-beam-job-dialog.component.css']
 })
 export class StartNewBeamJobDialogComponent {
   readonly DEV_MODE: boolean = AppConstants.DEV_MODE;

@@ -32,6 +32,7 @@ import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/service
 @Component({
   selector: 'oppia-display-modal',
   templateUrl: './display-solution-modal.component.html',
+  styleUrls: ['./display-solution-modal.component.css']
 })
 export class DisplaySolutionModalComponent {
   // These properties are initialized using Angular lifecycle hooks

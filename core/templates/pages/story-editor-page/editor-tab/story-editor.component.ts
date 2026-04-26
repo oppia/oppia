@@ -43,6 +43,7 @@ import constants from 'assets/constants';
 @Component({
   selector: 'oppia-story-editor',
   templateUrl: './story-editor.component.html',
+  styleUrls: ['./story-editor.component.css']
 })
 export class StoryEditorComponent implements OnInit, OnDestroy {
   story: Story;

@@ -59,6 +59,7 @@ interface VersionMetadataWithTooltip extends VersionMetadata {
 @Component({
   selector: 'oppia-history-tab',
   templateUrl: './history-tab.component.html',
+  styleUrls: ['./history-tab.component.css']
 })
 export class HistoryTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

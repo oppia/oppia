@@ -1,0 +1,34 @@
+.form-field {
+    width: 50%;
+  }
+  .oppia-page-card {
+    margin: 0;
+    padding: 30px 20px;
+    width: 100%;
+  }
+  .questions {
+    padding-bottom: 10px;
+  }
+  .select-skill-card {
+    margin: 0 auto;
+    width: 70%;
+  }
+  .question-editor-header-container,
+  .select-skill-dropdown-container {
+    margin: 0 auto;
+    width: 70%;
+  }
+  .select-skill-dropdown-container select {
+    width: 60%;
+  }
+  .question-list-container {
+    margin-top: -30px;
+  }
+  @media screen and (max-width: 768px) {
+    .question-editor-header-container {
+      width: 100%;
+    }
+    .question-editor-header {
+      margin-bottom: 45px;
+    }
+  }

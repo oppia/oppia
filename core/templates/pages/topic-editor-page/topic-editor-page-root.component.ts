@@ -23,6 +23,7 @@ import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 @Component({
   selector: 'topic-editor-page-root',
   templateUrl: './topic-editor-page-root.component.html',
+  styleUrls: ['./topic-editor-page-root.component.css']
 })
 export class TopicEditorPageRootComponent extends BaseRootComponent {
   title: string =

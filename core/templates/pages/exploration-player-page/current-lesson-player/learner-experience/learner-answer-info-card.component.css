@@ -1,0 +1,32 @@
+.oppia-learner-answer-info-card {
+    background: #fff;
+    border-radius: 2px;
+    margin-left: 87px;
+    padding-top: 20px;
+    text-align: left;
+  }
+
+  .oppia-learner-answer-info-card textarea {
+    resize: vertical;
+  }
+
+  .oppia-learner-answer-info-card .oppia-enter-answer-details {
+    padding: 20px;
+  }
+
+  .oppia-learner-answer-info-card .oppia-submit-button {
+    left: 80%;
+    position: relative;
+  }
+
+  @media screen and (max-width: 959px) {
+    .oppia-learner-answer-info-card {
+      margin-left: auto;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .oppia-learner-answer-info-card .oppia-submit-button {
+      left: 75%;
+    }
+  }

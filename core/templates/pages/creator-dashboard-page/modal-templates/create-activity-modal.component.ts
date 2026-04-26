@@ -26,6 +26,7 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'create-activity-modal',
   templateUrl: './create-activity-modal.component.html',
+  styleUrls: ['./create-activity-modal.component.css']
 })
 export class CreateActivityModalComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

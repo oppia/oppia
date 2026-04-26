@@ -1,0 +1,10 @@
+.oppia-blog-post-thumbnail /deep/ .blog-card {
+    width: unset;
+  }
+
+  @media (max-width: 680px) {
+    .oppia-blog-post-thumbnail /deep/ .blog-card {
+      margin: auto;
+      width: unset;
+    }
+  }

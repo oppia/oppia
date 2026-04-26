@@ -31,6 +31,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 @Component({
   selector: 'oppia-new-chapter-title-modal',
   templateUrl: './new-chapter-title-modal.component.html',
+  styleUrls: ['./new-chapter-title-modal.component.css']
 })
 export class NewChapterTitleModalComponent implements OnInit {
   @Input() nodeTitles!: string | string[];

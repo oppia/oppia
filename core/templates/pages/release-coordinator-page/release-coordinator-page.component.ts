@@ -50,6 +50,7 @@ interface MemoryCacheProfile {
 @Component({
   selector: 'oppia-release-coordinator-page',
   templateUrl: './release-coordinator-page.component.html',
+  styleUrls: ['./release-coordinator-page.component.css']
 })
 export class ReleaseCoordinatorPageComponent implements OnInit {
   @ViewChild('userInputToAddUserToGroup')

@@ -38,6 +38,7 @@ import {
 @Component({
   selector: 'oppia-skill-editor-main-tab',
   templateUrl: './skill-editor-main-tab.component.html',
+  styleUrls: ['./skill-editor-main-tab.component.css']
 })
 export class SkillEditorMainTabComponent
   implements OnInit, AfterContentChecked

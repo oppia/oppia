@@ -31,6 +31,7 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 @Component({
   selector: 'oppia-classrooms-page',
   templateUrl: './classrooms-page.component.html',
+  styleUrls: ['./classrooms-page.component.css']
 })
 export class ClassroomsPageComponent {
   classroomSummaries: ClassroomSummaryDict[] = [];

@@ -52,6 +52,7 @@ type SkillStatusOptionsKeys =
 @Component({
   selector: 'oppia-topics-and-skills-dashboard-page',
   templateUrl: './topics-and-skills-dashboard-page.component.html',
+  styleUrls: ['./topics-and-skills-dashboard-page.component.css']
 })
 export class TopicsAndSkillsDashboardPageComponent {
   directiveSubscriptions: Subscription = new Subscription();

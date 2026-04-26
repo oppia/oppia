@@ -30,6 +30,7 @@ import {Skill} from 'domain/skill/skill.model.ts';
 @Component({
   selector: 'oppia-skill-misconceptions-editor',
   templateUrl: './skill-misconceptions-editor.component.html',
+  styleUrls: ['./skill-misconceptions-editor.component.css']
 })
 export class SkillMisconceptionsEditorComponent implements OnInit {
   @Output() getMisconceptionsChange = new EventEmitter();

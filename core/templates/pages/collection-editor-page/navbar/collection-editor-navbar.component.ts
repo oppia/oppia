@@ -33,6 +33,7 @@ import {CollectionEditorSaveModalComponent} from '../modals/collection-editor-sa
 @Component({
   selector: 'collection-editor-navbar',
   templateUrl: './collection-editor-navbar.component.html',
+  styleUrls: ['./collection-editor-navbar.component.css']
 })
 export class CollectionEditorNavbarComponent {
   directiveSubscriptions = new Subscription();

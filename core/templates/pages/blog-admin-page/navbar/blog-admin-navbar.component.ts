@@ -25,6 +25,7 @@ import {UserService} from 'services/user.service';
 @Component({
   selector: 'oppia-blog-admin-navbar',
   templateUrl: './blog-admin-navbar.component.html',
+  styleUrls: ['./blog-admin-navbar.component.css']
 })
 export class BlogAdminNavbarComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

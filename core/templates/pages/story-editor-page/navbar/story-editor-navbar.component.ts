@@ -36,6 +36,7 @@ import {DraftChapterConfirmationModalComponent} from '../modal-templates/draft-c
 @Component({
   selector: 'oppia-story-editor-navbar',
   templateUrl: './story-editor-navbar.component.html',
+  styleUrls: ['./story-editor-navbar.component.css']
 })
 export class StoryEditorNavbarComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

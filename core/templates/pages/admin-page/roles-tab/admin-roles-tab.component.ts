@@ -33,6 +33,7 @@ import constants from 'assets/constants';
 @Component({
   selector: 'oppia-admin-roles-tab',
   templateUrl: './admin-roles-tab.component.html',
+  styleUrls: ['./admin-roles-tab.component.css']
 })
 export class AdminRolesTabComponent implements OnInit {
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();

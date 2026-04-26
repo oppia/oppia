@@ -27,6 +27,7 @@ import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.consta
 @Component({
   selector: 'oppia-story-viewer-navbar-pre-logo-action',
   templateUrl: './story-viewer-navbar-pre-logo-action.component.html',
+  styleUrls: ['./story-viewer-navbar-pre-logo-action.component.css']
 })
 export class StoryViewerNavbarPreLogoActionComponent
   implements OnInit, OnDestroy

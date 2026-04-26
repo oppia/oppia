@@ -1,0 +1,13 @@
+@media (min-width: 778px) {
+    /* this property hides mobile-nav-options on desktops */
+    .hide-on-desktop {
+      display: none;
+    }
+  }
+
+  @media (max-width: 778px) {
+    /* this property hides nav-options on mobiles */
+    .hide-on-mobile {
+      display: none;
+    }
+  }

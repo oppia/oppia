@@ -26,7 +26,7 @@ import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 @Component({
   selector: 'oppia-blog-card-preview-modal',
   templateUrl: './blog-card-preview-modal.component.html',
-  styleUrls: [],
+  styleUrls: ['./blog-card-preview-modal.component.css'],
 })
 export class BlogCardPreviewModalComponent
   extends ConfirmOrCancelModal

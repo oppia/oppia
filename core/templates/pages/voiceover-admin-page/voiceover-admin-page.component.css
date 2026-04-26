@@ -1,0 +1,258 @@
+.generate-voiceover-button {
+    color: #fff;
+    float: right;
+  }
+  .exploration-id-label, .exploration-title-label,  .language-accent-code-label {
+    font-weight: bold;
+    width: 30%;
+  }
+  .exploration-data-request-button {
+    margin-left: 10px;
+    width: 10%;
+  }
+  .exploration-data-request-input-container, .exploration-data-response-row-container {
+    align-items: center;
+    display: flex;
+    margin-bottom: 5px;
+  }
+  .exploration-data-close-button {
+    margin-left: 50%;
+  }
+  .exploration-data-response-message-container {
+    color: #f00;
+  }
+  .information-toast {
+    background-color: #4caf50;
+    border-radius: 8px;
+    bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    color: white;
+    margin: 20px;
+    padding: 12px 16px;
+    position: fixed;
+    right: 20px;
+    transition: opacity 0.8s ease;
+    width: 300px;
+    z-index: 9999;
+  }
+  .information-toast.fade-out {
+    opacity: 0;
+  }
+  .error-icon {
+    color: red;
+  }
+  .refresh-data-info-container {
+    margin: 20px;
+    text-align: right;
+  }
+  .datepicker-container {
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    margin-bottom: 1%;
+    margin-left: 1%;
+  }
+  .date-selector-inner-container {
+    align-items: center;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    margin: 10px;
+    padding: 16px 20px;
+    position: relative;
+    vertical-align: top;
+  }
+  .exceeding-limit-info-text {
+    padding: 10px 20px;
+  }
+  .info-text {
+    margin-left: 1%;
+  }
+  .date-selector-inner-container .mat-form-field-wrapper {
+    padding-bottom: 0;
+  }
+  .date-selector-inner-container .filter-label {
+    margin: 2px;
+  }
+  .date-selector-inner-container mat-form-field .mat-form-field-infix {
+    border-top: 0;
+    display: flex;
+    padding-left: 4px;
+    width: 100px;
+  }
+  .date-selector-inner-container mat-form-field .mat-form-field-wrapper .mat-form-field-flex {
+    margin: 0 2px 0 2px;
+  }
+  .datepicker-container button {
+    margin-top: 20px;
+  }
+  .datepicker-form-container {
+    width: 30%;
+  }
+  .language-accent-header {
+    margin-right: 23%;
+  }
+  .language-accent-autogeneration-status {
+    cursor: pointer;
+    width: 20%;
+  }
+  .language-accent-description {
+    width: 30%;
+  }
+  .table-container {
+    max-height: 500px;
+    overflow: auto;
+  }
+  .modify-accent {
+    width: 120px;
+  }
+  .table-header {
+    color: #000;
+    font-size: initial;
+  }
+  .voice-artist-table {
+    width: 100%;
+  }
+  .mat-header-cell {
+    justify-content: center;
+    text-align: center;
+  }
+  .mat-cell {
+    justify-content: center;
+    text-align: center;
+  }
+  .mat-mdc-row .mat-mdc-cell {
+    border-bottom: 1px solid transparent;
+    border-top: 1px solid transparent;
+    cursor: pointer;
+  }
+
+  .mat-mdc-row:hover .mat-mdc-cell {
+    border-color: currentColor;
+  }
+
+  .demo-row-is-clicked {
+    font-weight: bold;
+  }
+
+  .oppia-cancel-language-accent-dropdown {
+    width: fit-content;
+  }
+  .oppia-long-text-card {
+    max-width: 1050px;
+  }
+  .oppia-update-button {
+    margin-left: 10px;
+  }
+  .card-content {
+    padding: 20px
+  }
+  .oppia-language-accent-list {
+    align-items: center;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    width: -webkit-fill-available;
+  }
+  .oppia-language-accent-dropdown {
+    display: flex;
+    justify-content: space-between;
+    margin-left: 25px;
+    padding-top: 20px;
+    width: -webkit-fill-available;
+  }
+  .oppia-first-card-bottom-buttons {
+    display: flex;
+    margin-left: 25px;
+    padding-top: 20px;
+  }
+  .oppia-language-accent-dropdown-selector {
+    width: 400px;
+  }
+  .oppia-add-language-accent-button {
+    color: #00645c;
+  }
+  .oppia-supported-language-pair-heading {
+    font-weight: bold;
+    margin-left: 25px;
+  }
+  .oppia-supported-language-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .mat-card.oppia-page-card {
+    background: rgb(255,255,255);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    margin-top: 5%;
+    overflow: auto;
+    padding: 30px 55px 30px 45px;
+    position: relative;
+  }
+  /* :ng-deep is used to style the dropdown select panel.*/
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .mat-select-panel {
+    margin-left: 15px;
+  }
+
+  /* :ng-deep is used to style the form field.*/
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .datepicker-form-container .mat-form-field-infix {
+    align-items: center;
+    display: flex;
+    width: auto;
+  }
+
+  .autogeneration-disabled-text {
+    margin-right: 15px;
+  }
+
+  @media (max-width: 600px) {
+    .language-accent-description {
+      width: 50%;
+    }
+    .oppia-supported-language-pair-heading {
+      font-size: 1rem;
+      margin-left: 0;
+    }
+    .oppia-long-text-card {
+      padding: 8px 2px 8px 2px;
+    }
+    .language-accent-header {
+      margin-right: 0%;
+    }
+    .header-text {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+    .oppia-language-accent-list {
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: bold;
+      gap: 8px;
+      justify-content: flex-start;
+      padding: 5px 0;
+      width: 100%;
+    }
+    .language-accent-autogeneration-status {
+      width: 30%;
+    }
+    .autogeneration-select-field {
+      width: 100%;
+    }
+    .oppia-language-accent-dropdown-selector {
+      min-width: 120px;
+      width: 100%;
+    }
+    .voice-artist-table {
+      font-size: 0.85rem;
+    }
+    .modify-accent {
+      margin-top: 5px;
+      width: 100%;
+    }
+    .mat-card.oppia-page-card {
+      margin: 20% 5%;
+      padding: 10px;
+    }
+  }

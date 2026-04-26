@@ -85,6 +85,7 @@ interface LanguageCodeDescription {
 @Component({
   selector: 'contributor-dashboard-admin-page',
   templateUrl: './contributor-dashboard-admin-page.component.html',
+  styleUrls: ['./contributor-dashboard-admin-page.component.css']
 })
 export class ContributorDashboardAdminPageComponent implements OnInit {
   taskRunningInBackground: boolean = false;

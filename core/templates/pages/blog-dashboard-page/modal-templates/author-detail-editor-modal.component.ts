@@ -24,6 +24,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 @Component({
   selector: 'oppia-blog-author-details-editor',
   templateUrl: './author-detail-editor-modal.component.html',
+  styleUrls: ['./author-detail-editor-modal.component.css']
 })
 export class BlogAuthorDetailsEditorComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks

@@ -39,6 +39,7 @@ interface mergeviewOptions {
 @Component({
   selector: 'oppia-state-diff',
   templateUrl: './state-diff-modal.component.html',
+  styleUrls: ['./state-diff-modal.component.css']
 })
 export class StateDiffModalComponent
   extends ConfirmOrCancelModal

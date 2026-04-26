@@ -1,0 +1,48 @@
+.oppia-roles-container {
+    align-content: space-around;
+    align-items: center;
+    background-color: rgba(204, 204, 204, 0.438);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 10px;
+  }
+  .oppia-role-container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0;
+    min-width: 100px;
+    text-align: justify;
+  }
+  .oppia-role-avatar {
+    display: block;
+    margin: 0 auto;
+    width: 50px;
+  }
+  .oppia-role-name-lable {
+    font-size: 12px;
+    margin-top: 10px;
+  }
+  .oppia-actions-container {
+    margin-top: 50px;
+    min-height: 200px;
+  }
+  .oppia-selected-role {
+    background: #aaa;
+    border-radius: 8px;
+  }
+  .oppia-usernames-loading-spinner {
+    height: 200px;
+    padding: 25% 40%;
+  }
+  .oppia-option-list {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    position: relative;
+    vertical-align: top;
+  }

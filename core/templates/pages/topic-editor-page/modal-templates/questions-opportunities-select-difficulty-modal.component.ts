@@ -34,6 +34,7 @@ import {ImageLocalStorageService} from 'services/image-local-storage.service';
   selector: 'oppia-questions-opportunities-select-difficulty-modal',
   templateUrl:
     './questions-opportunities-select-difficulty-modal.component.html',
+  styleUrls: ['./questions-opportunities-select-difficulty-modal.component.css']
 })
 export class QuestionsOpportunitiesSelectDifficultyModalComponent
   extends ConfirmOrCancelModal

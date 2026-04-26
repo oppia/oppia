@@ -41,6 +41,7 @@ interface CategoryChoices {
 @Component({
   selector: 'oppia-exploration-metadata-modal',
   templateUrl: './exploration-metadata-modal.component.html',
+  styleUrls: ['./exploration-metadata-modal.component.css']
 })
 export class ExplorationMetadataModalComponent
   extends ConfirmOrCancelModal

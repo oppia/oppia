@@ -34,6 +34,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 @Component({
   selector: 'oppia-topic-editor-stories-list',
   templateUrl: './topic-editor-stories-list.component.html',
+  styleUrls: ['./topic-editor-stories-list.component.css']
 })
 export class TopicEditorStoriesListComponent implements OnInit {
   @Input() storySummaries: StorySummary[];

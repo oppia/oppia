@@ -23,6 +23,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 @Component({
   selector: 'skill-preview-modal',
   templateUrl: './skill-preview-modal.component.html',
+  styleUrls: ['./skill-preview-modal.component.css']
 })
 export class SkillPreviewModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks

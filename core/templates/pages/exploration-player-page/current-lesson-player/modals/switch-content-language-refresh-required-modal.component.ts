@@ -28,7 +28,7 @@ export const INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM =
   selector: 'switch-content-language-refresh-required-modal',
   templateUrl:
     './switch-content-language-refresh-required-modal.component.html',
-  styleUrls: [],
+  styleUrls: ['./switch-content-language-refresh-required-modal.component.css'],
 })
 export class SwitchContentLanguageRefreshRequiredModalComponent {
   @Input() languageCode!: string;

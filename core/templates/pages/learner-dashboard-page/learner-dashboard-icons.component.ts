@@ -28,6 +28,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'oppia-learner-dashboard-icons',
   templateUrl: './learner-dashboard-icons.component.html',
+  styleUrls: ['./learner-dashboard-icons.component.css']
 })
 export class LearnerDashboardIconsComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

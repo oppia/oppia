@@ -24,6 +24,7 @@ import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 @Component({
   selector: 'oppia-assign-skill-to-topic-modal',
   templateUrl: './assign-skill-to-topic-modal.component.html',
+  styleUrls: ['./assign-skill-to-topic-modal.component.css']
 })
 export class AssignSkillToTopicModalComponent extends ConfirmOrCancelModal {
   // This property is initialized using component interactions

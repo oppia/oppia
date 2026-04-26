@@ -56,6 +56,7 @@ export interface TopicNameToPrerequisiteTopicNames {
 @Component({
   selector: 'oppia-classroom-admin-page',
   templateUrl: './classroom-admin-page.component.html',
+  styleUrls: ['./classroom-admin-page.component.css']
 })
 export class ClassroomAdminPageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

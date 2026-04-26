@@ -63,6 +63,7 @@ interface DestValidation {
 @Component({
   selector: 'oppia-add-answer-group-modal-component',
   templateUrl: './add-answer-group-modal.component.html',
+  styleUrls: ['./add-answer-group-modal.component.css']
 })
 export class AddAnswerGroupModalComponent
   extends ConfirmOrCancelModal

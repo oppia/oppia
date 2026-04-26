@@ -45,6 +45,7 @@ interface NodeData {
 @Component({
   selector: 'oppia-topics-dependency-graph',
   templateUrl: './topic-dependency-graph-viz-modal.component.html',
+  styleUrls: ['./topic-dependency-graph-viz-modal.component.css']
 })
 export class TopicsDependencyGraphModalComponent extends ConfirmOrCancelModal {
   constructor(

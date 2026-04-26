@@ -23,6 +23,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 @Component({
   selector: 'oppia-editor-reloading-modal',
   templateUrl: './editor-reloading-modal.component.html',
+  styleUrls: ['./editor-reloading-modal.component.css']
 })
 export class EditorReloadingModalComponent
   extends ConfirmOrCancelModal

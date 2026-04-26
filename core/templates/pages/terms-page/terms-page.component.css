@@ -1,0 +1,36 @@
+.oppia-terms-list {
+    list-style: none;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    position: relative;
+    vertical-align: top;
+    width: 100%;
+  }
+  .oppia-page-cards-container .oppia-page-card {
+    padding: 30px 55px 30px 45px;
+  }
+
+  .oppia-terms-right-menu {
+    left: 50%;
+    margin-left: 360px;
+    position: fixed;
+    top: 100px;
+    width: 300px;
+  }
+
+  .oppia-terms-right-menu p {
+    line-height: 1;
+    margin: 0.5em 0;
+  }
+  .oppia-terms-right-menu ul {
+    list-style-type: none;
+    padding-left: 20px;
+  }
+  .oppia-page-cards-container .oppia-h2-text {
+    margin-top: 40px;
+  }
+
+  a {
+    text-decoration: underline;
+  }

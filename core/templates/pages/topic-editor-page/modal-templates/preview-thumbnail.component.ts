@@ -23,6 +23,7 @@ import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 @Component({
   selector: 'oppia-preview-thumbnail',
   templateUrl: './preview-thumbnail.component.html',
+  styleUrls: ['./preview-thumbnail.component.css']
 })
 export class PreviewThumbnailComponent {
   // These properties are initialized using Angular lifecycle hooks

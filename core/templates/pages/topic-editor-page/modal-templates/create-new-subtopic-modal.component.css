@@ -1,0 +1,61 @@
+.new-subtopic-editor .form-text {
+    margin-left: 37.5%;
+    margin-top: -3%;
+  }
+  .new-subtopic-editor .thumbnail-editor {
+    margin: 25px 0;
+  }
+  .new-subtopic-editor .description-editor {
+    margin: 10px 0 0;
+  }
+  .new-subtopic-editor .error-msg {
+    color: #f00;
+    font-size: smaller;
+    margin: 10px 0 0;
+  }
+  .oppia-create-new-subtopic-container .create-new-subtopic-content {
+    margin: 15px 0;
+  }
+  .oppia-create-new-subtopic-container .oppia-new-subtopic-editable-field {
+    font-size: 12px;
+  }
+  .section-content-box h4 {
+    margin: 10px 0 5px;
+  }
+  .section-content-box .description-editor {
+    margin-top: 0;
+  }
+  @media screen and (max-width: 768px) {
+    .create-new-subtopic .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+    }
+    .create-new-subtopic .modal-content {
+      border: 0;
+      border-radius: 0;
+      height: 100vh;
+      overflow: auto;
+    }
+    .create-new-subtopic .modal-header {
+      align-items: center;
+      background-color: #00609c;
+      display: flex;
+    }
+    .create-new-subtopic .modal-header h3 {
+      color: #fff;
+    }
+    .create-new-subtopic .create-new-subtopic-input-field {
+      margin: 25px 0;
+    }
+    .create-new-subtopic .modal-close-button {
+      color: #fff;
+      display: block;
+      font-size: 20px;
+    }
+    .create-new-subtopic .ng-touched.ng-empty.required {
+     outline: 1px solid #f00;
+    }
+  }

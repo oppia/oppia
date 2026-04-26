@@ -40,6 +40,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 @Component({
   selector: 'oppia-creator-dashboard-page',
   templateUrl: './creator-dashboard-page.component.html',
+  styleUrls: ['./creator-dashboard-page.component.css']
 })
 export class CreatorDashboardPageComponent {
   // These properties are initialized using Angular lifecycle hooks

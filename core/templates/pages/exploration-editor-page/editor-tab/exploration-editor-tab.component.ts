@@ -53,6 +53,7 @@ import {AlertsService} from 'services/alerts.service';
 @Component({
   selector: 'oppia-exploration-editor-tab',
   templateUrl: './exploration-editor-tab.component.html',
+  styleUrls: ['./exploration-editor-tab.component.css']
 })
 export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   @Input() explorationIsLinkedToStory = false;

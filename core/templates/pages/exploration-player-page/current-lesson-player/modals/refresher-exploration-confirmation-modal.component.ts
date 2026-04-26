@@ -27,6 +27,7 @@ import {PageContextService} from 'services/page-context.service';
 @Component({
   selector: 'oppia-refresher-confirmation-modal',
   templateUrl: './refresher-exploration-confirmation-modal.component.html',
+  styleUrls: ['./refresher-exploration-confirmation-modal.component.css']
 })
 export class RefresherExplorationConfirmationModal extends ConfirmOrCancelModal {
   confirmRedirectEventEmitter: EventEmitter<void> = new EventEmitter();

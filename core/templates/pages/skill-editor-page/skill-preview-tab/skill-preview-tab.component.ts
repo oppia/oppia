@@ -34,6 +34,7 @@ import {SkillEditorStateService} from '../services/skill-editor-state.service';
 @Component({
   selector: 'oppia-skill-preview-tab',
   templateUrl: './skill-preview-tab.component.html',
+  styleUrls: ['./skill-preview-tab.component.css']
 })
 export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   constructor(

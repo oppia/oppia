@@ -30,6 +30,7 @@ import {CollectionLinearizerService} from '../services/collection-linearizer.ser
 @Component({
   selector: 'oppia-collection-node-creator',
   templateUrl: './collection-node-creator.component.html',
+  styleUrls: ['./collection-node-creator.component.css']
 })
 export class CollectionNodeCreatorComponent {
   // This property is initialized using Angular lifecycle hooks

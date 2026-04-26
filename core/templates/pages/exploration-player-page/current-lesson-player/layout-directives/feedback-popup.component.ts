@@ -28,6 +28,7 @@ import {AppConstants} from 'app.constants';
 @Component({
   selector: 'oppia-feedback-popup',
   templateUrl: './feedback-popup.component.html',
+  styleUrls: ['./feedback-popup.component.css']
 })
 export class FeedbackPopupComponent {
   // These properties below are initialized using Angular lifecycle hooks

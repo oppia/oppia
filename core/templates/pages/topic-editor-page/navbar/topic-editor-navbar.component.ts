@@ -39,6 +39,7 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
 @Component({
   selector: 'oppia-topic-editor-navbar',
   templateUrl: './topic-editor-navbar.component.html',
+  styleUrls: ['./topic-editor-navbar.component.css']
 })
 export class TopicEditorNavbarComponent
   implements OnInit, OnDestroy, AfterContentChecked

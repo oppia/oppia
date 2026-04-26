@@ -24,6 +24,7 @@ import {AppConstants} from 'app.constants';
 @Component({
   selector: 'oppia-blog-post-thumbnail-upload-modal',
   templateUrl: './upload-blog-post-thumbnail-modal.component.html',
+  styleUrls: ['./upload-blog-post-thumbnail-modal.component.css']
 })
 export class UploadBlogPostThumbnailModalComponent extends ConfirmOrCancelModal {
   ALLOWED_IMAGE_EXTENSIONS = AppConstants.ALLOWED_IMAGE_FORMATS;

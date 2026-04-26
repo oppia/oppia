@@ -1,0 +1,94 @@
+.clickable.oppia-error-message-fill {
+    fill: yellow;
+    z-index: 10000
+  }
+
+  .oppia-graph-viz {
+    left: 0;
+    position: absolute;
+    top: 0;
+    z-index: 5;
+  }
+
+  .oppia-graph-viz .pannable-rect {
+    cursor: move;
+    fill: none;
+    fill-opacity: 0;
+    height: 100%;
+    pointer-events: all;
+    width: 100%;
+  }
+  .oppia-graph-viz path.link {
+    fill: none;
+    stroke: rgb(179, 179, 179);
+    stroke-width: 3px;
+  }
+  .oppia-graph-viz text {
+    font: 12px sans-serif;
+    pointer-events: none;
+  }
+  .oppia-graph-viz text.shadow {
+    stroke: #fff;
+    stroke-opacity: .8;
+    stroke-width: 3px;
+  }
+  .oppia-graph-viz .node rect {
+    fill: #fff;
+    pointer-events: all;
+    stroke: rgb(0, 0, 0);
+    -moz-transition: all 0.15s;
+    -webkit-transition: all 0.15s;
+    -o-transition: all 0.15s;
+    transition: all 0.15s;
+  }
+  .oppia-graph-resize-button .oppia-material-icons {
+    font-size: larger;
+  }
+  .oppia-graph-viz .oppia-box-fill {
+    fill: gray;
+  }
+  .oppia-graph-viz .clickable.oppia-error-message-fill {
+    fill: yellow;
+  }
+  .oppia-graph-viz .oppia-highlight-text {
+    font-size: 22px;
+    font-weight: bold;
+  }
+  .oppia-graph-viz .clickable.oppia-node-delete {
+    cursor: pointer;
+    fill: pink;
+  }
+  .oppia-graph-viz .oppia-rectangle {
+    fill: transparent;
+    stroke: black;
+  }
+  .oppia-graph-viz .node rect.terminal-node {
+    fill: green; /* terminal nodes are green to signify them */
+  }
+  .oppia-graph-viz .node rect.bad-node {
+    fill: #f35f55;
+  }
+  .oppia-graph-viz .node rect.current-node:hover,
+  .oppia-graph-viz .node rect.init-node:hover,
+  .oppia-graph-viz .node rect.terminal-node:hover,
+  .oppia-graph-viz .node rect.bad-node:hover,
+  .oppia-graph-viz .node rect.normal-node:hover {
+    fill: #c8c4c4;
+  }
+  .oppia-graph-viz .clickable {
+    cursor: pointer;
+  }
+  .oppia-graph-viz .legend-bar {
+    fill: url('#nodegradient');
+    stroke: black;
+    stroke-width: 0.5;
+  }
+
+  .oppia-graph-resize-button {
+    border: 0;
+    padding: 9px 10px 6px 10px;
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    z-index: 99;
+  }

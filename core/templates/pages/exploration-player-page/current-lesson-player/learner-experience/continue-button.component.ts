@@ -23,6 +23,7 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 @Component({
   selector: 'oppia-continue-button',
   templateUrl: './continue-button.component.html',
+  styleUrls: ['./continue-button.component.css']
 })
 export class ContinueButtonComponent {
   @Input() isLearnAgainButton: boolean = false;

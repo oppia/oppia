@@ -32,6 +32,7 @@ import {ExplorationGraphModalComponent} from '../templates/modal-templates/explo
 @Component({
   selector: 'oppia-exploration-graph',
   templateUrl: './exploration-graph.component.html',
+  styleUrls: ['./exploration-graph.component.css']
 })
 export class ExplorationGraphComponent {
   // This property is initialized using Angular lifecycle hooks

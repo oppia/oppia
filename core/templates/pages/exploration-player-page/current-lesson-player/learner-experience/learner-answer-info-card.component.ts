@@ -27,6 +27,7 @@ import {ConversationFlowService} from 'pages/exploration-player-page/services/co
 @Component({
   selector: 'oppia-learner-answer-info-card',
   templateUrl: './learner-answer-info-card.component.html',
+  styleUrls: ['./learner-answer-info-card.component.css']
 })
 export class LearnerAnswerInfoCard {
   // These properties are initialized using Angular lifecycle hooks

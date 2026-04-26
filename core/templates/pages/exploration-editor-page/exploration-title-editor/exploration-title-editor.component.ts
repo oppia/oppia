@@ -33,6 +33,7 @@ import {ExplorationTitleService} from '../services/exploration-title.service';
 @Component({
   selector: 'oppia-exploration-title-editor',
   templateUrl: './exploration-title-editor.component.html',
+  styleUrls: ['./exploration-title-editor.component.css']
 })
 export class ExplorationTitleEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

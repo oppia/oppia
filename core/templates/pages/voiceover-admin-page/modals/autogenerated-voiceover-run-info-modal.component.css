@@ -1,0 +1,32 @@
+.data-type-title {
+    font-weight: bold;
+    padding: 1%;
+    width: 50%;
+  }
+  .data-container {
+    display: flex;
+  }
+  .content-container {
+    width: 100%;
+  }
+  .messages-container {
+    overflow: auto;
+    padding: 1%;
+    white-space: pre-wrap;
+    width: 190%;
+  }
+  .error-messages-container {
+    background-color: rgba(0, 0, 0, 0.06);
+    font-family: monospace;
+    height: 250px;
+    overflow: scroll;
+    padding: 2%;
+    white-space: pre-wrap;
+  }
+  .copy-to-clipboard-button {
+    background-color: inherit;
+    border: 0;
+    cursor: pointer;
+    float: right;
+    margin-right: 10px;
+  }

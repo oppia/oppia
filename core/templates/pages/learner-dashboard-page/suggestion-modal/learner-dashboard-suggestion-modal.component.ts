@@ -24,7 +24,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 @Component({
   selector: 'oppia-learner-dashboard-suggestion-modal',
   templateUrl: './learner-dashboard-suggestion-modal.component.html',
-  styleUrls: [],
+  styleUrls: ['./learner-dashboard-suggestion-modal.component.css'],
 })
 export class LearnerDashboardSuggestionModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
