@@ -403,6 +403,7 @@ const commonModalBodySelector = '.e2e-test-modal-body';
 const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
 
 const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
+const improvementsTabButton = '.e2e-test-improvements-tab';
 const formErrorContainer = '.e2e-test-form-error-container';
 const numberWithUnitsModalSelector =
   '.e2e-test-number-with-units-help-modal-header';
@@ -4601,6 +4602,16 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(previousCardButton, {
       visible: true,
     });
+  }
+
+  /**
+   * Function to verify that the improvements tab is hidden.
+   * @param visible - Expected visibility.
+   */
+  async expectImprovementsTabToBePresnt(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(improvementsTabButton, visible);
   }
 
   /**
