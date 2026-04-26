@@ -129,8 +129,8 @@ class CustomHTMLParser(html.parser.HTMLParser):
         if tag == 'style' and _is_disallowed_style_tag_filepath(self.filepath):
             error_message = (
                 '%s --> Embedded style tags are not allowed in HTML '
-                'templates. Move the CSS to the component stylesheet.'
-                % self.filepath
+                'templates. Move the CSS to the corresponding '
+                '.component.css file.' % self.filepath
             )
             self.error_messages.append(error_message)
             self.failed = True

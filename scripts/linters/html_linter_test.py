@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import multiprocessing
 import os
+from unittest import mock
 
 from core.tests import test_utils
 
@@ -374,7 +375,7 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
             [
                 'core/templates/test.component.html --> Embedded style tags '
                 'are not allowed in HTML templates. Move the CSS to the '
-                'component stylesheet.'
+                'corresponding .component.css file.'
             ],
             parser.error_messages,
         )
@@ -389,15 +390,16 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
             '  </style>\n'
             '</div>\n'
         )
-        parser = html_linter.CustomHTMLParser(
-            filepath=(
-                'core/templates/components/common-layout-directives/'
-                'common-elements/background-banner.component.html'
-            ),
-            file_lines=tuple(file_content.splitlines(keepends=True)),
-        )
+        filepath = 'core/templates/test-legacy-style.component.html'
+        with mock.patch.object(
+            html_linter, 'LEGACY_STYLE_TAG_ALLOWLIST', frozenset([filepath])
+        ):
+            parser = html_linter.CustomHTMLParser(
+                filepath=filepath,
+                file_lines=tuple(file_content.splitlines(keepends=True)),
+            )
 
-        parser.feed(file_content)
+            parser.feed(file_content)
 
-        self.assertFalse(parser.failed)
-        self.assertEqual([], parser.error_messages)
+            self.assertFalse(parser.failed)
+            self.assertEqual([], parser.error_messages)
