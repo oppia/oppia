@@ -62,8 +62,8 @@ const FRACTION_SYMBOL_DICT = {
   output: {
     latex: '\\frac{{$1}}{{$2}}',
     small_latex: '\\frac{{$1}}{{$2}}',
-    asciimath: '({$1})/({$2})',
-    text: '({$1})/({$2})',
+    asciimath: '{$1}/{$2}',
+    text: '{$1}/{$2}',
   },
   input: 1,
   keys: ['/'],
