@@ -226,9 +226,6 @@ def _apply_subtopic_page_change(
     deleted_subtopic_ids: List[int],
     modified_subtopic_pages: Dict[str, subtopic_page_domain.SubtopicPage],
     modified_study_guides: Dict[str, study_guide_domain.StudyGuide],
-    modified_subtopic_change_cmds: Dict[
-        str, List[subtopic_page_domain.SubtopicPageChange]
-    ],
 ) -> None:
     """Applies a subtopic page property change to the subtopic pages collection.
 
@@ -245,8 +242,6 @@ def _apply_subtopic_page_change(
             modified subtopic pages keyed by page ID.
         modified_study_guides: dict(str, StudyGuide). Dictionary of modified
             study guides keyed by guide ID.
-        modified_subtopic_change_cmds: dict(str, list(SubtopicPageChange)).
-            Change commands for each subtopic page keyed by page ID.
 
     Raises:
         Exception. The subtopic with the given ID doesn't exist.
@@ -955,7 +950,6 @@ def apply_change_list(
                     deleted_subtopic_ids,
                     modified_subtopic_pages,
                     modified_study_guides,
-                    modified_subtopic_change_cmds,
                 )
             elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:
                 # Here we use cast because we are narrowing down the type from
