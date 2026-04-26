@@ -582,7 +582,7 @@ describe('Conversation flow service', () => {
 
   it('should return false when concept card is shown', () => {
     const conceptCard = new StateCard(
-      '',
+      null as unknown as string,
       '',
       '',
       createInteraction(null),
