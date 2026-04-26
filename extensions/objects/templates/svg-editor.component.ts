@@ -938,6 +938,10 @@ export class SvgEditorComponent implements OnInit {
   }
 
   private createBezierControlPoints(left: number, top: number): fabric.Circle {
+    // This function is used to add the control points for the quadratic
+    // bezier curve which is used to control the position of the curve.
+    // A size 2 is added so that the control circles is not rendered
+    // too small.
     const circle = new fabric.Circle({
       left: left,
       top: top,
@@ -996,6 +1000,9 @@ export class SvgEditorComponent implements OnInit {
 
   private getQuadraticBezierCurve(): fabric.Object | null {
     if (this.drawMode === this.DRAW_MODE_BEZIER) {
+      // The order of objects being added are the path followed by
+      // three control points. Therefore the 4th from the last is the
+      // quadratic curve.
       return this.canvas.getObjects().slice(-4, -3)[0];
     }
     return null;
@@ -1250,15 +1257,16 @@ export class SvgEditorComponent implements OnInit {
   private loadSvgFile(objects: fabric.Object[]): void {
     if (this.loadType === 'group') {
       objects.forEach((obj: fabric.Object) => {
-        const svgObject = obj as fabric.Object & {id?: string};
-        svgObject.set({
-          id: 'group' + this.groupCount,
-        } as unknown as Partial<fabric.Object>);
-        obj.toSVG = this.createCustomToSVG(
-          obj.toSVG,
-          obj.type ?? 'path',
+        const svgObject = obj as fabric.Object & {
+          id?: string;
+          type?: string;
+        };
+        svgObject.set('id', 'group' + this.groupCount);
+        svgObject.toSVG = this.createCustomToSVG(
+          svgObject.toSVG,
+          svgObject.type ?? 'path',
           svgObject.id ?? 'group' + this.groupCount,
-          obj
+          svgObject
         );
       });
       this.canvas.add(new fabric.Group(objects));
@@ -1418,9 +1426,10 @@ export class SvgEditorComponent implements OnInit {
         this.canvas.add(redoObj.object);
       } else {
         const shape = redoObj.object;
-        let index = this.canvasObjects.indexOf(shape);
+        const index = this.canvasObjects.indexOf(shape);
         this.canvasObjects.splice(index, 1);
-        this.canvas.remove(shape);
+        const canvasIndex = this.canvas._objects.indexOf(shape);
+        this.canvas._objects.splice(canvasIndex, 1);
       }
     }
     this.canvas.renderAll();
@@ -1471,10 +1480,12 @@ export class SvgEditorComponent implements OnInit {
       });
       this.canvas.renderAll();
     } else {
-      const shape = this.canvas.getActiveObject();
+      const shape = this.canvas.getActiveObject() as
+        | (fabric.Object & {type?: string})
+        | null;
       const strokeShapes = ['rect', 'circle', 'path', 'line', 'polyline'];
       this.canvas.freeDrawingBrush.color = this.fabricjsOptions.stroke;
-      const shapeType = (shape?.get('type') as string | undefined) ?? '';
+      const shapeType = shape?.type ?? '';
       if (shape && strokeShapes.indexOf(shapeType) !== -1) {
         shape.set({
           stroke: this.fabricjsOptions.stroke,
@@ -1492,9 +1503,11 @@ export class SvgEditorComponent implements OnInit {
       });
       this.canvas.renderAll();
     } else {
-      const shape = this.canvas.getActiveObject();
+      const shape = this.canvas.getActiveObject() as
+        | (fabric.Object & {type?: string})
+        | null;
       const fillShapes = ['rect', 'circle', 'path', 'textbox', 'polyline'];
-      const shapeType = (shape?.get('type') as string | undefined) ?? '';
+      const shapeType = shape?.type ?? '';
       if (shape && fillShapes.indexOf(shapeType) !== -1) {
         shape.set({
           fill: this.fabricjsOptions.fill,
@@ -1563,10 +1576,12 @@ export class SvgEditorComponent implements OnInit {
       } as Partial<fabric.Object>);
       this.canvas.renderAll();
     } else {
-      const shape = this.canvas.getActiveObject();
+      const shape = this.canvas.getActiveObject() as
+        | (fabric.Object & {type?: string})
+        | null;
       this.canvas.freeDrawingBrush.width = this.getSize();
       const strokeWidthShapes = ['rect', 'circle', 'path', 'line', 'polyline'];
-      const shapeType = (shape?.get('type') as string | undefined) ?? '';
+      const shapeType = shape?.type ?? '';
       if (shape && strokeWidthShapes.indexOf(shapeType) !== -1) {
         shape.set({
           strokeWidth: this.getSize(),
@@ -1725,16 +1740,16 @@ export class SvgEditorComponent implements OnInit {
         if (!pt || !curve?.path) {
           return;
         }
-        if (pt.name === 'p0' && curve.path[0]) {
-          curve.path[0][1] = pt.left ?? curve.path[0][1];
-          curve.path[0][2] = pt.top ?? curve.path[0][2];
-        } else if (pt.name === 'p1' && curve.path[1]) {
-          curve.path[1][1] = pt.left ?? curve.path[1][1];
-          curve.path[1][2] = pt.top ?? curve.path[1][2];
-        } else if (pt.name === 'p2' && curve.path[1]) {
-          curve.path[1][3] = pt.left ?? curve.path[1][3];
-          curve.path[1][4] = pt.top ?? curve.path[1][4];
+        const pathIndex =
+          pt.name === 'p0' ? 0 : pt.name === 'p1' || pt.name === 'p2' ? 1 : -1;
+        const xCoordinateIndex = pt.name === 'p2' ? 3 : 1;
+        const yCoordinateIndex = pt.name === 'p2' ? 4 : 2;
+        const targetPath = curve.path[pathIndex];
+        if (pathIndex === -1 || !targetPath) {
+          return;
         }
+        targetPath[xCoordinateIndex] = pt.left ?? targetPath[xCoordinateIndex];
+        targetPath[yCoordinateIndex] = pt.top ?? targetPath[yCoordinateIndex];
         this.canvas.renderAll();
       }
     });
@@ -1771,13 +1786,13 @@ export class SvgEditorComponent implements OnInit {
       const activeObject = this.canvas.getActiveObject();
       if (activeObject?.get('type') === 'textbox') {
         const text = activeObject;
-        const scaleX = text.get('scaleX');
-        const scaleY = text.get('scaleY');
-        const width = text.get('width');
-        const height = text.get('height');
+        const scaleX: number = text.get('scaleX') as number;
+        const scaleY: number = text.get('scaleY') as number;
+        const width: number = text.get('width') as number;
+        const height: number = text.get('height') as number;
         activeObject.set({
-          width: (width as number) * (scaleX as number),
-          height: (height as number) * (scaleY as number),
+          width: width * scaleX,
+          height: height * scaleY,
           scaleX: 1,
           scaleY: 1,
         });
@@ -1798,13 +1813,13 @@ export class SvgEditorComponent implements OnInit {
           return;
         }
         this.layerNum = this.canvas.getObjects().indexOf(shape) + 1;
-        const fillColor = shape.get('fill');
-        const strokeColor = shape.get('stroke');
+        const fillColor: string = (shape.get('fill') as string) ?? '';
+        const strokeColor: string = (shape.get('stroke') as string) ?? '';
         this.fillPicker?.setOptions({
-          color: (fillColor as string) ?? '',
+          color: fillColor,
         });
         this.strokePicker?.setOptions({
-          color: (strokeColor as string) ?? '',
+          color: strokeColor,
         });
         this.objectIsSelected = true;
         const strokeWidthShapes = [

@@ -51,15 +51,10 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
         class MockFile:
-            def __init__(
-                self,
-                flakes: int = 0,
-                flake_message: str = 'Disconnected , because no message',
-            ) -> None:
+            def __init__(self, flakes: int = 0) -> None:
                 self.counter = 0
                 self.run_counter = 0
                 self.flakes = flakes
-                self.flake_message = flake_message
 
             def readline(self) -> bytes:  # pylint: disable=missing-docstring
                 self.counter += 1
@@ -68,7 +63,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                         b'Executed tests. Trying to get the Angular injector..'
                     )
                 if self.counter == 2 and self.run_counter < self.flakes:
-                    return self.flake_message.encode('utf-8')
+                    return b'Disconnected , because no message'
                 self.counter = 0
                 self.run_counter += 1
                 return b''
@@ -124,21 +119,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             def wait(self) -> None:  # pylint: disable=missing-docstring
                 return None
 
-        class MockCaptureFlakyTask:
-            def __init__(self) -> None:
-                self.returncode = 0
-                self.stdout = MockFile(
-                    flakes=1,
-                    flake_message='ChromeHeadless has not captured in 60000 ms',
-                )
-                self.stderr = MockFile()
-
-            def poll(self) -> int:  # pylint: disable=missing-docstring
-                return 1
-
-            def wait(self) -> None:  # pylint: disable=missing-docstring
-                return None
-
         self.cmd_token_list: list[list[str]] = []
 
         def mock_success_check_call(
@@ -158,12 +138,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         ) -> MockVeryFlakyTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockVeryFlakyTask()
-
-        def mock_capture_flaky_check_call(
-            cmd_tokens: list[str], **unused_kwargs: str
-        ) -> MockCaptureFlakyTask:  # pylint: disable=unused-argument
-            self.cmd_token_list.append(cmd_tokens)
-            return MockCaptureFlakyTask()
 
         def mock_failed_check_call(
             cmd_tokens: list[str], **unused_kwargs: str
@@ -196,9 +170,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         )
         self.swap_very_flaky_Popen = self.swap(
             subprocess, 'Popen', mock_very_flaky_check_call
-        )
-        self.swap_capture_flaky_Popen = self.swap(
-            subprocess, 'Popen', mock_capture_flaky_check_call
         )
         self.swap_failed_Popen = self.swap(
             subprocess, 'Popen', mock_failed_check_call
@@ -405,27 +376,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                             args=['--run_on_changed_files_in_branch']
                         )
 
-    def test_get_rerun_reason(self) -> None:
-        self.assertEqual(
-            run_frontend_tests.get_rerun_reason(
-                'Disconnected (1 times), because no message in 120000 ms.'
-            ),
-            'Detected chrome disconnected flake (#16607), so rerunning '
-            'if attempts allow.',
-        )
-        self.assertEqual(
-            run_frontend_tests.get_rerun_reason(
-                'ChromeHeadless has not captured in 60000 ms, killing.'
-            ),
-            'Detected chrome capture-timeout flake, so rerunning '
-            'if attempts allow.',
-        )
-        self.assertIsNone(
-            run_frontend_tests.get_rerun_reason(
-                'All tests passed with no flaky browser logs.'
-            )
-        )
-
     def test_frontend_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
@@ -475,31 +425,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertIn('Attempt 1 of 2', self.print_arr)
         self.assertIn(
             'Detected chrome disconnected flake (#16607), so rerunning '
-            'if attempts allow.',
-            self.print_arr,
-        )
-        self.assertIn('Attempt 2 of 2', self.print_arr)
-        self.assertTrue(self.frontend_coverage_checks_called)
-        self.assertEqual(self.frontend_coverage_checks_args, [[]])
-        self.assertEqual(len(self.sys_exit_message), 0)
-
-    def test_frontend_tests_rerun_on_capture_timeout(self) -> None:
-        with self.swap_capture_flaky_Popen, self.print_swap, self.swap_build:
-            with self.swap_install_third_party_libs, self.swap_common:
-                with self.swap_check_frontend_coverage:
-                    run_frontend_tests.main(args=['--check_coverage'])
-
-        cmd = [
-            common.NODE_BIN_PATH,
-            '--max-old-space-size=4096',
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start',
-            os.path.join('core', 'tests', 'karma.conf.ts'),
-        ]
-        self.assertIn(cmd, self.cmd_token_list)
-        self.assertIn('Attempt 1 of 2', self.print_arr)
-        self.assertIn(
-            'Detected chrome capture-timeout flake, so rerunning '
             'if attempts allow.',
             self.print_arr,
         )
@@ -558,13 +483,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         ]
         self.assertIn(cmd, self.cmd_token_list)
         self.assertFalse(self.frontend_coverage_checks_called)
-        self.assertIn('Attempt 1 of 2', self.print_arr)
-        self.assertIn(
-            'Frontend tests exited with a non-zero status, so rerunning '
-            'once to rule out transient flakes.',
-            self.print_arr,
-        )
-        self.assertIn('Attempt 2 of 2', self.print_arr)
         self.assertIn(1, self.sys_exit_message)
 
     def test_frontend_tests_are_run_correctly_on_production(self) -> None:

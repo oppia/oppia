@@ -407,7 +407,7 @@ jobs:
       - name: Run Lighthouse performance checks (shard ${{ matrix.suite.name }})
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.run_lighthouse_tests --mode performance --skip_build --record_screen --pages ${{ join(matrix.suite.pages_to_run, ',') }}
-        timeout-minutes: 60
+        timeout-minutes: 45
       - name: Uploading puppeteer video as artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4

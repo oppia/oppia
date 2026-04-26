@@ -128,6 +128,7 @@ describe('Teach Oppia Modal Component', () => {
       solution: null,
     },
     linked_skill_id: null,
+    inapplicable_skill_misconception_ids: null,
     param_changes: [],
     solicit_answer_details: false,
     card_is_checkpoint: false,
@@ -369,9 +370,11 @@ describe('Teach Oppia Modal Component', () => {
       spyOn(
         trainingModalService,
         'openTrainUnresolvedAnswerModal'
-      ).and.callFake(
-        function (InteractionAnswer, interactionId, answerIndex) {}
-      );
+      ).and.callFake(function (
+        interactionAnswer: InteractionAnswer,
+        interactionId: string,
+        answerIndex: number
+      ) {});
 
       component.openTrainUnresolvedAnswerModal(0);
 

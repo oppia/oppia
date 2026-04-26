@@ -801,9 +801,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       const uploadedImageData = this.getRawUploadedImageData();
       if (!uploadedImageData) {
         return Object.keys(styles)
-          .map((key: string) => {
-            return key + ': ' + styles[key];
-          })
+          .map((key: string) => `${key}: ${styles[key]}`)
           .join('; ');
       }
       const data =
@@ -824,9 +822,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     }
 
     return Object.keys(styles)
-      .map((key: string) => {
-        return key + ': ' + styles[key];
-      })
+      .map((key: string) => `${key}: ${styles[key]}`)
       .join('; ');
   }
 
@@ -849,14 +845,12 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     // Check point 2 in the note before imports and after fileoverview.
     const imageDataURI = this.getUploadedImageDataOrThrow();
     const mimeType = imageDataURI.split(';')[0];
-    let newImageFile: Blob | null = null;
-
     if (mimeType === this.MIME_TYPE_GIF) {
       let successCb = (obj: GifshotCallbackObject) => {
         this.validateProcessedFilesize(obj.image);
-        newImageFile =
+        const newImageFile =
           this.imageUploadHelperService.convertImageDataToImageFile(obj.image);
-        if (!newImageFile) {
+        if (newImageFile === null) {
           this.alertsService.addWarning('Could not get resampled file.');
           document.body.style.cursor = 'default';
           return;
@@ -881,9 +875,9 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     } else if (mimeType === AppConstants.SVG_MIME_TYPE) {
       // Check point 2 in the note before imports and after fileoverview.
       const imageData = this.getUploadedImageDataOrThrow();
-      newImageFile =
+      const newImageFile =
         this.imageUploadHelperService.convertImageDataToImageFile(imageData);
-      if (!newImageFile) {
+      if (newImageFile === null) {
         this.alertsService.addWarning('Could not get resampled file.');
         return;
       }
@@ -900,9 +894,9 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       );
       this.validateProcessedFilesize(newImageData);
 
-      newImageFile =
+      const newImageFile =
         this.imageUploadHelperService.convertImageDataToImageFile(newImageData);
-      if (!newImageFile) {
+      if (newImageFile === null) {
         this.alertsService.addWarning('Could not get resampled file.');
         return;
       }

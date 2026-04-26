@@ -69,7 +69,7 @@ interface NoteSequence {
 
 interface NoteStartSequence {
   note: {
-    noteStart: NoteStart;
+    noteStart?: NoteStart;
   };
 }
 
@@ -461,7 +461,7 @@ export class MusicNotesInputComponent
         this.renderer.addClass(staffLineDiv, 'oppia-music-input-hovered');
 
         const lineValue = staffLineDiv.getAttribute('data-line-value');
-        if (!lineValue || !this.isNoteName(lineValue)) {
+        if (!this.isNoteName(lineValue)) {
           return;
         }
         if (this.isLedgerLineNote(lineValue)) {
@@ -520,9 +520,15 @@ export class MusicNotesInputComponent
           evt.clientX - staffContainer.getBoundingClientRect().left;
         const topPos = staffLineDiv.offsetTop;
         const lineValue = staffLineDiv.getAttribute('data-line-value');
-        if (!lineValue || !this.isNoteName(lineValue)) {
+        if (!this.isNoteName(lineValue)) {
           return;
         }
+
+        const note = {
+          baseNoteMidiNumber: this.NOTE_NAMES_TO_MIDI_VALUES[lineValue],
+          offset: parseInt(noteType, 10),
+          noteId,
+        };
 
         this._removeNotesFromNoteSequenceWithId(noteId);
 
@@ -557,7 +563,7 @@ export class MusicNotesInputComponent
         this.renderer.addClass(noteEl, 'oppia-music-input-on-staff');
 
         const noteStartInfo = this.getNoteStartFromLeftPos(finalLeft);
-        if (!noteStartInfo) {
+        if (!noteStartInfo || noteStartInfo.note.noteStart === undefined) {
           const parent = noteEl.parentNode;
           if (parent) {
             this.renderer.removeChild(parent, noteEl);
@@ -566,16 +572,14 @@ export class MusicNotesInputComponent
           return;
         }
 
-        const note: MusicNote = {
-          baseNoteMidiNumber: this.NOTE_NAMES_TO_MIDI_VALUES[lineValue],
-          offset: parseInt(noteType, 10),
-          noteId,
+        const noteToAdd: MusicNote = {
+          ...note,
           noteStart: noteStartInfo.note.noteStart,
         };
 
-        this._addNoteToNoteSequence(note);
+        this._addNoteToNoteSequence(noteToAdd);
         this._sortNoteSequence();
-        this.playSequence([[this._convertNoteToMidiPitch(note)]]);
+        this.playSequence([[this._convertNoteToMidiPitch(noteToAdd)]]);
         this.repaintLedgerLines();
       });
 
@@ -604,9 +608,12 @@ export class MusicNotesInputComponent
   // When compareNoteStarts(a, b) returns greater than 0, a is greater
   //   than b.
   compareNoteStarts(
-    a: {note: {noteStart: NoteStart}},
-    b: {note: {noteStart: NoteStart}}
+    a: {note: {noteStart?: NoteStart}},
+    b: {note: {noteStart?: NoteStart}}
   ): number {
+    if (!a.note.noteStart || !b.note.noteStart) {
+      return 0;
+    }
     return (
       (a.note.noteStart.num * b.note.noteStart.den -
         a.note.noteStart.den * b.note.noteStart.num) /
@@ -618,7 +625,7 @@ export class MusicNotesInputComponent
   // otherwise the position is available.
   checkIfNotePositionTaken(leftPos: number): boolean {
     const newNoteToCheck = this.getNoteStartFromLeftPos(leftPos);
-    if (!newNoteToCheck) {
+    if (!newNoteToCheck || newNoteToCheck.note.noteStart === undefined) {
       return false;
     }
 
@@ -724,10 +731,10 @@ export class MusicNotesInputComponent
     );
   }
 
-  isNoteName(noteName: string): noteName is NoteName {
+  private isNoteName(noteName?: string): noteName is NoteName {
     return Object.prototype.hasOwnProperty.call(
       this.NOTE_NAMES_TO_MIDI_VALUES,
-      noteName
+      noteName ?? ''
     );
   }
 

@@ -60,9 +60,6 @@ const acceptedBrowserAlerts = [
   'This action is irreversible. Are you sure?',
   'This action is irreversible. If you insist to proceed, please enter the commit message for the update',
 ];
-const BROWSER_LAUNCH_TIMEOUT_MSECS = 60000;
-const BROWSER_LAUNCH_MAX_ATTEMPTS = 3;
-const BROWSER_LAUNCH_RETRY_DELAY_MSECS = 5000;
 
 interface ClickDetails {
   position: {x: number; y: number};
@@ -116,156 +113,134 @@ export class BaseUser {
       args.push('--disable-site-isolation-trials');
     }
 
-    let browser: Browser | null = null;
-    let lastLaunchError: Error | null = null;
-    for (let attempt = 1; attempt <= BROWSER_LAUNCH_MAX_ATTEMPTS; attempt++) {
-      try {
-        browser = await puppeteer.launch({
-          /** TODO(#17761): Right now some acceptance tests are failing on
-           * headless mode. As per the expected behavior we need to make sure
-           * every test passes on both modes. */
-          headless,
-          args,
-          timeout: BROWSER_LAUNCH_TIMEOUT_MSECS,
-        });
-        break;
-      } catch (error) {
-        lastLaunchError = error as Error;
-        showMessage(
-          `Browser launch attempt ${attempt} of ${BROWSER_LAUNCH_MAX_ATTEMPTS} failed: ${lastLaunchError.message}`
-        );
-        if (attempt < BROWSER_LAUNCH_MAX_ATTEMPTS) {
-          await new Promise(resolve =>
-            setTimeout(resolve, BROWSER_LAUNCH_RETRY_DELAY_MSECS)
+    await puppeteer
+      .launch({
+        /** TODO(#17761): Right now some acceptance tests are failing on
+         * headless mode. As per the expected behavior we need to make sure
+         * every test passes on both modes. */
+        headless,
+        args,
+      })
+      .then(async browser => {
+        this.startTimeInMilliseconds = Date.now();
+        this.browserObject = browser;
+        ConsoleReporter.trackConsoleMessagesInBrowser(browser);
+        if (!mobile) {
+          TestToModulesMatcher.setGoldenFilePath(
+            `core/tests/test-modules-mappings/acceptance/${specName}.txt`
           );
+          TestToModulesMatcher.registerPuppeteerBrowser(browser);
         }
-      }
-    }
+        this.page = await browser.newPage();
+        this.attachNavigationLogs(this.page);
+        this.pages.push(this.page);
 
-    if (browser === null) {
-      throw (
-        lastLaunchError ??
-        new Error('Unable to launch browser for acceptance tests.')
-      );
-    }
+        if (mobile) {
+          // This is the default viewport and user agent settings for iPhone 6.
+          await this.page.setViewport({
+            width: 375,
+            height: 667,
+            deviceScaleFactor: 2,
+            isMobile: true,
+            hasTouch: true,
+            isLandscape: false,
+          });
+          await this.page.setUserAgent(
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) ' +
+              'AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
+              'Mobile/15A372 Safari/604.1'
+          );
+        } else {
+          this.page.setViewport({width: 1920, height: 1080});
+        }
 
-    this.startTimeInMilliseconds = Date.now();
-    this.browserObject = browser;
-    ConsoleReporter.trackConsoleMessagesInBrowser(browser);
-    if (!mobile) {
-      TestToModulesMatcher.setGoldenFilePath(
-        `core/tests/test-modules-mappings/acceptance/${specName}.txt`
-      );
-      TestToModulesMatcher.registerPuppeteerBrowser(browser);
-    }
-    this.page = await browser.newPage();
-    this.attachNavigationLogs(this.page);
-    this.pages.push(this.page);
+        // Enable Video Recording.
+        if (process.env.VIDEO_RECORDING_IS_ENABLED === '1') {
+          const uniqueString = Math.random().toString(36).substring(2, 8);
+          const outputFileName =
+            `${this.username}-${new Date().toISOString()}-${uniqueString}.mp4`.replace(
+              /[^a-z0-9.-]/gi,
+              '_'
+            );
 
-    if (mobile) {
-      // This is the default viewport and user agent settings for iPhone 6.
-      await this.page.setViewport({
-        width: 375,
-        height: 667,
-        deviceScaleFactor: 2,
-        isMobile: true,
-        hasTouch: true,
-        isLandscape: false,
+          const folderName =
+            `${mobile ? 'mobile' : 'desktop'}-${specName}`.replace(
+              /[^a-z0-9.-]/gi,
+              '_'
+            );
+          const outputDir = path.join(testConstants.TEST_VIDEO_DIR, folderName);
+          if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir, {recursive: true});
+          }
+
+          const config = {
+            followNewTab: false,
+            fps: 25,
+            ffmpeg_Path: null,
+            // Below dimensions are of recorded video.
+            videoFrame: {
+              width: 1280,
+              height: 720,
+            },
+            aspectRatio: '16:9',
+            videoCrf: 18,
+            videoCodec: 'libx264',
+            videoPreset: 'medium',
+            videoBitrate: 1000,
+            autopad: {
+              color: 'black',
+            },
+            waitForFrameBeforeStart: 2000,
+            waitForFrameAfterPageLoad: 2000,
+            maxRetries: 3, // Add retry mechanism.
+            ffmpegFlags: [
+              // Additional ffmpeg flags for stability.
+              '-movflags',
+              '+faststart',
+              '-max_muxing_queue_size',
+              '9999',
+            ],
+          };
+
+          const fullScreenRecordingPath = path.join(outputDir, outputFileName);
+          showMessage(`Saving screen recording to ${fullScreenRecordingPath}`);
+          this.screenRecorder = new PuppeteerScreenRecorder(this.page, config);
+          await this.screenRecorder.start(fullScreenRecordingPath);
+
+          // Ensure recording is stopped when the test fails.
+          process.on('SIGTERM', async () => {
+            await this.screenRecorder.stop();
+          });
+          process.on('SIGINT', async () => {
+            await this.screenRecorder.stop();
+          });
+        }
+
+        // Set up Download Folder.
+        const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
+
+        // Ensure the folder exists.
+        if (!fs.existsSync(downloadDir)) {
+          fs.mkdirSync(downloadDir, {recursive: true});
+        }
+
+        // Enable download behavior using Chrome DevTools Protocol (CDP).
+        const client = await this.page.target().createCDPSession();
+        await client.send('Page.setDownloadBehavior', {
+          behavior: 'allow',
+          downloadPath: downloadDir,
+        });
+
+        this.page.on('dialog', async dialog => {
+          const alertText = dialog.message();
+          if (acceptedBrowserAlerts.includes(alertText)) {
+            await dialog.accept();
+          } else {
+            throw new Error(`Unexpected alert: ${alertText}`);
+          }
+        });
+        this.setupDebugTools();
       });
-      await this.page.setUserAgent(
-        'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) ' +
-          'AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
-          'Mobile/15A372 Safari/604.1'
-      );
-    } else {
-      this.page.setViewport({width: 1920, height: 1080});
-    }
-
-    // Enable Video Recording.
-    if (process.env.VIDEO_RECORDING_IS_ENABLED === '1') {
-      const uniqueString = Math.random().toString(36).substring(2, 8);
-      const outputFileName =
-        `${this.username}-${new Date().toISOString()}-${uniqueString}.mp4`.replace(
-          /[^a-z0-9.-]/gi,
-          '_'
-        );
-
-      const folderName = `${mobile ? 'mobile' : 'desktop'}-${specName}`.replace(
-        /[^a-z0-9.-]/gi,
-        '_'
-      );
-      const outputDir = path.join(testConstants.TEST_VIDEO_DIR, folderName);
-      if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir, {recursive: true});
-      }
-
-      const config = {
-        followNewTab: false,
-        fps: 25,
-        ffmpeg_Path: null,
-        // Below dimensions are of recorded video.
-        videoFrame: {
-          width: 1280,
-          height: 720,
-        },
-        aspectRatio: '16:9',
-        videoCrf: 18,
-        videoCodec: 'libx264',
-        videoPreset: 'medium',
-        videoBitrate: 1000,
-        autopad: {
-          color: 'black',
-        },
-        waitForFrameBeforeStart: 2000,
-        waitForFrameAfterPageLoad: 2000,
-        maxRetries: 3, // Add retry mechanism.
-        ffmpegFlags: [
-          // Additional ffmpeg flags for stability.
-          '-movflags',
-          '+faststart',
-          '-max_muxing_queue_size',
-          '9999',
-        ],
-      };
-
-      const fullScreenRecordingPath = path.join(outputDir, outputFileName);
-      showMessage(`Saving screen recording to ${fullScreenRecordingPath}`);
-      this.screenRecorder = new PuppeteerScreenRecorder(this.page, config);
-      await this.screenRecorder.start(fullScreenRecordingPath);
-
-      // Ensure recording is stopped when the test fails.
-      process.on('SIGTERM', async () => {
-        await this.screenRecorder.stop();
-      });
-      process.on('SIGINT', async () => {
-        await this.screenRecorder.stop();
-      });
-    }
-
-    // Set up Download Folder.
-    const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
-
-    // Ensure the folder exists.
-    if (!fs.existsSync(downloadDir)) {
-      fs.mkdirSync(downloadDir, {recursive: true});
-    }
-
-    // Enable download behavior using Chrome DevTools Protocol (CDP).
-    const client = await this.page.target().createCDPSession();
-    await client.send('Page.setDownloadBehavior', {
-      behavior: 'allow',
-      downloadPath: downloadDir,
-    });
-
-    this.page.on('dialog', async dialog => {
-      const alertText = dialog.message();
-      if (acceptedBrowserAlerts.includes(alertText)) {
-        await dialog.accept();
-      } else {
-        throw new Error(`Unexpected alert: ${alertText}`);
-      }
-    });
-    this.setupDebugTools();
 
     return this.page;
   }
