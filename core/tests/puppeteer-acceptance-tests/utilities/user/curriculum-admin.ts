@@ -776,7 +776,7 @@ export class CurriculumAdmin extends TopicManager {
 
     await this.clickOnElementWithSelector(saveQuestionButton);
 
-    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(modalDiv, {hidden: true});
   }
 
