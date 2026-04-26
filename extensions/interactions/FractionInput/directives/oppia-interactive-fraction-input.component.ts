@@ -33,7 +33,7 @@ import {FractionAnswer, InteractionAnswer} from 'interactions/answer-defs';
 @Component({
   selector: 'oppia-interactive-fraction-input',
   templateUrl: './fraction-input-interaction.component.html',
-  styleUrls: [],
+  styleUrls: ['./fraction-input-interaction.component.css'],
 })
 export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

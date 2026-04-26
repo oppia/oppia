@@ -31,7 +31,7 @@ interface Choice {
   // eslint-disable-next-line max-len
   templateUrl:
     './list-of-sets-of-translatable-html-content-ids-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./list-of-sets-of-translatable-html-content-ids-editor.component.css'],
 })
 export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
   @Output() valueChanged = new EventEmitter();

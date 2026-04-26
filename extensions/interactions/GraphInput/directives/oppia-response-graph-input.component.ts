@@ -33,7 +33,7 @@ import {InteractionsExtensionsConstants} from 'interactions/interactions-extensi
 @Component({
   selector: 'oppia-response-graph-input',
   templateUrl: './graph-input-response.component.html',
-  styleUrls: [],
+  styleUrls: ['./graph-input-response.component.css'],
 })
 export class ResponseGraphInput {
   // These properties are initialized using Angular lifecycle hooks

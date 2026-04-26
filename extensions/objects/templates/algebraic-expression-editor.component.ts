@@ -37,6 +37,7 @@ interface FocusObj {
 @Component({
   selector: 'algebraic-expression-editor',
   templateUrl: './algebraic-expression-editor.component.html',
+  styleUrls: ['./algebraic-expression-editor.component.css']
 })
 export class AlgebraicExpressionEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

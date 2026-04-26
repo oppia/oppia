@@ -24,6 +24,7 @@ import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
 @Component({
   selector: 'ratio-expression-editor',
   templateUrl: './ratio-expression-editor.component.html',
+  styleUrls: ['./ratio-expression-editor.component.css']
 })
 export class RatioExpressionEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

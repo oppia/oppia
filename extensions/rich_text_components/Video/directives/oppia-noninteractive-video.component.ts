@@ -61,7 +61,7 @@ let apiLoaded = false;
 @Component({
   selector: 'oppia-noninteractive-video',
   templateUrl: './video.component.html',
-  styleUrls: [],
+  styleUrls: ['./video.component.css'],
 })
 export class NoninteractiveVideo implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks

@@ -34,6 +34,7 @@ import {PageContextService} from 'services/page-context.service';
 @Component({
   selector: 'skill-selector-editor',
   templateUrl: './skill-selector-editor.component.html',
+  styleUrls: ['./skill-selector-editor.component.css']
 })
 export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

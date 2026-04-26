@@ -23,7 +23,7 @@ import {DragAndDropAnswer} from 'interactions/answer-defs';
 @Component({
   selector: 'oppia-short-response-drag-and-drop-sort-input',
   templateUrl: './drag-and-drop-sort-input-short-response.component.html',
-  styleUrls: [],
+  styleUrls: ['./drag-and-drop-sort-input-short-response.component.css'],
 })
 export class ShortResponseDragAndDropSortInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

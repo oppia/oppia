@@ -26,7 +26,7 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
 @Component({
   selector: 'oppia-response-item-selection-input',
   templateUrl: './item-selection-input-response.component.html',
-  styleUrls: [],
+  styleUrls: ['./item-selection-input-response.component.css'],
 })
 export class ResponseItemSelectionInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

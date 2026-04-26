@@ -1,0 +1,11 @@
+.skill-selector-editor .skill-selector-item-container {
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .skill-selector-editor .skill-explanation-container {
+    padding-bottom: 10px;
+    padding-top: 5px;
+  }
+  .skill-selector-editor .oppia-list-group-item-text {
+    color: #000;
+  }

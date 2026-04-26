@@ -23,6 +23,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 @Component({
   selector: 'oppia-help-modal-number-with-units',
   templateUrl: './number-with-units-help-modal.component.html',
+  styleUrls: ['./number-with-units-help-modal.component.css']
 })
 export class HelpModalNumberWithUnitsComponent extends ConfirmOrCancelModal {
   constructor(ngbActiveModal: NgbActiveModal) {

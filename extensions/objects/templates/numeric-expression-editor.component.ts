@@ -32,6 +32,7 @@ import {FocusObj} from './math-equation-editor.component';
 @Component({
   selector: 'numeric-expression-editor',
   templateUrl: './numeric-expression-editor.component.html',
+  styleUrls: ['./numeric-expression-editor.component.css']
 })
 export class NumericExpressionEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

@@ -55,6 +55,7 @@ interface MapOptions {
 @Component({
   selector: 'oppia-interactive-interactive-map',
   templateUrl: './interactive-map-interaction.component.html',
+  styleUrls: ['./interactive-map-interaction.component.css']
 })
 export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

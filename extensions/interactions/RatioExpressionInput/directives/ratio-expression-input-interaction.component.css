@@ -1,0 +1,8 @@
+.oppia-ratio-expression-input-error {
+    margin-top: 10px;
+  }
+
+  .ng-invalid {
+    border-color: red;
+    outline-color: red;
+  }

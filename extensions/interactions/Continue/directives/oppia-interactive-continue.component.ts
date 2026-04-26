@@ -31,7 +31,7 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 @Component({
   selector: 'oppia-interactive-continue',
   templateUrl: './continue-interaction.component.html',
-  styleUrls: [],
+  styleUrls: ['./continue-interaction.component.css'],
 })
 export class OppiaInteractiveContinue implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

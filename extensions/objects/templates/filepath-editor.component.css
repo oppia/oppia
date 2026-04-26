@@ -1,0 +1,35 @@
+.create-or-upload-image-selector-container {
+    background-color: #dcdcdc;
+    display: flex;
+    height: fit-content;
+    justify-content: center;
+    outline: 1px solid;
+  }
+
+  .upload-image-container, .create-image-container {
+    align-self: center;
+    font-family: "Roboto", Arial, sans-serif;
+    padding: 45px;
+    text-align: center;
+  }
+  .upload-image-container {
+    border-right: 1px solid #000;
+  }
+  .create-image-button {
+    background-color: #00645b;
+    color: #fff;
+  }
+  @media screen and (max-width: 370px) {
+    .create-or-upload-image-selector-container {
+      flex-direction: column;
+    }
+    .upload-image-container, .create-image-container {
+      align-self: center;
+      font-family: "Roboto", Arial, sans-serif;
+      padding: 45px;
+      text-align: center;
+    }
+    .upload-image-container {
+      border-bottom: 1px solid #000;
+    }
+  }

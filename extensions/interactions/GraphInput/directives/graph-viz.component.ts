@@ -76,7 +76,7 @@ interface GraphOption {
 @Component({
   selector: 'graph-viz',
   templateUrl: './graph-viz.component.html',
-  styleUrls: [],
+  styleUrls: ['./graph-viz.component.css'],
 })
 export class GraphVizComponent implements OnInit, AfterViewInit {
   @Input() graph!: GraphAnswer;

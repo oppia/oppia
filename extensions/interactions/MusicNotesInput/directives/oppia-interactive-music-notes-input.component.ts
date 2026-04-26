@@ -79,6 +79,7 @@ interface DraggedNoteData {
 @Component({
   selector: 'oppia-interactive-music-notes-input',
   templateUrl: './music-notes-input-interaction.component.html',
+  styleUrls: ['./music-notes-input-interaction.component.css']
 })
 export class MusicNotesInputComponent
   implements OnInit, OnDestroy, AfterViewInit

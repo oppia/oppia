@@ -116,7 +116,7 @@ interface ImageUploadBackendResponse {
 @Component({
   selector: 'image-editor',
   templateUrl: './image-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./image-editor.component.css'],
 })
 export class ImageEditorComponent implements OnInit, OnChanges {
   @Input() modalId;

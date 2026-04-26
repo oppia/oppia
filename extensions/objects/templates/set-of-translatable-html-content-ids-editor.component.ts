@@ -32,7 +32,7 @@ interface Choice {
 @Component({
   selector: 'set-of-translatable-html-content-ids-editor',
   templateUrl: './set-of-translatable-html-content-ids-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./set-of-translatable-html-content-ids-editor.component.css'],
 })
 export class SetOfTranslatableHtmlContentIdsEditorComponent
   implements OnInit, OnChanges

@@ -1,0 +1,207 @@
+.filepath-editor .filepath-editor-saved-image-container img {
+    background-color: white;
+  }
+
+  .filepath-editor .filepath-editor-saved-image-container {
+    background-color: red;
+    display: inline-block;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .filepath-editor .filepath-editor-main-container {
+    margin: 0 auto;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    width: 100%;
+  }
+
+  .filepath-editor .filepath-editor-main-container .oppia-form-error {
+    word-break: break-word;
+  }
+
+  .filepath-editor .filepath-editor-crop-button {
+    margin: 0 4px 4px 4px;
+    width: 50px;
+  }
+
+  .filepath-editor .filepath-editor-image-crop-button-bar {
+    position: absolute;
+    z-index: 20;
+  }
+
+  .filepath-editor .filepath-editor-image-shade-overlay {
+    background-color: rgba(80, 80, 80, 0.4);
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+  }
+
+  .filepath-editor .filepath-editor-image-crop-container {
+    display: inline-block;
+    margin: auto;
+    position: relative;
+  }
+
+  .filepath-editor .filepath-editor-crop-area {
+    border: 3px dotted blue;
+    margin: auto;
+    position: absolute;
+    z-index: 20;
+  }
+
+  .filepath-editor .filepath-editor-resize-input {
+    border: 1px solid #ccc;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: normal;
+    height: 24px;
+    padding: 4px 2px;
+    text-align: right;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    width: 40px;
+  }
+
+  .filepath-editor .filepath-editor-button {
+    background: grey;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #f2f2f2), color-stop(1, #d0d0d0));
+    background-image: -o-linear-gradient(bottom, #f2f2f2 0%, #d0d0d0 100%);
+    background-image: -moz-linear-gradient(bottom, #f2f2f2 0%, #d0d0d0 100%);
+    background-image: -webkit-linear-gradient(bottom, #f2f2f2 0%, #d0d0d0 100%);
+    background-image: -ms-linear-gradient(bottom, #f2f2f2 0%, #d0d0d0 100%);
+    background-image: linear-gradient(to bottom, #f2f2f2 0%, #d0d0d0 100%);
+    cursor: default;
+    font-size: 12px;
+    font-weight: normal;
+    height: 24px;
+    padding: 4px 8px;
+    text-align: center;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .filepath-editor .filepath-editor-button:hover {
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #d0d0d0), color-stop(1, #d0d0d0));
+    background-image: -o-linear-gradient(bottom, #d0d0d0 0%, #d0d0d0 100%);
+    background-image: -moz-linear-gradient(bottom, #d0d0d0 0%, #d0d0d0 100%);
+    background-image: -webkit-linear-gradient(bottom, #d0d0d0 0%, #d0d0d0 100%);
+    background-image: -ms-linear-gradient(bottom, #d0d0d0 0%, #d0d0d0 100%);
+    background-image: linear-gradient(to bottom, #d0d0d0 0%, #d0d0d0 100%);
+    cursor: pointer;
+  }
+
+  .filepath-editor .filepath-editor-button:active {
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #b0b0b0), color-stop(1, #b0b0b0));
+    background-image: -o-linear-gradient(bottom, #b0b0b0 0%, #b0b0b0 100%);
+    background-image: -moz-linear-gradient(bottom, #b0b0b0 0%, #b0b0b0 100%);
+    background-image: -webkit-linear-gradient(bottom, #b0b0b0 0%, #b0b0b0 100%);
+    background-image: -ms-linear-gradient(bottom, #b0b0b0 0%, #b0b0b0 100%);
+    background-image: linear-gradient(to bottom, #b0b0b0 0%, #b0b0b0 100%);
+  }
+
+  .filepath-editor .filepath-editor-decrease-size {
+    border-bottom: solid #ccc 1px;
+    border-bottom-left-radius: 2px;
+    border-left: solid #ccc 1px;
+    border-right: none;
+    border-top: solid #ccc 1px;
+    border-top-left-radius: 2px;
+    display: inline-block;
+    width: 22px;
+  }
+
+  .filepath-editor .filepath-editor-increase-size {
+    border-bottom: solid #ccc 1px;
+    border-bottom-right-radius: 2px;
+    border-left: none;
+    border-right: solid #ccc 1px;
+    border-top: solid #ccc 1px;
+    border-top-right-radius: 2px;
+    display: inline-block;
+    width: 22px;
+  }
+
+  .filepath-editor .filepath-editor-img-toolbar-size {
+    width: 300;
+  }
+
+  .filepath-editor .filepath-editor-img-toolbar-size i {
+    color: red;
+    cursor: default;
+    font-size: 18px;
+    padding-bottom: 3px;
+  }
+
+  .filepath-editor .filepath-editor-img-toolbar-resize {
+    float: right;
+    text-align: right;
+  }
+
+  .filepath-editor .filepath-editor-img-toolbar {
+    padding: 4px;
+    text-align: left;
+  }
+
+  .filepath-editor .filepath-editor-image-container {
+    position: relative;
+    text-align: center;
+  }
+
+  .filepath-editor .filepath-editor-trash {
+    color: black;
+    position: absolute;
+    right: 6px;
+    text-shadow: 0 0 1px #fff;
+    top: 6px;
+  }
+
+  .filepath-editor .filepath-editor-save-box {
+    margin-top: 6px;
+    text-align: right;
+  }
+
+  .filepath-editor .filepath-editor-save-box button {
+    margin-left: 6px;
+  }
+
+  .filepath-editor .oppia-unsupported-svg-tag-attribute-error,
+  .filepath-editor .oppia-processed-image-too-large-error {
+    margin-top: 15px;
+  }
+
+  .oppia-unsupported-svg-tag-attribute-error {
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+    color: #8a6d3b;
+    padding: 10px;
+  }
+  @media(max-width:540px) {
+    .filepath-editor .filepath-editor-image-container {
+      text-align: left;
+    }
+
+    .filepath-editor .filepath-editor-img-toolbar-resize {
+      float: none;
+      text-align: left;
+    }
+
+    .filepath-editor .filepath-editor-save-box {
+      text-align: left;
+    }
+  }

@@ -53,7 +53,7 @@ export interface Region {
 @Component({
   selector: 'image-with-regions-editor',
   templateUrl: './image-with-regions-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./image-with-regions-editor.component.css'],
 })
 export class ImageWithRegionsEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

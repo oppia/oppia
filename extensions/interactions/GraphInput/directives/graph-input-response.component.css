@@ -1,0 +1,14 @@
+.oppia-graph-response-container {
+    background-color: white;
+    cursor: default;
+  }
+  .unselectable-text {
+    cursor: default;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+  }
+  .unclickable-text {
+    pointer-events: none;
+  }

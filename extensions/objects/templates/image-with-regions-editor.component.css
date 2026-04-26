@@ -1,0 +1,18 @@
+input.oppia-image-with-regions-region-label-editor {
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    display: block;
+    font-size: 14px;
+    margin: 0;
+    padding: 0 6px;
+    position: absolute;
+  }
+
+  .image-with-regions-editor .oppia-error-text {
+    margin-bottom: 4px;
+  }
+
+  .oppia-image-with-regions-editor-svg {
+    user-select: none;
+  }

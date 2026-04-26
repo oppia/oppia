@@ -30,6 +30,7 @@ type TranslatableHtmlContentIdEditorChoices = {val: string}[];
 @Component({
   selector: 'translatable-html-content-id-editor',
   templateUrl: './translatable-html-content-id.component.html',
+  styleUrls: ['./translatable-html-content-id.component.css']
 })
 export class TranslatableHtmlContentIdEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

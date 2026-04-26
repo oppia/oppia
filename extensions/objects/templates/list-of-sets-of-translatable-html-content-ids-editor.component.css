@@ -1,0 +1,17 @@
+.col-sm-1 {
+    margin-right: 10px;
+  }
+
+  .col-sm-10 {
+    border: 1px solid #000;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    margin-left: 10px;
+  }
+
+  p {
+    margin-bottom: 10px;
+  }
+  .oppia-drag-and-drop-error {
+    position: absolute;
+  }

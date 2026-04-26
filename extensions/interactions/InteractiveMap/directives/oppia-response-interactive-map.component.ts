@@ -33,6 +33,7 @@ import {icon, latLng, MapOptions, Marker, marker, tileLayer} from 'leaflet';
 @Component({
   selector: 'oppia-response-interactive-map',
   templateUrl: './interactive-map-response.component.html',
+  styleUrls: ['./interactive-map-response.component.css']
 })
 export class ResponseInteractiveMapComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

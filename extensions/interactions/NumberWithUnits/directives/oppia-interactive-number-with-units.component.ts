@@ -35,7 +35,7 @@ import {NumberWithUnitsRulesService} from './number-with-units-rules.service';
 @Component({
   selector: 'oppia-interactive-number-with-units',
   templateUrl: './number-with-units-interaction.component.html',
-  styleUrls: [],
+  styleUrls: ['./number-with-units-interaction.component.css'],
 })
 export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
