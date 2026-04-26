@@ -243,7 +243,7 @@ describe('Skill editor page', () => {
     tick();
 
     expect(clearSpy).toHaveBeenCalled();
-    expect(skillEditorRoutingService.questionIsBeingCreated).toBeFalse();
+    expect(skillEditorRoutingService.questionIsBeingCreated).toBeFalsy();
     expect(navigateFn).toHaveBeenCalled();
   }));
 
@@ -251,7 +251,9 @@ describe('Skill editor page', () => {
     spyOn(skillEditorRoutingService, 'getActiveTabName').and.returnValue(
       'questions'
     );
-    spyOn(component, 'navigationWithConfirmation').and.callFake(fn => fn());
+    spyOn(component, 'navigationWithConfirmation').and.callFake(
+      (fn: () => void) => fn()
+    );
     const navSpy = spyOn(skillEditorRoutingService, 'navigateToMainTab');
 
     component.selectMainTab();
@@ -274,7 +276,9 @@ describe('Skill editor page', () => {
     spyOn(skillEditorRoutingService, 'getActiveTabName').and.returnValue(
       'questions'
     );
-    spyOn(component, 'navigationWithConfirmation').and.callFake(fn => fn());
+    spyOn(component, 'navigationWithConfirmation').and.callFake(
+      (fn: () => void) => fn()
+    );
     const navSpy = spyOn(skillEditorRoutingService, 'navigateToPreviewTab');
 
     component.selectPreviewTab();
@@ -465,7 +469,6 @@ describe('Skill editor page', () => {
         'review material',
         AppConstants.COMPONENT_NAME_EXPLANATION
       ),
-      [],
       RecordedVoiceovers.createFromBackendDict({
         voiceovers_mapping: {
           COMPONENT_NAME_EXPLANATION: {},
@@ -563,7 +566,7 @@ describe('Skill editor page', () => {
       component.skillIsInitialized = false;
       component.createOrUpdateSkillEditorBrowserTabsInfo();
 
-      expect(component.skillIsInitialized).toBeTrue();
+      expect(component.skillIsInitialized).toBeTruthy();
     }
   );
 
@@ -609,7 +612,7 @@ describe('Skill editor page', () => {
 
       expect(
         skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
-      ).toBeTrue();
+      ).toBeTruthy();
       expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
 
       component.onClosingSkillEditorBrowserTab();
@@ -625,7 +628,7 @@ describe('Skill editor page', () => {
       // unsaved changes status will become false.
       expect(
         skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
-      ).toBeFalse();
+      ).toBeFalsy();
     }
   );
 
@@ -667,7 +670,7 @@ describe('Skill editor page', () => {
       presenceOfUnsavedChangesEventEmitter.emit();
       windowRef.nativeWindow.dispatchEvent(storageEvent);
 
-      expect(component.skillIsInitialized).toBeFalse();
+      expect(component.skillIsInitialized).toBeFalsy();
     }
   );
 

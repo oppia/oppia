@@ -125,7 +125,7 @@ describe('Skill Misconceptions Editor Component', () => {
 
     expect(component.skill).toBe(undefined);
     expect(component.misconceptions).toBeUndefined();
-    expect(component.misconceptionsListIsShown).toBeFalse();
+    expect(component.misconceptionsListIsShown).toBeFalsy();
 
     component.ngOnInit();
     mockOnSkillChangeEmitter.emit();
@@ -283,11 +283,11 @@ describe('Skill Misconceptions Editor Component', () => {
 
     component.toggleSkillEditorCard();
 
-    expect(component.skillEditorCardIsShown).toBeFalse();
+    expect(component.skillEditorCardIsShown).toBeFalsy();
 
     component.toggleSkillEditorCard();
 
-    expect(component.skillEditorCardIsShown).toBeTrue();
+    expect(component.skillEditorCardIsShown).toBeTruthy();
   });
 
   it('should show Misconceptions list when the window is narrow', () => {

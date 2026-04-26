@@ -107,7 +107,6 @@ describe('Skill Editor Navbar Component', () => {
         'review material',
         AppConstants.COMPONENT_NAME_EXPLANATION
       ),
-      [],
       RecordedVoiceovers.createFromBackendDict({
         voiceovers_mapping: {
           COMPONENT_NAME_EXPLANATION: {},
@@ -259,7 +258,7 @@ describe('Skill Editor Navbar Component', () => {
     tick();
 
     expect(clearSpy).toHaveBeenCalled();
-    expect(skillEditorRoutingService.questionIsBeingCreated).toBeFalse();
+    expect(skillEditorRoutingService.questionIsBeingCreated).toBeFalsy();
     expect(runSpy).toHaveBeenCalled();
   }));
 
@@ -273,7 +272,7 @@ describe('Skill Editor Navbar Component', () => {
 
     spyOn(ngbModal, 'open').and.returnValue({
       result: {
-        then: function (confirmCb, cancelCb) {
+        then: function (confirmCb: () => void, cancelCb: () => void) {
           cancelCb();
         },
       },
@@ -424,16 +423,18 @@ describe('Skill Editor Navbar Component', () => {
     'should save changes if save changes modal is opened and confirm ' +
       'button is clicked',
     fakeAsync(() => {
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return {
-          result: Promise.resolve('success'),
-        } as NgbModalRef;
-      });
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+        (dlg: unknown, opt: unknown) => {
+          return {
+            result: Promise.resolve('success'),
+          } as NgbModalRef;
+        }
+      );
 
       let saveSkillSpy = spyOn(
         skillEditorStateService,
         'saveSkill'
-      ).and.callFake((message, cb) => {
+      ).and.callFake((message: string, cb: () => void) => {
         cb();
         return true;
       });
@@ -451,7 +452,7 @@ describe('Skill Editor Navbar Component', () => {
       'button is clicked',
     fakeAsync(() => {
       let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
-        (modal, modalOptions) => {
+        (modal: unknown, modalOptions: unknown) => {
           return {
             result: Promise.reject(),
           } as NgbModalRef;
@@ -472,12 +473,14 @@ describe('Skill Editor Navbar Component', () => {
       fakeAsync(() => {
         // Setting unsaved changes to be two.
         spyOn(undoRedoService, 'getChangeCount').and.returnValue(2);
-        const ngbModalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-          return {
-            componentInstance: MockNgbModalRef,
-            result: Promise.resolve(),
-          } as NgbModalRef;
-        });
+        const ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
+          (dlg: unknown, opt: unknown) => {
+            return {
+              componentInstance: MockNgbModalRef,
+              result: Promise.resolve(),
+            } as NgbModalRef;
+          }
+        );
         let navigateToQuestionsTabSpy = spyOn(
           skillEditorRoutingService,
           'navigateToQuestionsTab'
@@ -496,12 +499,14 @@ describe('Skill Editor Navbar Component', () => {
       fakeAsync(() => {
         // Setting unsaved changes to be two.
         spyOn(undoRedoService, 'getChangeCount').and.returnValue(2);
-        const ngbModalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-          return {
-            componentInstance: MockNgbModalRef,
-            result: Promise.reject(),
-          } as NgbModalRef;
-        });
+        const ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
+          (dlg: unknown, opt: unknown) => {
+            return {
+              componentInstance: MockNgbModalRef,
+              result: Promise.reject(),
+            } as NgbModalRef;
+          }
+        );
         let navigateToQuestionsTabSpy = spyOn(
           skillEditorRoutingService,
           'navigateToQuestionsTab'

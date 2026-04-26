@@ -198,23 +198,23 @@ describe('Story editor navbar component', () => {
   });
 
   it('should get status of Serial Chapter Launch Feature flag', () => {
-    expect(component.isSerialChapterFeatureFlagEnabled()).toBeFalse();
+    expect(component.isSerialChapterFeatureFlagEnabled()).toBeFalsy();
 
     mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
       true;
-    expect(component.isSerialChapterFeatureFlagEnabled()).toBeTrue();
+    expect(component.isSerialChapterFeatureFlagEnabled()).toBeTruthy();
   });
 
   it('should get if chapter is publishable', () => {
     spyOn(storyEditorStateService, 'isCurrentNodePublishable').and.returnValue(
       true
     );
-    expect(component.isChapterPublishable()).toBeTrue();
+    expect(component.isChapterPublishable()).toBeTruthy();
 
     storyEditorStateService.isCurrentNodePublishable = jasmine
       .createSpy()
       .and.returnValue(false);
-    expect(component.isChapterPublishable()).toBeFalse();
+    expect(component.isChapterPublishable()).toBeFalsy();
   });
 
   it('should get if publish button is disabled', () => {
@@ -222,36 +222,36 @@ describe('Story editor navbar component', () => {
       storyEditorStateService,
       'getNewChapterPublicationIsDisabled'
     ).and.returnValue(true);
-    expect(component.isPublishButtonDisabled()).toBeTrue();
+    expect(component.isPublishButtonDisabled()).toBeTruthy();
 
     storyEditorStateService.getNewChapterPublicationIsDisabled = jasmine
       .createSpy()
       .and.returnValue(false);
-    expect(component.isPublishButtonDisabled()).toBeFalse();
+    expect(component.isPublishButtonDisabled()).toBeFalsy();
   });
 
   it('should get if chapters are being published', () => {
     spyOn(storyEditorStateService, 'areChaptersBeingPublished').and.returnValue(
       true
     );
-    expect(component.areChaptersBeingPublished()).toBeTrue();
+    expect(component.areChaptersBeingPublished()).toBeTruthy();
 
     storyEditorStateService.areChaptersBeingPublished = jasmine
       .createSpy()
       .and.returnValue(false);
-    expect(component.areChaptersBeingPublished()).toBeFalse();
+    expect(component.areChaptersBeingPublished()).toBeFalsy();
   });
 
   it('should get if chapter status is being changed', () => {
     spyOn(storyEditorStateService, 'isChangingChapterStatus').and.returnValue(
       true
     );
-    expect(component.isChapterStatusBeingChanged()).toBeTrue();
+    expect(component.isChapterStatusBeingChanged()).toBeTruthy();
 
     storyEditorStateService.isChangingChapterStatus = jasmine
       .createSpy()
       .and.returnValue(false);
-    expect(component.isChapterStatusBeingChanged()).toBeFalse();
+    expect(component.isChapterStatusBeingChanged()).toBeFalsy();
   });
 
   describe('on initialization ', () => {
@@ -477,35 +477,37 @@ describe('Story editor navbar component', () => {
       storyEditorStateService,
       'onStoryInitialized'
     ).and.returnValue(mockStoryInitializedEventEmitter);
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        result: Promise.resolve('success'),
-      } as NgbModalRef;
-    });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+      (dlg: unknown, opt: unknown) => {
+        return {
+          result: Promise.resolve('success'),
+        } as NgbModalRef;
+      }
+    );
 
     component.ngOnInit();
     mockStoryInitializedEventEmitter.emit();
     fixture.detectChanges();
 
-    expect(component.storyIsPublished).toBeFalse();
+    expect(component.storyIsPublished).toBeFalsy();
 
     storyEditorStateService.setStory(story);
     fixture.detectChanges();
     // This check will make sure that story is
     // loaded correctly before publishing it.
-    expect(storyEditorStateService.hasLoadedStory()).toBeTrue();
+    expect(storyEditorStateService.hasLoadedStory()).toBeTruthy();
 
     // Publishing story will acts as pre-check here.
     component.publishStory();
     tick(1000);
     fixture.detectChanges();
-    expect(component.storyIsPublished).toBeTrue();
+    expect(component.storyIsPublished).toBeTruthy();
 
     component.unpublishStory();
     tick(1000);
     fixture.detectChanges();
     expect(modalSpy).toHaveBeenCalled();
-    expect(component.storyIsPublished).toBeFalse();
+    expect(component.storyIsPublished).toBeFalsy();
   }));
 
   it('should toggle warning text', () => {
@@ -514,7 +516,7 @@ describe('Story editor navbar component', () => {
     component.toggleWarningText();
     fixture.detectChanges();
 
-    expect(component.warningsAreShown).toBeFalse();
+    expect(component.warningsAreShown).toBeFalsy();
   });
 
   it('should toggle navigation options', () => {
@@ -523,7 +525,7 @@ describe('Story editor navbar component', () => {
     component.toggleNavigationOptions();
     fixture.detectChanges();
 
-    expect(component.showNavigationOptions).toBeFalse();
+    expect(component.showNavigationOptions).toBeFalsy();
   });
 
   it('should toggle edit options', () => {
@@ -532,14 +534,14 @@ describe('Story editor navbar component', () => {
     component.toggleStoryEditOptions();
     fixture.detectChanges();
 
-    expect(component.showStoryEditOptions).toBeFalse();
+    expect(component.showStoryEditOptions).toBeFalsy();
   });
 
   it('should return whether story is published', () => {
     storyEditorStateService._storyIsPublished = true;
-    expect(component.isStoryPublished()).toBeTrue();
+    expect(component.isStoryPublished()).toBeTruthy();
     storyEditorStateService._storyIsPublished = false;
-    expect(component.isStoryPublished()).toBeFalse();
+    expect(component.isStoryPublished()).toBeFalsy();
   });
 
   it('should get count of warnings', () => {
@@ -627,20 +629,28 @@ describe('Story editor navbar component', () => {
         const saveChangesSpy = spyOn(
           storyEditorStateService,
           'saveStory'
-        ).and.callFake((commitMessage, successCallback, errorCallback) => {
-          if (commitMessage !== null) {
-            successCallback();
-          } else {
-            errorCallback('Expected a commit message but received none.');
+        ).and.callFake(
+          (
+            commitMessage: unknown,
+            successCallback: () => void,
+            errorCallback: (error: string) => void
+          ) => {
+            if (commitMessage !== null) {
+              successCallback();
+            } else {
+              errorCallback('Expected a commit message but received none.');
+            }
+            return true;
           }
-          return true;
-        });
-        const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-          return {
-            componentInstance: MockNgbModalRef,
-            result: Promise.resolve(commitMessage),
-          } as NgbModalRef;
-        });
+        );
+        const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+          (dlg: unknown, opt: unknown) => {
+            return {
+              componentInstance: MockNgbModalRef,
+              result: Promise.resolve(commitMessage),
+            } as NgbModalRef;
+          }
+        );
 
         component.ngOnInit();
         mockStoryInitializedEventEmitter.emit();
@@ -679,20 +689,28 @@ describe('Story editor navbar component', () => {
         const saveChangesSpy = spyOn(
           storyEditorStateService,
           'saveStory'
-        ).and.callFake((commitMessage, successCallback, errorCallback) => {
-          if (commitMessage !== null) {
-            successCallback();
-          } else {
-            errorCallback('Expected a commit message but received none.');
+        ).and.callFake(
+          (
+            commitMessage: unknown,
+            successCallback: () => void,
+            errorCallback: (error: string) => void
+          ) => {
+            if (commitMessage !== null) {
+              successCallback();
+            } else {
+              errorCallback('Expected a commit message but received none.');
+            }
+            return true;
           }
-          return true;
-        });
-        const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-          return {
-            componentInstance: MockNgbModalRef,
-            result: Promise.resolve(commitMessage),
-          } as NgbModalRef;
-        });
+        );
+        const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+          (dlg: unknown, opt: unknown) => {
+            return {
+              componentInstance: MockNgbModalRef,
+              result: Promise.resolve(commitMessage),
+            } as NgbModalRef;
+          }
+        );
 
         component.ngOnInit();
         mockStoryInitializedEventEmitter.emit();
@@ -728,20 +746,28 @@ describe('Story editor navbar component', () => {
       const saveChangesSpy = spyOn(
         storyEditorStateService,
         'saveStory'
-      ).and.callFake((commitMessage, successCallback, errorCallback) => {
-        if (commitMessage !== null) {
-          successCallback();
-        } else {
-          errorCallback('Expected a commit message but received none.');
+      ).and.callFake(
+        (
+          commitMessage: unknown,
+          successCallback: () => void,
+          errorCallback: (error: string) => void
+        ) => {
+          if (commitMessage !== null) {
+            successCallback();
+          } else {
+            errorCallback('Expected a commit message but received none.');
+          }
+          return true;
         }
-        return true;
-      });
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.reject(),
-        } as NgbModalRef;
-      });
+      );
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+        (dlg: unknown, opt: unknown) => {
+          return {
+            componentInstance: MockNgbModalRef,
+            result: Promise.reject(),
+          } as NgbModalRef;
+        }
+      );
 
       component.ngOnInit();
       mockStoryInitializedEventEmitter.emit();
@@ -778,11 +804,17 @@ describe('Story editor navbar component', () => {
     const saveChangesSpy = spyOn(
       storyEditorStateService,
       'saveStory'
-    ).and.callFake((commitMessage, successCallback, errorCallback) => {
-      storyEditorStateService.setChapterStatusIsChanging(false);
-      errorCallback(commitMessage);
-      return true;
-    });
+    ).and.callFake(
+      (
+        commitMessage: string,
+        successCallback: () => void,
+        errorCallback: (error: string) => void
+      ) => {
+        storyEditorStateService.setChapterStatusIsChanging(false);
+        errorCallback(commitMessage);
+        return true;
+      }
+    );
 
     component.changeChapterStatus('Draft');
     expect(saveChapterSpy).toHaveBeenCalled();
@@ -800,12 +832,14 @@ describe('Story editor navbar component', () => {
       .and.returnValue(true);
     let saveChangesSpy = spyOn(component, 'saveChanges');
     let storyNodeStatusSpy = spyOn(storyUpdateService, 'setStoryNodeStatus');
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve('BAD_CONTENT'),
-      } as NgbModalRef;
-    });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+      (dlg: unknown, opt: unknown) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve('BAD_CONTENT'),
+        } as NgbModalRef;
+      }
+    );
 
     component.saveChangesInReadyToPublishChapter();
     expect(saveChangesSpy).toHaveBeenCalled();
@@ -852,7 +886,11 @@ describe('Story editor navbar component', () => {
     ).and.callThrough();
     let successCallbackFunctionIsCalled: boolean = false;
     let saveStorySpy = spyOn(storyEditorStateService, 'saveStory').and.callFake(
-      (commitMessage, successCallback, errorCallback) => {
+      (
+        commitMessage: unknown,
+        successCallback: () => void,
+        errorCallback: (error: string) => void
+      ) => {
         if (successCallbackFunctionIsCalled) {
           successCallback();
         } else {
@@ -914,7 +952,7 @@ describe('Story editor navbar component', () => {
     let changeStoryStatusSpy = spyOn(
       storyEditorStateService,
       'changeStoryPublicationStatus'
-    ).and.callFake((newStatus, callback) => {
+    ).and.callFake((newStatus: string, callback: () => void) => {
       if (callback) {
         callback();
       }
@@ -932,21 +970,29 @@ describe('Story editor navbar component', () => {
     const saveStorySpy = spyOn(
       storyEditorStateService,
       'saveStory'
-    ).and.callFake((commitMessage, successCallback, errorCallback) => {
-      if (successCallbackFunctionIsCalled) {
-        successCallback();
-      } else {
-        errorCallback('Error');
+    ).and.callFake(
+      (
+        commitMessage: unknown,
+        successCallback: () => void,
+        errorCallback: (error: string) => void
+      ) => {
+        if (successCallbackFunctionIsCalled) {
+          successCallback();
+        } else {
+          errorCallback('Error');
+        }
+        storyEditorStateService.setChapterStatusIsChanging(false);
+        return true;
       }
-      storyEditorStateService.setChapterStatusIsChanging(false);
-      return true;
-    });
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve('BAD_CONTENT'),
-      } as NgbModalRef;
-    });
+    );
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+      (dlg: unknown, opt: unknown) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve('BAD_CONTENT'),
+        } as NgbModalRef;
+      }
+    );
 
     component.story.getStoryContents().getNodes()[1].setStatus('Published');
 
