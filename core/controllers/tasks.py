@@ -85,6 +85,9 @@ class UnsentFeedbackEmailHandler(
             logging.error(
                 'Permanent error sending unsent feedback email: %s' % e
             )
+            feedback_services.pop_feedback_message_references_transactional(
+                user_id, len(references)
+            )
             self.render_json({})
             return
 

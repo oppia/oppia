@@ -304,11 +304,16 @@ class TasksTests(test_utils.EmailTestBase):
                     'Fake 400 error'
                 )
             )
-
+            mock_pop = mock.Mock()
             with self.swap(
                 email_manager, 'send_feedback_message_email', mock_send_email
+            ), self.swap(
+                feedback_services,
+                'pop_feedback_message_references_transactional',
+                mock_pop,
             ):
                 self.process_and_flush_pending_tasks()
+            mock_pop.assert_called_once()
 
     @test_utils.set_platform_parameters(
         [
