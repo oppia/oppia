@@ -37,7 +37,6 @@ CODEOWNER_FILEPATH: Final = '.github/CODEOWNERS'
 # file.
 CODEOWNER_IMPORTANT_PATHS: Final = [
     '/core/storage/',
-    '/dependencies.json',
     '/package.json',
     '/requirements.txt',
     '/requirements.in',

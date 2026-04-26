@@ -421,6 +421,21 @@ const blogPostTitleContainerSelector =
 const blogPostContentSelector = '.e2e-test-blog-post-content';
 const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
+const blogWelcomeHeadingSelector = '.e2e-test-blog-welcome-heading';
+const blogNoResultsFoundSelector = '.e2e-test-no-results-found';
+const blogPostListSelector = '.e2e-test-blog-post-list';
+const blogPostTileItemSelector = '.e2e-test-blog-post-tile-item';
+const blogPostPageCardSelector = '.e2e-test-oppia-blog-post-page-card';
+const blogAuthorNameSelector = '.e2e-test-author-name';
+const blogPostAuthorSelector = '.e2e-test-username-visible';
+const blogPostPublishDateSelector = '.mobile-published-date';
+const blogPostTagContainerSelector = '.e2e-test-blog-tag-container';
+const blogShareButtonSelector = '.share-blog-post-button';
+const blogSuggestedForYouSectionSelector = '.post-to-recommend-section';
+const blogSuggestedForYouHeadingSelector = '.post-to-recommend-section-heading';
+const navbarAboutTabBlogButton = '.e2e-test-navbar-about-menu-blog-button';
+const postsDisplayHeadingSelector = '.posts-display-heading';
+const blogCardTagContainerSelector = '.blog-card-tag-container';
 
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
@@ -448,6 +463,8 @@ const topicPageRevisionTabContentSelector =
 const learnerViewCardSelector = '.oppia-learner-view-card-content';
 const signInBoxInSaveProressModalSelector = '.sign-in-box';
 const loginButtonSelector = '.e2e-mobile-test-login';
+const progressBarSelector = '.oppia-progress-bar';
+const suggestionSection = '.suggested-for-you-section';
 
 const youtubePlayerSelector = '.e2e-test-youtube-player';
 const collapsibleRTEHeaderSelector = '.e2e-test-collapsible-heading';
@@ -2446,6 +2463,32 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Changes the site language for an embedded exploration without reloading
+   * the page, since reloading resets the language in the embedded player.
+   * @param langCode - The language code to change to. Example: 'es', 'pt-br'
+   */
+  async changeSiteLanguageForEmbeddedExploration(
+    langCode: string
+  ): Promise<void> {
+    const languageOption = `.e2e-test-i18n-language-${langCode} a`;
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.evaluate(() => {
+        window.scrollTo(0, 0);
+      });
+    }
+    await this.page.waitForSelector(languageDropdown);
+    const languageDropdownElement = await this.page.$(languageDropdown);
+    if (!languageDropdownElement) {
+      throw new Error('Language dropdown element not found');
+    }
+    await languageDropdownElement.click();
+    await this.clickOnElementWithSelector(languageOption);
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
    * Checks if the the language dropdown is available or not.
    * @param status - Status of language dropdown.
    */
@@ -2661,11 +2704,50 @@ export class LoggedOutUser extends BaseUser {
    */
   async isDonorBoxVisbleOnDonatePage(): Promise<void> {
     const donorBox = await this.page.waitForSelector(donorBoxIframe);
+    if (!this.isViewportAtMobileWidth()) {
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          if (!element) {
+            return false;
+          }
+          const rect = element.getBoundingClientRect();
+          return rect.width > 0 && rect.height > 0;
+        },
+        {},
+        donorBoxIframe
+      );
+      await this.waitForDonorBoxFrameToLoad();
+    }
     if (!donorBox) {
       throw new Error('The donor box is not visible on the donate page.');
     } else {
       showMessage('The donor box is visible on the donate page.');
     }
+  }
+
+  /**
+   * Waits for the DonorBox iframe to load its frame URL.
+   * This avoids taking screenshots before the external content renders.
+   */
+  private async waitForDonorBoxFrameToLoad(): Promise<void> {
+    const maxWaitMsecs = 20000;
+    const pollIntervalMsecs = 500;
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < maxWaitMsecs) {
+      const donorBoxFrame = this.page
+        .frames()
+        .find(frame => frame.url().includes('donorbox.org'));
+      if (donorBoxFrame) {
+        return;
+      }
+      await this.page.waitForTimeout(pollIntervalMsecs);
+    }
+
+    throw new Error(
+      'The DonorBox iframe did not finish loading within the expected time.'
+    );
   }
 
   /**
@@ -3508,56 +3590,23 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to verify the Watch a Video button after subscribing to newsletter.
    */
-  async clickWatchAVideoButton(): Promise<void> {
-    await this.page.waitForSelector(watchAVideoButtonInThanksForSubscribe);
-    const buttonText = await this.page.$eval(
+  async expectWatchAVideoButtonToHaveCorrectLink(): Promise<void> {
+    await this.openExternalLink(
       watchAVideoButtonInThanksForSubscribe,
-      element => (element as HTMLElement).innerText
+      'https://youtu.be/OConyxG7HaM'
     );
-    if (buttonText !== 'Watch a video') {
-      throw new Error('The Watch A Video button does not exist!');
-    }
-    await this.clickAndWaitForNavigation(
-      watchAVideoButtonInThanksForSubscribe,
-      true
-    );
-    await this.waitForPageToFullyLoad();
-
-    const url = this.page.url();
-    if (!url.includes(testConstants.OppiaSocials.YouTube.Domain)) {
-      throw new Error(
-        `The Watch A Video button should open the right page,
-          but it opens ${url} instead.`
-      );
-    }
-    showMessage('The Watch A Video button opens the right page.');
+    showMessage('The Watch a Video button has the right link.');
   }
 
   /**
    * Function to verify the Read Blog button after subscribing to newsletter.
    */
-  async clickReadBlogButton(): Promise<void> {
-    await this.page.waitForSelector(readOurBlogButtonInThanksForSubscribe);
-    const buttonText = await this.page.$eval(
+  async expectReadBlogButtonToHaveCorrectLink(): Promise<void> {
+    await this.openExternalLink(
       readOurBlogButtonInThanksForSubscribe,
-      element => (element as HTMLElement).innerText
+      readBlogUrl
     );
-    if (buttonText !== 'Read our blog') {
-      throw new Error('The Read Our Blog button does not exist!');
-    }
-    await this.clickAndWaitForNavigation(
-      readOurBlogButtonInThanksForSubscribe,
-      true
-    );
-
-    if (this.page.url() !== readBlogUrl) {
-      throw new Error(
-        `The Read Our Blog button should open the Blog page,
-          but it opens ${this.page.url()} instead.`
-      );
-    } else {
-      showMessage('The Read Our Blog button opens the Blog page.');
-    }
+    showMessage('The Read our blog button has the right link.');
   }
   /**
    * Function to verify that the user is on the login page.
@@ -3995,6 +4044,24 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the practice tab in the topic page.
    */
   async navigateToPracticeTabInTopic(): Promise<void> {
+    const practiceTabLink = '.e2e-test-practice-tab-link';
+    const practiceContainer = '.e2e-test-practice-tab-container';
+    const practiceTabExists = await this.page.$(practiceTabLink);
+    if (!practiceTabExists) {
+      await this.page.reload({waitUntil: 'networkidle0'});
+      await this.page.waitForSelector(practiceTabLink, {
+        visible: true,
+        timeout: 30000,
+      });
+    }
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.evaluate(() => window.scrollTo(0, 0));
+    }
+    await this.clickOnElementWithSelector(practiceTabLink);
+    await this.page.waitForSelector(practiceContainer, {
+      visible: true,
+      timeout: 60000,
+    });
     await this.expectElementToBeVisible(practiceTabButtonSelector);
     await this.clickOnElementWithSelector(practiceTabButtonSelector);
 
@@ -4105,13 +4172,9 @@ export class LoggedOutUser extends BaseUser {
         chapter
       );
       if (chapterText.trim().includes(chapterName.trim())) {
-        await Promise.all([
-          this.page.waitForNavigation({
-            waitUntil: ['networkidle2', 'load'],
-          }),
-          this.waitForElementToBeClickable(chapter),
-          chapter.click(),
-        ]);
+        await this.waitForElementToBeClickable(chapter);
+        await chapter.click();
+        await this.expectPageURLToContain(testConstants.URLs.ExplorationPlayer);
         return;
       }
     }
@@ -4142,11 +4205,9 @@ export class LoggedOutUser extends BaseUser {
           title
         );
         if (titleText.trim() === storyName.trim()) {
-          await Promise.all([
-            this.page.waitForNavigation({waitUntil: ['networkidle0', 'load']}),
-            this.waitForElementToBeClickable(title),
-            title.click(),
-          ]);
+          await this.waitForElementToBeClickable(title);
+          await title.click();
+          await this.page.waitForSelector(chapterTitleSelector);
 
           await this.skipLoginPrompt();
 
@@ -4158,13 +4219,8 @@ export class LoggedOutUser extends BaseUser {
               chapter
             );
             if (chapterText.trim().includes(chapterName.trim())) {
-              await Promise.all([
-                this.page.waitForNavigation({
-                  waitUntil: ['networkidle2', 'load'],
-                }),
-                this.waitForElementToBeClickable(chapter),
-                chapter.click(),
-              ]);
+              await this.waitForElementToBeClickable(chapter);
+              await chapter.click();
 
               await this.expectPageURLToContain(
                 testConstants.URLs.ExplorationPlayer
@@ -6150,6 +6206,45 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Checks if suggestion section is visible or not.
+   * @param visible - Expected visibility.
+   */
+  async expectSuggestionSectionToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(suggestionSection, visible);
+  }
+
+  /**
+   * Checks if progress bar is visible or not.
+   * @param visible - Expected visibility.
+   */
+  async expectProgressBarToBePresent(visible: boolean = true): Promise<void> {
+    await this.expectElementToBeVisible(progressBarSelector, visible);
+  }
+
+  /**
+   * Check if the number input placeholder matches the expected text.
+   * @param expectedPlaceholder - Expected placeholder text of the input field.
+   */
+  async expectNumberInputPlaceholderToMatch(
+    expectedPlaceholder: string
+  ): Promise<void> {
+    // Wait until the placeholder attribute updates to the expected value.
+    await this.page.waitForFunction(
+      (selector: string, expected: string) => {
+        const el = document.querySelector(selector);
+        return el && el.getAttribute('placeholder') === expected;
+      },
+      {timeout: 30000},
+      floatFormInput,
+      expectedPlaceholder
+    );
+
+    showMessage(`Input placeholder is "${expectedPlaceholder}" as expected.`);
+  }
+
+  /**
    * Checks if the text content of an element matches the expected value.
    * @param selector - The CSS selector to find the element.
    * @param value - The expected text content value.
@@ -7132,6 +7227,175 @@ export class LoggedOutUser extends BaseUser {
    */
   async clearUsernameInput(): Promise<void> {
     await this.clearAllTextFrom(signUpUsernameInputField);
+  }
+
+  /**
+   * Navigates to the blog page via the navbar (About > Blog).
+   */
+  async navigateToBlogPageViaNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      // On mobile, navigate directly to blog URL since there's no blog button in sidebar.
+      // Todo(#25094): Add blog button to mobile sidebar and remove this direct navigation.
+      await this.navigateToBlogPage();
+    } else {
+      await this.page.waitForSelector(navbarAboutTab, {
+        visible: true,
+      });
+      await this.clickOnElementWithSelector(navbarAboutTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarAboutTabBlogButton,
+        blogUrl
+      );
+    }
+  }
+
+  /**
+   * Expects the blog welcome message to be visible.
+   */
+  async expectBlogWelcomeMessageToBeVisible(
+    expectedText: string
+  ): Promise<void> {
+    await this.expectElementContentToBe(
+      blogWelcomeHeadingSelector,
+      expectedText
+    );
+  }
+
+  /**
+   * Expects the "no blog posts" message to be visible.
+   */
+  async expectNoBlogPostsMessageToBeVisible(
+    expectedText: string
+  ): Promise<void> {
+    await this.expectElementContentToBe(
+      blogNoResultsFoundSelector,
+      expectedText
+    );
+  }
+
+  /**
+   * Expects the number of blog posts on the current page to be equal to the given number.
+   * @param number - The expected number of blog posts.
+   */
+  async expectNumberOfBlogPostsOnPageToBe(number: number): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, expected: number) =>
+        document.querySelectorAll(selector).length === expected,
+      {timeout: 10000},
+      blogPostTileItemSelector,
+      number
+    );
+
+    showMessage(`Found ${number} blog post(s) on the page as expected.`);
+  }
+
+  /**
+   * Expects a blog post with the given title to be present on the page.
+   * @param title - The title of the blog post to check for.
+   */
+  async expectBlogPostWithTitleToBePresent(title: string): Promise<void> {
+    await this.expectTextContentToContain(blogPostListSelector, title);
+    showMessage(`Blog post with title "${title}" is present.`);
+  }
+
+  /**
+   * Expects the blog page layout to be correct with all required elements.
+   */
+  async expectBlogPageLayoutToBeCorrect(): Promise<void> {
+    await this.expectElementToBeVisible(postsDisplayHeadingSelector);
+
+    const blogPosts = await this.page.$$(blogPostListSelector);
+    if (blogPosts.length === 0) {
+      showMessage('No blog posts found, but layout elements are present.');
+    }
+    await this.expectElementToBeVisible(blogPostTitleSelector);
+    await this.expectElementToBeVisible(blogPostAuthorSelector);
+    await this.expectElementToBeVisible(blogPostPublishDateSelector);
+    await this.expectElementToBeVisible(blogPostTagContainerSelector);
+
+    const paginationExists = await this.page.$(blogPaginationSelector);
+    if (paginationExists) {
+      await this.expectElementToBeVisible(blogPaginationSelector);
+    }
+
+    showMessage('Blog page layout is correct with all required elements.');
+  }
+
+  /**
+   * Clicks on the first blog post in the list.
+   */
+  async clickOnFirstBlogPost(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostTitleSelector);
+
+    const firstBlogPost = await this.page.$(blogPostTitleSelector);
+
+    if (!firstBlogPost) {
+      throw new Error('No blog posts found to click on.');
+    }
+
+    await firstBlogPost.click();
+    await this.waitForNetworkIdle();
+
+    await this.page.waitForFunction(
+      (selector: string) => document.querySelector(selector) !== null,
+      {timeout: 10000},
+      blogPostPageCardSelector
+    );
+  }
+
+  /**
+   * Expects blog post title to be visible.
+   */
+  async expectBlogPostTitleToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostTitleContainerSelector);
+  }
+
+  /**
+   * Expects blog post author name to be visible.
+   */
+  async expectBlogPostAuthorToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogAuthorNameSelector);
+  }
+
+  /**
+   * Expects blog post publish date to be visible.
+   */
+  async expectBlogPostPublishDateToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostPublishDateSelector);
+  }
+
+  /**
+   * Expects blog post content to be visible.
+   */
+  async expectBlogPostContentToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostContentSelector);
+  }
+
+  /**
+   * Expects blog post tags to be visible.
+   */
+  async expectBlogPostTagsToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogCardTagContainerSelector);
+  }
+
+  /**
+   * Expects blog share button to be visible.
+   */
+  async expectBlogShareButtonToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogShareButtonSelector);
+  }
+
+  /**
+   * Expects suggested posts section to be visible (if present).
+   */
+  async expectSuggestedBlogPostsSectionToBeVisible(): Promise<void> {
+    const suggestedSection = await this.page.$(
+      blogSuggestedForYouSectionSelector
+    );
+
+    if (suggestedSection) {
+      await this.expectElementToBeVisible(blogSuggestedForYouHeadingSelector);
+    }
   }
 }
 

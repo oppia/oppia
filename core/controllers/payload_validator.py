@@ -95,8 +95,7 @@ def validate_arguments_against_schema(
                     # Skip validation because the argument is optional.
                     continue
 
-                if arg_schema['default_value'] is not None:
-                    handler_args[arg_key] = arg_schema['default_value']
+                handler_args[arg_key] = arg_schema['default_value']
             else:
                 errors.append('Missing key in handler args: %s.' % arg_key)
                 continue
