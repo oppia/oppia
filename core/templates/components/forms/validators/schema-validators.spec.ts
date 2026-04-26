@@ -24,6 +24,10 @@ import {
 } from '@angular/forms';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {SchemaValidators} from './schema-validators';
+interface ValidatorTestCase {
+  controlValue: SchemaDefaultValue | undefined;
+  expectedResult: boolean;
+}
 
 class MockFormControl extends AbstractControl {
   value: SchemaDefaultValue = '1';
@@ -58,7 +62,7 @@ describe('Schema validators', () => {
         minValue: 3,
       };
 
-      const testCases = [
+      const testCases: ValidatorTestCase[] = [
         {controlValue: '12', expectedResult: false},
         {controlValue: '123', expectedResult: true},
         {controlValue: '1234', expectedResult: true},
@@ -69,9 +73,7 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.hasLengthAtLeast(args);
       testCases.forEach(testCase => {
-        control.setValue(
-          testCase.controlValue as unknown as SchemaDefaultValue
-        );
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
           expect(errorsReturned).toBeNull();
@@ -103,7 +105,7 @@ describe('Schema validators', () => {
         maxValue: 3,
       };
 
-      const testCases = [
+      const testCases: ValidatorTestCase[] = [
         {controlValue: '12', expectedResult: true},
         {controlValue: '123', expectedResult: true},
         {controlValue: '1234', expectedResult: false},
@@ -114,9 +116,7 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.hasLengthAtMost(args);
       testCases.forEach(testCase => {
-        control.setValue(
-          testCase.controlValue as unknown as SchemaDefaultValue
-        );
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
           expect(errorsReturned).toBeNull();
@@ -206,7 +206,7 @@ describe('Schema validators', () => {
       const control: MockFormControl = new MockFormControl();
       control.setValue(1);
 
-      const testCases = [
+      const testCases: ValidatorTestCase[] = [
         {controlValue: '1.23', expectedResult: true},
         {controlValue: '-1.23', expectedResult: true},
         {controlValue: '0', expectedResult: true},
@@ -238,9 +238,7 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.isFloat();
       testCases.forEach(testCase => {
-        control.setValue(
-          testCase.controlValue as unknown as SchemaDefaultValue
-        );
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
           expect(errorsReturned).toBeNull();
@@ -393,7 +391,7 @@ describe('Schema validators', () => {
 
     it('should fail when there are special characters other than hyphen', () => {
       const control: MockFormControl = new MockFormControl();
-      const testCases = [
+      const testCases: ValidatorTestCase[] = [
         {controlValue: 'special~chars', expectedResult: false},
         {controlValue: 'special`chars', expectedResult: false},
         {controlValue: 'special!chars', expectedResult: false},
@@ -427,9 +425,7 @@ describe('Schema validators', () => {
         {controlValue: 'special\\chars', expectedResult: false},
       ];
       testCases.forEach(testCase => {
-        control.setValue(
-          testCase.controlValue as unknown as SchemaDefaultValue
-        );
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         expect(filter(control)).toEqual(errorMsg);
       });
     });

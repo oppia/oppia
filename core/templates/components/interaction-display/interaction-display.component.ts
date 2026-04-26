@@ -29,6 +29,7 @@ import {
 import camelCaseFromHyphen from 'utility/string-utility';
 
 import {TAG_TO_INTERACTION_MAPPING} from 'interactions/tag-to-interaction-mapping';
+type ScopedValue = string | number | boolean | object | null | undefined;
 
 @Component({
   selector: 'oppia-interaction-display',
@@ -42,9 +43,8 @@ export class InteractionDisplayComponent {
   // This property contains the list of classes that needs to be applied to
   // parent container of the created interaction.
   @Input() classStr!: string;
-  // TODO(#13015): Remove use of unknown as a type.
   // The passed htmlData sometimes accesses property from parent scope.
-  @Input() parentScope!: Record<string, unknown>;
+  @Input() parentScope!: Record<string, ScopedValue>;
 
   @ViewChild('interactionContainer', {
     read: ViewContainerRef,
@@ -68,12 +68,12 @@ export class InteractionDisplayComponent {
       const firstChild = dom.body.firstElementChild;
       if (
         firstChild &&
-        (
-          TAG_TO_INTERACTION_MAPPING as unknown as Record<string, Type<unknown>>
-        )[firstChild.tagName]
+        (TAG_TO_INTERACTION_MAPPING as Record<string, Type<object>>)[
+          firstChild.tagName
+        ]
       ) {
         let interaction = (
-          TAG_TO_INTERACTION_MAPPING as unknown as Record<string, Type<unknown>>
+          TAG_TO_INTERACTION_MAPPING as Record<string, Type<object>>
         )[firstChild.tagName];
 
         const componentFactory =
@@ -86,7 +86,7 @@ export class InteractionDisplayComponent {
         Array.from(attributes).forEach(attribute => {
           let attributeNameInCamelCase = camelCaseFromHyphen(attribute.name);
 
-          let attributeValue: unknown = attribute.value;
+          let attributeValue: ScopedValue = attribute.value;
 
           // Properties enclosed with [] needs to be resolved from parent scope.
           // NOTE TO DEVELOPERS: The variables in this case are keyed by the
@@ -108,7 +108,7 @@ export class InteractionDisplayComponent {
             );
           }
 
-          (componentRef.instance as Record<string, unknown>)[
+          (componentRef.instance as Record<string, ScopedValue>)[
             attributeNameInCamelCase
           ] = attributeValue;
         });

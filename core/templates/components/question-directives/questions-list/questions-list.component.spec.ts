@@ -54,11 +54,11 @@ import {QuestionsListComponent} from './questions-list.component';
 
 class MockNgbModalRef {
   componentInstance = {
-    skillSummaries: null as unknown as ShortSkillSummary[],
-    skillsInSameTopicCount: null as unknown as number,
-    categorizedSkills: null as unknown as CategorizedSkills,
-    allowSkillsFromOtherTopics: null as unknown as boolean,
-    untriagedSkillSummaries: null as unknown as SkillSummary[],
+    skillSummaries: [],
+    skillsInSameTopicCount: 0,
+    categorizedSkills: {} as CategorizedSkills,
+    allowSkillsFromOtherTopics: false,
+    untriagedSkillSummaries: [] as SkillSummary[],
   };
 }
 
@@ -252,9 +252,9 @@ describe('Questions List Component', () => {
       language_code: 'en',
       version: 3,
       prerequisite_skill_ids: [],
-      all_questions_merged: null as unknown as boolean,
-      next_misconception_id: null as unknown as number,
-      superseding_skill_id: null as unknown as string,
+      all_questions_merged: false,
+      next_misconception_id: 0,
+      superseding_skill_id: '',
     });
 
     component.selectedSkillId = 'skillId1';
@@ -365,9 +365,9 @@ describe('Questions List Component', () => {
         language_code: 'en',
         version: 3,
         prerequisite_skill_ids: [],
-        all_questions_merged: null as unknown as boolean,
-        next_misconception_id: null as unknown as number,
-        superseding_skill_id: null as unknown as string,
+        all_questions_merged: false,
+        next_misconception_id: 0,
+        superseding_skill_id: '',
       });
 
       spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
@@ -452,9 +452,9 @@ describe('Questions List Component', () => {
       language_code: 'en',
       version: 3,
       prerequisite_skill_ids: [],
-      all_questions_merged: null as unknown as boolean,
-      next_misconception_id: null as unknown as number,
-      superseding_skill_id: null as unknown as string,
+      all_questions_merged: false,
+      next_misconception_id: 0,
+      superseding_skill_id: '',
     });
     spyOn(skillBackendApiService, 'fetchMultiSkillsAsync').and.returnValue(
       Promise.resolve([skill])
@@ -619,17 +619,17 @@ describe('Questions List Component', () => {
       component.skillLinkageModificationsArray = [
         {
           id: '1',
-          task: null as unknown as string,
+          task: '',
           difficulty: 1,
         },
         {
           id: '2',
-          task: null as unknown as string,
+          task: '',
           difficulty: 2,
         },
         {
           id: '1',
-          task: null as unknown as string,
+          task: '',
           difficulty: 1,
         },
       ];
@@ -660,17 +660,17 @@ describe('Questions List Component', () => {
       ).toHaveBeenCalledWith('qId', [
         {
           id: '1',
-          task: null as unknown as string,
+          task: '',
           difficulty: 1,
         },
         {
           id: '2',
-          task: null as unknown as string,
+          task: '',
           difficulty: 2,
         },
         {
           id: '1',
-          task: null as unknown as string,
+          task: '',
           difficulty: 1,
         },
       ]);
@@ -882,13 +882,9 @@ describe('Questions List Component', () => {
     it('should return null if editor is already opened', () => {
       component.editorIsOpen = true;
 
-      expect(
-        component.editQuestion(
-          null as unknown as QuestionSummary,
-          null as unknown as string,
-          null as unknown as number
-        )
-      ).toBe(undefined);
+      expect(component.editQuestion({} as QuestionSummary, '', 0)).toBe(
+        undefined
+      );
     });
 
     it(
@@ -897,11 +893,7 @@ describe('Questions List Component', () => {
         component.canEditQuestion = false;
         spyOn(alertsService, 'addWarning');
 
-        component.editQuestion(
-          null as unknown as QuestionSummary,
-          null as unknown as string,
-          null as unknown as number
-        );
+        component.editQuestion({} as QuestionSummary, '', 0);
 
         expect(alertsService.addWarning).toHaveBeenCalledWith(
           'User does not have enough rights to edit the question'
@@ -1098,7 +1090,7 @@ describe('Questions List Component', () => {
     ];
     spyOn(alertsService, 'addInfoMessage');
 
-    component.removeSkill(null as unknown as string);
+    component.removeSkill('');
 
     expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       'A question should be linked to at least one skill.'
@@ -1170,7 +1162,7 @@ describe('Questions List Component', () => {
 
     expect(component.showSolutionCheckpoint()).toBe(true);
 
-    component.question = null as unknown as Question;
+    component.question = {} as Question;
     expect(component.showSolutionCheckpoint()).toBe(false);
   });
 
@@ -1353,7 +1345,7 @@ describe('Questions List Component', () => {
       component.skillLinkageModificationsArray = [
         {
           id: '1',
-          task: null as unknown as string,
+          task: '',
           difficulty: 1,
         },
       ];
@@ -1396,12 +1388,12 @@ describe('Questions List Component', () => {
     component.skillLinkageModificationsArray = [
       {
         id: '1',
-        task: null as unknown as string,
+        task: '',
         difficulty: 1,
       },
       {
         id: '2',
-        task: null as unknown as string,
+        task: '',
         difficulty: 2,
       },
     ];

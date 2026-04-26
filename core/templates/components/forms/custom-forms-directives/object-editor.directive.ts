@@ -92,7 +92,7 @@ import {LoggerService} from 'services/contextual/logger.service';
 import {ComponentRef} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
-const EDITORS = {
+const EDITORS: Record<string, Type<ObjectEditor>> = {
   'algebraic-expression': AlgebraicExpressionEditorComponent,
   boolean: BooleanEditorComponent,
   'code-string': CodeStringEditorComponent,
@@ -138,16 +138,12 @@ const EDITORS = {
   'unicode-string': UnicodeStringEditorComponent,
 };
 
+interface AngularJSFormController {
+  $setValidity: (errorKey: string, isValid: boolean) => void;
+}
+
 interface ObjectEditor {
-  alwaysEditable: string;
-  initArgs: SchemaDefaultValue;
-  isEditable: string;
-  modalId: symbol;
-  objType: string;
-  schema: SchemaDefaultValue;
-  value: SchemaDefaultValue;
-  valueChanged?: EventEmitter<SchemaDefaultValue>;
-  validityChange?: EventEmitter<Record<string, boolean>>;
+  value?: unknown;
   ngOnChanges?: (changes: SimpleChanges) => void;
 }
 
@@ -182,7 +178,7 @@ export class ObjectEditorComponent
   @Input() modalId!: symbol;
   @Input() objType!: string;
   @Input() schema!: SchemaDefaultValue;
-  @Input() form!: unknown;
+  @Input() form!: AbstractControl | AngularJSFormController;
   @Output() validityChange: EventEmitter<void> = new EventEmitter();
   get value(): SchemaDefaultValue {
     return this._value;
@@ -264,75 +260,72 @@ export class ObjectEditorComponent
       }
       const componentFactory =
         this.componentFactoryResolver.resolveComponentFactory(
-          EDITORS[
-            editorName as keyof typeof EDITORS
-          ] as unknown as Type<unknown>
+          EDITORS[editorName as keyof typeof EDITORS] as Type<ObjectEditor>
         );
       this.viewContainerRef.clear();
-      // Unknown is type is used because it is default property of
-      // createComponent. This is used to access the instance of the
-      // component created. The type of the instance is not known.
-      const componentRef = this.viewContainerRef.createComponent<unknown>(
-        componentFactory
-      ) as ComponentRef<ObjectEditor>;
+      // ObjectEditor type is used to access the instance of the
+      // component created.
+      const componentRef =
+        this.viewContainerRef.createComponent<ObjectEditor>(componentFactory);
 
-      componentRef.instance.alwaysEditable = this.alwaysEditable;
-      componentRef.instance.initArgs = this.initArgs;
-      componentRef.instance.isEditable = this.isEditable;
-      componentRef.instance.modalId = this.modalId;
-      componentRef.instance.objType = this.objType;
+      const instance = componentRef.instance as unknown as Record<
+        string,
+        unknown
+      >;
+      instance.alwaysEditable = this.alwaysEditable;
+      instance.initArgs = this.initArgs;
+      instance.isEditable = this.isEditable;
+      instance.modalId = this.modalId;
+      instance.objType = this.objType;
 
       // Some Object editors have a schema predefined. In order to not
       // replace it with an undefined value, we check if "this.schema" is
       // defined and component doesn't have its own schema property.
-      if (this.schema && !componentRef.instance.schema) {
-        componentRef.instance.schema = this.schema;
+      if (this.schema && !instance.schema) {
+        instance.schema = this.schema;
       }
-      componentRef.instance.value = this.value;
+      instance.value = this.value;
 
       // Listening to @Output events (valueChanged and validityChange).
-      if (componentRef.instance.valueChanged) {
+      if (instance.valueChanged instanceof EventEmitter) {
         this.componentSubscriptions.add(
-          componentRef.instance.valueChanged.subscribe(newValue => {
+          instance.valueChanged.subscribe(newValue => {
             // Changes to array are not caught if the array reference doesn't
             // change. This is a hack for change detection.
             if (Array.isArray(newValue)) {
               this.value = [...newValue];
               return;
             }
-            this.value = newValue;
+            this.value = newValue as SchemaDefaultValue;
           })
         );
       }
-      if (componentRef.instance.validityChange) {
+      if (instance.validityChange instanceof EventEmitter) {
         this.componentSubscriptions.add(
-          componentRef.instance.validityChange.subscribe(errorsMap => {
-            for (const errorKey of Object.keys(errorsMap)) {
-              // Errors map contains true for a key if valid state and false
-              // for an error state. We remove the key from componentErrors
-              // when it is valid and add it when it is reported as error.
-              const errorState = errorsMap[errorKey];
-              if (errorState !== true) {
-                if (this.componentErrors[errorKey] === undefined) {
-                  this.componentErrors[errorKey] = errorState;
+          instance.validityChange.subscribe(
+            (errorsMap: Record<string, boolean>) => {
+              for (const errorKey of Object.keys(errorsMap)) {
+                // Errors map contains true for a key if valid state and false
+                // for an error state. We remove the key from componentErrors
+                // when it is valid and add it when it is reported as error.
+                const errorState = errorsMap[errorKey];
+                if (errorState !== true) {
+                  if (this.componentErrors[errorKey] === undefined) {
+                    this.componentErrors[errorKey] = errorState;
+                  }
+                } else {
+                  if (this.componentErrors[errorKey] !== undefined) {
+                    delete this.componentErrors[errorKey];
+                  }
                 }
-              } else {
-                if (this.componentErrors[errorKey] !== undefined) {
-                  delete this.componentErrors[errorKey];
+                if (this.form && '$setValidity' in this.form) {
+                  this.form.$setValidity(errorKey, errorsMap[errorKey]);
+                  this.validityChange.emit();
                 }
               }
-              if (this.form) {
-                (
-                  this.form as Record<
-                    string,
-                    (errorKey: string, isValid: boolean) => void
-                  >
-                ).$setValidity(errorKey, errorsMap[errorKey]);
-                this.validityChange.emit();
-              }
+              this.onValidatorChange();
             }
-            this.onValidatorChange();
-          })
+          )
         );
       }
       this.componentRef = componentRef;
