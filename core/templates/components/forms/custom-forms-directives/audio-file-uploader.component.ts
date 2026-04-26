@@ -29,6 +29,7 @@ import {AppConstants} from 'app.constants';
 @Component({
   selector: 'oppia-audio-file-uploader',
   templateUrl: './audio-file-uploader.component.html',
+  styleUrls: ['./audio-file-uploader.component.css'],
 })
 export class AudioFileUploaderComponent {
   // These properties are initialized using Angular lifecycle hooks

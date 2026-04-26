@@ -1,0 +1,13 @@
+.thumbnail-preview-image-container {
+    align-items: center;
+    display: flex;
+    height: 180px;
+    justify-content: center;
+    width: 248px;
+  }
+  .thumbnail-preview-image-container img {
+    background: transparent;
+    border: none;
+    height: 180px;
+    width: 142px;
+  }

@@ -39,6 +39,7 @@ interface DestValidation {
 @Component({
   selector: 'oppia-outcome-destination-editor',
   templateUrl: './outcome-destination-editor.component.html',
+  styleUrls: ['./outcome-destination-editor.component.css'],
 })
 export class OutcomeDestinationEditorComponent implements OnInit {
   @Output() addState: EventEmitter<string> = new EventEmitter<string>();

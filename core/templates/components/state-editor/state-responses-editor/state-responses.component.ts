@@ -63,6 +63,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 @Component({
   selector: 'oppia-state-responses',
   templateUrl: './state-responses.component.html',
+  styleUrls: ['./state-responses.component.css'],
 })
 export class StateResponsesComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

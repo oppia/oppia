@@ -44,6 +44,7 @@ interface AddOutcomeModalResponse {
 @Component({
   selector: 'oppia-outcome-editor',
   templateUrl: './outcome-editor.component.html',
+  styleUrls: ['./outcome-editor.component.css'],
 })
 export class OutcomeEditorComponent implements OnInit {
   @Output() saveDest: EventEmitter<Outcome> = new EventEmitter();

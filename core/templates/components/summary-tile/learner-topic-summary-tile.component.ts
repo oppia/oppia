@@ -27,6 +27,7 @@ import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.consta
 @Component({
   selector: 'oppia-learner-topic-summary-tile',
   templateUrl: './learner-topic-summary-tile.component.html',
+  styleUrls: ['./learner-topic-summary-tile.component.css'],
 })
 export class LearnerTopicSummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

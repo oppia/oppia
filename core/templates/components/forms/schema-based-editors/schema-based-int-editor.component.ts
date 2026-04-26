@@ -40,7 +40,7 @@ import {Validator as OppiaValidator} from 'interactions/TextInput/directives/tex
 @Component({
   selector: 'schema-based-int-editor',
   templateUrl: './schema-based-int-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./schema-based-int-editor.component.css', ],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

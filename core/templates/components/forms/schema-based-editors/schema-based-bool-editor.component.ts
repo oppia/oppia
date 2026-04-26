@@ -29,6 +29,7 @@ import {
 @Component({
   selector: 'schema-based-bool-editor',
   templateUrl: './schema-based-bool-editor.component.html',
+  styleUrls: ['./schema-based-bool-editor.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

@@ -30,6 +30,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 @Component({
   selector: 'oppia-classroom-navigation-links',
   templateUrl: './classroom-navigation-links.component.html',
+  styleUrls: ['./classroom-navigation-links.component.css'],
 })
 export class ClassroomNavigationLinksComponent implements OnInit {
   classroomSummaries: ClassroomSummaryDict[] = [];

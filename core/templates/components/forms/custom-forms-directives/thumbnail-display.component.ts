@@ -24,7 +24,7 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 @Component({
   selector: 'oppia-thumbnail-display',
   templateUrl: './thumbnail-display.component.html',
-  styleUrls: [],
+  styleUrls: ['./thumbnail-display.component.css', ],
 })
 export class ThumbnailDisplayComponent implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks

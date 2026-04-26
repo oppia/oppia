@@ -1,0 +1,49 @@
+.dropdown-option {
+    padding: 10px;
+  }
+
+  .rubric-error-message {
+    color: #f00;
+    display: block;
+    font-size: 0.8em;
+  }
+
+  .oppia-card-content-limit-error {
+    background: #fff5c8;
+    border: 0.0625rem solid #827127;
+    border-radius: 0.25rem;
+    color: #333;
+    padding-left: 0.25rem;
+  }
+
+  .helper-text {
+    color: #595959;
+    font-size: 13px;
+  }
+
+  .dropdown {
+    display: inline-block;
+  }
+
+  .rubric-options {
+    width: 200px;
+  }
+
+  .add-explanation-button {
+    background-color: #058ca6;
+    color: #fff;
+    margin-top: 1vh;
+  }
+
+  .rubric-editor {
+    margin-right: 15px;
+    margin-top: 2vh;
+  }
+
+  .oppia-rule-save-cancel-buttons {
+    text-align: right;
+  }
+  .oppia-rule-save-cancel-buttons .rubric-cancel-button {
+    border: 1px solid #999;
+    margin: 0 4px;
+  }

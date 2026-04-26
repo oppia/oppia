@@ -23,7 +23,7 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 @Component({
   selector: 'exploration-embed-button-modal',
   templateUrl: './exploration-embed-button-modal.component.html',
-  styleUrls: [],
+  styleUrls: ['./exploration-embed-button-modal.component.css', ],
 })
 export class ExplorationEmbedButtonModalComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

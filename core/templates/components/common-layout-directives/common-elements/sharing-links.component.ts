@@ -30,7 +30,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 @Component({
   selector: 'sharing-links',
   templateUrl: './sharing-links.component.html',
-  styleUrls: [],
+  styleUrls: ['./sharing-links.component.css', ],
 })
 export class SharingLinksComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

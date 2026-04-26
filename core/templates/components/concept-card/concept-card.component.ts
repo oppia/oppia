@@ -23,6 +23,7 @@ import {ConceptCard} from 'domain/skill/concept-card.model';
 @Component({
   selector: 'oppia-concept-card',
   templateUrl: './concept-card.component.html',
+  styleUrls: ['./concept-card.component.css'],
 })
 export class ConceptCardComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

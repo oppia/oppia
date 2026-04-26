@@ -51,6 +51,7 @@ import {Validator as OppiaValidator} from 'interactions/TextInput/directives/tex
 @Component({
   selector: 'schema-based-unicode-editor',
   templateUrl: './schema-based-unicode-editor.component.html',
+  styleUrls: ['./schema-based-unicode-editor.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

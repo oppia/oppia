@@ -42,6 +42,7 @@ interface ExplanationFormSchema {
 @Component({
   selector: 'oppia-solution-explanation-editor',
   templateUrl: './solution-explanation-editor.component.html',
+  styleUrls: ['./solution-explanation-editor.component.css'],
 })
 export class SolutionExplanationEditor implements OnDestroy, OnInit {
   @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();

@@ -82,7 +82,7 @@ export interface RteConfig extends CKEDITOR.config {
 @Component({
   selector: 'ck-editor-4-rte',
   templateUrl: './ck-editor-4-rte.component.html',
-  styleUrls: [],
+  styleUrls: ['./ck-editor-4-rte.component.css', ],
 })
 export class CkEditor4RteComponent
   implements AfterViewInit, OnChanges, OnDestroy, OnInit

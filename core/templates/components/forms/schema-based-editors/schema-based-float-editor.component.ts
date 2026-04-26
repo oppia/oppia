@@ -49,7 +49,7 @@ interface OppiaValidator {
 @Component({
   selector: 'schema-based-float-editor',
   templateUrl: './schema-based-float-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./schema-based-float-editor.component.css', ],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

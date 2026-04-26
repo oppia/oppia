@@ -1,0 +1,36 @@
+.btn-success {
+    margin: 2px;
+  }
+  .btn-secondary {
+    margin: 2px;
+  }
+  @media screen and (max-width: 768px) {
+    .skill-select-modal .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0 auto;
+      padding: 0;
+    }
+    .skill-select-modal .modal-header {
+      align-items: center;
+      background-color: #00609c;
+      justify-content: space-between;
+      padding: 12px 10px;
+      width: 100vw;
+    }
+    .skill-select-modal .modal-header h3 {
+      color: #fff;
+    }
+    .skill-select-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+    }
+    .select-skill-modal-header .modal-close-button {
+      color: #fff;
+      display: block;
+      font-size: 20px;
+    }
+    .select-skill-modal-header .modal-footer {
+      justify-content: flex-start;
+    }
+  }

@@ -45,6 +45,7 @@ interface HintFormSchema {
 @Component({
   selector: 'oppia-hint-editor',
   templateUrl: './hint-editor.component.html',
+  styleUrls: ['./hint-editor.component.css'],
 })
 export class HintEditorComponent implements OnInit, OnDestroy {
   @Output() saveHint = new EventEmitter<void>();

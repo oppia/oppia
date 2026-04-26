@@ -48,6 +48,7 @@ import {GenerateContentIdService} from 'services/generate-content-id.service';
 @Component({
   selector: 'oppia-question-editor',
   templateUrl: './question-editor.component.html',
+  styleUrls: ['./question-editor.component.css'],
 })
 export class QuestionEditorComponent implements OnInit, OnDestroy {
   @Output() questionChange = new EventEmitter<void>();

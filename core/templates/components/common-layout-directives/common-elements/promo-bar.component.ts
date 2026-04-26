@@ -26,6 +26,7 @@ import {PromoBarBackendApiService} from 'services/promo-bar-backend-api.service'
 @Component({
   selector: 'oppia-promo-bar',
   templateUrl: './promo-bar.component.html',
+  styleUrls: ['./promo-bar.component.css'],
 })
 export class PromoBarComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

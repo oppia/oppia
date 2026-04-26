@@ -30,6 +30,7 @@ import {Subscription} from 'rxjs';
 @Component({
   selector: 'oppia-collection-summary-tile',
   templateUrl: './collection-summary-tile.component.html',
+  styleUrls: ['./collection-summary-tile.component.css'],
 })
 export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

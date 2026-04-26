@@ -24,7 +24,7 @@ import {SkillMasteryBackendApiService} from 'domain/skill/skill-mastery-backend-
 @Component({
   selector: 'skill-mastery-viewer',
   templateUrl: './skill-mastery.component.html',
-  styleUrls: [],
+  styleUrls: ['./skill-mastery.component.css', ],
 })
 export class SkillMasteryViewerComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

@@ -31,6 +31,7 @@ import {
 @Component({
   selector: 'oppia-subtopic-summary-tile',
   templateUrl: './subtopic-summary-tile.component.html',
+  styleUrls: ['./subtopic-summary-tile.component.css'],
 })
 export class SubtopicSummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

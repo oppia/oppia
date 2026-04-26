@@ -46,6 +46,7 @@ interface HTMLSchema {
 @Component({
   selector: 'oppia-state-content-editor',
   templateUrl: './state-content-editor.component.html',
+  styleUrls: ['./state-content-editor.component.css'],
 })
 export class StateContentEditorComponent implements OnInit {
   @Output() intialize: EventEmitter<void> = new EventEmitter();

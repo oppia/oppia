@@ -30,6 +30,7 @@ interface Choice {
 @Component({
   selector: 'oppia-rule-type-selector',
   templateUrl: './rule-type-selector.component.html',
+  styleUrls: ['./rule-type-selector.component.css']
 })
 export class RuleTypeSelector implements OnInit {
   // This property is initialized using Angular lifecycle hooks

@@ -51,6 +51,7 @@ interface TaggedMisconception {
 @Component({
   selector: 'oppia-answer-group-editor',
   templateUrl: './answer-group-editor.component.html',
+  styleUrls: ['./answer-group-editor.component.css'],
 })
 export class AnswerGroupEditor implements OnInit, OnDestroy {
   @Input() displayFeedback: boolean;

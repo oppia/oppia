@@ -30,6 +30,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 @Component({
   selector: 'oppia-learner-topic-goals-summary-tile',
   templateUrl: './learner-topic-goals-summary-tile.component.html',
+  styleUrls: ['./learner-topic-goals-summary-tile.component.css'],
 })
 export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

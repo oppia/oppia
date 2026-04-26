@@ -66,6 +66,7 @@ export interface InitializeAnswerGroups {
 @Component({
   selector: 'oppia-state-interaction-editor',
   templateUrl: './state-interaction-editor.component.html',
+  styleUrls: ['./state-interaction-editor.component.css'],
 })
 export class StateInteractionEditorComponent implements OnInit, OnDestroy {
   @Output() markAllAudioAsNeedingUpdateModalIfRequired = new EventEmitter<

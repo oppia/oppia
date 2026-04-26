@@ -22,6 +22,7 @@ import {MatSnackBarRef} from '@angular/material/snack-bar';
 @Component({
   selector: 'app-custom-snackbar',
   templateUrl: './undo-snackbar.component.html',
+  styleUrls: ['./undo-snackbar.component.css'],
 })
 export class UndoSnackbarComponent {
   message!: string;

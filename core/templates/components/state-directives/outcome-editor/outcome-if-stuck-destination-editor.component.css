@@ -1,0 +1,16 @@
+.oppia-form-group {
+    font-size: 1.1em;
+  }
+  .dest-if-stuck-tooltip {
+    cursor: pointer;
+    float: right;
+  }
+  .form-select.oppia-form-control {
+    width: 200px;
+  }
+  .oppia-form-error-text {
+    font-size: 0.85em;
+  }
+  .oppia-id-text {
+    margin-top: 12px;
+  }

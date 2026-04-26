@@ -1,0 +1,9 @@
+.oppia-skill-mastery-viewer .oppia-mastery-percentage-increment {
+    color: green;
+  }
+  .oppia-skill-mastery-viewer .oppia-mastery-percentage-decrement {
+    color: red;
+  }
+  .oppia-skill-mastery-viewer .oppia-mastery-percentage-container {
+    margin-bottom: 10px;
+  }

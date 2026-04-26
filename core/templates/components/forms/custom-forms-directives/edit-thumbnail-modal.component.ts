@@ -35,6 +35,7 @@ interface Dimensions {
 @Component({
   selector: 'edit-thumbnail-modal',
   templateUrl: './edit-thumbnail-modal.component.html',
+  styleUrls: ['./edit-thumbnail-modal.component.css'],
   animations: [
     trigger('fade', [
       transition('void => *', [

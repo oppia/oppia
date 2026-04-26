@@ -94,6 +94,7 @@ interface DiffGraphData {
 @Component({
   selector: 'oppia-version-diff-visualization',
   templateUrl: './version-diff-visualization.component.html',
+  styleUrls: ['./version-diff-visualization.component.css'],
 })
 export class VersionDiffVisualizationComponent implements OnInit {
   // An object with the following properties:

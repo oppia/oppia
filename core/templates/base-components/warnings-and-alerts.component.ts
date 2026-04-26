@@ -22,6 +22,7 @@ import {AlertsService, Message, Warning} from 'services/alerts.service';
 @Component({
   selector: 'oppia-warnings-and-alerts',
   templateUrl: './warnings-and-alerts.component.html',
+  styleUrls: ['./warnings-and-alerts.component.css'],
 })
 export class WarningsAndAlertsComponent {
   constructor(private alertsService: AlertsService) {}

@@ -41,6 +41,7 @@ import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 @Component({
   selector: 'state-skill-editor',
   templateUrl: './state-skill-editor.component.html',
+  styleUrls: ['./state-skill-editor.component.css'],
 })
 export class StateSkillEditorComponent implements OnInit {
   @Output() onSaveLinkedSkillId: EventEmitter<string | null> = new EventEmitter<

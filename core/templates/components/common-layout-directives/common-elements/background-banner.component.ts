@@ -22,6 +22,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 @Component({
   selector: 'background-banner',
   templateUrl: './background-banner.component.html',
+  styleUrls: ['./background-banner.component.css'],
 })
 export class BackgroundBannerComponent implements OnInit {
   constructor(private urlInterpolationService: UrlInterpolationService) {}

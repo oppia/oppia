@@ -22,6 +22,7 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'thanks-for-subscribing-modal',
   templateUrl: './thanks-for-subscribing-modal.component.html',
+  styleUrls: ['./thanks-for-subscribing-modal.component.css'],
 })
 export class ThanksForSubscribingModalComponent {
   constructor(private activeModal: NgbActiveModal) {}

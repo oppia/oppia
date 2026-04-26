@@ -1,0 +1,27 @@
+.oppia-add-rule-button {
+    background-color: #058ca6;
+    border: 0;
+    border-radius: 0;
+    margin-top: 10px;
+    padding-top: 5px;
+    width: 100%;
+  }
+  .oppia-add-rule-button:active,
+  .oppia-add-rule-button:focus,
+  .oppia-add-rule-button:hover {
+    background-color: rgba(5,140,166,1);
+  }
+  .oppia-tagged-misconception-title {
+    margin-top: 10px;
+  }
+
+  .oppia-misconception-editor-container {
+    height: 100%;
+    max-width: 95%;
+  }
+
+  .oppia-misconception-selector-container {
+    border-bottom: 1px solid #ccc;
+    display: inline-block;
+    padding-bottom: 12px;
+  }

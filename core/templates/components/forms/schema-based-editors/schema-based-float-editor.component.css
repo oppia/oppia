@@ -1,0 +1,14 @@
+.schema-based-float-editor .oppia-numeric-input-error {
+    margin-top: 10px;
+  }
+  .schema-based-float-editor input.oppia-float-form-input {
+    -moz-appearance: textfield;
+  }
+  .schema-based-float-editor input.oppia-float-form-input::-webkit-outer-spin-button,
+  .schema-based-float-editor input.oppia-float-form-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .schema-based-float-editor .oppia-form-container {
+    font-size: 0.85em;
+  }

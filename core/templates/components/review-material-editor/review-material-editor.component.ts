@@ -39,6 +39,7 @@ interface BindableDict {
 @Component({
   selector: 'oppia-review-material-editor',
   templateUrl: './review-material-editor.component.html',
+  styleUrls: ['./review-material-editor.component.css'],
 })
 export class ReviewMaterialEditorComponent implements OnInit {
   @Output() onSaveExplanation: EventEmitter<SubtitledHtml> = new EventEmitter();

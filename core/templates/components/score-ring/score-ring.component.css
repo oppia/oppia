@@ -1,0 +1,21 @@
+.score-ring {
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 48px;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 60px;
+    margin: 0;
+    text-align: center;
+  }
+
+  .score-ring-circle {
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition-property: stroke-dashoffset;
+  }
+  @media(max-width: 425px) {
+    .score-ring {
+      bottom: 20px;
+      position: relative;
+    }
+  }

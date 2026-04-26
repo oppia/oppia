@@ -31,6 +31,7 @@ import {EditThumbnailModalComponent} from './edit-thumbnail-modal.component';
 @Component({
   selector: 'oppia-thumbnail-uploader',
   templateUrl: './thumbnail-uploader.component.html',
+  styleUrls: ['./thumbnail-uploader.component.css'],
 })
 export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   @Output() updateBgColor: EventEmitter<string> = new EventEmitter();

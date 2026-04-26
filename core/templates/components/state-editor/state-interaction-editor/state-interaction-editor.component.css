@@ -1,0 +1,96 @@
+.oppia-editable-section {
+    width: -webkit-fill-available;
+  }
+
+  .oppia-editor-card-with-avatar {
+    margin-top: 40px;
+  }
+  .oppia-exp-interaction-card-header {
+    font-size: 18px;
+    margin: 0;
+  }
+
+  .oppia-open-interaction-customizer-button {
+    background-color: transparent;
+    border: none;
+    color: transparent;
+    cursor: pointer;
+    height: 0;
+    margin: 0;
+    outline: none;
+    padding: 0;
+    width: 0;
+  }
+
+  .oppia-open-interaction-customizer-button:focus {
+    color: black;
+    height: 22px;
+    opacity: 0.8;
+    outline: 1px solid #000;
+    width: 22px;
+  }
+
+  .oppia-exp-interaction-card-header-container {
+    align-content: center;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 20px;
+  }
+
+  .oppia-add-interaction-button-container {
+    padding: 20px 30px;
+  }
+
+  .oppia-exp-interaction-container {
+    border: 1.5px solid #d3d1d1;
+    border-radius: 4px;
+    margin: 15px auto 30px;
+    width: 87%;
+  }
+
+  .oppia-state-interaction-content {
+    margin-top: 0;
+  }
+
+  .oppia-interaction-preview-container {
+    padding: 5px;
+    pointer-events: none;
+  }
+
+  .oppia-editor-card-section {
+    display: flex;
+    min-height: 80px;
+  }
+
+  .oppia-delete-interaction-icon {
+      font-size: 21px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .oppia-delete-interaction-button {
+      height: 25px;
+      padding: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 25px;
+    }
+
+    .oppia-exp-interaction-card-header {
+      padding: 0;
+    }
+
+    .oppia-exp-interaction-card-header-container i {
+      display: block;
+    }
+
+    .oppia-exp-interaction-card-header-container {
+      background-color: #fff;
+      padding: 0;
+    }
+
+    .oppia-editor-card-with-avatar {
+      margin-top: 20px;
+    }
+  }

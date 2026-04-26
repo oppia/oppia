@@ -29,6 +29,7 @@ import {AppConstants} from 'app.constants';
 @Component({
   selector: 'oppia-create-activity-button',
   templateUrl: './create-activity-button.component.html',
+  styleUrls: ['./create-activity-button.component.css'],
   encapsulation: ViewEncapsulation.None,
 })
 export class CreateActivityButtonComponent implements OnInit {

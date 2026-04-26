@@ -24,6 +24,7 @@ import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor
 @Component({
   selector: 'ck-editor-copy-toolbar',
   templateUrl: './ck-editor-copy-toolbar.component.html',
+  styleUrls: ['./ck-editor-copy-toolbar.component.css'],
 })
 export class CkEditorCopyToolbarComponent {
   constructor(

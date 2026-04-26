@@ -23,6 +23,7 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 @Component({
   selector: 'oppia-copy-url',
   templateUrl: './copy-url.component.html',
+  styleUrls: ['./copy-url.component.css'],
 })
 export class ComponentOverviewComponent {
   @Input() urlToCopy!: string;

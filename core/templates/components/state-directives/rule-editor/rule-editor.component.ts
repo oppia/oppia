@@ -58,6 +58,7 @@ export interface RuleDescriptionFragment {
 @Component({
   selector: 'oppia-rule-editor',
   templateUrl: './rule-editor.component.html',
+  styleUrls: ['./rule-editor.component.css'],
 })
 export class RuleEditorComponent
   implements OnInit, OnDestroy, AfterViewChecked

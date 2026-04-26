@@ -26,6 +26,7 @@ import {SkillsCategorizedByTopics} from 'pages/topics-and-skills-dashboard-page/
 @Component({
   selector: 'oppia-merge-skill',
   templateUrl: './merge-skill-modal.component.html',
+  styleUrls: ['./merge-skill-modal.component.css'],
 })
 export class MergeSkillModalComponent extends ConfirmOrCancelModal {
   // These properties below are initialized using Angular lifecycle hooks

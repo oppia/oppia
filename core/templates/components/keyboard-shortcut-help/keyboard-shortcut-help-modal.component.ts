@@ -24,7 +24,7 @@ import {PageContextService} from 'services/page-context.service';
 @Component({
   selector: 'keyboard-shortcut-help-modal',
   templateUrl: './keyboard-shortcut-help-modal.component.html',
-  styleUrls: [],
+  styleUrls: ['./keyboard-shortcut-help-modal.component.css', ],
 })
 export class KeyboardShortcutHelpModalComponent implements OnInit {
   constructor(

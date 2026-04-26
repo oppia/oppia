@@ -30,6 +30,7 @@ export interface CategorizedSkills {
 @Component({
   selector: 'oppia-select-skill',
   templateUrl: './select-skill-modal.component.html',
+  styleUrls: ['./select-skill-modal.component.css'],
 })
 export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks

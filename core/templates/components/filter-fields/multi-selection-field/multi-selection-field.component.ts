@@ -34,6 +34,7 @@ import {map, startWith} from 'rxjs/operators';
 @Component({
   selector: 'oppia-multi-selection-field',
   templateUrl: './multi-selection-field.component.html',
+  styleUrls: ['./multi-selection-field.component.css'],
 })
 export class MultiSelectionFieldComponent {
   @Input() selections: string[] = [];

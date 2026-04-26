@@ -30,6 +30,7 @@ import {PageContextService} from 'services/page-context.service';
 @Component({
   selector: 'oppia-outcome-feedback-editor',
   templateUrl: './outcome-feedback-editor.component.html',
+  styleUrls: ['./outcome-feedback-editor.component.css'],
 })
 export class OutcomeFeedbackEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

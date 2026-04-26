@@ -1,0 +1,34 @@
+.misconception-button {
+    font-size: 16px;
+    text-align: left;
+    width: 100%;
+  }
+  .misconception-button-selected {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: 1px solid #000;
+  }
+  .misconception-feedback-usage-checkbox {
+    cursor: pointer;
+  }
+  .misconception-feedback-usage-container {
+    margin-bottom: 4px;
+  }
+  .misconception-label {
+    margin-top: 2vh;
+    width: 100%;
+  }
+  .misconception-notes-container > p {
+    display: inline;
+  }
+  .misconception-list-container {
+    margin-bottom: 8px;
+  }
+  .misconception-info-container {
+    border: 1px solid #ccc;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-top: none;
+    padding-bottom: 6px;
+    padding-left: 12px;
+    padding-right: 4px;
+  }

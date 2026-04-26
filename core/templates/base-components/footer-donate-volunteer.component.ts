@@ -23,13 +23,14 @@ import {
   ElementRef,
   AfterViewInit,
 } from '@angular/core';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {NavbarAndFooterGATrackingPages} from 'app.constants';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { NavbarAndFooterGATrackingPages } from 'app.constants';
 
 @Component({
   selector: 'oppia-footer-donate-volunteer',
   templateUrl: './footer-donate-volunteer.component.html',
+  styleUrls: ['./footer-donate-volunteer.component.css'],
   encapsulation: ViewEncapsulation.None,
 })
 export class FooterDonateVolunteerComponent implements AfterViewInit {
@@ -38,7 +39,7 @@ export class FooterDonateVolunteerComponent implements AfterViewInit {
     private siteAnalyticsService: SiteAnalyticsService,
     private renderer: Renderer2,
     private el: ElementRef
-  ) {}
+  ) { }
 
   ngAfterViewInit(): void {
     // This lifecycle hook is called after Angular has fully initialized the component's view.
