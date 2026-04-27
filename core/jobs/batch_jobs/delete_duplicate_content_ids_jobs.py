@@ -176,7 +176,7 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
 
         combined_models = {
             'exploration': exp_id_to_exploration_model,
-            'voiceovers': exp_id_to_voiceover_model,
+            'voiceovers': exp_id_to_voiceover_models,
         } | 'Join explorations with voiceover models' >> beam.CoGroupByKey()
 
         fixed_explorations = (
@@ -279,7 +279,8 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
         )
 
         fixed_content_ids = []
-        content_id_replacements: Dict[str, List[str]] = {}
+        # Now maps old_content_id -> list of (new_content_id, state_name)
+        content_id_replacements: Dict[str, List[Tuple[str, str]]] = {}
 
         for duplicate_id in duplicate_content_ids:
             states_with_duplicate = [
@@ -301,7 +302,9 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
                 )
                 if duplicate_id not in content_id_replacements:
                     content_id_replacements[duplicate_id] = []
-                content_id_replacements[duplicate_id].append(new_content_id)
+                content_id_replacements[duplicate_id].append(
+                    (new_content_id, state_name)
+                )
                 fixed_content_ids.append(
                     f'{duplicate_id} -> {new_content_id} in {state_name}'
                 )
@@ -346,7 +349,7 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
 def _create_updated_entity_voiceovers_models(
     entity_voiceover_models: List[voiceover_models.EntityVoiceoversModel],
     new_version: int,
-    content_id_replacements: Dict[str, List[str]],
+    content_id_replacements: Dict[str, List[Tuple[str, str]]],
 ) -> List[base_models.BaseModel]:
     """Create updated voiceover models for a migrated exploration version.
 
@@ -375,9 +378,12 @@ def _create_updated_entity_voiceovers_models(
             entity_voiceovers.automated_voiceovers_audio_offsets_msecs
         )
 
-        for old_content_id, new_content_ids in content_id_replacements.items():
+        for (
+            old_content_id,
+            new_content_id_state_pairs,
+        ) in content_id_replacements.items():
             if old_content_id in entity_voiceovers.voiceovers_mapping:
-                for new_content_id in new_content_ids:
+                for new_content_id, _ in new_content_id_state_pairs:
                     new_voiceovers_mapping[new_content_id] = copy.deepcopy(
                         entity_voiceovers.voiceovers_mapping[old_content_id]
                     )
@@ -386,10 +392,7 @@ def _create_updated_entity_voiceovers_models(
                 old_content_id
                 in entity_voiceovers.automated_voiceovers_audio_offsets_msecs
             ):
-                for new_content_id in new_content_ids:
-                    # Each new content ID represents the same content in a
-                    # different state, so they all share the same audio offset
-                    # (timing information for synchronized playback).
+                for new_content_id, _ in new_content_id_state_pairs:
                     new_audio_offsets[new_content_id] = copy.deepcopy(
                         entity_voiceovers.automated_voiceovers_audio_offsets_msecs[
                             old_content_id

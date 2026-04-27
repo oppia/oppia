@@ -411,8 +411,8 @@ class CreateUpdatedEntityVoiceoversModelsTests(test_utils.GenericTestBase):
             [voiceover_model],
             2,
             {
-                'solution_1': ['content_4'],
-                'missing_content_id': ['content_5'],
+                'solution_1': [('content_4', 'Introduction')],
+                'missing_content_id': [('content_5', 'SomeOtherState')],
             },
         )
 
