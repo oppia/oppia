@@ -40,7 +40,6 @@ import {QuestionPlayerEngineService} from 'pages/exploration-player-page/service
 import {StateCard} from 'domain/state_card/state-card.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 const questionDict = {
   id: 'question_id',
   question_state_data: {
