@@ -30,6 +30,7 @@ export interface ExplorationOpportunitySummaryBackendDict {
   translation_in_review_counts: TranslationCountsDict;
   language_code: string;
   is_pinned: boolean;
+  reviewer_only_content_count: number;
 }
 
 export class ExplorationOpportunitySummary {
@@ -42,6 +43,7 @@ export class ExplorationOpportunitySummary {
   translationInReviewCount: TranslationCountsDict;
   languageCode: string;
   isPinned: boolean;
+  reviewerOnlyContentCount: number;
 
   constructor(
     expId: string,
@@ -52,7 +54,8 @@ export class ExplorationOpportunitySummary {
     translationCounts: TranslationCountsDict,
     translationInReviewCount: TranslationCountsDict,
     languageCode: string,
-    isPinned: boolean
+    isPinned: boolean,
+    reviewerOnlyContentCount: number
   ) {
     this.id = expId;
     this.topicName = topicName;
@@ -63,6 +66,7 @@ export class ExplorationOpportunitySummary {
     this.translationInReviewCount = translationInReviewCount;
     this.languageCode = languageCode;
     this.isPinned = isPinned;
+    this.reviewerOnlyContentCount = reviewerOnlyContentCount;
   }
 
   static createFromBackendDict(
@@ -77,7 +81,8 @@ export class ExplorationOpportunitySummary {
       backendDict.translation_counts,
       backendDict.translation_in_review_counts,
       backendDict.language_code,
-      backendDict.is_pinned
+      backendDict.is_pinned,
+      backendDict.reviewer_only_content_count
     );
   }
 
@@ -95,6 +100,10 @@ export class ExplorationOpportunitySummary {
 
   getContentCount(): number {
     return this.contentCount;
+  }
+
+  getReviewerOnlyContentCount(): number {
+    return this.reviewerOnlyContentCount;
   }
 
   getTranslationProgressPercentage(languageCode: string): number {
