@@ -21,7 +21,6 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {UserService} from 'services/user.service';
-import {UserService} from 'services/user.service';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 
 describe('Site Analytics Service', () => {
@@ -48,7 +47,11 @@ describe('Site Analytics Service', () => {
       'getLastPageViewTime',
       'setLastPageViewTime',
     ]);
-    const userServiceSpy = jasmine.createSpyObj('UserService', ['isLoggedIn']);
+    const userServiceSpy = jasmine.createSpyObj('UserService', [
+      'isLoggedIn',
+      'getUserInfoAsync',
+    ]);
+    userServiceSpy.getUserInfoAsync.and.returnValue(Promise.resolve());
     TestBed.configureTestingModule({
       providers: [
         SiteAnalyticsService,
