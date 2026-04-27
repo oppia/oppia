@@ -30,7 +30,6 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 const CARD_NAMES = {
   FIRST: 'Introduction',
   SECOND: '2nd Card',
-  THIRD: '3rd Card',
   FOURTH: '4th Card',
   FIFTH: '5th Card',
   SIXTH: '6th Card',
@@ -190,7 +189,7 @@ describe('Exploration Editor', function () {
     // Preview tab.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.expectPreviewCardContentToBe(
-      CARD_NAMES.THIRD,
+      CARD_NAMES.SECOND,
       'Enter a set.'
     );
     // Submit wrong answer. Also, verifies clicking on "Add Item" adds new item.

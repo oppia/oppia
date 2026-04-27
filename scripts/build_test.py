@@ -22,6 +22,7 @@ import ast
 import collections
 import contextlib
 import io
+import json
 import os
 import pathlib
 import re
@@ -94,46 +95,6 @@ class BuildTests(test_utils.GenericTestBase):
                 INVALID_OUTPUT_FILEPATH,
                 INVALID_FILENAME,
             )
-
-    def test_join_files(self) -> None:
-        """Determine third_party.js contains the content of the first 10 JS
-        files in /third_party/static.
-        """
-        third_party_js_stream = io.StringIO()
-        # Get all filepaths from dependencies.json.
-        dependency_filepaths = build.get_dependencies_filepaths()
-        # Join and write all JS files in /third_party/static to file_stream.
-        build._join_files(  # pylint: disable=protected-access
-            dependency_filepaths['js'], third_party_js_stream
-        )
-        counter = 0
-        # Only checking first 10 files.
-        js_file_count = 10
-        for js_filepath in dependency_filepaths['js']:
-            if counter == js_file_count:
-                break
-            with open(js_filepath, 'r', encoding='utf-8') as js_file:
-                # Assert that each line is copied over to file_stream object.
-                for line in js_file:
-                    self.assertIn(line, third_party_js_stream.getvalue())
-            counter += 1
-
-    def test_generate_copy_tasks_for_fonts(self) -> None:
-        """Test _generate_copy_tasks_for_fonts ensures that the number of copy
-        tasks matches the number of font files.
-        """
-        copy_tasks: Deque[threading.Thread] = collections.deque()
-        # Get all filepaths from dependencies.json.
-        dependency_filepaths = build.get_dependencies_filepaths()
-        # Setup a sandbox folder for copying fonts.
-        test_target = os.path.join('target', 'fonts', '')
-
-        self.assertEqual(len(copy_tasks), 0)
-        copy_tasks += build._generate_copy_tasks_for_fonts(  # pylint: disable=protected-access
-            dependency_filepaths['fonts'], test_target
-        )
-        # Asserting the same number of copy tasks and number of font files.
-        self.assertEqual(len(copy_tasks), len(dependency_filepaths['fonts']))
 
     def test_insert_hash(self) -> None:
         """Test _insert_hash returns correct filenames with provided hashes."""
@@ -999,38 +960,6 @@ class BuildTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(OSError, error_message):
             build.safe_delete_file(non_existent_filepaths[0])
 
-    def test_minify_third_party_libs(self) -> None:
-
-        def _mock_safe_delete_file(unused_filepath: str) -> None:
-            """Mocks build.safe_delete_file()."""
-            pass
-
-        self.assertFalse(
-            os.path.isfile(
-                'core/tests/data/third_party/css/third_party.min.css'
-            )
-        )
-
-        with self.swap(build, 'safe_delete_file', _mock_safe_delete_file):
-            build.minify_third_party_libs('core/tests/data/third_party')
-
-        self.assertTrue(
-            os.path.isfile(
-                'core/tests/data/third_party/css/third_party.min.css'
-            )
-        )
-
-        self.assertLess(
-            os.path.getsize(
-                'core/tests/data/third_party/css/third_party.min.css'
-            ),
-            os.path.getsize('core/tests/data/third_party/css/third_party.css'),
-        )
-
-        build.safe_delete_file(
-            'core/tests/data/third_party/css/third_party.min.css'
-        )
-
     def test_clean(self) -> None:
         check_function_calls = {
             'safe_delete_directory_tree_gets_called': 0,
@@ -1079,10 +1008,15 @@ class BuildTests(test_utils.GenericTestBase):
         clean_swap = self.swap_with_checks(
             build, 'clean', lambda: None, expected_args=[()]
         )
+        inject_angular_css_hashes_swap = self.swap_with_checks(
+            build, 'inject_angular_css_hashes', lambda: None, expected_args=[()]
+        )
 
         with ensure_files_exist_swap, build_using_webpack_swap, clean_swap:
             with modify_constants_swap, build_using_ng_swap:
-                with generate_python_package_swap:
+                with (
+                    generate_python_package_swap
+                ), inject_angular_css_hashes_swap:
                     build.main(args=['--prod_env'])
 
     def test_build_with_prod_source_maps(self) -> None:
@@ -1125,12 +1059,16 @@ class BuildTests(test_utils.GenericTestBase):
         install_third_party_libs_swap = self.swap_with_checks(
             install_third_party_libs, 'main', lambda: None, expected_args=[()]
         )
+        inject_angular_css_hashes_swap = self.swap_with_checks(
+            build, 'inject_angular_css_hashes', lambda: None, expected_args=[()]
+        )
 
         with ensure_files_exist_swap, build_using_webpack_swap:
             with modify_constants_swap, compare_file_count_swap:
                 with clean_swap, install_python_dev_dependencies_swap:
                     with build_using_ng_swap, install_third_party_libs_swap:
-                        build.main(args=['--prod_env', '--source_maps'])
+                        with inject_angular_css_hashes_swap:
+                            build.main(args=['--prod_env', '--source_maps'])
 
     def test_build_with_watcher(self) -> None:
         check_function_calls = {
@@ -1139,7 +1077,7 @@ class BuildTests(test_utils.GenericTestBase):
             'clean_gets_called': False,
         }
         expected_check_function_calls = {
-            'ensure_files_exist_gets_called': True,
+            'ensure_files_exist_gets_called': False,
             'modify_constants_gets_called': True,
             'clean_gets_called': True,
         }
@@ -1176,72 +1114,6 @@ class BuildTests(test_utils.GenericTestBase):
         )
         with assert_raises_regexp_context_manager:
             build.main(args=['--maintenance_mode'])
-
-    def test_cannot_minify_third_party_libs_in_dev_mode(self) -> None:
-        check_function_calls = {
-            'ensure_files_exist_gets_called': False,
-            'clean_gets_called': False,
-        }
-        expected_check_function_calls = {
-            'ensure_files_exist_gets_called': True,
-            'clean_gets_called': True,
-        }
-
-        def mock_ensure_files_exist(unused_filepaths: List[str]) -> None:
-            check_function_calls['ensure_files_exist_gets_called'] = True
-
-        def mock_clean() -> None:
-            check_function_calls['clean_gets_called'] = True
-
-        ensure_files_exist_swap = self.swap(
-            build, '_ensure_files_exist', mock_ensure_files_exist
-        )
-        clean_swap = self.swap(build, 'clean', mock_clean)
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(
-            Exception,
-            'minify_third_party_libs_only should not be set in non-prod env.',
-        )
-        with ensure_files_exist_swap, assert_raises_regexp_context_manager:
-            with clean_swap:
-                build.main(args=['--minify_third_party_libs_only'])
-
-        self.assertEqual(check_function_calls, expected_check_function_calls)
-
-    def test_only_minify_third_party_libs_in_dev_mode(self) -> None:
-        check_function_calls = {
-            'ensure_files_exist_gets_called': False,
-            'ensure_modify_constants_gets_called': False,
-            'clean_gets_called': False,
-        }
-        expected_check_function_calls = {
-            'ensure_files_exist_gets_called': True,
-            'ensure_modify_constants_gets_called': False,
-            'clean_gets_called': True,
-        }
-
-        def mock_ensure_files_exist(unused_filepaths: List[str]) -> None:
-            check_function_calls['ensure_files_exist_gets_called'] = True
-
-        def mock_modify_constants(
-            unused_prod_env: bool,
-            maintenance_mode: bool,  # pylint: disable=unused-argument
-        ) -> None:  # pylint: disable=unused-argument
-            check_function_calls['ensure_modify_constants_gets_called'] = True
-
-        def mock_clean() -> None:
-            check_function_calls['clean_gets_called'] = True
-
-        ensure_files_exist_swap = self.swap(
-            build, '_ensure_files_exist', mock_ensure_files_exist
-        )
-        modify_constants_swap = self.swap(
-            common, 'modify_constants', mock_modify_constants
-        )
-        clean_swap = self.swap(build, 'clean', mock_clean)
-        with ensure_files_exist_swap, modify_constants_swap, clean_swap:
-            build.main(args=['--prod_env', '--minify_third_party_libs_only'])
-
-        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_build_using_webpack_command(self) -> None:
 
@@ -1352,6 +1224,92 @@ class BuildTests(test_utils.GenericTestBase):
                 AssertionError, 'angular generated bundle should be non-empty'
             ):
                 build.build_using_ng()
+
+    def test_inject_angular_css_hashes_with_missing_dist_dir_fails(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            old_working_dir = os.getcwd()
+            os.chdir(temp_dir)
+            try:
+                with self.assertRaisesRegex(
+                    RuntimeError,
+                    'dist/oppia-angular-prod does not exist. '
+                    'Angular CLI build may have failed.',
+                ):
+                    build.inject_angular_css_hashes()
+            finally:
+                os.chdir(old_working_dir)
+
+    def test_inject_angular_css_hashes_updates_both_hashes_together(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            old_working_dir = os.getcwd()
+            os.chdir(temp_dir)
+            try:
+                os.makedirs('dist/oppia-angular-prod', exist_ok=True)
+                pathlib.Path(
+                    'dist/oppia-angular-prod/styles.abc123.css'
+                ).touch()
+                pathlib.Path(
+                    'dist/oppia-angular-prod/vendor-styles.def456.css'
+                ).touch()
+
+                os.makedirs('backend_prod_files/webpack_bundles', exist_ok=True)
+                html_file_path = os.path.join(
+                    'backend_prod_files',
+                    'webpack_bundles',
+                    'test.mainpage.html',
+                )
+                with open(html_file_path, 'w', encoding='utf-8') as f:
+                    f.write(
+                        '<link rel="stylesheet" '
+                        'href="/dist/oppia-angular-prod/vendor-styles.css">\n'
+                        '<link rel="stylesheet" '
+                        'href="/dist/oppia-angular-prod/styles.css">\n'
+                    )
+
+                os.makedirs('assets', exist_ok=True)
+                with open(
+                    build.HASHES_JSON_FILEPATH, 'w', encoding='utf-8'
+                ) as f:
+                    f.write(json.dumps({'existing_hash': '123'}))
+
+                updated_hashes: List[Dict[str, str]] = []
+
+                def mock_write_hashes_json_file(hashes: Dict[str, str]) -> None:
+                    updated_hashes.append(dict(hashes))
+
+                write_hashes_swap = self.swap(
+                    common,
+                    'write_hashes_json_file',
+                    mock_write_hashes_json_file,
+                )
+
+                with write_hashes_swap:
+                    build.inject_angular_css_hashes()
+
+                self.assertEqual(len(updated_hashes), 1)
+                self.assertEqual(updated_hashes[0]['existing_hash'], '123')
+                self.assertEqual(updated_hashes[0]['angular_styles'], 'abc123')
+                self.assertEqual(
+                    updated_hashes[0]['angular_vendor_styles'], 'def456'
+                )
+
+                with open(html_file_path, 'r', encoding='utf-8') as f:
+                    updated_html_content = f.read()
+
+                self.assertIn(
+                    '/dist/oppia-angular-prod/styles.abc123.css',
+                    updated_html_content,
+                )
+                self.assertIn(
+                    '/dist/oppia-angular-prod/vendor-styles.def456.css',
+                    updated_html_content,
+                )
+            finally:
+                os.chdir(old_working_dir)
 
 
 class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
