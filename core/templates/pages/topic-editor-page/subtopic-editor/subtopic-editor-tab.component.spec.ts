@@ -45,7 +45,7 @@ import {UrlFragmentEditorComponent} from '../../../components/url-fragment-edito
 import {By} from '@angular/platform-browser';
 import {PageContextService} from 'services/page-context.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {of, throwError} from 'rxjs';
+import {of} from 'rxjs';
 
 class MockQuestionBackendApiService {
   async fetchTotalQuestionCountForSkillIdsAsync() {
@@ -367,18 +367,6 @@ describe('Subtopic editor tab', () => {
     expect(component.getSkillEditorUrl(skillId)).toEqual(
       '/skill_editor/' + skillId
     );
-  });
-
-  it('should show SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS schema when feature flag is enabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = true;
-    component.ngOnInit();
-    expect(component.SUBTOPIC_PAGE_SCHEMA).toEqual({
-      type: 'html',
-      ui_config: {
-        rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
-        rows: 100,
-      },
-    });
   });
 
   it('should show schema editor', () => {

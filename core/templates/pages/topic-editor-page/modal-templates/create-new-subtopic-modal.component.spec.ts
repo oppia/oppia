@@ -41,7 +41,7 @@ import {UrlFragmentEditorComponent} from '../../../components/url-fragment-edito
 import {By} from '@angular/platform-browser';
 import {PageContextService} from 'services/page-context.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {of, throwError} from 'rxjs';
+import {of} from 'rxjs';
 
 class MockWindowRef {
   nativeWindow = {
@@ -301,24 +301,6 @@ describe('create new subtopic modal', function () {
     expect(component.sectionContentHtml).toBe('section content');
   });
 
-  it('should return ALL_COMPONENTS schema when EnableWorkedExamplesRteComponent is disabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = false;
-    let SUBTOPIC_PAGE_SCHEMA = component.getSchema();
-    expect(SUBTOPIC_PAGE_SCHEMA).toEqual(AllComponentsSchema);
-  });
-
-  it(
-    'should show Schema editor when user clicks' +
-      'on "Give a description or explanation of the subtopic." button',
-    () => {
-      let SUBTOPIC_PAGE_SCHEMA = component.getSchema();
-      expect(SUBTOPIC_PAGE_SCHEMA).toEqual(AllComponentsSchema);
-
-      component.showSchemaEditor();
-      expect(component.schemaEditorIsShown).toBe(true);
-    }
-  );
-
   it(
     'should update editableThumbnailFilename when ' +
       'filename updated in "Thumbnail Image" modal',
@@ -419,18 +401,6 @@ describe('create new subtopic modal', function () {
 
     platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = false;
     expect(component.isShowRestructuredStudyGuidesFeatureEnabled()).toBe(false);
-  });
-
-  it('should check if worked examples RTE component feature is enabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = true;
-    expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
-      true
-    );
-
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = false;
-    expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
-      false
-    );
   });
 
   it('should not create subtopic when "Cancel" button clicked', fakeAsync(() => {

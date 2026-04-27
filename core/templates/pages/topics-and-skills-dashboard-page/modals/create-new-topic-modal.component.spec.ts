@@ -211,7 +211,7 @@ describe('Create new topic modal', () => {
   it('should update isValid when thumbnail image is set', () => {
     expect(componentInstance.isValid()).toBeFalse();
 
-    // Mock newlyCreatedTopic.isValid() to return true
+    // Mock newlyCreatedTopic.isValid() to return true.
     spyOn(componentInstance.newlyCreatedTopic, 'isValid').and.returnValue(true);
     componentInstance.thumbnailImage = new Blob(['test'], {
       type: 'image/svg+xml',
