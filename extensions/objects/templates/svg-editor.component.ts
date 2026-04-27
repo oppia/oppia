@@ -1427,8 +1427,14 @@ export class SvgEditorComponent implements OnInit {
       } else {
         const shape = redoObj.object;
         const index = this.canvasObjects.indexOf(shape);
+        if (index === -1) {
+          return;
+        }
         this.canvasObjects.splice(index, 1);
         const canvasIndex = this.canvas._objects.indexOf(shape);
+        if (canvasIndex === -1) {
+          return;
+        }
         this.canvas._objects.splice(canvasIndex, 1);
       }
     }

@@ -547,9 +547,7 @@ def run_tests_with_pytest(parsed_args: argparse.Namespace) -> int:
     print('')
 
     # Run pytest with the converted arguments.
-    # Here we use cast because pytest.main() is typed broadly, but this script
-    # only consumes its integer process exit code.
-    exit_code = cast(int, pytest.main(pytest_args))
+    exit_code = pytest.main(pytest_args)
 
     return exit_code
 
