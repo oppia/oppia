@@ -90,21 +90,15 @@ describe('Logged-Out Learner', function () {
         subtopicName.toLowerCase().replace(/ /g, '-'),
         topicName
       );
-      // Create a skill with name 'Math' and 10 question inside it.
+
+      // Create a skill with name 'Math' and 3 question inside it.
       await curriculumAdmin.createSkillForTopic(skillName, topicName, false);
-      await curriculumAdmin.createQuestionsForSkill(skillName, 10);
+      await curriculumAdmin.createQuestionsForSkill(skillName, 3);
       await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
         skillName,
         subtopicName,
         topicName
       );
-      await curriculumAdmin.addSkillToDiagnosticTest(skillName, topicName);
-
-      // Enable the "Show practice tab to learners" in Topic Editor.
-      await curriculumAdmin.openTopicEditor(topicName);
-      await curriculumAdmin.togglePracticeTabCheckbox();
-      await curriculumAdmin.saveTopicDraft(topicName);
-      await curriculumAdmin.publishDraftTopic(topicName);
 
       // Add two dummy exploration.
       // Add first dummy exploration.
@@ -219,17 +213,6 @@ describe('Logged-Out Learner', function () {
         exploration2Id,
       ]);
       await curriculumAdmin.saveExplorationDraft();
-
-      // Mark second card as a checkpoint.
-      await curriculumAdmin.navigateToCard(CARDS.SECOND_CARD);
-      await curriculumAdmin.setTheStateAsCheckpoint();
-      // Mark third Card as a checkpoint.
-      await curriculumAdmin.navigateToCard(CARDS.THIRD_CARD);
-      await curriculumAdmin.setTheStateAsCheckpoint();
-
-      await curriculumAdmin.saveExplorationDraft(
-        'Add checkpoint as second and third card'
-      );
 
       explorationId = await curriculumAdmin.publishExplorationWithMetadata(
         EXPLORATION_TITLE.COMMUNITY_LESSON_1,
