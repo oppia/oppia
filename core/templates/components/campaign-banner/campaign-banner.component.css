@@ -124,7 +124,9 @@
 
 .oppia-campaign-end {
   color: #f4a33b;
+  font-family: 'Roboto-bold', sans-serif;
   font-size: 12px;
+  font-weight: 700;
   margin-top: 8px;
 }
 

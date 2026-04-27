@@ -142,6 +142,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             'translation_counts': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_codes_with_assigned_voice_artists': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_codes_needing_voice_artists': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'reviewer_only_content_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
         self.assertEqual(
             opportunity_models.ExplorationOpportunitySummaryModel.get_export_policy(),

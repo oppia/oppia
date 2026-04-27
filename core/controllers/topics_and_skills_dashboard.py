@@ -71,17 +71,12 @@ class TopicsAndSkillsDashboardPageDataHandler(
         merged_skill_ids = skill_services.get_merged_skill_ids()
         topic_rights_dict = topic_fetchers.get_all_topic_rights()
         for topic_summary in topic_summary_dicts:
-            if topic_rights_dict[topic_summary['id']]:
-                topic_rights = topic_rights_dict[topic_summary['id']]
-                if topic_rights:
-                    topic_summary['is_published'] = (
-                        topic_rights.topic_is_published
-                    )
-                    topic_summary['can_edit_topic'] = (
-                        topic_services.check_can_edit_topic(
-                            self.user, topic_rights
-                        )
-                    )
+            topic_rights = topic_rights_dict[topic_summary['id']]
+            if topic_rights:
+                topic_summary['is_published'] = topic_rights.topic_is_published
+                topic_summary['can_edit_topic'] = (
+                    topic_services.check_can_edit_topic(self.user, topic_rights)
+                )
 
         classrooms = classroom_config_services.get_all_classrooms()
         all_classroom_names = [classroom.name for classroom in classrooms]
@@ -605,14 +600,13 @@ class NewSkillHandler(
         files = self.normalized_payload['files']
 
         new_skill_id = skill_services.get_new_skill_id()
-        if linked_topic_ids is not None:
-            topics = topic_fetchers.get_topics_by_ids(linked_topic_ids)
-            for topic in topics:
-                if topic is None:
-                    raise self.InvalidInputException
-                topic_services.add_uncategorized_skill(
-                    self.user_id, topic.id, new_skill_id
-                )
+        topics = topic_fetchers.get_topics_by_ids(linked_topic_ids)
+        for topic in topics:
+            if topic is None:
+                raise self.InvalidInputException
+            topic_services.add_uncategorized_skill(
+                self.user_id, topic.id, new_skill_id
+            )
 
         if skill_services.does_skill_with_description_exist(description):
             raise self.InvalidInputException(

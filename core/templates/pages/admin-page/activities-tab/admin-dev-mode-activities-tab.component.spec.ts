@@ -31,6 +31,10 @@ import {
   AdminBackendApiService,
   AdminPageData,
 } from 'domain/admin/admin-backend-api.service';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
+import {StoryContents} from 'domain/story/story-contents-object.model';
+import {Story} from 'domain/story/story.model';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AdminDataService} from '../services/admin-data.service';
 import {AdminTaskManagerService} from '../services/admin-task-manager.service';
@@ -43,31 +47,59 @@ describe('Admin dev mode activities tab', () => {
   let adminDataService: AdminDataService;
   let adminTaskManagerService: AdminTaskManagerService;
   let windowRef: WindowRef;
-  let adminDataObject = {
+  let topicSummary = new CreatorTopicSummary(
+    'topic_id',
+    'Topic Name',
+    1,
+    1,
+    1,
+    1,
+    0,
+    'en',
+    'description',
+    1,
+    0,
+    0,
+    0,
+    true,
+    false,
+    null,
+    'thumbnail.svg',
+    '#C6DCDA',
+    'topic-name',
+    0,
+    0,
+    [1],
+    [1]
+  );
+  let skillSummary = new SkillSummary('skill_id', 'Skill 1', 'en', 1, 0, 0, 0);
+  let story = new Story(
+    'story_id',
+    'story_title',
+    'description',
+    '',
+    new StoryContents('node_1', [], 'node_2'),
+    'en',
+    1,
+    'topic_id',
+    '#C6DCDA',
+    'thumbnail.svg',
+    'story-title',
+    'meta'
+  );
+  let adminDataObject: AdminPageData = {
     demoExplorationIds: ['expId'],
     demoExplorations: [['0', 'welcome.yaml']],
     demoCollections: [['collectionId']],
-    skillList: [
-      {
-        id: 'Fg6LbD9h2Eg4',
-        description: 'Skill1',
-      },
-    ],
-    topicSummaries: [
-      {
-        id: 'topid_id',
-        name: 'topic_name',
-        description: 'description',
-      },
-    ],
-    storyList: [
-      {
-        id: 'story_id',
-        title: 'story_title',
-        description: 'description',
-      },
-    ],
-  } as AdminPageData;
+    updatableRoles: [],
+    roleToActions: {},
+    viewableRoles: [],
+    humanReadableRoles: {},
+    topicSummaries: [topicSummary],
+    platformParameters: [],
+    skillList: [skillSummary],
+    storyList: [story],
+  };
   let mockConfirmResult: (val: boolean) => void;
 
   beforeEach(async(() => {

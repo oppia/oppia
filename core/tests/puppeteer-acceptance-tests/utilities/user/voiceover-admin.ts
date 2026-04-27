@@ -101,7 +101,22 @@ export class VoiceoverAdmin extends BaseUser {
       if (isVisible) {
         // We are using page.click as this button might be overlapped by the
         // dropdown. Thus, it will fail with onClick.
-        this.page.click(mobileNavbarDropdown);
+        // TODO(#25021): Fix flaky mobile navbar dropdown closing in acceptance tests.
+        await this.page.click(mobileNavbarDropdown);
+        try {
+          await this.page.waitForSelector(
+            navigationDropdownInMobileVisibleSelector,
+            {hidden: true, timeout: 10000}
+          );
+        } catch (error) {
+          await this.page.click(mobileNavbarDropdown);
+          await this.page.waitForSelector(
+            navigationDropdownInMobileVisibleSelector,
+            {hidden: true}
+          );
+        }
+        // Ensure layout fully stabilized.
+        await this.waitForPageToFullyLoad();
       }
 
       // Open all dropdowns because by default all dropdowns are closed in mobile view.

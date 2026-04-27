@@ -1,5 +1,10 @@
 name: 'Merge Source Branch into Base Branch'
 description: 'Merge the PR source branch into its base branch, leaving the merge commit checked-out'
+inputs:
+  merge_sha:
+    description: 'Specific commit SHA from develop to merge. If empty, falls back to latest develop.'
+    required: false
+    default: ''
 runs:
   using: 'composite'
   steps:
@@ -20,7 +25,12 @@ runs:
         git remote add source "https://github.com/${{ github.event.pull_request.head.repo.full_name }}.git"
         git remote add base "https://github.com/${{ github.repository }}.git"
         git fetch source $GITHUB_HEAD_REF
-        git fetch base ${{ github.base_ref }}
-        git checkout base/${{ github.base_ref }}
+        if [ -n "${{ inputs.merge_sha }}" ]; then
+          git fetch base ${{ inputs.merge_sha }}
+          git checkout ${{ inputs.merge_sha }}
+        else
+          git fetch base ${{ github.base_ref }}
+          git checkout base/${{ github.base_ref }}
+        fi
         git merge source/$GITHUB_HEAD_REF
       shell: bash

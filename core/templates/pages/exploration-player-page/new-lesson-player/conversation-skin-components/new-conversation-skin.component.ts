@@ -191,6 +191,8 @@ export class NewConversationSkinComponent {
           this.playerTranscriptService.resetNumberOfIncorrectSubmissions();
           this.conversationFlowService.setNextCardIfStuck(null);
           this.continueToReviseStateButtonIsVisible = false;
+          // Reset showInteraction when a new card opens after stuck state redirect.
+          this.showInteraction = true;
           let pathnameArray = this.urlService.getPathname().split('/');
 
           if (
@@ -210,6 +212,13 @@ export class NewConversationSkinComponent {
             }
           }
 
+          // The continueToReviseStateButtonIsVisible should not be set for 'Continue'
+          // interaction, because the Continue button is already visible and
+          // clicking it should simply move to the next state, not trigger
+          // potentially dangerous stuck redirection logic.
+          if (newCard.getInteractionId() === 'Continue') {
+            return;
+          }
           this.conversationFlowService.triggerIfLearnerStuckAction(true, () => {
             this.continueToReviseStateButtonIsVisible = true;
           });
@@ -501,6 +510,12 @@ export class NewConversationSkinComponent {
   }
 
   triggerRedirectionToStuckState(): void {
+    // Save the current state name before redirecting so that after
+    // completing the revision, the learner can navigate back to it.
+    const currentStateName = this.conversationFlowService
+      .getDisplayedCard()
+      .getStateName();
+    this.conversationFlowService.setOriginalStuckStateName(currentStateName);
     // Redirect the learner.
     let nextStateCard = this.conversationFlowService.getNextCardIfStuck();
     if (nextStateCard) {

@@ -13,7 +13,6 @@
   "I18N_BLOG_HOME_PAGE_TITLE": "\"Oppia\" tinklarašis | \"Oppia\"",
   "I18N_BLOG_HOME_PAGE_WELCOME_HEADING": "Sveiki atvykę į tinklaraštį \"Oppia\"!",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_HEADING": "Rodomi paieškos rezultatai",
-  "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY": "Rodomi visų paieškos rezultatų <[startingNumber]> - <[endingNumber]>.",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY": "Rodomas <[totalNumber]> įrašų <[startingNumber]> - <[endingNumber]> .",
   "I18N_BLOG_POST_PAGE_RECOMMENDATION_SECTON_HEADING": "Siūloma Jums",
   "I18N_BLOG_POST_PAGE_TAGS_HEADING": "Žymos",

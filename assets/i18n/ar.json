@@ -210,7 +210,6 @@
   "I18N_BLOG_HOME_PAGE_TITLE": "مدونة أوبيا | أوبيا",
   "I18N_BLOG_HOME_PAGE_WELCOME_HEADING": "مرحبا بكم في مدونة Oppia!",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_HEADING": "عرض نتائج البحث",
-  "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY": "عرض <[startingNumber]> - <[endingNumber]> من إجمالي نتائج البحث.",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY": "عرض <[startingNumber]> - <[endingNumber]> من <[totalNumber]> منشورات",
   "I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT": "اضف صورة للواجهة",
   "I18N_BLOG_POST_EDITOR_BODY_HEADING": "جسم",
