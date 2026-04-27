@@ -120,6 +120,7 @@ describe('Subtopic editor tab', () => {
   let platformFeatureService: PlatformFeatureService;
   let subtopic: Subtopic;
   let wds: WindowDimensionsService;
+  let assetsBackendApiService: AssetsBackendApiService;
   let topicInitializedEventEmitter = new EventEmitter();
   let topicReinitializedEventEmitter = new EventEmitter();
   let subtopicPageLoadedEventEmitter = new EventEmitter();
@@ -171,6 +172,7 @@ describe('Subtopic editor tab', () => {
     topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     wds = TestBed.inject(WindowDimensionsService);
+    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
 
     let topic = new Topic(
       'id',
@@ -784,5 +786,46 @@ describe('Subtopic editor tab', () => {
     component.initEditor();
 
     expect(topicEditorStateService.loadSubtopicPage).not.toHaveBeenCalled();
+  });
+
+  it('should handle onImageSave with valid image data', done => {
+    const mockImageData = {
+      image_data: new Blob(['test'], {type: 'image/svg+xml'}),
+      filename: 'test-image.svg',
+      bg_color: '#FF0000',
+    };
+
+    spyOn(topicUpdateService, 'setSubtopicThumbnailFilename');
+    spyOn(topicUpdateService, 'setSubtopicThumbnailBgColor');
+    spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
+      of({filename: 'uploaded-image.svg'})
+    );
+
+    component.onImageSave(mockImageData);
+
+    setTimeout(() => {
+      expect(
+        topicUpdateService.setSubtopicThumbnailFilename
+      ).toHaveBeenCalled();
+      expect(topicUpdateService.setSubtopicThumbnailBgColor).toHaveBeenCalled();
+      done();
+    }, 0);
+  });
+
+  it('should return early from onImageSave when entity type is missing', () => {
+    const mockImageData = {
+      image_data: new Blob(['test'], {type: 'image/svg+xml'}),
+      filename: 'test-image.svg',
+      bg_color: '#FF0000',
+    };
+    let pageContextService = TestBed.inject(PageContextService);
+    spyOn(pageContextService, 'getEntityType').and.returnValue(null);
+    spyOn(console, 'error');
+
+    component.onImageSave(mockImageData);
+
+    expect(console.error).toHaveBeenCalledWith(
+      'Entity type or ID not available'
+    );
   });
 });

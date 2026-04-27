@@ -150,18 +150,12 @@ describe('create new subtopic modal', function () {
   let subtopicValidationService: SubtopicValidationService;
   let platformFeatureService: MockPlatformFeatureService;
   let htmlLengthService: MockHtmlLengthService;
+  let assetsBackendApiService: AssetsBackendApiService;
   let topic: Topic;
   let DefaultSubtopicPageSchema = {
     type: 'html',
     ui_config: {
       rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
-      rows: 100,
-    },
-  };
-  let AllComponentsSchema = {
-    type: 'html',
-    ui_config: {
-      rte_component_config_id: 'ALL_COMPONENTS',
       rows: 100,
     },
   };
@@ -221,6 +215,7 @@ describe('create new subtopic modal', function () {
     TestBed.inject(WindowRef);
     topicUpdateService = TestBed.inject(TopicUpdateService);
     subtopicValidationService = TestBed.inject(SubtopicValidationService);
+    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
 
     topic = new Topic(
       '',
@@ -596,6 +591,46 @@ describe('create new subtopic modal', function () {
       topic,
       123,
       '#FF0000'
+    );
+  });
+
+  it('should handle onImageSave with valid image data', done => {
+    const mockImageData = {
+      image_data: new Blob(['test'], {type: 'image/svg+xml'}),
+      filename: 'test-image.svg',
+      bg_color: '#FF0000',
+    };
+
+    spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
+      of({filename: 'uploaded-image.svg'})
+    );
+
+    component.onImageSave(mockImageData);
+
+    setTimeout(() => {
+      expect(component.thumbnailImage).toEqual(mockImageData.image_data);
+      expect(component.thumbnailFilename).toBe('uploaded-image.svg');
+      expect(component.thumbnailBgColor).toBe('#FF0000');
+      expect(component.editableThumbnailFilename).toBe('uploaded-image.svg');
+      expect(component.editableThumbnailBgColor).toBe('#FF0000');
+      done();
+    }, 0);
+  });
+
+  it('should return early from onImageSave when entity type is missing', () => {
+    const mockImageData = {
+      image_data: new Blob(['test'], {type: 'image/svg+xml'}),
+      filename: 'test-image.svg',
+      bg_color: '#FF0000',
+    };
+    let pageContextService = TestBed.inject(PageContextService);
+    spyOn(pageContextService, 'getEntityType').and.returnValue(null);
+    spyOn(console, 'error');
+
+    component.onImageSave(mockImageData);
+
+    expect(console.error).toHaveBeenCalledWith(
+      'Entity type or ID not available'
     );
   });
 });

@@ -52,6 +52,9 @@ import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skill
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
+import {ImageUploaderData} from 'components/forms/custom-forms-directives/image-uploader.component';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {of} from 'rxjs';
 
 class MockNgbModal {
   open() {
@@ -97,6 +100,7 @@ describe('Topic editor tab directive', () => {
   let undoRedoService: UndoRedoService;
   let topicEditorRoutingService: TopicEditorRoutingService;
   let windowDimensionsService: WindowDimensionsService;
+  let assetsBackendApiService: AssetsBackendApiService;
   let topic: Topic;
   let skillSummary: ShortSkillSummary;
   let story1: StoryReference;
@@ -172,6 +176,7 @@ describe('Topic editor tab directive', () => {
     undoRedoService = TestBed.inject(UndoRedoService);
     entityCreationService = TestBed.inject(EntityCreationService);
     topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
+    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
 
     spyOnProperty(topicEditorStateService, 'onTopicInitialized').and.callFake(
       () => {
@@ -1032,5 +1037,44 @@ describe('Topic editor tab directive', () => {
     expect(
       topicEditorStateService.updateExistenceOfTopicUrlFragment
     ).not.toHaveBeenCalled();
+  });
+
+  it('should handle onImageSave with valid image data', (done) => {
+    const mockImageData = {
+      image_data: new Blob(['test'], {type: 'image/svg+xml'}),
+      filename: 'test-image.svg',
+      bg_color: '#FF0000',
+    };
+
+    spyOn(topicUpdateService, 'setTopicThumbnailFilename');
+    spyOn(topicUpdateService, 'setTopicThumbnailBgColor');
+    spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
+      of({filename: 'uploaded-image.svg'})
+    );
+
+    component.onImageSave(mockImageData);
+
+    setTimeout(() => {
+      expect(topicUpdateService.setTopicThumbnailFilename).toHaveBeenCalled();
+      expect(topicUpdateService.setTopicThumbnailBgColor).toHaveBeenCalled();
+      done();
+    }, 0);
+  });
+
+  it('should return early from onImageSave when entity type is missing', () => {
+    const mockImageData = {
+      image_data: new Blob(['test'], {type: 'image/svg+xml'}),
+      filename: 'test-image.svg',
+      bg_color: '#FF0000',
+    };
+    let pageContextService = TestBed.inject(PageContextService);
+    spyOn(pageContextService, 'getEntityType').and.returnValue(null);
+    spyOn(console, 'error');
+
+    component.onImageSave(mockImageData);
+
+    expect(console.error).toHaveBeenCalledWith(
+      'Entity type or ID not available'
+    );
   });
 });
