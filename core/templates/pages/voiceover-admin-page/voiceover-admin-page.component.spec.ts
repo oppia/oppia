@@ -122,7 +122,7 @@ describe('Voiceover Admin Page component ', () => {
     expect(
       voiceoverBackendApiService.fetchVoiceoverAdminDataAsync
     ).not.toHaveBeenCalled();
-    expect(component.pageIsInitialized).toBeFalse();
+    expect(component.pageIsInitialized).toBeFalsy();
 
     component.ngOnInit();
     tick();
@@ -135,7 +135,7 @@ describe('Voiceover Admin Page component ', () => {
     expect(component.availableLanguageAccentDescriptionsToCodes).toEqual({
       'Hindi (India)': 'hi-IN',
     });
-    expect(component.pageIsInitialized).toBeTrue();
+    expect(component.pageIsInitialized).toBeTruthy();
   }));
 
   it('should be able to add language accent pair', fakeAsync(() => {
@@ -253,24 +253,24 @@ describe('Voiceover Admin Page component ', () => {
     component.languageAccentDropdownIsShown = false;
     component.showLanguageAccentDropdown();
 
-    expect(component.languageAccentDropdownIsShown).toBeTrue();
+    expect(component.languageAccentDropdownIsShown).toBeTruthy();
   });
 
   it('should be able to remove language accent dropdown', () => {
     component.languageAccentDropdownIsShown = true;
     component.removeLanguageAccentDropdown();
 
-    expect(component.languageAccentDropdownIsShown).toBeFalse();
+    expect(component.languageAccentDropdownIsShown).toBeFalsy();
   });
 
   it('should check whether given language accent supports cloud auto regeneration', () => {
     component.cloudSupportedLanguageAccentCodes = ['en-US', 'hi-IN'];
     expect(
       component.isAutogenerationSupportedByCloudService('en-US')
-    ).toBeTrue();
+    ).toBeTruthy();
     expect(
       component.isAutogenerationSupportedByCloudService('en-IN')
-    ).toBeFalse();
+    ).toBeFalsy();
   });
 
   it('should be able to update cloud supported language accent codes', fakeAsync(() => {
@@ -381,7 +381,7 @@ describe('Voiceover Admin Page component ', () => {
 
     let cloudTaskRun = [
       CloudTaskRun.createFromBackendDict({
-        id: '123',
+        task_run_id: 'task_1',
         cloud_task_name: 'Test Task',
         latest_job_state: 'RUNNING',
         function_id: 'function_456',
