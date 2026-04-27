@@ -60,8 +60,8 @@ const MULTIPLICATION_SYMBOL_DICT = {
 
 const FRACTION_SYMBOL_DICT = {
   output: {
-    latex: '\\frac{{$1}}{{$2}}',
-    small_latex: '\\frac{{$1}}{{$2}}',
+    latex: '{{$1}}/{{$2}}',
+    small_latex: '{{$1}}/{{$2}}',
     asciimath: '({$1})/({$2})',
     text: '({$1})/({$2})',
   },
@@ -133,9 +133,19 @@ export class GuppyConfigurationService {
   }
 
   changeDivSymbol(useFraction: boolean | {value: boolean} = false): void {
+    const shouldUseFraction =
+      typeof useFraction === 'boolean' ? useFraction : useFraction.value;
     Guppy.add_global_symbol(
       '/',
-      useFraction ? FRACTION_SYMBOL_DICT : DIVISION_SYMBOL_DICT
+      shouldUseFraction ? FRACTION_SYMBOL_DICT : DIVISION_SYMBOL_DICT
     );
+    const guppyKeyboardShortcuts = Guppy.kb as
+      | {
+          k_syms?: Record<string, string>;
+        }
+      | undefined;
+    if (guppyKeyboardShortcuts?.k_syms) {
+      guppyKeyboardShortcuts.k_syms['/'] = shouldUseFraction ? 'fraction' : '/';
+    }
   }
 }
