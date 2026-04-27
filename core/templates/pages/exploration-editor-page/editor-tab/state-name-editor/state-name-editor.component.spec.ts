@@ -122,6 +122,7 @@ describe('State Name Editor component', () => {
           classifier_model_id: null,
           card_is_checkpoint: false,
           linked_skill_id: null,
+          inapplicable_skill_misconception_ids: null,
           content: {
             content_id: 'content',
             html: 'First State Content',
@@ -153,6 +154,7 @@ describe('State Name Editor component', () => {
           classifier_model_id: null,
           card_is_checkpoint: false,
           linked_skill_id: null,
+          inapplicable_skill_misconception_ids: null,
           content: {
             content_id: 'content',
             html: 'Second State Content',
@@ -184,6 +186,7 @@ describe('State Name Editor component', () => {
           classifier_model_id: null,
           card_is_checkpoint: false,
           linked_skill_id: null,
+          inapplicable_skill_misconception_ids: null,
           content: {
             content_id: 'content',
             html: 'This is some content.',
