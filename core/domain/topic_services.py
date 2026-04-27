@@ -175,6 +175,219 @@ def save_new_topic(committer_id: str, topic: topic_domain.Topic) -> None:
     )
 
 
+def _handle_add_subtopic(
+    topic: topic_domain.Topic,
+    topic_id: str,
+    add_subtopic_cmd: topic_domain.AddSubtopicCmd,
+    modified_subtopic_pages: Dict[str, subtopic_page_domain.SubtopicPage],
+    modified_study_guides: Dict[str, study_guide_domain.StudyGuide],
+    modified_subtopic_change_cmds: Dict[
+        str, List[subtopic_page_domain.SubtopicPageChange]
+    ],
+    modified_study_guide_change_cmds: Dict[
+        str, List[study_guide_domain.StudyGuideChange]
+    ],
+    newly_created_subtopic_ids: List[int],
+) -> None:
+    """Handles topic subtopic-creation commands.
+
+    Args:
+        topic: Topic. The topic object to update.
+        topic_id: str. ID of the topic.
+        add_subtopic_cmd: AddSubtopicCmd. The change command.
+        modified_subtopic_pages: dict(str, SubtopicPage). Modified pages map.
+        modified_study_guides: dict(str, StudyGuide). Modified guides map.
+        modified_subtopic_change_cmds: dict(str, list(SubtopicPageChange)).
+            Subtopic page commands grouped by id.
+        modified_study_guide_change_cmds: dict(str, list(StudyGuideChange)).
+            Study guide commands grouped by id.
+        newly_created_subtopic_ids: list(int). IDs of newly created subtopics.
+    """
+    topic.add_subtopic(
+        add_subtopic_cmd.subtopic_id,
+        add_subtopic_cmd.title,
+        add_subtopic_cmd.url_fragment,
+    )
+    subtopic_page_id = subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+        topic_id, add_subtopic_cmd.subtopic_id
+    )
+    study_guide_id = study_guide_domain.StudyGuide.get_study_guide_id(
+        topic_id, add_subtopic_cmd.subtopic_id
+    )
+    modified_subtopic_pages[subtopic_page_id] = (
+        subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+            add_subtopic_cmd.subtopic_id, topic_id
+        )
+    )
+    modified_study_guides[study_guide_id] = (
+        study_guide_domain.StudyGuide.create_study_guide(
+            add_subtopic_cmd.subtopic_id,
+            topic_id,
+            add_subtopic_cmd.title,
+            'content',
+        )
+    )
+    modified_subtopic_change_cmds[subtopic_page_id].append(
+        subtopic_page_domain.SubtopicPageChange(
+            {
+                'cmd': 'create_new',
+                'topic_id': topic_id,
+                'subtopic_id': add_subtopic_cmd.subtopic_id,
+            }
+        )
+    )
+    modified_study_guide_change_cmds[study_guide_id].append(
+        study_guide_domain.StudyGuideChange(
+            {
+                'cmd': 'create_new',
+                'topic_id': topic_id,
+                'subtopic_id': add_subtopic_cmd.subtopic_id,
+            }
+        )
+    )
+    newly_created_subtopic_ids.append(add_subtopic_cmd.subtopic_id)
+
+
+def _handle_delete_subtopic(
+    topic: topic_domain.Topic,
+    delete_subtopic_cmd: topic_domain.DeleteSubtopicCmd,
+    newly_created_subtopic_ids: List[int],
+    deleted_subtopic_ids: List[int],
+) -> None:
+    """Handles topic subtopic-deletion commands.
+
+    Args:
+        topic: Topic. The topic object to update.
+        delete_subtopic_cmd: DeleteSubtopicCmd. The change command.
+        newly_created_subtopic_ids: list(int). IDs of newly created subtopics.
+        deleted_subtopic_ids: list(int). IDs of deleted subtopics.
+
+    Raises:
+        Exception. The incoming changelist had simultaneous creation and
+            deletion of subtopics.
+    """
+    topic.delete_subtopic(delete_subtopic_cmd.subtopic_id)
+    if delete_subtopic_cmd.subtopic_id in newly_created_subtopic_ids:
+        raise Exception(
+            'The incoming changelist had simultaneous'
+            ' creation and deletion of subtopics.'
+        )
+    deleted_subtopic_ids.append(delete_subtopic_cmd.subtopic_id)
+
+
+def _handle_add_canonical_story(
+    topic: topic_domain.Topic,
+    add_canonical_story_cmd: topic_domain.AddCanonicalStoryCmd,
+) -> None:
+    """Handles canonical-story addition commands."""
+    topic.add_canonical_story(add_canonical_story_cmd.story_id)
+
+
+def _handle_delete_canonical_story(
+    topic: topic_domain.Topic,
+    delete_canonical_story_cmd: topic_domain.DeleteCanonicalStoryCmd,
+) -> None:
+    """Handles canonical-story deletion commands."""
+    topic.delete_canonical_story(delete_canonical_story_cmd.story_id)
+
+
+def _handle_rearrange_canonical_story(
+    topic: topic_domain.Topic,
+    rearrange_canonical_story_cmd: topic_domain.RearrangeCanonicalStoryCmd,
+) -> None:
+    """Handles canonical-story reordering commands."""
+    topic.rearrange_canonical_story(
+        rearrange_canonical_story_cmd.from_index,
+        rearrange_canonical_story_cmd.to_index,
+    )
+
+
+def _handle_add_additional_story(
+    topic: topic_domain.Topic,
+    add_additional_story_cmd: topic_domain.AddAdditionalStoryCmd,
+) -> None:
+    """Handles additional-story addition commands."""
+    topic.add_additional_story(add_additional_story_cmd.story_id)
+
+
+def _handle_delete_additional_story(
+    topic: topic_domain.Topic,
+    delete_additional_story_cmd: topic_domain.DeleteAdditionalStoryCmd,
+) -> None:
+    """Handles additional-story deletion commands."""
+    topic.delete_additional_story(delete_additional_story_cmd.story_id)
+
+
+def _handle_add_uncategorized_skill_id(
+    topic: topic_domain.Topic,
+    add_uncategorized_skill_id_cmd: topic_domain.AddUncategorizedSkillIdCmd,
+) -> None:
+    """Handles uncategorized-skill addition commands."""
+    topic.add_uncategorized_skill_id(
+        add_uncategorized_skill_id_cmd.new_uncategorized_skill_id
+    )
+
+
+def _handle_remove_uncategorized_skill_id(
+    topic: topic_domain.Topic,
+    remove_uncategorized_skill_id_cmd: (
+        topic_domain.RemoveUncategorizedSkillIdCmd
+    ),
+) -> None:
+    """Handles uncategorized-skill removal commands."""
+    topic.remove_uncategorized_skill_id(
+        remove_uncategorized_skill_id_cmd.uncategorized_skill_id
+    )
+
+
+def _handle_move_skill_id_to_subtopic(
+    topic: topic_domain.Topic,
+    move_skill_id_to_subtopic_cmd: topic_domain.MoveSkillIdToSubtopicCmd,
+) -> None:
+    """Handles skill movement commands across subtopics."""
+    topic.move_skill_id_to_subtopic(
+        move_skill_id_to_subtopic_cmd.old_subtopic_id,
+        move_skill_id_to_subtopic_cmd.new_subtopic_id,
+        move_skill_id_to_subtopic_cmd.skill_id,
+    )
+
+
+def _handle_rearrange_skill_in_subtopic(
+    topic: topic_domain.Topic,
+    rearrange_skill_in_subtopic_cmd: topic_domain.RearrangeSkillInSubtopicCmd,
+) -> None:
+    """Handles skill reordering commands within a subtopic."""
+    topic.rearrange_skill_in_subtopic(
+        rearrange_skill_in_subtopic_cmd.subtopic_id,
+        rearrange_skill_in_subtopic_cmd.from_index,
+        rearrange_skill_in_subtopic_cmd.to_index,
+    )
+
+
+def _handle_rearrange_subtopic(
+    topic: topic_domain.Topic,
+    rearrange_subtopic_cmd: topic_domain.RearrangeSubtopicCmd,
+) -> None:
+    """Handles subtopic reordering commands."""
+    topic.rearrange_subtopic(
+        rearrange_subtopic_cmd.from_index,
+        rearrange_subtopic_cmd.to_index,
+    )
+
+
+def _handle_remove_skill_id_from_subtopic(
+    topic: topic_domain.Topic,
+    remove_skill_id_from_subtopic_cmd: (
+        topic_domain.RemoveSkillIdFromSubtopicCmd
+    ),
+) -> None:
+    """Handles skill-removal commands from a subtopic."""
+    topic.remove_skill_id_from_subtopic(
+        remove_skill_id_from_subtopic_cmd.subtopic_id,
+        remove_skill_id_from_subtopic_cmd.skill_id,
+    )
+
+
 def _collect_study_guide_changes(
     change: change_domain.BaseChange,
     topic: topic_domain.Topic,
@@ -197,7 +410,7 @@ def _collect_study_guide_changes(
     """
     # Remove union and StudyGuideChange once the study
     # guide logic when updating a subtopic page is
-    # removed from line 482.
+    # removed from line 695.
     update_study_guide_property_cmd: Union[
         study_guide_domain.UpdateStudyGuidePropertyCmd,
         study_guide_domain.StudyGuideChange,
@@ -536,84 +749,47 @@ def apply_change_list(
                 # Here we use cast because we are narrowing down the type from
                 # TopicChange to a specific change command.
                 add_subtopic_cmd = cast(topic_domain.AddSubtopicCmd, change)
-                topic.add_subtopic(
-                    add_subtopic_cmd.subtopic_id,
-                    add_subtopic_cmd.title,
-                    add_subtopic_cmd.url_fragment,
+                _handle_add_subtopic(
+                    topic,
+                    topic_id,
+                    add_subtopic_cmd,
+                    modified_subtopic_pages,
+                    modified_study_guides,
+                    modified_subtopic_change_cmds,
+                    modified_study_guide_change_cmds,
+                    newly_created_subtopic_ids,
                 )
-                subtopic_page_id = (
-                    subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-                        topic_id, add_subtopic_cmd.subtopic_id
-                    )
-                )
-                study_guide_id = (
-                    study_guide_domain.StudyGuide.get_study_guide_id(
-                        topic_id, add_subtopic_cmd.subtopic_id
-                    )
-                )
-                modified_subtopic_pages[subtopic_page_id] = (
-                    subtopic_page_domain.SubtopicPage.create_default_subtopic_page(  # pylint: disable=line-too-long
-                        add_subtopic_cmd.subtopic_id, topic_id
-                    )
-                )
-                modified_study_guides[study_guide_id] = (
-                    study_guide_domain.StudyGuide.create_study_guide(
-                        add_subtopic_cmd.subtopic_id,
-                        topic_id,
-                        add_subtopic_cmd.title,
-                        'content',
-                    )
-                )
-                modified_subtopic_change_cmds[subtopic_page_id].append(
-                    subtopic_page_domain.SubtopicPageChange(
-                        {
-                            'cmd': 'create_new',
-                            'topic_id': topic_id,
-                            'subtopic_id': add_subtopic_cmd.subtopic_id,
-                        }
-                    )
-                )
-                modified_study_guide_change_cmds[study_guide_id].append(
-                    study_guide_domain.StudyGuideChange(
-                        {
-                            'cmd': 'create_new',
-                            'topic_id': topic_id,
-                            'subtopic_id': add_subtopic_cmd.subtopic_id,
-                        }
-                    )
-                )
-                newly_created_subtopic_ids.append(add_subtopic_cmd.subtopic_id)
             elif change.cmd == topic_domain.CMD_DELETE_SUBTOPIC:
                 # Here we use cast because we are narrowing down the type from
                 # TopicChange to a specific change command.
                 delete_subtopic_cmd = cast(
                     topic_domain.DeleteSubtopicCmd, change
                 )
-                topic.delete_subtopic(delete_subtopic_cmd.subtopic_id)
-                if (
-                    delete_subtopic_cmd.subtopic_id
-                    in newly_created_subtopic_ids
-                ):
-                    raise Exception(
-                        'The incoming changelist had simultaneous'
-                        ' creation and deletion of subtopics.'
-                    )
-                deleted_subtopic_ids.append(delete_subtopic_cmd.subtopic_id)
+                _handle_delete_subtopic(
+                    topic,
+                    delete_subtopic_cmd,
+                    newly_created_subtopic_ids,
+                    deleted_subtopic_ids,
+                )
             elif change.cmd == topic_domain.CMD_ADD_CANONICAL_STORY:
                 # Here we use cast because we are narrowing down the type from
                 # TopicChange to a specific change command.
                 add_canonical_story_cmd = cast(
                     topic_domain.AddCanonicalStoryCmd, change
                 )
-                topic.add_canonical_story(add_canonical_story_cmd.story_id)
+                _handle_add_canonical_story(
+                    topic,
+                    add_canonical_story_cmd,
+                )
             elif change.cmd == topic_domain.CMD_DELETE_CANONICAL_STORY:
                 # Here we use cast because we are narrowing down the type from
                 # TopicChange to a specific change command.
                 delete_canonical_story_cmd = cast(
                     topic_domain.DeleteCanonicalStoryCmd, change
                 )
-                topic.delete_canonical_story(
-                    delete_canonical_story_cmd.story_id
+                _handle_delete_canonical_story(
+                    topic,
+                    delete_canonical_story_cmd,
                 )
             elif change.cmd == topic_domain.CMD_REARRANGE_CANONICAL_STORY:
                 # Here we use cast because we are narrowing down the type from
@@ -621,9 +797,9 @@ def apply_change_list(
                 rearrange_canonical_story_cmd = cast(
                     topic_domain.RearrangeCanonicalStoryCmd, change
                 )
-                topic.rearrange_canonical_story(
-                    rearrange_canonical_story_cmd.from_index,
-                    rearrange_canonical_story_cmd.to_index,
+                _handle_rearrange_canonical_story(
+                    topic,
+                    rearrange_canonical_story_cmd,
                 )
             elif change.cmd == topic_domain.CMD_ADD_ADDITIONAL_STORY:
                 # Here we use cast because we are narrowing down the type from
@@ -631,15 +807,19 @@ def apply_change_list(
                 add_additional_story_cmd = cast(
                     topic_domain.AddAdditionalStoryCmd, change
                 )
-                topic.add_additional_story(add_additional_story_cmd.story_id)
+                _handle_add_additional_story(
+                    topic,
+                    add_additional_story_cmd,
+                )
             elif change.cmd == topic_domain.CMD_DELETE_ADDITIONAL_STORY:
                 # Here we use cast because we are narrowing down the type from
                 # TopicChange to a specific change command.
                 delete_additional_story_cmd = cast(
                     topic_domain.DeleteAdditionalStoryCmd, change
                 )
-                topic.delete_additional_story(
-                    delete_additional_story_cmd.story_id
+                _handle_delete_additional_story(
+                    topic,
+                    delete_additional_story_cmd,
                 )
             elif change.cmd == topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID:
                 # Here we use cast because we are narrowing down the type from
@@ -647,8 +827,9 @@ def apply_change_list(
                 add_uncategorized_skill_id_cmd = cast(
                     topic_domain.AddUncategorizedSkillIdCmd, change
                 )
-                topic.add_uncategorized_skill_id(
-                    add_uncategorized_skill_id_cmd.new_uncategorized_skill_id
+                _handle_add_uncategorized_skill_id(
+                    topic,
+                    add_uncategorized_skill_id_cmd,
                 )
             elif change.cmd == topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
                 # Here we use cast because we are narrowing down the type from
@@ -656,8 +837,9 @@ def apply_change_list(
                 remove_uncategorized_skill_id_cmd = cast(
                     topic_domain.RemoveUncategorizedSkillIdCmd, change
                 )
-                topic.remove_uncategorized_skill_id(
-                    remove_uncategorized_skill_id_cmd.uncategorized_skill_id
+                _handle_remove_uncategorized_skill_id(
+                    topic,
+                    remove_uncategorized_skill_id_cmd,
                 )
             elif change.cmd == topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC:
                 # Here we use cast because we are narrowing down the type from
@@ -665,10 +847,9 @@ def apply_change_list(
                 move_skill_id_to_subtopic_cmd = cast(
                     topic_domain.MoveSkillIdToSubtopicCmd, change
                 )
-                topic.move_skill_id_to_subtopic(
-                    move_skill_id_to_subtopic_cmd.old_subtopic_id,
-                    move_skill_id_to_subtopic_cmd.new_subtopic_id,
-                    move_skill_id_to_subtopic_cmd.skill_id,
+                _handle_move_skill_id_to_subtopic(
+                    topic,
+                    move_skill_id_to_subtopic_cmd,
                 )
             elif change.cmd == topic_domain.CMD_REARRANGE_SKILL_IN_SUBTOPIC:
                 # Here we use cast because we are narrowing down the type from
@@ -676,10 +857,9 @@ def apply_change_list(
                 rearrange_skill_in_subtopic_cmd = cast(
                     topic_domain.RearrangeSkillInSubtopicCmd, change
                 )
-                topic.rearrange_skill_in_subtopic(
-                    rearrange_skill_in_subtopic_cmd.subtopic_id,
-                    rearrange_skill_in_subtopic_cmd.from_index,
-                    rearrange_skill_in_subtopic_cmd.to_index,
+                _handle_rearrange_skill_in_subtopic(
+                    topic,
+                    rearrange_skill_in_subtopic_cmd,
                 )
             elif change.cmd == topic_domain.CMD_REARRANGE_SUBTOPIC:
                 # Here we use cast because we are narrowing down the type from
@@ -687,9 +867,9 @@ def apply_change_list(
                 rearrange_subtopic_cmd = cast(
                     topic_domain.RearrangeSubtopicCmd, change
                 )
-                topic.rearrange_subtopic(
-                    rearrange_subtopic_cmd.from_index,
-                    rearrange_subtopic_cmd.to_index,
+                _handle_rearrange_subtopic(
+                    topic,
+                    rearrange_subtopic_cmd,
                 )
             elif change.cmd == topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC:
                 # Here we use cast because we are narrowing down the type from
@@ -697,9 +877,9 @@ def apply_change_list(
                 remove_skill_id_from_subtopic_cmd = cast(
                     topic_domain.RemoveSkillIdFromSubtopicCmd, change
                 )
-                topic.remove_skill_id_from_subtopic(
-                    remove_skill_id_from_subtopic_cmd.subtopic_id,
-                    remove_skill_id_from_subtopic_cmd.skill_id,
+                _handle_remove_skill_id_from_subtopic(
+                    topic,
+                    remove_skill_id_from_subtopic_cmd,
                 )
             elif change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
                 if change.property_name == topic_domain.TOPIC_PROPERTY_NAME:
