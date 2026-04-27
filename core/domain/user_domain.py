@@ -800,6 +800,289 @@ class UserContributions:
             self.edited_exploration_ids.sort()
 
 
+class WeeklyCreatorStatsDict(TypedDict):
+    """Dictionary representing a single weekly creator stats entry."""
+
+    average_ratings: Optional[float]
+    total_plays: int
+
+
+class UserStatsDict(TypedDict):
+    """Dictionary representation of UserStats domain object."""
+
+    user_id: str
+    impact_score: Optional[float]
+    total_plays: int
+    average_ratings: Optional[float]
+    num_ratings: int
+    weekly_creator_stats_list: List[Dict[str, WeeklyCreatorStatsDict]]
+    schema_version: int
+
+
+class UserStats:
+    """Domain object for the UserStatsModel.
+
+    Attributes:
+        user_id: str. The unique ID of the user.
+        impact_score: float or None. The user's calculated impact score across
+            explorations they contribute to. None when no impact score has
+            been computed yet.
+        total_plays: int. Total plays aggregated across all explorations
+            owned by the user.
+        average_ratings: float or None. Average of average ratings across all
+            explorations owned by the user. None when the user has not
+            received any ratings.
+        num_ratings: int. Total number of ratings received across all
+            explorations owned by the user.
+        weekly_creator_stats_list: list(dict). Historical weekly creator
+            stats. Each entry is a dict with a single date-string key
+            (YYYY-MM-DD) mapping to a dict containing average_ratings and
+            total_plays for that week.
+        schema_version: int. The schema version used to encode the stats.
+    """
+
+    def __init__(
+        self,
+        user_id: str,
+        impact_score: Optional[float],
+        total_plays: int,
+        average_ratings: Optional[float],
+        num_ratings: int,
+        weekly_creator_stats_list: List[Dict[str, WeeklyCreatorStatsDict]],
+        schema_version: int,
+    ) -> None:
+        """Constructs a UserStats domain object.
+
+        Args:
+            user_id: str. The unique ID of the user.
+            impact_score: float or None. The user's calculated impact score.
+            total_plays: int. Total plays across all explorations.
+            average_ratings: float or None. Average rating across all
+                explorations.
+            num_ratings: int. Total number of ratings received.
+            weekly_creator_stats_list: list(dict). Historical weekly stats.
+            schema_version: int. The dashboard stats schema version.
+        """
+        self.user_id = user_id
+        self.impact_score = impact_score
+        self.total_plays = total_plays
+        self.average_ratings = average_ratings
+        self.num_ratings = num_ratings
+        self.weekly_creator_stats_list = weekly_creator_stats_list
+        self.schema_version = schema_version
+
+    def to_dict(self) -> UserStatsDict:
+        """Returns a dict representation of the UserStats domain object.
+
+        Returns:
+            dict. A dict mapping all fields of UserStats.
+        """
+        return {
+            'user_id': self.user_id,
+            'impact_score': self.impact_score,
+            'total_plays': self.total_plays,
+            'average_ratings': self.average_ratings,
+            'num_ratings': self.num_ratings,
+            'weekly_creator_stats_list': self.weekly_creator_stats_list,
+            'schema_version': self.schema_version,
+        }
+
+    def validate(self) -> None:
+        """Validates the UserStats domain object.
+
+        Raises:
+            ValidationError. The user_id is not a non-empty string.
+            ValidationError. The impact_score is not None and not a
+                non-negative float.
+            ValidationError. The total_plays is not a non-negative integer.
+            ValidationError. The average_ratings is not None and not a float
+                in the allowed rating range.
+            ValidationError. The num_ratings is not a non-negative integer.
+            ValidationError. The num_ratings and average_ratings fields are
+                inconsistent.
+            ValidationError. The weekly_creator_stats_list is malformed.
+            ValidationError. The schema_version is not in the supported
+                range.
+        """
+        if not isinstance(self.user_id, str):
+            raise utils.ValidationError(
+                'Expected user_id to be a string, received %s' % self.user_id
+            )
+        if not self.user_id:
+            raise utils.ValidationError('No user id specified.')
+
+        if self.impact_score is not None:
+            if not isinstance(self.impact_score, float):
+                raise utils.ValidationError(
+                    'Expected impact_score to be a float, received %s'
+                    % self.impact_score
+                )
+            if self.impact_score < 0:
+                raise utils.ValidationError(
+                    'Expected impact_score to be non-negative, received %s'
+                    % self.impact_score
+                )
+
+        # Booleans are a subclass of int in Python; reject them explicitly so
+        # that True/False can't masquerade as a count.
+        if not isinstance(self.total_plays, int) or isinstance(
+            self.total_plays, bool
+        ):
+            raise utils.ValidationError(
+                'Expected total_plays to be an int, received %s'
+                % self.total_plays
+            )
+        if self.total_plays < 0:
+            raise utils.ValidationError(
+                'Expected total_plays to be non-negative, received %s'
+                % self.total_plays
+            )
+
+        if not isinstance(self.num_ratings, int) or isinstance(
+            self.num_ratings, bool
+        ):
+            raise utils.ValidationError(
+                'Expected num_ratings to be an int, received %s'
+                % self.num_ratings
+            )
+        if self.num_ratings < 0:
+            raise utils.ValidationError(
+                'Expected num_ratings to be non-negative, received %s'
+                % self.num_ratings
+            )
+
+        # Ratings on Oppia are integers in [1, 5] (see ALLOWED_RATINGS in
+        # core/domain/rating_services.py), so the per-user average must land
+        # in [1.0, 5.0] when any ratings have been recorded.
+        min_rating, max_rating = 1.0, 5.0
+        if self.average_ratings is not None:
+            if not isinstance(self.average_ratings, float):
+                raise utils.ValidationError(
+                    'Expected average_ratings to be a float, received %s'
+                    % self.average_ratings
+                )
+            if not min_rating <= self.average_ratings <= max_rating:
+                raise utils.ValidationError(
+                    'Expected average_ratings to be in the range [%s, %s], '
+                    'received %s'
+                    % (min_rating, max_rating, self.average_ratings)
+                )
+
+        # num_ratings and average_ratings must agree: either no ratings have
+        # been recorded (num_ratings == 0 and average_ratings is None) or at
+        # least one has (num_ratings > 0 and average_ratings is not None).
+        # See _refresh_average_ratings_transactional in event_services.py.
+        if (self.num_ratings == 0) != (self.average_ratings is None):
+            raise utils.ValidationError(
+                'Expected num_ratings and average_ratings to be consistent: '
+                'num_ratings=%s but average_ratings=%s'
+                % (self.num_ratings, self.average_ratings)
+            )
+
+        if not isinstance(self.weekly_creator_stats_list, list):
+            raise utils.ValidationError(
+                'Expected weekly_creator_stats_list to be a list, received %s'
+                % self.weekly_creator_stats_list
+            )
+        for entry in self.weekly_creator_stats_list:
+            self._validate_weekly_stats_entry(entry)
+
+        if not isinstance(self.schema_version, int) or isinstance(
+            self.schema_version, bool
+        ):
+            raise utils.ValidationError(
+                'Expected schema_version to be an int, received %s'
+                % self.schema_version
+            )
+        if not (
+            1
+            <= self.schema_version
+            <= feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION
+        ):
+            raise utils.ValidationError(
+                'Expected schema_version to be in the range [1, %d], '
+                'received %s'
+                % (
+                    feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION,
+                    self.schema_version,
+                )
+            )
+
+    # Here we use object because this validator deliberately runs before
+    # the entry's structure is trusted (e.g. when data is loaded from the
+    # datastore as a plain JsonProperty), so any narrower static type would
+    # be a lie.
+    @staticmethod
+    def _validate_weekly_stats_entry(entry: object) -> None:
+        """Validates a single entry in weekly_creator_stats_list.
+
+        Args:
+            entry: object. The entry to validate. Expected to be a dict with
+                a single date-string key whose value is a dict containing
+                average_ratings and total_plays.
+
+        Raises:
+            ValidationError. The entry is malformed.
+        """
+        if not isinstance(entry, dict):
+            raise utils.ValidationError(
+                'Expected each weekly_creator_stats_list entry to be a '
+                'dict, received %s' % entry
+            )
+        if len(entry) != 1:
+            raise utils.ValidationError(
+                'Expected each weekly_creator_stats_list entry to have '
+                'exactly one date key, received %s' % entry
+            )
+        date_key = next(iter(entry))
+        if not isinstance(date_key, str):
+            raise utils.ValidationError(
+                'Expected weekly_creator_stats_list entry key to be a '
+                'date string, received %s' % date_key
+            )
+        try:
+            datetime.datetime.strptime(
+                date_key, feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT
+            )
+        except ValueError as e:
+            raise utils.ValidationError(
+                'Expected weekly_creator_stats_list entry key to match '
+                'format %s, received %s'
+                % (feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT, date_key)
+            ) from e
+
+        stats = entry[date_key]
+        if not isinstance(stats, dict):
+            raise utils.ValidationError(
+                'Expected weekly_creator_stats_list entry value to be a '
+                'dict, received %s' % stats
+            )
+        if 'average_ratings' not in stats or 'total_plays' not in stats:
+            raise utils.ValidationError(
+                'Expected weekly_creator_stats_list entry value to contain '
+                'average_ratings and total_plays, received %s' % stats
+            )
+        average_ratings = stats['average_ratings']
+        if average_ratings is not None and not isinstance(
+            average_ratings, float
+        ):
+            raise utils.ValidationError(
+                'Expected weekly_creator_stats_list entry average_ratings '
+                'to be a float or None, received %s' % average_ratings
+            )
+        total_plays = stats['total_plays']
+        if not isinstance(total_plays, int) or isinstance(total_plays, bool):
+            raise utils.ValidationError(
+                'Expected weekly_creator_stats_list entry total_plays to '
+                'be an int, received %s' % total_plays
+            )
+        if total_plays < 0:
+            raise utils.ValidationError(
+                'Expected weekly_creator_stats_list entry total_plays to '
+                'be non-negative, received %s' % total_plays
+            )
+
+
 class UserGlobalPrefs:
     """Domain object for user global email preferences.
 

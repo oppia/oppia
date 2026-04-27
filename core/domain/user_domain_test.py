@@ -27,7 +27,7 @@ from core.domain import auth_services, user_domain, user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List, Optional, TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -715,6 +715,333 @@ class UserContributionsTests(test_utils.GenericTestBase):
             'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION,
         ):
             user_services.update_dashboard_stats_log(self.owner_id)
+
+
+class UserStatsTests(test_utils.GenericTestBase):
+    """Tests for the UserStats domain object."""
+
+    # Here we use object because individual tests intentionally override
+    # fields with values of mismatched types (e.g. a non-string user_id) to
+    # exercise validate() error branches; no narrower type covers them all.
+    def _make_user_stats(self, **overrides: object) -> user_domain.UserStats:
+        """Builds a UserStats with sane defaults, allowing per-test overrides.
+
+        Args:
+            **overrides: object. Field values to override on the returned
+                UserStats instance. May include intentionally-invalid values
+                used to exercise validate() error paths.
+
+        Returns:
+            UserStats. A UserStats domain object built from default fields
+            merged with the supplied overrides.
+        """
+        # Here we use object because individual tests deliberately inject
+        # mismatched-type values into this dict (e.g. an int for user_id)
+        # to exercise validate() error paths; no narrower value type covers
+        # all the field types that UserStats accepts.
+        defaults: Dict[str, object] = {
+            'user_id': 'uid',
+            'impact_score': 0.5,
+            'total_plays': 10,
+            'average_ratings': 4.2,
+            'num_ratings': 3,
+            'weekly_creator_stats_list': [
+                {'2024-01-01': {'average_ratings': 4.2, 'total_plays': 10}}
+            ],
+            'schema_version': feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION,
+        }
+        defaults.update(overrides)
+        # Here we use MyPy ignore because the defaults dict is typed as
+        # Dict[str, object] so tests can inject deliberately-invalid values;
+        # MyPy cannot prove the unpacked kwargs match UserStats's typed
+        # signature, but at runtime they do (or are wrong on purpose).
+        return user_domain.UserStats(**defaults)  # type: ignore[arg-type]
+
+    def test_to_dict_returns_all_fields(self) -> None:
+        stats = self._make_user_stats()
+        self.assertEqual(
+            stats.to_dict(),
+            {
+                'user_id': 'uid',
+                'impact_score': 0.5,
+                'total_plays': 10,
+                'average_ratings': 4.2,
+                'num_ratings': 3,
+                'weekly_creator_stats_list': [
+                    {
+                        '2024-01-01': {
+                            'average_ratings': 4.2,
+                            'total_plays': 10,
+                        }
+                    }
+                ],
+                'schema_version': (
+                    feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION
+                ),
+            },
+        )
+
+    def test_validate_passes_with_valid_data(self) -> None:
+        self._make_user_stats().validate()
+
+    def test_validate_passes_when_no_ratings_yet(self) -> None:
+        self._make_user_stats(
+            num_ratings=0,
+            average_ratings=None,
+            impact_score=None,
+            weekly_creator_stats_list=[],
+        ).validate()
+
+    def test_validate_non_str_user_id(self) -> None:
+        stats = self._make_user_stats(user_id=0)
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected user_id to be a string'
+        ):
+            stats.validate()
+
+    def test_validate_empty_user_id(self) -> None:
+        stats = self._make_user_stats(user_id='')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'No user id specified.'
+        ):
+            stats.validate()
+
+    def test_validate_non_float_impact_score(self) -> None:
+        stats = self._make_user_stats(impact_score='high')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected impact_score to be a float'
+        ):
+            stats.validate()
+
+    def test_validate_negative_impact_score(self) -> None:
+        stats = self._make_user_stats(impact_score=-0.1)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected impact_score to be non-negative',
+        ):
+            stats.validate()
+
+    def test_validate_non_int_total_plays(self) -> None:
+        stats = self._make_user_stats(total_plays='10')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected total_plays to be an int'
+        ):
+            stats.validate()
+
+    # Booleans are rejected explicitly because bool is a subclass of int.
+    def test_validate_bool_total_plays_rejected(self) -> None:
+        stats = self._make_user_stats(total_plays=True)
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected total_plays to be an int'
+        ):
+            stats.validate()
+
+    def test_validate_negative_total_plays(self) -> None:
+        stats = self._make_user_stats(total_plays=-1)
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected total_plays to be non-negative'
+        ):
+            stats.validate()
+
+    def test_validate_non_int_num_ratings(self) -> None:
+        stats = self._make_user_stats(num_ratings='3')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected num_ratings to be an int'
+        ):
+            stats.validate()
+
+    def test_validate_negative_num_ratings(self) -> None:
+        stats = self._make_user_stats(num_ratings=-1, average_ratings=None)
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected num_ratings to be non-negative'
+        ):
+            stats.validate()
+
+    def test_validate_non_float_average_ratings(self) -> None:
+        stats = self._make_user_stats(average_ratings='4.2')
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected average_ratings to be a float',
+        ):
+            stats.validate()
+
+    def test_validate_average_ratings_above_max(self) -> None:
+        stats = self._make_user_stats(average_ratings=5.5)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            r'Expected average_ratings to be in the range \[1.0, 5.0\]',
+        ):
+            stats.validate()
+
+    def test_validate_average_ratings_below_min(self) -> None:
+        stats = self._make_user_stats(average_ratings=0.5)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            r'Expected average_ratings to be in the range \[1.0, 5.0\]',
+        ):
+            stats.validate()
+
+    def test_validate_inconsistent_ratings_present_avg_missing(self) -> None:
+        stats = self._make_user_stats(num_ratings=2, average_ratings=None)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'num_ratings and average_ratings to be consistent',
+        ):
+            stats.validate()
+
+    def test_validate_inconsistent_avg_present_ratings_missing(self) -> None:
+        stats = self._make_user_stats(num_ratings=0, average_ratings=4.0)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'num_ratings and average_ratings to be consistent',
+        ):
+            stats.validate()
+
+    def test_validate_non_list_weekly_creator_stats(self) -> None:
+        stats = self._make_user_stats(weekly_creator_stats_list={})
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected weekly_creator_stats_list to be a list',
+        ):
+            stats.validate()
+
+    def test_validate_weekly_entry_not_dict(self) -> None:
+        stats = self._make_user_stats(weekly_creator_stats_list=['nope'])
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected each weekly_creator_stats_list entry to be a dict',
+        ):
+            stats.validate()
+
+    def test_validate_weekly_entry_multiple_keys(self) -> None:
+        stats = self._make_user_stats(
+            weekly_creator_stats_list=[
+                {
+                    '2024-01-01': {'average_ratings': 4.0, 'total_plays': 1},
+                    '2024-01-08': {'average_ratings': 4.0, 'total_plays': 2},
+                }
+            ]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'exactly one date key',
+        ):
+            stats.validate()
+
+    def test_validate_weekly_entry_non_string_date_key(self) -> None:
+        stats = self._make_user_stats(
+            weekly_creator_stats_list=[
+                {1: {'average_ratings': None, 'total_plays': 0}}
+            ]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'entry key to be a date string',
+        ):
+            stats.validate()
+
+    def test_validate_weekly_entry_bad_date_format(self) -> None:
+        stats = self._make_user_stats(
+            weekly_creator_stats_list=[
+                {'01/01/2024': {'average_ratings': 4.0, 'total_plays': 1}}
+            ]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'to match format',
+        ):
+            stats.validate()
+
+    def test_validate_weekly_entry_value_not_dict(self) -> None:
+        stats = self._make_user_stats(
+            weekly_creator_stats_list=[{'2024-01-01': 'nope'}]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected weekly_creator_stats_list entry value to be a dict',
+        ):
+            stats.validate()
+
+    def test_validate_weekly_entry_missing_required_keys(self) -> None:
+        stats = self._make_user_stats(
+            weekly_creator_stats_list=[{'2024-01-01': {'total_plays': 1}}]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'average_ratings and total_plays',
+        ):
+            stats.validate()
+
+    def test_validate_weekly_entry_bad_average_ratings_type(self) -> None:
+        stats = self._make_user_stats(
+            weekly_creator_stats_list=[
+                {'2024-01-01': {'average_ratings': 'high', 'total_plays': 1}}
+            ]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'entry average_ratings to be a float or None',
+        ):
+            stats.validate()
+
+    def test_validate_weekly_entry_bad_total_plays_type(self) -> None:
+        stats = self._make_user_stats(
+            weekly_creator_stats_list=[
+                {'2024-01-01': {'average_ratings': None, 'total_plays': '1'}}
+            ]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'entry total_plays to be an int',
+        ):
+            stats.validate()
+
+    def test_validate_weekly_entry_negative_total_plays(self) -> None:
+        stats = self._make_user_stats(
+            weekly_creator_stats_list=[
+                {'2024-01-01': {'average_ratings': None, 'total_plays': -1}}
+            ]
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'entry total_plays to be non-negative',
+        ):
+            stats.validate()
+
+    def test_validate_weekly_entry_allows_none_average_ratings(self) -> None:
+        # average_ratings=None is valid for a week where the user has no
+        # ratings yet (mirrors the model-level behaviour).
+        self._make_user_stats(
+            weekly_creator_stats_list=[
+                {'2024-01-01': {'average_ratings': None, 'total_plays': 0}}
+            ]
+        ).validate()
+
+    def test_validate_non_int_schema_version(self) -> None:
+        stats = self._make_user_stats(schema_version='1')
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected schema_version to be an int',
+        ):
+            stats.validate()
+
+    def test_validate_schema_version_below_range(self) -> None:
+        stats = self._make_user_stats(schema_version=0)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            r'Expected schema_version to be in the range \[1,',
+        ):
+            stats.validate()
+
+    def test_validate_schema_version_above_range(self) -> None:
+        stats = self._make_user_stats(
+            schema_version=(feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION + 1)
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            r'Expected schema_version to be in the range \[1,',
+        ):
+            stats.validate()
 
 
 class UserGlobalPrefsTests(test_utils.GenericTestBase):
