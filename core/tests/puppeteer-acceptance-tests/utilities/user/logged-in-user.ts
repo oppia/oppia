@@ -861,7 +861,10 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToSignUpPage(): Promise<void> {
     await this.goto(splashPageUrl, false);
-    await this.acceptCookiesIfPrompted();
+    if (!this.userHasAcceptedCookies) {
+      await this.clickOnElementWithText('OK');
+      this.userHasAcceptedCookies = true;
+    }
     await this.clickOnElementWithText('Sign in');
 
     await this.page.waitForSelector(loginPage, {

@@ -70,6 +70,8 @@ import {TranslationCoordinatorFactory} from '../user/translation-coordinator';
 import {QuestionCoordinatorFactory} from '../user/practice-question-coordinator';
 
 const ROLES = testConstants.Roles;
+const cookieBannerAcceptButton =
+  'button.e2e-test-oppia-cookie-banner-accept-button';
 
 /**
  * Mapping of user roles to their respective function class.
@@ -358,7 +360,8 @@ export class UserFactory {
     await user.openBrowser();
     await user.page.goto(testConstants.URLs.Home);
     await user.waitForPageToFullyLoad();
-    await user.acceptCookiesIfPrompted();
+    await user.clickOnElementWithSelector(cookieBannerAcceptButton);
+    user.userHasAcceptedCookies = true;
     activeUsers.push(user);
     return user;
   };
