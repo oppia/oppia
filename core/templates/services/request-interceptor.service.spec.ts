@@ -61,13 +61,9 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should expect request body to be a FormData constructor', () => {
-    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
-      // This throws "Argument of type 'string[]' is not assignable to parameter
-      // of type 'PromiseLike<string>'.". We need to suppress this error because
-      // we need to mock the `getTokenAsync` function for testing purposes.
-      // @ts-expect-error
-      ['sample-csrf-token']
-    );
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue([
+      'sample-csrf-token',
+    ]);
 
     httpClient
       .post('/api', {data: 'test'})
@@ -83,13 +79,9 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should modify http requests body when they are intercepted', () => {
-    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
-      // This throws "Argument of type 'string[]' is not assignable to parameter
-      // of type 'PromiseLike<string>'.". We need to suppress this error because
-      // we need to mock the `getTokenAsync` function for testing purposes.
-      // @ts-expect-error
-      ['sample-csrf-token']
-    );
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue([
+      'sample-csrf-token',
+    ]);
 
     httpClient
       .patch('/api', {data: 'test'})
@@ -110,13 +102,9 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should not handle http requests when the body is null', () => {
-    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
-      // This throws "Argument of type 'string[]' is not assignable to parameter
-      // of type 'PromiseLike<string>'.". We need to suppress this error because
-      // we need to mock the `getTokenAsync` function for testing purposes.
-      // @ts-expect-error
-      ['sample-csrf-token']
-    );
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue([
+      'sample-csrf-token',
+    ]);
 
     httpClient
       .get('/api')
@@ -253,13 +241,9 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should not throw error if null param in POST request', () => {
-    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
-      // This throws "Argument of type 'string[]' is not assignable to parameter
-      // of type 'PromiseLike<string>'.". We need to suppress this error because
-      // we need to mock the `getTokenAsync` function for testing purposes.
-      // @ts-expect-error
-      ['sample-csrf-token']
-    );
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue([
+      'sample-csrf-token',
+    ]);
 
     httpClient
       .post(
@@ -276,13 +260,9 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should not throw error if null param in PUT request', () => {
-    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
-      // This throws "Argument of type 'string[]' is not assignable to parameter
-      // of type 'PromiseLike<string>'.". We need to suppress this error because
-      // we need to mock the `getTokenAsync` function for testing purposes.
-      // @ts-expect-error
-      ['sample-csrf-token']
-    );
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue([
+      'sample-csrf-token',
+    ]);
 
     httpClient
       .put(
@@ -299,13 +279,9 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should not throw error if null param in PATCH request', () => {
-    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
-      // This throws "Argument of type 'string[]' is not assignable to parameter
-      // of type 'PromiseLike<string>'.". We need to suppress this error because
-      // we need to mock the `getTokenAsync` function for testing purposes.
-      // @ts-expect-error
-      ['sample-csrf-token']
-    );
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue([
+      'sample-csrf-token',
+    ]);
 
     httpClient
       .patch(

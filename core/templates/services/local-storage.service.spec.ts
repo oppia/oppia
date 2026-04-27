@@ -361,7 +361,9 @@ describe('LocalStorageService', () => {
       const key = 'lastAboutPageViewTime';
       localStorageService.setLastPageViewTime(key);
 
-      expect(localStorageService.getLastPageViewTime()).toBeNull();
+      expect(
+        localStorageService.getLastPageViewTime('lastPageViewTime')
+      ).toBeNull();
     });
   });
 });
