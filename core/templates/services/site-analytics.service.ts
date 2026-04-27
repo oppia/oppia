@@ -38,6 +38,7 @@ import {NavbarAndFooterGATrackingPages} from 'app.constants';
 export class SiteAnalyticsService {
   static googleAnalyticsIsInitialized: boolean = false;
   private isUserInfoInitialized = false;
+  private readonly userInfoInitializationPromise: Promise<void>;
 
   constructor(
     private windowRef: WindowRef,
