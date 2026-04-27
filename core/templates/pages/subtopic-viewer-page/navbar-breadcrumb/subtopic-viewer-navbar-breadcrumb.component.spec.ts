@@ -74,6 +74,9 @@ describe('Subtopic viewer navbar breadcrumb component', function () {
                     prev_subtopic_dict: null,
                     topic_id: 'topic_1',
                     topic_name: 'topic_1',
+
+                    sections: [],
+                    current_subtopic_id: 1,
                   })
                 );
               }),

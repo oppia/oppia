@@ -26,22 +26,18 @@ import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {StudyGuideSectionEditorComponent} from './study-guide-section-editor.component';
 import {HtmlLengthService} from 'services/html-length.service';
 
-class MockHtmlLengthService {
-  computeHtmlLength(html: string, calculationType: string): number {
-    return html.length;
-  }
-}
-
 describe('Study Guide Section editor component', () => {
   let component: StudyGuideSectionEditorComponent;
   let fixture: ComponentFixture<StudyGuideSectionEditorComponent>;
   let topicEditorStateService: TopicEditorStateService;
   let topicUpdateService: TopicUpdateService;
   let sampleStudyGuide: StudyGuide;
-  let htmlLengthService: HtmlLengthService;
+  let htmlLengthService: jasmine.SpyObj<HtmlLengthService>;
 
   beforeEach(waitForAsync(() => {
-    htmlLengthService = new MockHtmlLengthService();
+    htmlLengthService = jasmine.createSpyObj('HtmlLengthService', [
+      'computeHtmlLength',
+    ]);
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [StudyGuideSectionEditorComponent],
@@ -78,7 +74,7 @@ describe('Study Guide Section editor component', () => {
             html: '<p>section content</p>',
           },
         },
-      ] as StudyGuideSection[],
+      ] as unknown as StudyGuideSection[],
       2,
       'en'
     );
@@ -102,7 +98,7 @@ describe('Study Guide Section editor component', () => {
           content_id: 'section_content_1',
         };
       },
-    } as StudyGuideSection;
+    } as unknown as StudyGuideSection;
     component.ngOnInit();
   });
 
@@ -241,12 +237,12 @@ describe('Study Guide Section editor component', () => {
 
   it('should check if section content length is exceeded', () => {
     component.container.sectionContentHtml = 'short content';
-    let computeHtmlLengthSpy = spyOn(htmlLengthService, 'computeHtmlLength');
-    computeHtmlLengthSpy.and.returnValue(500);
+
+    htmlLengthService.computeHtmlLength.and.returnValue(500);
     let isExceeded = component.isSectionContentLengthExceeded();
     expect(isExceeded).toBe(false);
 
-    computeHtmlLengthSpy.and.returnValue(6500);
+    htmlLengthService.computeHtmlLength.and.returnValue(6500);
     isExceeded = component.isSectionContentLengthExceeded();
     expect(isExceeded).toBe(true);
   });
