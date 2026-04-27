@@ -45,7 +45,7 @@ import {UrlFragmentEditorComponent} from '../../../components/url-fragment-edito
 import {By} from '@angular/platform-browser';
 import {PageContextService} from 'services/page-context.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {of} from 'rxjs';
+import {of, throwError} from 'rxjs';
 
 class MockQuestionBackendApiService {
   async fetchTotalQuestionCountForSkillIdsAsync() {
@@ -827,5 +827,29 @@ describe('Subtopic editor tab', () => {
     expect(console.error).toHaveBeenCalledWith(
       'Entity type or ID not available'
     );
+  });
+
+  it('should handle error in onImageSave when upload fails', done => {
+    const mockImageData = {
+      image_data: new Blob(['test'], {type: 'image/svg+xml'}),
+      filename: 'test-image.svg',
+      bg_color: '#FF0000',
+    };
+    const mockError = new Error('Upload failed');
+
+    spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
+      throwError(() => mockError)
+    );
+    spyOn(console, 'error');
+
+    component.onImageSave(mockImageData);
+
+    setTimeout(() => {
+      expect(console.error).toHaveBeenCalledWith(
+        'Error uploading thumbnail:',
+        mockError
+      );
+      done();
+    }, 0);
   });
 });

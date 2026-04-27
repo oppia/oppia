@@ -52,9 +52,8 @@ import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skill
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
-import {ImageUploaderData} from 'components/forms/custom-forms-directives/image-uploader.component';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {of} from 'rxjs';
+import {of, throwError} from 'rxjs';
 
 class MockNgbModal {
   open() {
@@ -1076,5 +1075,29 @@ describe('Topic editor tab directive', () => {
     expect(console.error).toHaveBeenCalledWith(
       'Entity type or ID not available'
     );
+  });
+
+  it('should handle error in onImageSave when upload fails', (done) => {
+    const mockImageData = {
+      image_data: new Blob(['test'], {type: 'image/svg+xml'}),
+      filename: 'test-image.svg',
+      bg_color: '#FF0000',
+    };
+    const mockError = new Error('Upload failed');
+
+    spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
+      throwError(() => mockError)
+    );
+    spyOn(console, 'error');
+
+    component.onImageSave(mockImageData);
+
+    setTimeout(() => {
+      expect(console.error).toHaveBeenCalledWith(
+        'Error uploading thumbnail:',
+        mockError
+      );
+      done();
+    }, 0);
   });
 });
