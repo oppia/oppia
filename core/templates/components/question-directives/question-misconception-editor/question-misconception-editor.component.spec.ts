@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the question misconception editor component.
  */
 
-import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {EventEmitter, NO_ERRORS_SCHEMA, Type} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
@@ -25,7 +25,11 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbModal,
+  NgbModalOptions,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
 import {
   Outcome,
   QuestionMisconceptionEditorComponent,
@@ -225,12 +229,14 @@ describe('Question Misconception Editor Component', () => {
       misconceptionSkillId: 'abc',
       feedbackIsUsed: false,
     };
-    spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve(mockResultObject),
-      } as NgbModalRef;
-    });
+    spyOn(ngbModal, 'open').and.callFake(
+      (dlg: Type<unknown>, opt: NgbModalOptions) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(mockResultObject),
+        } as NgbModalRef;
+      }
+    );
 
     expect(component.misconceptionName).toEqual('misc1');
     expect(component.selectedMisconception).toEqual(

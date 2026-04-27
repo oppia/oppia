@@ -227,6 +227,7 @@ export class StoryEditorPageComponent implements OnInit, OnDestroy {
   onClosingStoryEditorBrowserTab(): void {
     const story = this.storyEditorStateService.getStory();
 
+    // Can be null if because EntityEditorBrowserTabsInfo teturns null if the data is not found on the local storage.
     const storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null =
       this.localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants.OPENED_STORY_EDITOR_BROWSER_TABS,
@@ -280,6 +281,7 @@ export class StoryEditorPageComponent implements OnInit, OnDestroy {
   updateStoryEditorBrowserTabsInfo(): void {
     const story = this.storyEditorStateService.getStory();
 
+    // Can be null if because EntityEditorBrowserTabsInfo teturns null if the data is not found on the local storage.
     const storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null =
       this.localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants.OPENED_STORY_EDITOR_BROWSER_TABS,

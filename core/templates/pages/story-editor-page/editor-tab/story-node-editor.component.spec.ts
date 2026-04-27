@@ -1007,7 +1007,7 @@ describe('Story node editor component', () => {
           },
         };
       },
-    } as unknown as Story;
+    } as Story;
 
     mockEventEmitterLast.emit();
     tick();

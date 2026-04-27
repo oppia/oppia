@@ -51,7 +51,10 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   @Input() nodeId!: string;
   @Input() outline!: string;
   @Input() description!: string;
+
+  // This value can be null if StoryNode.getExplorationId() returns null.
   @Input() explorationId!: string | null;
+
   @Input() thumbnailFilename!: string;
   @Input() thumbnailBgColor!: string;
   @Input() outlineIsFinalized!: boolean;
@@ -90,11 +93,19 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   editableThumbnailBgColor!: string;
   oldOutline!: string;
   editableOutline!: string;
+
+  // This value can be null if StoryNode.getExplorationId() returns null.
+  // This would make explorationId null, whose value is then assigned to this.
   currentExplorationId: string | null = null;
+
   expIdIsValid!: boolean;
   invalidExpErrorIsShown!: boolean;
   nodeTitleEditorIsShown!: boolean;
+
+  // Null if plannedPublicationDateMsecs returns false.
   plannedPublicationDate!: Date | null;
+
+  // Set null if plannedPublicationDate is null.
   editablePlannedPublicationDate!: Date | null;
   plannedPublicationDateIsInPast: boolean = false;
 
@@ -111,7 +122,8 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   private _untriagedSkillSummaries: SkillSummary[] = [];
 
   subscriptions = new Subscription();
-  newNodeId: string | null = null;
+
+  newNodeId!: string;
   availableNodes: {id: string; text: string}[] = [];
 
   constructor(
@@ -598,7 +610,6 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   }
 
   _recalculateAvailableNodes(): void {
-    this.newNodeId = null;
     this.availableNodes = [];
     let linearNodesList = this.story.getStoryContents().getLinearNodesList();
 
