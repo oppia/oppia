@@ -554,9 +554,7 @@ describe('NumericInputValidationService', () => {
     ).toEqual('I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT');
     expect(
       validatorService.validateNumericString('-12e2', '.', true, false)
-    ).toEqual(
-      'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT_NO_MINUS'
-    );
+    ).toEqual('I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_MINUS');
     expect(
       validatorService.validateNumericString('12f2', '.', true, false)
     ).toEqual('I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS');

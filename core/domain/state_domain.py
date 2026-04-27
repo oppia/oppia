@@ -2279,7 +2279,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         # argument names to a customization argument dict, the dict
         # representation of InteractionCustomizationArg.
         customization_args_dict = {}
-        for ca_name, _ in customization_args.items():
+        for ca_name in customization_args:
             customization_args_dict[ca_name] = customization_args[
                 ca_name
             ].to_customization_arg_dict()
@@ -2727,32 +2727,14 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             dict. A dictionary of customization argument names to the
             InteractionCustomizationArg domain object's.
         """
-        customization_args: Dict[str, InteractionCustomizationArg] = {}
-        for spec in ca_specs_dict:
-            customization_arg_dict = ca_dict.get(spec['name'])
-            if customization_arg_dict is None:
-                # Older state dicts may not include newly-added customization
-                # args. In those cases, we backfill from defaults.
-                # For allowExponentialNotation we default to True to preserve
-                # existing learner-facing behavior for legacy interactions.
-                if spec['name'] == 'allowExponentialNotation':
-                    customization_arg_dict = {'value': True}
-                else:
-                    # Here we use cast because customization arg specs can
-                    # contain broader default value types than
-                    # CustomizationArgsDictType.
-                    customization_arg_dict = cast(
-                        Dict[str, UnionOfCustomizationArgsDictValues],
-                        {'value': copy.deepcopy(spec['default_value'])},
-                    )
-
-            customization_args[spec['name']] = (
+        return {
+            spec['name']: (
                 InteractionCustomizationArg.from_customization_arg_dict(
-                    customization_arg_dict, spec['schema']
+                    ca_dict[spec['name']], spec['schema']
                 )
             )
-
-        return customization_args
+            for spec in ca_specs_dict
+        }
 
 
 class OutcomeDict(TypedDict):
@@ -4144,7 +4126,7 @@ class State(translation_domain.BaseTranslatableObject):
         customization_args = InteractionInstance.convert_customization_args_dict_to_customization_args(
             self.interaction.id, customization_args_dict
         )
-        for ca_name, ca in customization_args.items():
+        for ca in customization_args.values():
             ca.validate_subtitled_html()
 
         self.interaction.customization_args = customization_args

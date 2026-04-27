@@ -267,15 +267,7 @@ export class NumericInputValidationService {
     const includesMinus = value.includes('-');
     const includesExponent = value.includes('e');
 
-    if (requireNonnegativeInput && !allowExponentialNotation) {
-      if (includesMinus && includesExponent) {
-        return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT_NO_MINUS';
-      } else if (includesMinus) {
-        return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_MINUS';
-      } else if (includesExponent) {
-        return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT';
-      }
-    } else if (requireNonnegativeInput && includesMinus) {
+    if (requireNonnegativeInput && includesMinus) {
       return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_MINUS';
     } else if (!allowExponentialNotation && includesExponent) {
       return 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT';
