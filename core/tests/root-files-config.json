@@ -44,6 +44,7 @@
     "extensions/ckeditor_plugins/pre/plugin.js",
     "core/templates/pages/oppia-root/index.ts",
     "src/main.ts",
+    "src/vendor-styles.css",
     "src/index.html",
     "src/index.prod.html",
     "src/environments/environment.prod.ts",

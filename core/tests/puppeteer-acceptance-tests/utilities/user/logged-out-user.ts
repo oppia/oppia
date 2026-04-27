@@ -463,6 +463,8 @@ const topicPageRevisionTabContentSelector =
 const learnerViewCardSelector = '.oppia-learner-view-card-content';
 const signInBoxInSaveProressModalSelector = '.sign-in-box';
 const loginButtonSelector = '.e2e-mobile-test-login';
+const progressBarSelector = '.oppia-progress-bar';
+const suggestionSection = '.suggested-for-you-section';
 
 const youtubePlayerSelector = '.e2e-test-youtube-player';
 const collapsibleRTEHeaderSelector = '.e2e-test-collapsible-heading';
@@ -2461,6 +2463,32 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Changes the site language for an embedded exploration without reloading
+   * the page, since reloading resets the language in the embedded player.
+   * @param langCode - The language code to change to. Example: 'es', 'pt-br'
+   */
+  async changeSiteLanguageForEmbeddedExploration(
+    langCode: string
+  ): Promise<void> {
+    const languageOption = `.e2e-test-i18n-language-${langCode} a`;
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.evaluate(() => {
+        window.scrollTo(0, 0);
+      });
+    }
+    await this.page.waitForSelector(languageDropdown);
+    const languageDropdownElement = await this.page.$(languageDropdown);
+    if (!languageDropdownElement) {
+      throw new Error('Language dropdown element not found');
+    }
+    await languageDropdownElement.click();
+    await this.clickOnElementWithSelector(languageOption);
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
    * Checks if the the language dropdown is available or not.
    * @param status - Status of language dropdown.
    */
@@ -2676,11 +2704,50 @@ export class LoggedOutUser extends BaseUser {
    */
   async isDonorBoxVisbleOnDonatePage(): Promise<void> {
     const donorBox = await this.page.waitForSelector(donorBoxIframe);
+    if (!this.isViewportAtMobileWidth()) {
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          if (!element) {
+            return false;
+          }
+          const rect = element.getBoundingClientRect();
+          return rect.width > 0 && rect.height > 0;
+        },
+        {},
+        donorBoxIframe
+      );
+      await this.waitForDonorBoxFrameToLoad();
+    }
     if (!donorBox) {
       throw new Error('The donor box is not visible on the donate page.');
     } else {
       showMessage('The donor box is visible on the donate page.');
     }
+  }
+
+  /**
+   * Waits for the DonorBox iframe to load its frame URL.
+   * This avoids taking screenshots before the external content renders.
+   */
+  private async waitForDonorBoxFrameToLoad(): Promise<void> {
+    const maxWaitMsecs = 20000;
+    const pollIntervalMsecs = 500;
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < maxWaitMsecs) {
+      const donorBoxFrame = this.page
+        .frames()
+        .find(frame => frame.url().includes('donorbox.org'));
+      if (donorBoxFrame) {
+        return;
+      }
+      await this.page.waitForTimeout(pollIntervalMsecs);
+    }
+
+    throw new Error(
+      'The DonorBox iframe did not finish loading within the expected time.'
+    );
   }
 
   /**
@@ -6136,6 +6203,45 @@ export class LoggedOutUser extends BaseUser {
         }, but it was ${isVisible ? 'visible' : 'hidden'}`
       );
     }
+  }
+
+  /**
+   * Checks if suggestion section is visible or not.
+   * @param visible - Expected visibility.
+   */
+  async expectSuggestionSectionToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(suggestionSection, visible);
+  }
+
+  /**
+   * Checks if progress bar is visible or not.
+   * @param visible - Expected visibility.
+   */
+  async expectProgressBarToBePresent(visible: boolean = true): Promise<void> {
+    await this.expectElementToBeVisible(progressBarSelector, visible);
+  }
+
+  /**
+   * Check if the number input placeholder matches the expected text.
+   * @param expectedPlaceholder - Expected placeholder text of the input field.
+   */
+  async expectNumberInputPlaceholderToMatch(
+    expectedPlaceholder: string
+  ): Promise<void> {
+    // Wait until the placeholder attribute updates to the expected value.
+    await this.page.waitForFunction(
+      (selector: string, expected: string) => {
+        const el = document.querySelector(selector);
+        return el && el.getAttribute('placeholder') === expected;
+      },
+      {timeout: 30000},
+      floatFormInput,
+      expectedPlaceholder
+    );
+
+    showMessage(`Input placeholder is "${expectedPlaceholder}" as expected.`);
   }
 
   /**

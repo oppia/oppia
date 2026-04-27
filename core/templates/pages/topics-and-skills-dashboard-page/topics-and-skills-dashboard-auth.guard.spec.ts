@@ -26,7 +26,7 @@ import {
 } from '@angular/router';
 
 import {AppConstants} from 'app.constants';
-import {UserInfo} from '../../domain/user/user-info.model.ts';
+import {UserInfo} from '../../domain/user/user-info.model';
 import {UserService} from 'services/user.service';
 import {TopicsAndSkillsDashboardAuthGuard} from './topics-and-skills-dashboard-auth.guard';
 
