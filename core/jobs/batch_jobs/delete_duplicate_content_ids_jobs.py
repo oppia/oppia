@@ -168,7 +168,7 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             >> beam.Map(lambda model: (model.id, model))
         )
 
-        exp_id_to_voiceover_model = (
+        exp_id_to_voiceover_models = (
             entity_voiceovers_model_pcoll
             | 'Key voiceover model by entity ID'
             >> beam.Map(lambda model: (model.entity_id, model))
