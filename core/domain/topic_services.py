@@ -248,22 +248,17 @@ def _apply_subtopic_page_change(
     """
     # Ruling out the possibility of any other type for mypy type checking.
     assert isinstance(change.subtopic_id, int)
-    subtopic_page_id = (
-        subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-            topic_id, change.subtopic_id
-        )
+    subtopic_page_id = subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+        topic_id, change.subtopic_id
     )
-    study_guide_id = (
-        study_guide_domain.StudyGuide.get_study_guide_id(
-            topic_id, change.subtopic_id
-        )
+    study_guide_id = study_guide_domain.StudyGuide.get_study_guide_id(
+        topic_id, change.subtopic_id
     )
     if (modified_subtopic_pages[subtopic_page_id] is None) or (
         change.subtopic_id in deleted_subtopic_ids
     ):
         raise Exception(
-            'The subtopic with id %s doesn\'t exist'
-            % (change.subtopic_id)
+            'The subtopic with id %s doesn\'t exist' % (change.subtopic_id)
         )
 
     if (
@@ -289,21 +284,13 @@ def _apply_subtopic_page_change(
             update_subtopic_page_contents_html_cmd.new_value
         )
         page_contents.validate()
-        modified_subtopic_pages[
-            subtopic_page_id
-        ].update_page_contents_html(page_contents)
+        modified_subtopic_pages[subtopic_page_id].update_page_contents_html(
+            page_contents
+        )
         # Only update study guide if it exists.
         if study_guide_id in modified_study_guides:
-            (
-                modified_study_guides[
-                    study_guide_id
-                ].update_section_content
-            )(
-                (
-                    update_study_guide_sections_content_cmd.new_value.get(
-                        'html'
-                    )
-                ),
+            (modified_study_guides[study_guide_id].update_section_content)(
+                (update_study_guide_sections_content_cmd.new_value.get('html')),
                 'section_content_1',
             )
 
@@ -318,9 +305,7 @@ def _apply_subtopic_page_change(
             subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsAudioCmd,  # pylint: disable=line-too-long
             change,
         )
-        modified_subtopic_pages[
-            subtopic_page_id
-        ].update_page_contents_audio(
+        modified_subtopic_pages[subtopic_page_id].update_page_contents_audio(
             state_domain.RecordedVoiceovers.from_dict(
                 update_subtopic_page_contents_audio_cmd.new_value
             )
