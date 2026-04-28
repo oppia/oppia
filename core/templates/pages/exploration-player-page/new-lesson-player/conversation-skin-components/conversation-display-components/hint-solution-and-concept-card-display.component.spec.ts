@@ -197,9 +197,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
 
     component.ngOnInit();
 
-    expect(
-      (component as unknown as {_editorPreviewMode: boolean})._editorPreviewMode
-    ).toBeFalsy();
+    expect(component['_editorPreviewMode']).toBeFalsy();
     expect(component.iframed).toBe(false);
     expect(component.hintIndexes).toEqual([0, 1]);
   });
@@ -213,9 +211,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
 
     component.ngOnInit();
 
-    expect(
-      (component as unknown as {_editorPreviewMode: boolean})._editorPreviewMode
-    ).toBeTruthy();
+    expect(component['_editorPreviewMode']).toBeTruthy();
     expect(component.iframed).toBe(true);
   });
 
@@ -572,8 +568,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
   );
 
   it('should not record solution hit in editor preview mode', fakeAsync(() => {
-    (component as unknown as {_editorPreviewMode: boolean})._editorPreviewMode =
-      true;
+    component['_editorPreviewMode'] = true;
     spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
       true
     );
@@ -593,8 +588,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
   }));
 
   it('should not record solution hit in question mode', fakeAsync(() => {
-    (component as unknown as {_editorPreviewMode: boolean})._editorPreviewMode =
-      false;
+    component['_editorPreviewMode'] = false;
     spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
       true
     );
