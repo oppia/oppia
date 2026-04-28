@@ -92,7 +92,7 @@ import {LoggerService} from 'services/contextual/logger.service';
 import {ComponentRef} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
-const EDITORS: Record<string, Type<ObjectEditor>> = {
+const EDITORS = {
   'algebraic-expression': AlgebraicExpressionEditorComponent,
   boolean: BooleanEditorComponent,
   'code-string': CodeStringEditorComponent,
@@ -136,21 +136,21 @@ const EDITORS: Record<string, Type<ObjectEditor>> = {
   'translatable-set-of-unicode-string':
     TranslatableSetOfUnicodeStringEditorComponent,
   'unicode-string': UnicodeStringEditorComponent,
-};
+} as unknown as Record<string, Type<ObjectEditor<unknown>>>;
 
 interface AngularJSFormController {
   $setValidity: (errorKey: string, isValid: boolean) => void;
 }
 
-interface ObjectEditor {
+interface ObjectEditor<T = SchemaDefaultValue> {
   alwaysEditable?: string;
   initArgs?: SchemaDefaultValue;
   isEditable?: string;
   modalId?: symbol;
   objType?: string;
   schema?: SchemaDefaultValue;
-  value?: any;
-  valueChanged?: EventEmitter<any>;
+  value?: T;
+  valueChanged?: EventEmitter<T>;
   validityChange?: EventEmitter<Record<string, boolean>>;
   ngOnChanges?: (changes: SimpleChanges) => void;
 }
@@ -211,7 +211,7 @@ export class ObjectEditorComponent
   }
 
   @Output() valueChange = new EventEmitter();
-  componentRef!: ComponentRef<ObjectEditor>;
+  componentRef!: ComponentRef<ObjectEditor<unknown>>;
   componentSubscriptions = new Subscription();
   onChange: (_: SchemaDefaultValue) => void = () => {};
   onTouch!: () => void;
@@ -268,13 +268,15 @@ export class ObjectEditorComponent
       }
       const componentFactory =
         this.componentFactoryResolver.resolveComponentFactory(
-          EDITORS[editorName as keyof typeof EDITORS] as Type<ObjectEditor>
+          EDITORS[editorName as keyof typeof EDITORS]
         );
       this.viewContainerRef.clear();
       // ObjectEditor type is used to access the instance of the
       // component created.
       const componentRef =
-        this.viewContainerRef.createComponent<ObjectEditor>(componentFactory);
+        this.viewContainerRef.createComponent<ObjectEditor<unknown>>(
+          componentFactory
+        );
 
       const instance = componentRef.instance;
       instance.alwaysEditable = this.alwaysEditable;
