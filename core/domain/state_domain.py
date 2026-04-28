@@ -4126,7 +4126,7 @@ class State(translation_domain.BaseTranslatableObject):
                 self.interaction.id
             )
             for spec in interaction.customization_arg_specs:
-                ca_name = spec['name']
+                ca_name = spec.name
                 if ca_name in customization_args_dict:
                     continue
                 existing_customization_arg = (
@@ -4137,8 +4137,12 @@ class State(translation_domain.BaseTranslatableObject):
                         existing_customization_arg.to_customization_arg_dict()
                     )
                 else:
+                    default_value = cast(
+                        UnionOfCustomizationArgsDictValues,
+                        copy.deepcopy(spec.default_value),
+                    )
                     customization_args_dict[ca_name] = {
-                        'value': copy.deepcopy(spec['default_value'])
+                        'value': default_value
                     }
         customization_args = InteractionInstance.convert_customization_args_dict_to_customization_args(
             self.interaction.id, customization_args_dict
