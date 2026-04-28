@@ -2944,6 +2944,10 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
 
+    // Wait for any loading overlays to detach before clicking.
+    await this.page.waitForSelector('.oppia-loading-full-page', {
+      hidden: true,
+    });
     await this.clickOnElementWithSelector(addInteractionButton);
 
     // Check if modal title is correct.
