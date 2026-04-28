@@ -119,9 +119,10 @@ describe('Topic Preview Tab Component', () => {
       ],
       declarations: [TopicPreviewTabComponent],
       providers: [
+        MockTopicEditorStateService,
         {
           provide: TopicEditorStateService,
-          useClass: MockTopicEditorStateService,
+          useExisting: MockTopicEditorStateService,
         },
         {
           provide: UrlInterpolationService,
@@ -140,9 +141,7 @@ describe('Topic Preview Tab Component', () => {
     fixture = TestBed.createComponent(TopicPreviewTabComponent);
     componentInstance = fixture.componentInstance;
 
-    topicEditorStateService = TestBed.inject(
-      TopicEditorStateService
-    ) as unknown as MockTopicEditorStateService;
+    topicEditorStateService = TestBed.inject(MockTopicEditorStateService);
 
     componentInstance.ngOnInit();
   });

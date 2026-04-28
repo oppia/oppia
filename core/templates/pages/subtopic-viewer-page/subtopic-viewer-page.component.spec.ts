@@ -503,9 +503,11 @@ describe('Subtopic viewer page', function () {
   it('should open study guide when openStudyGuide is called', () => {
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'algebra';
-    component.nextSubtopic = {
-      getUrlFragment: () => 'linear-equations',
-    } as unknown as Subtopic;
+    const mockSubtopic = jasmine.createSpyObj<Subtopic>('Subtopic', [
+      'getUrlFragment',
+    ]);
+    mockSubtopic.getUrlFragment.and.returnValue('linear-equations');
+    component.nextSubtopic = mockSubtopic;
 
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
       '/test-url'
@@ -522,9 +524,12 @@ describe('Subtopic viewer page', function () {
   it('should open study guide when openStudyGuide is called with Ctrl+click event', () => {
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'algebra';
-    component.nextSubtopic = {
-      getUrlFragment: () => 'linear-equations',
-    } as unknown as Subtopic;
+    const mockSubtopic = jasmine.createSpyObj<Subtopic>('Subtopic', [
+      'getUrlFragment',
+    ]);
+    mockSubtopic.getUrlFragment.and.returnValue('linear-equations');
+
+    component.nextSubtopic = mockSubtopic;
     const mockEvent = new MouseEvent('click', {ctrlKey: true});
 
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
@@ -542,9 +547,11 @@ describe('Subtopic viewer page', function () {
   it('should not open study guide when required fragments are missing', () => {
     component.classroomUrlFragment = '';
     component.topicUrlFragment = 'algebra';
-    component.nextSubtopic = {
-      getUrlFragment: () => 'linear-equations',
-    } as unknown as Subtopic;
+    const mockSubtopic = jasmine.createSpyObj<Subtopic>('Subtopic', [
+      'getUrlFragment',
+    ]);
+    mockSubtopic.getUrlFragment.and.returnValue('linear-equations');
+    component.nextSubtopic = mockSubtopic;
 
     component.openStudyGuide();
 
@@ -700,10 +707,13 @@ describe('Subtopic viewer page', function () {
 
     // Test desktop view (default behavior).
     spyOn(component, 'checkMobileView').and.returnValue(false);
-    component.nextSubtopic = {
-      getTitle: () => longTitle,
-      getUrlFragment: () => 'test-fragment',
-    } as unknown as Subtopic;
+    const mockSubtopic = jasmine.createSpyObj<Subtopic>('Subtopic', [
+      'getTitle',
+      'getUrlFragment',
+    ]);
+    mockSubtopic.getTitle.and.returnValue(longTitle);
+    mockSubtopic.getUrlFragment.and.returnValue('test-fragment');
+    component.nextSubtopic = mockSubtopic;
 
     const desktopResult = component.checkNextSubtopicTitleLengthAndModify();
     // 20 chars + '...'.
@@ -721,10 +731,8 @@ describe('Subtopic viewer page', function () {
 
     // Test short title (should not be truncated).
     const shortTitle = 'Short title';
-    component.nextSubtopic = {
-      getTitle: () => shortTitle,
-      getUrlFragment: () => 'test-fragment',
-    } as unknown as Subtopic;
+    mockSubtopic.getTitle.and.returnValue(shortTitle);
+    component.nextSubtopic = mockSubtopic;
 
     const shortResult = component.checkNextSubtopicTitleLengthAndModify();
     expect(shortResult).toBe(shortTitle);
