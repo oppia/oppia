@@ -30,6 +30,7 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 const CARD_NAMES = {
   FIRST: 'Introduction',
   SECOND: '2nd Card',
+  THIRD: '3rd Card',
   FOURTH: '4th Card',
   FIFTH: '5th Card',
   SIXTH: '6th Card',
