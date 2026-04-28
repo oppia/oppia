@@ -611,6 +611,18 @@ export class BaseUser {
           },
           element
         );
+
+        // If the element is covered by a loading overlay (ng-star-inserted),
+        // wait for it to disappear before re-throwing.
+        if (
+          clickabilityDiagnostics.isCoveredByOtherElement &&
+          clickabilityDiagnostics.blockingElement.includes('ng-star-inserted')
+        ) {
+          await this.page.waitForSelector('.oppia-loading-full-page', {
+            hidden: true,
+          });
+        }
+
         await this.page.evaluate(isElementClickable, element, true, true);
 
         const reasonsText =
