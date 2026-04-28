@@ -31,7 +31,8 @@ import {State} from '../../../domain/state/state.model';
 import {Interaction} from '../../../domain/exploration/interaction.model';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
-
+import {SubtitledHtml} from '../../../domain/exploration/subtitled-html.model';
+import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 class MockNgbModalRef {
   componentInstance = {
     skillId: null,
@@ -177,13 +178,15 @@ describe('ConceptCardManager service', () => {
       'content'
     );
 
-    mockConceptCard = {
-      getExplanation: () => ({
-        getHtml: () => 'Test explanation',
+    mockConceptCard = new ConceptCard(
+      SubtitledHtml.createFromBackendDict({
+        content_id: 'explanation',
+        html: 'Test explanation',
       }),
-      getWorkedExamples: () => [],
-      getSkillDescription: () => 'Test skill',
-    } as unknown as ConceptCard;
+      RecordedVoiceovers.createFromBackendDict({
+        voiceovers_mapping: {},
+      })
+    );
   });
 
   it('should show concept card icon at the right time', fakeAsync(() => {
@@ -207,14 +210,12 @@ describe('ConceptCardManager service', () => {
   }));
 
   it('should open concept card modal', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: unknown, _opt: unknown) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve(),
-        } as NgbModalRef;
-      }
-    );
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve(),
+      } as NgbModalRef;
+    });
     ccms.openConceptCardModal('linkedSkillId');
     expect(modalSpy).toHaveBeenCalled();
   });

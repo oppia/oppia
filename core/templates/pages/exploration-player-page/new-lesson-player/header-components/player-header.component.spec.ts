@@ -493,9 +493,8 @@ describe('Lesson player header component', () => {
     });
 
     it('should return empty string for unknown context', () => {
-      (
-        componentInstance as unknown as {explorationContext: string}
-      ).explorationContext = 'unknown';
+      (componentInstance as {explorationContext: string}).explorationContext =
+        'unknown';
 
       expect(componentInstance.getHeaderTitleText()).toBe('');
     });

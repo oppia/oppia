@@ -487,9 +487,8 @@ describe('Content translation manager service', () => {
       'getLanguageOptionsForDropdown'
     ).and.returnValue(languageOptions);
 
-    (
-      audioPreloaderService as unknown as {exploration: Exploration | undefined}
-    ).exploration = undefined;
+    (audioPreloaderService as {exploration?: Exploration}).exploration =
+      undefined;
 
     ctms.initLessonTranslations();
 
@@ -518,9 +517,8 @@ describe('Content translation manager service', () => {
     ).and.returnValue(languageOptions);
     spyOn(voiceoverBackendApiService, 'fetchVoiceoverAdminDataAsync');
 
-    (
-      audioPreloaderService as unknown as {exploration: Exploration | undefined}
-    ).exploration = undefined;
+    (audioPreloaderService as {exploration?: Exploration}).exploration =
+      undefined;
 
     ctms.initLessonTranslations();
 
