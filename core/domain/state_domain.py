@@ -4112,16 +4112,11 @@ class State(translation_domain.BaseTranslatableObject):
         Raises:
             Exception. The customization arguments are not unique.
         """
-        # Here we use cast because for argument 'customization_args_mapping'
-        # we have used Mapping type because we want to allow
-        # 'update_interaction_customization_args' method to accept different
-        # subtypes of customization_arg dictionaries, but the problem with
-        # Mapping is that the Mapping does not allow to update(or set) values
-        # because Mapping is a read-only type. To overcome this issue, we
-        # narrowed down the type from Mapping to Dict by using cast so that
-        # while updating or setting a new value MyPy will not throw any error.
+        # We copy the Mapping to a mutable dict before backfilling missing
+        # args because Mapping itself is read-only.
         customization_args_dict = cast(
-            CustomizationArgsDictType, customization_args_mapping
+            CustomizationArgsDictType,
+            copy.deepcopy(dict(customization_args_mapping)),
         )
         # Older change lists may not include newly-added customization args.
         # Backfill missing args from existing values when available, otherwise
