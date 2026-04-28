@@ -1161,7 +1161,10 @@ describe('Questions List Component', () => {
     } as State);
 
     expect(component.showSolutionCheckpoint()).toBe(true);
-    // @ts-expect-error setting question to null for testing.
+    // This throws "Type 'null' is not assignable to type 'Question'.". We need to
+    // suppress this error because we are testing the component's behavior when
+    // question is null.
+    // @ts-expect-error
     component.question = null;
     expect(component.showSolutionCheckpoint()).toBe(false);
   });
