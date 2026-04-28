@@ -35,7 +35,7 @@ describe('UndoRedoService', () => {
   });
 
   const createBackendChangeObject = (value: string): BackendChangeObject => {
-    return {property_name: value} as unknown as BackendChangeObject;
+    return {property_name: value} as BackendChangeObject;
   };
 
   const createChangeDomainObject = (

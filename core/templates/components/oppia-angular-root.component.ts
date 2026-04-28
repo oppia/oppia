@@ -85,34 +85,13 @@ import {ServicesConstants} from 'services/services.constants';
 // TODO(#16309): Fix relative imports.
 import '../third-party-imports/ckeditor.import';
 
-// This throws "TS2307". We need to suppress this error because
-// rte-text-components are not strictly typed yet.
-// @ts-ignore
-import {NoninteractiveCollapsible} from 'rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
-// This throws "TS2307". We need to suppress this error because
-// rte-text-components are not strictly typed yet.
-// @ts-ignore
-import {NoninteractiveImage} from 'rich_text_components/Image/directives/oppia-noninteractive-image.component';
-// This throws "TS2307". We need to suppress this error because
-// rte-text-components are not strictly typed yet.
-// @ts-ignore
-import {NoninteractiveLink} from 'rich_text_components/Link/directives/oppia-noninteractive-link.component';
-// This throws "TS2307". We need to suppress this error because
-// rte-text-components are not strictly typed yet.
-// @ts-ignore
-import {NoninteractiveMath} from 'rich_text_components/Math/directives/oppia-noninteractive-math.component';
-// This throws "TS2307". We need to suppress this error because
-// rte-text-components are not strictly typed yet.
-// @ts-ignore
-import {NoninteractiveSkillreview} from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
-// This throws "TS2307". We need to suppress this error because
-// rte-text-components are not strictly typed yet.
-// @ts-ignore
-import {NoninteractiveTabs} from 'rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
-// This throws "TS2307". We need to suppress this error because
-// rte-text-components are not strictly typed yet.
-// @ts-ignore
-import {NoninteractiveVideo} from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
+import {NoninteractiveCollapsible} from '../../../extensions/rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
+import {NoninteractiveImage} from '../../../extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component';
+import {NoninteractiveLink} from '../../../extensions/rich_text_components/Link/directives/oppia-noninteractive-link.component';
+import {NoninteractiveMath} from '../../../extensions/rich_text_components/Math/directives/oppia-noninteractive-math.component';
+import {NoninteractiveSkillreview} from '../../../extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
+import {NoninteractiveTabs} from '../../../extensions/rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
+import {NoninteractiveVideo} from '../../../extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component';
 import {
   CkEditorInitializerService,
   RteHelperService as RteHelperServiceLocal,
@@ -124,10 +103,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {UrlService} from 'services/contextual/url.service';
 import {I18nService} from 'i18n/i18n.service';
 import {RteHelperService} from 'services/rte-helper.service';
-// This throws "TS2307". We need to suppress this error because
-// rte-text-components are not strictly typed yet.
-// @ts-ignore
-import {NoninteractiveWorkedexample} from 'rich_text_components/Workedexample/directives/oppia-noninteractive-workedexample.component';
+import {NoninteractiveWorkedexample} from '../../../extensions/rich_text_components/Workedexample/directives/oppia-noninteractive-workedexample.component';
 
 const componentMap = {
   Collapsible: {
@@ -206,29 +182,19 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   @Output() public initialized: EventEmitter<void> = new EventEmitter();
   direction: string = 'ltr';
 
-  static classroomBackendApiService: ClassroomBackendApiService =
-    null as unknown as ClassroomBackendApiService;
-  static pageContextService: PageContextService =
-    null as unknown as PageContextService;
-  static i18nLanguageCodeService: I18nLanguageCodeService =
-    null as unknown as I18nLanguageCodeService;
-  static ngZone: NgZone = null as unknown as NgZone;
-  static pageTitleService: PageTitleService =
-    null as unknown as PageTitleService;
-  static profilePageBackendApiService: ProfilePageBackendApiService =
-    null as unknown as ProfilePageBackendApiService;
+  static classroomBackendApiService: ClassroomBackendApiService;
+  static pageContextService: PageContextService;
+  static i18nLanguageCodeService: I18nLanguageCodeService;
+  static ngZone: NgZone;
+  static pageTitleService: PageTitleService;
+  static profilePageBackendApiService: ProfilePageBackendApiService;
   static rteElementsAreInitialized: boolean = false;
-  static rteHelperService: RteHelperService | unknown =
-    null as unknown as RteHelperService;
-  static ratingComputationService: RatingComputationService =
-    null as unknown as RatingComputationService;
-  static reviewTestBackendApiService: ReviewTestBackendApiService =
-    null as unknown as ReviewTestBackendApiService;
-  static storyViewerBackendApiService: StoryViewerBackendApiService =
-    null as unknown as StoryViewerBackendApiService;
-  static ajsValueProvider: (key: string, value: unknown) => void =
-    null as unknown as (key: string, value: unknown) => void;
-  static injector: Injector = null as unknown as Injector;
+  static rteHelperService: RteHelperService | unknown;
+  static ratingComputationService: RatingComputationService;
+  static reviewTestBackendApiService: ReviewTestBackendApiService;
+  static storyViewerBackendApiService: StoryViewerBackendApiService;
+  static ajsValueProvider: (key: string, value: unknown) => void;
+  static injector: Injector;
 
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,

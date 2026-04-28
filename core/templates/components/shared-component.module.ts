@@ -31,23 +31,14 @@ import {CustomFormsComponentsModule} from './forms/custom-forms-directives/custo
 import {DynamicContentModule} from './interaction-display/dynamic-content.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MaterialModule} from 'modules/material.module';
-// This throws "TS2307". We need to suppress this error because
-// object-components are not strictly typed yet.
-// @ts-ignore
-import {ObjectComponentsModule} from 'objects/object-components.module';
+import {ObjectComponentsModule} from '../../../extensions/objects/object-components.module';
 import {SharedFormsModule} from './forms/shared-forms.module';
 import {RecommendationsModule} from './recommendations/recommendations.module';
 import {CommonElementsModule} from './common-layout-directives/common-elements/common-elements.module';
-// This throws "TS2307". We need to suppress this error because
-// rich-text-components are not strictly typed yet.
-// @ts-ignore
-import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
+import {RichTextComponentsModule} from '../../../extensions/rich_text_components/rich-text-components.module';
 import {CodeMirrorModule} from './code-mirror/codemirror.module';
 import {OppiaCkEditor4Module} from './ck-editor-helpers/ckeditor4.module';
-// This throws "TS2307". We need to suppress this error because
-// base-components are not strictly typed yet.
-// @ts-ignore
-import {BaseModule} from 'base-components/base.module';
+import {BaseModule} from '../base-components/base.module';
 import {NgBootstrapModule} from 'modules/ng-boostrap.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {DragDropModule} from '@angular/cdk/drag-drop';
@@ -170,30 +161,12 @@ import {ReviewTestPageComponent} from 'pages/review-test-page/review-test-page.c
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {AddOutcomeModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 import {AnswerContentModalComponent} from './common-layout-directives/common-elements/answer-content-modal.component';
-// This throws "TS2307". We need to suppress this error because
-// visualizations are not strictly typed yet.
-// @ts-ignore
-import {VisualizationSortedTilesComponent} from 'visualizations/oppia-visualization-sorted-tiles.component';
-// This throws "TS2307". We need to suppress this error because
-// visualizations are not strictly typed yet.
-// @ts-ignore
-import {OppiaVisualizationClickHexbinsComponent} from 'visualizations/oppia-visualization-click-hexbins.directive';
-// This throws "TS2307". We need to suppress this error because
-// visualizations are not strictly typed yet.
-// @ts-ignore
-import {OppiaVisualizationFrequencyTableComponent} from 'visualizations/oppia-visualization-frequency-table.directive';
-// This throws "TS2307". We need to suppress this error because
-// visualizations are not strictly typed yet.
-// @ts-ignore
-import {OppiaVisualizationEnumeratedFrequencyTableComponent} from 'visualizations/oppia-visualization-enumerated-frequency-table.directive';
-// This throws "TS2307". We need to suppress this error because
-// value-generators are not strictly typed yet.
-// @ts-ignore
-import {RandomSelectorComponent} from 'value_generators/templates/random-selector.component';
-// This throws "TS2307". We need to suppress this error because
-// value-generators are not strictly typed yet.
-// @ts-ignore
-import {CopierComponent} from 'value_generators/templates/copier.component';
+import {VisualizationSortedTilesComponent} from '../../../extensions/visualizations/oppia-visualization-sorted-tiles.component';
+import {OppiaVisualizationClickHexbinsComponent} from '../../../extensions/visualizations/oppia-visualization-click-hexbins.directive';
+import {OppiaVisualizationFrequencyTableComponent} from '../../../extensions/visualizations/oppia-visualization-frequency-table.directive';
+import {OppiaVisualizationEnumeratedFrequencyTableComponent} from '../../../extensions/visualizations/oppia-visualization-enumerated-frequency-table.directive';
+import {RandomSelectorComponent} from '../../../extensions/value_generators/templates/random-selector.component';
+import {CopierComponent} from '../../../extensions/value_generators/templates/copier.component';
 import {UndoSnackbarComponent} from './custom-snackbar/undo-snackbar.component';
 import {TranslationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import {OppiaCkEditorCopyToolBarModule} from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
@@ -223,17 +196,11 @@ import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateModule} from '@ngx-translate/core';
 import {ComponentOverviewComponent} from './copy-url/copy-url.component';
 import {MatMenuModule} from '@angular/material/menu';
-// This throws "TS2307". We need to suppress this error because
-// value-generators are not strictly typed yet.
-// @ts-ignore
-import {DynamicComponentModule} from 'value_generators/templates/dynamic-component.module';
+import {DynamicComponentModule} from '../../../extensions/value_generators/templates/dynamic-component.module';
 import {ThanksForDonatingModalComponent} from 'pages/donate-page/thanks-for-donating-modal.component';
 import {DonationBoxComponent} from 'pages/donate-page/donation-box/donation-box.component';
 import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation-box-modal.component';
-// This throws "TS2307". We need to suppress this error because
-// rte-helper-modal.component is not strictly typed yet.
-// @ts-ignore
-import {RteHelperModalComponent} from 'services/rte-helper-modal.component';
+import {RteHelperModalComponent} from '../services/rte-helper-modal.component';
 import {DirectivesModule} from 'directives/directives.module';
 import {UrlFragmentEditorComponent} from './url-fragment-editor/url-fragment-editor.component';
 import {PreviewSummaryTileModalComponent} from 'pages/exploration-editor-page/settings-tab/templates/preview-summary-tile-modal.component';

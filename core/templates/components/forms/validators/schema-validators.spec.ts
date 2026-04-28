@@ -25,7 +25,7 @@ import {
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {SchemaValidators} from './schema-validators';
 interface ValidatorTestCase {
-  controlValue: SchemaDefaultValue | undefined;
+  controlValue: SchemaDefaultValue;
   expectedResult: boolean;
 }
 
@@ -39,15 +39,18 @@ class MockFormControl extends AbstractControl {
     super(validator, asyncValidator);
   }
 
-  patchValue(value: SchemaDefaultValue, options?: Object): void {
+  patchValue(
+    value: SchemaDefaultValue,
+    options?: Record<string, unknown>
+  ): void {
     return;
   }
 
-  reset(value?: SchemaDefaultValue, options?: Object): void {
+  reset(value?: SchemaDefaultValue, options?: Record<string, unknown>): void {
     return;
   }
 
-  setValue(value: SchemaDefaultValue, options?: Object): void {
+  setValue(value: SchemaDefaultValue, options?: Record<string, unknown>): void {
     this.value = value;
   }
 }
@@ -67,7 +70,7 @@ describe('Schema validators', () => {
         {controlValue: '123', expectedResult: true},
         {controlValue: '1234', expectedResult: true},
         {controlValue: ['1', '2'], expectedResult: false},
-        {controlValue: undefined, expectedResult: false},
+        {controlValue: null, expectedResult: false},
         {controlValue: ['1', '2', '3'], expectedResult: true},
         {controlValue: ['1', '2', '3', '4'], expectedResult: true},
       ];
@@ -109,7 +112,7 @@ describe('Schema validators', () => {
         {controlValue: '12', expectedResult: true},
         {controlValue: '123', expectedResult: true},
         {controlValue: '1234', expectedResult: false},
-        {controlValue: undefined, expectedResult: false},
+        {controlValue: null, expectedResult: false},
         {controlValue: ['1', '2'], expectedResult: true},
         {controlValue: ['1', '2', '3'], expectedResult: true},
         {controlValue: ['1', '2', '3', '4'], expectedResult: false},
@@ -150,7 +153,7 @@ describe('Schema validators', () => {
         minValue: -2.0,
       };
 
-      const testCases = [
+      const testCases: ValidatorTestCase[] = [
         {controlValue: 1.23, expectedResult: true},
         {controlValue: -1.23, expectedResult: true},
         {controlValue: -1.99, expectedResult: true},
@@ -160,7 +163,7 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.isAtLeast(args);
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
           expect(errorsReturned).toBeNull();
@@ -180,7 +183,7 @@ describe('Schema validators', () => {
         maxValue: -2.0,
       };
 
-      const testCases = [
+      const testCases: ValidatorTestCase[] = [
         {controlValue: 1.23, expectedResult: false},
         {controlValue: -1.23, expectedResult: false},
         {controlValue: -1.99, expectedResult: false},
@@ -190,7 +193,7 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.isAtMost(args);
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
           expect(errorsReturned).toBeNull();
@@ -224,7 +227,7 @@ describe('Schema validators', () => {
         {controlValue: ' 3.2% ', expectedResult: true},
         {controlValue: '0.', expectedResult: true},
         {controlValue: '', expectedResult: true},
-        {controlValue: undefined, expectedResult: true},
+        {controlValue: null, expectedResult: true},
         {controlValue: '3%%', expectedResult: false},
         {controlValue: '-', expectedResult: false},
         {controlValue: '.', expectedResult: false},
@@ -257,7 +260,7 @@ describe('Schema validators', () => {
       const control: MockFormControl = new MockFormControl();
       control.setValue(1);
 
-      const testCases = [
+      const testCases: ValidatorTestCase[] = [
         {controlValue: '3', expectedResult: true},
         {controlValue: '-3', expectedResult: true},
         {controlValue: '3.0', expectedResult: true},
@@ -266,7 +269,7 @@ describe('Schema validators', () => {
 
       const filter = SchemaValidators.isInteger();
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
           expect(errorsReturned).toBeNull();
@@ -282,14 +285,14 @@ describe('Schema validators', () => {
       const control: MockFormControl = new MockFormControl();
       control.setValue(1);
 
-      const testCases = [
+      const testCases: ValidatorTestCase[] = [
         {controlValue: 'a', expectedResult: true},
         {controlValue: '', expectedResult: false},
       ];
 
       const filter = SchemaValidators.isNonempty();
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
           expect(errorsReturned).toBeNull();

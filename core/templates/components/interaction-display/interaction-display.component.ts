@@ -29,7 +29,13 @@ import {
 import camelCaseFromHyphen from 'utility/string-utility';
 
 import {TAG_TO_INTERACTION_MAPPING} from 'interactions/tag-to-interaction-mapping';
-type ScopedValue = string | number | boolean | object | null | undefined;
+type ScopedValue =
+  | string
+  | number
+  | boolean
+  | Record<string, unknown>
+  | null
+  | undefined;
 
 @Component({
   selector: 'oppia-interaction-display',
@@ -65,16 +71,14 @@ export class InteractionDisplayComponent {
       let domparser = new DOMParser();
       let dom = domparser.parseFromString(this.htmlData, 'text/html');
 
+      const interactionMapping =
+        TAG_TO_INTERACTION_MAPPING as unknown as Record<
+          string,
+          Type<Record<string, unknown>>
+        >;
       const firstChild = dom.body.firstElementChild;
-      if (
-        firstChild &&
-        (TAG_TO_INTERACTION_MAPPING as Record<string, Type<object>>)[
-          firstChild.tagName
-        ]
-      ) {
-        let interaction = (
-          TAG_TO_INTERACTION_MAPPING as Record<string, Type<object>>
-        )[firstChild.tagName];
+      if (firstChild && interactionMapping[firstChild.tagName]) {
+        let interaction = interactionMapping[firstChild.tagName];
 
         const componentFactory =
           this.componentFactoryResolver.resolveComponentFactory(interaction);

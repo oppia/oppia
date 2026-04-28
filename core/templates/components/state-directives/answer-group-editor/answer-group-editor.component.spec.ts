@@ -36,6 +36,7 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {AnswerGroupEditor} from './answer-group-editor.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {Outcome} from 'domain/exploration/outcome.model';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 class MockPlatformFeatureService {
   status = {
@@ -500,7 +501,7 @@ describe('Answer Group Editor Component', () => {
 
     // An error is thrown if an invalid interaction ID is passed.
     stateInteractionIdService.savedMemento =
-      'InvalidInteraction' as unknown as 'TextInput';
+      'InvalidInteraction' as unknown as InteractionSpecsKey;
     component.rules = [];
     component.rules.push(
       new Rule(

@@ -27,10 +27,7 @@ import {
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {Injector, NO_ERRORS_SCHEMA} from '@angular/core';
 import {PageContextService} from 'services/page-context.service';
-// This throws "TS2307". We need to
-// suppress this error because rte-text-components are not strictly typed yet.
-// @ts-ignore
-import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
+import {RichTextComponentsModule} from '../../../extensions/rich_text_components/rich-text-components.module';
 import {CkEditorInitializerService} from './ck-editor-helpers/ck-editor-4-widgets.initializer';
 import {MetaTagCustomizationService} from 'services/contextual/meta-tag-customization.service';
 import {DocumentAttributeCustomizationService} from 'services/contextual/document-attribute-customization.service';

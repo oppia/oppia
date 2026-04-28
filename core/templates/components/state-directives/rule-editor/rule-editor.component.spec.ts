@@ -146,7 +146,7 @@ describe('Rule Editor Component', () => {
       {
         x: null,
         y: 1,
-      } as unknown as Record<string, string | number>,
+      } as unknown as RuleInputs,
       {
         x: 'TranslatableHtmlContentId',
         y: 'DragAndDropPositiveInt',
@@ -171,7 +171,7 @@ describe('Rule Editor Component', () => {
 
   it('should set component properties on initialization', () => {
     component.rule = new Rule(
-      '' as unknown as string,
+      '',
       {} as unknown as RuleInputs,
       {} as unknown as RuleInputTypes
     );
@@ -191,7 +191,7 @@ describe('Rule Editor Component', () => {
     'should set change validity on form valid' + ' change event',
     fakeAsync(() => {
       const eventBusGroup = new EventBusGroup(eventBusService);
-      component.rule = new Rule('' as unknown as string, {}, {});
+      component.rule = new Rule('', {}, {});
 
       expect(component.isInvalid).toBe(false);
 
@@ -216,7 +216,7 @@ describe('Rule Editor Component', () => {
 
   it('should not change validity on form valid change event with wrong modalId', fakeAsync(() => {
     const eventBusGroup = new EventBusGroup(eventBusService);
-    component.rule = new Rule('' as unknown as string, {}, {});
+    component.rule = new Rule('', {}, {});
     component.isEditingRuleInline = true;
     component.ngOnInit();
 
@@ -334,7 +334,7 @@ describe('Rule Editor Component', () => {
     };
 
     component.rule = new Rule(
-      '' as unknown as string,
+      '',
       {varName: 2} as unknown as RuleInputs,
       {} as unknown as RuleInputTypes
     );
@@ -352,7 +352,7 @@ describe('Rule Editor Component', () => {
 
   it('should save rule when user clicks save button', () => {
     component.rule = new Rule(
-      '' as unknown as string,
+      '',
       {} as unknown as RuleInputs,
       {} as unknown as RuleInputTypes
     );
@@ -408,7 +408,7 @@ describe('Rule Editor Component', () => {
           type: 'noneditable',
           varName: '',
         },
-      ] as RuleDescriptionFragment[]);
+      ] as unknown as RuleDescriptionFragment[]);
     })
   );
 
@@ -452,7 +452,7 @@ describe('Rule Editor Component', () => {
           type: 'noneditable',
           varName: '',
         },
-      ] as RuleDescriptionFragment[]);
+      ] as unknown as RuleDescriptionFragment[]);
     })
   );
 
@@ -491,7 +491,7 @@ describe('Rule Editor Component', () => {
           type: 'noneditable',
           varName: '',
         },
-      ] as RuleDescriptionFragment[]);
+      ] as unknown as RuleDescriptionFragment[]);
     })
   );
 
@@ -549,7 +549,7 @@ describe('Rule Editor Component', () => {
           type: 'noneditable',
           varName: '',
         },
-      ] as RuleDescriptionFragment[]);
+      ] as unknown as RuleDescriptionFragment[]);
     })
   );
   it('should initialize with null rule type', () => {
@@ -627,7 +627,7 @@ describe('Rule Editor Component', () => {
     const item = {
       type: 'html',
       varName: 'x',
-    } as RuleDescriptionFragment;
+    } as unknown as RuleDescriptionFragment;
     component.rule = new Rule(
       'Equals',
       {x: 'old_val'} as unknown as RuleInputs,

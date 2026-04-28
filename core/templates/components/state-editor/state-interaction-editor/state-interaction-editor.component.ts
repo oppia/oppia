@@ -291,9 +291,9 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
           this.onSaveInteractionData.emit(interactionData);
 
           this.stateSolutionService.saveDisplayedValue();
-          this.onSaveSolution.emit(
-            this.stateSolutionService.displayed as unknown as Solution
-          );
+          if (this.stateSolutionService.displayed) {
+            this.onSaveSolution.emit(this.stateSolutionService.displayed);
+          }
 
           this.stateInteractionIdService.onInteractionIdChanged.emit(
             this.stateInteractionIdService.savedMemento

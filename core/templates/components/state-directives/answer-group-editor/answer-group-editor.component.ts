@@ -42,6 +42,7 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface TaggedMisconception {
   skillId: string | null;
@@ -119,9 +120,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     return this.stateInteractionIdService.savedMemento;
   }
 
-  getDefaultInputValue(
-    varType: string
-  ): null | boolean | number | number[] | string | object | object[] {
+  getDefaultInputValue(varType: string): SchemaDefaultValue {
     // TODO(bhenning): Typed objects in the backend should be required
     // to provide a default value specific for their type.
     switch (varType) {
@@ -261,11 +260,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     // TODO(bhenning): Should use functionality in ruleEditor.js, but
     // move it to ResponsesService in StateResponses.js to properly
     // form a new rule.
-    const rule = Rule.createNew(
-      ruleType,
-      inputs as unknown as RuleInputs,
-      inputTypes
-    );
+    const rule = Rule.createNew(ruleType, inputs as RuleInputs, inputTypes);
     this.rules.push(rule);
     this.changeActiveRuleIndex(this.rules.length - 1);
   }

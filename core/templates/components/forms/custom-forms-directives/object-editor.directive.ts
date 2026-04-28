@@ -143,7 +143,15 @@ interface AngularJSFormController {
 }
 
 interface ObjectEditor {
-  value?: unknown;
+  alwaysEditable?: string;
+  initArgs?: SchemaDefaultValue;
+  isEditable?: string;
+  modalId?: symbol;
+  objType?: string;
+  schema?: SchemaDefaultValue;
+  value?: any;
+  valueChanged?: EventEmitter<any>;
+  validityChange?: EventEmitter<Record<string, boolean>>;
   ngOnChanges?: (changes: SimpleChanges) => void;
 }
 
@@ -268,10 +276,7 @@ export class ObjectEditorComponent
       const componentRef =
         this.viewContainerRef.createComponent<ObjectEditor>(componentFactory);
 
-      const instance = componentRef.instance as unknown as Record<
-        string,
-        unknown
-      >;
+      const instance = componentRef.instance;
       instance.alwaysEditable = this.alwaysEditable;
       instance.initArgs = this.initArgs;
       instance.isEditable = this.isEditable;

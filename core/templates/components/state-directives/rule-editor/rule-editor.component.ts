@@ -38,11 +38,8 @@ import {StateInteractionIdService} from 'components/state-editor/state-editor-pr
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {PopulateRuleContentIdsService} from 'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
-// This throws "TS2307". We need to suppress this error because
-// object-editor templates are not strictly typed yet.
-// @ts-ignore
-import DEFAULT_OBJECT_VALUES from 'objects/object_defaults.json';
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import DEFAULT_OBJECT_VALUES from '../../../../../extensions/objects/object_defaults.json';
+import INTERACTION_SPECS from '../../../../../extensions/interactions/interaction_specs.json';
 import {Rule} from 'domain/exploration/rule.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
@@ -81,7 +78,7 @@ export class RuleEditorComponent
   ruleDescriptionChoices!: Choice[];
   isInvalid: boolean = false;
   eventBusGroup: EventBusGroup;
-  editRuleForm: object = {};
+  editRuleForm: Record<string, unknown> = {};
 
   constructor(
     private eventBusService: EventBusService,
@@ -315,7 +312,7 @@ export class RuleEditorComponent
     if (this.isEditingRuleInline) {
       this.modalId = Symbol();
       this.eventBusGroup.on(
-        ObjectFormValidityChangeEvent as unknown as Newable<ObjectFormValidityChangeEvent>,
+        ObjectFormValidityChangeEvent as Newable<ObjectFormValidityChangeEvent>,
         (event: ObjectFormValidityChangeEvent) => {
           if (event.message.modalId === this.modalId) {
             this.isInvalid = event.message.value;

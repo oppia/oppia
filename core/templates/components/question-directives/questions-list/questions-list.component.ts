@@ -535,7 +535,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
           this.newQuestionSkillIds,
           this.newQuestionSkillDifficulties,
           this.question.toBackendDict(true),
-          imagesData as unknown as ImageData[]
+          imagesData as ImageData[]
         )
         .then(
           response => {
