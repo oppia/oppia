@@ -4123,6 +4123,28 @@ class State(translation_domain.BaseTranslatableObject):
         customization_args_dict = cast(
             CustomizationArgsDictType, customization_args_mapping
         )
+        # Older change lists may not include newly-added customization args.
+        # Backfill missing args from existing values when available, otherwise
+        # use the interaction spec default.
+        if self.interaction.id is not None:
+            interaction = interaction_registry.Registry.get_interaction_by_id(
+                self.interaction.id
+            )
+            for spec in interaction.customization_arg_specs:
+                ca_name = spec['name']
+                if ca_name in customization_args_dict:
+                    continue
+                existing_customization_arg = (
+                    self.interaction.customization_args.get(ca_name)
+                )
+                if existing_customization_arg is not None:
+                    customization_args_dict[ca_name] = (
+                        existing_customization_arg.to_customization_arg_dict()
+                    )
+                else:
+                    customization_args_dict[ca_name] = {
+                        'value': copy.deepcopy(spec['default_value'])
+                    }
         customization_args = InteractionInstance.convert_customization_args_dict_to_customization_args(
             self.interaction.id, customization_args_dict
         )
