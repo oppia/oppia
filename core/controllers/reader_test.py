@@ -2011,6 +2011,25 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             [],
         )
 
+    def test_exp_complete_event_with_decimal_params(self) -> None:
+        """Test that float values in params don't cause a schema error."""
+        self.login(self.USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'params': {'answer': 1.1},
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': 'final',
+            'version': 1,
+        }
+
+        self.post_json(
+            '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_0,
+            payload,
+            csrf_token=csrf_token,
+        )
+
 
 class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
     """Tests for the handler that records playthroughs."""
@@ -2601,6 +2620,42 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
 
+    def test_submit_answer_for_exp_with_decimal_answer(
+        self,
+    ) -> None:
+        """Test that a decimal answer does not cause a schema validation error."""
+
+        # Load demo exploration.
+        exp_id = '1'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        version = 1
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
+        )
+        state_name_1 = exploration_dict['exploration']['init_state_name']
+
+        self.post_json(
+            '/explorehandler/answer_submitted_event/%s' % exp_id,
+            {
+                'old_state_name': state_name_1,
+                'answer': 1.1,
+                'version': version,
+                'client_time_spent_in_secs': 0,
+                'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+                'answer_group_index': 0,
+                'rule_spec_index': 0,
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION
+                ),
+            },
+        )
+        self.logout()
+
     def test_submit_answer_for_exploration_raises_error_with_no_version(
         self,
     ) -> None:
@@ -2637,47 +2692,6 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
             'At \'http://localhost/explorehandler/answer_submitted_event/6\' '
             'these errors are happening:\n'
             'Missing key in handler args: version.',
-        )
-
-    def test_submit_answer_for_exp_raises_error_with_no_answer_matching_type(
-        self,
-    ) -> None:
-        # Load demo exploration.
-        exp_id = '6'
-        exp_services.delete_demo(exp_id)
-        exp_services.load_demo(exp_id)
-        version = 1
-
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.login(self.VIEWER_EMAIL)
-
-        exploration_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
-        )
-        state_name_1 = exploration_dict['exploration']['init_state_name']
-
-        response = self.post_json(
-            '/explorehandler/answer_submitted_event/%s' % exp_id,
-            {
-                'old_state_name': state_name_1,
-                'answer': 1.1,
-                'version': version,
-                'client_time_spent_in_secs': 0,
-                'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
-                'answer_group_index': 0,
-                'rule_spec_index': 0,
-                'classification_categorization': (
-                    exp_domain.EXPLICIT_CLASSIFICATION
-                ),
-            },
-            expected_status_int=400,
-        )
-        self.assertEqual(
-            response['error'],
-            'At \'http://localhost/explorehandler/answer_submitted_event/6\' '
-            'these errors are happening:\n'
-            'Schema validation for \'answer\' failed: '
-            'Type of 1.1 is not present in options',
         )
 
     def test_submit_answer_for_exp_raises_error_with_invalid_algebraic_answer(

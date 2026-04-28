@@ -631,7 +631,13 @@ class AnswerSubmittedEventHandler(
                     'values': {
                         'schema': {
                             'type': 'weak_multiple',
-                            'options': ['int', 'basestring', 'dict', 'list'],
+                            'options': [
+                                'int',
+                                'float',
+                                'basestring',
+                                'dict',
+                                'list',
+                            ],
                         }
                     },
                 },
@@ -652,7 +658,7 @@ class AnswerSubmittedEventHandler(
             'answer': {
                 'schema': {
                     'type': 'weak_multiple',
-                    'options': ['int', 'basestring', 'dict', 'list'],
+                    'options': ['int', 'float', 'basestring', 'dict', 'list'],
                 }
             },
             'client_time_spent_in_secs': {
@@ -813,7 +819,13 @@ class StateHitEventHandler(
                     'values': {
                         'schema': {
                             'type': 'weak_multiple',
-                            'options': ['int', 'basestring', 'dict', 'list'],
+                            'options': [
+                                'int',
+                                'float',
+                                'basestring',
+                                'dict',
+                                'list',
+                            ],
                         },
                     },
                     'default_value': {},
@@ -1365,7 +1377,13 @@ class ExplorationCompleteEventHandler(
                     'values': {
                         'schema': {
                             'type': 'weak_multiple',
-                            'options': ['int', 'basestring', 'dict', 'list'],
+                            'options': [
+                                'int',
+                                'float',
+                                'basestring',
+                                'dict',
+                                'list',
+                            ],
                         }
                     },
                 }
@@ -1489,7 +1507,13 @@ class ExplorationMaybeLeaveHandler(
                     'values': {
                         'schema': {
                             'type': 'weak_multiple',
-                            'options': ['int', 'basestring', 'dict', 'list'],
+                            'options': [
+                                'int',
+                                'float',
+                                'basestring',
+                                'dict',
+                                'list',
+                            ],
                         }
                     },
                 }
@@ -2165,7 +2189,7 @@ class LearnerAnswerDetailsSubmissionHandler(
             'answer': {
                 'schema': {
                     'type': 'weak_multiple',
-                    'options': ['int', 'basestring', 'dict', 'list'],
+                    'options': ['int', 'float', 'basestring', 'dict', 'list'],
                 }
             },
             'answer_details': {'schema': {'type': 'basestring'}},
