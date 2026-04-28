@@ -403,7 +403,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   }
 
   showSolutionCheckpoint(): boolean {
-    if (!this.question) {
+    if (!this.question || typeof this.question.getStateData !== 'function') {
       return false;
     }
 

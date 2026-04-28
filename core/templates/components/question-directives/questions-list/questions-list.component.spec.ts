@@ -1161,8 +1161,8 @@ describe('Questions List Component', () => {
     } as State);
 
     expect(component.showSolutionCheckpoint()).toBe(true);
-
-    component.question = {} as Question;
+    // @ts-expect-error setting question to null for testing.
+    component.question = null;
     expect(component.showSolutionCheckpoint()).toBe(false);
   });
 
