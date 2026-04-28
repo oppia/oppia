@@ -566,9 +566,13 @@ describe('Lesson Information card modal component', () => {
 
     let cards: StateCard[] = [];
     for (let i = 0; i < numCards; i++) {
-      cards.push({
-        getStateName: jasmine.createSpy('getStateName').and.returnValue(i),
-      } as unknown as StateCard);
+      const cardSpy = jasmine.createSpyObj<StateCard>('StateCard', [
+        'getStateName',
+      ]);
+
+      (cardSpy.getStateName as jasmine.Spy).and.returnValue(String(i));
+
+      cards.push(cardSpy);
     }
 
     spyOn(playerTranscriptService, 'getCard').and.callFake((index: number) => {
