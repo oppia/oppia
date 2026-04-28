@@ -33,8 +33,6 @@ import type {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Question} from 'domain/question/question.model';
 import {QuestionUpdateService} from 'domain/question/question-update.service';
-import {Solution} from 'domain/exploration/solution.model';
-import {Hint} from 'domain/exploration/hint-object.model';
 import type {Solution} from 'domain/exploration/solution.model';
 import type {Hint} from 'domain/exploration/hint-object.model';
 import type {AnswerGroup} from 'domain/exploration/answer-group.model';
