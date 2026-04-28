@@ -366,6 +366,49 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
+    def _convert_states_v57_dict_to_v58_dict(
+        cls, draft_change_list: List[exp_domain.ExplorationChange]
+    ) -> List[exp_domain.ExplorationChange]:
+        """Converts draft change list from state version 57 to 58. Version 58
+        adds allowExponentialNotation customization arg to NumericInput
+        interaction.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        for i, change in enumerate(draft_change_list):
+            if (
+                change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY
+                and change.property_name
+                == exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
+            ):
+                # Here we use cast because this if-condition narrows the type
+                # to the interaction customization args dict.
+                edit_interaction_cust_args_cmd = cast(
+                    exp_domain.EditExpStatePropertyInteractionCustArgsCmd,
+                    change,
+                )
+                new_value = edit_interaction_cust_args_cmd.new_value
+                if (
+                    'requireNonnegativeInput' in new_value
+                    and 'allowExponentialNotation' not in new_value
+                ):
+                    new_value['allowExponentialNotation'] = {'value': True}
+                    draft_change_list[i] = exp_domain.ExplorationChange(
+                        {
+                            'cmd': change.cmd,
+                            'property_name': change.property_name,
+                            'state_name': change.state_name,
+                            'new_value': new_value,
+                        }
+                    )
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v55_dict_to_v56_dict(
         cls, draft_change_list: List[exp_domain.ExplorationChange]
     ) -> List[exp_domain.ExplorationChange]:

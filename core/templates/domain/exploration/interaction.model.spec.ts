@@ -504,6 +504,9 @@ describe('Interaction', () => {
           requireNonnegativeInput: {
             value: true,
           },
+          allowExponentialNotation: {
+            value: true,
+          },
         },
         default_outcome: defaultOutcomeDict,
         hints: hintsDict,
@@ -530,6 +533,9 @@ describe('Interaction', () => {
         customization_args: {
           requireNonnegativeInput: {
             value: false,
+          },
+          allowExponentialNotation: {
+            value: true,
           },
         },
         default_outcome: defaultOutcomeDict,

@@ -13212,7 +13212,7 @@ class ExplorationInOldSchemaFormatTests(test_utils.GenericTestBase):
             'category': 'Algebra',
             'author_notes': '',
             'blurb': '',
-            'states_schema_version': 57,
+            'states_schema_version': feconf.CURRENT_STATE_SCHEMA_VERSION,
             'init_state_name': 'Introduction',
             'language_code': 'en',
             'objective': '',
