@@ -643,7 +643,7 @@ describe('create new subtopic modal', function () {
     const mockError = new Error('Upload failed');
 
     spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
-      throwError(() => mockError)
+      throwError(mockError)
     );
     spyOn(console, 'error');
 

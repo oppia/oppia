@@ -1038,7 +1038,7 @@ describe('Topic editor tab directive', () => {
     ).not.toHaveBeenCalled();
   });
 
-  it('should handle onImageSave with valid image data', (done) => {
+  it('should handle onImageSave with valid image data', done => {
     const mockImageData = {
       image_data: new Blob(['test'], {type: 'image/svg+xml'}),
       filename: 'test-image.svg',
@@ -1077,7 +1077,7 @@ describe('Topic editor tab directive', () => {
     );
   });
 
-  it('should handle error in onImageSave when upload fails', (done) => {
+  it('should handle error in onImageSave when upload fails', done => {
     const mockImageData = {
       image_data: new Blob(['test'], {type: 'image/svg+xml'}),
       filename: 'test-image.svg',
@@ -1086,7 +1086,7 @@ describe('Topic editor tab directive', () => {
     const mockError = new Error('Upload failed');
 
     spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
-      throwError(() => mockError)
+      throwError(mockError)
     );
     spyOn(console, 'error');
 
