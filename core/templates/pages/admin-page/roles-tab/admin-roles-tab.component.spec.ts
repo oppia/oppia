@@ -68,6 +68,7 @@ describe('Admin roles tab component ', function () {
     thumbnail_bg_color: '#C6DCDA',
     is_published: false,
     can_edit_topic: true,
+    can_edit_question: true,
     total_upcoming_chapters_count: 1,
     total_overdue_chapters_count: 1,
     total_chapter_counts_for_each_story: [5, 4],
