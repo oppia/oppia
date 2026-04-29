@@ -139,7 +139,7 @@ export class TopicEditorStateService {
     private skillBackendApiService: SkillBackendApiService,
     private undoRedoService: UndoRedoService
   ) {
-    this._topicRights = new TopicRights(false, false, false);
+    this._topicRights = new TopicRights(false, false, false, false);
     this._subtopicPage = new SubtopicPage(
       'id',
       'topic_id',

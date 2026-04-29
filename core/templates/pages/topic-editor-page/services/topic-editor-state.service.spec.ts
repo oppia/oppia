@@ -167,6 +167,7 @@ describe('Topic editor state service', () => {
         published: true,
         can_publish_topic: true,
         can_edit_topic: true,
+        can_edit_question: true,
       });
     }
   }
@@ -646,6 +647,7 @@ describe('Topic editor state service', () => {
         published: false,
         can_publish_topic: false,
         can_edit_topic: false,
+        can_edit_question: false,
       })
     );
 
@@ -654,6 +656,7 @@ describe('Topic editor state service', () => {
         published: true,
         can_publish_topic: true,
         can_edit_topic: true,
+        can_edit_question: true,
       })
     );
 
@@ -662,6 +665,7 @@ describe('Topic editor state service', () => {
         published: true,
         can_publish_topic: true,
         can_edit_topic: true,
+        can_edit_question: true,
       })
     );
   });

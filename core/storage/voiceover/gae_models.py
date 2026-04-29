@@ -43,7 +43,6 @@ datastore_services = models.Registry.import_datastore_services()
 
 VOICEOVER_AUTOGENERATION_POLICY_ID: Final = 'voiceover_policy'
 
-
 assert feconf.VoiceoverType.MANUAL.value == 'manual'
 assert feconf.VoiceoverType.AUTO.value == 'auto'
 
