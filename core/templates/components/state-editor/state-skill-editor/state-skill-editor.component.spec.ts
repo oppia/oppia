@@ -164,6 +164,7 @@ describe('State Skill Editor Component', () => {
         1,
         true,
         true,
+        false,
         'math',
         'public/img1.png',
         'green',
