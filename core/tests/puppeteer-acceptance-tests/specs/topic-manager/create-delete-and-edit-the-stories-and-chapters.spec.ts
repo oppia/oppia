@@ -140,8 +140,8 @@ describe('Topic Manager', function () {
 
     await topicManager.navigateToCreatorDashboardPageInExplorationEditor();
     await topicManager.navigateToExplorationEditorFromCreatorDashboard();
-    const programmingExplorationId =
-      await topicManager.createSimpleProgrammingExploration();
+    const unsupportedExplorationId =
+      await topicManager.createSimpleUnsupportedExploration();
 
     // Add simple chapter.
     await topicManager.openStoryEditor(
@@ -160,8 +160,8 @@ describe('Topic Manager', function () {
       'Arithmetic Operations'
     );
     await topicManager.addChapterWithoutSaving(
-      'Programming Exploration',
-      programmingExplorationId,
+      'Math Exploration',
+      unsupportedExplorationId,
       'The Broken Calculator',
       'Arithmetic Operations'
     );

@@ -390,6 +390,8 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                                     'multi_match': {
                                         'query': 'query',
                                         'fields': ['title', 'summary'],
+                                        'type': 'bool_prefix',
+                                        'operator': 'and',
                                     }
                                 }
                             ],

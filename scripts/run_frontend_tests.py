@@ -182,7 +182,11 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if parsed_args.run_minified_tests:
         print('Running test in production environment')
 
-        build.main(args=['--prod_env', '--minify_third_party_libs_only'])
+        # Skip the Angular ng build (--skip_ng_build) because karma tests
+        # use their own compilation pipeline and do not consume the Angular
+        # dist output. Omitting it saves ~10 minutes per invocation, keeping
+        # CI overhead on par with the previous minify-third-party-only approach.
+        build.main(args=['--prod_env', '--skip_ng_build'])
 
         cmd.append('--prodEnv')
     else:
