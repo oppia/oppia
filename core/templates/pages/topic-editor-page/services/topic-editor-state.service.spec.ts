@@ -912,4 +912,17 @@ describe('Topic editor state service', () => {
       topicEditorStateService.getSupersedingSkillIssues(['skill_1'])
     ).toEqual([]);
   }));
+
+  it('should handle fetch errors gracefully in updateSkillCache', fakeAsync(() => {
+    spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+      Promise.reject(new Error('Network error'))
+    );
+
+    topicEditorStateService.updateSkillCache(['skill_new']);
+    tick();
+
+    expect(
+      topicEditorStateService.getSupersedingSkillIssues(['skill_new'])
+    ).toEqual([]);
+  }));
 });

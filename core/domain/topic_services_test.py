@@ -3290,6 +3290,62 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.user_id, topic_id, 'has_superseding'
             )
 
+    def test_does_topic_have_skill_with_superseding_skill_returns_skill(
+        self,
+    ) -> None:
+        self.save_new_skill('superseding_skill', self.user_id)
+        self.save_new_skill('skill_to_merge', self.user_id)
+        changelist = [
+            skill_domain.SkillChange(
+                {
+                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                    'property_name': (
+                        skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID
+                    ),
+                    'old_value': '',
+                    'new_value': 'superseding_skill',
+                }
+            )
+        ]
+        skill_services.update_skill(
+            self.user_id, 'skill_to_merge', changelist, 'Merging skill.'
+        )
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id,
+            self.user_id,
+            name='Topic With Superseding',
+            description='desc',
+            url_fragment='topic-with-super',
+            uncategorized_skill_ids=['skill_to_merge'],
+        )
+        topic = topic_fetchers.get_topic_by_id(topic_id)
+        result = topic_services.does_topic_have_skill_with_superseding_skill(
+            topic
+        )
+        self.assertIsNotNone(result)
+        assert result is not None
+        self.assertEqual(result.id, 'skill_to_merge')
+
+    def test_does_topic_have_skill_with_superseding_skill_returns_none(
+        self,
+    ) -> None:
+        self.save_new_skill('regular_skill', self.user_id)
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id,
+            self.user_id,
+            name='Topic Without Superseding',
+            description='desc',
+            url_fragment='topic-no-super',
+            uncategorized_skill_ids=['regular_skill'],
+        )
+        topic = topic_fetchers.get_topic_by_id(topic_id)
+        result = topic_services.does_topic_have_skill_with_superseding_skill(
+            topic
+        )
+        self.assertIsNone(result)
+
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
     # inputs that we can normally catch by typing.
