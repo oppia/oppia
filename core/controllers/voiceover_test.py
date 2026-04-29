@@ -496,7 +496,7 @@ class AutomaticVoiceoverRegenerationRecordHandlerTests(
         )
         self.assertEqual(
             json_response['automatic_voiceover_regeneration_records'],
-            [cloud_task_run.to_dict()],
+            [cloud_task_run.to_dict_with_timezone_info()],
         )
         self.logout()
 
