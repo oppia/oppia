@@ -4747,6 +4747,63 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * This function creates a simple Programming Exploration using Code Editor.
+   * Starts at new Exploration Editor Page.
+   * Ends at same page, after adding programming interaction and saving the
+   * draft.
+   * @param {string} category - The category of the exploration.
+   */
+  async createSimpleProgrammingExploration(
+    category: string = 'Algebra'
+  ): Promise<string> {
+    // Check if element to add interaction is visible (pre-check)
+    await this.page.waitForSelector(stateEditSelector, {
+      visible: true,
+    });
+    await this.createMinimalExploration(
+      'This is a test Programming Exploration',
+      INTERACTION_TYPES.CODE_EDITOR
+    );
+    const lastInteraction = 'Last Card';
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    await this.select(destinationCardSelector, '/');
+    await this.page.waitForSelector(addStateInput, {visible: true});
+    await this.typeInInputField(addStateInput, lastInteraction);
+    await this.clickOnElementWithSelector(addNewResponseButton);
+    await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
+    await this.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong Answer. Please try again'
+    );
+    await this.navigateToCard(lastInteraction);
+    await this.createMinimalExploration(
+      'This is last card',
+      INTERACTION_TYPES.END_EXPLORATION
+    );
+    await this.saveExplorationDraft();
+    const explorationId = await this.publishExplorationWithMetadata(
+      'Simple Code Editor',
+      'This is goal here',
+      category
+    );
+
+    // Check if publish button is disabled (post-check)
+    const publishButton = await this.page.$(saveChangesButton);
+    const isDisabled = await this.page.evaluate(
+      el => el.disabled,
+      publishButton
+    );
+    if (isDisabled) {
+      showMessage('Publish Button is disabled, as expected');
+    } else {
+      showMessage(
+        'Publish Button is enabled and clickable, expected to be disabled'
+      );
+      throw new Error('Publish Button is enabled and clickable');
+    }
+    return explorationId;
+  }
+
+  /**
    * This function creates an exploration with an interaction that is not
    * supported on the mobile app (e.g. SetInput). This is useful for testing
    * validation errors when adding mobile-unsupported explorations to stories.
@@ -4787,7 +4844,7 @@ export class ExplorationEditor extends BaseUser {
     const explorationId = await this.publishExplorationWithMetadata(
       'Simple Math Exploration',
       'This is goal here',
-      category
+      'Mathematics'
     );
 
     // Check if publish button is disabled (post-check)

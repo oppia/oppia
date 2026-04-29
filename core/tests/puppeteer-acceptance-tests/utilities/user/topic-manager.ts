@@ -392,6 +392,10 @@ const mobilePublishStoryButton =
 const storyNodeSelector = 'tr.story-node';
 const publishChapterButton = '.e2e-test-publish-chapters-button';
 const chapterStatusSelector = '.e2e-test-chapter-status';
+const mobileAcquiredSkillsSectionBodySelector =
+  '.e2e-test-section-body-acquired-skills';
+const warningIndicatorSelector = '.e2e-test-warning-indicator';
+const warningTextSelector = '.e2e-test-warnings-text';
 export class TopicManager extends BaseUser {
   /**
    * Closes navigation in mobile view.
@@ -3121,10 +3125,10 @@ export class TopicManager extends BaseUser {
       await this.waitForSaveStoryButtonToBeEnabled(
         mobileSaveStoryChangesButton
       );
-      await this.clickOnElementWithSelectorOrJs(mobileSaveStoryChangesButton);
+      await this.clickOnElementWithJsFallback(mobileSaveStoryChangesButton);
     } else {
       await this.waitForSaveStoryButtonToBeEnabled(saveStoryButton);
-      await this.clickOnElementWithSelectorOrJs(saveStoryButton);
+      await this.clickOnElementWithJsFallback(saveStoryButton);
     }
     const saveModalVisible = await this.isElementVisible(
       saveChangesMessageInput,
@@ -3139,9 +3143,9 @@ export class TopicManager extends BaseUser {
         if (!isMobileSaveButtonVisible) {
           await this.clickOnElementWithSelector(mobileOptionsSelector);
         }
-        await this.clickOnElementWithSelectorOrJs(mobileSaveStoryChangesButton);
+        await this.clickOnElementWithJsFallback(mobileSaveStoryChangesButton);
       } else {
-        await this.clickOnElementWithSelectorOrJs(saveStoryButton);
+        await this.clickOnElementWithJsFallback(saveStoryButton);
       }
       await this.page.waitForSelector(saveChangesMessageInput, {
         visible: true,
@@ -3153,7 +3157,7 @@ export class TopicManager extends BaseUser {
       'Test saving story as topic manager.'
     );
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
-    await this.clickOnElementWithSelectorOrJs(closeSaveModalButton);
+    await this.clickOnElementWithJsFallback(closeSaveModalButton);
     const modalHidden = await this.isElementVisible(modalDiv, false, 30000);
     if (!modalHidden) {
       await this.page.keyboard.press('Escape');
@@ -3177,10 +3181,8 @@ export class TopicManager extends BaseUser {
       showMessage('Discard option disabled; no changes to discard.');
       return;
     }
-    await this.clickOnElementWithSelectorOrJs(showDiscardOptionButtonSelector);
-    await this.clickOnElementWithSelectorOrJs(
-      discardStoryChangesButtonSelector
-    );
+    await this.clickOnElementWithJsFallback(showDiscardOptionButtonSelector);
+    await this.clickOnElementWithJsFallback(discardStoryChangesButtonSelector);
     await this.waitForPageToFullyLoad();
 
     // Post-check: The save story button should be disabled after discarding changes.
@@ -3192,8 +3194,9 @@ export class TopicManager extends BaseUser {
   /**
    * Clicks an element using the normal click flow, with a JS click fallback
    * for controls that can be obscured in the story editor mobile UI.
+   * @param {string} selector - The CSS selector for the element to click.
    */
-  async clickOnElementWithSelectorOrJs(selector: string): Promise<void> {
+  async clickOnElementWithJsFallback(selector: string): Promise<void> {
     const elements = await this.page.$$(selector);
     if (!elements.length) {
       throw new Error(`Element not found for selector ${selector}`);
@@ -3239,6 +3242,7 @@ export class TopicManager extends BaseUser {
 
   /**
    * Waits for the save story button to become enabled.
+   * @param {string} selector - The CSS selector for the save story button.
    */
   async waitForSaveStoryButtonToBeEnabled(selector: string): Promise<void> {
     await this.page.waitForSelector(selector, {timeout: 15000});
@@ -3357,7 +3361,7 @@ export class TopicManager extends BaseUser {
    * Returns to the story editor from the mobile chapter editor.
    */
   async returnToStoryEditorInMobile(): Promise<void> {
-    await this.clickOnElementWithSelectorOrJs(mobileBackToStoryEditorButton);
+    await this.clickOnElementWithJsFallback(mobileBackToStoryEditorButton);
     await this.page.waitForFunction(() => {
       const hash = (window.location.hash || '').replace(/\/+$/, '');
       return hash === '' || hash === '#';
@@ -3681,7 +3685,7 @@ export class TopicManager extends BaseUser {
         }
       }
 
-      await this.ensureChapterListIsVisible();
+      await this.expectChapterListIsVisible();
 
       await this.page.waitForSelector(chapterTitleSelector, {timeout: 60000});
       const chapterTitles = await this.page.$$(chapterTitleSelector);
@@ -3764,7 +3768,7 @@ export class TopicManager extends BaseUser {
    * Edits the details of a chapter.
    * @param {string} chapterName - The name of the chapter.
    * @param {string} description - The description of the chapter.
-   * @param {string} explorationId - The ID of the exploration.
+   * @param {string} outline - The outline content for the chapter.
    * @param {string} thumbnailImage - The thumbnail image of the chapter.
    */
   async editChapterDetails(
@@ -3867,10 +3871,13 @@ export class TopicManager extends BaseUser {
     await this.scrollToBottomOfPage();
     await this.waitForPageToFullyLoad();
     if (this.isViewportAtMobileWidth()) {
-      await this.ensureMobileAcquiredSkillsSectionIsVisible();
-      const mobileBodySelector = '.e2e-test-section-body-acquired-skills';
-      await this.expectElementToBeVisible(mobileBodySelector);
-      const mobileBody = await this.page.$(mobileBodySelector);
+      await this.expectMobileAcquiredSkillsSectionIsVisible();
+      await this.expectElementToBeVisible(
+        mobileAcquiredSkillsSectionBodySelector
+      );
+      const mobileBody = await this.page.$(
+        mobileAcquiredSkillsSectionBodySelector
+      );
       if (!mobileBody) {
         throw new Error('Acquired Skills mobile section not found.');
       }
@@ -3952,7 +3959,7 @@ export class TopicManager extends BaseUser {
    */
   async removeAcquiredSkill(skillName: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.ensureMobileAcquiredSkillsSectionIsVisible();
+      await this.expectMobileAcquiredSkillsSectionIsVisible();
     }
     const cardSelector = this.isViewportAtMobileWidth()
       ? aquiredSkillSkillMobileSelector
@@ -4048,14 +4055,13 @@ export class TopicManager extends BaseUser {
   /**
    * Ensures the acquired skills section is expanded in mobile viewport.
    */
-  async ensureMobileAcquiredSkillsSectionIsVisible(): Promise<void> {
+  async expectMobileAcquiredSkillsSectionIsVisible(): Promise<void> {
     if (!this.isViewportAtMobileWidth()) {
       return;
     }
 
-    const mobileBodySelector = '.e2e-test-section-body-acquired-skills';
     const isVisible = await this.isElementVisible(
-      mobileBodySelector,
+      mobileAcquiredSkillsSectionBodySelector,
       true,
       1000
     );
@@ -4064,7 +4070,9 @@ export class TopicManager extends BaseUser {
     }
 
     await this.expandHeaderInMobile('Acquired Skills');
-    await this.expectElementToBeVisible(mobileBodySelector);
+    await this.expectElementToBeVisible(
+      mobileAcquiredSkillsSectionBodySelector
+    );
   }
 
   /**
@@ -4123,7 +4131,7 @@ export class TopicManager extends BaseUser {
     chapterName: string,
     targetChapterName: string
   ): Promise<void> {
-    await this.ensureChapterListIsVisible();
+    await this.expectChapterListIsVisible();
 
     const chapterTitles = await this.getCurrentChapterTitles();
     const chapterIndex = chapterTitles.indexOf(chapterName);
@@ -4200,7 +4208,7 @@ export class TopicManager extends BaseUser {
    * index 0 is moved.
    */
   async ensureChapterIsInitial(chapterName: string): Promise<void> {
-    await this.ensureChapterListIsVisible();
+    await this.expectChapterListIsVisible();
     let chapterTitles = await this.getCurrentChapterTitles();
     if (!chapterTitles.includes(chapterName)) {
       throw new Error(
@@ -4240,9 +4248,6 @@ export class TopicManager extends BaseUser {
   async expectWarningInIndicator(
     expectedWarning: string | RegExp
   ): Promise<void> {
-    const warningIndicatorSelector = '.e2e-test-warning-indicator';
-    const warningTextSelector = '.e2e-test-warnings-text';
-
     const requireVisible = !this.isViewportAtMobileWidth();
     const warningIndicator = await this.page.waitForSelector(
       warningIndicatorSelector,
@@ -4277,7 +4282,7 @@ export class TopicManager extends BaseUser {
 
     let warningVisible = await waitForWarningText();
     if (!warningVisible) {
-      await this.clickOnElementWithSelectorOrJs(warningIndicatorSelector);
+      await this.clickOnElementWithJsFallback(warningIndicatorSelector);
       warningVisible = await waitForWarningText();
     }
     if (!warningVisible) {
@@ -4337,7 +4342,7 @@ export class TopicManager extends BaseUser {
    * @param {string[]} expectedOrder - The expected order of chapter titles.
    */
   async expectChaptersOrderToBe(expectedOrder: string[]): Promise<void> {
-    await this.ensureChapterListIsVisible();
+    await this.expectChapterListIsVisible();
     const chapterTitles = await this.getCurrentChapterTitles();
 
     if (chapterTitles.length !== expectedOrder.length) {
@@ -4358,7 +4363,7 @@ export class TopicManager extends BaseUser {
   /**
    * Ensures the chapter list is visible in story editor.
    */
-  async ensureChapterListIsVisible(): Promise<void> {
+  async expectChapterListIsVisible(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       const chapterListVisible = await this.isElementVisible(
         chapterTitleSelector,
@@ -4397,6 +4402,8 @@ export class TopicManager extends BaseUser {
    * Moves a chapter in story editor using chapter action buttons.
    * Returns false when move controls are not available and caller should
    * fall back to drag and drop.
+   * @param {string} chapterName - The name of the chapter to move.
+   * @param {'up' | 'down'} direction - The direction to move the chapter.
    */
   async moveChapterWithActionButton(
     chapterName: string,
@@ -4456,6 +4463,8 @@ export class TopicManager extends BaseUser {
 
   /**
    * Reorders chapters using drag and drop.
+   * @param {string} chapterName - The name of the chapter to drag.
+   * @param {string} targetChapterName - The name of the chapter to drop before.
    */
   async reorderChapterUsingDragAndDrop(
     chapterName: string,
