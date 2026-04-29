@@ -2949,6 +2949,12 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(LOADING_OVERLAY_SELECTOR, {
       hidden: true,
     });
+    // Also wait for any local dimmer (ng-star-inserted) to be removed.
+    await this.page
+      .waitForFunction(() => !document.querySelector('.ng-star-inserted'), {
+        timeout: 20000,
+      })
+      .catch(() => {});
     await this.clickOnElementWithSelector(addInteractionButton);
 
     // Check if modal title is correct.

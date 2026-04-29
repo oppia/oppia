@@ -620,9 +620,12 @@ export class BaseUser {
           clickabilityDiagnostics.isCoveredByOtherElement &&
           clickabilityDiagnostics.blockingElement.includes(LOADING_DIMMER_CLASS)
         ) {
-          await this.page.waitForSelector(LOADING_OVERLAY_SELECTOR, {
-            hidden: true,
-          });
+          // Wait for the specific blocking class to disappear.
+          await this.page.waitForFunction(
+            (dimmerClass: string) => !document.querySelector(`.${dimmerClass}`),
+            {timeout: 30000},
+            LOADING_DIMMER_CLASS
+          );
         }
 
         await this.page.evaluate(isElementClickable, element, true, true);
