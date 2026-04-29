@@ -525,6 +525,12 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToLearnerDashboard(): Promise<void> {
     await this.goto(learnerDashboardUrl);
+    // Wait for the dashboard root element to be visible to ensure page is loaded.
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector('.e2e-test-learner-dashboard-root', {
+      visible: true,
+      timeout: 90000,
+    });
   }
 
   /**
