@@ -44,6 +44,8 @@ import {StateSolutionService} from '../state-editor-properties-services/state-so
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {InteractionDetailsCacheService} from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {Solution} from 'domain/exploration/solution.model';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 class MockNgbModal {
   modal: string = '';
@@ -159,25 +161,15 @@ describe('State Interaction component', () => {
   it(
     'should keep non-empty content when setting an interaction ' +
       'and throw error if state is undefined',
-    fakeAsync(() => {
+    () => {
       spyOn(component, 'throwError').and.stub();
-      spyOn(
-        stateEditorService,
-        'updateStateInteractionEditorInitialised'
-      ).and.stub();
-
-      component.ngOnInit();
-      tick();
       stateEditorService.onStateEditorInitialized.emit(
         undefined as unknown as State
       );
-      tick();
 
+      expect(component.throwError).toHaveBeenCalledWith(undefined);
       expect(component.interactionIsDisabled).toBe(false);
-      expect(
-        stateEditorService.updateStateInteractionEditorInitialised
-      ).toHaveBeenCalled();
-    })
+    }
   );
 
   it(
@@ -206,7 +198,7 @@ describe('State Interaction component', () => {
         null
       );
 
-      component.ngOnInit();
+      component.hasLoaded = false;
       stateEditorService.onStateEditorInitialized.emit(state);
 
       expect(component.interactionIsDisabled).toBe(false);
@@ -248,6 +240,11 @@ describe('State Interaction component', () => {
 
   it('should delete interaction when user click on delete btn', fakeAsync(() => {
     mockNgbModal.modal = 'delete_interaction';
+    stateSolutionService.displayed = {
+      correctAnswer: 'answer',
+      explanation: SubtitledHtml.createDefault('explanation', 'id'),
+      answerIsExclusive: true,
+    } as Solution;
 
     spyOn(stateSolutionService, 'saveDisplayedValue').and.stub();
     spyOn(mockNgbModal, 'open').and.callFake((dlg: string, opt: string) => {
@@ -255,11 +252,13 @@ describe('State Interaction component', () => {
         result: Promise.resolve('success'),
       } as NgbModalRef;
     });
+    spyOn(component.onSaveSolution, 'emit').and.stub();
 
     component.deleteInteraction();
     tick();
 
     expect(stateSolutionService.saveDisplayedValue).toHaveBeenCalled();
+    expect(component.onSaveSolution.emit).not.toHaveBeenCalled();
   }));
 
   it('should not delete interaction when user click on cancel btn', fakeAsync(() => {
@@ -323,9 +322,7 @@ describe('State Interaction component', () => {
       document.createElement('button')
     );
     component.customizeInteractionButton = customizeInteractionButtonRef;
-    spyOn(component, 'getCurrentInteractionName').and.returnValue(
-      'Introduction'
-    );
+    stateInteractionIdService.savedMemento = 'TextInput';
     component.interactionEditorIsShown = true;
     spyOn(customizeInteractionButtonRef.nativeElement, 'focus');
 
@@ -334,6 +331,40 @@ describe('State Interaction component', () => {
     expect(
       customizeInteractionButtonRef.nativeElement.focus
     ).toHaveBeenCalled();
+  });
+
+  it('should not focus on customize interaction button when interaction is not made', () => {
+    const event = new KeyboardEvent('keydown', {key: 'Tab'});
+    const customizeInteractionButtonRef = new ElementRef(
+      document.createElement('button')
+    );
+    component.customizeInteractionButton = customizeInteractionButtonRef;
+    stateInteractionIdService.savedMemento = '' as InteractionSpecsKey;
+    component.interactionEditorIsShown = true;
+    spyOn(customizeInteractionButtonRef.nativeElement, 'focus');
+
+    component.focusOnCustomizeInteraction(event);
+
+    expect(
+      customizeInteractionButtonRef.nativeElement.focus
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should not focus on customize interaction button when editor is not shown', () => {
+    const event = new KeyboardEvent('keydown', {key: 'Tab'});
+    const customizeInteractionButtonRef = new ElementRef(
+      document.createElement('button')
+    );
+    component.customizeInteractionButton = customizeInteractionButtonRef;
+    stateInteractionIdService.savedMemento = 'TextInput';
+    component.interactionEditorIsShown = false;
+    spyOn(customizeInteractionButtonRef.nativeElement, 'focus');
+
+    component.focusOnCustomizeInteraction(event);
+
+    expect(
+      customizeInteractionButtonRef.nativeElement.focus
+    ).not.toHaveBeenCalled();
   });
 
   it(
@@ -369,6 +400,7 @@ describe('State Interaction component', () => {
   );
 
   it('should save interaction when user click save', fakeAsync(() => {
+    component.interactionId = 'EndExploration';
     stateInteractionIdService.displayed = 'EndExploration';
     stateInteractionIdService.savedMemento = 'InteractiveMap';
     component.DEFAULT_TERMINAL_STATE_CONTENT = 'HTML Content';
@@ -427,4 +459,52 @@ describe('State Interaction component', () => {
       component.throwError(undefined as unknown as State);
     }).toThrowError('Expected stateData to be defined but received undefined');
   });
+  it('should handle interaction without answer choices', fakeAsync(() => {
+    component.interactionId = 'EndExploration';
+    stateInteractionIdService.displayed = 'EndExploration';
+    stateInteractionIdService.savedMemento = 'TextInput';
+    stateCustomizationArgsService.displayed = {};
+    stateCustomizationArgsService.savedMemento = {};
+
+    mockNgbModal.modal = 'add_interaction';
+    spyOn(mockNgbModal, 'open').and.callFake((dlg: string, opt: string) => {
+      return {
+        componentInstance: {},
+        result: Promise.resolve('success'),
+      } as NgbModalRef;
+    });
+
+    spyOn(stateEditorService, 'getAnswerChoices').and.returnValue(null);
+    spyOn(stateEditorService.onHandleCustomArgsUpdate, 'emit').and.stub();
+    spyOn(editabilityService, 'isEditable').and.returnValue(true);
+
+    component.openInteractionCustomizerModal();
+    tick();
+
+    expect(
+      stateEditorService.onHandleCustomArgsUpdate.emit
+    ).toHaveBeenCalledWith(undefined);
+  }));
+  it('should handle update answer choices without choices', fakeAsync(() => {
+    const stateData = {
+      interaction: {
+        id: 'EndExploration',
+        answerGroups: [],
+        defaultOutcome: null,
+        confirmedUnclassifiedAnswers: [],
+        hints: [],
+        solution: null,
+      },
+    } as unknown as State;
+
+    spyOn(stateEditorService, 'getAnswerChoices').and.returnValue(null);
+    spyOn(stateEditorService.onUpdateAnswerChoices, 'emit').and.stub();
+
+    stateEditorService.onStateEditorInitialized.emit(stateData);
+    tick();
+
+    expect(stateEditorService.onUpdateAnswerChoices.emit).toHaveBeenCalledWith(
+      undefined
+    );
+  }));
 });

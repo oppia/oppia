@@ -80,10 +80,10 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
   @Output() recomputeGraph = new EventEmitter<void>();
 
   @ViewChild('customizeInteractionButton')
-  customizeInteractionButton!: ElementRef;
+  customizeInteractionButton!: ElementRef<HTMLButtonElement>;
 
   @ViewChild('collapseAnswersAndResponsesButton')
-  collapseAnswersAndResponsesButton!: ElementRef;
+  collapseAnswersAndResponsesButton!: ElementRef<HTMLButtonElement>;
 
   customizationModalReopened!: boolean;
   DEFAULT_TERMINAL_STATE_CONTENT!: string;
@@ -216,7 +216,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
     };
     this.onSaveInteractionData.emit(interactionData);
 
-    this.onSaveNextContentIdIndex.emit();
+    this.onSaveNextContentIdIndex.emit(undefined as unknown as number);
     this.interactionDetailsCacheService.set(
       this.stateInteractionIdService.savedMemento,
       this.stateCustomizationArgsService.savedMemento
@@ -291,9 +291,6 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
           this.onSaveInteractionData.emit(interactionData);
 
           this.stateSolutionService.saveDisplayedValue();
-          if (this.stateSolutionService.displayed) {
-            this.onSaveSolution.emit(this.stateSolutionService.displayed);
-          }
 
           this.stateInteractionIdService.onInteractionIdChanged.emit(
             this.stateInteractionIdService.savedMemento
