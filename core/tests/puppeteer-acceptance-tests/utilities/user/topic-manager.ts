@@ -781,11 +781,6 @@ export class TopicManager extends BaseUser {
         topicEditorUrlFragmentField,
         urlFragment
       );
-
-      // TODO(#23302): Currently, changing the URL fragment throws some
-      // unexpected warnings. Once fixed, remove the three lines below.
-      await this.page.keyboard.press('Tab');
-      await this.clickOnElementWithSelector(closeToastMessageButtonSelector);
     }
     await this.clearAllTextFrom(updateTopicWebFragmentField);
     await this.typeInInputField(updateTopicWebFragmentField, titleFragments);
@@ -5560,6 +5555,7 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(mobilePublishStoryButton);
       await this.clickOnElementWithSelector(mobilePublishStoryButton);
     } else {
+      await this.waitForElementToBeClickable(publishChapterButton);
       await this.clickOnElementWithSelector(publishChapterButton);
     }
   }

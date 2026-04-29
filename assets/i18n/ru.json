@@ -68,7 +68,6 @@
   "I18N_BLOG_HOME_PAGE_TITLE": "Блог Oppia | Oppia",
   "I18N_BLOG_HOME_PAGE_WELCOME_HEADING": "Добро пожаловать в блог Oppia!",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_HEADING": "Результаты поиска",
-  "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY": "Показаны результаты поиска с <[startingNumber]> по <[endingNumber]>",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY": "Показаны записи с <[startingNumber]> по <[endingNumber]> из <[totalNumber]>.",
   "I18N_BLOG_POST_EDITOR_CANCEL_BUTTON_TEXT": "Отмена",
   "I18N_BLOG_POST_EDITOR_DELETE_BUTTON": "Удалить",

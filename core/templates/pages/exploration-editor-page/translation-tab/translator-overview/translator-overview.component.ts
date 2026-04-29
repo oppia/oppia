@@ -21,6 +21,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {ExplorationLanguageCodeService} from 'pages/exploration-editor-page/services/exploration-language-code.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -97,7 +98,8 @@ export class TranslatorOverviewComponent implements OnInit {
     private localStorageService: LocalStorageService,
     private windowRef: WindowRef,
     private voiceoverLanguageManagementService: VoiceoverLanguageManagementService,
-    private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService
+    private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   canShowTabModeSwitcher(): boolean {
@@ -380,5 +382,9 @@ export class TranslatorOverviewComponent implements OnInit {
         ?.automatedVoiceoversAudioOffsetsMsecs || {}
     );
     this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
+  }
+
+  isTranslationLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isLanguageRTL(this.languageCode);
   }
 }

@@ -141,6 +141,18 @@ describe('Topic Manager', function () {
     await topicManager.addChapter('Solving problems', explorationId);
     await topicManager.saveStoryDraft();
 
+    // Create and publish a new explorations.
+    const simpleExplorationId =
+      await topicManager.createAndPublishAMinimalExplorationWithTitle(
+        'Simple Exploration',
+        'Algebra'
+      );
+
+    await topicManager.navigateToCreatorDashboardPage();
+    await topicManager.navigateToExplorationEditorFromCreatorDashboard();
+    const unsupportedExplorationId =
+      await topicManager.createSimpleUnsupportedExploration();
+
     // Add simple chapter.
     await topicManager.openStoryEditor(
       'The Broken Calculator',
@@ -159,8 +171,8 @@ describe('Topic Manager', function () {
       'Arithmetic Operations'
     );
     await topicManager.addChapterWithoutSaving(
-      'Programming Exploration',
-      programmingExplorationId,
+      'Math Exploration',
+      unsupportedExplorationId,
       'The Broken Calculator',
       'Arithmetic Operations'
     );

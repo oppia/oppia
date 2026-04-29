@@ -62,7 +62,6 @@
   "I18N_BLOG_HOME_PAGE_TITLE": "オピアブログ | オピア",
   "I18N_BLOG_HOME_PAGE_WELCOME_HEADING": "オピアブログへようこそ！",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_HEADING": "検索結果の表示",
-  "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY": "<[startingNumber]>件目から<[endingNumber]>件目までの検索結果を表示しています。",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY": "<[totalNumber]>件中<[startingNumber]>件目から<[endingNumber]>件目までの投稿を表示しています。",
   "I18N_BLOG_POST_EDITOR_BODY_HEADING": "本文",
   "I18N_BLOG_POST_EDITOR_CANCEL_BUTTON_TEXT": "キャンセル",

@@ -162,6 +162,29 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(json_response['can_create_skill'], False)
         self.logout()
 
+    def test_get_with_topic_rights_set_to_none(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        def mock_get_all_topic_rights() -> Dict[str, None]:
+            return {self.topic_id: None}
+
+        with self.swap(
+            topic_fetchers,
+            'get_all_topic_rights',
+            mock_get_all_topic_rights,
+        ):
+            json_response = self.get_json(
+                feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL
+            )
+
+        self.assertNotIn(
+            'is_published', json_response['topic_summary_dicts'][0]
+        )
+        self.assertNotIn(
+            'can_edit_topic', json_response['topic_summary_dicts'][0]
+        )
+        self.logout()
+
 
 class CategorizedAndUntriagedSkillsDataHandlerTests(
     BaseTopicsAndSkillsDashboardTests

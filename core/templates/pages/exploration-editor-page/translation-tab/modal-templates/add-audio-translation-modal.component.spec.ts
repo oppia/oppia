@@ -150,4 +150,56 @@ describe('Add Audio Translation Modal component', () => {
     component.clearUploadedFile();
     expect(component.errorMessage).toBeNull();
   }));
+
+  it('should strip technical prefixes from backend error messages', fakeAsync(() => {
+    let file = {
+      size: 1000,
+    };
+    component.updateUploadedFile(file as Blob);
+
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(assetsBackendApiService, 'saveAudio').and.returnValue(
+      Promise.reject({
+        error:
+          "At 'http://localhost/createhandler/audioupload/0' " +
+          'these errors are happening:\n' +
+          "Schema validation for 'raw_audio_file' failed: " +
+          'Audio not recognized as a mp3 file',
+      })
+    );
+
+    component.confirm();
+    tick();
+
+    expect(component.errorMessage).toBe('Audio not recognized as a mp3 file');
+    expect(component.saveButtonText).toBe('Save');
+    expect(component.saveInProgress).toBe(false);
+  }));
+
+  it('should strip technical prefixes from audio duration error', fakeAsync(() => {
+    let file = {
+      size: 1000,
+    };
+    component.updateUploadedFile(file as Blob);
+
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(assetsBackendApiService, 'saveAudio').and.returnValue(
+      Promise.reject({
+        error:
+          "At 'http://localhost/createhandler/audioupload/0' " +
+          'these errors are happening:\n' +
+          "Schema validation for 'raw_audio_file' failed: " +
+          'Audio files must be under 300 seconds in length. ' +
+          'The uploaded file is 330.03 seconds long.',
+      })
+    );
+
+    component.confirm();
+    tick();
+
+    expect(component.errorMessage).toBe(
+      'Audio files must be under 300 seconds in length. ' +
+        'The uploaded file is 330.03 seconds long.'
+    );
+  }));
 });

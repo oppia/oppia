@@ -25,8 +25,20 @@ concurrency:
          || github.ref || github.run_id }}
   cancel-in-progress: true
 jobs:
+  setup_merge_sha:
+    name: Capture develop SHA
+    runs-on: ubuntu-22.04
+    outputs:
+      develop_sha: ${{ steps.get_sha.outputs.sha }}
+    steps:
+      - name: Get latest develop SHA
+        id: get_sha
+        run: |
+          SHA=$(git ls-remote https://github.com/oppia/oppia.git refs/heads/develop | awk '{print $1}')
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
   e2e_and_acceptance_coverage:
     name: Verify all e2e/acceptance tests are included
+    needs: setup_merge_sha
     runs-on: ubuntu-22.04
     # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
     if: ${{ ! (
@@ -38,7 +50,10 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+        with:
+          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
       - name: Check that all e2e and acceptance test files are captured in wdio.conf.js and core/tests/ci-test-suite-configs
+
         run: python -m scripts.check_tests_are_captured_in_ci
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
@@ -48,6 +63,7 @@ jobs:
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   check_test_suites_to_run:
     name: Compute which tests to run
+    needs: setup_merge_sha
     runs-on: ubuntu-22.04
     # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
     if: ${{ ! (
@@ -65,13 +81,15 @@ jobs:
           fetch-depth: 0
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+        with:
+          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
       - id: compute_test_suites
         name: Check test suites to run
         env:
           SHOULD_OUTPUT_ALL_TESTS: ${{ github.event_name != 'pull_request' || vars.RUN_SUITES_ON_CHANGED_FILES == 'false' }}
         # Note that the script also writes the output to $GITHUB_OUTPUT.
         run: |
-          TEST_SUITES_TO_RUN=$(python -m scripts.check_ci_test_suites_to_run --github_head_ref="HEAD" --github_base_ref="origin/${{ github.event.pull_request.base.ref }}" ${{ env.SHOULD_OUTPUT_ALL_TESTS == 'true' && '--output_all_test_suites' || '' }})
+          TEST_SUITES_TO_RUN=$(python -m scripts.check_ci_test_suites_to_run --github_head_ref="HEAD" --github_base_ref="${{ needs.setup_merge_sha.outputs.develop_sha }}" ${{ env.SHOULD_OUTPUT_ALL_TESTS == 'true' && '--output_all_test_suites' || '' }})
       - name: Upload root files mapping as a GitHub artifact
         uses: actions/upload-artifact@v4
         with:
@@ -79,7 +97,7 @@ jobs:
           path: root-files-mapping.json
   build:
     name: Build the app, and store build files as an artifact
-    needs: [check_test_suites_to_run]
+    needs: [check_test_suites_to_run, setup_merge_sha]
     runs-on: ubuntu-22.04
     if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.count > 0 ||
             fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.count > 0 ||
@@ -89,10 +107,12 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+        with:
+          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
   e2e_test:
-    needs: [check_test_suites_to_run, build]
+    needs: [check_test_suites_to_run, build, setup_merge_sha]
     runs-on: ubuntu-22.04
     if: ${{ 
         fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.count > 0 
@@ -120,6 +140,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+        with:
+          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
       - name: Install Chrome
@@ -190,7 +212,7 @@ jobs:
           message: "An E2E test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   acceptance_test:
-    needs: [check_test_suites_to_run, build]
+    needs: [check_test_suites_to_run, build, setup_merge_sha]
     runs-on: ubuntu-22.04
     if: ${{
         fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.count > 0
@@ -221,6 +243,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+        with:
+          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
 
@@ -333,6 +357,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+        with:
+          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
       - name: Install Chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         uses: ./.github/actions/install-chrome
@@ -349,7 +375,7 @@ jobs:
           message: "A Lighthouse test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   lighthouse_performance_test:
-    needs: [check_test_suites_to_run, build]
+    needs: [check_test_suites_to_run, build, setup_merge_sha]
     runs-on: ubuntu-22.04
     if: ${{
         fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.count > 0
@@ -365,6 +391,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+        with:
+          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
       - name: Install Chrome
@@ -403,6 +431,7 @@ jobs:
       - acceptance_test
       - lighthouse_accessibility_test
       - lighthouse_performance_test
+      - setup_merge_sha
     if: always()
     runs-on: ubuntu-22.04
     steps:
@@ -412,6 +441,8 @@ jobs:
       - name: Merge develop and set up dependencies
         if: github.event_name != 'merge_group'
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+        with:
+          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
       - name: Check workflow status
         if: github.event_name != 'merge_group'
         uses: ./.github/actions/check-workflow-status

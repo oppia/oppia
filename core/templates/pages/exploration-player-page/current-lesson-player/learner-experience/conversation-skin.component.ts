@@ -193,6 +193,8 @@ export class ConversationSkinComponent {
           this.playerTranscriptService.resetNumberOfIncorrectSubmissions();
           this.conversationFlowService.setNextCardIfStuck(null);
           this.continueToReviseStateButtonIsVisible = false;
+          // Reset showInteraction when a new card opens after stuck state redirect.
+          this.showInteraction = true;
           this.conversationFlowService.triggerIfLearnerStuckAction(true, () => {
             this.continueToReviseStateButtonIsVisible = true;
           });
@@ -468,6 +470,12 @@ export class ConversationSkinComponent {
   }
 
   triggerRedirectionToStuckState(): void {
+    // Save the current state name before redirecting so that after
+    // completing the revision, the learner can navigate back to it.
+    const currentStateName = this.conversationFlowService
+      .getDisplayedCard()
+      .getStateName();
+    this.conversationFlowService.setOriginalStuckStateName(currentStateName);
     // Redirect the learner.
     this.conversationFlowService.setNextStateCard(
       this.conversationFlowService.getNextCardIfStuck()

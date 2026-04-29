@@ -37,7 +37,7 @@ LANGUAGE_CODE_TO_VOICEOVER_FILENAMES: Dict[str, str] = {
 
 
 def regenerate_speech_from_text(
-    _: str, language_accent_code: str
+    _: str, language_accent_code: str, _oppia_project_id: Optional[str] = None
 ) -> Tuple[bytes, List[Dict[str, Union[str, float]]], Optional[str]]:
     """The method provides mock data to simulate the Azure text-to-speech
     synthesis service in the development environment.
@@ -46,6 +46,9 @@ def regenerate_speech_from_text(
         _: str. The plaintext that needs to be synthesized into speech.
         language_accent_code: str. The language accent code in which the speech
             is to be synthesized.
+        _oppia_project_id: Optional[str]. The Google Cloud Project ID.
+            Explicitly required when running on Beam Dataflow, as workers
+            cannot retrieve the ID from environment variables.
 
     Returns:
         tuple. A tuple containing three elements:
