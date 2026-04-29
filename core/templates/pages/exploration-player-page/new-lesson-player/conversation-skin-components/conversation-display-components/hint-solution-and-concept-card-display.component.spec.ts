@@ -197,7 +197,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
 
     component.ngOnInit();
 
-    expect(component['_editorPreviewMode']).toBeFalsy();
+    expect(pageContextService.isInExplorationEditorPage).toHaveBeenCalled();
     expect(component.iframed).toBe(false);
     expect(component.hintIndexes).toEqual([0, 1]);
   });
@@ -211,7 +211,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
 
     component.ngOnInit();
 
-    expect(component['_editorPreviewMode']).toBeTruthy();
+    expect(pageContextService.isInExplorationEditorPage).toHaveBeenCalled();
     expect(component.iframed).toBe(true);
   });
 
@@ -568,7 +568,15 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
   );
 
   it('should not record solution hit in editor preview mode', fakeAsync(() => {
-    component['_editorPreviewMode'] = true;
+    pageContextService.isInExplorationEditorPage = jasmine
+      .createSpy()
+      .and.returnValue(true);
+
+    component.ngOnInit();
+
+    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
+      'state1'
+    );
     spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
       true
     );
@@ -588,7 +596,11 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
   }));
 
   it('should not record solution hit in question mode', fakeAsync(() => {
-    component['_editorPreviewMode'] = false;
+    pageContextService.isInExplorationEditorPage = jasmine
+      .createSpy()
+      .and.returnValue(false);
+
+    component.ngOnInit();
     spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
       true
     );
