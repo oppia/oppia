@@ -48,23 +48,27 @@ describe('Lesson Creator', function () {
     );
 
     // Enable the Improvements Tab feature flag.
-    await releaseCoordinator.navigateToReleaseCoordinatorPage();
+    await releaseCoordinator.navigateToReleaseCoordinatorPageInReleaseCoordinator();
     await releaseCoordinator.navigateToFeaturesTab();
     await releaseCoordinator.enableFeatureFlag(IMPROVEMENTS_TAB_FEATURE_FLAG);
 
     // Create exploration "Test Exploration" and save as draft per CUJ.
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent('Test Exploration Content');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Test Exploration Content'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
+    );
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should not see improvements tab in draft exploration',
     async function () {
-      await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
       await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
 
       // Improvements Tab should NOT be visible in a draft exploration.

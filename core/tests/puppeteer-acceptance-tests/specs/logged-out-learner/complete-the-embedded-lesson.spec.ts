@@ -41,13 +41,15 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToCreatorDashboardPageInExplorationEditor();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.dismissWelcomeModalInExplorationEditor();
 
     // Create the first card with a NumberInput interaction.
-    await explorationEditor.updateCardContent('Exploración de pruebas');
-    await explorationEditor.addInteraction(
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'Exploración de pruebas'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
       INTERACTION_TYPES.NUMBER_INPUT,
       false
     );
@@ -64,23 +66,28 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Please try again!'
     );
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     await explorationEditor.navigateToCard('END');
-    await explorationEditor.updateCardContent('You have completed!');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.updateCardContentInExplorationEditor(
+      'You have completed!'
+    );
+    await explorationEditor.addInteractionInExplorationEditor(
+      INTERACTION_TYPES.END_EXPLORATION
+    );
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
     // Set exploration language to Spanish to verify localization behaviour.
-    await explorationEditor.navigateToSettingsTab();
+    await explorationEditor.navigateToSettingsTabInExplorationEditor();
     await explorationEditor.selectLanguage('español (Spanish)');
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraftInExplorationEditor();
 
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
-      'Exploración de pruebas',
-      'Learn basic counting',
-      'Algebra'
-    );
+    explorationId =
+      await explorationEditor.publishExplorationWithMetadataInExplorationEditor(
+        'Exploración de pruebas',
+        'Learn basic counting',
+        'Algebra'
+      );
 
     // Create a logged-out user to simulate anonymous learner behavior.
     loggedOutUser = await UserFactory.createLoggedOutUser();
