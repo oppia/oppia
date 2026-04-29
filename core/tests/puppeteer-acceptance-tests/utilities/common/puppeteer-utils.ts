@@ -50,6 +50,8 @@ const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
+const LOADING_DIMMER_CLASS = 'ng-star-inserted';
+const LOADING_OVERLAY_SELECTOR = '.oppia-loading-full-page';
 /** We accept the empty message because this is what is sent on
  * 'beforeunload' due to an issue with Chromium (see
  * https://github.com/puppeteer/puppeteer/issues/3725). */
@@ -616,9 +618,9 @@ export class BaseUser {
         // wait for it to disappear before re-throwing.
         if (
           clickabilityDiagnostics.isCoveredByOtherElement &&
-          clickabilityDiagnostics.blockingElement.includes('ng-star-inserted')
+          clickabilityDiagnostics.blockingElement.includes(LOADING_DIMMER_CLASS)
         ) {
-          await this.page.waitForSelector('.oppia-loading-full-page', {
+          await this.page.waitForSelector(LOADING_OVERLAY_SELECTOR, {
             hidden: true,
           });
         }

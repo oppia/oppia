@@ -515,6 +515,7 @@ const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-unpublished_exploration-v';
 const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-Publishwithaninteraction-v';
+const LOADING_OVERLAY_SELECTOR = '.oppia-loading-full-page';
 export class ExplorationEditor extends BaseUser {
   /**
    * Checks if the interaction name is as expected.
@@ -2945,7 +2946,7 @@ export class ExplorationEditor extends BaseUser {
     });
 
     // Wait for any loading overlays to detach before clicking.
-    await this.page.waitForSelector('.oppia-loading-full-page', {
+    await this.page.waitForSelector(LOADING_OVERLAY_SELECTOR, {
       hidden: true,
     });
     await this.clickOnElementWithSelector(addInteractionButton);
