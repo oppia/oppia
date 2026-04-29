@@ -27,6 +27,7 @@ import {AdminTaskManagerService} from 'pages/admin-page/services/admin-task-mana
 import {Schema} from 'services/schema-default-value.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {RoleToActionsBackendResponse} from 'domain/admin/admin-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
 
 interface UpdateRoleAction {
   // 'newRole' is 'null' when the form is refreshed.
@@ -61,9 +62,9 @@ export class BlogAdminPageComponent implements OnInit {
   roleToActions!: RoleToActionsBackendResponse;
   formData!: FormData;
   UPDATABLE_ROLES = {};
-  statusMessage: string = '';
   platformParameters: PlatformParameterBackendResponse = {};
   constructor(
+    private alertsService: AlertsService,
     private backendApiService: BlogAdminBackendApiService,
     private blogAdminDataService: BlogAdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
@@ -109,7 +110,7 @@ export class BlogAdminPageComponent implements OnInit {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
-    this.statusMessage = 'Updating User Role';
+    this.alertsService.addInfoMessage('Updating User Role');
     this.adminTaskManagerService.startTask();
     this.backendApiService
       .updateUserRoleAsync(
@@ -121,15 +122,17 @@ export class BlogAdminPageComponent implements OnInit {
       )
       .then(
         () => {
-          this.statusMessage =
+          this.alertsService.addSuccessMessage(
             'Role of ' +
-            formResponse.username +
-            ' successfully updated to ' +
-            formResponse.newRole;
+              formResponse.username +
+              ' successfully updated to ' +
+              formResponse.newRole,
+            10000
+          );
           this.refreshFormData();
         },
         errorResponse => {
-          this.statusMessage = errorResponse;
+          this.alertsService.addWarning(errorResponse);
         }
       );
     this.adminTaskManagerService.finishTask();
@@ -139,15 +142,15 @@ export class BlogAdminPageComponent implements OnInit {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
-    this.statusMessage = 'Processing query...';
+    this.alertsService.addInfoMessage('Processing query...');
     this.adminTaskManagerService.startTask();
     this.backendApiService.removeBlogEditorAsync(formResponse.username).then(
       () => {
-        this.statusMessage = 'Success.';
+        this.alertsService.addSuccessMessage('Success.', 10000);
         this.refreshFormData();
       },
       error => {
-        this.statusMessage = 'Server error: ' + error.error.error;
+        this.alertsService.addWarning('Server error: ' + error.error.error);
       }
     );
     this.adminTaskManagerService.finishTask();
@@ -177,7 +180,7 @@ export class BlogAdminPageComponent implements OnInit {
       return;
     }
 
-    this.statusMessage = 'Saving...';
+    this.alertsService.addInfoMessage('Saving...');
 
     this.adminTaskManagerService.startTask();
     let newPlatformParameterValues = {} as PlatformParameterValuesRecord;
@@ -192,11 +195,14 @@ export class BlogAdminPageComponent implements OnInit {
       )
       .then(
         () => {
-          this.statusMessage = 'Data saved successfully.';
+          this.alertsService.addSuccessMessage(
+            'Data saved successfully.',
+            10000
+          );
           this.adminTaskManagerService.finishTask();
         },
         errorResponse => {
-          this.statusMessage = 'Server error: ' + errorResponse;
+          this.alertsService.addWarning('Server error: ' + errorResponse);
           this.adminTaskManagerService.finishTask();
         }
       );
