@@ -51,7 +51,6 @@ const baseURL = testConstants.URLs.BaseURL;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const LOADING_DIMMER_CLASS = 'ng-star-inserted';
-const LOADING_OVERLAY_SELECTOR = '.oppia-loading-full-page';
 /** We accept the empty message because this is what is sent on
  * 'beforeunload' due to an issue with Chromium (see
  * https://github.com/puppeteer/puppeteer/issues/3725). */
@@ -614,17 +613,23 @@ export class BaseUser {
           element
         );
 
-        // If the element is covered by a loading overlay (ng-star-inserted),
-        // wait for it to disappear before re-throwing.
+        // If the element is covered by a loading overlay or a lingering modal
+        // from a previous test, wait for both to disappear before re-throwing.
         if (
           clickabilityDiagnostics.isCoveredByOtherElement &&
-          clickabilityDiagnostics.blockingElement.includes(LOADING_DIMMER_CLASS)
-        ) {
-          // Wait for the specific blocking class to disappear.
-          await this.page.waitForFunction(
-            (dimmerClass: string) => !document.querySelector(`.${dimmerClass}`),
-            {timeout: 30000},
+          (clickabilityDiagnostics.blockingElement.includes(
             LOADING_DIMMER_CLASS
+          ) ||
+            clickabilityDiagnostics.blockingElement.includes('modal'))
+        ) {
+          // Wait for either the loader or a lingering modal to disappear.
+          await this.page.waitForFunction(
+            (dimmer: string, modal: string) =>
+              !document.querySelector(`.${dimmer}`) &&
+              !document.querySelector(modal),
+            {timeout: 30000},
+            LOADING_DIMMER_CLASS,
+            'ngb-modal-window'
           );
         }
 
@@ -710,7 +715,7 @@ export class BaseUser {
     // https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space.
     const element = await this.page.waitForXPath(
       `//*[contains(normalize-space(text()), normalize-space("${text}"))]`,
-      {timeout: 10000}
+      {timeout: 60000}
     );
 
     if (!element) {

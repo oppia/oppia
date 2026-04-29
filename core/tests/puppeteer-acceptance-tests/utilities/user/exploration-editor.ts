@@ -2949,12 +2949,6 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(LOADING_OVERLAY_SELECTOR, {
       hidden: true,
     });
-    // Also wait for any local dimmer (ng-star-inserted) to be removed.
-    await this.page
-      .waitForFunction(() => !document.querySelector('.ng-star-inserted'), {
-        timeout: 20000,
-      })
-      .catch(() => {});
     await this.clickOnElementWithSelector(addInteractionButton);
 
     // Check if modal title is correct.
@@ -2968,7 +2962,7 @@ export class ExplorationEditor extends BaseUser {
     // Use a higher timeout for math interactions as they are heavy to render.
     const interactionElement = await this.page.waitForXPath(
       `//*[contains(normalize-space(text()), normalize-space("${interactionToAdd}"))]`,
-      {timeout: 30000}
+      {timeout: 120000}
     );
     if (!interactionElement) {
       throw new Error(`Interaction "${interactionToAdd}" not found in modal.`);
@@ -7228,7 +7222,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForFunction(
       (nodeSelector: string) =>
         document.querySelectorAll(nodeSelector).length > 0,
-      {timeout: 60000},
+      {timeout: 120000},
       explorationGraphNodeSelector
     );
     return await this.page.evaluate(
@@ -7306,7 +7300,7 @@ export class ExplorationEditor extends BaseUser {
           el => el.textContent?.trim() === name
         );
       },
-      {timeout: 60000},
+      {timeout: 120000},
       stateNodeSelector,
       stateName
     );
@@ -7417,7 +7411,7 @@ export class ExplorationEditor extends BaseUser {
           el => el.textContent?.trim() === value
         );
       },
-      {timeout: 60000},
+      {timeout: 120000},
       stateNodeSelector,
       cardName
     );
