@@ -2417,6 +2417,7 @@ class FrontendTopicSummaryDict(TopicSummaryDict):
 
     is_published: bool
     can_edit_topic: bool
+    can_edit_question: bool
     classroom: Optional[str]
     total_upcoming_chapters_count: int
     total_overdue_chapters_count: int
