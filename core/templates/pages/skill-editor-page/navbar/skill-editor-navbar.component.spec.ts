@@ -423,13 +423,11 @@ describe('Skill Editor Navbar Component', () => {
     'should save changes if save changes modal is opened and confirm ' +
       'button is clicked',
     fakeAsync(() => {
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-        (dlg: unknown, opt: unknown) => {
-          return {
-            result: Promise.resolve('success'),
-          } as NgbModalRef;
-        }
-      );
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+        return {
+          result: Promise.resolve('success'),
+        } as NgbModalRef;
+      });
 
       let saveSkillSpy = spyOn(
         skillEditorStateService,
