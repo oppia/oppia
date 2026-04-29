@@ -389,7 +389,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             )
 
     def test_get_subtopic_returns_correct_json(self) -> None:
-        subtopic = self.save_new_subtopic(1, 'user_id', 'topic_id')
+        study_guide = self.save_new_study_guide(1, 'user_id', 'topic_id')
         with self.secrets_swap:
             self.assertEqual(
                 self.get_json(
@@ -402,7 +402,9 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     {
                         'id': 'topic_id-1',
                         'version': 1,
-                        'payload': subtopic.to_dict(),
+                        'payload': (
+                            study_guide.to_subtopic_page_dict_for_android()
+                        ),
                     }
                 ],
             )
@@ -981,8 +983,8 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_multiple_subtopics_at_once(self) -> None:
         """Test multiple subtopics can be requested at once."""
-        subtopic1 = self.save_new_subtopic(1, 'user_id', 'topic_id')
-        subtopic2 = self.save_new_subtopic(2, 'user_id', 'topic_id')
+        study_guide1 = self.save_new_study_guide(1, 'user_id', 'topic_id')
+        study_guide2 = self.save_new_study_guide(2, 'user_id', 'topic_id')
 
         with self.secrets_swap:
             self.assertEqual(
@@ -998,12 +1000,16 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     {
                         'id': 'topic_id-1',
                         'version': 1,
-                        'payload': subtopic1.to_dict(),
+                        'payload': (
+                            study_guide1.to_subtopic_page_dict_for_android()
+                        ),
                     },
                     {
                         'id': 'topic_id-2',
                         'version': 1,
-                        'payload': subtopic2.to_dict(),
+                        'payload': (
+                            study_guide2.to_subtopic_page_dict_for_android()
+                        ),
                     },
                 ],
             )
