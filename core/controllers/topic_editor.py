@@ -814,8 +814,13 @@ class TopicRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             in user_actions_info.actions
         )
 
+        can_edit_question = topic_services.check_can_edit_question(
+            user_actions_info, topic_rights
+        )
+
         self.values.update(
             {
+                'can_edit_question': can_edit_question,
                 'can_edit_topic': can_edit_topic,
                 'published': topic_rights.topic_is_published,
                 'can_publish_topic': can_publish_topic,
