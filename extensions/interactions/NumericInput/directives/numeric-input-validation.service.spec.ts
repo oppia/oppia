@@ -178,7 +178,7 @@ describe('NumericInputValidationService', () => {
         rule_type: 'IsWithinTolerance',
         inputs: {
           x: 2,
-          tol: -1,
+          tol: 0,
         },
       },
       'NumericInput'
@@ -253,6 +253,64 @@ describe('NumericInputValidationService', () => {
         message: 'Learner answer 1 tolerance must be a positive value',
       },
     ]);
+  });
+
+  it('should show CRITICAL warning if tolerance is negative for IsWithinTolerance', () => {
+    answerGroups[0].rules = [
+      Rule.createFromBackendDict(
+        {
+          rule_type: 'IsWithinTolerance',
+          inputs: {
+            x: 2,
+            tol: -1,
+          },
+        },
+        'NumericInput'
+      ),
+    ];
+
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+
+    expect(warnings).toContain(
+      jasmine.objectContaining({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'The value of tolerance cannot be negative.',
+      })
+    );
+  });
+
+  it('should not show CRITICAL warning if tolerance is positive for IsWithinTolerance', () => {
+    answerGroups[0].rules = [
+      Rule.createFromBackendDict(
+        {
+          rule_type: 'IsWithinTolerance',
+          inputs: {
+            x: 2,
+            tol: 0.5,
+          },
+        },
+        'NumericInput'
+      ),
+    ];
+
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+
+    expect(warnings).not.toContain(
+      jasmine.objectContaining({
+        type: WARNING_TYPES.CRITICAL,
+        message: 'The value of tolerance cannot be negative.',
+      })
+    );
   });
 
   it('should show warning if input less than zero for IsWithinTolerance', () => {
