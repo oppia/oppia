@@ -245,9 +245,10 @@ describe('Exploration Recommendations Service', () => {
     });
 
     it('should return "#" if recommendation has no ID', () => {
-      const result = expRecsService.getExplorationLink([
-        {id: null} as unknown as LearnerExplorationSummary,
-      ]);
+      const summaryWithoutId = createSummary('');
+      summaryWithoutId.id = '';
+
+      const result = expRecsService.getExplorationLink([summaryWithoutId]);
       expect(result).toBe('#');
     });
 
