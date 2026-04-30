@@ -415,8 +415,9 @@ def _collect_study_guide_changes(
         study_guide_domain.UpdateStudyGuidePropertyCmd,
         study_guide_domain.StudyGuideChange,
     ]
-    # Here we use cast because we are narrowing down the type from
-    # TopicChange to a specific change command.
+    # Here use cast because we are narrowing down the type from BaseChange
+    # to UpdateStudyGuidePropertyCmd after confirming the command type through
+    # the CMD_UPDATE_STUDY_GUIDE_PROPERTY check in the caller function.
     update_study_guide_property_cmd = cast(
         study_guide_domain.UpdateStudyGuidePropertyCmd, change
     )
@@ -440,6 +441,18 @@ def _apply_subtopic_page_change(
     modified_subtopic_pages: Dict[str, subtopic_page_domain.SubtopicPage],
     modified_study_guides: Dict[str, study_guide_domain.StudyGuide],
 ) -> None:
+    """Applies a subtopic page property update.
+
+    Args:
+        change: BaseChange. Incoming subtopic page update command.
+        topic_id: str. ID of the topic.
+        deleted_subtopic_ids: list(int). IDs of deleted subtopics.
+        modified_subtopic_pages: dict(str, SubtopicPage). Modified pages map.
+        modified_study_guides: dict(str, StudyGuide). Modified guides map.
+
+    Raises:
+        Exception. The subtopic doesn't exist.
+    """
     assert isinstance(change.subtopic_id, int)
 
     subtopic_page_id = subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
@@ -462,6 +475,9 @@ def _apply_subtopic_page_change(
         change.property_name
         == subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
     ):
+        # Here use cast because this 'if' condition forces change to have type
+        # UpdateSubtopicPagePropertyPageContentsHtmlCmd, which is a specific
+        # subtype of BaseChange with the required property_name and new_value.
         update_cmd = cast(
             subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsHtmlCmd,
             change,
@@ -487,6 +503,9 @@ def _apply_subtopic_page_change(
         change.property_name
         == subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO
     ):
+        # Here use cast because this 'elif' condition forces change to have type
+        # UpdateSubtopicPagePropertyPageContentsAudioCmd, which is a specific
+        # subtype of BaseChange with the required property_name and new_value.
         update_cmd = cast(
             subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsAudioCmd,
             change,
