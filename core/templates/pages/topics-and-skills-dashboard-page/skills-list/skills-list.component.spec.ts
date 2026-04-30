@@ -453,6 +453,7 @@ describe('Skills List Component', () => {
         123,
         23,
         true,
+        true,
         false,
         'sad',
         'asdf',

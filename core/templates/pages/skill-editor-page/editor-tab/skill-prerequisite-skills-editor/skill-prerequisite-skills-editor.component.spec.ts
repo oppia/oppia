@@ -178,6 +178,7 @@ describe('Skill editor main tab Component', () => {
           uncategorizedSkillCount: 0,
           totalPublishedNodeCount: 0,
           canEditTopic: true,
+          canEditQuestion: true,
           isPublished: false,
           id: 'HLEn0XQiV9XE',
           topicModelCreatedOn: 1623851496406.576,
