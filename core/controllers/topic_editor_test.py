@@ -46,17 +46,24 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.QUESTION_ADMIN_EMAIL, self.QUESTION_ADMIN_USERNAME)
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.topic_manager_id = self.get_user_id_from_email(
             self.TOPIC_MANAGER_EMAIL
         )
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.question_admin_id = self.get_user_id_from_email(
+            self.QUESTION_ADMIN_EMAIL
+        )
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.topic_manager = user_services.get_user_actions_info(
             self.topic_manager_id
+        )
+        self.question_admin = user_services.get_user_actions_info(
+            self.question_admin_id
         )
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.new_user = user_services.get_user_actions_info(self.new_user_id)
@@ -136,6 +143,7 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         )
 
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
+        self.set_question_admins([self.QUESTION_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.save_new_valid_classroom(
             topic_id_to_prerequisite_topic_ids={self.topic_id: []}
@@ -1436,6 +1444,19 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
         )
         self.assertEqual(json_response['published'], False)
         self.assertEqual(json_response['can_publish_topic'], True)
+        self.assertEqual(json_response['can_edit_question'], True)
+        self.assertEqual(json_response['can_edit_topic'], True)
+        self.logout()
+
+        self.login(self.QUESTION_ADMIN_EMAIL)
+        # Test whether question admins can access topic rights.
+        json_response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_RIGHTS_URL_PREFIX, self.topic_id)
+        )
+        self.assertEqual(json_response['published'], False)
+        self.assertEqual(json_response['can_edit_topic'], False)
+        self.assertEqual(json_response['can_edit_question'], True)
+        self.assertEqual(json_response['can_publish_topic'], False)
         self.logout()
 
         self.login(self.NEW_USER_EMAIL)
@@ -1612,6 +1633,27 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
 
 class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
     """Tests for TopicUrlFragmentHandler."""
+
+    def test_normal_user_cannot_access_topic_url_fragment_handler(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+
+        self.get_json(
+            '%s/%s' % (feconf.TOPIC_URL_FRAGMENT_HANDLER, 'test'),
+            expected_status_int=401,
+        )
+
+        self.logout()
+
+    def test_topic_manager_can_access_topic_url_fragment_handler(self) -> None:
+        self.login(self.TOPIC_MANAGER_EMAIL)
+
+        json_response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_URL_FRAGMENT_HANDLER, 'unique-fragment')
+        )
+
+        self.assertEqual(json_response['topic_url_fragment_exists'], False)
+
+        self.logout()
 
     def test_topic_url_fragment_handler_when_unique(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
