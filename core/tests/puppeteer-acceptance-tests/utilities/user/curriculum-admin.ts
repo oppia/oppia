@@ -34,6 +34,8 @@ const richTextAreaField = 'div.e2e-test-rte';
 const richTextParagraphTag = 'div.e2e-test-rte p';
 
 const modalDiv = 'div.modal-content';
+const changeSubtopicAssignmentModal =
+  '.oppia-change-subtopic-assignment-modal div.modal-content';
 const closeSaveModalButton = '.e2e-test-close-save-modal-button';
 
 const photoBoxButton = 'div.e2e-test-photo-button';
@@ -1392,7 +1394,9 @@ export class CurriculumAdmin extends TopicManager {
       `${confirmSkillAssignationButton}:not([disabled])`
     );
     await this.clickOnElementWithSelector(confirmSkillAssignationButton);
-    await this.page.waitForSelector(modalDiv, {hidden: true});
+    await this.page.waitForSelector(changeSubtopicAssignmentModal, {
+      hidden: true,
+    });
     await this.saveTopicDraft(topicName);
   }
 

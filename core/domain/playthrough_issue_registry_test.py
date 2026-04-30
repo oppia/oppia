@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import importlib
+
 from core.domain import playthrough_issue_registry
 from core.tests import test_utils
 from extensions.issues.CyclicStateTransitions import CyclicStateTransitions
@@ -25,6 +27,8 @@ from extensions.issues.EarlyQuit import EarlyQuit
 from extensions.issues.MultipleIncorrectSubmissions import (
     MultipleIncorrectSubmissions,
 )
+
+from typing import Any
 
 
 class IssueRegistryUnitTests(test_utils.GenericTestBase):
@@ -75,3 +79,55 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
             playthrough_issue_registry.Registry.get_issue_by_type(
                 self.invalid_issue_type
             )
+
+    def test_refresh_skips_classes_not_inheriting_base_issue_spec(
+        self,
+    ) -> None:
+        """Test that _refresh skips classes whose base class is not
+        BaseExplorationIssueSpec.
+        """
+
+        class NotAnIssue:
+            """A dummy class that does not inherit from
+            BaseExplorationIssueSpec.
+            """
+
+            pass
+
+        original_import = importlib.import_module
+
+        # Here we use type Any because the mock_import_module function
+        # needs to return different module types depending on the name,
+        # so a specific return type cannot be used.
+        def mock_import_module(name: str) -> Any:
+            module = original_import(name)
+            if name.endswith('.EarlyQuit.EarlyQuit'):
+                setattr(module, 'EarlyQuit', NotAnIssue)
+            return module
+
+        with self.swap(importlib, 'import_module', mock_import_module):
+            playthrough_issue_registry.Registry._refresh()  # pylint: disable=protected-access
+
+        self.assertNotIn(
+            'EarlyQuit',
+            playthrough_issue_registry.Registry._issues,  # pylint: disable=protected-access
+        )
+        self.assertTrue(
+            len(
+                playthrough_issue_registry.Registry._issues  # pylint: disable=protected-access
+            )
+            > 0
+        )
+
+    def test_get_all_issues_returns_cached_when_already_populated(
+        self,
+    ) -> None:
+        """Test that get_all_issues skips _refresh when _issues is already
+        populated.
+        """
+        # First call populates _issues.
+        first_result = playthrough_issue_registry.Registry.get_all_issues()
+        self.assertTrue(len(first_result) > 0)
+        # Second call should return from cache without calling _refresh.
+        second_result = playthrough_issue_registry.Registry.get_all_issues()
+        self.assertEqual(len(first_result), len(second_result))
