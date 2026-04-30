@@ -13,10 +13,10 @@
 
   <div class="data-container">
     <div class="data-type-title">
-      <span>Function ID:</span>
+      <span>Event: </span>
     </div>
     <div class="messages-container">
-      {{getFunctionIdText(cloudTaskRun.functionId)}}
+      {{cloudTaskRun.getEventName()}}
     </div>
   </div>
 
@@ -95,8 +95,8 @@
   .error-messages-container {
     background-color: rgba(0, 0, 0, 0.06);
     font-family: monospace;
-    height: 250px;
-    overflow: scroll;
+    max-height: 250px;
+    overflow: auto;
     padding: 2%;
     white-space: pre-wrap;
   }
