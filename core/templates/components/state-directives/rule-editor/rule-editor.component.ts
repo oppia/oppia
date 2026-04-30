@@ -331,4 +331,15 @@ export class RuleEditorComponent
   ngAfterViewChecked(): void {
     this.changeDetectorRef.detectChanges();
   }
+
+  get isRuleValid(): boolean {
+    if (
+      this.currentInteractionId === 'NumericInput' &&
+      this.rule.type === 'IsWithinTolerance'
+    ) {
+      const tolerance = this.rule.inputs.tol;
+      return typeof tolerance === 'number' ? tolerance >= 0 : true;
+    }
+    return true;
+  }
 }
