@@ -50,7 +50,7 @@ const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
-const LOADING_DIMMER_CLASS = 'ng-star-inserted';
+const LOADING_DIMMER_CLASS = 'oppia-loading-full-page';
 /** We accept the empty message because this is what is sent on
  * 'beforeunload' due to an issue with Chromium (see
  * https://github.com/puppeteer/puppeteer/issues/3725). */
