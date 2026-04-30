@@ -185,7 +185,7 @@ describe('Topic questions tab', () => {
   });
 
   it('should initialize the variables when topic is initialized', () => {
-    const topicRights = new TopicRights(false, false, false);
+    const topicRights = new TopicRights(false, false, false, false);
     const allSkillSummaries = subtopic1.getSkillSummaries();
     spyOn(topicEditorStateService, 'getSkillIdToRubricsObject').and.returnValue(
       skillIdToRubricsObject
@@ -246,7 +246,7 @@ describe('Topic questions tab', () => {
 
   it('should initialize tab when topic is initialized', () => {
     // Setup.
-    const topicRights = new TopicRights(false, false, false);
+    const topicRights = new TopicRights(false, false, false, false);
     const allSkillSummaries = subtopic1.getSkillSummaries();
 
     // Action.
@@ -259,7 +259,7 @@ describe('Topic questions tab', () => {
   });
 
   it('should initialize tab when topic is reinitialized', () => {
-    const topicRights = new TopicRights(false, false, false);
+    const topicRights = new TopicRights(false, false, false, false);
     const allSkillSummaries = subtopic1.getSkillSummaries();
 
     topicInitializedEventEmitter.emit();
