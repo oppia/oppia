@@ -74,6 +74,7 @@ import {QuestionPlayerEngineService} from './question-player-engine.service';
 import {UserService} from '../../../services/user.service';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 describe('Conversation flow service', () => {
   let conversationFlowService: ConversationFlowService;
@@ -130,6 +131,18 @@ describe('Conversation flow service', () => {
     );
   };
   let displayedCard = createCard('');
+  const mockConceptCard = ConceptCard.createFromBackendDict({
+    explanation: {
+      content_id: 'explanation',
+      html: '<p>Test Explanation</p>',
+    },
+    recorded_voiceovers: {
+      voiceovers_mapping: {},
+    },
+  });
+  const mockInteractionRulesService = {
+    Equals: jasmine.createSpy('Equals'),
+  } as InteractionRulesService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -322,7 +335,7 @@ describe('Conversation flow service', () => {
     conversationFlowService.displayedCard = {
       getStateName: () => 'State1',
       isCompleted: () => false,
-    } as unknown as StateCard;
+    } as StateCard;
 
     spyOn(conversationFlowService, 'getNextStateCard').and.returnValue({
       getStateName: () => 'NextState',
@@ -582,7 +595,7 @@ describe('Conversation flow service', () => {
 
   it('should return false when concept card is shown', () => {
     const conceptCard = new StateCard(
-      null as unknown as string,
+      '',
       '',
       '',
       createInteraction(null),
@@ -780,7 +793,7 @@ describe('Conversation flow service', () => {
 
     conversationFlowService.showUpcomingCard();
 
-    conceptCardManagerService.setConceptCard(null as unknown as ConceptCard);
+    conceptCardManagerService.setConceptCard(mockConceptCard);
     conversationFlowService.answerIsCorrect = true;
 
     conversationFlowService.showUpcomingCard();
@@ -791,10 +804,7 @@ describe('Conversation flow service', () => {
     conversationFlowService.displayedCard = displayedCard;
     conversationFlowService.answerIsBeingProcessed = true;
 
-    conversationFlowService.submitAnswer(
-      '',
-      null as unknown as InteractionRulesService
-    );
+    conversationFlowService.submitAnswer('', mockInteractionRulesService);
 
     expect(displayedCard.updateCurrentAnswer).toHaveBeenCalledWith(null);
     conversationFlowService.answerIsBeingProcessed = false;
@@ -854,10 +864,7 @@ describe('Conversation flow service', () => {
     spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
     spyOn(conversationFlowService.onOppiaFeedbackAvailable, 'emit');
     spyOn(conversationFlowService, 'showPendingCard');
-    conversationFlowService.submitAnswer(
-      '',
-      null as unknown as InteractionRulesService
-    );
+    conversationFlowService.submitAnswer('', mockInteractionRulesService);
 
     spyOn(explorationModeService, 'isInQuestionMode').and.returnValues(
       false,
@@ -878,10 +885,7 @@ describe('Conversation flow service', () => {
     spyOn(playerPositionService.onHelpCardAvailable, 'emit');
     spyOn(playerPositionService, 'setDisplayedCardIndex');
 
-    conversationFlowService.submitAnswer(
-      '',
-      null as unknown as InteractionRulesService
-    );
+    conversationFlowService.submitAnswer('', mockInteractionRulesService);
     tick(200);
 
     spyOn(playerPositionService, 'recordAnswerSubmission');
@@ -1078,10 +1082,7 @@ describe('Conversation flow service', () => {
 
     conversationFlowService.explorationActuallyStarted = false;
 
-    conversationFlowService.submitAnswer(
-      '',
-      null as unknown as InteractionRulesService
-    );
+    conversationFlowService.submitAnswer('', mockInteractionRulesService);
     tick(2000);
   }));
 
@@ -1447,12 +1448,12 @@ describe('Conversation flow service', () => {
   });
 
   it('should set and get solution for state', () => {
-    const mockSolution = {
-      correctAnswer: true,
-      explanationHtml: 'Html',
-      answerIsExclusive: true,
-      explanationContentId: 'content_id',
-    } as unknown as Solution;
+    const mockSolution = Solution.createNew(
+      true,
+      'Sample answer' as InteractionAnswer,
+      'Html',
+      'content_id'
+    );
 
     conversationFlowService.setSolutionForState(mockSolution);
     expect(conversationFlowService.getSolutionForState()).toBe(mockSolution);
@@ -1473,12 +1474,12 @@ describe('Conversation flow service', () => {
     );
     spyOn(hintsAndSolutionManagerService, 'releaseSolution');
 
-    const mockSolution = {
-      correctAnswer: true,
-      explanationHtml: 'Html',
-      answerIsExclusive: true,
-      explanationContentId: 'content_id',
-    } as unknown as Solution;
+    const mockSolution = Solution.createNew(
+      true,
+      'Sample answer' as InteractionAnswer,
+      'Html',
+      'content_id'
+    );
     conversationFlowService.setSolutionForState(mockSolution);
     conversationFlowService.triggerIfLearnerStuckAction(true, mockCallback);
     tick(
@@ -1489,7 +1490,9 @@ describe('Conversation flow service', () => {
   }));
 
   it('should defer stuck check when isDelayed is false', fakeAsync(() => {
-    conversationFlowService.responseTimeout = setTimeout(() => {}, 100);
+    conversationFlowService.responseTimeout = jasmine.createSpyObj<
+      ReturnType<typeof setTimeout>
+    >('Timeout', ['ref', 'unref', 'hasRef', 'refresh']);
     const mockCallback = jasmine.createSpy('onShowContinueToReviseButton');
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
 
