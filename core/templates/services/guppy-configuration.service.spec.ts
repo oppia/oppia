@@ -74,6 +74,9 @@ describe('GuppyConfigurationService', () => {
   beforeEach(() => {
     guppyConfigurationService = TestBed.inject(GuppyConfigurationService);
     window.Guppy = MockGuppy as unknown as Guppy;
+    Guppy.kb = {
+      k_syms: {},
+    } as unknown as Object;
   });
 
   describe('Individual service', () => {
@@ -94,6 +97,50 @@ describe('GuppyConfigurationService', () => {
       spyOn(Guppy, 'remove_global_symbol');
       guppyConfigurationService.init();
       expect(Guppy.remove_global_symbol).not.toHaveBeenCalled();
+    });
+
+    it('should configure slash symbol when value is true', () => {
+      spyOn(Guppy, 'add_global_symbol');
+      guppyConfigurationService.changeDivSymbol(true);
+
+      expect(Guppy.add_global_symbol).toHaveBeenCalledWith(
+        '/',
+        jasmine.objectContaining({
+          attrs: jasmine.objectContaining({
+            type: 'fraction',
+          }),
+        })
+      );
+    });
+
+    it('should configure division symbol when value is false', () => {
+      spyOn(Guppy, 'add_global_symbol');
+      guppyConfigurationService.changeDivSymbol({value: false});
+
+      expect(Guppy.add_global_symbol).toHaveBeenCalledWith(
+        '/',
+        jasmine.objectContaining({
+          output: jasmine.objectContaining({
+            latex: '\\div',
+          }),
+        })
+      );
+    });
+
+    it('should use fraction shortcut when value is true', () => {
+      guppyConfigurationService.changeDivSymbol(true);
+
+      expect((Guppy.kb as {k_syms: Record<string, string>}).k_syms['/']).toBe(
+        'fraction'
+      );
+    });
+
+    it('should use slash shortcut when value is false', () => {
+      guppyConfigurationService.changeDivSymbol(false);
+
+      expect((Guppy.kb as {k_syms: Record<string, string>}).k_syms['/']).toBe(
+        '/'
+      );
     });
   });
 });

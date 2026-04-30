@@ -727,17 +727,12 @@ var ExplorationEditorMainTab = function () {
       NumericInput: 'commonly-used',
       TextInput: 'commonly-used',
       FractionInput: 'math',
-      GraphInput: 'math',
       SetInput: 'math',
       AlgebraicExpressionInput: 'math',
       MathEquationInput: 'math',
       NumericExpressionInput: 'math',
       NumberWithUnits: 'math',
       RatioExpressionInput: 'math',
-      CodeRepl: 'programming',
-      PencilCodeEditor: 'programming',
-      MusicNotesInput: 'music',
-      InteractiveMap: 'geography',
     };
 
     var interactionTabButton = interactionTab(

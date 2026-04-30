@@ -50,7 +50,6 @@ describe('Entity voiceovers service', () => {
     let contentIdToVoiceoversMapping = {
       content0: {
         manual: manualVoiceover,
-        auto: undefined,
       },
     };
     let entityVoiceoversBackendDict = {
@@ -150,27 +149,25 @@ describe('Entity voiceovers service', () => {
 
   it('should be able to mark voiceovers as needing update', () => {
     entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
-    expect(
-      entityVoiceovers.voiceoversMapping.content0.manual.needsUpdate
-    ).toBeFalse();
+    let mapping = entityVoiceovers.voiceoversMapping.content0;
+    expect(mapping?.manual?.needsUpdate).toBeFalsy();
 
     entityVoiceoversService.markManualVoiceoverAsNeedingUpdate('content0');
-    expect(
-      entityVoiceovers.voiceoversMapping.content0.manual.needsUpdate
-    ).toBeTrue();
+    mapping = entityVoiceovers.voiceoversMapping.content0;
+    expect(mapping?.manual?.needsUpdate).toBeTruthy();
   });
 
   it('should be able to remove voiceovers for a content ID', () => {
     entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
     expect(
       Object.keys(entityVoiceovers.voiceoversMapping).includes('content0')
-    ).toBeTrue();
+    ).toBeTruthy();
 
     entityVoiceoversService.removeAllVoiceoversForContent('content0');
 
     expect(
       Object.keys(entityVoiceovers.voiceoversMapping).includes('content0')
-    ).toBeFalse();
+    ).toBeFalsy();
   });
 
   it('should be able to get all content ID to voiceovers mapping', () => {
@@ -233,9 +230,9 @@ describe('Entity voiceovers service', () => {
 
   it('should verify if entity voiceovers are loaded', () => {
     entityVoiceoversService.entityVoiceoversLoaded = false;
-    expect(entityVoiceoversService.isEntityVoiceoversLoaded()).toBeFalse();
+    expect(entityVoiceoversService.isEntityVoiceoversLoaded()).toBeFalsy();
 
     entityVoiceoversService.entityVoiceoversLoaded = true;
-    expect(entityVoiceoversService.isEntityVoiceoversLoaded()).toBeTrue();
+    expect(entityVoiceoversService.isEntityVoiceoversLoaded()).toBeTruthy();
   });
 });
