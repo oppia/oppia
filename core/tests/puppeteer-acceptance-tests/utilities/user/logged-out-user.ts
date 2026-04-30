@@ -7413,7 +7413,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(profileLogoutButton, {
       visible: true,
     });
-    await this.page.click(profileLogoutButton);
+    await this.clickAndWaitForNavigation(profileLogoutButton, true);
   }
 
   /**

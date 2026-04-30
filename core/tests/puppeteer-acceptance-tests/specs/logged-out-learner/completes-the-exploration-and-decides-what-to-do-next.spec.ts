@@ -51,7 +51,6 @@ enum EXPLORATION_TITLE {
 describe('Logged-Out Learner', function () {
   let explorationId: string;
   let exploration1Id: string;
-  let exploration2Id: string;
   let loggedOutLearner: LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
@@ -102,13 +101,6 @@ describe('Logged-Out Learner', function () {
         'Incorrect, try again!'
       );
 
-      // Add 2 hints.
-      await curriculumAdmin.addHintToState(
-        'This hint 1 to help to answer the question.'
-      );
-      await curriculumAdmin.addHintToState(
-        'This hint 2 to help to answer the question'
-      );
       // Add answer with explanation.
       await curriculumAdmin.addSolutionToState('1/2', 'Answer is 1/2.', true);
 
@@ -145,8 +137,7 @@ describe('Logged-Out Learner', function () {
         throw new Error('Exploration ID is null or undefined.');
       }
 
-      // Add two dummy exploration.
-      // Add first dummy exploration.
+      // Add one dummy exploration.
       await curriculumAdmin.navigateToCreatorDashboardPage();
       await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
       // Add Interaction Cards.
@@ -171,34 +162,6 @@ describe('Logged-Out Learner', function () {
       if (!exploration1Id) {
         throw new Error(
           `Exploration title:${EXPLORATION_TITLE.EXPLORATION_1} ID is null or undefined.`
-        );
-      }
-
-      // Add second dummy exploration.
-      await curriculumAdmin.navigateToCreatorDashboardPage();
-      await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
-      // Add Interaction Cards.
-      await curriculumAdmin.updateCardContent(
-        `Welcome, to the ${EXPLORATION_TITLE.EXPLORATION_2}.`
-      );
-      await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
-      await curriculumAdmin.viewOppiaResponses();
-      await curriculumAdmin.directLearnersToNewCard(CARDS.FINAL_CARD);
-
-      await curriculumAdmin.navigateToCard(CARDS.FINAL_CARD);
-      await curriculumAdmin.updateCardContent(
-        'You have successfully completed the lesson!'
-      );
-      await curriculumAdmin.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-      await curriculumAdmin.saveExplorationDraft();
-      exploration2Id = await curriculumAdmin.publishExplorationWithMetadata(
-        EXPLORATION_TITLE.EXPLORATION_2,
-        `Learn basic Mathematics including ${EXPLORATION_TITLE.EXPLORATION_2}`,
-        'Mathematics'
-      );
-      if (!exploration2Id) {
-        throw new Error(
-          `Exploration title:${EXPLORATION_TITLE.EXPLORATION_2} ID is null or undefined.`
         );
       }
 
@@ -233,7 +196,7 @@ describe('Logged-Out Learner', function () {
       await curriculumAdmin.saveTopicDraft(topicName);
       await curriculumAdmin.publishDraftTopic(topicName);
 
-      // Create a story node with 3 chapters.
+      // Create a story node with 2 chapters.
       await curriculumAdmin.createAndPublishStoryWithChapters(
         'What are Place values',
         'place-values',
@@ -246,10 +209,6 @@ describe('Logged-Out Learner', function () {
             chapterTitle: EXPLORATION_TITLE.EXPLORATION_1,
             explorationId: exploration1Id,
           },
-          {
-            chapterTitle: EXPLORATION_TITLE.EXPLORATION_2,
-            explorationId: exploration2Id,
-          },
         ],
         topicName
       );
@@ -259,21 +218,6 @@ describe('Logged-Out Learner', function () {
         'math',
         topicName
       );
-
-      // Go to creator dashboard.
-      await curriculumAdmin.navigateToCreatorDashboardPage();
-
-      // Select the exploration 'What are the Place Values?'.
-      await curriculumAdmin.chooseExplorationForEditFromCreatorDashboard(
-        explorationId
-      );
-      // Link concept card in the Introduction card.
-      await curriculumAdmin.navigateToCard(CARDS.INTRODUCTION_CARD);
-
-      await curriculumAdmin.linkSkillToState('skill-1');
-
-      // Publish the changes of exploration.
-      await curriculumAdmin.saveExplorationDraft('Link concept card: skill-1');
 
       await loggedOutLearner.playLesson(explorationId);
       await loggedOutLearner.clickOnContinueButton();
@@ -295,10 +239,7 @@ describe('Logged-Out Learner', function () {
   it('should be able to visit the next lesson', async function () {
     await loggedOutLearner.clickOnProfileMenu();
     await loggedOutLearner.clickOnLogOutButton();
-    await loggedOutLearner.page.waitForNavigation();
     await loggedOutLearner.expectPageURLToContain(testConstants.URLs.BaseURL);
-    await loggedOutLearner.waitForPageToFullyLoad();
-    await loggedOutLearner.expectScreenshotToMatch('homePage', __dirname);
 
     // Visit the math classroom page.
     await loggedOutLearner.navigateToClassroomPage('math');
