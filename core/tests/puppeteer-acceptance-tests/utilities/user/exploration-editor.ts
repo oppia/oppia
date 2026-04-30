@@ -2959,6 +2959,18 @@ export class ExplorationEditor extends BaseUser {
     );
 
     await this.waitForNetworkIdle();
+    const mathInteractions = [
+      'Fraction Input',
+      'Graph Theory',
+      'Numeric Expression',
+      'Algebraic Expression',
+      'Math Equation',
+      'Number With Units',
+      'Ratio Expression Input',
+    ];
+    if (mathInteractions.includes(interactionToAdd)) {
+      await this.clickOnElementWithText('Math');
+    }
     // Use a higher timeout for math interactions as they are heavy to render.
     const interactionElement = await this.page.waitForXPath(
       `//*[contains(normalize-space(text()), normalize-space("${interactionToAdd}"))]`,
