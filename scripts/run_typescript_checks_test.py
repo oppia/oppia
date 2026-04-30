@@ -258,8 +258,18 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             'compile_and_check_typescript',
             mock_compile_and_check_typescript,
         )
+        compile_and_check_angular_templates_swap = self.swap(
+            run_typescript_checks,
+            'compile_and_check_angular_templates',
+            lambda _config_path: self.fail(
+                'Template strict checks should not run without --strict_checks.'
+            ),
+        )
 
-        with compile_and_check_typescript_swap:
+        with (
+            compile_and_check_typescript_swap,
+            compile_and_check_angular_templates_swap,
+        ):
             run_typescript_checks.main(args=[])
 
     def test_config_path_when_strict_checks_arg_is_used(self) -> None:
@@ -270,13 +280,27 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 config_path, run_typescript_checks.STRICT_TSCONFIG_FILEPATH
             )
 
+        def mock_compile_and_check_angular_templates(config_path: str) -> None:
+            self.assertEqual(
+                config_path,
+                run_typescript_checks.TEMPLATE_STRICT_TSCONFIG_FILEPATH,
+            )
+
         compile_and_check_typescript_swap = self.swap(
             run_typescript_checks,
             'compile_and_check_typescript',
             mock_compile_and_check_typescript,
         )
+        compile_and_check_angular_templates_swap = self.swap(
+            run_typescript_checks,
+            'compile_and_check_angular_templates',
+            mock_compile_and_check_angular_templates,
+        )
 
-        with compile_and_check_typescript_swap:
+        with (
+            compile_and_check_typescript_swap,
+            compile_and_check_angular_templates_swap,
+        ):
             run_typescript_checks.main(args=['--strict_checks'])
 
     def test_run_typescript_type_tests_passed(self) -> None:
