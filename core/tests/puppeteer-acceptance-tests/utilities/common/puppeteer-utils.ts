@@ -2177,6 +2177,23 @@ export class BaseUser {
   }
 
   /**
+   * Expects the text content of any toast message to match the given expected message.
+   * @param {string} expectedMessage - The expected message to match the toast message against.
+   */
+  async expectAnyToastMessage(expectedMessage: string): Promise<void> {
+    // Wait until any toast with the expected message is visible.
+    await this.page.waitForFunction(
+      (selector: string, expected: string) =>
+        Array.from(document.querySelectorAll(selector)).some(
+          el => el.textContent?.trim() === expected
+        ),
+      {},
+      toastMessageSelector,
+      expectedMessage
+    );
+  }
+
+  /**
    * Clicks on the button in the modal with the given title and action.
    * @param title - The title of the modal.
    * @param action - The action to click on the button in the modal.
