@@ -46,11 +46,14 @@ const oskContainerSelector = '.e2e-test-osk-container';
 const hideOSKButtonSelector = '.e2e-test-osk-hide-button';
 const plannedPublicationDateInput = '.e2e-test-planned-publication-date-input';
 const chapterTitleSelector = '.e2e-test-chapter-title';
+const usernameInputSelector = 'input.e2e-test-username-input';
+const agreeToTermsCheckboxSelector = 'input.e2e-test-agree-to-terms-checkbox';
+const registerUserButtonSelector =
+  'button.e2e-test-register-user:not([disabled])';
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
-const LOADING_DIMMER_CLASS = 'oppia-loading-full-page';
 /** We accept the empty message because this is what is sent on
  * 'beforeunload' due to an issue with Chromium (see
  * https://github.com/puppeteer/puppeteer/issues/3725). */
@@ -387,13 +390,9 @@ export class BaseUser {
    */
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
-    await this.typeInInputField('input.e2e-test-username-input', username);
-    await this.clickOnElementWithSelector(
-      'input.e2e-test-agree-to-terms-checkbox'
-    );
-    await this.page.waitForSelector(
-      'button.e2e-test-register-user:not([disabled])'
-    );
+    await this.typeInInputField(usernameInputSelector, username);
+    await this.clickOnElementWithSelector(agreeToTermsCheckboxSelector);
+    await this.page.waitForSelector(registerUserButtonSelector);
     await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
     this.username = username;
     this.email = email;
@@ -612,27 +611,6 @@ export class BaseUser {
           },
           element
         );
-
-        // If the element is covered by a loading overlay or a lingering modal
-        // from a previous test, wait for both to disappear before re-throwing.
-        if (
-          clickabilityDiagnostics.isCoveredByOtherElement &&
-          (clickabilityDiagnostics.blockingElement.includes(
-            LOADING_DIMMER_CLASS
-          ) ||
-            clickabilityDiagnostics.blockingElement.includes('modal'))
-        ) {
-          // Wait for either the loader or a lingering modal to disappear.
-          await this.page.waitForFunction(
-            (dimmer: string, modal: string) =>
-              !document.querySelector(`.${dimmer}`) &&
-              !document.querySelector(modal),
-            {timeout: 30000},
-            LOADING_DIMMER_CLASS,
-            'ngb-modal-window'
-          );
-        }
-
         await this.page.evaluate(isElementClickable, element, true, true);
 
         const reasonsText =
@@ -1548,22 +1526,8 @@ export class BaseUser {
     visibility: boolean = true,
     context: Page = this.page
   ): Promise<void> {
-    if (visibility) {
-      await context.waitForSelector(selector, {visible: true});
-    } else {
-      try {
-        await context.waitForFunction(
-          (sel: string) => {
-            const el = document.querySelector(sel);
-            return !el || (el as HTMLElement).offsetParent === null;
-          },
-          {timeout: 30000},
-          selector
-        );
-      } catch (error) {
-        await context.waitForSelector(selector, {hidden: true, timeout: 5000});
-      }
-    }
+    const options = visibility ? {visible: true} : {hidden: true};
+    await context.waitForSelector(selector, options);
     showMessage(`Element ${selector} is ${visibility ? 'visible' : 'hidden'}.`);
   }
 

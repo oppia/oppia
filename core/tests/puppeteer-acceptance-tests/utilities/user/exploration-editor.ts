@@ -2926,6 +2926,9 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOnElementWithSelector(
           INTERACTION_TABS_SELECTORS[interaction]
         );
+        // Ensure the new tab content has rendered before searching
+        // for the interaction.
+        await this.waitForPageToFullyLoad();
         showMessage(`Switched to ${interaction} tab.`);
         break;
       }
