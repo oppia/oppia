@@ -91,7 +91,6 @@ export class BaseUser {
   startTimeInMilliseconds: number = -1;
   screenRecorder!: PuppeteerScreenRecorder;
   static instances: BaseUser[] = []; // Track instances.
-  static serverErrors: string[] = []; // Track server errors.
 
   constructor() {
     BaseUser.instances.push(this);
@@ -137,7 +136,6 @@ export class BaseUser {
           TestToModulesMatcher.registerPuppeteerBrowser(browser);
         }
         this.page = await browser.newPage();
-        this.attachNavigationLogs(this.page);
         this.pages.push(this.page);
 
         if (mobile) {
@@ -267,27 +265,15 @@ export class BaseUser {
 
     // Prepare an array of promises for screenshots.
     const screenshotPromises = BaseUser.instances.map(async (instance, i) => {
-      if (!instance.page) {
-        return;
-      }
-      if (instance.page.isClosed()) {
+      if (instance.page) {
+        await instance.page.screenshot({
+          path: path.join(
+            outputDir,
+            outputFileName + randomString + `-instance-${i}.png`
+          ),
+        });
         showMessage(
-          `Skipped screenshot for ${instance.username ?? 'unknown user'} because the page is already closed.`
-        );
-        return;
-      }
-      try {
-        const screenshotPath = path.join(
-          outputDir,
-          outputFileName + randomString + `-instance-${i}.png`
-        );
-        await instance.page.screenshot({path: screenshotPath});
-        showMessage(
-          `Screenshot captured for test failure and saved as : ${screenshotPath}`
-        );
-      } catch (error) {
-        showMessage(
-          `Error while taking screenshot for ${instance.username ?? 'unknown user'}: ${error}`
+          `Screenshot captured for test failure and saved as : ${path.join(outputDir, outputFileName + `-instance-${i}.png`)}`
         );
       }
     });
@@ -403,10 +389,7 @@ export class BaseUser {
    */
   async reloadPage(): Promise<void> {
     await this.waitForPageToFullyLoad();
-    await this.page.reload({
-      waitUntil: ['networkidle2', 'load'],
-      timeout: 60000,
-    });
+    await this.page.reload({waitUntil: ['networkidle0', 'load']});
   }
 
   /**
@@ -421,7 +404,6 @@ export class BaseUser {
         )
       ).page()) ?? (await this.browserObject.newPage());
     this.page = newPage;
-    this.attachNavigationLogs(this.page);
     this.setupDebugTools();
   }
 
@@ -513,118 +495,9 @@ export class BaseUser {
       await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
       if (error instanceof Error) {
-        const clickabilityDiagnostics = await this.page.evaluate(
-          (targetElement: Element) => {
-            const describeElement = (el: Element | null): string => {
-              if (!el) {
-                return 'none';
-              }
-
-              const tag = el.tagName.toLowerCase();
-              const id = el.id ? `#${el.id}` : '';
-              const classNames = el.className
-                ? String(el.className).trim().split(/\s+/).filter(Boolean)
-                : [];
-              const classes =
-                classNames.length > 0 ? `.${classNames.join('.')}` : '';
-              return `<${tag}${id}${classes}>`;
-            };
-
-            const rect = targetElement.getBoundingClientRect();
-            const inViewport =
-              rect.top <= window.innerHeight &&
-              rect.bottom > 0 &&
-              rect.left <= window.innerWidth &&
-              rect.right > 0;
-
-            const isNativeDisabled =
-              (targetElement instanceof HTMLButtonElement ||
-                targetElement instanceof HTMLInputElement ||
-                targetElement instanceof HTMLSelectElement ||
-                targetElement instanceof HTMLTextAreaElement ||
-                targetElement instanceof HTMLOptionElement) &&
-              targetElement.disabled;
-            const isAriaDisabled =
-              targetElement.getAttribute('aria-disabled') === 'true' ||
-              targetElement.closest('[aria-disabled="true"]') !== null;
-            const isDisabled = isNativeDisabled || isAriaDisabled;
-
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            const centerTopElement = document.elementFromPoint(
-              centerX,
-              centerY
-            );
-            const firstClientRect = targetElement.getClientRects()[0];
-            const firstRectTopElement = firstClientRect
-              ? document.elementFromPoint(
-                  firstClientRect.left + firstClientRect.width / 2,
-                  firstClientRect.top + firstClientRect.height / 2
-                )
-              : null;
-
-            const isCoveredByOtherElement = [
-              centerTopElement,
-              firstRectTopElement,
-            ]
-              .filter(Boolean)
-              .some(topElement => {
-                if (!topElement) {
-                  return false;
-                }
-                return (
-                  topElement !== targetElement &&
-                  !targetElement.contains(topElement) &&
-                  !topElement.contains(targetElement)
-                );
-              });
-
-            const blockingElement =
-              [centerTopElement, firstRectTopElement]
-                .filter(
-                  topElement =>
-                    topElement &&
-                    topElement !== targetElement &&
-                    !targetElement.contains(topElement) &&
-                    !topElement.contains(targetElement)
-                )
-                .map(topElement => describeElement(topElement))[0] ?? 'none';
-
-            const reasons: string[] = [];
-            if (isDisabled) {
-              reasons.push('Element is disabled.');
-            }
-            if (!inViewport) {
-              reasons.push('Element is not in the viewport.');
-            }
-            if (isCoveredByOtherElement) {
-              reasons.push(`Element is blocked by ${blockingElement}.`);
-            }
-
-            return {
-              reasons,
-              isDisabled,
-              inViewport,
-              isCoveredByOtherElement,
-              blockingElement,
-            };
-          },
-          element
-        );
         await this.page.evaluate(isElementClickable, element, true, true);
-
-        const reasonsText =
-          clickabilityDiagnostics.reasons.length > 0
-            ? clickabilityDiagnostics.reasons
-                .map(
-                  (reason: string, index: number) => `${index + 1}. ${reason}`
-                )
-                .join('\n')
-            : 'No specific reason detected from diagnostics.';
-
         error.message =
           `Element ${elementDesc} took too long to be clickable.\n` +
-          `Detected reasons:\n${reasonsText}\n` +
           'Original Error:\n' +
           error.message;
       }
@@ -660,7 +533,7 @@ export class BaseUser {
     elementPlace?: number
   ): Promise<void> {
     const context = parentElement ?? this.page;
-    let element = await context.waitForSelector(selector, {timeout: 30000});
+    let element = await context.waitForSelector(selector, {timeout: 15000});
 
     // Get nth element if elementPlace is given.
     if (elementPlace) {
@@ -779,7 +652,6 @@ export class BaseUser {
     useSelector: boolean = false,
     options: puppeteer.WaitForOptions = {
       waitUntil: ['networkidle2', 'load'],
-      timeout: 60000,
     }
   ): Promise<void> {
     const navigationPromise = this.page.waitForNavigation(options);
@@ -809,10 +681,7 @@ export class BaseUser {
     // Clicking three times on a line of text selects all the text.
     const element = await this.getElementInParent(selector);
     await this.waitForElementToBeClickable(element);
-    await element.click();
-    await this.page.keyboard.down('Control');
-    await this.page.keyboard.press('A');
-    await this.page.keyboard.up('Control');
+    await element.click({clickCount: 3});
     await this.page.keyboard.press('Backspace');
   }
 
@@ -934,10 +803,7 @@ export class BaseUser {
    * This function navigates to the given URL.
    */
   async goto(url: string, verifyURL: boolean = true): Promise<void> {
-    await this.page.goto(url, {
-      waitUntil: ['networkidle2', 'load'],
-      timeout: 60000,
-    });
+    await this.page.goto(url, {waitUntil: ['networkidle0', 'load']});
 
     if (verifyURL) {
       await this.page.waitForFunction(
@@ -1422,7 +1288,6 @@ export class BaseUser {
 
     await newPage.bringToFront();
     this.page = newPage;
-    this.attachNavigationLogs(this.page);
     return newPage;
   }
 
@@ -1640,7 +1505,6 @@ export class BaseUser {
     selector: string,
     text: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(selector);
     try {
       await this.page.waitForFunction(
         (selector: string, text: string) => {
@@ -1893,10 +1757,10 @@ export class BaseUser {
         selector,
         parentElement
       );
-      await this.clickOnElement(selectElement);
+      await selectElement.click();
 
       // Select the option.
-      await this.page.waitForSelector('mat-option', {visible: true});
+      await this.page.waitForSelector('mat-option');
       const options = await this.page.$$('mat-option');
       const optionTexts: string[] = [];
 
@@ -1918,7 +1782,7 @@ export class BaseUser {
       }
 
       // Click on the option.
-      await this.clickOnElement(optionElement);
+      await optionElement.click();
 
       // Verify the value of the select is updated.
       await this.expectTextContentToBe(selector, value);
@@ -2177,23 +2041,6 @@ export class BaseUser {
   }
 
   /**
-   * Expects the text content of any toast message to match the given expected message.
-   * @param {string} expectedMessage - The expected message to match the toast message against.
-   */
-  async expectAnyToastMessage(expectedMessage: string): Promise<void> {
-    // Wait until any toast with the expected message is visible.
-    await this.page.waitForFunction(
-      (selector: string, expected: string) =>
-        Array.from(document.querySelectorAll(selector)).some(
-          el => el.textContent?.trim() === expected
-        ),
-      {},
-      toastMessageSelector,
-      expectedMessage
-    );
-  }
-
-  /**
    * Clicks on the button in the modal with the given title and action.
    * @param title - The title of the modal.
    * @param action - The action to click on the button in the modal.
@@ -2394,29 +2241,6 @@ export class BaseUser {
     await this.expectElementToBeVisible(hideOSKButtonSelector);
     await this.clickOnElementWithSelector(hideOSKButtonSelector);
     await this.expectElementToBeVisible(hideOSKButtonSelector, false);
-  }
-
-  /**
-   * Logs every navigation event on the page.
-   */
-  attachNavigationLogs(page: Page): void {
-    page.on('framenavigated', frame => {
-      showMessage('NAVIGATED: ' + frame.url());
-    });
-
-    page.on('response', response => {
-      if (response.status() >= 500 && response.url().startsWith(baseURL)) {
-        const url = response.url();
-        // TODO(#18372): Ignore 500 errors from version_history_handler.
-        if (url.includes('/version_history_handler/')) {
-          return;
-        }
-
-        const errorMsg = `Server error: ${response.status()} at ${url}`;
-        showMessage(errorMsg);
-        BaseUser.serverErrors.push(errorMsg);
-      }
-    });
   }
 }
 
