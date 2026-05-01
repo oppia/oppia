@@ -38,6 +38,11 @@
               },
               {
                 "glob": "**/*",
+                "input": "node_modules/@fortawesome/fontawesome-free/webfonts",
+                "output": "assets/webfonts"
+              },
+              {
+                "glob": "**/*",
                 "input": "node_modules/ckeditor4",
                 "output": "/third_party/ckeditor"
               },
@@ -48,11 +53,18 @@
               }
             ],
             "styles": [
+              {
+                "input": "src/vendor-styles.css",
+                "bundleName": "vendor-styles",
+                "inject": true
+              },
               "core/templates/css/oppia.css",
               "core/templates/css/oppia-material.css",
               "node_modules/ngx-toastr/toastr.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -122,11 +134,26 @@
                 "glob": "**/*",
                 "input": "node_modules/mathjax",
                 "output": "/assets/mathjax"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@fortawesome/fontawesome-free/webfonts",
+                "output": "assets/webfonts"
               }
             ],
             "styles": [
+              {
+                "input": "src/vendor-styles.css",
+                "bundleName": "vendor-styles",
+                "inject": true
+              },
+              "core/templates/css/oppia.css",
+              "core/templates/css/oppia-material.css",
+              "node_modules/ngx-toastr/toastr.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.js"
+            ]
           }
         },
         "lint": {

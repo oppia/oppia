@@ -34,6 +34,8 @@ import {
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AdminTaskManagerService} from 'pages/admin-page/services/admin-task-manager.service';
 import {BlogAdminPageComponent} from 'pages/blog-admin-page/blog-admin-page.component';
+import {AlertsService} from 'services/alerts.service';
+
 class MockWindowRef {
   nativeWindow = {
     confirm() {
@@ -58,11 +60,15 @@ describe('Blog Admin Page component ', () => {
 
   let blogAdminBackendApiService: BlogAdminBackendApiService;
   let adminTaskManagerService: AdminTaskManagerService;
+  let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
 
   let confirmSpy: jasmine.Spy;
   let startTaskSpy: jasmine.Spy;
   let finishTaskSpy: jasmine.Spy;
+  let addInfoMessageSpy: jasmine.Spy;
+  let addSuccessMessageSpy: jasmine.Spy;
+  let addWarningSpy: jasmine.Spy;
 
   const blogAdminPageData: BlogAdminPageData = {
     roleToActions: {
@@ -88,6 +94,7 @@ describe('Blog Admin Page component ', () => {
       providers: [
         BlogAdminBackendApiService,
         AdminTaskManagerService,
+        AlertsService,
         {
           provide: WindowRef,
           useValue: mockWindowRef,
@@ -103,9 +110,13 @@ describe('Blog Admin Page component ', () => {
   beforeEach(() => {
     blogAdminBackendApiService = TestBed.inject(BlogAdminBackendApiService);
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
+    alertsService = TestBed.inject(AlertsService);
 
     startTaskSpy = spyOn(adminTaskManagerService, 'startTask');
     finishTaskSpy = spyOn(adminTaskManagerService, 'finishTask');
+    addInfoMessageSpy = spyOn(alertsService, 'addInfoMessage');
+    addSuccessMessageSpy = spyOn(alertsService, 'addSuccessMessage');
+    addWarningSpy = spyOn(alertsService, 'addWarning');
     spyOn(blogAdminBackendApiService, 'getDataAsync').and.resolveTo(
       blogAdminPageData
     );
@@ -166,12 +177,13 @@ describe('Blog Admin Page component ', () => {
       component.submitUpdateRoleForm(component.formData.updateRole);
 
       expect(startTaskSpy).toHaveBeenCalled();
-      expect(component.statusMessage).toBe('Updating User Role');
+      expect(addInfoMessageSpy).toHaveBeenCalledWith('Updating User Role');
 
       flushMicrotasks();
 
-      expect(component.statusMessage).toBe(
-        'Role of username successfully updated to BLOG_ADMIN'
+      expect(addSuccessMessageSpy).toHaveBeenCalledWith(
+        'Role of username successfully updated to BLOG_ADMIN',
+        10000
       );
       expect(finishTaskSpy).toHaveBeenCalled();
     }));
@@ -201,11 +213,13 @@ describe('Blog Admin Page component ', () => {
       component.submitUpdateRoleForm(component.formData.updateRole);
 
       expect(startTaskSpy).toHaveBeenCalled();
-      expect(component.statusMessage).toBe('Updating User Role');
+      expect(addInfoMessageSpy).toHaveBeenCalledWith('Updating User Role');
 
       flushMicrotasks();
 
-      expect(component.statusMessage).toBe('The user already has this role.');
+      expect(addWarningSpy).toHaveBeenCalledWith(
+        'The user already has this role.'
+      );
       expect(finishTaskSpy).toHaveBeenCalled();
     }));
 
@@ -256,11 +270,11 @@ describe('Blog Admin Page component ', () => {
       component.submitRemoveEditorRoleForm(component.formData.updateRole);
 
       expect(startTaskSpy).toHaveBeenCalled();
-      expect(component.statusMessage).toBe('Processing query...');
+      expect(addInfoMessageSpy).toHaveBeenCalledWith('Processing query...');
 
       flushMicrotasks();
 
-      expect(component.statusMessage).toBe('Success.');
+      expect(addSuccessMessageSpy).toHaveBeenCalledWith('Success.', 10000);
       expect(finishTaskSpy).toHaveBeenCalled();
     }));
 
@@ -297,11 +311,11 @@ describe('Blog Admin Page component ', () => {
       component.submitRemoveEditorRoleForm(component.formData.updateRole);
 
       expect(startTaskSpy).toHaveBeenCalled();
-      expect(component.statusMessage).toBe('Processing query...');
+      expect(addInfoMessageSpy).toHaveBeenCalledWith('Processing query...');
 
       flushMicrotasks();
 
-      expect(component.statusMessage).toBe(
+      expect(addWarningSpy).toHaveBeenCalledWith(
         'Server error: Internal Server Error.'
       );
       expect(finishTaskSpy).toHaveBeenCalled();
@@ -337,7 +351,10 @@ describe('Blog Admin Page component ', () => {
       component.savePlatformParameters();
       tick();
 
-      expect(component.statusMessage).toBe('Data saved successfully.');
+      expect(addSuccessMessageSpy).toHaveBeenCalledWith(
+        'Data saved successfully.',
+        10000
+      );
     }));
 
     it(
@@ -353,7 +370,7 @@ describe('Blog Admin Page component ', () => {
         component.savePlatformParameters();
         tick();
 
-        expect(component.statusMessage).toBe(
+        expect(addWarningSpy).toHaveBeenCalledWith(
           'Server error: Internal Server Error.'
         );
       })
