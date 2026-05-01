@@ -30,6 +30,7 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 const CARD_NAMES = {
   FIRST: 'Introduction',
   SECOND: '2nd Card',
+  THIRD: '3rd Card',
   FOURTH: '4th Card',
   FIFTH: '5th Card',
   SIXTH: '6th Card',
@@ -105,7 +106,59 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
-  });
+  }, 600000);
+
+  it('should be able to preview "Graph Theory" interaction', async function () {
+    // Add a graph theory interaction.
+    await explorationEditor.updateCardContent('Create a star topology.');
+    await explorationEditor.addInteraction(
+      INTERACTION_TYPES.GRAPH_THEORY,
+      false
+    );
+    await explorationEditor.customizeGraphTheoryInteraction();
+    await explorationEditor.updateRuleInResponseModalTo(
+      'is a star network with center vertex'
+    );
+    await explorationEditor.updateGraphTheoryLearnerAnswerInResponseModal('4');
+    await explorationEditor.addResponseDetailsInResponseModal(
+      'Great!',
+      CARD_NAMES.THIRD,
+      false
+    );
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Please try again'
+    );
+    await explorationEditor.addHintToState('The hint is a star topology');
+    // Add solution.
+    await explorationEditor.addSolutionToState(
+      'a star network with center vertex 4',
+      'As given in the question.',
+      true
+    );
+    await explorationEditor.saveExplorationDraft();
+
+    // Submit wrong answer.
+    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.submitGraphStarNetworkSolution(1);
+    await explorationEditor.expectResponseFeedbackToBe('Please try again');
+    // View Hint.
+    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
+    // covered by navigation in mobile view.
+    if (!explorationEditor.isViewportAtMobileWidth()) {
+      await explorationEditor.viewHint();
+      await explorationEditor.expectHintInHintModalToContain(
+        'The hint is a star topology'
+      );
+      await explorationEditor.closeHintModal();
+    }
+    // Submit a correct answer.
+    await explorationEditor.submitGraphStarNetworkSolution(4);
+    await explorationEditor.expectResponseFeedbackToBe('Great!');
+
+    // Navigate to next card.
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.navigateToCard(CARD_NAMES.THIRD);
+  }, 600000);
 
   it('should be able to preview "Set Input" interaction', async function () {
     // Add Set Input Interaction.
@@ -165,7 +218,7 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.FOURTH);
-  });
+  }, 600000);
 
   it('should be able to preview "Numeric Expression" interaction', async function () {
     // Add a numeric expression interaction.
@@ -226,7 +279,7 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.FIFTH);
-  });
+  }, 600000);
 
   it('should be able to preview "Algebric Expression" intreaction', async function () {
     // Add a algebric expression interaction.
@@ -295,7 +348,7 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.SIXTH);
-  });
+  }, 600000);
 
   it('should be able to preview "Math Equation" interaction', async function () {
     // Add a math equation interaction.
@@ -359,7 +412,7 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.SEVENTH);
-  });
+  }, 600000);
 
   it('should be able to preview "Number With Units" interaction', async function () {
     // Add a number with units input interaction.
@@ -418,7 +471,7 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.EIGHTH);
-  });
+  }, 600000);
 
   it('should be able to preview "Ratio Expression Input" interaction', async function () {
     // Add a ratio expression input interaction.
@@ -470,7 +523,7 @@ describe('Exploration Editor', function () {
     // Submit correct answer.
     await explorationEditor.submitAnswerInInputField('1:2');
     await explorationEditor.expectResponseFeedbackToBe('Great!');
-  });
+  }, 600000);
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
