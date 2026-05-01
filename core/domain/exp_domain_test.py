@@ -3032,7 +3032,7 @@ class ExplorationDomainValidationTests(test_utils.GenericTestBase):
             translations=translation_dict,
         )
 
-    def test_validation_invalid_title(self) -> None:
+    def test_validation_fails_for_invalid_title(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.title = 'Hello #'
         self._assert_validation_error(exploration, 'Invalid character #')
