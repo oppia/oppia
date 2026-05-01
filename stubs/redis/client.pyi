@@ -2,7 +2,7 @@ from .core import CoreCommands as CoreCommands, _Key, _StrType
 
 from typing import Any, Generic, List
 
-class Redis(CoreCommands[_StrType]):
+class Redis(CoreCommands[_StrType], Generic[_StrType]):
     def __init__(
         self,
         host: str = ...,
@@ -15,6 +15,8 @@ class Redis(CoreCommands[_StrType]):
         transaction: bool = ...,
         shard_hint: Any = ...,
     ) -> Pipeline[_StrType]: ...
+
+class StrictRedis(Redis[_StrType], Generic[_StrType]): ...
 
 class Pipeline(Redis[_StrType], Generic[_StrType]):
     def hgetall(self, name: _Key) -> Pipeline[_StrType]: ...  # type: ignore[override]

@@ -184,7 +184,9 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
 
         with self.swap_to_always_raise(
             ndb, 'get_multi', Exception('Mock key error')
-        ), self.swap(logging, 'exception', _mock_logging_function), self.swap(
+        ), self.swap(
+            logging, 'exception', _mock_logging_function
+        ), self.swap(
             time, 'sleep', lambda _: None
         ):
             with self.assertRaisesRegex(Exception, error_msg):

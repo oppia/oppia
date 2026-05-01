@@ -25,10 +25,7 @@ from core import feconf
 import redis
 from typing import Dict, List, Mapping, Optional, Union
 
-# Here we use MyPy ignore because the redis library's type stubs
-# do not fully support subscript notation for StrictRedis, and MyPy
-# requires explicit type parameters.
-REDIS_CLIENT = redis.StrictRedis(  # type: ignore[type-arg]
+REDIS_CLIENT: redis.StrictRedis[bytes] = redis.StrictRedis(
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.STORAGE_EMULATOR_REDIS_DB_INDEX,

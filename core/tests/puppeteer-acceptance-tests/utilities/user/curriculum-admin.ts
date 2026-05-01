@@ -1957,32 +1957,16 @@ export class CurriculumAdmin extends TopicManager {
 
     const isMobileWidth = this.isViewportAtMobileWidth();
     if (isMobileWidth) {
-      const optionsButton = await this.page.waitForSelector(
-        mobileOptionsSelector
-      );
-      await optionsButton?.evaluate(el => (el as HTMLElement).click());
-      const saveDropdown = await this.page.waitForSelector(
-        mobileSaveTopicDropdown
-      );
-      await saveDropdown?.evaluate(el => (el as HTMLElement).click());
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
+      await this.clickOnElementWithSelector(mobileSaveTopicDropdown);
       await this.page.waitForSelector(mobileNavbarDropdownOptions);
-      const unpublishButton = await this.page.waitForSelector(
-        mobileUnpublishTopicButton
-      );
-      await unpublishButton?.evaluate(el => (el as HTMLElement).click());
+      await this.clickOnElementWithSelector(mobileUnpublishTopicButton);
       await this.page.reload({waitUntil: 'networkidle0'});
-      const optionsButtonFinal = await this.page.waitForSelector(
-        mobileOptionsSelector
-      );
-      await optionsButtonFinal?.evaluate(el => (el as HTMLElement).click());
-      const saveDropdownFinal = await this.page.waitForSelector(
-        mobileSaveTopicDropdown
-      );
-      await saveDropdownFinal?.evaluate(el => (el as HTMLElement).click());
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
+      await this.clickOnElementWithSelector(mobileSaveTopicDropdown);
       await this.page.waitForSelector(mobileNavbarDropdownOptions);
     } else {
-      const button = await this.page.waitForSelector(unpublishTopicButton);
-      await button?.evaluate(el => (el as HTMLElement).click());
+      await this.clickOnElementWithSelector(unpublishTopicButton);
       await this.page.reload({waitUntil: 'networkidle0'});
     }
 
@@ -2027,8 +2011,7 @@ export class CurriculumAdmin extends TopicManager {
           await this.page.waitForSelector(topicListItemOptions);
           const editBox = await topic.$(topicListItemOptions);
           if (editBox) {
-            await this.waitForElementToBeClickable(editBox);
-            await editBox.evaluate(el => (el as HTMLElement).click());
+            await this.clickOnElement(editBox);
             await this.page.waitForSelector(deleteTopicButton);
           } else {
             throw new Error('Edit button not found');
@@ -2036,8 +2019,7 @@ export class CurriculumAdmin extends TopicManager {
 
           const deleteButton = await topic.$(deleteTopicButton);
           if (deleteButton) {
-            await this.waitForElementToBeClickable(deleteButton);
-            await deleteButton.evaluate(el => (el as HTMLElement).click());
+            await this.clickOnElement(deleteButton);
             await this.page.waitForSelector(confirmTopicDeletionButton);
           } else {
             throw new Error('Delete button not found');
@@ -2046,8 +2028,7 @@ export class CurriculumAdmin extends TopicManager {
           await this.waitForElementToStabilize(confirmTopicDeletionButton);
           const confirmButton = await this.page.$(confirmTopicDeletionButton);
           if (confirmButton) {
-            await this.waitForElementToBeClickable(confirmButton);
-            await confirmButton.evaluate(el => (el as HTMLElement).click());
+            await this.clickOnElement(confirmButton);
             await this.page.waitForSelector(modalDiv, {hidden: true});
           } else {
             throw new Error('Confirm button not found');
@@ -2471,7 +2452,7 @@ export class CurriculumAdmin extends TopicManager {
     for (const option of options) {
       const text = await option.evaluate(el => el.textContent?.trim());
       if (text === topicName) {
-        await option.evaluate(el => (el as HTMLElement).click());
+        await this.clickOnElement(option);
         foundOption = true;
         break;
       }

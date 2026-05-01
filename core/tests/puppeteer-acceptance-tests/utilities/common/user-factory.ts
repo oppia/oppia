@@ -401,6 +401,12 @@ export class UserFactory {
     );
 
     showMessage('All browsers closed.');
+
+    if (BaseUser.serverErrors.length > 0) {
+      const errors = BaseUser.serverErrors.join('\n');
+      BaseUser.serverErrors = [];
+      throw new Error(`Server errors detected during the test run:\n${errors}`);
+    }
   };
 
   /**

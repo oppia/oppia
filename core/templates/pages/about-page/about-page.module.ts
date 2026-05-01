@@ -25,6 +25,8 @@ import {SharedComponentsModule} from 'components/shared-component.module';
 import {BarChartComponent} from './charts/bar-chart.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-module';
+import {PartnershipsSectionComponent} from './partnerships-section/partnerships-section.component';
+import {CtaSectionComponent} from './cta-section/cta-section.component';
 
 @NgModule({
   imports: [
@@ -34,6 +36,12 @@ import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-m
     NgbModule,
     CampaignBannerModule,
   ],
-  declarations: [AboutPageComponent, AboutPageRootComponent, BarChartComponent],
+  declarations: [
+    AboutPageComponent,
+    AboutPageRootComponent,
+    BarChartComponent,
+    PartnershipsSectionComponent,
+    CtaSectionComponent,
+  ],
 })
 export class AboutPageModule {}

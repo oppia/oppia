@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import glob
 import json
 import os
 import re
@@ -55,12 +54,8 @@ WEBPACK_CONFIG_FILEPATH: Final = os.path.join(
 
 APP_YAML_FILEPATH: Final = os.path.join(os.getcwd(), 'app_dev.yaml')
 
-DEPENDENCIES_JSON_FILE_PATH: Final = os.path.join(
-    os.getcwd(), 'dependencies.json'
-)
 PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
 _TYPE_DEFS_FILE_EXTENSION_LENGTH: Final = len('.d.ts')
-_DEPENDENCY_SOURCE_DEPENDENCIES_JSON: Final = 'dependencies.json'
 _DEPENDENCY_SOURCE_PACKAGE: Final = 'package.json'
 
 WORKFLOWS_DIR: Final = os.path.join(os.getcwd(), '.github', 'workflows')
@@ -110,32 +105,45 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
     def check_skip_files_in_app_dev_yaml(
         self,
     ) -> concurrent_task_utils.TaskResult:
-        """Check to ensure that all lines in skip_files in app_dev.yaml
-        reference valid files in the repository.
+        """Check skip_files section in app_dev.yaml follows expected format.
+
+        We validate the format of entries in the "# Third party files:" block
+        using a regex that matches versioned paths under third_party/static
+        instead of consulting the filesystem.
         """
         name = 'App dev file'
 
         failed = False
-        error_messages = []
+        error_messages: List[str] = []
         skip_files_section_found = False
+
         for line_num, line in enumerate(
             self.file_cache.readlines(APP_YAML_FILEPATH)
         ):
             stripped_line = line.strip()
+
             if '# Third party files:' in stripped_line:
                 skip_files_section_found = True
+                continue
+
             if not skip_files_section_found:
                 continue
-            if not stripped_line or stripped_line[0] == '#':
+
+            # Stop once we leave the section.
+            if stripped_line and not stripped_line.startswith(('-', '#')):
+                break
+
+            if not stripped_line or stripped_line.startswith('#'):
                 continue
-            # Extract the file pattern from the line as all skipped file
-            # lines start with a dash(-).
+
+            # Extract pattern (remove "- ")
             line_in_concern = stripped_line[len('- ') :]
-            # Adjustments to the dir paths in app_dev.yaml file
-            # for glob-style patterns to match correctly.
-            if line_in_concern.endswith('/'):
-                line_in_concern = line_in_concern[:-1]
-            if not glob.glob(line_in_concern):
+
+            # Validate expected format instead of checking filesystem.
+            if not re.match(
+                r'^third_party/static/.+-\d+\.\d+\.\d+/?$',
+                line_in_concern,
+            ):
                 error_message = (
                     '%s --> Pattern on line %s doesn\'t match '
                     'any file or directory' % (APP_YAML_FILEPATH, line_num + 1)

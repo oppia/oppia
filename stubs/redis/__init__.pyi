@@ -1,4 +1,3 @@
-from .client import Redis
-from .core import _StrType
+from .client import Redis as Redis, StrictRedis as StrictRedis
 
-StrictRedis = Redis[_StrType]
+__all__ = ['Redis', 'StrictRedis']

@@ -31,22 +31,14 @@ class OppiaRedisClient(metaclass=utils.SingletonMeta):
 
     def __init__(self) -> None:
         """Initialize the Oppia Redis client."""
-        # Here we use MyPy ignore because redis.StrictRedis is a generic type
-        # but the redis-py library's type stubs don't properly specify the type
-        # arguments, leading to type-arg errors that we cannot fix without
-        # modifying the library.
-        self._client: redis.StrictRedis = redis.StrictRedis(  # type: ignore[type-arg]
+        self._client: redis.StrictRedis[str] = redis.StrictRedis(
             host=feconf.REDISHOST,
             port=feconf.REDISPORT,
             db=feconf.OPPIA_REDIS_DB_INDEX,
             decode_responses=True,
         )
 
-    # Here we use MyPy ignore because redis.StrictRedis is a generic type but
-    # the redis-py library's type stubs don't properly specify the type
-    # arguments, leading to type-arg errors that we cannot fix without
-    # modifying the library.
-    def get_client(self) -> redis.StrictRedis:  # type: ignore[type-arg]
+    def get_client(self) -> redis.StrictRedis[str]:
         """Return the Redis client instance.
 
         Returns:
@@ -60,21 +52,13 @@ class CloudNdbRedisClient(metaclass=utils.SingletonMeta):
 
     def __init__(self) -> None:
         """Initialize the Cloud NDB Redis client."""
-        # Here we use MyPy ignore because redis.StrictRedis is a generic type
-        # but the redis-py library's type stubs don't properly specify the type
-        # arguments, leading to type-arg errors that we cannot fix without
-        # modifying the library.
-        self._client: redis.StrictRedis = redis.StrictRedis(  # type: ignore[type-arg]
+        self._client: redis.StrictRedis[bytes] = redis.StrictRedis(
             host=feconf.REDISHOST,
             port=feconf.REDISPORT,
             db=feconf.CLOUD_NDB_REDIS_DB_INDEX,
         )
 
-    # Here we use MyPy ignore because redis.StrictRedis is a generic type but
-    # the redis-py library's type stubs don't properly specify the type
-    # arguments, leading to type-arg errors that we cannot fix without
-    # modifying the library.
-    def get_client(self) -> redis.StrictRedis:  # type: ignore[type-arg]
+    def get_client(self) -> redis.StrictRedis[bytes]:
         """Return the Redis client instance.
 
         Returns:
@@ -83,10 +67,7 @@ class CloudNdbRedisClient(metaclass=utils.SingletonMeta):
         return self._client
 
 
-# Here we use MyPy ignore because redis.StrictRedis is a generic type but the
-# redis-py library's type stubs don't properly specify the type arguments,
-# leading to type-arg errors that we cannot fix without modifying the library.
-def get_oppia_redis_client() -> redis.StrictRedis:  # type: ignore[type-arg]
+def get_oppia_redis_client() -> redis.StrictRedis[str]:
     """Get or create the Oppia Redis client lazily.
 
     Returns:
@@ -95,10 +76,7 @@ def get_oppia_redis_client() -> redis.StrictRedis:  # type: ignore[type-arg]
     return OppiaRedisClient().get_client()
 
 
-# Here we use MyPy ignore because redis.StrictRedis is a generic type but the
-# redis-py library's type stubs don't properly specify the type arguments,
-# leading to type-arg errors that we cannot fix without modifying the library.
-def get_cloud_ndb_redis_client() -> redis.StrictRedis:  # type: ignore[type-arg]
+def get_cloud_ndb_redis_client() -> redis.StrictRedis[bytes]:
     """Get or create the Cloud NDB Redis client lazily.
 
     Returns:
@@ -126,16 +104,10 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
         keys_count = redis_full_profile['keys.count']
     except ResponseError:
         # Fallback for Redis versions that do not support memory stats command.
-        # Here we use MyPy ignore because the redis-py stubs in this
-        # environment do not correctly recognize the 'info' method on the
-        # Redis client.
-        info = client.info(section='memory')  # type: ignore
+        info = client.info(section='memory')
         total_allocated = info['used_memory']
         peak_allocated = info['used_memory_peak']
-        # Here we use MyPy ignore because the redis-py stubs in this
-        # environment do not correctly recognize the 'dbsize' method on the
-        # Redis client.
-        keys_count = client.dbsize()  # type: ignore
+        keys_count = client.dbsize()
 
     return caching_domain.MemoryCacheStats(
         total_allocated, peak_allocated, keys_count
