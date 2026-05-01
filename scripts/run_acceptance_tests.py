@@ -110,12 +110,14 @@ def compile_test_ts_files() -> None:
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start acceptance tests."""
     if common.is_oppia_server_already_running():
-        sys.exit(
-            """
-            Oppia server is already running. Try shutting all the servers down
-            before running the script.
-        """
+        print(
+            'Waiting for the existing server to shut down before the starting a new one.'
         )
+        for port in common.PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING:
+            if common.is_port_in_use(port):
+                print('Waiting for port %d to be free...' % port)
+                if not common.wait_for_port_to_not_be_in_use(port):
+                    sys.exit('Port %d could not be freed. Exiting.' % port)
 
     with contextlib.ExitStack() as stack:
         dev_mode = not args.prod_env
