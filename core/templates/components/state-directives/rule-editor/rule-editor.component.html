@@ -69,10 +69,14 @@
     </div>
   </form>
 
+  <div *ngIf="!isRuleValid" class="text-danger mt-2 oppia-warning-text">
+    The value of tolerance cannot be negative.
+  </div>
+
   <div class="oppia-rule-save-cancel-buttons" *ngIf="isEditingRuleInline">
     <div class="float-end">
       <button type="button" class="btn btn-secondary cancel-button" (click)="cancelThisEdit()">Cancel</button>
-      <button type="button" class="btn btn-success e2e-test-save-answer save-button" [disabled]="isInvalid" (click)="saveThisRule()">Save Answer</button>
+      <button type="button" class="btn btn-success e2e-test-save-answer save-button" [disabled]="isInvalid || !isRuleValid" (click)="saveThisRule()">Save Answer</button>
     </div>
 
     <div class="oppia-clear"></div>
