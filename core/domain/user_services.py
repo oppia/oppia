@@ -166,6 +166,12 @@ def get_user_id_from_username(
     Raises:
         Exception. No user_id found for the given username.
     """
+    if len(username) > constants.MAX_USERNAME_LENGTH:
+        if strict:
+            raise Exception(
+                'No user_id found for the given username: %s' % username
+            )
+        return None
     user_model = user_models.UserSettingsModel.get_by_normalized_username(
         user_domain.UserSettings.normalize_username(username)
     )
