@@ -2845,6 +2845,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.check_can_edit_topic(self.user_admin, topic_rights)
         )
 
+    def test_admin_can_edit_questions_in_topic(self) -> None:
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
+
+        self.assertTrue(
+            topic_services.check_can_edit_question(
+                self.user_admin, topic_rights
+            )
+        )
+
     def test_filter_published_topic_ids(self) -> None:
         published_topic_ids = topic_services.filter_published_topic_ids(
             [self.TOPIC_ID, 'invalid_id']
@@ -4119,6 +4128,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 ],
                 'is_published': True,
                 'can_edit_topic': True,
+                'can_edit_question': True,
                 'classroom': None,
                 'total_upcoming_chapters_count': 0,
                 'total_overdue_chapters_count': 0,
@@ -4206,6 +4216,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                     ],
                     'is_published': True,
                     'can_edit_topic': True,
+                    'can_edit_question': True,
                     'classroom': None,
                     'total_upcoming_chapters_count': 0,
                     'total_overdue_chapters_count': 0,

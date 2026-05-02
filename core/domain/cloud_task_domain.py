@@ -91,6 +91,34 @@ class CloudTaskRun:
             'created_on': self.created_on.isoformat(),
         }
 
+    def to_dict_with_timezone_info(self) -> CloudTaskRunDict:
+        """Returns a dictionary representation of this domain object with timezone
+        information included in the datetime fields.
+
+        Returns:
+            CloudTaskRunDict. A dictionary representation of the CloudTaskRun
+            object, with keys matching the attributes of the object and timezone
+            information included in the datetime fields.
+        """
+        return {
+            'task_run_id': self.task_run_id,
+            'cloud_task_name': self.cloud_task_name,
+            'task_id': self.task_id,
+            'queue_id': self.queue_id,
+            'latest_job_state': self.latest_job_state,
+            'function_id': self.function_id,
+            'exception_messages_for_failed_runs': (
+                self.exception_messages_for_failed_runs
+            ),
+            'current_retry_attempt': self.current_retry_attempt,
+            'last_updated': self.last_updated.replace(
+                tzinfo=datetime.timezone.utc
+            ).isoformat(),
+            'created_on': self.created_on.replace(
+                tzinfo=datetime.timezone.utc
+            ).isoformat(),
+        }
+
     @classmethod
     def from_dict(cls, cloud_task_run_dict: CloudTaskRunDict) -> CloudTaskRun:
         """Returns a domain object from a dictionary.
