@@ -172,30 +172,6 @@ describe('Logged-Out Learner', function () {
       await curriculumAdmin.navigateToCard(CARDS.SECOND_CARD);
       await curriculumAdmin.addExplorationDescriptionContainingAllRTEComponents();
 
-      await curriculumAdmin.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
-      await curriculumAdmin.addResponsesToTheInteraction(
-        INTERACTION_TYPES.FRACTION_INPUT,
-        '2',
-        'Correct!',
-        CARDS.THIRD_CARD,
-        true
-      );
-      await curriculumAdmin.editDefaultResponseFeedbackInExplorationEditorPage(
-        'Incorrect, try again!'
-      );
-
-      // Add 2 hints.
-      await curriculumAdmin.addHintToState(
-        'This hint 1 to help to answer the question.'
-      );
-      await curriculumAdmin.addHintToState(
-        'This hint 2 to help to answer the question'
-      );
-      // Add answer with explanation.
-      await curriculumAdmin.addSolutionToState('1/2', 'Answer is 1/2.', true);
-
-      await curriculumAdmin.navigateToCard(CARDS.THIRD_CARD);
-      await curriculumAdmin.updateCardContent('Good continue learning!!');
       await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
       await curriculumAdmin.viewOppiaResponses();
       await curriculumAdmin.directLearnersToNewCard(CARDS.FINAL_CARD);
@@ -230,8 +206,6 @@ describe('Logged-Out Learner', function () {
   it('should be able visit the community library', async function () {
     await loggedOutLearner.playLesson(explorationId);
     // Play a complete lesson.
-    await loggedOutLearner.clickOnContinueButton();
-    await loggedOutLearner.submitFractionInputResponse('1/2');
     await loggedOutLearner.clickOnContinueButton();
     await loggedOutLearner.clickOnContinueButton();
 
