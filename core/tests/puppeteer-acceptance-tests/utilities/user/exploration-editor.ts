@@ -408,6 +408,7 @@ const commonModalBodySelector = '.e2e-test-modal-body';
 const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
 
 const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
+const improvementsTabButton = '.e2e-test-improvements-tab';
 const formErrorContainer = '.e2e-test-form-error-container';
 const numberWithUnitsModalSelector =
   '.e2e-test-number-with-units-help-modal-header';
@@ -2940,13 +2941,8 @@ export class ExplorationEditor extends BaseUser {
     interactionType: INTERACTION_TYPES
   ): Promise<void> {
     const interactionTabs: Record<string, INTERACTION_TYPES[]> = {
-      [INTERACTION_TABS.PROGRAMMING]: [
-        INTERACTION_TYPES.CODE_EDITOR,
-        INTERACTION_TYPES.PENCIL_CODE_EDITOR,
-      ],
       [INTERACTION_TABS.MATHS]: [
         INTERACTION_TYPES.FRACTION_INPUT,
-        INTERACTION_TYPES.GRAPH_THEORY,
         INTERACTION_TYPES.NUMBER_INPUT,
         INTERACTION_TYPES.SET_INPUT,
         INTERACTION_TYPES.NUMERIC_EXPRESSION,
@@ -2955,8 +2951,6 @@ export class ExplorationEditor extends BaseUser {
         INTERACTION_TYPES.NUMBER_WITH_UNITS,
         INTERACTION_TYPES.RATIO_EXPRESSION_INPUT,
       ],
-      [INTERACTION_TABS.GEOGRAPHY]: [INTERACTION_TYPES.WORLD_MAP],
-      [INTERACTION_TABS.MUSIC]: [INTERACTION_TYPES.MUSIC_NOTES_INPUT],
     };
 
     for (const interaction in interactionTabs) {
@@ -4959,6 +4953,16 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to verify that the improvements tab is hidden.
+   * @param visible - Expected visibility.
+   */
+  async expectImprovementsTabToBePresnt(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(improvementsTabButton, visible);
+  }
+
+  /**
    * Function to submit an answer to a form input field.
    *
    * This function first determines the type of the input field in the DOM using the getInputType function.
@@ -5098,20 +5102,22 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * This function creates simple Programming Exploration.
+   * This function creates an exploration with an interaction that is not
+   * supported on the mobile app (e.g. SetInput). This is useful for testing
+   * validation errors when adding mobile-unsupported explorations to stories.
    * Starts at new Exploration Editor Page.
-   * Ends at same page, after adding programming interaction and saving the
+   * Ends at same page, after adding the unsupported interaction and saving the
    * draft.
    */
-  async createSimpleProgrammingExploration(): Promise<string> {
+  async createSimpleUnsupportedExploration(): Promise<string> {
     // Check if element to add interaction is visible (pre-check)
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
 
     await this.createMinimalExploration(
-      'This is a test Programming Exploration',
-      INTERACTION_TYPES.CODE_EDITOR
+      'This is a test Math Exploration',
+      INTERACTION_TYPES.SET_INPUT
     );
 
     const lastInteraction = 'Last Card';
@@ -5132,7 +5138,7 @@ export class ExplorationEditor extends BaseUser {
 
     await this.saveExplorationDraft();
     const explorationId = await this.publishExplorationWithMetadata(
-      'Simple Code Editor',
+      'Simple Math Exploration',
       'This is goal here',
       'Algebra'
     );
