@@ -3600,7 +3600,7 @@ export class LoggedOutUser extends BaseUser {
    * @param fraction - The fraction answer to submit.
    */
   async submitFractionInputResponse(fraction: string): Promise<void> {
-    await this.waitForElementToBeClickable(fractionInputSelector);
+    await this.waitForElementToStabilize(fractionInputSelector);
     await this.clearAllTextFrom(fractionInputSelector);
     await this.typeInInputField(fractionInputSelector, fraction);
     await this.submitResponse();
