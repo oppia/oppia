@@ -40,6 +40,8 @@ import {
   RecentFeedbackMessages,
 } from './services/moderator-page-backend-api.service';
 
+import {HttpErrorResponse} from '@angular/common/http';
+
 describe('Moderator Page Component', () => {
   let fixture: ComponentFixture<ModeratorPageComponent>;
   let componentInstance: ModeratorPageComponent;
@@ -190,9 +192,9 @@ describe('Moderator Page Component', () => {
   });
 
   it('should tell if message is from exploration', () => {
-    expect(componentInstance.isMessageFromExploration(message)).toBeTrue();
+    expect(componentInstance.isMessageFromExploration(message)).toBe(true);
     message.entityType = 'other_than_exploration';
-    expect(componentInstance.isMessageFromExploration(message)).toBeFalse();
+    expect(componentInstance.isMessageFromExploration(message)).toBe(false);
   });
 
   it('should get exploration create url', () => {
@@ -219,15 +221,15 @@ describe('Moderator Page Component', () => {
     componentInstance.displayedFeaturedActivityReferences = [
       {id: '', type: 'emptyID'},
     ];
-    expect(
-      componentInstance.isSaveFeaturedActivitiesButtonDisabled()
-    ).toBeTrue();
+    expect(componentInstance.isSaveFeaturedActivitiesButtonDisabled()).toBe(
+      true
+    );
     componentInstance.displayedFeaturedActivityReferences = [
       {id: 'is', type: 'not'},
     ];
-    expect(
-      componentInstance.isSaveFeaturedActivitiesButtonDisabled()
-    ).toBeFalse();
+    expect(componentInstance.isSaveFeaturedActivitiesButtonDisabled()).toBe(
+      false
+    );
   });
 
   it('should save featured activity references', () => {
@@ -271,23 +273,27 @@ describe('Moderator Page Component', () => {
     componentInstance.displayedFeaturedActivityReferences = [];
     componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
 
-    const mockError = {
+    const mockError = new HttpErrorResponse({
       status: 400,
       error: {
         error:
           'These Exploration IDs do not exist: dne_exploration. Please enter a different ID.',
       },
-    };
+    });
 
     spyOn(
-      componentInstance.moderatorPageBackendApiService,
+      (
+        componentInstance as unknown as {
+          moderatorPageBackendApiService: ModeratorPageBackendApiService;
+        }
+      ).moderatorPageBackendApiService,
       'saveFeaturedActivityReferencesAsync'
     ).and.callFake(() => {
       return {
         then: () => {
           return {
-            catch: (errorCallback: (err: string) => void) => {
-              errorCallback(mockError);
+            catch: (errorCallback: (err: HttpErrorResponse) => void) => {
+              errorCallback(mockError as HttpErrorResponse);
             },
           };
         },
@@ -314,23 +320,27 @@ describe('Moderator Page Component', () => {
     componentInstance.displayedFeaturedActivityReferences = [];
     componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
 
-    const mockError = {
+    const mockError = new HttpErrorResponse({
       status: 400,
       error: {
         error:
           'These Collection IDs do not exist: dne_collection. Please enter a different ID.',
       },
-    };
+    });
 
     spyOn(
-      componentInstance.moderatorPageBackendApiService,
+      (
+        componentInstance as unknown as {
+          moderatorPageBackendApiService: ModeratorPageBackendApiService;
+        }
+      ).moderatorPageBackendApiService,
       'saveFeaturedActivityReferencesAsync'
     ).and.callFake(() => {
       return {
         then: () => {
           return {
-            catch: (errorCallback: (err: string) => void) => {
-              errorCallback(mockError);
+            catch: (errorCallback: (err: HttpErrorResponse) => void) => {
+              errorCallback(mockError as HttpErrorResponse);
             },
           };
         },
@@ -357,23 +367,27 @@ describe('Moderator Page Component', () => {
     componentInstance.displayedFeaturedActivityReferences = [];
     componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
 
-    const mockError = {
+    const mockError = new HttpErrorResponse({
       status: 400,
       error: {
         error:
           'These Exploration IDs are private: priv_exploration. Please enter a different ID.',
       },
-    };
+    });
 
     spyOn(
-      componentInstance.moderatorPageBackendApiService,
+      (
+        componentInstance as unknown as {
+          moderatorPageBackendApiService: ModeratorPageBackendApiService;
+        }
+      ).moderatorPageBackendApiService,
       'saveFeaturedActivityReferencesAsync'
     ).and.callFake(() => {
       return {
         then: () => {
           return {
-            catch: (errorCallback: (err: string) => void) => {
-              errorCallback(mockError);
+            catch: (errorCallback: (err: HttpErrorResponse) => void) => {
+              errorCallback(mockError as HttpErrorResponse);
             },
           };
         },
@@ -400,23 +414,27 @@ describe('Moderator Page Component', () => {
     componentInstance.displayedFeaturedActivityReferences = [];
     componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
 
-    const mockError = {
+    const mockError = new HttpErrorResponse({
       status: 400,
       error: {
         error:
           'These Collection IDs are private: priv_collection. Please enter a different ID.',
       },
-    };
+    });
 
     spyOn(
-      componentInstance.moderatorPageBackendApiService,
+      (
+        componentInstance as unknown as {
+          moderatorPageBackendApiService: ModeratorPageBackendApiService;
+        }
+      ).moderatorPageBackendApiService,
       'saveFeaturedActivityReferencesAsync'
     ).and.callFake(() => {
       return {
         then: () => {
           return {
-            catch: (errorCallback: (err: string) => void) => {
-              errorCallback(mockError);
+            catch: (errorCallback: (err: HttpErrorResponse) => void) => {
+              errorCallback(mockError as HttpErrorResponse);
             },
           };
         },
@@ -433,22 +451,26 @@ describe('Moderator Page Component', () => {
   it('should display message for miscellaneous errors', () => {
     spyOn(alertsService, 'addWarning');
 
-    const mockError = {
+    const mockError = new HttpErrorResponse({
       status: 404,
       error: {
         error: '',
       },
-    };
+    });
 
     spyOn(
-      componentInstance.moderatorPageBackendApiService,
+      (
+        componentInstance as unknown as {
+          moderatorPageBackendApiService: ModeratorPageBackendApiService;
+        }
+      ).moderatorPageBackendApiService,
       'saveFeaturedActivityReferencesAsync'
     ).and.callFake(() => {
       return {
         then: () => {
           return {
-            catch: (errorCallback: (err: string) => void) => {
-              errorCallback(mockError);
+            catch: (errorCallback: (err: HttpErrorResponse) => void) => {
+              errorCallback(mockError as HttpErrorResponse);
             },
           };
         },

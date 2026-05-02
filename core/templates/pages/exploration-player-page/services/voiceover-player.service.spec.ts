@@ -19,7 +19,10 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
-import {EntityVoiceovers} from '../../../domain/voiceover/entity-voiceovers.model';
+import {
+  EntityVoiceovers,
+  EntityVoiceoversBackendDict,
+} from '../../../domain/voiceover/entity-voiceovers.model';
 import {EntityVoiceoversService} from '../../../services/entity-voiceovers.services';
 import {
   Voiceover,
@@ -68,12 +71,13 @@ describe('Voiceover player service', () => {
     );
     autoVoiceover = Voiceover.createFromBackendDict(autoVoiceoverBackendDict);
 
-    let entityVoiceoversBackendDict = {
+    let entityVoiceoversBackendDict: EntityVoiceoversBackendDict = {
       entity_id: 'exp_1',
       entity_type: 'exploration',
       entity_version: 1,
       language_accent_code: 'en-US',
       voiceovers_mapping: contentIdToVoiceoversMapping,
+      automated_voiceovers_audio_offsets_msecs: {},
     };
     entityVoiceovers = EntityVoiceovers.createFromBackendDict(
       entityVoiceoversBackendDict
@@ -112,14 +116,14 @@ describe('Voiceover player service', () => {
   it('should be able to get active voiceovers', () => {
     voiceoverPlayerService.activeVoiceover = manualVoiceover;
 
-    expect(voiceoverPlayerService.getActiveVoiceover().filename).toEqual(
-      'a.mp3'
-    );
+    expect(
+      (voiceoverPlayerService.getActiveVoiceover() as Voiceover).filename
+    ).toEqual('a.mp3');
 
     manualVoiceover.filename = 'b.mp3';
-    expect(voiceoverPlayerService.getActiveVoiceover().filename).toEqual(
-      'b.mp3'
-    );
+    expect(
+      (voiceoverPlayerService.getActiveVoiceover() as Voiceover).filename
+    ).toEqual('b.mp3');
   });
 
   it('should be able to get active content id', () => {

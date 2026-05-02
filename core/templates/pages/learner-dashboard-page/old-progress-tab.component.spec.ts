@@ -126,7 +126,8 @@ describe('Old Progress tab Component', () => {
       story_titles: ['Story 1'],
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      classroom: 'math',
+      classroom_name: 'math',
+      classroom_url_fragment: 'math',
       practice_tab_is_displayed: true,
       canonical_story_summary_dict: [
         {
@@ -177,12 +178,12 @@ describe('Old Progress tab Component', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.windowIsNarrow).toBeTrue();
+    expect(component.windowIsNarrow).toBe(true);
 
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
     mockResizeEmitter.emit();
 
-    expect(component.windowIsNarrow).toBeFalse();
+    expect(component.windowIsNarrow).toBe(false);
   }));
 
   it('should get static image url', () => {

@@ -25,7 +25,6 @@ import {PlayerPositionService} from './player-position.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {StateCard} from '../../../domain/state_card/state-card.model';
 import {Interaction} from '../../../domain/exploration/interaction.model';
-import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 
 describe('Player position service', () => {
   let pts: PlayerTranscriptService;
@@ -48,17 +47,17 @@ describe('Player position service', () => {
   });
 
   it('should record answer submission as true', () => {
-    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBeFalse();
+    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBe(false);
     pps.recordAnswerSubmission();
-    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBeTrue();
+    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBe(true);
   });
 
   it('should record answer submission by the learner as false', () => {
-    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBeFalse();
+    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBe(false);
     pps.recordAnswerSubmission();
-    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBeTrue();
+    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBe(true);
     pps.recordNavigationButtonClick();
-    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBeFalse();
+    expect(pps.hasLearnerJustSubmittedAnAnswer()).toBe(false);
   });
 
   it('should set displayed index card to given value', () => {
@@ -76,7 +75,6 @@ describe('Player position service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
         ''
       )
     );
@@ -87,7 +85,6 @@ describe('Player position service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
         ''
       )
     );

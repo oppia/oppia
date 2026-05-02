@@ -659,7 +659,9 @@ describe('Library Page Component', () => {
 
     const tile = document.createElement('div');
     tile.classList.add('oppia-library-carousel-tiles');
-    componentInstance.el.nativeElement.appendChild(tile);
+    (
+      componentInstance as unknown as {el: ElementRef}
+    ).el.nativeElement.appendChild(tile);
     componentInstance.initCarousels();
     expect(componentInstance.leftmostCardIndices.length).toEqual(1);
   });
@@ -704,8 +706,8 @@ describe('Library Page Component', () => {
     spyOnProperty(HTMLElement.prototype, 'scrollLeft', 'get').and.returnValue(
       0
     );
-    spyOn(window, 'requestAnimationFrame').and.callFake(callback =>
-      callback(0)
+    spyOn(window, 'requestAnimationFrame').and.callFake(
+      (callback: FrameRequestCallback) => callback(0)
     );
 
     componentInstance.scroll(3, false);
@@ -756,8 +758,8 @@ describe('Library Page Component', () => {
     spyOnProperty(HTMLElement.prototype, 'scrollLeft', 'get').and.returnValue(
       0
     );
-    spyOn(window, 'requestAnimationFrame').and.callFake(callback =>
-      callback(0)
+    spyOn(window, 'requestAnimationFrame').and.callFake(
+      (callback: FrameRequestCallback) => callback(0)
     );
 
     componentInstance.tileDisplayCount = 5;
@@ -834,16 +836,16 @@ describe('Library Page Component', () => {
     expect(componentInstance.dots).toEqual([0, 0, 1]);
 
     componentInstance.currentCardIndex = 0;
-    expect(
-      componentInstance.shouldShowPreviousClassroomChunkButton()
-    ).toBeFalse();
-    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBeTrue();
+    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
+      false
+    );
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(true);
 
     componentInstance.currentCardIndex = 2;
-    expect(
-      componentInstance.shouldShowPreviousClassroomChunkButton()
-    ).toBeTrue();
-    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBeFalse();
+    expect(componentInstance.shouldShowPreviousClassroomChunkButton()).toBe(
+      true
+    );
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBe(false);
   });
 
   it('should record analytics when classroom card is clicked', () => {
@@ -858,7 +860,9 @@ describe('Library Page Component', () => {
   });
   it('should set max-width style on carousel element when it exists', fakeAsync(() => {
     const originalLibraryTileWidth = AppConstants.LIBRARY_TILE_WIDTH_PX;
-    AppConstants.LIBRARY_TILE_WIDTH_PX = 200;
+    (
+      AppConstants as unknown as {LIBRARY_TILE_WIDTH_PX: number}
+    ).LIBRARY_TILE_WIDTH_PX = 200;
 
     componentInstance.tileDisplayCount = 3;
     componentInstance.libraryWindowIsNarrow = false;
@@ -883,14 +887,17 @@ describe('Library Page Component', () => {
 
     let carouselElement = document.createElement('div');
     carouselElement.setAttribute('class', 'oppia-library-carousel');
-    componentInstance.el.nativeElement.appendChild(carouselElement);
+    (
+      componentInstance as unknown as {el: ElementRef}
+    ).el.nativeElement.appendChild(carouselElement);
 
-    spyOn(componentInstance.el.nativeElement, 'querySelector').and.returnValue(
-      carouselElement
-    );
+    spyOn(
+      (componentInstance as unknown as {el: ElementRef}).el.nativeElement,
+      'querySelector'
+    ).and.returnValue(carouselElement);
 
     let rendererSetStyleSpy = spyOn(
-      componentInstance.renderer,
+      (componentInstance as unknown as {renderer: Renderer2}).renderer,
       'setStyle'
     ).and.callThrough();
 
@@ -918,7 +925,9 @@ describe('Library Page Component', () => {
     );
     expect(rendererSetStyleSpy).toHaveBeenCalledTimes(1);
 
-    AppConstants.LIBRARY_TILE_WIDTH_PX = originalLibraryTileWidth;
+    (
+      AppConstants as unknown as {LIBRARY_TILE_WIDTH_PX: number}
+    ).LIBRARY_TILE_WIDTH_PX = originalLibraryTileWidth;
   }));
 
   it('should scroll the carousel to the right smoothly', fakeAsync(() => {
@@ -951,14 +960,14 @@ describe('Library Page Component', () => {
 
     componentInstance.scroll(ind, isLeftScroll);
 
-    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toBeTrue();
+    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toBe(true);
 
     for (let i = 0; i <= 5; i++) {
       currentTime += 160;
       tick(160);
     }
 
-    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toBeFalse();
+    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toBe(false);
 
     expect(componentInstance.leftmostCardIndices[ind]).toBe(2);
 
