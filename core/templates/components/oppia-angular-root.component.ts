@@ -138,6 +138,8 @@ export const registerCustomElements = (injector: Injector): void => {
       (
         componentMap as unknown as Record<
           string,
+          // The 'unknown' type is used here because the component class
+          // can be any type.
           {component_class: Type<unknown>}
         >
       )[rteKey].component_class,
@@ -154,6 +156,9 @@ export const registerCustomElements = (injector: Injector): void => {
           (
             ServicesConstants.RTE_COMPONENT_SPECS as unknown as Record<
               string,
+              // The 'unknown' type is used here because the frontend_id
+              // is of type string but the RTE_COMPONENT_SPECS record can
+              // contain any type of value.
               {frontend_id: string}
             >
           )[rteKey].frontend_id
@@ -166,6 +171,9 @@ export const registerCustomElements = (injector: Injector): void => {
         (
           ServicesConstants.RTE_COMPONENT_SPECS as unknown as Record<
             string,
+            // The 'unknown' type is used here because the frontend_id
+            // is of type string but the RTE_COMPONENT_SPECS record can
+            // contain any type of value.
             {frontend_id: string}
           >
         )[rteKey].frontend_id,
@@ -189,10 +197,13 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static pageTitleService: PageTitleService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
   static rteElementsAreInitialized: boolean = false;
+  // The 'unknown' type is used here because the rteHelperService can be
+  // of any type.
   static rteHelperService: RteHelperService | unknown;
   static ratingComputationService: RatingComputationService;
   static reviewTestBackendApiService: ReviewTestBackendApiService;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
+  // The 'unknown' type is used here because the value can be of any type.
   static ajsValueProvider: (key: string, value: unknown) => void;
   static injector: Injector;
 
@@ -228,6 +239,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     }
     this.ngZone.runOutsideAngular(() => {
       CkEditorInitializerService.ckEditorInitializer(
+        // The 'unknown' type is used here because the rteHelperService can be
+        // of any type.
         OppiaAngularRootComponent.rteHelperService as unknown as RteHelperServiceLocal,
         this.htmlEscaperService,
         this.pageContextService,

@@ -72,9 +72,13 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
 
   rulesMemento: Rule[] | null = null;
   directiveSubscriptions = new Subscription();
+  // The 'unknown' type is used here because the record can contain any type
+  // of value.
   originalContentIdToContent!: Record<string, unknown>;
   activeRuleIndex!: number;
   answerChoices!: AnswerChoice[];
+  // The 'unknown' type is used here because the record can contain any type
+  // of value.
   editAnswerGroupForm: Record<string, unknown> = {};
   tagMisconceptionsFeatureFlagIsEnabled: boolean = false;
 
@@ -224,6 +228,8 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     let ruleDescriptions = (
       INTERACTION_SPECS as unknown as Record<
         string,
+        // The 'unknown' type is used here because the generic type of
+        // the record depends on the specific interaction.
         {rule_descriptions: Record<string, string>}
       >
     )[interactionId].rule_descriptions;
@@ -238,6 +244,8 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     let description = ruleDescriptions[ruleType];
 
     let PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+    // The 'unknown' type is used here because the record can contain any type
+    // of value.
     let inputs: Record<string, unknown> = {};
     const inputTypes: RuleInputTypes = {};
     let match;
@@ -344,7 +352,12 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
       );
     }
     return (
-      INTERACTION_SPECS as unknown as Record<string, {is_trainable: boolean}>
+      INTERACTION_SPECS as unknown as Record<
+        string,
+        // The 'unknown' type is used here because the generic type of
+        // the record depends on the specific interaction.
+        {is_trainable: boolean}
+      >
     )[interactionId].is_trainable;
   }
 
@@ -362,7 +375,11 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
    * @returns {Object} A Mapping of content ids (string) to content
    *   (string).
    */
+  // The 'unknown' type is used here because the record can contain any type
+  // of value.
   getTranslatableRulesContentIdToContentMap(): Record<string, unknown> {
+    // The 'unknown' type is used here because the record can contain any type
+    // of value.
     const contentIdToContentMap: Record<string, unknown> = {};
     this.rules.forEach(rule => {
       Object.keys(rule.inputs).forEach(ruleName => {

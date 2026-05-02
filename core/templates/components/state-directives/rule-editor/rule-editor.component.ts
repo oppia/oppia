@@ -78,6 +78,8 @@ export class RuleEditorComponent
   ruleDescriptionChoices!: Choice[];
   isInvalid: boolean = false;
   eventBusGroup: EventBusGroup;
+  // The 'unknown' type is used here because the record can contain any type
+  // of value.
   editRuleForm: Record<string, unknown> = {};
 
   constructor(
@@ -100,6 +102,8 @@ export class RuleEditorComponent
     let ruleDescription = (
       INTERACTION_SPECS as unknown as Record<
         string,
+        // The 'unknown' type is used here because the generic type of
+        // the record depends on the specific interaction.
         {rule_descriptions: Record<string, string>}
       >
     )[this.currentInteractionId].rule_descriptions[this.rule.type];

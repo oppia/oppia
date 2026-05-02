@@ -33,6 +33,8 @@ type ScopedValue =
   | string
   | number
   | boolean
+  // The 'unknown' type is used here because the record can contain any type
+  // of value.
   | Record<string, unknown>
   | null
   | undefined;
@@ -74,6 +76,8 @@ export class InteractionDisplayComponent {
       const interactionMapping =
         TAG_TO_INTERACTION_MAPPING as unknown as Record<
           string,
+          // The 'unknown' type is used here because the generic type of
+          // the record depends on the specific interaction.
           Type<Record<string, unknown>>
         >;
       const firstChild = dom.body.firstElementChild;

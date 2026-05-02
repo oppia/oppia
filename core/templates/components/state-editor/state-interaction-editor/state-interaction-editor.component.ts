@@ -216,6 +216,8 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
     };
     this.onSaveInteractionData.emit(interactionData);
 
+    // The 'unknown' type is used here because the nextContentIdIndex
+    // is not known at this point.
     this.onSaveNextContentIdIndex.emit(undefined as unknown as number);
     this.interactionDetailsCacheService.set(
       this.stateInteractionIdService.savedMemento,
@@ -274,8 +276,13 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       })
       .result.then(
         () => {
-          this.stateInteractionIdService.displayed =
-            null as unknown as InteractionSpecsKey;
+          this.stateInteractionIdService.displayed = +(
+            // The 'unknown' type is used here because the interactionId
+            (+(
+              // is null when it is deleted.
+              null
+            ))
+          ) as unknown as InteractionSpecsKey;
           this.stateCustomizationArgsService.displayed = {};
           this.stateSolutionService.displayed = null;
           this.interactionDetailsCacheService.removeDetails(

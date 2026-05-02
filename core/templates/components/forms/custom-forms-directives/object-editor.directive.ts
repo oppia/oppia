@@ -136,6 +136,10 @@ const EDITORS = {
   'translatable-set-of-unicode-string':
     TranslatableSetOfUnicodeStringEditorComponent,
   'unicode-string': UnicodeStringEditorComponent,
+  // The 'unknown' type is used here because the generic type of ObjectEditor
+  // depends on the specific editor being instantiated, which is determined
+  // at runtime. Defining a strictly typed union for all possible editor
+  // types is complex and outside the scope of this migration.
 } as unknown as Record<string, Type<ObjectEditor<unknown>>>;
 
 interface AngularJSFormController {
@@ -211,6 +215,8 @@ export class ObjectEditorComponent
   }
 
   @Output() valueChange = new EventEmitter();
+  // The 'unknown' type is used here because the generic type of ObjectEditor
+  // depends on the specific editor being instantiated.
   componentRef!: ComponentRef<ObjectEditor<unknown>>;
   componentSubscriptions = new Subscription();
   onChange: (_: SchemaDefaultValue) => void = () => {};
@@ -272,7 +278,8 @@ export class ObjectEditorComponent
         );
       this.viewContainerRef.clear();
       // ObjectEditor type is used to access the instance of the
-      // component created.
+      // component created. The 'unknown' type is used because the
+      // generic type of the instance depends on the specific editor.
       const componentRef =
         this.viewContainerRef.createComponent<ObjectEditor<unknown>>(
           componentFactory
