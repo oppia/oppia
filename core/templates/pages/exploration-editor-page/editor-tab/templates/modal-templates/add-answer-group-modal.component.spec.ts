@@ -28,6 +28,7 @@ import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/servic
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {Outcome} from 'domain/exploration/outcome.model';
+import {Rule} from 'domain/exploration/rule.model';
 import {Subscription} from 'rxjs';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
@@ -211,5 +212,39 @@ describe('Add Answer Group Modal Component', () => {
     component.updateState('update');
 
     expect(saveOutcomeDestDetailsSpy).toHaveBeenCalled();
+  });
+
+  describe('isRuleValid', () => {
+    it('should return true when interaction is not NumericInput', () => {
+      component.currentInteractionId = 'TextInput';
+      component.tmpRule = new Rule('Equals', {}, {});
+      expect(component.isRuleValid()).toBe(true);
+    });
+
+    it('should return true when interaction is NumericInput but rule is not IsWithinTolerance', () => {
+      component.currentInteractionId = 'NumericInput';
+      component.tmpRule = new Rule('Equals', {x: 5}, {});
+      expect(component.isRuleValid()).toBe(true);
+    });
+
+    it('should return true when interaction is NumericInput, rule is IsWithinTolerance, and tol is >= 0', () => {
+      component.currentInteractionId = 'NumericInput';
+      component.tmpRule = new Rule(
+        'IsWithinTolerance',
+        {tol: 0, x: 5},
+        {tol: 'Real', x: 'Real'}
+      );
+      expect(component.isRuleValid()).toBe(true);
+    });
+
+    it('should return false when interaction is NumericInput, rule is IsWithinTolerance, and tol is < 0', () => {
+      component.currentInteractionId = 'NumericInput';
+      component.tmpRule = new Rule(
+        'IsWithinTolerance',
+        {tol: -2, x: 5},
+        {tol: 'Real', x: 'Real'}
+      );
+      expect(component.isRuleValid()).toBe(false);
+    });
   });
 });
