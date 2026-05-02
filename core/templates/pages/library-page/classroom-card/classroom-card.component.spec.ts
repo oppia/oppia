@@ -76,8 +76,8 @@ describe('ClassroomCardComponent', () => {
 
   it('should show translated classroom name if translation key is present', () => {
     component.classroomSummary = dummyClassroomData;
-    component.classroomSummary.name = null;
-    expect(component.isHackyClassroomNameTranslationDisplayed()).toBeFalse();
+    component.classroomSummary.name = '' as unknown as string;
+    expect(component.isHackyClassroomNameTranslationDisplayed()).toBe(false);
 
     component.classroomSummary.name = 'math';
     spyOn(
@@ -102,6 +102,6 @@ describe('ClassroomCardComponent', () => {
     expect(component.classroomNameTranslationKey).toEqual(
       'I18N_CLASSROOM_MATH_NAME'
     );
-    expect(component.isHackyClassroomNameTranslationDisplayed()).toBeTrue();
+    expect(component.isHackyClassroomNameTranslationDisplayed()).toBe(true);
   });
 });
