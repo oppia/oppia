@@ -39,7 +39,6 @@ describe('Pretest question backend API service', function () {
           classifier_model_id: null,
           param_changes: [],
           solicit_answer_details: false,
-          inapplicable_skill_misconception_ids: [],
           content: {
             content_id: '1',
             html: 'Question 1',

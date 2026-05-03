@@ -24,20 +24,10 @@ describe('ObjectsDomainConstants', () => {
   let unitPrefixes: string[] = [];
   let currencyUnits: string[] = [];
   let mathjsUnits: string[] = [];
-
-  const math = create(all, {});
+  const math = create(all);
 
   const isValidUnit = (unit: string): boolean => {
-    const unitHelper = math.Unit as unknown as {
-      isValuelessUnit?: (u: string) => boolean;
-    };
-
-    const isValueless =
-      typeof unitHelper.isValuelessUnit === 'function'
-        ? unitHelper.isValuelessUnit(unit)
-        : false;
-
-    return currencyUnits.includes(unit) || isValueless;
+    return currencyUnits.includes(unit) || math.Unit.isValuelessUnit(unit);
   };
 
   const isValidPrefix = (prefix: string): boolean => {
@@ -45,39 +35,27 @@ describe('ObjectsDomainConstants', () => {
   };
 
   const getUnitPrefixes = (): string[] => {
-    const unitClass = math.Unit as unknown as {
-      PREFIXES?: Record<string, Record<string, unknown>>;
-    };
-
-    const prefixes = unitClass.PREFIXES ?? {};
-    const prefixSet = new Set<string>();
-
-    Object.keys(prefixes).forEach(name => {
+    const prefixes = math.Unit.PREFIXES;
+    let prefixSet = new Set<string>();
+    for (const name in prefixes) {
+      // Skip if prefix type is 'NONE'.
       if (name === 'NONE') {
-        return;
+        continue;
       }
-
-      const group = prefixes[name];
-      if (!group) {
-        return;
-      }
-
-      Object.keys(group).forEach(prefix => {
-        if (prefix !== '') {
-          prefixSet.add(prefix);
+      for (const prefix in prefixes[name]) {
+        // Each prefix type has an empty key that we can ignore.
+        if (prefix === '') {
+          continue;
         }
-      });
-    });
+        prefixSet.add(prefix);
+      }
+    }
 
     return Array.from(prefixSet);
   };
 
   const getAllMathjsUnits = (): string[] => {
-    const unitClass = math.Unit as unknown as {
-      units?: Record<string, unknown>;
-    };
-
-    return unitClass.units ? Object.keys(unitClass.units) : [];
+    return Object.keys(math.Unit.UNITS);
   };
 
   beforeEach(() => {
@@ -86,55 +64,77 @@ describe('ObjectsDomainConstants', () => {
     mathjsUnits = getAllMathjsUnits();
   });
 
-  it('should check that every value in UNIT_TO_NORMALIZED_UNIT_MAPPING is a valid unit', () => {
-    Object.values(
-      ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING
-    ).forEach((unit: string) => {
-      expect(isValidUnit(unit)).toBe(true);
-    });
-  });
-
-  it('should check that every key in UNIT_TO_NORMALIZED_UNIT_MAPPING is a valid unit', () => {
-    Object.keys(ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING).forEach(
-      (unit: string) => {
+  it(
+    'should check that every value in UNIT_TO_' +
+      'NORMALIZED_UNIT_MAPPING is a valid unit',
+    () => {
+      Object.values(
+        ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING
+      ).forEach(unit => {
         expect(isValidUnit(unit)).toBe(true);
-      }
-    );
-  });
+      });
+    }
+  );
 
-  it('should check that all mathjs units are present in UNIT_TO_NORMALIZED_UNIT_MAPPING', () => {
-    const units = Object.keys(
-      ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING
-    ).filter((unit: string) => !currencyUnits.includes(unit));
+  it(
+    'should check that every key in UNIT_TO_' +
+      'NORMALIZED_UNIT_MAPPING is a valid unit',
+    () => {
+      Object.keys(
+        ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING
+      ).forEach(unit => {
+        expect(isValidUnit(unit)).toBe(true);
+      });
+    }
+  );
 
-    const missingUnits = mathjsUnits.filter(
-      (unit: string) => !units.includes(unit)
-    );
+  it(
+    'should check that the UNIT_TO_NORMALIZED_UNIT_MAPPING contains' +
+      'all units supported by mathjs',
+    () => {
+      const units = Object.keys(
+        ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING
+      )
+        .filter((unit: string) => {
+          return !currencyUnits.includes(unit);
+        })
+        .sort();
+      expect(units).toEqual(mathjsUnits.sort());
+    }
+  );
 
-    expect(missingUnits).toEqual([]);
-  });
+  it(
+    'should check that every value in PREFIX_TO_' +
+      'NORMALIZED_PREFIX_MAPPING is a valid prefix',
+    () => {
+      Object.values(
+        ObjectsDomainConstants.PREFIX_TO_NORMALIZED_PREFIX_MAPPING
+      ).forEach(prefix => {
+        expect(isValidPrefix(prefix)).toBe(true);
+      });
+    }
+  );
 
-  it('should check that every value in PREFIX_TO_NORMALIZED_PREFIX_MAPPING is a valid prefix', () => {
-    Object.values(
-      ObjectsDomainConstants.PREFIX_TO_NORMALIZED_PREFIX_MAPPING
-    ).forEach((prefix: string) => {
-      expect(isValidPrefix(prefix)).toBe(true);
-    });
-  });
+  it(
+    'should check that every key in PREFIX_TO_' +
+      'NORMALIZED_PREFIX_MAPPING is a valid prefix',
+    () => {
+      Object.keys(
+        ObjectsDomainConstants.PREFIX_TO_NORMALIZED_PREFIX_MAPPING
+      ).forEach(prefix => {
+        expect(isValidPrefix(prefix)).toBe(true);
+      });
+    }
+  );
 
-  it('should check that every key in PREFIX_TO_NORMALIZED_PREFIX_MAPPING is a valid prefix', () => {
-    Object.keys(
-      ObjectsDomainConstants.PREFIX_TO_NORMALIZED_PREFIX_MAPPING
-    ).forEach((prefix: string) => {
-      expect(isValidPrefix(prefix)).toBe(true);
-    });
-  });
-
-  it('should check that the PREFIX_TO_NORMALIZED_PREFIX_MAPPING contains all prefixes supported by mathjs', () => {
-    const prefixes = Object.keys(
-      ObjectsDomainConstants.PREFIX_TO_NORMALIZED_PREFIX_MAPPING
-    ).sort();
-
-    expect(prefixes).toEqual(unitPrefixes.sort());
-  });
+  it(
+    'should check that the PREFIX_TO_NORMALIZED_PREFIX_MAPPING contains' +
+      'all prefixes supported by mathjs',
+    () => {
+      const prefixes = Object.keys(
+        ObjectsDomainConstants.PREFIX_TO_NORMALIZED_PREFIX_MAPPING
+      ).sort();
+      expect(prefixes).toEqual(unitPrefixes.sort());
+    }
+  );
 });

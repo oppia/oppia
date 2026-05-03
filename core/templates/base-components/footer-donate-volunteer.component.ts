@@ -36,8 +36,8 @@ export class FooterDonateVolunteerComponent implements AfterViewInit {
   constructor(
     private windowRef: WindowRef,
     private siteAnalyticsService: SiteAnalyticsService,
-    public renderer: Renderer2,
-    public el: ElementRef
+    private renderer: Renderer2,
+    private el: ElementRef
   ) {}
 
   ngAfterViewInit(): void {

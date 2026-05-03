@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the AudioBarComponent.
  */
 
-import {EventEmitter, NO_ERRORS_SCHEMA, ElementRef} from '@angular/core';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
@@ -142,7 +142,7 @@ describe('Audio Bar Component', () => {
       discardPeriodicTasks();
       fixture.detectChanges();
 
-      expect(component.isPaused).toBeTruthy();
+      expect(component.isPaused).toBe(true);
     })
   );
 
@@ -332,7 +332,7 @@ describe('Audio Bar Component', () => {
 
       component.onPlayButtonClicked();
       // Voiceover is still paused.
-      expect(component.isPaused).toBeTruthy();
+      expect(component.isPaused).toBeTrue();
     });
 
     it('should load audio track and play audio when play button is clicked', () => {
@@ -367,6 +367,7 @@ describe('Audio Bar Component', () => {
       let contentIdToVoiceoversMappingBackendDict = {
         content0: {
           manual: manualVoiceoverBackendDict,
+          auto: undefined,
         },
       };
       let entityId = 'exploration_1';
@@ -408,10 +409,7 @@ describe('Audio Bar Component', () => {
       component.voiceoverToBePlayed = undefined;
       component.updateDisplayableLanguageAccentDescription();
 
-      // Fix: Only cast to Voiceover if not undefined.
-      expect(
-        (component.voiceoverToBePlayed as Voiceover | undefined)?.filename
-      ).toEqual('a.mp3');
+      expect(component.voiceoverToBePlayed.filename).toEqual('a.mp3');
     });
 
     it('should be able to update displayable language accent code for auto voiceover', () => {
@@ -423,6 +421,7 @@ describe('Audio Bar Component', () => {
       };
       let contentIdToVoiceoversMappingBackendDict = {
         content0: {
+          manual: undefined,
           auto: autoVoiceoverBackendDict,
         },
       };
@@ -468,9 +467,7 @@ describe('Audio Bar Component', () => {
 
       component.voiceoverToBePlayed = undefined;
       component.updateDisplayableLanguageAccentDescription();
-      expect(
-        (component.voiceoverToBePlayed as Voiceover | undefined)?.filename
-      ).toEqual('b.mp3');
+      expect(component.voiceoverToBePlayed.filename).toEqual('b.mp3');
     });
 
     it('should pause uploaded voiceover when pause button is clicked', () => {

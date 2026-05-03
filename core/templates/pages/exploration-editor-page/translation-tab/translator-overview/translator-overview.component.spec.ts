@@ -256,7 +256,7 @@ describe('Translator Overview component', () => {
       let translatedContent = entityTranslation.getWrittenTranslation(
         'content1'
       ) as TranslatedContent;
-      expect(translatedContent.needsUpdate).toBeFalsy();
+      expect(translatedContent.needsUpdate).toBeFalse();
 
       spyOn(changeListService, 'getTranslationChangeList').and.returnValue([
         {
@@ -271,14 +271,14 @@ describe('Translator Overview component', () => {
       translatedContent = entityTranslation.getWrittenTranslation(
         'content1'
       ) as TranslatedContent;
-      expect(translatedContent.needsUpdate).toBeTruthy();
+      expect(translatedContent.needsUpdate).toBeTrue();
     }));
 
     it('should handle mark needs update translation changes for language', fakeAsync(() => {
       let translatedContent = entityTranslation.getWrittenTranslation(
         'content1'
       ) as TranslatedContent;
-      expect(translatedContent.needsUpdate).toBeFalsy();
+      expect(translatedContent.needsUpdate).toBeFalse();
 
       spyOn(changeListService, 'getTranslationChangeList').and.returnValue([
         {
@@ -298,11 +298,11 @@ describe('Translator Overview component', () => {
       translatedContent = entityTranslation.getWrittenTranslation(
         'content1'
       ) as TranslatedContent;
-      expect(translatedContent.needsUpdate).toBeTruthy();
+      expect(translatedContent.needsUpdate).toBeTrue();
     }));
 
     it('should update entity translations with remove translation changes', fakeAsync(() => {
-      expect(entityTranslation.hasWrittenTranslation('content1')).toBeTruthy();
+      expect(entityTranslation.hasWrittenTranslation('content1')).toBeTrue();
 
       spyOn(changeListService, 'getTranslationChangeList').and.returnValue([
         {
@@ -314,7 +314,7 @@ describe('Translator Overview component', () => {
       component.ngOnInit();
       tick();
 
-      expect(entityTranslation.hasWrittenTranslation('content1')).toBeFalsy();
+      expect(entityTranslation.hasWrittenTranslation('content1')).toBeFalse();
     }));
 
     it(
@@ -366,14 +366,14 @@ describe('Translator Overview component', () => {
       spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
         true
       );
-      expect(component.canShowTabModeSwitcher()).toBeTruthy();
+      expect(component.canShowTabModeSwitcher()).toBeTrue;
     });
 
     it('should not show mode switcher if exploration is not linked to story', () => {
       spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
         false
       );
-      expect(component.canShowTabModeSwitcher()).toBeFalsy();
+      expect(component.canShowTabModeSwitcher()).toBeFalse;
     });
   });
 
@@ -535,16 +535,16 @@ describe('Translator Overview component', () => {
     entityVoiceoversService.setLanguageCode('en');
     entityVoiceoversService.addEntityVoiceovers('en-IN', entityVoiceovers);
 
-    localStorageService.setLastSelectedLanguageAccentCode('');
+    localStorageService.setLastSelectedLanguageAccentCode('en-IN');
 
     component.updateLanguageAccentCodesDropdownOptions();
     tick(5);
     flush();
     discardPeriodicTasks();
 
-    expect(component.selectedLanguageAccentCode).toEqual('en-US');
+    expect(component.selectedLanguageAccentCode).toEqual('en-IN');
 
-    localStorageService.setLastSelectedLanguageAccentCode('');
+    localStorageService.setLastSelectedLanguageAccentCode(undefined);
 
     component.updateLanguageAccentCodesDropdownOptions();
     tick(5);

@@ -55,7 +55,7 @@ describe('State Translation Status Graph Component', () => {
   let stateName: string = 'State1';
   let state = {
     recordedVoiceovers: {},
-  } as unknown as State;
+  } as State;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({

@@ -22,7 +22,6 @@ import {
   TRANSLATION_DATA_FORMAT_UNICODE,
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
-  DataFormatToDefaultValuesKey,
 } from 'domain/exploration/written-translation.model';
 
 describe('WrittenTranslation object factory', () => {
@@ -84,9 +83,9 @@ describe('WrittenTranslation object factory', () => {
   });
 
   it('should throw error for an invalid data format on creation', () => {
-    expect(() =>
-      WrittenTranslation.createNew('invalid' as DataFormatToDefaultValuesKey)
-    ).toThrowError(/Invalid translation data format: invalid/);
+    expect(() => WrittenTranslation.createNew('invalid')).toThrowError(
+      'Invalid translation data format: invalid'
+    );
   });
 
   it('should throw error if the wrong setter is used', () => {

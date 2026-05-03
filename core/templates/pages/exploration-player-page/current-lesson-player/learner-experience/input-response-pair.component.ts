@@ -116,11 +116,7 @@ export class InputResponsePairComponent {
     );
     let interaction: Interaction = displayedCard.getInteraction();
     let shortAnswerHtml = '';
-    if (
-      typeof this.data.learnerInput === 'object' &&
-      this.data.learnerInput !== null &&
-      'answerDetails' in this.data.learnerInput
-    ) {
+    if (this.data.learnerInput.hasOwnProperty('answerDetails')) {
       shortAnswerHtml = (this.data.learnerInput as {answerDetails: string})
         .answerDetails;
     } else if (

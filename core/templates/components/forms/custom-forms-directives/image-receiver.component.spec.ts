@@ -190,7 +190,9 @@ describe('ImageReceiverComponent', () => {
 
   it('should return correct format string when there is one allowed image format', () => {
     component.allowedImageFormats = ['jpeg'];
-    const formatString = component.getAllowedImageFormatsString();
+    const formatString = component.getAllowedImageFormatsString(
+      component.allowedImageFormats
+    );
     expect(formatString).toBe('Is in .jpeg format');
   });
 

@@ -102,7 +102,17 @@ describe('Edit Thumbnail Modal Component', () => {
     svgSanitizerService = TestBed.inject(SvgSanitizerService);
     closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+    // This throws "Argument of type 'mockImageObject' is not assignable to
+    // parameter of type 'HTMLImageElement'.". We need to suppress this
+    // error because 'HTMLImageElement' has around 250 more properties.
+    // We have only defined the properties we need in 'mockImageObject'.
+    // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(new MockImageObject());
+    // This throws "Argument of type 'mockReaderObject' is not assignable to
+    // parameter of type 'HTMLImageElement'.". We need to suppress this
+    // error because 'HTMLImageElement' has around 250 more properties.
+    // We have only defined the properties we need in 'mockReaderObject'.
+    // @ts-expect-error
     spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
     spyOn(component, 'updateBackgroundColor').and.callThrough();
     spyOn(component, 'setImageDimensions').and.callThrough();
@@ -150,8 +160,8 @@ describe('Edit Thumbnail Modal Component', () => {
     component.onFileChanged(file);
 
     expect(component.uploadedImage).toBeNull();
-    expect(component.invalidFilenameWarningIsShown).toBe(false);
-    expect(component.invalidImageWarningIsShown).toBe(true);
+    expect(component.invalidFilenameWarningIsShown).toBeFalse();
+    expect(component.invalidImageWarningIsShown).toBeTrue();
   });
 
   it('should not load file if it does not have a proper filename', () => {
@@ -168,20 +178,20 @@ describe('Edit Thumbnail Modal Component', () => {
     var file = new File([arrayBuffer], 'thumb..nail.svg');
     component.onFileChanged(file);
     expect(component.uploadedImage).toBeNull();
-    expect(component.invalidFilenameWarningIsShown).toBe(true);
-    expect(component.invalidImageWarningIsShown).toBe(false);
+    expect(component.invalidFilenameWarningIsShown).toBeTrue();
+    expect(component.invalidImageWarningIsShown).toBeFalse();
 
     file = new File([arrayBuffer], 'thumb/nail.svg');
     component.onFileChanged(file);
     expect(component.uploadedImage).toBeNull();
-    expect(component.invalidFilenameWarningIsShown).toBe(true);
-    expect(component.invalidImageWarningIsShown).toBe(false);
+    expect(component.invalidFilenameWarningIsShown).toBeTrue();
+    expect(component.invalidImageWarningIsShown).toBeFalse();
 
     file = new File([arrayBuffer], '.thumbnail.svg');
     component.onFileChanged(file);
     expect(component.uploadedImage).toBeNull();
-    expect(component.invalidFilenameWarningIsShown).toBe(true);
-    expect(component.invalidImageWarningIsShown).toBe(false);
+    expect(component.invalidFilenameWarningIsShown).toBeTrue();
+    expect(component.invalidImageWarningIsShown).toBeFalse();
   });
 
   it('should update bgColor on changing background color', () => {
@@ -191,13 +201,13 @@ describe('Edit Thumbnail Modal Component', () => {
     component.updateBackgroundColor('#B3D8F1');
 
     expect(component.bgColor).toBe('#B3D8F1');
-    expect(component.thumbnailHasChanged).toBe(true);
+    expect(component.thumbnailHasChanged).toBeTrue();
   });
 
   it('should check for uploaded image to be svg', () => {
     component.uploadedImageMimeType = 'image/svg+xml';
     let result = component.isUploadedImageSvg();
-    expect(result).toBe(true);
+    expect(result).toBeTrue();
   });
 
   it('should check for uploaded image to have correct filename', () => {
@@ -207,7 +217,7 @@ describe('Edit Thumbnail Modal Component', () => {
     );
     const file = new File([arrayBuffer], 'thumbnail.svg');
     let result = component.isValidFilename(file);
-    expect(result).toBe(true);
+    expect(result).toBeTrue();
   });
 
   it('should set image dimensions', () => {
@@ -222,13 +232,13 @@ describe('Edit Thumbnail Modal Component', () => {
   it('should reset the uploaded image on clicking reset button', () => {
     component.reset();
     expect(component.uploadedImage).toBeNull();
-    expect(component.openInUploadMode).toBe(true);
+    expect(component.openInUploadMode).toBeTrue();
   });
 
   it('should reset the uploaded Image and show a warning', () => {
     component.onInvalidImageLoaded();
     expect(component.uploadedImage).toBeNull();
-    expect(component.invalidImageWarningIsShown).toBe(true);
+    expect(component.invalidImageWarningIsShown).toBeTrue();
   });
 
   it('should close the modal when clicking on Add Thumbnail Button', () => {
@@ -241,7 +251,7 @@ describe('Edit Thumbnail Modal Component', () => {
       width: 180,
     };
     component.confirm();
-    expect(component.thumbnailHasChanged).toBe(false);
+    expect(component.thumbnailHasChanged).toBeFalse();
     expect(closeSpy).toHaveBeenCalledWith({
       newThumbnailDataUrl: 'uploaded_img.svg',
       newBgColor: '#fff',
@@ -273,9 +283,9 @@ describe('Edit Thumbnail Modal Component', () => {
       ).and.returnValue(fileContent);
       let file = new File([fileContent], 'triangle.svg', {type: 'image/svg'});
       component.uploadedImageMimeType = 'image/svg+xml';
-      expect(component.thumbnailHasChanged).toBe(false);
+      expect(component.thumbnailHasChanged).toBeFalse();
       component.onFileChanged(file);
-      expect(component.thumbnailHasChanged).toBe(true);
+      expect(component.thumbnailHasChanged).toBeTrue();
     }
   );
 });

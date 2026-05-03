@@ -722,16 +722,8 @@ describe('Classroom backend API service', function () {
 
   it('should update classroom index mappings successfully', fakeAsync(() => {
     const mappings = [
-      {
-        classroom_id: 'classroom_1',
-        classroom_name: 'Math',
-        classroom_index: 1,
-      },
-      {
-        classroom_id: 'classroom_2',
-        classroom_name: 'Science',
-        classroom_index: 2,
-      },
+      {classroomId: 'classroom_1', classroomName: 'Math', classroomIndex: 1},
+      {classroomId: 'classroom_2', classroomName: 'Science', classroomIndex: 2},
     ];
     let service = classroomBackendApiService;
     let successHandler = jasmine.createSpy('success');
@@ -743,7 +735,7 @@ describe('Classroom backend API service', function () {
 
     const req = httpTestingController.expectOne('/update_classrooms_order');
     expect(req.request.method).toEqual('PUT');
-    expect(req.request.body instanceof FormData).toBe(true);
+    expect(req.request.body instanceof FormData).toBeTrue();
 
     req.flush(null);
 
@@ -755,11 +747,7 @@ describe('Classroom backend API service', function () {
 
   it('should handle error during classroom index mappings update', fakeAsync(() => {
     const mappings = [
-      {
-        classroom_id: 'classroom_1',
-        classroom_name: 'Math',
-        classroom_index: 1,
-      },
+      {classroomId: 'classroom_1', classroomName: 'Math', classroomIndex: 1},
     ];
     let service = classroomBackendApiService;
     let successHandler = jasmine.createSpy('success');

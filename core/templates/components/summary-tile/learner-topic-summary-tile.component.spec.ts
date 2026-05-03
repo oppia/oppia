@@ -165,8 +165,7 @@ describe('Learner Topic Summary Tile Component', () => {
       total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      classroom_name: '',
-      classroom_url_fragment: '',
+      classroom: '',
       practice_tab_is_displayed: false,
       canonical_story_summary_dict: [
         {
