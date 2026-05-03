@@ -64,7 +64,7 @@ class ParamName(enum.Enum):
         'unpublish_exploration_email_html_body'
     )
     RECORD_PLAYTHROUGH_PROBABILITY = 'record_playthrough_probability'
-    SERVER_CAN_SEND_EMAILS = 'server_can_send_emails'
+   
     SYSTEM_EMAIL_ADDRESS = 'system_email_address'
     SYSTEM_EMAIL_NAME = 'system_email_name'
     ADMIN_EMAIL_ADDRESS = 'admin_email_address'
