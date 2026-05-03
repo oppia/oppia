@@ -228,13 +228,7 @@ class CronMailReviewerNewSuggestionsHandler(
         """Sends email notifications to reviewers about new
         suggestions on the Contributor Dashboard.
         """
-        server_can_send_emails = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
-        )
-        if not server_can_send_emails:
-            return self.render_json({})
+        
 
         if not platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
