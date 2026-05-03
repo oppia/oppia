@@ -406,7 +406,7 @@ def get_exploration_contexts_by_story_id(
         list(ExplorationContext). The corresponding list of ExplorationContext
         domain objects.
     """
-    exploration_context_models = (
+    exploration_context_models: Sequence[exp_models.ExplorationContextModel] = (
         exp_models.ExplorationContextModel.get_all()
         .filter(exp_models.ExplorationContextModel.story_id == story_id)
         .fetch()
