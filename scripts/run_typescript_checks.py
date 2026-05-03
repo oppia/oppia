@@ -91,7 +91,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/exploration-footer.component.ts',
     'core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/conversation-skin.component.spec.ts',
     'core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/conversation-skin.component.ts',
-    'core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/input-response-pair.component.spec.ts',
     'core/templates/pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component.spec.ts',
     'core/templates/pages/exploration-player-page/services/answer-classification.service.spec.ts',
     'core/templates/pages/exploration-player-page/services/exploration-engine.service.spec.ts',
