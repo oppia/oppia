@@ -1215,3 +1215,87 @@ title: Old Title
             exploration.to_yaml(), '%sversion: 6\n' % self.UPGRADED_EXP_YAML
         )
         exploration.validate()
+
+
+class ExplorationContextRetrievalTests(test_utils.GenericTestBase):
+    """Test the exploration context retrieval methods."""
+
+    EXP_ID_1: Final = 'exp_id_1'
+    EXP_ID_2: Final = 'exp_id_2'
+    EXP_ID_3: Final = 'exp_id_3'
+    STORY_ID_1: Final = 'story_id_1'
+    STORY_ID_2: Final = 'story_id_2'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.exp_context_model_1 = exp_models.ExplorationContextModel(
+            id=self.EXP_ID_1, story_id=self.STORY_ID_1
+        )
+        self.exp_context_model_2 = exp_models.ExplorationContextModel(
+            id=self.EXP_ID_2, story_id=self.STORY_ID_1
+        )
+        self.exp_context_model_3 = exp_models.ExplorationContextModel(
+            id=self.EXP_ID_3, story_id=self.STORY_ID_2
+        )
+        exp_models.ExplorationContextModel.update_timestamps_multi(
+            [
+                self.exp_context_model_1,
+                self.exp_context_model_2,
+                self.exp_context_model_3,
+            ]
+        )
+        exp_models.ExplorationContextModel.put_multi(
+            [
+                self.exp_context_model_1,
+                self.exp_context_model_2,
+                self.exp_context_model_3,
+            ]
+        )
+
+    def test_get_exploration_context_from_model(self) -> None:
+        exp_context = exp_fetchers.get_exploration_context_from_model(
+            self.exp_context_model_1
+        )
+        self.assertEqual(exp_context.exp_id, self.EXP_ID_1)
+        self.assertEqual(exp_context.story_id, self.STORY_ID_1)
+
+    def test_get_exploration_context_by_id(self) -> None:
+        exp_context = exp_fetchers.get_exploration_context_by_id(self.EXP_ID_1)
+        # Ruling out the possibility of None for mypy type checking.
+        self.assertIsNotNone(exp_context)
+        self.assertEqual(exp_context.exp_id, self.EXP_ID_1)  # type: ignore[union-attr]
+        self.assertEqual(exp_context.story_id, self.STORY_ID_1)  # type: ignore[union-attr]
+
+        none_exp_context = exp_fetchers.get_exploration_context_by_id(
+            'invalid_id'
+        )
+        self.assertIsNone(none_exp_context)
+
+    def test_get_multiple_exploration_contexts_by_ids(self) -> None:
+        exp_contexts = exp_fetchers.get_multiple_exploration_contexts_by_ids(
+            [self.EXP_ID_1, self.EXP_ID_2, 'invalid_id']
+        )
+        self.assertEqual(len(exp_contexts), 3)
+        self.assertIsNotNone(exp_contexts[0])
+        self.assertEqual(exp_contexts[0].exp_id, self.EXP_ID_1)  # type: ignore[union-attr]
+        self.assertEqual(exp_contexts[0].story_id, self.STORY_ID_1)  # type: ignore[union-attr]
+
+        self.assertIsNotNone(exp_contexts[1])
+        self.assertEqual(exp_contexts[1].exp_id, self.EXP_ID_2)  # type: ignore[union-attr]
+        self.assertEqual(exp_contexts[1].story_id, self.STORY_ID_1)  # type: ignore[union-attr]
+
+        self.assertIsNone(exp_contexts[2])
+
+    def test_get_exploration_contexts_by_story_id(self) -> None:
+        exp_contexts = exp_fetchers.get_exploration_contexts_by_story_id(
+            self.STORY_ID_1
+        )
+        self.assertEqual(len(exp_contexts), 2)
+        exp_ids = [context.exp_id for context in exp_contexts]
+        self.assertIn(self.EXP_ID_1, exp_ids)
+        self.assertIn(self.EXP_ID_2, exp_ids)
+
+        empty_exp_contexts = exp_fetchers.get_exploration_contexts_by_story_id(
+            'invalid_story_id'
+        )
+        self.assertEqual(len(empty_exp_contexts), 0)

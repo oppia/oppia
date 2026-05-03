@@ -1433,6 +1433,46 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         d_state.update_card_is_checkpoint(False)
 
 
+class ExplorationContextUnitTests(test_utils.GenericTestBase):
+    """Tests for the ExplorationContext domain object."""
+
+    def test_validation_passes_with_valid_properties(self) -> None:
+        exploration_context = exp_domain.ExplorationContext('exp_1', 'story_1')
+        exploration_context.validate()
+
+    def test_validation_fails_with_invalid_exp_id_type(self) -> None:
+        # type: ignore[arg-type]
+        exploration_context = exp_domain.ExplorationContext(123, 'story_1')
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected exp_id to be a string, received 123',
+        ):
+            exploration_context.validate()
+
+    def test_validation_fails_with_empty_exp_id(self) -> None:
+        exploration_context = exp_domain.ExplorationContext('', 'story_1')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'exp_id must not be empty.'
+        ):
+            exploration_context.validate()
+
+    def test_validation_fails_with_invalid_story_id_type(self) -> None:
+        # type: ignore[arg-type]
+        exploration_context = exp_domain.ExplorationContext('exp_1', 123)
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected story_id to be a string, received 123',
+        ):
+            exploration_context.validate()
+
+    def test_validation_fails_with_empty_story_id(self) -> None:
+        exploration_context = exp_domain.ExplorationContext('exp_1', '')
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'story_id must not be empty.'
+        ):
+            exploration_context.validate()
+
+
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
 

@@ -13272,3 +13272,65 @@ class ExplorationInOldSchemaFormatTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             exploration_dict_with_voiceovers, expected_exploration_dict
         )
+
+
+class ExplorationContextServicesTests(test_utils.GenericTestBase):
+    """Test the exploration context services methods."""
+
+    EXP_ID_1: Final = 'exp_id_1'
+    EXP_ID_2: Final = 'exp_id_2'
+    STORY_ID_1: Final = 'story_id_1'
+    STORY_ID_2: Final = 'story_id_2'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.exp_context_1 = exp_domain.ExplorationContext(
+            self.EXP_ID_1, self.STORY_ID_1
+        )
+        self.exp_context_2 = exp_domain.ExplorationContext(
+            self.EXP_ID_2, self.STORY_ID_2
+        )
+
+    def test_save_exploration_contexts(self) -> None:
+        exp_services.save_exploration_contexts(
+            [self.exp_context_1, self.exp_context_2]
+        )
+
+        # Verify they are saved
+        exp_context_models = exp_models.ExplorationContextModel.get_multi(
+            [self.EXP_ID_1, self.EXP_ID_2]
+        )
+        self.assertEqual(len(exp_context_models), 2)
+
+        self.assertIsNotNone(exp_context_models[0])
+        self.assertEqual(exp_context_models[0].id, self.EXP_ID_1)  # type: ignore[union-attr]
+        self.assertEqual(exp_context_models[0].story_id, self.STORY_ID_1)  # type: ignore[union-attr]
+
+        self.assertIsNotNone(exp_context_models[1])
+        self.assertEqual(exp_context_models[1].id, self.EXP_ID_2)  # type: ignore[union-attr]
+        self.assertEqual(exp_context_models[1].story_id, self.STORY_ID_2)  # type: ignore[union-attr]
+
+    def test_delete_exploration_contexts(self) -> None:
+        # First save them
+        exp_services.save_exploration_contexts(
+            [self.exp_context_1, self.exp_context_2]
+        )
+
+        exp_context_models = exp_models.ExplorationContextModel.get_multi(
+            [self.EXP_ID_1, self.EXP_ID_2]
+        )
+        self.assertIsNotNone(exp_context_models[0])
+        self.assertIsNotNone(exp_context_models[1])
+
+        # Now delete them
+        exp_services.delete_exploration_contexts(
+            [self.exp_context_1, self.exp_context_2]
+        )
+
+        exp_context_models_after_delete = (
+            exp_models.ExplorationContextModel.get_multi(
+                [self.EXP_ID_1, self.EXP_ID_2]
+            )
+        )
+        self.assertIsNone(exp_context_models_after_delete[0])
+        self.assertIsNone(exp_context_models_after_delete[1])

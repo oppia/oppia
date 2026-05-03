@@ -363,17 +363,11 @@ def get_story_id_linked_to_exploration(exp_id: str) -> Optional[str]:
         str|None. The ID of the story if the exploration is linked to some
         story, otherwise None.
     """
-    exploration_context_model = exp_models.ExplorationContextModel.get(
-        exp_id, strict=False
-    )
-    if exploration_context_model is None:
+    exploration_context = exp_fetchers.get_exploration_context_by_id(exp_id)
+    if exploration_context is None:
         return None
 
-    # TODO(#15621): The explicit declaration of type for ndb properties
-    # should be removed. Currently, these ndb properties are annotated with
-    # Any return type. Once we have proper return type we can remove this.
-    story_id: str = exploration_context_model.story_id
-    return story_id
+    return exploration_context.story_id
 
 
 def get_all_exploration_summaries() -> Dict[str, exp_domain.ExplorationSummary]:
@@ -2652,6 +2646,48 @@ def compute_exploration_contributors_summary(
             del contributors_summary[contributor_id]
 
     return contributors_summary
+
+
+def save_exploration_contexts(
+    exploration_contexts: Sequence[exp_domain.ExplorationContext],
+) -> None:
+    """Save a list of exploration context domain objects as
+    ExplorationContextModel entities in the datastore.
+
+    Args:
+        exploration_contexts: list(ExplorationContext). The list of exploration
+            context domain objects to be saved.
+    """
+    new_exploration_context_models = [
+        exp_models.ExplorationContextModel(
+            id=context.exp_id, story_id=context.story_id
+        )
+        for context in exploration_contexts
+    ]
+    exp_models.ExplorationContextModel.update_timestamps_multi(
+        new_exploration_context_models
+    )
+    exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
+
+
+def delete_exploration_contexts(
+    exploration_contexts: Sequence[exp_domain.ExplorationContext],
+) -> None:
+    """Delete a list of exploration context domain objects from the datastore.
+
+    Args:
+        exploration_contexts: list(ExplorationContext). The list of exploration
+            context domain objects to be deleted.
+    """
+    exploration_context_models_to_be_deleted = [
+        exp_models.ExplorationContextModel(
+            id=context.exp_id, story_id=context.story_id
+        )
+        for context in exploration_contexts
+    ]
+    exp_models.ExplorationContextModel.delete_multi(
+        exploration_context_models_to_be_deleted
+    )
 
 
 def save_exploration_summary(

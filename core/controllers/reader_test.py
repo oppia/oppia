@@ -149,7 +149,9 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         exp_id = '0'
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
-        exp_models.ExplorationContextModel(id='0', story_id='story1').put()
+        exp_services.save_exploration_contexts(
+            [exp_domain.ExplorationContext(exp_id='0', story_id='story1')]
+        )
 
         # Viewer opens exploration.
         self.login(self.VIEWER_EMAIL)

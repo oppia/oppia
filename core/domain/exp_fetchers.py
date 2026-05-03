@@ -328,6 +328,95 @@ def get_exploration_summaries_from_models(
     return result
 
 
+def get_exploration_context_from_model(
+    exploration_context_model: exp_models.ExplorationContextModel,
+) -> exp_domain.ExplorationContext:
+    """Returns an ExplorationContext domain object.
+
+    Args:
+        exploration_context_model: ExplorationContextModel. The exploration
+            context model instance.
+
+    Returns:
+        ExplorationContext. The corresponding ExplorationContext domain object.
+    """
+    return exp_domain.ExplorationContext(
+        exploration_context_model.id, exploration_context_model.story_id
+    )
+
+
+def get_exploration_context_by_id(
+    exp_id: str,
+) -> Optional[exp_domain.ExplorationContext]:
+    """Returns an ExplorationContext domain object given an exploration ID.
+
+    Args:
+        exp_id: str. The ID of the exploration.
+
+    Returns:
+        ExplorationContext|None. The corresponding ExplorationContext domain
+        object, or None if no such model exists.
+    """
+    exploration_context_model = exp_models.ExplorationContextModel.get(
+        exp_id, strict=False
+    )
+    if exploration_context_model is None:
+        return None
+
+    return get_exploration_context_from_model(exploration_context_model)
+
+
+def get_multiple_exploration_contexts_by_ids(
+    exp_ids: List[str],
+) -> List[Optional[exp_domain.ExplorationContext]]:
+    """Returns a list of ExplorationContext domain objects given a list of
+    exploration IDs.
+
+    Args:
+        exp_ids: list(str). The IDs of the explorations.
+
+    Returns:
+        list(ExplorationContext|None). The corresponding list of
+        ExplorationContext domain objects. Any missing models are represented
+        as None in the list.
+    """
+    exploration_context_models = exp_models.ExplorationContextModel.get_multi(
+        exp_ids
+    )
+    exploration_contexts: List[Optional[exp_domain.ExplorationContext]] = []
+    for model in exploration_context_models:
+        if model is None:
+            exploration_contexts.append(None)
+        else:
+            exploration_contexts.append(
+                get_exploration_context_from_model(model)
+            )
+    return exploration_contexts
+
+
+def get_exploration_contexts_by_story_id(
+    story_id: str,
+) -> List[exp_domain.ExplorationContext]:
+    """Returns a list of ExplorationContext domain objects given a story ID.
+
+    Args:
+        story_id: str. The ID of the story.
+
+    Returns:
+        list(ExplorationContext). The corresponding list of ExplorationContext
+        domain objects.
+    """
+    exploration_context_models = (
+        exp_models.ExplorationContextModel.get_all()
+        .filter(exp_models.ExplorationContextModel.story_id == story_id)
+        .fetch()
+    )
+    return [
+        get_exploration_context_from_model(model)
+        for model in exploration_context_models
+    ]
+
+
 def get_exploration_summary_from_model(
     exp_summary_model: exp_models.ExpSummaryModel,
 ) -> exp_domain.ExplorationSummary:

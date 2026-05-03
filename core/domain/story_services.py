@@ -29,6 +29,7 @@ from core import feconf, utils
 from core.constants import constants
 from core.domain import (
     caching_services,
+    exp_domain,
     exp_fetchers,
     exp_services,
     learner_group_services,
@@ -867,22 +868,26 @@ def update_story(
         apply_change_list(story_id, change_list)
     )
     story_is_published = is_story_published_and_present_in_topic(new_story)
-    exploration_context_models_to_be_deleted_with_none = (
-        exp_models.ExplorationContextModel.get_multi(exp_ids_removed_from_story)
+    exploration_contexts_to_be_deleted_with_none = (
+        exp_fetchers.get_multiple_exploration_contexts_by_ids(
+            exp_ids_removed_from_story
+        )
     )
-    exploration_context_models_to_be_deleted = [
-        model
-        for model in exploration_context_models_to_be_deleted_with_none
-        if model is not None
+    exploration_contexts_to_be_deleted = [
+        context
+        for context in exploration_contexts_to_be_deleted_with_none
+        if context is not None
     ]
-    exploration_context_models_collisions_list = (
-        exp_models.ExplorationContextModel.get_multi(exp_ids_added_to_story)
+    exploration_contexts_collisions_list = (
+        exp_fetchers.get_multiple_exploration_contexts_by_ids(
+            exp_ids_added_to_story
+        )
     )
-    for context_model in exploration_context_models_collisions_list:
-        if context_model is not None and context_model.story_id != story_id:
+    for context in exploration_contexts_collisions_list:
+        if context is not None and context.story_id != story_id:
             raise utils.ValidationError(
                 'The exploration with ID %s is already linked to story '
-                'with ID %s' % (context_model.id, context_model.story_id)
+                'with ID %s' % (context.exp_id, context.story_id)
             )
 
     if (
@@ -904,18 +909,13 @@ def update_story(
         exp_ids_removed_from_story
     )
 
-    exp_models.ExplorationContextModel.delete_multi(
-        exploration_context_models_to_be_deleted
-    )
+    exp_services.delete_exploration_contexts(exploration_contexts_to_be_deleted)
 
-    new_exploration_context_models = [
-        exp_models.ExplorationContextModel(id=exp_id, story_id=story_id)
+    new_exploration_contexts = [
+        exp_domain.ExplorationContext(exp_id=exp_id, story_id=story_id)
         for exp_id in exp_ids_added_to_story
     ]
-    exp_models.ExplorationContextModel.update_timestamps_multi(
-        new_exploration_context_models
-    )
-    exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
+    exp_services.save_exploration_contexts(new_exploration_contexts)
 
 
 def delete_story(
@@ -948,14 +948,10 @@ def delete_story(
             exp_ids
         )
 
-    exploration_context_models: Sequence[exp_models.ExplorationContextModel] = (
-        exp_models.ExplorationContextModel.get_all()
-        .filter(exp_models.ExplorationContextModel.story_id == story_id)
-        .fetch()
+    exploration_contexts = exp_fetchers.get_exploration_contexts_by_story_id(
+        story_id
     )
-    exp_models.ExplorationContextModel.delete_multi(
-        list(exploration_context_models)
-    )
+    exp_services.delete_exploration_contexts(exploration_contexts)
 
     # This must come after the story is retrieved. Otherwise the memcache
     # key will be reinstated.

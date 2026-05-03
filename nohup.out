@@ -1,0 +1,6 @@
+Downloading Python-3.10.16.tar.xz...
+-> https://www.python.org/ftp/python/3.10.16/Python-3.10.16.tar.xz
+Installing Python-3.10.16...
+patching file setup.py
+Hunk #1 succeeded at 378 (offset 71 lines).
+Installed Python-3.10.16 to /root/.pyenv/versions/3.10.16

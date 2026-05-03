@@ -1471,6 +1471,41 @@ class MatchedDenominatorDict(TypedDict):
     denominator: int
 
 
+class ExplorationContext:
+    """Domain object for an exploration context."""
+
+    def __init__(self, exp_id: str, story_id: str) -> None:
+        """Constructs an ExplorationContext domain object.
+
+        Args:
+            exp_id: str. The unique ID of the exploration.
+            story_id: str. The ID of the story the exploration belongs to.
+        """
+        self.exp_id = exp_id
+        self.story_id = story_id
+
+    def validate(self) -> None:
+        """Validates the properties of the ExplorationContext object.
+
+        Raises:
+            ValidationError. One or more attributes of the ExplorationContext
+                are invalid.
+        """
+        if not isinstance(self.exp_id, str):
+            raise utils.ValidationError(
+                'Expected exp_id to be a string, received %s' % self.exp_id
+            )
+        if not self.exp_id:
+            raise utils.ValidationError('exp_id must not be empty.')
+
+        if not isinstance(self.story_id, str):
+            raise utils.ValidationError(
+                'Expected story_id to be a string, received %s' % self.story_id
+            )
+        if not self.story_id:
+            raise utils.ValidationError('story_id must not be empty.')
+
+
 class Exploration(translation_domain.BaseTranslatableObject):
     """Domain object for an Oppia exploration."""
 
