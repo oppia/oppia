@@ -17,6 +17,7 @@
  */
 
 import {AbstractControl, ValidationErrors} from '@angular/forms';
+import {NumberConversionService} from 'services/number-conversion.service';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {SchemaValidators} from './schema-validators';
 
@@ -36,7 +37,24 @@ class MockFormControl extends AbstractControl {
   }
 }
 
+class MockNumberConversionService {
+  currentDecimalSeparator(): string {
+    return '.';
+  }
+
+  convertToEnglishDecimal(value: string | number): number | null {
+    const normalized = value.toString().replace(',', '.');
+    const result = parseFloat(normalized);
+    return isNaN(result) ? null : result;
+  }
+}
+
 describe('Schema validators', () => {
+  let mockNumberConversionService: MockNumberConversionService;
+
+  beforeEach(() => {
+    mockNumberConversionService = new MockNumberConversionService();
+  });
   describe('when validating "has-length-at-least"', () => {
     it('should impose minimum length bounds', () => {
       const control: MockFormControl = new MockFormControl([], []);
@@ -146,7 +164,10 @@ describe('Schema validators', () => {
         {controlValue: -2.01, expectedResult: false},
         {controlValue: -3, expectedResult: false},
       ];
-      const filter = SchemaValidators.isAtLeast(args);
+      const filter = SchemaValidators.isAtLeast(
+        args,
+        mockNumberConversionService as unknown as NumberConversionService
+      );
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue);
         const errorsReturned = filter(control);
@@ -178,7 +199,10 @@ describe('Schema validators', () => {
         {controlValue: -2.01, expectedResult: true},
         {controlValue: -3, expectedResult: true},
       ];
-      const filter = SchemaValidators.isAtMost(args);
+      const filter = SchemaValidators.isAtMost(
+        args,
+        mockNumberConversionService as unknown as NumberConversionService
+      );
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue);
         const errorsReturned = filter(control);
@@ -228,7 +252,9 @@ describe('Schema validators', () => {
         {controlValue: '--1.23', expectedResult: false},
         {controlValue: '=1.23', expectedResult: false},
       ];
-      const filter = SchemaValidators.isFloat();
+      const filter = SchemaValidators.isFloat(
+        mockNumberConversionService as unknown as NumberConversionService
+      );
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue);
         const errorsReturned = filter(control);
@@ -243,6 +269,22 @@ describe('Schema validators', () => {
           .withContext(testCase.toString())
           .toBeDefined();
       });
+    });
+
+    it('should validate floats with comma as decimal separator', () => {
+      const commaMock = new MockNumberConversionService();
+      spyOn(commaMock, 'currentDecimalSeparator').and.returnValue(',');
+
+      const filter = SchemaValidators.isFloat(
+        commaMock as unknown as NumberConversionService
+      );
+      const control: MockFormControl = new MockFormControl([], []);
+
+      control.setValue('1,5');
+      expect(filter(control)).toBe(null);
+
+      control.setValue('abc');
+      expect(filter(control)).not.toBe(null);
     });
   });
 
