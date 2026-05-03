@@ -235,7 +235,7 @@ describe('Skill Preview Tab Component', () => {
     let skillId = 'df432fe';
     spyOn(questionPlayerEngineService, 'init').and.callFake(
       (
-        questionObject: unknown,
+        questionObject: [],
         successCallback: () => void,
         errorCallback: () => void
       ) => {}

@@ -477,13 +477,11 @@ describe('Story editor navbar component', () => {
       storyEditorStateService,
       'onStoryInitialized'
     ).and.returnValue(mockStoryInitializedEventEmitter);
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: unknown, opt: unknown) => {
-        return {
-          result: Promise.resolve('success'),
-        } as NgbModalRef;
-      }
-    );
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+      return {
+        result: Promise.resolve('success'),
+      } as NgbModalRef;
+    });
 
     component.ngOnInit();
     mockStoryInitializedEventEmitter.emit();
@@ -631,7 +629,7 @@ describe('Story editor navbar component', () => {
           'saveStory'
         ).and.callFake(
           (
-            commitMessage: unknown,
+            commitMessage: string,
             successCallback: () => void,
             errorCallback: (error: string) => void
           ) => {
@@ -643,14 +641,12 @@ describe('Story editor navbar component', () => {
             return true;
           }
         );
-        const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-          (dlg: unknown, opt: unknown) => {
-            return {
-              componentInstance: MockNgbModalRef,
-              result: Promise.resolve(commitMessage),
-            } as NgbModalRef;
-          }
-        );
+        const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+          return {
+            componentInstance: MockNgbModalRef,
+            result: Promise.resolve(commitMessage),
+          } as NgbModalRef;
+        });
 
         component.ngOnInit();
         mockStoryInitializedEventEmitter.emit();
@@ -691,7 +687,7 @@ describe('Story editor navbar component', () => {
           'saveStory'
         ).and.callFake(
           (
-            commitMessage: unknown,
+            commitMessage: string,
             successCallback: () => void,
             errorCallback: (error: string) => void
           ) => {
@@ -703,14 +699,12 @@ describe('Story editor navbar component', () => {
             return true;
           }
         );
-        const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-          (dlg: unknown, opt: unknown) => {
-            return {
-              componentInstance: MockNgbModalRef,
-              result: Promise.resolve(commitMessage),
-            } as NgbModalRef;
-          }
-        );
+        const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+          return {
+            componentInstance: MockNgbModalRef,
+            result: Promise.resolve(commitMessage),
+          } as NgbModalRef;
+        });
 
         component.ngOnInit();
         mockStoryInitializedEventEmitter.emit();
@@ -748,7 +742,7 @@ describe('Story editor navbar component', () => {
         'saveStory'
       ).and.callFake(
         (
-          commitMessage: unknown,
+          commitMessage: string,
           successCallback: () => void,
           errorCallback: (error: string) => void
         ) => {
@@ -760,14 +754,12 @@ describe('Story editor navbar component', () => {
           return true;
         }
       );
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-        (dlg: unknown, opt: unknown) => {
-          return {
-            componentInstance: MockNgbModalRef,
-            result: Promise.reject(),
-          } as NgbModalRef;
-        }
-      );
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.reject(),
+        } as NgbModalRef;
+      });
 
       component.ngOnInit();
       mockStoryInitializedEventEmitter.emit();
@@ -832,14 +824,12 @@ describe('Story editor navbar component', () => {
       .and.returnValue(true);
     let saveChangesSpy = spyOn(component, 'saveChanges');
     let storyNodeStatusSpy = spyOn(storyUpdateService, 'setStoryNodeStatus');
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: unknown, opt: unknown) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve('BAD_CONTENT'),
-        } as NgbModalRef;
-      }
-    );
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve('BAD_CONTENT'),
+      } as NgbModalRef;
+    });
 
     component.saveChangesInReadyToPublishChapter();
     expect(saveChangesSpy).toHaveBeenCalled();
@@ -887,7 +877,7 @@ describe('Story editor navbar component', () => {
     let successCallbackFunctionIsCalled: boolean = false;
     let saveStorySpy = spyOn(storyEditorStateService, 'saveStory').and.callFake(
       (
-        commitMessage: unknown,
+        commitMessage: string,
         successCallback: () => void,
         errorCallback: (error: string) => void
       ) => {
@@ -972,7 +962,7 @@ describe('Story editor navbar component', () => {
       'saveStory'
     ).and.callFake(
       (
-        commitMessage: unknown,
+        commitMessage: string,
         successCallback: () => void,
         errorCallback: (error: string) => void
       ) => {
@@ -985,14 +975,12 @@ describe('Story editor navbar component', () => {
         return true;
       }
     );
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: unknown, opt: unknown) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve('BAD_CONTENT'),
-        } as NgbModalRef;
-      }
-    );
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve('BAD_CONTENT'),
+      } as NgbModalRef;
+    });
 
     component.story.getStoryContents().getNodes()[1].setStatus('Published');
 

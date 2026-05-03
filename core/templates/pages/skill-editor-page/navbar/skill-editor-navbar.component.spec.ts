@@ -449,13 +449,11 @@ describe('Skill Editor Navbar Component', () => {
     'should not save changes if save changes modal is opened and cancel ' +
       'button is clicked',
     fakeAsync(() => {
-      let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
-        (modal: unknown, modalOptions: unknown) => {
-          return {
-            result: Promise.reject(),
-          } as NgbModalRef;
-        }
-      );
+      let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+        return {
+          result: Promise.reject(),
+        } as NgbModalRef;
+      });
       spyOn(skillEditorStateService, 'saveSkill');
 
       component.saveChanges();
@@ -471,14 +469,12 @@ describe('Skill Editor Navbar Component', () => {
       fakeAsync(() => {
         // Setting unsaved changes to be two.
         spyOn(undoRedoService, 'getChangeCount').and.returnValue(2);
-        const ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
-          (dlg: unknown, opt: unknown) => {
-            return {
-              componentInstance: MockNgbModalRef,
-              result: Promise.resolve(),
-            } as NgbModalRef;
-          }
-        );
+        const ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+          return {
+            componentInstance: MockNgbModalRef,
+            result: Promise.resolve(),
+          } as NgbModalRef;
+        });
         let navigateToQuestionsTabSpy = spyOn(
           skillEditorRoutingService,
           'navigateToQuestionsTab'
@@ -497,14 +493,12 @@ describe('Skill Editor Navbar Component', () => {
       fakeAsync(() => {
         // Setting unsaved changes to be two.
         spyOn(undoRedoService, 'getChangeCount').and.returnValue(2);
-        const ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
-          (dlg: unknown, opt: unknown) => {
-            return {
-              componentInstance: MockNgbModalRef,
-              result: Promise.reject(),
-            } as NgbModalRef;
-          }
-        );
+        const ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+          return {
+            componentInstance: MockNgbModalRef,
+            result: Promise.reject(),
+          } as NgbModalRef;
+        });
         let navigateToQuestionsTabSpy = spyOn(
           skillEditorRoutingService,
           'navigateToQuestionsTab'
