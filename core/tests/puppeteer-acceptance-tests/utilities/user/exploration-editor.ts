@@ -2970,7 +2970,7 @@ export class ExplorationEditor extends BaseUser {
     // Use a higher timeout for math interactions as they are heavy to render.
     const interactionElement = await this.page.waitForXPath(
       `//*[contains(normalize-space(text()), normalize-space("${interactionToAdd}"))]`,
-      {timeout: 90000}
+      {timeout: 180000}
     );
     if (!interactionElement) {
       throw new Error(`Interaction "${interactionToAdd}" not found in modal.`);
