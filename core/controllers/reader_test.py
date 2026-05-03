@@ -1608,7 +1608,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         payload = {
             'client_time_spent_in_secs': 0,
-            'params': {},
+            'params': {'answer': 1.1},
             'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
             'state_name': 'final',
             'version': 1,
@@ -1745,7 +1745,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         payload = {
             'client_time_spent_in_secs': 0,
-            'params': {},
+            'params': {'answer': 1.1},
             'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
             'state_name': 'middle',
             'version': 1,
@@ -3502,6 +3502,41 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
                 expected_status_int=500,
             )
+
+    def test_submit_learner_answer_details_for_question_with_decimal_answer(
+        self,
+    ) -> None:
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
+        self.save_new_question(
+            question_id,
+            editor_id,
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index,
+        )
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
+        ):
+            self.put_json(
+                '%s/%s/%s'
+                % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    feconf.ENTITY_TYPE_QUESTION,
+                    question_id,
+                ),
+                {
+                    'interaction_id': 'TextInput',
+                    'answer': 1.1,
+                    'answer_details': 'This is an answer details.',
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
 
 
 class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
