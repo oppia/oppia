@@ -457,7 +457,7 @@ export class ConversationFlowService {
    */
   isLearnAgainButton(): boolean {
     let conceptCardIsBeingShown =
-      this.displayedCard.getStateName() === null &&
+      this.displayedCard.getStateName() === '' &&
       !this.explorationModeService.isInQuestionMode();
     if (conceptCardIsBeingShown) {
       return false;

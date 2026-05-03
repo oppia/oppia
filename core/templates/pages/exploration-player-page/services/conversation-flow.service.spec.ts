@@ -795,6 +795,7 @@ describe('Conversation flow service', () => {
 
     conceptCardManagerService.setConceptCard(mockConceptCard);
     conversationFlowService.answerIsCorrect = true;
+    conversationFlowService.displayedCard.markAsNotCompleted();
 
     conversationFlowService.showUpcomingCard();
   });
