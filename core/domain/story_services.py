@@ -42,11 +42,11 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import List, Sequence, Tuple, cast
+from typing import List, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import exp_models, story_models, user_models
+    from mypy_imports import story_models, user_models
 
 (
     exp_models,

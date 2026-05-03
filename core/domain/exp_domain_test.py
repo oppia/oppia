@@ -1441,8 +1441,11 @@ class ExplorationContextUnitTests(test_utils.GenericTestBase):
         exploration_context.validate()
 
     def test_validation_fails_with_invalid_exp_id_type(self) -> None:
-        # type: ignore[arg-type]
-        exploration_context = exp_domain.ExplorationContext(123, 'story_1')
+        # Here we use MyPy ignore because we are passing an invalid type
+        # to test the validation logic.
+        exploration_context = exp_domain.ExplorationContext(
+            123, 'story_1'
+        )  # type: ignore[arg-type]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected exp_id to be a string, received 123',
@@ -1457,8 +1460,11 @@ class ExplorationContextUnitTests(test_utils.GenericTestBase):
             exploration_context.validate()
 
     def test_validation_fails_with_invalid_story_id_type(self) -> None:
-        # type: ignore[arg-type]
-        exploration_context = exp_domain.ExplorationContext('exp_1', 123)
+        # Here we use MyPy ignore because we are passing an invalid type
+        # to test the validation logic.
+        exploration_context = exp_domain.ExplorationContext(
+            'exp_1', 123
+        )  # type: ignore[arg-type]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected story_id to be a string, received 123',

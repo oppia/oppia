@@ -1263,7 +1263,11 @@ class ExplorationContextRetrievalTests(test_utils.GenericTestBase):
         exp_context = exp_fetchers.get_exploration_context_by_id(self.EXP_ID_1)
         # Ruling out the possibility of None for mypy type checking.
         self.assertIsNotNone(exp_context)
+        # Here we use MyPy ignore because Ruling out the possibility of
+        # None for mypy type checking is already done above.
         self.assertEqual(exp_context.exp_id, self.EXP_ID_1)  # type: ignore[union-attr]
+        # Here we use MyPy ignore because Ruling out the possibility of
+        # None for mypy type checking is already done above.
         self.assertEqual(exp_context.story_id, self.STORY_ID_1)  # type: ignore[union-attr]
 
         none_exp_context = exp_fetchers.get_exploration_context_by_id(
@@ -1277,11 +1281,19 @@ class ExplorationContextRetrievalTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(exp_contexts), 3)
         self.assertIsNotNone(exp_contexts[0])
+        # Here we use MyPy ignore because Ruling out the possibility of
+        # None for mypy type checking is already done above.
         self.assertEqual(exp_contexts[0].exp_id, self.EXP_ID_1)  # type: ignore[union-attr]
+        # Here we use MyPy ignore because Ruling out the possibility of
+        # None for mypy type checking is already done above.
         self.assertEqual(exp_contexts[0].story_id, self.STORY_ID_1)  # type: ignore[union-attr]
 
         self.assertIsNotNone(exp_contexts[1])
+        # Here we use MyPy ignore because Ruling out the possibility of
+        # None for mypy type checking is already done above.
         self.assertEqual(exp_contexts[1].exp_id, self.EXP_ID_2)  # type: ignore[union-attr]
+        # Here we use MyPy ignore because Ruling out the possibility of
+        # None for mypy type checking is already done above.
         self.assertEqual(exp_contexts[1].story_id, self.STORY_ID_1)  # type: ignore[union-attr]
 
         self.assertIsNone(exp_contexts[2])

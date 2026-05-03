@@ -13296,22 +13296,30 @@ class ExplorationContextServicesTests(test_utils.GenericTestBase):
             [self.exp_context_1, self.exp_context_2]
         )
 
-        # Verify they are saved
+        # Verify they are saved.
         exp_context_models = exp_models.ExplorationContextModel.get_multi(
             [self.EXP_ID_1, self.EXP_ID_2]
         )
         self.assertEqual(len(exp_context_models), 2)
 
         self.assertIsNotNone(exp_context_models[0])
+        # Here we use MyPy ignore because Ruling out the possibility of
+        # None for mypy type checking is already done above.
         self.assertEqual(exp_context_models[0].id, self.EXP_ID_1)  # type: ignore[union-attr]
+        # Here we use MyPy ignore because Ruling out the possibility of
+        # None for mypy type checking is already done above.
         self.assertEqual(exp_context_models[0].story_id, self.STORY_ID_1)  # type: ignore[union-attr]
 
         self.assertIsNotNone(exp_context_models[1])
+        # Here we use MyPy ignore because Ruling out the possibility of
+        # None for mypy type checking is already done above.
         self.assertEqual(exp_context_models[1].id, self.EXP_ID_2)  # type: ignore[union-attr]
+        # Here we use MyPy ignore because Ruling out the possibility of
+        # None for mypy type checking is already done above.
         self.assertEqual(exp_context_models[1].story_id, self.STORY_ID_2)  # type: ignore[union-attr]
 
     def test_delete_exploration_contexts(self) -> None:
-        # First save them
+        # First save them.
         exp_services.save_exploration_contexts(
             [self.exp_context_1, self.exp_context_2]
         )
@@ -13322,7 +13330,7 @@ class ExplorationContextServicesTests(test_utils.GenericTestBase):
         self.assertIsNotNone(exp_context_models[0])
         self.assertIsNotNone(exp_context_models[1])
 
-        # Now delete them
+        # Now delete them.
         exp_services.delete_exploration_contexts(
             [self.exp_context_1, self.exp_context_2]
         )
