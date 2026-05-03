@@ -1184,6 +1184,43 @@ describe('SvgEditor', () => {
     expect(component.objectUndoStack.length).toBe(0);
   });
 
+  it(
+    'should return safely when redo remove action shape is missing from ' +
+      'canvasObjects',
+    () => {
+      const shape = new fabric.Rect({width: 10, height: 10});
+      component.objectRedoStack = [{action: 'remove', object: shape}];
+      const renderAllSpy = spyOn(component.canvas, 'renderAll');
+
+      component.onRedo();
+
+      expect(component.objectUndoStack).toEqual([
+        jasmine.objectContaining({action: 'remove', object: shape}),
+      ]);
+      expect(component.canvasObjects).toEqual([]);
+      expect(renderAllSpy).not.toHaveBeenCalled();
+    }
+  );
+
+  it(
+    'should return safely when redo remove action shape is missing from ' +
+      'canvas internal objects',
+    () => {
+      const shape = new fabric.Rect({width: 10, height: 10});
+      component.objectRedoStack = [{action: 'remove', object: shape}];
+      component.canvasObjects = [shape];
+      const renderAllSpy = spyOn(component.canvas, 'renderAll');
+
+      component.onRedo();
+
+      expect(component.objectUndoStack).toEqual([
+        jasmine.objectContaining({action: 'remove', object: shape}),
+      ]);
+      expect(component.canvasObjects).toEqual([]);
+      expect(renderAllSpy).not.toHaveBeenCalled();
+    }
+  );
+
   it('should return early from createColorPicker when parent does not exist', () => {
     spyOn(document, 'getElementById').and.returnValue(null);
 
@@ -1206,6 +1243,32 @@ describe('SvgEditor', () => {
 
     expect(renderAllSpy).not.toHaveBeenCalled();
   });
+
+  it(
+    'should return early in bezier object moving handler for an ' +
+      'unsupported control point',
+    () => {
+      component.drawMode = component.DRAW_MODE_BEZIER;
+      spyOn(
+        component as unknown as {
+          getQuadraticBezierCurve: () => fabric.Object | null;
+        },
+        'getQuadraticBezierCurve'
+      ).and.returnValue({
+        path: [
+          ['M', 0, 0],
+          ['Q', 10, 10, 20, 20],
+        ],
+      } as unknown as fabric.Object);
+      const renderAllSpy = spyOn(component.canvas, 'renderAll');
+
+      component.canvas.fire('object:moving', {
+        target: {name: 'p3', left: 100, top: 100},
+      } as unknown as fabric.IEvent<Event>);
+
+      expect(renderAllSpy).not.toHaveBeenCalled();
+    }
+  );
 
   it('should return early in object:added handler when shape is missing', () => {
     component.drawMode = component.DRAW_MODE_NONE;
