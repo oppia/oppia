@@ -26,6 +26,7 @@ describe('Topic rights model', () => {
       published: false,
       can_edit_topic: true,
       can_publish_topic: true,
+      can_edit_question: true,
     };
 
     sampleTopicRights = TopicRights.createFromBackendDict(
@@ -53,6 +54,7 @@ describe('Topic rights model', () => {
         published: false,
         can_edit_topic: true,
         can_publish_topic: false,
+        can_edit_question: false,
       };
 
       var exampleTopicRights = TopicRights.createFromBackendDict(
@@ -70,15 +72,26 @@ describe('Topic rights model', () => {
   );
 
   it('should create an empty topic rights object', () => {
-    let emptyTopicRightsBackendObject = new TopicRights(false, false, false);
+    let emptyTopicRightsBackendObject = new TopicRights(
+      false,
+      false,
+      false,
+      false
+    );
 
     expect(emptyTopicRightsBackendObject.isPublished()).toEqual(false);
     expect(emptyTopicRightsBackendObject.canEditTopic()).toEqual(false);
     expect(emptyTopicRightsBackendObject.canPublishTopic()).toEqual(false);
+    expect(emptyTopicRightsBackendObject.canEditQuestion()).toEqual(false);
   });
 
   it('should make a copy from another topic rights', () => {
-    let emptyTopicRightsBackendObject = new TopicRights(false, false, false);
+    let emptyTopicRightsBackendObject = new TopicRights(
+      false,
+      false,
+      false,
+      false
+    );
 
     emptyTopicRightsBackendObject.copyFromTopicRights(sampleTopicRights);
 
@@ -86,5 +99,6 @@ describe('Topic rights model', () => {
     expect(emptyTopicRightsBackendObject.canEditTopic()).toEqual(true);
     expect(emptyTopicRightsBackendObject.canPublishTopic()).toEqual(true);
     expect(emptyTopicRightsBackendObject.canEditName()).toEqual(true);
+    expect(emptyTopicRightsBackendObject.canEditQuestion()).toEqual(true);
   });
 });

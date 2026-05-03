@@ -36,7 +36,6 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
@@ -304,7 +303,6 @@ describe('Checkpoint celebration modal component', function () {
           },
         },
       }),
-      RecordedVoiceovers.createEmpty(),
       'content'
     );
   });
@@ -577,9 +575,7 @@ describe('Checkpoint celebration modal component', function () {
     const expectedDelays = [2.2, 2.5, 2.8, 3.1, 3.4];
 
     component.checkpointNodeFadeInDelays.forEach((delay, index) => {
-      expect(delay)
-        .withContext(`fade-in delay for checkpoint ${index}`)
-        .toBeCloseTo(expectedDelays[index]);
+      expect(delay).toBeCloseTo(expectedDelays[index]);
     });
   });
 
