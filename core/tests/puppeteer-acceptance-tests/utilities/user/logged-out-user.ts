@@ -3486,7 +3486,8 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForFunction(
       (selector: string, value: string) => {
         const element = document.querySelector(selector);
-        return element?.textContent !== value;
+        const text = element?.textContent?.trim();
+        return !!text && text !== value?.trim();
       },
       {},
       currentCardContentSelector,
