@@ -361,6 +361,7 @@ export class UserFactory {
     await user.page.goto(testConstants.URLs.Home);
     await user.waitForPageToFullyLoad();
     await user.clickOnElementWithSelector(cookieBannerAcceptButton);
+    user.userHasAcceptedCookies = true;
     activeUsers.push(user);
     return user;
   };
