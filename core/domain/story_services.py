@@ -49,12 +49,9 @@ if MYPY:  # pragma: no cover
     from mypy_imports import story_models, user_models
 
 (
-    exp_models,
     story_models,
     user_models,
-) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.STORY, models.Names.USER]
-)
+) = models.Registry.import_models([models.Names.STORY, models.Names.USER])
 
 
 def get_new_story_id() -> str:

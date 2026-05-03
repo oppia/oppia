@@ -13291,6 +13291,15 @@ class ExplorationContextServicesTests(test_utils.GenericTestBase):
             self.EXP_ID_2, self.STORY_ID_2
         )
 
+    def test_save_exploration_contexts_with_invalid_context_raises_error(
+        self,
+    ) -> None:
+        invalid_context = exp_domain.ExplorationContext('', self.STORY_ID_1)
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'exp_id must not be empty.'
+        ):
+            exp_services.save_exploration_contexts([invalid_context])
+
     def test_save_exploration_contexts(self) -> None:
         exp_services.save_exploration_contexts(
             [self.exp_context_1, self.exp_context_2]

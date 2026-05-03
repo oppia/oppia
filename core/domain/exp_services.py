@@ -2658,6 +2658,9 @@ def save_exploration_contexts(
         exploration_contexts: list(ExplorationContext). The list of exploration
             context domain objects to be saved.
     """
+    for context in exploration_contexts:
+        context.validate()
+
     new_exploration_context_models = [
         exp_models.ExplorationContextModel(
             id=context.exp_id, story_id=context.story_id
