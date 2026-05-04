@@ -26,8 +26,6 @@ from core.platform.cache import redis_cache_services
 from core.tests import test_utils
 from scripts import common
 
-from redis.exceptions import ResponseError
-
 
 class RedisCacheServicesUnitTests(test_utils.TestBase):
     """Tests for redis_cache_services."""
@@ -43,7 +41,11 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
         self, mock_get_client: mock.MagicMock
     ) -> None:
         mock_client = mock.MagicMock()
-        mock_client.memory_stats.side_effect = ResponseError('Mock exception')
+        mock_client.memory_stats.side_effect = (
+            redis_cache_services.redis.exceptions.ResponseError(
+                'Mock exception'
+            )
+        )
         mock_client.info.return_value = {
             'used_memory': 1024,
             'used_memory_peak': 2048,
