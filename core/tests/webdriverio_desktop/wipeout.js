@@ -42,6 +42,8 @@ describe('When account is deleted it', function () {
       // cannot suppress the error without patching the library, so instead we
       // just ignore it here.
       'The user account has been disabled by an administrator',
+      'Firebase: Error (auth/user-disabled).',
+      'auth/user-disabled',
     ];
   });
 

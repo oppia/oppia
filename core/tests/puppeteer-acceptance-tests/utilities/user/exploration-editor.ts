@@ -5746,6 +5746,7 @@ export class ExplorationEditor extends BaseUser {
     });
     await this.typeInInputField(responseTextareaSelector, reply);
     await this.clickOnElementWithSelector(sendButtonSelector);
+    await this.waitForNetworkIdle();
 
     // Check if button is disabled after clicking
     await this.page.waitForFunction(
@@ -5848,7 +5849,9 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForFunction(
       (selector: string, elementNumber: number, expectedText: string) => {
         const elements = document.querySelectorAll(selector);
-        return elements[elementNumber - 1].textContent?.trim() === expectedText;
+        return (
+          elements[elementNumber - 1]?.textContent?.trim() === expectedText
+        );
       },
       {},
       feedbackStatusSelector,
@@ -7532,14 +7535,23 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectNumberOfPassersToBe(expected: number): Promise<void> {
     await this.expectElementToBeVisible(numberOfPassers);
-
-    const text = await this.page.$eval(
+    await this.page.waitForFunction(
+      (selector: string, expectedCount: number) => {
+        const element = document.querySelector(selector);
+        const text = element?.textContent?.trim() ?? '';
+        const match = text.match(/\d+/);
+        return Number(match?.[0] ?? 0) === expectedCount;
+      },
+      {timeout: 15000},
       numberOfPassers,
-      el => el.textContent?.trim() || ''
+      expected
     );
 
-    const match = text.match(/\d+/);
-    const actual = match ? Number(match[0]) : 0;
+    const actual = await this.page.$eval(numberOfPassers, el => {
+      const text = el.textContent?.trim() ?? '';
+      const match = text.match(/\d+/);
+      return Number(match?.[0] ?? 0);
+    });
 
     if (actual !== expected) {
       throw new Error(

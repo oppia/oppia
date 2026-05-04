@@ -149,4 +149,20 @@ describe('Tag Filter component', () => {
     );
     expect(component.tagFilterInputChange.emit).toHaveBeenCalledWith('');
   });
+
+  it('should emit empty value when tag selection clears the input', () => {
+    spyOn(component.tagFilterInputChange, 'emit');
+    component.listOfDefaultTags = ['Community', 'News'];
+    component.selectedTags = [];
+    component.tagFilterInput = {
+      nativeElement: {
+        value: '',
+      },
+    } as ElementRef;
+
+    component.ngOnInit();
+    component.selectTag({option: {viewValue: 'Community'}});
+
+    expect(component.tagFilterInputChange.emit).toHaveBeenCalledWith('');
+  });
 });

@@ -114,7 +114,7 @@ export class TagFilterComponent implements OnInit {
     this.tagFilter.valueChanges
       .pipe(
         startWith(this.tagFilter.value),
-        map(value => value.trim() ?? ''),
+        map(value => value?.trim() ?? ''),
         distinctUntilChanged()
       )
       .subscribe(value => {

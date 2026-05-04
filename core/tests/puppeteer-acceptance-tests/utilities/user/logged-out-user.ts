@@ -1071,6 +1071,9 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
     });
     await this.clickOnElementWithSelector(blogTagFilterSelector);
+    await this.page.waitForSelector(`.e2e-test-select-${tagName}`, {
+      visible: true,
+    });
     await this.clickOnElementWithSelector(`.e2e-test-select-${tagName}`);
     await this.page.waitForSelector(blogTagFilterDropdownSelector, {
       hidden: true,
