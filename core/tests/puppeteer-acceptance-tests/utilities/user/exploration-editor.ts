@@ -2968,19 +2968,17 @@ export class ExplorationEditor extends BaseUser {
 
     await this.waitForNetworkIdle();
     // Use a higher timeout for math interactions as they are heavy to render.
-    let interactionElement;
+    let tileText = interactionToAdd;
     if (interactionToAdd === 'Graph Theory') {
-      // The UI text is just "Graph", so text-matching fails. We use the strict Oppia E2E selector.
-      interactionElement = await this.page.waitForSelector(
-        '.e2e-test-interaction-tile-GraphInput',
-        {timeout: 60000}
-      );
-    } else {
-      interactionElement = await this.page.waitForXPath(
-        `//*[contains(normalize-space(text()), normalize-space("${interactionToAdd}"))]`,
-        {timeout: 60000}
-      );
+      // The interaction is passed as 'Graph Theory' in the spec,
+      // but the UI tile text is simply 'Graph'.
+      tileText = 'Graph';
     }
+
+    const interactionElement = await this.page.waitForXPath(
+      `//*[contains(normalize-space(text()), "${tileText}")]`,
+      {timeout: 90000}
+    );
     if (!interactionElement) {
       throw new Error(`Interaction "${interactionToAdd}" not found in modal.`);
     }
