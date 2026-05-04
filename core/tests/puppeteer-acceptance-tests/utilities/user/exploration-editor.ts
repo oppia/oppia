@@ -2879,6 +2879,10 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
+    // Ensure the page is fully settled before waiting for the edit button.
+    // On mobile, tab transitions and modal close animations can leave the
+    // editor content temporarily hidden.
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
@@ -3815,6 +3819,16 @@ export class ExplorationEditor extends BaseUser {
           `Unable to navigate to the card ${cardName}.\n` + error.message;
         throw error;
       }
+    }
+
+    // On mobile the state-graph modal uses an NgBootstrap CSS fade-out animation.
+    // Wait for it to fully disappear before returning, otherwise the modal
+    // backdrop can obstruct the editor content (e.g., stateEditSelector)
+    // in the next call.
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(explorationStateGraphModalSelector, {
+        hidden: true,
+      });
     }
   }
 
