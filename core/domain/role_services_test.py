@@ -49,6 +49,22 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
             [role_services.ACTION_PLAY_ANY_PUBLIC_ACTIVITY],
         )
 
+    def test_get_actions_question_admin(self) -> None:
+        self.assertCountEqual(
+            role_services.get_all_actions([feconf.ROLE_ID_QUESTION_ADMIN]),
+            [
+                role_services.ACTION_ACCESS_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE,
+                role_services.ACTION_ACCESS_TOPICS_AND_SKILLS_DASHBOARD,
+                role_services.ACTION_MANAGE_QUESTION_CONTRIBUTOR_ROLES,
+                role_services.ACTION_DELETE_ANY_QUESTION,
+                role_services.ACTION_EDIT_ANY_QUESTION,
+                role_services.ACTION_MANAGE_QUESTION_RIGHTS,
+                role_services.ACTION_VISIT_ANY_QUESTION_EDITOR_PAGE,
+                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE,
+                role_services.ACTION_MANAGE_QUESTION_SKILL_STATUS,
+            ],
+        )
+
     def test_action_allocated_to_all_allowed_roles(self) -> None:
         role_actions = role_services.get_role_actions()
 

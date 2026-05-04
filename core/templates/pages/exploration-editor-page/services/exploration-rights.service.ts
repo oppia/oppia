@@ -22,7 +22,10 @@ import {AppConstants} from 'app.constants';
 import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
 import {AlertsService} from 'services/alerts.service';
 import {ExplorationRightsBackendApiService} from './exploration-rights-backend-api.service';
-import {ExplorationRightsBackendData} from './exploration-rights-backend-api.service';
+import {
+  ExplorationRightsBackendData,
+  ModeratorRightsBackendData,
+} from './exploration-rights-backend-api.service';
 import {HttpErrorResponse} from '@angular/common/http';
 
 @Injectable({
@@ -210,17 +213,17 @@ export class ExplorationRightsService {
         version as number,
         emailBody
       )
-      .then((response: ExplorationRightsBackendData) => {
+      .then((response: ModeratorRightsBackendData) => {
         this.alertsService.clearWarnings();
         this.init(
-          response.rights.owner_names,
-          response.rights.editor_names,
-          response.rights.voice_artist_names,
-          response.rights.viewer_names,
-          response.rights.status,
-          response.rights.cloned_from,
-          response.rights.community_owned,
-          response.rights.viewable_if_private
+          response.rights_dict.owner_names,
+          response.rights_dict.editor_names,
+          response.rights_dict.voice_artist_names,
+          response.rights_dict.viewer_names,
+          response.rights_dict.status,
+          response.rights_dict.cloned_from,
+          response.rights_dict.community_owned,
+          response.rights_dict.viewable_if_private
         );
       })
       .catch(response => {

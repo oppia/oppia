@@ -69,11 +69,21 @@ describe('Topic update service', function () {
           id: 1,
           title: 'Title',
           skill_ids: ['skill_2'],
+          thumbnail_filename: null,
+          thumbnail_bg_color: null,
+          url_fragment: null,
         },
       ],
       next_subtopic_id: 2,
       language_code: 'en',
       skill_ids_for_diagnostic_test: [],
+      abbreviated_name: '',
+      meta_tag_content: '',
+      page_title_fragment_for_web: '',
+      practice_tab_is_displayed: false,
+      url_fragment: '',
+      thumbnail_filename: '',
+      thumbnail_bg_color: '',
     },
     skillIdToDescriptionDict: {
       skill_1: 'Description 1',
@@ -339,7 +349,7 @@ describe('Topic update service', function () {
   );
 
   it("should set/unset changes to a topic's abbreviated name", () => {
-    expect(_sampleTopic.getAbbreviatedName()).toEqual(undefined);
+    expect(_sampleTopic.getAbbreviatedName()).toEqual('');
 
     topicUpdateService.setAbbreviatedTopicName(
       _sampleTopic,
@@ -348,7 +358,7 @@ describe('Topic update service', function () {
     expect(_sampleTopic.getAbbreviatedName()).toEqual('new unique value');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getAbbreviatedName()).toEqual(undefined);
+    expect(_sampleTopic.getAbbreviatedName()).toEqual('');
   });
 
   it(
@@ -364,20 +374,20 @@ describe('Topic update service', function () {
           cmd: 'update_topic_property',
           property_name: 'abbreviated_name',
           new_value: 'new unique value',
-          old_value: null,
+          old_value: '',
         },
       ]);
     }
   );
 
   it("should set/unset changes to a topic's meta tag content", () => {
-    expect(_sampleTopic.getMetaTagContent()).toEqual(undefined);
+    expect(_sampleTopic.getMetaTagContent()).toEqual('');
 
     topicUpdateService.setMetaTagContent(_sampleTopic, 'new meta tag content');
     expect(_sampleTopic.getMetaTagContent()).toEqual('new meta tag content');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getMetaTagContent()).toEqual(undefined);
+    expect(_sampleTopic.getMetaTagContent()).toEqual('');
   });
 
   it(
@@ -393,14 +403,14 @@ describe('Topic update service', function () {
           cmd: 'update_topic_property',
           property_name: 'meta_tag_content',
           new_value: 'new meta tag content',
-          old_value: null,
+          old_value: '',
         },
       ]);
     }
   );
 
   it("should set/unset changes to a topic's page title", function () {
-    expect(_sampleTopic.getPageTitleFragmentForWeb()).toBeUndefined();
+    expect(_sampleTopic.getPageTitleFragmentForWeb()).toEqual('');
     topicUpdateService.setPageTitleFragmentForWeb(
       _sampleTopic,
       'new page title'
@@ -408,7 +418,7 @@ describe('Topic update service', function () {
     expect(_sampleTopic.getPageTitleFragmentForWeb()).toEqual('new page title');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getPageTitleFragmentForWeb()).toBeUndefined();
+    expect(_sampleTopic.getPageTitleFragmentForWeb()).toEqual('');
   });
 
   it(
@@ -424,7 +434,7 @@ describe('Topic update service', function () {
           cmd: 'update_topic_property',
           property_name: 'page_title_fragment_for_web',
           new_value: 'new page title',
-          old_value: null,
+          old_value: '',
         },
       ]);
     }
@@ -434,13 +444,13 @@ describe('Topic update service', function () {
     "should set/unset changes to a topic's practice tab is " +
       'displayed property',
     () => {
-      expect(_sampleTopic.getPracticeTabIsDisplayed()).toBeUndefined();
+      expect(_sampleTopic.getPracticeTabIsDisplayed()).toEqual(false);
 
       topicUpdateService.setPracticeTabIsDisplayed(_sampleTopic, true);
       expect(_sampleTopic.getPracticeTabIsDisplayed()).toEqual(true);
 
       undoRedoService.undoChange(_sampleTopic);
-      expect(_sampleTopic.getPracticeTabIsDisplayed()).toBeUndefined();
+      expect(_sampleTopic.getPracticeTabIsDisplayed()).toEqual(false);
     }
   );
 
@@ -454,20 +464,20 @@ describe('Topic update service', function () {
           cmd: 'update_topic_property',
           property_name: 'practice_tab_is_displayed',
           new_value: true,
-          old_value: null,
+          old_value: false,
         },
       ]);
     }
   );
 
   it("should set/unset changes to a topic's url fragment", () => {
-    expect(_sampleTopic.getUrlFragment()).toEqual(undefined);
+    expect(_sampleTopic.getUrlFragment()).toEqual('');
 
     topicUpdateService.setTopicUrlFragment(_sampleTopic, 'new-unique-value');
     expect(_sampleTopic.getUrlFragment()).toEqual('new-unique-value');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getUrlFragment()).toEqual(undefined);
+    expect(_sampleTopic.getUrlFragment()).toEqual('');
   });
 
   it(
@@ -480,14 +490,14 @@ describe('Topic update service', function () {
           cmd: 'update_topic_property',
           property_name: 'url_fragment',
           new_value: 'new-unique-value',
-          old_value: null,
+          old_value: '',
         },
       ]);
     }
   );
 
   it("should set/unset changes to a topic's thumbnail filename", () => {
-    expect(_sampleTopic.getThumbnailFilename()).toEqual(undefined);
+    expect(_sampleTopic.getThumbnailFilename()).toEqual('');
 
     topicUpdateService.setTopicThumbnailFilename(
       _sampleTopic,
@@ -496,7 +506,7 @@ describe('Topic update service', function () {
     expect(_sampleTopic.getThumbnailFilename()).toEqual('new unique value');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getThumbnailFilename()).toEqual(undefined);
+    expect(_sampleTopic.getThumbnailFilename()).toEqual('');
   });
 
   it(
@@ -512,20 +522,20 @@ describe('Topic update service', function () {
           cmd: 'update_topic_property',
           property_name: 'thumbnail_filename',
           new_value: 'new unique value',
-          old_value: null,
+          old_value: '',
         },
       ]);
     }
   );
 
   it("should set/unset changes to a topic's thumbnail bg color", () => {
-    expect(_sampleTopic.getThumbnailBgColor()).toEqual(undefined);
+    expect(_sampleTopic.getThumbnailBgColor()).toEqual('');
 
     topicUpdateService.setTopicThumbnailBgColor(_sampleTopic, '#ffffff');
     expect(_sampleTopic.getThumbnailBgColor()).toEqual('#ffffff');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getThumbnailBgColor()).toEqual(undefined);
+    expect(_sampleTopic.getThumbnailBgColor()).toEqual('');
   });
 
   it(
@@ -541,7 +551,7 @@ describe('Topic update service', function () {
           cmd: 'update_topic_property',
           property_name: 'thumbnail_bg_color',
           new_value: 'new unique value',
-          old_value: null,
+          old_value: '',
         },
       ]);
     }
@@ -628,9 +638,7 @@ describe('Topic update service', function () {
   );
 
   it("should set/unset changes to a subtopic's thumbnail" + 'filename', () => {
-    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename()).toEqual(
-      undefined
-    );
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename()).toEqual(null);
 
     topicUpdateService.setSubtopicThumbnailFilename(
       _sampleTopic,
@@ -642,9 +650,7 @@ describe('Topic update service', function () {
     );
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename()).toEqual(
-      undefined
-    );
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename()).toEqual(null);
   });
 
   it(
@@ -662,7 +668,7 @@ describe('Topic update service', function () {
           subtopic_id: 1,
           property_name: 'thumbnail_filename',
           new_value: 'filename',
-          old_value: undefined,
+          old_value: null,
         },
       ]);
     }
@@ -698,7 +704,7 @@ describe('Topic update service', function () {
           subtopic_id: 1,
           property_name: 'url_fragment',
           new_value: 'subtopic-url',
-          old_value: undefined,
+          old_value: null,
         },
       ]);
     }
@@ -716,19 +722,17 @@ describe('Topic update service', function () {
   );
 
   it("should set/unset changes to a subtopic's url fragment", () => {
-    expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual(undefined);
+    expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual(null);
 
     topicUpdateService.setSubtopicUrlFragment(_sampleTopic, 1, 'test-url');
     expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual('test-url');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual(undefined);
+    expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual(null);
   });
 
   it("should set/unset changes to a subtopic's thumbnail bg " + 'color', () => {
-    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(
-      undefined
-    );
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(null);
 
     topicUpdateService.setSubtopicThumbnailBgColor(_sampleTopic, 1, '#ffffff');
     expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(
@@ -736,9 +740,7 @@ describe('Topic update service', function () {
     );
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(
-      undefined
-    );
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(null);
   });
 
   it(
@@ -756,7 +758,7 @@ describe('Topic update service', function () {
           subtopic_id: 1,
           property_name: 'thumbnail_bg_color',
           new_value: '#ffffff',
-          old_value: undefined,
+          old_value: null,
         },
       ]);
     }
@@ -857,8 +859,22 @@ describe('Topic update service', function () {
 
   it('should rearrange a subtopic', () => {
     var subtopicsDict = [
-      {id: 2, title: 'Title2', skill_ids: []},
-      {id: 3, title: 'Title3', skill_ids: []},
+      {
+        id: 2,
+        title: 'Title2',
+        skill_ids: [],
+        thumbnail_filename: null,
+        thumbnail_bg_color: null,
+        url_fragment: null,
+      },
+      {
+        id: 3,
+        title: 'Title3',
+        skill_ids: [],
+        thumbnail_filename: null,
+        thumbnail_bg_color: null,
+        url_fragment: null,
+      },
     ];
     sampleTopicBackendObject.topicDict.subtopics.push(...subtopicsDict);
 
@@ -900,6 +916,9 @@ describe('Topic update service', function () {
         id: 1,
         title: 'Title',
         skill_ids: ['skill_2'],
+        thumbnail_filename: null,
+        thumbnail_bg_color: null,
+        url_fragment: null,
       },
     ];
   });
@@ -982,6 +1001,30 @@ describe('Topic update service', function () {
           undefined
         );
       }).toThrowError('New subtopic cannot be null');
+      expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+    }
+  );
+
+  it(
+    'should not create a backend change dict for moving a skill id to a' +
+      'subtopic when an error is encountered',
+    () => {
+      expect(() => {
+        topicUpdateService.moveSkillToSubtopic(
+          _sampleTopic,
+          null,
+          1,
+          _secondSkillSummary
+        );
+      }).toThrowError('Given skillId is not an uncategorized skill.');
+      expect(() => {
+        topicUpdateService.moveSkillToSubtopic(
+          _sampleTopic,
+          1,
+          2,
+          _secondSkillSummary
+        );
+      }).toThrowError("Subtopic with id 2 doesn't exist");
       expect(undoRedoService.getCommittableChangeList()).toEqual([]);
     }
   );

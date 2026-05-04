@@ -2404,6 +2404,282 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
             )
 
 
+class GetContentUpdatesFromCmdEditStatePropertyChangeTests(
+    test_utils.GenericTestBase
+):
+    """Tests for get_content_updates_from_cmd_edit_state_property_change."""
+
+    def test_returns_empty_mapping_for_non_edit_state_property_cmd(
+        self,
+    ) -> None:
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'State A',
+                'content_id_for_state_content': 'content_1',
+                'content_id_for_default_outcome': 'default_outcome_1',
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {},
+        )
+
+    def test_returns_empty_mapping_when_new_value_is_none(self) -> None:
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'new_value': None,
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {},
+        )
+
+    def test_extracts_content_updates_for_content_property(self) -> None:
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'new_value': {
+                    'content_id': 'content_1',
+                    'html': '<p>New content.</p>',
+                },
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {'content_1': '<p>New content.</p>'},
+        )
+
+    def test_extracts_content_updates_for_default_outcome(self) -> None:
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+                ),
+                'new_value': {
+                    'feedback': {
+                        'content_id': 'default_outcome_1',
+                        'html': '<p>Try again.</p>',
+                    }
+                },
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {'default_outcome_1': '<p>Try again.</p>'},
+        )
+
+    def test_extracts_content_updates_for_answer_groups(self) -> None:
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
+                ),
+                'new_value': [
+                    {
+                        'outcome': {
+                            'feedback': {
+                                'content_id': 'answer_group_1',
+                                'html': '<p>Correct.</p>',
+                            }
+                        }
+                    },
+                    {
+                        'outcome': {
+                            'feedback': {
+                                'content_id': 'answer_group_2',
+                                'html': '<p>Incorrect.</p>',
+                            }
+                        }
+                    },
+                ],
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {
+                'answer_group_1': '<p>Correct.</p>',
+                'answer_group_2': '<p>Incorrect.</p>',
+            },
+        )
+
+    def test_extracts_content_updates_for_hints_and_solution(self) -> None:
+        hints_change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                'new_value': [
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_1',
+                            'html': '<p>Hint 1.</p>',
+                        }
+                    },
+                    {
+                        'hint_content': {
+                            'content_id': 'hint_2',
+                            'html': '<p>Hint 2.</p>',
+                        }
+                    },
+                ],
+            }
+        )
+        solution_change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+                'new_value': {
+                    'explanation': {
+                        'content_id': 'solution_1',
+                        'html': '<p>Explanation.</p>',
+                    }
+                },
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                hints_change
+            ),
+            {
+                'hint_1': '<p>Hint 1.</p>',
+                'hint_2': '<p>Hint 2.</p>',
+            },
+        )
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                solution_change
+            ),
+            {'solution_1': '<p>Explanation.</p>'},
+        )
+
+    def test_extracts_content_updates_for_customization_args(self) -> None:
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
+                ),
+                'new_value': {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_1',
+                            'unicode_str': 'Enter answer',
+                        }
+                    },
+                    'choices': {
+                        'value': [
+                            {
+                                'content_id': 'ca_choices_1',
+                                'html': '<p>Choice 1</p>',
+                            },
+                            {
+                                'content_id': 'ca_choices_2',
+                                'unicode_str': '<p>Choice 2</p>',
+                            },
+                        ]
+                    },
+                    'rows': {'value': 1},
+                },
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {
+                'ca_placeholder_1': 'Enter answer',
+                'ca_choices_1': '<p>Choice 1</p>',
+                'ca_choices_2': '<p>Choice 2</p>',
+            },
+        )
+
+    def test_extracts_content_updates_for_customization_args_html_dict(
+        self,
+    ) -> None:
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
+                ),
+                'new_value': {
+                    'question': {
+                        'value': {
+                            'content_id': 'ca_question_1',
+                            'html': '<p>Question prompt</p>',
+                        }
+                    },
+                    'rows': {'value': 2},
+                },
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {'ca_question_1': '<p>Question prompt</p>'},
+        )
+
+    def test_should_not_extract_content_for_invalid_customization_args(
+        self,
+    ) -> None:
+        # Invalid value type for customization arg.
+        change = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'State A',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS
+                ),
+                'new_value': {
+                    'question': {
+                        'value': [999],
+                    },
+                    'rows': {'value': 2},
+                },
+            }
+        )
+
+        self.assertEqual(
+            exp_services.get_content_updates_from_cmd_edit_state_property_change(
+                change
+            ),
+            {},
+        )
+
+
 class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
 
     def test_get_image_filenames_from_exploration(self) -> None:

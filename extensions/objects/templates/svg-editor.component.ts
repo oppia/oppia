@@ -76,6 +76,9 @@ export class SvgEditorComponent implements OnInit {
   // modal dimensions.
   CANVAS_WIDTH = 494;
   CANVAS_HEIGHT = 368;
+  // Expose constant for use in template.
+  SVG_EDITOR_TOOLBAR_HEIGHT_PX =
+    SvgEditorConstants.SVG_EDITOR_TOOLBAR_HEIGHT_PX;
   drawMode = this.DRAW_MODE_NONE;
   polygonMode = this.CLOSED_POLYGON_MODE;
   isTouchDevice = this.deviceInfoService.hasTouchEvents();
@@ -255,6 +258,7 @@ export class SvgEditorComponent implements OnInit {
       this.diagramWidth = SvgEditorConstants.MIN_SVG_DIAGRAM_WIDTH;
     }
     this.currentDiagramWidth = this.diagramWidth;
+    this.setCanvasDimensions();
   }
 
   onHeightInputBlur(): void {
@@ -264,6 +268,7 @@ export class SvgEditorComponent implements OnInit {
       this.diagramHeight = SvgEditorConstants.MIN_SVG_DIAGRAM_HEIGHT;
     }
     this.currentDiagramHeight = this.diagramHeight;
+    this.setCanvasDimensions();
   }
 
   isDiagramCreated(): boolean {
@@ -550,24 +555,23 @@ export class SvgEditorComponent implements OnInit {
 
     value = obj['text-transform'] === 'uppercase' ? value.toUpperCase() : value;
 
-    obj.set({
-      text: value,
-    } as unknown);
-    var text = new fabric.Textbox(
-      (obj as unknown as {text: string}).text,
-      obj.toObject()
-    );
-    text.set({
+    // Use a new Textbox for editability, but copy properties from the loaded object.
+    const textOptions = (obj as fabric.Object).toObject();
+    const text = new fabric.Textbox(value, {
+      ...textOptions,
+      width: textOptions.width || this.diagramWidth,
       type: 'textbox',
       strokeUniform: true,
-    });
+      fill: (obj as fabric.Object).get('fill') || '#000',
+    }) as fabric.Textbox;
+
     // The text moves to the right every time the svg is
     // rendered so this is to ensure that the text doesn't
     // render outside the canvas.
     // https://github.com/fabricjs/fabric.js/issues/1280
-    if (text.left > this.CANVAS_WIDTH) {
+    if (text.left !== undefined && text.left > this.diagramWidth) {
       text.set({
-        left: this.CANVAS_WIDTH,
+        left: this.diagramWidth - (text.width || 0),
       });
     }
     coloredTextIndex.forEach(obj => {
@@ -654,7 +658,14 @@ export class SvgEditorComponent implements OnInit {
       this.canvas.getObjects(),
       {canvas: this.canvas}
     );
-    temporarySelection.scaleToWidth(this.canvas.getWidth());
+    // Only scale wide images to fit the canvas width. Tall/narrow images
+    // should not be scaled to width as this causes them to exceed the
+    // canvas height and get clipped.
+    const selectionWidth = temporarySelection.width ?? 0;
+    const selectionHeight = temporarySelection.height ?? 0;
+    if (selectionWidth > selectionHeight) {
+      temporarySelection.scaleToWidth(this.canvas.getWidth());
+    }
     temporarySelection.center();
     this.canvas.setActiveObject(temporarySelection);
     this.canvas.discardActiveObject();
@@ -1692,11 +1703,18 @@ export class SvgEditorComponent implements OnInit {
     });
   }
 
+  // Sets the canvas dimensions based on diagramHeight and diagramWidth which
+  // are controlled by the user through the dimension inputs. Previously, this
+  // method used imagePreloaderService.getDimensionsOfImage() to get dimensions
+  // from the saved image, but that approach didn't work for new/edited images
+  // where the user has changed the dimensions. Using diagramHeight/diagramWidth
+  // ensures the canvas always matches what the user has specified.
   setCanvasDimensions(): void {
-    let dimensions =
-      this.value && this.imagePreloaderService.getDimensionsOfImage(this.value);
-    this.canvas.setHeight(dimensions?.height || this.CANVAS_HEIGHT);
-    this.canvas.setWidth(dimensions?.width || this.CANVAS_WIDTH);
+    if (!this.canvas) {
+      return;
+    }
+    this.canvas.setHeight(this.diagramHeight);
+    this.canvas.setWidth(this.diagramWidth);
     this.canvas.renderAll();
   }
 

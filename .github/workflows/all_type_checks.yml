@@ -13,6 +13,11 @@ on:
     branches:
       - develop
       - release-*
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{
@@ -20,15 +25,33 @@ concurrency:
          || github.ref || github.run_id }}
   cancel-in-progress: true
 jobs:
+  setup_merge_sha:
+    name: Capture develop SHA
+    runs-on: ubuntu-22.04
+    outputs:
+      develop_sha: ${{ steps.get_sha.outputs.sha }}
+    steps:
+      - name: Get latest develop SHA
+        id: get_sha
+        run: |
+          SHA=$(git ls-remote https://github.com/oppia/oppia.git refs/heads/develop | awk '{print $1}')
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
   backend_type_checks:
     name: Backend
+    needs: setup_merge_sha
     runs-on: ubuntu-22.04
-    if: ${{ github.event_name != 'merge_group' || github.event.action != 'destroyed' }}
+    # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
+    if: ${{ ! (
+        (github.event_name == 'merge_group' && github.event.action == 'destroyed')
+        || (github.event_name == 'pull_request' && github.event.action == 'closed')
+      ) }}
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+        with:
+          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
       - name: Run Mypy type checks
         run: python -m scripts.run_mypy_checks
       - name: Report failure if failed on oppia/oppia develop branch
@@ -39,13 +62,20 @@ jobs:
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   frontend_type_checks:
     name: Frontend
+    needs: setup_merge_sha
     runs-on: ubuntu-22.04
-    if: ${{ github.event_name != 'merge_group' || github.event.action != 'destroyed' }}
+    # Skip the job if we were only launched to cancel running jobs via the concurrency key above.
+    if: ${{ ! (
+        (github.event_name == 'merge_group' && github.event.action == 'destroyed')
+        || (github.event_name == 'pull_request' && github.event.action == 'closed')
+      ) }}
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+        with:
+          merge_sha: ${{ needs.setup_merge_sha.outputs.develop_sha }}
       - name: Run typescript tests
         run: python -m scripts.run_typescript_checks
       - name: Run typescript tests in strict mode
