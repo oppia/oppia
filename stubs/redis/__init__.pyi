@@ -1,3 +1,4 @@
+from . import exceptions as exceptions
 from .client import Redis as Redis, StrictRedis as StrictRedis
 
-__all__ = ['Redis', 'StrictRedis']
+__all__ = ['Redis', 'StrictRedis', 'exceptions']
