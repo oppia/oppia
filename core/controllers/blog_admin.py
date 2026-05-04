@@ -19,6 +19,7 @@ from __future__ import annotations
 import logging
 
 from core import feconf
+from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import (
@@ -185,10 +186,30 @@ class BlogAdminRolesHandler(
                     'choices': [BLOG_ADMIN, BLOG_POST_EDITOR],
                 }
             },
-            'username': {'schema': {'type': 'basestring'}},
+            'username': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_USERNAME_LENGTH,
+                        }
+                    ],
+                }
+            },
         },
         'PUT': {
-            'username': {'schema': {'type': 'basestring'}},
+            'username': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_USERNAME_LENGTH,
+                        }
+                    ],
+                }
+            },
         },
     }
 
