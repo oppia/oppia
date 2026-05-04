@@ -24,8 +24,9 @@ from unittest import mock
 from core import feconf
 from core.platform.cache import redis_cache_services
 from core.tests import test_utils
-from redis.exceptions import ResponseError
 from scripts import common
+
+from redis.exceptions import ResponseError
 
 
 class RedisCacheServicesUnitTests(test_utils.TestBase):
