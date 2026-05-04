@@ -157,8 +157,10 @@ jobs:
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run E2E Test ${{ matrix.suite.name }}
+        id: e2e-test-attempt-1
         # TODO(#22448): Remove once all suites are fixed.
         if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
+        continue-on-error: true
         run: >
           set -o pipefail;
           VIDEO_RECORDING_IS_ENABLED=1
@@ -167,13 +169,17 @@ jobs:
           --skip_build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee e2e_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload E2E test logs
-        if: ${{ failure() }}
+        if: ${{ steps.e2e-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: e2e-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: e2e_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Run E2E Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
-        if: ${{ failure() }}
+        id: e2e-test-attempt-2
+        # We need to pass always() because if not, GitHub will implicitly use
+        # success(), which requires all previous steps to have succeeded. This
+        # is not what we want for flaky retries.
+        if: ${{ always() && steps.e2e-test-attempt-1.outcome == 'failure' }}
         run: >
           set -o pipefail;
           VIDEO_RECORDING_IS_ENABLED=1
@@ -182,29 +188,32 @@ jobs:
           --skip_build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee e2e_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload E2E retry test logs
-        if: ${{ failure() }}
+        if: ${{ always() && steps.e2e-test-attempt-2.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: e2e-test-retry-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: e2e_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Uploading webdriverio-video as Artifacts
-        if: ${{ failure() }}
+        if: ${{ always() && steps.e2e-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: webdriverio-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/webdriverio-video
       - name: Uploading webdriverio screenshots as Artifacts
-        if: ${{ failure() }}
+        if: ${{ always() && steps.e2e-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: webdriverio-screenshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/webdriverio-screenshots
       - name: Uploading webpack bundles as an artifact
-        if: ${{ failure() }}
+        if: ${{ always() && steps.e2e-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: webpack-bundles-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia/build
+      - name: Fail if both E2E attempts fail
+        if: ${{ always() && steps.e2e-test-attempt-1.outcome == 'failure' && steps.e2e-test-attempt-2.outcome != 'success' }}
+        run: exit 1
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
