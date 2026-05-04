@@ -29,7 +29,8 @@ type FilterArgsType = Parameters<ValidatorFunctionType>[0];
 
 export const validate = (
   control: AbstractControl,
-  validators: OppiaValidator[]
+  validators: OppiaValidator[],
+  numberConversionService: NumberConversionService
 ): ValidationErrors | null => {
   let underscoresToCamelCasePipe = new UnderscoresToCamelCasePipe();
   if (!validators || validators.length === 0) {
@@ -51,9 +52,13 @@ export const validate = (
     if (SchemaValidators[validatorName]) {
       const error = (
         SchemaValidators[validatorName] as (
-          arg: FilterArgsType
+          arg: FilterArgsType,
+          numberConversionService: NumberConversionService
         ) => ReturnType<ValidatorFunctionType>
-      )(filterArgs)(control);
+      )(
+        filterArgs,
+        numberConversionService
+      )(control);
       if (error !== null) {
         errorsPresent = true;
         allValidationErrors = {...allValidationErrors, ...error};

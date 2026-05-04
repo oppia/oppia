@@ -42,7 +42,10 @@ class MockNumberConversionService {
     return '.';
   }
 
-  convertToEnglishDecimal(value: string | number): number | null {
+  convertToEnglishDecimal(value: string | number | null): number | null {
+    if (value === null || value === undefined) {
+      return null;
+    }
     const normalized = value.toString().replace(',', '.');
     const result = parseFloat(normalized);
     return isNaN(result) ? null : result;

@@ -42,6 +42,7 @@ import {SharedPipesModule} from 'filters/shared-pipes.module';
 import {MaterialModule} from 'modules/material.module';
 import {DictSchema, UnicodeSchema} from 'services/schema-default-value.service';
 import {MockTranslateModule} from 'tests/unit-test-utils';
+import {NumberConversionService} from 'services/number-conversion.service';
 import {SchemaBasedBoolEditorComponent} from '../schema-based-bool-editor.component';
 import {SchemaBasedChoicesEditorComponent} from '../schema-based-choices-editor.component';
 import {SchemaBasedCustomEditorComponent} from '../schema-based-custom-editor.component';
@@ -104,7 +105,22 @@ describe('Schema based editor', () => {
         SchemaBasedUnicodeEditor,
         ObjectEditorComponent,
       ],
-      providers: [{provide: TranslateService, useClass: MockTranslateService}],
+      providers: [
+        {provide: TranslateService, useClass: MockTranslateService},
+        {
+          provide: NumberConversionService,
+          useValue: {
+            currentDecimalSeparator: () => '.',
+            convertToEnglishDecimal: (value: string | number | null) => {
+              if (value === null || value === undefined) {
+                return null;
+              }
+              const result = parseFloat(value.toString().replace(',', '.'));
+              return isNaN(result) ? null : result;
+            },
+          },
+        },
+      ],
     }).compileComponents();
   }));
 
