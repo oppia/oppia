@@ -827,7 +827,7 @@ describe('Topic update service', function () {
     );
     let subtopic1 = _sampleTopic.getSubtopicById(1);
     if (subtopic1 === null) {
-      throw new Error("Expected subtopic with id 1 to exist.");
+      throw new Error('Expected subtopic with id 1 to exist.');
     }
     let skills = subtopic1.getSkillSummaries();
     expect(skills.length).toEqual(3);
@@ -838,7 +838,7 @@ describe('Topic update service', function () {
     topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 1, 0);
     subtopic1 = _sampleTopic.getSubtopicById(1);
     if (subtopic1 === null) {
-      throw new Error("Expected subtopic with id 1 to exist.");
+      throw new Error('Expected subtopic with id 1 to exist.');
     }
     skills = subtopic1.getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_2');
@@ -848,7 +848,7 @@ describe('Topic update service', function () {
     topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 2, 1);
     subtopic1 = _sampleTopic.getSubtopicById(1);
     if (subtopic1 === null) {
-      throw new Error("Expected subtopic with id 1 to exist.");
+      throw new Error('Expected subtopic with id 1 to exist.');
     }
     skills = subtopic1.getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_2');
@@ -858,7 +858,7 @@ describe('Topic update service', function () {
     topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 2, 0);
     subtopic1 = _sampleTopic.getSubtopicById(1);
     if (subtopic1 === null) {
-      throw new Error("Expected subtopic with id 1 to exist.");
+      throw new Error('Expected subtopic with id 1 to exist.');
     }
     skills = subtopic1.getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_1');
@@ -868,7 +868,7 @@ describe('Topic update service', function () {
     undoRedoService.undoChange(_sampleTopic);
     subtopic1 = _sampleTopic.getSubtopicById(1);
     if (subtopic1 === null) {
-      throw new Error("Expected subtopic with id 1 to exist.");
+      throw new Error('Expected subtopic with id 1 to exist.');
     }
     skills = subtopic1.getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_2');
