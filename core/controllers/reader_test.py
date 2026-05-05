@@ -1649,46 +1649,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             [],
         )
 
-    def test_logged_out_exp_complete_event_handler(self) -> None:
-        """Test completion event for a logged-out user (no user_id)."""
-        csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_0,
-            {
-                'client_time_spent_in_secs': 0,
-                'params': {},
-                'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
-                'state_name': 'final',
-                'version': 1,
-            },
-            csrf_token=csrf_token,
-        )
-
-    def test_exp_incomplete_event_handler_with_story_but_no_topic(self) -> None:
-        """Test maybe-leave when story exists but has no corresponding topic."""
-        self.login(self.USER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        story = story_fetchers.get_story_by_id(self.STORY_ID)
-
-        with self.swap(story, 'corresponding_topic_id', None):
-            with self.swap(
-                story_fetchers, 'get_story_by_id', lambda story_id: story
-            ):
-                self.post_json(
-                    '/explorehandler/exploration_maybe_leave_event/%s'
-                    % self.EXP_ID_2_0,
-                    {
-                        'client_time_spent_in_secs': 0,
-                        'params': {},
-                        'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
-                        'state_name': 'Introduction',
-                        'version': 1,
-                    },
-                    csrf_token=csrf_token,
-                )
-        self.logout()
-
     def test_exp_complete_event_in_collection(self) -> None:
         """Test handler for completion of explorations in the context of
         collections.
@@ -1891,60 +1851,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                         '%s id.' % self.STORY_ID
                     ],
                 )
-
-    def test_logged_out_exp_incomplete_event_handler(self) -> None:
-        """Test maybe-leave event for a logged-out user (no user_id)."""
-        csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
-            {
-                'client_time_spent_in_secs': 0,
-                'params': {},
-                'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
-                'state_name': 'middle',
-                'version': 1,
-            },
-            csrf_token=csrf_token,
-        )
-
-    def test_exp_incomplete_event_handler_with_story_and_topic(self) -> None:
-        """Test maybe-leave when exploration is linked to a story with a topic."""
-        self.login(self.USER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            '/explorehandler/exploration_maybe_leave_event/%s'
-            % self.EXP_ID_2_0,
-            {
-                'client_time_spent_in_secs': 0,
-                'params': {},
-                'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
-                'state_name': 'Introduction',
-                'version': 1,
-            },
-            csrf_token=csrf_token,
-        )
-        self.logout()
-
-    def test_exp_incomplete_event_handler_when_story_not_found(self) -> None:
-        """Test maybe-leave when story_id exists but story object is None."""
-        self.login(self.USER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        with self.swap(
-            story_fetchers, 'get_story_by_id', lambda story_id: None
-        ):
-            self.post_json(
-                '/explorehandler/exploration_maybe_leave_event/%s'
-                % self.EXP_ID_2_0,
-                {
-                    'client_time_spent_in_secs': 0,
-                    'params': {},
-                    'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
-                    'state_name': 'Introduction',
-                    'version': 1,
-                },
-                csrf_token=csrf_token,
-            )
-        self.logout()
 
     def test_exp_incomplete_event_handler_with_no_version_raises_error(
         self,

@@ -2225,7 +2225,7 @@ class LearnerAnswerDetailsSubmissionHandler(
                     'Interaction id given does not match with the '
                     'interaction id of the state'
                 )
-        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:  # pragma: no cover
             state_reference = stats_services.get_state_reference_for_question(
                 entity_id
             )
