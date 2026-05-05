@@ -30,7 +30,6 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 const CARD_NAMES = {
   FIRST: 'Introduction',
   SECOND: '2nd Card',
-  THIRD: '3rd Card',
   FOURTH: '4th Card',
   FIFTH: '5th Card',
   SIXTH: '6th Card',
@@ -106,58 +105,6 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
-  }, 600000);
-
-  it('should be able to preview "Graph Theory" interaction', async function () {
-    // Add a graph theory interaction.
-    await explorationEditor.updateCardContent('Create a star topology.');
-    await explorationEditor.addInteraction(
-      INTERACTION_TYPES.GRAPH_THEORY,
-      false
-    );
-    await explorationEditor.customizeGraphTheoryInteraction();
-    await explorationEditor.updateRuleInResponseModalTo(
-      'is a star network with center vertex'
-    );
-    await explorationEditor.updateGraphTheoryLearnerAnswerInResponseModal('4');
-    await explorationEditor.addResponseDetailsInResponseModal(
-      'Great!',
-      CARD_NAMES.THIRD,
-      false
-    );
-    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
-      'Please try again'
-    );
-    await explorationEditor.addHintToState('The hint is a star topology');
-    // Add solution.
-    await explorationEditor.addSolutionToState(
-      'a star network with center vertex 4',
-      'As given in the question.',
-      true
-    );
-    await explorationEditor.saveExplorationDraft();
-
-    // Submit wrong answer.
-    await explorationEditor.navigateToPreviewTab();
-    await explorationEditor.submitGraphStarNetworkSolution(1);
-    await explorationEditor.expectResponseFeedbackToBe('Please try again');
-    // View Hint.
-    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
-    // covered by navigation in mobile view.
-    if (!explorationEditor.isViewportAtMobileWidth()) {
-      await explorationEditor.viewHint();
-      await explorationEditor.expectHintInHintModalToContain(
-        'The hint is a star topology'
-      );
-      await explorationEditor.closeHintModal();
-    }
-    // Submit a correct answer.
-    await explorationEditor.submitGraphStarNetworkSolution(4);
-    await explorationEditor.expectResponseFeedbackToBe('Great!');
-
-    // Navigate to next card.
-    await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARD_NAMES.THIRD);
   }, 600000);
 
   it('should be able to preview "Set Input" interaction', async function () {

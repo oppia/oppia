@@ -2890,8 +2890,18 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
+    // Wait for any lingering modals/backdrops to fully clear before interacting
+    // with the card content editor. Ghost modals from prior test steps can
+    // intercept clicks and cause hard-to-diagnose flakiness.
+    await this.page.waitForFunction(
+      () =>
+        document.querySelectorAll('.modal-backdrop, ngb-modal-window, .modal')
+          .length === 0,
+      {timeout: 60000}
+    );
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
+      timeout: 60000,
     });
     await this.clickOnElementWithSelector(stateEditSelector);
     await this.clearAllTextFrom(stateContentInputField);
@@ -2932,6 +2942,17 @@ export class ExplorationEditor extends BaseUser {
           INTERACTION_TABS_SELECTORS[interaction]
         );
         await this.clickOnElementWithSelector(
+          INTERACTION_TABS_SELECTORS[interaction]
+        );
+        // Wait until the tab gains the 'active' class before looking for tiles.
+        // Without this, Puppeteer may query tiles while the modal is still
+        // animating to the new tab, causing spurious 'not found' errors.
+        await this.page.waitForFunction(
+          (selector: string) => {
+            const el = document.querySelector(selector);
+            return el && el.classList.contains('active');
+          },
+          {timeout: 30000},
           INTERACTION_TABS_SELECTORS[interaction]
         );
         showMessage(`Switched to ${interaction} tab.`);
