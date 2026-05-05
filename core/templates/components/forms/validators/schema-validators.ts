@@ -133,9 +133,12 @@ export class SchemaValidators {
     numberConversionService: NumberConversionService
   ): (control: AbstractControl) => ValidationErrors | null {
     return (control: AbstractControl): ValidationErrors | null => {
-      const value = numberConversionService.convertToEnglishDecimal(
-        control.value
-      );
+      const value =
+        control.value === null || control.value === undefined
+          ? null
+          : numberConversionService.convertToEnglishDecimal(
+              String(control.value)
+            );
       if (value !== null && value >= args.minValue) {
         return null;
       }
@@ -150,9 +153,12 @@ export class SchemaValidators {
     numberConversionService: NumberConversionService
   ): (control: AbstractControl) => ValidationErrors | null {
     return (control: AbstractControl): ValidationErrors | null => {
-      const value = numberConversionService.convertToEnglishDecimal(
-        control.value
-      );
+      const value =
+        control.value === null || control.value === undefined
+          ? null
+          : numberConversionService.convertToEnglishDecimal(
+              String(control.value)
+            );
       if (value !== null && value <= args.maxValue) {
         return null;
       }
