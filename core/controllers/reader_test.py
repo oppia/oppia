@@ -2030,6 +2030,36 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
         )
 
+    def test_exp_complete_event_handler_for_logged_out_user(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'params': {},
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': 'final',
+            'version': 1,
+        }
+        self.post_json(
+            '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_0,
+            payload,
+            csrf_token=csrf_token,
+        )
+
+    def test_exp_maybe_leave_handler_for_logged_out_user(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'params': {},
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': 'middle',
+            'version': 1,
+        }
+        self.post_json(
+            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
+            payload,
+            csrf_token=csrf_token,
+        )
+
 
 class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
     """Tests for the handler that records playthroughs."""
@@ -3663,6 +3693,21 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_checkpoint_reached_for_logged_out_user(self) -> None:
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/checkpoint_reached/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!',
+            },
+            csrf_token=csrf_token,
+        )
+
 
 class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
     """Tests for exploration restart event handler."""
@@ -3749,6 +3794,46 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
             exploration_dict['most_recently_reached_checkpoint_state_name']
         )
 
+        self.logout()
+
+    def test_restart_handler_for_logged_out_user(self) -> None:
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/restart/%s' % exp_id,
+            {'most_recently_reached_checkpoint_state_name': 'Welcome!'},
+            csrf_token=csrf_token,
+        )
+
+    def test_restart_handler_clears_progress_when_state_name_is_none(
+        self,
+    ) -> None:
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        self.login(self.VIEWER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        self.put_json(
+            '/explorehandler/checkpoint_reached/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!',
+            },
+            csrf_token=csrf_token,
+        )
+
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/restart/%s' % exp_id,
+            {'most_recently_reached_checkpoint_state_name': None},
+            csrf_token=csrf_token,
+        )
         self.logout()
 
 
@@ -4103,6 +4188,18 @@ class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_sync_handler_for_logged_out_user(self) -> None:
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/sync_logged_out_and_logged_in_progress/%s' % exp_id,
+            {'unique_progress_url_id': 'pidABC'},
+            csrf_token=csrf_token,
+        )
+
 
 class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
     """Tests for fetching the version history of a particular state of an
@@ -4288,6 +4385,17 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
             },
         )
 
+        self.logout()
+
+    def test_metadata_version_history_when_last_edited_version_is_none(
+        self,
+    ) -> None:
+        self.login(self.OWNER_EMAIL)
+        response = self.get_json(
+            '%s/%s/%s'
+            % (feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 1)
+        )
+        self.assertIsNone(response['last_edited_version_number'])
         self.logout()
 
 
