@@ -5487,6 +5487,8 @@ export class ExplorationEditor extends BaseUser {
     for (let i = 0; i < answerItems.length - 1; i++) {
       const option = answerItems[i];
 
+      // Re-query the list fresh after each drag so stale handles from
+      // Angular re-renders do not cause incorrect source/destination picks.
       const optionElements = await this.page.$$(dragAndDropItemSelector);
       const destinationElement = optionElements[i];
 
@@ -5506,6 +5508,14 @@ export class ExplorationEditor extends BaseUser {
         throw new Error(`Option "${option}" not found.`);
       }
 
+      if (sourceElement === destinationElement) {
+        continue;
+      }
+
+      // Wait for elements to stop animating before reading bounding boxes.
+      await this.waitForElementToStabilize(sourceElement);
+      await this.waitForElementToStabilize(destinationElement);
+
       const sourceBox = await sourceElement.boundingBox();
       const destBox = await destinationElement.boundingBox();
 
@@ -5521,6 +5531,9 @@ export class ExplorationEditor extends BaseUser {
         destBox.x + destBox.width / 2,
         destBox.y + destBox.height / 2
       );
+
+      // Wait for the list to settle after the drag before the next iteration.
+      await this.page.waitForTimeout(500);
     }
 
     await this.clickOnSubmitAnswerButton();
