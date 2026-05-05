@@ -21,6 +21,9 @@ jobs:
         with:
           app-id: ${{ secrets.OPPIA_GITHUB_APP_ID }}
           private-key: ${{ secrets.OPPIA_GITHUB_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          permission-pull-requests: write
+          permission-members: read
 
       - name: Handle reviewers and post guidance
         uses: actions/github-script@v7
@@ -124,9 +127,7 @@ jobs:
                   `Hello @${prAuthor}! Thank you for making a PR. 👋\n\n` +
                   `@${assignedReviewer} has been assigned to do the first-pass review of your PR. ` +
                   `Other reviewers may be added after the first pass.\n\n` +
-                  `Please make sure the **"Assignees"** section in the sidebar on the right ` +
-                  `matches the **"Reviewers"** section.\n\n` +
-                  `If you need to request a different reviewer, you can leave a comment ` +
+                  `If you'd like additional reviewers to look at your PR, please assign them by leaving a comment ` +
                   `with the syntax \`@reviewer_username PTAL\`.\n\nThanks!`
               });
             };
@@ -231,9 +232,7 @@ jobs:
                     body:
                       `Hello @${prAuthor}! Thank you for making a PR. 👋\n\n` +
                       `We were unable to automatically assign a reviewer for your PR. ` +
-                      `Please make sure the **"Assignees"** section in the sidebar on the right ` +
-                      `matches the **"Reviewers"** section once a reviewer is assigned.\n\n` +
-                      `If you need to request a specific reviewer yourself, you can leave a comment ` +
+                      `If you'd like someone to look at your PR, please assign them by leaving a comment ` +
                       `with the syntax \`@reviewer_username PTAL\`.\n\nThanks!`
                   });
                 }
