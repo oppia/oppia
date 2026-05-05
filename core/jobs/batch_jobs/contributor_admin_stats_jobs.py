@@ -507,7 +507,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         entity_id = '%s.%s' % (language_code, contributor_user_id)
 
-        for stat in translation_contribution_stats:
+        for stat in translation_contribution_stats[:]:
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id
             ):
@@ -756,7 +756,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         entity_id = contributor_user_id
 
-        for stat in question_contribution_stats:
+        for stat in question_contribution_stats[:]:
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id
             ):
@@ -1124,7 +1124,7 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
         """
         translation_contribution_stats = list(translation_contribution_stats)
         valid_topic_ids_with_contribution_stats: List[str] = []
-        for stat in translation_contribution_stats:
+        for stat in translation_contribution_stats[:]:
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id
             ):
@@ -1276,7 +1276,7 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
         """
         question_contribution_stats = list(question_contribution_stats)
         valid_topic_ids_with_contribution_stats: List[str] = []
-        for stat in question_contribution_stats:
+        for stat in question_contribution_stats[:]:
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id
             ):
