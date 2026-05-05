@@ -43,6 +43,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     subtopic_migration_jobs,
     suggestion_migration_jobs,
     suggestion_stats_computation_jobs,
+    synthesize_voiceover_by_language_accent_jobs,
     topic_migration_jobs,
     translation_audit_jobs,
     translation_migration_jobs,
