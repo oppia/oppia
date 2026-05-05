@@ -248,7 +248,7 @@ describe('Translation Modal Component', () => {
     expect(component.updateTranslationErrors).toHaveBeenCalledTimes(1);
   });
 
-  it('should set validation errors when translation has missing custom tags', () => {
+  it('should set validation errors and disable save when translation has missing custom tags', () => {
     spyOn(component, 'ngOnInit').and.stub();
     spyOn(component, 'computeTranslationEditorOverflowState').and.stub();
     component.activeDataFormat = 'html';
@@ -264,25 +264,38 @@ describe('Translation Modal Component', () => {
       '.e2e-test-save-button'
     );
 
+    expect(saveButton).toBeTruthy();
+
     expect(component.hasIncompleteTranslationError).toBeTrue();
     expect(component.hasSubmitValidationErrors()).toBeTrue();
     expect(saveButton.disabled).toBeTrue();
   });
 
-  it('should clear validation errors after translated custom tags are added', () => {
+  it('should clear validation errors and enable save after translated custom tags are added', () => {
     component.activeDataFormat = 'html';
+    component.loadingData = false;
     component.textToTranslate =
       '<p>Original text</p><oppia-noninteractive-skillreview>' +
       '</oppia-noninteractive-skillreview>';
     component.updateHtml('<p>Translated text</p>');
+    fixture.detectChanges();
+
+    const saveButton: HTMLButtonElement = fixture.nativeElement.querySelector(
+      '.e2e-test-save-button'
+    );
+
+    expect(saveButton).toBeTruthy();
+    expect(saveButton.disabled).toBeTrue();
 
     component.updateHtml(
       '<p>Translated text</p><oppia-noninteractive-skillreview>' +
         '</oppia-noninteractive-skillreview>'
     );
+    fixture.detectChanges();
 
     expect(component.hasIncompleteTranslationError).toBeFalse();
     expect(component.hasSubmitValidationErrors()).toBeFalse();
+    expect(saveButton.disabled).toBeFalse();
   });
 
   it('should return the ExoansionTabType enum', () => {
