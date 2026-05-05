@@ -40,7 +40,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   topicName!: string;
   stringifiedSubtopicIds!: string;
-  questionPlayerConfig!: QuestionPlayerConfig;
+  questionPlayerConfig!: QuestionPlayerConfig | null;
   loadingMessage: string = 'Loading';
 
   constructor(

@@ -119,7 +119,7 @@ export class AnswerClassificationService {
     stateName: string,
     interactionInOldState: Interaction,
     answer: InteractionAnswer,
-    interactionRulesService: InteractionRulesService
+    interactionRulesService: InteractionRulesService | null
   ): AnswerClassificationResult {
     var answerClassificationResult = null;
 

@@ -381,6 +381,10 @@ export class ExplorationEngineService {
     );
     let nextFocusLabel: string = this.focusManagerService.generateFocusLabel();
 
+    if (interaction === null) {
+      this.alertsService.addWarning('Interaction cannot be null.');
+      return;
+    }
     let interactionId = interaction.id;
     let interactionHtml = null;
     let interactionCustomizationArgs =
@@ -401,7 +405,7 @@ export class ExplorationEngineService {
       );
     }
 
-    let questionHtml: string = this.makeQuestion(initialState, [newParams]);
+    let questionHtml = this.makeQuestion(initialState, [newParams]);
     if (questionHtml === null) {
       this.alertsService.addWarning('Expression parsing error.');
       return;
@@ -417,15 +421,15 @@ export class ExplorationEngineService {
     let initialCard = StateCard.createNewCard(
       this.currentStateName,
       questionHtml,
-      interactionHtml,
+      interactionHtml ?? '',
       interaction,
-      initialState.content.contentId
+      initialState.content.contentId || ''
     );
-    successCallback(initialCard, nextFocusLabel);
+    successCallback(initialCard, nextFocusLabel ?? '');
   }
 
   getInitialStateName(): string {
-    return this.exploration.getInitialState().name;
+    return this.exploration.getInitialState().name ?? '';
   }
 
   /**
@@ -439,8 +443,8 @@ export class ExplorationEngineService {
    *   (used in preview mode).
    */
   private _initParams(manualParamChanges: ParamChange[]): void {
-    let baseParams = {};
-    this.exploration.paramSpecs.forEach((paramName, paramSpec) => {
+    let baseParams: Record<string, any> = {};
+    this.exploration.paramSpecs.forEach((paramName: string, paramSpec: any) => {
       baseParams[paramName] = paramSpec.getType().createDefaultValue();
     });
 
@@ -878,9 +882,9 @@ export class ExplorationEngineService {
       refreshInteraction,
       feedbackHtml,
       refresherExplorationId,
-      missingPrerequisiteSkillId,
+      missingPrerequisiteSkillId || '',
       onSameCard,
-      null,
+      '',
       oldStateName === this.exploration.initStateName,
       isFirstHit,
       false,
@@ -960,7 +964,7 @@ export class ExplorationEngineService {
       questionHtmlIfStuck,
       nextInteractionIfStuckHtml,
       interaction,
-      contentId
+      contentId || ''
     );
   }
 
@@ -1051,11 +1055,10 @@ export class ExplorationEngineService {
     let shortestPathToStateInReverse: string[] = [];
     let pathsQueue: string[] = [];
     let visitedNodes: Record<string, boolean> = {};
-    let nodeToParentMap: Record<string, string> | null = {};
+    let nodeToParentMap: Record<string, string | null> = {};
     visitedNodes[this.exploration.initStateName] = true;
     pathsQueue.push(this.exploration.initStateName);
     // 1st state does not have a parent
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     nodeToParentMap[this.exploration.initStateName] = null;
     while (pathsQueue.length > 0) {
       // '.shift()' here can return an undefined value, but we're already
@@ -1082,10 +1085,10 @@ export class ExplorationEngineService {
     }
 
     // Reconstruct the shortest path from node to parent map.
-    let currStateName = destStateName;
+    let currStateName: string | null = destStateName;
     while (currStateName !== null) {
       shortestPathToStateInReverse.push(currStateName);
-      currStateName = nodeToParentMap[currStateName];
+      currStateName = nodeToParentMap[currStateName] ?? null;
     }
     // Actual shortest path in order is reverse of the path retrieved
     // from parent map, hence we return the reversed path that goes

@@ -122,7 +122,7 @@ export class TutorCardComponent {
   @Input() shouldHideInteraction!: boolean;
   @Input() userIsLoggedIn!: boolean;
   @Input() explorationIsInPreviewMode!: boolean;
-  @Input() questionPlayerConfig!: QuestionPlayerConfig;
+  @Input() questionPlayerConfig!: QuestionPlayerConfig | null;
   @Input() collectionSummary!: CollectionSummary;
   @Input() recommendedExplorationSummaries!: LearnerExplorationSummary[];
   @Input() nextLessonLink!: string;

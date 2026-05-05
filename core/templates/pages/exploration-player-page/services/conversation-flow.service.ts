@@ -46,6 +46,7 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {NumberAttemptsService} from './number-attempts.service';
 import {InteractionRulesService} from './answer-classification.service';
 import {FatigueDetectionService} from './fatigue-detection.service';
+
 import {QuestionPlayerEngineService} from './question-player-engine.service';
 import {ChapterProgressService} from './chapter-progress.service';
 import {LearnerParamsService} from './learner-params.service';
@@ -359,7 +360,7 @@ export class ConversationFlowService {
    * @param {InteractionRulesService} interactionRulesService - The rules service used to evaluate the answer.
    */
   submitAnswer(
-    answer: string,
+    answer: InteractionAnswer,
     interactionRulesService: InteractionRulesService
   ): void {
     let editorPreviewMode = this.pageContextService.isInExplorationEditorPage();

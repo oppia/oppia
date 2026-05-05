@@ -82,7 +82,7 @@ export class NewRatingsAndRecommendationsComponent
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() userIsLoggedIn!: boolean;
   @Input() explorationIsInPreviewMode!: boolean;
-  @Input() questionPlayerConfig!: QuestionPlayerConfig;
+  @Input() questionPlayerConfig!: QuestionPlayerConfig | null;
   @Input() collectionSummary!: CollectionSummary;
   @Input() recommendedExplorationSummaries!: LearnerExplorationSummary[];
 

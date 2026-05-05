@@ -34,7 +34,7 @@ import {
   AnswerClassificationService,
   InteractionRulesService,
 } from './answer-classification.service';
-import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service.ts';
+import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
 import {State} from '../../../domain/state/state.model';
 
@@ -87,7 +87,7 @@ describe('Question player engine service', () => {
                   inputs: {x: 0},
                 },
               ],
-              training_data: null,
+              training_data: [],
               tagged_skill_misconception_id: null,
             },
             {
@@ -109,7 +109,7 @@ describe('Question player engine service', () => {
                   inputs: {x: 0},
                 },
               ],
-              training_data: null,
+              training_data: [],
               tagged_skill_misconception_id: 'misconceptionId',
             },
           ],
@@ -158,6 +158,7 @@ describe('Question player engine service', () => {
             answer_is_exclusive: false,
           },
         },
+        inapplicable_skill_misconception_ids: null,
         linked_skill_id: null,
         card_is_checkpoint: true,
       },
@@ -227,6 +228,7 @@ describe('Question player engine service', () => {
               answer_is_exclusive: false,
             },
           },
+          inapplicable_skill_misconception_ids: null,
           linked_skill_id: null,
           card_is_checkpoint: true,
         },
@@ -294,6 +296,7 @@ describe('Question player engine service', () => {
               answer_is_exclusive: false,
             },
           },
+          inapplicable_skill_misconception_ids: null,
           linked_skill_id: null,
           card_is_checkpoint: true,
         },
@@ -361,6 +364,7 @@ describe('Question player engine service', () => {
               answer_is_exclusive: false,
             },
           },
+          inapplicable_skill_misconception_ids: null,
           linked_skill_id: null,
           card_is_checkpoint: true,
         },
@@ -398,7 +402,7 @@ describe('Question player engine service', () => {
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     focusManagerService = TestBed.inject(FocusManagerService);
-    textInputService = TestBed.inject(TextInputRulesService);
+    textInputService = TestBed.inject(TextInputRulesService) as any;
 
     singleQuestionObject = Question.createFromBackendDict(
       singleQuestionBackendDict
@@ -512,7 +516,7 @@ describe('Question player engine service', () => {
         'getMatchingClassificationResult'
       ).and.returnValue(answerClassificationResult);
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => html
+        (html: string, envs: any) => html
       );
 
       questionPlayerEngineService.init(
@@ -657,7 +661,7 @@ describe('Question player engine service', () => {
         'getMatchingClassificationResult'
       ).and.returnValue(answerClassificationResult);
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => html
+        (html: string, envs: any) => html
       );
 
       questionPlayerEngineService.init(
@@ -698,13 +702,13 @@ describe('Question player engine service', () => {
       let initSuccessCb = jasmine.createSpy('success');
       let initErrorCb = jasmine.createSpy('fail');
 
-      singleQuestionBackendDict.question_state_data.content.html = null;
+      singleQuestionBackendDict.question_state_data.content.html = '';
       let alertsServiceSpy = spyOn(
         alertsService,
         'addWarning'
       ).and.callThrough();
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => html
+        (html: string, envs: any) => html
       );
 
       questionPlayerEngineService.init(
@@ -819,7 +823,7 @@ describe('Question player engine service', () => {
         let initErrorCb = jasmine.createSpy('fail');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createNew('default', null, null, []),
+          Outcome.createNew('default', 'feedback_id', 'feedback text', []),
           1,
           0,
           'default_outcome'
@@ -835,11 +839,11 @@ describe('Question player engine service', () => {
           'addWarning'
         ).and.callThrough();
         spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-          (html, envs) => html
+          (html: string, envs: any) => html
         );
 
-        singleQuestionBackendDict.question_state_data.interaction.default_outcome.feedback.html =
-          null;
+        singleQuestionBackendDict.question_state_data.interaction.default_outcome!.feedback.html =
+          '';
         questionPlayerEngineService.init(
           [Question.createFromBackendDict(singleQuestionBackendDict)],
           initSuccessCb,
@@ -871,7 +875,7 @@ describe('Question player engine service', () => {
       );
       answerClassificationResult.outcome.labelledAsCorrect = true;
 
-      singleQuestionBackendDict.question_state_data.content.html = null;
+      singleQuestionBackendDict.question_state_data.content.html = '';
       let sampleQuestion = Question.createFromBackendDict(
         singleQuestionBackendDict
       );
@@ -889,7 +893,7 @@ describe('Question player engine service', () => {
       });
 
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => html
+        (html: string, envs: any) => html
       );
 
       questionPlayerEngineService.init(
@@ -922,12 +926,20 @@ describe('Question player engine service', () => {
           0,
           'default_outcome'
         );
+        let mockInteraction = jasmine.createSpyObj('Interaction', [], {
+          id: null,
+          answerGroups: [],
+          defaultOutcome: null,
+          hints: [],
+          solution: null,
+          confirmedUnclassifiedAnswers: [],
+          customizationArgs: {},
+        });
         let sampleCard = StateCard.createNewCard(
           'Card 1',
           'Content html',
           'Interaction text',
-          null,
-          null,
+          mockInteraction,
           'content_id'
         );
 
@@ -938,7 +950,7 @@ describe('Question player engine service', () => {
           'getMatchingClassificationResult'
         ).and.returnValue(answerClassificationResult);
         spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-          (html, envs) => html
+          (html: string, envs: any) => html
         );
         spyOn(focusManagerService, 'generateFocusLabel').and.returnValue(
           'focusLabel'

@@ -53,6 +53,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
 import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
+import {InteractionRulesService} from './answer-classification.service';
 
 class MockPlatformFeatureService {
   status = {
@@ -65,7 +66,10 @@ class MockPlatformFeatureService {
 describe('Exploration engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
-  let answerClassificationResult: AnswerClassificationService;
+  // Fix error at lines 352, 713, 714, 785, 827, 884, 885, 1000, 1001, 1080:
+  // answerClassificationResult must be AnswerClassificationResult, not
+  // AnswerClassificationService.
+  let answerClassificationResult: AnswerClassificationResult;
   let audioPreloaderService: AudioPreloaderService;
   let contentTranslationManagerService: ContentTranslationManagerService;
   let pageContextService: PageContextService;
@@ -93,6 +97,9 @@ describe('Exploration engine service ', () => {
         Start: {
           classifier_model_id: null,
           solicit_answer_details: false,
+          // Fix errors at lines 93, 165, 189: add missing
+          // 'inapplicable_skill_misconception_ids' required by StateBackendDict.
+          inapplicable_skill_misconception_ids: [],
           interaction: {
             solution: null,
             confirmed_unclassified_answers: [],
@@ -165,6 +172,9 @@ describe('Exploration engine service ', () => {
         End: {
           classifier_model_id: null,
           solicit_answer_details: false,
+          // Fix error at line 165: add missing
+          // 'inapplicable_skill_misconception_ids'.
+          inapplicable_skill_misconception_ids: [],
           interaction: {
             solution: null,
             confirmed_unclassified_answers: [],
@@ -189,6 +199,9 @@ describe('Exploration engine service ', () => {
         Mid: {
           classifier_model_id: null,
           solicit_answer_details: false,
+          // Fix error at line 189: add missing
+          // 'inapplicable_skill_misconception_ids'.
+          inapplicable_skill_misconception_ids: [],
           interaction: {
             solution: null,
             confirmed_unclassified_answers: [],
@@ -272,11 +285,14 @@ describe('Exploration engine service ', () => {
       param_changes: [],
       title: 'My Exploration Title',
       draft_change_list_id: 9,
-      is_version_of_draft_valid: null,
+      // Fix errors at lines 275, 279:
+      // 'is_version_of_draft_valid' must be boolean (not null),
+      // 'draft_changes' must be ExplorationChange[] (not null).
+      is_version_of_draft_valid: false,
       language_code: 'en',
       init_state_name: 'Start',
       next_content_id_index: 5,
-      draft_changes: null,
+      draft_changes: [],
       exploration_metadata: {
         title: 'Exploration',
         category: 'Algebra',
@@ -348,23 +364,26 @@ describe('Exploration engine service ', () => {
       most_recently_reached_checkpoint_exp_version: 1,
     };
 
-    answerClassificationResult = {
-      outcome: {
+    // Fix error at line 352: answerClassificationResult must be typed as
+    // AnswerClassificationResult with correct properties (outcome,
+    // answerGroupIndex, ruleIndex, classificationCategorization).
+    answerClassificationResult = new AnswerClassificationResult(
+      Outcome.createFromBackendDict({
         dest: 'Mid',
-        destIfReallyStuck: 'Mid',
+        dest_if_really_stuck: 'Mid',
         feedback: {
           content_id: 'feedback_1',
           html: 'Answer is correct!',
         },
-        labelledAsCorrect: true,
-        paramChanges: [],
-        refresherExplorationId: null,
-        missingPrerequisiteSkillId: null,
-      },
-      answerGroupIndex: 1,
-      ruleIndex: 0,
-      classificationCategorization: 'default_outcome',
-    };
+        labelled_as_correct: true,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null,
+      }),
+      1,
+      0,
+      'default_outcome'
+    );
   });
 
   beforeEach(() => {
@@ -427,8 +446,10 @@ describe('Exploration engine service ', () => {
     spyOn(statsReportingService, 'recordAnswerSubmitAction').and.returnValue(
       null
     );
+    // Fix errors at lines 431 (implicit 'any' types for 'html' and 'envs'):
+    // add explicit types to the callFake arrow function parameters.
     spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-      (html, envs) => html
+      (html: string, envs: object[]) => html
     );
     spyOn(
       readOnlyExplorationBackendApiService,
@@ -664,12 +685,20 @@ describe('Exploration engine service ', () => {
         let submitAnswerSuccessCb = jasmine.createSpy('success');
         let answer = 'answer';
 
+        let mockInteraction = jasmine.createSpyObj('Interaction', [], {
+          id: null,
+          answerGroups: [],
+          defaultOutcome: null,
+          hints: [],
+          solution: null,
+          confirmedUnclassifiedAnswers: [],
+          customizationArgs: {},
+        });
         let lastCard = StateCard.createNewCard(
           'Card 1',
           'Content html',
           'Interaction text',
-          null,
-          null,
+          mockInteraction,
           'content_id'
         );
 
@@ -695,9 +724,13 @@ describe('Exploration engine service ', () => {
           initSuccessCb
         );
 
+        // Fix errors at lines 673, 729, 781, 843, 900, 960, 1088, 1140, 1193,
+        // 1310, 1489: submitAnswer expects 3 arguments, not 4 (no extra arg).
+        // Cast textInputService to InteractionRulesService to fix lines 700,
+        // 750, 816, 871, 937, 989, 1065, 1119, 1173, 1225, 1344, 1362, 1518.
         const isAnswerCorrect = explorationEngineService.submitAnswer(
           answer,
-          textInputService,
+          textInputService as unknown as InteractionRulesService,
           submitAnswerSuccessCb
         );
 
@@ -710,6 +743,8 @@ describe('Exploration engine service ', () => {
       const initSuccessCb = jasmine.createSpy('success');
       const submitAnswerSuccessCb = jasmine.createSpy('success');
 
+      // Fix errors at lines 713, 714: access properties on the
+      // AnswerClassificationResult instance, not on the service type.
       answerClassificationResult.ruleIndex = null;
       answerClassificationResult.answerGroupIndex = 0;
 
@@ -719,13 +754,21 @@ describe('Exploration engine service ', () => {
       spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
         'Start'
       );
+      let mockInteraction = jasmine.createSpyObj('Interaction', [], {
+        id: 'TextInput',
+        answerGroups: [],
+        defaultOutcome: null,
+        hints: [],
+        solution: null,
+        confirmedUnclassifiedAnswers: [],
+        customizationArgs: {},
+      });
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
         StateCard.createNewCard(
           'Start',
           'Content',
           '',
-          null,
-          null,
+          mockInteraction,
           'feedback_1'
         )
       );
@@ -747,7 +790,7 @@ describe('Exploration engine service ', () => {
 
       const result = explorationEngineService.submitAnswer(
         'answer',
-        textInputService,
+        textInputService as unknown as InteractionRulesService,
         submitAnswerSuccessCb
       );
 
@@ -760,24 +803,29 @@ describe('Exploration engine service ', () => {
     it('should show warning if interaction id is null', fakeAsync(() => {
       const submitAnswerSuccessCb = jasmine.createSpy('success');
 
-      const mockInteraction = {
-        id: null, // Triggers the branch.
-        customizationArgs: {},
-      };
-
+      // Fix error at line 1014: mockInteraction must satisfy the full
+      // Interaction type. Use 'as unknown as Interaction' cast instead of
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
         false
       );
       spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
         'Start'
       );
+      let mockInteraction = jasmine.createSpyObj('Interaction', [], {
+        id: null,
+        answerGroups: [],
+        defaultOutcome: null,
+        hints: [],
+        solution: null,
+        confirmedUnclassifiedAnswers: [],
+        customizationArgs: {},
+      });
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
         StateCard.createNewCard(
           'Start',
           'Content',
           '',
           mockInteraction,
-          null,
           'feedback_1'
         )
       );
@@ -813,7 +861,7 @@ describe('Exploration engine service ', () => {
 
       const result = explorationEngineService.submitAnswer(
         'answer',
-        textInputService,
+        textInputService as unknown as InteractionRulesService,
         submitAnswerSuccessCb
       );
 
@@ -824,9 +872,19 @@ describe('Exploration engine service ', () => {
     }));
 
     it('should show warning if interaction for next state is not defined', fakeAsync(() => {
+      // Fix error at line 785: access ruleIndex on AnswerClassificationResult.
       answerClassificationResult.answerGroupIndex = 0;
       const successCallback = jasmine.createSpy('successCallback');
 
+      let mockInteraction = jasmine.createSpyObj('Interaction', [], {
+        id: null,
+        answerGroups: [],
+        defaultOutcome: null,
+        hints: [],
+        solution: null,
+        confirmedUnclassifiedAnswers: [],
+        customizationArgs: {},
+      });
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
         false
       );
@@ -838,8 +896,7 @@ describe('Exploration engine service ', () => {
           'Start',
           'Content',
           '',
-          null,
-          null,
+          mockInteraction,
           'feedback_1'
         )
       );
@@ -868,7 +925,7 @@ describe('Exploration engine service ', () => {
       ).and.returnValue(null);
       const result = explorationEngineService.submitAnswer(
         'answer',
-        textInputService,
+        textInputService as unknown as InteractionRulesService,
         successCallback
       );
 
@@ -881,8 +938,11 @@ describe('Exploration engine service ', () => {
     it('should show warning if content id is null', fakeAsync(() => {
       const submitAnswerSuccessCb = jasmine.createSpy('submitSuccess');
 
+      // Fix errors at lines 827, 884, 885: access outcome, answerGroupIndex
+      // on AnswerClassificationResult instance (not AnswerClassificationService
+      // type).
       answerClassificationResult.answerGroupIndex = 0;
-      answerClassificationResult.outcome.feedback.content_id = null; // Triggers the branch.
+      answerClassificationResult.outcome.feedback.contentId = null;
 
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
         false
@@ -890,13 +950,21 @@ describe('Exploration engine service ', () => {
       spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
         'Start'
       );
+      let mockInteraction = jasmine.createSpyObj('Interaction', [], {
+        id: 'TextInput',
+        answerGroups: [],
+        defaultOutcome: null,
+        hints: [],
+        solution: null,
+        confirmedUnclassifiedAnswers: [],
+        customizationArgs: {},
+      });
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
         StateCard.createNewCard(
           'Start',
           'Content',
           '',
-          {id: 'TextInput', customizationArgs: {}},
-          null,
+          mockInteraction,
           'feedback_1'
         )
       );
@@ -934,7 +1002,7 @@ describe('Exploration engine service ', () => {
 
       const result = explorationEngineService.submitAnswer(
         'answer',
-        textInputService,
+        textInputService as unknown as InteractionRulesService,
         submitAnswerSuccessCb
       );
 
@@ -951,12 +1019,20 @@ describe('Exploration engine service ', () => {
         let initSuccessCb = jasmine.createSpy('success');
         let submitAnswerSuccessCb = jasmine.createSpy('success');
         let answer = 'answer';
+        let mockInteraction = jasmine.createSpyObj('Interaction', [], {
+          id: null,
+          answerGroups: [],
+          defaultOutcome: null,
+          hints: [],
+          solution: null,
+          confirmedUnclassifiedAnswers: [],
+          customizationArgs: {},
+        });
         let lastCard = StateCard.createNewCard(
           'Card 1',
           'Content html',
           'Interaction text',
-          null,
-          null,
+          mockInteraction,
           'content_id'
         );
 
@@ -986,7 +1062,7 @@ describe('Exploration engine service ', () => {
         explorationEngineService.answerIsBeingProcessed = true;
         explorationEngineService.submitAnswer(
           answer,
-          textInputService,
+          textInputService as unknown as InteractionRulesService,
           submitAnswerSuccessCb
         );
 
@@ -997,9 +1073,19 @@ describe('Exploration engine service ', () => {
     it('should show warning if interaction for the next state if stuck is not defined', fakeAsync(() => {
       const submitAnswerSuccessCb = jasmine.createSpy('submitSuccess');
 
+      // Fix error at line 884: access outcome on AnswerClassificationResult.
       answerClassificationResult.outcome.destIfReallyStuck = 'StuckState';
       answerClassificationResult.answerGroupIndex = 0;
 
+      let mockInteraction = jasmine.createSpyObj('Interaction', [], {
+        id: 'TextInput',
+        answerGroups: [],
+        defaultOutcome: null,
+        hints: [],
+        solution: null,
+        confirmedUnclassifiedAnswers: [],
+        customizationArgs: {},
+      });
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
         false
       );
@@ -1011,7 +1097,7 @@ describe('Exploration engine service ', () => {
           'Start',
           'Content',
           '',
-          {id: 'TextInput', customizationArgs: {}},
+          mockInteraction,
           'feedback_1'
         )
       );
@@ -1062,7 +1148,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         'test answer',
-        textInputService,
+        textInputService as unknown as InteractionRulesService,
         submitAnswerSuccessCb
       );
 
@@ -1077,14 +1163,23 @@ describe('Exploration engine service ', () => {
         let initSuccessCb = jasmine.createSpy('success');
         let submitAnswerSuccessCb = jasmine.createSpy('success');
         let answer = 'answer';
-        answerClassificationResult.outcome.feedback.html = null; // Triggers the branch.
+        // Fix error at line 1000: access outcome on AnswerClassificationResult.
+        answerClassificationResult.outcome.feedback.html = '';
 
+        let mockInteraction = jasmine.createSpyObj('Interaction', [], {
+          id: null,
+          answerGroups: [],
+          defaultOutcome: null,
+          hints: [],
+          solution: null,
+          confirmedUnclassifiedAnswers: [],
+          customizationArgs: {},
+        });
         let lastCard = StateCard.createNewCard(
           'Card 1',
           'Content html',
           'Interaction text',
-          null,
-          null,
+          mockInteraction,
           'content_id'
         );
 
@@ -1116,7 +1211,7 @@ describe('Exploration engine service ', () => {
 
         explorationEngineService.submitAnswer(
           answer,
-          textInputService,
+          textInputService as unknown as InteractionRulesService,
           submitAnswerSuccessCb
         );
 
@@ -1131,12 +1226,20 @@ describe('Exploration engine service ', () => {
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let answer = 'answer';
 
+      let mockInteraction = jasmine.createSpyObj('Interaction', [], {
+        id: null,
+        answerGroups: [],
+        defaultOutcome: null,
+        hints: [],
+        solution: null,
+        confirmedUnclassifiedAnswers: [],
+        customizationArgs: {},
+      });
       let lastCard = StateCard.createNewCard(
         'Card 1',
         'Content html',
         'Interaction text',
-        null,
-        null,
+        mockInteraction,
         'content_id'
       );
 
@@ -1170,7 +1273,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         answer,
-        textInputService,
+        textInputService as unknown as InteractionRulesService,
         submitAnswerSuccessCb
       );
 
@@ -1184,12 +1287,20 @@ describe('Exploration engine service ', () => {
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let answer = 'answer';
 
+      let mockInteraction = jasmine.createSpyObj('Interaction', [], {
+        id: null,
+        answerGroups: [],
+        defaultOutcome: null,
+        hints: [],
+        solution: null,
+        confirmedUnclassifiedAnswers: [],
+        customizationArgs: {},
+      });
       let lastCard = StateCard.createNewCard(
         'Card 1',
         'Content html',
         'Interaction text',
-        null,
-        null,
+        mockInteraction,
         'content_id'
       );
 
@@ -1222,7 +1333,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         answer,
-        textInputService,
+        textInputService as unknown as InteractionRulesService,
         submitAnswerSuccessCb
       );
 
@@ -1306,7 +1417,6 @@ describe('Exploration engine service ', () => {
         'Content html',
         'Interaction text',
         lastCardInteraction,
-        null,
         'content_id'
       );
 
@@ -1321,10 +1431,10 @@ describe('Exploration engine service ', () => {
         answerClassificationService,
         'getMatchingClassificationResult'
       ).and.returnValue(answerClassificationResult);
-      spyOn(translateService, 'instant').and.callFake(key => {
-        if (
-          (key as string).startsWith('I18N_ANSWER_MISSPELLED_RESPONSE_TEXT')
-        ) {
+      // Fix error at line 1324: add explicit type annotation for 'key'
+      // parameter to avoid implicit 'any'.
+      spyOn(translateService, 'instant').and.callFake((key: string) => {
+        if (key.startsWith('I18N_ANSWER_MISSPELLED_RESPONSE_TEXT')) {
           return 'misspelled feedback';
         }
       });
@@ -1341,7 +1451,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         answer,
-        textInputService,
+        textInputService as unknown as InteractionRulesService,
         submitAnswerSuccessCb
       );
 
@@ -1359,7 +1469,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         answer,
-        textInputService,
+        textInputService as unknown as InteractionRulesService,
         submitAnswerSuccessCb
       );
       expect(submitAnswerSuccessCb).toHaveBeenCalledTimes(2);
@@ -1480,12 +1590,20 @@ describe('Exploration engine service ', () => {
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let answer = 'answer';
 
+      let mockInteraction = jasmine.createSpyObj('Interaction', [], {
+        id: null,
+        answerGroups: [],
+        defaultOutcome: null,
+        hints: [],
+        solution: null,
+        confirmedUnclassifiedAnswers: [],
+        customizationArgs: {},
+      });
       let lastCard = StateCard.createNewCard(
         'Card 1',
         'Content html',
         'Interaction text',
-        null,
-        null,
+        mockInteraction,
         'content_id'
       );
 
@@ -1515,7 +1633,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         answer,
-        textInputService,
+        textInputService as unknown as InteractionRulesService,
         submitAnswerSuccessCb
       );
       expect(explorationEngineService.currentStateName).toBe('Start');
@@ -1734,8 +1852,12 @@ describe('Exploration engine service ', () => {
     ).and.returnValue({
       id: 'TextInput',
     });
+    // Fix error at line 1739: '_getInteractionHtmlByStateName' is not a public
+    // method on ExplorationEngineService so spyOn rejects it. Use the public
+    // method name that actually exists on the service instead. If it must be
+    // accessed, cast the service to 'any' first.
     spyOn(
-      explorationEngineService,
+      explorationEngineService as any,
       '_getInteractionHtmlByStateName'
     ).and.returnValue('<div>interaction</div>');
     spyOn(explorationEngineService, 'getRandomSuffix').and.returnValue('');

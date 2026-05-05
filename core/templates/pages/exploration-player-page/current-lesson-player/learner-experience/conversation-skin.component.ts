@@ -60,6 +60,10 @@ import {CurrentEngineService} from 'pages/exploration-player-page/services/curre
 import {CardAnimationService} from 'pages/exploration-player-page/services/card-animation.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+import {InteractionAnswer} from 'interactions/answer-defs';
+import {QuestionPlayerConfig} from './ratings-and-recommendations.component';
+import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
+import {CollectionSummary} from 'domain/collection/collection-summary.model';
 
 @Component({
   selector: 'oppia-conversation-skin',
@@ -67,24 +71,24 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
   styleUrls: ['./conversation-skin.component.css'],
 })
 export class ConversationSkinComponent {
-  @Input() questionPlayerConfig;
-  @Input() diagnosticTestTopicTrackerModel;
+  @Input() questionPlayerConfig!: QuestionPlayerConfig | null;
+  @Input() diagnosticTestTopicTrackerModel!: DiagnosticTestTopicTrackerModel;
   directiveSubscriptions = new Subscription();
 
-  _editorPreviewMode;
+  _editorPreviewMode!: boolean;
 
-  isLoggedIn: boolean;
+  isLoggedIn!: boolean;
   voiceoversAreLoaded: boolean = false;
-  collectionTitle: string;
-  explorationId: string;
-  isIframed: boolean;
-  OPPIA_AVATAR_IMAGE_URL: string;
+  collectionTitle!: string | null;
+  explorationId!: string;
+  isIframed!: boolean;
+  OPPIA_AVATAR_IMAGE_URL!: string;
   correctnessFooterIsShown: boolean = true;
 
-  collectionSummary;
-  moveToExploration: boolean;
+  collectionSummary: string | null = null;
+  moveToExploration: boolean = false;
 
-  pidInUrl: string;
+  pidInUrl!: string | null;
   submitButtonIsDisabled = true;
   isLearnerReallyStuck: boolean = false;
   showInteraction: boolean = true;
@@ -310,7 +314,7 @@ export class ConversationSkinComponent {
       this.currentInteractionService.setOnSubmitFn(
         this.conversationFlowService.submitAnswer.bind(
           this.conversationFlowService
-        )
+        ) as any
       );
       this.initializePage();
 
@@ -451,6 +455,9 @@ export class ConversationSkinComponent {
 
   isSupplementalNavShown(): boolean {
     let displayedCard = this.conversationFlowService.getDisplayedCard();
+    if (!displayedCard) {
+      return false;
+    }
     if (
       displayedCard.getStateName() === null &&
       !this.explorationModeService.isInQuestionMode()
@@ -460,7 +467,8 @@ export class ConversationSkinComponent {
     let interaction = displayedCard.getInteraction();
     return (
       Boolean(interaction.id) &&
-      INTERACTION_SPECS[interaction.id].show_generic_submit_button &&
+      (INTERACTION_SPECS as any)[interaction.id as string]
+        .show_generic_submit_button &&
       this.isCurrentCardAtEndOfTranscript()
     );
   }
@@ -472,16 +480,19 @@ export class ConversationSkinComponent {
   triggerRedirectionToStuckState(): void {
     // Save the current state name before redirecting so that after
     // completing the revision, the learner can navigate back to it.
-    const currentStateName = this.conversationFlowService
-      .getDisplayedCard()
-      .getStateName();
+    const displayedCard = this.conversationFlowService.getDisplayedCard();
+    if (!displayedCard) {
+      return;
+    }
+    const currentStateName = displayedCard.getStateName();
     this.conversationFlowService.setOriginalStuckStateName(currentStateName);
     // Redirect the learner.
-    this.conversationFlowService.setNextStateCard(
-      this.conversationFlowService.getNextCardIfStuck()
-    );
-    this.showInteraction = false;
-    this.conversationFlowService.showPendingCard();
+    const nextCard = this.conversationFlowService.getNextCardIfStuck();
+    if (nextCard) {
+      this.conversationFlowService.setNextStateCard(nextCard);
+      this.showInteraction = false;
+      this.conversationFlowService.showPendingCard();
+    }
   }
 
   showQuestionAreNotAvailable(): void {
