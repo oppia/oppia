@@ -389,7 +389,9 @@ export class SuperAdmin extends LoggedInUser {
     await this.page
       .locator('select#label-target-update-form-role-select')
       .selectOption(role);
-    await this.page.locator(roleUpdateUsernameInput).fill(username);
+    const usernameInput = this.page.locator(roleUpdateUsernameInput);
+    await usernameInput.click(); // steal focus from the auto-focused number input
+    await usernameInput.fill(username);
     await this.page.locator(updateRoleButtonSelector).click();
 
     await expect(this.page.locator(updateRoleButtonSelector)).not.toBeEnabled();
