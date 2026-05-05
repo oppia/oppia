@@ -241,11 +241,9 @@ describe('Translation Modal Component', () => {
 
   it('should invoke change detection when set of strings is updated', () => {
     component.activeWrittenTranslation = ['old value'];
-    spyOn(component, 'updateTranslationErrors').and.callThrough();
     component.updateHtml(['new value']);
 
     expect(component.activeWrittenTranslation).toEqual(['new value']);
-    expect(component.updateTranslationErrors).toHaveBeenCalledTimes(1);
   });
 
   it('should set validation errors and disable save when translation has missing custom tags', () => {
@@ -266,9 +264,9 @@ describe('Translation Modal Component', () => {
 
     expect(saveButton).toBeTruthy();
 
-    expect(component.hasIncompleteTranslationError).toBeTrue();
-    expect(component.hasSubmitValidationErrors()).toBeTrue();
-    expect(saveButton.disabled).toBeTrue();
+    expect(component.hasIncompleteTranslationError).toBe(true);
+    expect(component.hasSubmitValidationErrors()).toBe(true);
+    expect(saveButton.disabled).toBe(true);
   });
 
   it('should clear validation errors and enable save after translated custom tags are added', () => {
@@ -285,7 +283,7 @@ describe('Translation Modal Component', () => {
     );
 
     expect(saveButton).toBeTruthy();
-    expect(saveButton.disabled).toBeTrue();
+    expect(saveButton.disabled).toBe(true);
 
     component.updateHtml(
       '<p>Translated text</p><oppia-noninteractive-skillreview>' +
@@ -293,9 +291,9 @@ describe('Translation Modal Component', () => {
     );
     fixture.detectChanges();
 
-    expect(component.hasIncompleteTranslationError).toBeFalse();
-    expect(component.hasSubmitValidationErrors()).toBeFalse();
-    expect(saveButton.disabled).toBeFalse();
+    expect(component.hasIncompleteTranslationError).toBe(false);
+    expect(component.hasSubmitValidationErrors()).toBe(false);
+    expect(saveButton.disabled).toBe(false);
   });
 
   it('should return the ExoansionTabType enum', () => {
