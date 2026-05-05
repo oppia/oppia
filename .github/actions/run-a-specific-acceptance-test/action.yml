@@ -97,7 +97,9 @@ runs:
     - name: Check for video recordings
       shell: bash
       run: |
-        ls /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance/**
+        ls /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance/** \
+        || ls core/tests/playwright-acceptance-tests/test-results/ \
+        || echo "No video recordings found."
 
     - name: Upload test recordings
       # We need to pass !cancelled() because if not, GitHub will implicitly use success(),
@@ -109,3 +111,18 @@ runs:
       with:
         name: video-recordings_${{ inputs.modified-suite-name-for-uploads }}
         path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance/${{ inputs.viewport-type == 'mobile' && 'mobile' || 'desktop' }}-*
+      continue-on-error: true
+
+    - name: Upload Playwright test results
+      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-results_${{ inputs.modified-suite-name-for-uploads }}
+        path: core/tests/playwright-acceptance-tests/test-results/
+
+    - name: Upload Playwright report
+      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-report_${{ inputs.modified-suite-name-for-uploads }}
+        path: core/tests/playwright-acceptance-tests/playwright-report/

@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import json
 import os
 import shutil
 import subprocess
@@ -65,7 +66,10 @@ _PARSER.add_argument(
 )
 
 _PARSER.add_argument(
-    '--headless', help='Run the tests in headless mode.', action='store_true'
+    '--headed',
+    help='Run Playwright tests with browser visible. '
+    'Has no effect on Puppeteer suites.',
+    action='store_true',
 )
 
 _PARSER.add_argument(
@@ -107,6 +111,33 @@ def compile_test_ts_files() -> None:
     )
 
 
+def install_playwright_dependencies() -> None:
+    """Installs Playwright npm dependencies and browsers."""
+    playwright_dir = os.path.join(
+        common.CURR_DIR, 'core', 'tests', 'playwright-acceptance-tests'
+    )
+    install_env = {
+        **os.environ,
+        'PATH': os.pathsep.join(
+            [
+                os.path.join(common.PLAYWRIGHT_NODE_PATH, 'bin'),
+                os.environ['PATH'],
+            ]
+        ),
+        'NODE': os.path.join(common.PLAYWRIGHT_NODE_PATH, 'bin', 'node'),
+    }
+    subprocess.check_call(
+        [common.PLAYWRIGHT_NPM_BIN_PATH, '--prefix', playwright_dir, 'ci'],
+        env=install_env,
+    )
+    playwright_bin = os.path.join(
+        playwright_dir, 'node_modules', '.bin', 'playwright'
+    )
+    subprocess.check_call(
+        [playwright_bin, 'install', 'chromium'], env=install_env
+    )
+
+
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start acceptance tests."""
     if common.is_oppia_server_already_running():
@@ -117,10 +148,36 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         """
         )
 
+    with open(
+        common.ACCEPTANCE_TEST_CONFIG_FILE_PATH, 'r', encoding='utf-8'
+    ) as f:
+        filedata = json.load(f)
+    suite_framework = None
+    suite_found = False
+
+    for suites in filedata.values():
+        for suite in suites:
+            if suite['name'] == args.suite:
+                suite_framework = suite['framework']
+                suite_found = True
+                break
+        if suite_found:
+            break
+
+    if not suite_found:
+        raise ValueError(f"Suite '{args.suite}' not found in config.")
+
     with contextlib.ExitStack() as stack:
         dev_mode = not args.prod_env
 
-        compile_test_ts_files()
+        # Only compile Puppeteer TypeScript for Puppeteer suites.
+        if suite_framework == 'puppeteer':
+            compile_test_ts_files()
+
+        # Install Playwright deps for Playwright suites.
+        if suite_framework == 'playwright':
+            install_playwright_dependencies()
+
         if args.skip_build:
             common.modify_constants(prod_env=args.prod_env)
         else:
@@ -155,7 +212,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         proc = stack.enter_context(
             servers.managed_acceptance_tests_server(
                 suite_name=args.suite,
-                headless=args.headless,
+                headless=not args.headed,  # headed=True means headless=False
                 mobile=args.mobile,
                 prod_env=args.prod_env,
                 stdout=subprocess.PIPE,
