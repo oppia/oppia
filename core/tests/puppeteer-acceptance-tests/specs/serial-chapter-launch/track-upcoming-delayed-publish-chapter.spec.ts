@@ -16,10 +16,10 @@
  * @fileoverview Acceptance test from Google Doc
  * https://docs.google.com/document/d/1mc64U-sHzX4gWzqTrS4stvaysy88HorYzX_vW0zLQy4/edit?tab=t.5otc6j266cak
  *
- * TODO(#26053): Move serial chapter acceptance tests into 
+ * TODO(#26053): Move serial chapter acceptance tests into
  * the existing CUJ structure (logged-in-learner/) and integrate them
- * with redesigned LD flows. This is currently separated due to pending alignment between 
- * serial chapter spec and cuj spreadsheet structure, so temporary isolation is used to 
+ * with redesigned LD flows. This is currently separated due to pending alignment between
+ * serial chapter spec and cuj spreadsheet structure, so temporary isolation is used to
  * avoid blocking prod Ops handover.
 
  * TM.Topic manager creates, tracks upcoming or delayed publications and publishes chapte
