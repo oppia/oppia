@@ -13,12 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance test from CUJv3 Doc
- * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ * @fileoverview Acceptance test from Google Doc
+ * https://docs.google.com/document/d/1mc64U-sHzX4gWzqTrS4stvaysy88HorYzX_vW0zLQy4/edit?tab=t.0
  *
- * LI.2. Set goals on the Learner Dashboard
- * LI.3. Track progress and get recommendations for next steps on the Learner Dashboard.
- * L1.10  Start Lessons from the Home tab in redesigned Learner Dashboard.
+ * TODO(#26053): Move serial chapter acceptance tests into 
+ * the existing CUJ structure (logged-in-learner/) and integrate them
+ * with redesigned LD flows. This is currently separated due to pending alignment between 
+ * serial chapter spec and cuj spreadsheet structure, so temporary isolation is used to 
+ * avoid blocking prod Ops handover.
+
+  LI. Learner sets goals and selects a topic which has all types of chapters(Published, Ready to Publish, Draft) and can play a published Chapter.
+  LI. Learner sees available and coming soon chapters in a topic 
+  LI. Learner continues learning when new chapters are published
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';

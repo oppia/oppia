@@ -13,10 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance test from CUJv3 Doc
- * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ * @fileoverview Acceptance test from Google Doc
+ * https://docs.google.com/document/d/1mc64U-sHzX4gWzqTrS4stvaysy88HorYzX_vW0zLQy4/edit?tab=t.5otc6j266cak
  *
- * TM.3. Create, delete and edit stories and chapters.
+ * TODO(#26053): Move serial chapter acceptance tests into 
+ * the existing CUJ structure (logged-in-learner/) and integrate them
+ * with redesigned LD flows. This is currently separated due to pending alignment between 
+ * serial chapter spec and cuj spreadsheet structure, so temporary isolation is used to 
+ * avoid blocking prod Ops handover.
+
+ * TM.Topic manager creates, tracks upcoming or delayed publications and publishes chapte
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
