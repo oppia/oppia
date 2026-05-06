@@ -77,7 +77,9 @@ export class BaseUser {
       .locator('button.e2e-test-register-user:not([disabled])')
       .waitFor({state: 'visible'});
     await this.clickOnElementWithText('Submit and start contributing');
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForURL((url: URL) => !url.href.includes('/signup'), {
+      timeout: 30000,
+    });
     this.username = username;
     this.email = email;
   }
