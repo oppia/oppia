@@ -153,6 +153,7 @@ describe('Answer Group Editor Component', () => {
 
       component.ngOnInit();
       component.activeRuleIndex = 1;
+      component.sendOnSaveTaggedMisconception(null);
       // The 'unknown' type is used here to bypass type checking for testing
       // purposes, allowing us to pass 'undefined' to a method that expects
       // an 'Outcome' object to test error handling or default behavior.
