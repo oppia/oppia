@@ -13,7 +13,7 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:8181',
     headless: process.env.HEADLESS !== 'false',
-    trace: 'retain-on-failure',
+    trace: 'on',
     screenshot: 'only-on-failure',
     video: 'on',
   },
