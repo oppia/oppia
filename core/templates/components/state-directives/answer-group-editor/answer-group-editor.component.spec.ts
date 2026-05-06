@@ -153,10 +153,14 @@ describe('Answer Group Editor Component', () => {
 
       component.ngOnInit();
       component.activeRuleIndex = 1;
-      component.sendOnSaveTaggedMisconception(null);
+      // The 'unknown' type is used here to bypass type checking for testing
+      // purposes, allowing us to pass 'undefined' to a method that expects
+      // an 'Outcome' object to test error handling or default behavior.
       component.sendOnSaveAnswerGroupCorrectnessLabel(
         undefined as unknown as Outcome
       );
+      // The 'unknown' type is used here to bypass type checking for testing
+      // purposes.
       component.sendOnSaveAnswerGroupFeedback(undefined as unknown as Outcome);
 
       externalSaveEmitter.emit();
@@ -184,7 +188,11 @@ describe('Answer Group Editor Component', () => {
       component.ngOnInit();
       component.activeRuleIndex = 1;
       alertsService.addMessage('info', 'Some other message', 0);
+      // The 'unknown' type is used here to bypass type checking for testing
+      // purposes.
       component.sendOnSaveAnswerGroupDest(undefined as unknown as Outcome);
+      // The 'unknown' type is used here to bypass type checking for testing
+      // purposes.
       component.sendOnSaveAnswerGroupDestIfStuck(
         undefined as unknown as Outcome
       );
@@ -499,7 +507,8 @@ describe('Answer Group Editor Component', () => {
 
     expect(component.isCurrentInteractionTrainable()).toBe(false);
 
-    // An error is thrown if an invalid interaction ID is passed.
+    // The 'unknown' type is used here to force an invalid interaction ID
+    // for testing error handling.
     stateInteractionIdService.savedMemento =
       'InvalidInteraction' as unknown as InteractionSpecsKey;
     component.rules = [];

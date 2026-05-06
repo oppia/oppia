@@ -33,8 +33,11 @@ type ScopedValue =
   | string
   | number
   | boolean
-  // The 'unknown' type is used here because the record can contain any type
-  // of value.
+  // The 'unknown' type is used here because 'ScopedValue' can represent various
+  // data types passed to interaction components (e.g., placeholder, lastAnswer,
+  // etc.). Since these properties can be complex objects whose internal
+  // structure is specific to the interaction being rendered (and thus only
+  // known at runtime), a more specific type cannot be defined here.
   | Record<string, unknown>
   | null
   | undefined;
@@ -51,7 +54,10 @@ export class InteractionDisplayComponent {
   // This property contains the list of classes that needs to be applied to
   // parent container of the created interaction.
   @Input() classStr!: string;
-  // The passed htmlData sometimes accesses property from parent scope.
+  // The 'unknown' type is used in 'ScopedValue' because 'parentScope' provides
+  // values to interaction properties. Since these properties vary for every
+  // interaction, and can be complex objects, we use Record<string, ScopedValue>
+  // to allow for any property mapping.
   @Input() parentScope!: Record<string, ScopedValue>;
 
   @ViewChild('interactionContainer', {
@@ -76,8 +82,11 @@ export class InteractionDisplayComponent {
       const interactionMapping =
         TAG_TO_INTERACTION_MAPPING as unknown as Record<
           string,
-          // The 'unknown' type is used here because the generic type of
-          // the record depends on the specific interaction.
+          // The 'unknown' type is used here because the Record represents a
+          // generic interaction component's properties. Since this mapping
+          // includes all possible interactions, each with its own unique set
+          // of properties and types, we use 'unknown' for the property values
+          // to allow generic assignment at runtime.
           Type<Record<string, unknown>>
         >;
       const firstChild = dom.body.firstElementChild;

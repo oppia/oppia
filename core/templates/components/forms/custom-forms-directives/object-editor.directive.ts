@@ -136,10 +136,11 @@ const EDITORS = {
   'translatable-set-of-unicode-string':
     TranslatableSetOfUnicodeStringEditorComponent,
   'unicode-string': UnicodeStringEditorComponent,
-  // The 'unknown' type is used here because the generic type of ObjectEditor
-  // depends on the specific editor being instantiated, which is determined
-  // at runtime. Defining a strictly typed union for all possible editor
-  // types is complex and outside the scope of this migration.
+  // The 'unknown' type is used here because each editor component in the
+  // EDITORS mapping has a different type for its 'value' property (e.g.,
+  // BooleanEditor uses boolean, IntEditor uses number, etc.). Since this
+  // mapping contains all possible editors, we use 'unknown' to represent
+  // the generic type of the 'ObjectEditor' instance.
 } as unknown as Record<string, Type<ObjectEditor<unknown>>>;
 
 interface AngularJSFormController {
@@ -215,8 +216,11 @@ export class ObjectEditorComponent
   }
 
   @Output() valueChange = new EventEmitter();
-  // The 'unknown' type is used here because the generic type of ObjectEditor
-  // depends on the specific editor being instantiated.
+  // The 'unknown' type is used here because 'componentRef' points to an
+  // instance of a specific editor component (like BooleanEditorComponent,
+  // IntEditorComponent, etc.). Since each editor has a different type for
+  // its 'value' property, 'unknown' is used for the generic parameter of
+  // 'ObjectEditor'.
   componentRef!: ComponentRef<ObjectEditor<unknown>>;
   componentSubscriptions = new Subscription();
   onChange: (_: SchemaDefaultValue) => void = () => {};
@@ -277,9 +281,12 @@ export class ObjectEditorComponent
           EDITORS[editorName as keyof typeof EDITORS]
         );
       this.viewContainerRef.clear();
-      // ObjectEditor type is used to access the instance of the
-      // component created. The 'unknown' type is used because the
-      // generic type of the instance depends on the specific editor.
+      // ObjectEditor type is used to access the instance of the component
+      // created. The 'unknown' type is used because the specific editor
+      // component (e.g., BooleanEditorComponent, IntEditorComponent, etc.)
+      // is only determined at runtime based on the 'objType' input.
+      // Since each editor expects a different value type, 'unknown' is
+      // used for the generic parameter of 'ObjectEditor'.
       const componentRef =
         this.viewContainerRef.createComponent<ObjectEditor<unknown>>(
           componentFactory

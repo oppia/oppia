@@ -72,12 +72,15 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
 
   rulesMemento: Rule[] | null = null;
   directiveSubscriptions = new Subscription();
-  // The 'unknown' type is used here because the record can contain any type of value.
+  // The 'unknown' type is used here because rule inputs can be of various
+  // types (e.g., strings, numbers, or complex objects) depending on the
+  // specific interaction and rule.
   originalContentIdToContent!: Record<string, unknown>;
   activeRuleIndex!: number;
   answerChoices!: AnswerChoice[];
-  // The 'unknown' type is used here because the record can contain any type
-  // of value.
+  // The 'unknown' type is used here because 'editAnswerGroupForm' is a
+  // generic container for form state, where keys are form control names
+  // and values can be any type corresponding to the interaction's inputs.
   editAnswerGroupForm: Record<string, unknown> = {};
   tagMisconceptionsFeatureFlagIsEnabled: boolean = false;
 
@@ -227,7 +230,9 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     let ruleDescriptions = (
       INTERACTION_SPECS as unknown as Record<
         string,
-        // The 'unknown' type is used here because the generic type depends on the interaction.
+        // The 'unknown' type is used here because the structure of rule
+        // descriptions varies across different interactions, and we only
+        // access the 'rule_descriptions' property here.
         {rule_descriptions: Record<string, string>}
       >
     )[interactionId].rule_descriptions;
@@ -242,7 +247,9 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     let description = ruleDescriptions[ruleType];
 
     let PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-    // The 'unknown' type is used here because the record can contain any type of value.
+    // The 'unknown' type is used here because 'inputs' holds the values for
+    // a rule's parameters, which can be any data type (string, number,
+    // object, etc.) depending on the specific rule being created.
     let inputs: Record<string, unknown> = {};
     const inputTypes: RuleInputTypes = {};
     let match;
@@ -351,7 +358,9 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     return (
       INTERACTION_SPECS as unknown as Record<
         string,
-        // The 'unknown' type is used here because the generic type depends on the interaction.
+        // The 'unknown' type is used here because the structure of
+        // interaction specifications varies, and we only need to access
+        // the 'is_trainable' property here.
         {is_trainable: boolean}
       >
     )[interactionId].is_trainable;
@@ -371,9 +380,12 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
    * @returns {Object} A Mapping of content ids (string) to content
    *   (string).
    */
-  // The 'unknown' type is used here because the record can contain any type of value.
+  // The 'unknown' type is used here because the values in the map are
+  // rule inputs, which can be any type (primitives or complex objects)
+  // depending on the rule and interaction.
   getTranslatableRulesContentIdToContentMap(): Record<string, unknown> {
-    // The 'unknown' type is used here because the record can contain any type of value.
+    // The 'unknown' type is used here because the values in the map are
+    // rule inputs, which can be any type depending on the rule and interaction.
     const contentIdToContentMap: Record<string, unknown> = {};
     this.rules.forEach(rule => {
       Object.keys(rule.inputs).forEach(ruleName => {
