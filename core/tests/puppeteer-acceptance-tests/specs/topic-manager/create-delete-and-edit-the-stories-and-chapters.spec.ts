@@ -33,7 +33,7 @@ describe('Topic Manager', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let explorationId: string;
   let simpleExplorationId: string;
-  let programmingExplorationId: string;
+  let unsupportedExplorationId: string;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -53,8 +53,8 @@ describe('Topic Manager', function () {
       );
     await curriculumAdmin.navigateToCreatorDashboardPage();
     await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
-    programmingExplorationId =
-      await curriculumAdmin.createSimpleProgrammingExploration('Mathematics');
+    unsupportedExplorationId =
+      await curriculumAdmin.createSimpleUnsupportedExploration();
     await curriculumAdmin.createAndPublishTopic(
       'Arithmetic Operations',
       'Addition',
@@ -160,7 +160,7 @@ describe('Topic Manager', function () {
     );
     await topicManager.addChapterWithoutSaving(
       'Programming Exploration',
-      programmingExplorationId,
+      unsupportedExplorationId,
       'The Broken Calculator',
       'Arithmetic Operations'
     );
