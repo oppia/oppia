@@ -27,7 +27,7 @@ export class BaseUser {
     if (currentUrl === url || currentUrl.startsWith(url)) {
       await this.page.reload();
     } else {
-      await this.page.goto(url);
+      await this.page.goto(url, {waitUntil: 'networkidle'});
     }
 
     if (verifyURL) {
