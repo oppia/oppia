@@ -110,6 +110,69 @@ def defer(
     cloud_task_model.put()
 
 
+# Here we use type Any because in defer() function '*args' points to the
+# positional arguments of any other function and those arguments can be of
+# type str, list, int and other types too. Similarly, '**kwargs' points to
+# the keyword arguments of any other function and those can also accept
+# different types of values like '*args'.
+def defer_voiceover_regeneration_task_in_batches(
+    fn_identifier: str,
+    queue_name: str,
+    parent_cloud_task_run_id: str,
+    child_cloud_task_model_id: str,
+    *args: Any,
+    **kwargs: Any,
+) -> None:
+    """Adds a new task to a specified deferred queue scheduled for immediate
+    execution.
+
+    Args:
+        fn_identifier: str. The string identifier of the function being
+            deferred.
+        queue_name: str. The name of the queue to place the task into. Should be
+            one of the QUEUE_NAME_* constants listed above.
+        parent_cloud_task_run_id: str. The ID of the parent Cloud Task run for
+            which the voiceover regeneration task is being deferred.
+        child_cloud_task_model_id: str. The ID for the new CloudTaskRunModel to
+            be created for this deferred task.
+        *args: list(*). Positional arguments for fn. Positional arguments
+            should be json serializable.
+        **kwargs: dict(str : *). Keyword arguments for fn.
+
+    Raises:
+        ValueError. The arguments and keyword arguments that are passed in are
+            not JSON serializable.
+    """
+    payload = {
+        'fn_identifier': fn_identifier,
+        'parent_cloud_task_run_id': parent_cloud_task_run_id,
+        'cloud_task_model_id': child_cloud_task_model_id,
+        'args': (args if args else []),
+        'kwargs': (kwargs if kwargs else {}),
+    }
+    try:
+        json.dumps(payload)
+    except TypeError as e:
+        raise ValueError(
+            'The args or kwargs passed to the deferred call with '
+            'function_identifier, %s, are not json serializable.'
+            % fn_identifier
+        ) from e
+    # This is a workaround for a known python bug.
+    # See https://bugs.python.org/issue7980
+    datetime.datetime.strptime('', '')
+
+    task = platform_taskqueue_services.create_http_task(
+        queue_name=queue_name, url=feconf.TASK_URL_DEFERRED, payload=payload
+    )
+    assert task.name is not None
+    cloud_task_model = create_new_cloud_task_model(
+        child_cloud_task_model_id, task.name, fn_identifier
+    )
+    cloud_task_model.update_timestamps()
+    cloud_task_model.put()
+
+
 # Here we use type Any because the argument 'params' can accept payload
 # dictionaries which can hold the values of type string, set, int and
 # other types too.
@@ -218,6 +281,29 @@ def get_cloud_task_run_by_model_id(
     if cloud_task_model is None:
         return None
     return convert_cloud_task_run_model_to_domain_object(cloud_task_model)
+
+
+def get_cloud_task_runs_by_model_ids(
+    model_ids: List[str],
+) -> List[cloud_task_domain.CloudTaskRun]:
+    """Fetches the CloudTaskRunModels using the provided model_ids.
+
+    Args:
+        model_ids: list(str). The IDs of the CloudTaskRunModels to retrieve.
+
+    Returns:
+        list(CloudTaskRun). A list of CloudTaskRun instances corresponding to the given
+        model_ids.
+    """
+    cloud_task_model_instances = cloud_task_models.CloudTaskRunModel.get_multi(
+        model_ids
+    )
+
+    return [
+        convert_cloud_task_run_model_to_domain_object(model)
+        for model in cloud_task_model_instances
+        if model is not None
+    ]
 
 
 def get_new_cloud_task_run_id() -> str:

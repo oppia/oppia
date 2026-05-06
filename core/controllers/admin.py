@@ -2292,7 +2292,7 @@ class AdminHandler(
             # Link the generated nodes and old nodes if they exist.
             graph_change_list = []
             old_dest_ids: List[str] = []
-            updated_story = story_fetchers.get_story_by_id('story_id')
+            updated_story = story_fetchers.get_story_by_id(story_id)
             existing_node_ids = [
                 node.id
                 for node in updated_story.story_contents.nodes

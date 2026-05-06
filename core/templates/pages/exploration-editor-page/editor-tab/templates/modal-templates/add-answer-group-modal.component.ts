@@ -51,7 +51,7 @@ import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface TaggedMisconception {
-  skillId: string;
+  skillId: string | null;
   misconceptionId: number;
 }
 
@@ -114,8 +114,13 @@ export class AddAnswerGroupModalComponent
     this.addState.emit(event);
   }
 
-  updateTaggedMisconception(taggedMisconception: TaggedMisconception): void {
-    this.tmpTaggedSkillMisconceptionId = `${taggedMisconception.skillId}-${taggedMisconception.misconceptionId}`;
+  updateTaggedMisconception(
+    taggedMisconception: TaggedMisconception | null
+  ): void {
+    this.tmpTaggedSkillMisconceptionId =
+      taggedMisconception !== null
+        ? `${taggedMisconception.skillId}-${taggedMisconception.misconceptionId}`
+        : null;
   }
 
   isSelfLoopWithNoFeedback(tmpOutcome: Outcome): boolean {
@@ -193,7 +198,7 @@ export class AddAnswerGroupModalComponent
     this.isEditable = this.editabilityService.isEditable();
     this.questionModeEnabled = this.stateEditorService.isInQuestionMode();
 
-    this.tmpRule = Rule.createNew(null, {}, {});
+    this.tmpRule = Rule.createNew(null as unknown as string, {}, {});
     var feedbackContentId = this.generateContentIdService.getNextStateId(
       AppConstants.COMPONENT_NAME_FEEDBACK
     );
@@ -218,5 +223,16 @@ export class AddAnswerGroupModalComponent
 
   ngOnDestroy(): void {
     this.eventBusGroup.unsubscribe();
+  }
+
+  isRuleValid(): boolean {
+    if (
+      this.currentInteractionId === 'NumericInput' &&
+      this.tmpRule.type === 'IsWithinTolerance'
+    ) {
+      const tolerance = this.tmpRule.inputs.tol;
+      return typeof tolerance === 'number' ? tolerance >= 0 : true;
+    }
+    return true;
   }
 }

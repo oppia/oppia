@@ -173,7 +173,7 @@ export class StateEditorService {
     this.interaction = newInteraction;
   }
 
-  setInteractionId(newId: string): void {
+  setInteractionId(newId: string | null): void {
     this.interaction.setId(newId);
   }
 

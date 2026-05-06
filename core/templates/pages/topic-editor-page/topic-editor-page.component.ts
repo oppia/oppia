@@ -38,11 +38,11 @@ import {TopicEditorStateService} from './services/topic-editor-state.service';
   templateUrl: './topic-editor-page.component.html',
 })
 export class TopicEditorPageComponent implements OnInit, OnDestroy {
-  topic: Topic;
-  validationIssues: string[];
-  prepublishValidationIssues: string[];
-  warningsAreShown: boolean;
-  topicRights: TopicRights;
+  topic: Topic | null = null;
+  validationIssues: string[] = [];
+  prepublishValidationIssues: string[] = [];
+  warningsAreShown = false;
+  topicRights: TopicRights | null = null;
   cancelNavigationOnce = false;
 
   constructor(
@@ -66,11 +66,14 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
   }
 
   getEntityType(): string {
-    return this.pageContextService.getEntityType();
+    return this.pageContextService.getEntityType() || '';
   }
 
   setDocumentTitle(): void {
-    let topicName = this.topicEditorStateService.getTopic().getName();
+    let topicName = this.topicEditorStateService.getTopic()?.getName();
+    if (!topicName) {
+      return;
+    }
     this.pageTitleService.setDocumentTitle(topicName + ' - Oppia');
     this.pageTitleService.setNavbarSubtitleForMobileView(topicName);
     this.topic = this.topicEditorStateService.getTopic();
@@ -124,9 +127,14 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
       if (!activeTab.startsWith('subtopic') && !lastSubtopicIdVisited) {
         this.topicEditorRoutingService.navigateToTopicPreviewTab();
       } else {
+        const subtopicIdFromUrl =
+          this.topicEditorRoutingService.getSubtopicIdFromUrl();
         const subtopicId =
-          this.topicEditorRoutingService.getSubtopicIdFromUrl() ??
-          lastSubtopicIdVisited;
+          subtopicIdFromUrl !== null &&
+          subtopicIdFromUrl !== undefined &&
+          !Number.isNaN(subtopicIdFromUrl)
+            ? subtopicIdFromUrl
+            : lastSubtopicIdVisited;
         this.topicEditorRoutingService.navigateToSubtopicPreviewTab(subtopicId);
       }
     });
@@ -135,9 +143,16 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
   selectMainTab(): void {
     this.confirmBeforeLeavingQuestions(() => {
       const activeTab = this.getActiveTabName();
-      const subtopicId =
-        this.topicEditorRoutingService.getSubtopicIdFromUrl() ??
+      const subtopicIdFromUrl =
+        this.topicEditorRoutingService.getSubtopicIdFromUrl();
+      const lastSubtopicIdVisited =
         this.topicEditorRoutingService.getLastSubtopicIdVisited();
+      const subtopicId =
+        subtopicIdFromUrl !== null &&
+        subtopicIdFromUrl !== undefined &&
+        !Number.isNaN(subtopicIdFromUrl)
+          ? subtopicIdFromUrl
+          : lastSubtopicIdVisited;
       const lastTabVisited = this.topicEditorRoutingService.getLastTabVisited();
 
       if (activeTab.startsWith('subtopic') || lastTabVisited === 'subtopic') {
@@ -183,9 +198,13 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
         return 'Topic Preview';
       }
     }
+    return 'Topic Editor';
   }
 
   _validateTopic(): void {
+    if (!this.topic) {
+      return;
+    }
     this.validationIssues = this.topic.validate();
     if (this.topicEditorStateService.getTopicWithNameExists()) {
       this.validationIssues.push('A topic with this name already exists.');
@@ -194,10 +213,13 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
       this.validationIssues.push('Topic URL fragment already exists.');
     }
     let prepublishTopicValidationIssues = this.topic.prepublishValidate();
-    let subtopicPrepublishValidationIssues = [].concat.apply(
-      [],
-      this.topic.getSubtopics().map(subtopic => subtopic.prepublishValidate())
-    );
+    let subtopicPrepublishValidationIssues: string[] = [];
+    this.topic.getSubtopics().forEach(subtopic => {
+      subtopicPrepublishValidationIssues =
+        subtopicPrepublishValidationIssues.concat(
+          subtopic.prepublishValidate()
+        );
+    });
     this.prepublishValidationIssues = prepublishTopicValidationIssues.concat(
       subtopicPrepublishValidationIssues
     );

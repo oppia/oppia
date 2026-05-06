@@ -1,0 +1,100 @@
+{
+    "_comment": "Glob patterns for i18n keys that are constructed dynamically at runtime and therefore cannot be detected by a literal string search. Each pattern uses '*' as a wildcard, and '?' to denote single characters (e.g. 12-char Object IDs). Add a new entry here ONLY if you have code that builds the key via string concatenation or template literals.",
+    "patterns": [
+        {
+            "pattern": "I18N_CLASSROOM_*_NAME",
+            "code_reference": "core/templates/services/i18n-language-code.service.ts :: getClassroomTranslationKeys()",
+            "reason": "Classroom name keys are constructed using I18N_CLASSROOM_${classroomName.toUpperCase()}_NAME."
+        },
+        {
+            "pattern": "I18N_CLASSROOM_*_COURSE_DETAILS",
+            "code_reference": "core/templates/services/i18n-language-code.service.ts :: getClassroomTranslationKeys()",
+            "reason": "Classroom course details keys are constructed using I18N_CLASSROOM_${classroomName.toUpperCase()}_COURSE_DETAILS."
+        },
+        {
+            "pattern": "I18N_CLASSROOM_*_TEASER_TEXT",
+            "code_reference": "core/templates/services/i18n-language-code.service.ts :: getClassroomTranslationKeys()",
+            "reason": "Classroom teaser text keys are constructed using I18N_CLASSROOM_${classroomName.toUpperCase()}_TEASER_TEXT."
+        },
+        {
+            "pattern": "I18N_CLASSROOM_*_TOPICS_LIST_INTRO",
+            "code_reference": "core/templates/services/i18n-language-code.service.ts :: getClassroomTranslationKeys()",
+            "reason": "Classroom topics list intro keys are constructed using I18N_CLASSROOM_${classroomName.toUpperCase()}_TOPICS_LIST_INTRO."
+        },
+        {
+            "pattern": "I18N_TOPIC_????????????_TITLE",
+            "code_reference": "core/templates/services/i18n-language-code.service.ts :: getTopicTranslationKey()",
+            "reason": "Topic title keys are constructed using I18N_TOPIC_${topicId}_TITLE."
+        },
+        {
+            "pattern": "I18N_TOPIC_????????????_DESCRIPTION",
+            "code_reference": "core/templates/services/i18n-language-code.service.ts :: getTopicTranslationKey()",
+            "reason": "Topic description keys are constructed using I18N_TOPIC_${topicId}_DESCRIPTION."
+        },
+        {
+            "pattern": "I18N_SUBTOPIC_????????????_*_TITLE",
+            "code_reference": "core/templates/services/i18n-language-code.service.ts :: getSubtopicTranslationKey()",
+            "reason": "Subtopic title keys are constructed using I18N_SUBTOPIC_${topicId}_${subtopicUrlFragment}_TITLE."
+        },
+        {
+            "pattern": "I18N_STORY_????????????_TITLE",
+            "code_reference": "core/templates/services/i18n-language-code.service.ts :: getStoryTranslationKey()",
+            "reason": "Story title keys are constructed using I18N_STORY_${storyId}_TITLE."
+        },
+        {
+            "pattern": "I18N_STORY_????????????_DESCRIPTION",
+            "code_reference": "core/templates/services/i18n-language-code.service.ts :: getStoryTranslationKey()",
+            "reason": "Story description keys are constructed using I18N_STORY_${storyId}_DESCRIPTION."
+        },
+        {
+            "pattern": "I18N_EXPLORATION_????????????_TITLE",
+            "code_reference": "core/templates/services/i18n-language-code.service.ts :: getExplorationTranslationKey()",
+            "reason": "Exploration title keys are constructed using I18N_EXPLORATION_${explorationId}_TITLE."
+        },
+        {
+            "pattern": "I18N_EXPLORATION_????????????_DESCRIPTION",
+            "code_reference": "core/templates/services/i18n-language-code.service.ts :: getExplorationTranslationKey()",
+            "reason": "Exploration description keys are constructed using I18N_EXPLORATION_${explorationId}_DESCRIPTION."
+        },
+        {
+            "pattern": "I18N_SYLLABUS_*_TITLE",
+            "code_reference": "core/templates/services/construct-translation-ids.service.ts :: getSyllabusTypeTitleId()",
+            "reason": "Syllabus title keys are constructed using I18N_SYLLABUS_${name.toUpperCase()}_TITLE."
+        },
+        {
+            "pattern": "I18N_LIBRARY_CATEGORIES_*",
+            "code_reference": "core/templates/services/construct-translation-ids.service.ts :: getLibraryId()",
+            "reason": "Library category keys are constructed using I18N_LIBRARY_${prefix}_${name} with prefix='CATEGORIES'."
+        },
+        {
+            "pattern": "I18N_LIBRARY_GROUPS_*",
+            "code_reference": "core/templates/services/construct-translation-ids.service.ts :: getLibraryId()",
+            "reason": "Library groups keys are constructed using I18N_LIBRARY_${prefix}_${name} with prefix='GROUPS'."
+        },
+        {
+            "pattern": "I18N_LIBRARY_N_*",
+            "code_reference": "core/templates/pages/library-page/search-bar/search-bar.component.ts :: updateSelectionDetails()",
+            "reason": "Library count keys are constructed using 'I18N_LIBRARY_N_' + itemsName.toUpperCase() (e.g. I18N_LIBRARY_N_CATEGORIES, I18N_LIBRARY_N_LANGUAGES)."
+        },
+        {
+            "pattern": "I18N_LIBRARY_ALL_*_SELECTED",
+            "code_reference": "core/templates/pages/library-page/search-bar/search-bar.component.ts :: updateSelectionDetails()",
+            "reason": "Library selection keys are constructed using 'I18N_LIBRARY_ALL_' + itemsName + '_SELECTED'."
+        },
+        {
+            "pattern": "I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_*",
+            "code_reference": "core/templates/pages/exploration-player-page/services/checkpoint-celebration-utility.service.ts :: getRandomI18nKey()",
+            "reason": "Checkpoint celebration message keys are constructed using prefix + '_' + messageKind + '_' + randomValue."
+        },
+        {
+            "pattern": "I18N_CONGRATULATORY_CHECKPOINT_TITLE_*",
+            "code_reference": "core/templates/pages/exploration-player-page/services/checkpoint-celebration-utility.service.ts :: getCheckpointTitleI18nKey()",
+            "reason": "Checkpoint celebration title keys are constructed using prefix + '_' + randomValue."
+        },
+        {
+            "pattern": "I18N_END_CHAPTER_MILESTONE_MESSAGE_*",
+            "code_reference": "core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/tutor-card.component.ts",
+            "reason": "End chapter milestone message keys are constructed using 'I18N_END_CHAPTER_MILESTONE_MESSAGE_' + chapterCountMessageIndex."
+        }
+    ]
+}

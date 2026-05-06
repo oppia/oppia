@@ -72,11 +72,11 @@ interface FetchStoriesBackendResponse {
 }
 
 interface FetchSubtopicPageBackendResponse {
-  subtopic_page: SubtopicPageBackendDict;
+  subtopic_page_dict: SubtopicPageBackendDict;
 }
 
 interface FetchStudyGuideBackendResponse {
-  study_guide: StudyGuideBackendDict;
+  study_guide_dict: StudyGuideBackendDict;
 }
 
 interface DeleteTopicBackendResponse {
@@ -212,7 +212,7 @@ export class EditableTopicBackendApiService {
       .toPromise()
       .then(
         response => {
-          let topic = response.subtopic_page;
+          let topic = response.subtopic_page_dict;
           if (successCallback) {
             successCallback(topic);
           }
@@ -242,7 +242,7 @@ export class EditableTopicBackendApiService {
       .toPromise()
       .then(
         response => {
-          let topic = response.study_guide;
+          let topic = response.study_guide_dict;
           if (successCallback) {
             successCallback(topic);
           }

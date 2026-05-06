@@ -110,6 +110,9 @@ INVALID_BLACK_FMT_SKIP_PRAGMA_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_black_pragma_fmt_skip.py'
 )
 CONSTANTS_FILEPATH: Final = os.path.join(os.getcwd(), 'assets', 'constants.ts')
+RICH_TEXT_COMPONENTS_DEFINITIONS_FILEPATH: Final = os.path.join(
+    os.getcwd(), 'assets', 'rich_text_components_definitions.ts'
+)
 VALID_PY_IGNORE_PRAGMA_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'valid_py_ignore_pragma.py'
 )
@@ -429,6 +432,109 @@ class GeneralLintTests(test_utils.LinterTestBase):
         )
 
         self.assertEqual('Bad pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_invalid_rte_component_config_id_in_ui_config(self) -> None:
+        def mock_readlines(filepath: str) -> Tuple[str, ...]:
+            if filepath == CONSTANTS_FILEPATH:
+                return (
+                    '"RTE_COMPONENT_CONFIGS": {',
+                    '  "ALL_COMPONENTS": ["tabs"],',
+                    '  "CURATED_LESSON_COMPONENTS": ["math"]',
+                    '},',
+                )
+            if filepath == RICH_TEXT_COMPONENTS_DEFINITIONS_FILEPATH:
+                return (
+                    '"ui_config": {',
+                    '  "rte_component_config_id": "ALL_COMPONENTS"',
+                    '},',
+                    '"ui_config": {',
+                    '  "rte_component_config_id": "INVALID_CONFIG_ID"',
+                    '}',
+                )
+            return ()
+
+        with self.swap(FILE_CACHE, 'readlines', mock_readlines):
+            linter = general_purpose_linter.GeneralPurposeLinter(
+                [RICH_TEXT_COMPONENTS_DEFINITIONS_FILEPATH], FILE_CACHE
+            )
+            lint_task_report = linter.check_rte_component_config_ids()
+        self.assert_same_list_elements(
+            [
+                'Line 5: The value of "rte_component_config_id" in ui_config '
+                'should match one of the keys in assets/constants.ts -> '
+                'RTE_COMPONENT_CONFIGS. Found "INVALID_CONFIG_ID".'
+            ],
+            lint_task_report.trimmed_messages,
+        )
+        self.assertEqual('RTE component config ids', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_valid_rte_component_config_id_in_ui_config(self) -> None:
+        def mock_readlines(filepath: str) -> Tuple[str, ...]:
+            if filepath == CONSTANTS_FILEPATH:
+                return (
+                    '"RTE_COMPONENT_CONFIGS": {',
+                    '  "ALL_COMPONENTS": ["tabs"],',
+                    '  "CURATED_LESSON_COMPONENTS": ["math"]',
+                    '},',
+                )
+            if filepath == RICH_TEXT_COMPONENTS_DEFINITIONS_FILEPATH:
+                return (
+                    '"ui_config": {',
+                    '  "rte_component_config_id": "ALL_COMPONENTS"',
+                    '}',
+                )
+            return ()
+
+        with self.swap(FILE_CACHE, 'readlines', mock_readlines):
+            linter = general_purpose_linter.GeneralPurposeLinter(
+                [RICH_TEXT_COMPONENTS_DEFINITIONS_FILEPATH], FILE_CACHE
+            )
+            lint_task_report = linter.check_rte_component_config_ids()
+        self.assertEqual(lint_task_report.trimmed_messages, [])
+        self.assertEqual('RTE component config ids', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
+
+    def test_rte_component_config_id_check_for_unrelated_file(self) -> None:
+        def mock_readlines(unused_filepath: str) -> Tuple[str, ...]:
+            raise Exception('readlines should not be called')
+
+        with self.swap(FILE_CACHE, 'readlines', mock_readlines):
+            linter = general_purpose_linter.GeneralPurposeLinter(
+                [VALID_PY_FILE_PATH], FILE_CACHE
+            )
+            lint_task_report = linter.check_rte_component_config_ids()
+        self.assertEqual(lint_task_report.trimmed_messages, [])
+        self.assertEqual('RTE component config ids', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
+
+    def test_rte_component_config_id_check_fails_if_constants_missing(
+        self,
+    ) -> None:
+        def mock_readlines(filepath: str) -> Tuple[str, ...]:
+            if filepath == CONSTANTS_FILEPATH:
+                return ('"FEATURE_FLAG": true,',)
+            if filepath == RICH_TEXT_COMPONENTS_DEFINITIONS_FILEPATH:
+                return (
+                    '"ui_config": {',
+                    '  "rte_component_config_id": "ALL_COMPONENTS"',
+                    '}',
+                )
+            return ()
+
+        with self.swap(FILE_CACHE, 'readlines', mock_readlines):
+            linter = general_purpose_linter.GeneralPurposeLinter(
+                [RICH_TEXT_COMPONENTS_DEFINITIONS_FILEPATH], FILE_CACHE
+            )
+            lint_task_report = linter.check_rte_component_config_ids()
+        self.assert_same_list_elements(
+            [
+                'Could not find valid keys under "RTE_COMPONENT_CONFIGS" in constants.ts.'
+            ],
+            lint_task_report.trimmed_messages,
+        )
+        self.assertEqual('RTE component config ids', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
     def test_linter_with_no_files(self) -> None:

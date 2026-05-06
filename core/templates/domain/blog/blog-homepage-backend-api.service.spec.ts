@@ -110,11 +110,13 @@ describe('Blog home page backend api service', () => {
       search_offset: null,
       blog_post_summaries_list: [],
       list_of_default_tags: ['learners', 'news'],
+      total_matching_blog_posts: 0,
     };
     searchResponseData = {
       searchOffset: null,
       blogPostSummariesList: [],
       listOfDefaultTags: ['learners', 'news'],
+      totalMatchingBlogPosts: 0,
     };
     blogPostObject = BlogPostData.createFromBackendDict(blogPost);
     blogPostPageBackendResponse = {
@@ -205,6 +207,8 @@ describe('Blog home page backend api service', () => {
 
   it('should successfully fetch search data', fakeAsync(() => {
     urlSearchQuery = '?q=testBlogSearch&tags=("News"%20OR%20"Mathematics")';
+    searchResponseBackendDict.total_matching_blog_posts = 0;
+    searchResponseData.totalMatchingBlogPosts = 0;
     bhpbas
       .fetchBlogPostSearchResultAsync(urlSearchQuery)
       .then(successHandler, failHandler);
@@ -253,6 +257,8 @@ describe('Blog home page backend api service', () => {
 
   it('should fetch search data with blog post summary data', fakeAsync(() => {
     urlSearchQuery = '?q=testBlogSearch&tags=("News"%20OR%20"Mathematics")';
+    searchResponseBackendDict.total_matching_blog_posts = 0;
+    searchResponseData.totalMatchingBlogPosts = 0;
     searchResponseBackendDict.blog_post_summaries_list = [blogPostSummary];
     searchResponseData.blogPostSummariesList = [blogPostSummaryObject];
     bhpbas

@@ -31,7 +31,7 @@ describe('Topic Manager', function () {
   let topicManager: TopicManager;
   let explorationId1: string | null;
   let explorationId2: string | null;
-  let explorationId3: string | null;
+  let unsupportedExplorationId: string | null;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -43,7 +43,9 @@ describe('Topic Manager', function () {
     // Create two simple explorations.
     explorationId1 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        'Exploring Quadratic Equations'
+        'Exploring Quadratic Equations',
+        'Algebra',
+        true
       );
 
     explorationId2 =
@@ -51,13 +53,13 @@ describe('Topic Manager', function () {
         'Understanding Polynomial Functions'
       );
 
-    // Create an exploration with Code Editor.
+    // Create an exploration with Set Input interaction.
     await curriculumAdmin.navigateToCreatorDashboardPage();
     await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
-    await curriculumAdmin.dismissWelcomeModal();
 
     // Create an exlporation unsupported by mobile.
-    explorationId3 = await curriculumAdmin.createSimpleProgrammingExploration();
+    unsupportedExplorationId =
+      await curriculumAdmin.createSimpleUnsupportedExploration();
 
     // Create Topics and add skills.
     await curriculumAdmin.createTopic('Algebra II', 'algebra-ii');
@@ -125,8 +127,8 @@ describe('Topic Manager', function () {
       // Add exploration with interaction unsupported on mobile and expect topic can't be updated.
       await topicManager.createAndSwitchToNewTab();
       await topicManager.addChapterWithoutSaving(
-        'Introduction to Python Programmin',
-        explorationId3 as string,
+        'Math Exploration',
+        unsupportedExplorationId as string,
         'Journey into Quadratic Equations',
         'Algebra II'
       );

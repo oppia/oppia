@@ -148,7 +148,7 @@ describe('Creator Dashboard Page Component', () => {
   });
 
   it(
-    'should get complete thumbail icon path corresponding to a given' +
+    'should get complete thumbnail icon path corresponding to a given' +
       ' relative path',
     () => {
       expect(component.getCompleteThumbnailIconUrl('/path/to/icon.png')).toBe(

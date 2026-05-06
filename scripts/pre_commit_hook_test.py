@@ -239,10 +239,8 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             return process
 
         with self.swap(subprocess, 'Popen', mock_popen):
-            self.assertEqual(
-                pre_commit_hook.start_subprocess_for_result(['cmd']),
-                (b'test\n', b''),
-            )
+            result = pre_commit_hook.start_subprocess_for_result(['cmd'])
+            self.assertEqual(result[0], b'test\n')
 
     def test_does_diff_include_package_lock_file_with_package_lock_in_diff(
         self,

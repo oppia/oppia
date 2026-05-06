@@ -93,7 +93,7 @@ describe('Exploration editor tab component', () => {
   let pageContextService: PageContextService;
   var generateContentIdService: GenerateContentIdService;
   var explorationNextContentIdIndexService: ExplorationNextContentIdIndexService;
-  let mockRefreshStateEditorEventEmitter = null;
+  let mockRefreshStateEditorEventEmitter: EventEmitter<void> | null = null;
   let versionHistoryService: VersionHistoryService;
   let stateObject: StateBackendDict;
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
@@ -103,7 +103,11 @@ describe('Exploration editor tab component', () => {
   class MockJoyrideService {
     startTour() {
       return {
-        subscribe: (value1, value2, value3) => {
+        subscribe: (
+          value1: (arg: {number: number}) => void,
+          value2: () => void,
+          value3: () => void
+        ) => {
           value1({number: 1});
           value1({number: 2});
           value1({number: 4});
@@ -122,13 +126,13 @@ describe('Exploration editor tab component', () => {
   class MockWindowRef {
     location = {path: '/create/2234'};
     nativeWindow = {
-      scrollTo: (value1, value2) => {},
+      scrollTo: (value1: number, value2: number) => {},
       sessionStorage: {
         promoIsDismissed: null,
-        setItem: (testKey1, testKey2) => {},
-        removeItem: testKey => {},
+        setItem: (testKey1: string, testKey2: string) => {},
+        removeItem: (testKey: string) => {},
       },
-      gtag: (value1, value2, value3) => {},
+      gtag: (value1: string, value2: string, value3: object) => {},
       navigator: {
         onLine: true,
         userAgent: null,
@@ -145,7 +149,7 @@ describe('Exploration editor tab component', () => {
       },
       document: {
         documentElement: {
-          setAttribute: (value1, value2) => {},
+          setAttribute: (value1: string, value2: string) => {},
           clientWidth: null,
           clientHeight: null,
         },
@@ -157,7 +161,7 @@ describe('Exploration editor tab component', () => {
           },
         },
       },
-      addEventListener: (value1, value2) => {},
+      addEventListener: (value1: string, value2: () => void) => {},
     };
   }
 
@@ -293,6 +297,7 @@ describe('Exploration editor tab component', () => {
         id: 'TextInput',
       },
       linked_skill_id: null,
+      inapplicable_skill_misconception_ids: [],
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
@@ -309,7 +314,7 @@ describe('Exploration editor tab component', () => {
           },
           interaction: {
             id: 'TextInput',
-            confirmed_unclassified_answers: null,
+            confirmed_unclassified_answers: [],
             customization_args: {
               placeholder: {
                 value: {
@@ -325,7 +330,7 @@ describe('Exploration editor tab component', () => {
             answer_groups: [
               {
                 rule_specs: [],
-                training_data: null,
+                training_data: [],
                 tagged_skill_misconception_id: null,
                 outcome: {
                   dest: 'unused',
@@ -364,6 +369,7 @@ describe('Exploration editor tab component', () => {
             hints: [],
           },
           linked_skill_id: null,
+          inapplicable_skill_misconception_ids: [],
           param_changes: [],
           solicit_answer_details: false,
         },
@@ -376,7 +382,7 @@ describe('Exploration editor tab component', () => {
           },
           interaction: {
             id: 'TextInput',
-            confirmed_unclassified_answers: null,
+            confirmed_unclassified_answers: [],
             solution: null,
             customization_args: {
               placeholder: {
@@ -393,7 +399,7 @@ describe('Exploration editor tab component', () => {
             answer_groups: [
               {
                 rule_specs: [],
-                training_data: null,
+                training_data: [],
                 tagged_skill_misconception_id: null,
                 outcome: {
                   missing_prerequisite_skill_id: null,
@@ -424,6 +430,7 @@ describe('Exploration editor tab component', () => {
             hints: [],
           },
           linked_skill_id: null,
+          inapplicable_skill_misconception_ids: [],
           param_changes: [],
           solicit_answer_details: false,
         },
@@ -548,7 +555,7 @@ describe('Exploration editor tab component', () => {
 
     expect(explorationStatesService.addState).toHaveBeenCalledWith(
       'Fourth State',
-      null
+      jasmine.any(Function)
     );
   });
 
@@ -641,13 +648,103 @@ describe('Exploration editor tab component', () => {
     expect(
       explorationStatesService.getState('First State')
         .inapplicableSkillMisconceptionIds
-    ).toEqual(undefined);
+    ).toEqual([]);
 
     component.saveInapplicableSkillMisconceptionIds(['skill_id1']);
     expect(
       explorationStatesService.getState('First State')
         .inapplicableSkillMisconceptionIds
     ).toEqual(['skill_id1']);
+  });
+
+  it('should throw if active state name is empty', () => {
+    stateEditorService.setActiveStateName('');
+    const firstStateInteraction =
+      explorationStatesService.getState('First State').interaction;
+
+    spyOn(explorationStatesService, 'saveInteractionId');
+    spyOn(explorationStatesService, 'saveInteractionCustomizationArgs');
+    spyOn(explorationStatesService, 'saveInteractionAnswerGroups');
+    spyOn(explorationStatesService, 'saveInteractionDefaultOutcome');
+    spyOn(explorationStatesService, 'saveSolution');
+    spyOn(explorationStatesService, 'saveHints');
+    spyOn(explorationStatesService, 'saveSolicitAnswerDetails');
+    spyOn(explorationStatesService, 'saveCardIsCheckpoint');
+    spyOn(explorationStatesService, 'saveStateContent');
+    spyOn(explorationStatesService, 'saveLinkedSkillId');
+    spyOn(explorationStatesService, 'saveInapplicableSkillMisconceptionIds');
+
+    expect(() => {
+      component.saveInteractionData({
+        interactionId: firstStateInteraction.id || '',
+        customizationArgs: firstStateInteraction.customizationArgs,
+      });
+    }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.saveInteractionAnswerGroups([]);
+    }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.saveInteractionDefaultOutcome(
+        firstStateInteraction.defaultOutcome as Outcome
+      );
+    }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.saveSolution(firstStateInteraction.solution as Solution);
+    }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.saveHints([]);
+    }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.saveSolicitAnswerDetails(true);
+    }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.onChangeCardIsCheckpoint();
+    }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.saveStateContent(
+        SubtitledHtml.createFromBackendDict({
+          content_id: 'content',
+          html: 'test',
+        })
+      );
+    }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.saveLinkedSkillId('skill_id_1');
+    }).toThrowError('Expected active state name to be non-null.');
+    expect(() => {
+      component.saveInapplicableSkillMisconceptionIds(['skill_id_1']);
+    }).toThrowError('Expected active state name to be non-null.');
+
+    expect(component.getStateContentPlaceholder()).toBe(
+      'You can speak to the learner here, then ask them a question.'
+    );
+    expect(() => {
+      component.initStateEditor();
+    }).not.toThrowError();
+
+    expect(explorationStatesService.saveInteractionId).not.toHaveBeenCalled();
+    expect(
+      explorationStatesService.saveInteractionCustomizationArgs
+    ).not.toHaveBeenCalled();
+    expect(
+      explorationStatesService.saveInteractionAnswerGroups
+    ).not.toHaveBeenCalled();
+    expect(
+      explorationStatesService.saveInteractionDefaultOutcome
+    ).not.toHaveBeenCalled();
+    expect(explorationStatesService.saveSolution).not.toHaveBeenCalled();
+    expect(explorationStatesService.saveHints).not.toHaveBeenCalled();
+    expect(
+      explorationStatesService.saveSolicitAnswerDetails
+    ).not.toHaveBeenCalled();
+    expect(
+      explorationStatesService.saveCardIsCheckpoint
+    ).not.toHaveBeenCalled();
+    expect(explorationStatesService.saveStateContent).not.toHaveBeenCalled();
+    expect(explorationStatesService.saveLinkedSkillId).not.toHaveBeenCalled();
+    expect(
+      explorationStatesService.saveInapplicableSkillMisconceptionIds
+    ).not.toHaveBeenCalled();
   });
 
   it('should populate misconceptions for state', fakeAsync(() => {
@@ -741,7 +838,7 @@ describe('Exploration editor tab component', () => {
       AnswerGroup.createFromBackendDict(
         {
           rule_specs: [],
-          training_data: null,
+          training_data: [],
           tagged_skill_misconception_id: null,
           outcome: {
             missing_prerequisite_skill_id: null,
@@ -756,7 +853,7 @@ describe('Exploration editor tab component', () => {
             refresher_exploration_id: null,
           },
         },
-        null
+        'TextInput'
       ),
     ]);
 
@@ -776,10 +873,10 @@ describe('Exploration editor tab component', () => {
             param_changes: [],
             refresher_exploration_id: null,
           },
-          training_data: null,
+          training_data: [],
           tagged_skill_misconception_id: '',
         },
-        null
+        'TextInput'
       ),
     ];
     component.saveInteractionAnswerGroups(displayedValue);
@@ -935,12 +1032,20 @@ describe('Exploration editor tab component', () => {
         'stateName',
         'id',
         'some',
-        null,
-        new Interaction([], [], null, null, [], 'id', null),
-        null,
-        null,
+        SubtitledHtml.createDefault('', 'content'),
+        new Interaction(
+          [],
+          [],
+          {} as Interaction['customizationArgs'],
+          null,
+          [],
+          'id',
+          null
+        ),
+        [],
+        false,
         true,
-        true
+        null
       );
       component.stateName = 'stateName';
 
@@ -952,7 +1057,7 @@ describe('Exploration editor tab component', () => {
       stateEditorService.updateStateEditorDirectiveInitialised();
       spyOn(component, 'initStateEditor').and.stub();
 
-      mockRefreshStateEditorEventEmitter.emit();
+      mockRefreshStateEditorEventEmitter?.emit();
       tick();
       component.initStateEditor();
       tick();
@@ -966,21 +1071,30 @@ describe('Exploration editor tab component', () => {
       'stateName',
       'id',
       'some',
-      null,
-      new Interaction([], [], null, null, [], 'id', null),
-      null,
-      null,
+      SubtitledHtml.createDefault('', 'content'),
+      new Interaction(
+        [],
+        [],
+        {} as Interaction['customizationArgs'],
+        null,
+        [],
+        'id',
+        null
+      ),
+      [],
+      false,
       true,
-      true
+      null
     );
     component.stateName = 'stateName';
     spyOn(explorationStatesService, 'getState').and.returnValues(state);
     spyOn(explorationStatesService, 'isInitialized').and.returnValue(true);
     spyOn(component, 'startTutorial');
+    stateEditorService.setActiveStateName('First State');
     editabilityService.onStartTutorial();
 
     component.initStateEditor();
-    mockRefreshStateEditorEventEmitter.emit();
+    mockRefreshStateEditorEventEmitter?.emit();
 
     expect(component.startTutorial).toHaveBeenCalled();
   });
@@ -992,6 +1106,7 @@ describe('Exploration editor tab component', () => {
 
   it('should not start tutorial if not in tutorial mode on page load', () => {
     spyOn(component, 'startTutorial');
+    stateEditorService.setActiveStateName('First State');
     editabilityService.onEndTutorial();
 
     component.initStateEditor();
@@ -1005,6 +1120,7 @@ describe('Exploration editor tab component', () => {
       'registerFinishTutorialEvent'
     );
     spyOn(editabilityService, 'onEndTutorial');
+    stateEditorService.setActiveStateName('First State');
     editabilityService.onStartTutorial();
 
     component.initStateEditor();
@@ -1029,6 +1145,7 @@ describe('Exploration editor tab component', () => {
         canEdit: false,
       } as ExplorationPermissions)
     );
+    stateEditorService.setActiveStateName('First State');
     editabilityService.onStartTutorial();
 
     component.initStateEditor();
@@ -1074,12 +1191,12 @@ describe('Exploration editor tab component', () => {
       'fetchStateVersionHistoryAsync'
     ).and.resolveTo(null);
 
-    expect(component.validationErrorIsShown).toBeFalse();
+    expect(component.validationErrorIsShown).toBe(false);
 
     component.initStateEditor();
     tick();
     flush();
 
-    expect(component.validationErrorIsShown).toBeTrue();
+    expect(component.validationErrorIsShown).toBe(true);
   }));
 });

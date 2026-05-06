@@ -141,7 +141,7 @@ class EditableStoryDataHandler(
 
         self.values.update(
             {
-                'story': story.to_dict(),
+                'story_dict': story.to_dict(),
                 'topic_name': topic.name,
                 'story_is_published': story_is_published,
                 'skill_summaries': skill_summary_dicts,
@@ -184,7 +184,7 @@ class EditableStoryDataHandler(
 
         story_dict = story_fetchers.get_story_by_id(story_id).to_dict()
 
-        self.values.update({'story': story_dict})
+        self.values.update({'story_dict': story_dict})
 
         self.render_json(self.values)
 

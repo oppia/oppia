@@ -1,10 +1,17 @@
 name: Merge develop and set up dependencies
 description: 'Merge develop into current branch, and set up dependencies'
+inputs:
+  merge_sha:
+    description: 'Specific commit SHA from develop to merge. If empty, falls back to latest develop.'
+    required: false
+    default: ''
 runs:
   using: composite
   steps:
     - name: Merge develop branch into the current branch
       uses: ./.github/actions/merge
+      with:
+        merge_sha: ${{ inputs.merge_sha }}
     - name: Setup Python 3.10.16
       uses: actions/setup-python@v5
       id: setup_python

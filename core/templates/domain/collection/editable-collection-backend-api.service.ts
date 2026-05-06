@@ -29,7 +29,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
 
 interface EditableCollectionBackendResponse {
-  collection: CollectionBackendDict;
+  collection_dict: CollectionBackendDict;
 }
 
 // TODO(bhenning): I think that this might be better merged with the
@@ -71,7 +71,7 @@ export class EditableCollectionBackendApiService {
       .toPromise()
       .then(
         response => {
-          var collectionObject = Collection.create(response.collection);
+          var collectionObject = Collection.create(response.collection_dict);
           if (successCallback) {
             successCallback(collectionObject);
           }
@@ -113,7 +113,7 @@ export class EditableCollectionBackendApiService {
       .then(
         response => {
           // The returned data is an updated collection dict.
-          var collectionObject = Collection.create(response.collection);
+          var collectionObject = Collection.create(response.collection_dict);
 
           // Update the ReadOnlyCollectionBackendApiService's cache with the new
           // collection.

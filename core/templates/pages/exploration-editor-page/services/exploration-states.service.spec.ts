@@ -148,6 +148,7 @@ describe('ExplorationStatesService', () => {
           solicit_answer_details: false,
           classifier_model_id: '0',
           card_is_checkpoint: false,
+          inapplicable_skill_misconception_ids: [],
         },
       },
       false
@@ -236,6 +237,6 @@ describe('ExplorationStatesService', () => {
     );
     expect(
       explorationStatesService.getSolicitAnswerDetailsMemento('Hola')
-    ).toBeTrue();
+    ).toBe(true);
   });
 });

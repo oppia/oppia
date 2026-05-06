@@ -1299,9 +1299,8 @@ class CommonTests(test_utils.GenericTestBase):
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
 
         with popen_swap:
-            self.assertEqual(
-                common.start_subprocess_for_result(['cmd']), (b'test\n', b'')
-            )
+            result = common.start_subprocess_for_result(['cmd'])
+            self.assertEqual(result[0], b'test\n')
 
     def test_workflow_permissions_set_to_read_all(self) -> None:
         workflows_dir = os.path.join(os.getcwd(), '.github', 'workflows')

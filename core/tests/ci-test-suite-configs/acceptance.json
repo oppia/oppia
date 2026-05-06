@@ -21,6 +21,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/interested-partner-organization/submit-a-partnership-application.spec.ts"
     },
     {
+      "name": "interested-partner-organization/view-the-blog",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-partner-organization/view-the-blog.spec.ts"
+    },
+    {
       "name": "interested-volunteer/apply-to-become-a-volunteer",
       "module": "core/tests/puppeteer-acceptance-tests/specs/interested-volunteer/apply-to-become-a-volunteer.spec.ts"
     },
@@ -99,6 +103,26 @@
     {
       "name": "exploration-editor/submit-review-and-respond-to-feedback",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/submit-review-and-respond-to-feedback.spec.ts"
+    },
+    {
+      "name": "lesson-creator/check-improvements-tab",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/check-improvements-tab.spec.ts"
+    },
+    {
+      "name": "lesson-creator/create-a-basic-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/create-a-basic-exploration.spec.ts"
+    },
+    {
+      "name": "lesson-creator/modify-an-existing-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/modify-an-existing-exploration.spec.ts"
+    },
+    {
+      "name": "lesson-creator/save-and-publish-the-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/save-and-publish-the-exploration.spec.ts"
+    },
+    {
+      "name": "lesson-creator/view-feedback-and-statistics-of-the-lesson",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/view-feedback-and-statistics-of-the-lesson.spec.ts"
     },
     {
       "name": "logged-in-user/add-concept-card-with-workedexample-to-exploration",
@@ -255,10 +279,6 @@
     {
       "name": "exploration-creator/preview-math-interactions",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-math-interactions.spec.ts"
-    },
-    {
-      "name": "exploration-creator/preview-rarely-used-interactions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-rarely-used-interactions.spec.ts"
     },
     {
       "name": "logged-out-learner/complete-some-practice-question",
@@ -477,12 +497,12 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-edit-and-delete-a-classroom.spec.ts"
     },
     {
-      "name": "translation-coordinator/add-remove-translation-rights",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-coordinator/add-remove-translation-rights.spec.ts"
+      "name": "translation-coordinator/manage-contributors-translation-review-rights",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-coordinator/manage-contributors-translation-review-rights.spec.ts"
     },
     {
-      "name": "practice-question-coordinator/add-and-remove-question-rights",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-coordinator/add-and-remove-question-rights.spec.ts"
+      "name": "practice-question-coordinator/manage-contributors-question-review-submission-rights",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-coordinator/manage-contributors-question-review-submission-rights.spec.ts"
     },
     {
       "name": "release-coordinator/enable-feature-flag",

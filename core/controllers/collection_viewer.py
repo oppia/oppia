@@ -51,7 +51,7 @@ class CollectionDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'can_edit': rights_manager.check_can_edit_activity(
                     self.user, collection_rights
                 ),
-                'collection': collection_dict,
+                'collection_dict': collection_dict,
                 'is_logged_in': bool(self.user_id),
                 'session_id': utils.generate_new_session_id(),
                 'meta_name': collection_dict['title'],

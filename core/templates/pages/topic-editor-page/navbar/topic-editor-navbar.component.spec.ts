@@ -167,14 +167,14 @@ describe('Topic Editor Navbar', () => {
       'Preview',
     ]);
     expect(componentInstance.activeTab).toEqual('Editor');
-    expect(componentInstance.showNavigationOptions).toBeFalse();
-    expect(componentInstance.warningsAreShown).toBeFalse();
-    expect(componentInstance.showTopicEditOptions).toBeFalse();
+    expect(componentInstance.showNavigationOptions).toBe(false);
+    expect(componentInstance.warningsAreShown).toBe(false);
+    expect(componentInstance.showTopicEditOptions).toBe(false);
     expect(componentInstance.topic).toEqual(topic);
-    expect(componentInstance.discardChangesButtonIsShown).toBeFalse();
+    expect(componentInstance.discardChangesButtonIsShown).toBe(false);
     expect(componentInstance.validationIssues).toEqual([]);
     expect(componentInstance.topicRights).toEqual(
-      new TopicRights(false, false, false)
+      new TopicRights(false, false, false, false)
     );
   });
 
@@ -293,13 +293,13 @@ describe('Topic Editor Navbar', () => {
   it('should return true when topic saving is in progress', () => {
     spyOn(topicEditorStateService, 'isSavingTopic').and.returnValue(true);
 
-    expect(componentInstance.isSaveInProgress()).toBeTrue();
+    expect(componentInstance.isSaveInProgress()).toBe(true);
   });
 
   it('should return false when topic saving is not in progress', () => {
     spyOn(topicEditorStateService, 'isSavingTopic').and.returnValue(false);
 
-    expect(componentInstance.isSaveInProgress()).toBeFalse();
+    expect(componentInstance.isSaveInProgress()).toBe(false);
   });
 
   it('should return active tab name when called', () => {
@@ -446,10 +446,13 @@ describe('Topic Editor Navbar', () => {
     "should not send email when user who doesn't have publishing rights" +
       " clicks the 'publish' button and then cancels",
     fakeAsync(() => {
+      componentInstance.topicId = 'topic_1';
+      componentInstance.topic = topic;
       spyOn(topicRightsBackendApiService, 'sendMailAsync').and.returnValue(
         Promise.resolve()
       );
       spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {},
         result: Promise.reject(),
       } as NgbModalRef);
       spyOn(alertsService, 'addSuccessMessage');
@@ -457,6 +460,7 @@ describe('Topic Editor Navbar', () => {
         published: false,
         can_publish_topic: false,
         can_edit_topic: true,
+        can_edit_question: true,
       });
 
       componentInstance.publishTopic();
@@ -494,11 +498,12 @@ describe('Topic Editor Navbar', () => {
       published: false,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.validationIssues = [];
     componentInstance.prepublishValidationIssues = [];
 
-    expect(componentInstance.isTopicSaveable()).toBeTrue();
+    expect(componentInstance.isTopicSaveable()).toBe(true);
   });
 
   it('should return false when there are no changes', () => {
@@ -507,11 +512,12 @@ describe('Topic Editor Navbar', () => {
       published: false,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.validationIssues = [];
     componentInstance.prepublishValidationIssues = [];
 
-    expect(componentInstance.isTopicSaveable()).toBeFalse();
+    expect(componentInstance.isTopicSaveable()).toBe(false);
   });
 
   it('should return false when topic has wranings', () => {
@@ -520,11 +526,12 @@ describe('Topic Editor Navbar', () => {
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.validationIssues = ['warn1'];
     componentInstance.prepublishValidationIssues = [];
 
-    expect(componentInstance.isTopicSaveable()).toBeFalse();
+    expect(componentInstance.isTopicSaveable()).toBe(false);
   });
 
   it('should return false when topic has pre publish validation issues', () => {
@@ -533,11 +540,12 @@ describe('Topic Editor Navbar', () => {
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.validationIssues = [];
     componentInstance.prepublishValidationIssues = ['warn1'];
 
-    expect(componentInstance.isTopicSaveable()).toBeFalse();
+    expect(componentInstance.isTopicSaveable()).toBe(false);
   });
 
   it('should show discard button when changes are present', () => {
@@ -546,8 +554,8 @@ describe('Topic Editor Navbar', () => {
 
     componentInstance.toggleDiscardChangeButton();
 
-    expect(componentInstance.showTopicEditOptions).toBeFalse();
-    expect(componentInstance.discardChangesButtonIsShown).toBeTrue();
+    expect(componentInstance.showTopicEditOptions).toBe(false);
+    expect(componentInstance.discardChangesButtonIsShown).toBe(true);
   });
 
   it('should disable discard button when changes are present', () => {
@@ -556,24 +564,27 @@ describe('Topic Editor Navbar', () => {
 
     componentInstance.toggleDiscardChangeButton();
 
-    expect(componentInstance.showTopicEditOptions).toBeFalse();
-    expect(componentInstance.discardChangesButtonIsShown).toBeFalse();
+    expect(componentInstance.showTopicEditOptions).toBe(false);
+    expect(componentInstance.discardChangesButtonIsShown).toBe(false);
   });
 
   it('should save topic when user saves topic changes', fakeAsync(() => {
-    const modalspy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: {
-          topicIsPublished: true,
-        },
-        result: Promise.resolve('commitMessage'),
-      } as NgbModalRef;
-    });
+    const modalspy = spyOn(ngbModal, 'open').and.callFake(
+      (dlg: boolean, opt: boolean) => {
+        return {
+          componentInstance: {
+            topicIsPublished: true,
+          },
+          result: Promise.resolve('commitMessage'),
+        } as NgbModalRef;
+      }
+    );
     topicEditorStateService.setTopic(topic);
     componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     spyOn(alertsService, 'addSuccessMessage');
     spyOn(topicEditorStateService, 'saveTopic').and.callFake(
@@ -597,19 +608,22 @@ describe('Topic Editor Navbar', () => {
   }));
 
   it('should close save topic modal when user clicks cancel', fakeAsync(() => {
-    const modalspy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: {
-          topicIsPublished: true,
-        },
-        result: Promise.reject(),
-      } as NgbModalRef;
-    });
+    const modalspy = spyOn(ngbModal, 'open').and.callFake(
+      (dlg: boolean, opt: boolean) => {
+        return {
+          componentInstance: {
+            topicIsPublished: true,
+          },
+          result: Promise.reject(),
+        } as NgbModalRef;
+      }
+    );
     topicEditorStateService.setTopic(topic);
     componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     spyOn(alertsService, 'addSuccessMessage');
     componentInstance.saveChanges();
@@ -627,11 +641,11 @@ describe('Topic Editor Navbar', () => {
 
       componentInstance.toggleNavigationOptions();
 
-      expect(componentInstance.showNavigationOptions).toBeFalse();
+      expect(componentInstance.showNavigationOptions).toBe(false);
 
       componentInstance.toggleNavigationOptions();
 
-      expect(componentInstance.showNavigationOptions).toBeTrue();
+      expect(componentInstance.showNavigationOptions).toBe(true);
     }
   );
 
@@ -643,11 +657,11 @@ describe('Topic Editor Navbar', () => {
 
       componentInstance.toggleTopicEditOptions();
 
-      expect(componentInstance.showTopicEditOptions).toBeFalse();
+      expect(componentInstance.showTopicEditOptions).toBe(false);
 
       componentInstance.toggleTopicEditOptions();
 
-      expect(componentInstance.showTopicEditOptions).toBeTrue();
+      expect(componentInstance.showTopicEditOptions).toBe(true);
     }
   );
 
@@ -658,11 +672,11 @@ describe('Topic Editor Navbar', () => {
 
       componentInstance.toggleWarningText();
 
-      expect(componentInstance.warningsAreShown).toBeFalse();
+      expect(componentInstance.warningsAreShown).toBe(false);
 
       componentInstance.toggleWarningText();
 
-      expect(componentInstance.warningsAreShown).toBeTrue();
+      expect(componentInstance.warningsAreShown).toBe(true);
     }
   );
 
@@ -701,39 +715,52 @@ describe('Topic Editor Navbar', () => {
   });
 
   it("should unpublish topic when user clicks the 'Unpublish' button", fakeAsync(() => {
+    componentInstance.topicId = 'topic_1';
     componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.showTopicEditOptions = true;
     spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and.returnValue(
-      Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>
+      Promise.resolve({
+        topic_id: 'topic_1',
+        topic_is_published: false,
+        manager_ids: [],
+      })
     );
     spyOn(topicEditorStateService, 'setTopicRights');
 
     componentInstance.unpublishTopic();
     tick();
 
-    expect(componentInstance.showTopicEditOptions).toBeFalse();
+    expect(componentInstance.showTopicEditOptions).toBe(false);
     expect(componentInstance.topicRights.isPublished()).toBe(false);
     expect(topicEditorStateService.setTopicRights).toHaveBeenCalledWith(
       TopicRights.createFromBackendDict({
         published: false,
         can_publish_topic: true,
         can_edit_topic: true,
+        can_edit_question: true,
       })
     );
   }));
 
   it('should not unpublish topic if topic has not been published', fakeAsync(() => {
+    componentInstance.topicId = 'topic_1';
     componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: false,
       can_publish_topic: false,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and.returnValue(
-      Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>
+      Promise.resolve({
+        topic_id: 'topic_1',
+        topic_is_published: false,
+        manager_ids: [],
+      })
     );
 
     componentInstance.unpublishTopic();
@@ -743,10 +770,12 @@ describe('Topic Editor Navbar', () => {
   }));
 
   it('should not unpublish topic if topic is assigned to a classroom', fakeAsync(() => {
+    componentInstance.topicId = 'topic_1';
     componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.showTopicEditOptions = true;
 
@@ -767,7 +796,7 @@ describe('Topic Editor Navbar', () => {
         'Contact the curriculum admins to remove it from the classroom first.'
     );
 
-    expect(componentInstance.showTopicEditOptions).toBeTrue();
+    expect(componentInstance.showTopicEditOptions).toBe(true);
     expect(result).toBe(false);
     expect(
       topicRightsBackendApiService.unpublishTopicAsync
@@ -776,14 +805,21 @@ describe('Topic Editor Navbar', () => {
   }));
 
   it("should publish topic when user clicks the 'publish' button", fakeAsync(() => {
+    componentInstance.topicId = 'topic_1';
+    componentInstance.topic = topic;
     spyOn(topicRightsBackendApiService, 'publishTopicAsync').and.returnValue(
-      Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>
+      Promise.resolve({
+        topic_id: 'topic_1',
+        topic_is_published: true,
+        manager_ids: [],
+      })
     );
     spyOn(alertsService, 'addSuccessMessage');
     componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: false,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
 
     componentInstance.publishTopic();
@@ -793,7 +829,7 @@ describe('Topic Editor Navbar', () => {
       'Topic published.',
       1000
     );
-    expect(componentInstance.topicRights.isPublished()).toBeTrue();
+    expect(componentInstance.topicRights.isPublished()).toBe(true);
     expect(windowRef.nativeWindow.location.href).toBe(
       '/topics-and-skills-dashboard'
     );
@@ -803,10 +839,12 @@ describe('Topic Editor Navbar', () => {
     "should send email when user who doesn't have publishing rights" +
       " clicks the 'publish' button",
     fakeAsync(() => {
+      componentInstance.topicId = 'topic_1';
+      componentInstance.topic = topic;
       spyOn(topicRightsBackendApiService, 'sendMailAsync').and.returnValue(
         Promise.resolve()
       );
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      spyOn(ngbModal, 'open').and.callFake((dlg: boolean, opt: boolean) => {
         return {
           result: Promise.resolve('success'),
         } as NgbModalRef;
@@ -816,6 +854,7 @@ describe('Topic Editor Navbar', () => {
         published: false,
         can_publish_topic: false,
         can_edit_topic: true,
+        can_edit_question: true,
       });
 
       componentInstance.publishTopic();
@@ -834,12 +873,15 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(componentInstance, '_navigateToPreview');
+    const navigateSpy = spyOn(
+      componentInstance as TopicEditorNavbarComponent,
+      '_navigateToPreview' as keyof TopicEditorNavbarComponent
+    );
 
     const mockModalRef = {
       componentInstance: {},
       result: Promise.resolve(),
-    };
+    } as NgbModalRef;
 
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
@@ -857,12 +899,15 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(componentInstance, '_navigateToPreview');
+    const navigateSpy = spyOn(
+      componentInstance as TopicEditorNavbarComponent,
+      '_navigateToPreview' as keyof TopicEditorNavbarComponent
+    );
 
     const mockModalRef = {
       componentInstance: {},
       result: Promise.reject(),
-    };
+    } as NgbModalRef;
 
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
@@ -880,12 +925,15 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(componentInstance, '_navigateToMainTab');
+    const navigateSpy = spyOn(
+      componentInstance as TopicEditorNavbarComponent,
+      '_navigateToMainTab' as keyof TopicEditorNavbarComponent
+    );
 
     const mockModalRef = {
       componentInstance: {},
       result: Promise.resolve(),
-    };
+    } as NgbModalRef;
 
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
@@ -903,12 +951,15 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(componentInstance, '_navigateToMainTab');
+    const navigateSpy = spyOn(
+      componentInstance as TopicEditorNavbarComponent,
+      '_navigateToMainTab' as keyof TopicEditorNavbarComponent
+    );
 
     const mockModalRef = {
       componentInstance: {},
       result: Promise.reject(),
-    };
+    } as NgbModalRef;
 
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
@@ -938,6 +989,61 @@ describe('Topic Editor Navbar', () => {
   it('should return true or false when called', () => {
     componentInstance.topic = topic;
     componentInstance._validateTopic();
-    expect(componentInstance.isWarningTooltipDisabled()).toBeFalse();
+    expect(componentInstance.isWarningTooltipDisabled()).toBe(false);
+  });
+
+  it('should return early from _navigateToPreview when classroomUrlFragment is null', () => {
+    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'main'
+    );
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
+    spyOn(topicEditorStateService, 'getClassroomUrlFragment').and.returnValue(
+      null
+    );
+    componentInstance.topic = topic;
+    spyOn(windowRef.nativeWindow, 'open');
+
+    componentInstance.openTopicViewer();
+
+    expect(windowRef.nativeWindow.open).not.toHaveBeenCalled();
+  });
+
+  it('should publish already published topic without redirecting to dashboard', fakeAsync(() => {
+    componentInstance.topicId = 'topic_1';
+    componentInstance.topic = topic;
+    spyOn(topicRightsBackendApiService, 'publishTopicAsync').and.returnValue(
+      Promise.resolve({
+        topic_id: 'topic_1',
+        topic_is_published: true,
+        manager_ids: [],
+      })
+    );
+    spyOn(alertsService, 'addSuccessMessage');
+    // Topic is already published.
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: true,
+      can_publish_topic: true,
+      can_edit_topic: true,
+      can_edit_question: true,
+    });
+
+    componentInstance.publishTopic();
+    tick(100);
+
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+      'Topic published.',
+      1000
+    );
+    expect(componentInstance.topicRights.isPublished()).toBe(true);
+    // Should not redirect to dashboard since topic was already published.
+    expect(windowRef.nativeWindow.location.href).not.toBe(
+      '/topics-and-skills-dashboard'
+    );
+  }));
+
+  it('should return default Editor text for unknown active tab in getMobileNavigatorText', () => {
+    let routingSpy = spyOn(topicEditorRoutingService, 'getActiveTabName');
+    routingSpy.and.returnValue('unknown_tab');
+    expect(componentInstance.getMobileNavigatorText()).toEqual('Editor');
   });
 });
