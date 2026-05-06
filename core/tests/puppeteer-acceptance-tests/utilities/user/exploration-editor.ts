@@ -43,6 +43,9 @@ const saveChangesButton = 'button.e2e-test-save-changes';
 const mathInteractionsTab = '.e2e-test-interaction-tab-math';
 const closeResponseModalButton = '.e2e-test-close-add-response-modal';
 
+const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
+const activeModalBackdropSelector = '.modal-backdrop, ngb-modal-window, .modal';
+
 const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
 const explorationTitleSelector = '.e2e-test-exploration-title-input';
@@ -2894,10 +2897,9 @@ export class ExplorationEditor extends BaseUser {
     // with the card content editor. Ghost modals from prior test steps can
     // intercept clicks and cause hard-to-diagnose flakiness.
     await this.page.waitForFunction(
-      () =>
-        document.querySelectorAll('.modal-backdrop, ngb-modal-window, .modal')
-          .length === 0,
-      {timeout: 60000}
+      (selector: string) => document.querySelectorAll(selector).length === 0,
+      {timeout: 60000},
+      activeModalBackdropSelector
     );
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
@@ -2975,7 +2977,7 @@ export class ExplorationEditor extends BaseUser {
     });
 
     // Wait for any loading overlays to detach before clicking.
-    await this.page.waitForSelector('.oppia-loading-full-page', {
+    await this.page.waitForSelector(loadingFullPageOverlaySelector, {
       hidden: true,
     });
     await this.clickOnElementWithSelector(addInteractionButton);
@@ -2990,11 +2992,6 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForNetworkIdle();
     // Use a higher timeout for math interactions as they are heavy to render.
     let tileText = interactionToAdd;
-    if (interactionToAdd === 'Graph Theory') {
-      // The interaction is passed as 'Graph Theory' in the spec,
-      // but the UI tile text is simply 'Graph'.
-      tileText = 'Graph';
-    }
 
     const interactionElement = await this.page.waitForXPath(
       `//*[contains(normalize-space(text()), "${tileText}")]`,
