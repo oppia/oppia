@@ -49,7 +49,7 @@ export interface ReadOnlyCollectionBackendResponse {
   meta_name: string;
   can_edit: boolean;
   meta_description: string;
-  collection: CollectionBackendDict;
+  collection_dict: CollectionBackendDict;
 }
 
 // TODO(bhenning): For preview mode, this service should be replaced by a
@@ -87,7 +87,7 @@ export class ReadOnlyCollectionBackendApiService {
       .then(
         response => {
           this._cacheCollectionDetails(response);
-          var collectionObject = Collection.create(response.collection);
+          var collectionObject = Collection.create(response.collection_dict);
           if (successCallback) {
             successCallback(collectionObject);
             this._collectionLoadedEventEmitter.emit();
@@ -104,10 +104,10 @@ export class ReadOnlyCollectionBackendApiService {
   private _cacheCollectionDetails(
     details: ReadOnlyCollectionBackendResponse
   ): void {
-    if (details.collection.id !== null) {
-      this._collectionDetailsCache[details.collection.id] = {
+    if (details.collection_dict.id !== null) {
+      this._collectionDetailsCache[details.collection_dict.id] = {
         canEdit: details.can_edit,
-        title: details.collection.title,
+        title: details.collection_dict.title,
       };
     }
   }

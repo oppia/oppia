@@ -55,6 +55,7 @@ describe('Contribution Admin dashboard stats service', () => {
     topic_model_last_updated: 3454354354,
     url_fragment: 'topic-name-one',
     can_edit_topic: false,
+    can_edit_question: false,
     is_published: false,
     total_upcoming_chapters_count: 1,
     total_overdue_chapters_count: 1,
@@ -79,6 +80,7 @@ describe('Contribution Admin dashboard stats service', () => {
     topic_model_last_updated: 3454354354,
     url_fragment: 'topic-name-two',
     can_edit_topic: false,
+    can_edit_question: false,
     is_published: false,
     total_upcoming_chapters_count: 1,
     total_overdue_chapters_count: 1,
@@ -95,6 +97,7 @@ describe('Contribution Admin dashboard stats service', () => {
     topic_list_intro: 'Topics Covered',
     teaser_text: 'learn math',
     is_published: true,
+    diagnostic_test_is_enabled: false,
     public_classrooms_count: 1,
     thumbnail_data: {
       filename: 'thumbnail.svg',
@@ -207,6 +210,7 @@ describe('Contribution Admin dashboard stats service', () => {
       responseDictionaries.topic_list_intro,
       responseDictionaries.teaser_text,
       responseDictionaries.is_published,
+      responseDictionaries.diagnostic_test_is_enabled,
       responseDictionaries.thumbnail_data,
       responseDictionaries.banner_data,
       responseDictionaries.public_classrooms_count

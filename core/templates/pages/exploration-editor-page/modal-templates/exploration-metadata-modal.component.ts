@@ -30,6 +30,8 @@ import {ExplorationTitleService} from '../services/exploration-title.service';
 import {AlertsService} from 'services/alerts.service';
 import {ExplorationStatesService} from '../services/exploration-states.service';
 import {ParamChange} from 'domain/exploration/param-change.model';
+import {ChangeListService} from '../services/change-list.service';
+import {filter, take} from 'rxjs/operators';
 
 interface CategoryChoices {
   id: string;
@@ -62,6 +64,7 @@ export class ExplorationMetadataModalComponent
   filteredChoices: CategoryChoices[] = [];
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
   tagIsInvalid: boolean = false;
+  isSaving: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -71,6 +74,7 @@ export class ExplorationMetadataModalComponent
     private explorationStatesService: ExplorationStatesService,
     private explorationTagsService: ExplorationTagsService,
     private explorationTitleService: ExplorationTitleService,
+    private changeListService: ChangeListService,
     private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
@@ -147,6 +151,9 @@ export class ExplorationMetadataModalComponent
       return;
     }
 
+    const initialChangeListLength =
+      this.changeListService.getChangeList().length;
+
     // Record any fields that have changed.
     let metadataList: string[] = [];
     if (this.explorationTitleService.hasChanged()) {
@@ -172,15 +179,22 @@ export class ExplorationMetadataModalComponent
     this.explorationLanguageCodeService.saveDisplayedValue();
     this.explorationTagsService.saveDisplayedValue();
 
-    // TODO(#20338): Get rid of the $timeout here.
-    // It's currently used because there is a race condition: the
-    // saveDisplayedValue() calls above result in autosave calls.
-    // These race with the discardDraft() call that
-    // will be called when the draft changes entered here
-    // are properly saved to the backend.
-    setTimeout(() => {
+    if (
+      this.changeListService.getChangeList().length === initialChangeListLength
+    ) {
       this.ngbActiveModal.close(metadataList);
-    }, 500);
+      return;
+    }
+
+    this.isSaving = true;
+    this.changeListService.autosaveIsInProgress$
+      .pipe(
+        filter(inProgress => !inProgress),
+        take(1)
+      )
+      .subscribe(() => {
+        this.ngbActiveModal.close(metadataList);
+      });
   }
 
   areRequiredFieldsFilled(): boolean {

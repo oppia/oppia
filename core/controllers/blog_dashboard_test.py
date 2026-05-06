@@ -431,7 +431,9 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             csrf_token=csrf_token,
         )
 
-        self.assertEqual(json_response['blog_post']['title'], 'Sample Title')
+        self.assertEqual(
+            json_response['blog_post_dict']['title'], 'Sample Title'
+        )
         blog_post = blog_services.get_blog_post_by_id(self.blog_post.id)
         self.assertEqual(blog_post.thumbnail_filename, 'file.svg')
 

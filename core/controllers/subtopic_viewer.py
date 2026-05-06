@@ -72,17 +72,15 @@ class SubtopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         topic = topic_fetchers.get_topic_by_name(topic_name)
         next_subtopic_dict = None
         prev_subtopic_dict = None
-        for index, subtopic in enumerate(topic.subtopics):
-            if subtopic.id == subtopic_id:
-                subtopic_title = subtopic.title
-                if index != len(topic.subtopics) - 1:
-                    next_subtopic_dict = topic.subtopics[index + 1].to_dict()
-                # Checking greater than 1 here, since otherwise the only
-                # subtopic page of the topic would always link to itself at the
-                # bottom of the subtopic page which isn't expected.
-                elif len(topic.subtopics) > 1:
-                    prev_subtopic_dict = topic.subtopics[index - 1].to_dict()
-                break
+        index = topic.get_subtopic_index(subtopic_id)
+        subtopic_title = topic.subtopics[index].title
+        if index != len(topic.subtopics) - 1:
+            next_subtopic_dict = topic.subtopics[index + 1].to_dict()
+        # Checking greater than 1 here, since otherwise the only
+        # subtopic page of the topic would always link to itself at the
+        # bottom of the subtopic page which isn't expected.
+        elif len(topic.subtopics) > 1:
+            prev_subtopic_dict = topic.subtopics[index - 1].to_dict()
         study_guide_sections_dicts_list = []
         subtopic_page_contents_dict: (
             subtopic_page_domain.SubtopicPageContentsDict

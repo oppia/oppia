@@ -60,6 +60,32 @@ export class ExplorationHtmlFormatterService {
     private htmlEscaper: HtmlEscaperService
   ) {}
 
+  private getDisplayedNumericExpressionAnswer(
+    answer: InteractionAnswer,
+    interactionId: string,
+    interactionCustomizationArgs: InteractionCustomizationArgs
+  ): InteractionAnswer {
+    if (
+      interactionId !== 'NumericExpressionInput' ||
+      !('useFractionForDivision' in interactionCustomizationArgs) ||
+      typeof answer !== 'string'
+    ) {
+      return answer;
+    }
+    const useFractionForDivision =
+      interactionCustomizationArgs.useFractionForDivision as
+        | boolean
+        | {value: boolean};
+    const shouldUseFraction =
+      typeof useFractionForDivision === 'boolean'
+        ? useFractionForDivision
+        : useFractionForDivision.value;
+    if (shouldUseFraction) {
+      return answer;
+    }
+    return answer.replace(/\//g, '÷');
+  }
+
   /**
    * @param {string} interactionId - The interaction id.
    * @param {object} interactionCustomizationArgs - The various
@@ -166,10 +192,18 @@ export class ExplorationHtmlFormatterService {
     if (interactionId === null) {
       throw new Error('InteractionId cannot be null');
     }
+    const displayedAnswer = this.getDisplayedNumericExpressionAnswer(
+      answer,
+      interactionId,
+      interactionCustomizationArgs
+    );
     var element = document.createElement(
       `oppia-response-${this.camelCaseToHyphens.transform(interactionId)}`
     );
-    element.setAttribute('answer', this.htmlEscaper.objToEscapedJson(answer));
+    element.setAttribute(
+      'answer',
+      this.htmlEscaper.objToEscapedJson(displayedAnswer)
+    );
     // TODO(sll): Get rid of this special case for multiple choice.
     if ('choices' in interactionCustomizationArgs) {
       let interactionChoices = interactionCustomizationArgs.choices.value;
@@ -186,10 +220,18 @@ export class ExplorationHtmlFormatterService {
     interactionId: string,
     interactionCustomizationArgs: InteractionCustomizationArgs
   ): string {
+    const displayedAnswer = this.getDisplayedNumericExpressionAnswer(
+      answer,
+      interactionId,
+      interactionCustomizationArgs
+    );
     let element = document.createElement(
       `oppia-short-response-${this.camelCaseToHyphens.transform(interactionId)}`
     );
-    element.setAttribute('answer', this.htmlEscaper.objToEscapedJson(answer));
+    element.setAttribute(
+      'answer',
+      this.htmlEscaper.objToEscapedJson(displayedAnswer)
+    );
     // TODO(sll): Get rid of this special case for multiple choice.
     if ('choices' in interactionCustomizationArgs) {
       let interactionChoices = interactionCustomizationArgs.choices.value;

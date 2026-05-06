@@ -1,23 +1,115 @@
-<div class="modal-header">
-  <h3 tabindex="0">Start New Feedback Thread</h3>
-</div>
+<form #newFeedbackThreadForm="ngForm"
+      novalidate
+      (ngSubmit)="create(newFeedbackThreadForm)">
+  <div class="modal-header">
+    <h3 tabindex="0">
+      {{ 'I18N_FEEDBACK_CREATE_THREAD_HEADER' | translate }}
+    </h3>
+  </div>
 
-<div class="modal-body">
-  <p>Thread subject: <input aria-label="Thread subject" class="oppia-feedback-modal-input oppia-autofocus" type="text" [(ngModel)]="newThreadSubject"></p>
-  <p>Message text <textarea aria-label="Message text" class="oppia-feedback-modal-textarea" [(ngModel)]="newThreadText" rows="6"></textarea></p>
-</div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label for="feedback-thread-subject">
+        {{ 'I18N_FEEDBACK_CREATE_THREAD_SUBJECT_LABEL' | translate }}
+      </label>
+      <input [attr.aria-label]="'I18N_FEEDBACK_CREATE_THREAD_SUBJECT_LABEL' | translate"
+             id="feedback-thread-subject"
+             class="oppia-feedback-modal-input oppia-autofocus"
+             type="text"
+             name="threadSubject"
+             required
+             [minlength]="SUBJECT_MIN_CHARS"
+             #subjectInput="ngModel"
+             [(ngModel)]="newThreadSubject"
+             (ngModelChange)="onSubjectInputChange()">
+      <span class="text-danger"
+            *ngIf="subjectValidationActive &&
+                   (isSubjectTrimmedEmpty() || isSubjectTrimmedTooShort())">
+        <span *ngIf="isSubjectTrimmedEmpty()">
+          {{ 'I18N_FEEDBACK_CREATE_THREAD_SUBJECT_REQUIRED' | translate }}
+        </span>
+        <span *ngIf="isSubjectTrimmedTooShort()">
+          {{
+            'I18N_FEEDBACK_CREATE_THREAD_SUBJECT_MIN_LENGTH'
+              | translate:{ min: SUBJECT_MIN_CHARS }
+          }}
+        </span>
+      </span>
+      <span class="text-danger" *ngIf="isSubjectTooLong()">
+        {{
+          'I18N_FEEDBACK_CREATE_THREAD_SUBJECT_MAX_LENGTH'
+            | translate:{ max: SUBJECT_MAX_CHARS }
+        }}
+      </span>
+    </div>
 
-<div class="modal-footer">
-  <button class="btn btn-secondary e2e-test-cancel-new-feedback-btn" (click)="cancel()">Cancel</button>
-  <button class="btn btn-success e2e-test-create-new-feedback-btn" (click)="create(newThreadSubject, newThreadText)" [disabled]="!newThreadSubject || !newThreadText">Create Thread</button>
-</div>
+    <div class="form-group">
+      <label for="feedback-thread-message">
+        {{ 'I18N_FEEDBACK_CREATE_THREAD_MESSAGE_LABEL' | translate }}
+      </label>
+      <textarea [attr.aria-label]="'I18N_FEEDBACK_CREATE_THREAD_MESSAGE_LABEL' | translate"
+                id="feedback-thread-message"
+                class="oppia-feedback-modal-textarea"
+                name="threadMessage"
+                required
+                rows="6"
+                [minlength]="MESSAGE_MIN_CHARS"
+                #messageInput="ngModel"
+                [(ngModel)]="newThreadText"
+                (ngModelChange)="onMessageInputChange()">
+      </textarea>
+      <span class="text-danger"
+            *ngIf="messageValidationActive &&
+                   (isMessageTrimmedEmpty() || isMessageTrimmedTooShort())">
+        <span *ngIf="isMessageTrimmedEmpty()">
+          {{ 'I18N_FEEDBACK_CREATE_THREAD_MESSAGE_REQUIRED' | translate }}
+        </span>
+        <span *ngIf="isMessageTrimmedTooShort()">
+          {{
+            'I18N_FEEDBACK_CREATE_THREAD_MESSAGE_MIN_LENGTH'
+              | translate:{ min: MESSAGE_MIN_CHARS }
+          }}
+        </span>
+      </span>
+      <span class="text-danger" *ngIf="isMessageTooLong()">
+        {{
+          'I18N_FEEDBACK_CREATE_THREAD_MESSAGE_MAX_LENGTH'
+            | translate:{ max: MESSAGE_MAX_CHARS }
+        }}
+      </span>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button"
+            class="btn btn-secondary e2e-test-cancel-new-feedback-btn"
+            (click)="cancel()">
+      {{ 'I18N_MODAL_CANCEL_BUTTON' | translate }}
+    </button>
+
+    <button type="submit"
+            class="btn btn-success e2e-test-create-new-feedback-btn">
+      {{ 'I18N_FEEDBACK_CREATE_THREAD_SUBMIT_BUTTON' | translate }}
+    </button>
+  </div>
+</form>
 
 <style>
   .oppia-feedback-modal-input {
     min-height: 35px;
+    width: 100%;
   }
   .oppia-feedback-modal-textarea {
     margin-top: 5px;
     min-height: 175px;
+    width: 100%;
+  }
+  .form-group {
+    margin-bottom: 18px;
+  }
+  .text-danger {
+    display: block;
+    font-size: 13px;
+    margin-top: 4px;
   }
 </style>

@@ -102,6 +102,7 @@ describe('Graph Data Service', () => {
             id: 'TextInput',
             solution: null,
           },
+          inapplicable_skill_misconception_ids: [],
           linked_skill_id: null,
           solicit_answer_details: false,
           classifier_model_id: '0',

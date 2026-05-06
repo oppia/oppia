@@ -1,0 +1,56 @@
+<div class="oppia-campaign-overlay" *ngIf="shouldShowBanner">
+
+  <div class="oppia-campaign-modal">
+
+    <button class="oppia-campaign-close" aria-label="Close" (click)="closeBanner()">
+      ×
+    </button>
+
+    <div class="oppia-campaign-content">
+
+      <div class="oppia-campaign-left">
+        <div class="oppia-campaign-left-containt">
+          <h2 class="oppia-campaign-title">
+            Most children graduate school without ever learning
+            <span class="highlight">how money works.</span>
+          </h2>
+
+          <div class="oppia-campaign-description">
+            <p class="font-roboto">
+              This {{ campaignEndMonth }}, Oppia is launching free, interactive financial literacy
+              lessons for learners who need them most. Your donation helps us
+              reach more of them.
+            </p>
+
+            <div class="oppia-campaign-impact">
+              <i class="fas fa-arrow-trend-up oppia-impact-icon"></i>
+              <div class="my-2 ms-5">
+                <strong class="fs-4">50%+</strong>
+                <div class="fs-6">Improvement in Learning Outcome</div>
+              </div>
+            </div>
+
+            <p class="oppia-campaign-subtext">
+              Your donation helps us reach more learners and empower the next
+              generation with essential financial skills.
+            </p>
+          </div>
+          <div class="align-items-center d-flex flex-column">
+            <a class="oppia-donate-btn fs-3"
+               (click)="navigateToDonatePage()">
+              Donate Now <i class="fas fa-arrow-right oppia-arrow"></i>
+            </a>
+
+            <div class="oppia-campaign-end">
+              Campaign ends {{ campaignEndMonth }} {{ campaignEndDay }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="oppia-campaign-right">
+        <img [src]="getStaticImageUrl(campaignBannerImagePath)" alt="Campaign image"
+             class="oppia-campaign-image">
+      </div>
+    </div>
+  </div>
+</div>
