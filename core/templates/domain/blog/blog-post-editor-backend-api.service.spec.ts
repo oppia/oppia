@@ -182,7 +182,7 @@ describe('Blog Post Editor backend api service', () => {
       '/blogeditorhandler/data/sampleBlogId'
     );
     expect(req.request.method).toEqual('PUT');
-    req.flush({blog_post: blogPostEditorBackendResponse.blog_post_dict});
+    req.flush({blog_post_dict: blogPostEditorBackendResponse.blog_post_dict});
 
     flushMicrotasks();
 

@@ -52,6 +52,10 @@ describe('VoiceoverAdminAuthGuard', () => {
     router = TestBed.inject(Router);
   });
 
+  afterEach(() => {
+    window.sessionStorage.clear();
+  });
+
   it('should redirect user to 401 page if user is not curriculum admin', done => {
     const getUserInfoAsyncSpy = spyOn(
       userService,

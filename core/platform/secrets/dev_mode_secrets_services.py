@@ -26,11 +26,14 @@ from typing import Optional
 
 
 @functools.lru_cache(maxsize=64)
-def get_secret(name: str) -> Optional[str]:
+def get_secret(name: str, _: Optional[str] = None) -> Optional[str]:
     """Gets the value of a secret. This is only dev mode version of the secrets.
 
     Args:
         name: str. The name of the secret to retrieve.
+        _: Optional[str]. The Google Cloud Project ID. Explicitly
+            required when running on Beam Dataflow, as workers cannot
+            retrieve the ID from environment variables.
 
     Returns:
         str. The value of the secret.

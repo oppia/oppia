@@ -45,8 +45,6 @@ const finalizeOutlineCheckbox = '.e2e-test-finalize-outline';
 const cancelUnpublishModalButton = '.e2e-test-cancel-unpublish-modal-button';
 const chapterConfirmAndUnpublishButton =
   '.e2e-test-confirm-unpublish-modal-button';
-const mobileSaveStoryChangesDropdown =
-  'div.navbar-mobile-options .e2e-test-mobile-changes-dropdown';
 const mobilePublishStoryButton =
   'div.navbar-mobile-options .e2e-test-mobile-publish-button';
 const publishUptoChaptersDropdownSelector =
@@ -171,26 +169,8 @@ describe('Logged-In Learner', function () {
       );
       await curriculumAdmin.publishStoryDraftChapterUpto('-1');
 
-      if (curriculumAdmin.isViewportAtMobileWidth()) {
-        await curriculumAdmin.clickOnElementWithSelector(
-          '.e2e-test-mobile-options-base'
-        );
-        await curriculumAdmin.page.waitForSelector(
-          mobileSaveStoryChangesDropdown,
-          {
-            visible: true,
-          }
-        );
-        await curriculumAdmin.clickOnElementWithSelector(
-          mobileSaveStoryChangesDropdown
-        );
-        await curriculumAdmin.page.waitForSelector(mobilePublishStoryButton);
-        await curriculumAdmin.clickOnElementWithSelector(
-          mobilePublishStoryButton
-        );
-      } else {
-        await curriculumAdmin.clickOnElementWithSelector(publishChapterButton);
-      }
+      await curriculumAdmin.publishStoryDraftSerialChapter();
+
       await curriculumAdmin.expectScreenshotToMatch(
         'unpublishConfirmationPopup',
         __dirname
@@ -217,6 +197,7 @@ describe('Logged-In Learner', function () {
           mobilePublishStoryButton
         );
       } else {
+        await curriculumAdmin.waitForElementToBeClickable(publishChapterButton);
         await curriculumAdmin.clickOnElementWithSelector(publishChapterButton);
       }
       await curriculumAdmin.clickOnElementWithSelector(

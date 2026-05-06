@@ -34,6 +34,14 @@ describe('ErrorPageComponent', () => {
   let windowRef: WindowRef;
 
   beforeEach(() => {
+    try {
+      if (window && window.sessionStorage) {
+        window.sessionStorage.clear();
+      }
+    } catch (error) {
+      // SessionStorage can throw in restricted environments; ignore safely.
+    }
+
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot()],
       declarations: [ErrorPageComponent],

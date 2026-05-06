@@ -52,6 +52,10 @@ describe('ModeratorAuthGuard', () => {
     router = TestBed.inject(Router);
   });
 
+  afterEach(() => {
+    window.sessionStorage.clear();
+  });
+
   it('should redirect user to 401 page if user is not moderator', done => {
     const getUserInfoAsyncSpy = spyOn(
       userService,

@@ -29,7 +29,7 @@ export interface MisconceptionSkillMap {
 }
 
 export interface TaggedMisconception {
-  skillId: string;
+  skillId: string | null;
   misconceptionId: number;
 }
 

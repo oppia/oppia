@@ -137,6 +137,17 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                     'apply_draft': {
                         'schema': {
                             'type': 'bool',
+                        }
+                    }
+                },
+                {'apply_draft': True},
+            ),
+            (
+                {'apply_draft': 'true'},
+                {
+                    'apply_draft': {
+                        'schema': {
+                            'type': 'bool',
                             'new_key_for_argument': 'new_key_for_apply_draft',
                         }
                     }

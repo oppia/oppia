@@ -25,7 +25,7 @@ import {BlogPostChangeDict} from 'domain/blog/blog-post-update.service';
 import {ImagesData} from 'services/image-local-storage.service';
 
 interface BlogPostUpdateBackendDict {
-  blog_post: BlogPostBackendDict;
+  blog_post_dict: BlogPostBackendDict;
 }
 
 interface BlogPostUpdatedData {
@@ -142,7 +142,7 @@ export class BlogPostEditorBackendApiService {
           response => {
             resolve({
               blogPostDict: BlogPostData.createFromBackendDict(
-                response.blog_post
+                response.blog_post_dict
               ),
             });
           },

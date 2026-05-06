@@ -1079,5 +1079,29 @@ describe('Site Analytics Service', () => {
         login_status: 'logged_in',
       });
     });
+
+    it('should register campaign page Donate CTA button click event', () => {
+      sas.registerCampaignBannerDonateButtonClick();
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'financial_literacy_campaign_banner_donate_button_click',
+        {
+          page_path: pathname,
+          login_status: 'logged_in',
+        }
+      );
+    });
+
+    it('should register campaign page shown event', () => {
+      sas.registerCampaignBannerVisibility();
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'financial_literacy_campaign_banner_shown',
+        {
+          page_path: pathname,
+          login_status: 'logged_in',
+        }
+      );
+    });
   });
 });

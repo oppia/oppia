@@ -22,6 +22,7 @@ import {AppConstants} from 'app.constants';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {ExplorationCategoryService} from 'pages/exploration-editor-page/services/exploration-category.service';
 import {ExplorationObjectiveService} from 'pages/exploration-editor-page/services/exploration-objective.service';
+import {ExplorationTagsService} from 'pages/exploration-editor-page/services/exploration-tags.service';
 import {ExplorationTitleService} from 'pages/exploration-editor-page/services/exploration-title.service';
 
 @Component({
@@ -33,6 +34,7 @@ export class PreviewSummaryTileModalComponent extends ConfirmOrCancelModal {
     private ngbActiveModal: NgbActiveModal,
     private explorationCategoryService: ExplorationCategoryService,
     private explorationObjectiveService: ExplorationObjectiveService,
+    private explorationTagsService: ExplorationTagsService,
     private explorationTitleService: ExplorationTitleService
   ) {
     super(ngbActiveModal);
@@ -71,5 +73,9 @@ export class PreviewSummaryTileModalComponent extends ConfirmOrCancelModal {
         ];
     }
     return color;
+  }
+
+  getTags(): string[] {
+    return this.explorationTagsService.displayed as string[];
   }
 }
