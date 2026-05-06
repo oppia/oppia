@@ -18,6 +18,10 @@ inputs:
     type: boolean
   modified-suite-name-for-uploads:
     description: A unique suite name without spaces and forward-slashes to use for the artifacts uploads. If not provided, the test data will not be uploaded.
+  upload-artifacts-on-success:
+    description: Whether to upload artifacts even when the test passes.
+    required: false
+    default: false
 
 runs:
   using: "composite"
@@ -51,7 +55,7 @@ runs:
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
       # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
       # Quote: "A default status check of success() is applied unless you *include* one of these functions."
-      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      if: ${{ !cancelled() && inputs.modified-suite-name-for-uploads != '' && (steps.run-acceptance-test.outcome == 'failure' || inputs.upload-artifacts-on-success) }}
       uses: actions/upload-artifact@v4
       with:
         name: test-logs_${{ inputs.modified-suite-name-for-uploads }}
@@ -62,7 +66,7 @@ runs:
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
       # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
       # Quote: "A default status check of success() is applied unless you *include* one of these functions."
-      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      if: ${{ !cancelled() && inputs.modified-suite-name-for-uploads != '' && (steps.run-acceptance-test.outcome == 'failure' || inputs.upload-artifacts-on-success) }}
       uses: actions/upload-artifact@v4
       with:
         name: failure-point-snapshots_${{ inputs.modified-suite-name-for-uploads }}
@@ -73,7 +77,7 @@ runs:
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
       # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
       # Quote: "A default status check of success() is applied unless you *include* one of these functions."
-      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      if: ${{ !cancelled() && inputs.modified-suite-name-for-uploads != '' && (steps.run-acceptance-test.outcome == 'failure' || inputs.upload-artifacts-on-success) }}
       uses: actions/upload-artifact@v4
       with:
         name: diff-snapshots_${{ inputs.modified-suite-name-for-uploads }}
@@ -86,7 +90,7 @@ runs:
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
       # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
       # Quote: "A default status check of success() is applied unless you *include* one of these functions."
-      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      if: ${{ !cancelled() && inputs.modified-suite-name-for-uploads != '' && (steps.run-acceptance-test.outcome == 'failure' || inputs.upload-artifacts-on-success) }}
       uses: actions/upload-artifact@v4
       with:
         name: new-snapshots_${{ inputs.modified-suite-name-for-uploads }}
@@ -106,7 +110,7 @@ runs:
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
       # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
       # Quote: "A default status check of success() is applied unless you *include* one of these functions."
-      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      if: ${{ !cancelled() && inputs.modified-suite-name-for-uploads != '' && (steps.run-acceptance-test.outcome == 'failure' || inputs.upload-artifacts-on-success) }}
       uses: actions/upload-artifact@v4
       with:
         name: video-recordings_${{ inputs.modified-suite-name-for-uploads }}
@@ -114,14 +118,14 @@ runs:
       continue-on-error: true
 
     - name: Upload Playwright test results
-      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      if: ${{ !cancelled() && inputs.modified-suite-name-for-uploads != '' && (steps.run-acceptance-test.outcome == 'failure' || inputs.upload-artifacts-on-success) }}
       uses: actions/upload-artifact@v4
       with:
         name: playwright-results_${{ inputs.modified-suite-name-for-uploads }}
         path: core/tests/playwright-acceptance-tests/test-results/
 
     - name: Upload Playwright report
-      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      if: ${{ !cancelled() && inputs.modified-suite-name-for-uploads != '' && (steps.run-acceptance-test.outcome == 'failure' || inputs.upload-artifacts-on-success) }}
       uses: actions/upload-artifact@v4
       with:
         name: playwright-report_${{ inputs.modified-suite-name-for-uploads }}
