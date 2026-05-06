@@ -245,11 +245,14 @@ export class ExplorationFooterComponent {
       }
     }
 
-    modalRef.componentInstance.checkpointCount = this.checkpointCount;
-    modalRef.componentInstance.completedCheckpointsCount =
-      this.completedCheckpointsCount;
-    modalRef.componentInstance.explorationTitle = this.expInfo!.title;
+    const componentInstance = modalRef.componentInstance;
 
+    if (componentInstance) {
+      componentInstance.checkpointCount = this.checkpointCount;
+      componentInstance.completedCheckpointsCount =
+        this.completedCheckpointsCount;
+      componentInstance.explorationTitle = this.expInfo?.title ?? '';
+    }
     modalRef.result.then(
       () => {
         // This callback is used for when the learner chooses to restart
@@ -303,7 +306,7 @@ export class ExplorationFooterComponent {
     modalRef.componentInstance.completedCheckpointsCount =
       this.completedCheckpointsCount;
     modalRef.componentInstance.contributorNames = this.contributorNames;
-    modalRef.componentInstance.expInfo = this.expInfo!;
+    modalRef.componentInstance.expInfo = this.expInfo;
     modalRef.componentInstance.userIsLoggedIn = this.userIsLoggedIn;
 
     modalRef.result.then(
@@ -390,7 +393,7 @@ export class ExplorationFooterComponent {
       .then((response: FetchExplorationBackendResponse) => {
         this.expStates = response.exploration.states;
         let count = 0;
-        for (let [, value] of Object.entries(this.expStates!)) {
+        for (let [, value] of Object.entries(this.expStates)) {
           if (value.card_is_checkpoint) {
             count++;
           }

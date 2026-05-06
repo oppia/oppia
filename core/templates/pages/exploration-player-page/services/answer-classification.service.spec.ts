@@ -31,6 +31,7 @@ import {Outcome} from '../../../domain/exploration/outcome.model';
 import {State, StateBackendDict} from '../../../domain/state/state.model';
 import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
 import {AlertsService} from '../../../services/alerts.service';
+import {Interaction} from '../../../domain/exploration/interaction.model';
 
 describe('Answer Classification Service', () => {
   const stateName = 'Test State';
@@ -49,7 +50,9 @@ describe('Answer Classification Service', () => {
     alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     interactionSpecsService = TestBed.inject(InteractionSpecsService);
-    textInputRulesService = TestBed.inject(TextInputRulesService) as any;
+    textInputRulesService = TestBed.inject(
+      TextInputRulesService
+    ) as unknown as InteractionRulesService;
   });
 
   describe('with string classifier disabled', () => {
@@ -654,7 +657,9 @@ describe('Answer Classification Service', () => {
         // Returns false when no answer group matches and
         // default outcome has destination equal to state name.
 
-        stateDict.interaction!.default_outcome!.dest = stateName as string;
+        if (stateDict.interaction.default_outcome) {
+          stateDict.interaction.default_outcome.dest = stateName as string;
+        }
         let state1 = State.createFromBackendDict(stateName, stateDict);
 
         let res1 =
@@ -670,14 +675,16 @@ describe('Answer Classification Service', () => {
           answerClassificationService.getMatchingClassificationResult
         ).toHaveBeenCalledWith(
           state1.name as string,
-          state1.interaction!,
+          state1.interaction,
           '777',
           textInputRulesService
         );
 
         // Returns true if any answer group matches.
 
-        stateDict.interaction!.default_outcome!.dest = 'default';
+        if (stateDict.interaction.default_outcome) {
+          stateDict.interaction.default_outcome.dest = 'default';
+        }
         let state2 = State.createFromBackendDict(stateName, stateDict);
 
         let res2 =
@@ -693,7 +700,7 @@ describe('Answer Classification Service', () => {
           answerClassificationService.getMatchingClassificationResult
         ).toHaveBeenCalledWith(
           state2.name as string,
-          state2.interaction!,
+          state2.interaction as Interaction,
           'equal',
           textInputRulesService
         );

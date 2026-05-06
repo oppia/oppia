@@ -45,6 +45,7 @@ import {LearnerAnswerInfoService} from './learner-answer-info.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {NumberAttemptsService} from './number-attempts.service';
 import {InteractionRulesService} from './answer-classification.service';
+import {InteractionAnswer} from 'interactions/answer-defs';
 import {FatigueDetectionService} from './fatigue-detection.service';
 
 import {QuestionPlayerEngineService} from './question-player-engine.service';
@@ -356,7 +357,7 @@ export class ConversationFlowService {
    * - Passing the answer to the current engine service.
    * - Handling feedback or continuation based on the response.
    *
-   * @param {string} answer - The answer provided by the learner.
+   * @param {InteractionAnswer} answer - The answer provided by the learner.
    * @param {InteractionRulesService} interactionRulesService - The rules service used to evaluate the answer.
    */
   submitAnswer(
@@ -1385,7 +1386,7 @@ export class ConversationFlowService {
   private _shouldInitLearnerAnswerInfo(
     isPreviewMode: boolean,
     explorationId: string,
-    answer: string,
+    answer: InteractionAnswer,
     interactionRulesService: InteractionRulesService
   ): void {
     /* istanbul ignore if */
@@ -1413,7 +1414,7 @@ export class ConversationFlowService {
    *
    * @private
    */
-  private _updateAnswerSubmissionState(answer: string): void {
+  private _updateAnswerSubmissionState(answer: InteractionAnswer): void {
     this.numberAttemptsService.submitAttempt();
     this.answerIsBeingProcessed = true;
     this.hasInteractedAtLeastOnce = true;

@@ -60,10 +60,8 @@ import {CurrentEngineService} from 'pages/exploration-player-page/services/curre
 import {CardAnimationService} from 'pages/exploration-player-page/services/card-animation.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
-import {InteractionAnswer} from 'interactions/answer-defs';
 import {QuestionPlayerConfig} from './ratings-and-recommendations.component';
 import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
-import {CollectionSummary} from 'domain/collection/collection-summary.model';
 
 @Component({
   selector: 'oppia-conversation-skin',
@@ -314,7 +312,7 @@ export class ConversationSkinComponent {
       this.currentInteractionService.setOnSubmitFn(
         this.conversationFlowService.submitAnswer.bind(
           this.conversationFlowService
-        ) as any
+        ) as () => void
       );
       this.initializePage();
 
@@ -467,8 +465,12 @@ export class ConversationSkinComponent {
     let interaction = displayedCard.getInteraction();
     return (
       Boolean(interaction.id) &&
-      (INTERACTION_SPECS as any)[interaction.id as string]
-        .show_generic_submit_button &&
+      (
+        INTERACTION_SPECS as Record<
+          string,
+          {show_generic_submit_button: boolean}
+        >
+      )[interaction.id as string].show_generic_submit_button &&
       this.isCurrentCardAtEndOfTranscript()
     );
   }

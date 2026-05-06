@@ -27,6 +27,7 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import {LoggerService} from 'services/contextual/logger.service';
 import {StateCard} from 'domain/state_card/state-card.model';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 @Injectable({
   providedIn: 'root',
@@ -91,7 +92,7 @@ export class PlayerTranscriptService {
     this.transcript.push(copyOfPreviousCard);
   }
 
-  addNewInput(input: string, isHint: boolean): void {
+  addNewInput(input: InteractionAnswer, isHint: boolean): void {
     let card = this.getLastCard();
     let pairs = card.getInputResponsePairs();
     if (pairs.length > 0 && card.getLastOppiaResponse() === null) {

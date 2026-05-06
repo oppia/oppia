@@ -53,7 +53,6 @@ import {EditableExplorationBackendApiService} from '../../../../domain/explorati
 import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {StateCard} from '../../../../domain/state_card/state-card.model';
-import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
 import {UserInfo} from '../../../../domain/user/user-info.model';
 import {QuestionPlayerEngineService} from '../../services/question-player-engine.service';
 import {UserService} from '../../../../services/user.service';
@@ -971,7 +970,7 @@ describe('ExplorationFooterComponent', () => {
 
   it('should open concept card when user clicks on the icon', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: any, opt: any) => {
+      (dlg: unknown, opt: unknown) => {
         return {
           componentInstance: MockNgbModalRef,
           result: Promise.resolve(),

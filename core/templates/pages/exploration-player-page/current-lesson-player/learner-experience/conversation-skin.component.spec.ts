@@ -74,7 +74,10 @@ import {LearnerAnswerInfoService} from '../../services/learner-answer-info.servi
 import {LearnerParamsService} from '../../services/learner-params.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
-import {QuestionPlayerEngineService} from '../../services/question-player-engine.service';
+import {
+  QuestionPlayerEngineService,
+  QuestionPlayerConfigDict,
+} from '../../services/question-player-engine.service';
 import {StatsReportingService} from '../../services/stats-reporting.service';
 import {ExplorationInitializationService} from '../../services/exploration-initialization.service';
 import {ConversationSkinComponent} from './conversation-skin.component';
@@ -91,46 +94,38 @@ import {CardAnimationService} from '../../services/card-animation.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {AuthService} from 'services/auth.service';
 
-// ---------------------------------------------------------------------------
 // Helper type aliases to avoid importing from non-existent paths.
-// ---------------------------------------------------------------------------
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type InteractionCustomizationArgs = any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type QuestionPlayerConfigDict = any;
+type InteractionCustomizationArgs = Record<string, unknown>;
 
-// ---------------------------------------------------------------------------
-// Helper factory so every `new StateCard(...)` + `new Interaction(...)` pair
+// Helper factory so every 'new StateCard(...)' and 'new Interaction(...)' pair
 // is written in one place, keeping the argument counts consistent.
-// ---------------------------------------------------------------------------
-function makeStateCard(interactionId: string = ''): StateCard {
+const makeStateCard = function (interactionId: string = ''): StateCard {
   const interaction = new Interaction(
-    [], // answerGroups
-    [], // confirmedUnclassifiedAnswers
-    {} as InteractionCustomizationArgs, // customizationArgs
-    null, // defaultOutcome
-    [], // hints
-    interactionId, // id
-    null // solution
+    [], // Answer groups.
+    [], // Confirmed unclassified answers.
+    {} as InteractionCustomizationArgs, // Customization args.
+    null, // Default outcome.
+    [], // Hints.
+    interactionId, // Id.
+    null // Solution.
   );
-  // FIX TS2345: StateCard's first arg must be string (not null), second must
-  // be string (not null). Third arg (interactionHtml) must also be string.
-  return new StateCard(
-    '', // stateName — string, not null
-    '', // contentHtml — string, not null
-    '', // interactionHtml — string, not null
-    interaction,
-    [], // recordedVoiceovers / interactionAnswers
-    'content' // contentId
-  );
-}
 
-// ---------------------------------------------------------------------------
-// Helper: build a CollectionPlaythrough so Collection constructor is satisfied.
-// CollectionPlaythrough.create(null, []) is the canonical empty instance.
-function makeCollectionPlaythrough(): CollectionPlaythrough {
+  return new StateCard(
+    '', // State name — string, not null.
+    '', // Content HTML — string, not null.
+    '', // Interaction HTML — string, not null.
+    interaction,
+    [], // Recorded voiceovers / interaction answers.
+    'content' // Content ID.
+  );
+};
+
+// Helper: build a CollectionPlaythrough so Collection constructor is
+// satisfied. CollectionPlaythrough.create(null, []) is the canonical
+// empty instance.
+const makeCollectionPlaythrough = (): CollectionPlaythrough => {
   return CollectionPlaythrough.create(null, []);
-}
+};
 
 class MockWindowRef {
   nativeWindow = {
@@ -597,7 +592,6 @@ describe('Conversation skin component', () => {
     );
     spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
 
-    // FIX TS2345: Collection arg 5 must be CollectionPlaythrough, not null.
     spyOn(
       readOnlyCollectionBackendApiService,
       'loadCollectionAsync'
@@ -764,7 +758,6 @@ describe('Conversation skin component', () => {
     );
     spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
 
-    // FIX TS2345: Collection arg 5 must be CollectionPlaythrough, not null.
     spyOn(
       readOnlyCollectionBackendApiService,
       'loadCollectionAsync'
@@ -907,7 +900,6 @@ describe('Conversation skin component', () => {
     );
     spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
 
-    // FIX TS2345: Collection arg 5 must be CollectionPlaythrough, not null.
     spyOn(
       readOnlyCollectionBackendApiService,
       'loadCollectionAsync'
@@ -1046,7 +1038,6 @@ describe('Conversation skin component', () => {
       );
       spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
 
-      // FIX TS2345: Collection arg 5 must be CollectionPlaythrough, not null.
       spyOn(
         readOnlyCollectionBackendApiService,
         'loadCollectionAsync'
@@ -1362,13 +1353,11 @@ describe('Conversation skin component', () => {
       let stateCardNames = ['Start', 'Mid', 'End'];
       let stateCards: StateCard[] = [];
       for (let stateName in stateCardNames) {
-        // FIX TS2345: StateCard first arg must be string (not null);
-        // Interaction arg 3 (solution) added to satisfy 7-arg requirement.
         stateCards.push(
           new StateCard(
-            stateName, // string — not null
+            stateName, // String, not null.
             '<p>Testing</p>',
-            '', // interactionHtml — string, not null
+            '', // Interaction HTML, string not null.
             new Interaction(
               [],
               [],
@@ -1378,7 +1367,7 @@ describe('Conversation skin component', () => {
               'Continue',
               null
             ),
-            [], // FIX TS2345: must be readonly InteractionAnswer[], not null
+            [],
             'content'
           )
         );
@@ -1396,7 +1385,13 @@ describe('Conversation skin component', () => {
       spyOn(playerPositionService, 'init').and.callFake((callb: () => void) => {
         callb();
       });
-      componentInstance.questionPlayerConfig = {} as QuestionPlayerConfigDict;
+      componentInstance.questionPlayerConfig = {
+        resultActionButtons: [],
+        skillList: [],
+        skillDescriptions: [],
+        questionCount: 0,
+        questionsSortedByDifficulty: false,
+      };
       spyOn(conversationFlowService.onPlayerStateChange, 'emit');
       spyOn(playerPositionService.onLoadedMostRecentCheckpoint, 'next');
       spyOn(focusManagerService, 'setFocusIfOnDesktop');
@@ -1588,8 +1583,7 @@ describe('Conversation skin component', () => {
       node_id: 'nodeId',
     });
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('story');
-    // FIX TS2554: ReadOnlyStoryNode requires 14 arguments. The original code
-    // passed 13. Added the missing 14th argument (thumbnailBgColor: string).
+
     const mockExplorationSummary = new LearnerExplorationSummary(
       'Math',
       false,
@@ -1622,7 +1616,7 @@ describe('Conversation skin component', () => {
       false,
       '',
       '',
-      '' // 14th argument: thumbnailBgColor
+      '' // 14th argument: thumbnailBgColor.
     );
     spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
       Promise.resolve(
@@ -1806,7 +1800,13 @@ describe('Conversation skin component', () => {
         new UserInfo([], false, false, false, false, false, '', '', '', true)
       )
     );
-    componentInstance.questionPlayerConfig = {} as QuestionPlayerConfigDict;
+    componentInstance.questionPlayerConfig = {
+      resultActionButtons: [],
+      skillList: [],
+      skillDescriptions: [],
+      questionCount: 0,
+      questionsSortedByDifficulty: false,
+    };
     spyOn(conversationFlowService.onPlayerStateChange, 'emit');
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
     spyOn(loaderService, 'hideLoadingScreen');
@@ -2251,11 +2251,11 @@ describe('Conversation skin component', () => {
       );
       spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
 
-      // Case 1: Redirect confirmed → allow unload.
+      // Case 1: Redirect confirmed, allow unload.
       getRedirectSpy.and.returnValue(true);
       expect(capturedCallback()).toBe(false);
 
-      // Case 2: Interacted, non-terminal, non-editor → prevent unload.
+      // Case 2: Interacted, non-terminal, non-editor, prevent unload.
       getRedirectSpy.and.returnValue(false);
       getHasInteractedSpy.and.returnValue(true);
       componentInstance._editorPreviewMode = false;
@@ -2267,16 +2267,16 @@ describe('Conversation skin component', () => {
       expect(capturedCallback()).toBe(true);
       expect(recordEventSpy).toHaveBeenCalled();
 
-      // Case 3: Editor preview mode → allow unload.
+      // Case 3: Editor preview mode, allow unload.
       componentInstance._editorPreviewMode = true;
       expect(capturedCallback()).toBe(false);
 
-      // Case 4: Terminal state → allow unload.
+      // Case 4: Terminal state, allow unload.
       componentInstance._editorPreviewMode = false;
       mockStateCard.isTerminal.and.returnValue(true);
       expect(capturedCallback()).toBe(false);
 
-      // Case 5: Question mode → allow unload.
+      // Case 5: Question mode, allow unload.
       mockStateCard.isTerminal.and.returnValue(false);
       isInQuestionModeSpy.and.returnValue(true);
       expect(capturedCallback()).toBe(false);

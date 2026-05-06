@@ -28,6 +28,7 @@ import {
   StatsReportingBackendApiService,
 } from 'domain/exploration/stats-reporting-backend-api.service';
 import {Stopwatch} from 'domain/utilities/stopwatch.model';
+import {InteractionAnswer} from 'interactions/answer-defs';
 import {ServicesConstants} from 'services/services.constants';
 
 @Injectable({
@@ -476,7 +477,7 @@ export class StatsReportingService {
   recordAnswerSubmitted(
     stateName: string,
     params: Object,
-    answer: string,
+    answer: InteractionAnswer,
     explorationId: string,
     answerIsCorrect: boolean,
     answerGroupIndex: number,
@@ -557,7 +558,7 @@ export class StatsReportingService {
     stateName: string,
     destStateName: string,
     interactionId: string,
-    answer: string,
+    answer: InteractionAnswer,
     feedback: string
   ): void {
     this.playthroughService.recordAnswerSubmitAction(

@@ -402,7 +402,9 @@ describe('Question player engine service', () => {
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     focusManagerService = TestBed.inject(FocusManagerService);
-    textInputService = TestBed.inject(TextInputRulesService) as any;
+    textInputService = TestBed.inject(
+      TextInputRulesService
+    ) as unknown as InteractionRulesService;
 
     singleQuestionObject = Question.createFromBackendDict(
       singleQuestionBackendDict
@@ -516,7 +518,7 @@ describe('Question player engine service', () => {
         'getMatchingClassificationResult'
       ).and.returnValue(answerClassificationResult);
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html: string, envs: any) => html
+        (html: string, envs: Record<string, string>) => html
       );
 
       questionPlayerEngineService.init(
@@ -661,7 +663,7 @@ describe('Question player engine service', () => {
         'getMatchingClassificationResult'
       ).and.returnValue(answerClassificationResult);
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html: string, envs: any) => html
+        (html: string, envs: Record<string, string>) => html
       );
 
       questionPlayerEngineService.init(
@@ -708,7 +710,7 @@ describe('Question player engine service', () => {
         'addWarning'
       ).and.callThrough();
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html: string, envs: any) => html
+        (html: string, envs: Record<string, string>) => html
       );
 
       questionPlayerEngineService.init(
@@ -839,11 +841,15 @@ describe('Question player engine service', () => {
           'addWarning'
         ).and.callThrough();
         spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-          (html: string, envs: any) => html
+          (html: string, envs: Record<string, string>) => html
         );
 
-        singleQuestionBackendDict.question_state_data.interaction.default_outcome!.feedback.html =
-          '';
+        const defaultOutcome =
+          singleQuestionBackendDict.question_state_data.interaction
+            .default_outcome;
+        if (defaultOutcome) {
+          defaultOutcome.feedback.html = '';
+        }
         questionPlayerEngineService.init(
           [Question.createFromBackendDict(singleQuestionBackendDict)],
           initSuccessCb,
@@ -893,7 +899,7 @@ describe('Question player engine service', () => {
       });
 
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html: string, envs: any) => html
+        (html: string, envs: Record<string, string>) => html
       );
 
       questionPlayerEngineService.init(
@@ -950,7 +956,7 @@ describe('Question player engine service', () => {
           'getMatchingClassificationResult'
         ).and.returnValue(answerClassificationResult);
         spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-          (html: string, envs: any) => html
+          (html: string, envs: Record<string, string>) => html
         );
         spyOn(focusManagerService, 'generateFocusLabel').and.returnValue(
           'focusLabel'

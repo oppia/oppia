@@ -42,7 +42,7 @@ import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 
-interface QuestionPlayerConfigDict {
+export interface QuestionPlayerConfigDict {
   skillList: string[];
   questionCount: number;
   questionsSortedByDifficulty: boolean;

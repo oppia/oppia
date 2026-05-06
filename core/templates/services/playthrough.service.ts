@@ -28,6 +28,7 @@ import {
 import {LearnerAction} from 'domain/statistics/learner-action.model';
 import {Playthrough} from 'domain/statistics/playthrough.model';
 import {PlaythroughBackendApiService} from 'domain/statistics/playthrough-backend-api.service';
+import {InteractionAnswer} from 'interactions/answer-defs';
 import {ServicesConstants} from 'services/services.constants';
 import {Stopwatch} from 'domain/utilities/stopwatch.model';
 import isEqual from 'lodash/isEqual';
@@ -225,7 +226,7 @@ export class PlaythroughService {
     stateName: string,
     destStateName: string,
     interactionId: string,
-    answer: string,
+    answer: InteractionAnswer,
     feedback: string,
     timeSpentInStateSecs: number
   ): void {

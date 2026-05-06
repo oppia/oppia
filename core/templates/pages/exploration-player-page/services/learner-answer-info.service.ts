@@ -47,7 +47,7 @@ export class LearnerAnswerInfoService {
   private stateName!: string | null;
   // Id is null until populated from the backend.
   private interactionId!: string | null;
-  private currentAnswer!: string;
+  private currentAnswer!: InteractionAnswer;
   private currentInteractionRulesService!: InteractionRulesService;
   private submittedAnswerInfoCount: number = 0;
   private canAskLearnerForAnswerInfo: boolean = false;
@@ -94,7 +94,7 @@ export class LearnerAnswerInfoService {
   initLearnerAnswerInfoService(
     entityId: string,
     state: State,
-    answer: string,
+    answer: InteractionAnswer,
     interactionRulesService: InteractionRulesService
   ): void {
     this.currentEntityId = entityId;
@@ -188,7 +188,7 @@ export class LearnerAnswerInfoService {
     return this.canAskLearnerForAnswerInfo;
   }
 
-  getCurrentAnswer(): string {
+  getCurrentAnswer(): InteractionAnswer {
     return this.currentAnswer;
   }
 

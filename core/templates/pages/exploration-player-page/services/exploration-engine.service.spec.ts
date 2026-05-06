@@ -804,7 +804,7 @@ describe('Exploration engine service ', () => {
       const submitAnswerSuccessCb = jasmine.createSpy('success');
 
       // Fix error at line 1014: mockInteraction must satisfy the full
-      // Interaction type. Use 'as unknown as Interaction' cast instead of
+      // Interaction type. Use 'as unknown as Interaction' cast instead of.
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
         false
       );
@@ -1857,7 +1857,7 @@ describe('Exploration engine service ', () => {
     // method name that actually exists on the service instead. If it must be
     // accessed, cast the service to 'any' first.
     spyOn(
-      explorationEngineService as any,
+      explorationEngineService as unknown as Record<string, unknown>,
       '_getInteractionHtmlByStateName'
     ).and.returnValue('<div>interaction</div>');
     spyOn(explorationEngineService, 'getRandomSuffix').and.returnValue('');

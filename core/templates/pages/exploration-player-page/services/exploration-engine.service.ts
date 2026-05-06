@@ -32,6 +32,7 @@ import {State} from 'domain/state/state.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
 import {TextInputCustomizationArgs} from 'interactions/customization-args-defs';
+import {InteractionAnswer} from 'interactions/answer-defs';
 import {AlertsService} from 'services/alerts.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {PageContextService} from 'services/page-context.service';
@@ -62,6 +63,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
 import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
 import forEach from 'lodash/forEach';
+import {ParamSpec} from 'domain/exploration/param-spec.model';
 
 @Injectable({
   providedIn: 'root',
@@ -193,7 +195,7 @@ export class ExplorationEngineService {
    * @returns {string} The feedback message to display to the learner.
    */
   private _getFeedback(
-    answer: string,
+    answer: InteractionAnswer,
     oldStateCard: StateCard,
     outcome: Outcome,
     envs: Record<string, string>[]
@@ -211,7 +213,7 @@ export class ExplorationEngineService {
       const answerIsOnlyMisspelled =
         this.answerClassificationService.isAnswerOnlyMisspelled(
           oldStateCard.getInteraction(),
-          answer
+          answer as string
         );
       if (answerIsOnlyMisspelled) {
         const randomResponse = this.randomFromArray(
@@ -443,10 +445,14 @@ export class ExplorationEngineService {
    *   (used in preview mode).
    */
   private _initParams(manualParamChanges: ParamChange[]): void {
-    let baseParams: Record<string, any> = {};
-    this.exploration.paramSpecs.forEach((paramName: string, paramSpec: any) => {
-      baseParams[paramName] = paramSpec.getType().createDefaultValue();
-    });
+    let baseParams: ExplorationParams = {};
+    this.exploration.paramSpecs.forEach(
+      (paramName: string, paramSpec: unknown) => {
+        baseParams[paramName] = (paramSpec as ParamSpec)
+          .getType()
+          .createDefaultValue() as string;
+      }
+    );
 
     let startingParams = this.makeParams(
       baseParams,
@@ -692,7 +698,7 @@ export class ExplorationEngineService {
    * @returns {boolean} Whether the answer is classified as correct.
    */
   submitAnswer(
-    answer: string,
+    answer: InteractionAnswer,
     interactionRulesService: InteractionRulesService,
     successCallback: (
       nextCard: StateCard,
@@ -786,7 +792,7 @@ export class ExplorationEngineService {
     }
     // Compute the data for the next state.
     let oldParams: ExplorationParams = this.learnerParamsService.getAllParams();
-    oldParams.answer = answer;
+    oldParams.answer = answer as string;
     let feedbackHtml: string = this._getFeedback(
       answer,
       oldStateCard,
@@ -821,7 +827,7 @@ export class ExplorationEngineService {
     }
 
     // TODO(sll): Remove the 'answer' key from newParams.
-    newParams.answer = answer;
+    newParams.answer = answer as string;
 
     this.answerIsBeingProcessed = false;
 
@@ -910,7 +916,7 @@ export class ExplorationEngineService {
    * @throws {Error} If the content ID of the fallback state is null.
    */
   private _getNextCardIfReallyStuck(
-    answer: string,
+    answer: InteractionAnswer,
     newStateNameIfStuck: string | null,
     oldParams: ExplorationParams,
     nextFocusLabel: string
@@ -930,7 +936,7 @@ export class ExplorationEngineService {
       },
     ]);
 
-    newParamsIfStuck.answer = answer;
+    newParamsIfStuck.answer = answer as string;
 
     this.nextStateIfStuckName = newStateNameIfStuck;
 
@@ -1058,7 +1064,7 @@ export class ExplorationEngineService {
     let nodeToParentMap: Record<string, string | null> = {};
     visitedNodes[this.exploration.initStateName] = true;
     pathsQueue.push(this.exploration.initStateName);
-    // 1st state does not have a parent
+    // 1st state does not have a parent.
     nodeToParentMap[this.exploration.initStateName] = null;
     while (pathsQueue.length > 0) {
       // '.shift()' here can return an undefined value, but we're already
