@@ -22,6 +22,7 @@ import {SuperAdmin} from '../user/super-admin';
 import {BlogPostEditor} from '../user/blog-post-editor';
 import testConstants, {BLOG_RIGHTS} from './test-constants';
 import {showMessage} from './show-message';
+import {LoggedOutUser} from '../user/logged-out-user';
 
 const ROLES = testConstants.Roles;
 
@@ -220,10 +221,10 @@ export class UserFactory {
   /**
    * Creates a logged-out user (no sign-up, just a fresh browser context).
    */
-  static async createLoggedOutUser(browser: Browser): Promise<BaseUser> {
+  static async createLoggedOutUser(browser: Browser): Promise<LoggedOutUser> {
     const context = await browser.newContext();
     const page = await context.newPage();
-    const user = new BaseUser(page);
+    const user = new LoggedOutUser(page);
     await user.goto(testConstants.URLs.Home);
     await page
       .locator('button.e2e-test-oppia-cookie-banner-accept-button')

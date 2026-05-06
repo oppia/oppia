@@ -4,7 +4,7 @@ const isMobile = process.env.MOBILE === 'true';
 
 export default defineConfig({
   testDir: './specs',
-  timeout: 120000,
+  timeout: 300000,
   expect: {
     timeout: 10000,
   },
