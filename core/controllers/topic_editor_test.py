@@ -560,7 +560,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                     'translations_mapping': {'content': {}}
                 },
             },
-            json_response['subtopic_page']['page_contents'],
+            json_response['subtopic_page_dict']['page_contents'],
         )
         self.logout()
 
@@ -578,7 +578,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                     'translations_mapping': {'content': {}}
                 },
             },
-            json_response['subtopic_page']['page_contents'],
+            json_response['subtopic_page_dict']['page_contents'],
         )
         self.logout()
 
@@ -596,7 +596,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                     'translations_mapping': {'content': {}}
                 },
             },
-            json_response['subtopic_page']['page_contents'],
+            json_response['subtopic_page_dict']['page_contents'],
         )
         self.logout()
 
@@ -722,7 +722,7 @@ class StudyGuideEditorTests(BaseTopicEditorControllerTests):
                     },
                 }
             ],
-            json_response['study_guide']['sections'],
+            json_response['study_guide_dict']['sections'],
         )
         self.logout()
 
@@ -745,7 +745,7 @@ class StudyGuideEditorTests(BaseTopicEditorControllerTests):
                     },
                 }
             ],
-            json_response['study_guide']['sections'],
+            json_response['study_guide_dict']['sections'],
         )
         self.logout()
 
@@ -768,7 +768,7 @@ class StudyGuideEditorTests(BaseTopicEditorControllerTests):
                     },
                 }
             ],
-            json_response['study_guide']['sections'],
+            json_response['study_guide_dict']['sections'],
         )
         self.logout()
 
@@ -1069,7 +1069,7 @@ class TopicEditorTests(
                     'translations_mapping': {'content': {}}
                 },
             },
-            json_response['subtopic_page']['page_contents'],
+            json_response['subtopic_page_dict']['page_contents'],
         )
         json_response = self.get_json(
             '%s/%s/%s'
@@ -1097,7 +1097,7 @@ class TopicEditorTests(
                     'translations_mapping': {'content': {}}
                 },
             },
-            json_response['subtopic_page']['page_contents'],
+            json_response['subtopic_page_dict']['page_contents'],
         )
 
         # Test if the corresponding study guides were created.
@@ -1118,7 +1118,7 @@ class TopicEditorTests(
                     },
                 }
             ],
-            json_response['study_guide']['sections'],
+            json_response['study_guide_dict']['sections'],
         )
         self.logout()
 
@@ -1612,6 +1612,27 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
 
 class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
     """Tests for TopicUrlFragmentHandler."""
+
+    def test_normal_user_cannot_access_topic_url_fragment_handler(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+
+        self.get_json(
+            '%s/%s' % (feconf.TOPIC_URL_FRAGMENT_HANDLER, 'test'),
+            expected_status_int=401,
+        )
+
+        self.logout()
+
+    def test_topic_manager_can_access_topic_url_fragment_handler(self) -> None:
+        self.login(self.TOPIC_MANAGER_EMAIL)
+
+        json_response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_URL_FRAGMENT_HANDLER, 'unique-fragment')
+        )
+
+        self.assertEqual(json_response['topic_url_fragment_exists'], False)
+
+        self.logout()
 
     def test_topic_url_fragment_handler_when_unique(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)

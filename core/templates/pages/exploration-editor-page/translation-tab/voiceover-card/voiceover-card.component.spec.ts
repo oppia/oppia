@@ -47,7 +47,7 @@ import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.m
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {State} from 'domain/state/state.model';
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
-import {VoiceoverRegenerationTaskMappingService} from 'services/voiceover-regeneration-task-mapping-service';
+import {VoiceoverRegenerationJobService} from 'services/voiceover-regeneration-job-service';
 
 @Pipe({name: 'formatTime'})
 class MockFormatTimePipe {
@@ -88,7 +88,7 @@ describe('Voiceover card component', () => {
   let platformFeatureService: PlatformFeatureService;
   let explorationStatesService: ExplorationStatesService;
   let adminBackendApiService: AdminBackendApiService;
-  let voiceoverRegenerationTaskMappingService: VoiceoverRegenerationTaskMappingService;
+  let voiceoverRegenerationJobService: VoiceoverRegenerationJobService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -133,8 +133,8 @@ describe('Voiceover card component', () => {
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     adminBackendApiService = TestBed.inject(AdminBackendApiService);
-    voiceoverRegenerationTaskMappingService = TestBed.inject(
-      VoiceoverRegenerationTaskMappingService
+    voiceoverRegenerationJobService = TestBed.inject(
+      VoiceoverRegenerationJobService
     );
 
     spyOn(
@@ -150,7 +150,7 @@ describe('Voiceover card component', () => {
       'onActiveLanguageAccentChanged'
     ).and.returnValue(new EventEmitter<void>());
     spyOn(
-      voiceoverRegenerationTaskMappingService,
+      voiceoverRegenerationJobService,
       'onNewRegenerationRequest'
     ).and.returnValue(new EventEmitter<void>());
     spyOn(entityVoiceoversService, 'onVoiceoverLoad').and.returnValue(
@@ -197,7 +197,7 @@ describe('Voiceover card component', () => {
     translationLanguageService.onActiveLanguageChanged.emit();
     translationTabActiveContentIdService.onActiveContentIdChanged.emit();
     entityVoiceoversService.onVoiceoverLoad.emit();
-    voiceoverRegenerationTaskMappingService.onNewRegenerationRequest.emit();
+    voiceoverRegenerationJobService.onNewRegenerationRequest.emit();
 
     flush();
     tick(5000);
@@ -993,7 +993,7 @@ describe('Voiceover card component', () => {
 
   it('should update automatic voiceover status when generation status is SUCCEEDED', fakeAsync(() => {
     spyOn(
-      voiceoverRegenerationTaskMappingService,
+      voiceoverRegenerationJobService,
       'getContentRegenerationStatus'
     ).and.returnValue('SUCCEEDED');
     spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.returnValue(
@@ -1010,7 +1010,7 @@ describe('Voiceover card component', () => {
 
   it('should update automatic voiceover status when generation status is FAILED', fakeAsync(() => {
     spyOn(
-      voiceoverRegenerationTaskMappingService,
+      voiceoverRegenerationJobService,
       'getContentRegenerationStatus'
     ).and.returnValue('FAILED');
 
@@ -1021,7 +1021,7 @@ describe('Voiceover card component', () => {
 
   it('should update automatic voiceover status when generation status is GENERATING', fakeAsync(() => {
     spyOn(
-      voiceoverRegenerationTaskMappingService,
+      voiceoverRegenerationJobService,
       'getContentRegenerationStatus'
     ).and.returnValue('GENERATING');
     component.automaticVoiceover = Voiceover.createFromBackendDict({

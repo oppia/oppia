@@ -239,6 +239,17 @@ export class TranslationSubmitter extends BaseUser {
   }
 
   /**
+   * Types text into the plain text input shown in the translation modal.
+   * @param text - The text to enter.
+   */
+  async typeTextInTranslationInput(text: string): Promise<void> {
+    await this.expectElementToBeVisible(textInputSelector);
+    await this.waitForElementToStabilize(textInputSelector);
+    await this.clearAllTextFrom(textInputSelector);
+    await this.typeInInputField(textInputSelector, text);
+  }
+
+  /**
    * Clicks on the save button in the customize RTE modal.
    */
   async clickOnSaveButtonInCustomizeRTEModal(): Promise<void> {

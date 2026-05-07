@@ -2,6 +2,7 @@
   <form #inputForm>
     <input type="file"
            class="e2e-test-upload-audio-input"
+           aria-label="Upload voiceover file"
            (change)="this.addAudio($event)"
            #fileInput>
   </form>

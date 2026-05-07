@@ -292,6 +292,23 @@ describe('Question Misconception Editor Component', () => {
     expect(component.misconceptionName).toEqual('misc1');
   });
 
+  it('should untag misconception when selectedMisconception is null', () => {
+    const saveTaggedMisconceptionSpy = spyOn(
+      component.saveTaggedMisconception,
+      'emit'
+    );
+    component.selectedMisconception = null;
+    component.selectedMisconceptionSkillId = null;
+    component.misconceptionEditorIsOpen = true;
+
+    component.updateMisconception();
+
+    expect(saveTaggedMisconceptionSpy).toHaveBeenCalledWith(null);
+    expect(component.misconceptionName).toEqual('');
+    expect(component.selectedMisconceptionSkillId).toBeNull();
+    expect(component.misconceptionEditorIsOpen).toBeFalse();
+  });
+
   it('should update the values', () => {
     let updatedValues = {
       misconception: mockMisconceptionObject.abc[1],

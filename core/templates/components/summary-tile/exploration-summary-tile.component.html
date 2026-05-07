@@ -96,6 +96,11 @@
             </span>
           </li>
         </ul>
+        <div *ngIf="tags && tags.length > 0" class="tags-section">
+          <span *ngFor="let tag of tags" class="tag-badge">
+            {{ tag }}
+          </span>
+        </div>
         <button *ngIf="isCollectionPreviewTile" class="oppia-learner-confirm-button oppia-play-exploration-button mat-button  mat-default-theme e2e-test-play-exploration-button">
           <span [innerHTML]="'I18N_PLAYER_PLAY_EXPLORATION' | translate"></span>
         </button>
