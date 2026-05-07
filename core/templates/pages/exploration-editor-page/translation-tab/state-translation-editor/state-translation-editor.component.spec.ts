@@ -177,10 +177,11 @@ describe('State Translation Editor Component', () => {
           content_0: {
             manual: manualVoiceover1,
           },
-        }
+        },
+        {}
       );
 
-      entityVoiceoversService.init('exp_id', 'exploration', 5);
+      entityVoiceoversService.init('exp_id', 'exploration', 5, 'hi');
       entityVoiceoversService.setLanguageCode('hi');
       entityVoiceoversService.setActiveLanguageAccentCode('hi-IN');
       entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
@@ -198,7 +199,9 @@ describe('State Translation Editor Component', () => {
     });
 
     it('should not open the modal if voiceover already needs update', () => {
-      state.recordedVoiceovers = RecordedVoiceovers.createFromBackendDict({
+      (
+        state as unknown as {recordedVoiceovers: RecordedVoiceovers}
+      ).recordedVoiceovers = RecordedVoiceovers.createFromBackendDict({
         voiceovers_mapping: {
           content1: {
             hi: {
@@ -229,10 +232,11 @@ describe('State Translation Editor Component', () => {
           content_0: {
             manual: manualVoiceover1,
           },
-        }
+        },
+        {}
       );
 
-      entityVoiceoversService.init('exp_id', 'exploration', 5);
+      entityVoiceoversService.init('exp_id', 'exploration', 5, 'hi');
       entityVoiceoversService.setLanguageCode('hi');
       entityVoiceoversService.setActiveLanguageAccentCode('hi-IN');
       entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
@@ -266,7 +270,7 @@ describe('State Translation Editor Component', () => {
         entityTranslationsService.languageCodeToLatestEntityTranslations.hi.translationMapping.hasOwnProperty(
           'content1'
         )
-      ).toBeTrue();
+      ).toBeTruthy();
 
       component.activeWrittenTranslation = TranslatedContent.createNew('html');
       component.activeWrittenTranslation.translation = '';
@@ -277,7 +281,7 @@ describe('State Translation Editor Component', () => {
         entityTranslationsService.languageCodeToLatestEntityTranslations.hi.translationMapping.hasOwnProperty(
           'content1'
         )
-      ).toBeFalse();
+      ).toBeFalsy();
     });
 
     it('should refresh the translation status', () => {
