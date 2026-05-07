@@ -79,7 +79,8 @@ describe('Site Analytics Service', () => {
   });
 
   describe('when tested using gtag spy', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
+      await Promise.resolve();
       gtagSpy = spyOn(ws.nativeWindow, 'gtag');
     });
 
