@@ -83,19 +83,25 @@ export class SiteAnalyticsService {
     eventName: string,
     eventParameters: Record<string, string | number | boolean> = {}
   ): void {
-    // If user info has not loaded yet and isLoggedIn() still reports false,
-    // delay sending the event to avoid mislabeling logged-in users.
-    if (!this.isUserInfoInitialized && !this.userService.isLoggedIn()) {
+    // Wait for user info initialization before emitting analytics
+    // events to avoid incorrect auth state reporting.
+    if (!this.isUserInfoInitialized) {
       this.userInfoInitializationPromise.then(() => {
         this._sendEventToGoogleAnalytics(eventName, eventParameters);
       });
       return;
     }
-
-    this.windowRef.nativeWindow.gtag('event', eventName, {
+    const loginStatus = this._getLoginStatus();
+    const updatedEventParameters = {
       ...eventParameters,
-      login_status: this._getLoginStatus(),
-    });
+      login_status: loginStatus,
+    };
+
+    this.windowRef.nativeWindow.gtag(
+      'event',
+      eventName,
+      updatedEventParameters
+    );
   }
 
   // The srcElement refers to the element on the page that is clicked.
