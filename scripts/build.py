@@ -25,7 +25,6 @@ import os
 import re
 import shutil
 import subprocess
-import sys
 import threading
 
 from scripts import (
@@ -791,7 +790,6 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         build_using_ng()
         sync_angular_css_hashes()
         generate_app_yaml(deploy_mode=options.deploy_mode)
-        # generate_build_directory(hashes)
 
     save_hashes_to_file({})
 

@@ -482,6 +482,8 @@ def managed_ng_build(
         use_prod_env: bool. Whether to compile for use in production.
         watch_mode: bool. Run the compiler in watch mode, which rebuilds on file
             change.
+        source_maps: bool. Whether to generate source maps for the compiled
+            files. This is useful for debugging the compiled code.
 
     Yields:
         psutil.Process. The ng compiler process.

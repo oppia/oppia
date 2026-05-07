@@ -19,20 +19,17 @@
 from __future__ import annotations
 
 import ast
-import collections
 import contextlib
 import io
 import json
 import os
 import pathlib
 import re
-import sys
 import tempfile
-import threading
 
 from core.tests import test_utils
 
-from typing import ContextManager, Deque, Dict, Iterator, List, Tuple, Union
+from typing import ContextManager, Dict, Iterator, List, Tuple
 
 from . import (
     build,

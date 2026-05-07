@@ -872,15 +872,13 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(proc.kill_count, 1)
 
     def test_managed_ng_build_in_watch_mode_when_build_succeeds(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
+        self.exit_stack.enter_context(
             self.swap_popen(outputs=[b'abc', b'Build at: 123', b'def'])
         )
         str_io = io.StringIO()
         self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
 
-        proc = self.exit_stack.enter_context(
-            servers.managed_ng_build(watch_mode=True)
-        )
+        self.exit_stack.enter_context(servers.managed_ng_build(watch_mode=True))
         self.exit_stack.close()
 
         self.assert_matches_regexps(

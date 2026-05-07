@@ -325,32 +325,30 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.print_arr,
         )
 
+    def test_run_ng_compilation_successfully(self) -> None:
+        swap_isdir = self.swap_with_checks(
+            os.path, 'isdir', lambda _: True, expected_kwargs=[]
+        )
 
-def test_run_ng_compilation_successfully(self) -> None:
-    swap_isdir = self.swap_with_checks(
-        os.path, 'isdir', lambda _: True, expected_kwargs=[]
-    )
-
-    with self.print_swap, self.swap_ng_compiler, swap_isdir:
-        run_lighthouse_tests.run_ng_compilation()
-
-    self.assertNotIn(
-        'Failed to complete ng compilation, exiting...', self.print_arr
-    )
-
-
-def test_run_ng_compilation_failed(self) -> None:
-    swap_isdir = self.swap_with_checks(
-        os.path, 'isdir', lambda _: False, expected_kwargs=[]
-    )
-
-    with self.print_swap, self.swap_ng_compiler, swap_isdir:
-        with self.swap_sys_exit:
+        with self.print_swap, self.swap_ng_compiler, swap_isdir:
             run_lighthouse_tests.run_ng_compilation()
 
-    self.assertIn(
-        'Failed to complete ng compilation, exiting...', self.print_arr
-    )
+        self.assertNotIn(
+            'Failed to complete ng compilation, exiting...', self.print_arr
+        )
+
+    def test_run_ng_compilation_failed(self) -> None:
+        swap_isdir = self.swap_with_checks(
+            os.path, 'isdir', lambda _: False, expected_kwargs=[]
+        )
+
+        with self.print_swap, self.swap_ng_compiler, swap_isdir:
+            with self.swap_sys_exit:
+                run_lighthouse_tests.run_ng_compilation()
+
+        self.assertIn(
+            'Failed to complete ng compilation, exiting...', self.print_arr
+        )
 
     def test_subprocess_error_results_in_failed_ng_compilation(
         self,

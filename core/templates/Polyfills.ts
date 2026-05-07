@@ -186,8 +186,8 @@ if (!Object.entries) {
   };
 }
 
-(window as any).global = window;
+(window as unknown as Window & {global: Window}).global = window;
 
-(window as any).process = {
+(window as unknown as Window & {process: {env: {DEBUG: undefined}}}).process = {
   env: {DEBUG: undefined},
 };
