@@ -17,7 +17,6 @@
  */
 
 import 'pages/common-imports';
-import 'google-analytics.initializer';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {enableProdMode} from '@angular/core';
 import {AppModule} from 'pages/oppia-root/app.module';
