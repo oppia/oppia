@@ -415,7 +415,7 @@ def _collect_study_guide_changes(
         study_guide_domain.UpdateStudyGuidePropertyCmd,
         study_guide_domain.StudyGuideChange,
     ]
-    # Here use cast because we are narrowing down the type from BaseChange
+    # Here we use cast because we are narrowing down the type from BaseChange
     # to UpdateStudyGuidePropertyCmd after confirming the command type through
     # the CMD_UPDATE_STUDY_GUIDE_PROPERTY check in the caller function.
     update_study_guide_property_cmd = cast(
@@ -468,14 +468,14 @@ def _apply_subtopic_page_change(
         or change.subtopic_id in deleted_subtopic_ids
     ):
         raise Exception(
-            'The subtopic with id %s does not exist' % change.subtopic_id
+            'The subtopic with id %s doesn\'t exist' % change.subtopic_id
         )
 
     if (
         change.property_name
         == subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
     ):
-        # Here use cast because this 'if' condition forces change to have type
+        # Here we use cast because this 'if' condition forces change to have type
         # UpdateSubtopicPagePropertyPageContentsHtmlCmd, which is a specific
         # subtype of BaseChange with the required property_name and new_value.
         update_cmd = cast(
@@ -503,7 +503,7 @@ def _apply_subtopic_page_change(
         change.property_name
         == subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO
     ):
-        # Here use cast because this 'elif' condition forces change to have type
+        # Here we use cast because this 'elif' condition forces change to have type
         # UpdateSubtopicPagePropertyPageContentsAudioCmd, which is a specific
         # subtype of BaseChange with the required property_name and new_value.
         update_cmd = cast(
