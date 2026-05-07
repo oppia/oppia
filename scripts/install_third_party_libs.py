@@ -44,7 +44,7 @@ from scripts import (
     dependency_utils,
 )
 
-from typing import Final
+from typing import Final, Optional, Sequence
 
 from . import clean, common
 
@@ -427,9 +427,9 @@ def install_elasticsearch_dev_server() -> None:
     print('ElasticSearch installed successfully.')
 
 
-def main() -> None:
+def main(args: Optional[Sequence[str]] = None) -> None:
     """Set up GAE and install third-party libraries for Oppia."""
-    args = _PARSER.parse_args()
+    parsed_args = _PARSER.parse_args(args=args if args is not None else [])
 
     # Initialize the gatekeeper
     # Use common.THIRD_PARTY_PYTHON_LIBS_DIR or the specific libs path
@@ -438,7 +438,9 @@ def main() -> None:
     )
 
     # Check the cache using 'args.force'
-    is_python_install_required = getattr(args, 'force', False) or gatekeeper.is_install_required()
+    is_python_install_required = (
+        getattr(parsed_args, 'force', False) or gatekeeper.is_install_required()
+    )
     if not is_python_install_required:
         print(
             "Python dependencies match the local cache. Skipping Python installation."
@@ -525,4 +527,4 @@ def main() -> None:
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when this Python file is used as a script.
 if __name__ == '__main__':  # pragma: no cover
-    main()
+    main(args=sys.argv[1:])
