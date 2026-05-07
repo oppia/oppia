@@ -138,11 +138,15 @@ describe('Skill editor main tab component', () => {
     spyOn(skillEditorStateService, 'getSkill').and.returnValue({
       getId: () => 'skill_1',
     } as never);
-
+    const assignedSkillTopicDataSpy = spyOn(
+      component,
+      'getAssignedSkillTopicData'
+    );
     expect(component.hasLoadedSkill()).toBe(false);
-
+    expect(assignedSkillTopicDataSpy).not.toHaveBeenCalled();
     spyOn(skillEditorStateService, 'hasLoadedSkill').and.returnValue(true);
     expect(component.hasLoadedSkill()).toBe(true);
+    expect(assignedSkillTopicDataSpy).toHaveBeenCalled();
   });
 
   it(
@@ -241,6 +245,14 @@ describe('Skill editor main tab component', () => {
     ];
 
     expect(component.isTopicDropdownEnabled()).toBe(true);
+  });
+
+  it('should return whether the subtopic status is shown', () => {
+    expect(component.shouldShowSubtopicStatus()).toBe(false);
+
+    component.topicName = 'topic1';
+
+    expect(component.shouldShowSubtopicStatus()).toBe(true);
   });
 
   it('should update subtopic name when selected topic is already assigned', () => {

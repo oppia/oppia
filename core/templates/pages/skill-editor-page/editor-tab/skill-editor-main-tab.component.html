@@ -26,13 +26,13 @@
             [(ngModel)]="topicName"
             (change)="handleTopicSelectionChange(topicName)"
             [disabled]="!isTopicDropdownEnabled()">
-            <option value="" disabled>Select a topic</option>
+            <option value="" disabled></option>
             <option *ngFor="let topic of getEditableTopicNames()" [value]="topic">
               {{ topic }}
             </option>
           </select>
         </div>
-        <div class="status-box" *ngIf="isTopicDropdownEnabled()">
+        <div class="status-box" *ngIf="shouldShowSubtopicStatus()">
           <strong class="status-key">
             Subtopic:
           </strong>

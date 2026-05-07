@@ -123,8 +123,9 @@ export class SkillEditorMainTabComponent
     return this.editableTopicSummaries.length > 0;
   }
 
-  // Clears the subtopic label when the selected topic has no existing
-  // skill-to-subtopic assignment.
+  shouldShowSubtopicStatus(): boolean {
+    return Boolean(this.topicName);
+  }
   updateSubtopicForTopic(topicName: string): void {
     const assignedSkillTopicData = this.assignedSkillTopicData;
     if (!assignedSkillTopicData || !assignedSkillTopicData[topicName]) {
@@ -196,7 +197,11 @@ export class SkillEditorMainTabComponent
 
   hasLoadedSkill(): boolean {
     this.skill = this.skillEditorStateService.getSkill();
-    return this.skillEditorStateService.hasLoadedSkill();
+    const hasLoadedSkill = this.skillEditorStateService.hasLoadedSkill();
+    if (hasLoadedSkill) {
+      this.getAssignedSkillTopicData();
+    }
+    return hasLoadedSkill;
   }
 
   ngAfterContentChecked(): void {
