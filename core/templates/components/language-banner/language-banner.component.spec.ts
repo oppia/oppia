@@ -33,6 +33,7 @@ import {By} from '@angular/platform-browser';
 import {UserService} from 'services/user.service';
 import {Router} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
+import {UserInfo} from 'domain/user/user-info.model';
 
 class MockUserService {
   getUserInfoAsync() {
@@ -51,7 +52,7 @@ describe('LanguageBannerComponent', () => {
   let fixture: ComponentFixture<LanguageBannerComponent>;
   let cookieService: CookieService;
   let debugElement: DebugElement;
-  let userService: MockUserService;
+  let userService: UserService;
   let router: MockRouter;
 
   let originalNavigatorLanguage = navigator.language;
@@ -84,7 +85,7 @@ describe('LanguageBannerComponent', () => {
 
     userService = TestBed.inject(UserService);
     cookieService = TestBed.inject(CookieService);
-    router = TestBed.inject(Router);
+    router = TestBed.inject(Router) as MockRouter;
 
     cookieService.put(
       COOKIE_NAME_COOKIES_ACKNOWLEDGED,
@@ -118,7 +119,7 @@ describe('LanguageBannerComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.bannerIsVisible).toBeFalse();
+    expect(component.bannerIsVisible).toBe(false);
   }));
 
   it('should not display banner if user is on the signup page', fakeAsync(() => {
@@ -127,18 +128,22 @@ describe('LanguageBannerComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.bannerIsVisible).toBeFalse();
+    expect(component.bannerIsVisible).toBe(false);
   }));
 
   it('should not display banner if user is logged in', fakeAsync(() => {
+    const mockUserInfo = jasmine.createSpyObj<UserInfo>('UserInfo', [
+      'isLoggedIn',
+    ]);
+    mockUserInfo.isLoggedIn.and.returnValue(true);
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve({isLoggedIn: () => true})
+      Promise.resolve(mockUserInfo)
     );
 
     component.ngOnInit();
     tick();
 
-    expect(component.bannerIsVisible).toBeFalse();
+    expect(component.bannerIsVisible).toBe(false);
   }));
 
   it("should not display banner if the user's browser language is english", fakeAsync(() => {
@@ -150,7 +155,7 @@ describe('LanguageBannerComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.bannerIsVisible).toBeFalse();
+    expect(component.bannerIsVisible).toBe(false);
   }));
 
   it('should not display banner if user has not accepted cookies', fakeAsync(() => {
@@ -159,14 +164,14 @@ describe('LanguageBannerComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.bannerIsVisible).toBeFalse();
+    expect(component.bannerIsVisible).toBe(false);
   }));
 
   it("should be dislayed if cookies are accepted, browser's language is not english and user is not on the sign in page", fakeAsync(() => {
     component.ngOnInit();
     tick();
 
-    expect(component.bannerIsVisible).toBeTrue();
+    expect(component.bannerIsVisible).toBe(true);
   }));
 
   it('should decrement the number of times remaining to show the banner', fakeAsync(() => {
@@ -204,7 +209,7 @@ describe('LanguageBannerComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.bannerIsVisible).toBeTrue();
+    expect(component.bannerIsVisible).toBe(true);
 
     component.ngOnInit();
     tick();
@@ -215,12 +220,12 @@ describe('LanguageBannerComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(component.bannerIsVisible).toBeTrue();
+    expect(component.bannerIsVisible).toBe(true);
 
     component.ngOnInit();
     tick();
 
-    expect(component.bannerIsVisible).toBeFalse();
+    expect(component.bannerIsVisible).toBe(false);
   }));
 
   it('should not display banner when the banner button is clicked', () => {
@@ -232,7 +237,7 @@ describe('LanguageBannerComponent', () => {
     ).nativeElement;
     bannerButton.click();
 
-    expect(component.bannerIsVisible).toBeFalse();
+    expect(component.bannerIsVisible).toBe(false);
   });
 
   it('should set the NUM_TIMES_REMAINING_TO_SHOW_LANGUAGE_BANNER cookie to 0 when clicked', fakeAsync(() => {
