@@ -5506,6 +5506,10 @@ export class ExplorationEditor extends BaseUser {
         throw new Error(`Option "${option}" not found.`);
       }
 
+      // Ensure that elements have stabilized before we start dragging.
+      await this.waitForElementToStabilize(sourceElement);
+      await this.waitForElementToStabilize(destinationElement);
+
       const sourceBox = await sourceElement.boundingBox();
       const destBox = await destinationElement.boundingBox();
 
