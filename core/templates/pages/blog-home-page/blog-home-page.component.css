@@ -238,12 +238,12 @@ oppia-blog-home-page .blog-post-card {
 }
 
 .mobile-navbar-blog-homepage {
-  color: inherit;
+  color: #ffffff;
   cursor: pointer;
   text-decoration: none;
 }
 
 .mobile-navbar-blog-homepage:hover {
-  color: inherit;
+  color: #ffffff;
   text-decoration: none;
 }

@@ -68,7 +68,7 @@ _PARSER.add_argument(
 
 _PARSER.add_argument(
     '--skip_build',
-    help='Sets whether to skip webpack build',
+    help='Sets whether to skip ng build',
     action='store_true',
 )
 
@@ -142,24 +142,6 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
         print('Puppeteer script failed. More details can be found above.')
         if record:
             print('Resulting puppeteer video saved at %s' % video_path)
-        sys.exit(1)
-
-
-def run_webpack_compilation() -> None:
-    """Runs webpack compilation."""
-    max_tries = 5
-    webpack_bundles_dir_name = 'webpack_bundles'
-    for _ in range(max_tries):
-        try:
-            with servers.managed_webpack_compiler() as proc:
-                proc.wait()
-        except subprocess.CalledProcessError as error:
-            print(error.output)
-            sys.exit(error.returncode)
-        if os.path.isdir(webpack_bundles_dir_name):
-            break
-    if not os.path.isdir(webpack_bundles_dir_name):
-        print('Failed to complete webpack compilation, exiting...')
         sys.exit(1)
 
 
@@ -310,20 +292,18 @@ def main(args: Optional[List[str]] = None) -> None:
         server_mode = SERVER_MODE_PROD
     if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
         if not parsed_args.skip_build:
-            # Builds webpack.
+            # Builds ng.
             print('Building files in production mode.')
             build.main(args=['--prod_env'])
         else:
-            # Skip webpack build if skip_build flag is passed.
-            print('Building files in production mode skipping webpack build.')
+            # Skip ng build if skip_build flag is passed.
+            print('Building files in production mode skipping ng build.')
             build.main(args=[])
             servers.run_ng_compilation()
-            run_webpack_compilation()
     else:
-        # Accessibility mode skip webpack build.
+        # Accessibility mode skip ng build.
         build.main(args=[])
         servers.run_ng_compilation()
-        run_webpack_compilation()
 
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())

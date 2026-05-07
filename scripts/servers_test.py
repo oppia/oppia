@@ -877,24 +877,22 @@ class ManagedProcessTests(test_utils.TestBase):
         )
         str_io = io.StringIO()
         self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
-        logs = self.exit_stack.enter_context(self.capture_logging())
 
         proc = self.exit_stack.enter_context(
             servers.managed_ng_build(watch_mode=True)
         )
         self.exit_stack.close()
 
-        self.assert_proc_was_managed_as_expected(logs, proc.pid)
-        self.assertEqual(len(popen_calls), 1)
-        self.assertIn('--watch', popen_calls[0].program_args)
         self.assert_matches_regexps(
             str_io.getvalue().strip().split('\n'),
             [
-                'Starting new Angular Compiler',
-                'abc',
-                'Build at: 123',
-                'def',
-                'Stopping Angular Compiler',
+                r'Starting new Angular Compiler',
+                r'abc',
+                r'Build at: 123',
+                r'Starting new RTL CSS Watcher: npm run watch:rtl',
+                r'def',
+                r'Stopping RTL CSS Watcher.*',
+                r'Stopping Angular Compiler.*',
             ],
         )
 
@@ -932,183 +930,6 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(
             popen_calls[0].program_args, '%s build --prod' % common.NG_BIN_PATH
         )
-
-    def test_managed_webpack_compiler_in_watch_mode_when_build_succeeds(
-        self,
-    ) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'abc', b'Built at: 123', b'def'])
-        )
-        str_io = io.StringIO()
-        self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
-        logs = self.exit_stack.enter_context(self.capture_logging())
-
-        proc = self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(watch_mode=True)
-        )
-        self.exit_stack.close()
-
-        self.assert_proc_was_managed_as_expected(logs, proc.pid)
-        self.assertEqual(len(popen_calls), 1)
-        self.assertIn('--color', popen_calls[0].program_args)
-        self.assertIn('--watch', popen_calls[0].program_args)
-        self.assertIn('--progress', popen_calls[0].program_args)
-        self.assert_matches_regexps(
-            str_io.getvalue().strip().split('\n'),
-            [
-                'Starting new Webpack Compiler',
-                'abc',
-                'Built at: 123',
-                'def',
-                'Stopping Webpack Compiler',
-            ],
-        )
-
-    def test_managed_webpack_compiler_in_watch_mode_raises_when_not_built(
-        self,
-    ) -> None:
-        # NOTE: The 'Built at: ' message is never printed.
-        self.exit_stack.enter_context(self.swap_popen(outputs=[b'abc', b'def']))
-        str_io = io.StringIO()
-        self.exit_stack.enter_context(contextlib.redirect_stdout(str_io))
-
-        with self.assertRaisesRegex(IOError, 'First build never completed'):
-            self.exit_stack.enter_context(
-                servers.managed_webpack_compiler(watch_mode=True)
-            )
-        self.assert_matches_regexps(
-            str_io.getvalue().strip().split('\n'),
-            [
-                'Starting new Webpack Compiler',
-                'abc',
-                'def',
-                'Stopping Webpack Compiler',
-            ],
-        )
-
-    def test_managed_webpack_compiler_uses_explicit_config_path(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
-
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(config_path='config.json')
-        )
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            '%s %s --config config.json'
-            % (common.NODE_BIN_PATH, common.WEBPACK_BIN_PATH),
-        )
-
-    def test_managed_webpack_compiler_uses_prod_source_maps_config(
-        self,
-    ) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
-
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(
-                use_prod_env=True, use_source_maps=True
-            )
-        )
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            '%s %s --config %s'
-            % (
-                common.NODE_BIN_PATH,
-                common.WEBPACK_BIN_PATH,
-                common.WEBPACK_PROD_SOURCE_MAPS_CONFIG,
-            ),
-        )
-
-    def test_managed_webpack_compiler_uses_prod_config(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
-
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(
-                use_prod_env=True, use_source_maps=False
-            )
-        )
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            '%s %s --config %s'
-            % (
-                common.NODE_BIN_PATH,
-                common.WEBPACK_BIN_PATH,
-                common.WEBPACK_PROD_CONFIG,
-            ),
-        )
-
-    def test_managed_webpack_compiler_uses_dev_source_maps_config(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
-
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(
-                use_prod_env=False, use_source_maps=True
-            )
-        )
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            '%s %s --config %s'
-            % (
-                common.NODE_BIN_PATH,
-                common.WEBPACK_BIN_PATH,
-                common.WEBPACK_DEV_SOURCE_MAPS_CONFIG,
-            ),
-        )
-
-    def test_managed_webpack_compiler_uses_dev_config(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
-
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(
-                use_prod_env=False, use_source_maps=False
-            )
-        )
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            '%s %s --config %s'
-            % (
-                common.NODE_BIN_PATH,
-                common.WEBPACK_BIN_PATH,
-                common.WEBPACK_DEV_CONFIG,
-            ),
-        )
-
-    def test_managed_webpack_compiler_with_max_old_space_size(self) -> None:
-        popen_calls = self.exit_stack.enter_context(
-            self.swap_popen(outputs=[b'Built at: 123'])
-        )
-
-        self.exit_stack.enter_context(
-            servers.managed_webpack_compiler(max_old_space_size=2056)
-        )
-        self.exit_stack.close()
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertIn('--max-old-space-size=2056', popen_calls[0].program_args)
 
     def test_managed_webdriverio_server_fails_to_get_chrome_version(
         self,

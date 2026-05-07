@@ -19,6 +19,7 @@
 import 'globalthis/auto';
 import 'proxy-polyfill';
 import '@webcomponents/custom-elements';
+import '@angular/localize/init';
 
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {
@@ -184,3 +185,9 @@ if (!Object.entries) {
     return objectEntriesArray;
   };
 }
+
+(window as any).global = window;
+
+(window as any).process = {
+  env: {DEBUG: undefined},
+};

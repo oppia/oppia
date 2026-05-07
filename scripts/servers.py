@@ -471,7 +471,10 @@ def create_managed_web_browser(port: int) -> ContextManager[psutil.Process]:
 
 @contextlib.contextmanager
 def managed_ng_build(
-    *, use_prod_env: bool = False, watch_mode: bool = False
+    *,
+    use_prod_env: bool = False,
+    watch_mode: bool = False,
+    source_maps: bool = False,
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the ng compiler gracefully.
 
@@ -491,6 +494,9 @@ def managed_ng_build(
         compiler_args.append('--prod')
     if watch_mode:
         compiler_args.append('--watch')
+    if source_maps:
+        compiler_args.append('--source-map')
+
     with contextlib.ExitStack() as exit_stack:
         # OK to use shell=True here because we are passing string literals and
         # constants, so there is no risk of a shell-injection attack.
@@ -519,103 +525,13 @@ def managed_ng_build(
                 # raise an error because a build hasn't finished successfully.
                 raise IOError('First build never completed')
 
-        def print_proc_output() -> None:
-            """Prints the proc's output until it is exhausted."""
-            for line in iter(read_line_func, None):
-                common.write_stdout_safe(line)
-
-        # Start a thread to print the rest of the compiler's output to stdout.
-        printer_thread = threading.Thread(target=print_proc_output)
-        printer_thread.start()
-        exit_stack.callback(printer_thread.join)
-
-        yield proc
-
-
-@contextlib.contextmanager
-def managed_webpack_compiler(
-    config_path: Optional[str] = None,
-    use_prod_env: bool = False,
-    use_source_maps: bool = False,
-    watch_mode: bool = False,
-    max_old_space_size: Optional[int] = None,
-) -> Iterator[psutil.Process]:
-    """Returns context manager to start/stop the webpack compiler gracefully.
-
-    Args:
-        config_path: str|None. Path to an explicit webpack config, or None to
-            determine it from the other args.
-        use_prod_env: bool. Whether to compile for use in production. Only
-            respected if config_path is None.
-        use_source_maps: bool. Whether to compile with source maps. Only
-            respected if config_path is None.
-        watch_mode: bool. Run the compiler in watch mode, which rebuilds on file
-            change.
-        max_old_space_size: int|None. Sets the max memory size of the compiler's
-            "old memory" section. As memory consumption approaches the limit,
-            the compiler will spend more time on garbage collection in an effort
-            to free unused memory.
-
-    Yields:
-        psutil.Process. The Webpack compiler process.
-
-    Raises:
-        OSError. First build never completed.
-    """
-    if config_path is not None:
-        pass
-    elif use_prod_env:
-        config_path = (
-            common.WEBPACK_PROD_SOURCE_MAPS_CONFIG
-            if use_source_maps
-            else common.WEBPACK_PROD_CONFIG
-        )
-    else:
-        config_path = (
-            common.WEBPACK_DEV_SOURCE_MAPS_CONFIG
-            if use_source_maps
-            else common.WEBPACK_DEV_CONFIG
-        )
-
-    compiler_args = [
-        common.NODE_BIN_PATH,
-        common.WEBPACK_BIN_PATH,
-        '--config',
-        config_path,
-    ]
-    if max_old_space_size:
-        # NOTE: --max-old-space-size is a flag for Node.js, not the Webpack
-        # compiler, so we insert it immediately after NODE_BIN_PATH.
-        compiler_args.insert(1, '--max-old-space-size=%d' % max_old_space_size)
-    if watch_mode:
-        compiler_args.extend(['--color', '--watch', '--progress'])
-    with contextlib.ExitStack() as exit_stack:
-        # OK to use shell=True here because we are passing string literals and
-        # constants, so there is no risk of a shell-injection attack.
-        proc = exit_stack.enter_context(
-            managed_process(
-                compiler_args,
-                human_readable_name='Webpack Compiler',
-                shell=True,
-                # Capture compiler's output to detect when builds have completed.
-                stdout=subprocess.PIPE,
+            exit_stack.enter_context(
+                managed_process(
+                    ['npm', 'run', 'watch:rtl'],
+                    human_readable_name='RTL CSS Watcher',
+                    shell=True,
+                )
             )
-        )
-
-        read_line_func: Callable[[], Optional[bytes]] = (
-            lambda: proc.stdout.readline() or None
-        )
-        if watch_mode:
-            for line in iter(read_line_func, None):
-                common.write_stdout_safe(line)
-                # Message printed when a compilation has succeeded. We break
-                # after the first one to ensure the site is ready to be visited.
-                if b'Built at: ' in line:
-                    break
-            else:
-                # If none of the lines contained the string 'Built at',
-                # raise an error because a build hasn't finished successfully.
-                raise IOError('First build never completed')
 
         def print_proc_output() -> None:
             """Prints the proc's output until it is exhausted."""

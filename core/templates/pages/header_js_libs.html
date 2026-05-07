@@ -12,8 +12,3 @@
   <!-- Google Tag Manager -->
   <script async src="https://www.googletagmanager.com/gtm.js?id=<%= GTM_ANALYTICS_ID %>"></script>
 <% } %>
-<!-- This code is used for inserting webpack bundles
-    https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-<% for (var chunk in htmlWebpackPlugin.files.js) { %>
-  <link rel="preload" as="script" href="<%= htmlWebpackPlugin.files.js[chunk] %>">
-<% } %>

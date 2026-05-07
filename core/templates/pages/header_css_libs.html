@@ -15,9 +15,7 @@
       as="style"
       onload="this.onload=null;this.rel='stylesheet'">
 
-<!-- Angular CLI global styles (Bootstrap, Font Awesome, oppia.css, oppia-material.css, toastr). -->
-<!-- Production placeholders are rewritten to hashed styles/vendor-styles filenames in scripts/build.py. -->
-<% if (webpackConfig.mode === 'production') { %>
+<% if (process.env.NODE_ENV === 'production') { %>
   <link rel="stylesheet" type="text/css" href="/dist/oppia-angular-prod/vendor-styles.css">
   <link rel="stylesheet" type="text/css" href="/dist/oppia-angular-prod/styles.css">
 <% } else { %>
