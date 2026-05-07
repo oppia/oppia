@@ -785,7 +785,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         maintenance_mode=options.maintenance_mode,
     )
     if options.prod_env:
-        hashes = generate_hashes()
+        generate_hashes()
         generate_python_package()
         build_using_ng()
         sync_angular_css_hashes()

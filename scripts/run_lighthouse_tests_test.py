@@ -372,7 +372,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         def mock_failed_context_manager() -> MockFailedCompilerContextManager:
             return MockFailedCompilerContextManager()
 
-        self.swap_ng_compiler = self.swap_with_checks(
+        swap_ng_compiler = self.swap_with_checks(
             servers,
             'managed_ng_build',
             mock_failed_context_manager,
@@ -383,7 +383,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             os.path, 'isdir', lambda _: False, expected_kwargs=[]
         )
 
-        with self.print_swap, self.swap_ng_compiler, swap_isdir:
+        with self.print_swap, swap_ng_compiler, swap_isdir:
             with self.swap_sys_exit:
                 run_lighthouse_tests.run_ng_compilation()
 
