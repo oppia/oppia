@@ -24,9 +24,11 @@ export interface LearnerAnswerInfoBackendDict {
 }
 
 export class LearnerAnswerInfo {
+  // Null when learner answer info hasn't been persisted to the backend yet.
   _id: string | null;
   _answer: string;
   _answerDetails: string;
+  // Null when learner answer info hasn't been persisted to the backend yet.
   _createdOn: number | null;
 
   constructor(

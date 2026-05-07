@@ -26,6 +26,7 @@ import {
   EditableQuestionBackendApiService,
   SkillLinkageModificationsArray,
 } from 'domain/question/editable-question-backend-api.service';
+import {SkillBackendDict} from 'domain/skill/skill.model';
 import {CsrfTokenService} from 'services/csrf-token.service';
 
 describe('EditableQuestionBackendApiService', () => {
@@ -105,7 +106,7 @@ describe('EditableQuestionBackendApiService', () => {
 
   const sampleDataResultsObjects: {
     questionObject: Question | null;
-    associated_skill_dicts: unknown[];
+    associated_skill_dicts: SkillBackendDict[];
   } = {
     questionObject: null,
     associated_skill_dicts: [],
