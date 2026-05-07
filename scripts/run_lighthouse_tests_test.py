@@ -330,8 +330,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             os.path, 'isdir', lambda _: True, expected_kwargs=[]
         )
 
-        with self.print_swap, self.swap_ng_compiler, swap_isdir:
-            run_lighthouse_tests.run_ng_compilation()
+        with self.print_swap, swap_ng_compiler, swap_isdir:
+            servers.run_ng_compilation()
 
         self.assertNotIn(
             'Failed to complete ng compilation, exiting...', self.print_arr
@@ -342,9 +342,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             os.path, 'isdir', lambda _: False, expected_kwargs=[]
         )
 
-        with self.print_swap, self.swap_ng_compiler, swap_isdir:
+        with self.print_swap, swap_ng_compiler, swap_isdir:
             with self.swap_sys_exit:
-                run_lighthouse_tests.run_ng_compilation()
+                servers.run_ng_compilation()
 
         self.assertIn(
             'Failed to complete ng compilation, exiting...', self.print_arr
@@ -385,7 +385,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
         with self.print_swap, swap_ng_compiler, swap_isdir:
             with self.swap_sys_exit:
-                run_lighthouse_tests.run_ng_compilation()
+                servers.run_ng_compilation()
 
         self.assertIn('Subprocess execution failed.', self.print_arr)
 
