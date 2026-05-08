@@ -136,36 +136,36 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
 
   directiveSubscriptions = new Subscription();
 
-  SUGGESTION_TYPE_QUESTION: string;
-  SUGGESTION_TYPE_TRANSLATE: string;
-  ACCOMPLISHMENTS_TYPE_STATS: string;
-  ACCOMPLISHMENTS_TYPE_BADGE: string;
-  TAB_TYPE_CONTRIBUTIONS: string;
-  TAB_TYPE_REVIEWS: string;
-  TAB_TYPE_ACCOMPLISHMENTS: string;
-  REVIEWABLE_QUESTIONS_SORT_KEYS: string[];
-  activeExplorationId: string;
-  contributions: Record<string, SuggestionDetails> | object;
-  userDetailsLoading: boolean;
-  userIsLoggedIn: boolean;
-  activeTabType: string;
-  activeTabSubtype: string;
-  dropdownShown: boolean;
-  activeDropdownTabChoice: string;
+  SUGGESTION_TYPE_QUESTION!: string;
+  SUGGESTION_TYPE_TRANSLATE!: string;
+  ACCOMPLISHMENTS_TYPE_STATS!: string;
+  ACCOMPLISHMENTS_TYPE_BADGE!: string;
+  TAB_TYPE_CONTRIBUTIONS!: string;
+  TAB_TYPE_REVIEWS!: string;
+  TAB_TYPE_ACCOMPLISHMENTS!: string;
+  REVIEWABLE_QUESTIONS_SORT_KEYS!: string[];
+  activeExplorationId: string | null = null;
+  contributions: Record<string, SuggestionDetails> | object = {};
+  userDetailsLoading: boolean = false;
+  userIsLoggedIn: boolean = false;
+  activeTabType!: string;
+  activeTabSubtype!: string;
+  dropdownShown: boolean = false;
+  activeDropdownTabChoice!: string;
   reviewTabs: TabDetails[] = [];
   accomplishmentsTabs: TabDetails[] = [];
   contributionTabs: TabDetails[] = [];
-  languageCode: string;
-  userCreatedQuestionsSortKey: string;
-  reviewableQuestionsSortKey: string;
-  userCreatedTranslationsSortKey: string;
-  reviewableTranslationsSortKey: string;
-  topicReady: boolean;
+  languageCode!: string;
+  userCreatedQuestionsSortKey!: string;
+  reviewableQuestionsSortKey!: string;
+  userCreatedTranslationsSortKey!: string;
+  reviewableTranslationsSortKey!: string;
+  topicReady: boolean = false;
   commitTimeout?: NodeJS.Timeout;
   queuedSuggestionSummary = null;
   queuedSuggestion = null;
   currentSnackbarRef?: MatSnackBarRef<UndoSnackbarComponent>;
-  tabNameToOpportunityFetchFunction: {
+  tabNameToOpportunityFetchFunction!: {
     [key: string]: {
       [key: string]: Function;
     };
@@ -211,7 +211,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   getQuestionContributionsSummary(
     suggestionIdToSuggestions: Record<string, SuggestionDetails>
   ): ContributionsSummary[] {
-    const questionContributionsSummaryList = [];
+    const questionContributionsSummaryList: ContributionsSummary[] = [];
     Object.keys(suggestionIdToSuggestions).forEach(key => {
       const suggestion = suggestionIdToSuggestions[key].suggestion;
       const details = suggestionIdToSuggestions[key].details;
@@ -229,8 +229,14 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
           suggestion.change_cmd.question_dict.question_state_data.content.html
         ),
         subheading: subheading,
-        labelText: this.SUGGESTION_LABELS[suggestion.status].text,
-        labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
+        labelText:
+          this.SUGGESTION_LABELS[
+            suggestion.status as keyof typeof this.SUGGESTION_LABELS
+          ].text,
+        labelColor:
+          this.SUGGESTION_LABELS[
+            suggestion.status as keyof typeof this.SUGGESTION_LABELS
+          ].color,
         actionButtonTitle:
           this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View',
       };
@@ -244,7 +250,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   getTranslationContributionsSummary(
     suggestionIdToSuggestions: Record<string, SuggestionDetails>
   ): ContributionsSummary[] {
-    const translationContributionsSummaryList = [];
+    const translationContributionsSummaryList: ContributionsSummary[] = [];
 
     Object.keys(suggestionIdToSuggestions).forEach(key => {
       const suggestion = suggestionIdToSuggestions[key].suggestion;
@@ -271,8 +277,13 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
           // now obsolete. See issue #16022.
           suggestion.exploration_content_html === null
             ? 'Obsolete'
-            : this.SUGGESTION_LABELS[suggestion.status].text,
-        labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
+            : this.SUGGESTION_LABELS[
+                suggestion.status as keyof typeof this.SUGGESTION_LABELS
+              ].text,
+        labelColor:
+          this.SUGGESTION_LABELS[
+            suggestion.status as keyof typeof this.SUGGESTION_LABELS
+          ].color,
         actionButtonTitle:
           this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View',
         translationWordCount:
@@ -374,7 +385,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       suggestionIdToContribution;
     modalRef.componentInstance.misconceptionsBySkill = misconceptionsBySkill;
 
-    modalRef.componentInstance.editSuggestionEmitter.subscribe(value => {
+    modalRef.componentInstance.editSuggestionEmitter.subscribe((value: any) => {
       this.openQuestionSuggestionModal(
         value.suggestionId,
         value.suggestion,

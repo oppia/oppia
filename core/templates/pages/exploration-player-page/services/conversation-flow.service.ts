@@ -81,7 +81,7 @@ interface AnswerResponseData {
   refresherExplorationId: string | null;
   missingPrerequisiteSkillId: string | null;
   remainOnCurrentCard: boolean;
-  taggedSkillMisconceptionId: string;
+  taggedSkillMisconceptionId: string | null;
   wasOldStateInitial: boolean;
   isFirstHit: boolean;
   isFinalQuestion: boolean;
@@ -413,9 +413,9 @@ export class ConversationFlowService {
         refreshInteraction: boolean,
         feedbackHtml: string,
         refresherExplorationId: string | null,
-        missingPrerequisiteSkillId: string,
+        missingPrerequisiteSkillId: string | null,
         remainOnCurrentCard: boolean,
-        taggedSkillMisconceptionId: string,
+        taggedSkillMisconceptionId: string | null,
         wasOldStateInitial: boolean,
         isFirstHit: boolean,
         isFinalQuestion: boolean,

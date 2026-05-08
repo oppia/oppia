@@ -32,6 +32,8 @@ import {CollectionNode} from 'domain/collection/collection-node.model';
 import {Collection} from 'domain/collection/collection.model';
 import {CollectionPlayerBackendApiService} from './services/collection-player-backend-api.service';
 import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
+import {CollectionPlaythrough} from 'domain/collection/collection-playthrough.model';
+import {CollectionSummaryBackendDict} from 'domain/collection/collection-summary.model';
 
 import './collection-player-page.component.css';
 
@@ -42,9 +44,9 @@ export interface IconParametersArray {
   thumbnailBgColor: string;
 }
 
-export interface CollectionSummary {
+export interface CollectionSummariesResponse {
   is_admin: boolean;
-  summaries: string[];
+  summaries: CollectionSummaryBackendDict[];
   user_email: string;
   is_topic_manager: boolean;
   username: boolean;
@@ -73,9 +75,9 @@ export interface CollectionHandler {
 export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   collection!: Collection;
-  collectionPlaythrough;
+  collectionPlaythrough!: CollectionPlaythrough;
   currentExplorationId!: string;
-  summaryToPreview!: LearnerExplorationSummaryBackendDict;
+  summaryToPreview: LearnerExplorationSummaryBackendDict | null = null;
   pathSvgParameters!: string;
   pathIconParameters!: IconParametersArray[];
   svgHeight!: number;
@@ -89,11 +91,11 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   ICON_X_LEFT_PX!: number;
   ICON_X_RIGHT_PX!: number;
   collectionId!: string;
-  nextExplorationId!: string;
-  collectionSummary;
+  nextExplorationId: string | null = null;
+  collectionSummary!: CollectionSummaryBackendDict;
   isLoggedIn: boolean = false;
   explorationCardIsShown: boolean = false;
-  elementToScrollTo: string;
+  elementToScrollTo: string = '';
 
   constructor(
     private guestCollectionProgressService: GuestCollectionProgressService,
@@ -133,13 +135,13 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
 
   getNextRecommendedCollectionNodes(): CollectionNode {
     return this.getCollectionNodeForExplorationId(
-      this.collectionPlaythrough.getNextExplorationId()
+      this.collectionPlaythrough.getNextExplorationId()!
     );
   }
 
   getCompletedExplorationNodes(): CollectionNode {
     return this.getCollectionNodeForExplorationId(
-      this.collectionPlaythrough.getCompletedExplorationIds()
+      this.collectionPlaythrough.getCompletedExplorationIds() as unknown as string
     );
   }
 
@@ -210,12 +212,12 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
     let iconParametersArray = [];
     iconParametersArray.push({
       thumbnailIconUrl: collectionNodes[0]
-        .getExplorationSummaryObject()
+        .getExplorationSummaryObject()!
         .thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
       left: '225px',
       top: '35px',
       thumbnailBgColor:
-        collectionNodes[0].getExplorationSummaryObject().thumbnail_bg_color,
+        collectionNodes[0].getExplorationSummaryObject()!.thumbnail_bg_color,
     });
 
     // Here x and y represent the co-ordinates for the icons in the
@@ -239,12 +241,12 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
       }
       iconParametersArray.push({
         thumbnailIconUrl: collectionNodes[i]
-          .getExplorationSummaryObject()
+          .getExplorationSummaryObject()!
           .thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
         left: x + 'px',
         top: y + 'px',
         thumbnailBgColor:
-          collectionNodes[i].getExplorationSummaryObject().thumbnail_bg_color,
+          collectionNodes[i].getExplorationSummaryObject()!.thumbnail_bg_color,
       });
     }
     return iconParametersArray;
@@ -262,12 +264,13 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
     } else if ((index + 1) % 4 === 0) {
       return '-55px';
     }
+    return '';
   }
 
   scrollToLocation(el: string): void {
     this.elementToScrollTo = el;
     const element = document.getElementById(el);
-    element.scrollIntoView({behavior: 'smooth'});
+    element!.scrollIntoView({behavior: 'smooth'});
   }
 
   closeOnClickingOutside(): void {
@@ -327,7 +330,7 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
-    this.collection = null;
+    this.collection = null as unknown as Collection;
     this.collectionId = this.urlService.getCollectionIdFromUrl();
     this.explorationCardIsShown = false;
     // The pathIconParameters is an array containing the co-ordinates,

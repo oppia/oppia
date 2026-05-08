@@ -195,14 +195,14 @@ export class DiagnosticTestPlayerEngineService {
       nextCard: StateCard,
       refreshInteraction: boolean,
       feedbackHtml: string,
-      refresherExplorationId: string,
-      missingPrerequisiteSkillId: string,
+      refresherExplorationId: string | null,
+      missingPrerequisiteSkillId: string | null,
       remainOnCurrentCard: boolean,
-      taggedSkillMisconceptionId: string,
+      taggedSkillMisconceptionId: string | null,
       wasOldStateInitial: boolean,
       isFirstHit: boolean,
       isFinalQuestion: boolean,
-      nextCardIfReallyStuck: StateCard,
+      nextCardIfReallyStuck: StateCard | null,
       focusLabel: string
     ) => void
   ): boolean {

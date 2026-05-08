@@ -108,16 +108,16 @@ export type RteComponentId = {
   templateUrl: './rte-helper-modal.component.html',
 })
 export class RteHelperModalComponent {
-  @Input() componentId: RteComponentId;
-  @Input() customizationArgSpecs: CustomizationArgsSpecsType;
-  @Input() attrsCustomizationArgsDict: CustomizationArgsForRteType;
-  @Input() componentIsNewlyCreated: boolean;
+  @Input() componentId!: RteComponentId;
+  @Input() customizationArgSpecs!: CustomizationArgsSpecsType;
+  @Input() attrsCustomizationArgsDict!: CustomizationArgsForRteType;
+  @Input() componentIsNewlyCreated!: boolean;
   modalIsLoading: boolean = true;
-  errorMessage: string;
+  errorMessage: string = '';
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
   @ViewChild('schemaForm') schemaForm!: NgForm;
-  public customizationArgsForm: FormGroup;
-  customizationArgsFormSubscription: Subscription;
+  public customizationArgsForm!: FormGroup;
+  customizationArgsFormSubscription!: Subscription;
   COMPONENT_ID_COLLAPSIBLE = 'collapsible';
   COMPONENT_ID_COLLAPSIBLE_HEADING = 'collapsible_heading';
   COMPONENT_ID_COLLAPSIBLE_CONTENT = 'collapsible_content';
@@ -210,7 +210,7 @@ export class RteHelperModalComponent {
       }
     }
 
-    const formGroupControls = {};
+    const formGroupControls: Record<string, any> = {};
     this.customizationArgSpecs.forEach((_, index) => {
       formGroupControls[index] = this.fb.control(
         this.tmpCustomizationArgs[index].value
@@ -243,7 +243,7 @@ export class RteHelperModalComponent {
     this.customizationArgsFormSubscription.unsubscribe();
   }
 
-  onCustomizationArgsFormChange(value: number | string | boolean): void {
+  onCustomizationArgsFormChange(value: Record<string, any>): void {
     this.clearRteErrorMessage();
     if (this.componentId === this.COMPONENT_ID_MATH) {
       let rawLatex: string = value[0].raw_latex;
@@ -499,9 +499,9 @@ export class RteHelperModalComponent {
       const svgFile = tmpCustomizationArgs[0].value.svgFile;
       const svgFileName = tmpCustomizationArgs[0].value.svg_filename;
       const rawLatex = tmpCustomizationArgs[0].value.raw_latex;
-      if (rawLatex === '' || svgFileName === '') {
+      if (rawLatex === '' || svgFileName === '' || svgFile === null) {
         this.alertsService.addWarning(
-          'The rawLatex or svgFileName for a Math expression should not ' +
+          'The rawLatex, svgFileName, or svgFile for a Math expression should not ' +
             'be empty.'
         );
         this.ngbActiveModal.dismiss('cancel');

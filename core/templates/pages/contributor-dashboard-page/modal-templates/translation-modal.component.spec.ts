@@ -208,6 +208,14 @@ describe('Translation Modal Component', () => {
       null,
       null,
       new ElementRef({offsetHeight: 200}),
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
       null
     );
     getUserContributionRightsDataAsyncSpy = spyOn(
