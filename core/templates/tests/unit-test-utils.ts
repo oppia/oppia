@@ -65,14 +65,16 @@ export class MockI18nService {
 })
 export class MockTranslateModule {}
 
-export const mockNumberConversionServiceObject: Partial<NumberConversionService> =
-  {
-    currentDecimalSeparator: () => '.',
-    convertToEnglishDecimal: (value: string | number | null) => {
-      if (value === null || value === undefined) {
-        return null;
-      }
-      const result = parseFloat(value.toString().replace(',', '.'));
-      return isNaN(result) ? null : result;
-    },
-  };
+export const mockNumberConversionServiceObject: Pick<
+  NumberConversionService,
+  'currentDecimalSeparator' | 'convertToEnglishDecimal'
+> = {
+  currentDecimalSeparator: () => '.',
+  convertToEnglishDecimal: (value: string) => {
+    if (value === null || value === undefined) {
+      return null;
+    }
+    const result = parseFloat(value.toString().replace(',', '.'));
+    return isNaN(result) ? null : result;
+  },
+};

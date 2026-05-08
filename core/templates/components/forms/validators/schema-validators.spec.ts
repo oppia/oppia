@@ -43,7 +43,7 @@ class MockNumberConversionService {
     return mockNumberConversionServiceObject.currentDecimalSeparator();
   }
 
-  convertToEnglishDecimal(value: string | number | null): number | null {
+  convertToEnglishDecimal(value: string): number | null {
     return mockNumberConversionServiceObject.convertToEnglishDecimal(value);
   }
 }
