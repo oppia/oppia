@@ -575,7 +575,7 @@ def regenerate_voiceover_for_exploration_content(
 
     voiceover = fetch_voiceover_by_filename(exploration_id, voiceover_filename)
 
-    voiceover_cloud_task_services.update_voiceover_regeneration_task_run_mapping_for_content(
+    voiceover_cloud_task_services.update_voiceover_regeneration_job_status(
         exploration_id, language_accent_code, content_id, 'SUCCEEDED'
     )
 

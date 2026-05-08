@@ -477,6 +477,27 @@ class FailingFunctionTests(test_utils.GenericTestBase):
         ):
             test_utils.FailingFunction(function, MockError, -1)
 
+    def test_failing_function_succeeds_after_num_tries(self) -> None:
+        """Test that the function successfully executes after failing
+        the specified number of times.
+        """
+
+        class MockError(Exception):
+            pass
+
+        function = lambda x: x**2
+        failing_func = test_utils.FailingFunction(
+            function, MockError('Dummy Exception'), 2
+        )
+        with self.assertRaisesRegex(MockError, 'Dummy Exception'):
+            failing_func(4)
+
+        with self.assertRaisesRegex(MockError, 'Dummy Exception'):
+            failing_func(4)
+
+        result = failing_func(4)
+        self.assertEqual(result, 16)
+
 
 class TestUtilsTests(test_utils.GenericTestBase):
 
@@ -521,6 +542,39 @@ class TestUtilsTests(test_utils.GenericTestBase):
             self.save_new_linear_exp_with_state_names_and_interactions(
                 'exp_id', 'owner_id', ['state_name'], []
             )
+
+    def test_raises_error_with_aot_compiled_true(self) -> None:
+        """Test that mock_load_template uses the src folder when
+        template_is_aot_compiled is True.
+        """
+        with self.assertRaisesRegex(
+            Exception, 'No file exists for the given file name'
+        ):
+            test_utils.mock_load_template(
+                'invalid_path', template_is_aot_compiled=True
+            )
+
+    def test_add_explorations_to_story_with_empty_list_does_nothing(
+        self,
+    ) -> None:
+        """Tests that passing an empty list of explorations skips the update."""
+        topic_id = 'topic_id_for_empty_test'
+        story_id = 'story_id_for_empty_test'
+        owner_id = 'owner@example.com'
+
+        self.save_new_topic(
+            topic_id,
+            owner_id,
+            name='Dummy Topic',
+            description='A topic for testing',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[],
+            next_subtopic_id=1,
+        )
+        self.save_new_story(story_id, owner_id, topic_id)
+        self.add_explorations_to_story(topic_id, story_id, [])
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally
@@ -863,6 +917,22 @@ class TestUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(2, len(coordinator_rights_model))
         self.assertEqual('en', coordinator_rights_model[0].language_id)
         self.assertEqual('hi', coordinator_rights_model[1].language_id)
+
+    def test_save_new_question_suggestion_v27_with_custom_suggestion_id(
+        self,
+    ) -> None:
+        """Tests that passing an explicit suggestion_id skips the auto-generation."""
+        author_id = 'test_author_id'
+        skill_id = 'test_skill_id'
+        custom_suggestion_id = 'my_custom_suggestion_id'
+
+        returned_id = (
+            self.save_new_question_suggestion_with_state_data_schema_v27(
+                author_id, skill_id, suggestion_id=custom_suggestion_id
+            )
+        )
+
+        self.assertEqual(returned_id, custom_suggestion_id)
 
     def test_mock_set_constants_to_default_raises_exception(self) -> None:
         """Test that mock_set_constants_to_default raises an exception."""
