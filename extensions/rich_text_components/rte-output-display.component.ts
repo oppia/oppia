@@ -762,11 +762,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       if (!componentTemplate) {
         return;
       }
-      return new TemplatePortal(
-        componentTemplate,
-        this._viewContainerRef,
-        {$implicit: node.attrs}
-      );
+      return new TemplatePortal(componentTemplate, this._viewContainerRef, {
+        $implicit: node.attrs,
+      });
     }
     const portalTemplate = this._getPortalTemplateBySelector(node.selector);
     if (portalTemplate) {

@@ -29,7 +29,10 @@ import {
 } from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {EventEmitter} from '@angular/core';
-import {OppiaRteParserService} from 'services/oppia-rte-parser.service';
+import {
+  OppiaRteNode,
+  OppiaRteParserService,
+} from 'services/oppia-rte-parser.service';
 import {RichTextComponentsModule} from './rich-text-components.module';
 import {RteOutputDisplayComponent} from './rte-output-display.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
@@ -677,6 +680,23 @@ describe('RTE display component', () => {
     let expectedString = ' ';
     let readableText = component.getReadableTextFromNode(node.childNodes[0]);
     expect(readableText).toBe(expectedString);
+  });
+
+  it('should return undefined for component nodes without a matching portal template', () => {
+    fixture.detectChanges();
+
+    const node = new OppiaRteNode('span');
+    Object.defineProperty(node, 'selector', {
+      value: 'oppia-noninteractive-unsupported',
+    });
+    node.nodeType = 'component';
+
+    const templatePortal = Reflect.get(component, '_getTemplatePortal').call(
+      component,
+      node
+    );
+
+    expect(templatePortal).toBeUndefined();
   });
 
   it('should return null when className is undefined', () => {
