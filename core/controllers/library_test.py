@@ -104,14 +104,17 @@ class LibraryPageTests(test_utils.GenericTestBase):
             self.assertEqual(offset, 1)
             return [], 2
 
-        with self.swap(
-            collection_services,
-            'get_collection_ids_matching_query',
-            mock_get_collection_ids_matching_query,
-        ), self.swap(
-            exp_services,
-            'get_exploration_ids_matching_query',
-            mock_get_exploration_ids_matching_query,
+        with (
+            self.swap(
+                collection_services,
+                'get_collection_ids_matching_query',
+                mock_get_collection_ids_matching_query,
+            ),
+            self.swap(
+                exp_services,
+                'get_exploration_ids_matching_query',
+                mock_get_exploration_ids_matching_query,
+            ),
         ):
             activity_list, new_search_offset = (
                 library_controllers.get_matching_activity_dicts(

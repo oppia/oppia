@@ -175,7 +175,6 @@ class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
 
 
 class StoryEditorTests(BaseStoryEditorControllerTests):
-
     def test_get_story_data_when_story_reference_is_not_first(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 

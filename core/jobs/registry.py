@@ -84,7 +84,6 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
 from typing import List, Type
 
 
-
 def get_all_jobs() -> List[Type[base_jobs.JobBase]]:
     """Returns all jobs that have inherited from the JobBase class.
 
