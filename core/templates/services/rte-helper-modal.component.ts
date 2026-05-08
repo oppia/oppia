@@ -131,7 +131,7 @@ export class RteHelperModalComponent {
   COMPONENT_ID_TABS_CONTENT = 'tabs_content';
   COMPONENT_ID_VIDEO = 'video';
   // Character limit for various RTE components.
-  CHARACTER_LIMITS = {
+  CHARACTER_LIMITS: Record<string, number> = {
     collapsible_heading: 200,
     collapsible_content: 500,
     link: 200,
@@ -211,7 +211,7 @@ export class RteHelperModalComponent {
     }
 
     const formGroupControls: Record<string, AbstractControl> = {};
-    this.customizationArgSpecs.forEach((_, index) => {
+    this.customizationArgSpecs.forEach((_: unknown, index: number) => {
       formGroupControls[index] = this.fb.control(
         this.tmpCustomizationArgs[index].value
       );
@@ -480,7 +480,7 @@ export class RteHelperModalComponent {
 
   save(): void {
     for (let index in this.customizationArgsForm.value) {
-      this.tmpCustomizationArgs[index].value =
+      this.tmpCustomizationArgs[index as unknown as number].value =
         this.customizationArgsForm.value[index];
     }
     this.externalRteSaveService.onExternalRteSave.emit();
@@ -517,6 +517,12 @@ export class RteHelperModalComponent {
       }
       const resampledFile =
         this.imageUploadHelperService.convertImageDataToImageFile(svgFile);
+
+      if (resampledFile === null) {
+        this.alertsService.addWarning('Could not generate SVG file.');
+        this.ngbActiveModal.dismiss('cancel');
+        return;
+      }
 
       let maxAllowedFileSize;
       if (
@@ -558,14 +564,14 @@ export class RteHelperModalComponent {
         .saveMathExpressionImage(
           resampledFile,
           svgFileName,
-          this.pageContextService.getEntityType(),
+          this.pageContextService.getEntityType() as string,
           this.pageContextService.getEntityId()
         )
         .then(
           response => {
             const mathContentDict = {
               raw_latex: tmpCustomizationArgs[0].value.raw_latex,
-              svg_filename: response.filename,
+              svg_filename: response.filename as string,
             };
             const caName = tmpCustomizationArgs[0].name;
             customizationArgsDict[caName] = mathContentDict;

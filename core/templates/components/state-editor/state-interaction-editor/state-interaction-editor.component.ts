@@ -37,7 +37,10 @@ import {AlertsService} from 'services/alerts.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {EditabilityService} from 'services/editability.service';
 import {StateCustomizationArgsService} from '../state-editor-properties-services/state-customization-args.service';
-import {StateEditorService} from '../state-editor-properties-services/state-editor.service';
+import {
+  AnswerChoice,
+  StateEditorService,
+} from '../state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from '../state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from '../state-editor-properties-services/state-solution.service';
 import {StateContentService} from '../state-editor-properties-services/state-content.service';
@@ -84,15 +87,15 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
   @ViewChild('collapseAnswersAndResponsesButton')
   collapseAnswersAndResponsesButton!: ElementRef;
 
-  customizationModalReopened: boolean;
-  DEFAULT_TERMINAL_STATE_CONTENT: string;
+  customizationModalReopened!: boolean;
+  DEFAULT_TERMINAL_STATE_CONTENT!: string;
   directiveSubscriptions = new Subscription();
-  hasLoaded: boolean;
-  interactionEditorIsShown: boolean;
-  interactionId: string;
-  interactionIsDisabled: boolean;
-  interactionPreviewHtml: string;
-  windowIsNarrow: boolean;
+  hasLoaded!: boolean;
+  interactionEditorIsShown!: boolean;
+  interactionId!: string;
+  interactionIsDisabled!: boolean;
+  interactionPreviewHtml!: string;
+  windowIsNarrow!: boolean;
 
   constructor(
     private alertsService: AlertsService,
@@ -152,7 +155,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      )
+      ) as unknown as AnswerChoice[] | undefined
     );
   }
 
@@ -235,7 +238,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      )
+      ) as unknown as AnswerChoice[] | undefined
     );
   }
 
@@ -273,7 +276,8 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       })
       .result.then(
         () => {
-          this.stateInteractionIdService.displayed = null;
+          this.stateInteractionIdService.displayed =
+            null as unknown as 'TextInput';
           this.stateCustomizationArgsService.displayed = {};
           this.stateSolutionService.displayed = null;
           this.interactionDetailsCacheService.removeDetails(
@@ -289,7 +293,11 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
           this.onSaveInteractionData.emit(interactionData);
 
           this.stateSolutionService.saveDisplayedValue();
-          this.onSaveSolution.emit(this.stateSolutionService.displayed);
+          this.onSaveSolution.emit(
+            this.stateSolutionService.displayed as unknown as
+              | Solution
+              | undefined
+          );
 
           this.stateInteractionIdService.onInteractionIdChanged.emit(
             this.stateInteractionIdService.savedMemento
@@ -339,9 +347,9 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
         this.hasLoaded = false;
         this.interactionDetailsCacheService.reset();
         this.responsesService.onInitializeAnswerGroups.emit({
-          interactionId: stateData.interaction.id,
+          interactionId: stateData.interaction.id as string,
           answerGroups: stateData.interaction.answerGroups,
-          defaultOutcome: stateData.interaction.defaultOutcome,
+          defaultOutcome: stateData.interaction.defaultOutcome as Outcome,
           confirmedUnclassifiedAnswers:
             stateData.interaction.confirmedUnclassifiedAnswers,
         });

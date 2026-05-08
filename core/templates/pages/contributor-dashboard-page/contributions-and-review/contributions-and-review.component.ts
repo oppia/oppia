@@ -130,7 +130,7 @@ const COMMIT_TIMEOUT_DURATION = 30000;
   templateUrl: './contributions-and-review.component.html',
 })
 export class ContributionsAndReview implements OnInit, OnDestroy {
-  @Input() activeTopicName: string;
+  @Input() activeTopicName!: string;
   @ViewChild('opportunitiesList')
   opportunitiesListRef!: OpportunitiesListComponent;
 
@@ -162,8 +162,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   reviewableTranslationsSortKey!: string;
   topicReady: boolean = false;
   commitTimeout?: NodeJS.Timeout;
-  queuedSuggestionSummary = null;
-  queuedSuggestion = null;
+  queuedSuggestionSummary: unknown = null;
+  queuedSuggestion: unknown = null;
   currentSnackbarRef?: MatSnackBarRef<UndoSnackbarComponent>;
   tabNameToOpportunityFetchFunction!: {
     [key: string]: {
@@ -422,8 +422,9 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     initialSuggestionId: string,
     reviewable: boolean
   ): void {
-    const details = this.contributions[initialSuggestionId]
-      .details as ContributionDetails;
+    const details = (this.contributions as Record<string, SuggestionDetails>)[
+      initialSuggestionId
+    ].details as ContributionDetails;
     const subheading =
       details.topic_name +
       ' / ' +
@@ -446,7 +447,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     modalRef.componentInstance.reviewable = reviewable;
     modalRef.componentInstance.subheading = subheading;
     modalRef.componentInstance.queuedSuggestionSummaryEmit.subscribe(
-      (queuedSuggestionSummary: string) => {
+      (queuedSuggestionSummary: unknown) => {
         if (this.queuedSuggestionSummary) {
           // Commit any previously queued suggestion.
           this.commitQueuedSuggestion();
@@ -458,14 +459,15 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     );
 
     modalRef.componentInstance.queuedSuggestionEmit.subscribe(
-      (queuedSuggestion: string) => {
+      (queuedSuggestion: unknown) => {
         this.queuedSuggestion = queuedSuggestion;
       }
     );
     modalRef.result.then(
       resolvedSuggestionIds => {
         const filteredResolvedSuggestionIds = resolvedSuggestionIds.filter(
-          suggestionId => this.queuedSuggestion?.suggestion_id !== suggestionId
+          (suggestionId: string) =>
+            this.queuedSuggestion?.suggestion_id !== suggestionId
         );
         // Emit only the filtered resolved suggestions.
         if (filteredResolvedSuggestionIds.length > 0) {
@@ -473,12 +475,12 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
             filteredResolvedSuggestionIds
           );
         }
-        resolvedSuggestionIds.forEach(suggestionId => {
+        resolvedSuggestionIds.forEach((suggestionId: string) => {
           if (
             !this.queuedSuggestion ||
-            this.queuedSuggestion.suggestion_id !== suggestionId
+            this.queuedSuggestion?.suggestion_id !== suggestionId
           ) {
-            delete this.contributions[suggestionId];
+            delete (this.contributions as Record<string, SuggestionDetails>)[suggestionId];
           }
         });
       },
@@ -491,7 +493,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   }
 
   startCommitTimeout(): void {
-    clearTimeout(this.commitTimeout); // Clear existing timeout.
+    clearTimeout(this.commitTimeout as unknown as number); // Clear existing timeout.
     // Start a new timeout for commit after timeframe.
     this.commitTimeout = setTimeout(() => {
       this.commitQueuedSuggestion();
@@ -507,13 +509,13 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     this.queuedSuggestionSummary = null;
 
     this.contributionAndReviewService.reviewExplorationSuggestion(
-      currentSuggestionSummary.target_id,
-      currentSuggestionSummary.suggestion_id,
-      currentSuggestionSummary.action_status,
-      currentSuggestionSummary.reviewer_message,
-      currentSuggestionSummary.action_status === 'accept' &&
-        currentSuggestionSummary.commit_message
-        ? currentSuggestionSummary.commit_message
+      currentSuggestionSummary?.target_id,
+      currentSuggestionSummary?.suggestion_id,
+      currentSuggestionSummary?.action_status,
+      currentSuggestionSummary?.reviewer_message,
+      currentSuggestionSummary?.action_status === 'accept' &&
+        currentSuggestionSummary?.commit_message
+        ? currentSuggestionSummary?.commit_message
         : null,
       // Only include commit_message for accepted suggestions.
       () => {
@@ -525,11 +527,13 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
               : 'rejected'
           }.`
         );
-        clearTimeout(this.commitTimeout);
+        clearTimeout(this.commitTimeout as unknown as number);
         this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
-          [currentSuggestionSummary.suggestion_id]
+          [currentSuggestionSummary?.suggestion_id]
         );
-        delete this.contributions[currentSuggestionSummary.suggestion_id];
+        delete (this.contributions as Record<string, SuggestionDetails>)[
+          currentSuggestionSummary?.suggestion_id
+        ];
         this.isCommitting = false;
       },
       errorMessage => {
@@ -563,7 +567,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
 
   undoReviewAction(): void {
     this.queuedSuggestionSummary = null;
-    clearTimeout(this.commitTimeout); // Clear the commit timeout.
+    clearTimeout(this.commitTimeout as unknown as number); // Clear the commit timeout.
   }
 
   isActiveTab(tabType: string, subType: string): boolean {
@@ -592,8 +596,11 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   ): void {
     const suggestionIdToContribution = {};
     for (let suggestionId in this.contributions) {
-      var contribution = this.contributions[suggestionId];
-      suggestionIdToContribution[suggestionId] = contribution;
+      var contribution = (this.contributions as Record<string, SuggestionDetails>)[
+        suggestionId
+      ];
+      (suggestionIdToContribution as Record<string, ActiveContributionDict>)[suggestionId] =
+        contribution;
     }
     const skillId = suggestion.change_cmd.skill_id;
 
@@ -603,21 +610,22 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     );
 
     this.skillBackendApiService.fetchSkillAsync(skillId).then(skillDict => {
-      const misconceptionsBySkill = {};
+      const misconceptionsBySkill: Record<string, unknown> = {};
       const skill = skillDict.skill;
       misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
       this._showQuestionSuggestionModal(
         suggestion,
         suggestionIdToContribution,
         reviewable,
-        question,
+        question as unknown,
         misconceptionsBySkill
       );
     });
   }
 
   onClickViewSuggestion(suggestionId: string): void {
-    const suggestion = this.contributions[suggestionId].suggestion;
+    const suggestion = (this.contributions as Record<string, SuggestionDetails>)[suggestionId]
+      .suggestion;
     const reviewable = this.activeTabType === this.TAB_TYPE_REVIEWS;
     if (suggestion.suggestion_type === this.SUGGESTION_TYPE_QUESTION) {
       this.openQuestionSuggestionModal(suggestionId, suggestion, reviewable);
@@ -625,8 +633,11 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     if (suggestion.suggestion_type === this.SUGGESTION_TYPE_TRANSLATE) {
       const suggestionIdToContribution = {};
       for (let suggestionId in this.contributions) {
-        const contribution = this.contributions[suggestionId];
-        suggestionIdToContribution[suggestionId] = contribution;
+        const contribution = (this.contributions as Record<string, ActiveContributionDict>)[
+          suggestionId
+        ];
+        (suggestionIdToContribution as Record<string, SuggestionDetails>)[suggestionId] =
+          contribution;
       }
       this.pageContextService.setCustomEntityContext(
         AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
@@ -648,6 +659,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     } else if (this.activeTabSubtype === this.SUGGESTION_TYPE_QUESTION) {
       return this.getQuestionContributionsSummary(suggestionIdToSuggestions);
     }
+    return [];
   }
 
   getActiveDropdownTabText(tabType: string, subType: string): string {
@@ -695,7 +707,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         this.languageCode
       )
       .then(response => {
-        const opportunitiesDicts = [];
+        const opportunitiesDicts: unknown[] = [];
         response.opportunities.forEach(opportunity => {
           const opportunityDict = {
             id: opportunity.getExplorationId(),
@@ -771,9 +783,10 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         this.activeTabType
       ];
 
-    return fetchFunction(shouldResetOffset).then(response => {
+    return fetchFunction(shouldResetOffset).then((response: unknown) => {
       Object.keys(response.suggestionIdToDetails).forEach(id => {
-        this.contributions[id] = response.suggestionIdToDetails[id];
+        (this.contributions as Record<string, SuggestionDetails>)[id] =
+          response.suggestionIdToDetails[id];
       });
       return {
         opportunitiesDicts: this.getContributionSummaries(
@@ -894,7 +907,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.subscribe(
         suggestionIds => {
           suggestionIds.forEach(suggestionId => {
-            delete this.contributions[suggestionId];
+            delete (this.contributions as Record<string, unknown>)[suggestionId];
           });
         }
       )
@@ -908,18 +921,20 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
           .getUserContributionRightsDataAsync()
           .then(userContributionRights => {
             const userCanReviewTranslationSuggestionsInLanguages =
-              userContributionRights.can_review_translation_for_language_codes;
+              userContributionRights?.can_review_translation_for_language_codes ||
+              [];
             const userCanReviewQuestionSuggestions =
-              userContributionRights.can_review_questions;
+              userContributionRights?.can_review_questions;
             const userReviewableSuggestionTypes = [];
             const userCanSuggestQuestions =
-              userContributionRights.can_suggest_questions;
+              userContributionRights?.can_suggest_questions;
             for (let index in this.contributionTabs) {
               if (
                 this.contributionTabs[index].tabSubType ===
                 this.SUGGESTION_TYPE_QUESTION
               ) {
-                this.contributionTabs[index].enabled = userCanSuggestQuestions;
+                this.contributionTabs[index].enabled =
+                  userCanSuggestQuestions || false;
               }
             }
             if (userCanReviewQuestionSuggestions) {
@@ -964,13 +979,13 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
 
     this.tabNameToOpportunityFetchFunction = {
       [this.SUGGESTION_TYPE_QUESTION]: {
-        [this.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
+        [this.TAB_TYPE_CONTRIBUTIONS]: (shouldResetOffset: boolean) => {
           return this.contributionAndReviewService.getUserCreatedQuestionSuggestionsAsync(
             shouldResetOffset,
             this.userCreatedQuestionsSortKey
           );
         },
-        [this.TAB_TYPE_REVIEWS]: shouldResetOffset => {
+        [this.TAB_TYPE_REVIEWS]: (shouldResetOffset: boolean) => {
           return this.contributionAndReviewService.getReviewableQuestionSuggestionsAsync(
             shouldResetOffset,
             this.reviewableQuestionsSortKey,
@@ -979,17 +994,17 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         },
       },
       [this.SUGGESTION_TYPE_TRANSLATE]: {
-        [this.TAB_TYPE_CONTRIBUTIONS]: shouldResetOffset => {
+        [this.TAB_TYPE_CONTRIBUTIONS]: (shouldResetOffset: boolean) => {
           return this.contributionAndReviewService.getUserCreatedTranslationSuggestionsAsync(
             shouldResetOffset,
             this.userCreatedTranslationsSortKey
           );
         },
-        [this.TAB_TYPE_REVIEWS]: shouldResetOffset => {
+        [this.TAB_TYPE_REVIEWS]: (shouldResetOffset: boolean) => {
           return this.contributionAndReviewService.getReviewableTranslationSuggestionsAsync(
             shouldResetOffset,
             this.reviewableTranslationsSortKey,
-            this.activeExplorationId
+            this.activeExplorationId || undefined
           );
         },
       },

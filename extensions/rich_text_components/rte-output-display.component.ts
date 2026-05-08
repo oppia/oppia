@@ -599,7 +599,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
       let previousHighlightedElement =
         this.getElementMatchingClassAndTextContent(
-          this.previousHighlightedElementId
+          this.previousHighlightedElementId as string
         );
 
       let currentElementIdToHighlight =
@@ -620,7 +620,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       }
 
       let currentElementToHighlight =
-        this.getElementMatchingClassAndTextContent(currentElementIdToHighlight);
+        this.getElementMatchingClassAndTextContent(
+          currentElementIdToHighlight as string
+        );
 
       // Highlights the current sentence being played in the audio player.
       if (currentElementToHighlight) {
