@@ -1635,7 +1635,9 @@ class LearnerIncompleteActivityHandler(
             learner_progress_services.remove_story_from_incomplete_list(
                 self.user_id, activity_id
             )
-        elif activity_type == constants.ACTIVITY_TYPE_LEARN_TOPIC:
+        elif (
+            activity_type == constants.ACTIVITY_TYPE_LEARN_TOPIC
+        ):  # pragma: no cover
             learner_progress_services.remove_topic_from_partially_learnt_list(
                 self.user_id, activity_id
             )

@@ -1299,6 +1299,20 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             expected_status_int=400,
         )
 
+    def test_logged_in_with_no_col_and_sysexps_disabled_has_only_authexps(
+        self,
+    ) -> None:
+        """Check that when system recommendations are explicitly disabled and
+        there's no collection, only author recommended explorations are returned.
+        """
+        self.login(self.NEW_USER_EMAIL)
+        recommendation_ids = self._get_recommendation_ids(
+            self.EXP_ID_0,
+            include_system_recommendations=False,
+            author_recommended_ids_str='["7","9"]',
+        )
+        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
+
 
 class FlagExplorationHandlerTests(test_utils.EmailTestBase):
     """Backend integration tests for flagging an exploration."""
@@ -2059,6 +2073,49 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             payload,
             csrf_token=csrf_token,
         )
+
+    def test_exp_maybe_leave_handler_for_logged_out_user_with_story(
+        self,
+    ) -> None:
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'params': {},
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': 'middle',
+            'version': 1,
+            'collection_id': self.COL_ID_1,
+        }
+        self.post_json(
+            '/explorehandler/exploration_maybe_leave_event/%s'
+            % self.EXP_ID_2_0,
+            payload,
+            csrf_token=csrf_token,
+        )
+
+    def test_exp_maybe_leave_handler_with_story_having_no_topic(
+        self,
+    ) -> None:
+        self.login(self.USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        setattr(story, 'corresponding_topic_id', None)
+
+        with self.swap(story_fetchers, 'get_story_by_id', lambda _: story):
+            payload = {
+                'client_time_spent_in_secs': 0,
+                'params': {},
+                'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+                'state_name': 'middle',
+                'version': 1,
+            }
+            self.post_json(
+                '/explorehandler/exploration_maybe_leave_event/%s'
+                % self.EXP_ID_2_0,
+                payload,
+                csrf_token=csrf_token,
+            )
 
 
 class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
@@ -3835,6 +3892,18 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
             csrf_token=csrf_token,
         )
         self.logout()
+
+    def test_restart_handler_for_logged_out_user_with_none_state(self) -> None:
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/restart/%s' % exp_id,
+            {'most_recently_reached_checkpoint_state_name': None},
+            csrf_token=csrf_token,
+        )
 
 
 class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
