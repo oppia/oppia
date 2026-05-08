@@ -24,6 +24,7 @@ import {
   NgModule,
   Pipe,
 } from '@angular/core';
+import {NumberConversionService} from 'services/number-conversion.service';
 
 @Pipe({name: 'translate'})
 export class MockTranslatePipe {
@@ -63,3 +64,15 @@ export class MockI18nService {
   exports: [MockTranslateDirective, MockTranslatePipe],
 })
 export class MockTranslateModule {}
+
+export const mockNumberConversionServiceObject: Partial<NumberConversionService> =
+  {
+    currentDecimalSeparator: () => '.',
+    convertToEnglishDecimal: (value: string | number | null) => {
+      if (value === null || value === undefined) {
+        return null;
+      }
+      const result = parseFloat(value.toString().replace(',', '.'));
+      return isNaN(result) ? null : result;
+    },
+  };

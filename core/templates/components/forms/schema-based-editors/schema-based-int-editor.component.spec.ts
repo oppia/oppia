@@ -25,6 +25,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {FormControl, FormsModule} from '@angular/forms';
+import {mockNumberConversionServiceObject} from 'tests/unit-test-utils';
 import {NumberConversionService} from 'services/number-conversion.service';
 import {SchemaBasedIntEditorComponent} from './schema-based-int-editor.component';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
@@ -45,16 +46,7 @@ describe('Schema Based Int Editor Component', () => {
         SchemaFormSubmittedService,
         {
           provide: NumberConversionService,
-          useValue: {
-            currentDecimalSeparator: () => '.',
-            convertToEnglishDecimal: (value: string | number | null) => {
-              if (value === null || value === undefined) {
-                return null;
-              }
-              const result = parseFloat(value.toString().replace(',', '.'));
-              return isNaN(result) ? null : result;
-            },
-          },
+          useValue: mockNumberConversionServiceObject,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],

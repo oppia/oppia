@@ -22,6 +22,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FormControl} from '@angular/forms';
 import {ApplyValidationDirective} from './apply-validation.directive';
 import {Validator} from 'interactions/TextInput/directives/text-input-validation.service';
+import {mockNumberConversionServiceObject} from 'tests/unit-test-utils';
 import {NumberConversionService} from 'services/number-conversion.service';
 
 @Component({
@@ -40,16 +41,7 @@ describe('Apply validation directive', () => {
       providers: [
         {
           provide: NumberConversionService,
-          useValue: {
-            currentDecimalSeparator: () => '.',
-            convertToEnglishDecimal: (value: string | number | null) => {
-              if (value === null || value === undefined) {
-                return null;
-              }
-              const result = parseFloat(value.toString().replace(',', '.'));
-              return isNaN(result) ? null : result;
-            },
-          },
+          useValue: mockNumberConversionServiceObject,
         },
       ],
     }).compileComponents();

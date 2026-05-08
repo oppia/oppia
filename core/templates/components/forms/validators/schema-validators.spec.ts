@@ -17,6 +17,7 @@
  */
 
 import {AbstractControl, ValidationErrors} from '@angular/forms';
+import {mockNumberConversionServiceObject} from 'tests/unit-test-utils';
 import {NumberConversionService} from 'services/number-conversion.service';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {SchemaValidators} from './schema-validators';
@@ -39,16 +40,11 @@ class MockFormControl extends AbstractControl {
 
 class MockNumberConversionService {
   currentDecimalSeparator(): string {
-    return '.';
+    return mockNumberConversionServiceObject.currentDecimalSeparator();
   }
 
   convertToEnglishDecimal(value: string | number | null): number | null {
-    if (value === null || value === undefined) {
-      return null;
-    }
-    const normalized = value.toString().replace(',', '.');
-    const result = parseFloat(normalized);
-    return isNaN(result) ? null : result;
+    return mockNumberConversionServiceObject.convertToEnglishDecimal(value);
   }
 }
 

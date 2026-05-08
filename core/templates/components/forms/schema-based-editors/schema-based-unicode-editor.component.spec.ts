@@ -31,6 +31,7 @@ import {
   TranslateModule,
   TranslateService,
 } from '@ngx-translate/core';
+import {mockNumberConversionServiceObject} from 'tests/unit-test-utils';
 import {NumberConversionService} from 'services/number-conversion.service';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
@@ -65,16 +66,7 @@ describe('Schema Based Unicode Editor', () => {
         TranslateService,
         {
           provide: NumberConversionService,
-          useValue: {
-            currentDecimalSeparator: () => '.',
-            convertToEnglishDecimal: (value: string | number | null) => {
-              if (value === null || value === undefined) {
-                return null;
-              }
-              const result = parseFloat(value.toString().replace(',', '.'));
-              return isNaN(result) ? null : result;
-            },
-          },
+          useValue: mockNumberConversionServiceObject,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
