@@ -210,6 +210,7 @@ export class RteHelperModalComponent {
       }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const formGroupControls: Record<string, any> = {};
     this.customizationArgSpecs.forEach((_, index) => {
       formGroupControls[index] = this.fb.control(
@@ -243,6 +244,7 @@ export class RteHelperModalComponent {
     this.customizationArgsFormSubscription.unsubscribe();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onCustomizationArgsFormChange(value: Record<string, any>): void {
     this.clearRteErrorMessage();
     if (this.componentId === this.COMPONENT_ID_MATH) {

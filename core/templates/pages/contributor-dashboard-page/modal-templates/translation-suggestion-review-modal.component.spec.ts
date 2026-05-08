@@ -142,6 +142,7 @@ describe('Translation Suggestion Review Modal Component', function () {
     component.contentContainer = new ElementRef({offsetHeight: 150});
     component.translationContainer = new ElementRef({offsetHeight: 150});
     component.contentPanel = new RteOutputDisplayComponent(
+      // This throws "TS2345". We need to suppress this error because we are passing null for mocked dependencies.
       // @ts-ignore
       null,
       null,
@@ -157,6 +158,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       null
     );
     component.translationPanel = new RteOutputDisplayComponent(
+      // This throws "TS2345". We need to suppress this error because we are passing null for mocked dependencies.
       // @ts-ignore
       null,
       null,

@@ -702,16 +702,16 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     }
     if (node.nodeType === 'component') {
       return new TemplatePortal(
-        (this as any)[
+        (this as unknown as Record<string, TemplateRef<unknown>>)[
           node.selector.split('oppia-noninteractive-')[1] + 'TagPortal'
         ],
         this._viewContainerRef,
         {$implicit: node.attrs}
       );
     }
-    if ((this as any)[node.selector + 'TagPortal'] !== undefined) {
+    if ((this as unknown as Record<string, TemplateRef<unknown>>)[node.selector + 'TagPortal'] !== undefined) {
       return new TemplatePortal(
-        (this as any)[node.selector + 'TagPortal'],
+        (this as unknown as Record<string, TemplateRef<unknown>>)[node.selector + 'TagPortal'],
         this._viewContainerRef,
         {$implicit: node}
       );
