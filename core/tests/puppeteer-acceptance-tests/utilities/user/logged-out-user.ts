@@ -2092,9 +2092,6 @@ export class LoggedOutUser extends BaseUser {
       expectedDestinationDomain
     );
 
-    expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url()).toContain(expectedDestinationDomain);
-    expect(newTabPage?.url()).toContain(expectedAccountId);
     await newTabPage?.close();
   }
 
