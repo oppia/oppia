@@ -442,9 +442,13 @@ export class ExplorationEngineService {
    */
   private _initParams(manualParamChanges: ParamChange[]): void {
     let baseParams: Record<string, string> = {};
-    this.exploration.paramSpecs.forEach((paramName: string, paramSpec: ParamSpec) => {
-      baseParams[paramName] = paramSpec.getType().createDefaultValue() as string;
-    });
+    this.exploration.paramSpecs.forEach(
+      (paramName: string, paramSpec: ParamSpec) => {
+        baseParams[paramName] = paramSpec
+          .getType()
+          .createDefaultValue() as string;
+      }
+    );
 
     let startingParams = this.makeParams(
       baseParams,

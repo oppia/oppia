@@ -247,8 +247,9 @@ export class RteHelperModalComponent {
     this.clearRteErrorMessage();
     if (this.componentId === this.COMPONENT_ID_MATH) {
       let rawLatex: string = (value[0] as {raw_latex: string}).raw_latex;
-      let mathExpressionSvgIsBeingProcessed: boolean =
-        (value[0] as {mathExpressionSvgIsBeingProcessed: boolean}).mathExpressionSvgIsBeingProcessed;
+      let mathExpressionSvgIsBeingProcessed: boolean = (
+        value[0] as {mathExpressionSvgIsBeingProcessed: boolean}
+      ).mathExpressionSvgIsBeingProcessed;
       if (mathExpressionSvgIsBeingProcessed || rawLatex === '') {
         this.updateRteErrorMessage(
           'Waiting for math expression SVG to be processed...'
@@ -400,7 +401,10 @@ export class RteHelperModalComponent {
     } else if (this.componentId === this.COMPONENT_ID_WORKEDEXAMPLE) {
       if (
         value[0] &&
-        this.isContentLengthExceeded(value[0] as string, this.COMPONENT_ID_WORKEDEXAMPLE)
+        this.isContentLengthExceeded(
+          value[0] as string,
+          this.COMPONENT_ID_WORKEDEXAMPLE
+        )
       ) {
         this.updateRteErrorMessage(
           `The question is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
@@ -414,7 +418,10 @@ export class RteHelperModalComponent {
 
       if (
         value[1] &&
-        this.isContentLengthExceeded(value[1] as string, this.COMPONENT_ID_WORKEDEXAMPLE)
+        this.isContentLengthExceeded(
+          value[1] as string,
+          this.COMPONENT_ID_WORKEDEXAMPLE
+        )
       ) {
         this.updateRteErrorMessage(
           `The answer is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`

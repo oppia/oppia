@@ -391,12 +391,13 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         suggestion: Suggestion;
         reviewable: boolean;
       }) => {
-      this.openQuestionSuggestionModal(
-        value.suggestionId,
-        value.suggestion,
-        value.reviewable
-      );
-    });
+        this.openQuestionSuggestionModal(
+          value.suggestionId,
+          value.suggestion,
+          value.reviewable
+        );
+      }
+    );
 
     modalRef.result.then(
       result => {

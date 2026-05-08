@@ -211,13 +211,14 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
     let collectionNodes = this.collection.getCollectionNodes();
     let iconParametersArray = [];
     iconParametersArray.push({
-      thumbnailIconUrl: (collectionNodes[0]
-        .getExplorationSummaryObject() as LearnerExplorationSummaryBackendDict)
-        .thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
+      thumbnailIconUrl: (
+        collectionNodes[0].getExplorationSummaryObject() as LearnerExplorationSummaryBackendDict
+      ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
       left: '225px',
       top: '35px',
-      thumbnailBgColor:
-        (collectionNodes[0].getExplorationSummaryObject() as LearnerExplorationSummaryBackendDict).thumbnail_bg_color,
+      thumbnailBgColor: (
+        collectionNodes[0].getExplorationSummaryObject() as LearnerExplorationSummaryBackendDict
+      ).thumbnail_bg_color,
     });
 
     // Here x and y represent the co-ordinates for the icons in the
@@ -240,13 +241,18 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
         y += this.ICON_Y_INCREMENT_PX;
       }
       iconParametersArray.push({
-        thumbnailIconUrl: (collectionNodes[i]
-          .getExplorationSummaryObject() as LearnerExplorationSummaryBackendDict)
-          .thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
+        thumbnailIconUrl: (
+          collectionNodes[
+            i
+          ].getExplorationSummaryObject() as LearnerExplorationSummaryBackendDict
+        ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
         left: x + 'px',
         top: y + 'px',
-        thumbnailBgColor:
-          (collectionNodes[i].getExplorationSummaryObject() as LearnerExplorationSummaryBackendDict).thumbnail_bg_color,
+        thumbnailBgColor: (
+          collectionNodes[
+            i
+          ].getExplorationSummaryObject() as LearnerExplorationSummaryBackendDict
+        ).thumbnail_bg_color,
       });
     }
     return iconParametersArray;
