@@ -273,7 +273,7 @@ export class RteHelperModalComponent {
       }
     } else if (this.componentId === this.COMPONENT_ID_TABS) {
       // Value[0] corresponds to all tab contents and titles.
-      let tabValues = value[0] as {title: string, content: string}[];
+      let tabValues = value[0] as {title: string; content: string}[];
       for (let tabIndex = 0; tabIndex < tabValues.length; tabIndex++) {
         if (tabValues[tabIndex].title === '') {
           this.updateRteErrorMessage(
