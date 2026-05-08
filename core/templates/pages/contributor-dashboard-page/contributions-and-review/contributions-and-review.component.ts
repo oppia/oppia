@@ -231,11 +231,11 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         subheading: subheading,
         labelText:
           this.SUGGESTION_LABELS[
-            suggestion.status as keyof typeof this.SUGGESTION_LABELS
+            suggestion.status as 'review' | 'accepted' | 'rejected'
           ].text,
         labelColor:
           this.SUGGESTION_LABELS[
-            suggestion.status as keyof typeof this.SUGGESTION_LABELS
+            suggestion.status as 'review' | 'accepted' | 'rejected'
           ].color,
         actionButtonTitle:
           this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View',
@@ -278,11 +278,11 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
           suggestion.exploration_content_html === null
             ? 'Obsolete'
             : this.SUGGESTION_LABELS[
-                suggestion.status as keyof typeof this.SUGGESTION_LABELS
+                suggestion.status as 'review' | 'accepted' | 'rejected'
               ].text,
         labelColor:
           this.SUGGESTION_LABELS[
-            suggestion.status as keyof typeof this.SUGGESTION_LABELS
+            suggestion.status as 'review' | 'accepted' | 'rejected'
           ].color,
         actionButtonTitle:
           this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View',

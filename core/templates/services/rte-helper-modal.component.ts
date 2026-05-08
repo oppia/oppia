@@ -375,7 +375,7 @@ export class RteHelperModalComponent {
       if (
         value[0] &&
         this.isContentLengthExceeded(
-          value[0],
+          value[0] as string,
           this.COMPONENT_ID_COLLAPSIBLE_HEADING
         )
       ) {
@@ -388,7 +388,7 @@ export class RteHelperModalComponent {
       if (
         value[1] &&
         this.isContentLengthExceeded(
-          value[1],
+          value[1] as string,
           this.COMPONENT_ID_COLLAPSIBLE_CONTENT
         )
       ) {
@@ -400,7 +400,7 @@ export class RteHelperModalComponent {
     } else if (this.componentId === this.COMPONENT_ID_WORKEDEXAMPLE) {
       if (
         value[0] &&
-        this.isContentLengthExceeded(value[0], this.COMPONENT_ID_WORKEDEXAMPLE)
+        this.isContentLengthExceeded(value[0] as string, this.COMPONENT_ID_WORKEDEXAMPLE)
       ) {
         this.updateRteErrorMessage(
           `The question is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
@@ -414,7 +414,7 @@ export class RteHelperModalComponent {
 
       if (
         value[1] &&
-        this.isContentLengthExceeded(value[1], this.COMPONENT_ID_WORKEDEXAMPLE)
+        this.isContentLengthExceeded(value[1] as string, this.COMPONENT_ID_WORKEDEXAMPLE)
       ) {
         this.updateRteErrorMessage(
           `The answer is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
