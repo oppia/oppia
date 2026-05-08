@@ -164,13 +164,15 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       node.nodeName === 'OPPIA-NONINTERACTIVE-SKILLREVIEW' ||
       node.nodeName === 'OPPIA-NONINTERACTIVE-LINK'
     ) {
-      const encodedText =
-        (node as Element).getAttribute('text-with-value') || '';
+      const encodedText = (node as Element).getAttribute(
+        'text-with-value'
+      ) as string;
       const decodedText = this.decodeHtmlEntities(encodedText);
       return JSON.parse(decodedText);
     } else if (node.nodeName === 'OPPIA-NONINTERACTIVE-MATH') {
-      const encodedMathContent =
-        (node as Element).getAttribute('math_content-with-value') || '';
+      const encodedMathContent = (node as Element).getAttribute(
+        'math_content-with-value'
+      ) as string;
       const decodedMathContent = this.decodeHtmlEntities(encodedMathContent);
       const latexText = JSON.parse(decodedMathContent)?.raw_latex;
       return this.parseAndConvertLatex(latexText);
@@ -443,8 +445,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         this.getActiveContentId()
       );
       this.automaticVoiceoverHighlightService.languageCode =
-        this.localStorageService.getLastSelectedTranslationLanguageCode() ||
-        AppConstants.DEFAULT_LANGUAGE_CODE;
+        this.localStorageService.getLastSelectedTranslationLanguageCode() as string;
       this.automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
         this.highlightIdToSentenceText
       );
@@ -490,8 +491,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
               continue;
             }
             if (preNode.childNodes[i].nodeType === 3) {
-              const nodeValue = preNode.childNodes[i].nodeValue;
-              if (nodeValue && nodeValue.replace(/\s/g, '') === '') {
+              const nodeValue = preNode.childNodes[i].nodeValue as string;
+              if (nodeValue.replace(/\s/g, '') === '') {
                 preNode.removeChild(preNode.childNodes[i]);
                 i--;
               }
@@ -563,7 +564,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
   removePreviousHighlightedElement(): void {
     let previousHighlightedElements = document.getElementsByClassName(
-      this.previousHighlightedElementId || ''
+      this.previousHighlightedElementId as string
     );
     for (let i = 0; i < previousHighlightedElements.length; i++) {
       let previousHighlightedElement = previousHighlightedElements[
@@ -612,7 +613,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         this.previousHighlightedElementId === currentElementIdToHighlight &&
         previousHighlightedElement?.textContent ===
           this.automaticVoiceoverHighlightService.getUnmodifiedSentenceByHighlightId(
-            currentElementIdToHighlight || ''
+            currentElementIdToHighlight as string
           )
       ) {
         return;
@@ -641,12 +642,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     }
   }
 
-  getElementMatchingClassAndTextContent(
-    className: string | undefined
-  ): HTMLElement | null {
-    if (!className) {
-      return null;
-    }
+  getElementMatchingClassAndTextContent(className: string): HTMLElement | null {
     let elements = document.getElementsByClassName(className);
     let textContent =
       this.automaticVoiceoverHighlightService.getUnmodifiedSentenceByHighlightId(
@@ -671,11 +667,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         this.pageContextService.getEditorTabContext() ===
           ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW)
     ) {
-      return this.voiceoverPlayerService.getActiveContentId() || '';
+      return this.voiceoverPlayerService.getActiveContentId() as string;
     } else {
-      return (
-        this.translationTabActiveContentIdService.getActiveContentId() || ''
-      );
+      return this.translationTabActiveContentIdService.getActiveContentId() as string;
     }
   }
 
@@ -709,9 +703,15 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         {$implicit: node.attrs}
       );
     }
-    if ((this as unknown as Record<string, TemplateRef<unknown>>)[node.selector + 'TagPortal'] !== undefined) {
+    if (
+      (this as unknown as Record<string, TemplateRef<unknown>>)[
+        node.selector + 'TagPortal'
+      ] !== undefined
+    ) {
       return new TemplatePortal(
-        (this as unknown as Record<string, TemplateRef<unknown>>)[node.selector + 'TagPortal'],
+        (this as unknown as Record<string, TemplateRef<unknown>>)[
+          node.selector + 'TagPortal'
+        ],
         this._viewContainerRef,
         {$implicit: node}
       );

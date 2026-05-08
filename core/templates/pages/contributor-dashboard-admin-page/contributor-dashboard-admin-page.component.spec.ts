@@ -636,6 +636,14 @@ describe('ContributorDashboardAdminPageComponent', () => {
           expect(result).toBe(true);
         })
       );
+
+      it('should return false if filter criterion is invalid', fakeAsync(() => {
+        component.ngOnInit();
+        component.formData.viewContributionReviewers.filterCriterion =
+          'invalid_criterion';
+        const result = component.formData.viewContributionReviewers.isValid();
+        expect(result).toBe(false);
+      }));
     });
 
     describe('in the view translation contribution stats section ', () => {

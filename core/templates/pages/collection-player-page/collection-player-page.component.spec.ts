@@ -330,6 +330,10 @@ describe('Collection player page component', () => {
       // Case 3.
       result = component.getExplorationTitlePosition(3);
       expect(result).toBe('-55px');
+
+      // Case 4 (Coverage for return '').
+      result = component.getExplorationTitlePosition(0.5);
+      expect(result).toBe('');
     }
   );
 
@@ -667,7 +671,23 @@ describe('Collection player page component', () => {
 
       expect(component.closeOnClickingOutside).toHaveBeenCalled();
       expect(component.scrollToLocation).toHaveBeenCalled();
-      expect(component.explorationCardIsShown).toBe(false);
+      expect(component.explorationCardIsShown).toBeFalse();
     })
   );
+
+  it('should not update collection summary if summary is null', fakeAsync(() => {
+    spyOn(
+      collectionPlayerBackendApiService,
+      'fetchCollectionSummariesAsync'
+    ).and.returnValue(Promise.resolve(null as any));
+    component.fetchSummaryAsync('colId1');
+    tick();
+    expect(component.collectionSummary).toBeUndefined();
+  }));
+
+  it('should not generate path parameters if collection is null', () => {
+    spyOn(component, 'generatePathParameters');
+    component.updateCollection(null as any);
+    expect(component.generatePathParameters).not.toHaveBeenCalled();
+  });
 });
