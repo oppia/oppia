@@ -383,7 +383,7 @@ describe('Story editor state service', () => {
       fakeEditableStoryBackendApiService,
       'changeStoryPublicationStatusAsync'
     ).and.callThrough();
-    var successCallback = jasmine.createSpy('successCallback');
+    const successCallback = jasmine.createSpy('successCallback');
 
     storyEditorStateService.loadStory('storyId_0');
     tick(1000);

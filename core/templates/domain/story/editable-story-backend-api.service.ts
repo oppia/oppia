@@ -57,7 +57,7 @@ interface ValidationExplorationBackendResponse {
 
 interface ChangeStoryPublicationStatusRequest {
   new_story_status_is_public: boolean;
-  story_unpublish_type: 'temporary' | 'permanent';
+  story_unpublish_type?: 'temporary' | 'permanent';
 }
 
 @Injectable({
@@ -150,7 +150,7 @@ export class EditableStoryBackendApiService {
     );
     const putData: ChangeStoryPublicationStatusRequest = {
       new_story_status_is_public: newStoryStatusIsPublic,
-      story_unpublish_type: mode || 'permanent',
+      ...(mode !== undefined && {story_unpublish_type: mode}),
     };
     this.http
       .put(storyPublishUrl, putData)
