@@ -385,7 +385,12 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       suggestionIdToContribution;
     modalRef.componentInstance.misconceptionsBySkill = misconceptionsBySkill;
 
-    modalRef.componentInstance.editSuggestionEmitter.subscribe((value: any) => {
+    modalRef.componentInstance.editSuggestionEmitter.subscribe(
+      (value: {
+        suggestionId: string;
+        suggestion: Suggestion;
+        reviewable: boolean;
+      }) => {
       this.openQuestionSuggestionModal(
         value.suggestionId,
         value.suggestion,

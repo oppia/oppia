@@ -17,7 +17,7 @@
  */
 
 import {Component, Input, ViewChild} from '@angular/core';
-import {NgForm} from '@angular/forms';
+import {NgForm, AbstractControl} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
@@ -210,8 +210,7 @@ export class RteHelperModalComponent {
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const formGroupControls: Record<string, any> = {};
+    const formGroupControls: Record<string, AbstractControl> = {};
     this.customizationArgSpecs.forEach((_, index) => {
       formGroupControls[index] = this.fb.control(
         this.tmpCustomizationArgs[index].value
@@ -244,13 +243,12 @@ export class RteHelperModalComponent {
     this.customizationArgsFormSubscription.unsubscribe();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onCustomizationArgsFormChange(value: Record<string, any>): void {
+  onCustomizationArgsFormChange(value: Record<string, unknown>): void {
     this.clearRteErrorMessage();
     if (this.componentId === this.COMPONENT_ID_MATH) {
-      let rawLatex: string = value[0].raw_latex;
+      let rawLatex: string = (value[0] as {raw_latex: string}).raw_latex;
       let mathExpressionSvgIsBeingProcessed: boolean =
-        value[0].mathExpressionSvgIsBeingProcessed;
+        (value[0] as {mathExpressionSvgIsBeingProcessed: boolean}).mathExpressionSvgIsBeingProcessed;
       if (mathExpressionSvgIsBeingProcessed || rawLatex === '') {
         this.updateRteErrorMessage(
           'Waiting for math expression SVG to be processed...'
@@ -258,8 +256,8 @@ export class RteHelperModalComponent {
         return;
       }
     } else if (this.componentId === this.COMPONENT_ID_VIDEO) {
-      let start: number = value[1];
-      let end: number = value[2];
+      let start: number = value[1] as number;
+      let end: number = value[2] as number;
       if (value[0] === '') {
         this.updateRteErrorMessage(
           'Please ensure that the Youtube URL or id is valid.'
@@ -275,15 +273,16 @@ export class RteHelperModalComponent {
       }
     } else if (this.componentId === this.COMPONENT_ID_TABS) {
       // Value[0] corresponds to all tab contents and titles.
-      for (let tabIndex = 0; tabIndex < value[0].length; tabIndex++) {
-        if (value[0][tabIndex].title === '') {
+      let tabValues = value[0] as {title: string, content: string}[];
+      for (let tabIndex = 0; tabIndex < tabValues.length; tabIndex++) {
+        if (tabValues[tabIndex].title === '') {
           this.updateRteErrorMessage(
             'Please ensure that the title of tab ' +
               (tabIndex + 1) +
               ' is filled.'
           );
           break;
-        } else if (value[0][tabIndex].content === '') {
+        } else if (tabValues[tabIndex].content === '') {
           this.updateRteErrorMessage(
             'Please ensure that the content of tab ' +
               (tabIndex + 1) +
@@ -294,7 +293,7 @@ export class RteHelperModalComponent {
           // Check content length.
           if (
             this.isContentLengthExceeded(
-              value[0][tabIndex].content,
+              tabValues[tabIndex].content,
               this.COMPONENT_ID_TABS_CONTENT
             )
           ) {
@@ -307,7 +306,7 @@ export class RteHelperModalComponent {
           // Check title length.
           if (
             this.isContentLengthExceeded(
-              value[0][tabIndex].title,
+              tabValues[tabIndex].title,
               this.COMPONENT_ID_TABS_HEADING
             )
           ) {
@@ -321,8 +320,8 @@ export class RteHelperModalComponent {
         }
       }
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
-      let url: string = value[0];
-      let text: string = value[1];
+      let url: string = value[0] as string;
+      let text: string = value[1] as string;
 
       // Check URL and text lengths.
       if (this.isContentLengthExceeded(url, this.COMPONENT_ID_LINK)) {
