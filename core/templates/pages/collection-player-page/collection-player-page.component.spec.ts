@@ -44,6 +44,7 @@ import {UserInfo} from 'domain/user/user-info.model';
 import {
   CollectionPlayerPageComponent,
   IconParametersArray,
+  CollectionSummariesResponse,
 } from './collection-player-page.component';
 import {CollectionNodeBackendDict} from 'domain/collection/collection-node.model';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -679,7 +680,9 @@ describe('Collection player page component', () => {
     spyOn(
       collectionPlayerBackendApiService,
       'fetchCollectionSummariesAsync'
-    ).and.returnValue(Promise.resolve(null as any));
+    ).and.returnValue(
+      Promise.resolve(null as unknown as CollectionSummariesResponse)
+    );
     component.fetchSummaryAsync('colId1');
     tick();
     expect(component.collectionSummary).toBeUndefined();
@@ -687,7 +690,7 @@ describe('Collection player page component', () => {
 
   it('should not generate path parameters if collection is null', () => {
     spyOn(component, 'generatePathParameters');
-    component.updateCollection(null as any);
+    component.updateCollection(null as unknown as Collection);
     expect(component.generatePathParameters).not.toHaveBeenCalled();
   });
 });
