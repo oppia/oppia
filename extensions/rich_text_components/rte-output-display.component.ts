@@ -718,6 +718,35 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     this.cdRef.detectChanges();
   }
 
+  private _getPortalTemplateBySelector(
+    selector: string
+  ): TemplateRef<unknown> | undefined {
+    const portalTemplates: Record<string, TemplateRef<unknown> | undefined> = {
+      p: this.pTagPortal,
+      h1: this.h1TagPortal,
+      span: this.spanTagPortal,
+      ol: this.olTagPortal,
+      li: this.liTagPortal,
+      ul: this.ulTagPortal,
+      pre: this.preTagPortal,
+      strong: this.strongTagPortal,
+      blockquote: this.blockquoteTagPortal,
+      em: this.emTagPortal,
+      text: this.textTagPortal,
+      collapsible: this.collapsibleTagPortal,
+      image: this.imageTagPortal,
+      link: this.linkTagPortal,
+      math: this.mathTagPortal,
+      skillreview: this.skillreviewTagPortal,
+      svgdiagram: this.svgdiagramTagPortal,
+      tabs: this.tabsTagPortal,
+      video: this.videoTagPortal,
+      workedexample: this.workedexampleTagPortal,
+      br: this.brTagPortal,
+    };
+    return portalTemplates[selector];
+  }
+
   private _getTemplatePortal(
     node: OppiaRteNode | TextNode
   ): TemplatePortal<unknown> | undefined {
@@ -727,17 +756,19 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       });
     }
     if (node.nodeType === 'component') {
+      const componentTemplate = this._getPortalTemplateBySelector(
+        node.selector.split('oppia-noninteractive-')[1]
+      );
+      if (!componentTemplate) {
+        return;
+      }
       return new TemplatePortal(
-        this[
-          node.selector.split('oppia-noninteractive-')[1] + 'TagPortal'
-        ] as TemplateRef<unknown>,
+        componentTemplate,
         this._viewContainerRef,
         {$implicit: node.attrs}
       );
     }
-    const portalTemplate = this[
-      `${node.selector}TagPortal` as keyof RteOutputDisplayComponent
-    ] as TemplateRef<unknown> | undefined;
+    const portalTemplate = this._getPortalTemplateBySelector(node.selector);
     if (portalTemplate) {
       return new TemplatePortal(portalTemplate, this._viewContainerRef, {
         $implicit: node,

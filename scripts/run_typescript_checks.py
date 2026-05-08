@@ -36,14 +36,6 @@ from typing import List, Optional, Sequence
 # pylint: disable=line-too-long, single-line-pragma
 TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/base-components/base-content.component.spec.ts',
-    'core/templates/base-components/footer-donate-volunteer.component.spec.ts',
-    'core/templates/base-components/oppia-footer.component.spec.ts',
-    'core/templates/components/button-directives/exploration-embed-button-modal.component.spec.ts',
-    'core/templates/components/button-directives/hint-and-solution-buttons.component.spec.ts',
-    'core/templates/components/checkpoint-celebration-modal/checkpoint-celebration-modal.component.spec.ts',
-    'core/templates/components/code-mirror/codemirror-mergeview.component.spec.ts',
-    'core/templates/components/common-layout-directives/common-elements/classroom-navigation-links.component.spec.ts',
-    'core/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.spec.ts',
     'core/templates/components/forms/custom-forms-directives/apply-validation.directive.ts',
     'core/templates/components/forms/custom-forms-directives/object-editor.directive.ts',
     'core/templates/components/forms/validators/schema-validators.spec.ts',
@@ -194,9 +186,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/services/state-top-answers-stats.service.spec.ts',
     'core/templates/services/voiceover-language-management-service.spec.ts',
     'extensions/interactions/FractionInput/directives/fraction-input-validation.service.spec.ts',
-    'extensions/interactions/MultipleChoiceInput/multiple-choice-input-interactions.module.ts',
     'extensions/objects/object-components.module.ts',
-    'extensions/rich_text_components/rte-output-display.component.ts',
 ]
 # pylint: enable=line-too-long, single-line-pragma
 

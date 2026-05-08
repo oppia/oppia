@@ -30,7 +30,6 @@ import {
   Renderer2,
   ViewChild,
 } from '@angular/core';
-import {InteractionAnswer, MusicNotesAnswer} from 'interactions/answer-defs';
 import {
   MusicNotesInputCustomizationArgs,
   ReadableMusicNote,
@@ -77,6 +76,10 @@ interface Sequence {
   value: ReadableMusicNote[];
 }
 
+interface ReadableMusicNoteWithoutDuration {
+  readableNoteName: string;
+}
+
 interface Note {
   id: string;
   type: number;
@@ -121,6 +124,21 @@ export class MusicNotesInputComponent
   // TODO(#15177): Add more features to Music-Notes-Input Interaction
   // More notes types will be added to NOTE_TYPES.
   NOTE_TYPES = [this.NOTE_TYPE_NATURAL];
+  NOTE_NAMES: NoteName[] = [
+    'A5',
+    'G5',
+    'F5',
+    'E5',
+    'D5',
+    'C5',
+    'B4',
+    'A4',
+    'G4',
+    'F4',
+    'E4',
+    'D4',
+    'C4',
+  ];
   NOTES_ON_LINES: NoteName[] = ['E4', 'G4', 'B4', 'D5', 'F5'];
   LEDGER_LINE_NOTES: NoteName[] = ['C4', 'A5'];
   verticalGridKeys: number[] = [
@@ -254,9 +272,9 @@ export class MusicNotesInputComponent
   // displayed. The staffContainerElt and all subsequent measurements
   // must be recalculated in order for the grid to work properly.
   reinitStaff(): void {
-    const elem = document.querySelector(
+    const elem = document.querySelector<HTMLElement>(
       '.oppia-music-input-valid-note-area'
-    ) as HTMLElement;
+    );
 
     if (elem) {
       this.renderer.setStyle(elem, 'visibility', 'hidden');
@@ -434,9 +452,7 @@ export class MusicNotesInputComponent
   }
 
   buildDroppableStaff(): void {
-    const lineValues = Object.keys(
-      this.NOTE_NAMES_TO_MIDI_VALUES
-    ) as NoteName[];
+    const lineValues = this.NOTE_NAMES;
     const staffContainer = this.elementRef.nativeElement.querySelector(
       '.oppia-music-input-staff'
     ) as HTMLElement;
@@ -775,8 +791,7 @@ export class MusicNotesInputComponent
   }
 
   _getCorrespondingNoteName(midiNumber: number): NoteName {
-    const noteNames = Object.keys(this.NOTE_NAMES_TO_MIDI_VALUES) as NoteName[];
-    for (const noteName of noteNames) {
+    for (const noteName of this.NOTE_NAMES) {
       if (this.NOTE_NAMES_TO_MIDI_VALUES[noteName] === midiNumber) {
         return noteName;
       }
@@ -793,7 +808,9 @@ export class MusicNotesInputComponent
    * (since 64 is the baseNoteMidiNumber for 'E', and -1 indicates a
    * flat).
    */
-  _convertNoteToReadableNote(note: MusicNote): ReadableMusicNote {
+  _convertNoteToReadableNote(
+    note: MusicNote
+  ): ReadableMusicNoteWithoutDuration {
     if (note.offset !== -1 && note.offset !== 0 && note.offset !== 1) {
       console.error('Invalid note offset: ' + note.offset);
     }
@@ -807,7 +824,7 @@ export class MusicNotesInputComponent
     return {
       readableNoteName:
         correspondingNoteName[0] + accidental + correspondingNoteName[1],
-    } as ReadableMusicNote;
+    };
   }
 
   /*
@@ -860,31 +877,34 @@ export class MusicNotesInputComponent
   // TODO(#15177): Add more features to Music-Notes-Input Interaction
   // Add more options for note durations.
   _makeAllNotesHaveDurationOne(
-    noteArray: ReadableMusicNote[]
+    noteArray: ReadableMusicNoteWithoutDuration[]
   ): ReadableMusicNote[] {
-    for (let i = 0; i < noteArray.length; i++) {
-      noteArray[i].noteDuration = {
-        num: 1,
-        den: 1,
+    return noteArray.map(note => {
+      return {
+        ...note,
+        noteDuration: {
+          num: 1,
+          den: 1,
+        },
       };
-    }
-    return noteArray;
+    });
   }
 
   submitAnswer(): void {
-    let readableSequence: MusicNotesAnswer[] = [];
+    const readableSequenceWithoutDuration: ReadableMusicNoteWithoutDuration[] =
+      [];
     for (let i = 0; i < this.noteSequence.length; i++) {
-      readableSequence.push(
+      readableSequenceWithoutDuration.push(
         this._convertNoteToReadableNote(this.noteSequence[i].note)
       );
     }
-    readableSequence = this._makeAllNotesHaveDurationOne(readableSequence);
-    if (readableSequence) {
-      this.currentInteractionService.onSubmit(
-        readableSequence as InteractionAnswer,
-        this.musicNotesInputRulesService
-      );
-    }
+    const readableSequence = this._makeAllNotesHaveDurationOne(
+      readableSequenceWithoutDuration
+    );
+    this.currentInteractionService.onSubmit(
+      readableSequence,
+      this.musicNotesInputRulesService
+    );
   }
 
   /** *****************************************************************

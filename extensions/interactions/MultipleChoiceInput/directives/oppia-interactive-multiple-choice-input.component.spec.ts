@@ -26,6 +26,7 @@ import {Interaction} from 'domain/exploration/interaction.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {TranslateModule} from '@ngx-translate/core';
 import {InteractionAnswer} from 'interactions/answer-defs';
+import {MultipleChoiceInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 describe('InteractiveMultipleChoiceInputComponent', () => {
@@ -56,7 +57,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
   }
 
   class MockCurrentInteractionService {
-    onSubmit(answer: InteractionAnswer, rulesService: unknown) {
+    onSubmit(answer: InteractionAnswer, _rulesService: object) {
       expect(answer).toBe(1);
     }
 
@@ -106,8 +107,24 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     component = fixture.componentInstance;
 
-    let contentId: string = 'content_id';
-    let interaction = {} as unknown as Interaction;
+    const contentId = 'content_id';
+    const interactionCustomizationArgs: MultipleChoiceInputCustomizationArgs = {
+      showChoicesInShuffledOrder: {
+        value: false,
+      },
+      choices: {
+        value: [],
+      },
+    };
+    const interaction = new Interaction(
+      [],
+      [],
+      interactionCustomizationArgs,
+      null,
+      [],
+      'MultipleChoiceInput',
+      null
+    );
     displayedCard = new StateCard(
       'test_name',
       'content',

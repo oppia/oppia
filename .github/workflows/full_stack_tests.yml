@@ -157,10 +157,8 @@ jobs:
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run E2E Test ${{ matrix.suite.name }}
-        id: e2e-test-attempt-1
         # TODO(#22448): Remove once all suites are fixed.
         if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
-        continue-on-error: true
         run: >
           set -o pipefail;
           VIDEO_RECORDING_IS_ENABLED=1
@@ -169,17 +167,13 @@ jobs:
           --skip_build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee e2e_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload E2E test logs
-        if: ${{ steps.e2e-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: e2e-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: e2e_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Run E2E Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
-        id: e2e-test-attempt-2
-        # We need to pass always() because if not, GitHub will implicitly use
-        # success(), which requires all previous steps to have succeeded. This
-        # is not what we want for flaky retries.
-        if: ${{ always() && steps.e2e-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() }}
         run: >
           set -o pipefail;
           VIDEO_RECORDING_IS_ENABLED=1
@@ -188,32 +182,29 @@ jobs:
           --skip_build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee e2e_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload E2E retry test logs
-        if: ${{ always() && steps.e2e-test-attempt-2.outcome == 'failure' }}
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: e2e-test-retry-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: e2e_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Uploading webdriverio-video as Artifacts
-        if: ${{ always() && steps.e2e-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: webdriverio-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/webdriverio-video
       - name: Uploading webdriverio screenshots as Artifacts
-        if: ${{ always() && steps.e2e-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: webdriverio-screenshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/webdriverio-screenshots
       - name: Uploading webpack bundles as an artifact
-        if: ${{ always() && steps.e2e-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: webpack-bundles-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia/build
-      - name: Fail if both E2E attempts fail
-        if: ${{ always() && steps.e2e-test-attempt-1.outcome == 'failure' && steps.e2e-test-attempt-2.outcome != 'success' }}
-        run: exit 1
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
@@ -266,11 +257,10 @@ jobs:
 
       # Desktop Test
       - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
-        id: desktop-test-attempt-1
+        id: desktop-test
         # TODO(#22448): Remove once all suites are fixed.
         if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
         timeout-minutes: 30
-        continue-on-error: true
         uses: ./.github/actions/run-a-specific-acceptance-test
         with:
           test-suite: ${{ matrix.suite.name }}
@@ -279,12 +269,11 @@ jobs:
           modified-suite-name-for-uploads: ${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}_desktop_original
 
       - name: Re-run Desktop Acceptance Test to check flakiness for ${{ matrix.suite.name }}
-        id: desktop-test-attempt-2
         # We need to pass always() because if not, GitHub will implicitly use success(),
         # which requires all previous jobs/steps to have succeeded. This is not what we want.
         # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
         # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
-        if: ${{ always() && steps.desktop-test-attempt-1.outcome == 'failure' }}
+        if: ${{ always() && steps.desktop-test.outcome == 'failure' }}
         timeout-minutes: 30
         uses: ./.github/actions/run-a-specific-acceptance-test
         with:
@@ -294,13 +283,12 @@ jobs:
 
       # Mobile Test
       - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
-        id: mobile-test-attempt-1
+        id: mobile-test
         # We are using always() to prevent the job step from being skipped if desktop test fails.
         # TODO(#22448): Remove steps.check_skip.outputs.SKIP_SUITE != 'true' check,
         # once all suites are fixed. Please don't remove the always() check.
         if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' && always() }}
         timeout-minutes: 30
-        continue-on-error: true
         # TODO(#23106): Currently, video recording failure interfares with
         # acceptance tests, making acceptance test suite fail even if sub-tests
         # passes. Once fixed, enable video recording by updating
@@ -313,12 +301,11 @@ jobs:
           modified-suite-name-for-uploads: ${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}_mobile_original
 
       - name: Re-run Mobile Acceptance Test to check flakiness for ${{ matrix.suite.name }}
-        id: mobile-test-attempt-2
         # We need to pass always() because if not, GitHub will implicitly use success(),
         # which requires all previous jobs/steps to have succeeded. This is not what we want.
         # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
         # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
-        if: ${{ always() && steps.mobile-test-attempt-1.outcome == 'failure' }}
+        if: ${{ always() && steps.mobile-test.outcome == 'failure' }}
         timeout-minutes: 30
         uses: ./.github/actions/run-a-specific-acceptance-test
         with:
@@ -328,22 +315,18 @@ jobs:
 
       # Upload other essential files.
       - name: Upload generated test to angular module mapping
-        if: ${{ always() && (steps.desktop-test-attempt-1.outcome == 'failure' || steps.mobile-test-attempt-1.outcome == 'failure') }}
+        if: ${{ failure() && (steps.desktop-test-attempt-1.outcome == 'failure' || steps.mobile-test-attempt-1.outcome == 'failure') }}
         uses: actions/upload-artifact@v4
         with:
           name: generated-test-to-angular-module-mapping-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
 
       - name: Upload webpack bundles
-        if: ${{ always() && (steps.desktop-test-attempt-1.outcome == 'failure' || steps.mobile-test-attempt-1.outcome == 'failure') }}
+        if: ${{ failure() && (steps.desktop-test-attempt-1.outcome == 'failure' || steps.mobile-test-attempt-1.outcome == 'failure') }}
         uses: actions/upload-artifact@v4
         with:
           name: webpack-bundles-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia/build
-
-      - name: Fail if both acceptance attempts fail for either viewport
-        if: ${{ always() && ((steps.desktop-test-attempt-1.outcome == 'failure' && steps.desktop-test-attempt-2.outcome != 'success') || (steps.mobile-test-attempt-1.outcome == 'failure' && steps.mobile-test-attempt-2.outcome != 'success')) }}
-        run: exit 1
 
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{

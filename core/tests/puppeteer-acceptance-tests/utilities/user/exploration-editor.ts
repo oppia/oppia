@@ -4874,34 +4874,22 @@ export class ExplorationEditor extends BaseUser {
    * This function checks the number of subscribers in the Subscribers tab of the creator dashboard.
    */
   async expectNumberOfSubscribersToBe(subscriberCount: number): Promise<void> {
-    await this.waitForCreatorDashboardDataToMatch(
-      async () =>
-        await this.page
-          .waitForFunction(
-            (selector: string, expectedCount: number) => {
-              const subscriberCountText =
-                document.querySelector(selector)?.textContent?.trim() || '';
-              return parseInt(subscriberCountText, 10) === expectedCount;
-            },
-            {timeout: 10000},
-            subscriberCountLabel,
-            subscriberCount
-          )
-          .then(() => true)
-          .catch(() => false),
-      async () => {
-        const currentSubscriberCount =
-          (await this.page
-            .$eval(subscriberCountLabel, element => element.textContent?.trim())
-            .catch(() => 'not found')) || 'not found';
-        return (
-          `Expected number of subscribers to be ${subscriberCount}, ` +
-          `but found ${currentSubscriberCount}.`
-        );
-      }
+    await this.page.waitForSelector(subscriberCountLabel);
+    const currentSubscriberCount = await this.page.$eval(
+      subscriberCountLabel,
+      element => element.textContent
     );
 
-    showMessage(`Number of subscribers is equal to ${subscriberCount}.`);
+    if (
+      currentSubscriberCount &&
+      parseInt(currentSubscriberCount) === subscriberCount
+    ) {
+      showMessage(`Number of subscribers is equal to ${subscriberCount}.`);
+    } else {
+      throw new Error(
+        `Number of subscribers is not equal to ${subscriberCount}.`
+      );
+    }
   }
 
   /**
@@ -5499,6 +5487,10 @@ export class ExplorationEditor extends BaseUser {
         throw new Error(`Option "${option}" not found.`);
       }
 
+      // Ensure that elements have stabilized before we start dragging.
+      await this.waitForElementToStabilize(sourceElement);
+      await this.waitForElementToStabilize(destinationElement);
+
       const sourceBox = await sourceElement.boundingBox();
       const destBox = await destinationElement.boundingBox();
 
@@ -5520,35 +5512,6 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Retries creator dashboard checks after reloading the page when data has
-   * not been updated yet.
-   * @param {Function} isDataReady - Returns whether the expected data is
-   * available on the page.
-   * @param {Function} getFailureMessage - Returns the final failure message
-   * after retries are exhausted.
-   */
-  async waitForCreatorDashboardDataToMatch(
-    isDataReady: () => Promise<boolean>,
-    getFailureMessage: () => Promise<string>
-  ): Promise<void> {
-    const maxReloads = 2;
-
-    for (let attempt = 0; attempt <= maxReloads; attempt++) {
-      await this.waitForPageToFullyLoad();
-
-      if (await isDataReady()) {
-        return;
-      }
-
-      if (attempt < maxReloads) {
-        await this.reloadPage();
-      }
-    }
-
-    throw new Error(await getFailureMessage());
-  }
-
-  /**
    * Function to verify the average rating and the number of users who submitted ratings.
    * @param {number} expectedRating - The expected average rating.
    * @param {number} expectedUsers - The expected count of users who submitted ratings.
@@ -5557,62 +5520,30 @@ export class ExplorationEditor extends BaseUser {
     expectedRating: number,
     expectedUsers: number
   ): Promise<void> {
-    await this.waitForCreatorDashboardDataToMatch(
-      async () =>
-        await this.page
-          .waitForFunction(
-            (
-              ratingSelector: string,
-              usersSelector: string,
-              expectedAverageRating: number,
-              expectedUsersCount: number
-            ) => {
-              const averageRatingText =
-                document.querySelector(ratingSelector)?.textContent?.trim() ||
-                '';
-              const totalUsersText =
-                document.querySelector(usersSelector)?.textContent?.trim() ||
-                '';
-              const averageRating = parseFloat(averageRatingText);
-              const totalUsersMatch = totalUsersText.match(/\d+/);
-              const totalUsers = totalUsersMatch
-                ? parseInt(totalUsersMatch[0], 10)
-                : 0;
-
-              return (
-                averageRating === expectedAverageRating &&
-                totalUsers === expectedUsersCount
-              );
-            },
-            {timeout: 10000},
-            avarageRatingSelector,
-            usersCountInRatingSelector,
-            expectedRating,
-            expectedUsers
-          )
-          .then(() => true)
-          .catch(() => false),
-      async () => {
-        const averageRatingText =
-          (await this.page
-            .$eval(avarageRatingSelector, element =>
-              (element as HTMLElement).innerText.trim()
-            )
-            .catch(() => 'not found')) || 'not found';
-        const totalUsersText =
-          (await this.page
-            .$eval(
-              usersCountInRatingSelector,
-              el => (el as HTMLElement).innerText.trim() || ''
-            )
-            .catch(() => 'not found')) || 'not found';
-        return (
-          `Expected average rating to be ${expectedRating} and ` +
-          `${expectedUsers} users to have submitted ratings, but found ` +
-          `${averageRatingText} and "${totalUsersText}" respectively.`
-        );
-      }
+    await this.page.waitForSelector(avarageRatingSelector, {
+      visible: true,
+    });
+    const avarageRating = await this.page.$eval(
+      avarageRatingSelector,
+      element => parseFloat((element as HTMLElement).innerText.trim())
     );
+    if (avarageRating !== expectedRating) {
+      throw new Error(
+        `Expected average rating to be ${expectedRating}, but found ${avarageRating}.`
+      );
+    }
+    const totalUsersText = await this.page.$eval(
+      usersCountInRatingSelector,
+      el => (el as HTMLElement).innerText.trim() || ''
+    );
+    // Extract number from text (e.g., "by 3 users" → 3).
+    const totalUsersMatch = totalUsersText.match(/\d+/);
+    const totalUsers = totalUsersMatch ? parseInt(totalUsersMatch[0], 10) : 0;
+    if (totalUsers !== expectedUsers) {
+      throw new Error(
+        `Expected ${expectedUsers} users to have submitted ratings, but found only ${totalUsers} instead.`
+      );
+    }
   }
 
   /**
@@ -5620,34 +5551,18 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} number - The expected count of open feedback entries.
    */
   async expectOpenFeedbacksToBe(number: number): Promise<void> {
-    await this.waitForCreatorDashboardDataToMatch(
-      async () =>
-        await this.page
-          .waitForFunction(
-            (selector: string, expectedCount: number) => {
-              const openFeedbackCountText =
-                document.querySelector(selector)?.textContent?.trim() || '';
-              return parseInt(openFeedbackCountText, 10) === expectedCount;
-            },
-            {timeout: 10000},
-            numberOfOpenFeedbacksSelector,
-            number
-          )
-          .then(() => true)
-          .catch(() => false),
-      async () => {
-        const numberOfOpenFeedbacks =
-          (await this.page
-            .$eval(numberOfOpenFeedbacksSelector, el =>
-              (el as HTMLElement).innerText.trim()
-            )
-            .catch(() => 'not found')) || 'not found';
-        return (
-          `Expected open feedback count to be ${number}, but found ` +
-          `${numberOfOpenFeedbacks}.`
-        );
-      }
+    await this.page.waitForSelector(numberOfOpenFeedbacksSelector, {
+      visible: true,
+    });
+    const numberOfOpenFeedbacks = await this.page.$eval(
+      numberOfOpenFeedbacksSelector,
+      el => parseInt((el as HTMLElement).innerText.trim(), 10)
     );
+    if (numberOfOpenFeedbacks !== number) {
+      throw new Error(
+        `Expected open feedback count to be ${number}, but found ${numberOfOpenFeedbacks}.`
+      );
+    }
   }
 
   /**
@@ -5655,34 +5570,17 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} number - The expected total play count.
    */
   async expectTotalPlaysToBe(number: number): Promise<void> {
-    await this.waitForCreatorDashboardDataToMatch(
-      async () =>
-        await this.page
-          .waitForFunction(
-            (selector: string, expectedCount: number) => {
-              const totalPlaysText =
-                document.querySelector(selector)?.textContent?.trim() || '';
-              return parseInt(totalPlaysText, 10) === expectedCount;
-            },
-            {timeout: 10000},
-            totalPlaysSelector,
-            number
-          )
-          .then(() => true)
-          .catch(() => false),
-      async () => {
-        const numberOfTotalPlays =
-          (await this.page
-            .$eval(totalPlaysSelector, el =>
-              (el as HTMLElement).innerText.trim()
-            )
-            .catch(() => 'not found')) || 'not found';
-        return (
-          `Expected total plays count to be ${number}, but found ` +
-          `${numberOfTotalPlays}.`
-        );
-      }
+    await this.page.waitForSelector(totalPlaysSelector, {
+      visible: true,
+    });
+    const numberOfTotalPlays = await this.page.$eval(totalPlaysSelector, el =>
+      parseInt((el as HTMLElement).innerText.trim(), 10)
     );
+    if (numberOfTotalPlays !== number) {
+      throw new Error(
+        `Expected total plays count to be ${number}, but found ${numberOfTotalPlays}.`
+      );
+    }
   }
 
   /**
@@ -5690,29 +5588,20 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} number - The expected count of total explorations.
    */
   async expectNumberOfExplorationsToBe(number: number): Promise<void> {
-    await this.waitForCreatorDashboardDataToMatch(
-      async () =>
-        await this.page
-          .waitForFunction(
-            (selector: string, expectedCount: number) =>
-              document.querySelectorAll(selector).length === expectedCount,
-            {timeout: 10000},
-            explorationSummaryTileTitleSelector,
-            number
-          )
-          .then(() => true)
-          .catch(() => false),
-      async () => {
-        const titlesOnPage = await this.page.$$eval(
-          explorationSummaryTileTitleSelector,
-          elements => elements.map(el => el.textContent?.trim() || '')
-        );
-        return (
-          `Expected ${number} explorations, but found ` +
-          `${titlesOnPage.length} instead (${titlesOnPage.join(', ')}).`
-        );
-      }
+    await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
+      visible: true,
+    });
+    const titlesOnPage = await this.page.$$eval(
+      explorationSummaryTileTitleSelector,
+      elements => elements.map(el => el.textContent?.trim() || '')
     );
+    const count = titlesOnPage.length;
+
+    if (count !== number) {
+      throw new Error(
+        `Expected ${number} explorations, but found ${count} instead.`
+      );
+    }
   }
 
   /**
@@ -5724,53 +5613,28 @@ export class ExplorationEditor extends BaseUser {
     explorationName: string,
     numberOfOccurrence: number = 1
   ): Promise<void> {
-    await this.waitForCreatorDashboardDataToMatch(
-      async () =>
-        await this.page
-          .waitForFunction(
-            (
-              selector: string,
-              expectedExplorationName: string,
-              expectedOccurrenceCount: number
-            ) => {
-              const titles = Array.from(
-                document.querySelectorAll(selector)
-              ).map(element => element.textContent?.trim() || '');
-              return (
-                titles.filter(title => title === expectedExplorationName)
-                  .length === expectedOccurrenceCount
-              );
-            },
-            {timeout: 10000},
-            explorationSummaryTileTitleSelector,
-            explorationName,
-            numberOfOccurrence
-          )
-          .then(() => true)
-          .catch(() => false),
-      async () => {
-        const titlesOnPage = await this.page.$$eval(
-          explorationSummaryTileTitleSelector,
-          elements => elements.map(el => el.textContent?.trim() || '')
-        );
-        const count = titlesOnPage.filter(
-          title => title === explorationName
-        ).length;
+    await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
+      visible: true,
+    });
 
-        if (numberOfOccurrence === 1) {
-          return (
-            `Exploration "${explorationName}" not found. ` +
-            `Current titles: ${titlesOnPage.join(', ')}.`
-          );
-        }
-
-        return (
-          `Exploration "${explorationName}" found ${count} times, but ` +
-          `expected ${numberOfOccurrence} times. Current titles: ` +
-          `${titlesOnPage.join(', ')}.`
-        );
-      }
+    // Extract all exploration titles.
+    const titlesOnPage = await this.page.$$eval(
+      explorationSummaryTileTitleSelector,
+      elements => elements.map(el => el.textContent?.trim() || '')
     );
+
+    // Count occurrences of the target exploration.
+    const count = titlesOnPage.filter(
+      title => title === explorationName
+    ).length;
+
+    if (numberOfOccurrence === 1 && count !== numberOfOccurrence) {
+      throw new Error(`Exploration "${explorationName}" not found.`);
+    } else if (count !== numberOfOccurrence) {
+      throw new Error(
+        `Exploration "${explorationName}" found ${count} times, but expected ${numberOfOccurrence} times.`
+      );
+    }
   }
 
   /**
