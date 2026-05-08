@@ -26,6 +26,7 @@ import {
 } from 'domain/exploration/exploration.model';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {ParamChange} from 'domain/exploration/param-change.model';
+import {ParamSpec} from 'domain/exploration/param-spec.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {StateObjectsBackendDict} from 'domain/exploration/states.model';
