@@ -136,7 +136,7 @@ export class CkEditorInitializerService {
             '</div>';
         }
         CKEDITOR.plugins.add(ckName, {
-          init: function (editor: CKEDITOR.editor) {
+          init: function (editor) {
             // Create the widget itself.
             editor.widgets.add(ckName, {
               button: componentDefn.tooltip,
@@ -283,7 +283,7 @@ export class CkEditorInitializerService {
                * This is how the widget will be represented in the outputs
                * source, so it is called when we call editor.getData().
                */
-              downcast: function (element: CKEDITOR.htmlParser.element) {
+              downcast: function (element) {
                 // Clear the angular rendering content, which we don't
                 // want in the output.
                 (element.children[0] as CKEDITOR.htmlParser.element).setHtml(
@@ -297,7 +297,7 @@ export class CkEditorInitializerService {
                * when we first load data in. Returns a boolean,
                * true iff "element" is an instance of this widget.
                */
-              upcast: function (element: CKEDITOR.htmlParser.element) {
+              upcast: function (element) {
                 return (
                   element.name !== 'p' &&
                   element.children.length > 0 &&
