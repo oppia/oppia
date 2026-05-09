@@ -1635,7 +1635,11 @@ class LearnerIncompleteActivityHandler(
             learner_progress_services.remove_story_from_incomplete_list(
                 self.user_id, activity_id
             )
-        elif activity_type == constants.ACTIVITY_TYPE_LEARN_TOPIC:
+        # The schema enforces that activity_type must be one of
+        # ['exploration', 'collection', 'story', 'learntopic']. Since the
+        # first three are handled above, this else branch is guaranteed to
+        # handle the 'learntopic' case and is always reachable.
+        else:
             learner_progress_services.remove_topic_from_partially_learnt_list(
                 self.user_id, activity_id
             )
@@ -2225,7 +2229,11 @@ class LearnerAnswerDetailsSubmissionHandler(
                     'Interaction id given does not match with the '
                     'interaction id of the state'
                 )
-        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+        # The schema enforces that entity_type must be one of
+        # ['exploration', 'question']. Since 'exploration' is handled above,
+        # this else branch is guaranteed to handle the 'question' case
+        # and is always reachable.
+        else:
             state_reference = stats_services.get_state_reference_for_question(
                 entity_id
             )
