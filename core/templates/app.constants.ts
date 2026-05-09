@@ -423,6 +423,20 @@ export const AppConstants = {
   },
   ONE_WEEK_IN_MILLIS: 7 * 24 * 60 * 60 * 1000,
   ONE_MONTH_IN_MILLIS: 30 * 24 * 60 * 60 * 1000,
+
+  FINANCIAL_LITERACY_CAMPAIGN_CONFIG_TEST: {
+    bannerImageRelativePath: '/donate/financial-literacy-campaign.webp',
+    startDate: new Date('2026-03-01'),
+    endDate: new Date('2026-04-30'),
+    bannerReRenderIntervalMs: 30 * 1000,
+  },
+
+  FINANCIAL_LITERACY_CAMPAIGN_CONFIG_PROD: {
+    bannerImageRelativePath: '/donate/financial-literacy-campaign.webp',
+    startDate: new Date('2026-04-07'),
+    endDate: new Date('2026-04-30'),
+    bannerReRenderIntervalMs: 7 * 24 * 60 * 60 * 1000,
+  },
 } as const;
 
 export enum NavbarAndFooterGATrackingPages {

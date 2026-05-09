@@ -17,12 +17,14 @@
 from __future__ import annotations
 
 import json
+import logging
 import traceback
 
 from core import feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
     email_manager,
+    email_services,
     exp_fetchers,
     exp_services,
     feedback_services,
@@ -233,6 +235,87 @@ class FlagExplorationEmailHandler(
         self.render_json({})
 
 
+class RetryEmailHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handler task for retrying unsuccessfully sent emails."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'sender_email': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'recipient_id': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'subject': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'html_body': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+            'text_body': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+        }
+    }
+
+    @acl_decorators.can_perform_tasks_in_taskqueue
+    def post(self) -> None:
+        """Attempts to resend an email.
+
+        If it fails, raises an error to trigger an automatic retry via Cloud Tasks.
+        """
+        payload = json.loads(self.request.body)
+
+        sender_email = payload.get('sender_email')
+        recipient_id = payload.get('recipient_id')
+        subject = payload.get('subject')
+        html_body = payload.get('html_body')
+        text_body = payload.get('text_body')
+
+        num_of_attempts_of_retry_made = int(
+            self.request.headers.get('X-AppEngine-TaskExecutionCount', 0)
+        )
+
+        # Cloud tasks automatically increment this header on each retry.
+        # It starts at 0 for the first attempt.
+        #
+        # Note: We use X-AppEngine-TaskExecutionCount instead of
+        # X-AppEngine-TaskRetryCount because TaskRetryCount includes infrastructure
+        # failures (e.g., lack of available instances) where the task never
+        # actually reached this handler. TaskExecutionCount strictly counts how
+        # many times this handler actually executed and failed, which is the
+        # exact metric we want to limit against.
+        # Docs: <https://cloud.google.com/tasks/docs/creating-appengine-handlers>.
+
+        # TODO(#25307): Improve this retry mechanism by differentiating between
+        # 4xx client errors (which should be dropped immediately) and 5xx server
+        # errors (which should be retried). Until then, we enforce a hard limit
+        # of 3 retries for all errors to prevent infinite queues.
+
+        if num_of_attempts_of_retry_made >= 3:
+            logging.error('Failed sending email after three retries')
+            self.render_json({})
+            return
+
+        try:
+            email_services.send_mail(
+                sender_email, recipient_id, subject, text_body, html_body
+            )
+        except Exception as e:
+            logging.error(
+                'Email retry failed for recipient %s: %s', recipient_id, e
+            )
+            raise Exception('Failed to resend email: %s' % e) from e
+
+        self.render_json({})
+
+
 class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """This task handler handles special tasks that make single asynchronous
     function calls. For more complex tasks that require a large number of
@@ -278,10 +361,18 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic
         ),
         fn_ids_to_names[
-            'FUNCTION_ID_REGENERATE_VOICEOVERS_OF_EXPLORATION_FOR_GIVEN_LANGUAGE_ACCENT'
+            'FUNCTION_ID_REGENERATE_VOICEOVERS_BY_LANGUAGE_ACCENT'
         ]: (
             voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent
         ),
+        fn_ids_to_names[
+            'FUNCTION_ID_REGENERATE_VOICEOVERS_AFTER_ACCEPTING_SUGGESTION'
+        ]: (
+            voiceover_services.regenerate_voiceovers_after_accepting_suggestion
+        ),
+        fn_ids_to_names[
+            'FUNCTION_ID_REGENERATE_VOICEOVERS_FOR_BATCH_CONTENTS'
+        ]: (voiceover_services.regenerate_voiceovers_for_batch_contents),
     }
 
     @acl_decorators.can_perform_tasks_in_taskqueue
@@ -331,9 +422,20 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 payload['fn_identifier']
             ]
 
-            # If the deferred task is a voiceover regeneration task, append the
+            # Some deferred tasks (e.g., voiceover regeneration) need to be
+            # split into multiple smaller tasks to distribute the load across
+            # separate deferred requests. If the payload contains a parent
+            # Cloud Task run ID, the ID must be passed as an argument to the
+            # downstream method.
+            parent_cloud_task_run_id = payload.get(
+                'parent_cloud_task_run_id', None
+            )
+            if parent_cloud_task_run_id is not None:
+                payload['args'].append(parent_cloud_task_run_id)
+
+            # If the deferred task is a voiceover regeneration parent task, append the
             # cloud task model ID to the arguments list.
-            if voiceover_cloud_task_services.is_voiceover_regeneration_task_function(
+            if voiceover_cloud_task_services.is_voiceover_regeneration_defer_function(
                 payload['fn_identifier']
             ):
                 payload['args'].append(cloud_task_model_id)

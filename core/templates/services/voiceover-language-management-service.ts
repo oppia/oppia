@@ -48,7 +48,7 @@ export class VoiceoverLanguageManagementService {
 
   getAutogeneratableLanguageAccents(languageCode: string): string[] {
     let supportedLanguageAccents = Object.keys(
-      this.languageCodesMapping[languageCode]
+      this.languageCodesMapping[languageCode] ?? {}
     ).filter(accent => this.languageCodesMapping[languageCode][accent]);
     return supportedLanguageAccents;
   }

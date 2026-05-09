@@ -131,6 +131,10 @@
       "framework": "puppeteer"
     },
     {
+      "name": "lesson-creator/check-improvements-tab",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/check-improvements-tab.spec.ts"
+    },
+    {
       "name": "lesson-creator/create-a-basic-exploration",
       "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/create-a-basic-exploration.spec.ts",
       "framework": "puppeteer"
@@ -144,6 +148,10 @@
       "name": "lesson-creator/save-and-publish-the-exploration",
       "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/save-and-publish-the-exploration.spec.ts",
       "framework": "puppeteer"
+    },
+    {
+      "name": "lesson-creator/view-feedback-and-statistics-of-the-lesson",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/view-feedback-and-statistics-of-the-lesson.spec.ts"
     },
     {
       "name": "logged-in-user/add-concept-card-with-workedexample-to-exploration",
@@ -338,11 +346,6 @@
     {
       "name": "exploration-creator/preview-math-interactions",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-math-interactions.spec.ts",
-      "framework": "puppeteer"
-    },
-    {
-      "name": "exploration-creator/preview-rarely-used-interactions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-rarely-used-interactions.spec.ts",
       "framework": "puppeteer"
     },
     {
@@ -616,13 +619,13 @@
       "framework": "puppeteer"
     },
     {
-      "name": "translation-coordinator/add-remove-translation-rights",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-coordinator/add-remove-translation-rights.spec.ts",
+      "name": "translation-coordinator/manage-contributors-translation-review-rights",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-coordinator/manage-contributors-translation-review-rights.spec.ts",
       "framework": "puppeteer"
     },
     {
-      "name": "practice-question-coordinator/add-and-remove-question-rights",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-coordinator/add-and-remove-question-rights.spec.ts",
+      "name": "practice-question-coordinator/manage-contributors-question-review-submission-rights",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-coordinator/manage-contributors-question-review-submission-rights.spec.ts",
       "framework": "puppeteer"
     },
     {

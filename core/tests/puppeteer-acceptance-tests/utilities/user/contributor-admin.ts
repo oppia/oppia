@@ -29,6 +29,10 @@ const commonModalTitleSelector = '.e2e-test-modal-header';
 const commonModalContainerSelector = '.e2e-test-modal-container';
 const addRightsButtonSelector = '.e2e-test-add-rights-button';
 const contributorCountSelector = '.e2e-test-contributor-count';
+const lastDatePickerInputSelector = '.e2e-test-last-date-picker-input';
+const mobileLastDatePickerInputSelector =
+  '.e2e-test-mobile-last-date-picker-input';
+const statsListItemSelector = '.e2e-test-stats-list-item';
 const tabSelectionDropdownMobileSelector = '.e2e-test-tab-selection-dropdown';
 const newContributorAdminDashboardPageSelector =
   '.e2e-test-new-contributor-admin-dashboard-page';
@@ -52,10 +56,14 @@ export class ContributorAdmin extends BaseUser {
 
   /**
    * Switches to the tab in the contributor dashboard admin page.
-   * @param {'Translation Submitters' | 'Translation Reviewers'} tabName - The name of the tab to switch to.
+   * @param {'Translation Submitters' | 'Translation Reviewers' | 'Question Submitters' | 'Question Reviewers'} tabName - The name of the tab to switch to.
    */
   async switchToTabInContributorAdminPage(
-    tabName: 'Translation Submitters' | 'Translation Reviewers'
+    tabName:
+      | 'Translation Submitters'
+      | 'Translation Reviewers'
+      | 'Question Submitters'
+      | 'Question Reviewers'
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       // Remove last 's' from the tab name.
@@ -119,6 +127,42 @@ export class ContributorAdmin extends BaseUser {
     await this.expectTextContentToBe(
       contributorCountSelector,
       number.toString()
+    );
+  }
+
+  /**
+   * Sets the "last activity" date filter to yesterday.
+   */
+  async setLastActivityDateFilterToYesterday(): Promise<void> {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const day = String(yesterday.getDate()).padStart(2, '0');
+    const month = yesterday.toLocaleString('en-US', {month: 'short'});
+    const year = String(yesterday.getFullYear());
+    const yesterdayDate = `${day}-${month}-${year}`;
+    const dateInputSelector = this.isViewportAtMobileWidth()
+      ? mobileLastDatePickerInputSelector
+      : lastDatePickerInputSelector;
+
+    await this.clearAllTextFrom(dateInputSelector);
+    await this.typeInInputField(dateInputSelector, yesterdayDate);
+    await this.page.keyboard.press('Enter');
+    await this.expectElementValueToBe(dateInputSelector, yesterdayDate);
+  }
+
+  /**
+   * Checks if the number of contributor stats rows in the table is as expected.
+   * @param {number} number - The expected number of stats rows.
+   */
+  async expectNumberOfStatsRowsToBe(number: number): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, expectedCount: number) => {
+        const rows = document.querySelectorAll(selector);
+        return rows.length === expectedCount;
+      },
+      {},
+      statsListItemSelector,
+      number
     );
   }
 }

@@ -18,6 +18,7 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {
   ComponentFixture,
   fakeAsync,
@@ -31,6 +32,7 @@ import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {AlertsService} from 'services/alerts.service';
 import {ExplorationCategoryService} from '../services/exploration-category.service';
+import {ChangeListService} from '../services/change-list.service';
 import {ExplorationDataService} from '../services/exploration-data.service';
 import {ExplorationLanguageCodeService} from '../services/exploration-language-code.service';
 import {ExplorationObjectiveService} from '../services/exploration-objective.service';
@@ -55,6 +57,33 @@ class MockNgbModal {
   }
 }
 
+class MockChangeListService {
+  private autosaveInProgressSubject = new BehaviorSubject<boolean>(false);
+  private changeList: object[] = [];
+
+  get autosaveIsInProgress$(): Observable<boolean> {
+    return this.autosaveInProgressSubject.asObservable();
+  }
+
+  editExplorationProperty(): void {
+    this.changeList.push({});
+    this.autosaveInProgressSubject.next(true);
+  }
+
+  emitAutosaveCompletion(): void {
+    this.autosaveInProgressSubject.next(false);
+  }
+
+  getChangeList(): object[] {
+    return this.changeList;
+  }
+
+  reset(): void {
+    this.changeList = [];
+    this.autosaveInProgressSubject.next(false);
+  }
+}
+
 describe('Exploration Metadata Modal Component', () => {
   let component: ExplorationMetadataModalComponent;
   let fixture: ComponentFixture<ExplorationMetadataModalComponent>;
@@ -65,6 +94,7 @@ describe('Exploration Metadata Modal Component', () => {
   let explorationStatesService: ExplorationStatesService;
   let explorationTagsService: ExplorationTagsService;
   let explorationTitleService: ExplorationTitleService;
+  let changeListService: MockChangeListService;
   let ngbActiveModal: NgbActiveModal;
 
   beforeEach(waitForAsync(() => {
@@ -88,6 +118,10 @@ describe('Exploration Metadata Modal Component', () => {
         {
           provide: NgbModal,
           useClass: MockNgbModal,
+        },
+        {
+          provide: ChangeListService,
+          useClass: MockChangeListService,
         },
         AlertsService,
         ExplorationCategoryService,
@@ -114,7 +148,11 @@ describe('Exploration Metadata Modal Component', () => {
       explorationStatesService = TestBed.inject(ExplorationStatesService);
       explorationTagsService = TestBed.inject(ExplorationTagsService);
       explorationTitleService = TestBed.inject(ExplorationTitleService);
+      changeListService = TestBed.inject(
+        ChangeListService
+      ) as unknown as MockChangeListService;
       ngbActiveModal = TestBed.inject(NgbActiveModal);
+      changeListService.reset();
 
       explorationObjectiveService.init('');
       explorationTitleService.init('');
@@ -339,9 +377,12 @@ describe('Exploration Metadata Modal Component', () => {
         explorationTagsService.displayed = ['h1'];
         explorationTitleService.displayed = 'New Title';
         expect(component.isSavingAllowed()).toBe(true);
-        component.save();
 
-        tick(500);
+        component.save();
+        expect(component.isSaving).toBe(true);
+        expect(ngbActiveModal.close).not.toHaveBeenCalled();
+
+        changeListService.emitAutosaveCompletion();
         flush();
 
         expect(ngbActiveModal.close).toHaveBeenCalledWith([
@@ -353,6 +394,52 @@ describe('Exploration Metadata Modal Component', () => {
         ]);
       })
     );
+
+    it('should close the modal immediately when no autosave is triggered', fakeAsync(() => {
+      spyOn(ngbActiveModal, 'close').and.stub();
+
+      explorationCategoryService.displayed = 'New Category';
+      explorationLanguageCodeService.displayed = 'en';
+      explorationObjectiveService.displayed =
+        'A valid objective already exists';
+      explorationTagsService.displayed = [];
+      explorationTitleService.displayed = 'New Title';
+
+      explorationCategoryService.savedMemento = 'New Category';
+      explorationLanguageCodeService.savedMemento = 'en';
+      explorationObjectiveService.savedMemento =
+        'A valid objective already exists';
+      explorationTagsService.savedMemento = [];
+      explorationTitleService.savedMemento = 'New Title';
+
+      component.save();
+      flush();
+
+      expect(ngbActiveModal.close).toHaveBeenCalledWith([]);
+    }));
+
+    it('should not enter saving state when no autosave is triggered', fakeAsync(() => {
+      spyOn(ngbActiveModal, 'close').and.stub();
+
+      explorationCategoryService.displayed = 'New Category';
+      explorationLanguageCodeService.displayed = 'en';
+      explorationObjectiveService.displayed =
+        'A valid objective already exists';
+      explorationTagsService.displayed = [];
+      explorationTitleService.displayed = 'New Title';
+
+      explorationCategoryService.savedMemento = 'New Category';
+      explorationLanguageCodeService.savedMemento = 'en';
+      explorationObjectiveService.savedMemento =
+        'A valid objective already exists';
+      explorationTagsService.savedMemento = [];
+      explorationTitleService.savedMemento = 'New Title';
+
+      component.save();
+      flush();
+
+      expect(component.isSaving).toBe(false);
+    }));
   });
 
   describe('when all metadata are not filled', () => {
@@ -369,7 +456,11 @@ describe('Exploration Metadata Modal Component', () => {
       explorationStatesService = TestBed.inject(ExplorationStatesService);
       explorationTagsService = TestBed.inject(ExplorationTagsService);
       explorationTitleService = TestBed.inject(ExplorationTitleService);
+      changeListService = TestBed.inject(
+        ChangeListService
+      ) as unknown as MockChangeListService;
       ngbActiveModal = TestBed.inject(NgbActiveModal);
+      changeListService.reset();
       explorationObjectiveService.init('');
       explorationTitleService.init('');
       explorationCategoryService.init('Generic category');

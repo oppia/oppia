@@ -24,6 +24,7 @@ from core import feconf
 from core.constants import constants
 from core.domain import (
     email_manager,
+    email_services,
     exp_domain,
     html_cleaner,
     platform_parameter_domain,
@@ -37,6 +38,7 @@ from core.domain import (
     subscription_services,
     suggestion_registry,
     suggestion_services,
+    taskqueue_services,
     translation_domain,
     user_services,
 )
@@ -9330,3 +9332,82 @@ class VoiceoverRegenerationNotificationEmailUnitTests(test_utils.EmailTestBase):
             sent_email_model.subject,
             '[Attention needed] Automatic Voiceover Generation Failed',
         )
+
+
+class EmailRetryQueueTests(test_utils.EmailTestBase):
+    """Tests the retry logic when email sending fails."""
+
+    USER_A_EMAIL = 'a@example.com'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.USER_A_EMAIL, 'userA')
+        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
+
+    def test_failed_send_mail_enqueues_retry_task(self) -> None:
+        def mock_send_mail(*_args: str, **_kwargs: str) -> None:
+            raise Exception('Simulated email failure')
+
+        enqueued_tasks = []
+
+        def mock_enqueue_task(
+            url: str, payload: dict[str, str], _delay: int
+        ) -> None:
+            enqueued_tasks.append((url, payload))
+
+        send_mail_swap = self.swap(email_services, 'send_mail', mock_send_mail)
+        enqueue_task_swap = self.swap(
+            taskqueue_services, 'enqueue_task', mock_enqueue_task
+        )
+
+        with send_mail_swap, enqueue_task_swap:
+            email_manager._send_email(  # pylint: disable=protected-access
+                self.user_a_id,
+                feconf.SYSTEM_COMMITTER_ID,
+                feconf.EMAIL_INTENT_SIGNUP,
+                'Subject',
+                'Body',
+                'sender@example.com',
+            )
+
+        self.assertEqual(len(enqueued_tasks), 1)
+        self.assertEqual(
+            enqueued_tasks[0][0], feconf.TASK_URL_RETRY_FAILED_EMAIL
+        )
+        self.assertEqual(enqueued_tasks[0][1]['subject'], 'Subject')
+
+    def test_failed_send_bulk_mail_enqueues_retry_task(self) -> None:
+        def mock_send_bulk_mail(*_args: str, **_kwargs: str) -> None:
+            raise Exception('Simulated bulk email failure')
+
+        enqueued_tasks = []
+
+        def mock_enqueue_task(
+            url: str, payload: dict[str, str], _delay: int
+        ) -> None:
+            enqueued_tasks.append((url, payload))
+
+        send_bulk_mail_swap = self.swap(
+            email_services, 'send_bulk_mail', mock_send_bulk_mail
+        )
+        enqueue_task_swap = self.swap(
+            taskqueue_services, 'enqueue_task', mock_enqueue_task
+        )
+
+        with send_bulk_mail_swap, enqueue_task_swap:
+            email_manager._send_bulk_mail(  # pylint: disable=protected-access
+                [self.user_a_id],
+                feconf.SYSTEM_COMMITTER_ID,
+                feconf.BULK_EMAIL_INTENT_MARKETING,
+                'Bulk Subject',
+                'Bulk Body',
+                'sender@example.com',
+                'Sender Name',
+                'instance_id',
+            )
+
+        self.assertEqual(len(enqueued_tasks), 1)
+        self.assertEqual(
+            enqueued_tasks[0][0], feconf.TASK_URL_RETRY_FAILED_EMAIL
+        )
+        self.assertEqual(enqueued_tasks[0][1]['subject'], 'Bulk Subject')

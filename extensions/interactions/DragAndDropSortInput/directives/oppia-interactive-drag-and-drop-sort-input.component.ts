@@ -28,6 +28,7 @@ import {
   CdkDragDrop,
   CdkDragExit,
   moveItemInArray,
+  transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import {DragAndDropSortInputCustomizationArgs} from 'interactions/customization-args-defs';
 
@@ -64,9 +65,11 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
   highlightedGroup: number = -1;
   noShow: number = -1;
   rootHeight: number = 40;
+  activeGroup!: number;
   activeItem!: number;
   listSubscription!: Subscription;
   @ViewChildren('listItem') listItems!: QueryList<ElementRef<HTMLDivElement>>;
+  maxGroups!: number;
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
@@ -85,11 +88,52 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     this.listSubscription.unsubscribe();
   }
 
+  getFlatIndex(groupIndex: number, itemIndex: number): number {
+    let index = 0;
+    for (
+      let currentGroupIndex = 0;
+      currentGroupIndex < groupIndex;
+      currentGroupIndex++
+    ) {
+      const group = this.multipleItemsInSamePositionArray[currentGroupIndex];
+      if (!group) {
+        continue;
+      }
+      index += group.length;
+    }
+    return index + itemIndex;
+  }
+
+  getGroupItemFromFlatIndex(flatIndex: number): {group: number; item: number} {
+    let count = 0;
+    for (
+      let currentGroupIndex = 0;
+      currentGroupIndex < this.multipleItemsInSamePositionArray.length;
+      currentGroupIndex++
+    ) {
+      const groupLength =
+        this.multipleItemsInSamePositionArray[currentGroupIndex].length;
+      if (flatIndex < count + groupLength) {
+        return {
+          group: currentGroupIndex,
+          item: flatIndex - count,
+        };
+      }
+      count += groupLength;
+    }
+    return {group: 0, item: 0};
+  }
+
   setFocus(): void {
     if (!this.listItems) {
       return;
     }
-    this.listItems.toArray()[this.activeItem].nativeElement.focus();
+    const items = this.listItems.toArray();
+    const flatIndex = this.getFlatIndex(this.activeGroup, this.activeItem);
+    if (!items[flatIndex]) {
+      return;
+    }
+    items[flatIndex].nativeElement.focus();
   }
 
   resetArray(): void {
@@ -231,6 +275,152 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     this.setFocus();
   }
 
+  handleKeyDownMultipleItems(
+    event: KeyboardEvent,
+    groupIndex: number,
+    itemIndex: number
+  ): void {
+    if (event.ctrlKey) {
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        let newGroupIndex = groupIndex + 2;
+        if (newGroupIndex >= this.multipleItemsInSamePositionArray.length) {
+          return;
+        }
+
+        // Move entire group down (swap).
+        const temp = this.multipleItemsInSamePositionArray[groupIndex];
+        this.multipleItemsInSamePositionArray[groupIndex] =
+          this.multipleItemsInSamePositionArray[newGroupIndex];
+        this.multipleItemsInSamePositionArray[newGroupIndex] = temp;
+
+        this.activeGroup = newGroupIndex;
+        this.activeItem = itemIndex;
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        let newGroupIndex = groupIndex - 2;
+        if (newGroupIndex < 0) {
+          return;
+        }
+
+        // Move entire group up (swap).
+        const temp = this.multipleItemsInSamePositionArray[groupIndex];
+        this.multipleItemsInSamePositionArray[groupIndex] =
+          this.multipleItemsInSamePositionArray[newGroupIndex];
+        this.multipleItemsInSamePositionArray[newGroupIndex] = temp;
+
+        this.activeGroup = newGroupIndex;
+        this.activeItem = itemIndex;
+      }
+    } else if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      const group = this.multipleItemsInSamePositionArray[groupIndex];
+      // Move inside group.
+      if (itemIndex < group.length - 1) {
+        let newItemIndex = itemIndex + 1;
+        moveItemInArray(group, itemIndex, newItemIndex);
+        this.activeGroup = groupIndex;
+        this.activeItem = newItemIndex;
+      }
+      // Transfer to next group.
+      else {
+        const item = group[itemIndex];
+        let newGroupIndex = groupIndex + 2;
+        if (newGroupIndex >= this.multipleItemsInSamePositionArray.length) {
+          const currentGroups = this.multipleItemsInSamePositionArray.filter(
+            group => group.length > 0
+          ).length;
+          // Possible to add group under the rest.
+          if (currentGroups < this.maxGroups) {
+            this.multipleItemsInSamePositionArray.push([]);
+            newGroupIndex = this.multipleItemsInSamePositionArray.length - 1;
+          } else {
+            // There is max number of groups.
+            return;
+          }
+        }
+
+        transferArrayItem(
+          this.multipleItemsInSamePositionArray[groupIndex],
+          this.multipleItemsInSamePositionArray[newGroupIndex],
+          itemIndex,
+          0
+        );
+
+        this.resetArray();
+        // Updates the active group and item index after transfer.
+        for (
+          let groupIndex = 0;
+          groupIndex < this.multipleItemsInSamePositionArray.length;
+          groupIndex++
+        ) {
+          const idx =
+            this.multipleItemsInSamePositionArray[groupIndex].indexOf(item);
+          if (idx !== -1) {
+            this.activeGroup = groupIndex;
+            this.activeItem = idx;
+            break;
+          }
+        }
+      }
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      const group = this.multipleItemsInSamePositionArray[groupIndex];
+
+      // Move inside group.
+      if (itemIndex > 0) {
+        let newItemIndex = itemIndex - 1;
+        moveItemInArray(group, itemIndex, newItemIndex);
+        this.activeGroup = groupIndex;
+        this.activeItem = newItemIndex;
+      }
+      // Transfer to previous group.
+      else {
+        let newGroupIndex = groupIndex - 2;
+        if (newGroupIndex < 0) {
+          return;
+        }
+
+        const targetGroup =
+          this.multipleItemsInSamePositionArray[newGroupIndex];
+        const insertIndex = targetGroup.length;
+        transferArrayItem(
+          this.multipleItemsInSamePositionArray[groupIndex],
+          targetGroup,
+          itemIndex,
+          insertIndex
+        );
+
+        this.activeGroup = newGroupIndex;
+        this.activeItem = insertIndex;
+        this.resetArray();
+      }
+    }
+
+    if (event.key === 'Tab') {
+      const flatIndex = this.getFlatIndex(groupIndex, itemIndex);
+      const totalItems = this.listItems.length;
+      let newFlatIndex = flatIndex;
+
+      if (event.shiftKey) {
+        if (flatIndex > 0) {
+          event.preventDefault();
+          newFlatIndex = flatIndex - 1;
+        }
+      } else {
+        if (flatIndex < totalItems - 1) {
+          event.preventDefault();
+          newFlatIndex = flatIndex + 1;
+        }
+      }
+
+      const position = this.getGroupItemFromFlatIndex(newFlatIndex);
+      this.activeGroup = position.group;
+      this.activeItem = position.item;
+    }
+    this.setFocus();
+  }
+
   hideElement(event: CdkDragExit<string[]>): void {
     // Emits when the user removes an element from the container
     // by dragging it into another container.
@@ -273,6 +463,8 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     this.choices = this.choicesValue.map(choice => choice.html);
     this.allowMultipleItemsInSamePosition =
       allowMultipleItemsInSamePosition.value;
+    // Max groups the array can have.
+    this.maxGroups = this.choices.length;
 
     let savedSolution = (
       this.savedSolution !== null ? this.savedSolution : []
