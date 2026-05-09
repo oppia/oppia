@@ -158,18 +158,7 @@ export class QuestionPlayerEngineService {
   ): void {
     this.pageContextService.setQuestionPlayerIsOpen();
     this.setAnswerIsBeingProcessed(false);
-    // let currentIndex = questionObjects.length;
-    // let randomIndex;
-
-    // while (currentIndex !== 0) {
-    //   randomIndex = Math.floor(Math.random() * currentIndex);
-    //   currentIndex--;
-
-    //   [questionObjects[currentIndex], questionObjects[randomIndex]] = [
-    //     questionObjects[randomIndex],
-    //     questionObjects[currentIndex],
-    //   ];
-    // }
+    // Shuffle the question order randomly.
     for (let i = 0; i < questionObjects.length; i++) {
       this.addQuestion(questionObjects[i]);
     }
@@ -384,8 +373,9 @@ export class QuestionPlayerEngineService {
     const interactionId = oldState.interaction.id ?? '';
     const interactionIsInline =
       !interactionId ||
-      (InteractionSpecsConstants.INTERACTION_SPECS as any)[interactionId]
-        ?.display_mode === AppConstants.INTERACTION_DISPLAY_MODE_INLINE;
+      InteractionSpecsConstants.INTERACTION_SPECS[
+        interactionId as keyof typeof InteractionSpecsConstants.INTERACTION_SPECS
+      ]?.display_mode === AppConstants.INTERACTION_DISPLAY_MODE_INLINE;
     const refreshInteraction = answerIsCorrect || interactionIsInline;
 
     const isFinalQuestion =
@@ -421,14 +411,14 @@ export class QuestionPlayerEngineService {
         nextCard as StateCard,
         refreshInteraction,
         feedbackHtml,
-        null as any,
-        null as any,
+        null,
+        null,
         onSameCard,
         taggedSkillMisconceptionId ?? '',
-        null as any,
-        null as any,
+        null,
+        null,
         isFinalQuestion,
-        nextCardIfReallyStuck as any,
+        nextCardIfReallyStuck,
         _nextFocusLabel
       );
     }
@@ -628,7 +618,9 @@ export class QuestionPlayerEngineService {
     const questionHtml = this.makeQuestion(initialState, []);
     if (questionHtml === null || questionHtml === '') {
       this.alertsService.addWarning('Question name should not be empty.');
-      if (errorCallback) errorCallback();
+      if (errorCallback) {
+        errorCallback();
+      }
       return;
     }
 
@@ -657,9 +649,10 @@ export class QuestionPlayerEngineService {
       interaction,
       initialState?.content.contentId ?? ''
     );
-    if (successCallback) successCallback(initialCard, nextFocusLabel);
+    if (successCallback) {
+      successCallback(initialCard, nextFocusLabel);
+    }
   }
-
   /**
    * Retrieves the state data for the currently active question.
    *
