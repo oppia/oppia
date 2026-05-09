@@ -92,8 +92,8 @@ export interface Opportunity {
   id: string;
   heading: string;
   subheading: string;
-  labelText: string;
-  labelColor: string;
+  labelText?: string;
+  labelColor?: string;
   actionButtonTitle: string;
   translationWordCount?: number;
   isPinned?: boolean;
@@ -717,8 +717,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
             actionButtonTitle: 'Translations',
             isPinned: opportunity.isPinned,
             topicName: opportunity.topicName,
-            labelText: '',
-            labelColor: '',
           };
           opportunitiesDicts.push(opportunityDict);
         });
@@ -795,7 +793,12 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
           ] as unknown as SuggestionDetails;
         });
         return {
-          opportunitiesDicts: this.getContributionSummaries(this.contributions),
+          opportunitiesDicts: this.getContributionSummaries(
+            response.suggestionIdToDetails as unknown as Record<
+              string,
+              SuggestionDetails
+            >
+          ),
           more: response.more,
         };
       }
