@@ -34,6 +34,7 @@ import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {
   ActiveContributionDict,
+  PendingSuggestionDict,
   TranslationSuggestionReviewModalComponent,
 } from '../modal-templates/translation-suggestion-review-modal.component';
 import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
@@ -44,7 +45,10 @@ import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
 import {UserService} from 'services/user.service';
 import {AlertsService} from 'services/alerts.service';
 import {PageContextService} from 'services/page-context.service';
-import {ContributionAndReviewService} from '../services/contribution-and-review.service';
+import {
+  ContributionAndReviewService,
+  FetchSuggestionsResponse,
+} from '../services/contribution-and-review.service';
 import {ContributionOpportunitiesService} from '../services/contribution-opportunities.service';
 import {OpportunitiesListComponent} from '../opportunities-list/opportunities-list.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
@@ -92,6 +96,8 @@ export interface Opportunity {
   labelColor: string;
   actionButtonTitle: string;
   translationWordCount?: number;
+  isPinned?: boolean;
+  topicName?: string;
 }
 
 export interface GetOpportunitiesResponse {
@@ -145,7 +151,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   TAB_TYPE_ACCOMPLISHMENTS!: string;
   REVIEWABLE_QUESTIONS_SORT_KEYS!: string[];
   activeExplorationId: string | null = null;
-  contributions: Record<string, SuggestionDetails> | object = {};
+  contributions: Record<string, SuggestionDetails> = {};
   userDetailsLoading: boolean = false;
   userIsLoggedIn: boolean = false;
   activeTabType!: string;
@@ -162,8 +168,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   reviewableTranslationsSortKey!: string;
   topicReady: boolean = false;
   commitTimeout?: NodeJS.Timeout;
-  queuedSuggestionSummary: unknown = null;
-  queuedSuggestion: unknown = null;
+  queuedSuggestionSummary: PendingSuggestionDict | null = null;
+  queuedSuggestion: PendingSuggestionDict | null = null;
   currentSnackbarRef?: MatSnackBarRef<UndoSnackbarComponent>;
   tabNameToOpportunityFetchFunction!: {
     [key: string]: {
@@ -447,7 +453,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     modalRef.componentInstance.reviewable = reviewable;
     modalRef.componentInstance.subheading = subheading;
     modalRef.componentInstance.queuedSuggestionSummaryEmit.subscribe(
-      (queuedSuggestionSummary: unknown) => {
+      (queuedSuggestionSummary: PendingSuggestionDict) => {
         if (this.queuedSuggestionSummary) {
           // Commit any previously queued suggestion.
           this.commitQueuedSuggestion();
@@ -459,7 +465,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     );
 
     modalRef.componentInstance.queuedSuggestionEmit.subscribe(
-      (queuedSuggestion: unknown) => {
+      (queuedSuggestion: PendingSuggestionDict) => {
         this.queuedSuggestion = queuedSuggestion;
       }
     );
@@ -478,9 +484,9 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         resolvedSuggestionIds.forEach((suggestionId: string) => {
           if (
             !this.queuedSuggestion ||
-            this.queuedSuggestion?.suggestion_id !== suggestionId
+            this.queuedSuggestion.suggestion_id !== suggestionId
           ) {
-            delete (this.contributions as Record<string, SuggestionDetails>)[suggestionId];
+            delete this.contributions[suggestionId];
           }
         });
       },
@@ -509,31 +515,29 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     this.queuedSuggestionSummary = null;
 
     this.contributionAndReviewService.reviewExplorationSuggestion(
-      currentSuggestionSummary?.target_id,
-      currentSuggestionSummary?.suggestion_id,
-      currentSuggestionSummary?.action_status,
-      currentSuggestionSummary?.reviewer_message,
-      currentSuggestionSummary?.action_status === 'accept' &&
-        currentSuggestionSummary?.commit_message
-        ? currentSuggestionSummary?.commit_message
+      currentSuggestionSummary.target_id,
+      currentSuggestionSummary.suggestion_id,
+      currentSuggestionSummary.action_status,
+      currentSuggestionSummary.reviewer_message,
+      currentSuggestionSummary.action_status === 'accept' &&
+        currentSuggestionSummary.commit_message
+        ? currentSuggestionSummary.commit_message
         : null,
       // Only include commit_message for accepted suggestions.
       () => {
         this.alertsService.clearMessages();
         this.alertsService.addSuccessMessage(
           `Suggestion ${
-            currentSuggestionSummary?.action_status === 'accept'
+            currentSuggestionSummary.action_status === 'accept'
               ? 'accepted'
               : 'rejected'
           }.`
         );
         clearTimeout(this.commitTimeout as unknown as number);
         this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
-          [currentSuggestionSummary?.suggestion_id]
+          [currentSuggestionSummary.suggestion_id]
         );
-        delete (this.contributions as Record<string, SuggestionDetails>)[
-          currentSuggestionSummary?.suggestion_id
-        ];
+        delete this.contributions[currentSuggestionSummary.suggestion_id];
         this.isCommitting = false;
       },
       errorMessage => {
@@ -594,13 +598,12 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     reviewable: boolean,
     question = undefined
   ): void {
-    const suggestionIdToContribution = {};
+    const suggestionIdToContribution: Record<string, ActiveContributionDict> =
+      {};
     for (let suggestionId in this.contributions) {
-      var contribution = (this.contributions as Record<string, SuggestionDetails>)[
+      suggestionIdToContribution[suggestionId] = this.contributions[
         suggestionId
-      ];
-      (suggestionIdToContribution as Record<string, ActiveContributionDict>)[suggestionId] =
-        contribution;
+      ] as unknown as ActiveContributionDict;
     }
     const skillId = suggestion.change_cmd.skill_id;
 
@@ -610,34 +613,32 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     );
 
     this.skillBackendApiService.fetchSkillAsync(skillId).then(skillDict => {
-      const misconceptionsBySkill: Record<string, unknown> = {};
+      const misconceptionsBySkill: MisconceptionSkillMap = {};
       const skill = skillDict.skill;
       misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
       this._showQuestionSuggestionModal(
         suggestion,
         suggestionIdToContribution,
         reviewable,
-        question as unknown,
+        question as unknown as Question,
         misconceptionsBySkill
       );
     });
   }
 
   onClickViewSuggestion(suggestionId: string): void {
-    const suggestion = (this.contributions as Record<string, SuggestionDetails>)[suggestionId]
-      .suggestion;
+    const suggestion = this.contributions[suggestionId].suggestion;
     const reviewable = this.activeTabType === this.TAB_TYPE_REVIEWS;
     if (suggestion.suggestion_type === this.SUGGESTION_TYPE_QUESTION) {
       this.openQuestionSuggestionModal(suggestionId, suggestion, reviewable);
     }
     if (suggestion.suggestion_type === this.SUGGESTION_TYPE_TRANSLATE) {
-      const suggestionIdToContribution = {};
+      const suggestionIdToContribution: Record<string, ActiveContributionDict> =
+        {};
       for (let suggestionId in this.contributions) {
-        const contribution = (this.contributions as Record<string, ActiveContributionDict>)[
+        suggestionIdToContribution[suggestionId] = this.contributions[
           suggestionId
-        ];
-        (suggestionIdToContribution as Record<string, SuggestionDetails>)[suggestionId] =
-          contribution;
+        ] as unknown as ActiveContributionDict;
       }
       this.pageContextService.setCustomEntityContext(
         AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
@@ -707,19 +708,22 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         this.languageCode
       )
       .then(response => {
-        const opportunitiesDicts: unknown[] = [];
+        const opportunitiesDicts: Opportunity[] = [];
         response.opportunities.forEach(opportunity => {
-          const opportunityDict = {
+          const opportunityDict: Opportunity = {
             id: opportunity.getExplorationId(),
             heading: opportunity.getOpportunityHeading(),
             subheading: opportunity.getOpportunitySubheading(),
             actionButtonTitle: 'Translations',
             isPinned: opportunity.isPinned,
             topicName: opportunity.topicName,
+            labelText: '',
+            labelColor: '',
           };
           opportunitiesDicts.push(opportunityDict);
         });
-        this.opportunities = opportunitiesDicts;
+        this.opportunities =
+          opportunitiesDicts as unknown as ExplorationOpportunitySummary[];
         return {
           opportunitiesDicts: opportunitiesDicts,
           more: response.more,
@@ -783,18 +787,19 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         this.activeTabType
       ];
 
-    return fetchFunction(shouldResetOffset).then((response: unknown) => {
-      Object.keys(response.suggestionIdToDetails).forEach(id => {
-        (this.contributions as Record<string, SuggestionDetails>)[id] =
-          response.suggestionIdToDetails[id];
-      });
-      return {
-        opportunitiesDicts: this.getContributionSummaries(
-          response.suggestionIdToDetails
-        ),
-        more: response.more,
-      };
-    });
+    return fetchFunction(shouldResetOffset).then(
+      (response: FetchSuggestionsResponse) => {
+        Object.keys(response.suggestionIdToDetails).forEach(id => {
+          this.contributions[id] = response.suggestionIdToDetails[
+            id
+          ] as unknown as SuggestionDetails;
+        });
+        return {
+          opportunitiesDicts: this.getContributionSummaries(this.contributions),
+          more: response.more,
+        };
+      }
+    );
   }
 
   loadOpportunities(): Promise<GetOpportunitiesResponse> {
@@ -907,7 +912,9 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.subscribe(
         suggestionIds => {
           suggestionIds.forEach(suggestionId => {
-            delete (this.contributions as Record<string, unknown>)[suggestionId];
+            delete (this.contributions as Record<string, unknown>)[
+              suggestionId
+            ];
           });
         }
       )

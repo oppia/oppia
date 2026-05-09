@@ -95,7 +95,7 @@ export interface ActiveContributionDict {
   suggestion: ActiveSuggestionDict;
 }
 
-interface PendingSuggestionDict {
+export interface PendingSuggestionDict {
   target_id: string;
   suggestion_id: string;
   action_status: string;
