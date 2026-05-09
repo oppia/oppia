@@ -501,6 +501,42 @@ const INTERACTION_TABS_SELECTORS: Record<string, string> = {
   [INTERACTION_TABS.MUSIC]: '.e2e-test-interaction-tab-music',
 };
 
+const INTERACTION_TILE_SELECTORS_BY_NAME: Record<string, string> = {
+  [INTERACTION_TYPES.ALGEBRAIC_EXPRESSION]:
+    'div.e2e-test-interaction-tile-AlgebraicExpressionInput',
+  [INTERACTION_TYPES.CODE_EDITOR]: 'div.e2e-test-interaction-tile-CodeRepl',
+  [INTERACTION_TYPES.CONTINUE_BUTTON]: 'div.e2e-test-interaction-tile-Continue',
+  [INTERACTION_TYPES.DRAG_AND_DROP_SORT]:
+    'div.e2e-test-interaction-tile-DragAndDropSortInput',
+  [INTERACTION_TYPES.END_EXPLORATION]:
+    'div.e2e-test-interaction-tile-EndExploration',
+  [INTERACTION_TYPES.FRACTION_INPUT]:
+    'div.e2e-test-interaction-tile-FractionInput',
+  [INTERACTION_TYPES.GRAPH_THEORY]: 'div.e2e-test-interaction-tile-GraphInput',
+  [INTERACTION_TYPES.ITEM_SELECTION]:
+    'div.e2e-test-interaction-tile-ItemSelectionInput',
+  [INTERACTION_TYPES.MATH_EQUATION]:
+    'div.e2e-test-interaction-tile-MathEquationInput',
+  [INTERACTION_TYPES.MULTIPLE_CHOICE]:
+    'div.e2e-test-interaction-tile-MultipleChoiceInput',
+  [INTERACTION_TYPES.MUSIC_NOTES_INPUT]:
+    'div.e2e-test-interaction-tile-MusicNotesInput',
+  [INTERACTION_TYPES.NUMBER_INPUT]:
+    'div.e2e-test-interaction-tile-NumericInput',
+  [INTERACTION_TYPES.NUMBER_WITH_UNITS]:
+    'div.e2e-test-interaction-tile-NumberWithUnits',
+  [INTERACTION_TYPES.NUMERIC_EXPRESSION]:
+    'div.e2e-test-interaction-tile-NumericExpressionInput',
+  [INTERACTION_TYPES.PENCIL_CODE_EDITOR]:
+    'div.e2e-test-interaction-tile-PencilCodeEditor',
+  [INTERACTION_TYPES.RATIO_EXPRESSION_INPUT]:
+    'div.e2e-test-interaction-tile-RatioExpressionInput',
+  [INTERACTION_TYPES.SET_INPUT]: 'div.e2e-test-interaction-tile-SetInput',
+  [INTERACTION_TYPES.TEXT_INPUT]: 'div.e2e-test-interaction-tile-TextInput',
+  [INTERACTION_TYPES.WORLD_MAP]: 'div.e2e-test-interaction-tile-InteractiveMap',
+  'Image Region': 'div.e2e-test-interaction-tile-ImageClickInput',
+};
+
 export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
   [INTERACTION_TYPES.CODE_EDITOR]: INTERACTION_TABS.PROGRAMMING,
   [INTERACTION_TYPES.FRACTION_INPUT]: INTERACTION_TABS.MATHS,
@@ -2930,6 +2966,25 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Selects an interaction tile from the interaction selection modal.
+   * @param interactionName - The interaction name shown in the modal.
+   */
+  async selectInteractionTile(interactionName: string): Promise<void> {
+    const interactionTileSelector =
+      INTERACTION_TILE_SELECTORS_BY_NAME[interactionName];
+
+    if (interactionTileSelector) {
+      await this.page.waitForSelector(interactionTileSelector, {
+        visible: true,
+      });
+      await this.clickOnElementWithSelector(interactionTileSelector);
+      return;
+    }
+
+    await this.clickOnElementWithText(interactionName);
+  }
+
+  /**
    * Function to add an interaction to the exploration.
    * @param {string} interactionToAdd - The interaction type to add to the Exploration.
    * @param {boolean} skipInteractionCustoization - Whether to skip interaction customization.
@@ -2952,7 +3007,7 @@ export class ExplorationEditor extends BaseUser {
     );
 
     await this.waitForNetworkIdle();
-    await this.clickOnElementWithText(interactionToAdd);
+    await this.selectInteractionTile(interactionToAdd);
     if (skipInteractionCustoization) {
       await this.expectCustomizeInteractionTitleToBe(
         `Customize Interaction (${interactionToAdd})`
@@ -3053,7 +3108,7 @@ export class ExplorationEditor extends BaseUser {
     });
     await this.clickOnElementWithSelector(addInteractionButton);
     await this.clickOnElementWithSelector(mathInteractionsTab);
-    await this.clickOnElementWithText(` ${interactionToAdd} `);
+    await this.selectInteractionTile(interactionToAdd);
     await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
@@ -3087,7 +3142,7 @@ export class ExplorationEditor extends BaseUser {
     await this.expectModalTitleToBe('Choose Interaction');
 
     // Click on image region interaction.
-    await this.clickOnElementWithText('Image Region');
+    await this.selectInteractionTile('Image Region');
     await this.expectCustomizeInteractionTitleToBe(
       'Customize Interaction (Image Region)'
     );
@@ -3808,6 +3863,12 @@ export class ExplorationEditor extends BaseUser {
           `Unable to navigate to the card ${cardName}.\n` + error.message;
         throw error;
       }
+    }
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(explorationStateGraphModalSelector, {
+        hidden: true,
+      });
     }
   }
 
