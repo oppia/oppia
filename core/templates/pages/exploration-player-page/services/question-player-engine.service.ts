@@ -308,7 +308,7 @@ export class QuestionPlayerEngineService {
       wasOldStateInitial,
       isFirstHit,
       isFinalQuestion: boolean,
-      nextCardIfReallyStuck: null,
+      nextCardIfReallyStuck: string | null,
       focusLabel: string
     ) => void
   ): boolean {
