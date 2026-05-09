@@ -1,11 +1,6 @@
 {
   "suites": [
     {
-      "name": "smoke/home-page-loads",
-      "module": "core/tests/playwright-acceptance-tests/specs/smoke/home-page-loads.spec.ts",
-      "framework": "playwright"
-    },
-    {
       "name": "logged-in-learner/serial-chapter",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/serial-chapter.spec.ts",
       "framework": "puppeteer"
@@ -32,8 +27,8 @@
     },
     {
       "name": "interested-partner-organization/view-the-blog",
-      "module": "core/tests/playwright-acceptance-tests/specs/interested-partner-organization/view-the-blog.spec.ts",
-      "framework": "playwright"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-partner-organization/view-the-blog.spec.ts",
+      "framework": "puppeteer"
     },
     {
       "name": "interested-volunteer/apply-to-become-a-volunteer",

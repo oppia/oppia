@@ -16,7 +16,7 @@
  * @fileoverview Super Admin users utility file.
  */
 
-import {expect} from '@playwright/test';
+import {Page, expect} from '@playwright/test';
 import {LoggedInUser} from './logged-in-user';
 import testConstants, {BLOG_RIGHTS, BlogRoles} from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -686,3 +686,7 @@ export class SuperAdmin extends LoggedInUser {
     showMessage(`Users "${users}" assignment verified.`);
   }
 }
+
+export const SuperAdminFactory = (page: Page): SuperAdmin => {
+  return new SuperAdmin(page);
+};

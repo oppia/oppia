@@ -1,5 +1,5 @@
-import {LoggedInUser} from './logged-in-user';
-import {expect} from '@playwright/test';
+import {BaseUser} from '../common/playwright-utils';
+import {Page, expect} from '@playwright/test';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
 
@@ -25,7 +25,7 @@ const tagSelector = '.e2e-test-blog-post-tags';
 const saveDraftButtonSelector = '.e2e-test-save-as-draft-button';
 const editBlogSelector = '.e2e-test-content-button';
 
-export class BlogPostEditor extends LoggedInUser {
+export class BlogPostEditor extends BaseUser {
   async updateUsernameInRegisterModal(username: string): Promise<void> {
     await this.clearAllTextFrom(usernameInputSelector);
     await this.typeInInputField(usernameInputSelector, username);
@@ -187,3 +187,7 @@ export class BlogPostEditor extends LoggedInUser {
     showMessage('Successfully published a blog post!');
   }
 }
+
+export const BlogPostEditorFactory = (page: Page): BlogPostEditor => {
+  return new BlogPostEditor(page);
+};

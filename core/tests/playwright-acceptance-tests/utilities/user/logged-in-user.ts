@@ -1,9 +1,8 @@
-import {BaseUser} from '../base-user';
-import {expect} from '@playwright/test';
+import {Page, expect} from '@playwright/test';
+import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 
 const profileDropdown = '.e2e-test-profile-dropdown';
-const commonModalTitleSelector = '.e2e-test-modal-header';
 
 export class LoggedInUser extends BaseUser {
   async navigateToPageUsingProfileMenu(pageName: string): Promise<void> {
@@ -18,14 +17,8 @@ export class LoggedInUser extends BaseUser {
       currentUrl.href.includes(url)
     );
   }
-
-  async reloadPage(): Promise<void> {
-    await this.page.reload({waitUntil: 'networkidle'});
-  }
-
-  async expectModalTitleToBe(expectedTitle: string): Promise<void> {
-    await expect(this.page.locator(commonModalTitleSelector)).toHaveText(
-      expectedTitle
-    );
-  }
 }
+
+export const LoggedInUserFactory = (page: Page): LoggedInUser => {
+  return new LoggedInUser(page);
+};

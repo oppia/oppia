@@ -7,24 +7,38 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
+// distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
 /**
  * @fileoverview Utility File for declaring and initializing users.
+ * Uses prototype-based composition to mix role capabilities onto user instances.
+ * Mirrors Puppeteer's pattern for consistent behavior across test frameworks.
  */
 
 import {Browser} from '@playwright/test';
-import {BaseUser} from '../base-user';
-import {SuperAdmin} from '../user/super-admin';
-import {BlogPostEditor} from '../user/blog-post-editor';
+import {BaseUser, BaseUserFactory} from './playwright-utils';
+import {SuperAdmin, SuperAdminFactory} from '../user/super-admin';
+import {BlogPostEditor, BlogPostEditorFactory} from '../user/blog-post-editor';
+import {LoggedOutUser, LoggedOutUserFactory} from '../user/logged-out-user';
+import {LoggedInUser, LoggedInUserFactory} from '../user/logged-in-user';
+import {BlogAdmin, BlogAdminFactory} from '../user/blog-admin';
 import testConstants, {BLOG_RIGHTS} from './test-constants';
 import {showMessage} from './show-message';
-import {LoggedOutUser} from '../user/logged-out-user';
 
 const ROLES = testConstants.Roles;
+const cookieBannerAcceptButton =
+  'button.e2e-test-oppia-cookie-banner-accept-button';
+
+/**
+ * Mapping of user roles to their respective factory functions.
+ */
+const USER_ROLE_MAPPING = {
+  [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
+  [ROLES.BLOG_ADMIN]: BlogAdminFactory,
+} as const;
 
 // Roles that are not reflected on the admin page after assignment.
 const USERS_ROLES_NOT_REFLECTED_IN_ADMIN_PAGE: string[] = [
@@ -32,231 +46,244 @@ const USERS_ROLES_NOT_REFLECTED_IN_ADMIN_PAGE: string[] = [
   ROLES.VOICEOVER_SUBMITTER,
 ];
 
-// Global super admin instance reused across all tests in a suite.
-// Mirrors Puppeteer's pattern — one super admin per suite.
-let superAdminInstance: SuperAdmin | null = null;
+/**
+ * These types are used to create a union of all the roles and then
+ * create an intersection of all the roles. This is used to create a
+ * composition of the user and the role for type inference.
+ */
+type UnionToIntersection<U> = (
+  U extends BaseUser ? (k: U) => void : never
+) extends (k: infer I) => void
+  ? I
+  : never;
+
+type MultipleRoleIntersection<T extends (keyof typeof USER_ROLE_MAPPING)[]> =
+  UnionToIntersection<ReturnType<(typeof USER_ROLE_MAPPING)[T[number]]>>;
+
+type OptionalRoles<TRoles extends (keyof typeof USER_ROLE_MAPPING)[]> =
+  TRoles extends never[] ? [] : TRoles | [];
+
+type BasicRolesUser = BaseUser & LoggedOutUser & LoggedInUser & BlogPostEditor;
+
+/**
+ * Global user instances that are created and can be reused again.
+ */
+let superAdminInstance: (SuperAdmin & BlogAdmin) | null = null;
+let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
   /**
-   * Creates and returns a super admin instance.
-   * Reuses the existing instance if already created (singleton per suite).
+   * This function creates a composition of the user and the role
+   * through object prototypes and returns the instance of that user.
    */
-  static async createNewSuperAdmin(browser: Browser): Promise<SuperAdmin> {
-    if (superAdminInstance !== null) {
-      return superAdminInstance;
+  private static composeUserWithRoles = function <
+    TUser extends BaseUser,
+    TRoles extends BaseUser[],
+  >(user: TUser, roles: TRoles): TUser & UnionToIntersection<TRoles[number]> {
+    for (const role of roles) {
+      const userPrototype = Object.getPrototypeOf(user);
+      const rolePrototype = Object.getPrototypeOf(role);
+
+      Object.getOwnPropertyNames(rolePrototype).forEach((name: string) => {
+        Object.defineProperty(
+          userPrototype,
+          name,
+          Object.getOwnPropertyDescriptor(rolePrototype, name) ||
+            Object.create(null)
+        );
+      });
     }
 
-    const context = await browser.newContext({
-      recordVideo: {dir: './test-results/videos/'},
-    });
-    const page = await context.newPage();
-    const superAdmin = new SuperAdmin(page);
-    superAdmin.username = 'superAdm';
-    superAdmin.email = 'testadmin@example.com';
-
-    await superAdmin.signUpNewUser('superAdm', 'testadmin@example.com');
-
-    // Grant all admin roles to superAdm — mirrors Puppeteer's pattern.
-    await superAdmin.assignRoleToUser('superAdm', ROLES.BLOG_ADMIN);
-    await superAdmin.expectUserToHaveRole('superAdm', ROLES.BLOG_ADMIN);
-    await superAdmin.assignRoleToUser('superAdm', ROLES.TRANSLATION_ADMIN);
-    await superAdmin.expectUserToHaveRole('superAdm', ROLES.TRANSLATION_ADMIN);
-    await superAdmin.assignRoleToUser('superAdm', ROLES.VOICEOVER_ADMIN);
-    await superAdmin.expectUserToHaveRole('superAdm', ROLES.VOICEOVER_ADMIN);
-
-    superAdminInstance = superAdmin;
-    showMessage('Super admin created successfully.');
-    return superAdminInstance;
-  }
+    return user as TUser & UnionToIntersection<TRoles[number]>;
+  };
 
   /**
-   * Assigns roles to a user via the super admin.
-   * Mirrors Puppeteer's assignRolesToUser logic exactly.
-   *
-   * @param user - The user to assign roles to.
-   * @param roles - The roles to assign.
-   * @param browser - The browser instance (needed to create super admin if
-   *     not yet created).
-   * @param args - Extra arguments for specific roles:
-   *     - TOPIC_MANAGER: topic name (string)
-   *     - TRANSLATION_COORDINATOR: language codes (string[])
-   *     - TRANSLATION_REVIEWER: language codes (string[])
-   *     - VOICEOVER_SUBMITTER: exploration ID (string)
+   * This function assigns roles to a user and returns the instance of
+   * that user.
+   * @param {TUser} user - The user to assign roles to.
+   * @param {TRoles} roles - The roles to assign to the user.
+   * @param {Browser} browser - The Playwright browser instance.
+   * @param {string | string[]} args - The arguments to pass to the role
+   *     assignment function. For Blog Post Editor, it uses the blog admin page.
+   * @returns {TUser & MultipleRoleIntersection<TRoles>} - The user with
+   *     the roles assigned.
    */
-  static async assignRolesToUser(
-    user: BaseUser,
-    roles: string[],
+  static assignRolesToUser = async function <
+    TUser extends BaseUser,
+    TRoles extends (keyof typeof USER_ROLE_MAPPING)[],
+  >(
+    user: TUser,
+    roles: TRoles,
     browser: Browser,
     args?: string | string[]
-  ): Promise<void> {
-    if (roles.length === 0) {
-      return;
-    }
-
-    // Create super admin if not already created.
-    const superAdmin = await UserFactory.createNewSuperAdmin(browser);
-
-    if (!user.username) {
-      throw new Error('Username is null while adding roles.');
-    }
-
+  ): Promise<TUser & MultipleRoleIntersection<TRoles>> {
     for (const role of roles) {
+      if (superAdminInstance === null) {
+        superAdminInstance = await UserFactory.createNewSuperAdmin(browser);
+      }
+
+      if (!user.username) {
+        throw new Error('Username is null while adding roles.');
+      }
+
       switch (role) {
         case ROLES.BLOG_POST_EDITOR:
-          // Blog post editor is assigned via blog admin page,
-          // not the standard admin roles page.
-          await superAdmin.navigateToBlogAdminPage();
-          await superAdmin.assignUserToRoleFromBlogAdminPage(
+          await superAdminInstance.navigateToBlogAdminPage();
+          await superAdminInstance.assignUserToRoleFromBlogAdminPage(
             user.username,
             BLOG_RIGHTS.BLOG_POST_EDITOR
           );
           break;
 
-        case ROLES.TOPIC_MANAGER:
-          if (typeof args !== 'string') {
-            throw new Error(
-              'Topic name (string) is required for TOPIC_MANAGER role.'
-            );
-          }
-          await superAdmin.assignRoleToUser(
-            user.username,
-            ROLES.TOPIC_MANAGER,
-            args
-          );
-          break;
-
-        case ROLES.TRANSLATION_COORDINATOR:
-          await superAdmin.assignRoleToUser(
-            user.username,
-            ROLES.TRANSLATION_COORDINATOR,
-            args
-          );
-          break;
-
-        case ROLES.TRANSLATION_REVIEWER:
-          await superAdmin.navigateToContributorDashboardAdminPage();
-          const languages =
-            typeof args === 'string' ? [args] : (args as string[]);
-          for (const language of languages) {
-            await superAdmin.addTranslationLanguageReviewRights(
-              user.username,
-              language
-            );
-          }
-          break;
-
-        case ROLES.VOICEOVER_SUBMITTER:
-          if (typeof args !== 'string') {
-            throw new Error(
-              'Exploration ID (string) is required for VOICEOVER_SUBMITTER role.'
-            );
-          }
-          await superAdmin.addVoiceoverArtistToExplorationWithID(
-            args,
-            user.username
-          );
-          break;
-
         default:
-          // Standard roles assigned via the admin roles page.
-          await superAdmin.assignRoleToUser(user.username, role);
+          await superAdminInstance.assignRoleToUser(user.username, role);
           break;
       }
 
-      // Verify the role was assigned (except for roles not shown on admin page).
       if (!USERS_ROLES_NOT_REFLECTED_IN_ADMIN_PAGE.includes(role)) {
-        await superAdmin.expectUserToHaveRole(user.username, role);
+        await superAdminInstance.expectUserToHaveRole(user.username, role);
       }
 
-      showMessage(`Role "${role}" assigned to "${user.username}".`);
+      UserFactory.composeUserWithRoles(user, [
+        USER_ROLE_MAPPING[role](user.page),
+      ]);
     }
-  }
+
+    return user as TUser & MultipleRoleIntersection<typeof roles>;
+  };
 
   /**
-   * Creates a new user, signs them up, assigns roles via super admin,
-   * and returns the user instance.
-   *
-   * The return type is BlogPostEditor because it extends the full
-   * class chain:
-   *   BaseUser → LoggedInUser → ExplorationEditor → ... → BlogPostEditor
-   * so it has ALL capabilities. Cast to a more specific type in tests
-   * if needed.
-   *
-   * @param username - The username for the new user.
-   * @param email - The email for the new user.
-   * @param browser - The Playwright browser instance.
-   * @param roles - Optional roles to assign via super admin.
-   * @param args - Extra args for specific roles (topic name, language, etc).
+   * This function creates a new user with the specified roles and returns
+   * the instance of that user.
+   * @param {string} username - The username of the user.
+   * @param {string} email - The email of the user.
+   * @param {Browser} browser - The Playwright browser instance.
+   * @param {OptionalRoles<TRoles>} roles - The roles to assign to the user.
+   * @param {string | string[]} args - The arguments to pass to the role
+   *     assignment function.
    */
-  static async createNewUser(
+  static createNewUser = async function <
+    TRoles extends (keyof typeof USER_ROLE_MAPPING)[] = never[],
+  >(
     username: string,
     email: string,
     browser: Browser,
-    roles: string[] = [],
+    roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>,
     args?: string | string[]
-  ): Promise<BlogPostEditor> {
+  ): Promise<BasicRolesUser & MultipleRoleIntersection<TRoles>> {
     const context = await browser.newContext({
       recordVideo: {dir: './test-results/videos/'},
     });
     const page = await context.newPage();
 
-    // BlogPostEditor sits at the top of the class hierarchy so it has
-    // all methods from every user class — mirrors Puppeteer's pattern
-    // of composing ALL role factories onto every user.
-    const user = new BlogPostEditor(page);
+    let user = UserFactory.composeUserWithRoles(BaseUserFactory(page), [
+      LoggedOutUserFactory(page),
+      LoggedInUserFactory(page),
+      BlogPostEditorFactory(page),
+    ]);
+
     user.username = username;
     user.email = email;
 
     await user.signUpNewUser(username, email);
-    showMessage(`User "${username}" created successfully.`);
+    activeUsers.push(user);
 
-    // Assign roles via super admin if any are specified.
-    if (roles.length > 0) {
-      await UserFactory.assignRolesToUser(user, roles, browser, args);
+    return (await UserFactory.assignRolesToUser(
+      user,
+      roles,
+      browser,
+      args
+    )) as BasicRolesUser & MultipleRoleIntersection<TRoles>;
+  };
+
+  /**
+   * The function creates a new super admin user and returns the instance
+   * of that user.
+   */
+  static createNewSuperAdmin = async function (
+    browser: Browser
+  ): Promise<SuperAdmin & BlogAdmin> {
+    if (superAdminInstance !== null) {
+      return superAdminInstance;
     }
 
-    return user;
-  }
+    const user = await UserFactory.createNewUser(
+      'superAdm',
+      'testadmin@example.com',
+      browser
+    );
+
+    const superAdmin = UserFactory.composeUserWithRoles(user, [
+      SuperAdminFactory(user.page),
+    ]);
+
+    await superAdmin.assignRoleToUser('superAdm', ROLES.BLOG_ADMIN);
+    await superAdmin.expectUserToHaveRole('superAdm', ROLES.BLOG_ADMIN);
+
+    superAdminInstance = UserFactory.composeUserWithRoles(superAdmin, [
+      BlogAdminFactory(user.page),
+    ]);
+
+    showMessage('Super admin created successfully.');
+    return superAdminInstance;
+  };
 
   /**
-   * Creates a logged-out user (no sign-up, just a fresh browser context).
+   * This function creates a new instance of a LoggedOutUser, opens a browser
+   * for that user, navigates to the home page, adds the user to the
+   * activeUsers array, and returns the user.
    */
-  static async createLoggedOutUser(browser: Browser): Promise<LoggedOutUser> {
+  static createLoggedOutUser = async function (
+    browser: Browser
+  ): Promise<LoggedOutUser> {
     const context = await browser.newContext();
     const page = await context.newPage();
-    const user = new LoggedOutUser(page);
-    await user.goto(testConstants.URLs.Home);
-    await page
-      .locator('button.e2e-test-oppia-cookie-banner-accept-button')
-      .click();
-    showMessage('Logged-out user created.');
+
+    let user = UserFactory.composeUserWithRoles(BaseUserFactory(page), [
+      LoggedOutUserFactory(page),
+    ]);
+
+    await page.goto(testConstants.URLs.Home);
+    await page.locator(cookieBannerAcceptButton).click();
+
+    activeUsers.push(user);
     return user;
-  }
+  };
 
   /**
-   * Closes all browser contexts for the given users.
-   * Also closes the super admin context and resets the singleton.
-   *
-   * Call this in test.afterAll().
+   * This function closes all the browsers opened by different users.
    */
-  static async closeAllBrowsers(users: BaseUser[]): Promise<void> {
-    showMessage(`Closing browsers for ${users.length} user(s).`);
-    await Promise.all(users.map(u => u.page.context().close()));
+  static closeAllBrowsers = async function (): Promise<void> {
+    showMessage(`Closing browsers for ${activeUsers.length} users.`);
+    await Promise.all(
+      activeUsers.map(async user => {
+        await user.closeBrowser();
+      })
+    );
 
+    activeUsers = [];
+    showMessage('All browsers closed.');
+  };
+
+  /**
+   * This function closes the browser for the provided user.
+   */
+  static closeBrowserForUser = async function (user: BaseUser): Promise<void> {
+    const index = activeUsers.indexOf(user);
+    if (index !== -1) {
+      activeUsers.splice(index, 1);
+    }
+    await user.closeBrowser();
+  };
+
+  /**
+   * This function closes the browser for SuperAdmin and resets the singleton.
+   */
+  static closeSuperAdminBrowser = async function (): Promise<void> {
     if (superAdminInstance !== null) {
-      await superAdminInstance.page.context().close();
+      await superAdminInstance.closeBrowser();
       superAdminInstance = null;
       showMessage('Super admin browser closed.');
     }
-
-    showMessage('All browsers closed.');
-  }
-
-  /**
-   * Closes the browser for a single user.
-   */
-  static async closeBrowserForUser(user: BaseUser): Promise<void> {
-    await user.page.context().close();
-    showMessage(`Browser closed for "${user.username}".`);
-  }
+  };
 }

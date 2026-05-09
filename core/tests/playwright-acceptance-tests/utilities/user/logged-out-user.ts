@@ -1,5 +1,5 @@
-import {BaseUser} from '../base-user';
-import {expect} from '@playwright/test';
+import {Page, expect} from '@playwright/test';
+import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
@@ -50,10 +50,6 @@ export class LoggedOutUser extends BaseUser {
       this.page.waitForURL(`**${blogUrl}**`),
       this.page.locator(navbarAboutTabBlogButton).click(),
     ]);
-  }
-
-  async reloadPage(): Promise<void> {
-    await this.page.reload();
   }
 
   async expectBlogWelcomeMessageToBeVisible(
@@ -258,3 +254,7 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 }
+
+export const LoggedOutUserFactory = (page: Page): LoggedOutUser => {
+  return new LoggedOutUser(page);
+};
