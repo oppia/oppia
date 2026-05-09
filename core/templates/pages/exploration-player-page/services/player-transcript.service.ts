@@ -105,7 +105,7 @@ export class PlayerTranscriptService {
       this.totalNumberOfAnswersSubmitted += 1;
     }
     this.transcript[this.transcript.length - 1].addInputResponsePair({
-      learnerInput: input,
+      learnerInput: String(input),
       oppiaResponse: null,
       isHint: isHint,
     });

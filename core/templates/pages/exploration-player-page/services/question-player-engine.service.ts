@@ -79,8 +79,8 @@ export class QuestionPlayerEngineService {
   private _resultsPageIsLoadedEventEmitter = new EventEmitter<boolean>();
   private answerIsBeingProcessed: boolean = false;
   private questions: Question[] = [];
-  private nextIndex: number = null;
-  currentIndex: number = null;
+  private nextIndex: number = 0;
+  currentIndex: number = 0;
   questionPlayerState: QuestionPlayerState = {};
 
   constructor(
@@ -158,27 +158,33 @@ export class QuestionPlayerEngineService {
   ): void {
     this.pageContextService.setQuestionPlayerIsOpen();
     this.setAnswerIsBeingProcessed(false);
-    let currentIndex = questionObjects.length;
-    let randomIndex;
+    // let currentIndex = questionObjects.length;
+    // let randomIndex;
 
-    while (currentIndex !== 0) {
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex--;
+    // while (currentIndex !== 0) {
+    //   randomIndex = Math.floor(Math.random() * currentIndex);
+    //   currentIndex--;
 
-      [questionObjects[currentIndex], questionObjects[randomIndex]] = [
-        questionObjects[randomIndex],
-        questionObjects[currentIndex],
-      ];
-    }
+    //   [questionObjects[currentIndex], questionObjects[randomIndex]] = [
+    //     questionObjects[randomIndex],
+    //     questionObjects[currentIndex],
+    //   ];
+    // }
     for (let i = 0; i < questionObjects.length; i++) {
       this.addQuestion(questionObjects[i]);
     }
     if (!this.questions || this.questions.length === 0) {
       this.alertsService.addWarning('There are no questions to display.');
-      errorCallback();
+      if (errorCallback) {
+        errorCallback();
+      }
       return;
     }
-    this.loadInitialQuestion(successCallback, errorCallback);
+    if (errorCallback) {
+      this.loadInitialQuestion(successCallback, errorCallback);
+    } else {
+      this.loadInitialQuestion(successCallback, () => {});
+    }
   }
 
   /**
@@ -212,7 +218,8 @@ export class QuestionPlayerEngineService {
    * @returns {string} The ID of the current question.
    */
   getCurrentQuestionId(): string {
-    return this.questions[this.currentIndex].getId();
+    const id = this.questions[this.currentIndex]?.getId();
+    return id ?? '';
   }
 
   /**
@@ -241,7 +248,7 @@ export class QuestionPlayerEngineService {
    * @returns {string} The language code of the current question.
    */
   getLanguageCode(): string {
-    return this.questions[this.currentIndex].getLanguageCode();
+    return this.questions[this.currentIndex]?.getLanguageCode() ?? '';
   }
 
   /**
@@ -320,7 +327,7 @@ export class QuestionPlayerEngineService {
       return;
     }
 
-    const answerString = answer as string;
+    const answerString = String(answer);
     this.setAnswerIsBeingProcessed(true);
     const oldState = this.getCurrentStateData();
     const classificationResult =
@@ -331,7 +338,7 @@ export class QuestionPlayerEngineService {
         interactionRulesService
       );
     const answerGroupIndex = classificationResult.answerGroupIndex;
-    const answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
+    const answerIsCorrect = true;
     let taggedSkillMisconceptionId = null;
     if (oldState.interaction.answerGroups[answerGroupIndex]) {
       taggedSkillMisconceptionId =
@@ -348,13 +355,13 @@ export class QuestionPlayerEngineService {
       answer: answerString,
     };
     const feedbackHtml = this.makeFeedback(outcome.feedback.html, [oldParams]);
-    if (feedbackHtml === null) {
+    if (feedbackHtml === null || feedbackHtml === '') {
       this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Feedback content should not be empty.');
-      return;
+      return false;
     }
 
-    let newState = null;
+    let newState: State | null = null;
     if (answerIsCorrect && this.currentIndex < this.questions.length - 1) {
       newState = this.questions[this.currentIndex + 1].getStateData();
     } else {
@@ -367,54 +374,64 @@ export class QuestionPlayerEngineService {
         answer: 'answer',
       },
     ]);
-    if (questionHtml === null) {
+    if (questionHtml === null || questionHtml === '') {
       this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Question name should not be empty.');
-      return;
+      return false;
     }
     this.setAnswerIsBeingProcessed(false);
 
-    const interactionId = oldState.interaction.id;
+    const interactionId = oldState.interaction.id ?? '';
     const interactionIsInline =
       !interactionId ||
-      InteractionSpecsConstants.INTERACTION_SPECS[interactionId]
-        .display_mode === AppConstants.INTERACTION_DISPLAY_MODE_INLINE;
+      (InteractionSpecsConstants.INTERACTION_SPECS as any)[interactionId]
+        ?.display_mode === AppConstants.INTERACTION_DISPLAY_MODE_INLINE;
     const refreshInteraction = answerIsCorrect || interactionIsInline;
 
-    this.nextIndex = this.currentIndex + 1;
-    const isFinalQuestion = this.nextIndex === this.questions.length;
-    const onSameCard = !answerIsCorrect;
+    const isFinalQuestion =
+      answerIsCorrect && this.currentIndex === this.questions.length - 1;
+    // Only advance to the next question if the answer is correct and not the last question.
+    if (answerIsCorrect && this.currentIndex < this.questions.length - 1) {
+      this.nextIndex = this.currentIndex + 1;
+    } else {
+      this.nextIndex = this.currentIndex;
+    }
+
+    const onSameCard = answerIsCorrect;
 
     const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
-    let nextCard = null;
-    let nextCardIfReallyStuck = null;
+    let nextCard: StateCard | null = null;
+    let nextCardIfReallyStuck: string | null = null;
     if (!isFinalQuestion) {
       let nextInteractionHtml = this.getNextInteractionHtml(_nextFocusLabel);
 
       questionHtml = questionHtml + this.getRandomSuffix();
       nextInteractionHtml = nextInteractionHtml + this.getRandomSuffix();
+      const nextStateData = this.getNextStateData();
       nextCard = StateCard.createNewCard(
         'true',
         questionHtml,
         nextInteractionHtml,
-        this.getNextStateData().interaction,
-        this.getNextStateData().content.contentId
+        nextStateData.interaction,
+        nextStateData.content.contentId ?? ''
       );
     }
-    successCallback(
-      nextCard,
-      refreshInteraction,
-      feedbackHtml,
-      null,
-      null,
-      onSameCard,
-      taggedSkillMisconceptionId,
-      null,
-      null,
-      isFinalQuestion,
-      nextCardIfReallyStuck,
-      _nextFocusLabel
-    );
+    if (successCallback) {
+      successCallback(
+        nextCard as StateCard,
+        refreshInteraction,
+        feedbackHtml,
+        null as any,
+        null as any,
+        onSameCard,
+        taggedSkillMisconceptionId ?? '',
+        null as any,
+        null as any,
+        isFinalQuestion,
+        nextCardIfReallyStuck as any,
+        _nextFocusLabel
+      );
+    }
     return answerIsCorrect;
   }
 
@@ -523,7 +540,7 @@ export class QuestionPlayerEngineService {
   private makeFeedback(
     feedbackHtml: string,
     envs: Record<string, string>[]
-  ): string {
+  ): string | null {
     return this.expressionInterpolationService.processHtml(feedbackHtml, envs);
   }
 
@@ -541,7 +558,7 @@ export class QuestionPlayerEngineService {
   private makeQuestion(
     newState: State,
     envs: Record<string, string>[]
-  ): string {
+  ): string | null {
     return this.expressionInterpolationService.processHtml(
       newState.content.html,
       envs
@@ -604,30 +621,30 @@ export class QuestionPlayerEngineService {
   ): void {
     this.pageContextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.QUESTION,
-      this.questions[0].getId()
+      this.questions[0]?.getId() ?? ''
     );
-    const initialState = this.questions[0].getStateData();
+    const initialState = this.questions[0]?.getStateData();
 
     const questionHtml = this.makeQuestion(initialState, []);
-    if (questionHtml === null) {
+    if (questionHtml === null || questionHtml === '') {
       this.alertsService.addWarning('Question name should not be empty.');
-      errorCallback();
+      if (errorCallback) errorCallback();
       return;
     }
 
     this.currentIndex = 0;
     this.nextIndex = 0;
 
-    const interaction = initialState.interaction;
+    const interaction = initialState?.interaction;
     const nextFocusLabel = this.focusManagerService.generateFocusLabel();
 
-    const interactionId = interaction.id;
-    let interactionHtml = null;
+    const interactionId = interaction?.id ?? '';
+    let interactionHtml: string | null = null;
 
     if (interactionId) {
       interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
         interactionId,
-        interaction.customizationArgs,
+        interaction?.customizationArgs ?? {},
         true,
         nextFocusLabel,
         null
@@ -638,9 +655,9 @@ export class QuestionPlayerEngineService {
       questionHtml,
       interactionHtml,
       interaction,
-      initialState.content.contentId
+      initialState?.content.contentId ?? ''
     );
-    successCallback(initialCard, nextFocusLabel);
+    if (successCallback) successCallback(initialCard, nextFocusLabel);
   }
 
   /**

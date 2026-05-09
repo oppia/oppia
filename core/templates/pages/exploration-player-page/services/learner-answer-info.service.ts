@@ -27,6 +27,7 @@ import {
 } from 'pages/exploration-player-page/services/answer-classification.service';
 import {ExplorationFeaturesBackendApiService} from 'services/exploration-features-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 @Injectable({
   providedIn: 'root',
@@ -176,7 +177,7 @@ export class LearnerAnswerInfoService {
       this.currentEntityId,
       this.stateName,
       this.interactionId,
-      this.currentAnswer,
+      String(this.currentAnswer),
       answerDetails
     );
     this.submittedAnswerInfoCount++;

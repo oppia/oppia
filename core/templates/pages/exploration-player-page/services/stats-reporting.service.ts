@@ -497,7 +497,7 @@ export class StatsReportingService {
 
     this.statsReportingBackendApiService
       .recordAnswerSubmittedAsync(
-        answer,
+        String(answer),
         params,
         this.explorationVersion,
         this.sessionId,

@@ -239,7 +239,7 @@ export class PlaythroughService {
         state_name: {value: stateName},
         dest_state_name: {value: destStateName},
         interaction_id: {value: interactionId},
-        submitted_answer: {value: answer},
+        submitted_answer: {value: String(answer)},
         feedback: {value: feedback},
         time_spent_state_in_msecs: {value: 1000 * timeSpentInStateSecs},
       })

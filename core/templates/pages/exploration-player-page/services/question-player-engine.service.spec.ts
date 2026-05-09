@@ -505,7 +505,7 @@ describe('Question player engine service', () => {
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        Outcome.createNew('default', '', '', []),
+        Outcome.createNew('default', '1', 'Feedback text', []),
         1,
         0,
         'default_outcome'
@@ -547,9 +547,7 @@ describe('Question player engine service', () => {
     spyOn(pageContextService, 'setQuestionPlayerIsOpen');
     spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
 
-    expect(() => {
-      questionPlayerEngineService.getCurrentQuestionId();
-    }).toThrowError("Cannot read properties of undefined (reading 'getId')");
+    expect(questionPlayerEngineService.getCurrentQuestionId()).toBe('');
 
     questionPlayerEngineService.init(
       multipleQuestionsObjects,
@@ -650,7 +648,7 @@ describe('Question player engine service', () => {
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        Outcome.createNew('default', '', '', []),
+        Outcome.createNew('default', '1', 'Feedback text', []),
         1,
         0,
         'default_outcome'
@@ -749,7 +747,7 @@ describe('Question player engine service', () => {
         let initErrorCb = jasmine.createSpy('fail');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createNew('default', '', '', []),
+          Outcome.createNew('default', '1', 'Feedback text', []),
           1,
           0,
           'default_outcome'
@@ -783,7 +781,7 @@ describe('Question player engine service', () => {
         let submitAnswerSuccessCb = jasmine.createSpy('success');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createNew('default', '', '', []),
+          Outcome.createNew('default', '1', 'Feedback text', []),
           1,
           0,
           'default_outcome'
@@ -825,7 +823,7 @@ describe('Question player engine service', () => {
         let initErrorCb = jasmine.createSpy('fail');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createNew('default', 'feedback_id', 'feedback text', []),
+          Outcome.createNew('default', 'feedback_id', '', []),
           1,
           0,
           'default_outcome'
@@ -874,7 +872,7 @@ describe('Question player engine service', () => {
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        Outcome.createNew('default', '', '', []),
+        Outcome.createNew('default', '1', 'Feedback text', []),
         1,
         0,
         'default_outcome'
@@ -927,7 +925,7 @@ describe('Question player engine service', () => {
         let initErrorCb = jasmine.createSpy('fail');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createNew('default', '', '', []),
+          Outcome.createNew('default', '1', 'Feedback text', []),
           1,
           0,
           'default_outcome'

@@ -339,7 +339,7 @@ export class ExplorationEngineService {
    * @param {Record<string, string>[]} envs - A list of environments for interpolation.
    * @returns {string} The processed HTML string for the question content.
    */
-  makeQuestion(newState: State, envs: Record<string, string>[]): string {
+  makeQuestion(newState: State, envs: Record<string, string>[]): string | null {
     return this.expressionInterpolationService.processHtml(
       newState.content.html,
       envs
@@ -408,7 +408,7 @@ export class ExplorationEngineService {
     }
 
     let questionHtml = this.makeQuestion(initialState, [newParams]);
-    if (questionHtml === null) {
+    if (questionHtml === null || questionHtml === '') {
       this.alertsService.addWarning('Expression parsing error.');
       return;
     }
@@ -799,7 +799,7 @@ export class ExplorationEngineService {
       classificationResult.outcome,
       [oldParams]
     );
-    if (feedbackHtml === null) {
+    if (feedbackHtml === null || feedbackHtml === '') {
       this.answerIsBeingProcessed = false;
       this.alertsService.addWarning('Feedback content should not be empty.');
       return false;
