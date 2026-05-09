@@ -16,7 +16,12 @@
  * @fileoverview Component for the Base Transclusion Component.
  */
 
-import {ChangeDetectorRef, Component, Directive} from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  Directive,
+  ViewEncapsulation,
+} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {CookieService} from 'ngx-cookie';
 import {Subscription} from 'rxjs';
@@ -30,13 +35,13 @@ import {SidebarStatusService} from 'services/sidebar-status.service';
 import {BackgroundMaskService} from 'services/stateful/background-mask.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {NavigationEnd, Router} from '@angular/router';
-import './base-content.component.css';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-base-content',
   templateUrl: './base-content.component.html',
   styleUrls: ['./base-content.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class BaseContentComponent {
   loadingMessage: string = '';

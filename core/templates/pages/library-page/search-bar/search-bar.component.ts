@@ -20,7 +20,13 @@ import {Subscription} from 'rxjs';
 import {Subject} from 'rxjs';
 import {AppConstants} from 'app.constants';
 import {EventToCodes, NavigationService} from 'services/navigation.service';
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewEncapsulation,
+} from '@angular/core';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SearchService, SelectionDetails} from 'services/search.service';
@@ -31,7 +37,6 @@ import {UrlService} from 'services/contextual/url.service';
 import {ConstructTranslationIdsService} from 'services/construct-translation-ids.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslateService} from '@ngx-translate/core';
-import './search-bar.component.css';
 
 interface SearchDropDownCategories {
   id: string;
@@ -47,6 +52,7 @@ interface LanguageIdAndText {
   selector: 'oppia-search-bar',
   templateUrl: './search-bar.component.html',
   styleUrls: ['./search-bar.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class SearchBarComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

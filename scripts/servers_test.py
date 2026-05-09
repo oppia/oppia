@@ -1140,6 +1140,22 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.exit_stack.close()
 
+    def test_managed_ng_build_with_source_maps(self) -> None:
+        popen_calls = self.exit_stack.enter_context(
+            self.swap_popen(outputs=[b'Build at: 123'])
+        )
+
+        self.exit_stack.enter_context(
+            servers.managed_ng_build(source_maps=True)
+        )
+        self.exit_stack.close()
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertIn(
+            '%s build --source-map' % common.NG_BIN_PATH,
+            popen_calls[0].program_args,
+        )
+
 
 class GetChromedriverVersionTests(test_utils.TestBase):
 

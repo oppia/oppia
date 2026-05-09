@@ -16,7 +16,7 @@
  * @fileoverview Component for the exploration player page.
  */
 
-import {Component, OnDestroy} from '@angular/core';
+import {Component, OnDestroy, ViewEncapsulation} from '@angular/core';
 import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
@@ -37,6 +37,8 @@ require('interactions/interactionsRequires.ts');
 @Component({
   selector: 'oppia-exploration-player-page',
   templateUrl: './exploration-player-page.component.html',
+
+  encapsulation: ViewEncapsulation.None,
 })
 export class ExplorationPlayerPageComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();

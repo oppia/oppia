@@ -16,7 +16,13 @@
  * @fileoverview Component for the topic viewer practice tab.
  */
 
-import {Component, Input, OnInit, OnDestroy} from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  OnDestroy,
+  ViewEncapsulation,
+} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
@@ -32,13 +38,13 @@ import {
 import {PracticeSessionConfirmationModal} from 'pages/topic-viewer-page/modals/practice-session-confirmation-modal.component';
 import {LoaderService} from 'services/loader.service';
 
-import './practice-tab.component.css';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 @Component({
   selector: 'practice-tab',
   templateUrl: './practice-tab.component.html',
   styleUrls: ['./practice-tab.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class PracticeTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

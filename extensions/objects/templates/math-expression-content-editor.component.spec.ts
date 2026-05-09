@@ -27,7 +27,6 @@ import {
 } from '@angular/core/testing';
 import {MathExpressionContentEditorComponent} from './math-expression-content-editor.component';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import 'mathjaxConfig.ts';
 import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {AlertsService} from 'services/alerts.service';
