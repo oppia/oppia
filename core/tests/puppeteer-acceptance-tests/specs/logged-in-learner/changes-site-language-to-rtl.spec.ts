@@ -126,6 +126,7 @@ describe('Logged-In Learner', function () {
 
     await loggedInUser1.navigateToLearnerDashboard();
     await loggedInUser1.verifyPageIsRTL();
+    await loggedInUser1.page.keyboard.press('Escape');
     await loggedInUser1.expectScreenshotToMatch(
       'RTLArabicLearnerDashboard',
       __dirname
@@ -133,6 +134,7 @@ describe('Logged-In Learner', function () {
 
     await loggedInUser1.navigateToHome(false);
     await loggedInUser1.verifyPageIsRTL();
+    await loggedInUser1.page.keyboard.press('Escape');
     await loggedInUser1.expectScreenshotToMatch('RTLArabicHomePage', __dirname);
   });
 
