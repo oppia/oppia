@@ -23,7 +23,7 @@ import copy
 import logging
 import os
 import re
-from core.domain import state_domain
+
 from core import feconf, schema_utils, utils
 from core.domain import (
     exp_domain,
@@ -2161,6 +2161,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ),
             state_dict_with_new_math_schema,
         )
+
     def test_convert_html_fields_with_none_default_outcome(self) -> None:
         """Test convert_html_fields_in_state when default_outcome is None."""
 
@@ -2195,7 +2196,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(result['content']['html'], '<p>Hello</p>')
         self.assertEqual(len(html_list), 1)
-
 
     def test_convert_html_fields_in_state_having_rule_spec_with_invalid_format(
         self,
