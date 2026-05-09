@@ -308,7 +308,7 @@ export class QuestionPlayerEngineService {
       wasOldStateInitial,
       isFirstHit,
       isFinalQuestion: boolean,
-      nextCardIfReallyStuck: string | null,
+      nextCardIfReallyStuck: StateCard | null,
       focusLabel: string
     ) => void
   ): boolean {
@@ -391,7 +391,7 @@ export class QuestionPlayerEngineService {
 
     const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
     let nextCard: StateCard | null = null;
-    let nextCardIfReallyStuck: string | null = null;
+    let nextCardIfReallyStuck: StateCard | null = null;
     if (!isFinalQuestion) {
       let nextInteractionHtml = this.getNextInteractionHtml(_nextFocusLabel);
 
