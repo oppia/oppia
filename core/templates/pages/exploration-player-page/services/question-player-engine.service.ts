@@ -301,12 +301,12 @@ export class QuestionPlayerEngineService {
       nextCard: StateCard,
       refreshInteraction: boolean,
       feedbackHtml: string,
-      refresherExplorationId,
-      missingPrerequisiteSkillId,
+      refresherExplorationId: string | null,
+      missingPrerequisiteSkillId: string | null,
       remainOnCurrentCard: boolean,
       taggedSkillMisconceptionId: string,
-      wasOldStateInitial,
-      isFirstHit,
+      wasOldStateInitial: boolean | null,
+      isFirstHit: boolean | null,
       isFinalQuestion: boolean,
       nextCardIfReallyStuck: StateCard | null,
       focusLabel: string
@@ -321,13 +321,14 @@ export class QuestionPlayerEngineService {
     const oldState = this.getCurrentStateData();
     const classificationResult =
       this.answerClassificationService.getMatchingClassificationResult(
-        null,
+        '',
         oldState.interaction,
         answer,
         interactionRulesService
       );
     const answerGroupIndex = classificationResult.answerGroupIndex;
-    const answerIsCorrect = true;
+    const answerIsCorrect: boolean =
+      classificationResult.outcome.labelledAsCorrect ?? false;
     let taggedSkillMisconceptionId = null;
     if (oldState.interaction.answerGroups[answerGroupIndex]) {
       taggedSkillMisconceptionId =
@@ -344,11 +345,6 @@ export class QuestionPlayerEngineService {
       answer: answerString,
     };
     const feedbackHtml = this.makeFeedback(outcome.feedback.html, [oldParams]);
-    if (feedbackHtml === null || feedbackHtml === '') {
-      this.setAnswerIsBeingProcessed(false);
-      this.alertsService.addWarning('Feedback content should not be empty.');
-      return false;
-    }
 
     let newState: State | null = null;
     if (answerIsCorrect && this.currentIndex < this.questions.length - 1) {
@@ -387,7 +383,7 @@ export class QuestionPlayerEngineService {
       this.nextIndex = this.currentIndex;
     }
 
-    const onSameCard = answerIsCorrect;
+    const onSameCard = isFinalQuestion;
 
     const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
     let nextCard: StateCard | null = null;
@@ -410,9 +406,9 @@ export class QuestionPlayerEngineService {
       successCallback(
         nextCard as StateCard,
         refreshInteraction,
-        feedbackHtml,
-        null,
-        null,
+        feedbackHtml ?? '',
+        '',
+        '',
         onSameCard,
         taggedSkillMisconceptionId ?? '',
         null,
@@ -615,7 +611,7 @@ export class QuestionPlayerEngineService {
     );
     const initialState = this.questions[0]?.getStateData();
 
-    const questionHtml = this.makeQuestion(initialState, []);
+    const questionHtml = this.makeQuestion(initialState as State, []);
     if (questionHtml === null || questionHtml === '') {
       this.alertsService.addWarning('Question name should not be empty.');
       if (errorCallback) {
@@ -635,7 +631,7 @@ export class QuestionPlayerEngineService {
 
     if (interactionId) {
       interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
-        interactionId,
+        interactionId ?? '',
         interaction?.customizationArgs ?? {},
         true,
         nextFocusLabel,
@@ -643,9 +639,9 @@ export class QuestionPlayerEngineService {
       );
     }
     const initialCard = StateCard.createNewCard(
-      null,
+      '',
       questionHtml,
-      interactionHtml,
+      interactionHtml ?? '',
       interaction,
       initialState?.content.contentId ?? ''
     );
@@ -681,7 +677,7 @@ export class QuestionPlayerEngineService {
    * @returns {string} The HTML string representing the interaction.
    */
   private getNextInteractionHtml(labelForFocusTarget: string): string {
-    const interactionId = this.getNextStateData().interaction.id;
+    const interactionId = this.getNextStateData().interaction.id ?? '';
     return this.explorationHtmlFormatterService.getInteractionHtml(
       interactionId,
       this.getNextStateData().interaction.customizationArgs,
