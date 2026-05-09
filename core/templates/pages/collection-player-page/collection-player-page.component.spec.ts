@@ -677,9 +677,8 @@ describe('Collection player page component', () => {
   );
 
   it('should not update collection summary if summary is null', fakeAsync(() => {
-    spyOn(
-      collectionPlayerBackendApiService,
-      'fetchCollectionSummariesAsync'
+    (
+      collectionPlayerBackendApiService.fetchCollectionSummariesAsync as jasmine.Spy
     ).and.returnValue(
       Promise.resolve(null as unknown as CollectionSummariesResponse)
     );
