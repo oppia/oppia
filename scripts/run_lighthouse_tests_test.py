@@ -347,7 +347,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 servers.run_ng_compilation()
 
         self.assertIn(
-            'Failed to complete ng compilation, exiting...', self.print_arr
+            'Failed to complete ng build compilation, exiting...',
+            self.print_arr,
         )
 
     def test_subprocess_error_results_in_failed_ng_compilation(
