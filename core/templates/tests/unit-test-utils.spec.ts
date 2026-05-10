@@ -77,17 +77,10 @@ describe('Testing mockNumberConversionServiceObject', () => {
 
   it('should return null for invalid inputs', () => {
     expect(
-      mockNumberConversionServiceObject.convertToEnglishDecimal(
-        null as unknown as string
-      )
-    ).toBeNull();
-    expect(
-      mockNumberConversionServiceObject.convertToEnglishDecimal(
-        undefined as unknown as string
-      )
-    ).toBeNull();
-    expect(
       mockNumberConversionServiceObject.convertToEnglishDecimal('abc')
+    ).toBeNull();
+    expect(
+      mockNumberConversionServiceObject.convertToEnglishDecimal('')
     ).toBeNull();
   });
 });

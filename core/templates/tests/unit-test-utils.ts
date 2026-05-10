@@ -71,10 +71,7 @@ export const mockNumberConversionServiceObject: Pick<
 > = {
   currentDecimalSeparator: () => '.',
   convertToEnglishDecimal: (value: string) => {
-    if (value === null || value === undefined) {
-      return null;
-    }
-    const result = parseFloat(value.toString().replace(',', '.'));
+    const result = parseFloat(value.replace(',', '.'));
     return isNaN(result) ? null : result;
   },
 };

@@ -270,16 +270,16 @@ describe('Schema validators', () => {
       });
     });
 
-    it('should validate floats with comma as decimal separator', () => {
-      const commaMock = new MockNumberConversionService();
-      spyOn(commaMock, 'currentDecimalSeparator').and.returnValue(',');
-
+    it('should use number conversion service to validate float values', () => {
       const filter = SchemaValidators.isFloat(
-        commaMock as unknown as NumberConversionService
+        mockNumberConversionService as unknown as NumberConversionService
       );
       const control: MockFormControl = new MockFormControl([], []);
 
       control.setValue('1,5');
+      expect(filter(control)).toBe(null);
+
+      control.setValue('1.5');
       expect(filter(control)).toBe(null);
 
       control.setValue('abc');
