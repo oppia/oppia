@@ -130,21 +130,7 @@ describe('Logged-In Learner', function () {
     await loggedInUser1.page.keyboard.press('Escape');
 
     await loggedInUser1.page.waitForFunction(() => {
-      return (
-        document.documentElement.dir === 'rtl' &&
-        getComputedStyle(document.body).direction === 'rtl'
-      );
-    });
-
-    await loggedInUser1.page.addStyleTag({
-      content: `
-      *,
-      *::before,
-      *::after {
-        animation: none !important;
-        transition: none !important;
-      }
-    `,
+      return document.documentElement.dir === 'rtl';
     });
 
     await loggedInUser1.expectScreenshotToMatch(
@@ -158,21 +144,7 @@ describe('Logged-In Learner', function () {
     await loggedInUser1.page.keyboard.press('Escape');
 
     await loggedInUser1.page.waitForFunction(() => {
-      return (
-        document.documentElement.dir === 'rtl' &&
-        getComputedStyle(document.body).direction === 'rtl'
-      );
-    });
-
-    await loggedInUser1.page.addStyleTag({
-      content: `
-      *,
-      *::before,
-      *::after {
-        animation: none !important;
-        transition: none !important;
-      }
-    `,
+      return document.documentElement.dir === 'rtl';
     });
 
     await loggedInUser1.expectScreenshotToMatch('RTLArabicHomePage', __dirname);
