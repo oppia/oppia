@@ -80,6 +80,7 @@ export class BaseUser {
 
   async typeInInputField(selector: string, text: string): Promise<void> {
     const locator = this.page.locator(selector);
+    await expect(locator).toBeVisible();
     // Detect if the target is a native input/textarea or a contenteditable
     // RTE. For inputs we can use `fill`. For contenteditable elements
     // (CKEditor, etc.), use keyboard events so the editor picks up the
