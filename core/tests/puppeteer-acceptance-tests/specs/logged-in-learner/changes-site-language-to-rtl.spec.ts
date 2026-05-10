@@ -129,10 +129,6 @@ describe('Logged-In Learner', function () {
 
     await loggedInUser1.page.keyboard.press('Escape');
 
-    await loggedInUser1.page.evaluate(async () => {
-      await document.fonts.ready;
-    });
-
     await loggedInUser1.page.waitForFunction(() => {
       return (
         document.documentElement.dir === 'rtl' &&
@@ -160,10 +156,6 @@ describe('Logged-In Learner', function () {
     await loggedInUser1.verifyPageIsRTL();
 
     await loggedInUser1.page.keyboard.press('Escape');
-
-    await loggedInUser1.page.evaluate(async () => {
-      await document.fonts.ready;
-    });
 
     await loggedInUser1.page.waitForFunction(() => {
       return (
