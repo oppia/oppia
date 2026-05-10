@@ -1735,6 +1735,10 @@ class TranslatableEntityType(enum.Enum):
 
     EXPLORATION = 'exploration'
     QUESTION = 'question'
+    SKILL = 'skill'
+    TOPIC = 'topic'
+    STORY = 'story'
+    CLASSROOM = 'classroom'
 
 
 class TranslatedContentDict(TypedDict):
