@@ -124,17 +124,13 @@ describe('Logged-In Learner', function () {
   it('should be able to change the site language to an RTL language', async function () {
     await loggedInUser1.changeSiteLanguage('ar');
 
-    await loggedInUser1.navigateToLearnerDashboard();
-    await loggedInUser1.verifyPageIsRTL();
-
-    await loggedInUser1.page.keyboard.press('Escape');
-
-    await loggedInUser1.page.waitForFunction(() => {
-      return (
-        document.readyState === 'complete' &&
-        document.documentElement.getAttribute('dir') === 'rtl'
-      );
+    await loggedInUser1.page.waitForSelector('.mat-mdc-menu-panel', {
+      hidden: true,
     });
+
+    await loggedInUser1.navigateToLearnerDashboard();
+
+    await loggedInUser1.verifyPageIsRTL();
 
     await loggedInUser1.expectScreenshotToMatch(
       'RTLArabicLearnerDashboard',
@@ -142,16 +138,8 @@ describe('Logged-In Learner', function () {
     );
 
     await loggedInUser1.navigateToHome(false);
+
     await loggedInUser1.verifyPageIsRTL();
-
-    await loggedInUser1.page.keyboard.press('Escape');
-
-    await loggedInUser1.page.waitForFunction(() => {
-      return (
-        document.readyState === 'complete' &&
-        document.documentElement.getAttribute('dir') === 'rtl'
-      );
-    });
 
     await loggedInUser1.expectScreenshotToMatch('RTLArabicHomePage', __dirname);
   });
