@@ -132,7 +132,8 @@
     },
     {
       "name": "lesson-creator/check-improvements-tab",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/check-improvements-tab.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/check-improvements-tab.spec.ts",
+      "framework": "puppeteer"
     },
     {
       "name": "lesson-creator/create-a-basic-exploration",
@@ -151,7 +152,8 @@
     },
     {
       "name": "lesson-creator/view-feedback-and-statistics-of-the-lesson",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/view-feedback-and-statistics-of-the-lesson.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/view-feedback-and-statistics-of-the-lesson.spec.ts",
+      "framework": "puppeteer"
     },
     {
       "name": "logged-in-user/add-concept-card-with-workedexample-to-exploration",
