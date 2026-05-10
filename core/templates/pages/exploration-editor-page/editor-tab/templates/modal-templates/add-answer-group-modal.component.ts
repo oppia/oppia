@@ -224,4 +224,15 @@ export class AddAnswerGroupModalComponent
   ngOnDestroy(): void {
     this.eventBusGroup.unsubscribe();
   }
+
+  isRuleValid(): boolean {
+    if (
+      this.currentInteractionId === 'NumericInput' &&
+      this.tmpRule.type === 'IsWithinTolerance'
+    ) {
+      const tolerance = this.tmpRule.inputs.tol;
+      return typeof tolerance === 'number' ? tolerance >= 0 : true;
+    }
+    return true;
+  }
 }

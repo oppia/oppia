@@ -234,7 +234,7 @@ class AutomaticVoiceoverRegenerationRecordHandler(
         self.values.update(
             {
                 'automatic_voiceover_regeneration_records': [
-                    cloud_task_run.to_dict()
+                    cloud_task_run.to_dict_with_timezone_info()
                     for cloud_task_run in cloud_task_run_objects[
                         :maximum_allowed_records
                     ]

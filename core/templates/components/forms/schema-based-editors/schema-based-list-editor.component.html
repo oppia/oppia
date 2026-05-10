@@ -25,7 +25,7 @@
 <div class="schema-based-list-editor">
   <form #listEditorForm="ngForm">
     <table class="w-100">
-      <tr *ngFor="let item of localValue; let idx = index; trackBy: trackByIndex" id="e2e-test-schema-based-list-editor-table-row">
+      <tr *ngFor="let item of localValue; let idx = index; trackBy: trackByIndex" [id]="'e2e-test-schema-based-list-editor-table-row-'+idx" class="e2e-test-schema-based-list-editor-table-row">
         <td class="e2e-test-schema-based-list-editor-table-data">
           <schema-based-editor [schema]="itemSchema"
                                [disabled]="disabled"
@@ -41,7 +41,8 @@
         <div *ngIf="!len && (!minListLength || localValue.length > minListLength) && localValue.length > 0" class="align-top">
           <button class="oppia-delete-list-entry-button oppia-transition-200 e2e-test-delete-list-entry" type="button"
                   (click)="deleteElement(idx)"
-                  [disabled]="disabled">
+                  [disabled]="disabled"
+                  aria-label="Delete this list entry">
             <i class="fas fa-times"></i>
             <span class="oppia-icon-accessibility-label">Delete this list entry</span>
           </button>
@@ -58,8 +59,9 @@
       <button [style.opacity]="(!isOneLineInput || isAddItemButtonPresent || (localValue && localValue.length && localValue[localValue.length - 1].length)) ? 1 : 0"
               *ngIf="!len && (maxListLength === null || localValue && localValue.length < maxListLength)"
               type="button" class="btn btn-secondary btn-sm ms-0 e2e-test-add-list-entry" (click)="addElement()"
-              [disabled]="disabled">
-        {{ addElementText | translate }}
+              [disabled]="disabled"
+              [attr.aria-label]="addElementText | translate">
+         {{ addElementText | translate }}
       </button>
     </div>
   </form>

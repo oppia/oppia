@@ -16,12 +16,12 @@
  * @fileoverview Component for the about page.
  */
 
-import {Component, OnInit, OnDestroy, ViewChild} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 
 import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {OppiaPlatformStatsData} from '../../oppia-platform-stats';
-import {NgbCarousel, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation-box-modal.component';
 import {ThanksForDonatingModalComponent} from 'pages/donate-page/thanks-for-donating-modal.component';
@@ -40,9 +40,6 @@ import {AccordionPanelData} from './data.model';
   styleUrls: ['./about-page.component.css'],
 })
 export class AboutPageComponent implements OnInit, OnDestroy {
-  @ViewChild('volunteerCarousel') volunteerCarousel!: NgbCarousel;
-  @ViewChild('volunteerCarouselMobile') volunteerCarouselMobile!: NgbCarousel;
-
   featuresData: AccordionPanelData[] = [
     {
       title: 'I18N_ABOUT_PAGE_FEATURE_TITLE1',
@@ -113,76 +110,11 @@ export class AboutPageComponent implements OnInit, OnDestroy {
   partnershipsFormLink: string = '';
   volunteerFormLink = AppConstants.VOLUNTEER_FORM_LINK;
   IMPACT_REPORT_LINK_2024 = AppConstants.IMPACT_REPORT_LINK_2024;
-  // Volunteer CTA is the default tab.
-  selectedTabIndex = 1;
-  volunteerRolesDetails = [
-    {
-      title: 'I18N_ABOUT_PAGE_CTA_OUTREACH_TITLE',
-      iconUrl: '/icons/outreach-icon',
-      description: 'I18N_ABOUT_PAGE_CTA_OUTREACH_DESCRIPTION',
-      listItems: [
-        'I18N_ABOUT_PAGE_CTA_OUTREACH_LIST_ITEM1',
-        'I18N_ABOUT_PAGE_CTA_OUTREACH_LIST_ITEM2',
-        'I18N_ABOUT_PAGE_CTA_OUTREACH_LIST_ITEM3',
-      ],
-    },
-    {
-      title: 'I18N_ABOUT_PAGE_CTA_SOFTWARE_TITLE',
-      iconUrl: '/icons/software-icon',
-      description: 'I18N_ABOUT_PAGE_CTA_SOFTWARE_DESCRIPTION',
-      listItems: [
-        'I18N_ABOUT_PAGE_CTA_SOFTWARE_LIST_ITEM1',
-        'I18N_ABOUT_PAGE_CTA_SOFTWARE_LIST_ITEM2',
-        'I18N_ABOUT_PAGE_CTA_SOFTWARE_LIST_ITEM3',
-      ],
-    },
-    {
-      title: 'I18N_ABOUT_PAGE_CTA_ART_TITLE',
-      iconUrl: '/icons/art-icon',
-      description: 'I18N_ABOUT_PAGE_CTA_ART_DESCRIPTION',
-      listItems: [
-        'I18N_ABOUT_PAGE_CTA_ART_LIST_ITEM1',
-        'I18N_ABOUT_PAGE_CTA_ART_LIST_ITEM2',
-      ],
-    },
-    {
-      title: 'I18N_ABOUT_PAGE_CTA_TRANSLATION_TITLE',
-      iconUrl: '/icons/translation-icon',
-      description: 'I18N_ABOUT_PAGE_CTA_TRANSLATION_DESCRIPTION',
-      listItems: [
-        'I18N_ABOUT_PAGE_CTA_TRANSLATION_LIST_ITEM1',
-        'I18N_ABOUT_PAGE_CTA_TRANSLATION_LIST_ITEM2',
-        'I18N_ABOUT_PAGE_CTA_TRANSLATION_LIST_ITEM3',
-      ],
-    },
-    {
-      title: 'I18N_ABOUT_PAGE_CTA_LESSON_TITLE',
-      iconUrl: '/icons/lesson-icon',
-      description: 'I18N_ABOUT_PAGE_CTA_LESSON_DESCRIPTION',
-      listItems: [
-        'I18N_ABOUT_PAGE_CTA_LESSON_LIST_ITEM1',
-        'I18N_ABOUT_PAGE_CTA_LESSON_LIST_ITEM2',
-        'I18N_ABOUT_PAGE_CTA_LESSON_LIST_ITEM3',
-      ],
-    },
-  ];
-  volunteerRolesIndices = {
-    desktop: [
-      [0, 1, 2],
-      [2, 3, 4],
-    ],
-    tablet: [
-      [0, 1],
-      [2, 3],
-      [3, 4],
-    ],
-    mobile: [[0], [1], [2], [3], [4]],
-  };
   screenType!: 'desktop' | 'tablet' | 'mobile';
 
   constructor(
-    private urlInterpolationService: UrlInterpolationService,
     private siteAnalyticsService: SiteAnalyticsService,
+    private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
     private ngbModal: NgbModal,
     private windowDimensionsService: WindowDimensionsService,
@@ -226,7 +158,7 @@ export class AboutPageComponent implements OnInit, OnDestroy {
   }
 
   setPartnershipsFormLink(): void {
-    const userLang = this.translateService.currentLang;
+    const userLang = this.translateService.currentLang || 'en';
 
     if (userLang === 'en' || userLang === 'pcm' || userLang === 'kab') {
       this.partnershipsFormLink = AppConstants.PARTNERSHIPS_FORM_LINK;
@@ -237,34 +169,6 @@ export class AboutPageComponent implements OnInit, OnDestroy {
         interpolatedLanguage +
         AppConstants.PARTNERSHIPS_FORM_TRANSLATED_LINK.SUFFIX;
     }
-  }
-
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  /*
-   * Returns a string that contains the image set for the srcset attribute.
-   * @param {string} imagePrefix - The prefix name of the images
-   * @param {string} imageExt - The extension of the images
-   * @param {number[]} sizes - The sizes of the images.Eg: [1,1.5,2]
-   */
-  getImageSet(imagePrefix: string, imageExt: string, sizes: number[]): string {
-    var imageSet = '';
-    for (let i = 0; i < sizes.length; i++) {
-      const sizeAfterRemovingPeriod = sizes[i].toString().replace('.', '');
-      imageSet +=
-        this.getStaticImageUrl(
-          `${imagePrefix}${sizeAfterRemovingPeriod}x.${imageExt}`
-        ) +
-        ' ' +
-        sizes[i] +
-        'x';
-      if (i < sizes.length - 1) {
-        imageSet += ', ';
-      }
-    }
-    return imageSet;
   }
 
   openDonationBoxModal(): void {
@@ -290,24 +194,12 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     this.featuresData[index].panelIsCollapsed = true;
   }
 
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
-  moveCarouselToPreviousSlide(): void {
-    if (this.screenType === 'mobile') {
-      this.volunteerCarouselMobile.prev();
-    } else {
-      this.volunteerCarousel.prev();
-    }
-  }
-
-  moveCarouselToNextSlide(): void {
-    if (this.screenType === 'mobile') {
-      this.volunteerCarouselMobile.next();
-    } else {
-      this.volunteerCarousel.next();
-    }
   }
 
   onClickExploreLessonsButton(): void {
