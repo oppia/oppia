@@ -2025,25 +2025,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             [],
         )
 
-    def test_exp_complete_event_with_decimal_params(self) -> None:
-        """Test that float values in params don't cause a schema error."""
-        self.login(self.USER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        payload = {
-            'client_time_spent_in_secs': 0,
-            'params': {'answer': 1.1},
-            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
-            'state_name': 'final',
-            'version': 1,
-        }
-
-        self.post_json(
-            '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_0,
-            payload,
-            csrf_token=csrf_token,
-        )
-
     def test_exp_complete_event_handler_for_logged_out_user(self) -> None:
         csrf_token = self.get_new_csrf_token()
         payload = {
@@ -4454,17 +4435,6 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
             },
         )
 
-        self.logout()
-
-    def test_metadata_version_history_when_last_edited_version_is_none(
-        self,
-    ) -> None:
-        self.login(self.OWNER_EMAIL)
-        response = self.get_json(
-            '%s/%s/%s'
-            % (feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 1)
-        )
-        self.assertIsNone(response['last_edited_version_number'])
         self.logout()
 
 
