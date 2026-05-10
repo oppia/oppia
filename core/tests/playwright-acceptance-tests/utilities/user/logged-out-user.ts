@@ -36,7 +36,7 @@ const blogPostTitleContainerAndContentSelector = `${blogPostTitleContainerSelect
 
 export class LoggedOutUser extends BaseUser {
   async navigateToBlogPage(): Promise<void> {
-    await this.page.goto(blogUrl);
+    await this.goto(blogUrl);
   }
 
   async navigateToBlogPageViaNavbar(): Promise<void> {
@@ -44,7 +44,7 @@ export class LoggedOutUser extends BaseUser {
       await this.navigateToBlogPage();
       return;
     }
-    await this.page.locator(navbarAboutTab).waitFor({state: 'visible'});
+    await expect(this.page.locator(navbarAboutTab)).toBeVisible();
     await this.page.locator(navbarAboutTab).click();
     await Promise.all([
       this.page.waitForURL(`**${blogUrl}**`),
@@ -70,8 +70,7 @@ export class LoggedOutUser extends BaseUser {
 
   async expectNumberOfBlogPostsOnPageToBe(number: number): Promise<void> {
     await expect(this.page.locator(blogPostTileItemSelector)).toHaveCount(
-      number,
-      {timeout: 10000}
+      number
     );
     showMessage(`Found ${number} blog post(s) on the page as expected.`);
   }
@@ -136,9 +135,7 @@ export class LoggedOutUser extends BaseUser {
     await expect(firstPost).toBeVisible();
     await firstPost.click();
 
-    await expect(this.page.locator(blogPostPageCardSelector)).toBeVisible({
-      timeout: 10000,
-    });
+    await expect(this.page.locator(blogPostPageCardSelector)).toBeVisible();
   }
 
   async expectBlogPostTitleToBeVisible(): Promise<void> {
@@ -152,15 +149,21 @@ export class LoggedOutUser extends BaseUser {
   }
 
   async expectBlogPostPublishDateToBeVisible(): Promise<void> {
-    await expect(this.page.locator(blogPostPublishDateSelector)).toBeVisible();
+    await expect(
+      this.page.locator(blogPostPublishDateSelector).first()
+    ).toBeVisible();
   }
 
   async expectBlogPostContentToBeVisible(): Promise<void> {
-    await expect(this.page.locator(blogPostContentSelector)).toBeVisible();
+    await expect(
+      this.page.locator(blogPostContentSelector).first()
+    ).toBeVisible();
   }
 
   async expectBlogPostTagsToBeVisible(): Promise<void> {
-    await expect(this.page.locator(blogCardTagContainerSelector)).toBeVisible();
+    await expect(
+      this.page.locator(blogCardTagContainerSelector).first()
+    ).toBeVisible();
   }
 
   async expectBlogShareButtonToBeVisible(): Promise<void> {
@@ -179,12 +182,9 @@ export class LoggedOutUser extends BaseUser {
   }
 
   async filterBlogPostsByTag(tagName: string): Promise<void> {
-    await this.page.locator(blogTagFilterSelector).waitFor({state: 'visible'});
     await this.page.locator(blogTagFilterSelector).click();
     await this.page.locator(`.e2e-test-select-${tagName}`).click();
-    await this.page
-      .locator(blogTagFilterDropdownSelector)
-      .waitFor({state: 'hidden'});
+    await expect(this.page.locator(blogTagFilterDropdownSelector)).toBeHidden();
 
     await Promise.all([
       this.page.waitForURL(
@@ -218,9 +218,7 @@ export class LoggedOutUser extends BaseUser {
   }
 
   async filterBlogPostsByKeyword(keyword: string): Promise<void> {
-    await this.page
-      .locator(blogSearchInputSelector)
-      .waitFor({state: 'visible'});
+    await expect(this.page.locator(blogSearchInputSelector)).toBeVisible();
     await this.page.locator(blogSearchInputSelector).fill(keyword);
 
     await Promise.all([

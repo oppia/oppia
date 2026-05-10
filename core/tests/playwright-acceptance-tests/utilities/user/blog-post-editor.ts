@@ -80,7 +80,7 @@ export class BlogPostEditor extends BaseUser {
   // --- New methods required by the test ---
 
   async navigateToBlogDashboardPage(): Promise<void> {
-    await this.page.goto(blogDashboardUrl);
+    await this.goto(blogDashboardUrl);
   }
 
   /**

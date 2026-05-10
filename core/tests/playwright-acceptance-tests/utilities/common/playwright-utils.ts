@@ -43,18 +43,25 @@ export class BaseUser {
   async goto(url: string, verifyURL: boolean = true): Promise<void> {
     const currentUrl = this.page.url();
 
+    // Normalize: only treat as "same page" if the URL matches exactly
+    // or continues with /, ?, or # — not a hash fragment of a sub-route
+    const isSamePage =
+      currentUrl === url ||
+      currentUrl === `${url}/` ||
+      currentUrl.startsWith(`${url}?`);
+
     // If already on the same URL, force a reload to reset page state.
     // This matches Puppeteer's behavior where goto always triggers
     // a full navigation even to the same URL.
-    if (currentUrl === url || currentUrl.startsWith(url)) {
+    if (isSamePage) {
       await this.page.reload();
     } else {
       await this.page.goto(url, {waitUntil: 'networkidle'});
     }
 
     if (verifyURL) {
-      await this.page.waitForURL((currentUrl: URL) =>
-        currentUrl.href.includes(url)
+      await this.page.waitForURL((currentURL: URL) =>
+        currentURL.href.includes(url)
       );
     }
   }
@@ -66,7 +73,37 @@ export class BaseUser {
   }
 
   async typeInInputField(selector: string, text: string): Promise<void> {
-    await this.page.locator(selector).fill(text);
+    const locator = this.page.locator(selector);
+    // Detect if the target is a native input/textarea or a contenteditable
+    // RTE. For inputs we can use `fill`. For contenteditable elements
+    // (CKEditor, etc.), use keyboard events so the editor picks up the
+    // change and emits its valueChange events.
+    const elementInfo = await locator.evaluate((el: Element) => {
+      return {
+        tagName: el.tagName.toLowerCase(),
+        isContentEditable: (el as HTMLElement).isContentEditable,
+      };
+    });
+
+    if (elementInfo.tagName === 'input' || elementInfo.tagName === 'textarea') {
+      await locator.fill(text);
+      return;
+    }
+
+    if (elementInfo.isContentEditable) {
+      await locator.click();
+      // Select existing content and replace it to ensure editor's change
+      // events are fired.
+      await this.page.keyboard.press('Control+A');
+      await this.page.keyboard.press('Backspace');
+      await this.page.keyboard.type(text);
+      // Blur to trigger any change/validation handlers.
+      await this.page.keyboard.press('Tab');
+      return;
+    }
+
+    // Fallback for other cases: attempt to fill (may throw for non-inputs).
+    await locator.fill(text);
   }
 
   async expectElementValueToBe(
