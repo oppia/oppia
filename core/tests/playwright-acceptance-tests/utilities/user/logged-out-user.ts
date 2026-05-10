@@ -92,7 +92,7 @@ export class LoggedOutUser extends BaseUser {
     }
 
     await nextButton.click();
-    await this.page.waitForLoadState('networkidle');
+    await expect(this.page.locator(blogPostTitleSelector)).toBeVisible();
 
     const newFirstPostTitle = await this.page
       .locator(blogPostTitleSelector)

@@ -375,28 +375,6 @@ export class SuperAdmin extends LoggedInUser {
   }
 
   // ---------------------------------------------------------------------------
-  // Blog Admin
-  // ---------------------------------------------------------------------------
-
-  async assignUserToRoleFromBlogAdminPage(
-    username: string,
-    role: BlogRoles
-  ): Promise<void> {
-    await this.page
-      .locator('select#label-target-update-form-role-select')
-      .selectOption(role);
-    const usernameLocator = this.page.locator(roleUpdateUsernameInput);
-    await expect(usernameLocator).toBeVisible();
-    await expect(usernameLocator).toBeEnabled();
-    await usernameLocator.click();
-    await usernameLocator.fill(username);
-    await expect(usernameLocator).toHaveValue(username);
-    await this.page.locator(updateRoleButtonSelector).click();
-
-    await expect(this.page.locator(updateRoleButtonSelector)).not.toBeEnabled();
-  }
-
-  // ---------------------------------------------------------------------------
   // Contributor Dashboard Admin
   // ---------------------------------------------------------------------------
 

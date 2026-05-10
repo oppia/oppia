@@ -29,6 +29,8 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 const ROLES = testConstants.Roles;
 const URLS = testConstants.URLs;
 
+test.describe.configure({mode: 'serial'});
+
 test.describe('Blog Post Writer', () => {
   let blogPostWriter: BlogPostEditor & LoggedInUser & LoggedOutUser;
 

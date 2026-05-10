@@ -28,6 +28,8 @@ import testConstants from '../../utilities/common/test-constants';
 
 const ROLES = testConstants.Roles;
 
+test.describe.configure({mode: 'serial'});
+
 test.describe('Logged-out User', () => {
   let interestedPartnerOrg: LoggedOutUser;
   let blogPostWriter: BlogPostEditor & LoggedInUser;
