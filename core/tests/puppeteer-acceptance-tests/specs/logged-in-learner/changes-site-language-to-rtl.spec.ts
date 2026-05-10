@@ -130,7 +130,10 @@ describe('Logged-In Learner', function () {
     await loggedInUser1.page.keyboard.press('Escape');
 
     await loggedInUser1.page.waitForFunction(() => {
-      return document.documentElement.dir === 'rtl';
+      return (
+        document.readyState === 'complete' &&
+        document.documentElement.getAttribute('dir') === 'rtl'
+      );
     });
 
     await loggedInUser1.expectScreenshotToMatch(
@@ -144,7 +147,10 @@ describe('Logged-In Learner', function () {
     await loggedInUser1.page.keyboard.press('Escape');
 
     await loggedInUser1.page.waitForFunction(() => {
-      return document.documentElement.dir === 'rtl';
+      return (
+        document.readyState === 'complete' &&
+        document.documentElement.getAttribute('dir') === 'rtl'
+      );
     });
 
     await loggedInUser1.expectScreenshotToMatch('RTLArabicHomePage', __dirname);
