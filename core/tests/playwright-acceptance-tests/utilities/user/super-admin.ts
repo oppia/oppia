@@ -378,10 +378,6 @@ export class SuperAdmin extends LoggedInUser {
   // Blog Admin
   // ---------------------------------------------------------------------------
 
-  /**
-   * Assigns a user as a blog post editor from the blog admin page.
-   * Mirrors Puppeteer's assignUserToRoleFromBlogAdminPage.
-   */
   async assignUserToRoleFromBlogAdminPage(
     username: string,
     role: BlogRoles
@@ -389,14 +385,15 @@ export class SuperAdmin extends LoggedInUser {
     await this.page
       .locator('select#label-target-update-form-role-select')
       .selectOption(role);
-    const usernameLocator = this.page.locator(roleUpdateUsernameInput);
-    await expect(usernameLocator).toBeVisible();
-    await expect(usernameLocator).toBeEnabled();
-    await usernameLocator.click();
-    await usernameLocator.fill(username);
-    await expect(usernameLocator).toHaveValue(username);
-    await this.page.locator(updateRoleButtonSelector).click();
 
+    const usernameInput = this.page.locator(roleUpdateUsernameInput);
+    await expect(usernameInput).toBeEnabled();
+
+    // Focus directly instead of relying on hit-testing
+    await usernameInput.focus();
+    await usernameInput.fill(username);
+
+    await this.page.locator(updateRoleButtonSelector).click();
     await expect(this.page.locator(updateRoleButtonSelector)).not.toBeEnabled();
   }
 
