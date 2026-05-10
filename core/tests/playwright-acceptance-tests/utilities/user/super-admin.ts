@@ -389,7 +389,7 @@ export class SuperAdmin extends LoggedInUser {
     await this.page
       .locator('select#label-target-update-form-role-select')
       .selectOption(role);
-    await this.page.waitForLoadState('networkidle');
+    await expect(this.page.locator(roleUpdateUsernameInput)).toBeEnabled();
     await this.page.locator(roleUpdateUsernameInput).fill(username);
     await this.page.locator(updateRoleButtonSelector).click();
 
