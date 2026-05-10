@@ -63,10 +63,11 @@ export class ContributionOpportunitiesService {
   private _moreVoiceoverOpportunitiesAvailable: boolean = true;
 
   private async _getSkillOpportunitiesAsync(
-    cursor: string
+    cursor: string,
+    searchQuery?: string
   ): Promise<SkillOpportunitiesDict> {
     return this.contributionOpportunitiesBackendApiService
-      .fetchSkillOpportunitiesAsync(cursor)
+      .fetchSkillOpportunitiesAsync(cursor, searchQuery)
       .then(({opportunities, nextCursor, more}) => {
         this._skillOpportunitiesCursor = nextCursor;
         this._moreSkillOpportunitiesAvailable = more;
@@ -102,8 +103,10 @@ export class ContributionOpportunitiesService {
     this.modalService.open(LoginRequiredModalContent);
   }
 
-  async getSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
-    return this._getSkillOpportunitiesAsync('');
+  async getSkillOpportunitiesAsync(
+    searchQuery?: string
+  ): Promise<SkillOpportunitiesDict> {
+    return this._getSkillOpportunitiesAsync('', searchQuery);
   }
 
   async getTranslationOpportunitiesAsync(
@@ -113,9 +116,14 @@ export class ContributionOpportunitiesService {
     return this._getTranslationOpportunitiesAsync(languageCode, topicName, '');
   }
 
-  async getMoreSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
+  async getMoreSkillOpportunitiesAsync(
+    searchQuery?: string
+  ): Promise<SkillOpportunitiesDict> {
     if (this._moreSkillOpportunitiesAvailable) {
-      return this._getSkillOpportunitiesAsync(this._skillOpportunitiesCursor);
+      return this._getSkillOpportunitiesAsync(
+        this._skillOpportunitiesCursor,
+        searchQuery
+      );
     }
     throw new Error('No more skill opportunities available.');
   }
