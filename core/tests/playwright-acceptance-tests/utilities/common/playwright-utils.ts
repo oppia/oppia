@@ -66,6 +66,12 @@ export class BaseUser {
     }
   }
 
+  async uploadFile(filePath: string): Promise<void> {
+    const fileInput = this.page.locator('input[type=file]');
+    await expect(fileInput).toBeAttached();
+    await fileInput.setInputFiles(filePath);
+  }
+
   async clearAllTextFrom(selector: string): Promise<void> {
     const locator = this.page.locator(selector);
     await locator.click({clickCount: 3});

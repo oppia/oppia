@@ -77,8 +77,6 @@ export class BlogPostEditor extends BaseUser {
     await expect(this.page.locator(bioInBlogDashboardSelector)).toHaveText(bio);
   }
 
-  // --- New methods required by the test ---
-
   async navigateToBlogDashboardPage(): Promise<void> {
     await this.goto(blogDashboardUrl);
   }
@@ -114,19 +112,17 @@ export class BlogPostEditor extends BaseUser {
   async uploadBlogPostThumbnailImage(
     imagePath: string = blogPostThumbnailImage
   ): Promise<void> {
-    await expect(this.page.locator(thumbnailPhotoBox)).toBeVisible();
-    await this.page.locator(thumbnailPhotoBox).click();
-    // Wait for the file chooser and upload the image.
-    const [fileChooser] = await Promise.all([
-      this.page.waitForEvent('filechooser'),
-      // The click above may already have triggered the chooser; if the
-      // implementation opens a hidden <input type="file"> separately, trigger it:
-      this.page.locator('input[type="file"]').first().dispatchEvent('click'),
-    ]);
-    await fileChooser.setFiles(imagePath);
-    await this.page.locator(addThumbnailImageButton).click();
-    // Modal closes after upload.
-    await expect(this.page.locator('body')).not.toHaveClass(/modal-open/);
+    if (this.isViewportAtMobileWidth()) {
+      await this.uploadFile(imagePath);
+      await this.page.locator(addThumbnailImageButton).click();
+      await expect(this.page.locator(addThumbnailImageButton)).toBeHidden();
+    } else {
+      await expect(this.page.locator(thumbnailPhotoBox)).toBeVisible();
+      await this.page.locator(thumbnailPhotoBox).click();
+      await this.uploadFile(imagePath);
+      await this.page.locator(addThumbnailImageButton).click();
+      await expect(this.page.locator('body.modal-open')).toBeHidden();
+    }
   }
 
   async updateBlogPostTitle(newBlogPostTitle: string): Promise<void> {
