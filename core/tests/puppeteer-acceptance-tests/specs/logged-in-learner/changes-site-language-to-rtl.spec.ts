@@ -128,11 +128,28 @@ describe('Logged-In Learner', function () {
     await loggedInUser1.verifyPageIsRTL();
 
     await loggedInUser1.page.keyboard.press('Escape');
-    await loggedInUser1.page.waitForFunction(
-      () =>
+
+    await loggedInUser1.page.evaluate(async () => {
+      await document.fonts.ready;
+    });
+
+    await loggedInUser1.page.waitForFunction(() => {
+      return (
         document.documentElement.dir === 'rtl' &&
-        !document.querySelector('[aria-expanded="true"]')
-    );
+        getComputedStyle(document.body).direction === 'rtl'
+      );
+    });
+
+    await loggedInUser1.page.addStyleTag({
+      content: `
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    `,
+    });
 
     await loggedInUser1.expectScreenshotToMatch(
       'RTLArabicLearnerDashboard',
@@ -143,11 +160,28 @@ describe('Logged-In Learner', function () {
     await loggedInUser1.verifyPageIsRTL();
 
     await loggedInUser1.page.keyboard.press('Escape');
-    await loggedInUser1.page.waitForFunction(
-      () =>
+
+    await loggedInUser1.page.evaluate(async () => {
+      await document.fonts.ready;
+    });
+
+    await loggedInUser1.page.waitForFunction(() => {
+      return (
         document.documentElement.dir === 'rtl' &&
-        !document.querySelector('[aria-expanded="true"]')
-    );
+        getComputedStyle(document.body).direction === 'rtl'
+      );
+    });
+
+    await loggedInUser1.page.addStyleTag({
+      content: `
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    `,
+    });
 
     await loggedInUser1.expectScreenshotToMatch('RTLArabicHomePage', __dirname);
   });
