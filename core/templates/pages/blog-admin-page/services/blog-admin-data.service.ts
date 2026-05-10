@@ -40,7 +40,16 @@ export class BlogAdminDataService {
     return this.dataPromise;
   }
 
-  async getDataAsync(): Promise<BlogAdminPageData> {
+  async getDataAsync(
+    forceRefresh: boolean = false
+  ): Promise<BlogAdminPageData> {
+    // Cache the promise so multiple callers (ngOnInit + other callers)
+    // don't trigger duplicate HTTP requests and cause UI re-renders
+    // while tests are interacting with the page.
+    if (this.dataPromise && !forceRefresh) {
+      return this.dataPromise;
+    }
+
     return this._getDataAsync();
   }
 }
