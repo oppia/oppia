@@ -29,6 +29,11 @@ runs:
           echo "The modified suite name should contain only the following characters: letters, digits, underscore and hyphen."
           exit 1
         fi
+    - name: Clean up stale Oppia server process before rerun
+      shell: bash
+      run: |
+        fuser -k 8181/tcp || true
+
     - name: Run ${{ inputs.viewport-type == 'mobile' && 'Mobile' || 'Desktop' }} Acceptance Test ${{ inputs.test-suite }}
       id: run-acceptance-test
       shell: bash
