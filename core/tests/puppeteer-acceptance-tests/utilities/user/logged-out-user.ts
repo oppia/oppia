@@ -1047,6 +1047,7 @@ export class LoggedOutUser extends BaseUser {
     if (!blogPostsFound) {
       return;
     }
+    await this.expectElementToBeVisible(blogPostContentSelector);
     const contentFound = await this.page.$$eval(
       `${blogPostTitleContainerSelector}, ${blogPostContentSelector}`,
       (elements, searchText) =>
@@ -1095,6 +1096,7 @@ export class LoggedOutUser extends BaseUser {
     if (!blogPostsFound) {
       return;
     }
+    await this.expectElementToBeVisible(blogPostTagSelector);
     const tagFound = await this.page.$$eval(
       blogPostTagSelector,
       (elements, expectedTag) =>
