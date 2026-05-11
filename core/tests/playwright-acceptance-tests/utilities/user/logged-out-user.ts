@@ -92,7 +92,9 @@ export class LoggedOutUser extends BaseUser {
     }
 
     await nextButton.click();
-    await expect(this.page.locator(blogPostTitleSelector)).toBeVisible();
+    await expect(
+      this.page.locator(blogPostTitleSelector).first()
+    ).toBeVisible();
 
     const newFirstPostTitle = await this.page
       .locator(blogPostTitleSelector)
