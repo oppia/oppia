@@ -1203,16 +1203,23 @@ export class LoggedOutUser extends BaseUser {
     expectedDestinationPageName: string
   ): Promise<void> {
     const pageTarget = this.page.target();
+    await this.waitForElementToStabilize(button);
+    await this.waitForElementToBeClickable(button);
     await this.clickOnElementWithSelector(button);
-    const newTarget = await this.browserObject.waitForTarget(
-      target => target.opener() === pageTarget
-    );
+    const newTarget = await this.browserObject.waitForTarget(target => {
+      return target.opener() === pageTarget;
+    });
     const newTabPage = await newTarget.page();
     if (newTabPage === null) {
       throw new Error(
         `${buttonName} should open the ${expectedDestinationPageName} page`
       );
     }
+    await newTabPage.waitForFunction(
+      (expectedUrl: string) => window.location.href === expectedUrl,
+      {timeout: 15000},
+      expectedDestinationPageUrl
+    );
     expect(newTabPage.url()).toBe(expectedDestinationPageUrl);
     await newTabPage.close();
   }
