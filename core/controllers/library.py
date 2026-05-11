@@ -28,12 +28,31 @@ from core.domain import (
     user_services,
 )
 
-from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union, cast
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    TypedDict,
+    TypeGuard,
+    Union,
+)
 
 UnionSummaryDictType = Union[
     summary_services.DisplayableExplorationSummaryDict,
     summary_services.DisplayableCollectionSummaryDict,
 ]
+
+
+# Here we use type Any because this helper validates a runtime request value
+# before it is narrowed to a more specific list type.
+def _is_list_of_str(value: Any) -> TypeGuard[List[str]]:
+    """Returns whether the given value is a list of strings."""
+    return isinstance(value, list) and all(
+        isinstance(item, str) for item in value
+    )
 
 
 def get_matching_activity_dicts(
@@ -376,7 +395,10 @@ class ExplorationSummariesHandlerNormalizedRequestDict(TypedDict):
     normalized_request dictionary.
     """
 
-    stringified_exp_ids: str
+    # Here we use type Any because JsonEncodedInString can normalize to any
+    # JSON type, and we narrow the value to List[str] in get() after runtime
+    # validation.
+    stringified_exp_ids: Any
     include_private_explorations: Optional[bool]
 
 
@@ -408,6 +430,11 @@ class ExplorationSummariesHandler(
         """Handles GET requests."""
         assert self.normalized_request is not None
         raw_exp_ids = self.normalized_request['stringified_exp_ids']
+
+        if not _is_list_of_str(raw_exp_ids):
+            raise self.NotFoundException
+
+        exp_ids = raw_exp_ids
         include_private_exps = self.normalized_request.get(
             'include_private_explorations'
         )
@@ -415,18 +442,6 @@ class ExplorationSummariesHandler(
         editor_user_id = self.user_id if include_private_exps else None
         if not editor_user_id:
             include_private_exps = False
-
-        # Here we use object because raw_exp_ids comes from a decoded request
-        # payload and needs runtime validation before narrowing.
-        # Here we use cast because the validator must inspect a generic request
-        # value before assigning a stricter type.
-        if not isinstance(cast(object, raw_exp_ids), list) or not all(
-            isinstance(exp_id, str) for exp_id in raw_exp_ids
-        ):
-            raise self.NotFoundException
-        # Here we use cast because raw_exp_ids is guaranteed to be List[str]
-        # after the type validation above.
-        exp_ids = cast(List[str], raw_exp_ids)
 
         if include_private_exps:
             summaries = (

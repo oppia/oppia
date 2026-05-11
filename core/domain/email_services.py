@@ -43,7 +43,7 @@ def _is_email_valid(email_address: Optional[str]) -> bool:
     Returns:
         bool. Whether the specified email address is valid.
     """
-    if email_address is None:
+    if not isinstance(email_address, str):
         return False
 
     stripped_address = email_address.strip()

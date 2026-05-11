@@ -29,7 +29,7 @@ from extensions.rich_text_components import components
 
 import bs4
 import defusedxml.ElementTree
-from typing import Callable, Dict, Iterator, List, Tuple, Union, cast
+from typing import Any, Callable, Dict, Iterator, List, Tuple, Union
 
 
 def wrap_with_siblings(tag: bs4.element.Tag, p: bs4.element.Tag) -> None:
@@ -983,20 +983,18 @@ def validate_math_tags_in_html_with_attribute_math_content(
     return error_list
 
 
-def is_parsable_as_xml(xml_string: bytes) -> bool:
+# Here we use type Any because callers may pass malformed runtime values, and
+# this helper needs to reject non-bytes inputs before parsing.
+def is_parsable_as_xml(xml_string: Any) -> bool:
     """Checks if input string is parsable as XML.
 
     Args:
-        xml_string: bytes. The XML string in bytes.
+        xml_string: *. The XML string in bytes.
 
     Returns:
         bool. Whether xml_string is parsable as XML or not.
     """
-    # Here we use object because this validator can receive malformed runtime
-    # values even though the helper annotation is bytes.
-    # Here we use cast because the runtime guard should still handle malformed
-    # inputs even though the static type for this helper is already bytes.
-    if not isinstance(cast(object, xml_string), bytes):
+    if not isinstance(xml_string, bytes):
         return False
     try:
         defusedxml.ElementTree.fromstring(xml_string)
