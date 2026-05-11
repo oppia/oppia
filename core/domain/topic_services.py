@@ -461,32 +461,31 @@ def _apply_study_guide_change(
     Raises:
         Exception. The subtopic doesn't exist.
     """
-    # Ruling out the possibility of any other type for mypy
-    # type checking.
-    assert isinstance(change.subtopic_id, int)
+    # Here we use cast because subtopic_id is int but BaseChange attrs are str.
+    subtopic_id = cast(int, change.subtopic_id)
     study_guide_id = study_guide_domain.StudyGuide.get_study_guide_id(
-        topic_id, change.subtopic_id
+        topic_id, subtopic_id
     )
     subtopic_page_id = subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-        topic_id, change.subtopic_id
+        topic_id, subtopic_id
     )
     if (modified_study_guides[study_guide_id] is None) or (
-        change.subtopic_id in deleted_subtopic_ids
+        subtopic_id in deleted_subtopic_ids
     ):
         raise Exception(
-            'The subtopic with id %s doesn\'t exist' % (change.subtopic_id)
+            'The subtopic with id %s doesn\'t exist' % (subtopic_id)
         )
 
     if change.property_name == study_guide_domain.STUDY_GUIDE_PROPERTY_SECTIONS:
-        # Here we use cast because this 'if'
-        # condition forces change to have type
-        # UpdateStudyGuidePropertyCmd.
+        # Here we use cast because mypy cannot infer the narrowed command type.
         update_study_guide_sections_cmd = cast(
             study_guide_domain.UpdateStudyGuidePropertyCmd, change
         )
-        new_sections_dict_list: List[
-            study_guide_domain.StudyGuideSectionDict
-        ] = update_study_guide_sections_cmd.new_value
+        # Here we use cast because new_value is generic on the base command type.
+        new_sections_dict_list = cast(
+            List[study_guide_domain.StudyGuideSectionDict],
+            update_study_guide_sections_cmd.new_value,
+        )
         new_sections: List[study_guide_domain.StudyGuideSection] = []
 
         # For updating the page_contents of the subtopic page corresponding
@@ -522,7 +521,7 @@ def _apply_study_guide_change(
         temporary_subtopic_page: Union[
             subtopic_page_domain.SubtopicPage, None
         ] = subtopic_page_services.get_subtopic_page_by_id(
-            topic_id, change.subtopic_id, False
+            topic_id, subtopic_id, strict=False
         )
         if temporary_subtopic_page is not None:
             modified_subtopic_pages[subtopic_page_id] = temporary_subtopic_page
