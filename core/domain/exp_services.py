@@ -492,13 +492,6 @@ def get_content_updates_from_cmd_edit_state_property_change(
     if change.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
         return content_id_to_content_value
 
-    # Here we use object because change.new_value can be malformed at runtime,
-    # and we need a runtime guard without forcing MyPy to assume the branch is
-    # unreachable.
-    change_new_value: object = change.new_value
-    if change_new_value is None:
-        return content_id_to_content_value
-
     def add_subtitled_html_from_dict(
         subtitled_html: state_domain.SubtitledHtmlDict,
     ) -> None:
@@ -848,18 +841,7 @@ def apply_change_list(
                         exp_domain.EditExpStatePropertyInteractionHintsCmd,
                         change,
                     )
-                    # Here we use object because hint_dicts is typed as
-                    # a list for this command, but we still need a runtime
-                    # guard for malformed data without making MyPy treat the
-                    # isinstance check as unreachable.
-                    hint_dicts: object = (
-                        edit_state_interaction_hints_cmd.new_value
-                    )
-                    if not isinstance(hint_dicts, list):
-                        raise Exception(
-                            'Expected hints_list to be a list,'
-                            ' received %s' % hint_dicts
-                        )
+                    hint_dicts = edit_state_interaction_hints_cmd.new_value
                     new_hints_list = [
                         state_domain.Hint.from_dict(hint_dict)
                         for hint_dict in hint_dicts
@@ -892,16 +874,6 @@ def apply_change_list(
                     change.property_name
                     == exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS
                 ):
-                    # Here we use object because change.new_value is typed as
-                    # a bool for this command, but we still need a runtime
-                    # guard for malformed data without making MyPy treat the
-                    # isinstance check as unreachable.
-                    solicit_answer_details_value: object = change.new_value
-                    if not isinstance(solicit_answer_details_value, bool):
-                        raise Exception(
-                            'Expected solicit_answer_details to be a '
-                            + 'bool, received %s' % solicit_answer_details_value
-                        )
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # EditExpStatePropertySolicitAnswerDetailsCmd.
@@ -916,16 +888,6 @@ def apply_change_list(
                     change.property_name
                     == exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT
                 ):
-                    # Here we use object because change.new_value is typed as
-                    # a bool for this command, but we still need a runtime
-                    # guard for malformed data without making MyPy treat the
-                    # isinstance check as unreachable.
-                    card_is_checkpoint_value: object = change.new_value
-                    if not isinstance(card_is_checkpoint_value, bool):
-                        raise Exception(
-                            'Expected card_is_checkpoint to be a '
-                            + 'bool, received %s' % card_is_checkpoint_value
-                        )
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # EditExpStatePropertyCardIsCheckpointCmd.

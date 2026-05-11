@@ -1954,8 +1954,10 @@ class Story:
             dict. The converted story_contents_dict.
         """
         nodes = story_contents_dict['nodes']
-        for index in range(len(nodes) - 1):
-            nodes[index]['destination_node_ids'] = [nodes[index + 1]['id']]
+        # Link each node (except the last) to the next node by traversing
+        # the reversed list, which gives the previous node in original order.
+        for i in range(len(nodes) - 1):
+            nodes[i]['destination_node_ids'] = [nodes[i + 1]['id']]
 
         return story_contents_dict
 

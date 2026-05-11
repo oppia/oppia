@@ -29,7 +29,7 @@ from extensions.rich_text_components import components
 
 import bs4
 import defusedxml.ElementTree
-from typing import Any, Callable, Dict, Iterator, List, Tuple, Union
+from typing import Callable, Dict, Iterator, List, Tuple, Union
 
 
 def wrap_with_siblings(tag: bs4.element.Tag, p: bs4.element.Tag) -> None:
@@ -983,9 +983,7 @@ def validate_math_tags_in_html_with_attribute_math_content(
     return error_list
 
 
-# Here we use type Any because callers may pass malformed runtime values, and
-# this helper needs to reject non-bytes inputs before parsing.
-def is_parsable_as_xml(xml_string: Any) -> bool:
+def is_parsable_as_xml(xml_string: bytes) -> bool:
     """Checks if input string is parsable as XML.
 
     Args:
@@ -994,8 +992,6 @@ def is_parsable_as_xml(xml_string: Any) -> bool:
     Returns:
         bool. Whether xml_string is parsable as XML or not.
     """
-    if not isinstance(xml_string, bytes):
-        return False
     try:
         defusedxml.ElementTree.fromstring(xml_string)
         return True
