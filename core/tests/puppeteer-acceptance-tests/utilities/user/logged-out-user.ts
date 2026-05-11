@@ -5029,6 +5029,23 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
       timeout: timeout,
     });
+    if (this.isViewportAtMobileWidth()) {
+      const isMobileNavOpen = await this.isElementVisible(
+        '.exp-nav-dropdown-container',
+        true,
+        1000
+      );
+      if (isMobileNavOpen) {
+        const isMobileOptionsVisible = await this.isElementVisible(
+          'i.e2e-test-mobile-options',
+          true,
+          1000
+        );
+        if (isMobileOptionsVisible) {
+          await this.clickOnElementWithSelector('i.e2e-test-mobile-options');
+        }
+      }
+    }
     await this.clickOnElementWithSelector(viewSolutionButton);
     await this.clickOnElementWithSelector(continueToSolutionButton);
     await this.page.waitForSelector(closeSolutionModalButton, {
