@@ -50,6 +50,8 @@ const LONG_SETUP_TIMEOUT_MSECS = 12 * 60 * 1000;
 
 const COLLECTION_CARD_LINK_SELECTOR = '.e2e-test-collection-card a';
 const EXPLORATION_TILE_LINK_SELECTOR = 'a[href*="/explore/"]';
+const COLLECTION_PREVIEW_TILE_LINK_SELECTOR =
+  '.oppia-exploration-summary-tile a[href*="/explore/"]';
 
 describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
@@ -186,7 +188,8 @@ describe('Logged-Out Learner', function () {
       throw new Error(`${SECOND_EXPLORATION_TITLE} was not visible.`);
     }
 
-    const explorationTileSelector = loggedOutLearner.isViewportAtMobileWidth()
+    const isMobileViewport = loggedOutLearner.isViewportAtMobileWidth();
+    const explorationTileSelector = isMobileViewport
       ? MOBILE_EXPLORATION_TILE_SELECTOR
       : DESKTOP_EXPLORATION_TILE_SELECTOR;
 
@@ -218,6 +221,31 @@ describe('Logged-Out Learner', function () {
             waitUntil: 'domcontentloaded',
             timeout: 60000,
           });
+        } else if (isMobileViewport) {
+          await tile.click();
+          await loggedOutLearner.page.waitForSelector(
+            COLLECTION_PREVIEW_TILE_LINK_SELECTOR,
+            {visible: true, timeout: 10000}
+          );
+          const previewLink = await loggedOutLearner.page
+            .$eval(COLLECTION_PREVIEW_TILE_LINK_SELECTOR, element => {
+              const href =
+                (element as HTMLAnchorElement).getAttribute('href') ?? '';
+              return href.startsWith('http')
+                ? new URL(href).pathname + new URL(href).search
+                : href;
+            })
+            .catch(() => null);
+          if (!previewLink) {
+            throw new Error('Could not open exploration preview tile.');
+          }
+          await loggedOutLearner.page.goto(
+            `http://localhost:8181${previewLink}`,
+            {
+              waitUntil: 'domcontentloaded',
+              timeout: 60000,
+            }
+          );
         } else {
           await Promise.all([
             loggedOutLearner.page.waitForNavigation({
@@ -232,13 +260,40 @@ describe('Logged-Out Learner', function () {
       }
     }
     if (!clickedPositiveNumbersExploration && explorationTiles.length > 0) {
-      await Promise.all([
-        loggedOutLearner.page.waitForNavigation({
-          waitUntil: 'domcontentloaded',
-          timeout: 30000,
-        }),
-        explorationTiles[0].click(),
-      ]);
+      if (isMobileViewport) {
+        await explorationTiles[0].click();
+        await loggedOutLearner.page.waitForSelector(
+          COLLECTION_PREVIEW_TILE_LINK_SELECTOR,
+          {visible: true, timeout: 10000}
+        );
+        const previewLink = await loggedOutLearner.page
+          .$eval(COLLECTION_PREVIEW_TILE_LINK_SELECTOR, element => {
+            const href =
+              (element as HTMLAnchorElement).getAttribute('href') ?? '';
+            return href.startsWith('http')
+              ? new URL(href).pathname + new URL(href).search
+              : href;
+          })
+          .catch(() => null);
+        if (!previewLink) {
+          throw new Error('Could not open exploration preview tile.');
+        }
+        await loggedOutLearner.page.goto(
+          `http://localhost:8181${previewLink}`,
+          {
+            waitUntil: 'domcontentloaded',
+            timeout: 60000,
+          }
+        );
+      } else {
+        await Promise.all([
+          loggedOutLearner.page.waitForNavigation({
+            waitUntil: 'domcontentloaded',
+            timeout: 30000,
+          }),
+          explorationTiles[0].click(),
+        ]);
+      }
       clickedFirstExplorationTile = true;
     }
     if (!clickedPositiveNumbersExploration && !clickedFirstExplorationTile) {
