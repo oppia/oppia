@@ -362,6 +362,8 @@ describe('Logged-Out Learner', function () {
       );
     }
 
+    await loggedOutLearner.scrollToBottomOfPage();
+
     await loggedOutLearner.page.waitForSelector(
       SHARE_COLLECTION_FOOTER_SELECTOR,
       {visible: true, timeout: 10000}
