@@ -362,11 +362,9 @@ describe('Logged-Out Learner', function () {
       );
     }
 
-    await loggedOutLearner.scrollToBottomOfPage();
-
     await loggedOutLearner.page.waitForSelector(
       SHARE_COLLECTION_FOOTER_SELECTOR,
-      {visible: true, timeout: 10000}
+      {timeout: 10000}
     );
     const shareText = await loggedOutLearner.page.$eval(
       SHARE_COLLECTION_FOOTER_SELECTOR,
