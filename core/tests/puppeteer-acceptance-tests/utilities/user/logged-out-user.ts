@@ -5045,8 +5045,13 @@ export class LoggedOutUser extends BaseUser {
           await this.clickOnElementWithSelector('i.e2e-test-mobile-options');
         }
       }
+
+      await this.page.$eval(viewSolutionButton, element => {
+        (element as HTMLElement).click();
+      });
+    } else {
+      await this.clickOnElementWithSelector(viewSolutionButton);
     }
-    await this.clickOnElementWithSelector(viewSolutionButton);
     await this.clickOnElementWithSelector(continueToSolutionButton);
     await this.page.waitForSelector(closeSolutionModalButton, {
       visible: true,
