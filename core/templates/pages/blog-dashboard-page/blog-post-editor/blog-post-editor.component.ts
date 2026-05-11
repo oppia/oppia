@@ -210,9 +210,8 @@ export class BlogPostEditorComponent implements OnInit {
 
   getDateStringInWords(naiveDateTime: string): string {
     let datestring = naiveDateTime.substring(0, naiveDateTime.length - 7);
-    return dayjs(datestring, 'MM-DD-YYYY, HH:mm:ss').format(
-      'MMMM D, YYYY [at] hh:mm A'
-    );
+    const utcDate = new Date(datestring + ' UTC');
+    return dayjs(utcDate).format('MMMM D, YYYY [at] hh:mm A');
   }
 
   updateLocalTitleValue(): void {
