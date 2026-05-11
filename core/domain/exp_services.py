@@ -803,18 +803,16 @@ def apply_change_list(
                     change.property_name
                     == exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
                 ):
-                    new_outcome = None
-                    if change.new_value:
-                        # Here we use cast because this 'elif'
-                        # condition forces change to have type
-                        # EditExpStatePropertyInteractionDefaultOutcomeCmd.
-                        edit_interaction_default_outcome_cmd = cast(
-                            exp_domain.EditExpStatePropertyInteractionDefaultOutcomeCmd,  # pylint: disable=line-too-long
-                            change,
-                        )
-                        new_outcome = state_domain.Outcome.from_dict(
-                            edit_interaction_default_outcome_cmd.new_value
-                        )
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyInteractionDefaultOutcomeCmd.
+                    edit_interaction_default_outcome_cmd = cast(
+                        exp_domain.EditExpStatePropertyInteractionDefaultOutcomeCmd,  # pylint: disable=line-too-long
+                        change,
+                    )
+                    new_outcome = state_domain.Outcome.from_dict(
+                        edit_interaction_default_outcome_cmd.new_value
+                    )
                     state.update_interaction_default_outcome(new_outcome)
                 elif (
                     change.property_name
@@ -851,7 +849,6 @@ def apply_change_list(
                     change.property_name
                     == exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION
                 ):
-                    new_solution = None
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # EditExpStatePropertyInteractionSolutionCmd.
@@ -859,16 +856,14 @@ def apply_change_list(
                         exp_domain.EditExpStatePropertyInteractionSolutionCmd,
                         change,
                     )
-                    if edit_interaction_solution_cmd.new_value is not None:
-                        if state.interaction.id is None:
-                            raise Exception(
-                                'solution cannot exist with None '
-                                'interaction id.'
-                            )
-                        new_solution = state_domain.Solution.from_dict(
-                            state.interaction.id,
-                            edit_interaction_solution_cmd.new_value,
+                    if state.interaction.id is None:
+                        raise Exception(
+                            'solution cannot exist with None ' 'interaction id.'
                         )
+                    new_solution = state_domain.Solution.from_dict(
+                        state.interaction.id,
+                        edit_interaction_solution_cmd.new_value,
+                    )
                     state.update_interaction_solution(new_solution)
                 elif (
                     change.property_name

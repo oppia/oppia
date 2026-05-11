@@ -169,7 +169,7 @@ def apply_change_list(
                 update_story_node_outline_status = cast(
                     story_domain.UpdateStoryNodeOutlineStatusCmd, change
                 )
-                if update_story_node_outline_status.new_value:
+                if update_story_node_outline_status.new_value is True:
                     story.mark_node_outline_as_finalized(
                         update_story_node_outline_status.node_id
                     )
