@@ -281,10 +281,6 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-math-interactions.spec.ts"
     },
     {
-      "name": "exploration-creator/preview-rarely-used-interactions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-rarely-used-interactions.spec.ts"
-    },
-    {
       "name": "logged-out-learner/complete-some-practice-question",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/complete-some-practice-question.spec.ts"
     },
