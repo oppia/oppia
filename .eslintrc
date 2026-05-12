@@ -160,6 +160,7 @@
     "oppia/no-multiple-component": "error",
     "oppia/no-multiline-disable": "error",
     "oppia/no-testonly": "error",
+    "oppia/no-view-encapsulation-none": "error",
     "oppia/test-message-style": "error",
     "oppia/no-test-blockers": "error",
     "oppia/no-bypass-security-phrase": "error",
