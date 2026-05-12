@@ -21,7 +21,6 @@ import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model
 import {ParamSpecs} from 'domain/exploration/param-specs.model';
 import {State} from 'domain/state/state.model';
 import {VersionHistoryService} from './version-history.service';
-import {StateBackendDict} from 'domain/state/state.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 describe('Version history service', () => {
