@@ -443,9 +443,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             incomplete_translation_language_codes=[],
             translation_counts={'xyz': 2},
         )
-        with self.assertRaisesRegex(
-            Exception, 'Invalid language code: xyz'
-        ):
+        with self.assertRaisesRegex(Exception, 'Invalid language code: xyz'):
             model.put()
 
     def test_validation_fails_for_translation_count_exceeding_content(
