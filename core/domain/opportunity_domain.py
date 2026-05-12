@@ -532,9 +532,7 @@ class TranslationOpportunity:
                     % (language_code, self.content_count, count)
                 )
 
-    def update_translation_count(
-        self, language_code: str, count: int
-    ) -> None:
+    def update_translation_count(self, language_code: str, count: int) -> None:
         """Updates the translation count of the given language.
 
         Args:
@@ -545,14 +543,10 @@ class TranslationOpportunity:
 
         if self.translation_counts[language_code] >= self.content_count:
             if language_code in self.incomplete_translation_language_codes:
-                self.incomplete_translation_language_codes.remove(
-                    language_code
-                )
+                self.incomplete_translation_language_codes.remove(language_code)
         else:
             if language_code not in self.incomplete_translation_language_codes:
-                self.incomplete_translation_language_codes.append(
-                    language_code
-                )
+                self.incomplete_translation_language_codes.append(language_code)
 
         self.validate()
 
@@ -568,14 +562,10 @@ class TranslationOpportunity:
         for lang_code, count in self.translation_counts.items():
             if count < self.content_count:
                 if lang_code not in self.incomplete_translation_language_codes:
-                    self.incomplete_translation_language_codes.append(
-                        lang_code
-                    )
+                    self.incomplete_translation_language_codes.append(lang_code)
             else:
                 if lang_code in self.incomplete_translation_language_codes:
-                    self.incomplete_translation_language_codes.remove(
-                        lang_code
-                    )
+                    self.incomplete_translation_language_codes.remove(lang_code)
 
         self.validate()
 

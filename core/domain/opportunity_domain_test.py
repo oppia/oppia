@@ -521,7 +521,7 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
         )
         self.assertIn(
             'hi',
-            self.valid_translation_opportunity.incomplete_translation_language_codes
+            self.valid_translation_opportunity.incomplete_translation_language_codes,
         )
 
         # Reach content_count.
@@ -531,14 +531,14 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
         )
         self.assertNotIn(
             'hi',
-            self.valid_translation_opportunity.incomplete_translation_language_codes
+            self.valid_translation_opportunity.incomplete_translation_language_codes,
         )
 
         # Drop below content_count (should be added back to incomplete).
         self.valid_translation_opportunity.update_translation_count('hi', 4)
         self.assertIn(
             'hi',
-            self.valid_translation_opportunity.incomplete_translation_language_codes
+            self.valid_translation_opportunity.incomplete_translation_language_codes,
         )
 
     def test_update_content_count(self) -> None:
@@ -546,7 +546,7 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
         self.valid_translation_opportunity.update_translation_count('hi', 5)
         self.assertNotIn(
             'hi',
-            self.valid_translation_opportunity.incomplete_translation_language_codes
+            self.valid_translation_opportunity.incomplete_translation_language_codes,
         )
 
         # Increase content_count -> hi becomes incomplete again.
@@ -554,19 +554,21 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
         self.assertEqual(self.valid_translation_opportunity.content_count, 10)
         self.assertIn(
             'hi',
-            self.valid_translation_opportunity.incomplete_translation_language_codes
+            self.valid_translation_opportunity.incomplete_translation_language_codes,
         )
 
         # Decrease content_count -> hi becomes complete.
         self.valid_translation_opportunity.update_content_count(5)
         self.assertNotIn(
             'hi',
-            self.valid_translation_opportunity.incomplete_translation_language_codes
+            self.valid_translation_opportunity.incomplete_translation_language_codes,
         )
 
     def test_update_topic_ids(self) -> None:
         self.valid_translation_opportunity.update_topic_ids(['topic_2'])
-        self.assertEqual(self.valid_translation_opportunity.topic_ids, ['topic_2'])
+        self.assertEqual(
+            self.valid_translation_opportunity.topic_ids, ['topic_2']
+        )
 
 
 class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
