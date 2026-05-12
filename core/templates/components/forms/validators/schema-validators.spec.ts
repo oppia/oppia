@@ -38,22 +38,7 @@ class MockFormControl extends AbstractControl {
   }
 }
 
-class MockNumberConversionService {
-  currentDecimalSeparator(): string {
-    return mockNumberConversionServiceObject.currentDecimalSeparator();
-  }
-
-  convertToEnglishDecimal(value: string): number | null {
-    return mockNumberConversionServiceObject.convertToEnglishDecimal(value);
-  }
-}
-
 describe('Schema validators', () => {
-  let mockNumberConversionService: MockNumberConversionService;
-
-  beforeEach(() => {
-    mockNumberConversionService = new MockNumberConversionService();
-  });
   describe('when validating "has-length-at-least"', () => {
     it('should impose minimum length bounds', () => {
       const control: MockFormControl = new MockFormControl([], []);
@@ -165,7 +150,7 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.isAtLeast(
         args,
-        mockNumberConversionService as unknown as NumberConversionService
+        mockNumberConversionServiceObject as NumberConversionService
       );
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue);
@@ -200,7 +185,7 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.isAtMost(
         args,
-        mockNumberConversionService as unknown as NumberConversionService
+        mockNumberConversionServiceObject as NumberConversionService
       );
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue);
@@ -252,7 +237,7 @@ describe('Schema validators', () => {
         {controlValue: '=1.23', expectedResult: false},
       ];
       const filter = SchemaValidators.isFloat(
-        mockNumberConversionService as unknown as NumberConversionService
+        mockNumberConversionServiceObject as NumberConversionService
       );
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue);
@@ -272,7 +257,7 @@ describe('Schema validators', () => {
 
     it('should use number conversion service to validate float values', () => {
       const filter = SchemaValidators.isFloat(
-        mockNumberConversionService as unknown as NumberConversionService
+        mockNumberConversionServiceObject as NumberConversionService
       );
       const control: MockFormControl = new MockFormControl([], []);
 
