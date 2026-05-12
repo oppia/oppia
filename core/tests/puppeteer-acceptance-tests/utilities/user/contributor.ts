@@ -109,6 +109,8 @@ export class Contributor extends ExplorationEditor {
     subheading: string,
     visible: boolean = true
   ): Promise<ElementHandle | null> {
+    await this.page.waitForNetworkIdle();
+
     const translationOpportunitiesPreset = await this.isElementVisible(
       opportunityItemSelector
     );
