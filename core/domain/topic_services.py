@@ -49,7 +49,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple, Union, cast
+from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -445,7 +445,7 @@ def _collect_subtopic_page_changes(
     modified_study_guide_change_cmds: Dict[
         str, List[study_guide_domain.StudyGuideChange]
     ],
-    ensure_study_guide_exists,
+    ensure_study_guide_exists: Callable[[int], Optional[str]],
 ) -> None:
     """Collects subtopic page preprocessing changes from a change command.
 
