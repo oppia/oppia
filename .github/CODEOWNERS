@@ -684,7 +684,6 @@
 /scripts/run_lighthouse_tests.py @oppia/dev-workflow-reviewers
 
 
-
 # User’s profile page.
 /core/controllers/profile*.py @oppia/lace-backend-reviewers
 /core/templates/domain/user/ @oppia/lace-frontend-reviewers
