@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf, utils
 from core.platform import models
 
 from typing import Dict, Optional, Sequence, Tuple
@@ -339,15 +340,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
         super()._pre_put_hook()
 
         # Check if entity_type is valid.
-        valid_entity_types = {
-            'exploration',
-            'question',
-            'skill',
-            'topic',
-            'story',
-            'classroom',
-        }
-        if self.entity_type not in valid_entity_types:
+        if self.entity_type not in feconf.TRANSLATABLE_ENTITY_TYPES:
             raise Exception(f'Invalid entity_type: {self.entity_type}')
 
         # Ensure counts are valid.
@@ -355,6 +348,8 @@ class TranslationOpportunityModel(base_models.BaseModel):
             raise Exception('content_count cannot be negative.')
 
         for lang_code, count in self.translation_counts.items():
+            if not utils.is_supported_audio_language_code(lang_code):
+                raise Exception(f'Invalid language code: {lang_code}')
             if not isinstance(count, int) or count < 0:
                 raise Exception(
                     f'Invalid translation count for {lang_code}: {count}'
@@ -383,16 +378,18 @@ class TranslationOpportunityModel(base_models.BaseModel):
         cls,
         entity_type: str,
         topic_id: Optional[str],
+        language_code: str,
         page_size: int,
         urlsafe_start_cursor: Optional[str],
     ) -> Tuple[Sequence[TranslationOpportunityModel], Optional[str], bool]:
-        """Returns a list of translation opportunities filtered by entity type
-        and topic.
+        """Returns a list of translation opportunities filtered by entity type,
+        topic and language code.
 
         Args:
             entity_type: str. The type of the entity.
             topic_id: str or None. The ID of the topic to filter by. If None,
                 all topics are included.
+            language_code: str. The language code to filter by.
             page_size: int. The maximum number of entities to be returned.
             urlsafe_start_cursor: str or None. The cursor for pagination.
 
@@ -407,7 +404,10 @@ class TranslationOpportunityModel(base_models.BaseModel):
         else:
             start_cursor = datastore_services.make_cursor()
 
-        query = cls.query(cls.entity_type == entity_type)
+        query = cls.query(
+            cls.entity_type == entity_type,
+            cls.incomplete_translation_language_codes == language_code,
+        )
 
         if topic_id:
             query = query.filter(cls.topic_ids == topic_id)

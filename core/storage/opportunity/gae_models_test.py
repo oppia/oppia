@@ -477,10 +477,10 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             translation_counts={'hi': 5},
         ).put()
 
-        # Test filter by entity_type and topic_id.
+        # Test filter by entity_type, topic_id and language_code.
         results, cursor, more = (
             opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
-                'exploration', 'topic1', 10, None
+                'exploration', 'topic1', 'hi', 10, None
             )
         )
         self.assertEqual(len(results), 2)
@@ -491,10 +491,10 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(more)
         self.assertTrue(isinstance(cursor, str))
 
-        # Test filter by entity_type only.
+        # Test filter by entity_type and language_code only.
         results, cursor, more = (
             opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
-                'exploration', None, 10, None
+                'exploration', None, 'hi', 10, None
             )
         )
         self.assertEqual(len(results), 2)
@@ -503,11 +503,19 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
         # Test filter by different topic_id.
         results, cursor, more = (
             opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
-                'exploration', 'topic2', 10, None
+                'exploration', 'topic2', 'hi', 10, None
             )
         )
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].entity_id, 'exp2')
+
+        # Test filter by different language_code.
+        results, cursor, more = (
+            opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
+                'exploration', 'topic1', 'en', 10, None
+            )
+        )
+        self.assertEqual(len(results), 0)
 
     def test_get_by_entity_type_and_topic_pagination(self) -> None:
         for i in range(5):
@@ -522,7 +530,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
 
         results, cursor, more = (
             opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
-                'exploration', 'topic1', 2, None
+                'exploration', 'topic1', 'hi', 2, None
             )
         )
         self.assertEqual(len(results), 2)
@@ -531,7 +539,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
 
         results, cursor, more = (
             opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
-                'exploration', 'topic1', 2, cursor
+                'exploration', 'topic1', 'hi', 2, cursor
             )
         )
         self.assertEqual(len(results), 2)
@@ -539,7 +547,7 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
 
         results, cursor, more = (
             opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
-                'exploration', 'topic1', 2, cursor
+                'exploration', 'topic1', 'hi', 2, cursor
             )
         )
         self.assertEqual(len(results), 1)
