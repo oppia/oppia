@@ -162,7 +162,7 @@ export class AddOrUpdateSolutionModalComponent
     }
     this.correctAnswerEditorHtml =
       this.explorationHtmlFormatterService.getInteractionHtml(
-        this.stateInteractionIdService.savedMemento,
+        this.stateInteractionIdService.savedMemento as InteractionSpecsKey,
         this.stateCustomizationArgsService.savedMemento,
         false,
         this.SOLUTION_EDITOR_FOCUS_LABEL,

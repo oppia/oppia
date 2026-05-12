@@ -48,6 +48,7 @@ import {ExplorationStatesService} from 'pages/exploration-editor-page/services/e
 import {State} from 'domain/state/state.model';
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {VoiceoverRegenerationJobService} from 'services/voiceover-regeneration-job-service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 @Pipe({name: 'formatTime'})
 class MockFormatTimePipe {
@@ -884,7 +885,7 @@ describe('Voiceover card component', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput',
+        id: 'TextInput' as InteractionSpecsKey,
       },
       linked_skill_id: null,
       param_changes: [],

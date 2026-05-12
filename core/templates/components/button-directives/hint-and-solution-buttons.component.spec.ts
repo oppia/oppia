@@ -54,7 +54,7 @@ describe('HintAndSolutionButtonsComponent', () => {
   let newCard: StateCard;
 
   const defaultInteractionBackendDict = {
-    id: 'TextInput',
+    id: 'TextInput' as const,
     answer_groups: [
       {
         outcome: {

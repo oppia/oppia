@@ -940,7 +940,7 @@ describe('Responses Service', () => {
       },
       null,
       [],
-      '0',
+      'MultipleChoiceInput',
       null
     );
     const solution = new Solution(

@@ -39,7 +39,7 @@ import {SchemaValidators} from '../validators/schema-validators';
   ],
 })
 export class ApplyValidationDirective implements Validator {
-  @Input() validators: OppiaValidator[];
+  @Input() validators!: OppiaValidator[];
   underscoresToCamelCasePipe = new UnderscoresToCamelCasePipe();
   validate(control: AbstractControl): ValidationErrors | null {
     if (!this.validators || this.validators.length === 0) {
@@ -51,7 +51,7 @@ export class ApplyValidationDirective implements Validator {
       const validatorName = this.underscoresToCamelCasePipe.transform(
         validatorSpec.id
       );
-      const filterArgs = {};
+      const filterArgs: Record<string, unknown> = {};
       for (let key in validatorSpec) {
         if (key !== 'id') {
           filterArgs[this.underscoresToCamelCasePipe.transform(key)] =

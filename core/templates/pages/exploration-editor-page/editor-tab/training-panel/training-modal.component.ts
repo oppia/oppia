@@ -53,6 +53,7 @@ import {NumericInputRulesService} from 'interactions/NumericInput/directives/num
 import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import {SetInputRulesService} from 'interactions/SetInput/directives/set-input-rules.service';
 import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 export const RULES_SERVICE_MAPPING = {
   AlgebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService,
@@ -205,7 +206,9 @@ export class TrainingModalComponent
     let interactionId = this.stateInteractionIdService.savedMemento;
 
     let rulesServiceName =
-      this.angularNameService.getNameOfInteractionRulesService(interactionId);
+      this.angularNameService.getNameOfInteractionRulesService(
+        interactionId as InteractionSpecsKey
+      );
     if (!isInteractionRulesServiceName(rulesServiceName)) {
       throw new Error(
         `Unrecognized interaction rules service: ${rulesServiceName}`

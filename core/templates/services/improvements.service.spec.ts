@@ -21,6 +21,7 @@ import {TestBed} from '@angular/core/testing';
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {ImprovementsService} from 'services/improvements.service';
 import {State} from 'domain/state/state.model';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 describe('ImprovementsService', () => {
   let improvementsService: ImprovementsService;
@@ -42,7 +43,7 @@ describe('ImprovementsService', () => {
           content_id: 'content',
         },
         interaction: {
-          id: 'TextInput',
+          id: 'TextInput' as InteractionSpecsKey,
           customization_args: {
             rows: {
               value: 1,
@@ -101,7 +102,7 @@ describe('ImprovementsService', () => {
           content_id: 'content',
         },
         interaction: {
-          id: 'FractionInput',
+          id: 'FractionInput' as InteractionSpecsKey,
           customization_args: {
             requireSimplestForm: {value: false},
             allowImproperFraction: {value: true},

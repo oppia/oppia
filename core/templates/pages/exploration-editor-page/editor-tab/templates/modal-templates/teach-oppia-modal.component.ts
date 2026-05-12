@@ -42,6 +42,7 @@ import {State} from 'domain/state/state.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {TeachOppiaModalBackendApiService} from './teach-oppia-modal-backend-api.service';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 export interface UnresolvedAnswer {
   answer: InteractionAnswer;
@@ -178,7 +179,7 @@ export class TeachOppiaModalComponent
     const truncatedAnswer =
       this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
         unresolvedAnswer.answer,
-        this.interactionId,
+        this.interactionId as InteractionSpecsKey,
         12
       );
     const successToast =
@@ -209,7 +210,7 @@ export class TeachOppiaModalComponent
     let interactionId = this.stateInteractionIdService.savedMemento;
     this.trainingModalService.openTrainUnresolvedAnswerModal(
       answer,
-      interactionId,
+      interactionId as InteractionSpecsKey,
       answerIndex
     );
   }
@@ -222,7 +223,7 @@ export class TeachOppiaModalComponent
           const truncatedAnswer =
             this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
               finishTrainingResult.answer,
-              this.interactionId,
+              this.interactionId as InteractionSpecsKey,
               12
             );
           const successToast =
@@ -241,7 +242,8 @@ export class TeachOppiaModalComponent
     if (stateName) {
       this._stateName = stateName;
       this._state = this.explorationStatesService.getState(this._stateName);
-      this.interactionId = this.stateInteractionIdService.savedMemento;
+      this.interactionId = this.stateInteractionIdService
+        .savedMemento as InteractionSpecsKey;
     }
 
     const rulesServiceName =

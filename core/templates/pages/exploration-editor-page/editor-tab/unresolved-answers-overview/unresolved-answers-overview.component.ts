@@ -70,8 +70,8 @@ export class UnresolvedAnswersOverviewComponent implements OnInit {
     );
   }
 
-  getCurrentInteractionId(): string {
-    return this.stateInteractionIdService.savedMemento;
+  getCurrentInteractionId(): InteractionSpecsKey {
+    return this.stateInteractionIdService.savedMemento as InteractionSpecsKey;
   }
 
   isCurrentInteractionLinear(): boolean {

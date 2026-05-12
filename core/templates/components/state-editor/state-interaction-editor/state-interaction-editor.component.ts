@@ -55,11 +55,12 @@ import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 export interface InitializeAnswerGroups {
-  interactionId: string;
+  interactionId: InteractionSpecsKey | null;
   answerGroups: AnswerGroup[];
-  defaultOutcome: Outcome;
+  defaultOutcome: Outcome | null;
   confirmedUnclassifiedAnswers: readonly InteractionAnswer[];
 }
 
@@ -84,15 +85,15 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
   @ViewChild('collapseAnswersAndResponsesButton')
   collapseAnswersAndResponsesButton!: ElementRef;
 
-  customizationModalReopened: boolean;
-  DEFAULT_TERMINAL_STATE_CONTENT: string;
+  customizationModalReopened!: boolean;
+  DEFAULT_TERMINAL_STATE_CONTENT!: string;
   directiveSubscriptions = new Subscription();
-  hasLoaded: boolean;
-  interactionEditorIsShown: boolean;
-  interactionId: string;
-  interactionIsDisabled: boolean;
-  interactionPreviewHtml: string;
-  windowIsNarrow: boolean;
+  hasLoaded!: boolean;
+  interactionEditorIsShown!: boolean;
+  interactionId!: InteractionSpecsKey | null;
+  interactionIsDisabled!: boolean;
+  interactionPreviewHtml!: string;
+  windowIsNarrow!: boolean;
 
   constructor(
     private alertsService: AlertsService,
@@ -152,7 +153,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      )
+      ) || undefined
     );
   }
 
@@ -201,6 +202,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateInteractionIdService.savedMemento;
     if (hasInteractionIdChanged) {
       if (
+        this.stateInteractionIdService.displayed &&
         INTERACTION_SPECS[this.stateInteractionIdService.displayed].is_terminal
       ) {
         this.updateDefaultTerminalStateContentIfEmpty();
@@ -217,7 +219,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
 
     this.onSaveNextContentIdIndex.emit();
     this.interactionDetailsCacheService.set(
-      this.stateInteractionIdService.savedMemento,
+      this.stateInteractionIdService.savedMemento as InteractionSpecsKey,
       this.stateCustomizationArgsService.savedMemento
     );
 
@@ -235,7 +237,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      )
+      ) || undefined
     );
   }
 
@@ -277,7 +279,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
           this.stateCustomizationArgsService.displayed = {};
           this.stateSolutionService.displayed = null;
           this.interactionDetailsCacheService.removeDetails(
-            this.stateInteractionIdService.savedMemento
+            this.stateInteractionIdService.savedMemento as InteractionSpecsKey
           );
           this.stateInteractionIdService.saveDisplayedValue();
           this.stateCustomizationArgsService.saveDisplayedValue();
@@ -289,7 +291,9 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
           this.onSaveInteractionData.emit(interactionData);
 
           this.stateSolutionService.saveDisplayedValue();
-          this.onSaveSolution.emit(this.stateSolutionService.displayed);
+          this.onSaveSolution.emit(
+            this.stateSolutionService.displayed || undefined
+          );
 
           this.stateInteractionIdService.onInteractionIdChanged.emit(
             this.stateInteractionIdService.savedMemento

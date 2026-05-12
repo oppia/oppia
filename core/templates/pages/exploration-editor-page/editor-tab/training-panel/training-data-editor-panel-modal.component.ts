@@ -53,6 +53,7 @@ import {TrainingModalService} from './training-modal.service';
 import {TruncateInputBasedOnInteractionAnswerTypePipe} from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 export const RULES_SERVICE_MAPPING = {
   AlgebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService,
@@ -142,7 +143,7 @@ export class TrainingDataEditorPanelComponent
       0;
     this.inputTemplate =
       this.explorationHtmlFormatterService.getInteractionHtml(
-        this.stateInteractionIdService.savedMemento,
+        this.stateInteractionIdService.savedMemento as InteractionSpecsKey,
         this.stateCustomizationArgsService.savedMemento,
         false,
         this.FOCUS_LABEL_TEST_INTERACTION_INPUT,
@@ -155,7 +156,7 @@ export class TrainingDataEditorPanelComponent
           let truncatedAnswer =
             this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
               finishTrainingResult.answer,
-              finishTrainingResult.interactionId,
+              finishTrainingResult.interactionId as InteractionSpecsKey,
               12
             );
           let successToast =
@@ -193,7 +194,7 @@ export class TrainingDataEditorPanelComponent
       let interactionId = this.stateInteractionIdService.savedMemento;
       this.trainingModalService.openTrainUnresolvedAnswerModal(
         answer,
-        interactionId,
+        interactionId as InteractionSpecsKey,
         answerIndex
       );
     }
@@ -242,7 +243,9 @@ export class TrainingDataEditorPanelComponent
     let interactionId = this.stateInteractionIdService.savedMemento;
 
     let rulesServiceName =
-      this.angularNameService.getNameOfInteractionRulesService(interactionId);
+      this.angularNameService.getNameOfInteractionRulesService(
+        interactionId as InteractionSpecsKey
+      );
 
     // Inject RulesService dynamically.
     let rulesService = this.injector.get(
@@ -294,7 +297,7 @@ export class TrainingDataEditorPanelComponent
       let truncatedAnswer =
         this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
           newAnswer,
-          interactionId,
+          interactionId as InteractionSpecsKey,
           12
         );
       let successToast =

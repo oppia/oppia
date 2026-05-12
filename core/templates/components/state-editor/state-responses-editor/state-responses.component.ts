@@ -193,7 +193,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   }
 
   getCurrentInteractionId(): string {
-    return this.stateInteractionIdService.savedMemento;
+    return this.stateInteractionIdService.savedMemento as InteractionSpecsKey;
   }
 
   isCreatingNewState(outcome: Outcome): boolean {
@@ -742,7 +742,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
         newInteractionId => {
           this.externalSaveService.onExternalSave.emit();
           this.responsesService.onInteractionIdChanged(
-            newInteractionId,
+            newInteractionId as InteractionSpecsKey,
             (newAnswerGroups, newDefaultOutcome) => {
               this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
               this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);

@@ -37,6 +37,7 @@ import {Outcome} from 'domain/exploration/outcome.model';
 import {Solution} from 'domain/exploration/solution.model';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import {State} from 'domain/state/state.model';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 export interface AnswerChoice {
   val: string | number | SubtitledHtml;
@@ -173,7 +174,7 @@ export class StateEditorService {
     this.interaction = newInteraction;
   }
 
-  setInteractionId(newId: string | null): void {
+  setInteractionId(newId: InteractionSpecsKey | null): void {
     this.interaction.setId(newId);
   }
 
@@ -213,7 +214,7 @@ export class StateEditorService {
   // equivalent to 'MultipleChoiceInput', 'ItemSelectionInput',
   // 'DragAndDropSortInput'.
   getAnswerChoices(
-    interactionId: string,
+    interactionId: InteractionSpecsKey | null,
     customizationArgs: InteractionCustomizationArgs
   ): AnswerChoice[] | null {
     if (!interactionId) {

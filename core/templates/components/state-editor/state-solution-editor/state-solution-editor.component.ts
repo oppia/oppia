@@ -93,7 +93,7 @@ export class StateSolutionEditorComponent implements OnInit {
     this.stateEditorService.updateStateSolutionEditorInitialised();
     this.correctAnswerEditorHtml =
       this.explorationHtmlFormatterService.getInteractionHtml(
-        this.stateInteractionIdService.savedMemento,
+        this.stateInteractionIdService.savedMemento as InteractionSpecsKey,
         this.stateCustomizationArgsService.savedMemento,
         false,
         this.SOLUTION_EDITOR_FOCUS_LABEL,
@@ -141,7 +141,7 @@ export class StateSolutionEditorComponent implements OnInit {
       throw new Error('Expected solution to be non-null.');
     }
     const solutionSummary = solution.getSummary(
-      interactionId,
+      interactionId as InteractionSpecsKey,
       this.stateCustomizationArgsService.savedMemento
     );
     const solutionAsPlainText =

@@ -21,6 +21,8 @@ import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model
 import {ParamSpecs} from 'domain/exploration/param-specs.model';
 import {State} from 'domain/state/state.model';
 import {VersionHistoryService} from './version-history.service';
+import {StateBackendDict} from 'domain/state/state.model';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 describe('Version history service', () => {
   let versionHistoryService: VersionHistoryService;
@@ -131,7 +133,7 @@ describe('Version history service', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput',
+        id: 'TextInput' as InteractionSpecsKey,
       },
       inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
@@ -193,7 +195,7 @@ describe('Version history service', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput',
+        id: 'TextInput' as InteractionSpecsKey,
       },
       inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
@@ -297,7 +299,7 @@ describe('Version history service', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput',
+        id: 'TextInput' as InteractionSpecsKey,
       },
       inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
@@ -366,7 +368,7 @@ describe('Version history service', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput',
+        id: 'TextInput' as InteractionSpecsKey,
       },
       inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
@@ -459,7 +461,7 @@ describe('Version history service', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput',
+        id: 'TextInput' as InteractionSpecsKey,
       },
       inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
@@ -560,7 +562,7 @@ describe('Version history service', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput',
+        id: 'TextInput' as InteractionSpecsKey,
       },
       inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
@@ -621,7 +623,7 @@ describe('Version history service', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput',
+        id: 'TextInput' as InteractionSpecsKey,
       },
       inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,

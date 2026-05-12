@@ -43,6 +43,7 @@ import {StatisticsTabComponent} from './statistics-tab.component';
 import {ExplorationDataService} from '../services/exploration-data.service';
 import {ExplorationStats} from 'domain/statistics/exploration-stats.model';
 import {StateStatsModalComponent} from './templates/state-stats-modal.component';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 describe('Statistics Tab Component', () => {
   let component: StatisticsTabComponent;
@@ -110,7 +111,7 @@ describe('Statistics Tab Component', () => {
           interaction: {
             solution: null,
             confirmed_unclassified_answers: [],
-            id: 'TextInput',
+            id: 'TextInput' as InteractionSpecsKey,
             hints: [],
             customization_args: {
               rows: {
@@ -180,7 +181,7 @@ describe('Statistics Tab Component', () => {
           interaction: {
             solution: null,
             confirmed_unclassified_answers: [],
-            id: 'EndExploration',
+            id: 'EndExploration' as InteractionSpecsKey,
             hints: [],
             customization_args: {
               recommendedExplorationIds: {
@@ -205,7 +206,7 @@ describe('Statistics Tab Component', () => {
           interaction: {
             solution: null,
             confirmed_unclassified_answers: [],
-            id: 'TextInput',
+            id: 'TextInput' as InteractionSpecsKey,
             hints: [],
             customization_args: {
               rows: {

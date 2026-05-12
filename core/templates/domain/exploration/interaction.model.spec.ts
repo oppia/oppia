@@ -598,7 +598,7 @@ describe('Interaction', () => {
           customization_args: {},
           default_outcome: defaultOutcomeDict,
           hints: hintsDict,
-          id: 'InteractionIDThatDNE',
+          id: 'InteractionIDThatDNE' as InteractionSpecsKey,
           solution: solutionDict,
         });
       }).toThrowError('Unrecognized interaction id InteractionIDThatDNE');
@@ -619,7 +619,7 @@ describe('Interaction', () => {
     const testInteraction = Interaction.createFromBackendDict(interactionDict);
 
     expect(testInteraction.id).toEqual('TextInput');
-    testInteraction.setId('new_interaction_id');
+    testInteraction.setId('new_interaction_id' as InteractionSpecsKey);
     expect(testInteraction.id).toEqual('new_interaction_id');
   });
 
@@ -826,7 +826,7 @@ describe('Interaction', () => {
         html: 'This is the new explanation to the answer',
       },
     };
-    const otherInteractionDict = {
+    const otherInteractionDict: InteractionBackendDict = {
       answer_groups: newAnswerGroups,
       confirmed_unclassified_answers: [],
       customization_args: {
@@ -897,7 +897,7 @@ describe('Interaction', () => {
     'should correctly convert an Interaction with MultipleChoice to a ' +
       'backend dict',
     () => {
-      const mcInteractionDict = {
+      const mcInteractionDict: InteractionBackendDict = {
         answer_groups: answerGroupsDict,
         confirmed_unclassified_answers: [],
         customization_args: {

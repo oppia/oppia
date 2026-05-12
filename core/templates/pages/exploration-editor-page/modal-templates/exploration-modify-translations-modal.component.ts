@@ -36,6 +36,7 @@ import {
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
 } from 'domain/exploration/written-translation.model';
 import {AppConstants} from 'app.constants';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 interface LanguageCodeToContentTranslations {
   [languageCode: string]: TranslatedContent;
@@ -75,7 +76,8 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     this.explorationId = this.pageContextService.getExplorationId();
     this.explorationVersion =
       this.pageContextService.getExplorationVersion() as number;
-    this.interactionId = this.stateInteractionIdService.savedMemento;
+    this.interactionId = this.stateInteractionIdService
+      .savedMemento as InteractionSpecsKey;
 
     // Populate the content translations via latest draft changes first,
     // in order to get the most recently updated translations.
