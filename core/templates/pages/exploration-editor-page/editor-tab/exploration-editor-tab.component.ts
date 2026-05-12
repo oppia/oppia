@@ -49,6 +49,7 @@ import {PageContextService} from 'services/page-context.service';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 @Component({
   selector: 'oppia-exploration-editor-tab',
@@ -285,7 +286,13 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
       cloneDeep(displayedValue.interactionId)
     );
     this.stateEditorService.setInteractionId(
+<<<<<<< HEAD
       cloneDeep(displayedValue.interactionId)
+=======
+      cloneDeep(
+        displayedValue.interactionId ?? null
+      ) as InteractionSpecsKey | null
+>>>>>>> c10de93762 (Fix interaction ID typing contracts to use InteractionSpecsKey)
     );
 
     this.explorationStatesService.saveInteractionCustomizationArgs(
