@@ -18,10 +18,10 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import user_validation_jobs
 from core.jobs.types import user_validation_errors
-from core import feconf
 from core.platform import models
 
 from typing import Final, Type
@@ -39,9 +39,9 @@ class GetUsersWithInvalidBioJobTests(job_test_utils.JobTestBase):
         user_validation_jobs.GetUsersWithInvalidBioJob
     )
 
-    USER_ID_1: Final = 'uid_' + 'a' * 32
-    USER_ID_2: Final = 'uid_' + 'b' * 32
-    USER_ID_3: Final = 'uid_' + 'c' * 32
+    USER_ID_1: Final = 'uid_%s' % ('a' * 32)
+    USER_ID_2: Final = 'uid_%s' % ('b' * 32)
+    USER_ID_3: Final = 'uid_%s' % ('c' * 32)
     USER_USERNAME_1: Final = 'user_1'
     USER_USERNAME_2: Final = 'user_2'
     USER_USERNAME_3: Final = 'user_3'

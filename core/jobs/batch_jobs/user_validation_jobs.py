@@ -75,8 +75,9 @@ class GetUsersWithInvalidBioJob(base_validation_jobs.BaseValidationJob):
             if not isinstance(model, user_models.UserSettingsModel):
                 return
             try:
-                # pylint: disable=protected-access
-                user_services._get_user_settings_from_model(model).validate()
+                user_services._get_user_settings_from_model(  # pylint: disable=protected-access
+                    model
+                ).validate()
             except Exception as e:
                 yield base_validation_errors.ModelDomainObjectValidateError(
                     model, str(e)
