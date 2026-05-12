@@ -930,7 +930,7 @@ describe('Library Page Component', () => {
 
     spyOn(document, 'querySelectorAll').and.returnValue([
       mockCarouselElement,
-    ] as unknown as NodeListOf<HTMLElement>);
+    ] as NodeListOf<HTMLElement>);
 
     componentInstance.tileDisplayCount = 2;
     componentInstance.leftmostCardIndices = [0];
@@ -973,7 +973,7 @@ describe('Library Page Component', () => {
     mockCarouselElement.scrollLeft = 100;
     spyOn(document, 'querySelectorAll').and.returnValue([
       mockCarouselElement,
-    ] as unknown as NodeListOf<HTMLElement>);
+    ] as NodeListOf<HTMLElement>);
 
     componentInstance.tileDisplayCount = 4;
     componentInstance.leftmostCardIndices = [0];
@@ -1002,7 +1002,7 @@ describe('Library Page Component', () => {
 
     spyOn(document, 'querySelectorAll').and.returnValue([
       mockCarouselElement,
-    ] as unknown as NodeListOf<HTMLElement>);
+    ] as NodeListOf<HTMLElement>);
 
     componentInstance.tileDisplayCount = 3;
     componentInstance.leftmostCardIndices = [5];

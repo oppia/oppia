@@ -617,4 +617,7 @@
       left: 0;
     }
   }
+  .oppia-top-navigation-bar .oppia-navbar-tabs {
+    flex-wrap: wrap;
+  }
 }
