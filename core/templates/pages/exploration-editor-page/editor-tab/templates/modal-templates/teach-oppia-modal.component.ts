@@ -183,7 +183,7 @@ export class TeachOppiaModalComponent
     const truncatedAnswer =
       this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
         unresolvedAnswer.answer,
-        this.interactionId,
+        this.interactionId as InteractionSpecsKey,
         12
       );
     const successToast =
@@ -218,7 +218,7 @@ export class TeachOppiaModalComponent
     }
     this.trainingModalService.openTrainUnresolvedAnswerModal(
       answer,
-      interactionId,
+      interactionId as InteractionSpecsKey,
       answerIndex
     );
   }
@@ -236,7 +236,7 @@ export class TeachOppiaModalComponent
           const truncatedAnswer =
             this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
               finishTrainingResult.answer,
-              this.interactionId,
+              this.interactionId as InteractionSpecsKey,
               12
             );
           const successToast =
@@ -255,7 +255,8 @@ export class TeachOppiaModalComponent
     if (stateName) {
       this._stateName = stateName;
       this._state = this.explorationStatesService.getState(this._stateName);
-      this.interactionId = this.stateInteractionIdService.savedMemento;
+      this.interactionId = this.stateInteractionIdService
+        .savedMemento as InteractionSpecsKey;
     }
     if (this.interactionId === null) {
       throw new Error(

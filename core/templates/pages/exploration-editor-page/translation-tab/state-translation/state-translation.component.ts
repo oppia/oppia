@@ -698,7 +698,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         this.stateName
       );
     this.answerChoices = this.stateEditorService.getAnswerChoices(
-      this.stateInteractionId,
+      this.stateInteractionId as InteractionSpecsKey,
       currentCustomizationArgs
     );
     this.interactionPreviewHtml = this.stateInteractionId

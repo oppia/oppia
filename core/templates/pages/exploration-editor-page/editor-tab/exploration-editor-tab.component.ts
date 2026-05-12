@@ -49,6 +49,7 @@ import {PageContextService} from 'services/page-context.service';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 @Component({
   selector: 'oppia-exploration-editor-tab',

@@ -44,6 +44,7 @@ import {EditabilityService} from 'services/editability.service';
 import type {InteractionData} from 'interactions/customization-args-defs';
 import {LoaderService} from 'services/loader.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 @Component({
   selector: 'oppia-question-editor',
@@ -98,7 +99,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
   saveInteractionData(displayedValue: InteractionData): void {
     this._updateQuestion(() => {
       this.stateEditorService.setInteractionId(
-        cloneDeep(displayedValue.interactionId)
+        cloneDeep(displayedValue.interactionId as InteractionSpecsKey)
       );
       this.stateEditorService.setInteractionCustomizationArgs(
         cloneDeep(displayedValue.customizationArgs)

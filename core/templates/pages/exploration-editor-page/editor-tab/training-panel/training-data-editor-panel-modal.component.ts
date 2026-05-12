@@ -50,6 +50,7 @@ import {TrainingModalService} from './training-modal.service';
 import {TruncateInputBasedOnInteractionAnswerTypePipe} from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 export const RULES_SERVICE_MAPPING = {
   AlgebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService,
@@ -158,7 +159,7 @@ export class TrainingDataEditorPanelComponent
           let truncatedAnswer =
             this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
               finishTrainingResult.answer,
-              finishTrainingResult.interactionId,
+              finishTrainingResult.interactionId as InteractionSpecsKey,
               12
             );
           let successToast =
@@ -201,7 +202,7 @@ export class TrainingDataEditorPanelComponent
       }
       this.trainingModalService.openTrainUnresolvedAnswerModal(
         answer,
-        interactionId,
+        interactionId as InteractionSpecsKey,
         answerIndex
       );
     }
@@ -252,7 +253,9 @@ export class TrainingDataEditorPanelComponent
       throw new Error('Cannot submit answer for a state with no interaction.');
     }
     let rulesServiceName =
-      this.angularNameService.getNameOfInteractionRulesService(interactionId);
+      this.angularNameService.getNameOfInteractionRulesService(
+        interactionId as InteractionSpecsKey
+      );
 
     // Inject RulesService dynamically.
     let rulesService = this.injector.get(
@@ -304,7 +307,7 @@ export class TrainingDataEditorPanelComponent
       let truncatedAnswer =
         this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
           newAnswer,
-          interactionId,
+          interactionId as InteractionSpecsKey,
           12
         );
       let successToast =

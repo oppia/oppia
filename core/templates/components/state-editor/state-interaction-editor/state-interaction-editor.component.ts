@@ -223,7 +223,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
     // process, but the emitter expects a value.
     this.onSaveNextContentIdIndex.emit(undefined as unknown as number);
     this.interactionDetailsCacheService.set(
-      this.stateInteractionIdService.savedMemento,
+      this.stateInteractionIdService.savedMemento as InteractionSpecsKey,
       this.stateCustomizationArgsService.savedMemento
     );
 
