@@ -18,84 +18,68 @@
 
 from __future__ import annotations
 
-from core.jobs import base_jobs
-from core.jobs.io import ndb_io
-from core.jobs.transforms import job_result_transforms
-from core.jobs.types import job_run_result
+from core.domain import user_services
+from core.jobs.batch_jobs.datastore_audit import base_validation_jobs
+from core.jobs.types import (
+    base_validation_errors,
+    job_run_result,
+    user_validation_errors,
+)
 from core.platform import models
 
-import apache_beam as beam
+from typing import Callable, Iterator, List
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import user_models
+    from mypy_imports import base_models, user_models
 
 (user_models,) = models.Registry.import_models([models.Names.USER])
 
 
-class GetUsersWithInvalidBioJob(base_jobs.JobBase):
+class GetUsersWithInvalidBioJob(base_validation_jobs.BaseValidationJob):
     """Validates that no user has a null bio
     or a bio with length greater than 2000.
     """
 
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        user_usernames_and_bios = (
-            self.pipeline
-            | 'Get all UserSettingsModels'
-            >> (ndb_io.GetModels(user_models.UserSettingsModel.get_all()))
-            | 'Extract username and bio from model'
-            >> beam.Map(
-                lambda user_settings: (
-                    user_settings.username,
-                    user_settings.user_bio,
-                )
-            )
-        )
+    def get_validation_fns(
+        self,
+    ) -> List[
+        Callable[[base_models.BaseModel], Iterator[job_run_result.JobRunResult]]
+    ]:
+        return [self.validate_user_bio]
 
-        users_with_invalid_bios = (
-            user_usernames_and_bios
-            | 'Get users with null bio or bio with length greater than 2000'
-            >> beam.Filter(
-                lambda user_username_and_bio: not isinstance(
-                    user_username_and_bio[1], str
-                )
-                or len(user_username_and_bio[1]) > 2000
-            )
-        )
+    def validate_user_bio(
+        self, model: base_models.BaseModel
+    ) -> Iterator[user_validation_errors.InvalidUserBioError]:
+        """Yields an error if the model has a null or too-long bio.
 
-        number_of_users_queried_report = (
-            user_usernames_and_bios
-            | 'Report count of user models'
-            >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'CountTotalUsers'
-                )
-            )
-        )
+        Args:
+            model: BaseModel. The model to validate.
 
-        number_of_users_with_invalid_bio_report = (
-            users_with_invalid_bios
-            | 'Report count of invalid user models'
-            >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'CountInvalidUserBios'
-                )
-            )
-        )
+        Yields:
+            InvalidUserBioError. If the user bio is invalid.
+        """
+        if not isinstance(model, user_models.UserSettingsModel):
+            return
+        if not isinstance(model.user_bio, str) or len(model.user_bio) > 2000:
+            yield user_validation_errors.InvalidUserBioError(model)
 
-        invalid_user_usernames_and_bios_report = (
-            users_with_invalid_bios
-            | 'Report info on each invalid user bio'
-            >> beam.Map(
-                lambda user_username_and_bio: job_run_result.JobRunResult.as_stderr(
-                    'The username of user is "%s" and their bio is "%s"'
-                    % (user_username_and_bio[0], user_username_and_bio[1])
+    def get_validate_domain_object_fn(
+        self,
+    ) -> Callable[
+        [base_models.BaseModel], Iterator[job_run_result.JobRunResult]
+    ]:
+        def validate_domain_object(
+            model: base_models.BaseModel,
+        ) -> Iterator[job_run_result.JobRunResult]:
+            if not isinstance(model, user_models.UserSettingsModel):
+                return
+            try:
+                # pylint: disable=protected-access
+                user_services._get_user_settings_from_model(model).validate()
+            except Exception as e:
+                yield base_validation_errors.ModelDomainObjectValidateError(
+                    model, str(e)
                 )
-            )
-        )
 
-        return (
-            number_of_users_queried_report,
-            number_of_users_with_invalid_bio_report,
-            invalid_user_usernames_and_bios_report,
-        ) | 'Combine reported results' >> beam.Flatten()
+        return validate_domain_object

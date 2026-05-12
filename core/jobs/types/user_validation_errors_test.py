@@ -160,3 +160,21 @@ class ArchivedModelNotMarkedDeletedErrorTests(
             'UserQueryModel(id="test"): model is archived '
             'but not marked as deleted',
         )
+
+
+class InvalidUserBioErrorTests(base_validation_errors_test.AuditErrorsTestBase):
+
+    def test_message(self) -> None:
+        model = user_models.UserSettingsModel(
+            id='test',
+            email='a@a.com',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+        )
+        error = user_validation_errors.InvalidUserBioError(model)
+
+        self.assertEqual(
+            error.stderr,
+            'InvalidUserBioError in UserSettingsModel(id="test"): '
+            'user_bio is None or has length greater than 2000',
+        )

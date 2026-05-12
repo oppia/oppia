@@ -80,3 +80,11 @@ class ArchivedModelNotMarkedDeletedError(
     def __init__(self, model: user_models.UserQueryModel) -> None:
         message = 'model is archived but not marked as deleted'
         super().__init__(message, model)
+
+
+class InvalidUserBioError(base_validation_errors.BaseValidationError):
+    """Error class for users with a null or too-long bio."""
+
+    def __init__(self, model: user_models.UserSettingsModel) -> None:
+        message = 'user_bio is None or has length greater than 2000'
+        super().__init__(message, model)
