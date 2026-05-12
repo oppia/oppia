@@ -492,7 +492,7 @@ describe('States', () => {
   });
 
   it('should update destIfReallyStuck in answer groups when renaming a state', () => {
-    const statesDictWithStuck = {
+    const statesDictWithStuck: {[stateName: string]: StateBackendDict} = {
       'old state': {
         classifier_model_id: null,
         content: {content_id: 'content', html: ''},
