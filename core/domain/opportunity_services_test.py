@@ -274,7 +274,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         self.assertEqual(len(translation_opportunities), 1)
         opportunity = translation_opportunities[0]
-        self.assertEqual(opportunity.translation_in_review_counts, {'hi': 1})
+        self.assertEqual(opportunity.id, '0')
 
     def test_get_translation_opportunities_with_no_translations_in_review(
         self,
@@ -295,7 +295,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         self.assertEqual(len(translation_opportunities), 1)
         opportunity = translation_opportunities[0]
-        self.assertEqual(opportunity.translation_in_review_counts, {})
+        self.assertEqual(opportunity.id, '0')
 
     def test_opportunity_get_deleted_with_removing_exploration_from_story_node(
         self,

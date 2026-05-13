@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import collections
 import logging
 
 from core import feature_flag_list, feconf
@@ -31,7 +30,6 @@ from core.domain import (
     question_fetchers,
     story_domain,
     story_fetchers,
-    suggestion_services,
     taskqueue_services,
     topic_domain,
     topic_fetchers,
@@ -122,13 +120,11 @@ def get_exploration_opportunity_summary_from_model(
         model.translation_counts,
         model.language_codes_needing_voice_artists,
         model.language_codes_with_assigned_voice_artists,
-        {},
         (
             model.reviewer_only_content_count
             if model.reviewer_only_content_count is not None
             else 0
         ),
-        False,
     )
 
 
@@ -274,7 +270,6 @@ def create_exp_opportunity_summary(
             translation_counts,
             list(language_codes_needing_voice_artists),
             [],
-            {},
             reviewer_only_content_count,
         )
     )
@@ -689,61 +684,13 @@ def get_translation_opportunities(
         )
     )
     opportunity_summaries = []
-    opportunity_summary_exp_ids = [
-        opportunity.id for opportunity in exp_opportunity_summary_models
-    ]
-    exp_id_to_in_review_count = {}
-    if len(opportunity_summary_exp_ids) > 0:
-        exp_id_to_in_review_count = (
-            _build_exp_id_to_translation_suggestion_in_review_count(
-                opportunity_summary_exp_ids, language_code
-            )
-        )
 
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
         opportunity_summary = get_exploration_opportunity_summary_from_model(
             exp_opportunity_summary_model
         )
-        if opportunity_summary.id in exp_id_to_in_review_count:
-            # Compute the translation_in_review_counts domain object field
-            # adhoc. Note that this field is not persisted and is only used in
-            # the frontend.
-            # TODO(#14833): Compute this value in the backend controller
-            # instead.
-            opportunity_summary.translation_in_review_counts = {
-                language_code: exp_id_to_in_review_count[opportunity_summary.id]
-            }
-
         opportunity_summaries.append(opportunity_summary)
     return opportunity_summaries, cursor, more
-
-
-def _build_exp_id_to_translation_suggestion_in_review_count(
-    exp_ids: List[str], language_code: str
-) -> Dict[str, int]:
-    """Returns a dict mapping exploration ID to the count of corresponding
-    translation suggestions that are currently in review.
-
-    Args:
-        exp_ids: list(str). List of exploration IDs for which to count
-            corresponding translations suggestions.
-        language_code: str. The language for which translation suggestions
-            should be fetched.
-
-    Returns:
-        dict(str, int). Dict of exploration IDs to counts of corresponding
-        translation suggestions currently in review.
-    """
-    exp_id_to_in_review_count: Dict[str, int] = collections.defaultdict(int)
-    suggestions_in_review = (
-        suggestion_services.get_translation_suggestions_in_review_by_exp_ids(
-            exp_ids, language_code
-        )
-    )
-    for suggestion in suggestions_in_review:
-        if suggestion is not None:
-            exp_id_to_in_review_count[suggestion.target_id] += 1
-    return exp_id_to_in_review_count
 
 
 def get_exploration_opportunity_summaries_by_ids(
@@ -1250,9 +1197,6 @@ def get_pinned_lesson(
 ) -> Optional[opportunity_domain.ExplorationOpportunitySummary]:
     """Retrieves the pinned lesson for a user in a specific language and topic.
 
-    NOTE: If the pinned lesson exists, it will have the 'is_pinned'
-    attribute set to True.
-
     Args:
         user_id: str. The ID of the user for whom to retrieve the pinned
             lesson.
@@ -1274,12 +1218,7 @@ def get_pinned_lesson(
         model = opportunity_models.ExplorationOpportunitySummaryModel.get(
             pinned_opportunity.opportunity_id
         )
-        exploration_opportunity_summary = (
-            get_exploration_opportunity_summary_from_model(model)
-        )
-        exploration_opportunity_summary.is_pinned = True
-
-        return exploration_opportunity_summary
+        return get_exploration_opportunity_summary_from_model(model)
 
     # If the model doesn't exist or has None as opportunity_id, return None.
     return None

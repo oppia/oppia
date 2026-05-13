@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import collections
 import datetime
 import json
 
@@ -71,6 +72,15 @@ class ClientSideSkillOpportunityDict(opportunity_domain.SkillOpportunityDict):
     """A dictionary representation of client side SkillOpportunity object."""
 
     topic_name: str
+
+
+class ClientSideExplorationOpportunitySummaryDict(
+    opportunity_domain.PartialExplorationOpportunitySummaryDict
+):
+    """A dictionary representation of client side opportunity data."""
+
+    translation_in_review_counts: Dict[str, int]
+    is_pinned: bool
 
 
 class ContributionOpportunitiesHandlerNormalizedRequestDict(TypedDict):
@@ -245,7 +255,7 @@ class ContributionOpportunitiesHandler(
         topic_name: Optional[str],
         search_cursor: Optional[str],
     ) -> Tuple[
-        List[opportunity_domain.PartialExplorationOpportunitySummaryDict],
+        List[ClientSideExplorationOpportunitySummaryDict],
         Optional[str],
         bool,
     ]:
@@ -276,8 +286,63 @@ class ContributionOpportunitiesHandler(
                 language_code, topic_name, search_cursor
             )
         )
-        opportunity_dicts = [opp.to_dict() for opp in opportunities]
+        opportunity_dicts: List[ClientSideExplorationOpportunitySummaryDict] = (
+            []
+        )
+        exp_ids: List[str] = []
+        for opp in opportunities:
+            base_opportunity_dict = opp.to_dict()
+            opportunity_dict: ClientSideExplorationOpportunitySummaryDict = {
+                'id': base_opportunity_dict['id'],
+                'topic_name': base_opportunity_dict['topic_name'],
+                'story_title': base_opportunity_dict['story_title'],
+                'chapter_title': base_opportunity_dict['chapter_title'],
+                'content_count': base_opportunity_dict['content_count'],
+                'translation_counts': base_opportunity_dict[
+                    'translation_counts'
+                ],
+                'reviewer_only_content_count': base_opportunity_dict[
+                    'reviewer_only_content_count'
+                ],
+                'translation_in_review_counts': {},
+                'is_pinned': False,
+            }
+            exp_ids.append(opportunity_dict['id'])
+            opportunity_dicts.append(opportunity_dict)
+        exp_id_to_in_review_count = (
+            self._build_exp_id_to_translation_suggestion_in_review_count(
+                exp_ids, language_code
+            )
+        )
+        for opportunity_dict in opportunity_dicts:
+            exp_id = opportunity_dict['id']
+            if exp_id in exp_id_to_in_review_count:
+                opportunity_dict['translation_in_review_counts'] = {
+                    language_code: exp_id_to_in_review_count[exp_id]
+                }
         return opportunity_dicts, next_cursor, more
+
+    def _build_exp_id_to_translation_suggestion_in_review_count(
+        self, exp_ids: List[str], language_code: str
+    ) -> Dict[str, int]:
+        """Returns a dict mapping exploration IDs to in-review counts.
+
+        Args:
+            exp_ids: list(str). List of exploration IDs.
+            language_code: str. The translation language code.
+
+        Returns:
+            dict(str, int). Mapping from exploration IDs to the number of
+            translation suggestions in review.
+        """
+        exp_id_to_in_review_count: Dict[str, int] = collections.defaultdict(int)
+        suggestions_in_review = suggestion_services.get_translation_suggestions_in_review_by_exp_ids(
+            exp_ids, language_code
+        )
+        for suggestion in suggestions_in_review:
+            if suggestion is not None:
+                exp_id_to_in_review_count[suggestion.target_id] += 1
+        return exp_id_to_in_review_count
 
 
 class ReviewableOpportunitiesHandlerNormalizedRequestDict(TypedDict):
@@ -319,14 +384,35 @@ class ReviewableOpportunitiesHandler(
         # means all request parameters come in as strings.
         topic_name = self.normalized_request.get('topic_name', None)
         language = self.normalized_request.get('language_code')
-        opportunity_dicts: List[
-            opportunity_domain.PartialExplorationOpportunitySummaryDict
-        ] = []
+        opportunity_dicts: List[ClientSideExplorationOpportunitySummaryDict] = (
+            []
+        )
         if self.user_id:
-            for opp in self._get_reviewable_exploration_opportunity_summaries(
-                self.user_id, topic_name, language
-            ):
-                opportunity_dicts.append(opp.to_dict())
+            opportunities, pinned_opportunity_id = (
+                self._get_reviewable_exploration_opportunity_summaries(
+                    self.user_id, topic_name, language
+                )
+            )
+            for opp in opportunities:
+                base_opportunity_dict = opp.to_dict()
+                opportunity_dict: (
+                    ClientSideExplorationOpportunitySummaryDict
+                ) = {
+                    'id': base_opportunity_dict['id'],
+                    'topic_name': base_opportunity_dict['topic_name'],
+                    'story_title': base_opportunity_dict['story_title'],
+                    'chapter_title': base_opportunity_dict['chapter_title'],
+                    'content_count': base_opportunity_dict['content_count'],
+                    'translation_counts': base_opportunity_dict[
+                        'translation_counts'
+                    ],
+                    'reviewer_only_content_count': base_opportunity_dict[
+                        'reviewer_only_content_count'
+                    ],
+                    'translation_in_review_counts': {},
+                    'is_pinned': opp.id == pinned_opportunity_id,
+                }
+                opportunity_dicts.append(opportunity_dict)
         self.values = {
             'opportunities': opportunity_dicts,
         }
@@ -334,7 +420,9 @@ class ReviewableOpportunitiesHandler(
 
     def _get_reviewable_exploration_opportunity_summaries(
         self, user_id: str, topic_name: Optional[str], language: Optional[str]
-    ) -> List[opportunity_domain.ExplorationOpportunitySummary]:
+    ) -> Tuple[
+        List[opportunity_domain.ExplorationOpportunitySummary], Optional[str]
+    ]:
         """Returns exploration opportunity summaries that have translation
         suggestions that are reviewable by the supplied user. The result is
         sorted in descending order by topic, story, and story node order.
@@ -352,8 +440,9 @@ class ReviewableOpportunitiesHandler(
                 of the language.
 
         Returns:
-            list(ExplorationOpportunitySummary). A list of the matching
-            exploration opportunity summaries.
+            2-tuple(list(ExplorationOpportunitySummary), str|None). A list of
+            the matching exploration opportunity summaries and the pinned
+            opportunity ID if available.
         """
         # 1. Fetch the IDs of all published explorations in the topics'
         #    published stories.
@@ -415,7 +504,14 @@ class ReviewableOpportunitiesHandler(
             if item is not None:
                 ordered_exp_opp_summaries[item.id] = item
 
-        return list(ordered_exp_opp_summaries.values())
+        return (
+            list(ordered_exp_opp_summaries.values()),
+            (
+                pinned_opportunity_summary.id
+                if pinned_opportunity_summary is not None
+                else None
+            ),
+        )
 
 
 class LessonsPinningHandlerNormalizedRequestDict(TypedDict):

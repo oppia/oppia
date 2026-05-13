@@ -35,9 +35,7 @@ class PartialExplorationOpportunitySummaryDict(TypedDict):
     chapter_title: str
     content_count: int
     translation_counts: Dict[str, int]
-    translation_in_review_counts: Dict[str, int]
     reviewer_only_content_count: int
-    is_pinned: bool
 
 
 class ExplorationOpportunitySummaryDict(
@@ -90,9 +88,7 @@ class ExplorationOpportunitySummary:
         translation_counts: Dict[str, int],
         language_codes_needing_voice_artists: List[str],
         language_codes_with_assigned_voice_artists: List[str],
-        translation_in_review_counts: Dict[str, int],
         reviewer_only_content_count: int = 0,
-        is_pinned: bool = False,
     ) -> None:
         """Constructs a ExplorationOpportunitySummary domain object.
 
@@ -114,14 +110,9 @@ class ExplorationOpportunitySummary:
             language_codes_with_assigned_voice_artists: list(str). A list of
                 language code for which a voice-artist is already assigned to
                 the exploration.
-            translation_in_review_counts: dict. A dict with language code as a
-                key and number of translation in review in that language as the
-                value.
             reviewer_only_content_count: int. The number of content items that are
                 only translatable by reviewers (e.g. content with
                 'set_of_strings' data format).
-            is_pinned: bool. Denotes whether the opportunity is pinned or not in
-                contributor dashboard.
         """
         self.id = exp_id
         self.topic_id = topic_id
@@ -140,9 +131,7 @@ class ExplorationOpportunitySummary:
         self.language_codes_with_assigned_voice_artists = (
             language_codes_with_assigned_voice_artists
         )
-        self.translation_in_review_counts = translation_in_review_counts
         self.reviewer_only_content_count = reviewer_only_content_count
-        self.is_pinned = is_pinned
         self.validate()
 
     @classmethod
@@ -178,9 +167,6 @@ class ExplorationOpportunitySummary:
             exploration_opportunity_summary_dict[
                 'language_codes_with_assigned_voice_artists'
             ],
-            exploration_opportunity_summary_dict[
-                'translation_in_review_counts'
-            ],
             exploration_opportunity_summary_dict.get(
                 'reviewer_only_content_count', 0
             ),
@@ -205,9 +191,7 @@ class ExplorationOpportunitySummary:
             'chapter_title': self.chapter_title,
             'content_count': self.content_count,
             'translation_counts': self.translation_counts,
-            'translation_in_review_counts': self.translation_in_review_counts,
             'reviewer_only_content_count': self.reviewer_only_content_count,
-            'is_pinned': self.is_pinned,
         }
 
     def validate(self) -> None:
@@ -240,7 +224,6 @@ class ExplorationOpportunitySummary:
             )
 
         self._validate_translation_counts(self.translation_counts)
-        self._validate_translation_counts(self.translation_in_review_counts)
 
         expected_set_of_all_languages = set(
             self.incomplete_translation_language_codes
