@@ -24,8 +24,8 @@ import sys
 import tempfile
 
 from core.tests import test_utils
-
 from scripts import common
+
 from typing import Dict, List
 
 from . import run_typescript_checks
@@ -545,7 +545,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 stdout = MockOutput()
 
             compile_temp_calls: List[tuple[str, List[str]]] = []
-            hashes_written: List[Dict[object, object]] = []
+            hashes_written: List[Dict[str, str]] = []
             ngcc_calls: List[str] = []
 
             def mock_popen(  # pylint: disable=unused-argument
@@ -563,6 +563,9 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
 
             def mock_compile_temp(config_path: str, errors: List[str]) -> None:
                 compile_temp_calls.append((config_path, errors))
+
+            def mock_write_hashes_json_file(hashes: Dict[str, str]) -> None:
+                hashes_written.append(hashes)
 
             with (
                 self.swap(
@@ -593,7 +596,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 self.swap(
                     common,
                     'write_hashes_json_file',
-                    lambda hashes: hashes_written.append(hashes),
+                    mock_write_hashes_json_file,
                 ),
                 self.swap(subprocess, 'Popen', mock_popen),
             ):
