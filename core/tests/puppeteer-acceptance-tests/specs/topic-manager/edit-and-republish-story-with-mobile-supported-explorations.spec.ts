@@ -87,6 +87,11 @@ describe('Topic Manager', function () {
 
     await curriculumAdmin.saveStoryDraft();
 
+    // Wait for save operation to fully complete before continuing.
+    await curriculumAdmin.expectElementToBeVisible(
+      '.e2e-test-snackbar-success'
+    );
+
     // Create topic Manager.
     topicManager = await UserFactory.createNewUser(
       'topicManager',
