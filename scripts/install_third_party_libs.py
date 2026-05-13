@@ -39,10 +39,7 @@ import tarfile
 from scripts import (
     install_python_dev_dependencies,  # pylint: disable=wrong-import-position, wrong-import-order
 )
-from scripts import install_python_prod_dependencies
-from scripts import (
-    dependency_utils,
-)
+from scripts import dependency_utils, install_python_prod_dependencies
 
 from typing import Final, Optional, Sequence
 
@@ -431,19 +428,17 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     """Set up GAE and install third-party libraries for Oppia."""
     parsed_args = _PARSER.parse_args(args=args if args is not None else [])
 
-    # Initialize the gatekeeper
-    # Use common.THIRD_PARTY_PYTHON_LIBS_DIR or the specific libs path
     gatekeeper = dependency_utils.DependencyGatekeeper(
         python_libs_dir=common.THIRD_PARTY_PYTHON_LIBS_DIR
     )
 
-    # Check the cache using 'args.force'
     is_python_install_required = (
-        getattr(parsed_args, 'force', False) or gatekeeper.is_install_required()
+        parsed_args.force or gatekeeper.is_install_required()
     )
     if not is_python_install_required:
         print(
-            "Python dependencies match the local cache. Skipping Python installation."
+            'Python dependencies match the local cache. Skipping'
+            ' Python installation.'
         )
 
     print('Running install_third_party_libs script...')
@@ -489,7 +484,9 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     # directory will be deployed to production.
     if is_python_install_required:
         common.print_each_string_after_two_new_lines(
-            ['Installing third-party Python and JS libs in third_party directory']
+            [
+                'Installing third-party Python and JS libs in third_party directory'
+            ]
         )
         common.create_readme(
             common.THIRD_PARTY_DIR,
