@@ -4008,6 +4008,22 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
                 opportunity_id=self.opportunity_id_1,
             )
 
+    def test_pre_put_hook_raises_exception_for_invalid_entity_type(
+        self,
+    ) -> None:
+        model = user_models.PinnedOpportunityModel(
+            id='id',
+            user_id='user_id',
+            language_code='en',
+            topic_id='topic_id',
+            opportunity_id='opportunity_id',
+            entity_type='invalid_type',
+        )
+        with self.assertRaisesRegex(
+            Exception, 'Invalid entity_type: invalid_type'
+        ):
+            model.put()
+
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             user_models.PinnedOpportunityModel.get_deletion_policy(),
