@@ -9,10 +9,11 @@ jobs:
   check_pr_description:
     permissions:
       pull-requests: write
+      issues: write
     runs-on: ubuntu-latest
     steps:
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '16'
       - name: Run PR description check
