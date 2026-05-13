@@ -49,7 +49,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple, Union, cast
+from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -410,7 +410,7 @@ def _collect_study_guide_changes(
     """
     # Remove union and StudyGuideChange once the study
     # guide logic when updating a subtopic page is
-    # removed from line 695.
+    # removed from line 506.
     update_study_guide_property_cmd: Union[
         study_guide_domain.UpdateStudyGuidePropertyCmd,
         study_guide_domain.StudyGuideChange,
@@ -432,6 +432,104 @@ def _collect_study_guide_changes(
         modified_study_guide_change_cmds[study_guide_id].append(
             update_study_guide_property_cmd
         )
+
+
+def _collect_subtopic_page_changes(
+    change: change_domain.BaseChange,
+    topic: topic_domain.Topic,
+    topic_id: str,
+    existing_subtopic_page_ids_to_be_modified: List[int],
+    modified_subtopic_change_cmds: Dict[
+        str, List[subtopic_page_domain.SubtopicPageChange]
+    ],
+    existing_study_guide_ids_to_be_modified: List[int],
+    modified_study_guide_change_cmds: Dict[
+        str, List[study_guide_domain.StudyGuideChange]
+    ],
+    ensure_study_guide_exists: Callable[[int], Optional[str]],
+) -> None:
+    """Collects subtopic page preprocessing changes from a change command.
+
+    When page contents HTML is updated, this also queues the matching study
+    guide change (if a study guide exists) so both can be loaded together.
+
+    Args:
+        change: BaseChange. Incoming change command with subtopic page updates.
+        topic: Topic. The topic object being updated.
+        topic_id: str. ID of the topic.
+        existing_subtopic_page_ids_to_be_modified: list(int). List tracking
+            subtopic page ids to be fetched and modified.
+        modified_subtopic_change_cmds: dict(str, list(SubtopicPageChange)).
+            Subtopic page change commands grouped by subtopic page id.
+        existing_study_guide_ids_to_be_modified: list(int). List tracking
+            study guide ids to be fetched and modified.
+        modified_study_guide_change_cmds: dict(str, list(StudyGuideChange)).
+            Study guide change commands grouped by study guide id.
+        ensure_study_guide_exists: function. Helper that returns a study guide
+            id when it exists or can be fetched.
+    """
+    # Here we use cast because we are narrowing down the type from
+    # TopicChange to a specific change command.
+    update_subtopic_page_property_cmd = cast(
+        subtopic_page_domain.UpdateSubtopicPagePropertyCmd, change
+    )
+
+    if update_subtopic_page_property_cmd.subtopic_id < topic.next_subtopic_id:
+        existing_subtopic_page_ids_to_be_modified.append(
+            update_subtopic_page_property_cmd.subtopic_id
+        )
+        subtopic_page_id = (
+            subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                topic_id, update_subtopic_page_property_cmd.subtopic_id
+            )
+        )
+        modified_subtopic_change_cmds[subtopic_page_id].append(
+            update_subtopic_page_property_cmd
+        )
+
+        if update_subtopic_page_property_cmd.property_name == (
+            subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
+        ):
+            # Only update study guide if it exists.
+            potential_study_guide_id: Optional[str] = ensure_study_guide_exists(
+                update_subtopic_page_property_cmd.subtopic_id
+            )
+            if potential_study_guide_id is not None:
+                # Here we use cast because we are sure that the
+                # new_value is subtitled html as written
+                # translations and recorded voiceovers are
+                # not used.
+                subtitled_html = cast(
+                    state_domain.SubtitledHtmlDict,
+                    update_subtopic_page_property_cmd.new_value,
+                )
+                update_study_guide_property_cmd = (
+                    study_guide_domain.StudyGuideChange
+                )(
+                    {
+                        'cmd': 'update_study_guide_property',
+                        'property_name': 'sections_content',
+                        'new_value': (subtitled_html['html']),
+                        'old_value': 'section_content_1',
+                        'subtopic_id': (
+                            # We use update_subtopic_page_property_cmd
+                            # here to avoid mypy errors. We will replace
+                            # this with a study guide alternative once
+                            # we start using study guides exclusively.
+                            update_subtopic_page_property_cmd.subtopic_id
+                        ),
+                    }
+                )
+                # We use update_subtopic_page_property_cmd
+                # here to avoid mypy errors. We will replace
+                # this with a study guide alternative once
+                # we start using study guides exclusively.
+                existing_study_guide_ids_to_be_modified.append(
+                    update_subtopic_page_property_cmd.subtopic_id
+                )
+                modified_study_guide_change_cmds[
+                    potential_study_guide_id
+                ].append(update_study_guide_property_cmd)
 
 
 def _apply_subtopic_page_change(
@@ -737,71 +835,16 @@ def apply_change_list(
             )
         # Remove this entire if block once study guides become standard.
         if change.cmd == subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY:
-            # Here we use cast because we are narrowing down the type from
-            # TopicChange to a specific change command.
-            update_subtopic_page_property_cmd = cast(
-                subtopic_page_domain.UpdateSubtopicPagePropertyCmd, change
+            _collect_subtopic_page_changes(
+                change,
+                topic,
+                topic_id,
+                existing_subtopic_page_ids_to_be_modified,
+                modified_subtopic_change_cmds,
+                existing_study_guide_ids_to_be_modified,
+                modified_study_guide_change_cmds,
+                _ensure_study_guide_exists,
             )
-
-            if (
-                update_subtopic_page_property_cmd.subtopic_id
-                < topic.next_subtopic_id
-            ):
-                existing_subtopic_page_ids_to_be_modified.append(
-                    update_subtopic_page_property_cmd.subtopic_id
-                )
-                subtopic_page_id = (
-                    subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-                        topic_id, update_subtopic_page_property_cmd.subtopic_id
-                    )
-                )
-                modified_subtopic_change_cmds[subtopic_page_id].append(
-                    update_subtopic_page_property_cmd
-                )
-
-                if update_subtopic_page_property_cmd.property_name == (
-                    subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
-                ):
-                    # Only update study guide if it exists.
-                    potential_study_guide_id: Optional[str] = (
-                        _ensure_study_guide_exists
-                    )(update_subtopic_page_property_cmd.subtopic_id)
-                    if potential_study_guide_id is not None:
-                        # Here we use cast because we are sure that the
-                        # new_value is subtitled html as written
-                        # translations and recorded voiceovers are
-                        # not used.
-                        subtitled_html = cast(
-                            state_domain.SubtitledHtmlDict,
-                            update_subtopic_page_property_cmd.new_value,
-                        )
-                        update_study_guide_property_cmd = (
-                            study_guide_domain.StudyGuideChange
-                        )(
-                            {
-                                'cmd': 'update_study_guide_property',
-                                'property_name': 'sections_content',
-                                'new_value': (subtitled_html['html']),
-                                'old_value': 'section_content_1',
-                                'subtopic_id': (
-                                    # We use update_subtopic_page_property_cmd
-                                    # here to avoid mypy errors. We will replace
-                                    # this with a study guide alternative once
-                                    # we start using study guides exclusively.
-                                    update_subtopic_page_property_cmd.subtopic_id
-                                ),
-                            }
-                        )
-                        # We use update_subtopic_page_property_cmd
-                        # here to avoid mypy errors. We will replace
-                        # this with a study guide alternative once
-                        # we start using study guides exclusively.
-                        existing_study_guide_ids_to_be_modified.append(
-                            update_subtopic_page_property_cmd.subtopic_id
-                        )
-                        modified_study_guide_change_cmds[
-                            potential_study_guide_id
-                        ].append(update_study_guide_property_cmd)
 
     modified_subtopic_pages_list = (
         subtopic_page_services.get_subtopic_pages_with_ids(
