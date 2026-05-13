@@ -31,7 +31,6 @@ import argparse
 import contextlib
 import os
 import pathlib
-import shutil
 import subprocess
 import sys
 import tarfile
@@ -427,37 +426,6 @@ def install_elasticsearch_dev_server() -> None:
     print('ElasticSearch installed successfully.')
 
 
-def copy_missing_guppy_katex_fonts() -> None:
-    """Copies any KaTeX font files missing from guppy-dev/build/fonts.
-
-    Guppy stores the full KaTeX font set under lib/katex/fonts, but its CSS
-    resolves those fonts from build/fonts. If build/fonts is missing any of the
-    referenced files, webpack emits URLs for files that are not present. We only
-    copy missing files so existing package files are left untouched.
-    """
-    source_dir = os.path.join(
-        common.NODE_MODULES_PATH, 'guppy-dev', 'lib', 'katex', 'fonts'
-    )
-    target_dir = os.path.join(
-        common.NODE_MODULES_PATH, 'guppy-dev', 'build', 'fonts'
-    )
-
-    if not os.path.exists(source_dir):
-        return
-
-    os.makedirs(target_dir, exist_ok=True)
-
-    for filename in os.listdir(source_dir):
-        source_file = os.path.join(source_dir, filename)
-        target_file = os.path.join(target_dir, filename)
-
-        if not os.path.isfile(source_file):
-            continue
-
-        if not os.path.exists(target_file):
-            shutil.copy(source_file, target_file)
-
-
 def main() -> None:
     """Set up GAE and install third-party libraries for Oppia."""
     print('Running install_third_party_libs script...')
@@ -531,7 +499,6 @@ def main() -> None:
         'the start.py script.\n',
     )
     subprocess.check_call(['yarn', 'install', '--pure-lockfile'])
-    copy_missing_guppy_katex_fonts()
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
