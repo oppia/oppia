@@ -55,6 +55,7 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {TranslationLanguageService} from '../services/translation-language.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-state-translation',
@@ -121,7 +122,8 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     private truncatePipe: TruncatePipe,
     private wrapTextWithEllipsisPipe: WrapTextWithEllipsisPipe,
     private parameterizeRuleDescriptionPipe: ParameterizeRuleDescriptionPipe,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   isVoiceoverModeActive(): boolean {
@@ -768,5 +770,10 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  isTranslationLanguageRTL(): boolean {
+    let languageCode = this.translationLanguageService.getActiveLanguageCode();
+    return this.i18nLanguageCodeService.isLanguageRTL(languageCode);
   }
 }

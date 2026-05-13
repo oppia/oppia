@@ -22,7 +22,6 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AddStudyGuideSectionModalComponent} from './add-study-guide-section.component';
 import {HtmlLengthService} from 'services/html-length.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockActiveModal {
   close(): void {
@@ -40,20 +39,11 @@ class MockHtmlLengthService {
   }
 }
 
-class MockPlatformFeatureService {
-  status = {
-    EnableWorkedExamplesRteComponent: {
-      isEnabled: false,
-    },
-  };
-}
-
 describe('Add Study Guide Section Modal Component', () => {
   let component: AddStudyGuideSectionModalComponent;
   let fixture: ComponentFixture<AddStudyGuideSectionModalComponent>;
   let ngbActiveModal: NgbActiveModal;
   let htmlLengthService: HtmlLengthService;
-  let platformFeatureService: PlatformFeatureService;
 
   beforeEach(waitForAsync(() => {
     htmlLengthService = new MockHtmlLengthService();
@@ -71,10 +61,6 @@ describe('Add Study Guide Section Modal Component', () => {
           provide: HtmlLengthService,
           useValue: htmlLengthService,
         },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
-        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -84,7 +70,6 @@ describe('Add Study Guide Section Modal Component', () => {
     fixture = TestBed.createComponent(AddStudyGuideSectionModalComponent);
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
 
     fixture.detectChanges();
   });
@@ -116,23 +101,6 @@ describe('Add Study Guide Section Modal Component', () => {
     );
   });
 
-  it('should get content schema when worked examples feature is disabled', () => {
-    spyOn(
-      component,
-      'isEnableWorkedexamplesRteComponentFeatureEnabled'
-    ).and.returnValue(false);
-
-    const schema = component.getContentSchema();
-
-    expect(schema).toEqual({
-      type: 'html',
-      ui_config: {
-        rte_component_config_id: 'ALL_COMPONENTS',
-        rows: 100,
-      },
-    });
-  });
-
   it('should update tempSectionHeadingPlaintext', () => {
     component.tempSectionHeadingPlaintext = 'heading';
 
@@ -161,20 +129,6 @@ describe('Add Study Guide Section Modal Component', () => {
     component.tempSectionContentHtml = 'content';
     component.updateLocalContent('content');
     expect(component.tempSectionContentHtml).toEqual('content');
-  });
-
-  it('should check worked examples feature flag', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      true;
-    expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
-      true
-    );
-
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      false;
-    expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
-      false
-    );
   });
 
   it('should check if section content length is exceeded', () => {

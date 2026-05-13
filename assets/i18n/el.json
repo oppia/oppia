@@ -146,7 +146,6 @@
   "I18N_BLOG_HOME_PAGE_TITLE": "Ιστολόγιο Oppia | Oppia",
   "I18N_BLOG_HOME_PAGE_WELCOME_HEADING": "Καλώς ήρθατε στο ιστολόγιο της Oppia!",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_HEADING": "Αποτελέσματα της Αναζήτησης",
-  "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY": "Εμφάνιση <[startingNumber]> - <[endingNumber]> των συνολικών αποτελεσμάτων αναζήτησης.",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY": "Εμφάνιση αναρτήσεων <[startingNumber]> - <[endingNumber]> από <[totalNumber]>.",
   "I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT": "Προσθήκη μικρογραφίας εικόνας",
   "I18N_BLOG_POST_EDITOR_BODY_HEADING": "Κύριο μέρος",

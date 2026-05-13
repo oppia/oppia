@@ -193,3 +193,11 @@
 .practice-tab .oppia-topic-viewer-container .background-banner-position {
   position: inherit;
 }
+
+practice-tab.topic-preview-mode .oppia-practice-tab-container .oppia-page-card {
+  box-sizing: border-box;
+  margin: 0;
+  padding-bottom: 30px;
+  padding-top: 24px;
+  width: 100%;
+}

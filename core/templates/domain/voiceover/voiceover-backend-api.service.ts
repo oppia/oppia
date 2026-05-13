@@ -244,7 +244,6 @@ export class VoiceoverBackendApiService {
           {
             exploration_id: explorationID,
             exploration_version: String(explorationVersion),
-            exploration_title: explorationTitle,
           }
         ),
         {}

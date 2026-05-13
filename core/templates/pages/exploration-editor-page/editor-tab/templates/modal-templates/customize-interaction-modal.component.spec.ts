@@ -464,10 +464,24 @@ describe('Customize Interaction Modal Component', () => {
       component.ngOnInit();
       tick();
 
+      const deprecatedInteractions = [
+        'PencilCodeEditor',
+        'MusicNotesInput',
+        'CodeRepl',
+        'GraphInput',
+        'InteractiveMap',
+      ];
+      const expectedCategories =
+        AppConstants.ALLOWED_INTERACTION_CATEGORIES.map(category => ({
+          name: category.name,
+          interaction_ids: ([...category.interaction_ids] as string[]).filter(
+            (id: string) => !deprecatedInteractions.includes(id)
+          ),
+        })).filter(category => category.interaction_ids.length > 0);
       expect(component.isinteractionOpen).toBe(true);
-      expect(component.allowedInteractionCategories).toEqual([
-        ...AppConstants.ALLOWED_INTERACTION_CATEGORIES,
-      ]);
+      expect(component.allowedInteractionCategories).toEqual(
+        expectedCategories
+      );
     })
   );
 

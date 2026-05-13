@@ -48,6 +48,7 @@ describe('Classroom backend API service', function () {
     topic_model_last_updated: 3454354354,
     url_fragment: 'topic-name-one',
     can_edit_topic: false,
+    can_edit_question: false,
     is_published: false,
     total_upcoming_chapters_count: 1,
     total_overdue_chapters_count: 1,
@@ -72,6 +73,7 @@ describe('Classroom backend API service', function () {
     topic_model_last_updated: 3454354354,
     url_fragment: 'topic-name-two',
     can_edit_topic: false,
+    can_edit_question: false,
     is_published: false,
     total_upcoming_chapters_count: 1,
     total_overdue_chapters_count: 1,
@@ -720,8 +722,16 @@ describe('Classroom backend API service', function () {
 
   it('should update classroom index mappings successfully', fakeAsync(() => {
     const mappings = [
-      {classroomId: 'classroom_1', classroomName: 'Math', classroomIndex: 1},
-      {classroomId: 'classroom_2', classroomName: 'Science', classroomIndex: 2},
+      {
+        classroom_id: 'classroom_1',
+        classroom_name: 'Math',
+        classroom_index: 1,
+      },
+      {
+        classroom_id: 'classroom_2',
+        classroom_name: 'Science',
+        classroom_index: 2,
+      },
     ];
     let service = classroomBackendApiService;
     let successHandler = jasmine.createSpy('success');
@@ -733,7 +743,7 @@ describe('Classroom backend API service', function () {
 
     const req = httpTestingController.expectOne('/update_classrooms_order');
     expect(req.request.method).toEqual('PUT');
-    expect(req.request.body instanceof FormData).toBeTrue();
+    expect(req.request.body instanceof FormData).toBe(true);
 
     req.flush(null);
 
@@ -745,7 +755,11 @@ describe('Classroom backend API service', function () {
 
   it('should handle error during classroom index mappings update', fakeAsync(() => {
     const mappings = [
-      {classroomId: 'classroom_1', classroomName: 'Math', classroomIndex: 1},
+      {
+        classroom_id: 'classroom_1',
+        classroom_name: 'Math',
+        classroom_index: 1,
+      },
     ];
     let service = classroomBackendApiService;
     let successHandler = jasmine.createSpy('success');

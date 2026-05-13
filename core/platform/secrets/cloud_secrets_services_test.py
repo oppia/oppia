@@ -35,6 +35,19 @@ class CloudSecretsServicesTests(test_utils.GenericTestBase):
         ):
             self.assertEqual(cloud_secrets_services.get_secret('name'), 'secre')
 
+    def test_get_secret_with_oppia_project_id_as_parameter(self) -> None:
+        with self.swap_to_always_return(
+            cloud_secrets_services.CLIENT,
+            'access_secret_version',
+            types.SimpleNamespace(payload=types.SimpleNamespace(data=b'secre')),
+        ):
+            self.assertEqual(
+                cloud_secrets_services.get_secret(
+                    'name', project_id='project-id'
+                ),
+                'secre',
+            )
+
     def test_get_secret_returns_none_when_secret_does_not_exist(self) -> None:
         with self.swap_to_always_raise(
             cloud_secrets_services.CLIENT,

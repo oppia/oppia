@@ -21,12 +21,12 @@ speech-service/index-text-to-speech.
 
 from __future__ import annotations
 
-import json
-import os
+import logging
 import re
+import time
+from xml.sax import saxutils
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import voiceover_services
 from core.platform import models
 
@@ -60,6 +60,8 @@ MAIN_CONTENT_SSML_TEMPLATE_BLOCK = """
         %s
     </p>
 """
+
+MAX_RETRIES_FOR_VOICEOVER_SYNTHESIS_WITH_EXPONENTIAL_BACKOFF = 10
 
 
 class WordBoundaryCollection:
@@ -103,11 +105,9 @@ def get_azure_voicecode_from_language_accent_code(
         str. The Azure voice code associated with the given language accent
         code.
     """
-    file_path = os.path.join(
-        feconf.VOICEOVERS_DATA_DIR, 'autogeneratable_language_accent_list.json'
+    autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
+        constants.autogeneratable_language_accent_constants
     )
-    with open(file_path, 'r', encoding='utf-8') as f:
-        autogeneratable_language_accent_list = json.loads(f.read())
 
     voice_code: str = autogeneratable_language_accent_list[
         language_accent_code
@@ -130,7 +130,7 @@ def process_factorial_in_text(
         str. The processed text with factorial expressions replaced by their
         corresponding words or phrases.
     """
-    pronounciation = math_symbol_pronunciations['!'] + ' '
+    pronounciation = math_symbol_pronunciations.get('!', '') + ' '
     return re.sub(r'(\d+)!', pronounciation + r'\1', text)
 
 
@@ -254,18 +254,29 @@ def convert_plaintext_to_ssml_content(
     )
 
     math_symbol_pronunciations = (
-        constants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.get(
+        constants.constants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.get(
             language_code, {}
         )
     )
 
     main_ssml_content = ''
     for content in content_list:
+        # Escaping special characters in the content to ensure they are
+        # pronounced correctly by the Azure Text-to-Speech service.
+        # This includes characters like <, >, &, etc.
+        content = saxutils.escape(content)
         # Updates the content to pronounce `-` correctly in the given language.
         if ' - ' in content:
-            content = content.replace(
-                '-', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['-']
-            )
+            pattern = re.compile(r'(\d+)\s*-\s*(\d+)')
+
+            def replacer(match: re.Match[str]) -> str:
+                num1, num2 = match.groups()
+                pronunciation = (
+                    MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['-']
+                )
+                return '%s %s %s' % (num1, pronunciation, num2)
+
+            content = pattern.sub(replacer, content)
 
         # Update the content to pronounce `*` correctly in the given language.
         if ' * ' in content:
@@ -286,7 +297,8 @@ def convert_plaintext_to_ssml_content(
         # Update the content to pronounce `/` correctly in the given language.
         if ' / ' in content:
             content = content.replace(
-                '/', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['÷']
+                ' / ',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['÷'],
             )
 
         # Update the content to pronounce `÷` correctly in the given language.
@@ -332,8 +344,10 @@ def convert_plaintext_to_ssml_content(
 
 
 def regenerate_speech_from_text(
-    plaintext: str, language_accent_code: str
-) -> Tuple[bytes, List[Dict[str, Union[str, float]]], Optional[str]]:
+    plaintext: str,
+    language_accent_code: str,
+    oppia_project_id: Optional[str] = None,
+) -> Tuple[Optional[bytes], List[Dict[str, Union[str, float]]], Optional[str]]:
     """Regenerates speech (Oppia's voiceovers) from the provided text.
 
     This method uses Azure Text-to-Speech to synthesize speech from the input
@@ -344,6 +358,9 @@ def regenerate_speech_from_text(
         plaintext: str. The plaintext that needs to be synthesized into speech.
         language_accent_code: str. The language accent code in which the speech
             is to be synthesized.
+        oppia_project_id: Optional[str]. The Google Cloud Project ID. Explicitly
+            required when running on Beam Dataflow, as workers cannot
+            retrieve the ID from environment variables.
 
     Returns:
         tuple. A tuple containing three elements:
@@ -360,7 +377,9 @@ def regenerate_speech_from_text(
     """
 
     # Azure text-to-speech API key.
-    azure_tts_api_key = secrets_services.get_secret('AZURE_TTS_API_KEY')
+    azure_tts_api_key = secrets_services.get_secret(
+        'AZURE_TTS_API_KEY', oppia_project_id
+    )
 
     if azure_tts_api_key is None:
         raise Exception('Azure TTS API key is not available.')
@@ -393,18 +412,85 @@ def regenerate_speech_from_text(
         plaintext, language_accent_code
     )
 
-    speech_synthesis_result = speech_synthesizer.speak_ssml_async(
-        ssml_text_for_speech_synthesis
-    ).get()
-
-    binary_audio_data = speech_synthesis_result.audio_data
-
+    delay_in_sec_before_retrying = 1
+    binary_audio_data = None
     error_details = None
-    if speech_synthesis_result.reason == speechsdk.ResultReason.Canceled:
-        cancellation_details = speech_synthesis_result.cancellation_details
 
-        if cancellation_details.reason == speechsdk.CancellationReason.Error:
-            error_details = cancellation_details.error_details
+    for _ in range(
+        MAX_RETRIES_FOR_VOICEOVER_SYNTHESIS_WITH_EXPONENTIAL_BACKOFF
+    ):
+        logging.info(
+            'Voiceover synthesis log: Retrying speech synthesis after %s seconds delay.',
+            delay_in_sec_before_retrying,
+        )
+        time.sleep(delay_in_sec_before_retrying)
+
+        speech_synthesis_result = speech_synthesizer.speak_ssml_async(
+            ssml_text_for_speech_synthesis
+        ).get()
+
+        if (
+            speech_synthesis_result.reason
+            == speechsdk.ResultReason.SynthesizingAudioCompleted
+        ):
+            binary_audio_data = speech_synthesis_result.audio_data
+            error_details = None
+            break
+
+        if speech_synthesis_result.reason == speechsdk.ResultReason.Canceled:
+            cancellation_details = speech_synthesis_result.cancellation_details
+
+            if (
+                cancellation_details.reason
+                == speechsdk.CancellationReason.Error
+            ):
+                error_details = cancellation_details.error_details
+                error_code = cancellation_details.error_code
+
+                logging.error(
+                    'Voiceover synthesis log: Speech synthesis failed for content %s with error code %s and details: %s'
+                    % (plaintext, error_code, error_details)
+                )
+
+                # Exponential backoff for retrying speech synthesis in case of too
+                # many requests, connection failure, or service timeout errors.
+                if error_code in [
+                    speechsdk.CancellationErrorCode.TooManyRequests,
+                    speechsdk.CancellationErrorCode.ConnectionFailure,
+                    speechsdk.CancellationErrorCode.ServiceTimeout,
+                ]:
+                    logging.info(
+                        'Voiceover synthesis log: Known error encountered, retrying with exponential backoff.'
+                    )
+                    delay_in_sec_before_retrying *= 2
+                    continue
+
+                logging.info(
+                    'Voiceover synthesis log: Non-retryable error encountered, aborting further attempts.'
+                )
+                break
+
+            error_details = (
+                'Speech synthesis was canceled for reason: %s'
+                % cancellation_details.reason
+            )
+            logging.error(
+                'Voiceover synthesis log: Voiceover synthesis error: %s for content: %s'
+                % (error_details, plaintext)
+            )
+            break
+
+        error_details = (
+            'Speech synthesis failed for reason: %s'
+            % speech_synthesis_result.reason
+        )
+        logging.error(
+            'Voiceover synthesis log: Voiceover synthesis error: %s for content: %s'
+            % (error_details, plaintext)
+        )
+        break
+
+    logging.info('Voiceover synthesis log: Speech synthesis attempt completed.')
 
     return (
         binary_audio_data,

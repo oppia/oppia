@@ -116,15 +116,6 @@ export class CreateNewSubtopicModalComponent
   }
 
   getSchema(): object {
-    if (!this.isEnableWorkedexamplesRteComponentFeatureEnabled()) {
-      this.SUBTOPIC_PAGE_SCHEMA = {
-        type: 'html',
-        ui_config: {
-          rte_component_config_id: 'ALL_COMPONENTS',
-          rows: 100,
-        },
-      };
-    }
     return this.SUBTOPIC_PAGE_SCHEMA;
   }
 
@@ -211,11 +202,6 @@ export class CreateNewSubtopicModalComponent
 
   isShowRestructuredStudyGuidesFeatureEnabled(): boolean {
     return this.platformFeatureService.status.ShowRestructuredStudyGuides
-      .isEnabled;
-  }
-
-  isEnableWorkedexamplesRteComponentFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.EnableWorkedExamplesRteComponent
       .isEnabled;
   }
 

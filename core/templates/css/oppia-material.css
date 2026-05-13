@@ -1874,6 +1874,9 @@ th.mat-header-cell, td.mat-cell, td.mat-footer-cell {
   background: white;
   color: rgba(0, 0, 0, 0.87); }
 
+.oppia-learner-dash-goals-modal .mat-dialog-container {
+  overflow: hidden; }
+
 .mat-divider {
   border-top-color: rgba(0, 0, 0, 0.12); }
 
