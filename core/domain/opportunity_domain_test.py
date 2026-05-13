@@ -407,6 +407,13 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
             },
         )
 
+    def test_invalid_entity_type_fails_validation(self) -> None:
+        self.valid_pinned_opportunity.entity_type = 'invalid_entity'
+        self._assert_validation_error(
+            self.valid_pinned_opportunity,
+            'Invalid entity_type: invalid_entity',
+        )
+
 
 class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
     """Tests for the TranslationOpportunity domain object."""
