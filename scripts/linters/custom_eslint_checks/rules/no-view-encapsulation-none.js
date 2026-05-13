@@ -21,13 +21,24 @@
 
 const path = require('path');
 
-const allowlistPath = path.resolve(
-  process.cwd(),
-  'scripts',
-  'linters',
-  'view_encapsulation_none_allowlist.js'
-);
-const allowlistedFilepaths = require(allowlistPath);
+/**
+ * Legacy allowlist for files that still use ViewEncapsulation.None.
+ *
+ * No new files should be added here. These legacy usages should be removed
+ * over time and replaced with component-scoped styling or a documented
+ * justification comment directly above the usage.
+ */
+const allowlistedFilepaths = [
+  'core/templates/base-components/footer-donate-volunteer.component.ts',
+  'core/templates/components/button-directives/create-activity-button.component.ts',
+  'core/templates/pages/exploration-player-page/current-lesson-player/' +
+    'exploration-player-page-root.component.ts',
+  'core/templates/pages/exploration-player-page/new-lesson-player/' +
+    'lesson-player-page-root.component.ts',
+  'core/templates/pages/splash-page/splash-page.component.ts',
+  'core/templates/pages/story-viewer-page/story-viewer-page-root.component.ts',
+  'core/templates/pages/volunteer-page/volunteer-page.component.ts',
+];
 const commentPattern = /^We need ViewEncapsulation\.None because .+/;
 
 const getRelativeFilename = function (filename) {
