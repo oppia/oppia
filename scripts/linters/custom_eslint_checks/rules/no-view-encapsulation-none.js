@@ -19,22 +19,22 @@
 
 'use strict';
 
-var path = require('path');
+const path = require('path');
 
-var allowlistPath = path.resolve(
-  __dirname,
-  '..',
-  '..',
+const allowlistPath = path.resolve(
+  process.cwd(),
+  'scripts',
+  'linters',
   'view_encapsulation_none_allowlist.js'
 );
-var allowlistedFilepaths = require(allowlistPath);
-var commentPattern = /^We need ViewEncapsulation\.None because .+/;
+const allowlistedFilepaths = require(allowlistPath);
+const commentPattern = /^We need ViewEncapsulation\.None because .+/;
 
-var getRelativeFilename = function (filename) {
+const getRelativeFilename = function (filename) {
   return path.relative(process.cwd(), filename).replace(/\\/g, '/');
 };
 
-var getNormalizedComment = function (comment) {
+const getNormalizedComment = function (comment) {
   return comment.value
     .split('\n')
     .map(line => line.replace(/^\s*\*?\s?/, '').trim())
@@ -56,27 +56,27 @@ module.exports = {
     schema: [],
     messages: {
       disallowViewEncapsulationNone:
-        'Avoid ViewEncapsulation.None. Add the file to the legacy allowlist ' +
-        'or add a comment immediately above this usage in the format ' +
+        'Avoid ViewEncapsulation.None. ' +
+        'Add a comment immediately above this usage in the format ' +
         '"We need ViewEncapsulation.None because ...".',
     },
   },
 
   create: function (context) {
-    var sourceCode = context.getSourceCode();
-    var filename = getRelativeFilename(context.getFilename());
+    const sourceCode = context.getSourceCode();
+    const filename = getRelativeFilename(context.getFilename());
 
-    var isAllowlistedFile = function () {
+    const isAllowlistedFile = function () {
       return allowlistedFilepaths.includes(filename);
     };
 
-    var hasValidExplanationComment = function (node) {
-      var commentsBeforeNode = sourceCode.getCommentsBefore(node.parent);
+    const hasValidExplanationComment = function (node) {
+      const commentsBeforeNode = sourceCode.getCommentsBefore(node.parent);
       if (commentsBeforeNode.length === 0) {
         return false;
       }
 
-      var nearestComment = commentsBeforeNode[commentsBeforeNode.length - 1];
+      const nearestComment = commentsBeforeNode[commentsBeforeNode.length - 1];
       if (nearestComment.loc.end.line !== node.loc.start.line - 1) {
         return false;
       }

@@ -18,12 +18,12 @@
 
 'use strict';
 
-var path = require('path');
+const path = require('path');
 
-var rule = require('./no-view-encapsulation-none');
-var RuleTester = require('eslint').RuleTester;
+const rule = require('./no-view-encapsulation-none');
+const RuleTester = require('eslint').RuleTester;
 
-var ruleTester = new RuleTester({
+const ruleTester = new RuleTester({
   parserOptions: {
     ecmaVersion: 2015,
     sourceType: 'module',
@@ -106,7 +106,7 @@ ruleTester.run('no-view-encapsulation-none', rule, {
       errors: [
         {
           message:
-            'Avoid ViewEncapsulation.None. Add the file to the legacy allowlist or add a comment immediately above this usage in the format "We need ViewEncapsulation.None because ...".',
+            'Avoid ViewEncapsulation.None. Add a comment immediately above this usage in the format "We need ViewEncapsulation.None because ...".',
         },
       ],
     },
@@ -122,7 +122,7 @@ ruleTester.run('no-view-encapsulation-none', rule, {
       errors: [
         {
           message:
-            'Avoid ViewEncapsulation.None. Add the file to the legacy allowlist or add a comment immediately above this usage in the format "We need ViewEncapsulation.None because ...".',
+            'Avoid ViewEncapsulation.None. Add a comment immediately above this usage in the format "We need ViewEncapsulation.None because ...".',
         },
       ],
     },
@@ -139,7 +139,7 @@ ruleTester.run('no-view-encapsulation-none', rule, {
       errors: [
         {
           message:
-            'Avoid ViewEncapsulation.None. Add the file to the legacy allowlist or add a comment immediately above this usage in the format "We need ViewEncapsulation.None because ...".',
+            'Avoid ViewEncapsulation.None. Add a comment immediately above this usage in the format "We need ViewEncapsulation.None because ...".',
         },
       ],
     },
