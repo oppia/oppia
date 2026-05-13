@@ -530,8 +530,8 @@ def _collect_subtopic_page_changes(
                 modified_study_guide_change_cmds[
                     potential_study_guide_id
                 ].append(update_study_guide_property_cmd)
-                
-                
+
+
 def _apply_subtopic_page_change(
     change: change_domain.BaseChange,
     topic_id: str,
