@@ -57,6 +57,11 @@ describe('Topic Manager', function () {
     await curriculumAdmin.navigateToCreatorDashboardPage();
     await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
 
+    // Wait for exploration editor to fully load.
+    await curriculumAdmin.expectElementToBeVisible(
+      '.e2e-test-exploration-editor-page'
+    );
+
     // Create an exlporation unsupported by mobile.
     unsupportedExplorationId =
       await curriculumAdmin.createSimpleUnsupportedExploration();
@@ -86,11 +91,6 @@ describe('Topic Manager', function () {
     );
 
     await curriculumAdmin.saveStoryDraft();
-
-    // Wait for save operation to fully complete before continuing.
-    await curriculumAdmin.expectElementToBeVisible(
-      '.e2e-test-snackbar-success'
-    );
 
     // Create topic Manager.
     topicManager = await UserFactory.createNewUser(
