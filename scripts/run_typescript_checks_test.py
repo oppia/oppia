@@ -25,7 +25,8 @@ import tempfile
 
 from core.tests import test_utils
 
-from typing import List
+from scripts import common
+from typing import Dict, List
 
 from . import run_typescript_checks
 
@@ -259,9 +260,11 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             )
             tmp_filepath = tmp_file.name
 
-        self.addCleanup(
-            lambda: os.path.exists(tmp_filepath) and os.remove(tmp_filepath)
-        )
+        def cleanup_tmp_filepath() -> None:
+            if os.path.exists(tmp_filepath):
+                os.remove(tmp_filepath)
+
+        self.addCleanup(cleanup_tmp_filepath)
 
         self.assertEqual(
             run_typescript_checks.load_exclude_paths(tmp_filepath),
@@ -542,7 +545,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 stdout = MockOutput()
 
             compile_temp_calls: List[tuple[str, List[str]]] = []
-            hashes_written: List[dict] = []
+            hashes_written: List[Dict[object, object]] = []
             ngcc_calls: List[str] = []
 
             def mock_popen(  # pylint: disable=unused-argument
@@ -588,7 +591,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                     mock_compile_temp,
                 ),
                 self.swap(
-                    run_typescript_checks.common,
+                    common,
                     'write_hashes_json_file',
                     lambda hashes: hashes_written.append(hashes),
                 ),
@@ -674,7 +677,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                     mock_compile_temp,
                 ),
                 self.swap(
-                    run_typescript_checks.common,
+                    common,
                     'write_hashes_json_file',
                     lambda _hashes: None,
                 ),
