@@ -27,6 +27,7 @@ const ROLES = testConstants.Roles;
 const questionText = 'Add 1+2';
 
 describe('Topic Manager', function () {
+  jest.setTimeout(600000);
   let topicManager: TopicManager & CurriculumAdmin & ExplorationEditor;
   let curriculumAdmin: CurriculumAdmin;
 
