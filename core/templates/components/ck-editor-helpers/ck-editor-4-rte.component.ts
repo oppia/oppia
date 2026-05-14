@@ -139,6 +139,10 @@ export class CkEditor4RteComponent
       )
     );
 
+    // The 'change' event above can fire asynchronously, so if the user
+    // types quickly and clicks save immediately, the model may still hold
+    // stale data. This subscription guarantees a synchronous flush right
+    // before the save logic runs, eliminating the race condition.
     this.subscriptions.add(
       this.externalRteSaveService.onExternalRteSave.subscribe(() => {
         if (this.ck) {
@@ -827,13 +831,9 @@ export class CkEditor4RteComponent
       20
     );
 
+    // The 'change' event fires asynchronously as the user edits content,
+    // keeping the Angular model in sync during normal editing.
     ck.on('change', () => {
-      this.syncEditorData(ck);
-    });
-
-    // Sync data on blur to ensure the Angular model is updated
-    // before any save action that follows a focus change.
-    ck.on('blur', () => {
       this.syncEditorData(ck);
     });
     ck.setData(this.value);
