@@ -2010,6 +2010,7 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Updates graph theory learner answer in response modal to be a simple star network.
+   * * @param {string} centerVertex - The text to be entered for the center vertex.
    */
   async updateGraphTheoryLearnerAnswerInResponseModal(
     centerVertex?: string
