@@ -314,6 +314,10 @@ const saveQuestionButton = 'button.e2e-test-save-question-button';
 const linkAnotherSkillToQuestionButton = '.e2e-test-link-another-skill-button';
 const questionDifficultyHeaderSelector = '.e2e-test-question-difficulty-header';
 const successToastSelector = '.toast-success';
+const skillLinkageItemSelector = '.e2e-test-skill-linkage-item';
+const skillLinkageDescriptionSelector = '.e2e-test-skill-linkage-description';
+const skillLinkageRemoveButtonSelector =
+  '.e2e-test-remove-skill-linkage-button';
 
 // Preview tab of the topic editor.
 const previewSubtabClass = 'e2e-test-preview-subtab';
@@ -979,6 +983,44 @@ export class TopicManager extends BaseUser {
     await this.expectElementToBeVisible(successToastSelector);
     // Wait for modal to close and button to be visible again.
     await this.page.waitForTimeout(500);
+  }
+
+  /**
+   * Removes a skill link from the currently open question.
+   * Note: The UI blocks removal of the last remaining skill link with an
+   * info message, so this method should only be used when there are
+   * multiple skills linked to the question.
+   * @param {string} skillDescription - Description of the skill to be unlinked.
+   */
+  async removeSkillLinkFromQuestion(skillDescription: string): Promise<void> {
+    await this.page.waitForSelector(skillLinkageItemSelector);
+    const linkageItems = await this.page.$$(skillLinkageItemSelector);
+
+    for (const item of linkageItems) {
+      const descriptionElement = await item.$(skillLinkageDescriptionSelector);
+      if (!descriptionElement) {
+        continue;
+      }
+      const text = await this.page.evaluate(
+        el => el.textContent?.trim(),
+        descriptionElement
+      );
+
+      if (text === skillDescription) {
+        const removeButton = await item.$(skillLinkageRemoveButtonSelector);
+        if (removeButton) {
+          await this.waitForElementToBeClickable(removeButton);
+          await removeButton.click();
+
+          // Unlinking a non-last skill triggers an auto-save API call.
+          // Wait for the success toast to confirm the save completed.
+          await this.expectElementToBeVisible(successToastSelector);
+          await this.page.waitForTimeout(500);
+          return;
+        }
+      }
+    }
+    throw new Error(`Skill link for "${skillDescription}" not found.`);
   }
 
   /**
@@ -3971,6 +4013,22 @@ export class TopicManager extends BaseUser {
 
     showMessage(`Question ${question} is visible.`);
     return requiredQuestionElement;
+  }
+
+  /**
+   * Checks that the question is NOT visible in the questions tab.
+   * @param {string} question - The question text to check for absence.
+   */
+  async expectQuestionToNotBeVisible(question: string): Promise<void> {
+    const questionElements = await this.page.$$(questionTextSelector);
+    for (const element of questionElements) {
+      const text = await element.evaluate(el => el.textContent?.trim());
+      if (text === question) {
+        throw new Error(
+          `Question "${question}" should not be visible but was found.`
+        );
+      }
+    }
   }
 
   async openQuestionEditor(question: string): Promise<void> {

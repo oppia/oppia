@@ -36,12 +36,12 @@
     </mat-card>
     <div *ngIf="!newQuestionIsBeingCreated" class="linked-skills-container">
       <h4> <strong> Linked Skills </strong> </h4>
-      <mat-card class="question-skill-id" *ngFor="let skill of associatedSkillSummaries">
+      <mat-card class="question-skill-id e2e-test-skill-linkage-item" *ngFor="let skill of associatedSkillSummaries">
         <div class="skill-description-card">
-          <span (click)="removeSkill(skill.getId())" aria-hidden="true">
+          <span (click)="removeSkill(skill.getId())" aria-hidden="true" class="e2e-test-remove-skill-linkage-button">
             <i class="material-icons oppia-cross-icon md-18">&#xE14C;</i>
           </span>
-          <a [attr.href]="getSkillEditorUrl(skill.getId())" target="_blank" rel="noopener">
+          <a [attr.href]="getSkillEditorUrl(skill.getId())" target="_blank" rel="noopener" class="e2e-test-skill-linkage-description">
             {{skill.getDescription()}}
           </a>
         </div>
