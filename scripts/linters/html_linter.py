@@ -23,7 +23,7 @@ import os
 import re
 import subprocess
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Final, FrozenSet, List, Optional, Tuple
 
 from .. import common, concurrent_task_utils
 from . import linter_utils
@@ -37,6 +37,38 @@ class TagMismatchException(Exception):
     """Error class for mismatch between start and end tags."""
 
     pass
+
+
+LEGACY_STYLE_TAG_ALLOWLIST_PATH: Final = os.path.join(
+    os.getcwd(), 'scripts', 'linters', 'html_style_tag_allowlist.txt'
+)
+STYLE_TAG_DISALLOWED_PATH_PREFIXES: Final = ('core/', 'extensions/')
+
+
+def _load_legacy_style_tag_allowlist() -> FrozenSet[str]:
+    """Loads the list of legacy HTML files that still contain style tags."""
+    with open(LEGACY_STYLE_TAG_ALLOWLIST_PATH, encoding='utf-8') as f:
+        return frozenset(line.strip() for line in f.readlines() if line.strip())
+
+
+LEGACY_STYLE_TAG_ALLOWLIST: Final = _load_legacy_style_tag_allowlist()
+
+
+def _get_repo_relative_filepath(filepath: str) -> str:
+    """Returns the given filepath relative to the repository root."""
+    return os.path.relpath(os.path.abspath(filepath), os.getcwd()).replace(
+        os.sep, '/'
+    )
+
+
+def _is_disallowed_style_tag_filepath(filepath: str) -> bool:
+    """Returns whether a style tag should be disallowed for the filepath."""
+    normalized_filepath = _get_repo_relative_filepath(filepath)
+    return (
+        normalized_filepath.endswith('.html')
+        and normalized_filepath.startswith(STYLE_TAG_DISALLOWED_PATH_PREFIXES)
+        and normalized_filepath not in LEGACY_STYLE_TAG_ALLOWLIST
+    )
 
 
 class CustomHTMLParser(html.parser.HTMLParser):
@@ -93,6 +125,15 @@ class CustomHTMLParser(html.parser.HTMLParser):
         tag_line = self.file_lines[line_number - 1].lstrip()
         opening_tag = '<' + tag
         attr_pos_mapping: Dict[str, List[int]] = {}
+
+        if tag == 'style' and _is_disallowed_style_tag_filepath(self.filepath):
+            error_message = (
+                '%s --> Embedded style tags are not allowed in HTML '
+                'templates. Move the CSS to the corresponding '
+                '.component.css file.' % self.filepath
+            )
+            self.error_messages.append(error_message)
+            self.failed = True
 
         # Check the indentation for content of style tag.
         if tag_line.startswith(opening_tag) and tag == 'style':

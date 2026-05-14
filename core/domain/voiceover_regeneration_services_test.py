@@ -257,6 +257,30 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
 
         self.assertEqual(audio_offset_list, generated_audio_offset_list)
 
+    def test_should_get_empty_audio_sucessfully(self) -> None:
+        content_html = '<p> This is a test text </p>'
+        exploration_id = 'exp_id'
+        language_accent_code = 'en-US'
+        filename = 'content_0-en-US-asdjytdyop.mp3'
+
+        def _mock_regenerate_speech_from_text(
+            _text: str,
+            _language_accent_code: str,
+            _oppia_project_id: Optional[str] = None,
+        ) -> Tuple[bytes, List[Dict[str, Union[str, float]]], Optional[str]]:
+
+            return (b'', [], '')
+
+        with self.swap(
+            dev_mode_speech_synthesis_services,
+            'regenerate_speech_from_text',
+            _mock_regenerate_speech_from_text,
+        ):
+            audio_offset_list = voiceover_regeneration_services.synthesize_voiceover_for_html_string(
+                exploration_id, content_html, language_accent_code, filename
+            )
+        self.assertEqual(audio_offset_list, [])
+
     @mock.patch(
         'core.domain.fs_services.GcsFileSystem.get',
         side_effect=Exception('Mocked exception during voiceover retrieval'),

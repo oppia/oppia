@@ -37,6 +37,8 @@ import {NavbarAndFooterGATrackingPages} from 'app.constants';
 })
 export class SiteAnalyticsService {
   static googleAnalyticsIsInitialized: boolean = false;
+  private isUserInfoInitialized = false;
+  private readonly userInfoInitializationPromise: Promise<void>;
 
   constructor(
     private windowRef: WindowRef,
@@ -50,12 +52,16 @@ export class SiteAnalyticsService {
       SiteAnalyticsService.googleAnalyticsIsInitialized = true;
     }
 
-    this._initializeLoginStatus();
+    this.userInfoInitializationPromise = this._initializeLoginStatus();
   }
 
   private async _initializeLoginStatus(): Promise<void> {
-    await this.userService.getUserInfoAsync();
-    this._pushLoginStatusToDataLayer();
+    try {
+      await this.userService.getUserInfoAsync();
+    } finally {
+      this.isUserInfoInitialized = true;
+      this._pushLoginStatusToDataLayer();
+    }
   }
 
   private _pushLoginStatusToDataLayer(): void {
@@ -77,8 +83,15 @@ export class SiteAnalyticsService {
     eventName: string,
     eventParameters: Record<string, string | number | boolean> = {}
   ): void {
+    // Wait for user info initialization before emitting analytics
+    // events to avoid incorrect auth state reporting.
+    if (!this.isUserInfoInitialized) {
+      this.userInfoInitializationPromise.then(() => {
+        this._sendEventToGoogleAnalytics(eventName, eventParameters);
+      });
+      return;
+    }
     const loginStatus = this._getLoginStatus();
-
     const updatedEventParameters = {
       ...eventParameters,
       login_status: loginStatus,

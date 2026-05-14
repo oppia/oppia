@@ -20,16 +20,11 @@
       </p>
     </li>
     <li>
-      <p *ngIf="!modifyTranslationsFeatureFlagIsEnabled">
-        <strong>Mark translations as stale:</strong>
-        Mark the existing translations for the given content as stale. Select this if your changes will require the translations
-        to be updated, but the previous translations can still be used.
-      </p>
       <p *ngIf="modifyTranslationsFeatureFlagIsEnabled">
         <strong>Modify existing translations:</strong>
         Select this if your changes mean that existing translations will need to be modified slightly.
       </p>
-      <p>
+      <p *ngIf="!modifyTranslationsFeatureFlagIsEnabled">
         <strong>Mark as Stale:</strong>
         Keep the existing translations, but mark them and any English voiceovers
         for updates. Choose this if your changes are small and only need minor fixes.

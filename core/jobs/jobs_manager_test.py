@@ -122,6 +122,24 @@ class RunJobTests(test_utils.GenericTestBase):
         result = beam_job_services.get_beam_job_run_result(run.id)
         self.assertIn('Failed to deploy WorkingJob', result.stderr)
 
+    def test_job_run_with_parameterized_arg(self) -> None:
+        run = jobs_manager.run_job(
+            WorkingJob,
+            True,
+            namespace=self.namespace,
+            parameterized_args={'language_accent_code': 'en-IN'},
+        )
+
+        self.assertEqual(run.latest_job_state, 'DONE')
+
+        run_model = beam_job_models.BeamJobRunModel.get(run.id)
+        self.assertEqual(run, run_model)
+
+        self.assertEqual(
+            beam_job_services.get_beam_job_run_result(run.id).to_dict(),
+            {'stdout': 'o', 'stderr': 'e'},
+        )
+
 
 class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
 

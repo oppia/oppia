@@ -404,6 +404,62 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
 
 
 class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
+    def test_get_for_only_subtopic_in_topic(self) -> None:
+        topic_id = 'single_subtopic_topic_id'
+        subtopic_id = 1
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                subtopic_id, topic_id
+            )
+        )
+        subtopic_page_services.save_subtopic_page(
+            self.admin_id,
+            subtopic_page,
+            'Added subtopic',
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': subtopic_id,
+                        'title': 'Only Subtopic',
+                        'url_fragment': 'only-subtopic-fragment',
+                    }
+                )
+            ],
+        )
+
+        only_subtopic = topic_domain.Subtopic.create_default_subtopic(
+            subtopic_id, 'Only Subtopic', 'only-subtopic-fragment'
+        )
+        only_subtopic.skill_ids = ['skill_id_only']
+
+        self.save_new_topic(
+            topic_id,
+            self.admin_id,
+            name='Single Subtopic Topic',
+            abbreviated_name='single-subtopic-topic',
+            url_fragment='single-subtopic',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[only_subtopic],
+            next_subtopic_id=2,
+        )
+        topic_services.publish_topic(topic_id, self.admin_id)
+
+        json_response = self.get_json(
+            '%s/staging/%s/%s'
+            % (
+                feconf.SUBTOPIC_DATA_HANDLER,
+                'single-subtopic',
+                'only-subtopic-fragment',
+            )
+        )
+
+        self.assertEqual(json_response['next_subtopic_dict'], None)
+        self.assertEqual(json_response['prev_subtopic_dict'], None)
+
     def test_get_for_first_subtopic_in_topic(self) -> None:
         json_response = self.get_json(
             '%s/staging/%s/%s'

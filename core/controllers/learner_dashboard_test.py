@@ -360,6 +360,45 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
         self.assertEqual(len(response['untracked_topics']), 1)
         self.logout()
 
+    def test_duplicate_exploration_ids_are_handled_correctly(self) -> None:
+        """Test that duplicate exploration ids across categories are skipped
+        to avoid redundant progress tracking.
+        """
+        self.login(self.VIEWER_EMAIL)
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+        learner_progress_services.mark_exploration_as_completed(
+            self.viewer_id, self.EXP_ID_1
+        )
+
+        playlist_model = user_models.LearnerPlaylistModel.get_by_id(
+            self.viewer_id
+        )
+        if playlist_model is None:
+            playlist_model = user_models.LearnerPlaylistModel(
+                id=self.viewer_id, exploration_ids=[], collection_ids=[]
+            )
+
+        playlist_model.exploration_ids.append(self.EXP_ID_1)
+        playlist_model.update_timestamps()
+        playlist_model.put()
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
+
+        self.assertEqual(len(response['completed_explorations_list']), 1)
+        self.assertEqual(len(response['exploration_playlist']), 1)
+
+        self.assertEqual(
+            response['completed_explorations_list'][0]['id'], self.EXP_ID_1
+        )
+        self.assertEqual(
+            response['exploration_playlist'][0]['id'], self.EXP_ID_1
+        )
+
+        self.logout()
+
     def test_get_learner_dashboard_ids(self) -> None:
         self.login(self.VIEWER_EMAIL)
 

@@ -74,7 +74,7 @@ const multipleChoiceResponseDropdown =
 const multipleChoiceResponseOption = 'mat-option.e2e-test-html-select-selector';
 const textInputInteractionButton = 'div.e2e-test-interaction-tile-TextInput';
 const textInputInteractionOption =
-  'tr#e2e-test-schema-based-list-editor-table-row';
+  'tr[id^="e2e-test-schema-based-list-editor-table-row"]';
 const textInputField = '.e2e-test-text-input';
 
 const saveDraftButton = 'button.e2e-test-save-draft-button';
@@ -403,6 +403,7 @@ const commonModalBodySelector = '.e2e-test-modal-body';
 const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
 
 const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
+const improvementsTabButton = '.e2e-test-improvements-tab';
 const formErrorContainer = '.e2e-test-form-error-container';
 const numberWithUnitsModalSelector =
   '.e2e-test-number-with-units-help-modal-header';
@@ -433,6 +434,17 @@ const answerInputSelector = '.e2e-test-answer-description-fragment input';
 const saveAnswerButtonInResponseGroupSelector = '.e2e-test-save-answer';
 const activeRuleTabClass = 'oppia-rule-tab-active';
 const activeTabClass = 'e2e-test-active-tab';
+const profileDropdown = '.e2e-test-profile-dropdown';
+const creatorDashboardMenuLink = '.e2e-test-creator-dashboard-link';
+const statsButtonTab = '.e2e-test-stats-tab';
+const mobileStatsTabButton = '.e2e-test-mobile-stats-button';
+const explorationStatsTabContentSelector = '.e2e-test-exploration-stats-card';
+const explorationStateStatsModalSelector = '.e2e-test-state-stats-modal-body';
+const explorationStateStatsEnterCountSelector =
+  '.e2e-test-state-stats-card-entered-here-count';
+const feedbackTimeElement =
+  '.e2e-test-oppia-feedback-tab-row td:nth-child(4) span';
+const numberOfPassers = '.e2e-test-num-passersby';
 
 const explorationGraphSelector = 'oppia-exploration-graph';
 const explorationGraphNodeBackgroundSelector = 'rect.e2e-test-node-background';
@@ -451,8 +463,6 @@ const cardHeightLimitWarningSelector = '.e2e-test-card-height-limit-warning';
 const saveRecommendationModalSelector = '.e2e-test-save-prompt-modal';
 const saveRecommendationModalSaveButtonSelector =
   'button.e2e-test-recommendation-prompt-save-button';
-const profileDropdown = '.e2e-test-profile-dropdown';
-const creatorDashboardMenuLink = '.e2e-test-creator-dashboard-link';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
@@ -1848,6 +1858,9 @@ export class ExplorationEditor extends BaseUser {
         );
         break;
       case INTERACTION_TYPES.TEXT_INPUT:
+        await this.page.waitForSelector(responseModalBodySelector, {
+          visible: true,
+        });
         await this.clickOnElementWithSelector(addResponseOptionButton);
         await this.page.waitForSelector(textInputInteractionOption);
         await this.page.type(textInputInteractionOption, answer);
@@ -2890,13 +2903,8 @@ export class ExplorationEditor extends BaseUser {
     interactionType: INTERACTION_TYPES
   ): Promise<void> {
     const interactionTabs: Record<string, INTERACTION_TYPES[]> = {
-      [INTERACTION_TABS.PROGRAMMING]: [
-        INTERACTION_TYPES.CODE_EDITOR,
-        INTERACTION_TYPES.PENCIL_CODE_EDITOR,
-      ],
       [INTERACTION_TABS.MATHS]: [
         INTERACTION_TYPES.FRACTION_INPUT,
-        INTERACTION_TYPES.GRAPH_THEORY,
         INTERACTION_TYPES.NUMBER_INPUT,
         INTERACTION_TYPES.SET_INPUT,
         INTERACTION_TYPES.NUMERIC_EXPRESSION,
@@ -2905,8 +2913,6 @@ export class ExplorationEditor extends BaseUser {
         INTERACTION_TYPES.NUMBER_WITH_UNITS,
         INTERACTION_TYPES.RATIO_EXPRESSION_INPUT,
       ],
-      [INTERACTION_TABS.GEOGRAPHY]: [INTERACTION_TYPES.WORLD_MAP],
-      [INTERACTION_TABS.MUSIC]: [INTERACTION_TYPES.MUSIC_NOTES_INPUT],
     };
 
     for (const interaction in interactionTabs) {
@@ -4592,6 +4598,16 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to verify that the improvements tab is hidden.
+   * @param visible - Expected visibility.
+   */
+  async expectImprovementsTabToBePresnt(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(improvementsTabButton, visible);
+  }
+
+  /**
    * Function to submit an answer to a form input field.
    *
    * This function first determines the type of the input field in the DOM using the getInputType function.
@@ -4731,20 +4747,22 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * This function creates simple Programming Exploration.
+   * This function creates an exploration with an interaction that is not
+   * supported on the mobile app (e.g. SetInput). This is useful for testing
+   * validation errors when adding mobile-unsupported explorations to stories.
    * Starts at new Exploration Editor Page.
-   * Ends at same page, after adding programming interaction and saving the
+   * Ends at same page, after adding the unsupported interaction and saving the
    * draft.
    */
-  async createSimpleProgrammingExploration(): Promise<string> {
+  async createSimpleUnsupportedExploration(): Promise<string> {
     // Check if element to add interaction is visible (pre-check)
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
 
     await this.createMinimalExploration(
-      'This is a test Programming Exploration',
-      INTERACTION_TYPES.CODE_EDITOR
+      'This is a test Math Exploration',
+      INTERACTION_TYPES.SET_INPUT
     );
 
     const lastInteraction = 'Last Card';
@@ -4765,7 +4783,7 @@ export class ExplorationEditor extends BaseUser {
 
     await this.saveExplorationDraft();
     const explorationId = await this.publishExplorationWithMetadata(
-      'Simple Code Editor',
+      'Simple Math Exploration',
       'This is goal here',
       'Algebra'
     );
@@ -5468,6 +5486,10 @@ export class ExplorationEditor extends BaseUser {
       if (!sourceElement) {
         throw new Error(`Option "${option}" not found.`);
       }
+
+      // Ensure that elements have stabilized before we start dragging.
+      await this.waitForElementToStabilize(sourceElement);
+      await this.waitForElementToStabilize(destinationElement);
 
       const sourceBox = await sourceElement.boundingBox();
       const destBox = await destinationElement.boundingBox();
@@ -7456,6 +7478,94 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(creatorDashboardMenuLink);
     await this.clickOnElementWithSelector(creatorDashboardMenuLink);
     await this.expectElementToBeVisible(creatorDashboardContainerSelector);
+  }
+
+  /**
+   * Navigates to the stats tab of the exploration editor.
+   */
+  async navigateToStatsTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
+      if (!mobileNavbarElement) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOnElementWithSelector(mobileStatsTabButton);
+    } else {
+      await this.clickOnElementWithSelector(statsButtonTab);
+      await this.waitForNetworkIdle();
+    }
+
+    await this.expectElementToBeVisible(explorationStatsTabContentSelector);
+  }
+
+  /**
+   * From the stats tab, open the modal showing the stats of the specified card.
+   */
+  async openCardStats(cardName: string): Promise<void> {
+    await this.navigateToCard(cardName);
+    await this.expectElementToBeVisible(explorationStateStatsModalSelector);
+  }
+
+  /**
+   * Function to check how many times a card has been entered.
+   * Requires the card stats modal to be open.
+   */
+  async expectCardEnteredTimesToBe(count: number): Promise<void> {
+    await this.expectTextContentToContain(
+      explorationStateStatsEnterCountSelector,
+      `Card entered: ${count} times.`
+    );
+  }
+
+  /**
+   * Close the currently-opened state stats modal.
+   */
+  async closeCardStats(): Promise<void> {
+    await this.clickOnElementWithSelector(closeModalButtonSelector);
+    await this.expectElementToBeVisible(
+      explorationStateStatsModalSelector,
+      false
+    );
+  }
+
+  /**
+   * Expects the number of passers to be a specific value.
+   * @param expected the expected number of passers.
+   */
+  async expectNumberOfPassersToBe(expected: number): Promise<void> {
+    await this.expectElementToBeVisible(numberOfPassers);
+
+    const text = await this.page.$eval(
+      numberOfPassers,
+      el => el.textContent?.trim() || ''
+    );
+
+    const match = text.match(/\d+/);
+    const actual = match ? Number(match[0]) : 0;
+
+    if (actual !== expected) {
+      throw new Error(
+        `Expected number of passers to be ${expected}, but found ${actual}.`
+      );
+    }
+  }
+
+  /**
+   * Expects the feedback reply details to be visible.
+   */
+  async expectFeedbackReplyDetailsToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(feedbackAuthorSelector);
+    await this.expectElementToBeVisible(feedbackStatusSelector);
+    await this.expectElementToBeVisible(feedbackTimeElement);
+  }
+
+  /**
+   * Expects Feedback Page to be visible.
+   */
+  async expectFeedbackPageTobeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
   }
 }
 

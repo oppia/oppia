@@ -37,20 +37,8 @@ var suites = {
     './core/tests/webdriverio_desktop/creatorDashboard.js'
   ],
 
-  embedding: [
-    './core/tests/webdriverio_desktop/embedding.js'
-  ],
-
-  explorationImprovementsTab: [
-    './core/tests/webdriverio_desktop/explorationImprovementsTab.js'
-  ],
-
   explorationHistoryTab: [
     './core/tests/webdriverio_desktop/explorationHistoryTab.js'
-  ],
-
-  explorationStatisticsTab: [
-    './core/tests/webdriverio_desktop/explorationStatisticsTab.js'
   ],
 
   learner: [
