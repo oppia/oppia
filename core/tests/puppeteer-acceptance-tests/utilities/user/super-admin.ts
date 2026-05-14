@@ -1374,6 +1374,20 @@ export class SuperAdmin extends BaseUser {
 
     return platformParameterContainerElements[index];
   }
+
+  /**
+   * Seeds the datastore with data required for acceptance tests.
+   */
+  async seedAcceptanceTestData(): Promise<void> {
+    await this.navigateToAdminPageActivitiesTab();
+    await this.clickOnElementWithText(' Seed Data ');
+
+    await this.waitForNetworkIdle();
+    await this.expectActionStatusMessageToBe(
+      'Data seeded successfully for acceptance tests.'
+    );
+    showMessage('Successfully seeded the data for acceptance tests.');
+  }
 }
 
 export let SuperAdminFactory = (): SuperAdmin => new SuperAdmin();

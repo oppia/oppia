@@ -80,6 +80,35 @@ describe('Super Admin', function () {
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );
+
+    it(
+      'should be able to seed acceptance test data',
+      async function () {
+        const isInProdMode = await superAdmin.isInProdMode();
+        if (isInProdMode) {
+          showMessage(
+            'The application is currently running in production mode. ' +
+              'The test for seeding acceptance test data is designed to run ' +
+              'in development mode only, so it will be skipped.'
+          );
+          return;
+        }
+        await superAdmin.navigateToAdminPageActivitiesTab();
+        await superAdmin.seedAcceptanceTestData();
+
+        // Verification of seeded data.
+        await superAdmin.navigateToTopicsAndSkillsDashboard();
+        await superAdmin.expectTopicInTopicsAndSkillDashboard('Acceptance Test Topic');
+        await superAdmin.expectSkillInTopicsAndSkillsDashboard('Acceptance Test Skill');
+
+        await superAdmin.navigateToCommunityLibrary();
+        await superAdmin.expectActivityToBePresent('Acceptance Test Exploration');
+
+        await superAdmin.navigateToBlogPage();
+        await superAdmin.expectBlogPostToBePresent('Acceptance Test Blog Post');
+      },
+      DEFAULT_SPEC_TIMEOUT_MSECS
+    );
   });
 
   describe('When run in production mode, Super Admin', function () {

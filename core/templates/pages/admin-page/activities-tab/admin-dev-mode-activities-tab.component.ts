@@ -362,6 +362,24 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.finishTask();
   }
 
+  seedAcceptanceTestData(): void {
+    this.adminTaskManagerService.startTask();
+    this.setStatusMessage.emit('Processing...');
+
+    this.adminBackendApiService.seedAcceptanceTestDataAsync().then(
+      () => {
+        this.getDataAsync();
+        this.setStatusMessage.emit(
+          'Data seeded successfully for acceptance tests.'
+        );
+      },
+      errorResponse => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
+      }
+    );
+    this.adminTaskManagerService.finishTask();
+  }
+
   async getDataAsync(): Promise<void> {
     const adminDataObject = await this.adminDataService.getDataAsync();
 

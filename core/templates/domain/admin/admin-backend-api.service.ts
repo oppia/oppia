@@ -794,4 +794,10 @@ export class AdminBackendApiService {
         );
     });
   }
+
+  async seedAcceptanceTestDataAsync(): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'seed_acceptance_test_data',
+    });
+  }
 }

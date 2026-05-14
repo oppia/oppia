@@ -281,6 +281,7 @@ class AdminHandler(
                         'regenerate_topic_related_opportunities',
                         'update_platform_parameter_rules',
                         'rollback_exploration_to_safe_state',
+                        'seed_acceptance_test_data',
                     ],
                 },
                 # TODO(#13331): Remove default_value when it is confirmed that,
@@ -646,6 +647,8 @@ class AdminHandler(
                     exp_id
                 )
                 result = {'version': version}
+            elif action == 'seed_acceptance_test_data':
+                self._seed_acceptance_test_data()
             else:
                 # The handler schema defines the possible values of 'action'.
                 # If 'action' has a value other than those defined in the
@@ -700,6 +703,56 @@ class AdminHandler(
             logging.exception('[ADMIN] %s', e)
             self.render_json({'error': str(e)})
             raise e
+
+    def _seed_acceptance_test_data(self) -> None:
+        """Seeds the datastore with data required for acceptance tests."""
+        # 1. Generate dummy structure data (topics, stories, etc.)
+        self._load_dummy_new_structures_data()
+
+        # 2. Generate dummy skill and questions
+        self._generate_dummy_skill_and_questions()
+
+        # 3. Generate dummy classroom
+        self._generate_dummy_classroom()
+
+        # 4. Generate dummy explorations
+        self._generate_dummy_explorations(3, 3)
+
+        # 5. Generate dummy blog post
+        self._load_dummy_blog_post(EDUCATION_BLOG_POST_TITLE)
+
+        # 6. Generate historical data
+        self._generate_historical_data()
+
+    def _generate_historical_data(self) -> None:
+        """Generates historical data for testing analytics and filtering."""
+        exp_id = exp_fetchers.get_new_exploration_id()
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exp_id,
+            title='Historical Exploration',
+            category='History',
+            objective='Test historical data',
+        )
+        exp_services.save_new_exploration(self.user_id, exploration)
+        rights_manager.publish_exploration(self.user, exp_id)
+
+        exp_models = models.Registry.import_models([models.Names.EXPLORATION])[0]
+        exp_model = exp_models.ExplorationModel.get_by_id(exp_id)
+        past_date = datetime.datetime.utcnow() - datetime.timedelta(days=365)
+        
+        # Manually update timestamps to simulate historical data.
+        exp_model.created_on = past_date
+        exp_model.last_updated = past_date
+        exp_model.update_timestamps(update_last_updated_time=False)
+        exp_model.put()
+
+        summary_model = exp_models.ExpSummaryModel.get_by_id(exp_id)
+        summary_model.created_on = past_date
+        summary_model.last_updated = past_date
+        summary_model.update_timestamps(update_last_updated_time=False)
+        summary_model.put()
+
+        exp_services.index_explorations_given_ids([exp_id])
 
     def _reload_exploration(self, exploration_id: str) -> None:
         """Reloads the exploration in dev_mode corresponding to the given
