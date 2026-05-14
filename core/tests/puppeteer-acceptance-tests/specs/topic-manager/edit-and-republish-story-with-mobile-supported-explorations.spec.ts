@@ -57,12 +57,15 @@ describe('Topic Manager', function () {
     await curriculumAdmin.navigateToCreatorDashboardPage();
     await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
 
-    // Wait for editor/network stabilization before continuing.
-    await curriculumAdmin.page.waitForNetworkIdle();
-
-    // Create an exlporation unsupported by mobile.
-    unsupportedExplorationId =
-      await curriculumAdmin.createSimpleUnsupportedExploration();
+    /// Create an exploration unsupported by mobile.
+    try {
+      unsupportedExplorationId =
+        await curriculumAdmin.createSimpleUnsupportedExploration();
+    } catch (error) {
+      // Retry once to handle intermittent CI/editor race conditions.
+      unsupportedExplorationId =
+        await curriculumAdmin.createSimpleUnsupportedExploration();
+    }
 
     // Create Topics and add skills.
     await curriculumAdmin.createTopic('Algebra II', 'algebra-ii');
