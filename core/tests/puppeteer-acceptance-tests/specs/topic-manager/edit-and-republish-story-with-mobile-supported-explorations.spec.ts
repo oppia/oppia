@@ -57,15 +57,12 @@ describe('Topic Manager', function () {
     await curriculumAdmin.navigateToCreatorDashboardPage();
     await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
 
-    /// Create an exploration unsupported by mobile.
-    try {
-      unsupportedExplorationId =
-        await curriculumAdmin.createSimpleUnsupportedExploration();
-    } catch (error) {
-      // Retry once to handle intermittent CI/editor race conditions.
-      unsupportedExplorationId =
-        await curriculumAdmin.createSimpleUnsupportedExploration();
-    }
+    // Create an exlporation unsupported by mobile.
+    unsupportedExplorationId =
+      await curriculumAdmin.createSimpleUnsupportedExploration();
+
+    // Add exploration with interaction unsupported on mobile and expect topic can't be updated.
+    await topicManager.createAndSwitchToNewTab();
 
     // Create Topics and add skills.
     await curriculumAdmin.createTopic('Algebra II', 'algebra-ii');
