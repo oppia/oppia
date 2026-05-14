@@ -34,16 +34,13 @@ describe('Topic Manager', function () {
   let unsupportedExplorationId: string | null;
 
   beforeAll(async function () {
-    console.log('STEP 1: Creating curriculum admin');
-
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculumAdmin1@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    console.log('STEP 2: Created curriculum admin');
-
+    // Create two simple explorations.
     explorationId1 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'Exploring Quadratic Equations',
@@ -51,75 +48,56 @@ describe('Topic Manager', function () {
         true
       );
 
-    console.log('STEP 3: Created exploration 1');
-
     explorationId2 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'Understanding Polynomial Functions'
       );
 
-    console.log('STEP 4: Created exploration 2');
-
+    // Create an exploration with Set Input interaction.
     await curriculumAdmin.navigateToCreatorDashboardPage();
-
-    console.log('STEP 5: Opened creator dashboard');
-
     await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
 
-    console.log('STEP 6: Opened exploration editor');
+    // Wait for editor/network stabilization before continuing.
+    await curriculumAdmin.page.waitForNetworkIdle();
 
+    // Create an exlporation unsupported by mobile.
     unsupportedExplorationId =
       await curriculumAdmin.createSimpleUnsupportedExploration();
 
-    console.log('STEP 7: Created unsupported exploration');
-
+    // Create Topics and add skills.
     await curriculumAdmin.createTopic('Algebra II', 'algebra-ii');
-
-    console.log('STEP 8: Created topic');
-
     await curriculumAdmin.createSkillForTopic(
       'Quadratic Equations',
       'Algebra II',
       false
     );
-
-    console.log('STEP 9: Created skill 1');
-
     await curriculumAdmin.createSkillForTopic(
       'Polynomial Functions',
       'Algebra II',
       false
     );
 
-    console.log('STEP 10: Created skill 2');
-
+    // Add story to topic.
     await curriculumAdmin.addStoryToTopic(
       'Journey into Quadratic Equations',
       'journey-into-quadratic-equations',
       'Algebra II'
     );
-
-    console.log('STEP 11: Added story');
-
     await curriculumAdmin.addChapter(
       'Quadratic Equations Basics',
       explorationId1 as string
     );
 
-    console.log('STEP 12: Added chapter');
-
     await curriculumAdmin.saveStoryDraft();
 
-    console.log('STEP 13: Saved story draft');
-
+    // Create topic Manager.
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topicManager1@example.com',
       [ROLES.TOPIC_MANAGER],
       'Algebra II'
     );
-
-    console.log('STEP 14: Created topic manager');
+    // Setup is taking longer than the Default timeout of 300000 ms.
   }, 380000);
 
   it(
