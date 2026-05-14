@@ -45,6 +45,7 @@ describe('Lesson Creator Profile Deletion', function () {
 
     await expEditor1.navigateToCreatorDashboardPage();
     await expEditor1.navigateToExplorationEditorFromCreatorDashboard();
+    await expEditor1.dismissWelcomeModal();
     positiveNumbersExpId = await expEditor1.getExplorationId();
     await expEditor1.updateCardContent('Introduction to positive numbers');
     await expEditor1.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
@@ -62,6 +63,7 @@ describe('Lesson Creator Profile Deletion', function () {
 
     await expEditor1.navigateToCreatorDashboardPage();
     await expEditor1.navigateToExplorationEditorFromCreatorDashboard();
+    await expEditor1.dismissWelcomeModal();
     negativeNumbersExpId = await expEditor1.getExplorationId();
     await expEditor1.updateCardContent('Negative Numbers Intro');
     await expEditor1.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
@@ -75,6 +77,7 @@ describe('Lesson Creator Profile Deletion', function () {
 
     await expEditor1.navigateToCreatorDashboardPage();
     await expEditor1.navigateToExplorationEditorFromCreatorDashboard();
+    await expEditor1.dismissWelcomeModal();
     wholeNumbersExpId = await expEditor1.getExplorationId();
     await expEditor1.updateCardContent('Draft that will be deleted.');
     await expEditor1.saveExplorationDraft();
