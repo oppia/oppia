@@ -54,9 +54,89 @@ oppia-search-bar .oppia-navbar-button-container {
 .oppia-search-bar-form {
   margin-top: 10px;
   padding-right: 0;
+  position: relative;
 }
 .oppia-search-bar-input.btn {
   color: #257d76;
+}
+
+.oppia-recent-searches-dropdown {
+  animation: oppiaFadeIn 0.2s ease-in-out;
+  background: #fff;
+  border: 1px solid #257d76;
+  border-radius: 0 0 4px 4px;
+  border-top: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  left: 0;
+  list-style: none;
+  margin: 0;
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 0;
+  position: absolute;
+  top: 35px;
+  width: 100%;
+  z-index: 100;
+}
+
+@keyframes oppiaFadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.oppia-recent-search-item {
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  display: flex;
+  padding: 8px 12px;
+  transition: background 0.2s ease;
+}
+
+.oppia-recent-search-item:last-child {
+  border-bottom: none;
+}
+
+.oppia-recent-search-item:hover {
+  background: #e6f2f1;
+}
+
+.oppia-recent-search-icon {
+  color: #257d76;
+  font-size: 14px;
+  margin-right: 12px;
+}
+
+.oppia-recent-search-text {
+  color: #333;
+  flex: 1;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oppia-clear-recent-searches {
+  background: #f9f9f9;
+  border-top: 1px solid #257d76;
+  color: #257d76;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+.oppia-clear-recent-searches:hover {
+  background: #257d76;
+  color: #fff;
+}
+
+@media (max-width: 767px) {
+  .oppia-recent-searches-dropdown {
+    top: 45px;
+    width: 17em;
+  }
 }
 .oppia-search-bar-icon {
   background: #fff;

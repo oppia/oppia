@@ -16,8 +16,19 @@
                [ngModelOptions]="{ updateOn: 'blur', standalone:'true' }"
                aria-label="Search bar"
                (keydown.enter)="$event.target.blur(); onSearchQueryChangeExec()"
-               (input)="searchToBeExec($event)">
+               (input)="searchToBeExec($event)"
+               (focus)="onSearchInputFocus()"
+               (blur)="onSearchInputBlur()">
       </div>
+      <ul class="oppia-recent-searches-dropdown" *ngIf="showRecentSearches && recentSearches.length > 0">
+        <li *ngFor="let item of recentSearches" (click)="selectRecentSearch(item)" class="oppia-recent-search-item">
+          <i class="fas fa-history oppia-recent-search-icon"></i>
+          <span class="oppia-recent-search-text">{{ item }}</span>
+        </li>
+        <li class="oppia-clear-recent-searches" (click)="clearRecentSearches()">
+          Clear Recent Searches
+        </li>
+      </ul>
     </div>
   </form>
 </div>

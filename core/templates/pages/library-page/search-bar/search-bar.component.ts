@@ -25,6 +25,7 @@ import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SearchService, SelectionDetails} from 'services/search.service';
 import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import {RecentSearchesService} from 'services/recent-searches.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {UrlService} from 'services/contextual/url.service';
@@ -68,6 +69,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   searchQueryChanged: Subject<string> = new Subject<string>();
   translationData: Record<string, number> = {};
   activeMenuName: string = '';
+  recentSearches: string[] = [];
+  showRecentSearches: boolean = false;
   @Input() enableDropup: boolean = false;
 
   constructor(
@@ -80,7 +83,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     private classroomBackendApiService: ClassroomBackendApiService,
     private languageUtilService: LanguageUtilService,
     private constructTranslationIdsService: ConstructTranslationIdsService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private recentSearchesService: RecentSearchesService
   ) {
     this.classroomPageIsActive = this.urlService
       .getPathname()
@@ -202,6 +206,11 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   onSearchQueryChangeExec(): void {
+    if (this.searchQuery.trim().length > 0) {
+      this.recentSearchesService.saveSearchQuery(this.searchQuery);
+      this.recentSearches = this.recentSearchesService.getRecentSearches();
+    }
+    this.showRecentSearches = false;
     let searchUrlQueryString = this.searchService.getSearchUrlQueryString(
       this.searchQuery,
       this.selectionDetails.categories.selections,
@@ -281,6 +290,31 @@ export class SearchBarComponent implements OnInit, OnDestroy {
         ),
       };
     });
+  }
+
+  onSearchInputFocus(): void {
+    this.recentSearches = this.recentSearchesService.getRecentSearches();
+    if (this.recentSearches.length > 0) {
+      this.showRecentSearches = true;
+    }
+  }
+
+  onSearchInputBlur(): void {
+    // Delay hiding to allow clicking on recent search items.
+    setTimeout(() => {
+      this.showRecentSearches = false;
+    }, 200);
+  }
+
+  selectRecentSearch(query: string): void {
+    this.searchQuery = query;
+    this.onSearchQueryChangeExec();
+  }
+
+  clearRecentSearches(): void {
+    this.recentSearchesService.clearRecentSearches();
+    this.recentSearches = [];
+    this.showRecentSearches = false;
   }
 
   ngOnInit(): void {

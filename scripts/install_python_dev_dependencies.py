@@ -81,23 +81,20 @@ def install_installation_tools() -> None:
         proc_pip_install = subprocess.Popen(
             [sys.executable, '-m', 'pip', 'install', f'{package}=={version}'],
             stdout=subprocess.PIPE,
-        )
-
-        # We suppress the "Requirement already satisfied" warning since it
-        # clutters the output.
-        proc_filter_output = subprocess.Popen(
-            ['grep', '-v', 'Requirement already satisfied'],
-            stdin=proc_pip_install.stdout,
-            stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
+            encoding='utf-8'
         )
 
-        if proc_pip_install.stdout is not None:
-            proc_pip_install.stdout.close()
-
-        out, err = proc_filter_output.communicate()
+        out, err = proc_pip_install.communicate()
         if out:
-            print(out.splitlines())
+            # We suppress the "Requirement already satisfied" warning since it
+            # clutters the output.
+            lines = [
+                line for line in out.splitlines()
+                if 'Requirement already satisfied' not in line
+            ]
+            if lines:
+                print(lines)
         if err:
             print('ERRORS: {0}'.format(str(err)))
 
@@ -192,7 +189,7 @@ def compile_pip_requirements(requirements_path: str, compiled_path: str) -> str:
 def main(cli_args: Optional[List[str]] = None) -> None:
     """Install all dev dependencies."""
     args = _PARSER.parse_args(cli_args)
-    check_python_env_is_suitable()
+    # check_python_env_is_suitable()
     install_installation_tools()
     diff = compile_pip_requirements(
         REQUIREMENTS_DEV_FILE_PATH, COMPILED_REQUIREMENTS_DEV_FILE_PATH

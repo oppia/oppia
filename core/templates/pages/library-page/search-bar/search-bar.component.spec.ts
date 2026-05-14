@@ -17,7 +17,7 @@
  */
 
 import {EventEmitter, Pipe} from '@angular/core';
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ComponentFixture, TestBed, waitForAsync, fakeAsync, tick} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SearchBarComponent} from 'pages/library-page/search-bar/search-bar.component';
@@ -32,6 +32,7 @@ import {SearchService, SelectionDetails} from 'services/search.service';
 import {ConstructTranslationIdsService} from 'services/construct-translation-ids.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {UrlService} from 'services/contextual/url.service';
+import {RecentSearchesService} from 'services/recent-searches.service';
 import {Subject} from 'rxjs/internal/Subject';
 
 @Pipe({name: 'truncate'})
@@ -105,6 +106,7 @@ describe('Search bar component', () => {
   let windowRef: MockWindowRef;
   let windowDimensionsService: WindowDimensionsService;
   let urlService: UrlService;
+  let recentSearchesService: RecentSearchesService;
   let component: SearchBarComponent;
   let fixture: ComponentFixture<SearchBarComponent>;
   let initTranslationEmitter = new EventEmitter();
@@ -200,6 +202,7 @@ describe('Search bar component', () => {
     );
     languageUtilService = TestBed.inject(LanguageUtilService);
     urlService = TestBed.inject(UrlService);
+    recentSearchesService = TestBed.inject(RecentSearchesService);
 
     component.ngOnInit();
     fixture.detectChanges();
@@ -331,12 +334,17 @@ describe('Search bar component', () => {
     spyOn(windowRef.nativeWindow.history, 'pushState');
 
     component.searchQuery = 'test_query';
+    spyOn(recentSearchesService, 'saveSearchQuery');
+    spyOn(recentSearchesService, 'getRecentSearches').and.returnValue(['test_query']);
 
     windowRef.nativeWindow.location = new URL(
       'http://localhost/search/find?lang=en'
     );
     component.onSearchQueryChangeExec();
 
+    expect(recentSearchesService.saveSearchQuery).toHaveBeenCalledWith('test_query');
+    expect(component.recentSearches).toEqual(['test_query']);
+    expect(component.showRecentSearches).toBeFalse();
     expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalled();
 
     windowRef.nativeWindow.location = new URL(
@@ -525,5 +533,34 @@ describe('Search bar component', () => {
     // need to test validations.
     // @ts-ignore
     component.openSubmenu(null, null);
+  });
+
+  it('should handle search input focus', () => {
+    spyOn(recentSearchesService, 'getRecentSearches').and.returnValue(['query1']);
+    component.onSearchInputFocus();
+    expect(component.recentSearches).toEqual(['query1']);
+    expect(component.showRecentSearches).toBeTrue();
+  });
+
+  it('should handle search input blur', fakeAsync(() => {
+    component.showRecentSearches = true;
+    component.onSearchInputBlur();
+    tick(200);
+    expect(component.showRecentSearches).toBeFalse();
+  }));
+
+  it('should select recent search', () => {
+    spyOn(component, 'onSearchQueryChangeExec');
+    component.selectRecentSearch('query1');
+    expect(component.searchQuery).toBe('query1');
+    expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
+  });
+
+  it('should clear recent searches', () => {
+    spyOn(recentSearchesService, 'clearRecentSearches');
+    component.clearRecentSearches();
+    expect(recentSearchesService.clearRecentSearches).toHaveBeenCalled();
+    expect(component.recentSearches).toEqual([]);
+    expect(component.showRecentSearches).toBeFalse();
   });
 });
