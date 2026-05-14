@@ -137,10 +137,9 @@ const EDITORS = {
     TranslatableSetOfUnicodeStringEditorComponent,
   'unicode-string': UnicodeStringEditorComponent,
   // The 'unknown' type is used here because each editor component in the
-  // EDITORS mapping has a different type for its 'value' property (e.g.,
-  // BooleanEditor uses boolean, IntEditor uses number, etc.). Since this
-  // mapping contains all possible editors, we use 'unknown' to represent
-  // the generic type of the 'ObjectEditor' instance.
+  // EDITORS mapping has a different type for its 'value' property.
+  // Since this mapping contains all possible editors, we use 'unknown' to
+  // represent the generic type of the 'ObjectEditor' instance.
 } as unknown as Record<string, Type<ObjectEditor<unknown>>>;
 
 interface AngularJSFormController {
@@ -217,10 +216,10 @@ export class ObjectEditorComponent
 
   @Output() valueChange = new EventEmitter();
   // The 'unknown' type is used here because 'componentRef' points to an
-  // instance of a specific editor component (like BooleanEditorComponent,
-  // IntEditorComponent, etc.). Since each editor has a different type for
-  // its 'value' property, 'unknown' is used for the generic parameter of
-  // 'ObjectEditor'.
+  // instance of a specific editor component (e.g., BooleanEditorComponent)
+  // that is determined by the 'objType' input at runtime. Since each editor
+  // has a different type for its 'value' property, 'unknown' is used for
+  // the generic parameter of 'ObjectEditor'.
   componentRef!: ComponentRef<ObjectEditor<unknown>>;
   componentSubscriptions = new Subscription();
   onChange: (_: SchemaDefaultValue) => void = () => {};
@@ -283,8 +282,8 @@ export class ObjectEditorComponent
       this.viewContainerRef.clear();
       // ObjectEditor type is used to access the instance of the component
       // created. The 'unknown' type is used because the specific editor
-      // component (e.g., BooleanEditorComponent, IntEditorComponent, etc.)
-      // is only determined at runtime based on the 'objType' input.
+      // component is only determined at runtime based on the 'objType'
+      // input (e.g., 'Boolean' results in BooleanEditorComponent).
       // Since each editor expects a different value type, 'unknown' is
       // used for the generic parameter of 'ObjectEditor'.
       const componentRef =

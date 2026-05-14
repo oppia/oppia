@@ -98,10 +98,12 @@ export class RuleEditorComponent
       return '';
     }
 
+    // The 'unknown' type is used here because the generic type of
+    // INTERACTION_SPECS depends on the specific interaction, which is
+    // only known at runtime.
     let ruleDescription = (
       INTERACTION_SPECS as unknown as Record<
         string,
-        // The 'unknown' type is used here because the generic type depends on the interaction.
         {rule_descriptions: Record<string, string>}
       >
     )[this.currentInteractionId].rule_descriptions[this.rule.type];

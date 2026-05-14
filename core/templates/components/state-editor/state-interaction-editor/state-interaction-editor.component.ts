@@ -216,7 +216,9 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
     };
     this.onSaveInteractionData.emit(interactionData);
 
-    // The 'unknown' type is used here because the nextContentIdIndex is not known at this point.
+    // We emit 'undefined' as an unknown number because the nextContentIdIndex
+    // is not yet determined at this stage of the customization modal save
+    // process, but the emitter expects a value.
     this.onSaveNextContentIdIndex.emit(undefined as unknown as number);
     this.interactionDetailsCacheService.set(
       this.stateInteractionIdService.savedMemento,
@@ -276,7 +278,9 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       .result.then(
         () => {
           this.stateInteractionIdService.displayed =
-            // The 'unknown' type is used here because the interactionId is null when it is deleted.
+            // When an interaction is deleted, the interactionId is set to null
+            // to indicate its absence. We use 'unknown' to bypass the
+            // strict type check for 'InteractionSpecsKey'.
             null as unknown as InteractionSpecsKey;
           this.stateCustomizationArgsService.displayed = {};
           this.stateSolutionService.displayed = null;

@@ -227,12 +227,12 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   addNewRule(): void {
     // Build an initial blank set of inputs for the initial rule.
     let interactionId = this.getCurrentInteractionId();
+    // The 'unknown' type is used here because the structure of rule
+    // descriptions varies across different interactions, and we only
+    // access the 'rule_descriptions' property here.
     let ruleDescriptions = (
       INTERACTION_SPECS as unknown as Record<
         string,
-        // The 'unknown' type is used here because the structure of rule
-        // descriptions varies across different interactions, and we only
-        // access the 'rule_descriptions' property here.
         {rule_descriptions: Record<string, string>}
       >
     )[interactionId].rule_descriptions;
@@ -310,6 +310,8 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
           updatedContentIdToContent.hasOwnProperty(contentId) &&
           !isEqual(
             this.originalContentIdToContent[contentId],
+            // The 'unknown' type is used here because rule inputs can be
+            // primitives or complex objects.
             (updatedContentIdToContent as Record<string, unknown>)[contentId]
           )
         ) {
@@ -355,14 +357,11 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
           this.rules.map(rule => rule.type).join(', ')
       );
     }
+    // The 'unknown' type is used here because the structure of
+    // interaction specifications varies, and we only need to access
+    // the 'is_trainable' property here.
     return (
-      INTERACTION_SPECS as unknown as Record<
-        string,
-        // The 'unknown' type is used here because the structure of
-        // interaction specifications varies, and we only need to access
-        // the 'is_trainable' property here.
-        {is_trainable: boolean}
-      >
+      INTERACTION_SPECS as unknown as Record<string, {is_trainable: boolean}>
     )[interactionId].is_trainable;
   }
 
@@ -384,8 +383,6 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   // rule inputs, which can be any type (primitives or complex objects)
   // depending on the rule and interaction.
   getTranslatableRulesContentIdToContentMap(): Record<string, unknown> {
-    // The 'unknown' type is used here because the values in the map are
-    // rule inputs, which can be any type depending on the rule and interaction.
     const contentIdToContentMap: Record<string, unknown> = {};
     this.rules.forEach(rule => {
       Object.keys(rule.inputs).forEach(ruleName => {
