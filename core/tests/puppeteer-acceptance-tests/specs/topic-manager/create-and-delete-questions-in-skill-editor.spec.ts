@@ -20,13 +20,14 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 const questionText = 'Add 1+2';
 
 describe('Topic Manager', function () {
-  let topicManager: TopicManager & CurriculumAdmin;
+  let topicManager: TopicManager & CurriculumAdmin & ExplorationEditor;
   let curriculumAdmin: CurriculumAdmin;
 
   beforeAll(async function () {
