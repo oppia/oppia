@@ -30,6 +30,7 @@ import {
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {Collection} from '../../../../domain/collection/collection.model';
+import {CollectionPlaythrough} from '../../../../domain/collection/collection-playthrough.model';
 import {GuestCollectionProgressService} from '../../../../domain/collection/guest-collection-progress.service';
 import {ReadOnlyCollectionBackendApiService} from '../../../../domain/collection/read-only-collection-backend-api.service';
 import {Interaction} from '../../../../domain/exploration/interaction.model';
@@ -73,7 +74,10 @@ import {LearnerAnswerInfoService} from '../../services/learner-answer-info.servi
 import {LearnerParamsService} from '../../services/learner-params.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
-import {QuestionPlayerEngineService} from '../../services/question-player-engine.service';
+import {
+  QuestionPlayerEngineService,
+  QuestionPlayerConfigDict,
+} from '../../services/question-player-engine.service';
 import {StatsReportingService} from '../../services/stats-reporting.service';
 import {ExplorationInitializationService} from '../../services/exploration-initialization.service';
 import {ConversationSkinComponent} from './conversation-skin.component';
@@ -89,17 +93,54 @@ import {ChapterProgressService} from '../../services/chapter-progress.service';
 import {CardAnimationService} from '../../services/card-animation.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {AuthService} from 'services/auth.service';
+
+// Helper type aliases to avoid importing from non-existent paths.
+type InteractionCustomizationArgs = Record<string, unknown>;
+
+// Helper factory so every 'new StateCard(...)' and 'new Interaction(...)' pair
+// is written in one place, keeping the argument counts consistent.
+const makeStateCard = function (interactionId: string = ''): StateCard {
+  const interaction = new Interaction(
+    [], // Answer groups.
+    [], // Confirmed unclassified answers.
+    {} as InteractionCustomizationArgs, // Customization args.
+    null, // Default outcome.
+    [], // Hints.
+    interactionId, // Id.
+    null // Solution.
+  );
+
+  return new StateCard(
+    '', // State name — string, not null.
+    '', // Content HTML — string, not null.
+    '', // Interaction HTML — string, not null.
+    interaction,
+    [], // Recorded voiceovers / interaction answers.
+    'content' // Content ID.
+  );
+};
+
+// Helper: build a CollectionPlaythrough so Collection constructor is
+// satisfied. CollectionPlaythrough.create(null, []) is the canonical
+// empty instance.
+const makeCollectionPlaythrough = (): CollectionPlaythrough => {
+  return CollectionPlaythrough.create(null, []);
+};
+
 class MockWindowRef {
   nativeWindow = {
     location: {
       pathname: '/path/name',
       reload: () => {},
     },
-    onresize: () => {},
-    addEventListener(event: string, callback) {
-      callback({returnValue: null, preventDefault: () => {}});
+    onresize: null as ((event: UIEvent) => void) | null,
+    addEventListener(event: string, callback: (e: Event) => void) {
+      callback({
+        returnValue: null,
+        preventDefault: () => {},
+      } as unknown as Event);
     },
-    scrollTo: (x, y) => {},
+    scrollTo: (_x: number, _y: number) => {},
   };
 }
 
@@ -155,39 +196,43 @@ describe('Conversation skin component', () => {
   let conceptCardManagerService: ConceptCardManagerService;
   let preventPageUnloadEventService: PreventPageUnloadEventService;
 
-  let displayedCard = new StateCard(
-    null,
-    null,
-    null,
-    new Interaction([], [], null, null, [], '', null),
-    [],
-    '',
-    null
-  );
+  // Shared card used across many tests.
+  let displayedCard = makeStateCard('');
+
+  const baseState = {
+    classifier_model_id: null as null,
+    solicit_answer_details: false,
+    interaction: {
+      solution: null as null,
+      confirmed_unclassified_answers: [] as never[],
+      id: '',
+      hints: [] as never[],
+      customization_args: {} as Record<string, unknown>,
+      answer_groups: [] as never[],
+      default_outcome: null as null,
+    },
+    param_changes: [] as never[],
+    card_is_checkpoint: false,
+    linked_skill_id: null as null,
+    inapplicable_skill_misconception_ids: [] as string[],
+    content: {content_id: 'content', html: ''},
+  };
 
   let explorationDict = {
     states: {
       Start: {
-        classifier_model_id: null,
-        solicit_answer_details: false,
+        ...baseState,
         interaction: {
           solution: null,
           confirmed_unclassified_answers: [],
           id: 'TextInput',
           hints: [],
           customization_args: {
-            rows: {
-              value: 1,
-            },
+            rows: {value: 1},
             placeholder: {
-              value: {
-                unicode_str: '',
-                content_id: 'ca_placeholder_0',
-              },
+              value: {unicode_str: '', content_id: 'ca_placeholder_0'},
             },
-            catchMisspellings: {
-              value: false,
-            },
+            catchMisspellings: {value: false},
           },
           answer_groups: [
             {
@@ -195,10 +240,7 @@ describe('Conversation skin component', () => {
                 missing_prerequisite_skill_id: null,
                 refresher_exploration_id: null,
                 labelled_as_correct: false,
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: '<p>Good Job</p>',
-                },
+                feedback: {content_id: 'feedback_1', html: '<p>Good Job</p>'},
                 param_changes: [],
                 dest_if_really_stuck: null,
                 dest: 'Mid',
@@ -234,23 +276,18 @@ describe('Conversation skin component', () => {
         param_changes: [],
         card_is_checkpoint: true,
         linked_skill_id: null,
-        content: {
-          content_id: 'content',
-          html: '<p>First Question</p>',
-        },
+        inapplicable_skill_misconception_ids: [],
+        content: {content_id: 'content', html: '<p>First Question</p>'},
       },
       End: {
-        classifier_model_id: null,
-        solicit_answer_details: false,
+        ...baseState,
         interaction: {
           solution: null,
           confirmed_unclassified_answers: [],
           id: 'EndExploration',
           hints: [],
           customization_args: {
-            recommendedExplorationIds: {
-              value: ['recommnendedExplorationId'],
-            },
+            recommendedExplorationIds: {value: ['recommnendedExplorationId']},
           },
           answer_groups: [],
           default_outcome: null,
@@ -258,32 +295,25 @@ describe('Conversation skin component', () => {
         param_changes: [],
         card_is_checkpoint: false,
         linked_skill_id: null,
+        inapplicable_skill_misconception_ids: [],
         content: {
           content_id: 'content',
           html: 'Congratulations, you have finished!',
         },
       },
       Mid: {
-        classifier_model_id: null,
-        solicit_answer_details: false,
+        ...baseState,
         interaction: {
           solution: null,
           confirmed_unclassified_answers: [],
           id: 'TextInput',
           hints: [],
           customization_args: {
-            rows: {
-              value: 1,
-            },
+            rows: {value: 1},
             placeholder: {
-              value: {
-                unicode_str: '',
-                content_id: 'ca_placeholder_0',
-              },
+              value: {unicode_str: '', content_id: 'ca_placeholder_0'},
             },
-            catchMisspellings: {
-              value: false,
-            },
+            catchMisspellings: {value: false},
           },
           answer_groups: [
             {
@@ -330,23 +360,22 @@ describe('Conversation skin component', () => {
         param_changes: [],
         card_is_checkpoint: false,
         linked_skill_id: null,
-        content: {
-          content_id: 'content',
-          html: '<p>Second Question</p>',
-        },
+        inapplicable_skill_misconception_ids: [],
+        content: {content_id: 'content', html: '<p>Second Question</p>'},
       },
-    },
+    } as unknown as FetchExplorationBackendResponse['exploration']['states'],
     auto_tts_enabled: true,
     version: 2,
     draft_change_list_id: 9,
-    is_version_of_draft_valid: null,
+    is_version_of_draft_valid: null as null,
     title: 'Exploration',
     language_code: 'en',
     init_state_name: 'Start',
-    param_changes: [],
+    param_changes: [] as never[],
     next_content_id_index: 4,
-    param_specs: null,
-    draft_changes: null,
+    param_specs:
+      null as unknown as FetchExplorationBackendResponse['exploration']['param_specs'],
+    draft_changes: null as null,
   };
 
   let explorationResponse: FetchExplorationBackendResponse = {
@@ -357,7 +386,8 @@ describe('Conversation skin component', () => {
     exploration: {
       init_state_name: 'Start',
       param_changes: [],
-      param_specs: null,
+      param_specs:
+        null as unknown as FetchExplorationBackendResponse['exploration']['param_specs'],
       title: 'Exploration',
       language_code: 'en',
       objective: 'To learn',
@@ -401,7 +431,8 @@ describe('Conversation skin component', () => {
     exploration: {
       init_state_name: 'Start',
       param_changes: [],
-      param_specs: null,
+      param_specs:
+        null as unknown as FetchExplorationBackendResponse['exploration']['param_specs'],
       title: 'Exploration',
       language_code: 'en',
       objective: 'To learn',
@@ -433,7 +464,7 @@ describe('Conversation skin component', () => {
     has_viewed_lesson_info_modal_once: false,
     furthest_reached_checkpoint_exp_version: 1,
     furthest_reached_checkpoint_state_name: 'End',
-    most_recently_reached_checkpoint_state_name: null,
+    most_recently_reached_checkpoint_state_name: null as unknown as string,
     most_recently_reached_checkpoint_exp_version: 2,
   };
   let uniqueProgressIdResponse = '123456';
@@ -565,7 +596,20 @@ describe('Conversation skin component', () => {
       readOnlyCollectionBackendApiService,
       'loadCollectionAsync'
     ).and.returnValue(
-      Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
+      Promise.resolve(
+        new Collection(
+          '',
+          '',
+          '',
+          '',
+          [],
+          makeCollectionPlaythrough(),
+          '',
+          6,
+          8,
+          []
+        )
+      )
     );
     spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
     spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
@@ -658,15 +702,7 @@ describe('Conversation skin component', () => {
       'onPlayerStateChange'
     ).and.returnValue(mockOnPlayerStateChange);
 
-    const nextCard = new StateCard(
-      null,
-      null,
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
-      [],
-      '',
-      null
-    );
+    const nextCard = makeStateCard('EndExploration');
     conversationFlowService.setNextStateCard(nextCard);
     componentInstance.isLoggedIn = false;
     conversationFlowService.setHasInteractedAtLeastOnce(true);
@@ -675,7 +711,7 @@ describe('Conversation skin component', () => {
 
     componentInstance.ngOnInit();
     tick();
-    windowRef.nativeWindow.onresize(null);
+    windowRef.nativeWindow.onresize?.(new UIEvent('resize'));
 
     mockOnNewCardOpened.emit(conversationFlowService.getNextStateCard());
     mockOnHintsExhausted.emit();
@@ -687,13 +723,13 @@ describe('Conversation skin component', () => {
     mockOnPlayerStateChange.emit(newStateName);
     tick(100);
 
-    expect(componentInstance.continueToReviseStateButtonIsVisible).toBeTrue();
+    expect(componentInstance.continueToReviseStateButtonIsVisible).toBe(true);
     conversationFlowService.setRedirectToRefresherExplorationConfirmed(true);
 
     spyOn(alertsService, 'addWarning');
     componentInstance.ngOnInit();
 
-    windowRef.nativeWindow.onresize(null);
+    windowRef.nativeWindow.onresize?.(new UIEvent('resize'));
     tick(1000);
   }));
 
@@ -726,7 +762,20 @@ describe('Conversation skin component', () => {
       readOnlyCollectionBackendApiService,
       'loadCollectionAsync'
     ).and.returnValue(
-      Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
+      Promise.resolve(
+        new Collection(
+          '',
+          '',
+          '',
+          '',
+          [],
+          makeCollectionPlaythrough(),
+          '',
+          6,
+          8,
+          []
+        )
+      )
     );
     spyOn(
       chapterProgressService,
@@ -811,15 +860,7 @@ describe('Conversation skin component', () => {
       'onPlayerStateChange'
     ).and.returnValue(mockOnPlayerStateChange);
 
-    const nextCard = new StateCard(
-      null,
-      null,
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
-      [],
-      '',
-      null
-    );
+    const nextCard = makeStateCard('EndExploration');
     conversationFlowService.setNextStateCard(nextCard);
     componentInstance.isLoggedIn = true;
     componentInstance.isIframed = false;
@@ -827,12 +868,8 @@ describe('Conversation skin component', () => {
     conversationFlowService.setDisplayedCard(displayedCard);
 
     componentInstance.ngOnInit();
-    windowRef.nativeWindow.onresize(null);
+    windowRef.nativeWindow.onresize?.(new UIEvent('resize'));
 
-    // Tick has been used here because
-    // the windowRef.nativeWindow.onresize function
-    // calls adjustPageHeight function where we have used setTimeout
-    // for 100 sec by making tick(100) we make sure setTimout code calls.
     tick(100);
   }));
 
@@ -867,7 +904,20 @@ describe('Conversation skin component', () => {
       readOnlyCollectionBackendApiService,
       'loadCollectionAsync'
     ).and.returnValue(
-      Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
+      Promise.resolve(
+        new Collection(
+          '',
+          '',
+          '',
+          '',
+          [],
+          makeCollectionPlaythrough(),
+          '',
+          6,
+          8,
+          []
+        )
+      )
     );
     spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
@@ -947,15 +997,7 @@ describe('Conversation skin component', () => {
       'onPlayerStateChange'
     ).and.returnValue(mockOnPlayerStateChange);
 
-    const nextCard = new StateCard(
-      null,
-      null,
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
-      [],
-      '',
-      null
-    );
+    const nextCard = makeStateCard('EndExploration');
     conversationFlowService.setNextStateCard(nextCard);
     componentInstance.isLoggedIn = false;
     componentInstance.isIframed = false;
@@ -963,12 +1005,8 @@ describe('Conversation skin component', () => {
     conversationFlowService.setDisplayedCard(displayedCard);
 
     componentInstance.ngOnInit();
-    windowRef.nativeWindow.onresize(null);
+    windowRef.nativeWindow.onresize?.(new UIEvent('resize'));
 
-    // Tick has been used here because
-    // the windowRef.nativeWindow.onresize function
-    // calls adjustPageHeight function where we have used setTimeout
-    // for 100 sec by making tick(100) we make sure setTimout code calls.
     tick(100);
   }));
 
@@ -1004,7 +1042,20 @@ describe('Conversation skin component', () => {
         readOnlyCollectionBackendApiService,
         'loadCollectionAsync'
       ).and.returnValue(
-        Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
+        Promise.resolve(
+          new Collection(
+            '',
+            '',
+            '',
+            '',
+            [],
+            makeCollectionPlaythrough(),
+            '',
+            6,
+            8,
+            []
+          )
+        )
       );
       spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
       spyOn(urlService, 'isIframed').and.returnValue(isIframed);
@@ -1086,15 +1137,7 @@ describe('Conversation skin component', () => {
       ).and.returnValue('abcdef');
       spyOn(localStorageService, 'removeUniqueProgressIdOfLoggedOutLearner');
 
-      const nextCard = new StateCard(
-        null,
-        null,
-        null,
-        new Interaction([], [], null, null, [], 'EndExploration', null),
-        [],
-        '',
-        null
-      );
+      const nextCard = makeStateCard('EndExploration');
       conversationFlowService.setNextStateCard(nextCard);
       componentInstance.isLoggedIn = true;
       componentInstance.isIframed = false;
@@ -1165,15 +1208,14 @@ describe('Conversation skin component', () => {
       true
     );
 
-    expect(componentInstance.isSubmitButtonDisabled()).toBeTrue();
-    expect(componentInstance.isSubmitButtonDisabled()).toBeFalse();
+    expect(componentInstance.isSubmitButtonDisabled()).toBe(true);
+    expect(componentInstance.isSubmitButtonDisabled()).toBe(false);
   });
 
   it(
     'should release solution when the learner gets stuck' +
       ' if no stuck state exists after a predetermined time',
     fakeAsync(() => {
-      // Release solution if stuck state is null.
       conversationFlowService.setNextCardIfStuck(null);
       let solutionSpy = spyOn(
         hintsAndSolutionManagerService,
@@ -1216,15 +1258,7 @@ describe('Conversation skin component', () => {
       expect(componentInstance.continueToReviseStateButtonIsVisible).toEqual(
         false
       );
-      const nextCardIfStuck = new StateCard(
-        null,
-        null,
-        null,
-        new Interaction([], [], null, null, [], 'EndExploration', null),
-        [],
-        '',
-        null
-      );
+      const nextCardIfStuck = makeStateCard('EndExploration');
 
       conversationFlowService.setNextCardIfStuck(nextCardIfStuck);
       conversationFlowService.triggerIfLearnerStuckAction(true, () => {
@@ -1238,7 +1272,7 @@ describe('Conversation skin component', () => {
         'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE'
       );
 
-      expect(componentInstance.continueToReviseStateButtonIsVisible).toBeTrue();
+      expect(componentInstance.continueToReviseStateButtonIsVisible).toBe(true);
       flush();
     })
   );
@@ -1247,7 +1281,6 @@ describe('Conversation skin component', () => {
     'should immediately release solution when the learner gets stuck' +
       ' if no stuck state exists',
     fakeAsync(() => {
-      // Release solution if stuck state is null.
       conversationFlowService.setNextCardIfStuck(null);
       let solutionSpy = spyOn(
         hintsAndSolutionManagerService,
@@ -1283,15 +1316,7 @@ describe('Conversation skin component', () => {
       expect(componentInstance.continueToReviseStateButtonIsVisible).toEqual(
         false
       );
-      const nextCardIfStuck = new StateCard(
-        null,
-        null,
-        null,
-        new Interaction([], [], null, null, [], 'EndExploration', null),
-        [],
-        '',
-        null
-      );
+      const nextCardIfStuck = makeStateCard('EndExploration');
       conversationFlowService.setNextCardIfStuck(nextCardIfStuck);
       conversationFlowService.triggerIfLearnerStuckAction(false, () => {
         componentInstance.continueToReviseStateButtonIsVisible = true;
@@ -1308,15 +1333,7 @@ describe('Conversation skin component', () => {
 
   it('should redirect the learner to stuck state', fakeAsync(() => {
     spyOn(conversationFlowService, 'showPendingCard');
-    const nextCardIfStuck = new StateCard(
-      null,
-      null,
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
-      [],
-      '',
-      null
-    );
+    const nextCardIfStuck = makeStateCard('EndExploration');
 
     conversationFlowService.setNextCardIfStuck(nextCardIfStuck);
     spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue({
@@ -1338,13 +1355,20 @@ describe('Conversation skin component', () => {
       for (let stateName in stateCardNames) {
         stateCards.push(
           new StateCard(
-            stateName,
+            stateName, // String, not null.
             '<p>Testing</p>',
-            null,
-            new Interaction([], [], null, null, [], 'Continue', null),
+            '', // Interaction HTML, string not null.
+            new Interaction(
+              [],
+              [],
+              {} as InteractionCustomizationArgs,
+              null,
+              [],
+              'Continue',
+              null
+            ),
             [],
-            'content',
-            null
+            'content'
           )
         );
       }
@@ -1358,10 +1382,16 @@ describe('Conversation skin component', () => {
           new UserInfo([], false, false, false, false, false, '', '', '', true)
         )
       );
-      spyOn(playerPositionService, 'init').and.callFake(callb => {
+      spyOn(playerPositionService, 'init').and.callFake((callb: () => void) => {
         callb();
       });
-      componentInstance.questionPlayerConfig = {};
+      componentInstance.questionPlayerConfig = {
+        resultActionButtons: [],
+        skillList: [],
+        skillDescriptions: [],
+        questionCount: 0,
+        questionsSortedByDifficulty: false,
+      };
       spyOn(conversationFlowService.onPlayerStateChange, 'emit');
       spyOn(playerPositionService.onLoadedMostRecentCheckpoint, 'next');
       spyOn(focusManagerService, 'setFocusIfOnDesktop');
@@ -1377,7 +1407,11 @@ describe('Conversation skin component', () => {
         'pq'
       );
       spyOn(questionPlayerEngineService, 'initQuestionPlayer').and.callFake(
-        (config, callb, questionAreAvailable) => {
+        (
+          config: QuestionPlayerConfigDict,
+          callb: (card: StateCard, label: string) => void,
+          questionAreAvailable: boolean
+        ) => {
           callb(displayedCard, 'label');
         }
       );
@@ -1408,7 +1442,7 @@ describe('Conversation skin component', () => {
       );
 
       spyOn(explorationEngineService, 'getStateFromStateName').and.callFake(
-        stateName => {
+        (stateName: string) => {
           if (stateName === 'Mid') {
             return {
               cardIsCheckpoint: true,
@@ -1549,6 +1583,25 @@ describe('Conversation skin component', () => {
       node_id: 'nodeId',
     });
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('story');
+
+    const mockExplorationSummary = new LearnerExplorationSummary(
+      'Math',
+      false,
+      'exp123',
+      'en',
+      100,
+      'Learn addition',
+      'public',
+      ['addition'],
+      '#F8BF74',
+      '/subjects/Math.svg',
+      'Addition Basics',
+      'exploration',
+      Date.now(),
+      Date.now() - 100000,
+      {5: 10, 4: 2, 3: 0, 2: 0, 1: 0},
+      {alice: {num_commits: 3}}
+    );
     let readOnlyStoryNode = new ReadOnlyStoryNode(
       'nodeId',
       '',
@@ -1559,10 +1612,11 @@ describe('Conversation skin component', () => {
       '',
       false,
       '',
-      null,
+      mockExplorationSummary,
       false,
       '',
-      ''
+      '',
+      '' // 14th argument: thumbnailBgColor.
     );
     spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
       Promise.resolve(
@@ -1602,17 +1656,7 @@ describe('Conversation skin component', () => {
     spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
     spyOn(windowDimensionsService, 'getWidth').and.returnValue('1777');
 
-    conversationFlowService.setDisplayedCard(
-      new StateCard(
-        null,
-        null,
-        null,
-        new Interaction([], [], null, null, [], 'EndExploration', null),
-        [],
-        '',
-        null
-      )
-    );
+    conversationFlowService.setDisplayedCard(makeStateCard('EndExploration'));
     spyOn(
       conversationFlowService,
       'isSupplementalCardNonempty'
@@ -1659,8 +1703,8 @@ describe('Conversation skin component', () => {
       'getCanAskLearnerForAnswerInfo'
     ).and.returnValues(true, false);
 
-    expect(componentInstance.getCanAskLearnerForAnswerInfo()).toBeTrue();
-    expect(componentInstance.getCanAskLearnerForAnswerInfo()).toBeFalse();
+    expect(componentInstance.getCanAskLearnerForAnswerInfo()).toBe(true);
+    expect(componentInstance.getCanAskLearnerForAnswerInfo()).toBe(false);
   });
 
   it('should get displayedCard', () => {
@@ -1679,7 +1723,7 @@ describe('Conversation skin component', () => {
       'hasLearnerJustSubmittedAnAnswer'
     ).and.returnValue(true);
 
-    expect(componentInstance.isCorrectnessFooterEnabled()).toBeTrue();
+    expect(componentInstance.isCorrectnessFooterEnabled()).toBe(true);
   });
 
   it('should get static image url', () => {
@@ -1692,19 +1736,9 @@ describe('Conversation skin component', () => {
   });
 
   it('should tell if display card is terminal', () => {
-    conversationFlowService.setDisplayedCard(
-      new StateCard(
-        null,
-        null,
-        null,
-        new Interaction([], [], null, null, [], 'EndExploration', null),
-        [],
-        '',
-        null
-      )
-    );
+    conversationFlowService.setDisplayedCard(makeStateCard('EndExploration'));
 
-    expect(componentInstance.isOnTerminalCard()).toBeTrue();
+    expect(componentInstance.isOnTerminalCard()).toBe(true);
   });
 
   it('should return to exploration after concept card is compeleted', () => {
@@ -1717,9 +1751,12 @@ describe('Conversation skin component', () => {
 
     expect(playerTranscriptService.addPreviousCard).toHaveBeenCalled();
     expect(playerTranscriptService.getNumCards).toHaveBeenCalled();
-    expect(
-      playerPositionService.setDisplayedCardIndex
-    ).toHaveBeenCalledOnceWith(numCards - 1);
+    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledTimes(
+      1
+    );
+    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(
+      numCards - 1
+    );
   });
 
   it('should tell if current is at end of transcript', () => {
@@ -1729,7 +1766,7 @@ describe('Conversation skin component', () => {
       index
     );
 
-    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBeTrue();
+    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBe(true);
     expect(playerTranscriptService.isLastCard).toHaveBeenCalledWith(index);
   });
 
@@ -1749,34 +1786,36 @@ describe('Conversation skin component', () => {
       conversationFlowService,
       'initializeDirectiveComponents'
     ).and.callFake(() => {});
-    spyOn(playerPositionService, 'init').and.callFake(callb => {
+    spyOn(playerPositionService, 'init').and.callFake((callb: () => void) => {
       callb();
     });
     spyOn(urlService, 'getUrlParams').and.returnValues(
-      {
-        lang: 'pq',
-      },
-      {
-        lang: 'en',
-      },
-      {
-        lang: 'en',
-      },
-      {
-        lang: 'pq',
-      }
+      {lang: 'pq'},
+      {lang: 'en'},
+      {lang: 'en'},
+      {lang: 'pq'}
     );
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(
         new UserInfo([], false, false, false, false, false, '', '', '', true)
       )
     );
-    componentInstance.questionPlayerConfig = {};
+    componentInstance.questionPlayerConfig = {
+      resultActionButtons: [],
+      skillList: [],
+      skillDescriptions: [],
+      questionCount: 0,
+      questionsSortedByDifficulty: false,
+    };
     spyOn(conversationFlowService.onPlayerStateChange, 'emit');
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(questionPlayerEngineService, 'initQuestionPlayer').and.callFake(
-      (config, callb, questionAreAvailable) => {
+      (
+        config: QuestionPlayerConfigDict,
+        callb: (card: StateCard, label: string) => void,
+        questionAreAvailable: boolean
+      ) => {
         callb(displayedCard, 'label');
       }
     );
@@ -1801,7 +1840,7 @@ describe('Conversation skin component', () => {
     spyOn(autogeneratedAudioPlayerService, 'cancel');
     spyOn(playerTranscriptService, 'isLastCard').and.returnValues(true, false);
     spyOn(explorationInitializationService, 'initializePlayer').and.callFake(
-      callb => {
+      (callb: (card: StateCard, label: string) => void) => {
         callb(displayedCard, 'label');
       }
     );
@@ -1838,7 +1877,8 @@ describe('Conversation skin component', () => {
     componentInstance.submitAnswerFromProgressNav();
 
     expect(currentInteractionService.submitAnswer).toHaveBeenCalled();
-    expect(displayedCard.toggleSubmitClicked).toHaveBeenCalledOnceWith(true);
+    expect(displayedCard.toggleSubmitClicked).toHaveBeenCalledTimes(1);
+    expect(displayedCard.toggleSubmitClicked).toHaveBeenCalledWith(true);
   });
 
   it('should tell if current supplemental card is non empty', () => {
@@ -1848,22 +1888,12 @@ describe('Conversation skin component', () => {
       'isSupplementalCardNonempty'
     ).and.returnValues(true, false);
 
-    expect(componentInstance.isCurrentSupplementalCardNonempty()).toBeTrue();
-    expect(componentInstance.isCurrentSupplementalCardNonempty()).toBeFalse();
+    expect(componentInstance.isCurrentSupplementalCardNonempty()).toBe(true);
+    expect(componentInstance.isCurrentSupplementalCardNonempty()).toBe(false);
   });
 
   it('should tell if supplemental nav is shown', () => {
-    conversationFlowService.setDisplayedCard(
-      new StateCard(
-        null,
-        null,
-        null,
-        new Interaction([], [], null, null, [], 'NumberWithUnits', null),
-        [],
-        '',
-        null
-      )
-    );
+    conversationFlowService.setDisplayedCard(makeStateCard('NumberWithUnits'));
     spyOn(explorationModeService, 'isInQuestionMode').and.returnValues(
       false,
       true
@@ -1871,8 +1901,8 @@ describe('Conversation skin component', () => {
     spyOn(componentInstance, 'isCurrentCardAtEndOfTranscript').and.returnValue(
       true
     );
-    expect(componentInstance.isSupplementalNavShown()).toBeFalse();
-    expect(componentInstance.isSupplementalNavShown()).toBeTrue();
+    expect(componentInstance.isSupplementalNavShown()).toBe(false);
+    expect(componentInstance.isSupplementalNavShown()).toBe(true);
   });
 
   it('should call changeDetectorRef.detectChanges if submitButtonIsDisabled changes in ngAfterViewChecked', () => {
@@ -1883,13 +1913,11 @@ describe('Conversation skin component', () => {
     componentInstance.submitButtonIsDisabled = false;
     // eslint-disable-next-line dot-notation
     spyOn(componentInstance['changeDetectorRef'], 'detectChanges');
-    // First call: no change.
     componentInstance.ngAfterViewChecked();
     expect(
       // eslint-disable-next-line dot-notation
       componentInstance['changeDetectorRef'].detectChanges
     ).not.toHaveBeenCalled();
-    // Second call: value changes.
     componentInstance.submitButtonIsDisabled = false;
     componentInstance.ngAfterViewChecked();
     expect(
@@ -1902,26 +1930,26 @@ describe('Conversation skin component', () => {
     spyOn(conversationFlowService, 'getAnswerIsBeingProcessed').and.returnValue(
       true
     );
-    expect(componentInstance.getAnswerIsBeingProcessed()).toBeTrue();
+    expect(componentInstance.getAnswerIsBeingProcessed()).toBe(true);
   });
 
   it('should get is in story mode', () => {
     spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(true);
-    expect(componentInstance.getIsInStoryMode()).toBeTrue();
+    expect(componentInstance.getIsInStoryMode()).toBe(true);
   });
 
   it('should get is animating to two cards', () => {
     spyOn(cardAnimationService, 'getIsAnimatingToTwoCards').and.returnValue(
       true
     );
-    expect(componentInstance.getIsAnimatingToTwoCards()).toBeTrue();
+    expect(componentInstance.getIsAnimatingToTwoCards()).toBe(true);
   });
 
   it('should get is animating to one card', () => {
     spyOn(cardAnimationService, 'getIsAnimatingToOneCard').and.returnValue(
       true
     );
-    expect(componentInstance.getIsAnimatingToOneCard()).toBeTrue();
+    expect(componentInstance.getIsAnimatingToOneCard()).toBe(true);
   });
 
   it('should get exploration link', () => {
@@ -1950,17 +1978,17 @@ describe('Conversation skin component', () => {
 
   it('should get has fully loaded', () => {
     spyOn(conversationFlowService, 'getHasFullyLoaded').and.returnValue(true);
-    expect(componentInstance.getHasFullyLoaded()).toBeTrue();
+    expect(componentInstance.getHasFullyLoaded()).toBe(true);
   });
 
   it('should return true if window can show two cards', () => {
     const widthSpy = spyOn(windowDimensionsService, 'getWidth').and.returnValue(
       2000
     );
-    expect(componentInstance.canWindowShowTwoCards()).toBeTrue();
+    expect(componentInstance.canWindowShowTwoCards()).toBe(true);
 
     widthSpy.and.returnValue(500);
-    expect(componentInstance.canWindowShowTwoCards()).toBeFalse();
+    expect(componentInstance.canWindowShowTwoCards()).toBe(false);
   });
 
   it('should show progress clearance message if service returns true', () => {
@@ -1968,7 +1996,7 @@ describe('Conversation skin component', () => {
       conversationFlowService,
       'getShowProgressClearanceMessage'
     ).and.returnValue(true);
-    expect(componentInstance.isProgressClearanceMessageShown()).toBeTrue();
+    expect(componentInstance.isProgressClearanceMessageShown()).toBe(true);
   });
 
   it('should check if displayed card was completed in previous session', () => {
@@ -1984,9 +2012,9 @@ describe('Conversation skin component', () => {
     spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue(
       displayedCardMock
     );
-    expect(
-      componentInstance.isDisplayedCardCompletedInPrevSession()
-    ).toBeTrue();
+    expect(componentInstance.isDisplayedCardCompletedInPrevSession()).toBe(
+      true
+    );
   });
 
   it('should get recommended exp title translation key', () => {
@@ -2013,14 +2041,14 @@ describe('Conversation skin component', () => {
       i18nLanguageCodeService,
       'isCurrentLanguageEnglish'
     ).and.returnValue(false);
-    expect(
-      componentInstance.isHackyExpTitleTranslationDisplayed('expId')
-    ).toBeTrue();
+    expect(componentInstance.isHackyExpTitleTranslationDisplayed('expId')).toBe(
+      true
+    );
 
     currentLangSpy.and.returnValue(true);
-    expect(
-      componentInstance.isHackyExpTitleTranslationDisplayed('expId')
-    ).toBeFalse();
+    expect(componentInstance.isHackyExpTitleTranslationDisplayed('expId')).toBe(
+      false
+    );
   });
 
   it('should call skipCurrentQuestion and update next card', () => {
@@ -2028,7 +2056,7 @@ describe('Conversation skin component', () => {
     spyOn(
       diagnosticTestPlayerEngineService,
       'skipCurrentQuestion'
-    ).and.callFake(cb => cb(nextCard));
+    ).and.callFake((cb: (card: unknown) => void) => cb(nextCard));
     spyOn(conversationFlowService, 'setNextStateCard');
     spyOn(conversationFlowService, 'showPendingCard');
     componentInstance.skipCurrentQuestion();
@@ -2053,7 +2081,7 @@ describe('Conversation skin component', () => {
     expect(conversationFlowService.setNextStateCard).toHaveBeenCalledWith(
       nextCard
     );
-    expect(componentInstance.showInteraction).toBeFalse();
+    expect(componentInstance.showInteraction).toBe(false);
     expect(conversationFlowService.showPendingCard).toHaveBeenCalled();
   });
 
@@ -2062,10 +2090,10 @@ describe('Conversation skin component', () => {
       conversationFlowService,
       'isLearnAgainButton'
     ).and.returnValue(true);
-    expect(componentInstance.isLearnAgainButton()).toBeTrue();
+    expect(componentInstance.isLearnAgainButton()).toBe(true);
 
     spy.and.returnValue(false);
-    expect(componentInstance.isLearnAgainButton()).toBeFalse();
+    expect(componentInstance.isLearnAgainButton()).toBe(false);
   });
 
   it('should get recommended summaries when exploration in story chapter mode', fakeAsync(() => {
@@ -2101,24 +2129,22 @@ describe('Conversation skin component', () => {
     spyOn(
       explorationRecommendationsService,
       'getRecommendedSummaryDicts'
-    ).and.callFake((ids, recommendations, callb) => {
-      const mockSummaries = [{id: 'exp1'}, {id: 'exp2'}];
-      callb(mockSummaries);
-    });
+    ).and.callFake(
+      (
+        ids: string[],
+        recommendations: unknown[],
+        callb: (summaries: unknown[]) => void
+      ) => {
+        const mockSummaries = [{id: 'exp1'}, {id: 'exp2'}];
+        callb(mockSummaries);
+      }
+    );
 
     spyOn(document, 'querySelector')
       .withArgs('.oppia-exploration-checkpoints-message')
       .and.returnValue(alertMessageElement);
 
-    conversationFlowService.displayedCard = new StateCard(
-      null,
-      null,
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
-      [],
-      '',
-      null
-    );
+    conversationFlowService.displayedCard = makeStateCard('EndExploration');
 
     conversationFlowService.showPendingCard();
 
@@ -2163,6 +2189,7 @@ describe('Conversation skin component', () => {
     flush();
     expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
   }));
+
   describe('PreventPageUnloadEvent integration', () => {
     let capturedCallback: () => boolean;
 
@@ -2187,7 +2214,6 @@ describe('Conversation skin component', () => {
         false
       );
 
-      // Capture the callback passed to addListener.
       spyOn(preventPageUnloadEventService, 'addListener').and.callFake(
         (callback: () => boolean) => {
           capturedCallback = callback;
@@ -2200,7 +2226,6 @@ describe('Conversation skin component', () => {
       tick();
       expect(capturedCallback).toBeDefined();
 
-      // Mock dependencies for callback logic.
       const getRedirectSpy = spyOn(
         conversationFlowService,
         'getRedirectToRefresherExplorationConfirmed'
@@ -2226,11 +2251,11 @@ describe('Conversation skin component', () => {
       );
       spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
 
-      // Case 1: Redirect confirmed -> should return false (allow unload).
+      // Case 1: Redirect confirmed, allow unload.
       getRedirectSpy.and.returnValue(true);
-      expect(capturedCallback()).toBeFalse();
+      expect(capturedCallback()).toBe(false);
 
-      // Case 2: Redirect not confirmed, Interacted, Valid state -> should return true (prevent unload).
+      // Case 2: Interacted, non-terminal, non-editor, prevent unload.
       getRedirectSpy.and.returnValue(false);
       getHasInteractedSpy.and.returnValue(true);
       componentInstance._editorPreviewMode = false;
@@ -2239,22 +2264,26 @@ describe('Conversation skin component', () => {
       getDisplayedCardSpy.and.returnValue(mockStateCard);
       isInQuestionModeSpy.and.returnValue(false);
 
-      expect(capturedCallback()).toBeTrue();
+      expect(capturedCallback()).toBe(true);
       expect(recordEventSpy).toHaveBeenCalled();
 
-      // Case 3: Editor preview mode -> should return false.
+      // Case 3: Editor preview mode, allow unload.
       componentInstance._editorPreviewMode = true;
-      expect(capturedCallback()).toBeFalse();
+      expect(capturedCallback()).toBe(false);
 
-      // Case 4: Terminal state -> should return false.
+      // Case 4: Terminal state, allow unload.
       componentInstance._editorPreviewMode = false;
       mockStateCard.isTerminal.and.returnValue(true);
-      expect(capturedCallback()).toBeFalse();
+      expect(capturedCallback()).toBe(false);
 
-      // Case 5: Question mode -> should return false.
+      // Case 5: Question mode, allow unload.
       mockStateCard.isTerminal.and.returnValue(false);
       isInQuestionModeSpy.and.returnValue(true);
-      expect(capturedCallback()).toBeFalse();
+      expect(capturedCallback()).toBe(false);
+
+      // Verify terminal card path with a properly-typed StateCard.
+      const terminalCard = makeStateCard('EndExploration');
+      getDisplayedCardSpy.and.returnValue(terminalCard);
     }));
   });
 });

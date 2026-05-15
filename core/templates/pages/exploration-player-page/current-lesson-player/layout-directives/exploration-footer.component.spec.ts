@@ -53,7 +53,6 @@ import {EditableExplorationBackendApiService} from '../../../../domain/explorati
 import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {StateCard} from '../../../../domain/state_card/state-card.model';
-import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
 import {UserInfo} from '../../../../domain/user/user-info.model';
 import {QuestionPlayerEngineService} from '../../services/question-player-engine.service';
 import {UserService} from '../../../../services/user.service';
@@ -349,7 +348,6 @@ describe('ExplorationFooterComponent', () => {
             },
           },
         }),
-        RecordedVoiceovers.createEmpty(),
         'content'
       );
 
@@ -358,7 +356,7 @@ describe('ExplorationFooterComponent', () => {
       tick();
 
       expect(component.explorationId).toBe('exp1');
-      expect(component.iframed).toBeTrue();
+      expect(component.iframed).toBe(true);
       expect(
         explorationSummaryBackendApiService.loadPublicAndPrivateExplorationSummariesAsync
       ).toHaveBeenCalledWith(['exp1']);
@@ -471,15 +469,20 @@ describe('ExplorationFooterComponent', () => {
       'resetExplorationProgressAsync'
     ).and.returnValue(Promise.resolve());
 
-    const stateCard = new StateCard(
+    const stateCard = StateCard.createNewCard(
       'End',
       '<p>Testing</p>',
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
-      [],
-      null,
-      'content',
-      null
+      '<interaction></interaction>',
+      Interaction.createFromBackendDict({
+        id: 'EndExploration',
+        customization_args: {},
+        default_outcome: null,
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        hints: [],
+        solution: null,
+      }),
+      'content'
     );
 
     const endState = {
@@ -501,6 +504,7 @@ describe('ExplorationFooterComponent', () => {
       param_changes: [],
       card_is_checkpoint: false,
       linked_skill_id: null,
+      inapplicable_skill_misconception_ids: null,
       content: {
         content_id: 'content',
         html: 'Congratulations, you have finished!',
@@ -557,15 +561,20 @@ describe('ExplorationFooterComponent', () => {
       'resetExplorationProgressAsync'
     );
 
-    const stateCard = new StateCard(
+    const stateCard = StateCard.createNewCard(
       'End',
       '<p>Testing</p>',
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
-      [],
-      null,
-      'content',
-      null
+      '<interaction></interaction>',
+      Interaction.createFromBackendDict({
+        id: 'EndExploration',
+        customization_args: {},
+        default_outcome: null,
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        hints: [],
+        solution: null,
+      }),
+      'content'
     );
 
     const endState = {
@@ -587,6 +596,7 @@ describe('ExplorationFooterComponent', () => {
       param_changes: [],
       card_is_checkpoint: false,
       linked_skill_id: null,
+      inapplicable_skill_misconception_ids: null,
       content: {
         content_id: 'content',
         html: 'Congratulations, you have finished!',
@@ -618,7 +628,30 @@ describe('ExplorationFooterComponent', () => {
       ' fails while opening progress reminder modal',
     fakeAsync(() => {
       component.explorationId = 'expId';
-      component.expInfo = null;
+      component.expInfo = {
+        id: 'exp1',
+        title: 'Test Exploration',
+        category: 'Test',
+        objective: 'Test objective',
+        language_code: 'en',
+        tags: [],
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+        },
+        num_views: 0,
+        status: 'public',
+        last_updated_msec: 0,
+        community_owned: false,
+        thumbnail_icon_url: '',
+        thumbnail_bg_color: '',
+        created_on_msec: 0,
+        human_readable_contributors_summary: {},
+        activity_type: 'exploration',
+      };
       spyOn(
         learnerViewInfoBackendApiService,
         'fetchLearnerInfoAsync'
@@ -641,7 +674,7 @@ describe('ExplorationFooterComponent', () => {
     () => {
       spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
       spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
-      expect(component.hintsAndSolutionsAreSupported).toBeTrue();
+      expect(component.hintsAndSolutionsAreSupported).toBe(true);
 
       spyOnProperty(
         questionPlayerEngineService,
@@ -651,7 +684,7 @@ describe('ExplorationFooterComponent', () => {
       component.ngOnInit();
       mockResultsLoadedEventEmitter.emit(true);
 
-      expect(component.hintsAndSolutionsAreSupported).toBeFalse();
+      expect(component.hintsAndSolutionsAreSupported).toBe(false);
     }
   );
 
@@ -682,7 +715,7 @@ describe('ExplorationFooterComponent', () => {
       exploration: {
         init_state_name: 'Introduction',
         param_changes: [],
-        param_specs: null,
+        param_specs: {},
         title: 'Exploration',
         next_content_id_index: 5,
         language_code: 'en',
@@ -690,6 +723,7 @@ describe('ExplorationFooterComponent', () => {
         states: {
           Start: {
             classifier_model_id: null,
+            inapplicable_skill_misconception_ids: null,
             solicit_answer_details: false,
             interaction: {
               solution: null,
@@ -762,6 +796,7 @@ describe('ExplorationFooterComponent', () => {
           },
           End: {
             classifier_model_id: null,
+            inapplicable_skill_misconception_ids: null,
             solicit_answer_details: false,
             interaction: {
               solution: null,
@@ -786,6 +821,7 @@ describe('ExplorationFooterComponent', () => {
           },
           Mid: {
             classifier_model_id: null,
+            inapplicable_skill_misconception_ids: null,
             solicit_answer_details: false,
             interaction: {
               solution: null,
@@ -903,15 +939,20 @@ describe('ExplorationFooterComponent', () => {
       )
     );
 
-    let stateCard = new StateCard(
+    let stateCard = StateCard.createNewCard(
       'End',
       '<p>Testing</p>',
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
-      [],
-      null,
-      'content',
-      null
+      '<interaction></interaction>',
+      Interaction.createFromBackendDict({
+        id: 'EndExploration',
+        customization_args: {},
+        default_outcome: null,
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        hints: [],
+        solution: null,
+      }),
+      'content'
     );
 
     spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
@@ -928,12 +969,14 @@ describe('ExplorationFooterComponent', () => {
   }));
 
   it('should open concept card when user clicks on the icon', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve(),
-      } as NgbModalRef;
-    });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+      (dlg: unknown, opt: unknown) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      }
+    );
     component.openConceptCardModal();
     expect(modalSpy).toHaveBeenCalled();
   });
@@ -966,6 +1009,7 @@ describe('ExplorationFooterComponent', () => {
       next_content_id_index: 0,
       card_is_checkpoint: false,
       linked_skill_id: 'Id',
+      inapplicable_skill_misconception_ids: null,
       content: {
         content_id: 'content',
         html: 'Congratulations, you have finished!',
@@ -997,7 +1041,30 @@ describe('ExplorationFooterComponent', () => {
     );
 
     expect(component.openInformationCardModal).toHaveBeenCalled();
-    component.expInfo = null;
+    component.expInfo = {
+      id: 'exp1',
+      title: 'Test Exploration',
+      category: 'Test',
+      objective: 'Test objective',
+      language_code: 'en',
+      tags: [],
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      },
+      num_views: 0,
+      status: 'public',
+      last_updated_msec: 0,
+      community_owned: false,
+      thumbnail_icon_url: '',
+      thumbnail_bg_color: '',
+      created_on_msec: 0,
+      human_readable_contributors_summary: {},
+      activity_type: 'exploration',
+    };
 
     component.showInformationCard();
     tick();
@@ -1027,14 +1094,22 @@ describe('ExplorationFooterComponent', () => {
       'State A',
       '<p>Content</p>',
       '<interaction></interaction>',
-      null,
-      RecordedVoiceovers.createEmpty(),
+      Interaction.createFromBackendDict({
+        id: 'EndExploration',
+        customization_args: {},
+        default_outcome: null,
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        hints: [],
+        solution: null,
+      }),
       'content'
     );
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
     spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue(
       State.createFromBackendDict('State A', {
         classifier_model_id: null,
+        inapplicable_skill_misconception_ids: null,
         content: {
           html: '',
           content_id: 'content',
@@ -1088,7 +1163,30 @@ describe('ExplorationFooterComponent', () => {
     fakeAsync(() => {
       let explorationId = 'expId';
       component.explorationId = explorationId;
-      component.expInfo = null;
+      component.expInfo = {
+        id: 'exp1',
+        title: 'Test Exploration',
+        category: 'Test',
+        objective: 'Test objective',
+        language_code: 'en',
+        tags: [],
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+        },
+        num_views: 0,
+        status: 'public',
+        last_updated_msec: 0,
+        community_owned: false,
+        thumbnail_icon_url: '',
+        thumbnail_bg_color: '',
+        created_on_msec: 0,
+        human_readable_contributors_summary: {},
+        activity_type: 'exploration',
+      };
 
       spyOn(
         learnerViewInfoBackendApiService,
@@ -1113,7 +1211,7 @@ describe('ExplorationFooterComponent', () => {
         init_state_name: 'Introduction',
         next_content_id_index: 5,
         param_changes: [],
-        param_specs: null,
+        param_specs: {},
         title: 'Exploration',
         language_code: 'en',
         objective: 'To learn',
@@ -1121,6 +1219,7 @@ describe('ExplorationFooterComponent', () => {
           Introduction: {
             param_changes: [],
             classifier_model_id: null,
+            inapplicable_skill_misconception_ids: null,
             solicit_answer_details: true,
             card_is_checkpoint: true,
             linked_skill_id: null,
@@ -1204,7 +1303,7 @@ describe('ExplorationFooterComponent', () => {
       exploration: {
         init_state_name: 'Introduction',
         param_changes: [],
-        param_specs: null,
+        param_specs: {},
         title: 'Exploration',
         next_content_id_index: 5,
         language_code: 'en',
@@ -1213,6 +1312,7 @@ describe('ExplorationFooterComponent', () => {
           Introduction: {
             param_changes: [],
             classifier_model_id: null,
+            inapplicable_skill_misconception_ids: null,
             solicit_answer_details: true,
             card_is_checkpoint: true,
             linked_skill_id: null,
@@ -1282,7 +1382,7 @@ describe('ExplorationFooterComponent', () => {
     component.setLearnerHasViewedLessonInfoTooltip();
     tick();
 
-    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeFalse();
+    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBe(false);
   }));
 
   it('should correctly mark lesson info tooltip as viewed', () => {
@@ -1290,10 +1390,10 @@ describe('ExplorationFooterComponent', () => {
       editableExplorationBackendApiService,
       'recordLearnerHasViewedLessonInfoModalOnce'
     ).and.returnValue(Promise.resolve());
-    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeFalse();
+    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBe(false);
     component.userIsLoggedIn = true;
     component.learnerHasViewedLessonInfo();
-    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeTrue();
+    expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBe(true);
     expect(
       editableExplorationBackendApiService.recordLearnerHasViewedLessonInfoModalOnce
     ).toHaveBeenCalled();
@@ -1312,7 +1412,7 @@ describe('ExplorationFooterComponent', () => {
 
       component.ngOnInit();
 
-      expect(component.hintsAndSolutionsAreSupported).toBeTrue();
+      expect(component.hintsAndSolutionsAreSupported).toBe(true);
       expect(
         questionPlayerEngineService.resultsPageIsLoadedEventEmitter.subscribe
       ).toHaveBeenCalled();

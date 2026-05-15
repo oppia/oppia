@@ -44,7 +44,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import './exploration-footer.component.css';
-import {OppiaNoninteractiveSkillreviewConceptCardModalComponent} from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
+import {OppiaNoninteractiveSkillreviewConceptCardModalComponent} from '../../../../../../extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {QuestionPlayerEngineService} from 'pages/exploration-player-page/services/question-player-engine.service';
@@ -71,8 +71,8 @@ export class ExplorationFooterComponent {
   // Used to update the number of checkpoints completed
   // and decide the completed width of the progress bar.
   checkpointArray: number[] = [0];
-  expInfo: LearnerExplorationSummaryBackendDict;
-  expStates: StateObjectsBackendDict;
+  expInfo: LearnerExplorationSummaryBackendDict | undefined;
+  expStates: StateObjectsBackendDict | undefined;
   completedCheckpointsCount: number = 0;
   lastCheckpointWasCompleted: boolean = false;
   learnerHasViewedLessonInfoTooltip: boolean = false;
@@ -235,19 +235,24 @@ export class ExplorationFooterComponent {
     let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
     if (displayedCardIndex > 0) {
       let state = this.explorationEngineService.getState();
-      let stateCard = this.explorationEngineService.getStateCardByName(
-        state.name
-      );
-      if (stateCard.isTerminal()) {
-        this.completedCheckpointsCount += 1;
+      if (state.name) {
+        let stateCard = this.explorationEngineService.getStateCardByName(
+          state.name
+        );
+        if (stateCard.isTerminal()) {
+          this.completedCheckpointsCount += 1;
+        }
       }
     }
 
-    modalRef.componentInstance.checkpointCount = this.checkpointCount;
-    modalRef.componentInstance.completedCheckpointsCount =
-      this.completedCheckpointsCount;
-    modalRef.componentInstance.explorationTitle = this.expInfo.title;
+    const componentInstance = modalRef.componentInstance;
 
+    if (componentInstance) {
+      componentInstance.checkpointCount = this.checkpointCount;
+      componentInstance.completedCheckpointsCount =
+        this.completedCheckpointsCount;
+      componentInstance.explorationTitle = this.expInfo?.title ?? '';
+    }
     modalRef.result.then(
       () => {
         // This callback is used for when the learner chooses to restart
@@ -280,11 +285,13 @@ export class ExplorationFooterComponent {
     let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
     if (displayedCardIndex > 0) {
       let state = this.explorationEngineService.getState();
-      let stateCard = this.explorationEngineService.getStateCardByName(
-        state.name
-      );
-      if (stateCard.isTerminal()) {
-        this.completedCheckpointsCount += 1;
+      if (state.name) {
+        let stateCard = this.explorationEngineService.getStateCardByName(
+          state.name
+        );
+        if (stateCard.isTerminal()) {
+          this.completedCheckpointsCount += 1;
+        }
       }
     }
 

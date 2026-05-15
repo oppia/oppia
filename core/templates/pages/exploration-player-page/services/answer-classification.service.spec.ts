@@ -28,9 +28,10 @@ import {CamelCaseToHyphensPipe} from '../../../filters/string-utility-filters/ca
 import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import {InteractionSpecsService} from '../../../services/interaction-specs.service';
 import {Outcome} from '../../../domain/exploration/outcome.model';
-import {State} from '../../../domain/state/state.model';
+import {State, StateBackendDict} from '../../../domain/state/state.model';
 import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
 import {AlertsService} from '../../../services/alerts.service';
+import {Interaction} from '../../../domain/exploration/interaction.model';
 
 describe('Answer Classification Service', () => {
   const stateName = 'Test State';
@@ -49,11 +50,13 @@ describe('Answer Classification Service', () => {
     alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     interactionSpecsService = TestBed.inject(InteractionSpecsService);
-    textInputRulesService = TestBed.inject(TextInputRulesService);
+    textInputRulesService = TestBed.inject(
+      TextInputRulesService
+    ) as unknown as InteractionRulesService;
   });
 
   describe('with string classifier disabled', () => {
-    let stateDict;
+    let stateDict!: StateBackendDict;
 
     beforeEach(() => {
       spyOn(interactionSpecsService, 'isInteractionTrainable').and.returnValue(
@@ -65,8 +68,14 @@ describe('Answer Classification Service', () => {
           content_id: 'content',
           html: 'content',
         },
+        classifier_model_id: null,
+        card_is_checkpoint: false,
+        linked_skill_id: null,
+        inapplicable_skill_misconception_ids: null,
         interaction: {
           id: 'TextInput',
+          confirmed_unclassified_answers: [],
+          solution: null,
           customization_args: {
             placeholder: {
               value: {
@@ -104,6 +113,8 @@ describe('Answer Classification Service', () => {
                   },
                 },
               ],
+              training_data: [],
+              tagged_skill_misconception_id: null,
             },
             {
               outcome: {
@@ -147,6 +158,8 @@ describe('Answer Classification Service', () => {
                   },
                 },
               ],
+              training_data: [],
+              tagged_skill_misconception_id: null,
             },
             {
               outcome: {
@@ -190,6 +203,8 @@ describe('Answer Classification Service', () => {
                   },
                 },
               ],
+              training_data: [],
+              tagged_skill_misconception_id: null,
             },
           ],
           default_outcome: {
@@ -216,7 +231,7 @@ describe('Answer Classification Service', () => {
 
       expect(() =>
         answerClassificationService.getMatchingClassificationResult(
-          state.name,
+          state.name as string,
           state.interaction,
           '0',
           null
@@ -234,7 +249,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name,
+            state.name as string,
             state.interaction,
             '10',
             textInputRulesService
@@ -250,7 +265,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name,
+            state.name as string,
             state.interaction,
             '5',
             textInputRulesService
@@ -266,7 +281,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name,
+            state.name as string,
             state.interaction,
             '6',
             textInputRulesService
@@ -287,7 +302,7 @@ describe('Answer Classification Service', () => {
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
-          state.name,
+          state.name as string,
           state.interaction,
           '777',
           textInputRulesService
@@ -308,12 +323,23 @@ describe('Answer Classification Service', () => {
       () => {
         spyOn(alertsService, 'addWarning').and.callThrough();
 
-        stateDict.interaction.default_outcome = null;
+        stateDict.interaction.default_outcome = {
+          dest: '' as string,
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'default_outcome',
+            html: '',
+          },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        };
         const state = State.createFromBackendDict(stateName, stateDict);
 
         expect(() =>
           answerClassificationService.getMatchingClassificationResult(
-            state.name,
+            state.name as string,
             state.interaction,
             'abc',
             textInputRulesService
@@ -357,6 +383,8 @@ describe('Answer Classification Service', () => {
                 },
               },
             ],
+            training_data: [],
+            tagged_skill_misconception_id: null,
           },
         ];
 
@@ -364,7 +392,7 @@ describe('Answer Classification Service', () => {
 
         expect(() =>
           answerClassificationService.getMatchingClassificationResult(
-            state.name,
+            state.name as string,
             state.interaction,
             '0',
             null
@@ -390,65 +418,15 @@ describe('Answer Classification Service', () => {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
           },
+          training_data: [],
+          tagged_skill_misconception_id: null,
           rule_specs: [
             {
               rule_type: 'Equals',
               inputs: {
                 x: {
                   contentId: 'rule_input_0',
-                  normalizedStrSet: ['IncorrectAnswer'],
-                },
-              },
-            },
-          ],
-        },
-        {
-          outcome: {
-            dest: 'outcome 2',
-            dest_if_really_stuck: null,
-            feedback: {
-              content_id: 'feedback_2',
-              html: '',
-            },
-            labelled_as_correct: true,
-            param_changes: [],
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null,
-          },
-          rule_specs: [
-            {
-              rule_type: 'Equals',
-              inputs: {
-                x: {
-                  contentId: 'rule_input_1',
-                  normalizedStrSet: ['Answer'],
-                },
-              },
-            },
-            {
-              rule_type: 'Equals',
-              inputs: {
-                x: {
-                  contentId: 'rule_input_2',
-                  normalizedStrSet: ['MaybeCorrect'],
-                },
-              },
-            },
-            {
-              rule_type: 'FuzzyEquals',
-              inputs: {
-                x: {
-                  contentId: 'rule_input_3',
-                  normalizedStrSet: ['FuzzilyCorrect'],
-                },
-              },
-            },
-            {
-              rule_type: 'Equals',
-              inputs: {
-                x: {
-                  contentId: 'rule_input_short_answer',
-                  normalizedStrSet: ['ans'],
+                  normalizedStrSet: ['10'],
                 },
               },
             },
@@ -496,7 +474,7 @@ describe('Answer Classification Service', () => {
   });
 
   describe('with training data classification', () => {
-    let stateDict;
+    let stateDict!: StateBackendDict;
 
     beforeEach(() => {
       spyOn(interactionSpecsService, 'isInteractionTrainable').and.returnValue(
@@ -508,8 +486,14 @@ describe('Answer Classification Service', () => {
           content_id: 'content',
           html: 'content',
         },
+        classifier_model_id: null,
+        card_is_checkpoint: false,
+        linked_skill_id: null,
+        inapplicable_skill_misconception_ids: null,
         interaction: {
           id: 'TextInput',
+          confirmed_unclassified_answers: [],
+          solution: null,
           customization_args: {
             placeholder: {
               value: {
@@ -537,6 +521,7 @@ describe('Answer Classification Service', () => {
                 missing_prerequisite_skill_id: null,
               },
               training_data: ['abc', 'input'],
+              tagged_skill_misconception_id: null,
               rule_specs: [
                 {
                   rule_type: 'Equals',
@@ -563,6 +548,7 @@ describe('Answer Classification Service', () => {
                 missing_prerequisite_skill_id: null,
               },
               training_data: ['xyz'],
+              tagged_skill_misconception_id: null,
               rule_specs: [
                 {
                   rule_type: 'Contains',
@@ -603,7 +589,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name,
+            state.name as string,
             state.interaction,
             'abc',
             textInputRulesService
@@ -619,7 +605,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name,
+            state.name as string,
             state.interaction,
             'xyz',
             textInputRulesService
@@ -643,7 +629,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name,
+            state.name as string,
             state.interaction,
             'input',
             textInputRulesService
@@ -671,22 +657,24 @@ describe('Answer Classification Service', () => {
         // Returns false when no answer group matches and
         // default outcome has destination equal to state name.
 
-        stateDict.interaction.default_outcome.dest = stateName;
+        if (stateDict.interaction.default_outcome) {
+          stateDict.interaction.default_outcome.dest = stateName as string;
+        }
         let state1 = State.createFromBackendDict(stateName, stateDict);
 
         let res1 =
           answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-            state1.name,
+            state1.name as string,
             state1,
             '777',
             textInputRulesService
           );
 
-        expect(res1).toBeFalse();
+        expect(res1).toBe(false);
         expect(
           answerClassificationService.getMatchingClassificationResult
         ).toHaveBeenCalledWith(
-          state1.name,
+          state1.name as string,
           state1.interaction,
           '777',
           textInputRulesService
@@ -694,23 +682,25 @@ describe('Answer Classification Service', () => {
 
         // Returns true if any answer group matches.
 
-        stateDict.interaction.default_outcome.dest = 'default';
+        if (stateDict.interaction.default_outcome) {
+          stateDict.interaction.default_outcome.dest = 'default';
+        }
         let state2 = State.createFromBackendDict(stateName, stateDict);
 
         let res2 =
           answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-            state2.name,
+            state2.name as string,
             state2,
             'equal',
             textInputRulesService
           );
 
-        expect(res2).toBeTrue();
+        expect(res2).toBe(true);
         expect(
           answerClassificationService.getMatchingClassificationResult
         ).toHaveBeenCalledWith(
-          state2.name,
-          state2.interaction,
+          state2.name as string,
+          state2.interaction as Interaction,
           'equal',
           textInputRulesService
         );
