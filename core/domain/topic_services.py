@@ -1326,11 +1326,27 @@ def publish_story(topic_id: str, story_id: str, committer_id: str) -> None:
     )
 
 
+def _cleanup_permanently_unpublished_story(
+    exp_ids: List[str],
+) -> None:
+    """Deletes exploration opportunities and rejects translation suggestions
+    for a permanently unpublished story. This cleanup is intentionally
+    skipped for temporarily unpublished stories so that the content can be
+    restored without data loss when the story is republished.
+
+    Args:
+        exp_ids: list(str). The exploration IDs linked to the story whose
+            opportunities and suggestions should be cleaned up.
+    """
+    opportunity_services.delete_exploration_opportunities(exp_ids)
+    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
+
+
 def unpublish_story(
     topic_id: str,
     story_id: str,
     committer_id: str,
-    unpublish_type: str = topic_domain.STORY_UNPUBLISH_TYPE_PERMANENT,
+    unpublish_type: str = topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
 ) -> None:
     """Marks the given story as unpublished.
 
@@ -1338,8 +1354,8 @@ def unpublish_story(
         topic_id: str. The id of the topic.
         story_id: str. The id of the given story.
         committer_id: str. ID of the committer.
-        unpublish_type: str. Either STORY_UNPUBLISH_TYPE_PERMANENT or
-            STORY_UNPUBLISH_TYPE_TEMPORARY. Defaults to permanent.
+        unpublish_type: str. Either STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH
+            or STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH. Defaults to permanent.
 
     Raises:
         Exception. The given story does not exist.
@@ -1402,13 +1418,12 @@ def unpublish_story(
     )
     generate_topic_summary(topic.id)
 
-    # Delete corresponding exploration opportunities and reject associated
-    # translation suggestions.
-    if unpublish_type == topic_domain.STORY_UNPUBLISH_TYPE_PERMANENT:
-        exp_ids = story.story_contents.get_all_linked_exp_ids()
-        opportunity_services.delete_exploration_opportunities(exp_ids)
-        suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
-            exp_ids
+    if (
+        unpublish_type
+        == topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH
+    ):
+        _cleanup_permanently_unpublished_story(
+            story.story_contents.get_all_linked_exp_ids()
         )
 
 

@@ -56,8 +56,7 @@ interface ValidationExplorationBackendResponse {
 }
 
 interface ChangeStoryPublicationStatusRequest {
-  new_story_status_is_public: boolean;
-  story_unpublish_type?: 'temporary' | 'permanent';
+  story_unpublish_type: 'publish' | 'temporary' | 'permanent';
 }
 
 @Injectable({
@@ -137,10 +136,9 @@ export class EditableStoryBackendApiService {
 
   private _changeStoryPublicationStatus(
     storyId: string,
-    newStoryStatusIsPublic: boolean,
+    unpublishType: 'publish' | 'temporary' | 'permanent',
     successCallback: (value: void) => void,
-    errorCallback: (reason: string) => void,
-    mode?: 'temporary' | 'permanent'
+    errorCallback: (reason: string) => void
   ): void {
     const storyPublishUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.STORY_PUBLISH_URL_TEMPLATE,
@@ -149,8 +147,7 @@ export class EditableStoryBackendApiService {
       }
     );
     const putData: ChangeStoryPublicationStatusRequest = {
-      new_story_status_is_public: newStoryStatusIsPublic,
-      ...(mode !== undefined && {story_unpublish_type: mode}),
+      story_unpublish_type: unpublishType,
     };
     this.http
       .put(storyPublishUrl, putData)
@@ -280,26 +277,15 @@ export class EditableStoryBackendApiService {
 
   async changeStoryPublicationStatusAsync(
     storyId: string,
-    newStoryStatusIsPublic: boolean,
-    mode?: 'temporary' | 'permanent'
+    unpublishType: 'publish' | 'temporary' | 'permanent'
   ): Promise<void> {
     return new Promise((resolve, reject) => {
-      if (mode !== undefined) {
-        this._changeStoryPublicationStatus(
-          storyId,
-          newStoryStatusIsPublic,
-          resolve,
-          reject,
-          mode
-        );
-      } else {
-        this._changeStoryPublicationStatus(
-          storyId,
-          newStoryStatusIsPublic,
-          resolve,
-          reject
-        );
-      }
+      this._changeStoryPublicationStatus(
+        storyId,
+        unpublishType,
+        resolve,
+        reject
+      );
     });
   }
 

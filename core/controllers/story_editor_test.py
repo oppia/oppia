@@ -71,7 +71,9 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, new_story_id),
-            {'new_story_status_is_public': True},
+            {
+                'story_unpublish_type': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+            },
             csrf_token=csrf_token,
             expected_status_int=404,
         )
@@ -83,14 +85,16 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, new_story_id),
-            {'new_story_status_is_public': True},
+            {
+                'story_unpublish_type': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+            },
             csrf_token=csrf_token,
             expected_status_int=404,
         )
 
         self.logout()
 
-    def test_put_can_not_publish_story_with_invalid_new_story_status_value(
+    def test_put_can_not_publish_story_with_invalid_story_unpublish_type(
         self,
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -98,7 +102,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
-            {'new_story_status_is_public': 'Invalid value'},
+            {'story_unpublish_type': 'invalid_value'},
             csrf_token=csrf_token,
             expected_status_int=400,
         )
@@ -112,7 +116,9 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
-            {'new_story_status_is_public': True},
+            {
+                'story_unpublish_type': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+            },
             csrf_token=csrf_token,
         )
 
@@ -123,7 +129,11 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
-            {'new_story_status_is_public': False},
+            {
+                'story_unpublish_type': (
+                    topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH
+                )
+            },
             csrf_token=csrf_token,
         )
 
@@ -137,7 +147,9 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
         # Check that non-admins cannot publish a story.
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
-            {'new_story_status_is_public': True},
+            {
+                'story_unpublish_type': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+            },
             csrf_token=csrf_token,
             expected_status_int=401,
         )
@@ -148,16 +160,17 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
-            {'new_story_status_is_public': True},
+            {
+                'story_unpublish_type': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+            },
             csrf_token=csrf_token,
         )
 
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
             {
-                'new_story_status_is_public': False,
                 'story_unpublish_type': (
-                    topic_domain.STORY_UNPUBLISH_TYPE_TEMPORARY
+                    topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH
                 ),
             },
             csrf_token=csrf_token,
@@ -169,7 +182,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
                 self.assertEqual(reference.story_is_published, False)
                 self.assertEqual(
                     reference.story_unpublish_type,
-                    topic_domain.STORY_UNPUBLISH_TYPE_TEMPORARY,
+                    topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
                 )
 
         self.logout()

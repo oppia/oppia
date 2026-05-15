@@ -1299,7 +1299,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID,
             self.story_id_1,
             self.user_id_admin,
-            topic_domain.STORY_UNPUBLISH_TYPE_TEMPORARY,
+            topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
         )
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         for reference in topic.canonical_story_references:
@@ -1307,7 +1307,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(reference.story_is_published, False)
                 self.assertEqual(
                     reference.story_unpublish_type,
-                    topic_domain.STORY_UNPUBLISH_TYPE_TEMPORARY,
+                    topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
                 )
 
     def test_unpublish_story_permanently_sets_unpublish_type(self) -> None:
@@ -1318,7 +1318,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID,
             self.story_id_1,
             self.user_id_admin,
-            topic_domain.STORY_UNPUBLISH_TYPE_PERMANENT,
+            topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
         )
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         for reference in topic.canonical_story_references:
@@ -1326,7 +1326,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(reference.story_is_published, False)
                 self.assertEqual(
                     reference.story_unpublish_type,
-                    topic_domain.STORY_UNPUBLISH_TYPE_PERMANENT,
+                    topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
                 )
 
     def test_invalid_publish_and_unpublish_story(self) -> None:

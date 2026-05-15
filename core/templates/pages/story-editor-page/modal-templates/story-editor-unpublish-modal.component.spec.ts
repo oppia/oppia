@@ -84,7 +84,7 @@ describe('Story Editor Unpublish Modal Component', () => {
     });
   });
 
-  it('should not close when popup is in choice state', () => {
+  it('should not close when showing the choice screen', () => {
     mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
       false;
     const spy = spyOn(ngbActiveModal, 'close');

@@ -30,7 +30,7 @@ from core.domain import (
     topic_services,
 )
 
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, List, TypedDict
 
 SCHEMA_FOR_STORY_ID = {
     'type': 'basestring',
@@ -206,8 +206,7 @@ class StoryPublishHandlerNormalizedPayloadDict(TypedDict):
     normalized_payload dictionary.
     """
 
-    new_story_status_is_public: bool
-    story_unpublish_type: Optional[str]
+    story_unpublish_type: str
 
 
 class StoryPublishHandler(
@@ -219,18 +218,15 @@ class StoryPublishHandler(
     URL_PATH_ARGS_SCHEMAS = {'story_id': {'schema': SCHEMA_FOR_STORY_ID}}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
-            'new_story_status_is_public': {
-                'schema': {'type': 'bool'},
-            },
             'story_unpublish_type': {
                 'schema': {
                     'type': 'basestring',
                     'choices': [
-                        topic_domain.STORY_UNPUBLISH_TYPE_PERMANENT,
-                        topic_domain.STORY_UNPUBLISH_TYPE_TEMPORARY,
+                        topic_domain.STORY_PUBLICATION_ACTION_PUBLISH,
+                        topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
+                        topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
                     ],
                 },
-                'default_value': None,
             },
         }
     }
@@ -246,30 +242,15 @@ class StoryPublishHandler(
         assert self.normalized_payload is not None
         story = story_fetchers.get_story_by_id(story_id, strict=True)
         topic_id = story.corresponding_topic_id
-        topic = topic_fetchers.get_topic_by_id(topic_id, strict=True)
 
-        story_reference = next(
-            ref
-            for ref in topic.canonical_story_references
-            if ref.story_id == story_id
-        )
-        story_unpublish_type = story_reference.story_unpublish_type
+        story_unpublish_type = self.normalized_payload['story_unpublish_type']
 
-        new_story_status_is_public = self.normalized_payload[
-            'new_story_status_is_public'
-        ]
-
-        if new_story_status_is_public:
+        if (
+            story_unpublish_type
+            == topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+        ):
             topic_services.publish_story(topic_id, story_id, self.user_id)
         else:
-            story_unpublish_type = self.normalized_payload.get(
-                'story_unpublish_type'
-            )
-            if story_unpublish_type is None:
-                story_unpublish_type = (
-                    topic_domain.STORY_UNPUBLISH_TYPE_PERMANENT
-                )
-
             topic_services.unpublish_story(
                 topic_id,
                 story_id,

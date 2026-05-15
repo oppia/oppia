@@ -260,7 +260,7 @@ export class StoryEditorNavbarComponent implements OnInit {
   }
 
   publishStory(): void {
-    this.storyEditorStateService.changeStoryPublicationStatus(true, () => {
+    this.storyEditorStateService.changeStoryPublicationStatus('publish', () => {
       this.storyIsPublished = this.storyEditorStateService.isStoryPublished();
     });
   }
@@ -272,14 +272,13 @@ export class StoryEditorNavbarComponent implements OnInit {
         result => {
           if (result?.mode) {
             this.storyEditorStateService.changeStoryPublicationStatus(
-              false,
+              result.mode,
               () => {
                 this.storyIsPublished =
                   this.storyEditorStateService.isStoryPublished();
                 this.forceValidateExplorations = true;
                 this._validateStory();
-              },
-              result.mode
+              }
             );
           }
         },
@@ -348,7 +347,7 @@ export class StoryEditorNavbarComponent implements OnInit {
             }
             if (Number(selectedChapterIndexInPublishUptoDropdown) === -1) {
               this.storyEditorStateService.changeStoryPublicationStatus(
-                false,
+                'permanent',
                 () => {
                   this.storyIsPublished =
                     this.storyEditorStateService.isStoryPublished();

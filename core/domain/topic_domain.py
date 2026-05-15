@@ -76,8 +76,9 @@ CMD_DELETE_ADDITIONAL_STORY = 'delete_additional_story'
 CMD_PUBLISH_STORY = 'publish_story'
 CMD_UNPUBLISH_STORY = 'unpublish_story'
 
-STORY_UNPUBLISH_TYPE_PERMANENT: Final = 'permanent'
-STORY_UNPUBLISH_TYPE_TEMPORARY: Final = 'temporary'
+STORY_PUBLICATION_ACTION_PUBLISH: Final = 'publish'
+STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH: Final = 'permanent'
+STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH: Final = 'temporary'
 CMD_ADD_UNCATEGORIZED_SKILL_ID = 'add_uncategorized_skill_id'
 CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill_id'
 CMD_MOVE_SKILL_ID_TO_SUBTOPIC = 'move_skill_id_to_subtopic'
@@ -1422,14 +1423,14 @@ class Topic:
     def unpublish_story(
         self,
         story_id: str,
-        unpublish_type: str = STORY_UNPUBLISH_TYPE_PERMANENT,
+        unpublish_type: str = STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
     ) -> None:
         """Marks story with the given id as unpublished.
 
         Args:
             story_id: str. The ID of the story to unpublish.
-            unpublish_type: str. Either STORY_UNPUBLISH_TYPE_PERMANENT or
-                STORY_UNPUBLISH_TYPE_TEMPORARY.
+            unpublish_type: str. Either STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH
+                or STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH.
 
         Raises:
             Exception. Story with given id doesn't exist in the topic.

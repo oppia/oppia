@@ -279,7 +279,7 @@ describe('Editable story backend API service', () => {
 
     // Send a request to update story.
     editableStoryBackendApiService
-      .changeStoryPublicationStatusAsync('storyId', true)
+      .changeStoryPublicationStatusAsync('storyId', 'publish')
       .then(successHandler, failHandler);
     let req = httpTestingController.expectOne('/story_publish_handler/storyId');
     expect(req.request.method).toEqual('PUT');
@@ -295,7 +295,7 @@ describe('Editable story backend API service', () => {
 
     // Send a request to update story.
     editableStoryBackendApiService
-      .changeStoryPublicationStatusAsync('storyId', false, 'permanent')
+      .changeStoryPublicationStatusAsync('storyId', 'permanent')
       .then(successHandler, failHandler);
     let req = httpTestingController.expectOne('/story_publish_handler/storyId');
     expect(req.request.method).toEqual('PUT');
@@ -416,7 +416,7 @@ describe('Editable story backend API service', () => {
 
     // Loading a story the first time should fetch it from the backend.
     editableStoryBackendApiService
-      .changeStoryPublicationStatusAsync('storyId', true)
+      .changeStoryPublicationStatusAsync('storyId', 'publish')
       .then(successHandler, failHandler);
     let req = httpTestingController.expectOne('/story_publish_handler/storyId');
     expect(req.request.method).toEqual('PUT');

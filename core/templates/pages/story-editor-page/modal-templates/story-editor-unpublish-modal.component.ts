@@ -41,14 +41,17 @@ export class StoryEditorUnpublishModalComponent {
   selectedReasonText: string = this.badContentReasonText;
   unpublishingReason: string = 'BAD_CONTENT';
 
-  popup: 'choice' | 'temporary' | 'permanent' = 'choice';
+  showingChoiceScreen: boolean = true;
+  mode: 'temporary' | 'permanent' = 'permanent';
 
   selectTemporary(): void {
-    this.popup = 'temporary';
+    this.showingChoiceScreen = false;
+    this.mode = 'temporary';
   }
 
   selectPermanent(): void {
-    this.popup = 'permanent';
+    this.showingChoiceScreen = false;
+    this.mode = 'permanent';
   }
 
   cancel(): void {
@@ -64,14 +67,9 @@ export class StoryEditorUnpublishModalComponent {
       return;
     }
 
-    if (this.popup === 'temporary') {
+    if (!this.showingChoiceScreen) {
       this.activeModal.close({
-        mode: 'temporary',
-        reason: undefined,
-      });
-    } else if (this.popup === 'permanent') {
-      this.activeModal.close({
-        mode: 'permanent',
+        mode: this.mode,
         reason: undefined,
       });
     }
