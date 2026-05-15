@@ -395,7 +395,12 @@ describe('Collection player page component', () => {
       tick();
 
       // This happens when collection is not loaded.
-      component.collectionPlaythrough = undefined as any;
+      component.collectionPlaythrough = undefined as unknown as {
+        getNextExplorationId: () => string | null;
+        getCompletedExplorationIds: () => string[];
+        getNextRecommendedCollectionNodeCount: () => number;
+        getCompletedExplorationNodeCount: () => number;
+      };
       let res = component.isCompletedExploration('123');
 
       expect(res).toBe(false);

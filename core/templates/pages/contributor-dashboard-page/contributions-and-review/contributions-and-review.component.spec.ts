@@ -35,6 +35,7 @@ import {
   Suggestion,
   SuggestionDetails,
 } from './contributions-and-review.component';
+import {ActiveContributionDict} from '../modal-templates/translation-suggestion-review-modal.component';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {Skill} from 'domain/skill/skill.model';
@@ -750,7 +751,7 @@ describe('Contributions and review component', () => {
             },
           },
           solicit_answer_details: false,
-        } as any,
+        },
         language_code: 'en',
         version: 1,
         linked_skill_ids: ['abc'],
@@ -1196,11 +1197,11 @@ describe('Contributions and review component', () => {
       };
 
       component._showQuestionSuggestionModal(
-        suggestion as any,
-        suggestionIdToContribution as any,
+        suggestion as Suggestion,
+        suggestionIdToContribution as Record<string, ActiveContributionDict>,
         false,
-        null as any,
-        null as any
+        null,
+        null
       );
 
       let value = {
@@ -1565,8 +1566,8 @@ describe('Contributions and review component', () => {
                       html: 'html',
                       content_id: 'content_1',
                     },
-                  } as any,
-                } as any,
+                  },
+                },
                 skill_difficulty: ['Medium'],
               },
               target_id: 'string;,',
@@ -1683,7 +1684,7 @@ describe('Contributions and review component', () => {
           actionButtonTitle: 'Translations',
           isPinned: true,
           topicName: 'Topic 1',
-        } as any,
+        },
         {
           id: '2',
           heading: 'heading',
@@ -1691,7 +1692,7 @@ describe('Contributions and review component', () => {
           actionButtonTitle: 'Translations',
           isPinned: false,
           topicName: 'Topic 1',
-        } as any,
+        },
         {
           id: '3',
           heading: 'heading',
@@ -1699,7 +1700,7 @@ describe('Contributions and review component', () => {
           actionButtonTitle: 'Translations',
           isPinned: false,
           topicName: 'Topic 1',
-        } as any,
+        },
       ];
       component.languageCode = 'en';
 
@@ -1734,7 +1735,7 @@ describe('Contributions and review component', () => {
             actionButtonTitle: 'Translations',
             isPinned: true,
             topicName: 'Topic 1',
-          } as any,
+          },
           {
             id: '2',
             heading: 'heading',
@@ -1742,7 +1743,7 @@ describe('Contributions and review component', () => {
             actionButtonTitle: 'Translations',
             isPinned: false,
             topicName: 'Topic 1',
-          } as any,
+          },
           {
             id: '3',
             heading: 'heading',
@@ -1750,7 +1751,7 @@ describe('Contributions and review component', () => {
             actionButtonTitle: 'Translations',
             isPinned: false,
             topicName: 'Topic 1',
-          } as any,
+          },
         ];
         component.languageCode = 'en';
 
@@ -1816,8 +1817,8 @@ describe('Contributions and review component', () => {
       jasmine
         .createSpy('userReviewableSuggestionTypes.length')
         .and.returnValue(0);
-      component.SUGGESTION_TYPE_TRANSLATE = '' as any;
-      component.SUGGESTION_TYPE_QUESTION = '' as any;
+      component.SUGGESTION_TYPE_TRANSLATE = '';
+      component.SUGGESTION_TYPE_QUESTION = '';
       getUserContributionRightsDataAsyncSpy.and.returnValue(
         Promise.resolve({
           can_review_translation_for_language_codes: ['something', 'cool'],
@@ -1840,8 +1841,8 @@ describe('Contributions and review component', () => {
       jasmine
         .createSpy('userReviewableSuggestionTypes.length')
         .and.returnValue(0);
-      component.SUGGESTION_TYPE_TRANSLATE = '' as any;
-      component.SUGGESTION_TYPE_QUESTION = '' as any;
+      component.SUGGESTION_TYPE_TRANSLATE = '';
+      component.SUGGESTION_TYPE_QUESTION = '';
       getUserContributionRightsDataAsyncSpy.and.returnValue(
         Promise.resolve({
           can_review_translation_for_language_codes: [],
@@ -1865,8 +1866,8 @@ describe('Contributions and review component', () => {
       jasmine
         .createSpy('userReviewableSuggestionTypes.length')
         .and.returnValue(0);
-      component.SUGGESTION_TYPE_TRANSLATE = '' as any;
-      component.SUGGESTION_TYPE_QUESTION = '' as any;
+      component.SUGGESTION_TYPE_TRANSLATE = '';
+      component.SUGGESTION_TYPE_QUESTION = '';
       getUserContributionRightsDataAsyncSpy.and.returnValue(
         Promise.resolve({
           can_review_translation_for_language_codes: [],
@@ -1996,8 +1997,12 @@ describe('Contributions and review component', () => {
       };
 
       spyOn(formatRtePreviewPipe, 'transform').and.returnValue('heading');
-      component.getQuestionContributionsSummary(suggestion as any);
-      component.getTranslationContributionsSummary(suggestion as any);
+      component.getQuestionContributionsSummary(
+        suggestion as Record<string, SuggestionDetails>
+      );
+      component.getTranslationContributionsSummary(
+        suggestion as Record<string, SuggestionDetails>
+      );
     });
 
     it(
@@ -2575,7 +2580,7 @@ describe('Contributions and review component', () => {
         },
       };
       const clickEvent = {
-        target: null as any,
+        target: null,
       };
       const querySelectorSpy = spyOn(document, 'querySelector').and.returnValue(
         null
@@ -2611,7 +2616,7 @@ describe('Contributions and review component', () => {
 
     it('should return back when user click is made outside', () => {
       const clickEvent = {
-        target: null as any,
+        target: null,
       };
       spyOn(document, 'querySelector').and.returnValue(null);
 
@@ -2677,7 +2682,7 @@ describe('Contributions and review component', () => {
         suggestion_id: 'suggestion_1',
         action_status: 'accepted',
         reviewer_message: 'test',
-      } as any;
+      };
 
       // Simulate opening the modal and the user actions.
       component.onClickViewSuggestion('suggestion_1');

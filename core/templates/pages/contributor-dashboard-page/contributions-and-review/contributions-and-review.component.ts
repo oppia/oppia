@@ -162,8 +162,14 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   reviewableTranslationsSortKey: string = '';
   topicReady: boolean = false;
   commitTimeout?: NodeJS.Timeout;
-  queuedSuggestionSummary: any = null;
-  queuedSuggestion: any = null;
+  queuedSuggestionSummary: {
+    target_id: string;
+    suggestion_id: string;
+    action_status: string;
+    reviewer_message: string;
+    commit_message?: string;
+  } | null = null;
+  queuedSuggestion: Suggestion | null = null;
   currentSnackbarRef?: MatSnackBarRef<UndoSnackbarComponent>;
   tabNameToOpportunityFetchFunction: {
     [key: string]: {
@@ -498,7 +504,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     // Start a new timeout for commit after timeframe.
     this.commitTimeout = setTimeout(() => {
       this.commitQueuedSuggestion();
-    }, COMMIT_TIMEOUT_DURATION) as any;
+    }, COMMIT_TIMEOUT_DURATION);
   }
 
   commitQueuedSuggestion(): void {
@@ -601,7 +607,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       {};
     for (let suggestionId in this.contributions) {
       var contribution = this.contributions[suggestionId];
-      suggestionIdToContribution[suggestionId] = contribution as any;
+      suggestionIdToContribution[suggestionId] =
+        contribution as ActiveContributionDict;
     }
     const skillId = suggestion.change_cmd.skill_id;
 
@@ -641,7 +648,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         {};
       for (let suggestionId in this.contributions) {
         const contribution = this.contributions[suggestionId];
-        suggestionIdToContribution[suggestionId] = contribution as any;
+        suggestionIdToContribution[suggestionId] =
+          contribution as ActiveContributionDict;
       }
       this.pageContextService.setCustomEntityContext(
         AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
@@ -715,7 +723,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
           opportunities: ExplorationOpportunitySummary[];
           more: boolean;
         }) => {
-          const opportunitiesDicts: any[] = [];
+          const opportunitiesDicts: Opportunity[] = [];
           response.opportunities.forEach(
             (opportunity: ExplorationOpportunitySummary) => {
               const opportunityDict = {

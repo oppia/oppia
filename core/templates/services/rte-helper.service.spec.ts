@@ -19,6 +19,11 @@
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {RteHelperService} from './rte-helper.service';
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';
+import {
+  RteComponentId,
+  CustomizationArgsSpecsType,
+  CustomizationArgsForRteType,
+} from './rte-helper-modal.component';
 
 describe('Rte Helper Service', () => {
   let rteHelperService: RteHelperService;
@@ -372,9 +377,15 @@ describe('Rte Helper Service', () => {
   });
 
   it('should evaluate when rich text component is not inline', () => {
-    expect(rteHelperService.isInlineComponent('video' as any)).toBe(false);
-    expect(rteHelperService.isInlineComponent('tabs' as any)).toBe(false);
-    expect(rteHelperService.isInlineComponent('image' as any)).toBe(false);
+    expect(rteHelperService.isInlineComponent('video' as RteComponentId)).toBe(
+      false
+    );
+    expect(rteHelperService.isInlineComponent('tabs' as RteComponentId)).toBe(
+      false
+    );
+    expect(rteHelperService.isInlineComponent('image' as RteComponentId)).toBe(
+      false
+    );
   });
 
   it('should open customization modal', () => {
@@ -389,9 +400,9 @@ describe('Rte Helper Service', () => {
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     rteHelperService.openCustomizationModal(
       false,
-      'video' as any,
-      [] as any,
-      {} as any,
+      'video' as RteComponentId,
+      [] as CustomizationArgsSpecsType,
+      {} as CustomizationArgsForRteType,
       submitCallBackSpy,
       dismissCallBackSpy
     );
@@ -411,9 +422,9 @@ describe('Rte Helper Service', () => {
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     rteHelperService.openCustomizationModal(
       false,
-      'video' as any,
-      [] as any,
-      {} as any,
+      'video' as RteComponentId,
+      [] as CustomizationArgsSpecsType,
+      {} as CustomizationArgsForRteType,
       submitCallBackSpy,
       dismissCallBackSpy
     );
@@ -434,9 +445,9 @@ describe('Rte Helper Service', () => {
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     rteHelperService.openCustomizationModal(
       false,
-      'video' as any,
-      [] as any,
-      {} as any,
+      'video' as RteComponentId,
+      [] as CustomizationArgsSpecsType,
+      {} as CustomizationArgsForRteType,
       submitCallBackSpy,
       dismissCallBackSpy
     );
@@ -461,9 +472,9 @@ describe('Rte Helper Service', () => {
 
       rteHelperService.openCustomizationModal(
         false,
-        'image' as any,
-        [] as any,
-        {} as any,
+        'image' as RteComponentId,
+        [] as CustomizationArgsSpecsType,
+        {} as CustomizationArgsForRteType,
         undefined,
         dismissCallBackSpy
       );
@@ -489,9 +500,9 @@ describe('Rte Helper Service', () => {
 
       rteHelperService.openCustomizationModal(
         true,
-        'image' as any,
-        [] as any,
-        {} as any,
+        'image' as RteComponentId,
+        [] as CustomizationArgsSpecsType,
+        {} as CustomizationArgsForRteType,
         undefined,
         dismissCallBackSpy
       );
@@ -514,8 +525,8 @@ describe('Rte Helper Service', () => {
     rteHelperService.openCustomizationModal(
       false,
       'math',
-      [] as any,
-      {} as any,
+      [] as CustomizationArgsSpecsType,
+      {} as CustomizationArgsForRteType,
       undefined,
       dismissCallBackSpy
     );
