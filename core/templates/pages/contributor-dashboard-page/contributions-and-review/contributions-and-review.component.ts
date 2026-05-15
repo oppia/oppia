@@ -16,8 +16,6 @@
  * @fileoverview Component for showing and reviewing contributions.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import {
   Component,
   OnDestroy,

@@ -16,8 +16,6 @@
  * @fileoverview Spec for service that parses rich text string.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import {DOCUMENT} from '@angular/common';
 import {TestBed} from '@angular/core/testing';
 import {

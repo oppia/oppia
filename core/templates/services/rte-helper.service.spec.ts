@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for RteHelperService.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {RteHelperService} from './rte-helper.service';
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';
