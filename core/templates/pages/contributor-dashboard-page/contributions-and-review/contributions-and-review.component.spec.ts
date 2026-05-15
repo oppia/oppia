@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for contributionsAndReview.
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import {
   ComponentFixture,
   fakeAsync,

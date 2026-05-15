@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the Collection player page component.
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import {
   ComponentFixture,
   fakeAsync,

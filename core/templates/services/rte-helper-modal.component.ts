@@ -16,6 +16,9 @@
  * @fileoverview Component for RteHelperModal.
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 import {Component, Input, ViewChild} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
@@ -210,9 +213,13 @@ export class RteHelperModalComponent {
       }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const formGroupControls: {[key: number]: any} = {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.customizationArgSpecs.forEach((_: any, index: number) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (formGroupControls as any)[index] = this.fb.control(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (this.tmpCustomizationArgs as any)[index].value
       );
     });
@@ -557,6 +564,7 @@ export class RteHelperModalComponent {
         this.pageContextService.getImageSaveDestination() ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       ) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.imageLocalStorageService.saveImage(svgFileName, svgFile!);
         const mathContentDict = {
           raw_latex: tmpCustomizationArgs[0].value.raw_latex,
@@ -567,11 +575,15 @@ export class RteHelperModalComponent {
         this.ngbActiveModal.close(customizationArgsDict);
         return;
       }
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       this.assetsBackendApiService
         .saveMathExpressionImage(
           resampledFile,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           svgFileName!,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           this.pageContextService.getEntityType()!,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           this.pageContextService.getEntityId()!
         )
         .then(

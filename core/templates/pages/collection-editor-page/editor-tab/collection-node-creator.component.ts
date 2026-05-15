@@ -77,7 +77,7 @@ export class CollectionNodeCreatorComponent {
             null;
           if (summaries.length !== 0 && summaries[0].id === newExplorationId) {
             // Convert ExplorationSummaryDict to LearnerExplorationSummaryBackendDict
-            // by adding the missing required properties
+            // by adding the missing required properties.
             summaryBackendObject = {
               ...summaries[0],
               activity_type: 'exploration',

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for RteHelperModalController.
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import {
   TestBed,
   ComponentFixture,
