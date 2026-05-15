@@ -914,6 +914,13 @@ export class TopicManager extends BaseUser {
 
     await this.expectElementToBeVisible(saveQuestionButton, false);
     await this.expectElementToBeVisible(successToastSelector);
+
+    // Wait for the editor to close and the question list to appear.
+    // After saving, the question list is refreshed asynchronously.
+    await this.page.waitForSelector(questionContainerSelector, {
+      visible: true,
+      timeout: 30000,
+    });
   }
 
   /**
@@ -3993,7 +4000,20 @@ export class TopicManager extends BaseUser {
   async expectQuestionToBeVisible(
     question: string
   ): Promise<ElementHandle<Element>> {
-    await this.expectElementToBeVisible(questionTextSelector);
+    // Poll until the expected question text appears in the list.
+    // This handles the case where the question list is refreshed
+    // asynchronously after saving a question.
+    await this.page.waitForFunction(
+      (selector: string, expectedText: string) => {
+        const elements = document.querySelectorAll(selector);
+        return Array.from(elements).some(
+          el => el.textContent?.trim() === expectedText
+        );
+      },
+      {timeout: 30000},
+      questionTextSelector,
+      question
+    );
 
     const questionElements = await this.page.$$(questionTextSelector);
     let requiredQuestionElement: ElementHandle<Element> | null = null;
