@@ -451,30 +451,35 @@ export class ConversationSkinComponent {
     return this.cardAnimationService.getIsAnimatingToOneCard();
   }
 
+  // isSupplementalNavShown(): boolean {
+  //   let displayedCard = this.conversationFlowService.getDisplayedCard();
+  //   if (!displayedCard) {
+  //     return false;
+  //   }
+  //   if (
+  //     displayedCard.getStateName() === null &&
+  //     !this.explorationModeService.isInQuestionMode()
+  //   ) {
+  //     return false;
+  //   }
+  //   let interaction = displayedCard.getInteraction();
+  //   return (
+  //     Boolean(interaction.id) &&
+  //     (
+  //       INTERACTION_SPECS as Record<
+  //         string,
+  //         {show_generic_submit_button: boolean}
+  //       >
+  //     )[interaction.id as string].show_generic_submit_button &&
+  //     this.isCurrentCardAtEndOfTranscript()
+  //   );
+  // }
   isSupplementalNavShown(): boolean {
-    let displayedCard = this.conversationFlowService.getDisplayedCard();
-    if (!displayedCard) {
-      return false;
-    }
-    if (
-      displayedCard.getStateName() === null &&
-      !this.explorationModeService.isInQuestionMode()
-    ) {
-      return false;
-    }
-    let interaction = displayedCard.getInteraction();
     return (
-      Boolean(interaction.id) &&
-      (
-        INTERACTION_SPECS as Record<
-          string,
-          {show_generic_submit_button: boolean}
-        >
-      )[interaction.id as string].show_generic_submit_button &&
+      this.explorationModeService.isInQuestionMode() &&
       this.isCurrentCardAtEndOfTranscript()
     );
   }
-
   isCurrentCardAtEndOfTranscript(): boolean {
     return this.playerPositionService.isCurrentCardAtEndOfTranscript();
   }

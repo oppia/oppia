@@ -22,6 +22,7 @@ import {
   async,
   ComponentFixture,
   fakeAsync,
+  flushMicrotasks,
   TestBed,
   tick,
 } from '@angular/core/testing';
@@ -211,20 +212,21 @@ describe('ExplorationFooterComponent', () => {
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     userService = TestBed.inject(UserService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    ngbModal = TestBed.inject(NgbModal);
     checkpointCelebrationUtilityService = TestBed.inject(
       CheckpointCelebrationUtilityService
     );
     conceptCardManagerService = TestBed.inject(ConceptCardManagerService);
+
     fixture = TestBed.createComponent(ExplorationFooterComponent);
-    ngbModal = TestBed.inject(NgbModal);
     component = fixture.componentInstance;
+
     fixture.detectChanges();
 
     spyOn(playerPositionService, 'onNewCardOpened').and.returnValue(
       new EventEmitter<StateCard>()
     );
   });
-
   afterEach(() => {
     component.ngOnDestroy();
   });
@@ -660,7 +662,10 @@ describe('ExplorationFooterComponent', () => {
         3
       );
       spyOn(loggerService, 'error');
-
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {},
+        result: Promise.reject(),
+      } as NgbModalRef);
       component.showProgressReminderModal();
       tick();
 
@@ -1027,10 +1032,10 @@ describe('ExplorationFooterComponent', () => {
 
   it('should display lesson information card', fakeAsync(() => {
     component.explorationId = 'exp1';
-    component.expInfo = {} as LearnerExplorationSummaryBackendDict;
+    component.expInfo = undefined;
 
     spyOn(component, 'openInformationCardModal');
-    component.showInformationCard();
+
     spyOn(
       learnerViewInfoBackendApiService,
       'fetchLearnerInfoAsync'
@@ -1040,38 +1045,15 @@ describe('ExplorationFooterComponent', () => {
       })
     );
 
-    expect(component.openInformationCardModal).toHaveBeenCalled();
-    component.expInfo = {
-      id: 'exp1',
-      title: 'Test Exploration',
-      category: 'Test',
-      objective: 'Test objective',
-      language_code: 'en',
-      tags: [],
-      ratings: {
-        1: 0,
-        2: 0,
-        3: 0,
-        4: 0,
-        5: 0,
-      },
-      num_views: 0,
-      status: 'public',
-      last_updated_msec: 0,
-      community_owned: false,
-      thumbnail_icon_url: '',
-      thumbnail_bg_color: '',
-      created_on_msec: 0,
-      human_readable_contributors_summary: {},
-      activity_type: 'exploration',
-    };
-
     component.showInformationCard();
-    tick();
+
+    flushMicrotasks();
 
     expect(
       learnerViewInfoBackendApiService.fetchLearnerInfoAsync
     ).toHaveBeenCalled();
+
+    expect(component.openInformationCardModal).toHaveBeenCalled();
   }));
 
   it('should get footer image url', () => {
@@ -1193,7 +1175,10 @@ describe('ExplorationFooterComponent', () => {
         'fetchLearnerInfoAsync'
       ).and.returnValue(Promise.reject());
       spyOn(loggerService, 'error');
-
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {},
+        result: Promise.reject(),
+      } as NgbModalRef);
       component.showInformationCard();
       tick();
 

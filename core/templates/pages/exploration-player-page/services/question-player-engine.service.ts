@@ -211,7 +211,16 @@ export class QuestionPlayerEngineService {
    *
    * @returns {string} The ID of the current question.
    */
-  getCurrentQuestionId(): string {
+
+  getCurrentQuestionId(): string | null {
+    if (
+      this.currentIndex === null ||
+      this.currentIndex === undefined ||
+      !this.questions[this.currentIndex]
+    ) {
+      return '';
+    }
+
     return this.questions[this.currentIndex].getId();
   }
 
@@ -320,7 +329,8 @@ export class QuestionPlayerEngineService {
       return;
     }
 
-    const answerString = answer as string;
+    const answerString =
+      typeof answer === 'string' ? answer : JSON.stringify(answer);
     this.setAnswerIsBeingProcessed(true);
     const oldState = this.getCurrentStateData();
     const classificationResult =
@@ -348,7 +358,7 @@ export class QuestionPlayerEngineService {
       answer: answerString,
     };
     const feedbackHtml = this.makeFeedback(outcome.feedback.html, [oldParams]);
-    if (feedbackHtml === null) {
+    if (!feedbackHtml) {
       this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Feedback content should not be empty.');
       return;
@@ -367,7 +377,7 @@ export class QuestionPlayerEngineService {
         answer: 'answer',
       },
     ]);
-    if (questionHtml === null) {
+    if (!questionHtml || questionHtml.trim() === '') {
       this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Question name should not be empty.');
       return;
@@ -523,7 +533,7 @@ export class QuestionPlayerEngineService {
   private makeFeedback(
     feedbackHtml: string,
     envs: Record<string, string>[]
-  ): string {
+  ): string | null {
     return this.expressionInterpolationService.processHtml(feedbackHtml, envs);
   }
 
@@ -541,7 +551,7 @@ export class QuestionPlayerEngineService {
   private makeQuestion(
     newState: State,
     envs: Record<string, string>[]
-  ): string {
+  ): string | null {
     return this.expressionInterpolationService.processHtml(
       newState.content.html,
       envs
@@ -609,7 +619,7 @@ export class QuestionPlayerEngineService {
     const initialState = this.questions[0].getStateData();
 
     const questionHtml = this.makeQuestion(initialState, []);
-    if (questionHtml === null) {
+    if (!questionHtml || questionHtml.trim() === '') {
       this.alertsService.addWarning('Question name should not be empty.');
       errorCallback();
       return;

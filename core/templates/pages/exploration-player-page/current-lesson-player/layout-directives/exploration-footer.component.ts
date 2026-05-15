@@ -245,14 +245,19 @@ export class ExplorationFooterComponent {
       }
     }
 
-    const componentInstance = modalRef.componentInstance;
+    // const componentInstance = modalRef.componentInstance;
 
-    if (componentInstance) {
-      componentInstance.checkpointCount = this.checkpointCount;
-      componentInstance.completedCheckpointsCount =
-        this.completedCheckpointsCount;
-      componentInstance.explorationTitle = this.expInfo?.title ?? '';
-    }
+    // if (componentInstance) {
+    //   componentInstance.checkpointCount = this.checkpointCount;
+    //   componentInstance.completedCheckpointsCount =
+    //     this.completedCheckpointsCount;
+    //   componentInstance.explorationTitle = this.expInfo?.title ?? '';
+    // }
+    modalRef.componentInstance.checkpointCount = this.checkpointCount;
+    modalRef.componentInstance.completedCheckpointsCount =
+      this.completedCheckpointsCount;
+    modalRef.componentInstance.explorationTitle = this.expInfo?.title ?? '';
+
     modalRef.result.then(
       () => {
         // This callback is used for when the learner chooses to restart
