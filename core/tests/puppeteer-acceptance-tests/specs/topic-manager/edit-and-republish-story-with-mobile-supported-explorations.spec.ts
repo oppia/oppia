@@ -87,8 +87,8 @@ describe('Topic Manager', function () {
     );
 
     await curriculumAdmin.saveStoryDraft();
-    await curriculumAdmin.waitForPageToFullyLoad();
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.waitForPageToFullyLoad();
 
     // Create topic Manager.
     topicManager = await UserFactory.createNewUser(
