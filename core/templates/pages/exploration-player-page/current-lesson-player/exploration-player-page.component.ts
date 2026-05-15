@@ -37,8 +37,6 @@ require('interactions/interactionsRequires.ts');
 @Component({
   selector: 'oppia-exploration-player-page',
   templateUrl: './exploration-player-page.component.html',
-
-  encapsulation: ViewEncapsulation.None,
 })
 export class ExplorationPlayerPageComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();

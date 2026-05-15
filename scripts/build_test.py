@@ -453,14 +453,11 @@ class BuildTests(test_utils.GenericTestBase):
             content = yaml_file.read()
 
         self.assertIn(
-            'static_dir: dist/oppia-angular-prod/third_party/ckeditor\n',
+            'static_dir: build/third_party/ckeditor\n',
             content,
         )
         self.assertIn(
-            (
-                'static_dir: '
-                'dist/oppia-angular-prod/third_party/ckeditor-bootstrapck\n'
-            ),
+            ('static_dir: ' 'build/third_party/ckeditor-bootstrapck\n'),
             content,
         )
         self.assertNotIn(
@@ -710,7 +707,7 @@ class BuildTests(test_utils.GenericTestBase):
             build,
             'get_file_count',
             mock_get_file_count,
-            expected_args=[('dist/oppia-angular-prod',)],
+            expected_args=[('build',)],
         )
 
         with ng_build_swap, get_file_count_swap:
@@ -739,7 +736,7 @@ class BuildTests(test_utils.GenericTestBase):
             build,
             'get_file_count',
             mock_get_file_count,
-            expected_args=[('dist/oppia-angular-prod',)],
+            expected_args=[('build',)],
         )
 
         with ng_build_swap, get_file_count_swap:
@@ -757,7 +754,7 @@ class BuildTests(test_utils.GenericTestBase):
             try:
                 with self.assertRaisesRegex(
                     RuntimeError,
-                    'dist/oppia-angular-prod does not exist. '
+                    'build does not exist. '
                     'Angular CLI build may have failed.',
                 ):
                     build.sync_angular_css_hashes()
@@ -771,13 +768,9 @@ class BuildTests(test_utils.GenericTestBase):
             old_working_dir = os.getcwd()
             os.chdir(temp_dir)
             try:
-                os.makedirs('dist/oppia-angular-prod', exist_ok=True)
-                pathlib.Path(
-                    'dist/oppia-angular-prod/styles.abc123.css'
-                ).touch()
-                pathlib.Path(
-                    'dist/oppia-angular-prod/vendor-styles.def456.css'
-                ).touch()
+                os.makedirs('build', exist_ok=True)
+                pathlib.Path('build/styles.abc123.css').touch()
+                pathlib.Path('build/vendor-styles.def456.css').touch()
 
                 os.makedirs('assets', exist_ok=True)
                 with open(

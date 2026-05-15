@@ -99,7 +99,7 @@ FILEPATHS_NOT_TO_RENAME = (
     '*.py',
     'third_party/generated/webfonts/*',
     'dist/oppia-angular/*',
-    'dist/oppia-angular-prod/*',
+    'build/*',
 )
 
 # These are the env vars that need to be removed from app.yaml when we are
@@ -257,18 +257,14 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
                     'removed does not exist.' % env_variable
                 )
             content = re.sub('  %s: ".*"\n' % env_variable, '', content)
+
     # In app_dev.yaml, CKEditor is served from the Angular dev build output
-    # (dist/oppia-angular/). For app.yaml (used in prod mode), it must point
-    # to the prod build output (dist/oppia-angular-prod/).
-    #
-    # Some unit tests use minimal mock app_dev.yaml files that do not define
-    # CKEditor handlers. In that case we skip this rewrite. When CKEditor
-    # handlers are present, we still require exactly one replacement.
+    # For app.yaml (used in prod mode), it must point to the prod build folder.
     if '/third_party/ckeditor' in content:
         content = replace_content_or_fail(
             content,
             r'^[ \t]*static_dir:[ \t]*dist/oppia-angular(?:/browser)?/third_party/ckeditor[ \t]*\r?$',
-            '  static_dir: dist/oppia-angular-prod/third_party/ckeditor',
+            '  static_dir: build/third_party/ckeditor',
             'CKEditor static_dir entry was not found in app.yaml content.',
         )
     if '/third_party/ckeditor-bootstrapck' in content:
@@ -279,15 +275,17 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
                 r'dist/oppia-angular(?:/browser)?/third_party/ckeditor-bootstrapck'
                 r'[ \t]*\r?$'
             ),
-            '  static_dir: dist/oppia-angular-prod/third_party/ckeditor-bootstrapck',
+            '  static_dir: build/third_party/ckeditor-bootstrapck',
             'CKEditor bootstrapck static_dir entry was not found in app.yaml content.',
         )
-    # In app_dev.yaml, MathJax is served from the Angular dev build output
-    # (dist/oppia-angular/). For app.yaml (used in prod mode), it must point
-    # to the prod build output (dist/oppia-angular-prod/).
+
+    # MathJax must point to the prod build output
     content = content.replace(
         'static_dir: dist/oppia-angular/assets/mathjax',
-        'static_dir: dist/oppia-angular-prod/assets/mathjax',
+        'static_dir: build/assets/mathjax',
+    )
+    content = content.replace(
+        'static_files: extensions/', 'static_files: build/extensions/'
     )
     if os.path.isfile(APP_YAML_FILEPATH):
         os.remove(APP_YAML_FILEPATH)
@@ -463,7 +461,7 @@ def process_html(
 def build_using_ng() -> None:
     """Execute angular build process. This runs the angular compiler and
     generates an ahead of time compiled bundle. This bundle can be found in the
-    dist/oppia-angular-prod folder.
+    build folder.
     """
     print('Building using angular cli')
     managed_ng_build_process = servers.managed_ng_build(
@@ -472,7 +470,7 @@ def build_using_ng() -> None:
     with managed_ng_build_process as p:
         p.wait()
     assert (
-        get_file_count('dist/oppia-angular-prod') > 0
+        get_file_count('build') > 0
     ), 'angular generated bundle should be non-empty'
 
 
@@ -483,7 +481,7 @@ def sync_angular_css_hashes() -> None:
     Angular generates hashed filenames.
     """
 
-    dist_dir = 'dist/oppia-angular-prod'
+    dist_dir = 'build'
 
     if not os.path.exists(dist_dir):
         raise RuntimeError(
@@ -762,6 +760,31 @@ def clean() -> None:
     safe_delete_directory_tree('build/')
 
 
+def rename_assets_with_hashes() -> None:
+    """Renames static assets in the build directory to include their hashes."""
+    dist_dir = 'build'
+    if not os.path.exists(HASHES_JSON_FILEPATH):
+        return
+
+    with open(HASHES_JSON_FILEPATH, 'r', encoding='utf-8') as f:
+        hashes = json.load(f)
+
+    for filepath, file_hash in hashes.items():
+        relative_filepath = filepath.lstrip('/')
+
+        possible_paths = [
+            os.path.join(dist_dir, 'assets', relative_filepath),
+            os.path.join(dist_dir, relative_filepath),
+            os.path.join(dist_dir, 'extensions', relative_filepath),
+        ]
+
+        for unhashed_file_path in possible_paths:
+            if os.path.exists(unhashed_file_path):
+                hashed_file_path = _insert_hash(unhashed_file_path, file_hash)
+                shutil.copyfile(unhashed_file_path, hashed_file_path)
+                break
+
+
 def main(args: Optional[Sequence[str]] = None) -> None:
     """The main method of this script."""
     options = _PARSER.parse_args(args=args)
@@ -789,6 +812,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         generate_python_package()
         build_using_ng()
         sync_angular_css_hashes()
+        rename_assets_with_hashes()
         generate_app_yaml(deploy_mode=options.deploy_mode)
 
     save_hashes_to_file({})
