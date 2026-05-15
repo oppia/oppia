@@ -87,7 +87,6 @@ describe('Topic Manager', function () {
     );
 
     await curriculumAdmin.saveStoryDraft();
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.waitForPageToFullyLoad();
 
     // Create topic Manager.
