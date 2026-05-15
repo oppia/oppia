@@ -2528,17 +2528,17 @@ export class ExplorationEditor extends BaseUser {
 
     // If the create activity modal appears (user has collection editor role),
     // click the exploration option.
-    try {
-      await this.page.waitForSelector(creationModalSelector, {
-        visible: true,
-        timeout: 5000,
-      });
+    const isCreationModalVisible = await this.isElementVisible(
+      creationModalSelector,
+      true,
+      5000
+    );
+
+    if (isCreationModalVisible) {
       await this.clickAndWaitForNavigation(
         createExplorationFromModalSelector,
         true
       );
-    } catch {
-      // No modal appeared, navigation already happened directly.
     }
 
     await this.page.waitForFunction(
