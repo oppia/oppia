@@ -472,19 +472,21 @@ export class CustomizeInteractionModalComponent
       ];
     }
 
-    if (this.stateEditorService.isInQuestionMode()) {
-      this.allowedInteractionCategories = [
-        ...AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES,
-      ];
-    } else if (this.pageContextService.isExplorationLinkedToStory()) {
-      this.allowedInteractionCategories = [
-        ...AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES,
-      ];
-    } else {
-      this.allowedInteractionCategories = [
-        ...AppConstants.ALLOWED_INTERACTION_CATEGORIES,
-      ];
-    }
+    const deprecatedInteractions = [
+      'PencilCodeEditor',
+      'MusicNotesInput',
+      'CodeRepl',
+      'GraphInput',
+      'InteractiveMap',
+    ];
+    this.allowedInteractionCategories = this.allowedInteractionCategories
+      .map(category => ({
+        ...category,
+        interaction_ids: category.interaction_ids.filter(
+          id => !deprecatedInteractions.includes(id)
+        ),
+      }))
+      .filter(category => category.interaction_ids.length > 0);
 
     if (this.stateInteractionIdService.savedMemento) {
       this.customizationModalReopened = true;
