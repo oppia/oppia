@@ -1047,6 +1047,7 @@ export class LoggedOutUser extends BaseUser {
     if (!blogPostsFound) {
       return;
     }
+    await this.expectElementToBeVisible(blogPostContentSelector);
     const contentFound = await this.page.$$eval(
       `${blogPostTitleContainerSelector}, ${blogPostContentSelector}`,
       (elements, searchText) =>
@@ -1095,6 +1096,7 @@ export class LoggedOutUser extends BaseUser {
     if (!blogPostsFound) {
       return;
     }
+    await this.expectElementToBeVisible(blogPostTagSelector);
     const tagFound = await this.page.$$eval(
       blogPostTagSelector,
       (elements, expectedTag) =>
@@ -3493,7 +3495,8 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForFunction(
       (selector: string, value: string) => {
         const element = document.querySelector(selector);
-        return element?.textContent !== value;
+        const text = element?.textContent?.trim();
+        return !!text && text !== value?.trim();
       },
       {},
       currentCardContentSelector,
