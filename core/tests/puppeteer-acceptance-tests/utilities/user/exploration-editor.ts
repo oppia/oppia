@@ -3535,7 +3535,19 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(addUsernameInputBox);
     await this.typeInInputField(addUsernameInputBox, username);
     await this.clickOnElementWithSelector(addRoleDropdown);
-    await this.clickOnElementWithText(managerRoleOption);
+    // Prefer clicking the actual mat-option element to avoid overlay/span
+    // elements blocking the text node.
+    await this.page.waitForSelector('mat-option');
+    const roleOptions = await this.page.$$('mat-option');
+    const roleOptionTexts = await this.page.$$eval('mat-option', elements =>
+      elements.map(element => element.textContent?.trim())
+    );
+    const roleIndex = roleOptionTexts.indexOf(managerRoleOption);
+    if (roleIndex === -1) {
+      throw new Error(`Could not find option with text ${managerRoleOption}`);
+    }
+    await roleOptions[roleIndex].click();
+    await this.page.waitForSelector('mat-option', {visible: false});
     await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.expectElementToBeVisible(saveRoleButton, false);
@@ -3554,7 +3566,19 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(addUsernameInputBox);
     await this.typeInInputField(addUsernameInputBox, username);
     await this.clickOnElementWithSelector(addRoleDropdown);
-    await this.clickOnElementWithText(managerRoleOption);
+    // Prefer clicking the actual mat-option element to avoid overlay/span
+    // elements blocking the text node.
+    await this.page.waitForSelector('mat-option');
+    const roleOptions = await this.page.$$('mat-option');
+    const roleOptionTexts = await this.page.$$eval('mat-option', elements =>
+      elements.map(element => element.textContent?.trim())
+    );
+    const roleIndex = roleOptionTexts.indexOf(managerRoleOption);
+    if (roleIndex === -1) {
+      throw new Error(`Could not find option with text ${managerRoleOption}`);
+    }
+    await roleOptions[roleIndex].click();
+    await this.page.waitForSelector('mat-option', {visible: false});
     await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.expectElementToBeVisible(saveRoleButton, false);
