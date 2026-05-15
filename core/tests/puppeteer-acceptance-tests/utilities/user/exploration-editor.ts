@@ -62,6 +62,8 @@ const addRoleDropdown = 'mat-select.e2e-test-role-select';
 const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
+const creationModalSelector = '.e2e-test-creation-modal';
+const createExplorationFromModalSelector = '.e2e-test-create-exploration';
 
 const interactionDiv = '.e2e-test-interaction';
 const addInteractionModalSelector = 'customize-interaction-body-container';
@@ -2527,12 +2529,12 @@ export class ExplorationEditor extends BaseUser {
     // If the create activity modal appears (user has collection editor role),
     // click the exploration option.
     try {
-      await this.page.waitForSelector('.e2e-test-creation-modal', {
+      await this.page.waitForSelector(creationModalSelector, {
         visible: true,
         timeout: 5000,
       });
       await this.clickAndWaitForNavigation(
-        '.e2e-test-create-exploration',
+        createExplorationFromModalSelector,
         true
       );
     } catch {
