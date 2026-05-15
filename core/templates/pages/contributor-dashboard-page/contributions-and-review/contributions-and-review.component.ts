@@ -621,7 +621,10 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       .fetchSkillAsync(skillId)
       .then(
         (skillDict: {
-          skill: {getId: () => string; getMisconceptions: () => any[]};
+          skill: {
+            getId: () => string;
+            getMisconceptions: () => Misconception[];
+          };
         }) => {
           const misconceptionsBySkill: MisconceptionSkillMap = {};
           const skill = skillDict.skill;

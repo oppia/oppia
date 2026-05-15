@@ -1785,7 +1785,11 @@ describe('Contributions and review component', () => {
 
     it('should open snackbar and handle action', fakeAsync(() => {
       spyOn(snackBar, 'open').and.callFake(
-        (message: string, actionText: string, config: any) => {
+        (
+          message: string,
+          actionText: string,
+          config: {duration?: number; verticalPosition?: string} | undefined
+        ) => {
           const data = TestBed.inject(MAT_SNACK_BAR_DATA);
           data.onAction = of(null);
           return {

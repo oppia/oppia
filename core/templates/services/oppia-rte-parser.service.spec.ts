@@ -142,8 +142,8 @@ describe('RTE parser service', () => {
         super();
       }
 
-      get tagName(): any {
-        return undefined;
+      get tagName(): string {
+        return '';
       }
     }
     customElements.define(

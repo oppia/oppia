@@ -553,7 +553,9 @@ export class RteHelperModalComponent {
         this.pageContextService.getImageSaveDestination() ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       ) {
-        this.imageLocalStorageService.saveImage(svgFileName, svgFile!);
+        if (svgFileName && svgFile) {
+          this.imageLocalStorageService.saveImage(svgFileName, svgFile);
+        }
         const mathContentDict = {
           raw_latex: tmpCustomizationArgs[0].value.raw_latex,
           svg_filename: svgFileName,
@@ -563,30 +565,34 @@ export class RteHelperModalComponent {
         this.ngbActiveModal.close(customizationArgsDict);
         return;
       }
-      this.assetsBackendApiService
-        .saveMathExpressionImage(
-          resampledFile,
-          svgFileName!,
-          this.pageContextService.getEntityType()!,
-          this.pageContextService.getEntityId()!
-        )
-        .then(
-          response => {
-            const mathContentDict = {
-              raw_latex: tmpCustomizationArgs[0].value.raw_latex,
-              svg_filename: response.filename,
-            };
-            const caName = tmpCustomizationArgs[0].name;
-            customizationArgsDict[caName] = mathContentDict;
-            this.ngbActiveModal.close(customizationArgsDict);
-          },
-          errorResponse => {
-            this.alertsService.addWarning(
-              errorResponse.error || 'Error communicating with server.'
-            );
-            this.ngbActiveModal.dismiss('cancel');
-          }
-        );
+      const entityType = this.pageContextService.getEntityType();
+      const entityId = this.pageContextService.getEntityId();
+      if (svgFileName && entityType && entityId) {
+        this.assetsBackendApiService
+          .saveMathExpressionImage(
+            resampledFile,
+            svgFileName,
+            entityType,
+            entityId
+          )
+          .then(
+            response => {
+              const mathContentDict = {
+                raw_latex: tmpCustomizationArgs[0].value.raw_latex,
+                svg_filename: response.filename,
+              };
+              const caName = tmpCustomizationArgs[0].name;
+              customizationArgsDict[caName] = mathContentDict;
+              this.ngbActiveModal.close(customizationArgsDict);
+            },
+            errorResponse => {
+              this.alertsService.addWarning(
+                errorResponse.error || 'Error communicating with server.'
+              );
+              this.ngbActiveModal.dismiss('cancel');
+            }
+          );
+      }
     } else {
       for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
         const caName = this.tmpCustomizationArgs[i].name;
