@@ -3549,8 +3549,10 @@ export class ExplorationEditor extends BaseUser {
     await roleOptions[roleIndex].click();
     await this.page.waitForSelector('mat-option', {visible: false});
     await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
+    await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.expectElementToBeVisible(saveRoleButton, false);
+    await this.waitForPageToFullyLoad();
     showMessage(`${username} has been added as manager role.`);
   }
 
@@ -3580,8 +3582,10 @@ export class ExplorationEditor extends BaseUser {
     await roleOptions[roleIndex].click();
     await this.page.waitForSelector('mat-option', {visible: false});
     await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
+    await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.expectElementToBeVisible(saveRoleButton, false);
+    await this.waitForPageToFullyLoad();
     showMessage(
       `${username} has been added as manager role (after form open).`
     );
