@@ -27,8 +27,8 @@ import {
 describe('RTE parser service', () => {
   let rteParserService: OppiaRteParserService;
 
-  const compareRteNodeToObject = (node: OppiaRteNode, dom) => {
-    const dfs = (n: OppiaRteNode | TextNode, d) => {
+  const compareRteNodeToObject = (node: OppiaRteNode, dom: any): boolean => {
+    const dfs = (n: OppiaRteNode | TextNode, d: any): boolean => {
       if ('value' in n) {
         if (!d.value) {
           return false;
@@ -116,10 +116,7 @@ describe('RTE parser service', () => {
     ];
     testCases.forEach(testCase => {
       let node = rteParserService.constructFromRteString(testCase.rteString);
-      expect(compareRteNodeToObject(node, testCase.representation)).toBe(
-        true,
-        testCase.rteString
-      );
+      expect(compareRteNodeToObject(node, testCase.representation)).toBe(true);
     });
   });
 
@@ -129,14 +126,14 @@ describe('RTE parser service', () => {
         super();
       }
 
-      get tagName() {
+      get tagName(): any {
         return undefined;
       }
     }
-    customElements.define('dummy-element', DummyHtmlElement);
+    customElements.define('dummy-element', DummyHtmlElement as any);
 
     expect(() => {
-      rteParserService.constructFromDomParser(new DummyHtmlElement());
+      rteParserService.constructFromDomParser(new DummyHtmlElement() as any);
     }).toThrowError(
       'tagName is undefined.\n' +
         'body: <dummy-element></dummy-element>\n ' +

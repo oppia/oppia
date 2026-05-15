@@ -20,6 +20,7 @@ import {Component} from '@angular/core';
 import {ExplorationCreationBackendApiService} from 'components/entity-creation-services/exploration-creation-backend-api.service';
 import {Collection} from 'domain/collection/collection.model';
 import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
+import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {AlertsService} from 'services/alerts.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
@@ -72,9 +73,18 @@ export class CollectionNodeCreatorComponent {
       .then(
         responseObject => {
           let summaries = responseObject.summaries;
-          let summaryBackendObject = null;
+          let summaryBackendObject: LearnerExplorationSummaryBackendDict | null =
+            null;
           if (summaries.length !== 0 && summaries[0].id === newExplorationId) {
-            summaryBackendObject = summaries[0];
+            // Convert ExplorationSummaryDict to LearnerExplorationSummaryBackendDict
+            // by adding the missing required properties
+            summaryBackendObject = {
+              ...summaries[0],
+              activity_type: 'exploration',
+              last_updated_msec: Date.now(),
+              ratings: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
+              created_on_msec: Date.now(),
+            };
           }
 
           if (summaryBackendObject) {

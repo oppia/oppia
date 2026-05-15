@@ -108,16 +108,16 @@ export type RteComponentId = {
   templateUrl: './rte-helper-modal.component.html',
 })
 export class RteHelperModalComponent {
-  @Input() componentId: RteComponentId;
-  @Input() customizationArgSpecs: CustomizationArgsSpecsType;
-  @Input() attrsCustomizationArgsDict: CustomizationArgsForRteType;
-  @Input() componentIsNewlyCreated: boolean;
+  @Input() componentId!: RteComponentId;
+  @Input() customizationArgSpecs!: CustomizationArgsSpecsType;
+  @Input() attrsCustomizationArgsDict!: CustomizationArgsForRteType;
+  @Input() componentIsNewlyCreated!: boolean;
   modalIsLoading: boolean = true;
-  errorMessage: string;
+  errorMessage!: string;
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
   @ViewChild('schemaForm') schemaForm!: NgForm;
-  public customizationArgsForm: FormGroup;
-  customizationArgsFormSubscription: Subscription;
+  public customizationArgsForm!: FormGroup;
+  customizationArgsFormSubscription!: Subscription;
   COMPONENT_ID_COLLAPSIBLE = 'collapsible';
   COMPONENT_ID_COLLAPSIBLE_HEADING = 'collapsible_heading';
   COMPONENT_ID_COLLAPSIBLE_CONTENT = 'collapsible_content';
@@ -210,10 +210,10 @@ export class RteHelperModalComponent {
       }
     }
 
-    const formGroupControls = {};
-    this.customizationArgSpecs.forEach((_, index) => {
-      formGroupControls[index] = this.fb.control(
-        this.tmpCustomizationArgs[index].value
+    const formGroupControls: {[key: number]: any} = {};
+    this.customizationArgSpecs.forEach((_: any, index: number) => {
+      (formGroupControls as any)[index] = this.fb.control(
+        (this.tmpCustomizationArgs as any)[index].value
       );
     });
 
@@ -243,12 +243,12 @@ export class RteHelperModalComponent {
     this.customizationArgsFormSubscription.unsubscribe();
   }
 
-  onCustomizationArgsFormChange(value: number | string | boolean): void {
+  onCustomizationArgsFormChange(value: any): void {
     this.clearRteErrorMessage();
     if (this.componentId === this.COMPONENT_ID_MATH) {
-      let rawLatex: string = value[0].raw_latex;
-      let mathExpressionSvgIsBeingProcessed: boolean =
-        value[0].mathExpressionSvgIsBeingProcessed;
+      let rawLatex: string = (value as any)[0].raw_latex;
+      let mathExpressionSvgIsBeingProcessed: boolean = (value as any)[0]
+        .mathExpressionSvgIsBeingProcessed;
       if (mathExpressionSvgIsBeingProcessed || rawLatex === '') {
         this.updateRteErrorMessage(
           'Waiting for math expression SVG to be processed...'
@@ -256,9 +256,9 @@ export class RteHelperModalComponent {
         return;
       }
     } else if (this.componentId === this.COMPONENT_ID_VIDEO) {
-      let start: number = value[1];
-      let end: number = value[2];
-      if (value[0] === '') {
+      let start: number = (value as any)[1];
+      let end: number = (value as any)[2];
+      if ((value as any)[0] === '') {
         this.updateRteErrorMessage(
           'Please ensure that the Youtube URL or id is valid.'
         );
@@ -273,15 +273,15 @@ export class RteHelperModalComponent {
       }
     } else if (this.componentId === this.COMPONENT_ID_TABS) {
       // Value[0] corresponds to all tab contents and titles.
-      for (let tabIndex = 0; tabIndex < value[0].length; tabIndex++) {
-        if (value[0][tabIndex].title === '') {
+      for (let tabIndex = 0; tabIndex < (value as any)[0].length; tabIndex++) {
+        if ((value as any)[0][tabIndex].title === '') {
           this.updateRteErrorMessage(
             'Please ensure that the title of tab ' +
               (tabIndex + 1) +
               ' is filled.'
           );
           break;
-        } else if (value[0][tabIndex].content === '') {
+        } else if ((value as any)[0][tabIndex].content === '') {
           this.updateRteErrorMessage(
             'Please ensure that the content of tab ' +
               (tabIndex + 1) +
@@ -292,7 +292,7 @@ export class RteHelperModalComponent {
           // Check content length.
           if (
             this.isContentLengthExceeded(
-              value[0][tabIndex].content,
+              (value as any)[0][tabIndex].content,
               this.COMPONENT_ID_TABS_CONTENT
             )
           ) {
@@ -305,7 +305,7 @@ export class RteHelperModalComponent {
           // Check title length.
           if (
             this.isContentLengthExceeded(
-              value[0][tabIndex].title,
+              (value as any)[0][tabIndex].title,
               this.COMPONENT_ID_TABS_HEADING
             )
           ) {
@@ -319,8 +319,8 @@ export class RteHelperModalComponent {
         }
       }
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
-      let url: string = value[0];
-      let text: string = value[1];
+      let url: string = (value as any)[0];
+      let text: string = (value as any)[1];
 
       // Check URL and text lengths.
       if (this.isContentLengthExceeded(url, this.COMPONENT_ID_LINK)) {
@@ -338,7 +338,7 @@ export class RteHelperModalComponent {
       }
 
       if (!text.trim()) {
-        value[1] = url;
+        (value as any)[1] = url;
         text = url;
       } else {
         // First check if the `text` looks like a URL.
@@ -372,9 +372,9 @@ export class RteHelperModalComponent {
     } else if (this.componentId === this.COMPONENT_ID_COLLAPSIBLE) {
       // Check heading and content lengths for collapsible components.
       if (
-        value[0] &&
+        (value as any)[0] &&
         this.isContentLengthExceeded(
-          value[0],
+          (value as any)[0],
           this.COMPONENT_ID_COLLAPSIBLE_HEADING
         )
       ) {
@@ -385,9 +385,9 @@ export class RteHelperModalComponent {
       }
 
       if (
-        value[1] &&
+        (value as any)[1] &&
         this.isContentLengthExceeded(
-          value[1],
+          (value as any)[1],
           this.COMPONENT_ID_COLLAPSIBLE_CONTENT
         )
       ) {
@@ -398,28 +398,34 @@ export class RteHelperModalComponent {
       }
     } else if (this.componentId === this.COMPONENT_ID_WORKEDEXAMPLE) {
       if (
-        value[0] &&
-        this.isContentLengthExceeded(value[0], this.COMPONENT_ID_WORKEDEXAMPLE)
+        (value as any)[0] &&
+        this.isContentLengthExceeded(
+          (value as any)[0],
+          this.COMPONENT_ID_WORKEDEXAMPLE
+        )
       ) {
         this.updateRteErrorMessage(
           `The question is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
         );
         return;
-      } else if (value[0] === '') {
+      } else if ((value as any)[0] === '') {
         this.updateRteErrorMessage(
           'Please ensure the worked example has a question.'
         );
       }
 
       if (
-        value[1] &&
-        this.isContentLengthExceeded(value[1], this.COMPONENT_ID_WORKEDEXAMPLE)
+        (value as any)[1] &&
+        this.isContentLengthExceeded(
+          (value as any)[1],
+          this.COMPONENT_ID_WORKEDEXAMPLE
+        )
       ) {
         this.updateRteErrorMessage(
           `The answer is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
         );
         return;
-      } else if (value[1] === '') {
+      } else if ((value as any)[1] === '') {
         this.updateRteErrorMessage(
           'Please ensure the worked example has an answer.'
         );
@@ -452,7 +458,10 @@ export class RteHelperModalComponent {
    * @returns The character limit for the component
    */
   getCharacterLimit(componentId: string): number {
-    return this.CHARACTER_LIMITS[componentId] || this.CHARACTER_LIMITS.default;
+    return (
+      (this.CHARACTER_LIMITS as any)[componentId] ||
+      this.CHARACTER_LIMITS.default
+    );
   }
 
   isErrorMessageNonempty(): boolean {
@@ -472,8 +481,9 @@ export class RteHelperModalComponent {
 
   save(): void {
     for (let index in this.customizationArgsForm.value) {
-      this.tmpCustomizationArgs[index].value =
-        this.customizationArgsForm.value[index];
+      (this.tmpCustomizationArgs as any)[index].value = (
+        this.customizationArgsForm.value as any
+      )[index];
     }
     this.externalRteSaveService.onExternalRteSave.emit();
 
@@ -507,8 +517,19 @@ export class RteHelperModalComponent {
         this.ngbActiveModal.dismiss('cancel');
         return;
       }
+      if (!svgFile) {
+        this.alertsService.addWarning('SVG file is missing.');
+        this.ngbActiveModal.dismiss('cancel');
+        return;
+      }
       const resampledFile =
         this.imageUploadHelperService.convertImageDataToImageFile(svgFile);
+
+      if (!resampledFile) {
+        this.alertsService.addWarning('Failed to process SVG file.');
+        this.ngbActiveModal.dismiss('cancel');
+        return;
+      }
 
       let maxAllowedFileSize;
       if (
@@ -536,7 +557,7 @@ export class RteHelperModalComponent {
         this.pageContextService.getImageSaveDestination() ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       ) {
-        this.imageLocalStorageService.saveImage(svgFileName, svgFile);
+        this.imageLocalStorageService.saveImage(svgFileName, svgFile!);
         const mathContentDict = {
           raw_latex: tmpCustomizationArgs[0].value.raw_latex,
           svg_filename: svgFileName,
@@ -549,9 +570,9 @@ export class RteHelperModalComponent {
       this.assetsBackendApiService
         .saveMathExpressionImage(
           resampledFile,
-          svgFileName,
-          this.pageContextService.getEntityType(),
-          this.pageContextService.getEntityId()
+          svgFileName!,
+          this.pageContextService.getEntityType()!,
+          this.pageContextService.getEntityId()!
         )
         .then(
           response => {
@@ -575,9 +596,9 @@ export class RteHelperModalComponent {
         const caName = this.tmpCustomizationArgs[i].name;
         if (this.componentId === this.COMPONENT_ID_VIDEO) {
           if (caName === 'video_id') {
-            this.tmpCustomizationArgs[i].value =
+            (this.tmpCustomizationArgs as any)[i].value =
               this.extractVideoIdFromVideoUrl(
-                this.tmpCustomizationArgs[i].value.toString()
+                (this.tmpCustomizationArgs as any)[i].value.toString()
               );
           }
         }
@@ -585,7 +606,7 @@ export class RteHelperModalComponent {
           customizationArgsDict as {
             [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
           }
-        )[caName] = this.tmpCustomizationArgs[i].value;
+        )[caName] = (this.tmpCustomizationArgs as any)[i].value;
       }
       this.ngbActiveModal.close(customizationArgsDict);
       this.customizationArgsFormSubscription.unsubscribe();

@@ -27,14 +27,14 @@ interface ViewContributionReviewers {
   filterCriterion: string;
   username: string;
   category: string | null;
-  languageCode: string;
+  languageCode: string | null;
   isValid: () => boolean;
 }
 
 interface AddContributionReviewer {
   username: string;
   category: string | null;
-  languageCode: string;
+  languageCode: string | null;
   isValid: () => boolean;
 }
 
@@ -42,7 +42,7 @@ interface RemoveContributionReviewer {
   method: string;
   username: string;
   category: string | null;
-  languageCode: string;
+  languageCode: string | null;
   isValid: () => boolean;
 }
 
@@ -92,13 +92,13 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
   UserIsTranslationAdmin: boolean = false;
   isNewUiEnabled: boolean = false;
 
-  USER_FILTER_CRITERION_ROLE: string;
-  USER_FILTER_CRITERION_USERNAME: string;
-  CD_USER_RIGHTS_CATEGORIES: Record<string, string>;
+  USER_FILTER_CRITERION_ROLE: string = '';
+  USER_FILTER_CRITERION_USERNAME: string = '';
+  CD_USER_RIGHTS_CATEGORIES: Record<string, string> = {};
 
   contributionReviewersDataFetched: boolean = false;
   contributionReviewersResult: ContributionReviewersResult = {};
-  translationContributionStatsFetched: boolean;
+  translationContributionStatsFetched: boolean = false;
   translationContributionStatsResults: TranslationContributionStat[] = [];
   languageCodesAndDescriptions: LanguageCodeDescription[] = [];
   formData!: FormData;
@@ -143,6 +143,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
           ) {
             return Boolean(this.formData.viewContributionReviewers.username);
           }
+          return false;
         },
       },
       addContributionReviewer: {
@@ -274,9 +275,9 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
 
     this.contributorDashboardAdminBackendApiService
       .addContributionReviewerAsync(
-        formResponse.category,
+        formResponse.category ?? '',
         formResponse.username,
-        formResponse.languageCode
+        formResponse.languageCode ?? ''
       )
       .then(
         () => {
@@ -305,8 +306,8 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
     ) {
       this.contributorDashboardAdminBackendApiService
         .viewContributionReviewersAsync(
-          formResponse.category,
-          formResponse.languageCode
+          formResponse.category ?? '',
+          formResponse.languageCode ?? ''
         )
         .then(usersObject => {
           this.contributionReviewersResult.usernames = usersObject.usernames;
@@ -366,9 +367,9 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
 
     this.contributorDashboardAdminBackendApiService
       .removeContributionReviewerAsync(
-        formResponse.category,
+        formResponse.category ?? '',
         formResponse.username,
-        formResponse.languageCode
+        formResponse.languageCode ?? ''
       )
       .then(
         () => {

@@ -372,9 +372,9 @@ describe('Rte Helper Service', () => {
   });
 
   it('should evaluate when rich text component is not inline', () => {
-    expect(rteHelperService.isInlineComponent('video')).toBe(false);
-    expect(rteHelperService.isInlineComponent('tabs')).toBe(false);
-    expect(rteHelperService.isInlineComponent('image')).toBe(false);
+    expect(rteHelperService.isInlineComponent('video' as any)).toBe(false);
+    expect(rteHelperService.isInlineComponent('tabs' as any)).toBe(false);
+    expect(rteHelperService.isInlineComponent('image' as any)).toBe(false);
   });
 
   it('should open customization modal', () => {
@@ -389,9 +389,9 @@ describe('Rte Helper Service', () => {
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     rteHelperService.openCustomizationModal(
       false,
-      'video',
-      [],
-      {},
+      'video' as any,
+      [] as any,
+      {} as any,
       submitCallBackSpy,
       dismissCallBackSpy
     );
@@ -411,9 +411,9 @@ describe('Rte Helper Service', () => {
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     rteHelperService.openCustomizationModal(
       false,
-      'video',
-      [],
-      {},
+      'video' as any,
+      [] as any,
+      {} as any,
       submitCallBackSpy,
       dismissCallBackSpy
     );
@@ -434,9 +434,9 @@ describe('Rte Helper Service', () => {
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     rteHelperService.openCustomizationModal(
       false,
-      'video',
-      [],
-      {},
+      'video' as any,
+      [] as any,
+      {} as any,
       submitCallBackSpy,
       dismissCallBackSpy
     );
@@ -461,9 +461,9 @@ describe('Rte Helper Service', () => {
 
       rteHelperService.openCustomizationModal(
         false,
-        'image',
-        [],
-        {},
+        'image' as any,
+        [] as any,
+        {} as any,
         undefined,
         dismissCallBackSpy
       );
@@ -489,9 +489,9 @@ describe('Rte Helper Service', () => {
 
       rteHelperService.openCustomizationModal(
         true,
-        'image',
-        [],
-        {},
+        'image' as any,
+        [] as any,
+        {} as any,
         undefined,
         dismissCallBackSpy
       );
@@ -514,8 +514,8 @@ describe('Rte Helper Service', () => {
     rteHelperService.openCustomizationModal(
       false,
       'math',
-      [],
-      {},
+      [] as any,
+      {} as any,
       undefined,
       dismissCallBackSpy
     );
