@@ -56,13 +56,11 @@ describe('Topic Manager', function () {
     // Create an exploration with Set Input interaction.
     await curriculumAdmin.navigateToCreatorDashboardPage();
     await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
+    await curriculumAdmin.waitForPageToFullyLoad();
 
     // Create an exlporation unsupported by mobile.
     unsupportedExplorationId =
       await curriculumAdmin.createSimpleUnsupportedExploration();
-
-    // Add exploration with interaction unsupported on mobile and expect topic can't be updated.
-    await topicManager.createAndSwitchToNewTab();
 
     // Create Topics and add skills.
     await curriculumAdmin.createTopic('Algebra II', 'algebra-ii');
@@ -89,7 +87,8 @@ describe('Topic Manager', function () {
     );
 
     await curriculumAdmin.saveStoryDraft();
-
+    await curriculumAdmin.waitForPageToFullyLoad();
+    await curriculumAdmin.waitForPageToFullyLoad();
     // Create topic Manager.
     topicManager = await UserFactory.createNewUser(
       'topicManager',
