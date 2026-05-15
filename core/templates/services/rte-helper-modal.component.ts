@@ -276,15 +276,16 @@ export class RteHelperModalComponent {
       }
     } else if (this.componentId === this.COMPONENT_ID_TABS) {
       // Value[0] corresponds to all tab contents and titles.
-      for (let tabIndex = 0; tabIndex < value[0].length; tabIndex++) {
-        if (value[0][tabIndex].title === '') {
+      const tabsArray = value[0] as Array<{title: string; content: string}>;
+      for (let tabIndex = 0; tabIndex < tabsArray.length; tabIndex++) {
+        if (tabsArray[tabIndex].title === '') {
           this.updateRteErrorMessage(
             'Please ensure that the title of tab ' +
               (tabIndex + 1) +
               ' is filled.'
           );
           break;
-        } else if (value[0][tabIndex].content === '') {
+        } else if (tabsArray[tabIndex].content === '') {
           this.updateRteErrorMessage(
             'Please ensure that the content of tab ' +
               (tabIndex + 1) +
@@ -295,7 +296,7 @@ export class RteHelperModalComponent {
           // Check content length.
           if (
             this.isContentLengthExceeded(
-              value[0][tabIndex].content,
+              tabsArray[tabIndex].content,
               this.COMPONENT_ID_TABS_CONTENT
             )
           ) {
@@ -308,7 +309,7 @@ export class RteHelperModalComponent {
           // Check title length.
           if (
             this.isContentLengthExceeded(
-              value[0][tabIndex].title,
+              tabsArray[tabIndex].title,
               this.COMPONENT_ID_TABS_HEADING
             )
           ) {
@@ -322,8 +323,8 @@ export class RteHelperModalComponent {
         }
       }
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
-      let url: string = value[0];
-      let text: string = value[1];
+      let url: string = value[0] as string;
+      let text: string = value[1] as string;
 
       // Check URL and text lengths.
       if (this.isContentLengthExceeded(url, this.COMPONENT_ID_LINK)) {
@@ -377,7 +378,7 @@ export class RteHelperModalComponent {
       if (
         value[0] &&
         this.isContentLengthExceeded(
-          value[0],
+          value[0] as string,
           this.COMPONENT_ID_COLLAPSIBLE_HEADING
         )
       ) {
@@ -390,7 +391,7 @@ export class RteHelperModalComponent {
       if (
         value[1] &&
         this.isContentLengthExceeded(
-          value[1],
+          value[1] as string,
           this.COMPONENT_ID_COLLAPSIBLE_CONTENT
         )
       ) {
@@ -402,7 +403,10 @@ export class RteHelperModalComponent {
     } else if (this.componentId === this.COMPONENT_ID_WORKEDEXAMPLE) {
       if (
         value[0] &&
-        this.isContentLengthExceeded(value[0], this.COMPONENT_ID_WORKEDEXAMPLE)
+        this.isContentLengthExceeded(
+          value[0] as string,
+          this.COMPONENT_ID_WORKEDEXAMPLE
+        )
       ) {
         this.updateRteErrorMessage(
           `The question is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
@@ -416,7 +420,10 @@ export class RteHelperModalComponent {
 
       if (
         value[1] &&
-        this.isContentLengthExceeded(value[1], this.COMPONENT_ID_WORKEDEXAMPLE)
+        this.isContentLengthExceeded(
+          value[1] as string,
+          this.COMPONENT_ID_WORKEDEXAMPLE
+        )
       ) {
         this.updateRteErrorMessage(
           `The answer is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`

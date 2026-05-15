@@ -24,6 +24,7 @@ import {
   CustomizationArgsSpecsType,
   CustomizationArgsForRteType,
 } from './rte-helper-modal.component';
+import {AppConstants} from 'app.constants';
 
 describe('Rte Helper Service', () => {
   let rteHelperService: RteHelperService;
@@ -377,15 +378,21 @@ describe('Rte Helper Service', () => {
   });
 
   it('should evaluate when rich text component is not inline', () => {
-    expect(rteHelperService.isInlineComponent('video' as RteComponentId)).toBe(
-      false
-    );
-    expect(rteHelperService.isInlineComponent('tabs' as RteComponentId)).toBe(
-      false
-    );
-    expect(rteHelperService.isInlineComponent('image' as RteComponentId)).toBe(
-      false
-    );
+    expect(
+      rteHelperService.isInlineComponent(
+        'video' as (typeof AppConstants.INLINE_RTE_COMPONENTS)[number]
+      )
+    ).toBe(false);
+    expect(
+      rteHelperService.isInlineComponent(
+        'tabs' as (typeof AppConstants.INLINE_RTE_COMPONENTS)[number]
+      )
+    ).toBe(false);
+    expect(
+      rteHelperService.isInlineComponent(
+        'image' as (typeof AppConstants.INLINE_RTE_COMPONENTS)[number]
+      )
+    ).toBe(false);
   });
 
   it('should open customization modal', () => {

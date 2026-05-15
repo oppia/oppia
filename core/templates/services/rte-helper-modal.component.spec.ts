@@ -114,7 +114,7 @@ describe('RteHelperModalComponent', () => {
         name: 'video_id',
         default_value: 'https://www.youtube.com/watch?v=Ntcw0H0hwPU',
       },
-    ] as CustomizationArgsSpecsType;
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -122,7 +122,7 @@ describe('RteHelperModalComponent', () => {
       component.componentId = 'video';
       component.attrsCustomizationArgsDict = {
         heading: 'This value is not default.',
-      } as CustomizationArgsForRteType;
+      } as unknown as CustomizationArgsForRteType;
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -175,14 +175,14 @@ describe('RteHelperModalComponent', () => {
           ],
         },
       },
-    ] as CustomizationArgsSpecsType;
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
       component.attrsCustomizationArgsDict = {
         heading: 'This value is not default.',
-      } as CustomizationArgsForRteType;
+      } as unknown as CustomizationArgsForRteType;
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -201,7 +201,7 @@ describe('RteHelperModalComponent', () => {
           svg_filename: '',
         },
       },
-    ] as CustomizationArgsSpecsType;
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -212,7 +212,7 @@ describe('RteHelperModalComponent', () => {
           raw_latex: '',
           svg_filename: '',
         },
-      } as CustomizationArgsForRteType;
+      } as unknown as CustomizationArgsForRteType;
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -456,7 +456,7 @@ describe('RteHelperModalComponent', () => {
         name: 'text',
         default_value: '',
       },
-    ] as CustomizationArgsSpecsType;
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -465,7 +465,7 @@ describe('RteHelperModalComponent', () => {
       component.attrsCustomizationArgsDict = {
         url: 'google.com',
         text: 'google.com',
-      } as CustomizationArgsForRteType;
+      } as unknown as CustomizationArgsForRteType;
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -577,7 +577,7 @@ describe('RteHelperModalComponent', () => {
         name: 'autoplay',
         default_value: false,
       },
-    ] as CustomizationArgsSpecsType;
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -588,7 +588,7 @@ describe('RteHelperModalComponent', () => {
           start: 0,
           end: 10,
           autoplay: false,
-        } as CustomizationArgsForRteType);
+        } as unknown as CustomizationArgsForRteType);
       component.customizationArgSpecs = customizationArgSpecs;
     });
     it('should disable save button and display error message', fakeAsync(() => {
@@ -621,7 +621,7 @@ describe('RteHelperModalComponent', () => {
         name: 'alt',
         default_value: '',
       },
-    ] as CustomizationArgsSpecsType;
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -630,7 +630,7 @@ describe('RteHelperModalComponent', () => {
         alt: '',
         caption: '',
         filepath: '',
-      } as CustomizationArgsForRteType;
+      } as unknown as CustomizationArgsForRteType;
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -667,7 +667,7 @@ describe('RteHelperModalComponent', () => {
         name: 'alt',
         default_value: '',
       },
-    ] as CustomizationArgsSpecsType;
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -677,7 +677,7 @@ describe('RteHelperModalComponent', () => {
         alt: '',
         caption: '',
         filepath: '',
-      } as CustomizationArgsForRteType;
+      } as unknown as CustomizationArgsForRteType;
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -699,7 +699,7 @@ describe('RteHelperModalComponent', () => {
         name: 'text',
         default_value: 'oppia',
       },
-    ] as CustomizationArgsSpecsType;
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -708,7 +708,7 @@ describe('RteHelperModalComponent', () => {
         (component.attrsCustomizationArgsDict = {
           url: 'oppia.org',
           text: 'oppia',
-        } as CustomizationArgsForRteType);
+        } as unknown as CustomizationArgsForRteType);
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -739,7 +739,7 @@ describe('RteHelperModalComponent', () => {
         name: 'text',
         default_value: ' ',
       },
-    ] as CustomizationArgsSpecsType;
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -748,7 +748,7 @@ describe('RteHelperModalComponent', () => {
         (component.attrsCustomizationArgsDict = {
           url: 'oppia.org',
           text: ' ',
-        } as CustomizationArgsForRteType);
+        } as unknown as CustomizationArgsForRteType);
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -815,7 +815,7 @@ describe('RteHelperModalComponent', () => {
         name: 'autoplay',
         default_value: false,
       },
-    ] as CustomizationArgsSpecsType;
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -826,7 +826,7 @@ describe('RteHelperModalComponent', () => {
           start: 0,
           end: 0,
           autoplay: false,
-        } as CustomizationArgsForRteType);
+        } as unknown as CustomizationArgsForRteType);
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -863,7 +863,7 @@ describe('RteHelperModalComponent', () => {
           },
         ],
       },
-    ] as CustomizationArgsSpecsType;
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -880,7 +880,7 @@ describe('RteHelperModalComponent', () => {
               content: 'Content for Tab 2',
             },
           ],
-        } as CustomizationArgsForRteType);
+        } as unknown as CustomizationArgsForRteType);
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -951,7 +951,7 @@ describe('RteHelperModalComponent', () => {
         name: 'content',
         default_value: 'Hello',
       },
-    ] as CustomizationArgsSpecsType;
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -960,7 +960,7 @@ describe('RteHelperModalComponent', () => {
         (component.attrsCustomizationArgsDict = {
           heading: 'Collapsible 1',
           content: 'Hello',
-        } as CustomizationArgsForRteType);
+        } as unknown as CustomizationArgsForRteType);
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -1001,7 +1001,7 @@ describe('RteHelperModalComponent', () => {
         name: 'answer',
         default_value: 'sample answer',
       },
-    ] as CustomizationArgsSpecsType;
+    ] as unknown as CustomizationArgsSpecsType;
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
@@ -1010,7 +1010,7 @@ describe('RteHelperModalComponent', () => {
         (component.attrsCustomizationArgsDict = {
           heading: 'sample question',
           content: 'sample answer',
-        } as CustomizationArgsForRteType);
+        } as unknown as CustomizationArgsForRteType);
       component.customizationArgSpecs = customizationArgSpecs;
     });
 

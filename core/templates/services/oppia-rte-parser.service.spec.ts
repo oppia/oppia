@@ -77,11 +77,25 @@ describe('RTE parser service', () => {
         }
       }
 
-      if (n.children.length !== d.children.length) {
+      if (
+        !n.children ||
+        !d.children ||
+        n.children.length !== d.children.length
+      ) {
         return false;
       }
       for (let childIndex = 0; childIndex < n.children.length; childIndex++) {
-        if (!dfs(n.children[childIndex], d.children[childIndex])) {
+        if (
+          !dfs(
+            n.children[childIndex] as unknown as OppiaRteNode | TextNode,
+            d.children[childIndex] as {
+              tag?: string;
+              value?: string;
+              attrs?: Record<string, string>;
+              children?: unknown[];
+            }
+          )
+        ) {
           return false;
         }
       }
@@ -153,7 +167,7 @@ describe('RTE parser service', () => {
 
     expect(() => {
       rteParserService.constructFromDomParser(
-        new DummyHtmlElement() as unknown as Element
+        new DummyHtmlElement() as unknown as HTMLElement
       );
     }).toThrowError(
       'tagName is undefined.\n' +

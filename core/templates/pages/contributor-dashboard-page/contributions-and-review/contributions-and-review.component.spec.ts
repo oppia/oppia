@@ -39,6 +39,7 @@ import {ActiveContributionDict} from '../modal-templates/translation-suggestion-
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {Skill} from 'domain/skill/skill.model';
+import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {PageContextService} from 'services/page-context.service';
 import {UserService} from 'services/user.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
@@ -646,6 +647,7 @@ describe('Contributions and review component', () => {
           classifier_model_id: null,
           card_is_checkpoint: false,
           linked_skill_id: null,
+          inapplicable_skill_misconception_ids: null,
           content: {
             html: 'Question 1',
             content_id: 'content_1',
@@ -741,15 +743,6 @@ describe('Contributions and review component', () => {
             id: 'TextInput',
           },
           param_changes: [],
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content_1: {},
-              content_2: {},
-              content_3: {},
-              content_4: {},
-              content_5: {},
-            },
-          },
           solicit_answer_details: false,
         },
         language_code: 'en',
@@ -1197,11 +1190,14 @@ describe('Contributions and review component', () => {
       };
 
       component._showQuestionSuggestionModal(
-        suggestion as Suggestion,
-        suggestionIdToContribution as Record<string, ActiveContributionDict>,
+        suggestion as unknown as Suggestion,
+        suggestionIdToContribution as unknown as Record<
+          string,
+          ActiveContributionDict
+        >,
         false,
-        null,
-        null
+        undefined as unknown as Question,
+        null as unknown as MisconceptionSkillMap
       );
 
       let value = {
@@ -1561,12 +1557,42 @@ describe('Contributions and review component', () => {
                 content_html: 'string',
                 translation_html: 'html',
                 question_dict: {
+                  id: 'question_1',
+                  question_state_data_schema_version: 0,
                   question_state_data: {
+                    classifier_model_id: null,
+                    card_is_checkpoint: false,
+                    linked_skill_id: null,
+                    inapplicable_skill_misconception_ids: null,
                     content: {
                       html: 'html',
                       content_id: 'content_1',
                     },
+                    interaction: {
+                      answer_groups: [],
+                      confirmed_unclassified_answers: [],
+                      customization_args: {},
+                      default_outcome: {
+                        dest: null,
+                        dest_if_really_stuck: null,
+                        feedback: {html: '', content_id: ''},
+                        labelled_as_correct: false,
+                        param_changes: [],
+                        refresher_exploration_id: null,
+                        missing_prerequisite_skill_id: null,
+                      },
+                      hints: [],
+                      solution: null,
+                      id: 'TextInput',
+                    },
+                    param_changes: [],
+                    solicit_answer_details: false,
                   },
+                  language_code: 'en',
+                  version: 1,
+                  linked_skill_ids: [],
+                  next_content_id_index: 1,
+                  inapplicable_skill_misconception_ids: [],
                 },
                 skill_difficulty: ['Medium'],
               },
@@ -1677,30 +1703,42 @@ describe('Contributions and review component', () => {
         exploration_id: '1',
       };
       component.opportunities = [
-        {
-          id: '1',
-          heading: 'heading',
-          subheading: 'subheading',
-          actionButtonTitle: 'Translations',
-          isPinned: true,
-          topicName: 'Topic 1',
-        },
-        {
-          id: '2',
-          heading: 'heading',
-          subheading: 'subheading',
-          actionButtonTitle: 'Translations',
-          isPinned: false,
-          topicName: 'Topic 1',
-        },
-        {
-          id: '3',
-          heading: 'heading',
-          subheading: 'subheading',
-          actionButtonTitle: 'Translations',
-          isPinned: false,
-          topicName: 'Topic 1',
-        },
+        new ExplorationOpportunitySummary(
+          '1',
+          'Topic 1',
+          'Story 1',
+          'heading',
+          10,
+          {},
+          {},
+          'en',
+          true,
+          0
+        ),
+        new ExplorationOpportunitySummary(
+          '2',
+          'Topic 1',
+          'Story 1',
+          'heading',
+          10,
+          {},
+          {},
+          'en',
+          false,
+          0
+        ),
+        new ExplorationOpportunitySummary(
+          '3',
+          'Topic 1',
+          'Story 1',
+          'heading',
+          10,
+          {},
+          {},
+          'en',
+          false,
+          0
+        ),
       ];
       component.languageCode = 'en';
 
@@ -1728,30 +1766,42 @@ describe('Contributions and review component', () => {
           exploration_id: '8',
         };
         component.opportunities = [
-          {
-            id: '1',
-            heading: 'heading',
-            subheading: 'subheading',
-            actionButtonTitle: 'Translations',
-            isPinned: true,
-            topicName: 'Topic 1',
-          },
-          {
-            id: '2',
-            heading: 'heading',
-            subheading: 'subheading',
-            actionButtonTitle: 'Translations',
-            isPinned: false,
-            topicName: 'Topic 1',
-          },
-          {
-            id: '3',
-            heading: 'heading',
-            subheading: 'subheading',
-            actionButtonTitle: 'Translations',
-            isPinned: false,
-            topicName: 'Topic 1',
-          },
+          new ExplorationOpportunitySummary(
+            '1',
+            'Topic 1',
+            'Story 1',
+            'heading',
+            10,
+            {},
+            {},
+            'en',
+            true,
+            0
+          ),
+          new ExplorationOpportunitySummary(
+            '2',
+            'Topic 1',
+            'Story 1',
+            'heading',
+            10,
+            {},
+            {},
+            'en',
+            false,
+            0
+          ),
+          new ExplorationOpportunitySummary(
+            '3',
+            'Topic 1',
+            'Story 1',
+            'heading',
+            10,
+            {},
+            {},
+            'en',
+            false,
+            0
+          ),
         ];
         component.languageCode = 'en';
 
@@ -2002,10 +2052,10 @@ describe('Contributions and review component', () => {
 
       spyOn(formatRtePreviewPipe, 'transform').and.returnValue('heading');
       component.getQuestionContributionsSummary(
-        suggestion as Record<string, SuggestionDetails>
+        suggestion as unknown as Record<string, SuggestionDetails>
       );
       component.getTranslationContributionsSummary(
-        suggestion as Record<string, SuggestionDetails>
+        suggestion as unknown as Record<string, SuggestionDetails>
       );
     });
 
@@ -2584,7 +2634,7 @@ describe('Contributions and review component', () => {
         },
       };
       const clickEvent = {
-        target: null,
+        target: document.createElement('div'),
       };
       const querySelectorSpy = spyOn(document, 'querySelector').and.returnValue(
         null
@@ -2620,7 +2670,7 @@ describe('Contributions and review component', () => {
 
     it('should return back when user click is made outside', () => {
       const clickEvent = {
-        target: null,
+        target: document.createElement('div'),
       };
       spyOn(document, 'querySelector').and.returnValue(null);
 

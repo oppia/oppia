@@ -30,7 +30,10 @@ import cloneDeep from 'lodash/cloneDeep';
 import {Subscription, Observable} from 'rxjs';
 import {Rubric} from 'domain/skill/rubric.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
-import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
+import {
+  MisconceptionSkillMap,
+  Misconception,
+} from 'domain/skill/misconception.model';
 import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {
   ActiveContributionDict,
@@ -453,7 +456,13 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     modalRef.componentInstance.reviewable = reviewable;
     modalRef.componentInstance.subheading = subheading;
     modalRef.componentInstance.queuedSuggestionSummaryEmit.subscribe(
-      (queuedSuggestionSummary: string) => {
+      (queuedSuggestionSummary: {
+        target_id: string;
+        suggestion_id: string;
+        action_status: string;
+        reviewer_message: string;
+        commit_message?: string;
+      }) => {
         if (this.queuedSuggestionSummary) {
           // Commit any previously queued suggestion.
           this.commitQueuedSuggestion();
@@ -465,7 +474,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     );
 
     modalRef.componentInstance.queuedSuggestionEmit.subscribe(
-      (queuedSuggestion: string) => {
+      (queuedSuggestion: Suggestion) => {
         this.queuedSuggestion = queuedSuggestion;
       }
     );
@@ -608,7 +617,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     for (let suggestionId in this.contributions) {
       var contribution = this.contributions[suggestionId];
       suggestionIdToContribution[suggestionId] =
-        contribution as ActiveContributionDict;
+        contribution as unknown as ActiveContributionDict;
     }
     const skillId = suggestion.change_cmd.skill_id;
 
@@ -617,27 +626,25 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       skillId
     );
 
-    this.skillBackendApiService
-      .fetchSkillAsync(skillId)
-      .then(
-        (skillDict: {
-          skill: {
-            getId: () => string;
-            getMisconceptions: () => Misconception[];
-          };
-        }) => {
-          const misconceptionsBySkill: MisconceptionSkillMap = {};
-          const skill = skillDict.skill;
-          misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
-          this._showQuestionSuggestionModal(
-            suggestion,
-            suggestionIdToContribution,
-            reviewable,
-            question as Question,
-            misconceptionsBySkill
-          );
-        }
-      );
+    this.skillBackendApiService.fetchSkillAsync(skillId).then(
+      (skillDict: {
+        skill: {
+          getId: () => string;
+          getMisconceptions: () => Misconception[];
+        };
+      }) => {
+        const misconceptionsBySkill: MisconceptionSkillMap = {};
+        const skill = skillDict.skill;
+        misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
+        this._showQuestionSuggestionModal(
+          suggestion,
+          suggestionIdToContribution,
+          reviewable,
+          question as Question,
+          misconceptionsBySkill
+        );
+      }
+    );
   }
 
   onClickViewSuggestion(suggestionId: string): void {
@@ -652,7 +659,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       for (let suggestionId in this.contributions) {
         const contribution = this.contributions[suggestionId];
         suggestionIdToContribution[suggestionId] =
-          contribution as ActiveContributionDict;
+          contribution as unknown as ActiveContributionDict;
       }
       this.pageContextService.setCustomEntityContext(
         AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
@@ -726,21 +733,21 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
           opportunities: ExplorationOpportunitySummary[];
           more: boolean;
         }) => {
+          this.opportunities = response.opportunities;
           const opportunitiesDicts: Opportunity[] = [];
           response.opportunities.forEach(
             (opportunity: ExplorationOpportunitySummary) => {
-              const opportunityDict = {
+              const opportunityDict: Opportunity = {
                 id: opportunity.getExplorationId(),
                 heading: opportunity.getOpportunityHeading(),
                 subheading: opportunity.getOpportunitySubheading(),
+                labelText: '',
+                labelColor: '',
                 actionButtonTitle: 'Translations',
-                isPinned: opportunity.isPinned,
-                topicName: opportunity.topicName,
               };
               opportunitiesDicts.push(opportunityDict);
             }
           );
-          this.opportunities = opportunitiesDicts;
           return {
             opportunitiesDicts: opportunitiesDicts,
             more: response.more,
