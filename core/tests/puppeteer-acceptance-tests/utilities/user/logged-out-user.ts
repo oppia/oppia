@@ -2086,15 +2086,18 @@ export class LoggedOutUser extends BaseUser {
       throw new Error('No new tab opened.');
     }
     const newTabPage = await newTarget.page();
+    if (newTabPage === null) {
+      throw new Error('New tab page could not be retrieved.');
+    }
 
     // Wait for the new page to navigate to the correct domain per reviewer request.
-    await newTabPage?.waitForFunction(
+    await newTabPage.waitForFunction(
       (domain: string) => window.location.href.includes(domain),
       {timeout: 10000},
       expectedDestinationDomain
     );
 
-    await newTabPage?.close();
+    await newTabPage.close();
   }
 
   /**
