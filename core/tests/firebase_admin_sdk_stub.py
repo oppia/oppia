@@ -42,11 +42,8 @@ datastore_services = models.Registry.import_datastore_services()
 platform_auth_services = models.Registry.import_auth_services()
 
 
-class AuthServicesStub:
+class FirebaseAdminSdkStub:
     """Test-only implementation of the public API in core.platform.auth."""
-
-    # NEW
-    _is_session_active: bool = False
 
     class AuthUser:
         """Authentication user with ID and deletion status."""
@@ -61,8 +58,10 @@ class AuthServicesStub:
 
     def __init__(self) -> None:
         """Initializes a new instance that emulates an empty auth server."""
-        self._user_id_by_auth_id: Dict[str, AuthServicesStub.AuthUser] = {}
+        self._user_id_by_auth_id: Dict[str, FirebaseAdminSdkStub.AuthUser] = {}
         self._external_user_id_associations: Set[str] = set()
+        # NEW
+        self._is_session_active: bool = False
 
     @classmethod
     def install_stub(
@@ -173,31 +172,23 @@ class AuthServicesStub:
             close = stack.pop_all().close
         return close
 
-    @classmethod
     def establish_auth_session(
-        cls, _: webapp2.Request, __: webapp2.Response
+        self, _: webapp2.Request, __: webapp2.Response
     ) -> None:
         """Sets login cookies to maintain a user's sign-in session."""
-        # NOVO: Marca a sessão como iniciada
-        cls._is_session_active = True
+        self._is_session_active = True
 
-    @classmethod
-    def destroy_auth_session(cls, _: webapp2.Response) -> None:
+    def destroy_auth_session(self, _: webapp2.Response) -> None:
         """Clears login cookies from the given response headers."""
-        # NOVO: Marca a sessão como destruída
-        cls._is_session_active = False
+        self._is_session_active = False
 
-    @classmethod
     def get_auth_claims_from_request(
-        cls, _: webapp2.Request
+        self, _: webapp2.Request
     ) -> Optional[auth_domain.AuthClaims]:
         """Authenticates the request and returns claims about its authorizer."""
-
-        # NOVO: Se a sessão não estiver ativa, retorna None (simula o usuário deslogado)
-        if not cls._is_session_active:
+        if not self._is_session_active:
             return None
 
-        # O resto do código continua igual, usando o os.environ por baixo do capô!
         auth_id = os.environ.get('USER_ID', '')
         email = os.environ.get('USER_EMAIL', '')
         role_is_super_admin = os.environ.get('USER_IS_ADMIN', '0') == '1'
@@ -343,7 +334,9 @@ class AuthServicesStub:
             id=user_id, firebase_auth_id=auth_id
         ).put()
         self._external_user_id_associations.add(user_id)
-        self._user_id_by_auth_id[auth_id] = AuthServicesStub.AuthUser(user_id)
+        self._user_id_by_auth_id[auth_id] = FirebaseAdminSdkStub.AuthUser(
+            user_id
+        )
 
     def associate_multi_auth_ids_with_user_ids(
         self, auth_id_user_id_pairs: List[auth_domain.AuthIdUserIdPair]
@@ -377,7 +370,7 @@ class AuthServicesStub:
         external_user_ids: Set[str] = {u for _, u in auth_id_user_id_pairs}
         self._external_user_id_associations.update(external_user_ids)
         auth_id_user_id_pairs_with_deletion = {
-            auth_id: AuthServicesStub.AuthUser(user_id)
+            auth_id: FirebaseAdminSdkStub.AuthUser(user_id)
             for auth_id, user_id in auth_id_user_id_pairs
         }
         self._user_id_by_auth_id.update(auth_id_user_id_pairs_with_deletion)

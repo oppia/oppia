@@ -81,7 +81,7 @@ from core.platform import models
 from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 from scripts import common
-from core.tests.firebase_admin_sdk_stub import AuthServicesStub
+from core.tests.firebase_admin_sdk_stub import FirebaseAdminSdkStub
 
 import elasticsearch
 import requests_mock
@@ -2330,7 +2330,7 @@ version: 1
         es_stub.reset()
 
         with contextlib.ExitStack() as stack:
-            stack.callback(AuthServicesStub.install_stub(self))
+            stack.callback(FirebaseAdminSdkStub.install_stub(self))
             es_client = elastic_search_services.ES.get_client()
             stack.enter_context(
                 self.swap(
@@ -2398,23 +2398,22 @@ version: 1
             self.signup_superadmin_user()
 
     def login(self, email: str, is_super_admin: Optional[bool] = False) -> None:
-        """Sets the environment variables to simulate a login.
-
-        Args:
-            email: str. The email of the user who is to be logged in.
-            is_super_admin: bool. Whether the user is a super admin.
-        """
+        """Sets the environment variables to simulate a login."""
         os.environ['USER_ID'] = self.get_auth_id_from_email(email)
         os.environ['USER_EMAIL'] = email
         os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
-        AuthServicesStub._is_session_active = True
+
+        platform_auth_services.establish_auth_session(
+            webapp2.Request.blank('/'), webapp2.Response()
+        )
 
     def logout(self) -> None:
         """Simulates a logout by resetting the environment variables."""
         os.environ['USER_ID'] = ''
         os.environ['USER_EMAIL'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
-        AuthServicesStub._is_session_active = False
+
+        platform_auth_services.destroy_auth_session(webapp2.Response())
 
     @contextlib.contextmanager
     def login_context(
