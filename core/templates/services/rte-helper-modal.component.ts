@@ -276,7 +276,7 @@ export class RteHelperModalComponent {
       }
     } else if (this.componentId === this.COMPONENT_ID_TABS) {
       // Value[0] corresponds to all tab contents and titles.
-      const tabsArray = value[0] as Array<{title: string; content: string}>;
+      const tabsArray = value[0] as {title: string; content: string}[];
       for (let tabIndex = 0; tabIndex < tabsArray.length; tabIndex++) {
         if (tabsArray[tabIndex].title === '') {
           this.updateRteErrorMessage(
