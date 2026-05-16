@@ -98,6 +98,9 @@ describe('Logged-in User', function () {
       await curriculumAdmin.saveStoryDraft();
       await curriculumAdmin.publishStoryDraft();
 
+      await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+      await curriculumAdmin.waitForPageToFullyLoad();
+
       loggedInUser = await UserFactory.createNewUser(
         'loggedInUser1',
         'logged_in_user1@example.com'
