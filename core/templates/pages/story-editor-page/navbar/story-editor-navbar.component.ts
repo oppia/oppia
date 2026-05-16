@@ -18,7 +18,11 @@
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
-import {EditableStoryBackendApiService} from 'domain/story/editable-story-backend-api.service';
+import {
+  EditableStoryBackendApiService,
+  STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
+  STORY_PUBLICATION_ACTION_PUBLISH,
+} from 'domain/story/editable-story-backend-api.service';
 import {StoryValidationService} from 'domain/story/story-validation.service';
 import {Story} from 'domain/story/story.model';
 import {StoryNode} from 'domain/story/story-node.model';
@@ -260,9 +264,12 @@ export class StoryEditorNavbarComponent implements OnInit {
   }
 
   publishStory(): void {
-    this.storyEditorStateService.changeStoryPublicationStatus('publish', () => {
-      this.storyIsPublished = this.storyEditorStateService.isStoryPublished();
-    });
+    this.storyEditorStateService.changeStoryPublicationStatus(
+      STORY_PUBLICATION_ACTION_PUBLISH,
+      () => {
+        this.storyIsPublished = this.storyEditorStateService.isStoryPublished();
+      }
+    );
   }
 
   unpublishStory(): void {
@@ -347,7 +354,7 @@ export class StoryEditorNavbarComponent implements OnInit {
             }
             if (Number(selectedChapterIndexInPublishUptoDropdown) === -1) {
               this.storyEditorStateService.changeStoryPublicationStatus(
-                'permanent_unpublish',
+                STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
                 () => {
                   this.storyIsPublished =
                     this.storyEditorStateService.isStoryPublished();

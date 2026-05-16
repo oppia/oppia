@@ -55,11 +55,19 @@ interface ValidationExplorationBackendResponse {
   validation_error_messages: string[];
 }
 
+export const STORY_PUBLICATION_ACTION_PUBLISH = 'publish' as const;
+export const STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH =
+  'temporary_unpublish' as const;
+export const STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH =
+  'permanent_unpublish' as const;
+
+export type StoryPublicationAction =
+  | typeof STORY_PUBLICATION_ACTION_PUBLISH
+  | typeof STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH
+  | typeof STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH;
+
 interface ChangeStoryPublicationStatusRequest {
-  story_publication_action:
-    | 'publish'
-    | 'temporary_unpublish'
-    | 'permanent_unpublish';
+  story_publication_action: StoryPublicationAction;
 }
 
 @Injectable({
@@ -139,10 +147,7 @@ export class EditableStoryBackendApiService {
 
   private _changeStoryPublicationStatus(
     storyId: string,
-    publicationAction:
-      | 'publish'
-      | 'temporary_unpublish'
-      | 'permanent_unpublish',
+    publicationAction: StoryPublicationAction,
     successCallback: (value: void) => void,
     errorCallback: (reason: string) => void
   ): void {
@@ -283,7 +288,7 @@ export class EditableStoryBackendApiService {
 
   async changeStoryPublicationStatusAsync(
     storyId: string,
-    publicationAction: 'publish' | 'temporary_unpublish' | 'permanent_unpublish'
+    publicationAction: StoryPublicationAction
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       this._changeStoryPublicationStatus(

@@ -18,6 +18,10 @@
 
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
+  STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
+} from 'domain/story/editable-story-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
@@ -42,16 +46,19 @@ export class StoryEditorUnpublishModalComponent {
   unpublishingReason: string = 'BAD_CONTENT';
 
   showingChoiceScreen: boolean = true;
-  mode: 'temporary_unpublish' | 'permanent_unpublish' = 'permanent_unpublish';
+  mode:
+    | typeof STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH
+    | typeof STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH =
+    STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH;
 
   selectTemporary(): void {
     this.showingChoiceScreen = false;
-    this.mode = 'temporary_unpublish';
+    this.mode = STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH;
   }
 
   selectPermanent(): void {
     this.showingChoiceScreen = false;
-    this.mode = 'permanent_unpublish';
+    this.mode = STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH;
   }
 
   cancel(): void {
@@ -61,7 +68,7 @@ export class StoryEditorUnpublishModalComponent {
   confirm(): void {
     if (this.isSerialChapterFeatureFlagEnabled()) {
       this.activeModal.close({
-        mode: 'permanent_unpublish',
+        mode: STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
         reason: this.unpublishingReason,
       });
       return;
