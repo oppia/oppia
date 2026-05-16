@@ -61,6 +61,7 @@ export class BlogHomePageComponent implements OnInit {
   searchQuery: string = '';
   activeMenuName: string = '';
   searchButtonIsActive: boolean = false;
+  pendingTagFilterInput: string = '';
   searchQueryChanged: Subject<string> = new Subject<string>();
   listOfDefaultTags: string[] = [];
   selectedTags: string[] = [];
@@ -351,6 +352,19 @@ export class BlogHomePageComponent implements OnInit {
 
   onSearchQueryChangeExec(): void {
     this.loaderService.showLoadingScreen('Loading');
+
+    const hasUnselectedTagInput = this.pendingTagFilterInput.trim().length > 0;
+    if (
+      hasUnselectedTagInput &&
+      this.selectedTags.length === 0 &&
+      this.searchQuery === ''
+    ) {
+      this.alertsService.addWarning(
+        'Please select a tag from the suggestions before searching by tags.'
+      );
+      this.loaderService.hideLoadingScreen();
+      return;
+    }
 
     let currentParams = this.route.snapshot.queryParams;
 

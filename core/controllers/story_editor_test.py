@@ -185,6 +185,36 @@ class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
 
 class StoryEditorTests(BaseStoryEditorControllerTests):
 
+    def test_get_story_data_when_story_reference_is_not_first(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        topic_id = topic_fetchers.get_new_topic_id()
+        first_story_id = story_services.get_new_story_id()
+        second_story_id = story_services.get_new_story_id()
+
+        self.save_new_story(first_story_id, self.admin_id, topic_id)
+        self.save_new_story(second_story_id, self.admin_id, topic_id)
+        self.save_new_topic(
+            topic_id,
+            self.admin_id,
+            name='Another Name',
+            abbreviated_name='another-name',
+            url_fragment='another-name',
+            description='Another description',
+            canonical_story_ids=[first_story_id, second_story_id],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[],
+            next_subtopic_id=1,
+        )
+
+        json_response = self.get_json(
+            '%s/%s' % (feconf.STORY_EDITOR_DATA_URL_PREFIX, second_story_id)
+        )
+        self.assertEqual(json_response['story_dict']['id'], second_story_id)
+        self.assertFalse(json_response['story_is_published'])
+        self.logout()
+
     def test_can_not_get_access_story_handler_with_invalid_story_id(
         self,
     ) -> None:
