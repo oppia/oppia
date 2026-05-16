@@ -410,6 +410,7 @@ const commonModalBodySelector = '.e2e-test-modal-body';
 const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
 
 const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
+const closeLessonInfoTooltipSelector = '.e2e-test-close-lesson-info-tooltip';
 const improvementsTabButton = '.e2e-test-improvements-tab';
 const formErrorContainer = '.e2e-test-form-error-container';
 const numberWithUnitsModalSelector =
@@ -4751,6 +4752,18 @@ export class ExplorationEditor extends BaseUser {
         await this.page.keyboard.press('Escape');
       }
       await this.page.waitForSelector('ngb-modal-window.modal.show', {
+        hidden: true,
+      });
+    }
+
+    const isLessonInfoTooltipVisible = await this.isElementVisible(
+      closeLessonInfoTooltipSelector,
+      true,
+      1500
+    );
+    if (isLessonInfoTooltipVisible) {
+      await this.clickOnElementWithSelector(closeLessonInfoTooltipSelector);
+      await this.page.waitForSelector(closeLessonInfoTooltipSelector, {
         hidden: true,
       });
     }
