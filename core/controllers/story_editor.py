@@ -206,7 +206,7 @@ class StoryPublishHandlerNormalizedPayloadDict(TypedDict):
     normalized_payload dictionary.
     """
 
-    story_unpublish_type: str
+    story_publication_action: str
 
 
 class StoryPublishHandler(
@@ -218,7 +218,7 @@ class StoryPublishHandler(
     URL_PATH_ARGS_SCHEMAS = {'story_id': {'schema': SCHEMA_FOR_STORY_ID}}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
-            'story_unpublish_type': {
+            'story_publication_action': {
                 'schema': {
                     'type': 'basestring',
                     'choices': [
@@ -243,10 +243,12 @@ class StoryPublishHandler(
         story = story_fetchers.get_story_by_id(story_id, strict=True)
         topic_id = story.corresponding_topic_id
 
-        story_unpublish_type = self.normalized_payload['story_unpublish_type']
+        story_publication_action = self.normalized_payload[
+            'story_publication_action'
+        ]
 
         if (
-            story_unpublish_type
+            story_publication_action
             == topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
         ):
             topic_services.publish_story(topic_id, story_id, self.user_id)
@@ -255,7 +257,7 @@ class StoryPublishHandler(
                 topic_id,
                 story_id,
                 self.user_id,
-                story_unpublish_type,
+                story_publication_action,
             )
 
         self.render_json(self.values)

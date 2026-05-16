@@ -295,7 +295,7 @@ describe('Editable story backend API service', () => {
 
     // Send a request to update story.
     editableStoryBackendApiService
-      .changeStoryPublicationStatusAsync('storyId', 'permanent')
+      .changeStoryPublicationStatusAsync('storyId', 'permanent_unpublish')
       .then(successHandler, failHandler);
     let req = httpTestingController.expectOne('/story_publish_handler/storyId');
     expect(req.request.method).toEqual('PUT');

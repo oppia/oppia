@@ -72,7 +72,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, new_story_id),
             {
-                'story_unpublish_type': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+                'story_publication_action': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
             },
             csrf_token=csrf_token,
             expected_status_int=404,
@@ -86,7 +86,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, new_story_id),
             {
-                'story_unpublish_type': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+                'story_publication_action': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
             },
             csrf_token=csrf_token,
             expected_status_int=404,
@@ -94,7 +94,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
         self.logout()
 
-    def test_put_can_not_publish_story_with_invalid_story_unpublish_type(
+    def test_put_can_not_publish_story_with_invalid_story_publication_action(
         self,
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -102,7 +102,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
-            {'story_unpublish_type': 'invalid_value'},
+            {'story_publication_action': 'invalid_value'},
             csrf_token=csrf_token,
             expected_status_int=400,
         )
@@ -117,7 +117,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
             {
-                'story_unpublish_type': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+                'story_publication_action': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
             },
             csrf_token=csrf_token,
         )
@@ -130,7 +130,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
             {
-                'story_unpublish_type': (
+                'story_publication_action': (
                     topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH
                 )
             },
@@ -148,7 +148,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
             {
-                'story_unpublish_type': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+                'story_publication_action': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
             },
             csrf_token=csrf_token,
             expected_status_int=401,
@@ -161,7 +161,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
             {
-                'story_unpublish_type': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+                'story_publication_action': topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
             },
             csrf_token=csrf_token,
         )
@@ -169,7 +169,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
         self.put_json(
             '%s/%s' % (feconf.STORY_PUBLISH_HANDLER, self.story_id),
             {
-                'story_unpublish_type': (
+                'story_publication_action': (
                     topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH
                 ),
             },

@@ -347,7 +347,7 @@ export class StoryEditorNavbarComponent implements OnInit {
             }
             if (Number(selectedChapterIndexInPublishUptoDropdown) === -1) {
               this.storyEditorStateService.changeStoryPublicationStatus(
-                'permanent',
+                'permanent_unpublish',
                 () => {
                   this.storyIsPublished =
                     this.storyEditorStateService.isStoryPublished();

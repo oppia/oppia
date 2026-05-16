@@ -77,8 +77,8 @@ CMD_PUBLISH_STORY = 'publish_story'
 CMD_UNPUBLISH_STORY = 'unpublish_story'
 
 STORY_PUBLICATION_ACTION_PUBLISH: Final = 'publish'
-STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH: Final = 'permanent'
-STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH: Final = 'temporary'
+STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH: Final = 'permanent_unpublish'
+STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH: Final = 'temporary_unpublish'
 CMD_ADD_UNCATEGORIZED_SKILL_ID = 'add_uncategorized_skill_id'
 CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill_id'
 CMD_MOVE_SKILL_ID_TO_SUBTOPIC = 'move_skill_id_to_subtopic'
@@ -765,7 +765,7 @@ class StoryReference:
             story_id: str. The ID of the story.
             story_is_published: bool. Whether the story is published or not.
             story_unpublish_type: str|None. How the story was unpublished
-                ('permanent' or 'temporary'), or None if currently published.
+                ('permanent_unpublish' or 'temporary_unpublish'), or None if currently published.
         """
         self.story_id = story_id
         self.story_is_published = story_is_published

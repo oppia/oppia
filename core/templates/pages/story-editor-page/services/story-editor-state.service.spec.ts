@@ -392,7 +392,7 @@ describe('Story editor state service', () => {
     expect(storyEditorStateService.isStoryPublished()).toBe(true);
     expect(
       storyEditorStateService.changeStoryPublicationStatus(
-        'permanent',
+        'permanent_unpublish',
         successCallback
       )
     ).toBe(true);
@@ -401,7 +401,10 @@ describe('Story editor state service', () => {
     var expectedId = 'storyId_0';
     var publishStorySpy =
       fakeEditableStoryBackendApiService.changeStoryPublicationStatusAsync;
-    expect(publishStorySpy).toHaveBeenCalledWith(expectedId, 'permanent');
+    expect(publishStorySpy).toHaveBeenCalledWith(
+      expectedId,
+      'permanent_unpublish'
+    );
     expect(storyEditorStateService.isStoryPublished()).toBe(false);
     expect(successCallback).toHaveBeenCalled();
   }));

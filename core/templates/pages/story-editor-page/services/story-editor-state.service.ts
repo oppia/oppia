@@ -275,7 +275,10 @@ export class StoryEditorStateService {
   }
 
   changeStoryPublicationStatus(
-    unpublishType: 'publish' | 'temporary' | 'permanent',
+    publicationAction:
+      | 'publish'
+      | 'temporary_unpublish'
+      | 'permanent_unpublish',
     successCallback: (value?: Object) => void
   ): boolean {
     const storyId = this._story.getId();
@@ -287,10 +290,10 @@ export class StoryEditorStateService {
     }
 
     this.editableStoryBackendApiService
-      .changeStoryPublicationStatusAsync(storyId, unpublishType)
+      .changeStoryPublicationStatusAsync(storyId, publicationAction)
       .then(
         () => {
-          this._setStoryPublicationStatus(unpublishType === 'publish');
+          this._setStoryPublicationStatus(publicationAction === 'publish');
           if (successCallback) {
             successCallback();
           }

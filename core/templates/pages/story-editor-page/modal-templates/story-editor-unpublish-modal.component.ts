@@ -42,16 +42,16 @@ export class StoryEditorUnpublishModalComponent {
   unpublishingReason: string = 'BAD_CONTENT';
 
   showingChoiceScreen: boolean = true;
-  mode: 'temporary' | 'permanent' = 'permanent';
+  mode: 'temporary_unpublish' | 'permanent_unpublish' = 'permanent_unpublish';
 
   selectTemporary(): void {
     this.showingChoiceScreen = false;
-    this.mode = 'temporary';
+    this.mode = 'temporary_unpublish';
   }
 
   selectPermanent(): void {
     this.showingChoiceScreen = false;
-    this.mode = 'permanent';
+    this.mode = 'permanent_unpublish';
   }
 
   cancel(): void {
@@ -61,7 +61,7 @@ export class StoryEditorUnpublishModalComponent {
   confirm(): void {
     if (this.isSerialChapterFeatureFlagEnabled()) {
       this.activeModal.close({
-        mode: 'permanent',
+        mode: 'permanent_unpublish',
         reason: this.unpublishingReason,
       });
       return;
@@ -70,7 +70,7 @@ export class StoryEditorUnpublishModalComponent {
     if (!this.showingChoiceScreen) {
       this.activeModal.close({
         mode: this.mode,
-        reason: undefined,
+        reason: null,
       });
     }
   }

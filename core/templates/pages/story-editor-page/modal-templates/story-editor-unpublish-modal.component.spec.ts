@@ -79,7 +79,7 @@ describe('Story Editor Unpublish Modal Component', () => {
     const spy = spyOn(ngbActiveModal, 'close');
     component.confirm();
     expect(spy).toHaveBeenCalledWith({
-      mode: 'permanent',
+      mode: 'permanent_unpublish',
       reason: component.unpublishingReason,
     });
   });
@@ -99,8 +99,8 @@ describe('Story Editor Unpublish Modal Component', () => {
     component.selectTemporary();
     component.confirm();
     expect(spy).toHaveBeenCalledWith({
-      mode: 'temporary',
-      reason: undefined,
+      mode: 'temporary_unpublish',
+      reason: null,
     });
   });
 
@@ -111,8 +111,8 @@ describe('Story Editor Unpublish Modal Component', () => {
     component.selectPermanent();
     component.confirm();
     expect(spy).toHaveBeenCalledWith({
-      mode: 'permanent',
-      reason: undefined,
+      mode: 'permanent_unpublish',
+      reason: null,
     });
   });
 
