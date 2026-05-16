@@ -487,6 +487,13 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                     return False
                 return original_exists(filepath)
 
+            print_arr: List[str] = []
+
+            def mock_print(
+                msg: str, end: str = '\n'  # pylint: disable=unused-argument
+            ) -> None:
+                print_arr.append(msg)
+
             with (
                 self.swap(
                     run_typescript_checks,
@@ -510,12 +517,19 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 ),
                 self.swap(os.path, 'exists', mock_exists),
                 self.swap(subprocess, 'Popen', mock_popen),
+                self.swap(builtins, 'print', mock_print),
             ):
                 with self.assertRaisesRegex(SystemExit, '1'):
                     run_typescript_checks.compile_temp_strict_template_tsconfig(
                         'temp-template-config.json',
                         ['core/templates/a.component.ts: initial error'],
                     )
+
+            self.assertIn(
+                '1 Files with errors found during Angular template '
+                'compilation.\n',
+                print_arr,
+            )
 
     def test_compile_and_check_angular_templates_runs_expected_steps(
         self,
@@ -604,14 +618,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                     'template-config.json'
                 )
 
-            with open(template_config_path, 'r', encoding='utf-8') as f:
-                config = json.load(f)
-
             self.assertEqual(hashes_written, [{}])
             self.assertEqual(ngcc_calls, ['called'])
-            self.assertEqual(
-                config['include'], list(run_typescript_checks.PREFIXES)
-            )
             self.assertFalse(os.path.exists(os.path.dirname(compiled_js_dir)))
             self.assertEqual(
                 compile_temp_calls,

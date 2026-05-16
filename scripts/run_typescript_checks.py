@@ -423,7 +423,8 @@ def compile_temp_strict_template_tsconfig(
     if temp_error_messages:
         print('\n%s' % '\n'.join(temp_error_messages))
         print(
-            '%s Errors found during Angular template compilation.\n'
+            '%s Files with errors found during Angular template '
+            'compilation.\n'
             % len(
                 set(
                     TEMPLATE_ERROR_FILEPATH_REGEX.findall(
@@ -494,13 +495,6 @@ def compile_and_check_angular_templates(config_path: str) -> None:
             strict checks.
     """
     common.write_hashes_json_file({})
-    with open(TEMPLATE_STRICT_TSCONFIG_FILEPATH, 'r', encoding='utf-8') as f:
-        strict_ts_config = yaml.safe_load(f)
-        strict_ts_config['include'] = PREFIXES
-
-    with open(TEMPLATE_STRICT_TSCONFIG_FILEPATH, 'w', encoding='utf-8') as f:
-        json.dump(strict_ts_config, f, indent=2, sort_keys=True)
-        f.write('\n')
 
     os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
     validate_compiled_js_dir()
