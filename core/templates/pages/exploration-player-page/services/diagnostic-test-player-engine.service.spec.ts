@@ -56,11 +56,6 @@ describe('Diagnostic test engine service', () => {
     );
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
 
-    // Mock the 'Equals' rule because the test question's TextInput interaction
-    // uses rule_type: 'Equals' in its answer_groups configuration.
-    textInputService = {
-      Equals: jasmine.createSpy('Equals'),
-    };
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     alertsService = TestBed.inject(AlertsService);
     expressionInterpolationService = TestBed.inject(
