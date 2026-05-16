@@ -68,6 +68,9 @@ describe('Logged-in User', function () {
       await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
       await curriculumAdmin.publishClassroom('Math');
 
+      await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+      await curriculumAdmin.waitForPageToFullyLoad();
+
       const placeValueChapters = [
         'What are the Place Values',
         'Find the Value of a Number',
