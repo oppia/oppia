@@ -17,8 +17,8 @@
  */
 
 import {AbstractControl, ValidationErrors} from '@angular/forms';
-import {mockNumberConversionServiceObject} from 'tests/unit-test-utils';
 import {NumberConversionService} from 'services/number-conversion.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {SchemaValidators} from './schema-validators';
 
@@ -39,6 +39,16 @@ class MockFormControl extends AbstractControl {
 }
 
 describe('Schema validators', () => {
+  let numberConversionService: NumberConversionService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+
+  beforeEach(() => {
+    i18nLanguageCodeService = new I18nLanguageCodeService();
+    numberConversionService = new NumberConversionService(
+      i18nLanguageCodeService
+    );
+  });
+
   describe('when validating "has-length-at-least"', () => {
     it('should impose minimum length bounds', () => {
       const control: MockFormControl = new MockFormControl([], []);
@@ -148,10 +158,7 @@ describe('Schema validators', () => {
         {controlValue: -2.01, expectedResult: false},
         {controlValue: -3, expectedResult: false},
       ];
-      const filter = SchemaValidators.isAtLeast(
-        args,
-        mockNumberConversionServiceObject as NumberConversionService
-      );
+      const filter = SchemaValidators.isAtLeast(args, numberConversionService);
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue);
         const errorsReturned = filter(control);
@@ -183,10 +190,7 @@ describe('Schema validators', () => {
         {controlValue: -2.01, expectedResult: true},
         {controlValue: -3, expectedResult: true},
       ];
-      const filter = SchemaValidators.isAtMost(
-        args,
-        mockNumberConversionServiceObject as NumberConversionService
-      );
+      const filter = SchemaValidators.isAtMost(args, numberConversionService);
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue);
         const errorsReturned = filter(control);
@@ -202,24 +206,19 @@ describe('Schema validators', () => {
   });
 
   describe('when validating float', () => {
-    it('should validate floats correctly', () => {
+    it('should validate floats correctly in English locale', () => {
       const control: MockFormControl = new MockFormControl([], []);
-      control.setValue(1);
-
       const testCases = [
         {controlValue: '1.23', expectedResult: true},
         {controlValue: '-1.23', expectedResult: true},
         {controlValue: '0', expectedResult: true},
         {controlValue: '-1', expectedResult: true},
         {controlValue: '-1.0', expectedResult: true},
-        {controlValue: '1,5', expectedResult: true},
         {controlValue: '1%', expectedResult: true},
         {controlValue: '1.5%', expectedResult: true},
         {controlValue: '-5%', expectedResult: true},
         {controlValue: '.35', expectedResult: true},
-        {controlValue: ',3', expectedResult: true},
         {controlValue: '.3%', expectedResult: true},
-        {controlValue: '2,5%', expectedResult: true},
         {controlValue: '3.2% ', expectedResult: true},
         {controlValue: ' 3.2% ', expectedResult: true},
         {controlValue: '0.', expectedResult: true},
@@ -236,9 +235,7 @@ describe('Schema validators', () => {
         {controlValue: '--1.23', expectedResult: false},
         {controlValue: '=1.23', expectedResult: false},
       ];
-      const filter = SchemaValidators.isFloat(
-        mockNumberConversionServiceObject as NumberConversionService
-      );
+      const filter = SchemaValidators.isFloat(numberConversionService);
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue);
         const errorsReturned = filter(control);
@@ -255,20 +252,31 @@ describe('Schema validators', () => {
       });
     });
 
-    it('should use number conversion service to validate float values', () => {
-      const filter = SchemaValidators.isFloat(
-        mockNumberConversionServiceObject as NumberConversionService
-      );
+    it('should validate floats correctly in French locale', () => {
+      i18nLanguageCodeService.setI18nLanguageCode('fr');
       const control: MockFormControl = new MockFormControl([], []);
+      const filter = SchemaValidators.isFloat(numberConversionService);
 
-      control.setValue('1,5');
-      expect(filter(control)).toBe(null);
-
-      control.setValue('1.5');
-      expect(filter(control)).toBe(null);
-
-      control.setValue('abc');
-      expect(filter(control)).not.toBe(null);
+      const testCases = [
+        {controlValue: '1,5', expectedResult: true},
+        {controlValue: ',3', expectedResult: true},
+        {controlValue: '2,5%', expectedResult: true},
+        {controlValue: '1.5', expectedResult: true},
+      ];
+      testCases.forEach(testCase => {
+        control.setValue(testCase.controlValue);
+        const errorsReturned = filter(control);
+        if (testCase.expectedResult === true) {
+          expect(errorsReturned).toBe(null, testCase.toString());
+          return;
+        }
+        if (errorsReturned === null) {
+          throw new Error(testCase.controlValue as string);
+        }
+        expect(errorsReturned.isFloat)
+          .withContext(testCase.toString())
+          .toBeDefined();
+      });
     });
   });
 
