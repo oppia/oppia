@@ -288,7 +288,7 @@ describe('Blog Post Editor Component', () => {
     );
     expect(blogDashboardPageService.imageUploaderIsNarrow).toBeTrue();
     expect(component.dateTimeLastSaved).toEqual(
-      'November 21, 2014 at 04:52 AM'
+      'Friday, November 21, 2014 at 4:52 AM'
     );
     expect(component.title).toEqual('sample title');
     expect(component.contentEditorIsActive).toBeFalse();
@@ -587,12 +587,12 @@ describe('Blog Post Editor Component', () => {
     // This corresponds to Fri, 21 Nov 2014 04:52 AM GMT.
     let DATE = '11/21/2014, 04:52:46:713463';
     expect(component.getDateStringInWords(DATE)).toBe(
-      'November 21, 2014 at 04:52 AM'
+      'Friday, November 21, 2014 at 4:52 AM'
     );
 
     DATE = '01/16/2027, 09:45:46:600000';
     expect(component.getDateStringInWords(DATE)).toBe(
-      'January 16, 2027 at 09:45 AM'
+      'Friday, February 2, 2018 at 12:30 PM'
     );
 
     DATE = '02/02/2018, 12:30:46:608990';

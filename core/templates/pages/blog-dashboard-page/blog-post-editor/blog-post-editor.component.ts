@@ -211,7 +211,8 @@ export class BlogPostEditorComponent implements OnInit {
 
   getDateStringInWords(naiveDateTime: string): string {
     let normalized = naiveDateTime.replace(
-      /(\d{2}:\d{2}:\d{2}):(\d+)$/, '$1.$2'
+      /(\d{2}:\d{2}:\d{2}):(\d+)$/,
+      '$1.$2'
     );
     let millisSinceEpoch = new Date(normalized + ' UTC').getTime();
     return this.dateTimeFormatService.getDateTimeInWords(millisSinceEpoch);
