@@ -25,6 +25,7 @@ from core.constants import constants
 from core.domain import (
     activity_services,
     change_domain,
+    collection_rights_domain,
     exp_rights_domain,
     rights_domain,
     role_services,
@@ -85,7 +86,7 @@ def get_activity_rights_from_model(
         )
         return get_exploration_rights_from_model(activity_rights_model)
 
-    return rights_domain.ActivityRights(
+    return collection_rights_domain.CollectionRights(
         activity_rights_model.id,
         activity_rights_model.owner_ids,
         activity_rights_model.editor_ids,
