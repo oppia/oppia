@@ -28,8 +28,6 @@ from core.domain import (
     email_manager,
     fs_services,
     image_validation_services,
-    platform_parameter_list,
-    platform_parameter_services,
     question_services,
     role_services,
     skill_services,
@@ -570,15 +568,11 @@ class EditableTopicDataHandler(
                     'The deleted skills: %s are still present in topic with '
                     'id %s' % (deleted_skills_string, topic_id)
                 )
-                server_can_send_emails = platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+                email_manager.send_mail_to_admin(
+                    'Deleted skills present in topic',
+                    'The deleted skills: %s are still present in '
+                    'topic with id %s' % (deleted_skills_string, topic_id),
                 )
-                if server_can_send_emails:
-                    email_manager.send_mail_to_admin(
-                        'Deleted skills present in topic',
-                        'The deleted skills: %s are still present in '
-                        'topic with id %s' % (deleted_skills_string, topic_id),
-                    )
             skill_summaries = skill_services.get_multi_skill_summaries(
                 topic_object.get_all_skill_ids()
             )
@@ -714,15 +708,11 @@ class EditableTopicDataHandler(
                 'The deleted skills: %s are still present in topic with id %s'
                 % (deleted_skills_string, topic_id)
             )
-            server_can_send_emails = platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            email_manager.send_mail_to_admin(
+                'Deleted skills present in topic',
+                'The deleted skills: %s are still present in topic with '
+                'id %s' % (deleted_skills_string, topic_id),
             )
-            if server_can_send_emails:
-                email_manager.send_mail_to_admin(
-                    'Deleted skills present in topic',
-                    'The deleted skills: %s are still present in topic with '
-                    'id %s' % (deleted_skills_string, topic_id),
-                )
 
         self.values.update(
             {
@@ -884,22 +874,16 @@ class TopicPublishSendMailHandler(
         """
         assert self.normalized_payload is not None
         topic_url = '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, topic_id)
-        server_can_send_emails = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
+        email_manager.send_mail_to_admin(
+            'Request to review and publish a topic',
+            '%s wants to publish topic: %s at URL %s, please review'
+            ' and publish if it looks good.'
+            % (
+                self.username,
+                self.normalized_payload['topic_name'],
+                topic_url,
+            ),
         )
-        if server_can_send_emails:
-            email_manager.send_mail_to_admin(
-                'Request to review and publish a topic',
-                '%s wants to publish topic: %s at URL %s, please review'
-                ' and publish if it looks good.'
-                % (
-                    self.username,
-                    self.normalized_payload['topic_name'],
-                    topic_url,
-                ),
-            )
 
         self.render_json(self.values)
 
