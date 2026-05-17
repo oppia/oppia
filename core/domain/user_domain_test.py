@@ -94,9 +94,10 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
             modifiable_user_data_dict['display_alias'],
             modifiable_user_data_dict['pin'],
             modifiable_user_data_dict['preferred_language_codes'],
-            modifiable_user_data_dict['preferred_site_language_code'],
-            modifiable_user_data_dict['preferred_audio_language_code'],
-            modifiable_user_data_dict['preferred_translation_language_code'],
+            modifiable_user_data_dict['preferred_site_language_code'] or '',
+            modifiable_user_data_dict['preferred_audio_language_code'] or '',
+            modifiable_user_data_dict['preferred_translation_language_code']
+            or '',
             modifiable_user_data_dict['user_id'],
             modifiable_user_data_dict['fake_field'],
         )
