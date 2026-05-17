@@ -15,9 +15,9 @@
 /**
  * @fileoverview Unit tests for WindowDimensionsService.
  */
-import {TestBed} from '@angular/core/testing';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
+import { TestBed } from '@angular/core/testing';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Window Dimensions Service', () => {
   let wds: WindowDimensionsService;
@@ -101,9 +101,18 @@ describe('Window Dimensions Service', () => {
   });
 
   it('should check if window is narrow', () => {
-    spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(668);
-
+    spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(500);
     expect(wds.isWindowNarrow()).toBe(true);
+  });
+
+  it('should check if window is narrow at 1150px boundary', () => {
+    spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(1150);
+    expect(wds.isWindowNarrow()).toBe(true);
+  });
+
+  it('should check if window is not narrow above 1150px', () => {
+    spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(1151);
+    expect(wds.isWindowNarrow()).toBe(false);
   });
 
   it('should return observable on window resize', () => {

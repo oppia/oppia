@@ -47,7 +47,7 @@ export class WindowDimensionsService {
   }
 
   isWindowNarrow(): boolean {
-    let NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 1150;
+    const NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 1150;
     return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
   }
 }
