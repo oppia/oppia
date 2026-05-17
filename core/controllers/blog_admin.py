@@ -40,9 +40,8 @@ class BlogAdminHandlerNormalizedPayloadDict(TypedDict):
     """Normalized payload for BlogAdminHandler."""
 
     action: str
+    # Here we use type Any because platform parameters can have multiple primitive types (int, float, bool, str) depending on configuration.
     new_platform_parameter_values: Dict[str, Any]
-    # Here we use type Any because platform parameters can have multiple
-    # primitive types (int, float, bool, str) depending on configuration.
 
 
 class BlogAdminHandler(
@@ -148,9 +147,8 @@ class BlogAdminHandler(
         self._update_platform_parameters(new_values)
         self._log_platform_parameter_update(new_values)
 
+    # Here we use type Any because platform parameters support multiple primitive types and are validated dynamically at runtime.
     def _update_platform_parameters(self, new_values: Dict[str, Any]) -> None:
-        # Here we use type Any because platform parameters support multiple
-        # primitive types and are validated dynamically at runtime.
         """Updates platform parameters in registry."""
 
         if not new_values:
@@ -185,11 +183,10 @@ class BlogAdminHandler(
                 param.default_value,
             )
 
+    # Here we use type Any because platform parameters may contain values of different primitive types (int, float, bool, str).
     def _log_platform_parameter_update(
         self, new_values: Dict[str, Any]
     ) -> None:
-        # Here we use type Any because platform parameters may contain values
-        # of different primitive types (int, float, bool, str).
         """Logs platform parameter updates."""
         logging.info(
             '[BLOG ADMIN] %s saved platform parameter values: %s',
