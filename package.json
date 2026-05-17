@@ -4,7 +4,7 @@
   "description": "Oppia enables the creation of interactive online lessons.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:rtl": "postcss dist/oppia-angular-prod/styles.*.css --use rtlcss -d dist/oppia-angular-prod/ --ext rtl.css",
+    "build:rtl": "postcss build/styles.*.css --use rtlcss -d build/ --ext rtl.css",
     "watch:rtl": "postcss dist/oppia-angular/styles.css --use rtlcss -o dist/oppia-angular/styles-rtl.css --watch"
   },
   "repository": {
