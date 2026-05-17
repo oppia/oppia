@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the blog admin page"""
+"""Controllers for the blog admin page."""
 
 from __future__ import annotations
 
 import logging
+from typing import Any, Dict, Final, TypedDict
 
 from core import feconf
 from core.controllers import acl_decorators, base
@@ -31,28 +32,25 @@ from core.domain import (
     user_services,
 )
 
-from typing import Dict, Final, Optional, TypedDict
-
 BLOG_POST_EDITOR: Final = feconf.ROLE_ID_BLOG_POST_EDITOR
 BLOG_ADMIN: Final = feconf.ROLE_ID_BLOG_ADMIN
 
 
 class BlogAdminHandlerNormalizedPayloadDict(TypedDict):
-    """Dict representation of BlogAdminHandler's normalized_payload
-    dictionary.
-    """
+    """Normalized payload for BlogAdminHandler."""
 
     action: str
-    new_platform_parameter_values: Dict[str, object]
+    new_platform_parameter_values: Dict[str, Any]
 
 
 class BlogAdminHandler(
     base.BaseHandler[BlogAdminHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
-    """Handler for the blog admin page."""
+    """Handler for blog admin operations such as updating platform parameters."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'POST': {
@@ -76,6 +74,7 @@ class BlogAdminHandler(
 
     @acl_decorators.can_access_blog_admin_page
     def get(self) -> None:
+        """Handles GET request for blog admin page data."""
         max_no_of_tags_parameter = platform_parameter_registry.Registry.get_platform_parameter(
             platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
         )
@@ -116,19 +115,21 @@ class BlogAdminHandler(
 
     @acl_decorators.can_access_blog_admin_page
     def post(self) -> None:
+        """Handles updates to platform parameters."""
         self._validate_save_platform_parameters_action()
         self._handle_save_platform_parameters()
         self.render_json({})
 
     def _validate_save_platform_parameters_action(self) -> None:
+        """Validates POST action type."""
         assert self.normalized_payload is not None
 
         action = self.normalized_payload['action']
-
         if action != 'save_platform_parameters':
             raise self.InvalidInputException(f'Invalid action: {action}')
 
     def _handle_save_platform_parameters(self) -> None:
+        """Handles saving platform parameter updates."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
 
@@ -145,7 +146,8 @@ class BlogAdminHandler(
         self._update_platform_parameters(new_values)
         self._log_platform_parameter_update(new_values)
 
-    def _update_platform_parameters(self, new_values: Dict[str, int]) -> None:
+    def _update_platform_parameters(self, new_values: Dict[str, Any]) -> None:
+        """Updates platform parameters in registry."""
 
         if not new_values:
             raise self.InvalidInputException(
@@ -180,8 +182,9 @@ class BlogAdminHandler(
             )
 
     def _log_platform_parameter_update(
-        self, new_values: Dict[str, int]
+        self, new_values: Dict[str, Any]
     ) -> None:
+        """Logs platform parameter updates."""
         logging.info(
             '[BLOG ADMIN] %s saved platform parameter values: %s',
             self.user_id,
@@ -190,6 +193,8 @@ class BlogAdminHandler(
 
 
 class BlogAdminRolesHandlerNormalizedPayloadDict(TypedDict):
+    """Normalized payload for BlogAdminRolesHandler."""
+
     role: str
     username: str
 
@@ -197,6 +202,7 @@ class BlogAdminRolesHandlerNormalizedPayloadDict(TypedDict):
 class BlogAdminRolesHandler(
     base.BaseHandler[BlogAdminRolesHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
+    """Handles role assignment and removal for blog users."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -218,6 +224,7 @@ class BlogAdminRolesHandler(
 
     @acl_decorators.can_manage_blog_post_editors
     def post(self) -> None:
+        """Assigns a role to a user."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
 
@@ -241,6 +248,7 @@ class BlogAdminRolesHandler(
 
     @acl_decorators.can_manage_blog_post_editors
     def put(self) -> None:
+        """Removes blog post editor role from a user."""
         assert self.normalized_payload is not None
 
         username = self.normalized_payload['username']
@@ -248,7 +256,7 @@ class BlogAdminRolesHandler(
         user_id = user_services.get_user_id_from_username(username)
 
         if user_id is None:
-            raise self.InvalidInputException('Invalid username: %s' % username)
+            raise self.InvalidInputException(f'Invalid username: {username}')
 
         user_services.remove_user_role(user_id, feconf.ROLE_ID_BLOG_POST_EDITOR)
 
