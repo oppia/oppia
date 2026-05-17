@@ -151,6 +151,7 @@ class BlogAdminHandler(
     # Here we use type Any because platform parameters support multiple primitive types and are validated dynamically at runtime.
     def _update_platform_parameters(self, new_values: Dict[str, Any]) -> None:
         """Updates platform parameters in registry."""
+        assert self.user_id is not None
 
         if not new_values:
             raise self.InvalidInputException(
