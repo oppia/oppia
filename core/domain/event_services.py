@@ -31,7 +31,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Any, Callable, Dict, Optional, Union
+from typing import Callable, Dict, Generic, Optional, ParamSpec, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -44,23 +44,20 @@ if MYPY:  # pragma: no cover
 transaction_services = models.Registry.import_transaction_services()
 
 
-class BaseEventHandler:
+P = ParamSpec('P')
+
+
+class BaseEventHandler(Generic[P]):
     """Base class for event dispatchers."""
 
     # A string denoting the type of the event. Should be specified by
     # subclasses and considered immutable.
     EVENT_TYPE: Optional[str] = None
 
-    # Here, `_handle_event` is added only to inform MyPy that
-    # method `_handle_event` is always going to exists and it
-    # has type Callable[..., None].
-    _handle_event: Callable[..., None]
+    _handle_event: Callable[P, None]
 
-    # TODO(#16047): Here we use type Any because in child classes this
-    # method can be redefined with any number of named and keyword arguments
-    # with different kinds of types.
     @classmethod
-    def record(cls, *args: Any, **kwargs: Any) -> None:
+    def record(cls, *args: P.args, **kwargs: P.kwargs) -> None:
         """Process incoming events.
 
         Callers of event handlers should call this method, not _handle_event().
@@ -79,7 +76,9 @@ class BaseEventHandler:
         cls._handle_event(*args, **kwargs)
 
 
-class StatsEventsHandler(BaseEventHandler):
+class StatsEventsHandler(
+    BaseEventHandler[[str, int, Dict[str, Dict[str, Union[int, str]]]]]
+):
     """Event handler for incremental update of analytics model using aggregated
     stats data.
     """
@@ -122,7 +121,23 @@ class StatsEventsHandler(BaseEventHandler):
             )
 
 
-class AnswerSubmissionEventHandler(BaseEventHandler):
+class AnswerSubmissionEventHandler(
+    BaseEventHandler[
+        [
+            str,
+            int,
+            str,
+            str,
+            int,
+            int,
+            str,
+            str,
+            float,
+            Dict[str, Union[str, int]],
+            str,
+        ]
+    ]
+):
     """Event handler for recording answer submissions."""
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_ANSWER_SUBMITTED
@@ -178,7 +193,9 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
         )
 
 
-class ExplorationActualStartEventHandler(BaseEventHandler):
+class ExplorationActualStartEventHandler(
+    BaseEventHandler[[str, int, str, str]]
+):
     """Event handler for recording exploration actual start events."""
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION
@@ -195,7 +212,7 @@ class ExplorationActualStartEventHandler(BaseEventHandler):
         )
 
 
-class SolutionHitEventHandler(BaseEventHandler):
+class SolutionHitEventHandler(BaseEventHandler[[str, int, str, str, float]]):
     """Event handler for recording solution hit events."""
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_SOLUTION_HIT
@@ -219,7 +236,9 @@ class SolutionHitEventHandler(BaseEventHandler):
         )
 
 
-class StartExplorationEventHandler(BaseEventHandler):
+class StartExplorationEventHandler(
+    BaseEventHandler[[str, int, str, str, Dict[str, str], str]]
+):
     """Event handler for recording exploration start events."""
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_START_EXPLORATION
@@ -243,7 +262,9 @@ class StartExplorationEventHandler(BaseEventHandler):
         handle_exploration_start(exp_id)
 
 
-class MaybeLeaveExplorationEventHandler(BaseEventHandler):
+class MaybeLeaveExplorationEventHandler(
+    BaseEventHandler[[str, int, str, str, float, Dict[str, str], str]]
+):
     """Event handler for recording exploration leave events."""
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION
@@ -273,7 +294,9 @@ class MaybeLeaveExplorationEventHandler(BaseEventHandler):
         )
 
 
-class CompleteExplorationEventHandler(BaseEventHandler):
+class CompleteExplorationEventHandler(
+    BaseEventHandler[[str, int, str, str, float, Dict[str, str], str]]
+):
     """Event handler for recording exploration completion events."""
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_COMPLETE_EXPLORATION
@@ -303,7 +326,7 @@ class CompleteExplorationEventHandler(BaseEventHandler):
         )
 
 
-class RateExplorationEventHandler(BaseEventHandler):
+class RateExplorationEventHandler(BaseEventHandler[[str, str, int, int]]):
     """Event handler for recording exploration rating events."""
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_RATE_EXPLORATION
@@ -321,7 +344,9 @@ class RateExplorationEventHandler(BaseEventHandler):
         handle_exploration_rating(exp_id, rating, old_rating)
 
 
-class StateHitEventHandler(BaseEventHandler):
+class StateHitEventHandler(
+    BaseEventHandler[[str, int, str, str, Dict[str, str], str]]
+):
     """Event handler for recording state hit events."""
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_STATE_HIT
@@ -343,7 +368,7 @@ class StateHitEventHandler(BaseEventHandler):
         )
 
 
-class StateCompleteEventHandler(BaseEventHandler):
+class StateCompleteEventHandler(BaseEventHandler[[str, int, str, str, float]]):
     """Event handler for recording state complete events."""
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_STATE_COMPLETED
@@ -367,7 +392,9 @@ class StateCompleteEventHandler(BaseEventHandler):
         )
 
 
-class LeaveForRefresherExpEventHandler(BaseEventHandler):
+class LeaveForRefresherExpEventHandler(
+    BaseEventHandler[[str, str, int, str, str, float]]
+):
     """Event handler for recording "leave for refresher exploration" events."""
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_LEAVE_FOR_REFRESHER_EXP
@@ -395,7 +422,7 @@ class LeaveForRefresherExpEventHandler(BaseEventHandler):
         )
 
 
-class FeedbackThreadCreatedEventHandler(BaseEventHandler):
+class FeedbackThreadCreatedEventHandler(BaseEventHandler[[str]]):
     """Event handler for recording new feedback thread creation events."""
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_NEW_THREAD_CREATED
@@ -408,7 +435,9 @@ class FeedbackThreadCreatedEventHandler(BaseEventHandler):
         feedback_services.handle_new_thread_created(exp_id)
 
 
-class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
+class FeedbackThreadStatusChangedEventHandler(
+    BaseEventHandler[[str, str, str]]
+):
     """Event handler for recording reopening feedback thread events."""
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_THREAD_STATUS_CHANGED
