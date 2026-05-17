@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Final, TypedDict
 
 from core import feconf
 from core.controllers import acl_decorators, base
@@ -31,6 +30,8 @@ from core.domain import (
     role_services,
     user_services,
 )
+
+from typing import Any, Dict, Final, TypedDict
 
 BLOG_POST_EDITOR: Final = feconf.ROLE_ID_BLOG_POST_EDITOR
 BLOG_ADMIN: Final = feconf.ROLE_ID_BLOG_ADMIN
