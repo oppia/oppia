@@ -64,9 +64,9 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
         display_alias: str,
         pin: Optional[str],
         preferred_language_codes: List[str],
-        preferred_site_language_code: Optional[str],
-        preferred_audio_language_code: Optional[str],
-        preferred_translation_language_code: Optional[str],
+        preferred_site_language_code: str,
+        preferred_audio_language_code: str,
+        preferred_translation_language_code: str,
         user_id: Optional[str] = None,
         fake_field: Optional[str] = None,
     ) -> None:
