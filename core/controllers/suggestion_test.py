@@ -4107,11 +4107,9 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'content_count': 1,
                     'reviewer_only_content_count': 0,
                     'id': 'exp1',
-                    'is_pinned': False,
                     'story_title': 'A story',
                     'topic_name': 'topic',
                     'translation_counts': {},
-                    'translation_in_review_counts': {},
                 }
             },
         )

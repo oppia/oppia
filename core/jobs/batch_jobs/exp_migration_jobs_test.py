@@ -482,9 +482,7 @@ class MigrateExplorationJobTests(
             'story_title': 'A story title',
             'content_count': 4,
             'translation_counts': {'hi': 0, 'bn': 0},
-            'translation_in_review_counts': {},
             'reviewer_only_content_count': 0,
-            'is_pinned': False,
         }
 
         self.assertEqual(
@@ -952,9 +950,7 @@ class AuditExplorationMigrationJobTests(
             'story_title': 'A story title',
             'content_count': 4,
             'translation_counts': {'hi': 0},
-            'translation_in_review_counts': {},
             'reviewer_only_content_count': 0,
-            'is_pinned': False,
         }
 
         self.assertEqual(
