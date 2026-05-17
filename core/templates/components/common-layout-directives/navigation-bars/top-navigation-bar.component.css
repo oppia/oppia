@@ -417,6 +417,9 @@
 
 .oppia-top-navigation-bar .oppia-navbar-dropdown .nav-link {
   color: #00645c;
+  overflow-wrap: break-word;
+  white-space: normal;
+  word-break: break-word;
 }
 .oppia-top-navigation-bar .oppia-navbar-dropdown .nav-link:hover {
   color: #333;
