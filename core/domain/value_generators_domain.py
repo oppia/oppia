@@ -25,16 +25,16 @@ import os
 
 from core import feconf, utils
 
-from typing import Any, Dict, Type
+from typing import Any, Dict, Generic, Type, TypeVar
+
+ReturnT = TypeVar('ReturnT')
 
 
-class BaseValueGenerator:
+class BaseValueGenerator(Generic[ReturnT]):
     """Base value generator class.
 
     A value generator is a class containing a function that takes in
-    customization args and uses them to generate a value. The generated values
-    are not typed, so if the caller wants strongly-typed values it would need
-    to normalize the output of each generator.
+    customization args and uses them to generate a value.
 
     Each value generator should define a template file and an AngularJS
     directive. The names of these two files should be [ClassName].html and
@@ -67,10 +67,12 @@ class BaseValueGenerator:
             )
         )
 
-    # Here we use type Any because child classes of BaseValueGenerator can use
-    # the 'generate_value' function with different types of arguments, 'args',
-    # 'kwargs' and return type are set to 'Any'.
-    def generate_value(self, *args: Any, **kwargs: Any) -> Any:
+    # Here we use object because child classes of BaseValueGenerator override
+    # this method with different concrete argument types. Using object as the
+    # base type for *args and **kwargs allows subclasses to define their own
+    # specific parameter types without violating the Liskov substitution
+    # principle at the base class level.
+    def generate_value(self, *args: object, **kwargs: object) -> ReturnT:
         """Generates a new value, using the given customization args.
 
         The first arg should be context_params.
@@ -88,7 +90,11 @@ class Registry:
             mapping value generator class names to their classes.
     """
 
-    value_generators_dict: Dict[str, Type[BaseValueGenerator]] = {}
+    # Here we use type Any because the Registry stores generator classes before
+    # they are instantiated, and at this level the concrete ReturnT of each
+    # BaseValueGenerator subclass is not yet known. Any is the only type that
+    # correctly represents an unparameterized generic class in this context.
+    value_generators_dict: Dict[str, Type[BaseValueGenerator[Any]]] = {}
 
     @classmethod
     def _refresh_registry(cls) -> None:
@@ -108,15 +114,24 @@ class Registry:
                 cls.value_generators_dict[clazz.__name__] = clazz
 
     @classmethod
-    def get_all_generator_classes(cls) -> Dict[str, Type[BaseValueGenerator]]:
+    # Here we use type Any because the return type contains generator classes
+    # whose concrete ReturnT is not known at the Registry level. See comment
+    # on value_generators_dict for full justification.
+    def get_all_generator_classes(
+        cls,
+    ) -> Dict[str, Type[BaseValueGenerator[Any]]]:
         """Get the dict of all value generator classes."""
         cls._refresh_registry()
         return copy.deepcopy(cls.value_generators_dict)
 
     @classmethod
     def get_generator_class_by_id(
-        cls, generator_id: str
-    ) -> Type[BaseValueGenerator]:
+        cls,
+        generator_id: str,
+        # Here we use type Any because the generator class returned by this method
+        # may have any concrete ReturnT depending on which subclass is retrieved.
+        # The caller is responsible for knowing the expected return type.
+    ) -> Type[BaseValueGenerator[Any]]:
         """Gets a generator class by its id.
 
         Refreshes once if the generator is not found; subsequently, throws an

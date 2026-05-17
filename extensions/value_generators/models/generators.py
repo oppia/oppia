@@ -26,7 +26,7 @@ from core.domain import value_generators_domain
 from typing import Dict, List, Optional
 
 
-class Copier(value_generators_domain.BaseValueGenerator):
+class Copier(value_generators_domain.BaseValueGenerator[str]):
     """Returns a copy of the input value."""
 
     default_value: str = ''
@@ -53,7 +53,7 @@ class Copier(value_generators_domain.BaseValueGenerator):
         return copy.deepcopy(value)
 
 
-class RandomSelector(value_generators_domain.BaseValueGenerator):
+class RandomSelector(value_generators_domain.BaseValueGenerator[str]):
     """Returns a random value from the input list."""
 
     default_value: str = ''

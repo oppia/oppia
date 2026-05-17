@@ -156,7 +156,7 @@ class ParamChange:
         return self._name
 
     @property
-    def generator(self) -> value_generators_domain.BaseValueGenerator:
+    def generator(self) -> value_generators_domain.BaseValueGenerator[str]:
         """The value generator used to define the new value of the
         changing parameter.
 
