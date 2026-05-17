@@ -267,4 +267,3 @@ class BlogAdminRolesHandler(
         blog_services.deassign_user_from_all_blog_posts(user_id)
 
         self.render_json({})
-        
