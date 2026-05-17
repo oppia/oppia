@@ -47,15 +47,16 @@ from core.platform import models
 from extensions import domain
 
 from typing import (
-    Any,
     Callable,
     Dict,
+    Generic,
     List,
     Mapping,
     Optional,
     Set,
     Type,
     TypedDict,
+    TypeVar,
     Union,
     cast,
 )
@@ -86,7 +87,10 @@ class BaseSuggestionDict(TypedDict):
     edited_by_reviewer: bool
 
 
-class BaseSuggestion:
+ChangeT = TypeVar('ChangeT', bound=change_domain.BaseChange)
+
+
+class BaseSuggestion(Generic[ChangeT]):
     """Base class for a suggestion.
 
     Attributes:
@@ -126,7 +130,7 @@ class BaseSuggestion:
     target_id: str
     target_version_at_submission: int
     author_id: str
-    change_cmd: change_domain.BaseChange
+    change_cmd: ChangeT
     score_category: str
     last_updated: datetime.datetime
     created_on: datetime.datetime
@@ -350,13 +354,7 @@ class BaseSuggestion:
             'populate_old_value_of_change.'
         )
 
-    # TODO(#16047): Here we use type Any because the method pre_update_validate
-    # is used inside sub-classes with different argument types, which according
-    # to MyPy violates the 'Liskov substitution principle' and throws an error
-    # in every sub-class where this pre_update_validate method is used. So, to
-    # avoid the error in every sub-class, we have used Any type here but once
-    # this BaseSuggestion class is refactored, we can remove type Any from here.
-    def pre_update_validate(self, change_cmd: Any) -> None:
+    def pre_update_validate(self, change_cmd: ChangeT) -> None:
         """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
         """
@@ -439,7 +437,9 @@ class BaseSuggestion:
         return self.status != suggestion_models.STATUS_IN_REVIEW
 
 
-class SuggestionEditStateContent(BaseSuggestion):
+class SuggestionEditStateContent(
+    BaseSuggestion[exp_domain.EditExpStatePropertyContentCmd]
+):
     """Domain object for a suggestion of type
     SUGGESTION_TYPE_EDIT_STATE_CONTENT.
     """
@@ -672,7 +672,9 @@ class SuggestionEditStateContent(BaseSuggestion):
         )
 
 
-class SuggestionTranslateContent(BaseSuggestion):
+class SuggestionTranslateContent(
+    BaseSuggestion[exp_domain.AddWrittenTranslationCmd]
+):
     """Domain object for a suggestion of type
     SUGGESTION_TYPE_TRANSLATE_CONTENT.
     """
@@ -775,7 +777,7 @@ class SuggestionTranslateContent(BaseSuggestion):
             )
 
     def pre_update_validate(
-        self, change_cmd: exp_domain.ExplorationChange
+        self, change_cmd: exp_domain.AddWrittenTranslationCmd
     ) -> None:
         """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
@@ -905,7 +907,9 @@ class SuggestionTranslateContent(BaseSuggestion):
         )
 
 
-class SuggestionAddQuestion(BaseSuggestion):
+class SuggestionAddQuestion(
+    BaseSuggestion[question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd]
+):
     """Domain object for a suggestion of type SUGGESTION_TYPE_ADD_QUESTION.
 
     Attributes:
@@ -1215,10 +1219,7 @@ class SuggestionAddQuestion(BaseSuggestion):
 
     def pre_update_validate(
         self,
-        change_cmd: Union[
-            question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd,
-            question_domain.CreateNewFullySpecifiedQuestionCmd,
-        ],
+        change_cmd: question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd,
     ) -> None:
         """Performs the pre update validation. This functions need to be called
         before updating the suggestion.
