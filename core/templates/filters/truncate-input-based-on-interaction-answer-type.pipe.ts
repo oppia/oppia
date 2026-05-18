@@ -19,8 +19,13 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
-import {CodeReplAnswer, InteractionAnswer} from 'interactions/answer-defs';
+import {InteractionAnswer} from 'interactions/answer-defs';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+
+// Minimal interface for inputs that carry a truncatable code string.
+interface TruncatableInput {
+  code: string;
+}
 
 @Pipe({
   name: 'truncateInputBasedOnInteractionAnswerTypePipe',
@@ -56,9 +61,9 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
     }
 
     if (answerType === 'NormalizedString') {
-      actualInputToTruncate = (inputUpdate as CodeReplAnswer).code;
+      actualInputToTruncate = (inputUpdate).code;
     } else if (answerType === 'CodeEvaluation') {
-      actualInputToTruncate = (inputUpdate as CodeReplAnswer).code;
+      actualInputToTruncate = (inputUpdate).code;
     } else {
       throw new Error('Unknown interaction answer type');
     }
