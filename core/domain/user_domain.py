@@ -26,9 +26,24 @@ from core.constants import constants
 
 from typing import Dict, List, Optional, TypedDict
 
+_SUPPORTED_SITE_LANGUAGE_CODES = [
+    language['id'] for language in constants.SUPPORTED_SITE_LANGUAGES
+]
+_SUPPORTED_AUDIO_LANGUAGE_CODES = [
+    language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+]
+DEFAULT_SITE_LANGUAGE_CODE = (
+    constants.DEFAULT_LANGUAGE_CODE
+    if constants.DEFAULT_LANGUAGE_CODE in _SUPPORTED_SITE_LANGUAGE_CODES
+    else _SUPPORTED_SITE_LANGUAGE_CODES[0]
+)
+DEFAULT_AUDIO_LANGUAGE_CODE = (
+    constants.DEFAULT_LANGUAGE_CODE
+    if constants.DEFAULT_LANGUAGE_CODE in _SUPPORTED_AUDIO_LANGUAGE_CODES
+    else _SUPPORTED_AUDIO_LANGUAGE_CODES[0]
+)
 
-# TODO(#15105): Refactor UserSettings to limit the number of Optional
-# fields used in UserSettingsDict.
+
 class UserSettingsDict(TypedDict):
     """Dictionary representing the UserSettings object."""
 
@@ -50,13 +65,13 @@ class UserSettingsDict(TypedDict):
     subject_interests: List[str]
     first_contribution_msec: Optional[float]
     preferred_language_codes: List[str]
-    preferred_site_language_code: Optional[str]
-    preferred_audio_language_code: Optional[str]
-    preferred_translation_language_code: Optional[str]
+    preferred_site_language_code: str
+    preferred_audio_language_code: str
+    preferred_translation_language_code: str
     pin: Optional[str]
     display_alias: Optional[str]
     deleted: bool
-    created_on: Optional[datetime.datetime]
+    created_on: datetime.datetime
 
 
 class UserSettings:
@@ -124,13 +139,16 @@ class UserSettings:
         subject_interests: Optional[List[str]] = None,
         first_contribution_msec: Optional[float] = None,
         preferred_language_codes: Optional[List[str]] = None,
-        preferred_site_language_code: Optional[str] = None,
-        preferred_audio_language_code: Optional[str] = None,
-        preferred_translation_language_code: Optional[str] = None,
+        preferred_site_language_code: str = DEFAULT_SITE_LANGUAGE_CODE,
+        preferred_audio_language_code: str = DEFAULT_AUDIO_LANGUAGE_CODE,
+        preferred_translation_language_code: str = (
+            constants.DEFAULT_LANGUAGE_CODE
+        ),
         pin: Optional[str] = None,
         display_alias: Optional[str] = None,
         deleted: bool = False,
-        created_on: Optional[datetime.datetime] = None,
+        *,
+        created_on: datetime.datetime,
     ) -> None:
         """Constructs a UserSettings domain object.
 
@@ -165,11 +183,10 @@ class UserSettings:
                 when the user first contributed to Oppia.
             preferred_language_codes: list(str) or None. Exploration language
                 preferences specified by the user.
-            preferred_site_language_code: str or None. System language
-                preference.
-            preferred_audio_language_code: str or None. Default language used
-                for audio translations preference.
-            preferred_translation_language_code: str or None. Text Translation
+            preferred_site_language_code: str. System language preference.
+            preferred_audio_language_code: str. Default language used for
+                audio translations preference.
+            preferred_translation_language_code: str. Text Translation
                 language preference of the translator that persists on the
                 contributor dashboard.
             pin: str or None. The PIN of the user's profile for android.
@@ -387,12 +404,15 @@ class UserSettings:
         )
         self.preferred_site_language_code = (
             modifiable_user_data.preferred_site_language_code
+            or DEFAULT_SITE_LANGUAGE_CODE
         )
         self.preferred_audio_language_code = (
             modifiable_user_data.preferred_audio_language_code
+            or DEFAULT_AUDIO_LANGUAGE_CODE
         )
         self.preferred_translation_language_code = (
             modifiable_user_data.preferred_translation_language_code
+            or constants.DEFAULT_LANGUAGE_CODE
         )
         self.pin = modifiable_user_data.pin
 

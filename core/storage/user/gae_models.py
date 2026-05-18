@@ -48,6 +48,23 @@ if MYPY:  # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
+_SUPPORTED_SITE_LANGUAGE_CODES = [
+    language['id'] for language in constants.SUPPORTED_SITE_LANGUAGES
+]
+_SUPPORTED_AUDIO_LANGUAGE_CODES = [
+    language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+]
+DEFAULT_SITE_LANGUAGE_CODE = (
+    constants.DEFAULT_LANGUAGE_CODE
+    if constants.DEFAULT_LANGUAGE_CODE in _SUPPORTED_SITE_LANGUAGE_CODES
+    else _SUPPORTED_SITE_LANGUAGE_CODES[0]
+)
+DEFAULT_AUDIO_LANGUAGE_CODE = (
+    constants.DEFAULT_LANGUAGE_CODE
+    if constants.DEFAULT_LANGUAGE_CODE in _SUPPORTED_AUDIO_LANGUAGE_CODES
+    else _SUPPORTED_AUDIO_LANGUAGE_CODES[0]
+)
+
 
 class UserSettingsModel(base_models.BaseModel):
     """Settings and preferences for a particular user.
@@ -94,14 +111,14 @@ class UserSettingsModel(base_models.BaseModel):
     )
     # System language preference (for I18N).
     preferred_site_language_code = datastore_services.StringProperty(
-        default=None,
+        default=DEFAULT_SITE_LANGUAGE_CODE,
         choices=[
             language['id'] for language in constants.SUPPORTED_SITE_LANGUAGES
         ],
     )
     # Audio language preference used for audio translations.
     preferred_audio_language_code = datastore_services.StringProperty(
-        default=None,
+        default=DEFAULT_AUDIO_LANGUAGE_CODE,
         choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
         ],
@@ -109,7 +126,7 @@ class UserSettingsModel(base_models.BaseModel):
     # Language preference when submitting text translations in the
     # contributor dashboard.
     preferred_translation_language_code = datastore_services.StringProperty(
-        default=None
+        default=constants.DEFAULT_LANGUAGE_CODE
     )
 
     # Attributes used for full users only.

@@ -22,6 +22,7 @@ import datetime
 import types
 
 from core import feconf, utils
+from core.constants import constants
 from core.domain import exp_domain, exp_services
 from core.platform import models
 from core.tests import test_utils
@@ -311,9 +312,11 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'subject_interests': [],
             'first_contribution_msec': None,
             'preferred_language_codes': [],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'preferred_translation_language_code': None,
+            'preferred_site_language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'preferred_audio_language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'preferred_translation_language_code': (
+                constants.DEFAULT_LANGUAGE_CODE
+            ),
             'display_alias': None,
             'has_viewed_lesson_info_modal_once': False,
         }

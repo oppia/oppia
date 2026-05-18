@@ -79,6 +79,23 @@ bulk_email_services = models.Registry.import_bulk_email_services()
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
+_SUPPORTED_SITE_LANGUAGE_CODES = [
+    language['id'] for language in constants.SUPPORTED_SITE_LANGUAGES
+]
+_SUPPORTED_AUDIO_LANGUAGE_CODES = [
+    language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+]
+DEFAULT_SITE_LANGUAGE_CODE = (
+    constants.DEFAULT_LANGUAGE_CODE
+    if constants.DEFAULT_LANGUAGE_CODE in _SUPPORTED_SITE_LANGUAGE_CODES
+    else _SUPPORTED_SITE_LANGUAGE_CODES[0]
+)
+DEFAULT_AUDIO_LANGUAGE_CODE = (
+    constants.DEFAULT_LANGUAGE_CODE
+    if constants.DEFAULT_LANGUAGE_CODE in _SUPPORTED_AUDIO_LANGUAGE_CODES
+    else _SUPPORTED_AUDIO_LANGUAGE_CODES[0]
+)
+
 # Size (in px) of the gravatar being retrieved.
 GRAVATAR_SIZE_PX: Final = 150
 # Data url for images/avatar/user_blue_72px.png.
@@ -364,6 +381,7 @@ def get_users_settings(
                     username='admin',
                     has_viewed_lesson_info_modal_once=False,
                     last_agreed_to_terms=datetime.datetime.utcnow(),
+                    created_on=datetime.datetime.utcnow(),
                 )
             )
         else:
@@ -1101,17 +1119,22 @@ def _get_user_settings_from_model(
         preferred_language_codes=(user_settings_model.preferred_language_codes),
         preferred_site_language_code=(
             user_settings_model.preferred_site_language_code
+            or DEFAULT_SITE_LANGUAGE_CODE
         ),
         preferred_audio_language_code=(
             user_settings_model.preferred_audio_language_code
+            or DEFAULT_AUDIO_LANGUAGE_CODE
         ),
         preferred_translation_language_code=(
             user_settings_model.preferred_translation_language_code
+            or constants.DEFAULT_LANGUAGE_CODE
         ),
         pin=user_settings_model.pin,
         display_alias=user_settings_model.display_alias,
         deleted=user_settings_model.deleted,
-        created_on=user_settings_model.created_on,
+        created_on=(
+            user_settings_model.created_on or datetime.datetime.utcnow()
+        ),
         has_viewed_lesson_info_modal_once=(
             user_settings_model.has_viewed_lesson_info_modal_once
         ),
@@ -1230,6 +1253,7 @@ def create_new_user(auth_id: str, email: str) -> user_domain.UserSettings:
         False,
         False,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
+        created_on=datetime.datetime.utcnow(),
     )
     _create_new_user_transactional(auth_id, user_settings)
     return user_settings
@@ -1302,6 +1326,7 @@ def create_new_profiles(
             False,
             preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
             pin=modifiable_user_data.pin,
+            created_on=datetime.datetime.utcnow(),
         )
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)
 

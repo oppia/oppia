@@ -2237,7 +2237,7 @@ class TranslationPreferenceHandlerTest(test_utils.GenericTestBase):
         self.login(user_email)
 
         response = self.get_json('/preferredtranslationlanguage')
-        self.assertIsNone(response['preferred_translation_language_code'])
+        self.assertEqual(response['preferred_translation_language_code'], 'en')
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(

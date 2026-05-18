@@ -146,9 +146,11 @@ class UserSettingsTests(test_utils.GenericTestBase):
             'display_alias': 'display_alias',
             'pin': '12345',
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'preferred_translation_language_code': None,
+            'preferred_site_language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'preferred_audio_language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'preferred_translation_language_code': (
+                constants.DEFAULT_LANGUAGE_CODE
+            ),
             'user_id': 'user_id',
         }
         self.modifiable_user_data = (
@@ -159,9 +161,11 @@ class UserSettingsTests(test_utils.GenericTestBase):
             'display_alias': 'display_alias_3',
             'pin': None,
             'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'preferred_translation_language_code': None,
+            'preferred_site_language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'preferred_audio_language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'preferred_translation_language_code': (
+                constants.DEFAULT_LANGUAGE_CODE
+            ),
             'user_id': None,
         }
         self.modifiable_new_user_data = (

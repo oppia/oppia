@@ -4053,6 +4053,9 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         )
 
         self.logout()
+        reviewer_settings = user_services.get_user_settings(self.reviewer_id)
+        reviewer_settings.preferred_translation_language_code = 'hi'
+        user_services.save_user_settings(reviewer_settings)
         self.login(self.REVIEWER_EMAIL)
 
     def test_exploration_handler_returns_data_with_no_exploration_id(
