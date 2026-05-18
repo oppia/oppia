@@ -1304,7 +1304,8 @@ def apply_change_list(
 
     try:
         for change in change_list:
-            handler = command_handlers.get(change.cmd)
+            cmd = cast(str, change.cmd)
+            handler = command_handlers.get(cmd)
             if handler is not None:
                 handler(change)
         return (
