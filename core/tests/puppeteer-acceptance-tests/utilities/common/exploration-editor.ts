@@ -51,15 +51,16 @@ export class ExplorationEditorModal {
       );
       showMessage('Tutorial pop-up closed successfully.');
     } catch (error) {
+      const errorMessage = (error as Error).message;
       if (!failIfMissing) {
         showMessage(
           'Welcome Modal not found, but test can be continued.\n' +
-            `Error: ${error.message}`
+            `Error: ${errorMessage}`
         );
         return;
       }
       throw new Error(
-        'Welcome Modal not found.\n' + 'Actual Error:\n' + error.message
+        'Welcome Modal not found.\n' + 'Actual Error:\n' + errorMessage
       );
     }
   }
