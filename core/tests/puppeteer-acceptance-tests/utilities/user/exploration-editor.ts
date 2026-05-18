@@ -43,6 +43,9 @@ const saveChangesButton = 'button.e2e-test-save-changes';
 const mathInteractionsTab = '.e2e-test-interaction-tab-math';
 const closeResponseModalButton = '.e2e-test-close-add-response-modal';
 
+const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
+const activeModalBackdropSelector = '.modal-backdrop, ngb-modal-window, .modal';
+
 const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
 const explorationTitleSelector = '.e2e-test-exploration-title-input';
@@ -74,7 +77,7 @@ const multipleChoiceResponseDropdown =
 const multipleChoiceResponseOption = 'mat-option.e2e-test-html-select-selector';
 const textInputInteractionButton = 'div.e2e-test-interaction-tile-TextInput';
 const textInputInteractionOption =
-  'tr#e2e-test-schema-based-list-editor-table-row';
+  'tr[id^="e2e-test-schema-based-list-editor-table-row"]';
 const textInputField = '.e2e-test-text-input';
 
 const saveDraftButton = 'button.e2e-test-save-draft-button';
@@ -403,6 +406,7 @@ const commonModalBodySelector = '.e2e-test-modal-body';
 const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
 
 const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
+const improvementsTabButton = '.e2e-test-improvements-tab';
 const formErrorContainer = '.e2e-test-form-error-container';
 const numberWithUnitsModalSelector =
   '.e2e-test-number-with-units-help-modal-header';
@@ -531,7 +535,9 @@ export class ExplorationEditor extends BaseUser {
   async removeFeedbackResponseInPreviewTab(): Promise<void> {
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector);
     // Wait for the response modal animation to finish, else it causes flakiness.
-    await this.page.waitForTimeout(2000);
+    await this.page.waitForSelector(feedbackResponseRemoveSelector, {
+      visible: true,
+    });
     await this.clickOnElementWithSelector(feedbackResponseRemoveSelector);
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector, false);
   }
@@ -2004,9 +2010,19 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Updates graph theory learner answer in response modal to be a simple star network.
+   * * @param {string} centerVertex - The text to be entered for the center vertex.
    */
-  async updateGraphTheoryLearnerAnswerInResponseModal(): Promise<void> {
+  async updateGraphTheoryLearnerAnswerInResponseModal(
+    centerVertex?: string
+  ): Promise<void> {
     const responseBox = await this.getRuleEditorModal();
+
+    if (centerVertex) {
+      const inputElement = await responseBox.$('input');
+      if (inputElement) {
+        await inputElement.type(centerVertex);
+      }
+    }
 
     await this.waitForPageToFullyLoad();
     const graphViz = new GraphViz(this.page, responseBox);
@@ -2878,8 +2894,17 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
+    // Wait for any lingering modals/backdrops to fully clear before interacting
+    // with the card content editor. Ghost modals from prior test steps can
+    // intercept clicks and cause hard-to-diagnose flakiness.
+    await this.page.waitForFunction(
+      (selector: string) => document.querySelectorAll(selector).length === 0,
+      {timeout: 60000},
+      activeModalBackdropSelector
+    );
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
+      timeout: 60000,
     });
     await this.clickOnElementWithSelector(stateEditSelector);
     await this.clearAllTextFrom(stateContentInputField);
@@ -2902,13 +2927,8 @@ export class ExplorationEditor extends BaseUser {
     interactionType: INTERACTION_TYPES
   ): Promise<void> {
     const interactionTabs: Record<string, INTERACTION_TYPES[]> = {
-      [INTERACTION_TABS.PROGRAMMING]: [
-        INTERACTION_TYPES.CODE_EDITOR,
-        INTERACTION_TYPES.PENCIL_CODE_EDITOR,
-      ],
       [INTERACTION_TABS.MATHS]: [
         INTERACTION_TYPES.FRACTION_INPUT,
-        INTERACTION_TYPES.GRAPH_THEORY,
         INTERACTION_TYPES.NUMBER_INPUT,
         INTERACTION_TYPES.SET_INPUT,
         INTERACTION_TYPES.NUMERIC_EXPRESSION,
@@ -2917,8 +2937,6 @@ export class ExplorationEditor extends BaseUser {
         INTERACTION_TYPES.NUMBER_WITH_UNITS,
         INTERACTION_TYPES.RATIO_EXPRESSION_INPUT,
       ],
-      [INTERACTION_TABS.GEOGRAPHY]: [INTERACTION_TYPES.WORLD_MAP],
-      [INTERACTION_TABS.MUSIC]: [INTERACTION_TYPES.MUSIC_NOTES_INPUT],
     };
 
     for (const interaction in interactionTabs) {
@@ -2927,6 +2945,17 @@ export class ExplorationEditor extends BaseUser {
           INTERACTION_TABS_SELECTORS[interaction]
         );
         await this.clickOnElementWithSelector(
+          INTERACTION_TABS_SELECTORS[interaction]
+        );
+        // Wait until the tab gains the 'active' class before looking for tiles.
+        // Without this, Puppeteer may query tiles while the modal is still
+        // animating to the new tab, causing spurious 'not found' errors.
+        await this.page.waitForFunction(
+          (selector: string) => {
+            const el = document.querySelector(selector);
+            return el && el.classList.contains('active');
+          },
+          {timeout: 30000},
           INTERACTION_TABS_SELECTORS[interaction]
         );
         showMessage(`Switched to ${interaction} tab.`);
@@ -2948,6 +2977,10 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
 
+    // Wait for any loading overlays to detach before clicking.
+    await this.page.waitForSelector(loadingFullPageOverlaySelector, {
+      hidden: true,
+    });
     await this.clickOnElementWithSelector(addInteractionButton);
 
     // Check if modal title is correct.
@@ -2958,7 +2991,17 @@ export class ExplorationEditor extends BaseUser {
     );
 
     await this.waitForNetworkIdle();
-    await this.clickOnElementWithText(interactionToAdd);
+    // Use a higher timeout for math interactions as they are heavy to render.
+    let tileText = interactionToAdd;
+
+    const interactionElement = await this.page.waitForXPath(
+      `//*[contains(normalize-space(text()), "${tileText}")]`,
+      {timeout: 90000}
+    );
+    if (!interactionElement) {
+      throw new Error(`Interaction "${interactionToAdd}" not found in modal.`);
+    }
+    await this.clickOnElement(interactionElement);
     if (skipInteractionCustoization) {
       await this.expectCustomizeInteractionTitleToBe(
         `Customize Interaction (${interactionToAdd})`
@@ -4337,8 +4380,11 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(previewTabButton);
     }
 
-    await this.expectElementToBeVisible(previewTabContainer);
+    await this.page.waitForFunction(() =>
+      window.location.href.includes('#/preview/')
+    );
     await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(previewTabContainer, {visible: true});
   }
 
   /**
@@ -4604,6 +4650,16 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to verify that the improvements tab is hidden.
+   * @param visible - Expected visibility.
+   */
+  async expectImprovementsTabToBePresnt(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(improvementsTabButton, visible);
+  }
+
+  /**
    * Function to submit an answer to a form input field.
    *
    * This function first determines the type of the input field in the DOM using the getInputType function.
@@ -4743,20 +4799,22 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * This function creates simple Programming Exploration.
+   * This function creates an exploration with an interaction that is not
+   * supported on the mobile app (e.g. SetInput). This is useful for testing
+   * validation errors when adding mobile-unsupported explorations to stories.
    * Starts at new Exploration Editor Page.
-   * Ends at same page, after adding programming interaction and saving the
+   * Ends at same page, after adding the unsupported interaction and saving the
    * draft.
    */
-  async createSimpleProgrammingExploration(): Promise<string> {
+  async createSimpleUnsupportedExploration(): Promise<string> {
     // Check if element to add interaction is visible (pre-check)
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
 
     await this.createMinimalExploration(
-      'This is a test Programming Exploration',
-      INTERACTION_TYPES.CODE_EDITOR
+      'This is a test Math Exploration',
+      INTERACTION_TYPES.SET_INPUT
     );
 
     const lastInteraction = 'Last Card';
@@ -4777,7 +4835,7 @@ export class ExplorationEditor extends BaseUser {
 
     await this.saveExplorationDraft();
     const explorationId = await this.publishExplorationWithMetadata(
-      'Simple Code Editor',
+      'Simple Math Exploration',
       'This is goal here',
       'Algebra'
     );
@@ -5480,6 +5538,10 @@ export class ExplorationEditor extends BaseUser {
       if (!sourceElement) {
         throw new Error(`Option "${option}" not found.`);
       }
+
+      // Ensure that elements have stabilized before we start dragging.
+      await this.waitForElementToStabilize(sourceElement);
+      await this.waitForElementToStabilize(destinationElement);
 
       const sourceBox = await sourceElement.boundingBox();
       const destBox = await destinationElement.boundingBox();

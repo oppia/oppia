@@ -6153,7 +6153,9 @@ export default {
   // Interaction IDs for which answer details cannot be solicited.
   "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],
 
+  "FEEDBACK_SUBJECT_MIN_CHAR_LIMIT": 3,
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
+  "FEEDBACK_MESSAGE_MIN_CHAR_LIMIT": 5,
 
   "MAX_CURRENT_GOALS_COUNT": 5,
 

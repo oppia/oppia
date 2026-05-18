@@ -280,6 +280,11 @@ describe('CampaignBannerComponent', () => {
     platformFeatureService.status.EnableCampaignBannerTestMode.isEnabled = true;
 
     component.setCampaignConfig();
+
+    const config = component.campaignConfig as CampaignConfig;
+    config.startDate = new Date(Date.now() - 100000);
+    config.endDate = new Date(Date.now() + 100000);
+
     component.computeBannerVisibility();
 
     expect(component.shouldShowBanner).toBe(true);

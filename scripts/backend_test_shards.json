@@ -209,7 +209,8 @@
         "core.jobs.batch_jobs.subtopic_migration_jobs_test",
         "core.jobs.batch_jobs.reject_invalid_suggestion_and_delete_invalid_translation_jobs_test",
         "core.domain.voiceover_cloud_task_services_test",
-        "core.jobs.batch_jobs.cleanup_duplicate_translation_suggestions_jobs_test"
+        "core.jobs.batch_jobs.cleanup_duplicate_translation_suggestions_jobs_test",
+        "core.jobs.batch_jobs.recover_orphaned_translations_jobs_test"
     ],
     "4": [
         "core.storage.learner_group.gae_models_test",
@@ -300,7 +301,6 @@
         "core.domain.translation_services_test",
         "core.storage.recommendations.gae_models_test",
         "scripts.linters.other_files_linter_test",
-        "scripts.install_dependencies_json_packages_test",
         "scripts.check_frontend_test_coverage_test",
         "core.platform.models_test",
         "core.storage.feedback.gae_models_test",
