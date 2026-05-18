@@ -14,16 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Stubs for the Firebase Admin SDK."""
+
 from __future__ import annotations
 
 import contextlib
 import os
 
-import webapp2
 from core.domain import auth_domain
 from core.platform import models
 
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Set
+import webapp2
+from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Set
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -60,7 +62,6 @@ class FirebaseAdminSdkStub:
         """Initializes a new instance that emulates an empty auth server."""
         self._user_id_by_auth_id: Dict[str, FirebaseAdminSdkStub.AuthUser] = {}
         self._external_user_id_associations: Set[str] = set()
-        # NEW
         self._is_session_active: bool = False
 
     @classmethod
@@ -163,12 +164,6 @@ class FirebaseAdminSdkStub:
                 )
             )
 
-            # Standard usage of ExitStack: enter a bunch of context managers
-            # from the safety of an ExitStack's context. Once they've all been
-            # opened, pop_all() of them off of the original context so they can
-            # *stay* open. Calling the function returned will exit all of them
-            # in reverse order.
-            # https://docs.python.org/3/library/contextlib.html#cleaning-up-in-an-enter-implementation
             close = stack.pop_all().close
         return close
 

@@ -41,7 +41,6 @@ from core import feature_flag_list, feconf, schema_utils, utils
 from core.constants import constants
 from core.controllers import base
 from core.domain import (
-    auth_domain,
     blog_services,
     caching_domain,
     classroom_config_domain,
@@ -80,8 +79,8 @@ from core.domain import (
 from core.platform import models
 from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
+from core.tests import firebase_admin_sdk_stub
 from scripts import common
-from core.tests.firebase_admin_sdk_stub import FirebaseAdminSdkStub
 
 import elasticsearch
 import requests_mock
@@ -102,7 +101,6 @@ from typing import (
     OrderedDict,
     Pattern,
     Sequence,
-    Set,
     Tuple,
     Type,
     TypedDict,
@@ -115,7 +113,6 @@ from typing import (
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
-        auth_models,
         base_models,
         datastore_services,
         email_services,
@@ -2330,7 +2327,9 @@ version: 1
         es_stub.reset()
 
         with contextlib.ExitStack() as stack:
-            stack.callback(FirebaseAdminSdkStub.install_stub(self))
+            stack.callback(
+                firebase_admin_sdk_stub.FirebaseAdminSdkStub.install_stub(self)
+            )
             es_client = elastic_search_services.ES.get_client()
             stack.enter_context(
                 self.swap(

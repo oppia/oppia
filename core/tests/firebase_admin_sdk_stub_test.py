@@ -14,14 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for the Firebase Admin SDK."""
+
 from __future__ import annotations
 
 import os
-import webapp2
 
 from core.domain import auth_domain
-from core.tests import test_utils
-from core.tests.firebase_admin_sdk_stub import FirebaseAdminSdkStub
+from core.tests import firebase_admin_sdk_stub, test_utils
+
+import webapp2
 
 
 class FirebaseAdminSdkStubTests(test_utils.TestBase):
@@ -29,24 +31,24 @@ class FirebaseAdminSdkStubTests(test_utils.TestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.stub = FirebaseAdminSdkStub()
+        self.stub = firebase_admin_sdk_stub.FirebaseAdminSdkStub()
         self.mock_request = webapp2.Request.blank('/')
         self.mock_response = webapp2.Response()
 
     def test_establish_auth_session_sets_active_state(self) -> None:
-        self.assertFalse(self.stub._is_session_active)
+        self.assertFalse(getattr(self.stub, '_is_session_active'))
         self.stub.establish_auth_session(self.mock_request, self.mock_response)
-        self.assertTrue(self.stub._is_session_active)
+        self.assertTrue(getattr(self.stub, '_is_session_active'))
 
     def test_destroy_auth_session_sets_inactive_state(self) -> None:
-        self.stub._is_session_active = True
+        setattr(self.stub, '_is_session_active', True)
         self.stub.destroy_auth_session(self.mock_response)
-        self.assertFalse(self.stub._is_session_active)
+        self.assertFalse(getattr(self.stub, '_is_session_active'))
 
     def test_get_auth_claims_returns_none_when_session_inactive(self) -> None:
         os.environ['USER_ID'] = 'user_123'
         os.environ['USER_EMAIL'] = 'test@example.com'
-        self.stub._is_session_active = False
+        setattr(self.stub, '_is_session_active', False)
         claims = self.stub.get_auth_claims_from_request(self.mock_request)
         self.assertIsNone(claims)
 
@@ -54,9 +56,10 @@ class FirebaseAdminSdkStubTests(test_utils.TestBase):
         os.environ['USER_ID'] = 'user_123'
         os.environ['USER_EMAIL'] = 'test@example.com'
         os.environ['USER_IS_ADMIN'] = '0'
-        self.stub._is_session_active = True
+        setattr(self.stub, '_is_session_active', True)
         claims = self.stub.get_auth_claims_from_request(self.mock_request)
         self.assertIsNotNone(claims)
+        assert claims is not None
         self.assertEqual(claims.auth_id, 'user_123')
         self.assertEqual(claims.email, 'test@example.com')
         self.assertFalse(claims.role_is_super_admin)
