@@ -1424,6 +1424,9 @@ def _add_message_to_email_buffer(
         new_status: str. One of STATUS_CHOICES. Value of new thread status.
     """
     thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+    # Only send feedback emails for exploration entities.
+    if thread.entity_type != feconf.ENTITY_TYPE_EXPLORATION:
+        return
     exploration_id = thread.entity_id
     has_suggestion = thread.has_suggestion
     feedback_message_reference = feedback_domain.FeedbackMessageReference(
