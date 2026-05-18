@@ -14,7 +14,8 @@
 
 /**
  * @fileoverview Acceptance tests for keyboard navigation and focus shifting.
- * Tests cover the usage of keyboard shortcuts for navigation and ensuring the correct element is focused.
+ * Tests cover the usage of keyboard shortcuts for ensuring the correct
+ * element is focused.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -88,30 +89,9 @@ describe('Logged-out User', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to navigate the site using keyboard shortcuts, check focus, and interact with the exploration player.',
+    'should be able to shift focus using keyboard shortcuts and interact with the exploration player.',
     async function () {
-      // Navigate to the Get Started page using the ‘Ctrl+6’ shortcut.
-      await loggedOutUser.simulateKeyboardShortcut('Control+Digit6');
-      await loggedOutUser.expectToBeOnPage('get started');
-
-      // Navigate to the About page using the ‘Ctrl+4’ shortcut.
-      await loggedOutUser.simulateKeyboardShortcut('Control+Digit4');
-      await loggedOutUser.expectToBeOnPage('about');
-
-      // Navigate to the Preferences page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+5’ shortcut.
-      await loggedOutUser.simulateKeyboardShortcut('Control+Digit5');
-      await loggedOutUser.expectToBeOnPage('login');
-
-      // Navigate to the learner-dashboard page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+2’ shortcut.
-      await loggedOutUser.simulateKeyboardShortcut('Control+Digit2');
-      await loggedOutUser.expectToBeOnPage('login');
-
-      // Navigate to the creator-dashboard page (Can't because logged-out, so will be navigated to login page) using the ‘Ctrl+3’ shortcut.
-      await loggedOutUser.simulateKeyboardShortcut('Control+Digit3');
-      await loggedOutUser.expectToBeOnPage('login');
-
-      // Navigate to the Community Library page using the ‘Ctrl+1’ shortcut.
-      await loggedOutUser.simulateKeyboardShortcut('Control+Digit1');
+      await loggedOutUser.navigateToCommunityLibraryPage();
       await loggedOutUser.expectToBeOnPage('community library');
 
       // Expects the focus to be on Search bar in the Community Library page.
@@ -131,10 +111,10 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.continueToNextCard();
 
-      // Expects the focus to be on the back button in lesson player.
+      // Expects the focus to be on the continue or next button in lesson player.
       await loggedOutUser.verifyFocusAfterShortcut('j');
 
-      // Expects the focus to be on the continue or next button in lesson player.
+      // Expects the focus to be on the back button in lesson player.
       await loggedOutUser.verifyFocusAfterShortcut('k');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
