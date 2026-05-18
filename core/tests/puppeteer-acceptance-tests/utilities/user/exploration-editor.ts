@@ -43,6 +43,9 @@ const saveChangesButton = 'button.e2e-test-save-changes';
 const mathInteractionsTab = '.e2e-test-interaction-tab-math';
 const closeResponseModalButton = '.e2e-test-close-add-response-modal';
 
+const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
+const activeModalBackdropSelector = '.modal-backdrop, ngb-modal-window, .modal';
+
 const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
 const explorationTitleSelector = '.e2e-test-exploration-title-input';
@@ -532,7 +535,9 @@ export class ExplorationEditor extends BaseUser {
   async removeFeedbackResponseInPreviewTab(): Promise<void> {
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector);
     // Wait for the response modal animation to finish, else it causes flakiness.
-    await this.page.waitForTimeout(2000);
+    await this.page.waitForSelector(feedbackResponseRemoveSelector, {
+      visible: true,
+    });
     await this.clickOnElementWithSelector(feedbackResponseRemoveSelector);
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector, false);
   }
@@ -2005,9 +2010,19 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Updates graph theory learner answer in response modal to be a simple star network.
+   * * @param {string} centerVertex - The text to be entered for the center vertex.
    */
-  async updateGraphTheoryLearnerAnswerInResponseModal(): Promise<void> {
+  async updateGraphTheoryLearnerAnswerInResponseModal(
+    centerVertex?: string
+  ): Promise<void> {
     const responseBox = await this.getRuleEditorModal();
+
+    if (centerVertex) {
+      const inputElement = await responseBox.$('input');
+      if (inputElement) {
+        await inputElement.type(centerVertex);
+      }
+    }
 
     await this.waitForPageToFullyLoad();
     const graphViz = new GraphViz(this.page, responseBox);
@@ -2879,8 +2894,17 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
+    // Wait for any lingering modals/backdrops to fully clear before interacting
+    // with the card content editor. Ghost modals from prior test steps can
+    // intercept clicks and cause hard-to-diagnose flakiness.
+    await this.page.waitForFunction(
+      (selector: string) => document.querySelectorAll(selector).length === 0,
+      {timeout: 60000},
+      activeModalBackdropSelector
+    );
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
+      timeout: 60000,
     });
     await this.clickOnElementWithSelector(stateEditSelector);
     await this.clearAllTextFrom(stateContentInputField);
@@ -2923,6 +2947,17 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOnElementWithSelector(
           INTERACTION_TABS_SELECTORS[interaction]
         );
+        // Wait until the tab gains the 'active' class before looking for tiles.
+        // Without this, Puppeteer may query tiles while the modal is still
+        // animating to the new tab, causing spurious 'not found' errors.
+        await this.page.waitForFunction(
+          (selector: string) => {
+            const el = document.querySelector(selector);
+            return el && el.classList.contains('active');
+          },
+          {timeout: 30000},
+          INTERACTION_TABS_SELECTORS[interaction]
+        );
         showMessage(`Switched to ${interaction} tab.`);
         break;
       }
@@ -2942,6 +2977,10 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
 
+    // Wait for any loading overlays to detach before clicking.
+    await this.page.waitForSelector(loadingFullPageOverlaySelector, {
+      hidden: true,
+    });
     await this.clickOnElementWithSelector(addInteractionButton);
 
     // Check if modal title is correct.
@@ -2952,7 +2991,17 @@ export class ExplorationEditor extends BaseUser {
     );
 
     await this.waitForNetworkIdle();
-    await this.clickOnElementWithText(interactionToAdd);
+    // Use a higher timeout for math interactions as they are heavy to render.
+    let tileText = interactionToAdd;
+
+    const interactionElement = await this.page.waitForXPath(
+      `//*[contains(normalize-space(text()), "${tileText}")]`,
+      {timeout: 90000}
+    );
+    if (!interactionElement) {
+      throw new Error(`Interaction "${interactionToAdd}" not found in modal.`);
+    }
+    await this.clickOnElement(interactionElement);
     if (skipInteractionCustoization) {
       await this.expectCustomizeInteractionTitleToBe(
         `Customize Interaction (${interactionToAdd})`
@@ -4331,8 +4380,11 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(previewTabButton);
     }
 
-    await this.expectElementToBeVisible(previewTabContainer);
+    await this.page.waitForFunction(() =>
+      window.location.href.includes('#/preview/')
+    );
     await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(previewTabContainer, {visible: true});
   }
 
   /**
