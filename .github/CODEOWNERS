@@ -44,6 +44,14 @@
 /scripts/ @oppia/dev-workflow-reviewers
 
 
+# Frontend unit tests
+# This is a broad default and is intentionally placed before the team-specific
+# sections below so that those sections take precedence for the directories they
+# own (CODEOWNERS uses the last matching pattern, so later rows win).
+/core/templates/**/*.spec.ts @oppia/lace-frontend-reviewers
+/extensions/**/*.spec.ts @oppia/lace-frontend-reviewers
+
+
 # Angular Migration team
 /core/templates/pages/base-root.component.ts @oppia/lace-frontend-reviewers
 /core/controllers/oppia_root*.py @oppia/lace-frontend-reviewers
@@ -133,6 +141,7 @@
 /core/templates/services/html-length.service.ts @oppia/contributor-experience-team
 /core/templates/services/html-length.service.spec.ts @oppia/contributor-experience-team
 /core/templates/services/iso-datepicker-adapter.service.ts @oppia/contributor-experience-team
+/core/templates/services/iso-datepicker-adapter.service.spec.ts @oppia/contributor-experience-team
 /core/templates/services/translation-validation.service.ts @oppia/contributor-experience-team
 /core/templates/services/translation-validation.service.spec.ts @oppia/contributor-experience-team
 /core/templates/components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component.html @oppia/contributor-experience-team
@@ -334,7 +343,7 @@
 /core/templates/services/internet-connectivity.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/server-connection-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/number-conversion.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/insert-script.service.ts @oppia/lace-frontend-reviewers @oppia/core-reviewers
+/core/templates/services/insert-script.service*.ts @oppia/lace-frontend-reviewers @oppia/core-reviewers
 
 # Global stylesheet.
 /core/templates/css/oppia.css @oppia/lace-frontend-reviewers
@@ -696,10 +705,6 @@
 # Service constants
 /core/templates/services/services.constants.ts @oppia/lace-frontend-reviewers
 
-
-# Frontend unit tests
-/core/templates/**/*.spec.ts @oppia/lace-frontend-reviewers
-/extensions/**/*.spec.ts @oppia/lace-frontend-reviewers
 
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @oppia/lace-backend-reviewers

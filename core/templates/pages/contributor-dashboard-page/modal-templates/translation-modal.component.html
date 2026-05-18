@@ -136,7 +136,7 @@
     Go back
   </button>
   <button class="btn btn-success oppia-upload-translated-text-button e2e-test-save-button"
-          [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted()"
+          [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted() || hasSubmitValidationErrors()"
           (click)="suggestTranslatedText()">
     <i [hidden]="!uploadingTranslation" class="fa fa-spinner"></i>
     <span [hidden]="uploadingTranslation || moreAvailable">
@@ -152,7 +152,7 @@
     Cancel
   </button>
   <button class="btn btn-success oppia-upload-translated-text-button e2e-test-save-button"
-          [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted()"
+          [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted() || hasSubmitValidationErrors()"
           (click)="updateTranslatedText()">
     <i [hidden]="!uploadingTranslation" class="fa fa-spinner"></i>
     <span [hidden]="uploadingTranslation">
