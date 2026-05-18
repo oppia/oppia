@@ -701,7 +701,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
 
     def test_raises_error_if_created_on_is_unavailable(self) -> None:
         user_settings = user_services.get_user_settings(self.user_1_id)
-        user_settings.created_on = None
+        user_settings.__dict__['created_on'] = None
 
         with self.swap_to_always_return(
             user_services, 'get_user_settings', user_settings
