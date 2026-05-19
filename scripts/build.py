@@ -243,13 +243,7 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
         return updated_content
 
     if deploy_mode:
-        # The version: default line is required to run jobs on a local server (
-        # both in prod & non-prod env). This line is not required when app.yaml
-        # is generated during deployment. So, we remove this if the build
-        # process is being run from the deploy script.
         content = content.replace('version: default', '')
-        # The FIREBASE_AUTH_EMULATOR_HOST environment variable is only needed to
-        # test locally, and MUST NOT be included in the deployed file.
         for env_variable in ENV_VARS_TO_REMOVE_FROM_DEPLOYED_APP_YAML:
             if env_variable not in content:
                 raise Exception(
@@ -258,8 +252,6 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
                 )
             content = re.sub('  %s: ".*"\n' % env_variable, '', content)
 
-    # In app_dev.yaml, CKEditor is served from the Angular dev build output
-    # For app.yaml (used in prod mode), it must point to the prod build folder.
     if '/third_party/ckeditor' in content:
         content = replace_content_or_fail(
             content,
@@ -279,7 +271,6 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
             'CKEditor bootstrapck static_dir entry was not found in app.yaml content.',
         )
 
-    # MathJax must point to the prod build output
     content = content.replace(
         'static_dir: dist/oppia-angular/assets/mathjax',
         'static_dir: build/assets/mathjax',
