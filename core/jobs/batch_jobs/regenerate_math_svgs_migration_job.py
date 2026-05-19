@@ -31,7 +31,7 @@ from core.platform import models
 import apache_beam as beam
 import bs4
 import result
-from typing import Dict, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -254,7 +254,8 @@ def _update_exploration_model(
 
 
 def _update_html_in_dict(
-    obj: Union[dict, list, str],
+    # Here we use type Any because the dict values and list elements can be nested dicts, lists, or strings of arbitrary depth.
+    obj: Union[Dict[str, Any], List[Any], str],
     svg_mapping: Dict[str, str],
     total_replacements: int,
 ) -> None:
