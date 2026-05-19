@@ -1304,6 +1304,8 @@ def apply_change_list(
 
     try:
         for change in change_list:
+            # Here we use cast because BaseChange defines cmd as a broadly
+            # typed attribute, but our handler map only accepts string keys.
             cmd = cast(str, change.cmd)
             handler = command_handlers.get(cmd)
             if handler is not None:
