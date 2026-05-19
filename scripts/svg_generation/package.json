@@ -1,0 +1,12 @@
+{
+  "name": "oppia-svg-generation",
+  "version": "1.0.0",
+  "description": "Regenerates math SVGs with STIX-Web font via MathJax 2.x + Puppeteer",
+  "scripts": {
+    "generate": "node bulk_generate_svgs.js"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "puppeteer": "^22.0.0"
+  }
+}

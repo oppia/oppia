@@ -31,7 +31,7 @@ from core.platform import models
 import apache_beam as beam
 import bs4
 import result
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -58,18 +58,19 @@ def _load_svg_mapping() -> Dict[str, str]:
     if not os.path.exists(_SVG_MAPPING_PATH):
         raise FileNotFoundError(
             'svg_mapping.json not found at %s. '
-            'Run bulk_generate_svgs.js first.' % _SVG_MAPPING_PATH
+            'To generate it: cd scripts/svg_generation && '
+            'npm install && node bulk_generate_svgs.js' % _SVG_MAPPING_PATH
         )
     with open(_SVG_MAPPING_PATH, 'r', encoding='utf-8') as f:
         entries = json.load(f)
 
-    mapping = {}
+    old_to_new_filename_mapping = {}
     for entry in entries:
-        old = entry.get('old_filename', '')
-        new = entry.get('new_filename', '')
-        if old and new:
-            mapping[old] = new
-    return mapping
+        old_svg_filename = entry.get('old_filename', '')
+        new_svg_filename = entry.get('new_filename', '')
+        if old_svg_filename and new_svg_filename:
+            old_to_new_filename_mapping[old_svg_filename] = new_svg_filename
+    return old_to_new_filename_mapping
 
 
 SVG_FILENAME_MAPPING: Dict[str, str] = {}
@@ -253,9 +254,7 @@ def _update_exploration_model(
 
 
 def _update_html_in_dict(
-    # Here we use object because the function handles dict, list, and str
-    # types recursively and no single more specific type covers all cases.
-    obj: object,
+    obj: Union[dict, list, str],
     svg_mapping: Dict[str, str],
     total_replacements: int,
 ) -> None:
