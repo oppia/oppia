@@ -1,17 +1,20 @@
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 /**
- * bulk_generate_svgs.js
- *
- * Regenerates all math SVGs using headless Chrome + MathJax 2.x with
- * STIX-Web font — exactly matching Oppia's frontend MathJax config.
- *
- * Usage (from Oppia root):
- *   cd scripts/svg_generation
- *   npm install
- *   node bulk_generate_svgs.js
- *
- * To use a custom Chrome binary:
- *   CHROME_PATH=/path/to/chrome node bulk_generate_svgs.js
- **/
+ * @fileoverview Script to regenerate all math SVGs.
+ */
 
 'use strict';
 
@@ -29,12 +32,20 @@ const MATHJAX_CDN =
   'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js' +
   '?config=TeX-AMS_SVG';
 
+const log = {
+  info: (...args) => process.stdout.write(args.join(' ') + '\n'),
+  warn: (...args) => process.stderr.write('WARNING: ' + args.join(' ') + '\n'),
+  error: (...args) => process.stderr.write('ERROR: ' + args.join(' ') + '\n'),
+};
+
 /**
  * Initializes a Puppeteer page with MathJax 2.x loaded and configured.
  * Call this once. After this, call renderLatexToSvg() as many times as needed.
+ *
+ * @param {import('puppeteer').Page} page - The Puppeteer page instance.
+ * @returns {Promise<void>}
  */
-async function setupPage(page) {
-  // Inject config as inline script in page HTML, before MathJax loads.
+const setupPage = async function (page) {
   await page.setContent(`
     <html>
     <head>
@@ -65,7 +76,6 @@ async function setupPage(page) {
     </html>
   `);
 
-  // Wait until MathJax.Hub exists and is ready.
   await page.waitForFunction(
     () =>
       window.MathJax &&
@@ -74,35 +84,35 @@ async function setupPage(page) {
     {timeout: 30000}
   );
 
-  // Wait for MathJax startup to fully complete.
   await page.evaluate(() => {
     return new Promise(resolve => {
       window.MathJax.Hub.Register.StartupHook('End', resolve);
-      if (window.MathJax.isReady) resolve();
+      if (window.MathJax.isReady) {
+        resolve();
+      }
     });
   });
 
-  console.log('MathJax loaded and ready.\n');
-}
+  log.info('MathJax loaded and ready.\n');
+};
+
 /**
  * Renders a single LaTeX string to SVG using the already-loaded MathJax.
- * Does NOT reload MathJax — just calls Hub.Queue on a new element.
+ * Does not reload MathJax — just calls Hub.Queue on a new element.
  *
- * @param {import('puppeteer').Page} page
- * @param {string} latex
- * @returns {Promise<string>} SVG string
+ * @param {import('puppeteer').Page} page - The Puppeteer page instance.
+ * @param {string} latex - The LaTeX string to render.
+ * @returns {Promise<string>} The SVG string.
  */
-async function renderLatexToSvg(page, latex) {
+const renderLatexToSvg = async function (page, latex) {
   return await page.evaluate(async latex => {
-    // Create a hidden container with the LaTeX.
     const container = document.createElement('div');
     container.style.visibility = 'hidden';
     container.style.position = 'absolute';
     // \( ... \) is MathJax 2.x inline math delimiter.
-    container.innerHTML = '\\(' + latex + '\\)';
+    container.insertAdjacentHTML('beforeend', '\\(' + latex + '\\)');
     document.body.appendChild(container);
 
-    // Typeset just this element using the already-loaded MathJax.
     await new Promise((resolve, reject) => {
       const timeout = setTimeout(
         () => reject(new Error('MathJax typeset timed out')),
@@ -117,7 +127,6 @@ async function renderLatexToSvg(page, latex) {
       );
     });
 
-    // Extract the SVG MathJax generated inside the container.
     const svgElement = container.querySelector('svg');
     if (!svgElement) {
       document.body.removeChild(container);
@@ -128,34 +137,54 @@ async function renderLatexToSvg(page, latex) {
     document.body.removeChild(container);
     return svgString;
   }, latex);
-}
+};
 
-function extractDimensions(svgString) {
+/**
+ * Extracts height, width, and vertical padding dimensions from an SVG string.
+ *
+ * @param {string} svgString - The SVG string to extract dimensions from.
+ * @returns {{height: string, width: string, verticalPadding: string}}
+ */
+const extractDimensions = function (svgString) {
   const dimensions = {height: '', width: '', verticalPadding: '0'};
 
   const heightMatch = svgString.match(/height="([^"]+)"/);
   if (heightMatch) {
     const n = heightMatch[1].match(/\d+\.?\d*/);
-    if (n) dimensions.height = n[0].replace('.', 'd');
+    if (n) {
+      dimensions.height = n[0].replace('.', 'd');
+    }
   }
 
   const widthMatch = svgString.match(/width="([^"]+)"/);
   if (widthMatch) {
     const n = widthMatch[1].match(/\d+\.?\d*/);
-    if (n) dimensions.width = n[0].replace('.', 'd');
+    if (n) {
+      dimensions.width = n[0].replace('.', 'd');
+    }
   }
 
-  // vertical-align from style="vertical-align: -0.241ex;"
+  // Extract vertical-align from style="vertical-align: -0.241ex;".
   const styleMatch = svgString.match(/style="([^"]+)"/);
   if (styleMatch) {
     const n = styleMatch[1].match(/\d+\.?\d*/);
-    if (n) dimensions.verticalPadding = n[0].replace('.', 'd');
+    if (n) {
+      dimensions.verticalPadding = n[0].replace('.', 'd');
+    }
   }
 
   return dimensions;
-}
+};
 
-function buildFilename(latex, dims) {
+/**
+ * Builds a deterministic SVG filename from the LaTeX string and dimensions.
+ * Uses an MD5 hash of the LaTeX string to ensure uniqueness.
+ *
+ * @param {string} latex - The LaTeX string.
+ * @param {{height: string, width: string, verticalPadding: string}} dims
+ * @returns {string} The filename.
+ */
+const buildFilename = function (latex, dims) {
   const hash = crypto
     .createHash('md5')
     .update(latex)
@@ -163,23 +192,40 @@ function buildFilename(latex, dims) {
     .slice(0, 10);
 
   return (
-    `mathImg_${hash}` +
-    `_height_${dims.height}` +
-    `_width_${dims.width}` +
-    `_vertical_${dims.verticalPadding}.svg`
+    'mathImg_' +
+    hash +
+    '_height_' +
+    dims.height +
+    '_width_' +
+    dims.width +
+    '_vertical_' +
+    dims.verticalPadding +
+    '.svg'
   );
-}
+};
 
-function cleanSvg(svgString) {
+/**
+ * Cleans an SVG string to match Oppia's cleanMathExpressionSvgString() output.
+ *
+ * @param {string} svgString - The raw SVG string.
+ * @returns {string} The cleaned SVG string.
+ */
+const cleanSvg = function (svgString) {
   return svgString
     .replace(/xmlns:xlink="[^"]*"/g, '')
     .replace(/\srole="[^"]*"/g, '')
     .replace(/\saria-hidden="[^"]*"/g, '')
     .replace(/\sdata-[\w-]+=(?:"[^"]*"|'[^']*')/g, '')
     .replace(/<svg(?![^>]*xmlns=)/, '<svg xmlns="http://www.w3.org/2000/svg"');
-}
+};
 
-function extractMathTagsFromHtml(htmlString) {
+/**
+ * Extracts all math tag raw_latex and svg_filename values from an HTML string.
+ *
+ * @param {string} htmlString - The HTML string to extract math tags from.
+ * @returns {Array<{rawLatex: string, svgFilename: string}>}
+ */
+const extractMathTagsFromHtml = function (htmlString) {
   const results = [];
   const attrRegex = /math_content-with-value="([^"]+)"/g;
   let match;
@@ -203,35 +249,49 @@ function extractMathTagsFromHtml(htmlString) {
         });
       }
     } catch (e) {
-      console.warn(
-        '  Could not parse math tag:',
-        match[1].slice(0, 60),
-        '→',
-        e.message
-      );
+      log.warn('Could not parse math tag:', match[1].slice(0, 60), e.message);
     }
   }
   return results;
-}
+};
 
-function collectHtmlStrings(obj, found = []) {
+/**
+ * Recursively collects all HTML strings containing math tags from an object.
+ *
+ * @param {*} obj - The object to walk.
+ * @param {string[]} found - Accumulator for found HTML strings.
+ * @returns {string[]} All HTML strings containing math tags.
+ */
+const collectHtmlStrings = function (obj, found = []) {
   if (typeof obj === 'string') {
-    if (obj.includes('oppia-noninteractive-math')) found.push(obj);
+    if (obj.includes('oppia-noninteractive-math')) {
+      found.push(obj);
+    }
   } else if (Array.isArray(obj)) {
-    for (const item of obj) collectHtmlStrings(item, found);
+    for (const item of obj) {
+      collectHtmlStrings(item, found);
+    }
   } else if (obj && typeof obj === 'object') {
-    for (const value of Object.values(obj)) collectHtmlStrings(value, found);
+    for (const value of Object.values(obj)) {
+      collectHtmlStrings(value, found);
+    }
   }
   return found;
-}
+};
 
-async function main() {
+/**
+ * Main entry point. Iterates over all explorations, renders math SVGs, and
+ * writes svg_mapping.json.
+ *
+ * @returns {Promise<void>}
+ */
+const main = async function () {
   if (!fs.existsSync(EXPLORATIONS_DIR)) {
-    console.error('Explorations directory not found:', EXPLORATIONS_DIR);
+    log.error('Explorations directory not found:', EXPLORATIONS_DIR);
     process.exit(1);
   }
 
-  console.log('Launching headless Chrome...');
+  log.info('Launching headless Chrome...');
   const browser = await puppeteer.launch({
     headless: 'new',
     executablePath: process.env.CHROME_PATH || undefined,
@@ -240,11 +300,9 @@ async function main() {
 
   const page = await browser.newPage();
 
-  // Suppress noisy browser console output.
   page.on('console', () => {});
   page.on('pageerror', () => {});
 
-  // Load MathJax ONCE with correct config.
   await setupPage(page);
 
   const mapping = [];
@@ -256,37 +314,40 @@ async function main() {
       fs.statSync(path.join(EXPLORATIONS_DIR, name)).isDirectory()
     );
 
-  console.log(`Found ${explorationIds.length} explorations.\n`);
+  log.info('Found ' + explorationIds.length + ' explorations.\n');
 
   for (const explorationId of explorationIds) {
     const explorationDir = path.join(EXPLORATIONS_DIR, explorationId);
-    const yamlPath = path.join(explorationDir, `${explorationId}.yaml`);
+    const yamlPath = path.join(explorationDir, explorationId + '.yaml');
     const imageDir = path.join(explorationDir, 'assets', 'image');
 
-    if (!fs.existsSync(yamlPath)) continue;
+    if (!fs.existsSync(yamlPath)) {
+      continue;
+    }
 
     let explorationData;
     try {
       explorationData = yaml.load(fs.readFileSync(yamlPath, 'utf8'));
     } catch (e) {
-      console.error(
-        `  ERROR: Could not parse YAML for "${explorationId}":`,
-        e.message
-      );
+      log.error('Could not parse YAML for "' + explorationId + '":', e.message);
       continue;
     }
 
     const htmlStrings = collectHtmlStrings(explorationData);
-    if (htmlStrings.length === 0) continue;
+    if (htmlStrings.length === 0) {
+      continue;
+    }
 
     const mathTags = [];
     for (const html of htmlStrings) {
       mathTags.push(...extractMathTagsFromHtml(html));
     }
-    if (mathTags.length === 0) continue;
+    if (mathTags.length === 0) {
+      continue;
+    }
 
-    console.log(
-      `Processing "${explorationId}": ${mathTags.length} math tag(s)`
+    log.info(
+      'Processing "' + explorationId + '": ' + mathTags.length + ' math tag(s)'
     );
 
     if (!fs.existsSync(imageDir)) {
@@ -294,8 +355,10 @@ async function main() {
     }
 
     for (const {rawLatex, svgFilename: oldFilename} of mathTags) {
-      const dedupeKey = `${explorationId}::${rawLatex}`;
-      if (seen.has(dedupeKey)) continue;
+      const dedupeKey = explorationId + '::' + rawLatex;
+      if (seen.has(dedupeKey)) {
+        continue;
+      }
       seen.add(dedupeKey);
 
       try {
@@ -304,9 +367,7 @@ async function main() {
         const dims = extractDimensions(cleanedSvg);
 
         if (!dims.height || !dims.width) {
-          console.warn(
-            `  WARNING: Could not extract dimensions for: ${rawLatex}`
-          );
+          log.warn('Could not extract dimensions for: ' + rawLatex);
           continue;
         }
 
@@ -320,10 +381,10 @@ async function main() {
           raw_latex: rawLatex,
         });
 
-        console.log(`  ✓ ${rawLatex}`);
-        console.log(`    → ${newFilename}`);
+        log.info('  Done: ' + rawLatex);
+        log.info('    -> ' + newFilename);
       } catch (e) {
-        console.error(`  ERROR processing LaTeX "${rawLatex}": ${e.message}`);
+        log.error('Could not process LaTeX "' + rawLatex + '": ' + e.message);
       }
     }
   }
@@ -336,12 +397,12 @@ async function main() {
     'utf8'
   );
 
-  console.log(`\nDone.`);
-  console.log(`Generated ${mapping.length} new SVG(s).`);
-  console.log(`Mapping written to: ${MAPPING_OUTPUT_PATH}`);
-}
+  log.info('\nDone.');
+  log.info('Generated ' + mapping.length + ' new SVG(s).');
+  log.info('Mapping written to: ' + MAPPING_OUTPUT_PATH);
+};
 
 main().catch(err => {
-  console.error('Fatal error:', err);
+  log.error('Fatal error:', err);
   process.exit(1);
 });
