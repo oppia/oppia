@@ -1294,7 +1294,12 @@ def _get_all_recipient_ids(
                 in this thread, excluding owners of the exploration and the
                 given author.
     """
-    exploration_rights = rights_manager.get_exploration_rights(exploration_id)
+    exploration_rights = rights_manager.get_exploration_rights(
+        exploration_id, strict=False
+    )
+
+    if exploration_rights is None:
+        return ([], [])
 
     owner_ids = set(exploration_rights.owner_ids)
     participant_ids = {
