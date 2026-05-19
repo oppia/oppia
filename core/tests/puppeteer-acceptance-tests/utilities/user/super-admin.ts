@@ -358,23 +358,68 @@ export class SuperAdmin extends BaseUser {
    */
   async expectUserToHaveRole(username: string, role: string): Promise<void> {
     const currentPageUrl = this.page.url();
+    const normalizedRole = role.toLowerCase();
+
     await this.goto(adminPageRolesTab);
-    await this.typeInInputField(roleEditorInputField, username);
-    await this.clickOnElementWithSelector(roleEditorButtonSelector);
-    await this.page.waitForSelector(justifyContentDiv);
-    const userRoleElements = await this.page.$$(userRoleDescriptionSelector);
-    for (let i = 0; i < userRoleElements.length; i++) {
-      const roleText = await this.page.evaluate(
-        (element: HTMLElement) => element.innerText,
-        userRoleElements[i]
-      );
-      if (roleText.toLowerCase() === role) {
+    await this.page.waitForSelector(roleEditorInputField, {
+      visible: true,
+      timeout: 60000,
+    });
+
+    const timeoutMs = 90000;
+    const start = Date.now();
+    let attempts = 0;
+    while (Date.now() - start < timeoutMs) {
+      attempts += 1;
+
+      // Re-run the search to avoid stale results.
+      await this.page.click(roleEditorInputField, {clickCount: 3});
+      await this.page.keyboard.press('Backspace');
+      await this.typeInInputField(roleEditorInputField, username);
+      await this.clickOnElementWithSelector(roleEditorButtonSelector);
+
+      await this.page.waitForSelector(justifyContentDiv, {
+        visible: true,
+        timeout: 30000,
+      });
+
+      const roleFound = await this.page
+        .$$eval(
+          userRoleDescriptionSelector,
+          (elements, expectedRole) =>
+            elements.some(
+              el =>
+                (el as HTMLElement).innerText.trim().toLowerCase() ===
+                String(expectedRole)
+            ),
+          normalizedRole
+        )
+        .catch(() => false);
+
+      if (roleFound) {
         showMessage(`User ${username} has the ${role} role!`);
         await this.goto(currentPageUrl);
         return;
       }
+
+      // Role assignment can take a moment to propagate; wait and retry.
+      await this.page.waitForTimeout(2000);
+
+      // Occasionally reload to bust any cached/stale role view state.
+      if (attempts % 3 === 0) {
+        await this.page.reload({waitUntil: ['load', 'networkidle2']});
+        await this.page.waitForSelector(roleEditorInputField, {
+          visible: true,
+          timeout: 60000,
+        });
+      }
     }
-    throw new Error(`User does not have the "${role}" role!`);
+
+    await this.goto(currentPageUrl);
+    throw new Error(
+      `User does not have the "${role}" role after ${attempts} checks ` +
+        `over ${timeoutMs}ms.`
+    );
   }
 
   /**
@@ -1035,12 +1080,13 @@ export class SuperAdmin extends BaseUser {
       );
       showMessage('Default value changed successfully.');
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       console.error(
         `Failed to change default value of platform parameter "${platformParam}".\n` +
           'Original Error:\n' +
-          error.stack
+          err.stack
       );
-      throw error;
+      throw err;
     }
   }
 

@@ -44,7 +44,7 @@ const mathInteractionsTab = '.e2e-test-interaction-tab-math';
 const closeResponseModalButton = '.e2e-test-close-add-response-modal';
 
 const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
-const activeModalBackdropSelector = '.modal-backdrop, ngb-modal-window, .modal';
+const activeModalBackdropSelector = '.modal-backdrop, ngb-modal-window';
 
 const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
@@ -2810,7 +2810,8 @@ export class ExplorationEditor extends BaseUser {
     try {
       return await confirmPublish();
     } catch (error) {
-      showMessage('Failed to publish the exploration.\n' + error.stack);
+      const err = error instanceof Error ? error : new Error(String(error));
+      showMessage('Failed to publish the exploration.\n' + err.stack);
 
       const errorSavingExplorationElement = await this.page.$(
         errorSavingExplorationModal
@@ -2935,14 +2936,52 @@ export class ExplorationEditor extends BaseUser {
   async updateCardContent(content: string): Promise<void> {
     await this.ensureEditorTabIsActive();
 
-    // Wait for any lingering modals/backdrops to fully clear before interacting
-    // with the card content editor. Ghost modals from prior test steps can
-    // intercept clicks and cause hard-to-diagnose flakiness.
-    await this.page.waitForFunction(
-      (selector: string) => document.querySelectorAll(selector).length === 0,
-      {timeout: 60000},
-      activeModalBackdropSelector
-    );
+    // If any modal backdrops are still visible, they can intercept clicks.
+    // Only wait when needed, and keep it bounded to avoid inflating test time.
+    const hasVisibleModalBackdrop = await this.page
+      .waitForFunction(
+        (selector: string) => {
+          const elements = Array.from(
+            document.querySelectorAll(selector)
+          ) as HTMLElement[];
+          return elements.some(el => {
+            const style = window.getComputedStyle(el);
+            const rect = el.getBoundingClientRect();
+            return (
+              style.display !== 'none' &&
+              style.visibility !== 'hidden' &&
+              rect.width > 0 &&
+              rect.height > 0
+            );
+          });
+        },
+        {timeout: 250},
+        activeModalBackdropSelector
+      )
+      .then(() => true)
+      .catch(() => false);
+
+    if (hasVisibleModalBackdrop) {
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const elements = Array.from(
+            document.querySelectorAll(selector)
+          ) as HTMLElement[];
+          return elements.every(el => {
+            const style = window.getComputedStyle(el);
+            const rect = el.getBoundingClientRect();
+            const visible =
+              style.display !== 'none' &&
+              style.visibility !== 'hidden' &&
+              rect.width > 0 &&
+              rect.height > 0;
+            return !visible;
+          });
+        },
+        {timeout: 10000},
+        activeModalBackdropSelector
+      );
+    }
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
       timeout: 60000,
@@ -3303,8 +3342,9 @@ export class ExplorationEditor extends BaseUser {
         throw new Error('The goal does not match the expected goal.');
       }
     } catch (error) {
-      console.error('Error:', error.message);
-      throw error;
+      const err = error instanceof Error ? error : new Error(String(error));
+      console.error('Error:', err.message);
+      throw err;
     }
   }
 
@@ -4849,49 +4889,55 @@ export class ExplorationEditor extends BaseUser {
    * Navigates to editor tab when preview tab is currently active.
    */
   async ensureEditorTabIsActive(): Promise<void> {
-    const isDismissWelcomeModalButtonVisible = await this.isElementVisible(
-      'button.e2e-test-dismiss-welcome-modal',
-      true,
-      1500
+    // This method is called frequently (e.g. before most editor actions).
+    // Avoid repeated multi-second waits here; do quick presence/visibility
+    // checks and only navigate when clearly necessary.
+    const dismissWelcomeModalButtonSelector =
+      'button.e2e-test-dismiss-welcome-modal';
+    const dismissWelcomeModalButton = await this.page.$(
+      dismissWelcomeModalButtonSelector
     );
-
-    if (isDismissWelcomeModalButtonVisible) {
-      await this.dismissWelcomeModal(false);
+    if (dismissWelcomeModalButton) {
+      try {
+        await this.dismissWelcomeModal(false);
+      } catch {
+        // Ignore and continue; the modal may already be dismissing.
+      }
     }
 
-    const isPreviewTabActive = await this.isElementVisible(
-      previewTabContainer,
-      true,
-      1000
-    );
+    const isSelectorVisible = async (selector: string): Promise<boolean> => {
+      const handle = await this.page.$(selector);
+      if (!handle) {
+        return false;
+      }
+      try {
+        return await handle.evaluate(el => {
+          const element = el as HTMLElement;
+          const style = window.getComputedStyle(element);
+          const rect = element.getBoundingClientRect();
+          return (
+            style.display !== 'none' &&
+            style.visibility !== 'hidden' &&
+            rect.width > 0 &&
+            rect.height > 0
+          );
+        });
+      } catch {
+        return false;
+      }
+    };
 
-    if (isPreviewTabActive) {
+    if (await isSelectorVisible(previewTabContainer)) {
       await this.navigateToEditorTab();
       return;
     }
 
-    const isAddInteractionButtonVisible = await this.isElementVisible(
-      addInteractionButton,
-      true,
-      1200
-    );
-    const isStateEditorVisible = await this.isElementVisible(
-      stateEditSelector,
-      true,
-      1200
-    );
-    const isInteractionEditorVisible = await this.isElementVisible(
-      interactionDiv,
-      true,
-      1200
-    );
-
     // Once an interaction exists, "+ ADD INTERACTION" is hidden by design.
     // So we treat any editor surface as a valid editor-tab signal.
     const isEditorTabReady =
-      isAddInteractionButtonVisible ||
-      isStateEditorVisible ||
-      isInteractionEditorVisible;
+      (await isSelectorVisible(addInteractionButton)) ||
+      (await isSelectorVisible(stateEditSelector)) ||
+      (await isSelectorVisible(interactionDiv));
 
     if (!isEditorTabReady) {
       await this.navigateToEditorTab();
