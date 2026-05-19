@@ -49,6 +49,7 @@ import {FetchExplorationBackendResponse} from './read-only-exploration-backend-a
 export interface ExplorationBackendDict {
   auto_tts_enabled: boolean;
   draft_changes: ExplorationChange[];
+  exploration_id?: string;
   is_version_of_draft_valid: boolean;
   init_state_name: string;
   param_changes: ParamChangeBackendDict[];

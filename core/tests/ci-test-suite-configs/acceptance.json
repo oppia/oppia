@@ -105,6 +105,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/submit-review-and-respond-to-feedback.spec.ts"
     },
     {
+      "name": "lesson-creator/check-improvements-tab",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/check-improvements-tab.spec.ts"
+    },
+    {
       "name": "lesson-creator/create-a-basic-exploration",
       "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/create-a-basic-exploration.spec.ts"
     },
@@ -115,6 +119,10 @@
     {
       "name": "lesson-creator/save-and-publish-the-exploration",
       "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/save-and-publish-the-exploration.spec.ts"
+    },
+    {
+      "name": "lesson-creator/view-feedback-and-statistics-of-the-lesson",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/view-feedback-and-statistics-of-the-lesson.spec.ts"
     },
     {
       "name": "logged-in-user/add-concept-card-with-workedexample-to-exploration",
@@ -271,10 +279,6 @@
     {
       "name": "exploration-creator/preview-math-interactions",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-math-interactions.spec.ts"
-    },
-    {
-      "name": "exploration-creator/preview-rarely-used-interactions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-rarely-used-interactions.spec.ts"
     },
     {
       "name": "logged-out-learner/complete-some-practice-question",

@@ -34,6 +34,11 @@ class JobOptionsTests(test_utils.TestBase):
 
         self.assertEqual(options.namespace, 'abc')
 
+    def test_special_overwritten_values(self) -> None:
+        options = job_options.JobOptions(language_accent_code='en-IN')
+
+        self.assertEqual(options.language_accent_code, 'en-IN')
+
     def test_unsupported_values(self) -> None:
         with self.assertRaisesRegex(ValueError, r'Unsupported option\(s\)'):
             job_options.JobOptions(a='a', b='b')

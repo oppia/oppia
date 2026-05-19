@@ -25,7 +25,6 @@ import {PlayerTranscriptService} from '../../services/player-transcript.service'
 import {InputResponsePairComponent} from './input-response-pair.component';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {NgbModule, NgbPopover} from '@ng-bootstrap/ng-bootstrap';
-import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
 import {StateCard} from '../../../../domain/state_card/state-card.model';
 import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {AppConstants} from '../../../../app.constants';
@@ -74,69 +73,47 @@ describe('InputResponsePairComponent', () => {
       true
     );
 
-    spyOn(playerTranscriptService, 'getCard').and.returnValue(
-      StateCard.createNewCard(
-        'State 2',
-        '<p>Content</p>',
-        '<interaction></interaction>',
-        Interaction.createFromBackendDict({
-          id: 'GraphInput',
-          answer_groups: [
-            {
-              outcome: {
-                dest: 'State',
-                dest_if_really_stuck: null,
-                feedback: {
-                  html: '',
-                  content_id: 'This is a new feedback text',
-                },
-                refresher_exploration_id: 'test',
-                missing_prerequisite_skill_id: 'test_skill_id',
-                labelled_as_correct: true,
-                param_changes: [],
+    StateCard.createNewCard(
+      'State 1',
+      '<p>Content</p>',
+      '<interaction></interaction>',
+      Interaction.createFromBackendDict({
+        id: 'TextInput',
+        answer_groups: [
+          {
+            outcome: {
+              dest: 'State',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: '1',
+                html: '',
               },
-              rule_specs: [],
-              training_data: [],
-              tagged_skill_misconception_id: '',
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
             },
-          ],
-          default_outcome: {
-            dest: 'Hola',
-            dest_if_really_stuck: null,
-            feedback: {
-              content_id: '',
-              html: '',
-            },
-            labelled_as_correct: true,
-            param_changes: [],
-            refresher_exploration_id: 'test',
-            missing_prerequisite_skill_id: 'test_skill_id',
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: null,
           },
-          confirmed_unclassified_answers: [],
-          customization_args: {
-            rows: {
-              value: true,
-            },
-            placeholder: {
-              value: 1,
-            },
-            catchMisspellings: {
-              value: false,
+        ],
+        default_outcome: null,
+        customization_args: {
+          rows: {value: 1},
+          placeholder: {
+            value: {
+              content_id: 'placeholder',
+              unicode_str: 'Type here',
             },
           },
-          hints: [],
-          solution: {
-            answer_is_exclusive: true,
-            correct_answer: 'test_answer',
-            explanation: {
-              content_id: '2',
-              html: 'test_explanation1',
-            },
-          },
-        }),
-        RecordedVoiceovers.createEmpty(),
-        'content'
-      )
+          catchMisspellings: {value: false},
+        },
+        hints: [],
+        solution: null,
+        confirmed_unclassified_answers: [],
+      }),
+      'content'
     );
   });
 
@@ -160,13 +137,35 @@ describe('InputResponsePairComponent', () => {
         isHint: true,
       };
 
-      expect(component.isVideoRteElementPresentInResponse()).toBeFalse();
+      expect(component.isVideoRteElementPresentInResponse()).toBeFalsy();
     }
   );
 
   it('should get answer html for the displayed card', () => {
     spyOn(explorationHtmlFormatter, 'getAnswerHtml').and.returnValue(
       '<p> HTML Answer </p>'
+    );
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(
+      new StateCard(
+        'State 1',
+        '<p>Content</p>',
+        '<interaction></interaction>',
+        Interaction.createFromBackendDict({
+          id: 'TextInput',
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            rows: {value: 1},
+            placeholder: {value: {content_id: null, unicode_str: ''}},
+            catchMisspellings: {value: false},
+          },
+          default_outcome: null,
+          hints: [],
+          solution: null,
+        }),
+        [],
+        'content'
+      )
     );
     component.data = {
       learnerInput: '',
@@ -196,6 +195,27 @@ describe('InputResponsePairComponent', () => {
   it('should get a short summary of the answer', () => {
     spyOn(explorationHtmlFormatter, 'getShortAnswerHtml').and.returnValue(
       'Short Answer'
+    );
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(
+      new StateCard(
+        'State 1',
+        '<p>Content</p>',
+        '<interaction></interaction>',
+        Interaction.createFromBackendDict({
+          id: 'DragAndDropSortInput',
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            choices: {value: [{content_id: null, html: ''}]},
+            allowMultipleItemsInSamePosition: {value: false},
+          },
+          default_outcome: null,
+          hints: [],
+          solution: null,
+        }),
+        [],
+        'content'
+      )
     );
     component.data = {
       // This throws "Type '{ answerDetails: string; }' is not assignable to
@@ -306,6 +326,27 @@ describe('InputResponsePairComponent', () => {
     spyOn(explorationHtmlFormatter, 'getShortAnswerHtml').and.returnValue(
       'Short Answer'
     );
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(
+      new StateCard(
+        'State 1',
+        '<p>Content</p>',
+        '<interaction></interaction>',
+        Interaction.createFromBackendDict({
+          id: 'DragAndDropSortInput',
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            choices: {value: [{content_id: null, html: ''}]},
+            allowMultipleItemsInSamePosition: {value: false},
+          },
+          default_outcome: null,
+          hints: [],
+          solution: null,
+        }),
+        [],
+        'content'
+      )
+    );
 
     component.data = {
       learnerInput: '',
@@ -329,6 +370,27 @@ describe('InputResponsePairComponent', () => {
   it('should verify that the popup content its not null', () => {
     spyOn(explorationHtmlFormatter, 'getAnswerHtml').and.returnValue(
       '<p> HTML Answer </p>'
+    );
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(
+      new StateCard(
+        'State 1',
+        '<p>Content</p>',
+        '<interaction></interaction>',
+        Interaction.createFromBackendDict({
+          id: 'DragAndDropSortInput',
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            choices: {value: [{content_id: null, html: ''}]},
+            allowMultipleItemsInSamePosition: {value: false},
+          },
+          default_outcome: null,
+          hints: [],
+          solution: null,
+        }),
+        [],
+        'content'
+      )
     );
 
     component.data = {
