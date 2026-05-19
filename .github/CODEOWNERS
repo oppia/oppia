@@ -42,6 +42,7 @@
 /core/templates/utility/ @oppia/lace-frontend-reviewers
 /extensions/ @oppia/lace-backend-reviewers
 /scripts/ @oppia/dev-workflow-reviewers
+/scripts/svg_generation/ @oppia/dev-workflow-reviewers
 
 
 # Angular Migration team
