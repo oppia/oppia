@@ -17,10 +17,7 @@
  */
 
 import {BaseUser} from '../common/puppeteer-utils';
-import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-
-const communityLibraryPage = testConstants.URLs.CommunityLibrary;
 
 // Creator Dashboard selectors.
 const createActivityButton = 'button.e2e-test-create-activity';
@@ -52,20 +49,8 @@ const editorDeleteNode = '.e2e-test-editor-delete-node';
 
 // Library page selectors.
 const searchInput = '.e2e-test-search-input';
-const collectionSummaryTile = '.e2e-test-collection-summary-tile';
-const collectionSummaryTileTitle = '.e2e-test-collection-summary-tile-title';
-
-// Collection player selectors.
-const collectionPlayerTitle = '.oppia-collection-player-title-font';
 
 export class CollectionEditor extends BaseUser {
-  /**
-   * Navigates to the Community Library page.
-   */
-  async navigateToCommunityLibraryPage(): Promise<void> {
-    await this.goto(communityLibraryPage);
-  }
-
   /**
    * Creates a new collection from the Creator Dashboard.
    */
@@ -88,19 +73,19 @@ export class CollectionEditor extends BaseUser {
     await this.typeInInputField(addExplorationInput, explorationId);
 
     // Wait for the button to become active after debouncing.
-    await this.page.waitForSelector(`${addExplorationButton}:not([disabled])`, {
-      timeout: 10000,
-    });
+    await this.expectElementToBeVisible(
+      `${addExplorationButton}:not([disabled])`
+    );
     // Capture node count before clicking to avoid race conditions.
     const nodeCountBefore = (await this.page.$$(collectionEditorNode)).length;
     await this.clickOnElementWithSelector(addExplorationButton);
     await this.page.waitForFunction(
       (selector: string, expectedCount: number) => {
-        return document.querySelectorAll(selector).length > expectedCount;
+        return document.querySelectorAll(selector).length === expectedCount;
       },
       {timeout: 10000},
       collectionEditorNode,
-      nodeCountBefore
+      nodeCountBefore + 1
     );
     showMessage(`Added exploration ${explorationId} to the collection.`);
   }
@@ -160,43 +145,12 @@ export class CollectionEditor extends BaseUser {
       );
     }
 
-    // The arrow elements are conditionally rendered via *ngIf in the Angular
-    // template, so they are removed from the DOM entirely when not applicable
-    // (e.g., no left arrow on the first node). When the element is absent,
-    // querySelector returns null and isVisible evaluates to false.
-    const isVisible = await this.page.evaluate(
-      (nodeIndex: number, selector: string, nodeSelector: string) => {
-        const allNodes = document.querySelectorAll(nodeSelector);
-        const node = allNodes[nodeIndex];
-        if (!node) {
-          return false;
-        }
-        const arrow = node.querySelector(selector);
-        if (!arrow) {
-          return false;
-        }
-        const style = window.getComputedStyle(arrow);
-        return (
-          style.display !== 'none' &&
-          style.visibility !== 'hidden' &&
-          style.opacity !== '0'
-        );
-      },
-      index,
+    const nodeElement = nodes[index];
+    await this.expectElementToBeVisible(
       arrowSelector,
-      collectionEditorNode
+      shouldBeVisible,
+      nodeElement
     );
-
-    if (shouldBeVisible && !isVisible) {
-      throw new Error(
-        `Expected "${arrowLabel}" arrow on node at index ${index} to be visible, but it is not.`
-      );
-    }
-    if (!shouldBeVisible && isVisible) {
-      throw new Error(
-        `Expected "${arrowLabel}" arrow on node at index ${index} to NOT be visible, but it is.`
-      );
-    }
 
     const visibilityText = shouldBeVisible ? 'visible' : 'hidden';
     showMessage(
@@ -367,19 +321,7 @@ export class CollectionEditor extends BaseUser {
    * handles the commit message modal, and waits for the save to complete.
    */
   async saveCollectionDraft(): Promise<void> {
-    // Wait for the save draft button to be enabled.
-    await this.page.waitForFunction(
-      (selector: string) => {
-        const btn = document.querySelector(selector);
-        return btn && !btn.hasAttribute('disabled');
-      },
-      {},
-      saveDraftButton
-    );
-    // Use JavaScript click to bypass any overlay issues (e.g., toast messages).
-    await this.page.$eval(saveDraftButton, (button: Element) =>
-      (button as HTMLButtonElement).click()
-    );
+    await this.clickOnElementWithSelector(saveDraftButton);
 
     // Handle the commit message modal that opens after clicking Save Draft.
     await this.expectElementToBeVisible(saveModal);
@@ -464,18 +406,7 @@ export class CollectionEditor extends BaseUser {
    * Clicks the publish collection button.
    */
   async clickOnPublishCollectionButton(): Promise<void> {
-    await this.page.waitForFunction(
-      (selector: string) => {
-        const btn = document.querySelector(selector);
-        return btn && !btn.hasAttribute('disabled');
-      },
-      {},
-      editorPublishButton
-    );
-    // Use JavaScript click to bypass any overlay issues (e.g., toast messages).
-    await this.page.$eval(editorPublishButton, (button: Element) =>
-      (button as HTMLButtonElement).click()
-    );
+    await this.clickOnElementWithSelector(editorPublishButton);
 
     // Post-check: wait for the publish metadata form to appear.
     await this.expectElementToBeVisible(editorTitleInput);
@@ -490,6 +421,7 @@ export class CollectionEditor extends BaseUser {
     await this.expectElementToBeVisible(editorTitleInput);
     await this.clearAllTextFrom(editorTitleInput);
     await this.typeInInputField(editorTitleInput, title);
+    await this.expectInputValueToBe(editorTitleInput, title);
     showMessage(`Set collection title to "${title}".`);
   }
 
@@ -501,6 +433,7 @@ export class CollectionEditor extends BaseUser {
     await this.expectElementToBeVisible(collectionEditorObjectiveInput);
     await this.clearAllTextFrom(collectionEditorObjectiveInput);
     await this.typeInInputField(collectionEditorObjectiveInput, objective);
+    await this.expectInputValueToBe(collectionEditorObjectiveInput, objective);
     showMessage(`Set collection objective to "${objective}".`);
   }
 
@@ -575,42 +508,12 @@ export class CollectionEditor extends BaseUser {
   }
 
   /**
-   * Plays a collection from the library.
-   * @param {string} collectionName - The name of the collection to play.
-   */
-  async playCollection(collectionName: string): Promise<void> {
-    await this.expectElementToBeVisible(collectionSummaryTile);
-
-    const tiles = await this.page.$$(collectionSummaryTile);
-    for (const tile of tiles) {
-      const titleElement = await tile.$(collectionSummaryTileTitle);
-      if (titleElement) {
-        const title = await titleElement.evaluate(el => el.textContent?.trim());
-        if (title === collectionName) {
-          await this.clickOnElement(tile);
-          await this.waitForPageToFullyLoad();
-
-          // Post-check: verify navigation to the collection player page.
-          await this.expectElementToBeVisible(collectionPlayerTitle);
-          showMessage(`Playing collection: "${collectionName}".`);
-          return;
-        }
-      }
-    }
-
-    throw new Error(`Collection "${collectionName}" not found in the library.`);
-  }
-
-  /**
    * Verifies that the current page is the collection player.
    */
   async expectToBeOnCollectionPlayerPage(): Promise<void> {
-    const url = this.page.url();
-    if (!url.includes('/collection/')) {
-      throw new Error(
-        `Expected to be on collection player page, but current URL is: ${url}`
-      );
-    }
+    await this.page.waitForFunction((url: string) => {
+      return window.location.href.includes(url);
+    });
     showMessage('Verified that we are on the collection player page.');
   }
 

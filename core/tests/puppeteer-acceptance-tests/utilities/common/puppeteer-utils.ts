@@ -880,6 +880,14 @@ export class BaseUser {
     await element.type(text);
   }
 
+  async expectInputValueToBe(selector: string, value: string): Promise<void> {
+    await this.expectElementToBeVisible(selector);
+    const element = await this.page.$(selector);
+    expect(await element?.evaluate(el => (el as HTMLInputElement).value)).toBe(
+      value
+    );
+  }
+
   /**
    * This function converts a given date string into ISO format (YYYY-MM-DD).
    */
@@ -1524,7 +1532,7 @@ export class BaseUser {
   async expectElementToBeVisible(
     selector: string,
     visibility: boolean = true,
-    context: Page = this.page
+    context: Page | ElementHandle<Element> = this.page
   ): Promise<void> {
     const options = visibility ? {visible: true} : {hidden: true};
     await context.waitForSelector(selector, options);

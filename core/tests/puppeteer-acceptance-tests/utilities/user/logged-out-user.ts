@@ -3150,35 +3150,32 @@ export class LoggedOutUser extends BaseUser {
       // Clicking a circle triggers updateExplorationPreview(), which displays
       // an exploration summary tile. Clicking the summary tile navigates to
       // the exploration.
-      const mobileLinks = await this.page.$$(mobilePathSegmentLinkSelector);
-      for (const link of mobileLinks) {
-        const titleData = await link.evaluate(
+      const mobileLinkElements = await this.page.$$(
+        mobilePathSegmentLinkSelector
+      );
+      for (const linkElement of mobileLinkElements) {
+        const titleData = await linkElement.evaluate(
           el => el.getAttribute('title-data') || ''
         );
         if (titleData.includes(explorationName)) {
           // Click the SVG circle to trigger Angular's click handler.
-          await link.evaluate((el, svgSelector: string) => {
-            const svg = el.querySelector(svgSelector);
-            if (svg) {
-              svg.dispatchEvent(
-                new MouseEvent('click', {bubbles: true, cancelable: true})
-              );
-            }
-          }, mobileCollectionExplorationSelector);
+          const svgElement = await linkElement.waitForSelector(
+            mobileCollectionExplorationSelector,
+            {visible: true}
+          );
+          if (!svgElement) {
+            throw new Error(
+              `Could not find exploration "${explorationName}" to play in the collection.`
+            );
+          }
+          await this.clickOnElement(svgElement);
 
           // Wait for the exploration summary preview tile to appear.
           await this.expectElementToBeVisible(collectionPreviewTileSelector);
 
-          // Click the summary tile's anchor link to navigate to the
-          // exploration.
-          await this.page.evaluate((tileSelector: string) => {
-            const anchor = document.querySelector(
-              `${tileSelector} a`
-            ) as HTMLElement;
-            if (anchor) {
-              anchor.click();
-            }
-          }, collectionPreviewTileSelector);
+          await this.clickOnElementWithSelector(
+            `${collectionPreviewTileSelector} a`
+          );
           await this.expectElementToBeVisible(stateConversationContent);
           showMessage(`Playing exploration: "${explorationName}".`);
           return;
@@ -3191,11 +3188,13 @@ export class LoggedOutUser extends BaseUser {
     } else {
       // On desktop, the exploration links are direct children of the
       // collection path section.
-      const explorationLinks = await this.page.$$(collectionPathLinkSelector);
-      for (const link of explorationLinks) {
-        const text = await link.evaluate(el => el.textContent?.trim());
+      const explorationLinkElements = await this.page.$$(
+        collectionPathLinkSelector
+      );
+      for (const linkElement of explorationLinkElements) {
+        const text = await linkElement.evaluate(el => el.textContent?.trim());
         if (text && text.includes(explorationName)) {
-          await link.click();
+          await this.clickOnElement(linkElement);
           await this.expectElementToBeVisible(stateConversationContent);
           showMessage(`Playing exploration: "${explorationName}".`);
           return;
