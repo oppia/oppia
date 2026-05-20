@@ -42,6 +42,7 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 interface TaggedMisconception {
   skillId: string | null;
@@ -115,7 +116,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     return this.responsesService.getAnswerChoices();
   }
 
-  getCurrentInteractionId(): string {
+  getCurrentInteractionId(): InteractionSpecsKey | null {
     return this.stateInteractionIdService.savedMemento;
   }
 

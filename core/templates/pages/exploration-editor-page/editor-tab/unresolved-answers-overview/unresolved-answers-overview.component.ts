@@ -71,22 +71,22 @@ export class UnresolvedAnswersOverviewComponent implements OnInit {
   }
 
   getCurrentInteractionId(): InteractionSpecsKey {
-    return this.stateInteractionIdService.savedMemento as InteractionSpecsKey;
+    let stateinteractionId = this.stateInteractionIdService.savedMemento;
+    if (stateinteractionId === null) {
+      throw new Error('Expected interaction ID to be non-null.');
+    }
+    return stateinteractionId;
   }
 
   isCurrentInteractionLinear(): boolean {
     let interactionId = this.getCurrentInteractionId();
-    return (
-      Boolean(interactionId) &&
-      INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_linear
-    );
+    return Boolean(interactionId) && INTERACTION_SPECS[interactionId].is_linear;
   }
 
   isCurrentInteractionTrainable(): boolean {
     let interactionId = this.getCurrentInteractionId();
     return (
-      Boolean(interactionId) &&
-      INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_trainable
+      Boolean(interactionId) && INTERACTION_SPECS[interactionId].is_trainable
     );
   }
 

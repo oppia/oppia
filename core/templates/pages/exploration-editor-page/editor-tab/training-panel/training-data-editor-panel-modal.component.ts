@@ -141,9 +141,15 @@ export class TrainingDataEditorPanelComponent
     this.answerGroupHasNonEmptyRules =
       this.responsesService.getAnswerGroup(this.answerGroupIndex).rules.length >
       0;
+    let interactionId = this.stateInteractionIdService.savedMemento;
+    if (interactionId === null) {
+      throw new Error(
+        'Cannot initialize training data editor for a state with no interaction.'
+      );
+    }
     this.inputTemplate =
       this.explorationHtmlFormatterService.getInteractionHtml(
-        this.stateInteractionIdService.savedMemento as InteractionSpecsKey,
+        interactionId,
         this.stateCustomizationArgsService.savedMemento,
         false,
         this.FOCUS_LABEL_TEST_INTERACTION_INPUT,
@@ -156,7 +162,7 @@ export class TrainingDataEditorPanelComponent
           let truncatedAnswer =
             this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
               finishTrainingResult.answer,
-              finishTrainingResult.interactionId as InteractionSpecsKey,
+              finishTrainingResult.interactionId,
               12
             );
           let successToast =
@@ -192,9 +198,14 @@ export class TrainingDataEditorPanelComponent
     ) {
       let answer = this.trainingData[answerIndex].answer;
       let interactionId = this.stateInteractionIdService.savedMemento;
+      if (interactionId === null) {
+        throw new Error(
+          'Cannot open training modal for a state with no interaction.'
+        );
+      }
       this.trainingModalService.openTrainUnresolvedAnswerModal(
         answer,
-        interactionId as InteractionSpecsKey,
+        interactionId,
         answerIndex
       );
     }
@@ -241,18 +252,18 @@ export class TrainingDataEditorPanelComponent
     this.newAnswerIsAlreadyResolved = false;
 
     let interactionId = this.stateInteractionIdService.savedMemento;
-
+    if (interactionId === null) {
+      throw new Error('Cannot submit answer for a state with no interaction.');
+    }
     let rulesServiceName =
-      this.angularNameService.getNameOfInteractionRulesService(
-        interactionId as InteractionSpecsKey
-      );
+      this.angularNameService.getNameOfInteractionRulesService(interactionId);
 
     // Inject RulesService dynamically.
     let rulesService = this.injector.get(
       RULES_SERVICE_MAPPING[
         rulesServiceName as keyof typeof RULES_SERVICE_MAPPING
       ]
-    ) as InteractionRulesService;
+    );
 
     let newAnswerTemplate = this.explorationHtmlFormatterService.getAnswerHtml(
       newAnswer,
@@ -297,7 +308,7 @@ export class TrainingDataEditorPanelComponent
       let truncatedAnswer =
         this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
           newAnswer,
-          interactionId as InteractionSpecsKey,
+          interactionId,
           12
         );
       let successToast =

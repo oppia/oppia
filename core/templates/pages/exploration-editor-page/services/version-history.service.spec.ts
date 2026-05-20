@@ -22,7 +22,6 @@ import {ParamSpecs} from 'domain/exploration/param-specs.model';
 import {State} from 'domain/state/state.model';
 import {VersionHistoryService} from './version-history.service';
 import {StateBackendDict} from 'domain/state/state.model';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 describe('Version history service', () => {
   let versionHistoryService: VersionHistoryService;
@@ -99,7 +98,7 @@ describe('Version history service', () => {
   it('should insert state version history', () => {
     expect(versionHistoryService.fetchedStateData.length).toEqual(0);
 
-    const stateObject = {
+    const stateObject: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -133,22 +132,13 @@ describe('Version history service', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput' as InteractionSpecsKey,
+        id: 'TextInput',
       },
       inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          hint_1: {},
-          rule_input_2: {},
-        },
-      },
     };
     const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
@@ -161,7 +151,7 @@ describe('Version history service', () => {
   });
 
   it('should reset state version history', () => {
-    const stateObject = {
+    const stateObject: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -195,22 +185,13 @@ describe('Version history service', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput' as InteractionSpecsKey,
+        id: 'TextInput',
       },
       inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          hint_1: {},
-          rule_input_2: {},
-        },
-      },
     };
     const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
@@ -265,7 +246,7 @@ describe('Version history service', () => {
   });
 
   it('should find whether new state version history data should be fetched', () => {
-    const stateObject = {
+    const stateObject: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -299,22 +280,13 @@ describe('Version history service', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput' as InteractionSpecsKey,
+        id: 'TextInput',
       },
       inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          hint_1: {},
-          rule_input_2: {},
-        },
-      },
     };
     const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
@@ -334,7 +306,7 @@ describe('Version history service', () => {
   it('should get whether we should show backward state diff data', () => {
     expect(versionHistoryService.canShowBackwardStateDiffData()).toBe(false);
 
-    const stateObject = {
+    const stateObject: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -368,22 +340,13 @@ describe('Version history service', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput' as InteractionSpecsKey,
+        id: 'TextInput',
       },
       inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          hint_1: {},
-          rule_input_2: {},
-        },
-      },
     };
     const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
@@ -427,7 +390,7 @@ describe('Version history service', () => {
   it('should get whether we should show foward state diff data', () => {
     expect(versionHistoryService.canShowForwardStateDiffData()).toBe(false);
 
-    const stateObject = {
+    const stateObject: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -461,22 +424,13 @@ describe('Version history service', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput' as InteractionSpecsKey,
+        id: 'TextInput',
       },
       inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          hint_1: {},
-          rule_input_2: {},
-        },
-      },
     };
     const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
@@ -528,7 +482,7 @@ describe('Version history service', () => {
   });
 
   it('should get backward state diff data', () => {
-    const stateObject = {
+    const stateObject: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -562,22 +516,13 @@ describe('Version history service', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput' as InteractionSpecsKey,
+        id: 'TextInput',
       },
       inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          hint_1: {},
-          rule_input_2: {},
-        },
-      },
     };
     const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
@@ -589,7 +534,7 @@ describe('Version history service', () => {
   });
 
   it('should get forward state diff data', () => {
-    const stateObject = {
+    const stateObject: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -623,22 +568,13 @@ describe('Version history service', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput' as InteractionSpecsKey,
+        id: 'TextInput',
       },
       inapplicable_skill_misconception_ids: [],
       linked_skill_id: null,
-      next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          hint_1: {},
-          rule_input_2: {},
-        },
-      },
     };
     const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');

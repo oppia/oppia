@@ -38,7 +38,6 @@ import {StateEditorConstants} from '../state-editor.constants';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 interface DeleteValue {
   index: number;
@@ -91,9 +90,13 @@ export class StateSolutionEditorComponent implements OnInit {
     this.SOLUTION_EDITOR_FOCUS_LABEL =
       'currentCorrectAnswerEditorHtmlForSolutionEditor';
     this.stateEditorService.updateStateSolutionEditorInitialised();
+    const interactionId = this.stateInteractionIdService.savedMemento;
+    if (interactionId === null) {
+      throw new Error('Expected interactionId to be non-null.');
+    }
     this.correctAnswerEditorHtml =
       this.explorationHtmlFormatterService.getInteractionHtml(
-        this.stateInteractionIdService.savedMemento as InteractionSpecsKey,
+        interactionId,
         this.stateCustomizationArgsService.savedMemento,
         false,
         this.SOLUTION_EDITOR_FOCUS_LABEL,
@@ -140,8 +143,11 @@ export class StateSolutionEditorComponent implements OnInit {
     if (solution === null) {
       throw new Error('Expected solution to be non-null.');
     }
+    if (interactionId === null) {
+      throw new Error('Expected interactionId to be non-null.');
+    }
     const solutionSummary = solution.getSummary(
-      interactionId as InteractionSpecsKey,
+      interactionId,
       this.stateCustomizationArgsService.savedMemento
     );
     const solutionAsPlainText =
@@ -157,10 +163,10 @@ export class StateSolutionEditorComponent implements OnInit {
   // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): boolean {
     let savedMemento = this.stateInteractionIdService.savedMemento;
-    return (
-      Boolean(savedMemento) &&
-      INTERACTION_SPECS[savedMemento as InteractionSpecsKey].is_linear
-    );
+    if (savedMemento === null) {
+      throw new Error('Expected savedMemento to be non-null.');
+    }
+    return Boolean(savedMemento) && INTERACTION_SPECS[savedMemento].is_linear;
   }
 
   onSaveSolution(value: Solution | null): void {

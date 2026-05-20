@@ -33,12 +33,19 @@ import {
 } from 'interactions/rule-input-defs';
 import isEqual from 'lodash/isEqual';
 
-export interface InteractionRulesService {
-  [ruleName: string]: (
-    answer: InteractionAnswer,
-    ruleInputs: InteractionRuleInputs
-  ) => boolean;
-}
+// InteractionRulesService defines the contract for all rule service classes.
+// Concrete rule service classes implement this contract by providing named
+// rule methods. The dynamic lookup by rule name is handled internally in
+// AnswerClassificationService using RuleMethodLookup.
+export type InteractionRulesService = object;
+
+// Internal type used only within AnswerClassificationService to perform
+// dynamic rule method lookup by name without requiring an index signature
+// on every concrete rules service class.
+type RuleMethodLookup = Record<
+  string,
+  (answer: InteractionAnswer, ruleInputs: InteractionRuleInputs) => boolean
+>;
 
 @Injectable({providedIn: 'root'})
 export class AnswerClassificationService {
@@ -67,11 +74,14 @@ export class AnswerClassificationService {
   ): AnswerClassificationResult {
     // Find the first group that contains a rule which returns true
     // TODO(bhenning): Implement training data classification.
+    // Cast to RuleMethodLookup for dynamic rule name lookup. This is safe
+    // because all concrete rule services implement the required rule methods.
+    const rulesLookup = interactionRulesService as unknown as RuleMethodLookup;
     for (var i = 0; i < answerGroups.length; ++i) {
       const answerGroup = answerGroups[i];
       for (var j = 0; j < answerGroup.rules.length; ++j) {
         const rule = answerGroup.rules[j];
-        if (interactionRulesService[rule.type](answer, rule.inputs)) {
+        if (rulesLookup[rule.type](answer, rule.inputs)) {
           return new AnswerClassificationResult(
             answerGroup.outcome,
             i,

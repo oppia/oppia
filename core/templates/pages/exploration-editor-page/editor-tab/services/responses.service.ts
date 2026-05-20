@@ -127,8 +127,7 @@ export class ResponsesService {
     const currentInteractionId = this.stateInteractionIdService.savedMemento;
     const interactionCanHaveSolution =
       currentInteractionId &&
-      INTERACTION_SPECS[currentInteractionId as InteractionSpecsKey]
-        .can_have_solution;
+      INTERACTION_SPECS[currentInteractionId].can_have_solution;
     const stateSolutionSavedMemento = this.stateSolutionService.savedMemento;
     const solutionExists =
       stateSolutionSavedMemento &&
@@ -357,7 +356,7 @@ export class ResponsesService {
   }
 
   onInteractionIdChanged(
-    newInteractionId: string,
+    newInteractionId: InteractionSpecsKey | null,
     callback: (value: AnswerGroup[], value2: Outcome | null) => void
   ): void {
     this._answerGroups = [];
@@ -366,9 +365,7 @@ export class ResponsesService {
     // Recreate the default outcome if switching away from a terminal
     // interaction.
     if (newInteractionId) {
-      if (
-        INTERACTION_SPECS[newInteractionId as InteractionSpecsKey].is_terminal
-      ) {
+      if (INTERACTION_SPECS[newInteractionId].is_terminal) {
         this._defaultOutcome = null;
       } else if (!this._defaultOutcome) {
         const stateName = this.stateEditorService.getActiveStateName();

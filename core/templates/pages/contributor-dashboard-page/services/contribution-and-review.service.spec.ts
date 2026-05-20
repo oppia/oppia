@@ -1000,7 +1000,7 @@ describe('Contribution and review service', () => {
             html: '<p>This is an explanation.</p>',
           },
         },
-        id: 'TextInput' as InteractionSpecsKey,
+        id: 'TextInput',
       },
       linked_skill_id: null,
       inapplicable_skill_misconception_ids: null,

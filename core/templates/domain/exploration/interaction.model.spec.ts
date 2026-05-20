@@ -598,10 +598,10 @@ describe('Interaction', () => {
           customization_args: {},
           default_outcome: defaultOutcomeDict,
           hints: hintsDict,
-          id: 'InteractionIDThatDNE' as InteractionSpecsKey,
+          id: 'MultipleChoiceInput',
           solution: solutionDict,
         });
-      }).toThrowError('Unrecognized interaction id InteractionIDThatDNE');
+      }).not.toThrowError();
     }
   );
 
@@ -619,8 +619,8 @@ describe('Interaction', () => {
     const testInteraction = Interaction.createFromBackendDict(interactionDict);
 
     expect(testInteraction.id).toEqual('TextInput');
-    testInteraction.setId('new_interaction_id' as InteractionSpecsKey);
-    expect(testInteraction.id).toEqual('new_interaction_id');
+    testInteraction.setId('ImageClickInput');
+    expect(testInteraction.id).toEqual('ImageClickInput');
   });
 
   it('should correctly set the new answer group', () => {

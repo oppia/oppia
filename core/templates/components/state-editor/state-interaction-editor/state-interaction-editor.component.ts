@@ -153,7 +153,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      ) || undefined
+      )
     );
   }
 
@@ -219,7 +219,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
 
     this.onSaveNextContentIdIndex.emit();
     this.interactionDetailsCacheService.set(
-      this.stateInteractionIdService.savedMemento as InteractionSpecsKey,
+      this.stateInteractionIdService.savedMemento,
       this.stateCustomizationArgsService.savedMemento
     );
 
@@ -237,7 +237,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      ) || undefined
+      )
     );
   }
 
@@ -279,7 +279,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
           this.stateCustomizationArgsService.displayed = {};
           this.stateSolutionService.displayed = null;
           this.interactionDetailsCacheService.removeDetails(
-            this.stateInteractionIdService.savedMemento as InteractionSpecsKey
+            this.stateInteractionIdService.savedMemento
           );
           this.stateInteractionIdService.saveDisplayedValue();
           this.stateCustomizationArgsService.saveDisplayedValue();
@@ -291,9 +291,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
           this.onSaveInteractionData.emit(interactionData);
 
           this.stateSolutionService.saveDisplayedValue();
-          this.onSaveSolution.emit(
-            this.stateSolutionService.displayed || undefined
-          );
+          this.onSaveSolution.emit(this.stateSolutionService.displayed);
 
           this.stateInteractionIdService.onInteractionIdChanged.emit(
             this.stateInteractionIdService.savedMemento

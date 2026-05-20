@@ -25,38 +25,11 @@ import {PageContextService} from 'services/page-context.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {Observable, Subject} from 'rxjs';
-import {AlgebraicExpressionInputRulesService} from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
-import {CodeReplRulesService} from 'interactions/CodeRepl/directives/code-repl-rules.service';
-import {ContinueRulesService} from 'interactions/Continue/directives/continue-rules.service';
-import {FractionInputRulesService} from 'interactions/FractionInput/directives/fraction-input-rules.service';
-import {ImageClickInputRulesService} from 'interactions/ImageClickInput/directives/image-click-input-rules.service';
-import {InteractiveMapRulesService} from 'interactions/InteractiveMap/directives/interactive-map-rules.service';
-import {MathEquationInputRulesService} from 'interactions/MathEquationInput/directives/math-equation-input-rules.service';
-import {NumericExpressionInputRulesService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
-import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
-import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
-import {GraphInputRulesService} from 'interactions/GraphInput/directives/graph-input-rules.service';
-import {SetInputRulesService} from 'interactions/SetInput/directives/set-input-rules.service';
-import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
+import {InteractionRulesService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {StateCard} from 'domain/state_card/state-card.model';
 
 type SubmitAnswerFn = () => void;
-
-type InteractionRulesService =
-  | AlgebraicExpressionInputRulesService
-  | CodeReplRulesService
-  | ContinueRulesService
-  | FractionInputRulesService
-  | ImageClickInputRulesService
-  | InteractiveMapRulesService
-  | MathEquationInputRulesService
-  | NumericExpressionInputRulesService
-  | NumericInputRulesService
-  | PencilCodeEditorRulesService
-  | GraphInputRulesService
-  | SetInputRulesService
-  | TextInputRulesService;
 
 export type OnSubmitFn = (
   answer: InteractionAnswer,

@@ -39,7 +39,7 @@ import {StatsReportingService} from 'pages/exploration-player-page/services/stat
 import {HintAndSolutionButtonsComponent} from './hint-and-solution-buttons.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-
+import {InteractionBackendDict} from 'domain/exploration/interaction.model';
 describe('HintAndSolutionButtonsComponent', () => {
   let component: HintAndSolutionButtonsComponent;
   let fixture: ComponentFixture<HintAndSolutionButtonsComponent>;
@@ -53,8 +53,8 @@ describe('HintAndSolutionButtonsComponent', () => {
 
   let newCard: StateCard;
 
-  const defaultInteractionBackendDict = {
-    id: 'TextInput' as const,
+  const defaultInteractionBackendDict: InteractionBackendDict = {
+    id: 'TextInput',
     answer_groups: [
       {
         outcome: {

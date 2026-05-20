@@ -204,11 +204,11 @@ export class TrainingModalComponent
 
     // Retrieve the interaction ID.
     let interactionId = this.stateInteractionIdService.savedMemento;
-
+    if (interactionId === null) {
+      throw new Error('Expected interaction ID to be non-null.');
+    }
     let rulesServiceName =
-      this.angularNameService.getNameOfInteractionRulesService(
-        interactionId as InteractionSpecsKey
-      );
+      this.angularNameService.getNameOfInteractionRulesService(interactionId);
     if (!isInteractionRulesServiceName(rulesServiceName)) {
       throw new Error(
         `Unrecognized interaction rules service: ${rulesServiceName}`

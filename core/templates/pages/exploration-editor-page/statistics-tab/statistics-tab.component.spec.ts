@@ -27,7 +27,7 @@ import {
   StateInteractionStats,
   StateInteractionStatsService,
 } from 'services/state-interaction-stats.service';
-import {States} from 'domain/exploration/states.model';
+import {States, StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {AlertsService} from 'services/alerts.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -43,7 +43,7 @@ import {StatisticsTabComponent} from './statistics-tab.component';
 import {ExplorationDataService} from '../services/exploration-data.service';
 import {ExplorationStats} from 'domain/statistics/exploration-stats.model';
 import {StateStatsModalComponent} from './templates/state-stats-modal.component';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {StateBackendDict} from 'domain/state/state.model';
 
 describe('Statistics Tab Component', () => {
   let component: StatisticsTabComponent;
@@ -102,175 +102,175 @@ describe('Statistics Tab Component', () => {
     // present in the states object.
     // @ts-ignore
     spyOn(States, 'createFromBackendDict').and.returnValue(null);
-
-    let explorationDict = {
-      states: {
-        Start: {
-          classifier_model_id: null,
-          solicit_answer_details: false,
-          interaction: {
-            solution: null,
-            confirmed_unclassified_answers: [],
-            id: 'TextInput' as InteractionSpecsKey,
-            hints: [],
-            customization_args: {
-              rows: {
-                value: 1,
-              },
-              placeholder: {
-                value: {
-                  unicode_str: '',
-                  content_id: 'ca_placeholder_0',
-                },
-              },
+    let states: StateObjectsBackendDict = {
+      Start: {
+        classifier_model_id: null,
+        solicit_answer_details: false,
+        interaction: {
+          solution: null,
+          confirmed_unclassified_answers: [],
+          id: 'TextInput',
+          hints: [],
+          customization_args: {
+            rows: {
+              value: 1,
             },
-            answer_groups: [
-              {
-                outcome: {
-                  missing_prerequisite_skill_id: null,
-                  refresher_exploration_id: null,
-                  labelled_as_correct: false,
-                  feedback: {
-                    content_id: 'feedback_1',
-                    html: '<p>Good Job</p>',
-                  },
-                  param_changes: [],
-                  dest_if_really_stuck: null,
-                  dest: 'Mid',
-                },
-                training_data: [],
-                rule_specs: [
-                  {
-                    inputs: {
-                      x: {
-                        normalizedStrSet: ['answer'],
-                        contentId: 'rule_input_2',
-                      },
-                    },
-                    rule_type: 'FuzzyEquals',
-                  },
-                ],
-                tagged_skill_misconception_id: null,
+            placeholder: {
+              value: {
+                unicode_str: '',
+                content_id: 'ca_placeholder_0',
               },
-            ],
-            default_outcome: {
-              missing_prerequisite_skill_id: null,
-              refresher_exploration_id: null,
-              labelled_as_correct: false,
-              feedback: {
-                content_id: 'default_outcome',
-                html: '<p>Try again.</p>',
-              },
-              param_changes: [],
-              dest_if_really_stuck: null,
-              dest: 'Start',
             },
           },
-          inapplicable_skill_misconception_ids: [],
-          param_changes: [],
-          card_is_checkpoint: true,
-          linked_skill_id: null,
-          content: {
-            content_id: 'content',
-            html: '<p>First Question</p>',
+          answer_groups: [
+            {
+              outcome: {
+                missing_prerequisite_skill_id: null,
+                refresher_exploration_id: null,
+                labelled_as_correct: false,
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: '<p>Good Job</p>',
+                },
+                param_changes: [],
+                dest_if_really_stuck: null,
+                dest: 'Mid',
+              },
+              training_data: [],
+              rule_specs: [
+                {
+                  inputs: {
+                    x: {
+                      normalizedStrSet: ['answer'],
+                      contentId: 'rule_input_2',
+                    },
+                  },
+                  rule_type: 'FuzzyEquals',
+                },
+              ],
+              tagged_skill_misconception_id: null,
+            },
+          ],
+          default_outcome: {
+            missing_prerequisite_skill_id: null,
+            refresher_exploration_id: null,
+            labelled_as_correct: false,
+            feedback: {
+              content_id: 'default_outcome',
+              html: '<p>Try again.</p>',
+            },
+            param_changes: [],
+            dest_if_really_stuck: null,
+            dest: 'Start',
           },
         },
-        End: {
-          classifier_model_id: null,
-          solicit_answer_details: false,
-          interaction: {
-            solution: null,
-            confirmed_unclassified_answers: [],
-            id: 'EndExploration' as InteractionSpecsKey,
-            hints: [],
-            customization_args: {
-              recommendedExplorationIds: {
-                value: ['recommnendedExplorationId'],
-              },
-            },
-            answer_groups: [],
-            default_outcome: null,
-          },
-          inapplicable_skill_misconception_ids: [],
-          param_changes: [],
-          card_is_checkpoint: false,
-          linked_skill_id: null,
-          content: {
-            content_id: 'content',
-            html: 'Congratulations, you have finished!',
-          },
-        },
-        Mid: {
-          classifier_model_id: null,
-          solicit_answer_details: false,
-          interaction: {
-            solution: null,
-            confirmed_unclassified_answers: [],
-            id: 'TextInput' as InteractionSpecsKey,
-            hints: [],
-            customization_args: {
-              rows: {
-                value: 1,
-              },
-              placeholder: {
-                value: {
-                  unicode_str: '',
-                  content_id: 'ca_placeholder_0',
-                },
-              },
-            },
-            answer_groups: [
-              {
-                outcome: {
-                  missing_prerequisite_skill_id: null,
-                  refresher_exploration_id: null,
-                  labelled_as_correct: false,
-                  feedback: {
-                    content_id: 'feedback_1',
-                    html: ' <p>Good Job</p>',
-                  },
-                  param_changes: [],
-                  dest_if_really_stuck: null,
-                  dest: 'End',
-                },
-                training_data: [],
-                rule_specs: [
-                  {
-                    inputs: {
-                      x: {
-                        normalizedStrSet: ['answer'],
-                        contentId: 'rule_input_2',
-                      },
-                    },
-                    rule_type: 'FuzzyEquals',
-                  },
-                ],
-                tagged_skill_misconception_id: null,
-              },
-            ],
-            default_outcome: {
-              missing_prerequisite_skill_id: null,
-              refresher_exploration_id: null,
-              labelled_as_correct: false,
-              feedback: {
-                content_id: 'default_outcome',
-                html: '<p>try again.</p>',
-              },
-              param_changes: [],
-              dest_if_really_stuck: null,
-              dest: 'Mid',
-            },
-          },
-          inapplicable_skill_misconception_ids: [],
-          param_changes: [],
-          card_is_checkpoint: false,
-          linked_skill_id: null,
-          content: {
-            content_id: 'content',
-            html: '<p>Second Question</p>',
-          },
+        inapplicable_skill_misconception_ids: [],
+        param_changes: [],
+        card_is_checkpoint: true,
+        linked_skill_id: null,
+        content: {
+          content_id: 'content',
+          html: '<p>First Question</p>',
         },
       },
+      End: {
+        classifier_model_id: null,
+        solicit_answer_details: false,
+        interaction: {
+          solution: null,
+          confirmed_unclassified_answers: [],
+          id: 'EndExploration',
+          hints: [],
+          customization_args: {
+            recommendedExplorationIds: {
+              value: ['recommnendedExplorationId'],
+            },
+          },
+          answer_groups: [],
+          default_outcome: null,
+        },
+        inapplicable_skill_misconception_ids: [],
+        param_changes: [],
+        card_is_checkpoint: false,
+        linked_skill_id: null,
+        content: {
+          content_id: 'content',
+          html: 'Congratulations, you have finished!',
+        },
+      },
+      Mid: {
+        classifier_model_id: null,
+        solicit_answer_details: false,
+        interaction: {
+          solution: null,
+          confirmed_unclassified_answers: [],
+          id: 'TextInput',
+          hints: [],
+          customization_args: {
+            rows: {
+              value: 1,
+            },
+            placeholder: {
+              value: {
+                unicode_str: '',
+                content_id: 'ca_placeholder_0',
+              },
+            },
+          },
+          answer_groups: [
+            {
+              outcome: {
+                missing_prerequisite_skill_id: null,
+                refresher_exploration_id: null,
+                labelled_as_correct: false,
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ' <p>Good Job</p>',
+                },
+                param_changes: [],
+                dest_if_really_stuck: null,
+                dest: 'End',
+              },
+              training_data: [],
+              rule_specs: [
+                {
+                  inputs: {
+                    x: {
+                      normalizedStrSet: ['answer'],
+                      contentId: 'rule_input_2',
+                    },
+                  },
+                  rule_type: 'FuzzyEquals',
+                },
+              ],
+              tagged_skill_misconception_id: null,
+            },
+          ],
+          default_outcome: {
+            missing_prerequisite_skill_id: null,
+            refresher_exploration_id: null,
+            labelled_as_correct: false,
+            feedback: {
+              content_id: 'default_outcome',
+              html: '<p>try again.</p>',
+            },
+            param_changes: [],
+            dest_if_really_stuck: null,
+            dest: 'Mid',
+          },
+        },
+        inapplicable_skill_misconception_ids: [],
+        param_changes: [],
+        card_is_checkpoint: false,
+        linked_skill_id: null,
+        content: {
+          content_id: 'content',
+          html: '<p>Second Question</p>',
+        },
+      },
+    };
+    let explorationDict = {
+      states,
       auto_tts_enabled: true,
       version: 2,
       draft_change_list_id: 9,

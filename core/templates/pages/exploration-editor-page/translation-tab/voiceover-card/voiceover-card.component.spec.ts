@@ -48,7 +48,7 @@ import {ExplorationStatesService} from 'pages/exploration-editor-page/services/e
 import {State} from 'domain/state/state.model';
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {VoiceoverRegenerationJobService} from 'services/voiceover-regeneration-job-service';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {StateBackendDict} from 'domain/state/state.model';
 
 @Pipe({name: 'formatTime'})
 class MockFormatTimePipe {
@@ -841,17 +841,11 @@ describe('Voiceover card component', () => {
   }));
 
   it('should return correct content availability status', () => {
-    const stateObject = {
+    const stateObject: StateBackendDict = {
       classifier_model_id: null,
       content: {
         content_id: 'content_0',
         html: 'Hello world!',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content_0: {},
-          default_outcome_1: {},
-        },
       },
       inapplicable_skill_misconception_ids: [],
       interaction: {
@@ -885,7 +879,7 @@ describe('Voiceover card component', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput' as InteractionSpecsKey,
+        id: 'TextInput',
       },
       linked_skill_id: null,
       param_changes: [],

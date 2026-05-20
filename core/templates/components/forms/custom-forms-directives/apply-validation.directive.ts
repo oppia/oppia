@@ -51,7 +51,7 @@ export class ApplyValidationDirective implements Validator {
       const validatorName = this.underscoresToCamelCasePipe.transform(
         validatorSpec.id
       );
-      const filterArgs: Record<string, unknown> = {};
+      const filterArgs: Record<string, string | number> = {};
       for (let key in validatorSpec) {
         if (key !== 'id') {
           filterArgs[this.underscoresToCamelCasePipe.transform(key)] =

@@ -56,7 +56,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     [languageCode: string]: boolean;
   } = {};
   translationsHaveLoaded: boolean = false;
-  interactionId?: string;
+  interactionId: InteractionSpecsKey | null = null;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -76,9 +76,8 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
     this.explorationId = this.pageContextService.getExplorationId();
     this.explorationVersion =
       this.pageContextService.getExplorationVersion() as number;
-    this.interactionId = this.stateInteractionIdService
-      .savedMemento as InteractionSpecsKey;
 
+    this.interactionId = this.stateInteractionIdService.savedMemento;
     // Populate the content translations via latest draft changes first,
     // in order to get the most recently updated translations.
     for (let language in this.entityTranslationsService

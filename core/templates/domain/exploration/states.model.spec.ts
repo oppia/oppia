@@ -21,7 +21,7 @@ import {TestBed} from '@angular/core/testing';
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {State, StateBackendDict} from 'domain/state/state.model';
 import {States} from 'domain/exploration/states.model';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 describe('States', () => {
   let statesDict: Record<string, StateBackendDict>;
   let newState: StateBackendDict;
@@ -492,12 +492,12 @@ describe('States', () => {
   });
 
   it('should update destIfReallyStuck in answer groups when renaming a state', () => {
-    const statesDictWithStuck: {[stateName: string]: StateBackendDict} = {
+    const statesDictWithStuck: StateObjectsBackendDict = {
       'old state': {
         classifier_model_id: null,
         content: {content_id: 'content', html: ''},
         interaction: {
-          id: 'TextInput' as InteractionSpecsKey,
+          id: 'TextInput',
           answer_groups: [
             {
               outcome: {
@@ -542,7 +542,7 @@ describe('States', () => {
         classifier_model_id: null,
         content: {content_id: 'content', html: ''},
         interaction: {
-          id: 'TextInput' as InteractionSpecsKey,
+          id: 'TextInput',
           answer_groups: [],
           confirmed_unclassified_answers: [],
           customization_args: {

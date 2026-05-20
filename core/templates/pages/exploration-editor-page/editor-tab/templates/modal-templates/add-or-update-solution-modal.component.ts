@@ -109,8 +109,12 @@ export class AddOrUpdateSolutionModalComponent
   }
 
   shouldAdditionalSubmitButtonBeShown(): boolean {
-    let interactionId = this.stateInteractionIdService
-      .savedMemento as InteractionSpecsKey;
+    let interactionId = this.stateInteractionIdService.savedMemento;
+    if (interactionId === null) {
+      throw new Error(
+        'Cannot check submit button for a state with no interaction.'
+      );
+    }
     const interactionSpec =
       InteractionSpecsConstants.INTERACTION_SPECS[interactionId];
     return interactionSpec.show_generic_submit_button;
@@ -160,9 +164,13 @@ export class AddOrUpdateSolutionModalComponent
     } else {
       this.savedSolution = null;
     }
+    let interactionId = this.stateInteractionIdService.savedMemento;
+    if (interactionId === null) {
+      throw new Error('Cannot set solution for a state with no interaction.');
+    }
     this.correctAnswerEditorHtml =
       this.explorationHtmlFormatterService.getInteractionHtml(
-        this.stateInteractionIdService.savedMemento as InteractionSpecsKey,
+        interactionId,
         this.stateCustomizationArgsService.savedMemento,
         false,
         this.SOLUTION_EDITOR_FOCUS_LABEL,
