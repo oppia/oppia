@@ -3021,7 +3021,10 @@ export class LoggedOutUser extends BaseUser {
       const title = await titleElement.evaluate(el => el.textContent?.trim());
       if (title === collectionTitle) {
         // Get the parent anchor <a> that wraps the tile.
-        const anchor = await titleElement.evaluateHandle(el => el.closest('a'));
+        const anchorHandle = await titleElement.evaluateHandle(el =>
+          el.closest('a')
+        );
+        const anchor = anchorHandle.asElement();
         if (!anchor) {
           throw new Error(
             `Found collection "${collectionTitle}" but it has no parent anchor.`

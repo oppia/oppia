@@ -511,9 +511,13 @@ export class CollectionEditor extends BaseUser {
    * Verifies that the current page is the collection player.
    */
   async expectToBeOnCollectionPlayerPage(): Promise<void> {
-    await this.page.waitForFunction((url: string) => {
-      return window.location.href.includes(url);
-    });
+    await this.page.waitForFunction(
+      (url: string) => {
+        return window.location.href.includes(url);
+      },
+      {},
+      '/collection'
+    );
     showMessage('Verified that we are on the collection player page.');
   }
 
