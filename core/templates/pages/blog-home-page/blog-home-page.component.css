@@ -223,17 +223,17 @@ oppia-blog-home-page .blog-post-card {
 }
 
 .blog-homepage .oppia-navbar-breadcrumb {
-  display: -webkit-inline-box;
-  flex-flow: column;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
   margin-left: -10px;
   overflow-wrap: break-word;
-  padding-top: 3px;
 }
 
 @media(max-width:500px) {
   .oppia-navbar-breadcrumb.main-blog-homepage-mobile-breadcrumb {
     line-height: 12px;
-    padding-top: 15px;
+    padding-top: 0;
   }
 }
 

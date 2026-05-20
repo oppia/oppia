@@ -40,8 +40,6 @@ import {UrlService} from 'services/contextual/url.service';
 import {BlogHomePageConstants} from './blog-home-page.constants';
 import {Router, ActivatedRoute} from '@angular/router';
 
-import './blog-home-page.component.css';
-
 @Component({
   selector: 'oppia-blog-home-page',
   templateUrl: './blog-home-page.component.html',
