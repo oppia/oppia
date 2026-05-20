@@ -154,7 +154,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      ) ?? undefined
+      )
     );
   }
 
@@ -223,7 +223,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
     // process, but the emitter expects a value.
     this.onSaveNextContentIdIndex.emit(undefined as unknown as number);
     this.interactionDetailsCacheService.set(
-      this.stateInteractionIdService.savedMemento as InteractionSpecsKey,
+      this.stateInteractionIdService.savedMemento,
       this.stateCustomizationArgsService.savedMemento
     );
 
@@ -241,7 +241,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      ) ?? undefined
+      )
     );
   }
 

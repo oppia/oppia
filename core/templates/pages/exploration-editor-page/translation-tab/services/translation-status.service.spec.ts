@@ -174,7 +174,7 @@ describe('Translation status service', () => {
           ],
           solution: null,
           hints: [],
-          id: 'MultipleChoiceInput' as InteractionSpecsKey,
+          id: 'MultipleChoiceInput',
           customization_args: {
             choices: {
               value: ['<p>1</p>', '<p>2</p>'],
@@ -234,7 +234,7 @@ describe('Translation status service', () => {
           ],
           solution: null,
           hints: [],
-          id: 'MultipleChoiceInput' as InteractionSpecsKey,
+          id: 'MultipleChoiceInput',
           customization_args: {
             choices: {
               value: ['<p>1</p>'],
@@ -271,7 +271,7 @@ describe('Translation status service', () => {
           answer_groups: [],
           solution: null,
           hints: [],
-          id: 'EndExploration' as InteractionSpecsKey,
+          id: 'EndExploration',
           customization_args: {
             recommendedExplorationIds: {
               value: [],

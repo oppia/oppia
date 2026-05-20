@@ -159,7 +159,7 @@ export class TrainingDataEditorPanelComponent
           let truncatedAnswer =
             this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
               finishTrainingResult.answer,
-              finishTrainingResult.interactionId as InteractionSpecsKey,
+              finishTrainingResult.interactionId,
               12
             );
           let successToast =
@@ -202,7 +202,7 @@ export class TrainingDataEditorPanelComponent
       }
       this.trainingModalService.openTrainUnresolvedAnswerModal(
         answer,
-        interactionId as InteractionSpecsKey,
+        interactionId,
         answerIndex
       );
     }
@@ -253,9 +253,7 @@ export class TrainingDataEditorPanelComponent
       throw new Error('Cannot submit answer for a state with no interaction.');
     }
     let rulesServiceName =
-      this.angularNameService.getNameOfInteractionRulesService(
-        interactionId as InteractionSpecsKey
-      );
+      this.angularNameService.getNameOfInteractionRulesService(interactionId);
 
     // Inject RulesService dynamically.
     let rulesService = this.injector.get(
@@ -307,7 +305,7 @@ export class TrainingDataEditorPanelComponent
       let truncatedAnswer =
         this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
           newAnswer,
-          interactionId as InteractionSpecsKey,
+          interactionId,
           12
         );
       let successToast =

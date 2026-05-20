@@ -879,7 +879,7 @@ describe('Voiceover card component', () => {
         },
         hints: [],
         solution: null,
-        id: 'TextInput' as InteractionSpecsKey,
+        id: 'TextInput',
       },
       linked_skill_id: null,
       param_changes: [],

@@ -44,6 +44,7 @@ import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 interface TaggedMisconception {
   skillId: string | null;

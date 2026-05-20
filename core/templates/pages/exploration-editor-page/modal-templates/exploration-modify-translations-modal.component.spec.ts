@@ -42,6 +42,7 @@ import {PageContextService} from 'services/page-context.service';
 import {TranslationLanguageService} from '../translation-tab/services/translation-language.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {FormsModule} from '@angular/forms';
+
 const MOCK_MODIFY_TRANSLATION_OPPORTUNITY: ModifyTranslationOpportunity = {
   id: 'expId',
   contentId: 'content1',
