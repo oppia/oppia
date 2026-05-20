@@ -1062,6 +1062,7 @@ export class LoggedOutUser extends BaseUser {
     if (!blogPostsFound) {
       return;
     }
+    await this.expectElementToBeVisible(blogPostContentSelector);
     const contentFound = await this.page.$$eval(
       `${blogPostTitleContainerSelector}, ${blogPostContentSelector}`,
       (elements, searchText) =>
@@ -1110,6 +1111,7 @@ export class LoggedOutUser extends BaseUser {
     if (!blogPostsFound) {
       return;
     }
+    await this.expectElementToBeVisible(blogPostTagSelector);
     const tagFound = await this.page.$$eval(
       blogPostTagSelector,
       (elements, expectedTag) =>
@@ -2452,8 +2454,10 @@ export class LoggedOutUser extends BaseUser {
         window.scrollTo(0, 0);
       });
     }
-    await this.page.waitForSelector(languageDropdown);
-    const languageDropdownElement = await this.page.$(languageDropdown);
+    const languageDropdownElement = await this.page.waitForSelector(
+      languageDropdown,
+      {visible: true}
+    );
     if (!languageDropdownElement) {
       throw new Error('Language dropdown element not found');
     }
@@ -2461,7 +2465,7 @@ export class LoggedOutUser extends BaseUser {
       languageDropdown,
       el => el.textContent
     );
-    await languageDropdownElement.click();
+    await this.clickOnElement(languageDropdownElement);
     await this.clickOnElementWithSelector(languageOption);
     // Here we need to reload the page again to confirm the language change.
     await this.page.reload();
@@ -2492,12 +2496,14 @@ export class LoggedOutUser extends BaseUser {
         window.scrollTo(0, 0);
       });
     }
-    await this.page.waitForSelector(languageDropdown);
-    const languageDropdownElement = await this.page.$(languageDropdown);
+    const languageDropdownElement = await this.page.waitForSelector(
+      languageDropdown,
+      {visible: true}
+    );
     if (!languageDropdownElement) {
       throw new Error('Language dropdown element not found');
     }
-    await languageDropdownElement.click();
+    await this.clickOnElement(languageDropdownElement);
     await this.clickOnElementWithSelector(languageOption);
     await this.waitForNetworkIdle();
     await this.waitForPageToFullyLoad();
@@ -3828,7 +3834,8 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForFunction(
       (selector: string, value: string) => {
         const element = document.querySelector(selector);
-        return element?.textContent !== value;
+        const text = element?.textContent?.trim();
+        return !!text && text !== value?.trim();
       },
       {},
       currentCardContentSelector,

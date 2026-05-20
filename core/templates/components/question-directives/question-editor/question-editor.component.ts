@@ -146,7 +146,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     return 'Save Question';
   }
 
-  _updateQuestion(updateFunction: Function): void {
+  _updateQuestion(updateFunction: () => void): void {
     this.questionChange.emit();
     this.questionUpdateService.setQuestionStateData(
       this.question,
