@@ -154,7 +154,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      ) || undefined
+      )
     );
   }
 
@@ -223,7 +223,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
     // process, but the emitter expects a value.
     this.onSaveNextContentIdIndex.emit(undefined as unknown as number);
     this.interactionDetailsCacheService.set(
-      this.stateInteractionIdService.savedMemento as InteractionSpecsKey,
+      this.stateInteractionIdService.savedMemento,
       this.stateCustomizationArgsService.savedMemento
     );
 
@@ -241,7 +241,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      ) || undefined
+      )
     );
   }
 
@@ -286,13 +286,9 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
             null as unknown as InteractionSpecsKey;
           this.stateCustomizationArgsService.displayed = {};
           this.stateSolutionService.displayed = null;
-          const savedInteractionId =
-            this.stateInteractionIdService.savedMemento;
-          if (savedInteractionId !== null) {
-            this.interactionDetailsCacheService.removeDetails(
-              savedInteractionId
-            );
-          }
+          this.interactionDetailsCacheService.removeDetails(
+            this.stateInteractionIdService.savedMemento
+          );
           this.stateInteractionIdService.saveDisplayedValue();
           this.stateCustomizationArgsService.saveDisplayedValue();
 
@@ -302,9 +298,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
           });
 
           this.stateSolutionService.saveDisplayedValue();
-          this.onSaveSolution.emit(
-            this.stateSolutionService.displayed || undefined
-          );
+          this.onSaveSolution.emit(this.stateSolutionService.displayed);
 
           this.stateInteractionIdService.onInteractionIdChanged.emit(
             this.stateInteractionIdService.savedMemento

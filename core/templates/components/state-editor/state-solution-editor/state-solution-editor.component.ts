@@ -147,7 +147,7 @@ export class StateSolutionEditorComponent implements OnInit {
       throw new Error('Expected interactionId to be non-null.');
     }
     const solutionSummary = solution.getSummary(
-      interactionId as InteractionSpecsKey,
+      interactionId,
       this.stateCustomizationArgsService.savedMemento
     );
     const solutionAsPlainText =

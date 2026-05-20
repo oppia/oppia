@@ -738,7 +738,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
         newInteractionId => {
           this.externalSaveService.onExternalSave.emit();
           this.responsesService.onInteractionIdChanged(
-            newInteractionId as InteractionSpecsKey,
+            newInteractionId,
             (newAnswerGroups, newDefaultOutcome) => {
               this.onSaveInteractionDefaultOutcome.emit(newDefaultOutcome);
               this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);

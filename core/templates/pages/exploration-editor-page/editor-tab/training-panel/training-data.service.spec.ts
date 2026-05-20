@@ -31,7 +31,6 @@ import {Interaction} from 'domain/exploration/interaction.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 class MockNgbModal {
   open() {

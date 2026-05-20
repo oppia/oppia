@@ -43,7 +43,7 @@ describe('ImprovementsService', () => {
           content_id: 'content',
         },
         interaction: {
-          id: 'TextInput' as InteractionSpecsKey,
+          id: 'TextInput',
           customization_args: {
             rows: {
               value: 1,
@@ -102,7 +102,7 @@ describe('ImprovementsService', () => {
           content_id: 'content',
         },
         interaction: {
-          id: 'FractionInput' as InteractionSpecsKey,
+          id: 'FractionInput',
           customization_args: {
             requireSimplestForm: {value: false},
             allowImproperFraction: {value: true},

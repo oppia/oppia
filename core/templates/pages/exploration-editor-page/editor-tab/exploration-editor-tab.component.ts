@@ -293,6 +293,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
         displayedValue.interactionId ?? null
       ) as InteractionSpecsKey | null
 >>>>>>> c10de93762 (Fix interaction ID typing contracts to use InteractionSpecsKey)
+      cloneDeep(displayedValue.interactionId)
     );
 
     this.explorationStatesService.saveInteractionCustomizationArgs(

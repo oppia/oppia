@@ -28,7 +28,6 @@ import {
 import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
 import {CompareVersionsService} from './compare-versions.service';
 import {StateBackendDict} from 'domain/state/state.model';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 interface stateDetails {
   contentStr: string;
@@ -93,7 +92,7 @@ describe('Compare versions service', () => {
           html: stateDetail.contentStr,
         },
         interaction: {
-          id: 'EndExploration' as InteractionSpecsKey,
+          id: 'EndExploration',
           answer_groups: [],
           confirmed_unclassified_answers: [],
           customization_args: {
