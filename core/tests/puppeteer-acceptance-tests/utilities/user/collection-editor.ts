@@ -69,7 +69,7 @@ export class CollectionEditor extends BaseUser {
   /**
    * Creates a new collection from the Creator Dashboard.
    */
-  async openCollectionEditor(): Promise<void> {
+  async createACollection(): Promise<void> {
     await this.clickOnElementWithSelector(createActivityButton);
     await this.expectElementToBeVisible(createCollectionButton);
     await this.clickOnElementWithSelector(createCollectionButton);
@@ -463,7 +463,7 @@ export class CollectionEditor extends BaseUser {
   /**
    * Clicks the publish collection button.
    */
-  async publishCollection(): Promise<void> {
+  async clickOnPublishCollectionButton(): Promise<void> {
     await this.page.waitForFunction(
       (selector: string) => {
         const btn = document.querySelector(selector);

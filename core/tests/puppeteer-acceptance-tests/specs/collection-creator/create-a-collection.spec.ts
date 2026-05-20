@@ -36,11 +36,17 @@ describe('Collection Creator', function () {
   let thirdExplorationId: string;
 
   beforeAll(async function () {
-    // Create a user to create explorations that will be added to the collection.
+    // Create Users.
     explorationCreator = await UserFactory.createNewUser(
       'explorationCreator',
       'exploration_creator@example.com'
     );
+    collectionEditor = await UserFactory.createNewUser(
+      'collectionEditor',
+      'collection_editor@example.com',
+      [ROLES.COLLECTION_EDITOR]
+    );
+    loggedOutUser = await UserFactory.createLoggedOutUser();
 
     // Create 3 explorations: Positive Numbers, Negative Numbers, Whole Numbers.
     await explorationCreator.navigateToCreatorDashboardPage();
@@ -49,138 +55,117 @@ describe('Collection Creator', function () {
     await explorationCreator.updateCardContent('Positive Numbers Content');
     await explorationCreator.addInteraction('End Exploration');
     await explorationCreator.saveExplorationDraft();
-    await explorationCreator.publishExplorationWithMetadata(
-      'Positive Numbers',
-      'Exploration about positive numbers.',
-      'Algebra'
-    );
-    firstExplorationId = await explorationCreator.getExplorationId();
+    firstExplorationId =
+      await explorationCreator.publishExplorationWithMetadata(
+        'Positive Numbers',
+        'Exploration about positive numbers.',
+        'Algebra'
+      );
 
     await explorationCreator.navigateToCreatorDashboardPage();
     await explorationCreator.navigateToExplorationEditorFromCreatorDashboard();
     await explorationCreator.updateCardContent('Negative Numbers Content');
     await explorationCreator.addInteraction('End Exploration');
     await explorationCreator.saveExplorationDraft();
-    await explorationCreator.publishExplorationWithMetadata(
-      'Negative Numbers',
-      'Exploration about negative numbers.',
-      'Algebra'
-    );
-    secondExplorationId = await explorationCreator.getExplorationId();
+    secondExplorationId =
+      await explorationCreator.publishExplorationWithMetadata(
+        'Negative Numbers',
+        'Exploration about negative numbers.',
+        'Algebra'
+      );
 
     await explorationCreator.navigateToCreatorDashboardPage();
     await explorationCreator.navigateToExplorationEditorFromCreatorDashboard();
     await explorationCreator.updateCardContent('Whole Numbers Content');
     await explorationCreator.addInteraction('End Exploration');
     await explorationCreator.saveExplorationDraft();
-    await explorationCreator.publishExplorationWithMetadata(
-      'Whole Numbers',
-      'Exploration about whole numbers.',
-      'Algebra'
-    );
-    thirdExplorationId = await explorationCreator.getExplorationId();
+    thirdExplorationId =
+      await explorationCreator.publishExplorationWithMetadata(
+        'Whole Numbers',
+        'Exploration about whole numbers.',
+        'Algebra'
+      );
 
     await explorationCreator.closeBrowser();
-
-    // Create a user with collection editor role.
-    collectionEditor = await UserFactory.createNewUser(
-      'collectionEditor',
-      'collection_editor@example.com',
-      [ROLES.COLLECTION_EDITOR]
-    );
-
-    // Create a logged-out user for verifying the published collection.
-    loggedOutUser = await UserFactory.createLoggedOutUser();
   });
 
   it('should be able to create a collection and add explorations', async function () {
     // Navigate to creator dashboard and create a new collection.
     await collectionEditor.navigateToCreatorDashboardUsingProfileDropdown();
-    await collectionEditor.openCollectionEditor();
+    await collectionEditor.createACollection();
 
-    // Verify the collection editor page matches the expected state
-    // (Snapshot Collections.1: empty collection editor with add exploration
-    // input visible).
     await collectionEditor.expectToBeOnCollectionEditorPage();
     await collectionEditor.expectAddExplorationInputToBeVisible();
+    await collectionEditor.expectCollectionEditorToBeEmpty();
     await collectionEditor.expectScreenshotToMatch(
       'emptyCollectionEditor',
       __dirname
     );
 
-    // Verify the collection editor is empty initially.
-    await collectionEditor.expectCollectionEditorToBeEmpty();
-
-    // Add the first exploration.
+    // Add Positive Numbers exploration.
     await collectionEditor.addExistingExploration(firstExplorationId);
 
-    // Verify the first node is visible with no arrows.
     await collectionEditor.expectNodeToBeVisible('Positive Numbers');
     await collectionEditor.expectMoveLeftArrow(0, false);
     await collectionEditor.expectMoveRightArrow(0, false);
 
-    // Add the second and third explorations.
+    // Add remaining explorations.
     await collectionEditor.addExistingExploration(secondExplorationId);
     await collectionEditor.addExistingExploration(thirdExplorationId);
 
-    // Verify all nodes appear in order.
     await collectionEditor.expectNodesInOrder([
       'Positive Numbers',
       'Negative Numbers',
       'Whole Numbers',
     ]);
 
-    // Verify arrow visibility on each node.
     await collectionEditor.expectMoveRightArrow(0, true);
+
     await collectionEditor.expectMoveLeftArrow(1, true);
     await collectionEditor.expectMoveRightArrow(1, true);
+
     await collectionEditor.expectMoveLeftArrow(2, true);
 
-    // Shift "Positive Numbers" to the right.
+    // Shift Positive Numbers to the right.
     await collectionEditor.shiftNodeRight(0);
 
-    // Verify the new order after shift.
     await collectionEditor.expectNodesInOrder([
       'Negative Numbers',
       'Positive Numbers',
       'Whole Numbers',
     ]);
 
-    // Delete node "Negative Numbers" (now at index 0 after shift).
+    // Delete node Negative Numbers (now at index 0 after shift).
     await collectionEditor.deleteNode(0);
 
-    // Verify remaining nodes in order and "Negative Numbers" is not visible.
+    await collectionEditor.expectNodeNotVisible('Negative Numbers');
     await collectionEditor.expectNodesInOrder([
       'Positive Numbers',
       'Whole Numbers',
     ]);
-    await collectionEditor.expectNodeNotVisible('Negative Numbers');
-
-    // Click on the "Save Draft" button.
-    await collectionEditor.saveCollectionDraft();
-
-    // Verify "Save Draft" button is disabled and "Publish" is clickable.
-    await collectionEditor.expectSaveDraftButtonDisabled();
-    await collectionEditor.expectPublishButtonClickable();
   });
 
   it('should be able to save and publish the collection draft', async function () {
-    // Click on the "Publish" button.
-    await collectionEditor.publishCollection();
+    // Save exploration draft.
+    await collectionEditor.saveCollectionDraft();
+
+    await collectionEditor.expectSaveDraftButtonDisabled();
+    await collectionEditor.expectPublishButtonClickable();
+
+    // Publish the exploration.
+    await collectionEditor.clickOnPublishCollectionButton();
 
     // Add title, goal, and category.
     await collectionEditor.setTitle('Test Collection');
     await collectionEditor.setObjective('End-to-end test for collection');
     await collectionEditor.setCategory('Algebra');
 
-    // Click "Save Changes".
     await collectionEditor.saveChanges();
 
     // Verify "Publish" button is disabled (no unpublished changes).
     await collectionEditor.expectPublishButtonDisabled();
 
-    // As loggedOutUser: navigate to community library and verify collection
-    // is visible.
+    // Check community page for the collection.
     await loggedOutUser.navigateToCommunityLibraryOnNavbar();
     await loggedOutUser.expectCollectionToBeVisibleInLibrary('Test Collection');
   });

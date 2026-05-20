@@ -77,11 +77,11 @@ describe('Logged-in Learner viewing a collection', function () {
     );
 
     await collectionEditor.navigateToCreatorDashboardUsingProfileDropdown();
-    await collectionEditor.openCollectionEditor();
+    await collectionEditor.createACollection();
     await collectionEditor.addExistingExploration(exploration1Id);
     await collectionEditor.addExistingExploration(exploration2Id);
     await collectionEditor.saveCollectionDraft();
-    await collectionEditor.publishCollection();
+    await collectionEditor.clickOnPublishCollectionButton();
     await collectionEditor.setTitle('Numbers');
     await collectionEditor.setObjective(
       'End-to-end test for viewing a collection'
