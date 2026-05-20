@@ -81,6 +81,7 @@
 /typings/ @oppia/dev-workflow-reviewers
 /tsconfig*.json @oppia/dev-workflow-reviewers
 /scripts/run_typescript_checks*.py @oppia/dev-workflow-reviewers
+/scripts/template_strict_exclude_paths.txt @oppia/dev-workflow-reviewers
 
 
 # App Feedback Reporting project
