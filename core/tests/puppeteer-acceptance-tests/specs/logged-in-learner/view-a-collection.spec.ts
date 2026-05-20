@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from E2E Migration Doc
  * https://docs.google.com/spreadsheets/d/1DIZ0_Gmf9uhjTbhuDpA495PTjYZW9ZE97r6urS-iXwg/edit?gid=888982708#gid=888982708&range=A154:A156
  *
- * LI.10. View a collection
+ * LI.10. Play a collection
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
