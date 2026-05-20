@@ -28,12 +28,6 @@ var suites = {
     './core/tests/webdriverio_desktop/**/*.js',
   ],
 
-  contributorAdminDashboard: [
-    './core/tests/webdriverio_desktop/contributorAdminDashboard.js'
-  collections: [
-    './core/tests/webdriverio_desktop/collections.js'
-  ],
-
   creatorDashboard: [
     './core/tests/webdriverio_desktop/creatorDashboard.js'
   ],
@@ -42,15 +36,6 @@ var suites = {
     './core/tests/webdriverio_desktop/explorationHistoryTab.js'
   ],
 
-  explorationStatisticsTab: [
-    './core/tests/webdriverio_desktop/explorationStatisticsTab.js'
-  ],
-
-  explorationTranslationTab: [
-    './core/tests/webdriverio_desktop/explorationTranslationTab.js'
-  learner: [
-    './core/tests/webdriverio/learnerFlow.js'
-  ],
   navigation: [
     './core/tests/webdriverio_desktop/navigation.js'
   ],
