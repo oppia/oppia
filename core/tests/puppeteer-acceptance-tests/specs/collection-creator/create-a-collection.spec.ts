@@ -96,7 +96,7 @@ describe('Collection Creator', function () {
   it('should be able to create a collection and add explorations', async function () {
     // Navigate to creator dashboard and create a new collection.
     await collectionEditor.navigateToCreatorDashboardUsingProfileDropdown();
-    await collectionEditor.createNewCollection();
+    await collectionEditor.openCollectionEditor();
 
     // Verify the collection editor page matches the expected state
     // (Snapshot Collections.1: empty collection editor with add exploration

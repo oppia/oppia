@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from E2E Migration Doc
  * https://docs.google.com/spreadsheets/d/1DIZ0_Gmf9uhjTbhuDpA495PTjYZW9ZE97r6urS-iXwg/edit?gid=888982708#gid=888982708&range=A154:A156
  *
- * LO.13. View a collection
+ * LI.10. View a collection
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -77,7 +77,7 @@ describe('Logged-in Learner viewing a collection', function () {
     );
 
     await collectionEditor.navigateToCreatorDashboardUsingProfileDropdown();
-    await collectionEditor.createNewCollection();
+    await collectionEditor.openCollectionEditor();
     await collectionEditor.addExistingExploration(exploration1Id);
     await collectionEditor.addExistingExploration(exploration2Id);
     await collectionEditor.saveCollectionDraft();
@@ -105,7 +105,7 @@ describe('Logged-in Learner viewing a collection', function () {
   });
 
   it(
-    'should find, play and verify collection features from the library',
+    'should be able to play a collection',
     async function () {
       // Navigate to community library via the "Learn" navbar.
       await viewerUser.navigateToCommunityLibraryOnNavbar();
@@ -115,7 +115,7 @@ describe('Logged-in Learner viewing a collection', function () {
       await viewerUser.clickOnCollectionInLibrary('Numbers');
 
       // Verify "Begin Numbers:" and both explorations are visible.
-      await viewerUser.expectCollectionBeginTextVisible('Numbers');
+      await viewerUser.expectCollectionBeginTextVisible('Begin Numbers:');
       await viewerUser.expectExplorationVisibleInCollectionPage(
         'Positive Numbers'
       );

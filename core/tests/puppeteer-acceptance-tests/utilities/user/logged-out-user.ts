@@ -3058,16 +3058,13 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Verifies that the "Begin [collectionName]:" text is visible on the
    * collection player page.
-   * @param {string} collectionName - The collection name.
+   * @param {string} expectedText - The collection name.
    */
-  async expectCollectionBeginTextVisible(
-    collectionName: string
-  ): Promise<void> {
+  async expectCollectionBeginTextVisible(expectedText: string): Promise<void> {
     await this.expectElementToBeVisible(collectionPlayerTitleSelector);
     const titleText = await this.page.$eval(collectionPlayerTitleSelector, el =>
       el.textContent?.trim()
     );
-    const expectedText = `Begin ${collectionName}:`;
     if (!titleText || !titleText.includes(expectedText)) {
       throw new Error(
         `Expected "${expectedText}" to be visible, but found: "${titleText}".`

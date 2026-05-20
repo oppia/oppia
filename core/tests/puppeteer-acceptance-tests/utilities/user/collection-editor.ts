@@ -69,7 +69,7 @@ export class CollectionEditor extends BaseUser {
   /**
    * Creates a new collection from the Creator Dashboard.
    */
-  async createNewCollection(): Promise<void> {
+  async openCollectionEditor(): Promise<void> {
     await this.clickOnElementWithSelector(createActivityButton);
     await this.expectElementToBeVisible(createCollectionButton);
     await this.clickOnElementWithSelector(createCollectionButton);
@@ -133,6 +133,8 @@ export class CollectionEditor extends BaseUser {
         );
       }
     }
+
+    expect(titles.length).toEqual(expectedOrder.length);
     showMessage(`Nodes are in expected order: [${expectedOrder.join(', ')}].`);
   }
 
