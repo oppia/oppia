@@ -20,6 +20,12 @@ import {Pipe, PipeTransform} from '@angular/core';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 import {InteractionAnswer} from 'interactions/answer-defs';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+
+// Minimal interface for inputs that carry a truncatable code string.
+interface TruncatableInput {
+  code: string;
+}
 
 @Pipe({
   name: 'truncateInputBasedOnInteractionAnswerTypePipe',
@@ -34,9 +40,10 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
     interactionId: string,
     length: number
   ): string {
-    let answerType = INTERACTION_SPECS[interactionId].answer_type;
+    let answerType =
+      INTERACTION_SPECS[interactionId as InteractionSpecsKey].answer_type;
     let actualInputToTruncate = '';
-    let inputUpdate;
+    let inputUpdate: TruncatableInput;
 
     // TODO(#15858): Update InteractionAnswer type and remove if block
     // code in truncate-input-based-on-interaction-answer-type.pipe.ts file.
@@ -48,11 +55,9 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
     // For now i am using the if block logic to do the task.
     // by doing so we don't need to change this in whole codebase.
     if (typeof input !== 'object') {
-      inputUpdate = {
-        code: input,
-      };
+      inputUpdate = {code: String(input)};
     } else {
-      inputUpdate = input;
+      inputUpdate = input as TruncatableInput;
     }
 
     if (answerType === 'NormalizedString') {
