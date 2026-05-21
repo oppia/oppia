@@ -781,6 +781,9 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.stateEditorService.onUpdateAnswerChoices.subscribe(
         newAnswerChoices => {
+          if (newAnswerChoices === null) {
+            throw new Error('Expected new answer choices to be non-null');
+          }
           this.responsesService.updateAnswerChoices(newAnswerChoices);
         }
       )
@@ -789,6 +792,9 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.stateEditorService.onHandleCustomArgsUpdate.subscribe(
         newAnswerChoices => {
+          if (newAnswerChoices === null) {
+            throw new Error('Expected new answer choices to be non-null');
+          }
           this.responsesService.handleCustomArgsUpdate(
             newAnswerChoices,
             newAnswerGroups => {

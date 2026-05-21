@@ -53,7 +53,6 @@ import {NumericInputRulesService} from 'interactions/NumericInput/directives/num
 import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import {SetInputRulesService} from 'interactions/SetInput/directives/set-input-rules.service';
 import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 export const RULES_SERVICE_MAPPING = {
   AlgebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService,

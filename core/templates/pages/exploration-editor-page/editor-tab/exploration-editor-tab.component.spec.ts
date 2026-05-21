@@ -76,6 +76,7 @@ import {Skill} from 'domain/skill/skill.model';
 import {Misconception} from 'domain/skill/misconception.model';
 import {AlertsService} from 'services/alerts.service';
 import {InteractionData} from 'interactions/customization-args-defs';
+
 describe('Exploration editor tab component', () => {
   let component: ExplorationEditorTabComponent;
   let fixture: ComponentFixture<ExplorationEditorTabComponent>;

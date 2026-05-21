@@ -61,9 +61,9 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
     }
 
     if (answerType === 'NormalizedString') {
-      actualInputToTruncate = (inputUpdate as CodeReplAnswer).code;
+      actualInputToTruncate = (inputUpdate as TruncatableInput).code;
     } else if (answerType === 'CodeEvaluation') {
-      actualInputToTruncate = (inputUpdate as CodeReplAnswer).code;
+      actualInputToTruncate = (inputUpdate as TruncatableInput).code;
     } else {
       throw new Error('Unknown interaction answer type');
     }

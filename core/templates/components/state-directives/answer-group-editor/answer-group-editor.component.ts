@@ -74,7 +74,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   originalContentIdToContent: object;
   activeRuleIndex: number;
-  answerChoices: AnswerChoice[];
+  answerChoices: AnswerChoice[] | null;
   editAnswerGroupForm: object;
   tagMisconceptionsFeatureFlagIsEnabled: boolean = false;
 
@@ -112,7 +112,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     return this.stateEditorService.isInQuestionMode();
   }
 
-  getAnswerChoices(): AnswerChoice[] {
+  getAnswerChoices(): AnswerChoice[] | null {
     return this.responsesService.getAnswerChoices();
   }
 
@@ -223,6 +223,9 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   addNewRule(): void {
     // Build an initial blank set of inputs for the initial rule.
     let interactionId = this.getCurrentInteractionId();
+    if (interactionId === null) {
+      throw new Error('Cannot add a rule when there is no interaction.');
+    }
     let ruleDescriptions = INTERACTION_SPECS[interactionId].rule_descriptions;
     let ruleTypes = Object.keys(ruleDescriptions);
     if (ruleTypes.length === 0) {

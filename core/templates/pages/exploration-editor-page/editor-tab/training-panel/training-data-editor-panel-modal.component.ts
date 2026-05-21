@@ -38,10 +38,7 @@ import {NumericInputRulesService} from 'interactions/NumericInput/directives/num
 import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import {SetInputRulesService} from 'interactions/SetInput/directives/set-input-rules.service';
 import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
-import {
-  AnswerClassificationService,
-  InteractionRulesService,
-} from 'pages/exploration-player-page/services/answer-classification.service';
+import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {AlertsService} from 'services/alerts.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {State} from 'domain/state/state.model';
@@ -53,7 +50,6 @@ import {TrainingModalService} from './training-modal.service';
 import {TruncateInputBasedOnInteractionAnswerTypePipe} from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 export const RULES_SERVICE_MAPPING = {
   AlgebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService,

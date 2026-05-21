@@ -28,10 +28,7 @@ import {StateCustomizationArgsService} from 'components/state-editor/state-edito
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {Solution} from 'domain/exploration/solution.model';
-import {
-  InteractionSpecsConstants,
-  InteractionSpecsKey,
-} from 'pages/interaction-specs.constants';
+import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {
   CALCULATION_TYPE_CHARACTER,
