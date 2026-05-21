@@ -50,7 +50,7 @@ describe('LC.12 Visit Creator Dashboard', function () {
     'should view contribution stats',
     async function () {
       await lessonCreator.navigateToCreatorDashboardUsingProfileDropdown();
-      await lessonCreator.expectCreatorDashboardEmptyMessageToBe(
+      await lessonCreator.expectCreatorDashboardMessageToBe(
         "It looks like you haven't created any explorations yet. Let's get started!"
       );
 
