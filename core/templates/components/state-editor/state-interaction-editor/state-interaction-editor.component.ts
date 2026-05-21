@@ -286,9 +286,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
             null as unknown as InteractionSpecsKey;
           this.stateCustomizationArgsService.displayed = {};
           this.stateSolutionService.displayed = null;
-          this.interactionDetailsCacheService.removeDetails(
-            this.stateInteractionIdService.savedMemento
-          );
+          this.interactionDetailsCacheService.removeDetails(interactionId);
           this.stateInteractionIdService.saveDisplayedValue();
           this.stateCustomizationArgsService.saveDisplayedValue();
 
