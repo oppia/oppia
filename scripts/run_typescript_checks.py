@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -36,29 +37,13 @@ from typing import List, Optional, Sequence
 # pylint: disable=line-too-long, single-line-pragma
 TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/base-components/base-content.component.spec.ts',
-    'core/templates/base-components/footer-donate-volunteer.component.spec.ts',
-    'core/templates/base-components/oppia-footer.component.spec.ts',
-    'core/templates/components/button-directives/exploration-embed-button-modal.component.spec.ts',
-    'core/templates/components/button-directives/hint-and-solution-buttons.component.spec.ts',
-    'core/templates/components/checkpoint-celebration-modal/checkpoint-celebration-modal.component.spec.ts',
-    'core/templates/components/code-mirror/codemirror-mergeview.component.spec.ts',
-    'core/templates/components/common-layout-directives/common-elements/classroom-navigation-links.component.spec.ts',
-    'core/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.spec.ts',
     'core/templates/components/forms/custom-forms-directives/apply-validation.directive.ts',
-    'core/templates/components/forms/custom-forms-directives/edit-thumbnail-modal.component.spec.ts',
-    'core/templates/components/forms/custom-forms-directives/image-receiver.component.spec.ts',
-    'core/templates/components/forms/custom-forms-directives/image-uploader-modal.component.spec.ts',
     'core/templates/components/forms/custom-forms-directives/object-editor.directive.ts',
-    'core/templates/components/forms/forms-templates/mark-translations-as-needing-update-modal.component.spec.ts',
-    'core/templates/components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec.ts',
-    'core/templates/components/forms/schema-based-editors/schema-based-editor.component.spec.ts',
     'core/templates/components/forms/validators/schema-validators.spec.ts',
     'core/templates/components/interaction-display/interaction-display.component.spec.ts',
     'core/templates/components/interaction-display/interaction-display.component.ts',
-    'core/templates/components/language-banner/language-banner.component.spec.ts',
     'core/templates/components/oppia-angular-root.component.spec.ts',
     'core/templates/components/oppia-angular-root.component.ts',
-    'core/templates/components/question-directives/question-editor/question-editor.component.spec.ts',
     'core/templates/components/question-directives/question-editor/question-editor.component.ts',
     'core/templates/components/question-directives/questions-list/questions-list.component.spec.ts',
     'core/templates/components/question-directives/questions-list/questions-list.component.ts',
@@ -70,50 +55,31 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/components/state-editor/state-editor.component.ts',
     'core/templates/components/state-editor/state-interaction-editor/state-interaction-editor.component.spec.ts',
     'core/templates/components/state-editor/state-interaction-editor/state-interaction-editor.component.ts',
-    'core/templates/components/summary-tile/learner-topic-summary-tile.component.spec.ts',
-    'core/templates/domain/admin/admin-backend-api.service.spec.ts',
-    'core/templates/domain/classroom/classroom-backend-api.service.spec.ts',
     'core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts',
-    'core/templates/domain/exploration/editable-exploration-backend-api.service.spec.ts',
     'core/templates/domain/exploration/param-type.model.spec.ts',
     'core/templates/domain/exploration/read-only-exploration-backend-api.service.spec.ts',
     'core/templates/domain/exploration/states.model.spec.ts',
     'core/templates/domain/exploration/written-translation.model.spec.ts',
     'core/templates/domain/objects/objects-domain.constants.spec.ts',
     'core/templates/domain/question/diagnostic-test-questions.model.spec.ts',
-    'core/templates/domain/question/editable-question-backend-api.service.spec.ts',
     'core/templates/domain/question/pretest-question-backend-api.service.spec.ts',
     'core/templates/domain/question/question-backend-api.service.spec.ts',
+    'core/templates/domain/topic/topic-creation-backend-api.service.spec.ts',
+    'core/templates/domain/exploration/editable-exploration-backend-api.service.spec.ts',
+    'core/templates/domain/question/editable-question-backend-api.service.spec.ts',
     'core/templates/domain/question/question-update.service.ts',
     'core/templates/domain/statistics/learner-answer-info.model.ts',
-    'core/templates/domain/topic/topic-creation-backend-api.service.spec.ts',
     'core/templates/domain/topic/topic-update.service.spec.ts',
     'core/templates/domain/topic/topic-update.service.ts',
-    'core/templates/domain/voiceover/voiceover-backend-api.service.spec.ts',
     'core/templates/filters/truncate-input-based-on-interaction-answer-type.pipe.spec.ts',
     'core/templates/filters/truncate-input-based-on-interaction-answer-type.pipe.ts',
-    'core/templates/pages/admin-page/activities-tab/admin-dev-mode-activities-tab.component.spec.ts',
-    'core/templates/pages/admin-page/misc-tab/admin-misc-tab.component.spec.ts',
-    'core/templates/pages/admin-page/roles-tab/admin-roles-tab.component.spec.ts',
-    'core/templates/pages/classroom-admin-page/classroom-admin-page.component.spec.ts',
     'core/templates/pages/classroom-page/classroom-page.module.ts',
     'core/templates/pages/collection-editor-page/editor-tab/collection-node-creator.component.ts',
     'core/templates/pages/collection-player-page/collection-player-page.component.ts',
     'core/templates/pages/contributor-dashboard-admin-page/contributor-dashboard-admin-page.component.ts',
-    'core/templates/pages/contributor-dashboard-admin-page/services/contributor-dashboard-admin-stats-backend-api.service.spec.ts',
     'core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.spec.ts',
     'core/templates/pages/contributor-dashboard-page/contributions-and-review/contributions-and-review.component.ts',
-    'core/templates/pages/contributor-dashboard-page/modal-templates/question-suggestion-editor-modal.component.spec.ts',
-    'core/templates/pages/contributor-dashboard-page/modal-templates/translation-modal.component.spec.ts',
-    'core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts',
-    'core/templates/pages/contributor-dashboard-page/services/question-suggestion-backend-api.service.spec.ts',
-    'core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts',
     'core/templates/pages/contributor-dashboard-page/services/translate-text.service.ts',
-    'core/templates/pages/creator-dashboard-page/modal-templates/upload-activity-modal.component.spec.ts',
-    'core/templates/pages/diagnostic-test-player-page/diagnostic-test-player.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/editor-tab/state-name-editor/state-name-editor.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/editor-tab/state-version-history/state-version-history.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/teach-oppia-modal.component.spec.ts',
     'core/templates/pages/exploration-editor-page/exploration-editor-page.component.spec.ts',
     'core/templates/pages/exploration-editor-page/exploration-editor-page.component.ts',
     'core/templates/pages/exploration-editor-page/exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component.spec.ts',
@@ -122,33 +88,19 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/exploration-editor-page/feedback-tab/feedback-tab.component.ts',
     'core/templates/pages/exploration-editor-page/history-tab/history-tab.component.spec.ts',
     'core/templates/pages/exploration-editor-page/history-tab/history-tab.component.ts',
-    'core/templates/pages/exploration-editor-page/history-tab/services/compare-versions.service.spec.ts',
     'core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.spec.ts',
     'core/templates/pages/exploration-editor-page/improvements-tab/improvements-tab.component.ts',
-    'core/templates/pages/exploration-editor-page/modal-templates/exploration-modify-translations-modal.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/modal-templates/state-version-history-modal.component.spec.ts',
     'core/templates/pages/exploration-editor-page/param-changes-editor/param-changes-editor.component.ts',
     'core/templates/pages/exploration-editor-page/param-changes-editor/value-generator-editor.component.spec.ts',
     'core/templates/pages/exploration-editor-page/param-changes-editor/value-generator-editor.component.ts',
-    'core/templates/pages/exploration-editor-page/services/exploration-save.service.spec.ts',
     'core/templates/pages/exploration-editor-page/services/exploration-states.service.ts',
     'core/templates/pages/exploration-editor-page/services/router.service.ts',
-    'core/templates/pages/exploration-editor-page/translation-tab/services/translation-topic.service.spec.ts',
-    'core/templates/pages/exploration-editor-page/translation-tab/state-translation-editor/state-translation-editor.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/translation-tab/state-translation-status-graph/state-translation-status-graph.component.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/state-translation/state-translation.component.spec.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/state-translation/state-translation.component.ts',
-    'core/templates/pages/exploration-editor-page/translation-tab/translation-tab.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/translation-tab/translator-overview/translator-overview.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/translation-tab/voiceover-card/voiceover-card.component.spec.ts',
-    'core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/audio-bar.component.spec.ts',
-    'core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/content-language-selector.component.spec.ts',
     'core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/exploration-footer.component.spec.ts',
     'core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/exploration-footer.component.ts',
-    'core/templates/pages/exploration-player-page/current-lesson-player/layout-directives/progress-nav.component.spec.ts',
     'core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/conversation-skin.component.spec.ts',
     'core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/conversation-skin.component.ts',
-    'core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/input-response-pair.component.spec.ts',
     'core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/learner-answer-info-card.component.spec.ts',
     'core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/ratings-and-recommendations.component.spec.ts',
     'core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/tutor-card.component.spec.ts',
@@ -229,16 +181,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/topic-editor-page/topic-editor-page.component.ts',
     'core/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.spec.ts',
     'core/templates/pages/topics-and-skills-dashboard-page/skills-list/skills-list.component.spec.ts',
-    'core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-auth.guard.spec.ts',
-    'core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.component.spec.ts',
-    'core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service.spec.ts',
-    'core/templates/pages/voiceover-admin-page/voiceover-admin-page.component.spec.ts',
-    'core/templates/services/date-time-format.service.spec.ts',
-    'core/templates/services/entity-voiceovers.services.spec.ts',
-    'core/templates/services/exploration-features.service.spec.ts',
-    'core/templates/services/exploration-improvements-task-registry.service.spec.ts',
-    'core/templates/services/exploration-improvements.service.spec.ts',
-    'core/templates/services/improvements.service.spec.ts',
     'core/templates/services/insert-script.service.spec.ts',
     'core/templates/services/local-storage.service.spec.ts',
     'core/templates/services/oppia-rte-parser.service.spec.ts',
@@ -288,8 +230,33 @@ COMPILED_JS_DIR = os.path.join('local_compiled_js_for_test', '')
 TSCONFIG_FILEPATH = 'tsconfig.json'
 STRICT_TSCONFIG_FILEPATH = 'tsconfig-strict.json'
 TEMP_STRICT_TSCONFIG_FILEPATH = 'temp-tsconfig-strict.json'
+TEMPLATE_STRICT_TSCONFIG_FILEPATH = 'tsconfig-template-strict.json'
+TEMP_TEMPLATE_STRICT_TSCONFIG_FILEPATH = 'temp-tsconfig-template-strict.json'
+TEMPLATE_STRICT_EXCLUDE_PATHS_FILEPATH = os.path.join(
+    'scripts', 'template_strict_exclude_paths.txt'
+)
 TYPE_TESTS_TSCONFIG_FILEPATH = os.path.join('typings', 'tests', 'tsconfig.json')
 PREFIXES = ('core', 'extensions', 'typings')
+TEMPLATE_ERROR_FILEPATH_REGEX = re.compile(
+    r'((?:core/templates|extensions)/[^\n:]+\.ts)'
+)
+
+
+def load_exclude_paths(filepath: str) -> List[str]:
+    """Loads a newline-delimited strict-check allowlist from a file.
+
+    Args:
+        filepath: str. The path of the allowlist file.
+
+    Returns:
+        List[str]. The allowlisted file paths.
+    """
+    with open(filepath, 'r', encoding='utf-8') as f:
+        return [
+            line.strip()
+            for line in f.readlines()
+            if line.strip() and not line.startswith('#')
+        ]
 
 
 def validate_compiled_js_dir() -> None:
@@ -379,6 +346,107 @@ def compile_temp_strict_tsconfig(
         print('Compilation successful!')
 
 
+def run_ngcc() -> None:
+    """Processes Angular dependencies for Ivy compilation."""
+    print('Processing Angular packages with ngcc...')
+    cmd = [
+        './node_modules/.bin/ngcc',
+        '--properties',
+        'es2015',
+        'browser',
+        'module',
+        'main',
+        '--first-only',
+        '--create-ivy-entry-points',
+    ]
+    process = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        encoding='utf-8',
+    )
+
+    assert process.stdout is not None
+    output_lines = list(iter(process.stdout.readline, ''))
+    if process.wait() != 0:
+        print('\n%s' % '\n'.join(output_lines))
+        sys.exit(1)
+
+
+def compile_temp_strict_template_tsconfig(
+    config_path: str, error_messages: List[str]
+) -> None:
+    """Compiles a strict Angular-template config for non-allowlisted files.
+
+    Args:
+        config_path: str. The config that should be used to run the template
+            strict checks.
+        error_messages: List[str]. A list of error messages produced by
+            compiling the full strict template config.
+    """
+    errors = [x.strip() for x in error_messages]
+    files_with_errors = sorted(
+        set(TEMPLATE_ERROR_FILEPATH_REGEX.findall('\n'.join(errors)))
+    )
+
+    template_strict_exclude_paths = load_exclude_paths(
+        TEMPLATE_STRICT_EXCLUDE_PATHS_FILEPATH
+    )
+    files_not_template_strict = [
+        filename
+        for filename in files_with_errors
+        if filename not in template_strict_exclude_paths
+    ]
+    files_not_template_strict.append('typings')
+
+    with open(TEMPLATE_STRICT_TSCONFIG_FILEPATH, 'r', encoding='utf-8') as f:
+        strict_ts_config = yaml.safe_load(f)
+        strict_ts_config['include'] = files_not_template_strict
+
+    with open(
+        TEMP_TEMPLATE_STRICT_TSCONFIG_FILEPATH, 'w', encoding='utf-8'
+    ) as f:
+        json.dump(strict_ts_config, f, indent=2, sort_keys=True)
+        f.write('\n')
+
+    os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
+    validate_compiled_js_dir()
+
+    if os.path.exists(COMPILED_JS_DIR):
+        shutil.rmtree(COMPILED_JS_DIR)
+
+    cmd = ['./node_modules/.bin/ngc', '--project', config_path]
+    process = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        encoding='utf-8',
+    )
+
+    assert process.stdout is not None
+    temp_error_messages = list(iter(process.stdout.readline, ''))
+
+    if os.path.exists(TEMP_TEMPLATE_STRICT_TSCONFIG_FILEPATH):
+        os.remove(TEMP_TEMPLATE_STRICT_TSCONFIG_FILEPATH)
+
+    if temp_error_messages:
+        print('\n%s' % '\n'.join(temp_error_messages))
+        print(
+            '%s Files with errors found during Angular template '
+            'compilation.\n'
+            % len(
+                set(
+                    TEMPLATE_ERROR_FILEPATH_REGEX.findall(
+                        '\n'.join(temp_error_messages)
+                    )
+                )
+            )
+        )
+        sys.exit(1)
+    else:
+        print('Angular template compilation successful!')
+
+
 def compile_and_check_typescript(config_path: str) -> None:
     """Compiles typescript files and checks the compilation errors.
 
@@ -428,6 +496,40 @@ def compile_and_check_typescript(config_path: str) -> None:
             print('Compilation successful!')
 
 
+def compile_and_check_angular_templates(config_path: str) -> None:
+    """Compiles Angular templates with strict template type checks enabled.
+
+    Args:
+        config_path: str. The config that should be used to run the template
+            strict checks.
+    """
+    common.write_hashes_json_file({})
+
+    os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
+    validate_compiled_js_dir()
+
+    if os.path.exists(COMPILED_JS_DIR):
+        shutil.rmtree(COMPILED_JS_DIR)
+
+    run_ngcc()
+
+    print('Compiling and testing Angular templates...')
+    cmd = ['./node_modules/.bin/ngc', '--project', config_path]
+    process = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        encoding='utf-8',
+    )
+
+    assert process.stdout is not None
+    error_messages = list(iter(process.stdout.readline, ''))
+
+    compile_temp_strict_template_tsconfig(
+        TEMP_TEMPLATE_STRICT_TSCONFIG_FILEPATH, error_messages
+    )
+
+
 def run_typescript_type_tests() -> None:
     """Runs the TypeScript type tests in typings/tests."""
     print('Running TypeScript type tests.')
@@ -465,11 +567,11 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     run_typescript_type_tests()
 
     # Then run the main TypeScript compilation checks.
-    compile_and_check_typescript(
-        STRICT_TSCONFIG_FILEPATH
-        if parsed_args.strict_checks
-        else TSCONFIG_FILEPATH
-    )
+    if parsed_args.strict_checks:
+        compile_and_check_typescript(STRICT_TSCONFIG_FILEPATH)
+        compile_and_check_angular_templates(TEMPLATE_STRICT_TSCONFIG_FILEPATH)
+    else:
+        compile_and_check_typescript(TSCONFIG_FILEPATH)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

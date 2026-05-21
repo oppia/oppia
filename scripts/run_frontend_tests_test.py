@@ -501,9 +501,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         ]
         self.assertIn(cmd, self.cmd_token_list)
         self.assertIn('Running test in production environment', self.print_arr)
-        self.assertIn(
-            ['--prod_env', '--minify_third_party_libs_only'], self.build_args
-        )
+        self.assertIn(['--prod_env', '--skip_ng_build'], self.build_args)
 
     def test_coverage_checks_are_not_run_when_frontend_tests_fail(self) -> None:
         with self.swap_failed_Popen, self.print_swap, self.swap_build:

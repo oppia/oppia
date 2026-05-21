@@ -22,6 +22,7 @@ from core import feature_flag_list, feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
+    beam_job_services,
     exp_fetchers,
     feature_flag_services,
     opportunity_services,
@@ -31,6 +32,7 @@ from core.domain import (
     voiceover_regeneration_services,
     voiceover_services,
 )
+from core.jobs.batch_jobs import synthesize_voiceover_by_language_accent_jobs
 
 from typing import Dict, List, Optional, TypedDict
 
@@ -115,7 +117,28 @@ class VoiceoverLanguageCodesMappingHandler(
             'language_codes_mapping'
         ]
 
+        new_accent_code = voiceover_services.get_new_auto_voiceover_accent(
+            language_codes_mapping
+        )
         voiceover_services.save_language_accent_support(language_codes_mapping)
+
+        if (
+            new_accent_code
+            and voiceover_services.is_accent_code_valid_for_autogeneration(
+                new_accent_code
+            )
+            and feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+                None,
+            )
+        ):
+            beam_job_services.run_beam_job(
+                job_class=(
+                    synthesize_voiceover_by_language_accent_jobs.VoiceoverSynthesisByAccentJob
+                ),
+                parameterized_args={'language_accent_code': new_accent_code},
+            )
+
         self.render_json(self.values)
 
 
@@ -211,7 +234,7 @@ class AutomaticVoiceoverRegenerationRecordHandler(
         self.values.update(
             {
                 'automatic_voiceover_regeneration_records': [
-                    cloud_task_run.to_dict()
+                    cloud_task_run.to_dict_with_timezone_info()
                     for cloud_task_run in cloud_task_run_objects[
                         :maximum_allowed_records
                     ]
@@ -286,7 +309,6 @@ class RegenerateVoiceoverOnExpUpdateHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {'schema': {'type': 'basestring'}},
         'exploration_version': {'schema': {'type': 'int'}},
-        'exploration_title': {'schema': {'type': 'basestring'}},
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
@@ -295,7 +317,6 @@ class RegenerateVoiceoverOnExpUpdateHandler(
         self,
         exploration_id: str,
         exploration_version: int,
-        exploration_title: str,
     ) -> None:
         """Regenerates the voiceover for the given exploration data when an
         exploration is updated.
@@ -314,10 +335,7 @@ class RegenerateVoiceoverOnExpUpdateHandler(
                 ],
                 taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
                 exploration_id,
-                exploration_title,
                 exploration_version,
-                feconf.SYSTEM_COMMITTER_ID,
-                datetime.datetime.utcnow().isoformat(),
             )
         self.render_json(self.values)
 
@@ -475,12 +493,10 @@ class RegenerateVoiceoversForExplorationHandler(
         ):
             taskqueue_services.defer(
                 feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
-                    'FUNCTION_ID_REGENERATE_VOICEOVERS_OF_EXPLORATION_FOR_GIVEN_LANGUAGE_ACCENT'
+                    'FUNCTION_ID_REGENERATE_VOICEOVERS_BY_LANGUAGE_ACCENT'
                 ],
                 taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
                 exploration_id,
                 language_accent_code,
-                self.user_id,
-                datetime.datetime.utcnow().isoformat(),
             )
         self.render_json(self.values)

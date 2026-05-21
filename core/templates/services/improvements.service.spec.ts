@@ -78,6 +78,7 @@ describe('ImprovementsService', () => {
         param_changes: [],
         solicit_answer_details: false,
         card_is_checkpoint: false,
+        inapplicable_skill_misconception_ids: [],
       };
 
       let mockState = State.createFromBackendDict(
@@ -133,6 +134,7 @@ describe('ImprovementsService', () => {
         param_changes: [],
         solicit_answer_details: false,
         card_is_checkpoint: false,
+        inapplicable_skill_misconception_ids: [],
       };
 
       let mockState = State.createFromBackendDict(
@@ -188,6 +190,7 @@ describe('ImprovementsService', () => {
         param_changes: [],
         solicit_answer_details: false,
         card_is_checkpoint: false,
+        inapplicable_skill_misconception_ids: [],
       };
 
       let mockState = State.createFromBackendDict(
