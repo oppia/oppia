@@ -63,6 +63,10 @@ export default {
     {
       "language_code": "yo",
       "explanation": "For learners in Nigeria."
+    },
+    {
+      "language_code": "ne",
+      "explanation": "For learners in Nepal."
     }],
 
   "RTE_COMPONENT_CONFIGS": {
@@ -5374,6 +5378,12 @@ export default {
     "decimal_separator": ".",
     "ariaLabelInEnglish": "Marathi"
   }, {
+    "code": "ne",
+    "description": "नेपाली (Nepali)",
+    "direction": "ltr",
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Nepali"
+  }, {
     "code": "no",
     "description": "Norsk (Norwegian)",
     "direction": "ltr",
@@ -5820,6 +5830,11 @@ export default {
     "id": "mr",
     "description": "मराठी (Marathi)",
     "relatedLanguages": ["mr"],
+    "direction": "ltr"
+  }, {
+    "id": "ne",
+    "description": "नेपाली (Nepali)",
+    "relatedLanguages": ["ne"],
     "direction": "ltr"
   }, {
     "id": "no",
