@@ -210,11 +210,6 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateInteractionIdService.saveDisplayedValue();
     }
     this.stateCustomizationArgsService.saveDisplayedValue();
-
-    let interactionData: InteractionData = {
-      interactionId: this.stateInteractionIdService.displayed,
-      customizationArgs: this.stateCustomizationArgsService.displayed,
-    };
     this.onSaveNextContentIdIndex.emit();
 
     let interactionId = this.stateInteractionIdService.savedMemento;
