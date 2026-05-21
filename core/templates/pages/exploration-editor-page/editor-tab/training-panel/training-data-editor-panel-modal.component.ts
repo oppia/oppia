@@ -50,7 +50,6 @@ import {TrainingModalService} from './training-modal.service';
 import {TruncateInputBasedOnInteractionAnswerTypePipe} from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 export const RULES_SERVICE_MAPPING = {
   AlgebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService,
