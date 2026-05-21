@@ -40,8 +40,7 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
     interactionId: InteractionSpecsKey,
     length: number
   ): string {
-    let answerType =
-      INTERACTION_SPECS[interactionId as InteractionSpecsKey].answer_type;
+    let answerType = INTERACTION_SPECS[interactionId].answer_type;
     let actualInputToTruncate = '';
     let inputUpdate: TruncatableInput;
 
