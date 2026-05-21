@@ -935,21 +935,17 @@ export class TopicManager extends BaseUser {
    * since linkage changes are auto-saved.
    */
   async expectSaveQuestionButtonDisabled(): Promise<void> {
-    // Wait for any pending operations to complete.
-    await this.page.waitForTimeout(2000);
-    const saveButton = await this.page.$(saveQuestionButton);
-    if (!saveButton) {
-      throw new Error('Save question button not found');
-    }
-    const isDisabled = await this.page.evaluate(
-      (btn: Element) => (btn as HTMLButtonElement).disabled,
-      saveButton
+    // Poll until the save button is disabled.
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const btn = document.querySelector(
+          selector
+        ) as HTMLButtonElement | null;
+        return btn && btn.disabled;
+      },
+      {timeout: 30000},
+      saveQuestionButton
     );
-    if (!isDisabled) {
-      throw new Error(
-        'Expected save question button to be disabled after skill linkage change'
-      );
-    }
   }
 
   /**
@@ -970,16 +966,8 @@ export class TopicManager extends BaseUser {
       timeout: 30000,
     });
     await this.clickOnElementWithSelector(linkAnotherSkillToQuestionButton);
-    // Wait for the skill selector modal to load skills from API.
-    await this.page.waitForSelector(skillItem, {timeout: 60000});
-    // Type in skill name to filter.
-    await this.typeInInputField(skillNameInputSelector, skillName);
-    // Wait a moment for the filter to apply.
-    await this.page.waitForTimeout(500);
-    // Click matching skill item.
-    await this.clickOnElementWithSelector(skillItem);
-    // Confirm skill selection.
-    await this.clickOnElementWithSelector(confirmSkillButton);
+    await this.fillSkillNameInSkillSelectionModal(skillName);
+    await this.selectSkillAndClickOnDoneInSkillSelectionModal(skillName);
     // Wait for the success toast to appear as linkage changes are auto-saved.
     await this.expectElementToBeVisible(successToastSelector);
     // Wait for modal to close and button to be visible again.
@@ -4034,15 +4022,17 @@ export class TopicManager extends BaseUser {
    * @param {string} question - The question text to check for absence.
    */
   async expectQuestionToNotBeVisible(question: string): Promise<void> {
-    const questionElements = await this.page.$$(questionTextSelector);
-    for (const element of questionElements) {
-      const text = await element.evaluate(el => el.textContent?.trim());
-      if (text === question) {
-        throw new Error(
-          `Question "${question}" should not be visible but was found.`
+    await this.page.waitForFunction(
+      (selector: string, text: string) => {
+        const elements = document.querySelectorAll(selector);
+        return Array.from(elements).every(
+          el => el.textContent?.trim() !== text
         );
-      }
-    }
+      },
+      {timeout: 30000},
+      questionTextSelector,
+      question
+    );
   }
 
   async openQuestionEditor(question: string): Promise<void> {

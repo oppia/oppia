@@ -282,7 +282,11 @@ class QuestionSkillLinkHandler(
         question = question_services.get_question_by_id(
             question_id, strict=False
         )
-        question_dict = question.to_dict() if question else None
+        if question is None:
+            raise self.NotFoundException(
+                'The question with the given id doesn\'t exist.'
+            )
+        question_dict = question.to_dict()
         self.render_json({'question_dict': question_dict})
 
 
@@ -380,7 +384,11 @@ class EditableQuestionDataHandler(
         question = question_services.get_question_by_id(
             question_id, strict=False
         )
-        question_dict = question.to_dict() if question else None
+        if question is None:
+            raise self.NotFoundException(
+                'The question with the given id doesn\'t exist.'
+            )
+        question_dict = question.to_dict()
         self.render_json({'question_dict': question_dict})
 
     @acl_decorators.can_delete_question

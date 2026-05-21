@@ -728,7 +728,6 @@ describe('Questions List Component', () => {
         editableQuestionBackendApiService,
         'updateQuestionAsync'
       ).and.returnValue(Promise.reject());
-
       spyOn(questionUndoRedoService, 'clearChanges');
       spyOn(questionsListService, 'getQuestionSummariesAsync');
       spyOn(alertsService, 'addWarning');
@@ -1321,12 +1320,17 @@ describe('Questions List Component', () => {
       editableQuestionBackendApiService,
       'editQuestionSkillLinksAsync'
     ).and.returnValue(Promise.resolve(question.toBackendDict(true)));
+    spyOn(alertsService, 'addSuccessMessage');
 
     component.updateSkillLinkage();
 
     tick(500);
 
     expect(component.skillLinkageModificationsArray).toEqual([]);
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+      'Question saved successfully.',
+      2000
+    );
   }));
 
   it(

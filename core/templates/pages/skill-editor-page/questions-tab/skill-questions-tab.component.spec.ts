@@ -202,4 +202,19 @@ describe('Skill question tab component', () => {
 
     expect(component.skillsCategorizedByTopics).toEqual(mockCategorizedSkills);
   }));
+
+  it('should handle error when fetching dashboard data fails', fakeAsync(() => {
+    spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
+    spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
+    spyOn(
+      topicsAndSkillsDashboardBackendApiService,
+      'fetchDashboardDataAsync'
+    ).and.returnValue(Promise.reject());
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.skillsCategorizedByTopics).toEqual({});
+    expect(component.untriagedSkillSummaries).toEqual([]);
+  }));
 });

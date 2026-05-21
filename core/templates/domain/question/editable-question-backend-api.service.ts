@@ -48,10 +48,8 @@ export interface FetchQuestionBackendResponse {
   user_email: string;
   username: string;
 }
-export interface UpdateEditableQuestionBackendResponse {
-  question_dict: QuestionBackendDict;
-}
-export interface EditQuestionSkillLinkBackendResponse {
+// The backend response key uses snake_case per Oppia's backend convention.
+export interface QuestionBackendResponse {
   question_dict: QuestionBackendDict;
 }
 export interface FetchQuestionResponse {
@@ -170,7 +168,7 @@ export class EditableQuestionBackendApiService {
     });
   }
 
-  async editQuestionSkillLinksAsync(
+  editQuestionSkillLinksAsync(
     questionId: string,
     skillIdsTaskArray: SkillLinkageModificationsArray[]
   ): Promise<QuestionBackendDict> {
@@ -183,7 +181,7 @@ export class EditableQuestionBackendApiService {
       );
 
     return this.http
-      .put<EditQuestionSkillLinkBackendResponse>(editQuestionSkillLinkUrl, {
+      .put<QuestionBackendResponse>(editQuestionSkillLinkUrl, {
         skill_ids_task_list: skillIdsTaskArray,
       })
       .toPromise()
@@ -207,7 +205,7 @@ export class EditableQuestionBackendApiService {
    * the success callback, if one is provided to the returned promise
    * object. Errors are passed to the error callback, if one is provided.
    */
-  async updateQuestionAsync(
+  updateQuestionAsync(
     questionId: string,
     questionVersion: string,
     commitMessage: string,
@@ -227,10 +225,7 @@ export class EditableQuestionBackendApiService {
     };
 
     return this.http
-      .put<UpdateEditableQuestionBackendResponse>(
-        editableQuestionDataUrl,
-        putData
-      )
+      .put<QuestionBackendResponse>(editableQuestionDataUrl, putData)
       .toPromise()
       .then(
         response => {

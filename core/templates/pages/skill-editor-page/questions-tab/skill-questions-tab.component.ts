@@ -42,8 +42,8 @@ export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
   groupedSkillSummaries!: GroupedSkillSummaries;
   skillIdToRubricsObject: Record<string, Rubric[]> = {};
   difficultyCount!: number;
-  skillsCategorizedByTopics!: CategorizedSkills;
-  untriagedSkillSummaries!: SkillSummary[];
+  skillsCategorizedByTopics: CategorizedSkills = {};
+  untriagedSkillSummaries: SkillSummary[] = [];
 
   constructor(
     private skillEditorStateService: SkillEditorStateService,
@@ -62,6 +62,11 @@ export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
       .then(response => {
         this.skillsCategorizedByTopics = response.categorizedSkillsDict;
         this.untriagedSkillSummaries = response.untriagedSkillSummaries;
+      })
+      .catch(() => {
+        this.skillsCategorizedByTopics = {};
+        this.untriagedSkillSummaries = [];
+        this.untriagedSkillSummaries = [];
       });
   }
 
