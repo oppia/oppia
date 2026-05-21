@@ -688,6 +688,25 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         )
         self.logout()
 
+    def test_put_with_incorrect_question_id_returns_404_status(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '%s/%s' % (feconf.QUESTION_SKILL_LINK_URL_PREFIX, 'abc123456789'),
+            {
+                'skill_ids_task_list': [
+                    {
+                        'id': self.skill_id,
+                        'task': 'update_difficulty',
+                        'difficulty': 0.9,
+                    }
+                ]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=404,
+        )
+        self.logout()
+
 
 class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
     """Tests get, put and delete methods of editable questions data handler."""
@@ -810,6 +829,41 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             expected_status_int=200,
         )
         self.logout()
+
+    def test_put_with_incorrect_question_id_returns_404_status(self) -> None:
+        mock_returns: List[Optional[question_domain.Question]] = [
+            self.question,
+            None,
+        ]
+
+        def _mock_get_question_by_id(
+            unused_question_id: str, **unused_kwargs: str
+        ) -> Optional[question_domain.Question]:
+            """Mocks '_get_question_by_id'. Returns None on second call."""
+            return mock_returns.pop(0)
+
+        question_services_swap = self.swap(
+            question_services, 'get_question_by_id', _mock_get_question_by_id
+        )
+
+        with question_services_swap:
+            self.login(self.CURRICULUM_ADMIN_EMAIL)
+            csrf_token = self.get_new_csrf_token()
+
+            payload = {
+                'change_list': [],
+                'commit_message': 'update question data',
+                'version': 1,
+            }
+
+            self.put_json(
+                '%s/%s'
+                % (feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
+                payload,
+                csrf_token=csrf_token,
+                expected_status_int=404,
+            )
+            self.logout()
 
     def test_put_with_long_commit_message_fails(self) -> None:
         new_question_data = self._create_valid_question_data(
