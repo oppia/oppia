@@ -158,6 +158,11 @@ const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
 const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
 const explorationCategoryDropdown =
   'mat-form-field.e2e-test-exploration-category-metadata-modal';
+const lessonInfoButton = 'button.oppia-lesson-info';
+const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
+const closeLessonInfoButton = '.e2e-test-close-lesson-info-modal-button';
+const feedbackCloseButton = '.e2e-test-exploration-feedback-close-button';
+const contributorProfileLink = '.e2e-test-contributor-icon';
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = '.e2e-test-confirm-publish';
 const explorationIdElement = 'span.oppia-unique-progress-id';
@@ -4718,6 +4723,85 @@ export class LoggedInUser extends BaseUser {
     showMessage(
       'All specified chapters are present in the coming soon chapters list'
     );
+  }
+
+  /**
+   * Navigates to the Community Library page.
+   */
+  async navigateToCommunityLibrary(): Promise<void> {
+    await this.goto(testConstants.URLs.CommunityLibrary);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Star rate the exploration by clicking the specified star.
+   * @param {number} stars - The star index to click (1-based).
+   */
+  async starRateExploration(stars: number): Promise<void> {
+    // Ensure rating stars are visible before interacting.
+    await this.expectElementToBeVisible(ratingStarSelector, true);
+
+    const ratingStars = await this.page.$$(ratingStarSelector);
+
+    if (ratingStars.length < stars) {
+      throw new Error(`Only ${ratingStars.length} stars found`);
+    }
+
+    await ratingStars[stars - 1].click();
+  }
+
+  /**
+   * Submits feedback for the current exploration after rating.
+   * @param {string} feedback - The feedback text to submit.
+   */
+  async giveFeedbackAfterRating(feedback: string): Promise<void> {
+    await this.expectElementToBeVisible(feedbackTextareaSelector, true);
+
+    await this.typeInInputField(feedbackTextareaSelector, feedback);
+    await this.expectElementToBeVisible(submitButtonSelector, true);
+    await this.clickOnElementWithSelector(submitButtonSelector);
+
+    await this.waitForNetworkIdle();
+  }
+
+  /**
+   * Closes the feedback popup dialog.
+   */
+  async closeFeedbackPopup(): Promise<void> {
+    await this.expectElementToBeVisible(feedbackCloseButton, true);
+    await this.clickOnElementWithSelector(feedbackCloseButton);
+
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Opens the lesson info modal.
+   */
+  async openLessonInfoModal(): Promise<void> {
+    await this.expectElementToBeVisible(lessonInfoButton, true);
+    await this.clickOnElementWithSelector(lessonInfoButton);
+    await this.expectElementToBeVisible(lessonInfoCardSelector, true);
+  }
+
+  /**
+   * Closes the lesson info modal.
+   */
+  async closeLessonInfoModal(): Promise<void> {
+    await this.expectElementToBeVisible(closeLessonInfoButton, true);
+    await this.clickOnElementWithSelector(closeLessonInfoButton);
+    await this.expectElementToBeVisible(lessonInfoCardSelector, false);
+  }
+
+  /**
+   * Navigates to the creator's profile page from the lesson info modal.
+   */
+
+  async visitCreatorProfileFromLessonInfoModal(): Promise<void> {
+    await this.expectElementToBeVisible(contributorProfileLink, true);
+
+    await this.clickOnElementWithSelector(contributorProfileLink);
+
+    await this.waitForPageToFullyLoad();
   }
 }
 

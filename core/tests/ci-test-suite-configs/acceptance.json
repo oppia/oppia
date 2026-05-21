@@ -125,6 +125,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/view-feedback-and-statistics-of-the-lesson.spec.ts"
     },
     {
+      "name": "lesson-creator/create-a-collection",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/create-a-collection.spec.ts"
+    },
+    {
       "name": "logged-in-user/add-concept-card-with-workedexample-to-exploration",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/add-concept-card-with-workedexample-to-exploration.spec.ts"
     },
