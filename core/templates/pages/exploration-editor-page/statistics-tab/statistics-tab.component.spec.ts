@@ -43,7 +43,6 @@ import {StatisticsTabComponent} from './statistics-tab.component';
 import {ExplorationDataService} from '../services/exploration-data.service';
 import {ExplorationStats} from 'domain/statistics/exploration-stats.model';
 import {StateStatsModalComponent} from './templates/state-stats-modal.component';
-import {StateBackendDict} from 'domain/state/state.model';
 
 describe('Statistics Tab Component', () => {
   let component: StatisticsTabComponent;

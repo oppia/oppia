@@ -53,7 +53,6 @@ import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
-import {Interaction} from 'domain/exploration/interaction.model';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
