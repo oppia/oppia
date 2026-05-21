@@ -18,10 +18,12 @@ from __future__ import annotations
 
 import json
 import os
+from typing import List, Optional
 
 from core import feconf
 from core.constants import constants
 from core.domain import (
+    question_domain,
     question_fetchers,
     question_services,
     skill_services,
