@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf, utils
 from core.platform import models
 
 from typing import Dict, Optional, Sequence, Tuple
@@ -339,14 +340,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
         super()._pre_put_hook()
 
         # Check if entity_type is valid.
-        valid_entity_types = {
-            'exploration',
-            'skill',
-            'topic',
-            'story',
-            'classroom',
-        }
-        if self.entity_type not in valid_entity_types:
+        if self.entity_type not in feconf.TRANSLATABLE_ENTITY_TYPES:
             raise Exception(f'Invalid entity_type: {self.entity_type}')
 
         # Ensure counts are valid.
@@ -354,6 +348,8 @@ class TranslationOpportunityModel(base_models.BaseModel):
             raise Exception('content_count cannot be negative.')
 
         for lang_code, count in self.translation_counts.items():
+            if not utils.is_supported_audio_language_code(lang_code):
+                raise Exception(f'Invalid language code: {lang_code}')
             if not isinstance(count, int) or count < 0:
                 raise Exception(
                     f'Invalid translation count for {lang_code}: {count}'
@@ -376,6 +372,86 @@ class TranslationOpportunityModel(base_models.BaseModel):
             str. A unique string ID in the form: {entity_type}.{entity_id}.
         """
         return f'{entity_type}.{entity_id}'
+
+    @classmethod
+    def get_by_entity_type_and_topic(
+        cls,
+        entity_type: str,
+        topic_id: Optional[str],
+        language_code: str,
+        page_size: int,
+        urlsafe_start_cursor: Optional[str],
+    ) -> Tuple[Sequence[TranslationOpportunityModel], Optional[str], bool]:
+        """Returns a list of translation opportunities filtered by entity type,
+        topic and language code.
+
+        Args:
+            entity_type: str. The type of the entity.
+            topic_id: str or None. The ID of the topic to filter by. If None,
+                all topics are included.
+            language_code: str. The language code to filter by.
+            page_size: int. The maximum number of entities to be returned.
+            urlsafe_start_cursor: str or None. The cursor for pagination.
+
+        Returns:
+            tuple(list(TranslationOpportunityModel), str|None, bool). A 3-tuple
+            of (results, cursor, more).
+        """
+        if urlsafe_start_cursor:
+            start_cursor = datastore_services.make_cursor(
+                urlsafe_cursor=urlsafe_start_cursor
+            )
+        else:
+            start_cursor = datastore_services.make_cursor()
+
+        query = cls.query(
+            cls.entity_type == entity_type,
+            cls.incomplete_translation_language_codes == language_code,
+        )
+
+        if topic_id:
+            query = query.filter(cls.topic_ids == topic_id)
+
+        # Order by created_on to ensure consistent pagination.
+        query = query.order(cls.created_on)
+
+        fetch_result: Tuple[
+            Sequence[TranslationOpportunityModel],
+            datastore_services.Cursor,
+            bool,
+        ] = query.fetch_page(page_size, start_cursor=start_cursor)
+        results, cursor, _ = fetch_result
+
+        # TODO(#13462): Refactor this so that we don't do the lookup.
+        # Do a forward lookup so that we can know if there are more values.
+        fetch_result = query.fetch_page(
+            page_size + 1, start_cursor=start_cursor
+        )
+        plus_one_query_models, _, _ = fetch_result
+        more_results = len(plus_one_query_models) == page_size + 1
+
+        return (
+            results,
+            (cursor.urlsafe().decode('utf-8') if cursor else None),
+            more_results,
+        )
+
+    @classmethod
+    def get_by_entity_ids(
+        cls, entity_type: str, entity_ids: Sequence[str]
+    ) -> Sequence[Optional[TranslationOpportunityModel]]:
+        """Returns a list of translation opportunities for the given entity IDs.
+
+        Args:
+            entity_type: str. The type of the entity.
+            entity_ids: list(str). The IDs of the entities.
+
+        Returns:
+            list(TranslationOpportunityModel|None). The models corresponding to
+            the given entity IDs, in the same order.
+        """
+        model_ids = [cls._generate_id(entity_type, eid) for eid in entity_ids]
+        return cls.get_multi(model_ids)
 
     @classmethod
     def create_new(
