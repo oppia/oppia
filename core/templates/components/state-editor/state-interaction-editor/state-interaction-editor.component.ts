@@ -279,11 +279,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       })
       .result.then(
         () => {
-          this.stateInteractionIdService.displayed =
-            // When an interaction is deleted, the interactionId is set to null
-            // to indicate its absence. We use 'unknown' to bypass the
-            // strict type check for 'InteractionSpecsKey'.
-            null as unknown as InteractionSpecsKey;
+          this.stateInteractionIdService.displayed = null;
           this.stateCustomizationArgsService.displayed = {};
           this.stateSolutionService.displayed = null;
           const savedInteractionId =
