@@ -24,16 +24,18 @@ export interface LearnerAnswerInfoBackendDict {
 }
 
 export class LearnerAnswerInfo {
-  _id: string;
+  // Null when learner answer info hasn't been persisted to the backend yet.
+  _id: string | null;
   _answer: string;
   _answerDetails: string;
-  _createdOn: number;
+  // Null when learner answer info hasn't been persisted to the backend yet.
+  _createdOn: number | null;
 
   constructor(
-    learnerAnswerInfoId: string,
+    learnerAnswerInfoId: string | null,
     answer: string,
     answerDetails: string,
-    createdOn: number
+    createdOn: number | null
   ) {
     this._id = learnerAnswerInfoId;
     this._answer = answer;
@@ -59,7 +61,7 @@ export class LearnerAnswerInfo {
     );
   }
 
-  getId(): string {
+  getId(): string | null {
     return this._id;
   }
 
@@ -71,7 +73,7 @@ export class LearnerAnswerInfo {
     return this._answerDetails;
   }
 
-  getCreatedOn(): number {
+  getCreatedOn(): number | null {
     return this._createdOn;
   }
 }
