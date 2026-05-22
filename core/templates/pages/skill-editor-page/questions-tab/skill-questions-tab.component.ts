@@ -66,7 +66,6 @@ export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
       .catch(() => {
         this.skillsCategorizedByTopics = {};
         this.untriagedSkillSummaries = [];
-        this.untriagedSkillSummaries = [];
       });
   }
 

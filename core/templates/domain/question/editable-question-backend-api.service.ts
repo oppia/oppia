@@ -171,7 +171,7 @@ export class EditableQuestionBackendApiService {
   editQuestionSkillLinksAsync(
     questionId: string,
     skillIdsTaskArray: SkillLinkageModificationsArray[]
-  ): Promise<QuestionBackendDict> {
+  ): Promise<Question> {
     const editQuestionSkillLinkUrl =
       this.urlInterpolationService.interpolateUrl(
         QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE,
@@ -187,7 +187,7 @@ export class EditableQuestionBackendApiService {
       .toPromise()
       .then(
         response => {
-          return response.question_dict;
+          return Question.createFromBackendDict(response.question_dict);
         },
         errorResponse => {
           return Promise.reject(errorResponse.error.error);
@@ -210,7 +210,7 @@ export class EditableQuestionBackendApiService {
     questionVersion: string,
     commitMessage: string,
     changeList: BackendChangeObject[]
-  ): Promise<QuestionBackendDict> {
+  ): Promise<Question> {
     const editableQuestionDataUrl = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
       {
@@ -229,7 +229,7 @@ export class EditableQuestionBackendApiService {
       .toPromise()
       .then(
         response => {
-          return cloneDeep(response.question_dict);
+          return Question.createFromBackendDict(response.question_dict);
         },
         errorResponse => {
           return Promise.reject(errorResponse.error.error);

@@ -913,7 +913,6 @@ export class TopicManager extends BaseUser {
     // After saving, the question list is refreshed asynchronously.
     await this.page.waitForSelector(questionContainerSelector, {
       visible: true,
-      timeout: 30000,
     });
   }
 
@@ -943,7 +942,7 @@ export class TopicManager extends BaseUser {
         ) as HTMLButtonElement | null;
         return btn && btn.disabled;
       },
-      {timeout: 30000},
+      {},
       saveQuestionButton
     );
   }
@@ -957,13 +956,11 @@ export class TopicManager extends BaseUser {
     // The difficulty header only appears when difficultyCount is set.
     await this.page.waitForSelector(questionDifficultyHeaderSelector, {
       visible: true,
-      timeout: 60000,
     });
 
     // Now wait for and click the "Link Another Skill" button.
     await this.page.waitForSelector(linkAnotherSkillToQuestionButton, {
       visible: true,
-      timeout: 30000,
     });
     await this.clickOnElementWithSelector(linkAnotherSkillToQuestionButton);
     await this.fillSkillNameInSkillSelectionModal(skillName);
@@ -3992,7 +3989,7 @@ export class TopicManager extends BaseUser {
           el => el.textContent?.trim() === expectedText
         );
       },
-      {timeout: 30000},
+      {},
       questionTextSelector,
       question
     );
@@ -4029,7 +4026,7 @@ export class TopicManager extends BaseUser {
           el => el.textContent?.trim() !== text
         );
       },
-      {timeout: 30000},
+      {},
       questionTextSelector,
       question
     );
@@ -4043,7 +4040,6 @@ export class TopicManager extends BaseUser {
     await this.expectElementToBeVisible(addQuestionButtonSelector, false);
     await this.page.waitForSelector(questionDifficultyHeaderSelector, {
       visible: true,
-      timeout: 60000,
     });
   }
 

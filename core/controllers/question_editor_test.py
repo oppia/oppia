@@ -842,7 +842,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         def _mock_get_question_by_id(
             unused_question_id: str, **unused_kwargs: str
         ) -> Optional[question_domain.Question]:
-            """Mocks '_get_question_by_id'. Returns None on second call."""
+            """Mocks '_get_question_by_id'. Returns None on fourth call."""
             return mock_returns.pop(0)
 
         question_services_swap = self.swap(

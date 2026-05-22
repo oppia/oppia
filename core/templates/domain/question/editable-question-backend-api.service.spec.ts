@@ -301,7 +301,9 @@ describe('EditableQuestionBackendApiService', () => {
     updateReq.flush(questionWrapper);
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(question);
+    expect(successHandler).toHaveBeenCalledWith(
+      Question.createFromBackendDict(question)
+    );
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -355,7 +357,9 @@ describe('EditableQuestionBackendApiService', () => {
     });
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults.questionDict);
+    expect(successHandler).toHaveBeenCalledWith(
+      Question.createFromBackendDict(sampleDataResults.questionDict)
+    );
     expect(failHandler).not.toHaveBeenCalled();
   }));
 

@@ -43,7 +43,7 @@ import {
   Misconception,
   MisconceptionSkillMap,
 } from 'domain/skill/misconception.model';
-import {Question, QuestionBackendDict} from 'domain/question/question.model';
+import {Question} from 'domain/question/question.model';
 import {State} from 'domain/state/state.model';
 import {Rubric} from 'domain/skill/rubric.model';
 import {EditableQuestionBackendApiService} from 'domain/question/editable-question-backend-api.service';
@@ -572,8 +572,8 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
               this.questionUndoRedoService.getCommittableChangeList()
             )
             .then(
-              (data: QuestionBackendDict) => {
-                this.question = Question.createFromBackendDict(data);
+              (data: Question) => {
+                this.question = data;
                 this.questionUndoRedoService.clearChanges();
                 this.editorIsOpen = false;
                 this.questionIsBeingSaved = false;
@@ -642,9 +642,9 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         this.questionId,
         this.skillLinkageModificationsArray
       )
-      .then(data => {
-        if (data) {
-          this.question = Question.createFromBackendDict(data);
+      .then(question => {
+        if (question) {
+          this.question = question;
         }
         this.skillLinkageModificationsArray = [];
         setTimeout(() => {
@@ -666,8 +666,8 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         this.questionId,
         this.skillLinkageModificationsArray
       )
-      .then(data => {
-        this.question = Question.createFromBackendDict(data);
+      .then(question => {
+        this.question = question;
         this.skillLinkageModificationsArray = [];
         this.alertsService.addSuccessMessage(
           'Question saved successfully.',
