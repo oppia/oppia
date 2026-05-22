@@ -89,7 +89,7 @@ class FeatureNames(enum.Enum):
     ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER = (
         'enable_financial_literacy_campaign_banner'
     )
-    ENABLE_AUTOMATIC_TRANSLATION_SUGGESTION = (
+    ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS = (
         'enable_automatic_translation_suggestions'
     )
     # A separate flag is used for testing the financial literacy campaign banner with early dates.
@@ -129,7 +129,7 @@ DEV_FEATURES_LIST = [
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
-    FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTION,
+    FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
