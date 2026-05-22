@@ -7815,6 +7815,8 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Card at index ${index} not found.`);
     }
 
+    await this.waitForElementToStabilize(card);
+
     const rating = await card.$eval(explorationGridRatingSelector, el =>
       (el as HTMLElement).innerText.trim()
     );
@@ -7868,6 +7870,8 @@ export class ExplorationEditor extends BaseUser {
     if (!row) {
       throw new Error(`Row at index ${index} not found.`);
     }
+
+    await this.waitForElementToStabilize(row);
 
     const rating = await row.$eval('td:nth-child(2)', el =>
       (el as HTMLElement).innerText.trim()
