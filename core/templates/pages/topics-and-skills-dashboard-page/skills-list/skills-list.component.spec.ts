@@ -325,8 +325,8 @@ describe('Skills List Component', () => {
 
   it('should show edit options', () => {
     componentInstance.selectedIndex = 'test_index';
-    expect(componentInstance.showEditOptions('test_index')).toBeTruthy();
-    expect(componentInstance.showEditOptions('test')).toBeFalsy();
+    expect(componentInstance.showEditOptions('test_index')).toBe(true);
+    expect(componentInstance.showEditOptions('test')).toBe(false);
   });
 
   it('should change edit options', () => {

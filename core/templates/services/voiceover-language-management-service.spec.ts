@@ -98,13 +98,13 @@ describe('Voiceover language management service', () => {
 
     expect(
       voiceoverLanguageManagementService.canVoiceoverForLanguage('en')
-    ).toBeTruthy();
+    ).toBe(true);
     expect(
       voiceoverLanguageManagementService.canVoiceoverForLanguage('hi')
-    ).toBeTruthy();
+    ).toBe(true);
     expect(
       voiceoverLanguageManagementService.canVoiceoverForLanguage('es')
-    ).toBeFalsy();
+    ).toBe(false);
   });
 
   it('should be able to set cloud supported language accents', () => {
@@ -133,11 +133,11 @@ describe('Voiceover language management service', () => {
       voiceoverLanguageManagementService.isAutogenerationSupportedGivenLanguageAccent(
         'en-US'
       )
-    ).toBeTruthy();
+    ).toBe(true);
     expect(
       voiceoverLanguageManagementService.isAutogenerationSupportedGivenLanguageAccent(
         'en-GB'
       )
-    ).toBeFalsy();
+    ).toBe(false);
   });
 });

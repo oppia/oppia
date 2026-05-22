@@ -243,7 +243,7 @@ describe('Skill editor page', () => {
     tick();
 
     expect(clearSpy).toHaveBeenCalled();
-    expect(skillEditorRoutingService.questionIsBeingCreated).toBeFalsy();
+    expect(skillEditorRoutingService.questionIsBeingCreated).toBe(false);
     expect(navigateFn).toHaveBeenCalled();
   }));
 
@@ -566,7 +566,7 @@ describe('Skill editor page', () => {
       component.skillIsInitialized = false;
       component.createOrUpdateSkillEditorBrowserTabsInfo();
 
-      expect(component.skillIsInitialized).toBeTruthy();
+      expect(component.skillIsInitialized).toBe(true);
     }
   );
 
@@ -610,9 +610,9 @@ describe('Skill editor page', () => {
         EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS
       );
 
-      expect(
-        skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
-      ).toBeTruthy();
+      expect(skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()).toBe(
+        true
+      );
       expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
 
       component.onClosingSkillEditorBrowserTab();
@@ -626,9 +626,9 @@ describe('Skill editor page', () => {
 
       // Since the tab containing unsaved changes is closed, the value of
       // unsaved changes status will become false.
-      expect(
-        skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
-      ).toBeFalsy();
+      expect(skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()).toBe(
+        false
+      );
     }
   );
 
@@ -670,7 +670,7 @@ describe('Skill editor page', () => {
       presenceOfUnsavedChangesEventEmitter.emit();
       windowRef.nativeWindow.dispatchEvent(storageEvent);
 
-      expect(component.skillIsInitialized).toBeFalsy();
+      expect(component.skillIsInitialized).toBe(false);
     }
   );
 

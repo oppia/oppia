@@ -275,7 +275,7 @@ describe('Skill Preview Tab Component', () => {
 
   it('should tell if current supplemental card is non empty', () => {
     component.displayedCard = displayedCard;
-    expect(component.isCurrentSupplementalCardNonEmpty()).toBeFalsy();
+    expect(component.isCurrentSupplementalCardNonEmpty()).toBe(false);
 
     component.displayedCard = new StateCard(
       '',
@@ -294,7 +294,7 @@ describe('Skill Preview Tab Component', () => {
       ''
     );
 
-    expect(component.isCurrentSupplementalCardNonEmpty()).toBeTruthy();
+    expect(component.isCurrentSupplementalCardNonEmpty()).toBe(true);
   });
 
   it('should tell if window can show two cards', () => {
@@ -302,12 +302,12 @@ describe('Skill Preview Tab Component', () => {
       ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX + 1
     );
 
-    expect(component.canWindowShowTwoCards()).toBeTruthy();
+    expect(component.canWindowShowTwoCards()).toBe(true);
   });
 
   it('should tell if supplemental card is non empty', () => {
     component.displayedCard = displayedCard;
-    expect(component.displayedCard.isInteractionInline()).toBeTruthy();
+    expect(component.displayedCard.isInteractionInline()).toBe(true);
 
     component.displayedCard = new StateCard(
       '',
@@ -326,7 +326,7 @@ describe('Skill Preview Tab Component', () => {
       ''
     );
 
-    expect(component.displayedCard.isInteractionInline()).toBeFalsy();
+    expect(component.displayedCard.isInteractionInline()).toBe(false);
   });
 
   it('should filter the questions', () => {
@@ -369,6 +369,6 @@ describe('Skill Preview Tab Component', () => {
     component.ngOnInit();
     currentInteractionService.onSubmit('answer', mockInteractionRule);
 
-    expect(component.questionsFetched).toBeFalsy();
+    expect(component.questionsFetched).toBe(false);
   }));
 });

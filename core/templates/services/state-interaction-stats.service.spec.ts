@@ -186,7 +186,7 @@ describe('State Interaction Stats Service', () => {
   it('should support improvements overview for states with text-input', () => {
     expect(
       stateInteractionStatsService.stateSupportsImprovementsOverview(mockState)
-    ).toBeTruthy();
+    ).toBe(true);
   });
 
   it('should throw error if state name does not exist', fakeAsync(async () => {

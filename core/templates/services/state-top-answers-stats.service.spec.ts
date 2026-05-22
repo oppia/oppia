@@ -134,7 +134,7 @@ describe('StateTopAnswersStatsService', () => {
   };
 
   it('should not contain any stats before init', () => {
-    expect(stateTopAnswersStatsService.hasStateStats('Hola')).toBeFalsy();
+    expect(stateTopAnswersStatsService.hasStateStats('Hola')).toBe(false);
   });
 
   it('should identify unaddressed issues', fakeAsync(async () => {
@@ -216,7 +216,7 @@ describe('StateTopAnswersStatsService', () => {
     flushMicrotasks();
     await stateTopAnswersStatsService.getInitPromiseAsync();
 
-    expect(stateTopAnswersStatsService.hasStateStats('Hola')).toBeTruthy();
+    expect(stateTopAnswersStatsService.hasStateStats('Hola')).toBe(true);
   }));
 
   it('should have stats for state without any answers', fakeAsync(async () => {
@@ -226,7 +226,7 @@ describe('StateTopAnswersStatsService', () => {
     flushMicrotasks();
     await stateTopAnswersStatsService.getInitPromiseAsync();
 
-    expect(stateTopAnswersStatsService.hasStateStats('Hola')).toBeTruthy();
+    expect(stateTopAnswersStatsService.hasStateStats('Hola')).toBe(true);
   }));
 
   it('should not have stats for state not provided by backend', fakeAsync(async () => {
@@ -236,7 +236,7 @@ describe('StateTopAnswersStatsService', () => {
     flushMicrotasks();
     await stateTopAnswersStatsService.getInitPromiseAsync();
 
-    expect(stateTopAnswersStatsService.hasStateStats('Me Llamo')).toBeFalsy();
+    expect(stateTopAnswersStatsService.hasStateStats('Me Llamo')).toBe(false);
   }));
 
   it('should only returns state names with stats', fakeAsync(async () => {

@@ -258,7 +258,7 @@ describe('Skill Editor Navbar Component', () => {
     tick();
 
     expect(clearSpy).toHaveBeenCalled();
-    expect(skillEditorRoutingService.questionIsBeingCreated).toBeFalsy();
+    expect(skillEditorRoutingService.questionIsBeingCreated).toBe(false);
     expect(runSpy).toHaveBeenCalled();
   }));
 

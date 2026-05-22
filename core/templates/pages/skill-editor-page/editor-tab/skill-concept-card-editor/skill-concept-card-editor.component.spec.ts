@@ -202,10 +202,10 @@ describe('Skill Concept Card Editor Component', () => {
 
     component.toggleSkillEditorCard();
 
-    expect(component.skillEditorCardIsShown).toBeFalsy();
+    expect(component.skillEditorCardIsShown).toBe(false);
 
     component.toggleSkillEditorCard();
 
-    expect(component.skillEditorCardIsShown).toBeTruthy();
+    expect(component.skillEditorCardIsShown).toBe(true);
   });
 });

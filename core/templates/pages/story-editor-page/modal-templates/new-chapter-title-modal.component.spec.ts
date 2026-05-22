@@ -193,14 +193,14 @@ describe('Create New Chapter Modal Component', () => {
   it('should initialize component properties after controller is initialized', () => {
     expect(component.nodeTitles).toEqual(nodeTitles);
     expect(component.errorMsg).toBe(null);
-    expect(component.categoryIsDefault).toBeTruthy();
+    expect(component.categoryIsDefault).toBe(true);
   });
 
   it('should validate explorationId correctly', () => {
     component.explorationId = 'validId';
-    expect(component.validateExplorationId()).toBeTruthy();
+    expect(component.validateExplorationId()).toBe(true);
     component.explorationId = 'oppia.org/validId';
-    expect(component.validateExplorationId()).toBeFalsy();
+    expect(component.validateExplorationId()).toBe(false);
   });
 
   it('should update thumbnail filename when changing thumbnail file', () => {

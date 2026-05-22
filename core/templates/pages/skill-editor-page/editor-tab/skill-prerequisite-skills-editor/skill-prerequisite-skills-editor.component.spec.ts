@@ -455,14 +455,14 @@ describe('Skill editor main tab Component', () => {
       mockEventEmitter
     );
 
-    expect(component.prerequisiteSkillsAreShown).toBeFalsy();
+    expect(component.prerequisiteSkillsAreShown).toBe(false);
 
     component.windowIsNarrow = true;
 
     component.ngOnInit();
     mockEventEmitter.emit();
 
-    expect(component.windowIsNarrow).toBeFalsy();
+    expect(component.windowIsNarrow).toBe(false);
   });
 
   it('should toggle skill editor card on clicking', () => {
@@ -471,11 +471,11 @@ describe('Skill editor main tab Component', () => {
 
     component.toggleSkillEditorCard();
 
-    expect(component.skillEditorCardIsShown).toBeFalsy();
+    expect(component.skillEditorCardIsShown).toBe(false);
 
     component.toggleSkillEditorCard();
 
-    expect(component.skillEditorCardIsShown).toBeTruthy();
+    expect(component.skillEditorCardIsShown).toBe(true);
   });
 
   it('should show Prerequisites list when the window is narrow', () => {

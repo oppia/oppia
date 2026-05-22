@@ -317,7 +317,7 @@ describe('Subtopic viewer page', function () {
         subtopicDataObject.getNextSubtopic()
       );
       expect(component.prevSubtopic).toBeUndefined();
-      expect(component.subtopicSummaryIsShown).toBeTruthy();
+      expect(component.subtopicSummaryIsShown).toBe(true);
 
       expect(component.subtopicTitleTranslationKey).toEqual(
         'I18N_SUBTOPIC_123abcd_test_TITLE'
@@ -452,7 +452,7 @@ describe('Subtopic viewer page', function () {
       subtopicDataObjectWithPrevSubtopic.getPrevSubtopic()
     );
     expect(component.nextSubtopic).toBeUndefined();
-    expect(component.subtopicSummaryIsShown).toBeTruthy();
+    expect(component.subtopicSummaryIsShown).toBe(true);
 
     component.ngOnDestroy();
   }));

@@ -176,13 +176,13 @@ describe('Topic Preview Tab Component', () => {
   it('should return true when practiceTabIsDisplayed is true', () => {
     topicEditorStateService.setPracticeTabDisplayed(true);
     componentInstance.ngOnInit();
-    expect(componentInstance.isPracticeTabEnabled()).toBeTruthy();
+    expect(componentInstance.isPracticeTabEnabled()).toBe(true);
   });
 
   it('should return false when practiceTabIsDisplayed is false', () => {
     topicEditorStateService.setPracticeTabDisplayed(false);
     componentInstance.ngOnInit();
-    expect(componentInstance.isPracticeTabEnabled()).toBeFalsy();
+    expect(componentInstance.isPracticeTabEnabled()).toBe(false);
   });
 
   it('should update page title on language change', () => {

@@ -88,7 +88,7 @@ describe('SubtopicViewerAuthGuard', () => {
 
     tick();
 
-    expect(canActivateResult).toBeTruthy();
+    expect(canActivateResult).toBe(true);
     expect(avbas).toHaveBeenCalled();
     expect(navigateSpy).not.toHaveBeenCalled();
   }));
@@ -112,7 +112,7 @@ describe('SubtopicViewerAuthGuard', () => {
 
     tick();
 
-    expect(canActivateResult).toBeFalsy();
+    expect(canActivateResult).toBe(false);
     expect(navigateSpy).toHaveBeenCalledWith([
       `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
     ]);
