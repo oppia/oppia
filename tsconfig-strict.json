@@ -8,7 +8,7 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "lib": [
-      "es2017",
+      "es2020",
       "dom",
       "dom.iterable",
       "webworker"
