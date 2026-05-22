@@ -2549,7 +2549,20 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToCreatorDashboardPage(): Promise<void> {
     await this.goto(creatorDashboardPage);
+    await this.waitForCreatorDashboardToLoad();
     showMessage('Creator dashboard page is opened successfully.');
+  }
+
+  /**
+   * Waits for the creator dashboard content to finish loading.
+   */
+  async waitForCreatorDashboardToLoad(): Promise<void> {
+    await this.expectElementToBeVisible(
+      creatorDashboardContainerSelector,
+      true
+    );
+    await this.waitForPageToFullyLoad();
+    await this.waitForNetworkIdle({idleTime: 1000});
   }
 
   /**
@@ -7640,7 +7653,7 @@ export class ExplorationEditor extends BaseUser {
 
     await this.expectElementToBeVisible(creatorDashboardMenuLink);
     await this.clickOnElementWithSelector(creatorDashboardMenuLink);
-    await this.expectElementToBeVisible(creatorDashboardContainerSelector);
+    await this.waitForCreatorDashboardToLoad();
   }
 
   /**
@@ -7807,6 +7820,51 @@ export class ExplorationEditor extends BaseUser {
     expectedOpenFeedback: string,
     expectedViews: string
   ): Promise<void> {
+    await this.waitForNetworkIdle({idleTime: 1000});
+
+    await this.page.waitForFunction(
+      (
+        gridSelector: string,
+        ratingSelector: string,
+        feedbackSelector: string,
+        viewsSelector: string,
+        cardIndex: number,
+        rating: string,
+        openFeedback: string,
+        views: string
+      ) => {
+        const cards = Array.from(document.querySelectorAll(gridSelector));
+        const card = cards[cardIndex] as HTMLElement | undefined;
+
+        if (!card) {
+          return false;
+        }
+
+        const getInnerText = (selector: string): string => {
+          return (
+            (
+              card.querySelector(selector) as HTMLElement | null
+            )?.innerText.trim() || ''
+          );
+        };
+
+        return (
+          getInnerText(ratingSelector) === rating &&
+          getInnerText(feedbackSelector) === openFeedback &&
+          getInnerText(viewsSelector) === views
+        );
+      },
+      {},
+      explorationGridSelector,
+      explorationGridRatingSelector,
+      explorationGridFeedbackSelector,
+      explorationGridViewsSelector,
+      index,
+      expectedRating,
+      expectedOpenFeedback,
+      expectedViews
+    );
+
     const cards = await this.page.$$(explorationGridSelector);
 
     const card = cards[index];
@@ -7814,8 +7872,6 @@ export class ExplorationEditor extends BaseUser {
     if (!card) {
       throw new Error(`Card at index ${index} not found.`);
     }
-
-    await this.waitForNetworkIdle({idleTime: 1000});
 
     const rating = await card.$eval(explorationGridRatingSelector, el =>
       (el as HTMLElement).innerText.trim()
@@ -7863,6 +7919,45 @@ export class ExplorationEditor extends BaseUser {
     expectedOpenThreads: string,
     expectedPlays: string
   ): Promise<void> {
+    await this.waitForNetworkIdle({idleTime: 1000});
+
+    await this.page.waitForFunction(
+      (
+        listSelector: string,
+        cardIndex: number,
+        rating: string,
+        openThreads: string,
+        plays: string
+      ) => {
+        const rows = Array.from(document.querySelectorAll(listSelector));
+        const row = rows[cardIndex] as HTMLElement | undefined;
+
+        if (!row) {
+          return false;
+        }
+
+        const getCellText = (cellSelector: string): string => {
+          return (
+            (
+              row.querySelector(cellSelector) as HTMLElement | null
+            )?.innerText.trim() || ''
+          );
+        };
+
+        return (
+          getCellText('td:nth-child(2)') === rating &&
+          getCellText('td:nth-child(3)') === plays &&
+          getCellText('td:nth-child(4)') === openThreads
+        );
+      },
+      {},
+      explorationListItemSelector,
+      index,
+      expectedRating,
+      expectedOpenThreads,
+      expectedPlays
+    );
+
     const rows = await this.page.$$(explorationListItemSelector);
 
     const row = rows[index];
@@ -7870,8 +7965,6 @@ export class ExplorationEditor extends BaseUser {
     if (!row) {
       throw new Error(`Row at index ${index} not found.`);
     }
-
-    await this.waitForNetworkIdle({idleTime: 1000});
 
     const rating = await row.$eval('td:nth-child(2)', el =>
       (el as HTMLElement).innerText.trim()
@@ -7914,7 +8007,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(listViewButtonSelector);
 
     await this.expectElementToBeVisible(explorationListSelector, true);
-    await this.waitForNetworkIdle({idleTime: 1000});
+    await this.waitForCreatorDashboardToLoad();
   }
 
   /**
