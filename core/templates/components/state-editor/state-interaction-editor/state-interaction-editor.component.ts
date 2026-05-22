@@ -210,6 +210,12 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateInteractionIdService.saveDisplayedValue();
     }
     this.stateCustomizationArgsService.saveDisplayedValue();
+
+    let interactionData: InteractionData = {
+      interactionId: this.stateInteractionIdService.displayed,
+      customizationArgs: this.stateCustomizationArgsService.displayed,
+    };
+    this.onSaveInteractionData.emit(interactionData);
     this.onSaveNextContentIdIndex.emit();
 
     let interactionId = this.stateInteractionIdService.savedMemento;
@@ -273,16 +279,16 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       })
       .result.then(
         () => {
-          let interactionId = this.stateInteractionIdService.savedMemento;
-          if (interactionId === null) {
-            throw new Error(
-              'Expected interactionId to be null but received ' + interactionId
-            );
-          }
           this.stateInteractionIdService.displayed = null;
           this.stateCustomizationArgsService.displayed = {};
           this.stateSolutionService.displayed = null;
-          this.interactionDetailsCacheService.removeDetails(interactionId);
+          const savedInteractionId =
+            this.stateInteractionIdService.savedMemento;
+          if (savedInteractionId !== null) {
+            this.interactionDetailsCacheService.removeDetails(
+              savedInteractionId
+            );
+          }
           this.stateInteractionIdService.saveDisplayedValue();
           this.stateCustomizationArgsService.saveDisplayedValue();
 

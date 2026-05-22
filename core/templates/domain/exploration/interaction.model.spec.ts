@@ -598,10 +598,10 @@ describe('Interaction', () => {
           customization_args: {},
           default_outcome: defaultOutcomeDict,
           hints: hintsDict,
-          id: 'MultipleChoiceInput',
+          id: 'InteractionIDThatDNE' as InteractionSpecsKey,
           solution: solutionDict,
         });
-      }).not.toThrowError();
+      }).toThrowError('Unrecognized interaction id InteractionIDThatDNE');
     }
   );
 
