@@ -142,9 +142,9 @@ describe('Progress nav component', () => {
     tick();
 
     expect(componentInstance.isIframed).toEqual(isIframed);
-    expect(componentInstance.helpCardHasContinueButton).toBeTruthy();
+    expect(componentInstance.helpCardHasContinueButton).toBe(true);
     expect(componentInstance.submit.emit).toHaveBeenCalled();
-    expect(componentInstance.progressTrackerIsVisible).toBeTruthy();
+    expect(componentInstance.progressTrackerIsVisible).toBe(true);
   }));
 
   it('should update displayed card info', fakeAsync(() => {
@@ -165,7 +165,7 @@ describe('Progress nav component', () => {
 
     expect(playerPositionService.getDisplayedCardIndex).toHaveBeenCalled();
     expect(playerTranscriptService.isLastCard).toHaveBeenCalled();
-    expect(componentInstance.helpCardHasContinueButton).toBeFalsy();
+    expect(componentInstance.helpCardHasContinueButton).toBe(false);
     expect(componentInstance.interactionIsInline).toEqual(
       mockDisplayedCard.isInteractionInline()
     );
@@ -195,12 +195,12 @@ describe('Progress nav component', () => {
   it('should tell if continue button should be shown', () => {
     componentInstance.conceptCardIsBeingShown = true;
 
-    expect(componentInstance.shouldContinueButtonBeShown()).toBeTruthy();
+    expect(componentInstance.shouldContinueButtonBeShown()).toBe(true);
 
     componentInstance.conceptCardIsBeingShown = false;
     componentInstance.interactionIsInline = false;
 
-    expect(componentInstance.shouldContinueButtonBeShown()).toBeFalsy();
+    expect(componentInstance.shouldContinueButtonBeShown()).toBe(false);
   });
 
   it('should be able to skip the question', () => {
@@ -214,7 +214,7 @@ describe('Progress nav component', () => {
   it('should tell if interaction have submit nav button', () => {
     componentInstance.interactionId = 'ImageClickInput';
 
-    expect(componentInstance.doesInteractionHaveNavSubmitButton()).toBeFalsy();
+    expect(componentInstance.doesInteractionHaveNavSubmitButton()).toBe(false);
 
     componentInstance.interactionId = 'not_valid';
 

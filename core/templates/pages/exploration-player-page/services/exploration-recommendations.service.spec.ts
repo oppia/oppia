@@ -98,7 +98,7 @@ describe('Exploration Recommendations Service', () => {
 
     it('should initialize with editor context', () => {
       expRecsService = TestBed.inject(ExplorationRecommendationsService);
-      expect(expRecsService.isInEditorPage).toBeTruthy();
+      expect(expRecsService.isInEditorPage).toBe(true);
     });
 
     describe('in the Preview tab', () => {
@@ -110,8 +110,8 @@ describe('Exploration Recommendations Service', () => {
 
       it('should initialize with editor preview context', () => {
         expRecsService = TestBed.inject(ExplorationRecommendationsService);
-        expect(expRecsService.isInEditorPage).toBeTruthy();
-        expect(expRecsService.isInEditorPreviewMode).toBeTruthy();
+        expect(expRecsService.isInEditorPage).toBe(true);
+        expect(expRecsService.isInEditorPreviewMode).toBe(true);
       });
     });
   });
@@ -125,7 +125,7 @@ describe('Exploration Recommendations Service', () => {
 
     it('should not initialize with editor context', () => {
       expRecsService = TestBed.inject(ExplorationRecommendationsService);
-      expect(expRecsService.isInEditorPage).toBeFalsy();
+      expect(expRecsService.isInEditorPage).toBe(false);
     });
   });
 

@@ -219,7 +219,7 @@ describe('Current Interaction Service', () => {
     );
     spyOn(displayedCard, 'showNoResponseError').and.returnValue(true);
 
-    expect(currentInteractionService.showNoResponseError()).toBeTruthy();
+    expect(currentInteractionService.showNoResponseError()).toBe(true);
   });
   it('should update answer validity using updateAnswerIsValid', () => {
     spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
@@ -243,8 +243,8 @@ describe('Current Interaction Service', () => {
       false
     );
 
-    expect(currentInteractionService.showInvalidResponseError()).toBeTruthy();
-    expect(currentInteractionService.showInvalidResponseError()).toBeFalsy();
+    expect(currentInteractionService.showInvalidResponseError()).toBe(true);
+    expect(currentInteractionService.showInvalidResponseError()).toBe(false);
     expect(displayedCard.showInvalidResponseError).toHaveBeenCalledTimes(2);
   });
 });

@@ -180,7 +180,7 @@ describe('NewInputResponsePairComponent', () => {
         isHint: true,
       };
 
-      expect(component.isVideoRteElementPresentInResponse()).toBeFalsy();
+      expect(component.isVideoRteElementPresentInResponse()).toBe(false);
     }
   );
 
@@ -359,21 +359,21 @@ describe('NewInputResponsePairComponent', () => {
 
     fixture.detectChanges();
 
-    expect(document.querySelector('ngb-popover-window')).not.toBeTruthy();
+    expect(document.querySelector('ngb-popover-window')).not.toBe(true);
 
     const popover = fixture.debugElement
       .query(By.directive(NgbPopover))
       .injector.get(NgbPopover);
-    expect(popover).toBeTruthy();
+    expect(popover).toBe(true);
     popover.toggle();
 
     fixture.detectChanges();
 
-    expect(document.querySelector('ngb-popover-window')).toBeTruthy();
+    expect(document.querySelector('ngb-popover-window')).toBe(true);
 
     const popoverContent = document.querySelector(
       '.oppia-answer-popup oppia-interaction-display'
     );
-    expect(popoverContent).toBeTruthy();
+    expect(popoverContent).toBe(true);
   });
 });

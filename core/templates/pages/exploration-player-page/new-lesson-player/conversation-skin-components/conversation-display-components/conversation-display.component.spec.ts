@@ -287,26 +287,26 @@ describe('Conversation display component', () => {
 
   it('should return true if in exploration context', () => {
     spyOn(pageContextService, 'isInExplorationContext').and.returnValue(true);
-    expect(componentInstance.isInExplorationPlayerContext()).toBeTruthy();
+    expect(componentInstance.isInExplorationPlayerContext()).toBe(true);
     expect(pageContextService.isInExplorationContext).toHaveBeenCalled();
   });
 
   it('should return false if not in exploration context', () => {
     spyOn(pageContextService, 'isInExplorationContext').and.returnValue(false);
-    expect(componentInstance.isInExplorationPlayerContext()).toBeFalsy();
+    expect(componentInstance.isInExplorationPlayerContext()).toBe(false);
     expect(pageContextService.isInExplorationContext).toHaveBeenCalled();
   });
 
   it('should return true if displayedCard is not completed', () => {
     componentInstance.displayedCard = mockDisplayedCard;
     spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(false);
-    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBeTruthy();
+    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBe(true);
   });
 
   it('should return false if displayedCard is completed', () => {
     componentInstance.displayedCard = mockDisplayedCard;
     spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(true);
-    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBeFalsy();
+    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBe(false);
   });
 
   describe('shouldResponseHistoryBeShown', () => {
@@ -321,7 +321,7 @@ describe('Conversation display component', () => {
         {},
       ]);
       spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
-      expect(componentInstance.shouldResponseHistoryBeShown()).toBeFalsy();
+      expect(componentInstance.shouldResponseHistoryBeShown()).toBe(false);
     });
 
     it('should return true if interaction is inline and pairCount > 1', () => {
@@ -331,28 +331,28 @@ describe('Conversation display component', () => {
         {},
       ]);
       spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
-      expect(componentInstance.shouldResponseHistoryBeShown()).toBeTruthy();
+      expect(componentInstance.shouldResponseHistoryBeShown()).toBe(true);
     });
 
     it('should return false if interaction is inline and pairCount <= 1', () => {
       componentInstance.inputOutputHistoryIsShown = true;
       spyOn(mockDisplayedCard, 'getInputResponsePairs').and.returnValue([{}]);
       spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
-      expect(componentInstance.shouldResponseHistoryBeShown()).toBeFalsy();
+      expect(componentInstance.shouldResponseHistoryBeShown()).toBe(false);
     });
 
     it('should return true if interaction is not inline and pairCount > 0', () => {
       componentInstance.inputOutputHistoryIsShown = true;
       spyOn(mockDisplayedCard, 'getInputResponsePairs').and.returnValue([{}]);
       spyOn(componentInstance, 'isInteractionInline').and.returnValue(false);
-      expect(componentInstance.shouldResponseHistoryBeShown()).toBeTruthy();
+      expect(componentInstance.shouldResponseHistoryBeShown()).toBe(true);
     });
 
     it('should return false if interaction is not inline and pairCount == 0', () => {
       componentInstance.inputOutputHistoryIsShown = true;
       spyOn(mockDisplayedCard, 'getInputResponsePairs').and.returnValue([]);
       spyOn(componentInstance, 'isInteractionInline').and.returnValue(false);
-      expect(componentInstance.shouldResponseHistoryBeShown()).toBeFalsy();
+      expect(componentInstance.shouldResponseHistoryBeShown()).toBe(false);
     });
   });
 
@@ -860,7 +860,7 @@ describe('Conversation display component', () => {
   it('should tell if audio bar is expanded on mobile device', () => {
     spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
     spyOn(audioBarStatusService, 'isAudioBarExpanded').and.returnValue(true);
-    expect(componentInstance.isAudioBarExpandedOnMobileDevice()).toBeTruthy();
+    expect(componentInstance.isAudioBarExpandedOnMobileDevice()).toBe(true);
   });
 
   it('should update displayed card', fakeAsync(() => {
@@ -897,11 +897,11 @@ describe('Conversation display component', () => {
   it('should check if interaction is inline', () => {
     componentInstance.conceptCardIsBeingShown = true;
     componentInstance.displayedCard = mockDisplayedCard;
-    expect(componentInstance.isInteractionInline()).toBeTruthy();
+    expect(componentInstance.isInteractionInline()).toBe(true);
     componentInstance.conceptCardIsBeingShown = false;
     spyOn(mockDisplayedCard, 'isInteractionInline').and.returnValue(false);
     componentInstance.displayedCard = mockDisplayedCard;
-    expect(componentInstance.isInteractionInline()).toBeFalsy();
+    expect(componentInstance.isInteractionInline()).toBe(false);
   });
 
   it('should get content audio highlight class', () => {
@@ -932,38 +932,38 @@ describe('Conversation display component', () => {
   it('should toggle show previous responses', () => {
     componentInstance.arePreviousResponsesShown = false;
     componentInstance.toggleShowPreviousResponses();
-    expect(componentInstance.arePreviousResponsesShown).toBeTruthy();
+    expect(componentInstance.arePreviousResponsesShown).toBe(true);
   });
 
   it('should tell if window is narrow', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
-    expect(componentInstance.isWindowNarrow()).toBeTruthy();
+    expect(componentInstance.isWindowNarrow()).toBe(true);
   });
 
   it('should show two cards', () => {
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(300);
-    expect(componentInstance.canWindowShowTwoCards()).toBeFalsy();
+    expect(componentInstance.canWindowShowTwoCards()).toBe(false);
   });
 
   it('should tell if audio bar can be shown', () => {
     componentInstance.isIframed = false;
     spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(false);
-    expect(componentInstance.showAudioBar()).toBeTruthy();
+    expect(componentInstance.showAudioBar()).toBe(true);
   });
 
   it('should tell if content audio translation is available', () => {
     componentInstance.conceptCardIsBeingShown = true;
     componentInstance.displayedCard = mockDisplayedCard;
-    expect(componentInstance.isContentAudioTranslationAvailable()).toBeFalsy();
+    expect(componentInstance.isContentAudioTranslationAvailable()).toBe(false);
     componentInstance.conceptCardIsBeingShown = false;
     componentInstance.displayedCard = mockDisplayedCard;
-    expect(componentInstance.isContentAudioTranslationAvailable()).toBeTruthy();
+    expect(componentInstance.isContentAudioTranslationAvailable()).toBe(true);
   });
 
   it('should tell if on a terminal card', () => {
     componentInstance.displayedCard = mockDisplayedCard;
     spyOn(mockDisplayedCard, 'isTerminal').and.returnValue(true);
-    expect(componentInstance.isOnTerminalCard()).toBeTruthy();
+    expect(componentInstance.isOnTerminalCard()).toBe(true);
   });
 
   it('should get input response pair id', () => {

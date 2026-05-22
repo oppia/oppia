@@ -185,7 +185,7 @@ describe('Supplemental card component', () => {
   it('should clear help card', () => {
     componentInstance.clearHelpCard();
     expect(componentInstance.helpCardHtml).toBeNull();
-    expect(componentInstance.helpCardHasContinueButton).toBeFalsy();
+    expect(componentInstance.helpCardHasContinueButton).toBe(false);
     expect(componentInstance.maxHelpCardHeightSeen).toEqual(0);
   });
 
@@ -206,10 +206,10 @@ describe('Supplemental card component', () => {
       () => innerHeight
     );
 
-    expect(componentInstance.isHelpCardTall()).toBeFalsy();
+    expect(componentInstance.isHelpCardTall()).toBe(false);
 
     innerHeight = 100;
-    expect(componentInstance.isHelpCardTall()).toBeTruthy();
+    expect(componentInstance.isHelpCardTall()).toBe(true);
   });
 
   it('should update help card bottom position', () => {

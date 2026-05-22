@@ -710,9 +710,9 @@ describe('Diagnostic test engine service', () => {
       'getMatchingClassificationResult'
     ).and.returnValue(answerClassificationResult);
 
-    expect(
-      diagnosticTestPlayerEngineService.isDiagnosticTestFinished()
-    ).toBeFalsy();
+    expect(diagnosticTestPlayerEngineService.isDiagnosticTestFinished()).toBe(
+      false
+    );
 
     // Submitting the correct answer.
     diagnosticTestPlayerEngineService.submitAnswer(
@@ -722,9 +722,9 @@ describe('Diagnostic test engine service', () => {
     );
     tick();
 
-    expect(
-      diagnosticTestPlayerEngineService.isDiagnosticTestFinished()
-    ).toBeTruthy();
+    expect(diagnosticTestPlayerEngineService.isDiagnosticTestFinished()).toBe(
+      true
+    );
   }));
 
   it(
@@ -807,9 +807,9 @@ describe('Diagnostic test engine service', () => {
         question2
       );
 
-      expect(
-        diagnosticTestPlayerEngineService.isDiagnosticTestFinished()
-      ).toBeFalsy();
+      expect(diagnosticTestPlayerEngineService.isDiagnosticTestFinished()).toBe(
+        false
+      );
 
       expect(diagnosticTestPlayerEngineService.getCurrentTopicId()).toEqual(
         'topicId2'
@@ -834,9 +834,9 @@ describe('Diagnostic test engine service', () => {
       ).toEqual(2);
       // Since the learner has attempted the maximum number of questions (2) in
       // the test so the test should be terminated.
-      expect(
-        diagnosticTestPlayerEngineService.isDiagnosticTestFinished()
-      ).toBeTruthy();
+      expect(diagnosticTestPlayerEngineService.isDiagnosticTestFinished()).toBe(
+        true
+      );
     })
   );
 

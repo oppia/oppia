@@ -222,19 +222,19 @@ describe('Conversation flow service', () => {
   it('should tell if supplemental card is non empty', () => {
     expect(
       conversationFlowService.isSupplementalCardNonempty(displayedCard)
-    ).toBeFalsy();
+    ).toBe(false);
 
     let textInputCard = createCard('TextInput');
     expect(
       conversationFlowService.isSupplementalCardNonempty(textInputCard)
-    ).toBeFalsy();
+    ).toBe(false);
 
     let supplementaryImageInputCard = createCard('ImageClickInput');
     expect(
       conversationFlowService.isSupplementalCardNonempty(
         supplementaryImageInputCard
       )
-    ).toBeTruthy();
+    ).toBe(true);
   });
 
   it('should return to exploration after concept card if last card is shown', () => {
@@ -287,7 +287,7 @@ describe('Conversation flow service', () => {
 
     conversationFlowService.showUpcomingCard();
 
-    expect(conversationFlowService.moveToExploration).toBeFalsy();
+    expect(conversationFlowService.moveToExploration).toBe(false);
     expect(explorationModeService.setExplorationModeFromUrl).toHaveBeenCalled();
     expect(explorationEngineService.loadInitialState).toHaveBeenCalled();
   });
@@ -387,93 +387,91 @@ describe('Conversation flow service', () => {
     conversationFlowService.setHasInteractedAtLeastOnce(true);
     // Since there is no getter, we can indirectly check expected behavior,
     // but here we just test the method does not throw.
-    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBeTruthy();
+    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBe(true);
 
     conversationFlowService.setHasInteractedAtLeastOnce(false);
-    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBeFalsy();
+    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBe(false);
   });
 
   it('should set and get explorationActuallyStarted correctly', () => {
     conversationFlowService.setExplorationActuallyStarted(true);
-    expect(
-      conversationFlowService.getExplorationActuallyStarted()
-    ).toBeTruthy();
+    expect(conversationFlowService.getExplorationActuallyStarted()).toBe(true);
 
     conversationFlowService.setExplorationActuallyStarted(false);
-    expect(conversationFlowService.getExplorationActuallyStarted()).toBeFalsy();
+    expect(conversationFlowService.getExplorationActuallyStarted()).toBe(false);
   });
 
   it('should set and get showProgressClearanceMessage correctly', () => {
     conversationFlowService.setShowProgressClearanceMessage(true);
-    expect(
-      conversationFlowService.getShowProgressClearanceMessage()
-    ).toBeTruthy();
+    expect(conversationFlowService.getShowProgressClearanceMessage()).toBe(
+      true
+    );
 
     conversationFlowService.setShowProgressClearanceMessage(false);
-    expect(
-      conversationFlowService.getShowProgressClearanceMessage()
-    ).toBeFalsy();
+    expect(conversationFlowService.getShowProgressClearanceMessage()).toBe(
+      false
+    );
   });
 
   it('should set and get answerIsCorrect correctly', () => {
     conversationFlowService.setAnswerIsCorrect(true);
-    expect(conversationFlowService.getAnswerIsCorrect()).toBeTruthy();
+    expect(conversationFlowService.getAnswerIsCorrect()).toBe(true);
 
     conversationFlowService.setAnswerIsCorrect(false);
-    expect(conversationFlowService.getAnswerIsCorrect()).toBeFalsy();
+    expect(conversationFlowService.getAnswerIsCorrect()).toBe(false);
   });
 
   it('should set and get answerIsBeingProcessed correctly', () => {
     conversationFlowService.setAnswerIsBeingProcessed(true);
-    expect(conversationFlowService.getAnswerIsBeingProcessed()).toBeTruthy();
+    expect(conversationFlowService.getAnswerIsBeingProcessed()).toBe(true);
 
     conversationFlowService.setAnswerIsBeingProcessed(false);
-    expect(conversationFlowService.getAnswerIsBeingProcessed()).toBeFalsy();
+    expect(conversationFlowService.getAnswerIsBeingProcessed()).toBe(false);
   });
 
   it('should set and get hasInteractedAtLeastOnce correctly', () => {
     conversationFlowService.setHasInteractedAtLeastOnce(true);
-    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBeTruthy();
+    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBe(true);
 
     conversationFlowService.setHasInteractedAtLeastOnce(false);
-    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBeFalsy();
+    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBe(false);
   });
 
   it('should set and get hasFullyLoaded correctly', () => {
     conversationFlowService.setHasFullyLoaded(true);
-    expect(conversationFlowService.getHasFullyLoaded()).toBeTruthy();
+    expect(conversationFlowService.getHasFullyLoaded()).toBe(true);
 
     conversationFlowService.setHasFullyLoaded(false);
-    expect(conversationFlowService.getHasFullyLoaded()).toBeFalsy();
+    expect(conversationFlowService.getHasFullyLoaded()).toBe(false);
   });
 
   it('should set and get answerIsCorrect correctly', () => {
     conversationFlowService.setAnswerIsCorrect(true);
-    expect(conversationFlowService.getAnswerIsCorrect()).toBeTruthy();
+    expect(conversationFlowService.getAnswerIsCorrect()).toBe(true);
 
     conversationFlowService.setAnswerIsCorrect(false);
-    expect(conversationFlowService.getAnswerIsCorrect()).toBeFalsy();
+    expect(conversationFlowService.getAnswerIsCorrect()).toBe(false);
   });
 
   it('should get solutionForState correctly', () => {
     conversationFlowService.solutionForState = null;
-    expect(conversationFlowService.getSolutionForState()).toBeFalsy();
+    expect(conversationFlowService.getSolutionForState()).toBe(false);
   });
 
   it('should set and get answerIsBeingProcessed correctly', () => {
     conversationFlowService.setAnswerIsBeingProcessed(true);
-    expect(conversationFlowService.getAnswerIsBeingProcessed()).toBeTruthy();
+    expect(conversationFlowService.getAnswerIsBeingProcessed()).toBe(true);
 
     conversationFlowService.setAnswerIsBeingProcessed(false);
-    expect(conversationFlowService.getAnswerIsBeingProcessed()).toBeFalsy();
+    expect(conversationFlowService.getAnswerIsBeingProcessed()).toBe(false);
   });
 
   it('should set and get hasInteractedAtLeastOnce correctly', () => {
     conversationFlowService.setHasInteractedAtLeastOnce(true);
-    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBeTruthy();
+    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBe(true);
 
     conversationFlowService.setHasInteractedAtLeastOnce(false);
-    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBeFalsy();
+    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBe(false);
   });
 
   it('should move backward by one card when index is valid', () => {
@@ -607,7 +605,7 @@ describe('Conversation flow service', () => {
     spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(false);
 
     const result = conversationFlowService.isLearnAgainButton();
-    expect(result).toBeFalsy();
+    expect(result).toBe(false);
   });
 
   it('should return false when interaction id is missing', () => {
@@ -623,7 +621,7 @@ describe('Conversation flow service', () => {
     conversationFlowService.displayedCard = card;
 
     const result = conversationFlowService.isLearnAgainButton();
-    expect(result).toBeFalsy();
+    expect(result).toBe(false);
   });
 
   it('should return false when interaction is linear', () => {
@@ -639,7 +637,7 @@ describe('Conversation flow service', () => {
     conversationFlowService.displayedCard = card;
 
     const result = conversationFlowService.isLearnAgainButton();
-    expect(result).toBeFalsy();
+    expect(result).toBe(false);
   });
 
   it('should return true when all conditions met', () => {
@@ -657,7 +655,7 @@ describe('Conversation flow service', () => {
     spyOn(conversationFlowService, 'getAnswerIsCorrect').and.returnValue(false);
 
     const result = conversationFlowService.isLearnAgainButton();
-    expect(result).toBeTruthy();
+    expect(result).toBe(true);
   });
 
   it('should return false when answer is correct even if card seen before', () => {
@@ -675,7 +673,7 @@ describe('Conversation flow service', () => {
     spyOn(conversationFlowService, 'getAnswerIsCorrect').and.returnValue(true);
 
     const result = conversationFlowService.isLearnAgainButton();
-    expect(result).toBeFalsy();
+    expect(result).toBe(false);
   });
 
   it('should skip checkpoint logic when card is not checkpoint', () => {
@@ -1427,10 +1425,10 @@ describe('Conversation flow service', () => {
 
   it('should return correct value for isRefresherExploration', () => {
     conversationFlowService.isRefresherExploration = true;
-    expect(conversationFlowService.getIsRefresherExploration()).toBeTruthy();
+    expect(conversationFlowService.getIsRefresherExploration()).toBe(true);
 
     conversationFlowService.isRefresherExploration = false;
-    expect(conversationFlowService.getIsRefresherExploration()).toBeFalsy();
+    expect(conversationFlowService.getIsRefresherExploration()).toBe(false);
   });
 
   it('should return correct parent exploration IDs', () => {

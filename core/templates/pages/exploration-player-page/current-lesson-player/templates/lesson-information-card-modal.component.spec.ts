@@ -529,7 +529,7 @@ describe('Lesson Information card modal component', () => {
 
     componentInstance.closeSaveProgressMenu();
 
-    expect(componentInstance.saveProgressMenuIsShown).toBeFalsy();
+    expect(componentInstance.saveProgressMenuIsShown).toBe(false);
   });
 
   it('should return 0% when no checkpoints are completed', () => {
