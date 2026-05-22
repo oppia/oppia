@@ -3481,6 +3481,10 @@ class PinnedOpportunityModel(base_models.BaseModel):
     )
     topic_id = datastore_services.StringProperty(required=True, indexed=True)
     opportunity_id = datastore_services.StringProperty(indexed=True)
+    # TODO(#24933): A Beam job (BackfillPinnedOpportunityModelJob) is planned
+    # in Milestone 1.10 to backfill this field to the default value
+    # ('exploration') for all existing datastore entities, ensuring they are
+    # properly indexed for future entity-type based queries.
     entity_type = datastore_services.StringProperty(
         indexed=True, default=feconf.ENTITY_TYPE_EXPLORATION
     )

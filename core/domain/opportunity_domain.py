@@ -532,6 +532,20 @@ class TranslationOpportunity:
                     % (language_code, self.content_count, count)
                 )
 
+    def _update_language_completeness(self, language_code: str) -> None:
+        """Updates the completeness state of the given language code.
+
+        Args:
+            language_code: str. The language code to update.
+        """
+        count = self.translation_counts.get(language_code, 0)
+        if count < self.content_count:
+            if language_code not in self.incomplete_translation_language_codes:
+                self.incomplete_translation_language_codes.append(language_code)
+        else:
+            if language_code in self.incomplete_translation_language_codes:
+                self.incomplete_translation_language_codes.remove(language_code)
+
     def update_translation_count(self, language_code: str, count: int) -> None:
         """Updates the translation count of the given language.
 
@@ -540,14 +554,7 @@ class TranslationOpportunity:
             count: int. The new number of translations.
         """
         self.translation_counts[language_code] = count
-
-        if self.translation_counts[language_code] >= self.content_count:
-            if language_code in self.incomplete_translation_language_codes:
-                self.incomplete_translation_language_codes.remove(language_code)
-        else:
-            if language_code not in self.incomplete_translation_language_codes:
-                self.incomplete_translation_language_codes.append(language_code)
-
+        self._update_language_completeness(language_code)
         self.validate()
 
     def update_content_count(self, content_count: int) -> None:
@@ -559,13 +566,8 @@ class TranslationOpportunity:
         self.content_count = content_count
 
         # Re-check all languages to see if any are now incomplete or complete.
-        for lang_code, count in self.translation_counts.items():
-            if count < self.content_count:
-                if lang_code not in self.incomplete_translation_language_codes:
-                    self.incomplete_translation_language_codes.append(lang_code)
-            else:
-                if lang_code in self.incomplete_translation_language_codes:
-                    self.incomplete_translation_language_codes.remove(lang_code)
+        for lang_code in self.translation_counts:
+            self._update_language_completeness(lang_code)
 
         self.validate()
 
