@@ -228,7 +228,10 @@ const getExplorationEditorUrl = async function (browser, page) {
     await page.waitForTimeout(3000);
     await page.waitForSelector('mat-option');
     await page.waitForTimeout(3000);
-    await page.click('mat-option[ng-reflect-value="Algebra"]');
+    const [algebraOption] = await page.$x(
+      "//mat-option[contains(., 'Algebra')]"
+    );
+    await algebraOption.click();
 
     await page.waitForTimeout(3000);
     await page.waitForSelector(expConfirmPublishButton, {visible: true});
