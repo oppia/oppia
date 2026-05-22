@@ -455,7 +455,7 @@ describe('Conversation flow service', () => {
 
   it('should get solutionForState correctly', () => {
     conversationFlowService.solutionForState = null;
-    expect(conversationFlowService.getSolutionForState()).toBe(false);
+    expect(conversationFlowService.getSolutionForState()).toBeNull();
   });
 
   it('should set and get answerIsBeingProcessed correctly', () => {

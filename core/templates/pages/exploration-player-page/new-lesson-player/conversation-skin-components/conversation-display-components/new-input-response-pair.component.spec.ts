@@ -359,21 +359,21 @@ describe('NewInputResponsePairComponent', () => {
 
     fixture.detectChanges();
 
-    expect(document.querySelector('ngb-popover-window')).not.toBe(true);
+    expect(document.querySelector('ngb-popover-window')).toBeNull();
 
     const popover = fixture.debugElement
       .query(By.directive(NgbPopover))
       .injector.get(NgbPopover);
-    expect(popover).toBe(true);
+    expect(popover).not.toBeNull();
     popover.toggle();
 
     fixture.detectChanges();
 
-    expect(document.querySelector('ngb-popover-window')).toBe(true);
+    expect(document.querySelector('ngb-popover-window')).not.toBeNull();
 
     const popoverContent = document.querySelector(
       '.oppia-answer-popup oppia-interaction-display'
     );
-    expect(popoverContent).toBe(true);
+    expect(popoverContent).not.toBeNull();
   });
 });
