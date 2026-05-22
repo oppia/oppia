@@ -1675,6 +1675,7 @@ TRANSLATABLE_ENTITY_TYPES = [
     ENTITY_TYPE_SKILL,
     ENTITY_TYPE_STORY,
     ENTITY_TYPE_CLASSROOM,
+    ENTITY_TYPE_QUESTION,
 ]
 
 # Possible suggestion types.
@@ -1735,6 +1736,10 @@ class TranslatableEntityType(enum.Enum):
 
     EXPLORATION = 'exploration'
     QUESTION = 'question'
+    SKILL = 'skill'
+    TOPIC = 'topic'
+    STORY = 'story'
+    CLASSROOM = 'classroom'
 
 
 class TranslatedContentDict(TypedDict):
