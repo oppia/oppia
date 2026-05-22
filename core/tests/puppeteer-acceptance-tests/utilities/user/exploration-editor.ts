@@ -7815,34 +7815,7 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Card at index ${index} not found.`);
     }
 
-    await this.page.waitForFunction(
-      (
-        cardElement: HTMLElement,
-        expectedRatingText: string,
-        expectedOpenFeedbackText: string,
-        expectedViewsText: string
-      ) => {
-        const getText = (selector: string): string => {
-          const element = cardElement.querySelector(selector) as
-            | HTMLElement
-            | undefined;
-
-          return element?.innerText.trim() ?? '';
-        };
-
-        return (
-          getText('.e2e-test-exp-summary-tile-rating') === expectedRatingText &&
-          getText('.e2e-test-exp-summary-tile-open-feedback') ===
-            expectedOpenFeedbackText &&
-          getText('.e2e-test-exp-summary-tile-num-views') === expectedViewsText
-        );
-      },
-      {timeout: 10000},
-      card,
-      expectedRating,
-      expectedOpenFeedback,
-      expectedViews
-    );
+    await this.waitForNetworkIdle({idleTime: 1000});
 
     const rating = await card.$eval(explorationGridRatingSelector, el =>
       (el as HTMLElement).innerText.trim()
@@ -7898,33 +7871,7 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Row at index ${index} not found.`);
     }
 
-    await this.page.waitForFunction(
-      (
-        rowElement: HTMLElement,
-        expectedRatingText: string,
-        expectedOpenThreadsText: string,
-        expectedPlaysText: string
-      ) => {
-        const getText = (selector: string): string => {
-          const element = rowElement.querySelector(selector) as
-            | HTMLElement
-            | undefined;
-
-          return element?.innerText.trim() ?? '';
-        };
-
-        return (
-          getText('td:nth-child(2)') === expectedRatingText &&
-          getText('td:nth-child(3)') === expectedPlaysText &&
-          getText('td:nth-child(4)') === expectedOpenThreadsText
-        );
-      },
-      {timeout: 10000},
-      row,
-      expectedRating,
-      expectedOpenThreads,
-      expectedPlays
-    );
+    await this.waitForNetworkIdle({idleTime: 1000});
 
     const rating = await row.$eval('td:nth-child(2)', el =>
       (el as HTMLElement).innerText.trim()
@@ -7967,6 +7914,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(listViewButtonSelector);
 
     await this.expectElementToBeVisible(explorationListSelector, true);
+    await this.waitForNetworkIdle({idleTime: 1000});
   }
 
   /**

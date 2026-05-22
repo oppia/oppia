@@ -146,6 +146,8 @@ describe('LC.12 Visit Creator Dashboard', function () {
         'Positive Numbers',
       ]);
 
+      await lessonCreator.waitForPageToFullyLoad();
+
       await lessonCreator.expectGridCardDetailsToBe(0, '5.0', '1', '1');
 
       await lessonCreator.expectGridCardDetailsToBe(1, '3.0', '0', '1');
