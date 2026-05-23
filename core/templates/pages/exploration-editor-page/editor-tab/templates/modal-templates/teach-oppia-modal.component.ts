@@ -42,6 +42,7 @@ import {State} from 'domain/state/state.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {TeachOppiaModalBackendApiService} from './teach-oppia-modal-backend-api.service';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
+import './teach-oppia-modal.component.css';
 
 export interface UnresolvedAnswer {
   answer: InteractionAnswer;
@@ -53,6 +54,8 @@ export interface UnresolvedAnswer {
 @Component({
   selector: 'oppia-teach-oppia-modal',
   templateUrl: './teach-oppia-modal.component.html',
+
+  styleUrls: ['./teach-oppia-modal.component.css'],
 })
 export class TeachOppiaModalComponent
   extends ConfirmOrCancelModal

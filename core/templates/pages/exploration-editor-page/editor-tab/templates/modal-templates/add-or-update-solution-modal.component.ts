@@ -37,6 +37,7 @@ import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
 } from 'services/html-length.service';
+import './add-or-update-solution-modal.component.css';
 
 interface HtmlFormSchema {
   type: 'html';
@@ -59,6 +60,8 @@ interface SolutionInterface {
 @Component({
   selector: 'oppia-add-or-update-solution-modal',
   templateUrl: './add-or-update-solution-modal.component.html',
+
+  styleUrls: ['./add-or-update-solution-modal.component.css'],
 })
 export class AddOrUpdateSolutionModalComponent
   extends ConfirmOrCancelModal

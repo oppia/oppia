@@ -23,10 +23,13 @@ import {
   StateDiffData,
   VersionHistoryService,
 } from 'pages/exploration-editor-page/services/version-history.service';
+import './state-version-history.component.css';
 
 @Component({
   selector: 'oppia-state-version-history',
   templateUrl: './state-version-history.component.html',
+
+  styleUrls: ['./state-version-history.component.css'],
 })
 export class StateVersionHistoryComponent {
   @Input() validationErrorIsShown!: boolean;

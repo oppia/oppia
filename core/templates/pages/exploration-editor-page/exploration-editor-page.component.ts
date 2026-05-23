@@ -82,6 +82,7 @@ import {
   InsertScriptService,
   KNOWN_SCRIPTS,
 } from 'services/insert-script.service';
+import './exploration-editor-page.component.css';
 
 interface ExplorationData extends ExplorationBackendDict {
   exploration_is_linked_to_story: boolean;
@@ -111,6 +112,8 @@ interface ExplorationData extends ExplorationBackendDict {
 @Component({
   selector: 'exploration-editor-page',
   templateUrl: './exploration-editor-page.component.html',
+
+  styleUrls: ['./exploration-editor-page.component.css'],
 })
 export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
