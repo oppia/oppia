@@ -33,10 +33,12 @@ import {
   ExplorationOpportunitiesDict,
 } from '../services/contribution-opportunities.service';
 import {TranslateTextService} from '../services/translate-text.service';
+import './translation-opportunities.component.css';
 
 @Component({
   selector: 'oppia-translation-opportunities',
   templateUrl: './translation-opportunities.component.html',
+  styleUrls: ['./translation-opportunities.component.css'],
 })
 export class TranslationOpportunitiesComponent {
   // These properties are initialized using Angular lifecycle hooks

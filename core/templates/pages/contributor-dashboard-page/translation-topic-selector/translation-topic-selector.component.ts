@@ -32,10 +32,12 @@ import {
   ContributionOpportunitiesBackendApiService,
   // eslint-disable-next-line max-len
 } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
+import './translation-topic-selector.component.css';
 
 @Component({
   selector: 'translation-topic-selector',
   templateUrl: './translation-topic-selector.component.html',
+  styleUrls: ['./translation-topic-selector.component.css'],
 })
 export class TranslationTopicSelectorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
