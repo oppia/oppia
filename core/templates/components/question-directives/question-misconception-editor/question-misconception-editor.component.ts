@@ -31,6 +31,8 @@ import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model'
 import {Rule} from 'domain/exploration/rule.model';
 import {Subscription} from 'rxjs';
 
+import './question-misconception-editor.component.css';
+
 export interface MisconceptionUpdatedValues {
   misconception: Misconception | null;
   skillId: string | null;
@@ -45,6 +47,7 @@ export interface Outcome {
 @Component({
   selector: 'oppia-question-misconception-editor',
   templateUrl: './question-misconception-editor.component.html',
+  styleUrls: ['./question-misconception-editor.component.css'],
 })
 export class QuestionMisconceptionEditorComponent implements OnInit {
   @Output() saveAnswerGroupFeedback: EventEmitter<Outcome> = new EventEmitter();

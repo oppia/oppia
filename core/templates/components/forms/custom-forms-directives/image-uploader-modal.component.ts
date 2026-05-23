@@ -30,11 +30,15 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import Cropper from 'cropperjs';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+
+import './image-uploader-modal.component.css';
+
 require('cropperjs/dist/cropper.min.css');
 
 @Component({
   selector: 'oppia-image-uploader-modal',
   templateUrl: './image-uploader-modal.component.html',
+  styleUrls: ['./image-uploader-modal.component.css'],
 })
 export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
   @Input() imageUploaderParameters!: ImageUploaderParameters;

@@ -21,10 +21,12 @@ import {SafeResourceUrl} from '@angular/platform-browser';
 
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 
+import './thumbnail-display.component.css';
+
 @Component({
   selector: 'oppia-thumbnail-display',
   templateUrl: './thumbnail-display.component.html',
-  styleUrls: [],
+  styleUrls: ['./thumbnail-display.component.css'],
 })
 export class ThumbnailDisplayComponent implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks
