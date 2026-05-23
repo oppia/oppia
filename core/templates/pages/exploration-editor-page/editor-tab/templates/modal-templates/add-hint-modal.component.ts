@@ -30,6 +30,7 @@ import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
 } from 'services/html-length.service';
+import './add-hint-modal.component.css';
 
 interface HintFormSchema {
   type: string;
@@ -39,6 +40,8 @@ interface HintFormSchema {
 @Component({
   selector: 'oppia-add-hint-modal',
   templateUrl: './add-hint-modal.component.html',
+
+  styleUrls: ['./add-hint-modal.component.css'],
 })
 export class AddHintModalComponent
   extends ConfirmOrCancelModal
