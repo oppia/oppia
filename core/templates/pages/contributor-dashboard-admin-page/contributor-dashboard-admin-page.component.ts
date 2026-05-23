@@ -23,6 +23,8 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ContributorDashboardAdminBackendApiService} from './services/contributor-dashboard-admin-backend-api.service';
 import {AppConstants} from 'app.constants';
 
+import './contributor-dashboard-admin-page.component.css';
+
 interface ViewContributionReviewers {
   filterCriterion: string;
   username: string;
@@ -85,6 +87,7 @@ interface LanguageCodeDescription {
 @Component({
   selector: 'contributor-dashboard-admin-page',
   templateUrl: './contributor-dashboard-admin-page.component.html',
+  styleUrls: ['./contributor-dashboard-admin-page.component.css'],
 })
 export class ContributorDashboardAdminPageComponent implements OnInit {
   taskRunningInBackground: boolean = false;

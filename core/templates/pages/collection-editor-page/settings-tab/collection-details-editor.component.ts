@@ -28,9 +28,12 @@ import {AlertsService} from 'services/alerts.service';
 import {CollectionEditorPageConstants} from '../collection-editor-page.constants';
 import {CollectionEditorStateService} from '../services/collection-editor-state.service';
 
+import './collection-details-editor.component.css';
+
 @Component({
   selector: 'collection-details-editor',
   templateUrl: './collection-details-editor.component.html',
+  styleUrls: ['./collection-details-editor.component.css'],
 })
 export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

@@ -23,9 +23,12 @@ import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UserService} from 'services/user.service';
 
+import './classroom-admin-navbar.component.css';
+
 @Component({
   selector: 'oppia-classroom-admin-navbar',
   templateUrl: './classroom-admin-navbar.component.html',
+  styleUrls: ['./classroom-admin-navbar.component.css'],
 })
 export class ClassroomAdminNavbarComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
