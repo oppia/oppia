@@ -21,7 +21,6 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
-
 import './state-stats-modal.component.css';
 
 interface PieChartOpitons {
@@ -40,6 +39,8 @@ interface PieChartOpitons {
 @Component({
   selector: 'oppia-state-stats-modal',
   templateUrl: './state-stats-modal.component.html',
+
+  styleUrls: ['./state-stats-modal.component.css'],
 })
 export class StateStatsModalComponent
   extends ConfirmOrCancelModal
