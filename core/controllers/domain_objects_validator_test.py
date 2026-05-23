@@ -34,7 +34,7 @@ from core.domain import (
 )
 from core.tests import test_utils
 
-from typing import Dict, List, Mapping, Optional, Union, cast
+from typing import Dict, List, Mapping, Optional, Union
 
 
 class ValidateSuggestionChangeTests(test_utils.GenericTestBase):
@@ -830,6 +830,25 @@ class ValidateSkillIdsTests(test_utils.GenericTestBase):
 class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
     """Tests for general feedback session_info validation."""
 
+    # Here we use object because session-info diagnostics include heterogeneous
+    # nested dict/list payload values from client logs.
+    def _as_dict(self, value: object) -> Dict[object, object]:
+        """Returns value after asserting it is a dict."""
+        if not isinstance(value, dict):
+            raise AssertionError('Expected dict.')
+        return value
+
+    # Here we use object because session-info diagnostics include heterogeneous
+    # nested dict/list payload values from client logs.
+    def _as_list_of_dicts(self, value: object) -> List[Dict[object, object]]:
+        """Returns value after asserting it is a list of dicts."""
+        if not isinstance(value, list):
+            raise AssertionError('Expected list.')
+        for item in value:
+            if not isinstance(item, dict):
+                raise AssertionError('Expected dict item.')
+        return value
+
     def setUp(self) -> None:
         super().setUp()
         # Here we use object because session-info diagnostics are heterogeneous
@@ -993,10 +1012,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
         validated_info = domain_objects_validator.validate_general_feedback_session_info_log_entries(
             self.session_info
         )
-        environment_json = cast(
-            Dict[str, object], validated_info['environment_json']
-        )
-        page_json = cast(Dict[str, object], environment_json['page'])
+        environment_json = self._as_dict(validated_info['environment_json'])
+        page_json = self._as_dict(environment_json['page'])
         self.assertEqual(
             page_json['url'],
             'http://oppia.org/explore/exp0',
@@ -1076,8 +1093,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        console_errors_json = cast(
-            List[Dict[str, object]], invalid_session_info['console_errors_json']
+        console_errors_json = self._as_list_of_dicts(
+            invalid_session_info['console_errors_json']
         )
         console_errors_json[0]['error_message'] = 1
         with self.assertRaisesRegex(
@@ -1089,8 +1106,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        console_errors_json = cast(
-            List[Dict[str, object]], invalid_session_info['console_errors_json']
+        console_errors_json = self._as_list_of_dicts(
+            invalid_session_info['console_errors_json']
         )
         console_errors_json[0]['error_message'] = 'a' * (
             feconf.MAX_SESSION_INFO_LOG_MESSAGE_LENGTH + 1
@@ -1105,8 +1122,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        console_errors_json = cast(
-            List[Dict[str, object]], invalid_session_info['console_errors_json']
+        console_errors_json = self._as_list_of_dicts(
+            invalid_session_info['console_errors_json']
         )
         console_errors_json[0]['timestamp_msecs'] = 'not_an_int'
         with self.assertRaisesRegex(
@@ -1118,8 +1135,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        console_errors_json = cast(
-            List[Dict[str, object]], invalid_session_info['console_errors_json']
+        console_errors_json = self._as_list_of_dicts(
+            invalid_session_info['console_errors_json']
         )
         console_errors_json[0]['log_level'] = 'not_a_valid_log_level'
         with self.assertRaisesRegex(
@@ -1130,8 +1147,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        console_errors_json = cast(
-            List[Dict[str, object]], invalid_session_info['console_errors_json']
+        console_errors_json = self._as_list_of_dicts(
+            invalid_session_info['console_errors_json']
         )
         console_errors_json[0]['stack_trace'] = 1
         with self.assertRaisesRegex(
@@ -1142,8 +1159,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        console_errors_json = cast(
-            List[Dict[str, object]], invalid_session_info['console_errors_json']
+        console_errors_json = self._as_list_of_dicts(
+            invalid_session_info['console_errors_json']
         )
         console_errors_json[0]['stack_trace'] = 'a' * (
             feconf.MAX_SESSION_INFO_STACK_TRACE_LENGTH + 1
@@ -1170,9 +1187,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        failed_requests_json = cast(
-            List[Dict[str, object]],
-            invalid_session_info['failed_requests_json'],
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
         )
         failed_requests_json[0]['url'] = 1
         with self.assertRaisesRegex(
@@ -1183,9 +1199,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        failed_requests_json = cast(
-            List[Dict[str, object]],
-            invalid_session_info['failed_requests_json'],
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
         )
         failed_requests_json[0]['url'] = 'a' * (feconf.MAX_PAGE_URL_LENGTH + 1)
         with self.assertRaisesRegex(
@@ -1198,9 +1213,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        failed_requests_json = cast(
-            List[Dict[str, object]],
-            invalid_session_info['failed_requests_json'],
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
         )
         failed_requests_json[0]['method'] = 100
         with self.assertRaisesRegex(
@@ -1211,9 +1225,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        failed_requests_json = cast(
-            List[Dict[str, object]],
-            invalid_session_info['failed_requests_json'],
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
         )
         failed_requests_json[0]['method'] = 'a' * (
             feconf.MAX_SESSION_INFO_METHOD_LENGTH + 1
@@ -1228,9 +1241,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        failed_requests_json = cast(
-            List[Dict[str, object]],
-            invalid_session_info['failed_requests_json'],
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
         )
         failed_requests_json[0]['status_code'] = '500'
         with self.assertRaisesRegex(
@@ -1242,9 +1254,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        failed_requests_json = cast(
-            List[Dict[str, object]],
-            invalid_session_info['failed_requests_json'],
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
         )
         failed_requests_json[0]['timestamp_msecs'] = 'not_an_int'
         with self.assertRaisesRegex(
@@ -1256,9 +1267,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        failed_requests_json = cast(
-            List[Dict[str, object]],
-            invalid_session_info['failed_requests_json'],
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
         )
         failed_requests_json[0]['status_text'] = 1
         with self.assertRaisesRegex(
@@ -1281,9 +1291,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        failed_requests_json = cast(
-            List[Dict[str, object]],
-            invalid_session_info['failed_requests_json'],
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
         )
         failed_requests_json[0]['status_text'] = 'a' * (
             feconf.MAX_SESSION_INFO_STATUS_TEXT_LENGTH + 1
@@ -1298,9 +1307,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        failed_requests_json = cast(
-            List[Dict[str, object]],
-            invalid_session_info['failed_requests_json'],
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
         )
         failed_requests_json[0]['error_message'] = 1
         with self.assertRaisesRegex(
@@ -1312,9 +1320,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        failed_requests_json = cast(
-            List[Dict[str, object]],
-            invalid_session_info['failed_requests_json'],
+        failed_requests_json = self._as_list_of_dicts(
+            invalid_session_info['failed_requests_json']
         )
         failed_requests_json[0]['error_message'] = 'a' * (
             feconf.MAX_SESSION_INFO_LOG_MESSAGE_LENGTH + 1
@@ -1341,9 +1348,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        navigation_history_json = cast(
-            List[Dict[str, object]],
-            invalid_session_info['navigation_history_json'],
+        navigation_history_json = self._as_list_of_dicts(
+            invalid_session_info['navigation_history_json']
         )
         navigation_history_json[0]['path'] = 1
         with self.assertRaisesRegex(
@@ -1354,9 +1360,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        navigation_history_json = cast(
-            List[Dict[str, object]],
-            invalid_session_info['navigation_history_json'],
+        navigation_history_json = self._as_list_of_dicts(
+            invalid_session_info['navigation_history_json']
         )
         navigation_history_json[0]['path'] = 'a' * (
             feconf.MAX_PAGE_URL_LENGTH + 1
@@ -1371,9 +1376,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        navigation_history_json = cast(
-            List[Dict[str, object]],
-            invalid_session_info['navigation_history_json'],
+        navigation_history_json = self._as_list_of_dicts(
+            invalid_session_info['navigation_history_json']
         )
         navigation_history_json[0]['timestamp_msecs'] = 'not_an_int'
         with self.assertRaisesRegex(
@@ -1388,8 +1392,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         invalid_session_info = copy.deepcopy(self.session_info)
-        environment_json = cast(
-            Dict[str, object], invalid_session_info['environment_json']
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
         )
         environment_json['page'] = 'not_a_dict'
         with self.assertRaisesRegex(
@@ -1400,10 +1404,10 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        environment_json = cast(
-            Dict[str, object], invalid_session_info['environment_json']
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
         )
-        page_json = cast(Dict[str, object], environment_json['page'])
+        page_json = self._as_dict(environment_json['page'])
         page_json['url'] = 1
         with self.assertRaisesRegex(
             Exception, 'Session info page.url should be a string.'
@@ -1413,10 +1417,10 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        environment_json = cast(
-            Dict[str, object], invalid_session_info['environment_json']
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
         )
-        page_json = cast(Dict[str, object], environment_json['page'])
+        page_json = self._as_dict(environment_json['page'])
         page_json['title'] = 1
         with self.assertRaisesRegex(
             Exception, 'Session info page.title should be a string.'
@@ -1426,10 +1430,10 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        environment_json = cast(
-            Dict[str, object], invalid_session_info['environment_json']
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
         )
-        page_json = cast(Dict[str, object], environment_json['page'])
+        page_json = self._as_dict(environment_json['page'])
         page_json['title'] = 'a' * (
             feconf.MAX_SESSION_INFO_PAGE_FIELD_LENGTH + 1
         )
@@ -1441,8 +1445,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        environment_json = cast(
-            Dict[str, object], invalid_session_info['environment_json']
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
         )
         environment_json['viewport'] = 'not_a_dict'
         with self.assertRaisesRegex(
@@ -1453,10 +1457,10 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        environment_json = cast(
-            Dict[str, object], invalid_session_info['environment_json']
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
         )
-        viewport_json = cast(Dict[str, object], environment_json['viewport'])
+        viewport_json = self._as_dict(environment_json['viewport'])
         viewport_json['width'] = 'not_an_int'
         with self.assertRaisesRegex(
             Exception, 'Session info viewport.width should be an int.'
@@ -1466,8 +1470,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        environment_json = cast(
-            Dict[str, object], invalid_session_info['environment_json']
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
         )
         environment_json['locale'] = 'not_a_dict'
         with self.assertRaisesRegex(
@@ -1478,10 +1482,10 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        environment_json = cast(
-            Dict[str, object], invalid_session_info['environment_json']
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
         )
-        locale_json = cast(Dict[str, object], environment_json['locale'])
+        locale_json = self._as_dict(environment_json['locale'])
         locale_json['language_code'] = 1
         with self.assertRaisesRegex(
             Exception, 'Session info locale.language_code should be a string.'
@@ -1491,10 +1495,10 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        environment_json = cast(
-            Dict[str, object], invalid_session_info['environment_json']
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
         )
-        locale_json = cast(Dict[str, object], environment_json['locale'])
+        locale_json = self._as_dict(environment_json['locale'])
         locale_json['language_code'] = 'invalid_code'
         with self.assertRaisesRegex(
             Exception, 'Session info locale.language_code is invalid.'
@@ -1504,10 +1508,10 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        environment_json = cast(
-            Dict[str, object], invalid_session_info['environment_json']
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
         )
-        locale_json = cast(Dict[str, object], environment_json['locale'])
+        locale_json = self._as_dict(environment_json['locale'])
         locale_json['direction'] = 'invalid'
         with self.assertRaisesRegex(
             Exception,
@@ -1521,8 +1525,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         invalid_session_info = copy.deepcopy(self.session_info)
-        environment_json = cast(
-            Dict[str, object], invalid_session_info['environment_json']
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
         )
         environment_json['user_agent'] = 100
         with self.assertRaisesRegex(
@@ -1533,8 +1537,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        environment_json = cast(
-            Dict[str, object], invalid_session_info['environment_json']
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
         )
         environment_json['client_time_msecs'] = 'not_an_int'
         with self.assertRaisesRegex(
@@ -1545,8 +1549,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        environment_json = cast(
-            Dict[str, object], invalid_session_info['environment_json']
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
         )
         environment_json['user_agent'] = 'a' * (
             feconf.MAX_SESSION_INFO_USER_AGENT_LENGTH + 1
@@ -1561,8 +1565,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        environment_json = cast(
-            Dict[str, object], invalid_session_info['environment_json']
+        environment_json = self._as_dict(
+            invalid_session_info['environment_json']
         )
         environment_json['timezone_offset_mins'] = 'not_an_int'
         with self.assertRaisesRegex(
