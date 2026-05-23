@@ -48,6 +48,7 @@ export enum FeatureNames {
   EnableReadyForReviewTest = 'enable_ready_for_review_test',
   EnableCampaignBanner = 'enable_financial_literacy_campaign_banner',
   EnableCampaignBannerTestMode = 'enable_financial_literacy_campaign_banner_test_mode',
+  EnableAutomaticTranslationSuggestions = 'enable_automatic_translation_suggestions',
 }
 
 export interface FeatureStatusSummaryBackendDict {
