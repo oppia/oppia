@@ -48,9 +48,12 @@ import {Hint} from 'domain/exploration/hint-object.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 
+import './state-editor.component.css';
+
 @Component({
   selector: 'oppia-state-editor',
   templateUrl: './state-editor.component.html',
+  styleUrls: ['./state-editor.component.css'],
 })
 export class StateEditorComponent implements OnInit, OnDestroy {
   @Output() onSaveHints = new EventEmitter<Hint[]>();

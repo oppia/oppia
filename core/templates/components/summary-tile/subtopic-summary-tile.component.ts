@@ -28,9 +28,12 @@ import {
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
 
+import './subtopic-summary-tile.component.css';
+
 @Component({
   selector: 'oppia-subtopic-summary-tile',
   templateUrl: './subtopic-summary-tile.component.html',
+  styleUrls: ['./subtopic-summary-tile.component.css'],
 })
 export class SubtopicSummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

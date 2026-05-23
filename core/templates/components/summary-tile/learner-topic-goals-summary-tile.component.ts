@@ -27,9 +27,13 @@ import {UrlService} from 'services/contextual/url.service';
 import {StoryNode} from 'domain/story/story-node.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+
+import './learner-topic-goals-summary-tile.component.css';
+
 @Component({
   selector: 'oppia-learner-topic-goals-summary-tile',
   templateUrl: './learner-topic-goals-summary-tile.component.html',
+  styleUrls: ['./learner-topic-goals-summary-tile.component.css'],
 })
 export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

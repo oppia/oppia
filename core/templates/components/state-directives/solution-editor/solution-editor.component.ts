@@ -24,6 +24,8 @@ import {StateInteractionIdService} from 'components/state-editor/state-editor-pr
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {Solution} from 'domain/exploration/solution.model';
 
+import './solution-editor.component.css';
+
 interface ExplanationFormSchema {
   type: string;
   ui_config: object;
@@ -32,6 +34,7 @@ interface ExplanationFormSchema {
 @Component({
   selector: 'oppia-solution-editor',
   templateUrl: './solution-editor.component.html',
+  styleUrls: ['./solution-editor.component.css'],
 })
 export class SolutionEditor implements OnInit {
   @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
