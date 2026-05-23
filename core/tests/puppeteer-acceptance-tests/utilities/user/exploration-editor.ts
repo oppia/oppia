@@ -7824,83 +7824,79 @@ export class ExplorationEditor extends BaseUser {
 
     await this.page.waitForFunction(
       (
-        gridSelector: string,
+        cardSelector: string,
+        cardIndex: number,
         ratingSelector: string,
         feedbackSelector: string,
         viewsSelector: string,
-        cardIndex: number,
-        rating: string,
-        openFeedback: string,
-        views: string
+        ratingValue: string,
+        feedbackValue: string,
+        viewsValue: string
       ) => {
-        const cards = Array.from(document.querySelectorAll(gridSelector));
+        const cards = Array.from(document.querySelectorAll(cardSelector));
         const card = cards[cardIndex] as HTMLElement | undefined;
 
         if (!card) {
           return false;
         }
 
-        const getInnerText = (selector: string): string => {
-          return (
-            (
-              card.querySelector(selector) as HTMLElement | null
-            )?.innerText.trim() || ''
-          );
-        };
+        const getText = (selector: string): string =>
+          card.querySelector(selector)?.textContent?.trim() || '';
 
         return (
-          getInnerText(ratingSelector) === rating &&
-          getInnerText(feedbackSelector) === openFeedback &&
-          getInnerText(viewsSelector) === views
+          getText(ratingSelector) === ratingValue &&
+          getText(feedbackSelector) === feedbackValue &&
+          getText(viewsSelector) === viewsValue
         );
       },
-      {},
+      {timeout: 10000},
       explorationGridSelector,
+      index,
       explorationGridRatingSelector,
       explorationGridFeedbackSelector,
       explorationGridViewsSelector,
-      index,
       expectedRating,
       expectedOpenFeedback,
       expectedViews
     );
 
     const cards = await this.page.$$(explorationGridSelector);
-
     const card = cards[index];
 
     if (!card) {
       throw new Error(`Card at index ${index} not found.`);
     }
 
-    const rating = await card.$eval(explorationGridRatingSelector, el =>
-      (el as HTMLElement).innerText.trim()
+    const rating = await card.$eval(
+      explorationGridRatingSelector,
+      el => (el as HTMLElement).textContent?.trim() || ''
     );
 
     if (rating !== expectedRating) {
       throw new Error(
-        `Expected rating "${expectedRating}" ` + `but found "${rating}".`
+        `Expected rating "${expectedRating}" but found "${rating}".`
       );
     }
 
-    const feedback = await card.$eval(explorationGridFeedbackSelector, el =>
-      (el as HTMLElement).innerText.trim()
+    const feedback = await card.$eval(
+      explorationGridFeedbackSelector,
+      el => (el as HTMLElement).textContent?.trim() || ''
     );
 
     if (feedback !== expectedOpenFeedback) {
       throw new Error(
-        `Expected open feedback "${expectedOpenFeedback}" ` +
-          `but found "${feedback}".`
+        `Expected open feedback "${expectedOpenFeedback}" but found "${feedback}".`
       );
     }
 
-    const views = await card.$eval(explorationGridViewsSelector, el =>
-      (el as HTMLElement).innerText.trim()
+    const views = await card.$eval(
+      explorationGridViewsSelector,
+      el => (el as HTMLElement).textContent?.trim() || ''
     );
 
     if (views !== expectedViews) {
       throw new Error(
-        `Expected views "${expectedViews}" ` + `but found "${views}".`
+        `Expected views "${expectedViews}" but found "${views}".`
       );
     }
   }
