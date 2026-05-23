@@ -27,9 +27,12 @@ import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {Story} from 'domain/story/story.model';
 
+import './admin-dev-mode-activities-tab.component.css';
+
 @Component({
   selector: 'oppia-admin-dev-mode-activities-tab',
   templateUrl: './admin-dev-mode-activities-tab.component.html',
+  styleUrls: ['./admin-dev-mode-activities-tab.component.css'],
 })
 export class AdminDevModeActivitiesTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();

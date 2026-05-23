@@ -29,9 +29,12 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
 import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 
+import './lesson-card.component.css';
+
 @Component({
   selector: 'lesson-card',
   templateUrl: './lesson-card.component.html',
+  styleUrls: ['./lesson-card.component.css'],
 })
 export class LessonCardComponent implements OnInit {
   @Input() story!: StorySummary | LearnerExplorationSummary | CollectionSummary;

@@ -19,9 +19,12 @@
 import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {AppConstants} from 'app.constants';
 
+import './url-fragment-editor.component.css';
+
 @Component({
   selector: 'url-fragment-editor-component',
   templateUrl: './url-fragment-editor.component.html',
+  styleUrls: ['./url-fragment-editor.component.css'],
 })
 export class UrlFragmentEditorComponent {
   // The heading of the input box.

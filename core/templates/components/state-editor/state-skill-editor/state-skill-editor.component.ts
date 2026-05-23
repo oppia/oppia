@@ -38,9 +38,12 @@ import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {UserService} from 'services/user.service';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 
+import './state-skill-editor.component.css';
+
 @Component({
   selector: 'state-skill-editor',
   templateUrl: './state-skill-editor.component.html',
+  styleUrls: ['./state-skill-editor.component.css'],
 })
 export class StateSkillEditorComponent implements OnInit {
   @Output() onSaveLinkedSkillId: EventEmitter<string | null> = new EventEmitter<

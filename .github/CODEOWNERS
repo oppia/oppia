@@ -272,6 +272,7 @@
 /core/templates/services/schema-form-submitted.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-undefined-last-element.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/url-fragment-editor/url-fragment-editor.component.html @oppia/lace-frontend-reviewers
+/core/templates/components/url-fragment-editor/url-fragment-editor.component.css @oppia/lace-frontend-reviewers
 /core/templates/components/url-fragment-editor/url-fragment-editor.component.ts @oppia/lace-frontend-reviewers
 /core/templates/components/url-fragment-editor/url-fragment-editor.component.spec.ts @oppia/lace-frontend-reviewers
 

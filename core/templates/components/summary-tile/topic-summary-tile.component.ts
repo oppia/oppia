@@ -27,9 +27,12 @@ import {
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
 
+import './topic-summary-tile.component.css';
+
 @Component({
   selector: 'oppia-topic-summary-tile',
   templateUrl: './topic-summary-tile.component.html',
+  styleUrls: ['./topic-summary-tile.component.css'],
 })
 export class TopicSummaryTileComponent {
   // These properties are initialized using Angular lifecycle hooks

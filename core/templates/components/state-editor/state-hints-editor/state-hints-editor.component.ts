@@ -37,6 +37,8 @@ import {DeleteLastHintModalComponent} from 'pages/exploration-editor-page/editor
 import {Solution} from 'domain/exploration/solution.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
+import './state-hints-editor.component.css';
+
 interface DeleteValueResponse {
   index: number;
   evt: Event;
@@ -49,6 +51,7 @@ interface AddHintModalResponse {
 @Component({
   selector: 'oppia-state-hints-editor',
   templateUrl: './state-hints-editor.component.html',
+  styleUrls: ['./state-hints-editor.component.css'],
 })
 export class StateHintsEditorComponent implements OnInit {
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();

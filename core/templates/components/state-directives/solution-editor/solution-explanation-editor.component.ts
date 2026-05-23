@@ -34,6 +34,8 @@ import {
   HtmlLengthService,
 } from 'services/html-length.service';
 
+import './solution-explanation-editor.component.css';
+
 interface ExplanationFormSchema {
   type: string;
   ui_config: object;
@@ -42,6 +44,7 @@ interface ExplanationFormSchema {
 @Component({
   selector: 'oppia-solution-explanation-editor',
   templateUrl: './solution-explanation-editor.component.html',
+  styleUrls: ['./solution-explanation-editor.component.css'],
 })
 export class SolutionExplanationEditor implements OnDestroy, OnInit {
   @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
