@@ -27,9 +27,12 @@ import {
 } from '@angular/core';
 import {QuestionPlayerConstants} from '../question-directives/question-player/question-player.constants';
 
+import './score-ring.component.css';
+
 @Component({
   selector: 'oppia-score-ring',
   templateUrl: './score-ring.component.html',
+  styleUrls: ['./score-ring.component.css'],
 })
 export class ScoreRingComponent implements AfterViewInit, OnChanges {
   constructor() {}

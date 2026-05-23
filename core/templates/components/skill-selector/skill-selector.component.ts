@@ -25,6 +25,8 @@ import cloneDeep from 'lodash/cloneDeep';
 import {GroupedSkillSummaries} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {UserService} from 'services/user.service';
 
+import './skill-selector.component.css';
+
 interface SubTopicFilterDict {
   [topicName: string]: {subTopicName: string; checked: boolean}[];
 }
@@ -32,6 +34,7 @@ interface SubTopicFilterDict {
 @Component({
   selector: 'oppia-skill-selector',
   templateUrl: './skill-selector.component.html',
+  styleUrls: ['./skill-selector.component.css'],
 })
 export class SkillSelectorComponent implements OnInit {
   // If countOfSkillsToPrioritize > 0, then sortedSkillSummaries should

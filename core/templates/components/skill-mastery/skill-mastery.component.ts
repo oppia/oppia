@@ -21,10 +21,12 @@ import {Component, Input, OnInit} from '@angular/core';
 import {SkillMasteryListConstants} from 'components/skills-mastery-list/skills-mastery-list.constants';
 import {SkillMasteryBackendApiService} from 'domain/skill/skill-mastery-backend-api.service';
 
+import './skill-mastery.component.css';
+
 @Component({
   selector: 'skill-mastery-viewer',
   templateUrl: './skill-mastery.component.html',
-  styleUrls: [],
+  styleUrls: ['./skill-mastery.component.css'],
 })
 export class SkillMasteryViewerComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

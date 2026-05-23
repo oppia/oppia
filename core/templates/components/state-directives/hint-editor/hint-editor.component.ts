@@ -37,6 +37,8 @@ import {
   HtmlLengthService,
 } from 'services/html-length.service';
 
+import './hint-editor.component.css';
+
 interface HintFormSchema {
   type: string;
   ui_config: object;
@@ -45,6 +47,7 @@ interface HintFormSchema {
 @Component({
   selector: 'oppia-hint-editor',
   templateUrl: './hint-editor.component.html',
+  styleUrls: ['./hint-editor.component.css'],
 })
 export class HintEditorComponent implements OnInit, OnDestroy {
   @Output() saveHint = new EventEmitter<void>();

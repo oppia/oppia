@@ -21,6 +21,8 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 
+import './select-skill-modal.component.css';
+
 export interface CategorizedSkills {
   [topic: string]: {
     [subtopic: string]: SkillSummaryBackendDict[];
@@ -30,6 +32,7 @@ export interface CategorizedSkills {
 @Component({
   selector: 'oppia-select-skill',
   templateUrl: './select-skill-modal.component.html',
+  styleUrls: ['./select-skill-modal.component.css'],
 })
 export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks

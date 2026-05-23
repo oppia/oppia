@@ -24,6 +24,9 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {AppConstants} from 'app.constants';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+
+import './response-header.component.css';
+
 interface DeleteValue {
   index: number;
   evt: Event;
@@ -31,6 +34,7 @@ interface DeleteValue {
 @Component({
   selector: 'oppia-response-header',
   templateUrl: './response-header.component.html',
+  styleUrls: ['./response-header.component.css'],
 })
 export class ResponseHeaderComponent {
   @Output() delete = new EventEmitter<DeleteValue>();
