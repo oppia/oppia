@@ -36,10 +36,12 @@ import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {ExplorationRatings} from 'domain/summary/learner-exploration-summary.model';
 import {CreatorDashboardStats} from 'domain/creator_dashboard/creator-dashboard-stats.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import './creator-dashboard-page.component.css';
 
 @Component({
   selector: 'oppia-creator-dashboard-page',
   templateUrl: './creator-dashboard-page.component.html',
+  styleUrls: ['./creator-dashboard-page.component.css'],
 })
 export class CreatorDashboardPageComponent {
   // These properties are initialized using Angular lifecycle hooks
