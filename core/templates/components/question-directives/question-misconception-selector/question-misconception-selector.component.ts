@@ -24,6 +24,8 @@ import {
   MisconceptionSkillMap,
 } from 'domain/skill/misconception.model';
 
+import './question-misconception-selector.component.css';
+
 interface UpdatedValues {
   misconception: Misconception | null;
   skillId: string | null;
@@ -33,6 +35,7 @@ interface UpdatedValues {
 @Component({
   selector: 'oppia-question-misconception-selector',
   templateUrl: './question-misconception-selector.component.html',
+  styleUrls: ['./question-misconception-selector.component.css'],
 })
 export class QuestionMisconceptionSelectorComponent implements OnInit {
   @Output() updateMisconceptionValues: EventEmitter<UpdatedValues> =

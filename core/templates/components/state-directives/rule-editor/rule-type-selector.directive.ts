@@ -22,6 +22,8 @@ import {ReplaceInputsWithEllipsesPipe} from 'filters/string-utility-filters/repl
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
+import './rule-type-selector.component.css';
+
 interface Choice {
   id: string;
   text: string;
@@ -30,6 +32,7 @@ interface Choice {
 @Component({
   selector: 'oppia-rule-type-selector',
   templateUrl: './rule-type-selector.component.html',
+  styleUrls: ['./rule-type-selector.component.css'],
 })
 export class RuleTypeSelector implements OnInit {
   // This property is initialized using Angular lifecycle hooks

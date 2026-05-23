@@ -27,6 +27,8 @@ import {UserService} from 'services/user.service';
 import {AppConstants} from 'app.constants';
 import {Outcome} from 'domain/exploration/outcome.model';
 
+import './outcome-destination-editor.component.css';
+
 interface DestinationChoice {
   id: string;
   text: string;
@@ -39,6 +41,7 @@ interface DestValidation {
 @Component({
   selector: 'oppia-outcome-destination-editor',
   templateUrl: './outcome-destination-editor.component.html',
+  styleUrls: ['./outcome-destination-editor.component.css'],
 })
 export class OutcomeDestinationEditorComponent implements OnInit {
   @Output() addState: EventEmitter<string> = new EventEmitter<string>();

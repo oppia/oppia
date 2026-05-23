@@ -18,6 +18,8 @@
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
+import './summary-list-header.component.css';
+
 interface DeleteSummaryEventData {
   index: number;
   event: Event;
@@ -26,6 +28,7 @@ interface DeleteSummaryEventData {
 @Component({
   selector: 'oppia-summary-list-header',
   templateUrl: './summary-list-header.component.html',
+  styleUrls: ['./summary-list-header.component.css'],
 })
 export class SummaryListHeaderComponent {
   // These properties are initialized using Angular lifecycle hooks

@@ -44,6 +44,8 @@ import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
+import './answer-group-editor.component.css';
+
 interface TaggedMisconception {
   skillId: string | null;
   misconceptionId: number;
@@ -52,6 +54,7 @@ interface TaggedMisconception {
 @Component({
   selector: 'oppia-answer-group-editor',
   templateUrl: './answer-group-editor.component.html',
+  styleUrls: ['./answer-group-editor.component.css'],
 })
 export class AnswerGroupEditor implements OnInit, OnDestroy {
   @Input() displayFeedback!: boolean;
