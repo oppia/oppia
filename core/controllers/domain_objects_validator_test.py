@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import datetime
 import os
+import copy
 
 from core import feconf, utils
 from core.constants import constants
@@ -960,4 +961,188 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
                 domain_objects_validator.is_feedback_submission_from_allowed_feedback_page_hostname(
                     'localhost'
                 )
+            )
+
+    def test_validate_general_feedback_submit_payload_coupling(self) -> None:
+        with self.assertRaisesRegex(
+            Exception,
+            'Session info must be provided if include_session_info is True.',
+        ):
+            domain_objects_validator.validate_general_feedback_submit_payload_coupling(
+                {
+                    'include_session_info': True,
+                    'session_info': None,
+                }
+            )
+
+        payload: Dict[str, object] = {
+            'include_session_info': False,
+            'session_info': None,
+        }
+        self.assertEqual(
+            domain_objects_validator.validate_general_feedback_submit_payload_coupling(
+                payload
+            ),
+            payload,
+        )
+
+    def test_validate_general_feedback_session_info_log_entries_happy_path(
+        self,
+    ) -> None:
+        validated_info = domain_objects_validator.validate_general_feedback_session_info_log_entries(
+            self.session_info
+        )
+        self.assertEqual(
+            validated_info['environment_json']['page']['url'],
+            'http://oppia.org/explore/exp0',
+        )
+
+    def test_validate_general_feedback_session_info_rejects_unknown_top_level_keys(
+        self,
+    ) -> None:
+        invalid_session_info = copy.deepcopy(self.session_info)
+        invalid_session_info['unknown_key'] = True
+        with self.assertRaisesRegex(
+            Exception, 'Session info contains unknown keys: unknown_key'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+    def test_validate_general_feedback_session_info_rejects_invalid_top_level_types(
+        self,
+    ) -> None:
+        test_cases = [
+            (
+                'console_errors_json',
+                'not_a_list',
+                'console_errors_json should be a list.',
+            ),
+            (
+                'failed_requests_json',
+                'not_a_list',
+                'failed_requests_json should be a list.',
+            ),
+            (
+                'navigation_history_json',
+                'not_a_list',
+                'navigation_history_json should be a list.',
+            ),
+            (
+                'environment_json',
+                'not_a_dict',
+                'environment_json should be a dict.',
+            ),
+        ]
+        for key, value, expected_error in test_cases:
+            invalid_session_info = copy.deepcopy(self.session_info)
+            invalid_session_info[key] = value
+            with self.assertRaisesRegex(Exception, expected_error):
+                (
+                    domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                        invalid_session_info
+                    )
+                )
+
+    def test_validate_general_feedback_session_info_rejects_too_many_entries(
+        self,
+    ) -> None:
+        invalid_session_info = copy.deepcopy(self.session_info)
+        invalid_session_info['console_errors_json'] = [{}] * (
+            feconf.MAX_SESSION_INFO_LOG_ENTRIES + 1
+        )
+        with self.assertRaisesRegex(
+            Exception, 'Session info log entries exceed maximum allowed limit.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+    def test_validate_general_feedback_session_info_rejects_invalid_console_error_fields(
+        self,
+    ) -> None:
+        invalid_session_info = copy.deepcopy(self.session_info)
+        invalid_session_info['console_errors_json'] = ['not_a_dict']
+        with self.assertRaisesRegex(
+            Exception, 'console_errors_json should be a list of dicts.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        invalid_session_info['console_errors_json'][0]['error_message'] = 1
+        with self.assertRaisesRegex(
+            Exception,
+            'error_message in console_errors_json should be a string.',
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        invalid_session_info['console_errors_json'][0]['error_message'] = (
+            'a' * (feconf.MAX_SESSION_INFO_LOG_MESSAGE_LENGTH + 1)
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'error_message in console_errors_json exceeds maximum length of %d characters.'
+            % feconf.MAX_SESSION_INFO_LOG_MESSAGE_LENGTH,
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+    def test_validate_general_feedback_session_info_rejects_invalid_failed_request_fields(
+        self,
+    ) -> None:
+        invalid_session_info = copy.deepcopy(self.session_info)
+        invalid_session_info['failed_requests_json'] = ['not_a_dict']
+        with self.assertRaisesRegex(
+            Exception, 'failed_requests_json should be a list of dicts.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        invalid_session_info['failed_requests_json'][0]['url'] = 1
+        with self.assertRaisesRegex(
+            Exception, 'url in failed_requests_json should be a string.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        invalid_session_info['failed_requests_json'][0]['status_text'] = 1
+        with self.assertRaisesRegex(
+            Exception, 'status_text in failed_requests_json should be a string.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+    def test_validate_general_feedback_session_info_rejects_invalid_navigation_and_environment_fields(
+        self,
+    ) -> None:
+        invalid_session_info = copy.deepcopy(self.session_info)
+        invalid_session_info['navigation_history_json'] = ['not_a_dict']
+        with self.assertRaisesRegex(
+            Exception, 'navigation_history_json should be a list of dicts.'
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
+            )
+
+        invalid_session_info = copy.deepcopy(self.session_info)
+        invalid_session_info['environment_json']['locale'][
+            'direction'
+        ] = 'invalid'
+        with self.assertRaisesRegex(
+            Exception,
+            'Session info locale.direction should be "ltr" or "rtl".',
+        ):
+            domain_objects_validator.validate_general_feedback_session_info_log_entries(
+                invalid_session_info
             )
