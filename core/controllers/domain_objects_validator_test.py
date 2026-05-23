@@ -824,3 +824,140 @@ class ValidateSkillIdsTests(test_utils.GenericTestBase):
     def test_valid_skill_ids_do_not_raise_exception(self) -> None:
         valid_skill_ids: str = 'skillid12345'
         domain_objects_validator.validate_skill_ids(valid_skill_ids)
+
+
+class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
+    """Tests for general feedback session_info validation."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        # Here we use object because session-info diagnostics are heterogeneous
+        # JSON-like payloads (nested dict/list values) from client logs.
+        self.session_info: Dict[str, object] = {
+            'console_errors_json': [
+                {
+                    'error_message': 'TypeError: Cannot read properties of undefined',
+                    'log_level': 'error',
+                    'timestamp_msecs': 1767225600000,
+                    'stack_trace': (
+                        'TypeError: Cannot read properties of undefined\n'
+                        ' at FeedbackComponent.submit (feedback.component.ts:45)'
+                    ),
+                }
+            ],
+            'failed_requests_json': [
+                {
+                    'url': '/createhandler/web_feedback',
+                    'method': 'POST',
+                    'status_code': 500,
+                    'timestamp_msecs': 1767225601000,
+                    'status_text': 'Internal Server Error',
+                    'error_message': 'Request failed with status code 500',
+                }
+            ],
+            'navigation_history_json': [
+                {
+                    'path': '/learn/math',
+                    'timestamp_msecs': 1767225590000,
+                },
+                {
+                    'path': '/explore/exp0',
+                    'timestamp_msecs': 1767225600000,
+                },
+            ],
+            'environment_json': {
+                'client_time_msecs': 1767225602000,
+                'timezone_offset_mins': -330,
+                'user_agent': (
+                    'Mozilla/5.0 (X11; Linux x86_64) '
+                    'AppleWebKit/537.36 Chrome/136.0 Safari/537.36'
+                ),
+                'viewport': {
+                    'width': 1920,
+                    'height': 1080,
+                },
+                'page': {
+                    'url': 'http://oppia.org/explore/exp0',
+                    'title': 'Fractions Exploration',
+                },
+                'locale': {
+                    'language_code': 'en',
+                    'direction': 'ltr',
+                },
+            },
+        }
+
+    def test_is_feedback_submission_from_allowed_feedback_page_hostname(
+        self,
+    ) -> None:
+        for hostname in feconf.ALLOWED_FEEDBACK_PAGE_HOSTS:
+            self.assertTrue(
+                domain_objects_validator.is_feedback_submission_from_allowed_feedback_page_hostname(
+                    hostname
+                )
+            )
+        self.assertTrue(
+            domain_objects_validator.is_feedback_submission_from_allowed_feedback_page_hostname(
+                'www.oppia.org'
+            )
+        )
+        self.assertTrue(
+            domain_objects_validator.is_feedback_submission_from_allowed_feedback_page_hostname(
+                'oppiatestserver.org'
+            )
+        )
+        self.assertTrue(
+            domain_objects_validator.is_feedback_submission_from_allowed_feedback_page_hostname(
+                'subdomain.oppiatestserver.org'
+            )
+        )
+        self.assertFalse(
+            domain_objects_validator.is_feedback_submission_from_allowed_feedback_page_hostname(
+                'fakeoppia.org'
+            )
+        )
+
+    def test_validate_general_feedback_page_url(self) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'Page URL must start with http:// or https://.'
+        ):
+            domain_objects_validator.validate_general_feedback_page_url(
+                'httpps://fakeoppia.org'
+            )
+        with self.assertRaisesRegex(
+            Exception,
+            'Hostname of the page URL is not allowed for feedback submission.',
+        ):
+            domain_objects_validator.validate_general_feedback_page_url(
+                'http://fakeoppia.org'
+            )
+        with self.assertRaisesRegex(
+            Exception,
+            'Page URL exceeds maximum length of %d characters.'
+            % (feconf.MAX_PAGE_URL_LENGTH),
+        ):
+            domain_objects_validator.validate_general_feedback_page_url(
+                'https://www.oppia.org/%s' % ('a' * feconf.MAX_PAGE_URL_LENGTH)
+            )
+        self.assertEqual(
+            domain_objects_validator.validate_general_feedback_page_url(
+                '  https://www.oppia.org/learn/math  '
+            ),
+            'https://www.oppia.org/learn/math',
+        )
+
+    def test_localhost_is_allowed_in_non_prod_env(self) -> None:
+        with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
+            self.assertTrue(
+                domain_objects_validator.is_feedback_submission_from_allowed_feedback_page_hostname(
+                    'localhost'
+                )
+            )
+
+    def test_localhost_is_rejected_in_prod_env(self) -> None:
+        with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+            self.assertFalse(
+                domain_objects_validator.is_feedback_submission_from_allowed_feedback_page_hostname(
+                    'localhost'
+                )
+            )

@@ -202,6 +202,36 @@ MAX_CHARS_IN_BLOG_POST_URL = (
     + constants.BLOG_POST_ID_LENGTH
 )
 
+# Maximum lengths for various session info fields.
+MAX_PAGE_URL_LENGTH = 2000
+# This is the maximum limit for console errors
+# and failed requests in session info.
+MAX_SESSION_INFO_LOG_ENTRIES = 25
+MAX_NAVIGATION_HISTORY_ENTRIES = 5
+MAX_SESSION_INFO_USER_AGENT_LENGTH = 1000
+MAX_SESSION_INFO_PAGE_FIELD_LENGTH = 2000
+
+MAX_SESSION_INFO_LOG_MESSAGE_LENGTH = 1000
+MAX_SESSION_INFO_STACK_TRACE_LENGTH = 4000
+MAX_SESSION_INFO_METHOD_LENGTH = 20
+MAX_SESSION_INFO_STATUS_TEXT_LENGTH = 200
+ALLOWED_FEEDBACK_PAGE_HOST_SUFFIXES = (
+    'oppia.org',
+    'oppiatestserver.org',
+    'oppiaserver-backup-migration.appspot.com',
+)
+ALLOWED_FEEDBACK_PAGE_HOSTS = (
+    'localhost',
+    '127.0.0.1',
+    '::1',
+)
+ALLOWED_SESSION_INFO_TOP_LEVEL_KEYS = (
+    'console_errors_json',
+    'failed_requests_json',
+    'navigation_history_json',
+    'environment_json',
+)
+
 # Allowed formats of how HTML is present in rule specs.
 HTML_RULE_VARIABLE_FORMAT_SET = 'set'
 HTML_RULE_VARIABLE_FORMAT_STRING = 'string'
