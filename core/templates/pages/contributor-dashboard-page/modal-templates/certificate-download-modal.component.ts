@@ -26,6 +26,8 @@ import {
 } from '../services/contribution-and-review-backend-api.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
 
+import './certificate-download-modal.component.css';
+
 interface CertificateContentData {
   text: string;
   linePosition: number;
@@ -34,6 +36,7 @@ interface CertificateContentData {
 @Component({
   selector: 'certificate-download-modal',
   templateUrl: './certificate-download-modal.component.html',
+  styleUrls: ['./certificate-download-modal.component.css'],
 })
 export class CertificateDownloadModalComponent {
   @Input() suggestionType!: string;

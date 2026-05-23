@@ -53,6 +53,8 @@ import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
+import './translation-modal.component.css';
+
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 class UiConfig {
@@ -101,6 +103,7 @@ export interface ImageDetails {
 @Component({
   selector: 'oppia-translation-modal',
   templateUrl: './translation-modal.component.html',
+  styleUrls: ['./translation-modal.component.css'],
 })
 export class TranslationModalComponent {
   // These properties below are initialized using Angular lifecycle hooks

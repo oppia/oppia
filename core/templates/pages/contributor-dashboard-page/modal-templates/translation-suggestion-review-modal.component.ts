@@ -50,6 +50,8 @@ import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.co
 import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
+import './translation-suggestion-review-modal.component.css';
+
 interface HTMLSchema {
   type: string;
   ui_config: object;
@@ -111,6 +113,7 @@ enum ExpansionTabType {
 @Component({
   selector: 'oppia-translation-suggestion-review-modal',
   templateUrl: './translation-suggestion-review-modal.component.html',
+  styleUrls: ['./translation-suggestion-review-modal.component.css'],
 })
 export class TranslationSuggestionReviewModalComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

@@ -38,6 +38,8 @@ import {AppConstants} from 'app.constants';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {CertificateDownloadModalComponent} from '../modal-templates/certificate-download-modal.component';
 
+import './contributor-stats.component.css';
+
 interface Option {
   contributionType: string;
   displayName: string;
@@ -96,7 +98,7 @@ interface QuestionReviewStats extends Stat {
 @Component({
   selector: 'contributor-stats',
   templateUrl: './contributor-stats.component.html',
-  styleUrls: [],
+  styleUrls: ['./contributor-stats.component.css'],
 })
 export class ContributorStatsComponent {
   @Input() type!: string;

@@ -23,10 +23,12 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {SignInEventService} from 'services/sign-in-event.service';
 import {Component} from '@angular/core';
 
+import './login-required-message.component.css';
+
 @Component({
   selector: 'login-required-message',
   templateUrl: './login-required-message.component.html',
-  styleUrls: [],
+  styleUrls: ['./login-required-message.component.css'],
 })
 export class LoginRequiredMessageComponent {
   // These properties are initialized using Angular lifecycle hooks
