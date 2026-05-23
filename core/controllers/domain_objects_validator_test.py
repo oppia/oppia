@@ -974,7 +974,8 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
                     'session_info': None,
                 }
             )
-
+        # Here we use object because session-info diagnostics are heterogeneous
+        # JSON-like payloads (nested dict/list values) from client logs.
         payload: Dict[str, object] = {
             'include_session_info': False,
             'session_info': None,
