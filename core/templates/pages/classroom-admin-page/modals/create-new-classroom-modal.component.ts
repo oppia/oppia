@@ -23,9 +23,12 @@ import {ClassroomBackendApiService} from '../../../domain/classroom/classroom-ba
 import {NewClassroomData} from '../new-classroom.model';
 import {ClassroomAdminDataService} from '../services/classroom-admin-data.service';
 
+import './create-new-classroom-modal.component.css';
+
 @Component({
   selector: 'oppia-create-new-classroom-modal',
   templateUrl: './create-new-classroom-modal.component.html',
+  styleUrls: ['./create-new-classroom-modal.component.css'],
 })
 export class CreateNewClassroomModalComponent extends ConfirmOrCancelModal {
   constructor(
