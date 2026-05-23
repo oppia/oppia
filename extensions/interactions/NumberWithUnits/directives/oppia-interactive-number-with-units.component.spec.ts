@@ -261,7 +261,7 @@ describe('Number with units interaction component', () => {
 
   it('should correctly parse number with comma as decimal separator', () => {
     const i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    i18nLanguageCodeService.setI18nLanguageCode('pt');
+    i18nLanguageCodeService.setI18nLanguageCode('pt-br');
 
     component.answer = '1,2 hr';
     spyOn(currentInteractionService, 'onSubmit');

@@ -20,7 +20,6 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {NumberConversionService} from 'services/number-conversion.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {NumberWithUnitsAnswer} from 'interactions/answer-defs';
 
