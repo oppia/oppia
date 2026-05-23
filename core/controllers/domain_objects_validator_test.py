@@ -16,9 +16,9 @@
 
 from __future__ import annotations
 
+import copy
 import datetime
 import os
-import copy
 
 from core import feconf, utils
 from core.constants import constants
