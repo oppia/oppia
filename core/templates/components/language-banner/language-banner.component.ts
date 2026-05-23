@@ -22,9 +22,12 @@ import {UserService} from 'services/user.service';
 import {LanguageBannerService} from './language-banner.service';
 import {Router} from '@angular/router';
 
+import './language-banner.component.css';
+
 @Component({
   selector: 'language-banner',
   templateUrl: './language-banner.component.html',
+  styleUrls: ['./language-banner.component.css'],
 })
 export class LanguageBannerComponent implements OnInit {
   bannerIsVisible: boolean = false;

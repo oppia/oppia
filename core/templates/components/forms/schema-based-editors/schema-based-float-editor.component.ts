@@ -40,6 +40,8 @@ import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 
+import './schema-based-float-editor.component.css';
+
 interface OppiaValidator {
   id: string;
   min_value: number;
@@ -49,7 +51,7 @@ interface OppiaValidator {
 @Component({
   selector: 'schema-based-float-editor',
   templateUrl: './schema-based-float-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./schema-based-float-editor.component.css'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

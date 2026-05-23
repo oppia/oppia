@@ -45,9 +45,12 @@ import type {InteractionData} from 'interactions/customization-args-defs';
 import {LoaderService} from 'services/loader.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 
+import './question-editor.component.css';
+
 @Component({
   selector: 'oppia-question-editor',
   templateUrl: './question-editor.component.html',
+  styleUrls: ['./question-editor.component.css'],
 })
 export class QuestionEditorComponent implements OnInit, OnDestroy {
   @Output() questionChange = new EventEmitter<void>();

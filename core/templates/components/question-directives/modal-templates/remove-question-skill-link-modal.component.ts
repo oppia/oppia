@@ -25,6 +25,8 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 
+import './remove-question-skill-link-modal.component.css';
+
 export interface TopicNameToTopicId {
   [key: string]: string;
 }
@@ -32,6 +34,7 @@ export interface TopicNameToTopicId {
 @Component({
   selector: 'oppia-remove-question-skill-link-modal',
   templateUrl: './remove-question-skill-link-modal.component.html',
+  styleUrls: ['./remove-question-skill-link-modal.component.css'],
 })
 export class RemoveQuestionSkillLinkModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
