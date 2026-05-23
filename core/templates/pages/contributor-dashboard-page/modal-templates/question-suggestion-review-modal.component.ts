@@ -36,6 +36,8 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {SuggestionModalService} from 'services/suggestion-modal.service';
 import {ThreadDataBackendApiService} from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 
+import './question-suggestion-review.component.css';
+
 interface QuestionSuggestionModalValue {
   suggestionId: string;
   suggestion: ActiveSuggestionDict;
@@ -96,6 +98,7 @@ interface ActiveContributionDict {
 @Component({
   selector: 'oppia-question-suggestion-review-modal',
   templateUrl: './question-suggestion-review.component.html',
+  styleUrls: ['./question-suggestion-review.component.css'],
 })
 export class QuestionSuggestionReviewModalComponent
   extends ConfirmOrCancelModal

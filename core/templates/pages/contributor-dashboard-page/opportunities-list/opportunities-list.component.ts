@@ -25,6 +25,8 @@ import {ExplorationOpportunity} from '../opportunities-list-item/opportunities-l
 import {AppConstants} from 'app.constants';
 import {Subscription} from 'rxjs';
 
+import './opportunities-list.component.css';
+
 type ExplorationOpportunitiesFetcherFunction = () => Promise<{
   opportunitiesDicts: ExplorationOpportunity[];
   more: boolean;
@@ -33,7 +35,7 @@ type ExplorationOpportunitiesFetcherFunction = () => Promise<{
 @Component({
   selector: 'oppia-opportunities-list',
   templateUrl: './opportunities-list.component.html',
-  styleUrls: [],
+  styleUrls: ['./opportunities-list.component.css'],
 })
 export class OpportunitiesListComponent {
   // These properties are initialized using Angular lifecycle hooks
