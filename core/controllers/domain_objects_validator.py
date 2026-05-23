@@ -464,8 +464,8 @@ def validate_general_feedback_session_info_log_entries(
         raise base.BaseHandler.InvalidInputException(
             'console_errors_json should be a list.'
         )
-    failed__requests_json = session_info.get('failed_requests_json', '[]')
-    if not isinstance(failed__requests_json, list):
+    failed_requests_json = session_info.get('failed_requests_json', '[]')
+    if not isinstance(failed_requests_json, list):
         raise base.BaseHandler.InvalidInputException(
             'failed_requests_json should be a list.'
         )
@@ -481,7 +481,7 @@ def validate_general_feedback_session_info_log_entries(
         )
     if (
         len(console_errors_json) > feconf.MAX_SESSION_INFO_LOG_ENTRIES
-        or len(failed__requests_json) > feconf.MAX_SESSION_INFO_LOG_ENTRIES
+        or len(failed_requests_json) > feconf.MAX_SESSION_INFO_LOG_ENTRIES
         or len(navigation_history_json) > feconf.MAX_NAVIGATION_HISTORY_ENTRIES
     ):
         raise base.BaseHandler.InvalidInputException(
@@ -530,7 +530,7 @@ def validate_general_feedback_session_info_log_entries(
                     'stack_trace in console_errors_json exceeds maximum length of %d characters.'
                     % feconf.MAX_SESSION_INFO_STACK_TRACE_LENGTH
                 )
-    for entry in failed__requests_json:
+    for entry in failed_requests_json:
         if not isinstance(entry, dict):
             raise base.BaseHandler.InvalidInputException(
                 'failed_requests_json should be a list of dicts.'
@@ -679,7 +679,7 @@ def validate_general_feedback_session_info_log_entries(
 
     return {
         'console_errors_json': console_errors_json,
-        'failed_requests_json': failed__requests_json,
+        'failed_requests_json': failed_requests_json,
         'navigation_history_json': navigation_history_json,
         'environment_json': {
             'client_time_msecs': client_time_msecs,
