@@ -121,7 +121,7 @@ describe('NumberWithUnitsEditorComponent', () => {
 
   it('should correctly parse number with comma as decimal separator', () => {
     const i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    i18nLanguageCodeService.setI18nLanguageCode('pt');
+    i18nLanguageCodeService.setI18nLanguageCode('pt-br');
     spyOn(component.valueChanged, 'emit');
 
     component.updateValue('1,5 kg');
