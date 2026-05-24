@@ -5143,3 +5143,30 @@ def is_from_oppia_android_build(
         return handler(self, **kwargs)
 
     return test_is_from_oppia_android_build
+
+
+def can_access_certificate_dashboard(
+    handler: Callable[..., _GenericHandlerFunctionReturnType],
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Decorator to check whether the user can access the certificate
+    dashboard.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function.
+    """
+
+    @functools.wraps(handler)
+    def test_can_access_certificate_dashboard(
+        self: _SelfBaseHandlerType,
+    ) -> _GenericHandlerFunctionReturnType:
+        """Stub handler for certificate dashboard access checks.
+
+        Returns:
+            *. The return value of the decorated function.
+        """
+        return handler(self)
+
+    return test_can_access_certificate_dashboard
