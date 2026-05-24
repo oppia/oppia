@@ -122,11 +122,28 @@ class BackfillTranslationOpportunityModelJobTests(
                         'content_value': '<p>Hola</p>',
                         'needs_update': False,
                     },
+                    'content_1': {
+                        'content_format': 'html',
+                        'content_value': '<p>Needs update</p>',
+                        'needs_update': True,
+                    },
                 },
             )
         )
         translation_model.update_timestamps()
         translation_model.put()
+
+        translation_model_en = (
+            translation_models.EntityTranslationsModel.create_new(
+                'exploration',
+                self.exp_id,
+                1,
+                'en',
+                {}
+            )
+        )
+        translation_model_en.update_timestamps()
+        translation_model_en.put()
 
     def test_creates_translation_opportunity_model(self) -> None:
         self.assert_job_output_is(
@@ -148,7 +165,31 @@ class BackfillTranslationOpportunityModelJobTests(
         self.assertEqual(model.topic_ids, ['topic_id'])
         # Exploration currently has 0 content_count from create_default_exploration.
         self.assertEqual(model.content_count, 0)
-        self.assertEqual(model.translation_counts, {'hi': 1})
+        self.assertEqual(model.translation_counts, {'hi': 1, 'en': 0})
+
+    def test_fails_if_missing_summary_model(self) -> None:
+        summary_model = opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
+            self.exp_id
+        )
+        summary_model.delete()
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stderr='TRANSLATION OPPORTUNITY MODEL CREATION ERROR: "Missing ExplorationOpportunitySummaryModel": 1'
+                ),
+            ]
+        )
+
+    def test_fails_if_missing_exploration_model(self) -> None:
+        exp_model = exp_models.ExplorationModel.get_by_id(self.exp_id)
+        exp_model.delete()
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stderr='TRANSLATION OPPORTUNITY MODEL CREATION ERROR: "Missing ExplorationModel": 1'
+                ),
+            ]
+        )
 
 
 class AuditBackfillTranslationOpportunityModelJobTests(
