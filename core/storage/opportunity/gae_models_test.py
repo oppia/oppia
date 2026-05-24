@@ -433,6 +433,19 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
         ):
             model.put()
 
+    def test_validation_fails_for_invalid_language_code(self) -> None:
+        model = opportunity_models.TranslationOpportunityModel(
+            id='exploration.explangbad',
+            entity_type='exploration',
+            entity_id='explangbad',
+            topic_ids=[],
+            content_count=5,
+            incomplete_translation_language_codes=[],
+            translation_counts={'xyz': 2},
+        )
+        with self.assertRaisesRegex(Exception, 'Invalid language code: xyz'):
+            model.put()
+
     def test_validation_fails_for_translation_count_exceeding_content(
         self,
     ) -> None:
@@ -450,3 +463,150 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             r'Translation count for fr \(5\) exceeds content_count \(3\)',
         ):
             model.put()
+
+    def test_get_by_entity_type_and_topic(self) -> None:
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type='exploration',
+            entity_id='exp1',
+            topic_ids=['topic1'],
+            content_count=10,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 5},
+        ).put()
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type='exploration',
+            entity_id='exp2',
+            topic_ids=['topic1', 'topic2'],
+            content_count=10,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 5},
+        ).put()
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type='skill',
+            entity_id='skill1',
+            topic_ids=['topic2'],
+            content_count=10,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 5},
+        ).put()
+
+        # Test filter by entity_type, topic_id and language_code.
+        results, cursor, more = (
+            opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
+                'exploration', 'topic1', 'hi', 10, None
+            )
+        )
+        self.assertEqual(len(results), 2)
+        assert results[0] is not None
+        assert results[1] is not None
+        self.assertEqual(results[0].entity_id, 'exp1')
+        self.assertEqual(results[1].entity_id, 'exp2')
+        self.assertFalse(more)
+        self.assertTrue(isinstance(cursor, str))
+
+        # Test filter by entity_type and language_code only.
+        results, cursor, more = (
+            opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
+                'exploration', None, 'hi', 10, None
+            )
+        )
+        self.assertEqual(len(results), 2)
+        self.assertFalse(more)
+
+        # Test filter by different topic_id.
+        results, cursor, more = (
+            opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
+                'exploration', 'topic2', 'hi', 10, None
+            )
+        )
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].entity_id, 'exp2')
+
+        # Test filter by different language_code.
+        results, cursor, more = (
+            opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
+                'exploration', 'topic1', 'en', 10, None
+            )
+        )
+        self.assertEqual(len(results), 0)
+
+    def test_get_by_entity_type_and_topic_pagination(self) -> None:
+        for i in range(5):
+            opportunity_models.TranslationOpportunityModel.create_new(
+                entity_type='exploration',
+                entity_id='exp%s' % i,
+                topic_ids=['topic1'],
+                content_count=10,
+                incomplete_translation_language_codes=['hi'],
+                translation_counts={'hi': 5},
+            ).put()
+
+        results, cursor, more = (
+            opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
+                'exploration', 'topic1', 'hi', 2, None
+            )
+        )
+        self.assertEqual(len(results), 2)
+        self.assertTrue(more)
+        self.assertIsNotNone(cursor)
+
+        results, cursor, more = (
+            opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
+                'exploration', 'topic1', 'hi', 2, cursor
+            )
+        )
+        self.assertEqual(len(results), 2)
+        self.assertTrue(more)
+
+        results, cursor, more = (
+            opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
+                'exploration', 'topic1', 'hi', 2, cursor
+            )
+        )
+        self.assertEqual(len(results), 1)
+        self.assertFalse(more)
+
+    def test_get_by_entity_ids(self) -> None:
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type='exploration',
+            entity_id='exp1',
+            topic_ids=['topic1'],
+            content_count=10,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 5},
+        ).put()
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type='exploration',
+            entity_id='exp2',
+            topic_ids=['topic1'],
+            content_count=10,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 5},
+        ).put()
+
+        results = (
+            opportunity_models.TranslationOpportunityModel.get_by_entity_ids(
+                'exploration', ['exp1', 'exp2', 'exp3']
+            )
+        )
+        self.assertEqual(len(results), 3)
+        assert results[0] is not None
+        assert results[1] is not None
+        self.assertEqual(results[0].entity_id, 'exp1')
+        self.assertEqual(results[1].entity_id, 'exp2')
+        self.assertIsNone(results[2])
+
+    def test_validation_success_for_question_entity_type(self) -> None:
+        model = opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type='question',
+            entity_id='q1',
+            topic_ids=['topic1'],
+            content_count=10,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'hi': 5},
+        )
+        model.put()
+        retrieved = opportunity_models.TranslationOpportunityModel.get_by_id(
+            'question.q1'
+        )
+        self.assertIsNotNone(retrieved)
