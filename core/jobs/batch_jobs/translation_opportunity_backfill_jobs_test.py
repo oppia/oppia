@@ -30,9 +30,16 @@ MYPY = False
 if MYPY:
     from mypy_imports import exp_models, opportunity_models, translation_models
 
-(exp_models, opportunity_models, translation_models) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.OPPORTUNITY, models.Names.TRANSLATION]
+exp_models, opportunity_models, translation_models = (
+    models.Registry.import_models(
+        [
+            models.Names.EXPLORATION,
+            models.Names.OPPORTUNITY,
+            models.Names.TRANSLATION,
+        ]
+    )
 )
+
 
 class BackfillTranslationOpportunityModelJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase
@@ -47,7 +54,9 @@ class BackfillTranslationOpportunityModelJobTests(
         self.author_id = self.get_user_id_from_email('author@example.com')
         self.exp_id = 'exp_1'
 
-        rights_manager.create_new_exploration_rights(self.exp_id, self.author_id)
+        rights_manager.create_new_exploration_rights(
+            self.exp_id, self.author_id
+        )
         model = self.create_model(
             exp_models.ExplorationModel,
             id=self.exp_id,
@@ -65,7 +74,9 @@ class BackfillTranslationOpportunityModelJobTests(
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             states={
                 feconf.DEFAULT_INIT_STATE_NAME: (
-                    exp_domain.Exploration.create_default_exploration(self.exp_id)
+                    exp_domain.Exploration.create_default_exploration(
+                        self.exp_id
+                    )
                     .states[feconf.DEFAULT_INIT_STATE_NAME]
                     .to_dict()
                 )
@@ -93,22 +104,24 @@ class BackfillTranslationOpportunityModelJobTests(
             incomplete_translation_language_codes=['hi'],
             translation_counts={'hi': 1},
             language_codes_needing_voice_artists=['en'],
-            language_codes_with_assigned_voice_artists=[]
+            language_codes_with_assigned_voice_artists=[],
         ).put()
 
         # Create EntityTranslationsModel.
-        translation_model = translation_models.EntityTranslationsModel.create_new(
-            'exploration',
-            self.exp_id,
-            1,
-            'hi',
-            {
-                'content_0': {
-                    'content_format': 'html',
-                    'content_value': '<p>Hola</p>',
-                    'needs_update': False,
+        translation_model = (
+            translation_models.EntityTranslationsModel.create_new(
+                'exploration',
+                self.exp_id,
+                1,
+                'hi',
+                {
+                    'content_0': {
+                        'content_format': 'html',
+                        'content_value': '<p>Hola</p>',
+                        'needs_update': False,
+                    },
                 },
-            },
+            )
         )
         translation_model.update_timestamps()
         translation_model.put()
