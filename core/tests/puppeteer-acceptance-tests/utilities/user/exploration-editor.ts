@@ -7833,6 +7833,63 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Card at index ${index} not found.`);
     }
 
+    const titleText = await this.page.evaluate(
+      el => el.textContent?.trim() || '',
+      titleElement
+    );
+
+    await this.page.waitForFunction(
+      (
+        titleSelector: string,
+        cardSelector: string,
+        ratingSelector: string,
+        feedbackSelector: string,
+        viewsSelector: string,
+        expectedTitle: string,
+        expectedRatingText: string,
+        expectedFeedbackText: string,
+        expectedViewsText: string
+      ) => {
+        const titleNodes = Array.from(document.querySelectorAll(titleSelector));
+        const titleNode = titleNodes.find(
+          element => element.textContent?.trim() === expectedTitle
+        );
+
+        if (!titleNode) {
+          return false;
+        }
+
+        const card = titleNode.closest(cardSelector);
+        if (!card) {
+          return false;
+        }
+
+        const getStatisticText = (selector: string): string => {
+          return (
+            (
+              card.querySelector(selector) as HTMLElement | null
+            )?.textContent?.trim() || ''
+          );
+        };
+
+        return (
+          getStatisticText(ratingSelector) === expectedRatingText &&
+          getStatisticText(feedbackSelector) === expectedFeedbackText &&
+          getStatisticText(viewsSelector) === expectedViewsText
+        );
+      },
+      {},
+      explorationGridCardTitleSelector,
+      explorationGridSelector,
+      explorationGridRatingSelector,
+      explorationGridFeedbackSelector,
+      explorationGridViewsSelector,
+      titleText,
+      expectedRating,
+      expectedOpenFeedback,
+      expectedViews
+    );
+
     const cardHandle = await titleElement.evaluateHandle(
       (element, cardSelector) => element.closest(cardSelector),
       explorationGridSelector
@@ -7903,6 +7960,57 @@ export class ExplorationEditor extends BaseUser {
     if (!titleElement) {
       throw new Error(`Row at index ${index} not found.`);
     }
+
+    const titleText = await this.page.evaluate(
+      el => el.textContent?.trim() || '',
+      titleElement
+    );
+
+    await this.page.waitForFunction(
+      (
+        titleSelector: string,
+        rowSelector: string,
+        expectedTitle: string,
+        expectedRatingText: string,
+        expectedOpenThreadsText: string,
+        expectedPlaysText: string
+      ) => {
+        const titleNodes = Array.from(document.querySelectorAll(titleSelector));
+        const titleNode = titleNodes.find(
+          element => element.textContent?.trim() === expectedTitle
+        );
+
+        if (!titleNode) {
+          return false;
+        }
+
+        const row = titleNode.closest(rowSelector);
+        if (!row) {
+          return false;
+        }
+
+        const getCellText = (cellSelector: string): string => {
+          return (
+            (
+              row.querySelector(cellSelector) as HTMLElement | null
+            )?.textContent?.trim() || ''
+          );
+        };
+
+        return (
+          getCellText('td:nth-child(2)') === expectedRatingText &&
+          getCellText('td:nth-child(3)') === expectedPlaysText &&
+          getCellText('td:nth-child(4)') === expectedOpenThreadsText
+        );
+      },
+      {},
+      explorationListRowTitleSelector,
+      explorationListItemSelector,
+      titleText,
+      expectedRating,
+      expectedOpenThreads,
+      expectedPlays
+    );
 
     const rowHandle = await titleElement.evaluateHandle(
       (element, rowSelector) => element.closest(rowSelector),
