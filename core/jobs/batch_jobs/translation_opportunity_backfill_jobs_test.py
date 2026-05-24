@@ -136,7 +136,7 @@ class BackfillTranslationOpportunityModelJobTests(
         )
 
         model = opportunity_models.TranslationOpportunityModel.get(
-            opportunity_models.TranslationOpportunityModel._generate_id(
+            opportunity_models.TranslationOpportunityModel._generate_id(  # pylint: disable=protected-access
                 feconf.TranslatableEntityType.EXPLORATION.value, self.exp_id
             )
         )
