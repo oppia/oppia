@@ -17,15 +17,14 @@
  */
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-
-import {BaseModule} from 'base-components/base.module';
+import {SharedComponentsModule} from 'components/shared-component.module';
 import {CertificateOfferingDashboardPageComponent} from './certificate-offering-dashboard-page.component';
 import {CertificateOfferingDashboardPageRoutingModule} from './certificate-offering-dashboard-page-routing.module';
 import {CertificateOfferingDashboardPageRootComponent} from './certificate-offering-dashboard-page-root.component';
 
 @NgModule({
   imports: [
-    BaseModule,
+    SharedComponentsModule,
     CommonModule,
     CertificateOfferingDashboardPageRoutingModule,
   ],
