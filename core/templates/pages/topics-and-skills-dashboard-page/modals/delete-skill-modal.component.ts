@@ -25,6 +25,7 @@ import {
   TopicsAndSkillsDashboardBackendApiService,
   TopicIdToDiagnosticTestSkillIdsResponse,
 } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import './delete-skill-modal.component.css';
 
 export interface TopicAssignmentsSummary {
   subtopicId: number;
@@ -39,6 +40,7 @@ export interface TopicNameToTopicAssignments {
 @Component({
   selector: 'oppia-delete-skill-modal',
   templateUrl: './delete-skill-modal.component.html',
+  styleUrls: ['./delete-skill-modal.component.css'],
 })
 export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
