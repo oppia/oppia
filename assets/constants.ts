@@ -63,6 +63,10 @@ export default {
     {
       "language_code": "yo",
       "explanation": "For learners in Nigeria."
+    },
+    {
+      "language_code": "ne",
+      "explanation": "For learners in Nepal."
     }],
 
   "RTE_COMPONENT_CONFIGS": {
@@ -5374,6 +5378,12 @@ export default {
     "decimal_separator": ".",
     "ariaLabelInEnglish": "Marathi"
   }, {
+    "code": "ne",
+    "description": "नेपाली (Nepali)",
+    "direction": "ltr",
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Nepali"
+  }, {
     "code": "no",
     "description": "Norsk (Norwegian)",
     "direction": "ltr",
@@ -5822,6 +5832,11 @@ export default {
     "relatedLanguages": ["mr"],
     "direction": "ltr"
   }, {
+    "id": "ne",
+    "description": "नेपाली (Nepali)",
+    "relatedLanguages": ["ne"],
+    "direction": "ltr"
+  }, {
     "id": "no",
     "description": "Norsk (Norwegian)",
     "relatedLanguages": ["no"],
@@ -6153,7 +6168,9 @@ export default {
   // Interaction IDs for which answer details cannot be solicited.
   "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],
 
+  "FEEDBACK_SUBJECT_MIN_CHAR_LIMIT": 3,
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
+  "FEEDBACK_MESSAGE_MIN_CHAR_LIMIT": 5,
 
   "MAX_CURRENT_GOALS_COUNT": 5,
 

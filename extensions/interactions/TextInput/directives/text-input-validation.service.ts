@@ -128,6 +128,16 @@ export class TextInputValidationService {
     let seenStringsFuzzyEquals: string[] = [];
     let seenRuleTypes: Set<string>;
 
+    // Tracks every string added by a Contains rule together with its
+    // 0-based rule index, so a later Equals rule can reference it by
+    // number in its warning message.
+    interface ContainsRuleLocation {
+      containsString: string;
+      ruleIndex: number;
+      answerGroupIndex: number;
+    }
+    let seenContainsRuleLocations: ContainsRuleLocation[] = [];
+
     for (let [answerGroupIndex, answerGroup] of answerGroups.entries()) {
       seenRuleTypes = new Set();
       for (let [ruleIndex, rule] of answerGroup.rules.entries()) {
@@ -165,6 +175,13 @@ export class TextInputValidationService {
           }
 
           seenStringsContains.push(...currentStrings);
+          for (const str of currentStrings) {
+            seenContainsRuleLocations.push({
+              containsString: str,
+              ruleIndex,
+              answerGroupIndex,
+            });
+          }
         } else if (rule.type === 'StartsWith') {
           // Check if any of the current strings contain any of the previously
           // seen strings as a prefix.
@@ -223,6 +240,23 @@ export class TextInputValidationService {
                 `${answerGroupIndex + 1} will never be matched because it ` +
                 "is preceded by a 'FuzzyEquals' answer with a matching input",
             });
+          } else {
+            // Check whether any of the Equals values are already covered by
+            // a prior Contains rule whose target string is a substring of the
+            // Equals value. Such an Equals answer can never be matched first
+            // because the Contains rule will always fire before it.
+            for (const currentString of currentStrings) {
+              const coveringRule = seenContainsRuleLocations.find(
+                ({containsString}) => currentString.includes(containsString)
+              );
+              if (coveringRule !== undefined) {
+                warningsList.push({
+                  type: AppConstants.WARNING_TYPES.ERROR,
+                  message: `Learner answer ${ruleIndex + 1} from Oppia response ${answerGroupIndex + 1} is redundant because it is already covered by learner answer ${coveringRule.ruleIndex + 1} from Oppia response ${coveringRule.answerGroupIndex + 1}.`,
+                });
+                break;
+              }
+            }
           }
           seenStringsEquals.push(...currentStrings);
         } else if (rule.type === 'FuzzyEquals') {

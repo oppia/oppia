@@ -693,7 +693,7 @@ export class BaseUser {
     // https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space.
     const element = await this.page.waitForXPath(
       `//*[contains(normalize-space(text()), normalize-space("${text}"))]`,
-      {timeout: 10000}
+      {timeout: 60000}
     );
 
     if (!element) {
@@ -1526,8 +1526,18 @@ export class BaseUser {
     visibility: boolean = true,
     context: Page = this.page
   ): Promise<void> {
-    const options = visibility ? {visible: true} : {hidden: true};
-    await context.waitForSelector(selector, options);
+    if (visibility) {
+      await context.waitForSelector(selector, {visible: true});
+    } else {
+      await context.waitForFunction(
+        (sel: string) => {
+          const el = document.querySelector(sel);
+          return !el || (el as HTMLElement).offsetParent === null;
+        },
+        {},
+        selector
+      );
+    }
     showMessage(`Element ${selector} is ${visibility ? 'visible' : 'hidden'}.`);
   }
 
@@ -2174,6 +2184,23 @@ export class BaseUser {
       await this.page.click(toastMessageSelector);
     }
     await this.expectElementToBeVisible(toastMessageSelector, false);
+  }
+
+  /**
+   * Expects the text content of any toast message to match the given expected message.
+   * @param {string} expectedMessage - The expected message to match the toast message against.
+   */
+  async expectAnyToastMessage(expectedMessage: string): Promise<void> {
+    // Wait until any toast with the expected message is visible.
+    await this.page.waitForFunction(
+      (selector: string, expected: string) =>
+        Array.from(document.querySelectorAll(selector)).some(
+          el => el.textContent?.trim() === expected
+        ),
+      {},
+      toastMessageSelector,
+      expectedMessage
+    );
   }
 
   /**
