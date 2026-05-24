@@ -62,7 +62,7 @@ import {AudioFileUploaderComponent} from './forms/custom-forms-directives/audio-
 import {ThumbnailDisplayComponent} from './forms/custom-forms-directives/thumbnail-display.component';
 import {SkillMasteryViewerComponent} from './skill-mastery/skill-mastery.component';
 import {ExplorationSummaryTileComponent} from './summary-tile/exploration-summary-tile.component';
-import {PracticeTabComponent} from 'pages/topic-viewer-page/practice-tab/practice-tab.component';
+import {PracticeTabComponent} from 'pages/topic-viewer-page/deprecations/practice-tab/practice-tab.component';
 import {CollectionSummaryTileComponent} from './summary-tile/collection-summary-tile.component';
 import {TakeBreakModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/take-break-modal.component';
 import {TopicsAndSkillsDashboardNavbarBreadcrumbComponent} from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
