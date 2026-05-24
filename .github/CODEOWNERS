@@ -267,6 +267,7 @@
 # Forms pages.
 /core/templates/components/forms/ @oppia/lace-frontend-reviewers
 /core/templates/services/rte-helper-modal.component.html @oppia/lace-frontend-reviewers
+/core/templates/services/rte-helper-modal.component.css @oppia/lace-frontend-reviewers
 /core/templates/utility/forms.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-default-value.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/schema-form-submitted.service*.ts @oppia/lace-frontend-reviewers

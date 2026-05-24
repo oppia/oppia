@@ -38,6 +38,7 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import Picker from 'vanilla-picker';
 import {SvgFileFetcherBackendApiService} from './svg-file-fetcher-backend-api.service';
 import {SvgEditorConstants} from './svg-editor.constants';
+import './svg-editor.component.css';
 
 export interface Dimensions {
   height: number;
@@ -54,6 +55,7 @@ export class PolyPoint {
 @Component({
   selector: 'svg-editor',
   templateUrl: './svg-editor.component.html',
+  styleUrls: ['./svg-editor.component.css'],
 })
 export class SvgEditorComponent implements OnInit {
   @Input() value: string;

@@ -30,10 +30,12 @@ import {AppConstants} from 'app.constants';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {SkillBackendDict} from 'domain/skill/skill.model.ts';
 import {PageContextService} from 'services/page-context.service';
+import './skill-selector-editor.component.css';
 
 @Component({
   selector: 'skill-selector-editor',
   templateUrl: './skill-selector-editor.component.html',
+  styleUrls: ['./skill-selector-editor.component.css'],
 })
 export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks

@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import multiprocessing
 import os
-from unittest import mock
 
 from core.tests import test_utils
 
@@ -379,27 +378,3 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
             ],
             parser.error_messages,
         )
-
-    def test_custom_parser_allows_legacy_embedded_style_tags(self) -> None:
-        file_content = (
-            '<div>\n'
-            '  <style>\n'
-            '    .test {\n'
-            '      color: red;\n'
-            '    }\n'
-            '  </style>\n'
-            '</div>\n'
-        )
-        filepath = 'core/templates/test-legacy-style.component.html'
-        with mock.patch.object(
-            html_linter, 'LEGACY_STYLE_TAG_ALLOWLIST', frozenset([filepath])
-        ):
-            parser = html_linter.CustomHTMLParser(
-                filepath=filepath,
-                file_lines=tuple(file_content.splitlines(keepends=True)),
-            )
-
-            parser.feed(file_content)
-
-            self.assertFalse(parser.failed)
-            self.assertEqual([], parser.error_messages)
