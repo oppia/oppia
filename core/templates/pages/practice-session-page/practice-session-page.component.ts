@@ -28,10 +28,13 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PageTitleService} from 'services/page-title.service';
 import {PracticeSessionsBackendApiService} from './practice-session-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import './practice-session-page.component.css';
 
 @Component({
   selector: 'practice-session-page',
   templateUrl: './practice-session-page.component.html',
+
+  styleUrls: ['./practice-session-page.component.css'],
 })
 export class PracticeSessionPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

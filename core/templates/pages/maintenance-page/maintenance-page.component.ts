@@ -19,11 +19,12 @@
 import {Component, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {DocumentAttributeCustomizationService} from 'services/contextual/document-attribute-customization.service';
+import './maintenance-page.component.css';
 
 @Component({
   selector: 'oppia-maintenance-page',
   templateUrl: './maintenance-page.component.html',
-  styleUrls: [],
+  styleUrls: ['./maintenance-page.component.css'],
 })
 export class MaintenancePageComponent implements OnInit {
   currentLang: string = 'en';

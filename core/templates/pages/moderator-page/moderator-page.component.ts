@@ -29,10 +29,13 @@ import {
   ExplorationDict,
   ModeratorPageBackendApiService,
 } from './services/moderator-page-backend-api.service';
+import './moderator-page.component.css';
 
 @Component({
   selector: 'oppia-moderator-page',
   templateUrl: './moderator-page.component.html',
+
+  styleUrls: ['./moderator-page.component.css'],
 })
 export class ModeratorPageComponent {
   allCommits: CommitMessage[] = [];
