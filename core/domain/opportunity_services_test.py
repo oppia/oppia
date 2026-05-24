@@ -1948,7 +1948,9 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, 'Unsupported entity type: invalid'
         ):
-            opportunity_services._fetch_entities_by_type('invalid', ['id'])
+            opportunity_services._fetch_entities_by_type(  # pylint: disable=protected-access
+                'invalid', ['id']
+            )
 
     def test_compute_topic_ids_with_unsupported_type_raises_exception(
         self,
@@ -1956,7 +1958,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, 'Unsupported entity type: invalid'
         ):
-            opportunity_services._compute_topic_ids_of_translation_opportunities(
+            opportunity_services._compute_topic_ids_of_translation_opportunities(  # pylint: disable=protected-access
                 {'invalid': ['id']}
             )
 
@@ -1997,9 +1999,9 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
         card = cards[0]
         card.content_count = 100
 
-        opportunity_services._save_multi_translation_opportunities(
+        opportunity_services._save_multi_translation_opportunities(  # pylint: disable=protected-access
             [card]
-        )  # pylint: disable=protected-access
+        )
 
         updated_cards, _, _ = (
             opportunity_services.get_translation_opportunities_with_new_models(
