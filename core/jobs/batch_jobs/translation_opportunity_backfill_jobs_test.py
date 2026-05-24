@@ -135,11 +135,7 @@ class BackfillTranslationOpportunityModelJobTests(
 
         translation_model_en = (
             translation_models.EntityTranslationsModel.create_new(
-                'exploration',
-                self.exp_id,
-                1,
-                'en',
-                {}
+                'exploration', self.exp_id, 1, 'en', {}
             )
         )
         translation_model_en.update_timestamps()
@@ -168,8 +164,10 @@ class BackfillTranslationOpportunityModelJobTests(
         self.assertEqual(model.translation_counts, {'hi': 1, 'en': 0})
 
     def test_fails_if_missing_summary_model(self) -> None:
-        summary_model = opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
-            self.exp_id
+        summary_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
+                self.exp_id
+            )
         )
         summary_model.delete()
         self.assert_job_output_is(
@@ -182,7 +180,7 @@ class BackfillTranslationOpportunityModelJobTests(
 
     def test_fails_if_missing_exploration_model(self) -> None:
         exp_model = exp_models.ExplorationModel.get_by_id(self.exp_id)
-        exp_model.delete()
+        exp_model.delete(self.author_id, 'Deleting for test')
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(
