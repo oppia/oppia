@@ -42,37 +42,3 @@
     </form>
   </mat-card>
 </div>
-
-<style>
-  .login-page {
-    align-items: center;
-    display: flex;
-    height: 400px;
-    justify-content: center;
-  }
-  .login-page .login-card {
-    max-width: 500px;
-    min-width: 150px;
-    width: 100%;
-  }
-  .login-page .mat-card-actions {
-    margin: 0;
-  }
-  .login-page .mat-card-header {
-    margin: 0 -16px; /* Explanation: https://stackoverflow.com/a/64183157/4859885. */
-  }
-  .login-page .mat-form-field {
-    width: 100%;
-  }
-  .login-page /deep/ .mat-form-field-invalid .mat-input-element {
-    caret-color: #f44336;
-  }
-  .login-page /deep/ .mat-error,
-  .login-page /deep/ .mat-form-field.mat-form-field-invalid .mat-form-field-label {
-    color: #f44336;
-  }
-  .login-page /deep/ .mat-form-field.mat-form-field-invalid .mat-form-field-ripple,
-  .login-page /deep/ .mat-form-field.mat-form-field-invalid .mat-form-field-ripple.mat-accent {
-    background-color: #f44336;
-  }
-</style>
