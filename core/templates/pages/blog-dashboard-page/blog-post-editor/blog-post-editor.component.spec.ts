@@ -592,12 +592,12 @@ describe('Blog Post Editor Component', () => {
 
     DATE = '01/16/2027, 09:45:46:600000';
     expect(component.getDateStringInWords(DATE)).toBe(
-      'Friday, February 2, 2018 at 12:30 PM'
-    );
+      'Saturday, January 16, 2027 at 9:45 AM'
+    );x
 
     DATE = '02/02/2018, 12:30:46:608990';
     expect(component.getDateStringInWords(DATE)).toBe(
-      'February 2, 2018 at 12:30 PM'
+      'Friday, February 2, 2018 at 12:30 PM'
     );
   });
 
