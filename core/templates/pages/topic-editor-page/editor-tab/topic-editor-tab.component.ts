@@ -45,10 +45,12 @@ import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {Topic} from 'domain/topic/topic-object.model';
 import {TopicRights} from 'domain/topic/topic-rights.model';
 import {RearrangeSkillsInSubtopicsModalComponent} from '../modal-templates/rearrange-skills-in-subtopics-modal.component';
+import './topic-editor-tab.component.css';
 
 @Component({
   selector: 'oppia-topic-editor-tab',
   templateUrl: './topic-editor-tab.component.html',
+  styleUrls: ['./topic-editor-tab.component.css'],
 })
 export class TopicEditorTabComponent implements OnInit, OnDestroy {
   skillCreationIsAllowed!: boolean;

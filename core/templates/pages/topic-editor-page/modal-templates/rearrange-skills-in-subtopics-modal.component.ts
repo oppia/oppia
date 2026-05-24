@@ -33,10 +33,12 @@ import {
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import {AppConstants} from 'app.constants';
+import './rearrange-skills-in-subtopics-modal.component.css';
 
 @Component({
   selector: 'oppia-rearrange-skills-in-subtopics-modal',
   templateUrl: './rearrange-skills-in-subtopics-modal.component.html',
+  styleUrls: ['./rearrange-skills-in-subtopics-modal.component.css'],
 })
 export class RearrangeSkillsInSubtopicsModalComponent
   extends ConfirmOrCancelModal

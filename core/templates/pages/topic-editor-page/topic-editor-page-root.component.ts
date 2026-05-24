@@ -19,10 +19,12 @@
 import {Component} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
+import './topic-editor-page-root.component.css';
 
 @Component({
   selector: 'topic-editor-page-root',
   templateUrl: './topic-editor-page-root.component.html',
+  styleUrls: ['./topic-editor-page-root.component.css'],
 })
 export class TopicEditorPageRootComponent extends BaseRootComponent {
   title: string =

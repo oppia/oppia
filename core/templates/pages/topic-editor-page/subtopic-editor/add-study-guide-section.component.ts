@@ -24,6 +24,7 @@ import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
 } from 'services/html-length.service';
+import './add-study-guide-section.component.css';
 
 interface HtmlFormSchema {
   type: 'html' | 'unicode';
@@ -33,6 +34,7 @@ interface HtmlFormSchema {
 @Component({
   selector: 'oppia-add-study-guide-section-modal',
   templateUrl: './add-study-guide-section.component.html',
+  styleUrls: ['./add-study-guide-section.component.css'],
 })
 export class AddStudyGuideSectionModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
