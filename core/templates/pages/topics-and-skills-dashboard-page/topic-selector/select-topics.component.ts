@@ -17,10 +17,12 @@
  */
 
 import {Component, Input, Output, EventEmitter} from '@angular/core';
+import './select-topics.component.css';
 
 @Component({
   selector: 'oppia-select-topics',
   templateUrl: './select-topics.component.html',
+  styleUrls: ['./select-topics.component.css'],
 })
 export class SelectTopicsComponent {
   // These properties are initialized using Angular lifecycle hooks
