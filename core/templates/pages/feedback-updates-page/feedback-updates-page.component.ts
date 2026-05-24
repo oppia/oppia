@@ -47,7 +47,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PageTitleService} from 'services/page-title.service';
 import {UrlService} from 'services/contextual/url.service';
-
 import './feedback-updates-page.component.css';
 
 @Component({
