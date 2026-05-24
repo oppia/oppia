@@ -385,9 +385,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         ] = translation_models.EntityTranslationsModel.get_all().fetch()
         self.assertEqual(len(entity_translation_models), 2)
         entity_translation_model_hi = next(
-            et
-            for et in entity_translation_models
-            if et.language_code == 'hi'
+            et for et in entity_translation_models if et.language_code == 'hi'
         )
         self.assertEqual(entity_translation_model_hi.entity_version, 5)
         self.assertEqual(
@@ -398,9 +396,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             [False, False],
         )
         entity_translation_model_ar = next(
-            et
-            for et in entity_translation_models
-            if et.language_code == 'ar'
+            et for et in entity_translation_models if et.language_code == 'ar'
         )
         self.assertEqual(entity_translation_model_ar.entity_version, 5)
         self.assertEqual(
@@ -429,7 +425,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         )
 
         self.assertEqual(len(entity_translation_models), 2)
-        
+
         # Hindi translation should be marked as needs update.
         entity_translation_hi = next(
             et for et in entity_translation_models if et.language_code == 'hi'
@@ -441,7 +437,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             ],
             [False, True],
         )
-        
+
         # Arabic translation should NOT be marked as needs update.
         entity_translation_ar = next(
             et for et in entity_translation_models if et.language_code == 'ar'
