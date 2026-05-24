@@ -92,7 +92,7 @@ class BackfillTranslationOpportunityModelJobTests(
         model.commit(self.author_id, 'commit_message', [commit_cmd.to_dict()])
 
         # Create ExplorationOpportunitySummaryModel.
-        self.create_model(
+        summary_model = self.create_model(
             opportunity_models.ExplorationOpportunitySummaryModel,
             id=self.exp_id,
             topic_id='topic_id',
@@ -105,7 +105,9 @@ class BackfillTranslationOpportunityModelJobTests(
             translation_counts={'hi': 1},
             language_codes_needing_voice_artists=['en'],
             language_codes_with_assigned_voice_artists=[],
-        ).put()
+        )
+        summary_model.update_timestamps()
+        summary_model.put()
 
         # Create EntityTranslationsModel.
         translation_model = (
