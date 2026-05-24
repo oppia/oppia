@@ -1,0 +1,194 @@
+# coding: utf-8
+#
+# Copyright 2026 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Jobs that backfill TranslationOpportunityModel from existing ExplorationOpportunitySummaryModels."""
+
+from __future__ import annotations
+
+from core import feconf
+from core.constants import constants
+from core.domain import exp_fetchers
+from core.jobs import base_jobs
+from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
+from core.jobs.types import job_run_result
+from core.platform import models
+
+import apache_beam as beam
+import result
+from typing import Any, Dict, Iterable, Tuple
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import exp_models, opportunity_models, translation_models
+
+(
+    exp_models,
+    opportunity_models,
+    translation_models,
+) = models.Registry.import_models(
+    [
+        models.Names.EXPLORATION,
+        models.Names.OPPORTUNITY,
+        models.Names.TRANSLATION,
+    ]
+)
+datastore_services = models.Registry.import_datastore_services()
+
+
+class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
+    """Backfills TranslationOpportunityModels from existing ExplorationOpportunitySummaryModels."""
+
+    DATASTORE_UPDATES_ALLOWED = True
+
+    @staticmethod
+    def _create_translation_opportunity(
+        # Here we use type Any because the values from the CoGroupByKey
+        # could be ExplorationOpportunitySummaryModel, ExplorationModel, or
+        # EntityTranslationsModel.
+        element: Tuple[str, Dict[str, Iterable[Any]]],
+    ) -> result.Result[opportunity_models.TranslationOpportunityModel, str]:
+        """Creates a TranslationOpportunityModel from the grouped data."""
+        exp_id = element[0]
+        grouped_data = element[1]
+
+        summary_models = list(grouped_data['summary_model'])
+        if not summary_models:
+            return result.Err('Missing ExplorationOpportunitySummaryModel')
+        summary_model = summary_models[0]
+
+        exps = list(grouped_data['exp'])
+        if not exps:
+            return result.Err('Missing ExplorationModel')
+        exp = exps[0]
+
+        translations = list(grouped_data['translations'])
+        content_count = exp.get_content_count()
+
+        translation_counts = {}
+        for translation_model in translations:
+            lang_code = translation_model.language_code
+            count = 0
+            for translated_content in translation_model.translations.values():
+                if not translated_content['needs_update']:
+                    count += 1
+            translation_counts[lang_code] = count
+
+        audio_language_codes = set(
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+        )
+        complete_languages = [
+            lang
+            for lang, count in translation_counts.items()
+            if count == content_count
+        ]
+        incomplete_translation_language_codes = sorted(
+            list(audio_language_codes - set(complete_languages))
+        )
+        if exp.language_code in incomplete_translation_language_codes:
+            incomplete_translation_language_codes.remove(exp.language_code)
+
+        with datastore_services.get_ndb_context():
+            model = opportunity_models.TranslationOpportunityModel(
+                id=opportunity_models.TranslationOpportunityModel._generate_id(  # pylint: disable=protected-access
+                    feconf.TranslatableEntityType.EXPLORATION.value, exp_id
+                ),
+                entity_type=feconf.TranslatableEntityType.EXPLORATION.value,
+                entity_id=exp_id,
+                topic_ids=[summary_model.topic_id],
+                content_count=content_count,
+                incomplete_translation_language_codes=incomplete_translation_language_codes,
+                translation_counts=translation_counts,
+            )
+            model.update_timestamps()
+        return result.Ok(model)
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        exp_opportunity_summary_models = (
+            self.pipeline
+            | 'Get all ExplorationOpportunitySummaryModels'
+            >> ndb_io.GetModels(
+                opportunity_models.ExplorationOpportunitySummaryModel.get_all(
+                    include_deleted=False
+                )
+            )
+            | 'Map summary models to exp_id'
+            >> beam.Map(lambda model: (model.id, model))
+        )
+
+        exp_models_pcoll = (
+            self.pipeline
+            | 'Get all ExplorationModels'
+            >> ndb_io.GetModels(
+                exp_models.ExplorationModel.get_all(include_deleted=False)
+            )
+            | 'Get exploration from model'
+            >> beam.Map(exp_fetchers.get_exploration_from_model)
+            | 'Map exp to exp_id' >> beam.Map(lambda exp: (exp.id, exp))
+        )
+
+        entity_translations_pcoll = (
+            self.pipeline
+            | 'Get all EntityTranslationsModels'
+            >> ndb_io.GetModels(
+                translation_models.EntityTranslationsModel.get_all(
+                    include_deleted=False
+                )
+            )
+            | 'Filter exploration translations'
+            >> beam.Filter(
+                lambda model: model.entity_type
+                == feconf.TranslatableEntityType.EXPLORATION.value
+            )
+            | 'Map translation to exp_id'
+            >> beam.Map(lambda model: (model.entity_id, model))
+        )
+
+        grouped_data = {
+            'summary_model': exp_opportunity_summary_models,
+            'exp': exp_models_pcoll,
+            'translations': entity_translations_pcoll,
+        } | 'Group by exp_id' >> beam.CoGroupByKey()
+
+        created_models_results = (
+            grouped_data
+            | 'Create TranslationOpportunityModels'
+            >> beam.Map(self._create_translation_opportunity)
+        )
+
+        if self.DATASTORE_UPDATES_ALLOWED:
+            unused_put_results = (
+                created_models_results
+                | 'Filter OK results' >> beam.Filter(lambda res: res.is_ok())
+                | 'Unwrap models' >> beam.Map(lambda res: res.unwrap())
+                | 'Put models' >> ndb_io.PutModels()
+            )
+
+        return (
+            created_models_results
+            | 'Generate results'
+            >> job_result_transforms.ResultsToJobRunResults(
+                'TRANSLATION OPPORTUNITY MODEL CREATION'
+            )
+        )
+
+
+class AuditBackfillTranslationOpportunityModelJob(
+    BackfillTranslationOpportunityModelJob
+):
+    """Audit job for BackfillTranslationOpportunityModelJob."""
+
+    DATASTORE_UPDATES_ALLOWED = False
