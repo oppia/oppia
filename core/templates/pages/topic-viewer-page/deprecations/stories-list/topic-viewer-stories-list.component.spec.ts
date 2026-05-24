@@ -103,18 +103,18 @@ describe('Topic Viewer Stories List Component', () => {
     spyOn(
       i18nLanguageCodeService,
       'isHackyTranslationAvailable'
-    ).and.returnValues(true, true, true);
+    ).and.returnValues(true, true);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValues(
-      false,
       false,
       false
     );
+    spyOn(
+      i18nLanguageCodeService,
+      'isClassroomnNameTranslationAvailable'
+    ).and.returnValue(true);
 
     component.ngOnInit();
 
-    expect(component.isHackyTopicNameTranslationDisplayed()).toBe(true);
-    expect(component.isHackyTopicDescTranslationDisplayed()).toBe(true);
-    expect(component.isHackyClassroomNameTranslationDisplayed()).toBe(true);
     expect(component.isHackyTopicNameTranslationDisplayed()).toBe(true);
     expect(component.isHackyTopicDescTranslationDisplayed()).toBe(true);
     expect(component.isHackyClassroomNameTranslationDisplayed()).toBe(true);
@@ -171,10 +171,10 @@ describe('Topic Viewer Stories List Component', () => {
     component.classroomUrlFragment = '';
     expect(component.getClassroomUrl()).toBe('/learn');
 
-    component.classroomUrlFragment = '';
+    component.classroomUrlFragment = null as unknown as string;
     expect(component.getClassroomUrl()).toBe('/learn');
 
-    component.classroomUrlFragment = '';
+    component.classroomUrlFragment = undefined as unknown as string;
     expect(component.getClassroomUrl()).toBe('/learn');
   });
 });
