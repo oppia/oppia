@@ -26,10 +26,13 @@ import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {Misconception} from 'domain/skill/misconception.model';
 import {Skill} from 'domain/skill/skill.model.ts';
+import './skill-misconceptions-editor.component.css';
 
 @Component({
   selector: 'oppia-skill-misconceptions-editor',
   templateUrl: './skill-misconceptions-editor.component.html',
+
+  styleUrls: ['./skill-misconceptions-editor.component.css'],
 })
 export class SkillMisconceptionsEditorComponent implements OnInit {
   @Output() getMisconceptionsChange = new EventEmitter();

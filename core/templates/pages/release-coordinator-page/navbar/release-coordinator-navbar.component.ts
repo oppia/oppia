@@ -23,10 +23,13 @@ import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ReleaseCoordinatorPageConstants} from 'pages/release-coordinator-page/release-coordinator-page.constants';
 import {UserService} from 'services/user.service';
+import './release-coordinator-navbar.component.css';
 
 @Component({
   selector: 'oppia-release-coordinator-navbar',
   templateUrl: './release-coordinator-navbar.component.html',
+
+  styleUrls: ['./release-coordinator-navbar.component.css'],
 })
 export class ReleaseCoordinatorNavbarComponent implements OnInit {
   @Output() activeTabChange = new EventEmitter();

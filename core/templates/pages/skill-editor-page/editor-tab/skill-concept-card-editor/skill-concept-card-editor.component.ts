@@ -28,6 +28,7 @@ import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
 import {SkillPreviewModalComponent} from '../skill-preview-modal.component';
 import {Skill} from 'domain/skill/skill.model.ts';
+import './skill-concept-card-editor.component.css';
 
 interface BindableFieldDict {
   displayedConceptCardExplanation: string;
@@ -36,6 +37,8 @@ interface BindableFieldDict {
 @Component({
   selector: 'oppia-skill-concept-card-editor',
   templateUrl: './skill-concept-card-editor.component.html',
+
+  styleUrls: ['./skill-concept-card-editor.component.css'],
 })
 export class SkillConceptCardEditorComponent implements OnInit {
   @Output() getConceptCardChange: EventEmitter<void> = new EventEmitter();

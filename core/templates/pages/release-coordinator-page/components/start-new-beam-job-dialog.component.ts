@@ -26,10 +26,13 @@ import {ReleaseCoordinatorBackendApiService} from 'pages/release-coordinator-pag
 import {AlertsService} from 'services/alerts.service';
 import {of} from 'rxjs';
 import {AppConstants} from 'app.constants';
+import './start-new-beam-job-dialog.component.css';
 
 @Component({
   selector: 'start-new-beam-job-dialog',
   templateUrl: './start-new-beam-job-dialog.component.html',
+
+  styleUrls: ['./start-new-beam-job-dialog.component.css'],
 })
 export class StartNewBeamJobDialogComponent {
   readonly DEV_MODE: boolean = AppConstants.DEV_MODE;

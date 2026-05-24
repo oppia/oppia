@@ -28,10 +28,13 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {UrlService} from 'services/contextual/url.service';
 import {ReviewTestEngineService} from './review-test-engine.service';
 import {QuestionPlayerConfig} from 'pages/exploration-player-page/current-lesson-player/learner-experience/ratings-and-recommendations.component';
+import './review-test-page.component.css';
 
 @Component({
   selector: 'review-test-page',
   templateUrl: './review-test-page.component.html',
+
+  styleUrls: ['./review-test-page.component.css'],
 })
 export class ReviewTestPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();

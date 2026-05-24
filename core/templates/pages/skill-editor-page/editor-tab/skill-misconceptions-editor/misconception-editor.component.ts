@@ -30,6 +30,7 @@ import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {Skill} from 'domain/skill/skill.model.ts';
 import {Misconception} from 'domain/skill/misconception.model';
+import './misconception-editor.component.css';
 
 interface MisconceptionFormSchema {
   type: 'html';
@@ -46,6 +47,8 @@ interface Container {
 @Component({
   selector: 'oppia-misconception-editor',
   templateUrl: './misconception-editor.component.html',
+
+  styleUrls: ['./misconception-editor.component.css'],
 })
 export class MisconceptionEditorComponent implements OnInit {
   @Output() onMisconceptionChange = new EventEmitter<void>();

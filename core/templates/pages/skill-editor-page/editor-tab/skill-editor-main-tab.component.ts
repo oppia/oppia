@@ -34,10 +34,13 @@ import {
   AssignedSkillTopicData,
   SkillEditorStateService,
 } from '../services/skill-editor-state.service';
+import './skill-editor-main-tab.component.css';
 
 @Component({
   selector: 'oppia-skill-editor-main-tab',
   templateUrl: './skill-editor-main-tab.component.html',
+
+  styleUrls: ['./skill-editor-main-tab.component.css'],
 })
 export class SkillEditorMainTabComponent
   implements OnInit, AfterContentChecked

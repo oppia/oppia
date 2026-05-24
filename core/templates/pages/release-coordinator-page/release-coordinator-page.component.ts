@@ -40,6 +40,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {DeleteUserGroupConfirmModalComponent} from 'pages/release-coordinator-page/modals/delete-user-group-confirm-modal.component';
 import {LoaderService} from 'services/loader.service';
 import {UserGroup} from 'domain/release_coordinator/user-group.model';
+import './release-coordinator-page.component.css';
 
 interface MemoryCacheProfile {
   totalAllocatedInBytes: string;
@@ -50,6 +51,8 @@ interface MemoryCacheProfile {
 @Component({
   selector: 'oppia-release-coordinator-page',
   templateUrl: './release-coordinator-page.component.html',
+
+  styleUrls: ['./release-coordinator-page.component.css'],
 })
 export class ReleaseCoordinatorPageComponent implements OnInit {
   @ViewChild('userInputToAddUserToGroup')

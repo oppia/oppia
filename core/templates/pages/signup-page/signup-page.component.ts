@@ -30,10 +30,13 @@ import {LicenseExplanationModalComponent} from './modals/license-explanation-mod
 import {RegistrationSessionExpiredModalComponent} from './modals/registration-session-expired-modal.component';
 import {SignupPageBackendApiService} from './services/signup-page-backend-api.service';
 import analyticsConstants from 'analytics-constants';
+import './signup-page.component.css';
 
 @Component({
   selector: 'oppia-signup-page',
   templateUrl: './signup-page.component.html',
+
+  styleUrls: ['./signup-page.component.css'],
 })
 export class SignupPageComponent {
   // These properties are initialized using Angular lifecycle hooks
