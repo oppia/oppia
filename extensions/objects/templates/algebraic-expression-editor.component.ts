@@ -29,6 +29,7 @@ import {GuppyConfigurationService} from 'services/guppy-configuration.service';
 import {GuppyInitializationService} from 'services/guppy-initialization.service';
 import {MathInteractionsService} from 'services/math-interactions.service';
 import {TranslateService} from '@ngx-translate/core';
+import './algebraic-expression-editor.component.css';
 
 interface FocusObj {
   focused: boolean;
@@ -37,6 +38,7 @@ interface FocusObj {
 @Component({
   selector: 'algebraic-expression-editor',
   templateUrl: './algebraic-expression-editor.component.html',
+  styleUrls: ['./algebraic-expression-editor.component.css'],
 })
 export class AlgebraicExpressionEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

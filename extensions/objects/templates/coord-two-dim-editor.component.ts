@@ -28,11 +28,12 @@ import {
   marker,
   tileLayer,
 } from 'leaflet';
+import './coord-two-dim-editor.component.css';
 
 @Component({
   selector: 'coord-two-dim-editor',
   templateUrl: './coord-two-dim-editor.component.html',
-  styleUrls: [],
+  styleUrls: ['./coord-two-dim-editor.component.css'],
 })
 export class CoordTwoDimEditorComponent implements OnInit {
   private _attribution =

@@ -29,10 +29,12 @@ import {Component, Input, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {icon, latLng, MapOptions, Marker, marker, tileLayer} from 'leaflet';
+import './interactive-map-response.component.css';
 
 @Component({
   selector: 'oppia-response-interactive-map',
   templateUrl: './interactive-map-response.component.html',
+  styleUrls: ['./interactive-map-response.component.css'],
 })
 export class ResponseInteractiveMapComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
