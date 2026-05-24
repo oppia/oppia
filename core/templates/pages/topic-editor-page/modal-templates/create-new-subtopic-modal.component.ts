@@ -33,10 +33,12 @@ import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
 } from 'services/html-length.service';
+import './create-new-subtopic-modal.component.css';
 
 @Component({
   selector: 'oppia-create-new-subtopic-modal',
   templateUrl: './create-new-subtopic-modal.component.html',
+  styleUrls: ['./create-new-subtopic-modal.component.css'],
 })
 export class CreateNewSubtopicModalComponent
   extends ConfirmOrCancelModal
