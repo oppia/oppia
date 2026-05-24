@@ -1956,3 +1956,65 @@ class UserContributionRightsUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             user_contribution_rights.can_submit_at_least_one_item()
         )
+
+
+class UserSettingsProfileNameTests(test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_settings = user_services.get_user_settings(self.owner_id)
+
+    def test_profile_name_is_none_by_default(self) -> None:
+        self.assertIsNone(self.user_settings.profile_name)
+
+    def test_validate_valid_profile_name_succeeds(self) -> None:
+        self.user_settings.profile_name = 'Ana Maria'
+        self.user_settings.validate()
+
+    def test_validate_profile_name_with_hyphen_succeeds(self) -> None:
+        self.user_settings.profile_name = 'Jean-Pierre'
+        self.user_settings.validate()
+
+    def test_validate_non_str_profile_name_raises_error(self) -> None:
+        # Here we use MyPy ignore because we are intentionally assigning an
+        # invalid type to test that validation raises an error.
+        self.user_settings.profile_name = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected profile_name to be a string'
+        ):
+            self.user_settings.validate()
+
+    def test_validate_empty_profile_name_raises_error(self) -> None:
+        self.user_settings.profile_name = ''
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'profile_name cannot be an empty string'
+        ):
+            self.user_settings.validate()
+
+    def test_validate_too_long_profile_name_raises_error(self) -> None:
+        self.user_settings.profile_name = 'A' * 51
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'profile_name cannot be longer than'
+        ):
+            self.user_settings.validate()
+
+    def test_validate_profile_name_with_invalid_chars_raises_error(
+        self,
+    ) -> None:
+        self.user_settings.profile_name = 'Ana123'
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'profile_name can only contain letters, spaces, and hyphens',
+        ):
+            self.user_settings.validate()
+
+    def test_to_dict_includes_profile_name_when_set(self) -> None:
+        self.user_settings.profile_name = 'Ana Maria'
+        result = self.user_settings.to_dict()
+        self.assertEqual(result['profile_name'], 'Ana Maria')
+
+    def test_to_dict_includes_none_when_profile_name_not_set(self) -> None:
+        result = self.user_settings.to_dict()
+        self.assertIsNone(result['profile_name'])

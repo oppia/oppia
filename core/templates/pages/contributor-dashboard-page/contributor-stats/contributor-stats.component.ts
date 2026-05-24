@@ -32,6 +32,7 @@ import {
   TranslationContributionBackendDict,
   TranslationReviewBackendDict,
 } from '../services/contribution-and-review-stats.service';
+import {ContributionAndReviewBackendApiService} from '../services/contribution-and-review-backend-api.service';
 import {UserService} from 'services/user.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {AppConstants} from 'app.constants';
@@ -110,6 +111,11 @@ export class ContributorStatsComponent {
   ITEMS_PER_PAGE: number = 5;
   dataLoading = false;
 
+  profileName: string | null = null;
+  profileNameInput: string = '';
+  isSubmitting: boolean = false;
+  profileNameErrorMessage: string = '';
+
   userCanReviewTranslationSuggestions: boolean = false;
   userCanReviewQuestionSuggestions: boolean = false;
   userCanSuggestQuestions: boolean = false;
@@ -187,6 +193,7 @@ export class ContributorStatsComponent {
   constructor(
     public readonly languageUtilService: LanguageUtilService,
     private readonly contributionAndReviewStatsService: ContributionAndReviewStatsService,
+    private readonly contributionAndReviewBackendApiService: ContributionAndReviewBackendApiService,
     private readonly userService: UserService,
     private readonly modalService: NgbModal,
     private readonly injector: Injector
@@ -231,7 +238,36 @@ export class ContributorStatsComponent {
     }
 
     await this.fetchStats();
+
+    const profileNameResponse =
+      await this.contributionAndReviewBackendApiService.fetchProfileNameAsync();
+    this.profileName = profileNameResponse.profile_name;
+
     this.dataLoading = false;
+  }
+
+  async submitProfileName(): Promise<void> {
+    this.profileNameErrorMessage = '';
+    if (!this.profileNameInput.trim()) {
+      this.profileNameErrorMessage = 'Name cannot be empty.';
+      return;
+    }
+    if (this.profileNameInput.length > 50) {
+      this.profileNameErrorMessage =
+        'Name cannot be longer than 50 characters.';
+      return;
+    }
+    this.isSubmitting = true;
+    try {
+      await this.contributionAndReviewBackendApiService.setProfileNameAsync(
+        this.profileNameInput
+      );
+      this.profileName = this.profileNameInput;
+    } catch (e) {
+      this.profileNameErrorMessage = 'Could not save name. Please try again.';
+    } finally {
+      this.isSubmitting = false;
+    }
   }
 
   toggleDropdown(): void {

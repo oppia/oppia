@@ -892,6 +892,50 @@ class UserInfoHandler(
         self.render_json({'success': True})
 
 
+class ProfileNameHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of ProfileNameHandler's
+    normalized_payload dictionary.
+    """
+
+    profile_name: str
+
+
+class ProfileNameHandler(
+    base.BaseHandler[ProfileNameHandlerNormalizedPayloadDict, Dict[str, str]]
+):
+    """Handler for setting a contributor's profile name (write-once)."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'profile_name': {
+                'schema': {'type': 'basestring'},
+                'validators': [{'id': 'has_length_at_most', 'max_value': 50}],
+            }
+        },
+    }
+
+    @acl_decorators.can_manage_own_account
+    def get(self) -> None:
+        """Handles GET requests to fetch the current user's profile name."""
+        assert self.user_id is not None
+        user_settings = user_services.get_user_settings(self.user_id)
+        self.render_json({'profile_name': user_settings.profile_name})
+
+    @acl_decorators.can_manage_own_account
+    def put(self) -> None:
+        """Handles PUT requests to set the profile name."""
+        assert self.user_id is not None
+        assert self.normalized_payload is not None
+        profile_name = self.normalized_payload['profile_name']
+        try:
+            user_services.update_profile_name(self.user_id, profile_name)
+        except Exception as e:
+            raise self.InvalidInputException(e) from e
+        self.render_json({})
+
+
 class UrlHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of UrlHandler's
     normalized_request dictionary.

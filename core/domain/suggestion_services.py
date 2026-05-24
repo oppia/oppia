@@ -4401,6 +4401,7 @@ def generate_contributor_certificate_data(
     language_code: Optional[str],
     from_date: datetime.datetime,
     to_date: datetime.datetime,
+    display_name: Optional[str] = None,
 ) -> Optional[suggestion_registry.ContributorCertificateInfoDict]:
     """Returns data to generate the certificate.
 
@@ -4414,6 +4415,8 @@ def generate_contributor_certificate_data(
             contributions were created.
         to_date: datetime.datetime. The end of the date range for which the
             contributions were created.
+        display_name: str|None. The name to use on the certificate. If None,
+            the username is used.
 
     Returns:
         ContributorCertificateInfoDict|None. Data to generate the certificate,
@@ -4443,7 +4446,10 @@ def generate_contributor_certificate_data(
     else:
         raise Exception('The suggestion type is invalid.')
 
-    return data.to_dict() if data is not None else None
+    if data is None:
+        return None
+    data.contributor_name = display_name or username
+    return data.to_dict()
 
 
 def _generate_translation_contributor_certificate_data(

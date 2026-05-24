@@ -1985,6 +1985,7 @@ class ContributorCertificateInfoDict(TypedDict):
     contribution_hours: str
     contribution_word_count: int
     language: Optional[str]
+    contributor_name: str
 
 
 class ContributorCertificateInfo:
@@ -2000,6 +2001,7 @@ class ContributorCertificateInfo:
         contribution_hours: str,
         contribution_word_count: int,
         language: Optional[str],
+        contributor_name: str = '',
     ) -> None:
         self.from_date = from_date
         self.to_date = to_date
@@ -2007,6 +2009,7 @@ class ContributorCertificateInfo:
         self.contribution_hours = contribution_hours
         self.contribution_word_count = contribution_word_count
         self.language = language
+        self.contributor_name = contributor_name
 
     def to_dict(self) -> ContributorCertificateInfoDict:
         """Returns a dict representation of a ContributorCertificateInfo
@@ -2023,6 +2026,7 @@ class ContributorCertificateInfo:
             'contribution_hours': self.contribution_hours,
             'contribution_word_count': self.contribution_word_count,
             'language': self.language,
+            'contributor_name': self.contributor_name,
         }
 
 

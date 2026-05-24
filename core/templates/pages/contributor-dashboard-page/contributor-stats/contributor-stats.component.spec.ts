@@ -37,6 +37,7 @@ import {
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap';
 import {CertificateDownloadModalComponent} from '../modal-templates/certificate-download-modal.component';
+import {ContributionAndReviewBackendApiService} from '../services/contribution-and-review-backend-api.service';
 
 describe('Contributor stats component', () => {
   let fetchAllContributionAndReviewStatsAsync: jasmine.Spy;
@@ -126,6 +127,7 @@ describe('Contributor stats component', () => {
   let component: ContributorStatsComponent;
   let fixture: ComponentFixture<ContributorStatsComponent>;
   let contributionAndReviewStatsService: ContributionAndReviewStatsService;
+  let contributionAndReviewBackendApiService: ContributionAndReviewBackendApiService;
   let languageUtilService: LanguageUtilService;
   let userService: UserService;
   let modalService: NgbModal;
@@ -155,6 +157,9 @@ describe('Contributor stats component', () => {
 
     contributionAndReviewStatsService = TestBed.inject(
       ContributionAndReviewStatsService
+    );
+    contributionAndReviewBackendApiService = TestBed.inject(
+      ContributionAndReviewBackendApiService
     );
     certificateModal = TestBed.createComponent(
       CertificateDownloadModalComponent
@@ -195,6 +200,10 @@ describe('Contributor stats component', () => {
       spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
         Promise.resolve(userContributionRights)
       );
+      spyOn(
+        contributionAndReviewBackendApiService,
+        'fetchProfileNameAsync'
+      ).and.returnValue(Promise.resolve({profile_name: null}));
       component.ngOnInit();
     }));
 
@@ -408,6 +417,106 @@ describe('Contributor stats component', () => {
 
       component.toggleMobileDropdown();
       expect(component.mobileDropdownShown).toBe(false);
+    }));
+  });
+
+  describe('profile name', () => {
+    beforeEach(waitForAsync(() => {
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve({
+          isLoggedIn: () => true,
+          getUsername: () => 'user',
+        } as UserInfo)
+      );
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+    }));
+
+    it('should show form when profile name is null', fakeAsync(() => {
+      spyOn(
+        contributionAndReviewBackendApiService,
+        'fetchProfileNameAsync'
+      ).and.returnValue(Promise.resolve({profile_name: null}));
+
+      component.ngOnInit();
+      flush();
+
+      expect(component.profileName).toBeNull();
+    }));
+
+    it('should show saved name when profile name is set', fakeAsync(() => {
+      spyOn(
+        contributionAndReviewBackendApiService,
+        'fetchProfileNameAsync'
+      ).and.returnValue(Promise.resolve({profile_name: 'Ana Maria'}));
+
+      component.ngOnInit();
+      flush();
+
+      expect(component.profileName).toBe('Ana Maria');
+    }));
+
+    it('should update profileName after successful submit', fakeAsync(() => {
+      spyOn(
+        contributionAndReviewBackendApiService,
+        'fetchProfileNameAsync'
+      ).and.returnValue(Promise.resolve({profile_name: null}));
+      spyOn(
+        contributionAndReviewBackendApiService,
+        'setProfileNameAsync'
+      ).and.returnValue(Promise.resolve());
+
+      component.ngOnInit();
+      flush();
+
+      component.profileNameInput = 'Ana Maria';
+      component.submitProfileName();
+      flush();
+
+      expect(component.profileName).toBe('Ana Maria');
+      expect(component.profileNameErrorMessage).toBe('');
+    }));
+
+    it('should show error when submit fails', fakeAsync(() => {
+      spyOn(
+        contributionAndReviewBackendApiService,
+        'fetchProfileNameAsync'
+      ).and.returnValue(Promise.resolve({profile_name: null}));
+      spyOn(
+        contributionAndReviewBackendApiService,
+        'setProfileNameAsync'
+      ).and.callFake(() => {
+        const rejection = Promise.reject(new Error('already set'));
+        rejection.catch(() => {});
+        return rejection;
+      });
+
+      component.ngOnInit();
+      flush();
+
+      component.profileNameInput = 'Ana Maria';
+      component.submitProfileName();
+      flush();
+
+      expect(component.profileName).toBeNull();
+      expect(component.profileNameErrorMessage).not.toBe('');
+    }));
+
+    it('should show error when input is empty', fakeAsync(() => {
+      spyOn(
+        contributionAndReviewBackendApiService,
+        'fetchProfileNameAsync'
+      ).and.returnValue(Promise.resolve({profile_name: null}));
+
+      component.ngOnInit();
+      flush();
+
+      component.profileNameInput = '';
+      component.submitProfileName();
+      flush();
+
+      expect(component.profileNameErrorMessage).not.toBe('');
     }));
   });
 });

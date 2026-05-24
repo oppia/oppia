@@ -1167,9 +1167,20 @@ class ContributorCertificateHandler(
                 'To date should not be a future date.'
             )
 
+        user_settings = user_services.get_user_settings_from_username(username)
+        display_name = (
+            user_settings.profile_name
+            if user_settings is not None and user_settings.profile_name
+            else username
+        )
         certificate_data = (
             suggestion_services.generate_contributor_certificate_data(
-                username, suggestion_type, language, from_datetime, to_datetime
+                username,
+                suggestion_type,
+                language,
+                from_datetime,
+                to_datetime,
+                display_name,
             )
         )
 

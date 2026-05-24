@@ -1970,3 +1970,57 @@ class UrlHandlerTests(test_utils.GenericTestBase):
             'status_code': 400,
         }
         self.assertEqual(response, error)
+
+
+class ProfileNameHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_put_valid_profile_name_returns_200(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/profilename',
+            {'profile_name': 'Ana Maria'},
+            csrf_token=csrf_token,
+        )
+        user_settings = user_services.get_user_settings(self.owner_id)
+        self.assertEqual(user_settings.profile_name, 'Ana Maria')
+        self.logout()
+
+    def test_put_when_profile_name_already_set_returns_400(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/profilename',
+            {'profile_name': 'Ana Maria'},
+            csrf_token=csrf_token,
+        )
+        self.put_json(
+            '/profilename',
+            {'profile_name': 'Outro Nome'},
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+        self.logout()
+
+    def test_put_without_login_returns_401(self) -> None:
+        self.put_json(
+            '/profilename',
+            {'profile_name': 'Ana Maria'},
+            expected_status_int=401,
+        )
+
+    def test_put_with_too_long_profile_name_returns_400(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/profilename',
+            {'profile_name': 'A' * 51},
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+        self.logout()

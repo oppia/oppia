@@ -5000,3 +5000,31 @@ class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
                 'user1', 'non_existing_language'
             )
         )
+
+
+class UpdateProfileNameTests(test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_set_profile_name_for_first_time_succeeds(self) -> None:
+        user_services.update_profile_name(self.owner_id, 'Ana Maria')
+        user_settings = user_services.get_user_settings(self.owner_id)
+        self.assertEqual(user_settings.profile_name, 'Ana Maria')
+
+    def test_overwrite_existing_profile_name_raises_exception(self) -> None:
+        user_services.update_profile_name(self.owner_id, 'Ana Maria')
+        with self.assertRaisesRegex(
+            Exception,
+            'Profile name has already been set and cannot be changed.',
+        ):
+            user_services.update_profile_name(self.owner_id, 'Outro Nome')
+
+    def test_set_invalid_profile_name_raises_validation_error(self) -> None:
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'profile_name can only contain letters, spaces, and hyphens',
+        ):
+            user_services.update_profile_name(self.owner_id, 'Ana123')
