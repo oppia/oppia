@@ -45,6 +45,7 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {ImageClickInputRulesService} from './image-click-input-rules.service';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
 import {SafeResourceUrl} from '@angular/platform-browser';
+import './image-click-input-interaction.component.css';
 
 interface RectangleRegion extends ImagePoint {
   height: number;
@@ -59,7 +60,7 @@ interface ImagePoint {
 @Component({
   selector: 'oppia-interactive-image-click-input',
   templateUrl: './image-click-input-interaction.component.html',
-  styleUrls: [],
+  styleUrls: ['./image-click-input-interaction.component.css'],
 })
 export class InteractiveImageClickInput implements OnInit, OnDestroy {
   @Input() imageAndRegionsWithValue!: string;

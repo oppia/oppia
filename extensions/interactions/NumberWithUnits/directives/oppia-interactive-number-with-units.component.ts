@@ -32,11 +32,12 @@ import {HelpModalNumberWithUnitsComponent} from './oppia-help-modal-number-with-
 import {NumberConversionService} from 'services/number-conversion.service';
 import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {NumberWithUnitsRulesService} from './number-with-units-rules.service';
+import './number-with-units-interaction.component.css';
 
 @Component({
   selector: 'oppia-interactive-number-with-units',
   templateUrl: './number-with-units-interaction.component.html',
-  styleUrls: [],
+  styleUrls: ['./number-with-units-interaction.component.css'],
 })
 export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
