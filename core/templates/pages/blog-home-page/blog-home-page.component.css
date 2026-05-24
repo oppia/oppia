@@ -223,9 +223,9 @@ oppia-blog-home-page .blog-post-card {
 }
 
 .blog-homepage .oppia-navbar-breadcrumb {
+  align-items: center;
   display: inline-flex;
   flex-direction: row;
-  align-items: center;
   margin-left: -10px;
   overflow-wrap: break-word;
 }

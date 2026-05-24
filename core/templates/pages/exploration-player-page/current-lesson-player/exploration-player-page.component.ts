@@ -16,7 +16,7 @@
  * @fileoverview Component for the exploration player page.
  */
 
-import {Component, OnDestroy, ViewEncapsulation} from '@angular/core';
+import {Component, OnDestroy} from '@angular/core';
 import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
