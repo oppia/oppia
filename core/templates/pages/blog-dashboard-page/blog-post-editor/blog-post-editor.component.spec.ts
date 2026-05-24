@@ -53,6 +53,7 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UserService} from 'services/user.service';
 import {UserInfo} from 'domain/user/user-info.model';
+import {DateTimeFormatService} from 'services/date-time-format.service';
 
 describe('Blog Post Editor Component', () => {
   let fixture: ComponentFixture<BlogPostEditorComponent>;
@@ -69,6 +70,7 @@ describe('Blog Post Editor Component', () => {
   let windowDimensionsService: WindowDimensionsService;
   let preventPageUnloadEventService: PreventPageUnloadEventService;
   let userService: UserService;
+  let dateTimeFormatService: DateTimeFormatService;
 
   let sampleBlogPostBackendDict = {
     id: 'sampleBlogId',
@@ -166,6 +168,7 @@ describe('Blog Post Editor Component', () => {
     );
     ngbModal = TestBed.inject(NgbModal);
     userService = TestBed.inject(UserService);
+    dateTimeFormatService = TestBed.inject(DateTimeFormatService);
     sampleBlogPostData = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict
     );
@@ -593,7 +596,18 @@ describe('Blog Post Editor Component', () => {
     DATE = '01/16/2027, 09:45:46:600000';
     expect(component.getDateStringInWords(DATE)).toBe(
       'Saturday, January 16, 2027 at 9:45 AM'
-    );x
+    );it('should get formatted date string from the timestamp in milliseconds', () => {
+    spyOn(dateTimeFormatService, 'getDateTimeInWords').and.returnValue(
+      'Friday, November 21, 2014 at 4:52 AM'
+    );
+    let DATE = '11/21/2014, 04:52:46:713463';
+    expect(component.getDateStringInWords(DATE)).toBe(
+      'Friday, November 21, 2014 at 4:52 AM'
+    );
+    expect(dateTimeFormatService.getDateTimeInWords).toHaveBeenCalledWith(
+      1416545566713
+    );
+  });
 
     DATE = '02/02/2018, 12:30:46:608990';
     expect(component.getDateStringInWords(DATE)).toBe(
