@@ -4854,6 +4854,7 @@ class WipeoutServiceDeletePinnedOpportunitiesModelsTest(
             topic_id=self.TOPIC_ID,
             opportunity_id=self.OPPORTUNITY_ID,
             language_code='en',
+            entity_type='exploration',
         )
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
