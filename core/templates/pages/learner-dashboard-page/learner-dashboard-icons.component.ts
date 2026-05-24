@@ -24,10 +24,13 @@ import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboar
 import {LearnerDashboardActivityIds} from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 import {LearnerPlaylistModalComponent} from './modal-templates/learner-playlist-modal.component';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import './learner-dashboard-icons.component.css';
 
 @Component({
   selector: 'oppia-learner-dashboard-icons',
   templateUrl: './learner-dashboard-icons.component.html',
+
+  styleUrls: ['./learner-dashboard-icons.component.css'],
 })
 export class LearnerDashboardIconsComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
