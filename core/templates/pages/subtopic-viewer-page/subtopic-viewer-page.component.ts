@@ -36,7 +36,6 @@ import {
 import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
 
-import './subtopic-viewer-page.component.css';
 import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -45,6 +44,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import './subtopic-viewer-page.component.css';
 
 @Component({
   selector: 'oppia-subtopic-viewer-page',

@@ -27,11 +27,12 @@ import {
   I18nLanguageCodeService,
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
+import './subtopic-viewer-navbar-breadcrumb.component.css';
 
 @Component({
   selector: 'subtopic-viewer-navbar-breadcrumb',
   templateUrl: './subtopic-viewer-navbar-breadcrumb.component.html',
-  styleUrls: [],
+  styleUrls: ['./subtopic-viewer-navbar-breadcrumb.component.css'],
 })
 export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
