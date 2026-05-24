@@ -133,14 +133,6 @@ class BackfillTranslationOpportunityModelJobTests(
         translation_model.update_timestamps()
         translation_model.put()
 
-        translation_model_en = (
-            translation_models.EntityTranslationsModel.create_new(
-                'exploration', self.exp_id, 1, 'en', {}
-            )
-        )
-        translation_model_en.update_timestamps()
-        translation_model_en.put()
-
     def test_creates_translation_opportunity_model(self) -> None:
         self.assert_job_output_is(
             [
@@ -161,6 +153,32 @@ class BackfillTranslationOpportunityModelJobTests(
         self.assertEqual(model.topic_ids, ['topic_id'])
         # Exploration currently has 0 content_count from create_default_exploration.
         self.assertEqual(model.content_count, 0)
+        self.assertEqual(model.translation_counts, {'hi': 1})
+
+    def test_creates_translation_opportunity_model_with_complete_native_language(
+        self,
+    ) -> None:
+        translation_model_en = (
+            translation_models.EntityTranslationsModel.create_new(
+                'exploration', self.exp_id, 1, 'en', {}
+            )
+        )
+        translation_model_en.update_timestamps()
+        translation_model_en.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+            ]
+        )
+
+        model = opportunity_models.TranslationOpportunityModel.get(
+            opportunity_models.TranslationOpportunityModel._generate_id(  # pylint: disable=protected-access
+                feconf.TranslatableEntityType.EXPLORATION.value, self.exp_id
+            )
+        )
         self.assertEqual(model.translation_counts, {'hi': 1, 'en': 0})
 
     def test_fails_if_missing_summary_model(self) -> None:
