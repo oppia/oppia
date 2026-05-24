@@ -276,7 +276,7 @@ def generate_app_yaml(deploy_mode: bool = False) -> None:
         'static_dir: build/assets/mathjax',
     )
     content = content.replace(
-        'static_dir: extensions', 'static_dir: build/extensions'
+        'static_files: extensions/', 'static_files: build/extensions/'
     )
     if os.path.isfile(APP_YAML_FILEPATH):
         os.remove(APP_YAML_FILEPATH)

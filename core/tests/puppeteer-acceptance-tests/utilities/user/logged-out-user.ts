@@ -3024,12 +3024,18 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
     });
 
-    await this.clickOnElementWithSelector(
-      featuresAccordionCloseButtonInAboutPage
-    );
-    await this.page.waitForSelector(featuresAccordionPanelContentInAboutPage, {
-      hidden: true,
+    await this.page.$eval(featuresAccordionCloseButtonInAboutPage, btn => {
+      (btn as HTMLElement).click();
     });
+
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const panel = document.querySelector(selector);
+        return !panel || !panel.classList.contains('show');
+      },
+      {},
+      featuresAccordionPanelContentInAboutPage
+    );
   }
 
   /**
