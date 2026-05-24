@@ -24,10 +24,13 @@ import {
   GroupedSkillSummaries,
   SkillEditorStateService,
 } from '../services/skill-editor-state.service';
+import './skill-questions-tab.component.css';
 
 @Component({
   selector: 'oppia-questions-tab',
   templateUrl: './skill-questions-tab.component.html',
+
+  styleUrls: ['./skill-questions-tab.component.css'],
 })
 export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
   // These properties below are initialized using Angular lifecycle hooks

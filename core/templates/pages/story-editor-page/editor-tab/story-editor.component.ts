@@ -39,10 +39,13 @@ import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import constants from 'assets/constants';
+import './story-editor.component.css';
 
 @Component({
   selector: 'oppia-story-editor',
   templateUrl: './story-editor.component.html',
+
+  styleUrls: ['./story-editor.component.css'],
 })
 export class StoryEditorComponent implements OnInit, OnDestroy {
   story: Story;
