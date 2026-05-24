@@ -115,6 +115,9 @@ describe('Topic Viewer Stories List Component', () => {
     expect(component.isHackyTopicNameTranslationDisplayed()).toBe(true);
     expect(component.isHackyTopicDescTranslationDisplayed()).toBe(true);
     expect(component.isHackyClassroomNameTranslationDisplayed()).toBe(true);
+    expect(component.isHackyTopicNameTranslationDisplayed()).toBe(true);
+    expect(component.isHackyTopicDescTranslationDisplayed()).toBe(true);
+    expect(component.isHackyClassroomNameTranslationDisplayed()).toBe(true);
   });
 
   it('should not return the classroom name i18n key if the topic is not assigned to any classroom', () => {
@@ -168,10 +171,10 @@ describe('Topic Viewer Stories List Component', () => {
     component.classroomUrlFragment = '';
     expect(component.getClassroomUrl()).toBe('/learn');
 
-    component.classroomUrlFragment = null as unknown as string;
+    component.classroomUrlFragment = '';
     expect(component.getClassroomUrl()).toBe('/learn');
 
-    component.classroomUrlFragment = undefined as unknown as string;
+    component.classroomUrlFragment = '';
     expect(component.getClassroomUrl()).toBe('/learn');
   });
 });
