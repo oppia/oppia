@@ -54,7 +54,7 @@
             </button>
             <div ngbDropdownMenu class="dropdown-menu dropdown-menu-start" [attr.aria-label]="'dropdownMenuButton-' + index">
               <a ngbDropdownItem class="dropdown-item e2e-test-revert-version"
-                 href="#"
+                 href="javascript:void(0)"
                  *ngIf="metadata.versionNumber !== currentVersion && isEditable()"
                  (click)="showCheckRevertExplorationModal(metadata.versionNumber)">
                 Revert
