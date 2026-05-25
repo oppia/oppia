@@ -19,7 +19,6 @@
 import {TestBed} from '@angular/core/testing';
 import {MockTranslatePipe} from './unit-test-utils';
 import {MockCapitalizePipe} from './unit-test-utils';
-import {mockNumberConversionServiceObject} from './unit-test-utils';
 
 describe('Testing MockTranslatePipe', () => {
   let mtp: MockTranslatePipe;
@@ -56,31 +55,5 @@ describe('Testing MockCapitalizePipe', () => {
   it('should return same value', () => {
     expect(mcp.transform('a')).toEqual('a');
     expect(mcp.transform('abc')).toEqual('abc');
-  });
-});
-
-describe('Testing mockNumberConversionServiceObject', () => {
-  it('should return dot as default decimal separator', () => {
-    expect(mockNumberConversionServiceObject.currentDecimalSeparator()).toBe(
-      '.'
-    );
-  });
-
-  it('should convert valid number strings to English decimal', () => {
-    expect(
-      mockNumberConversionServiceObject.convertToEnglishDecimal('1.5')
-    ).toBe(1.5);
-    expect(
-      mockNumberConversionServiceObject.convertToEnglishDecimal('1,5')
-    ).toBe(1.5);
-  });
-
-  it('should return null for invalid inputs', () => {
-    expect(
-      mockNumberConversionServiceObject.convertToEnglishDecimal('abc')
-    ).toBeNull();
-    expect(
-      mockNumberConversionServiceObject.convertToEnglishDecimal('')
-    ).toBeNull();
   });
 });

@@ -41,9 +41,9 @@ import {DirectivesModule} from 'directives/directives.module';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
 import {MaterialModule} from 'modules/material.module';
 import {DictSchema, UnicodeSchema} from 'services/schema-default-value.service';
-import {mockNumberConversionServiceObject} from 'tests/unit-test-utils';
 import {MockTranslateModule} from 'tests/unit-test-utils';
 import {NumberConversionService} from 'services/number-conversion.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SchemaBasedBoolEditorComponent} from '../schema-based-bool-editor.component';
 import {SchemaBasedChoicesEditorComponent} from '../schema-based-choices-editor.component';
 import {SchemaBasedCustomEditorComponent} from '../schema-based-custom-editor.component';
@@ -108,10 +108,8 @@ describe('Schema based editor', () => {
       ],
       providers: [
         {provide: TranslateService, useClass: MockTranslateService},
-        {
-          provide: NumberConversionService,
-          useValue: mockNumberConversionServiceObject,
-        },
+        NumberConversionService,
+        I18nLanguageCodeService,
       ],
     }).compileComponents();
   }));
