@@ -103,15 +103,11 @@ describe('Topic Viewer Stories List Component', () => {
     spyOn(
       i18nLanguageCodeService,
       'isHackyTranslationAvailable'
-    ).and.returnValues(true, true);
+    ).and.returnValues(true, true, true);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValues(
       false,
       false
     );
-    spyOn(
-      i18nLanguageCodeService,
-      'isClassroomnNameTranslationAvailable'
-    ).and.returnValue(true);
 
     component.ngOnInit();
 
