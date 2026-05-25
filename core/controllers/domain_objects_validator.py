@@ -459,17 +459,17 @@ def validate_general_feedback_session_info_log_entries(
         raise base.BaseHandler.InvalidInputException(
             'Session info contains unknown keys: %s' % ', '.join(unknown_keys)
         )
-    console_errors_json = session_info.get('console_errors_json', '[]')
+    console_errors_json = session_info.get('console_errors_json', [])
     if not isinstance(console_errors_json, list):
         raise base.BaseHandler.InvalidInputException(
             'console_errors_json should be a list.'
         )
-    failed_requests_json = session_info.get('failed_requests_json', '[]')
+    failed_requests_json = session_info.get('failed_requests_json', [])
     if not isinstance(failed_requests_json, list):
         raise base.BaseHandler.InvalidInputException(
             'failed_requests_json should be a list.'
         )
-    navigation_history_json = session_info.get('navigation_history_json', '[]')
+    navigation_history_json = session_info.get('navigation_history_json', [])
     if not isinstance(navigation_history_json, list):
         raise base.BaseHandler.InvalidInputException(
             'navigation_history_json should be a list.'
