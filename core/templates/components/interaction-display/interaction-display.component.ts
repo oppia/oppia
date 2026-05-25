@@ -54,7 +54,7 @@ export class InteractionDisplayComponent {
   // This property contains the list of classes that needs to be applied to
   // parent container of the created interaction.
   @Input() classStr!: string;
-  @Input() parentScope!: Record<string, ScopedValue>;
+  @Input() parentScope?: Object;
 
   @ViewChild('interactionContainer', {
     read: ViewContainerRef,
@@ -110,7 +110,9 @@ export class InteractionDisplayComponent {
           // is irrelevant for this usecase).
           if (/[\])}[{(]/g.test(attribute.name)) {
             if (this.parentScope) {
-              attributeValue = this.parentScope[attributeNameInCamelCase];
+              attributeValue = (
+                this.parentScope as Record<string, ScopedValue>
+              )[attributeNameInCamelCase];
             } else {
               attributeValue = null;
             }
