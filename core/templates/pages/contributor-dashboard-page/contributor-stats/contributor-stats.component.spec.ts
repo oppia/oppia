@@ -486,11 +486,7 @@ describe('Contributor stats component', () => {
       spyOn(
         contributionAndReviewBackendApiService,
         'setProfileNameAsync'
-      ).and.callFake(() => {
-        const rejection = Promise.reject(new Error('already set'));
-        rejection.catch(() => {});
-        return rejection;
-      });
+      ).and.throwError('already set');
 
       component.ngOnInit();
       flush();
