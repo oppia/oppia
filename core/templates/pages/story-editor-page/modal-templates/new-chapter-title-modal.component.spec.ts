@@ -56,7 +56,7 @@ describe('Create New Chapter Modal Component', () => {
   let component: NewChapterTitleModalComponent;
   let storyEditorStateService: StoryEditorStateService;
   let storyUpdateService: StoryUpdateService;
-  let curatedExplorationValidationService;
+  let curatedExplorationValidationService: CuratedExplorationValidationService;
   let nodeTitles = ['title 1', 'title 2', 'title 3'];
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let editableStoryBackendApiService: EditableStoryBackendApiService;
@@ -106,6 +106,10 @@ describe('Create New Chapter Modal Component', () => {
       notes: 'Story notes',
       version: 1,
       corresponding_topic_id: 'topic_id',
+      thumbnail_filename: 'thumbnail.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      url_fragment: 'story-title',
+      meta_tag_content: 'Story meta tag content',
       story_contents: {
         initial_node_id: 'node_2',
         nodes: [
@@ -119,6 +123,18 @@ describe('Create New Chapter Modal Component', () => {
             outline: 'Outline',
             exploration_id: null,
             outline_is_finalized: false,
+
+            thumbnail_bg_color: '#C6DCDA',
+            thumbnail_filename: 'thumbnail.svg',
+            status: 'Draft',
+            planned_publication_date_msecs: null,
+            prerequisite_chapter_ids: [],
+            next_chapter_ids: [],
+            publication_notes: '',
+
+            last_modified_msecs: 0,
+            first_publication_date_msecs: null,
+            unpublishing_reason: '',
           },
           {
             id: 'node_2',
@@ -130,6 +146,18 @@ describe('Create New Chapter Modal Component', () => {
             outline: 'Outline 2',
             exploration_id: 'exp_1',
             outline_is_finalized: true,
+
+            thumbnail_bg_color: '#C6DCDA',
+            thumbnail_filename: 'thumbnail.svg',
+            status: 'Published',
+            planned_publication_date_msecs: null,
+            prerequisite_chapter_ids: [],
+            next_chapter_ids: [],
+            publication_notes: '',
+
+            last_modified_msecs: 0,
+            first_publication_date_msecs: null,
+            unpublishing_reason: '',
           },
         ],
         next_node_id: 'node_3',
@@ -170,9 +198,9 @@ describe('Create New Chapter Modal Component', () => {
 
   it('should validate explorationId correctly', () => {
     component.explorationId = 'validId';
-    expect(component.validateExplorationId()).toBeTrue();
+    expect(component.validateExplorationId()).toBe(true);
     component.explorationId = 'oppia.org/validId';
-    expect(component.validateExplorationId()).toBeFalse();
+    expect(component.validateExplorationId()).toBe(false);
   });
 
   it('should update thumbnail filename when changing thumbnail file', () => {
