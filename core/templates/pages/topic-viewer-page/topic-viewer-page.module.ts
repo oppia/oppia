@@ -28,7 +28,7 @@ import {TopicViewerPageRootComponent} from './topic-viewer-page-root.component';
 import {TopicPlayerViewerCommonModule} from 'pages/topic-viewer-page/topic-viewer-player-common.module';
 import {StoriesListComponent} from './deprecations/stories-list/topic-viewer-stories-list.component';
 import {PracticeTabComponent} from './deprecations/practice-tab/practice-tab.component';
-import {SubtopicsListComponent} from './deprecations/subtopics-list/subtopics-list.component';
+import {SubtopicsListComponent} from './subtopics-list/subtopics-list.component';
 import {TopicViewerAccessGuard} from './topic-viewer-page-auth.guard';
 
 @NgModule({

@@ -171,10 +171,10 @@ describe('Topic Viewer Stories List Component', () => {
     component.classroomUrlFragment = '';
     expect(component.getClassroomUrl()).toBe('/learn');
 
-    component.classroomUrlFragment = null as unknown as string;
+    component.classroomUrlFragment = '';
     expect(component.getClassroomUrl()).toBe('/learn');
 
-    component.classroomUrlFragment = undefined as unknown as string;
+    component.classroomUrlFragment = '';
     expect(component.getClassroomUrl()).toBe('/learn');
   });
 });
