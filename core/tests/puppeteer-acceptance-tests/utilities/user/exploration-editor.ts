@@ -7833,41 +7833,30 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Card at index ${index} not found.`);
     }
 
-    const titleText = await this.page.evaluate(
-      el => el.textContent?.trim() || '',
-      titleElement
+    const cardHandle = await titleElement.evaluateHandle(
+      (element, cardSelector) => element.closest(cardSelector),
+      explorationGridSelector
     );
+    const card = cardHandle.asElement();
+
+    if (!card) {
+      throw new Error(`Card at index ${index} not found.`);
+    }
 
     await this.page.waitForFunction(
       (
-        titleSelector: string,
-        cardSelector: string,
+        cardElement: Element,
         ratingSelector: string,
         feedbackSelector: string,
         viewsSelector: string,
-        expectedTitle: string,
         expectedRatingText: string,
         expectedFeedbackText: string,
         expectedViewsText: string
       ) => {
-        const titleNodes = Array.from(document.querySelectorAll(titleSelector));
-        const titleNode = titleNodes.find(
-          element => element.textContent?.trim() === expectedTitle
-        );
-
-        if (!titleNode) {
-          return false;
-        }
-
-        const card = titleNode.closest(cardSelector);
-        if (!card) {
-          return false;
-        }
-
         const getStatisticText = (selector: string): string => {
           return (
             (
-              card.querySelector(selector) as HTMLElement | null
+              cardElement.querySelector(selector) as HTMLElement | null
             )?.textContent?.trim() || ''
           );
         };
@@ -7879,57 +7868,57 @@ export class ExplorationEditor extends BaseUser {
         );
       },
       {},
-      explorationGridCardTitleSelector,
-      explorationGridSelector,
+      card,
       explorationGridRatingSelector,
       explorationGridFeedbackSelector,
       explorationGridViewsSelector,
-      titleText,
       expectedRating,
       expectedOpenFeedback,
       expectedViews
     );
 
-    const cardHandle = await titleElement.evaluateHandle(
-      (element, cardSelector) => element.closest(cardSelector),
-      explorationGridSelector
-    );
-    const card = cardHandle.asElement();
+    const cardDetails = await this.page.evaluate(
+      (
+        cardElement: Element,
+        ratingSelector: string,
+        feedbackSelector: string,
+        viewsSelector: string
+      ) => {
+        const getStatisticText = (selector: string): string => {
+          return (
+            (
+              cardElement.querySelector(selector) as HTMLElement | null
+            )?.textContent?.trim() || ''
+          );
+        };
 
-    if (!card) {
-      throw new Error(`Card at index ${index} not found.`);
-    }
-
-    const rating = await card.$eval(
+        return {
+          rating: getStatisticText(ratingSelector),
+          feedback: getStatisticText(feedbackSelector),
+          views: getStatisticText(viewsSelector),
+        };
+      },
+      card,
       explorationGridRatingSelector,
-      el => (el as HTMLElement).textContent?.trim() || ''
-    );
-
-    if (rating !== expectedRating) {
-      throw new Error(
-        `Expected rating "${expectedRating}" but found "${rating}".`
-      );
-    }
-
-    const feedback = await card.$eval(
       explorationGridFeedbackSelector,
-      el => (el as HTMLElement).textContent?.trim() || ''
+      explorationGridViewsSelector
     );
 
-    if (feedback !== expectedOpenFeedback) {
+    if (cardDetails.rating !== expectedRating) {
       throw new Error(
-        `Expected open feedback "${expectedOpenFeedback}" but found "${feedback}".`
+        `Expected rating "${expectedRating}" but found "${cardDetails.rating}".`
       );
     }
 
-    const views = await card.$eval(
-      explorationGridViewsSelector,
-      el => (el as HTMLElement).textContent?.trim() || ''
-    );
-
-    if (views !== expectedViews) {
+    if (cardDetails.feedback !== expectedOpenFeedback) {
       throw new Error(
-        `Expected views "${expectedViews}" but found "${views}".`
+        `Expected open feedback "${expectedOpenFeedback}" but found "${cardDetails.feedback}".`
+      );
+    }
+
+    if (cardDetails.views !== expectedViews) {
+      throw new Error(
+        `Expected views "${expectedViews}" but found "${cardDetails.views}".`
       );
     }
   }
@@ -7960,39 +7949,27 @@ export class ExplorationEditor extends BaseUser {
     if (!titleElement) {
       throw new Error(`Row at index ${index} not found.`);
     }
-
-    const titleText = await this.page.evaluate(
-      el => el.textContent?.trim() || '',
-      titleElement
+    const rowHandle = await titleElement.evaluateHandle(
+      (element, rowSelector) => element.closest(rowSelector),
+      explorationListItemSelector
     );
+    const row = rowHandle.asElement();
+
+    if (!row) {
+      throw new Error(`Row at index ${index} not found.`);
+    }
 
     await this.page.waitForFunction(
       (
-        titleSelector: string,
-        rowSelector: string,
-        expectedTitle: string,
+        rowElement: Element,
         expectedRatingText: string,
         expectedOpenThreadsText: string,
         expectedPlaysText: string
       ) => {
-        const titleNodes = Array.from(document.querySelectorAll(titleSelector));
-        const titleNode = titleNodes.find(
-          element => element.textContent?.trim() === expectedTitle
-        );
-
-        if (!titleNode) {
-          return false;
-        }
-
-        const row = titleNode.closest(rowSelector);
-        if (!row) {
-          return false;
-        }
-
         const getCellText = (cellSelector: string): string => {
           return (
             (
-              row.querySelector(cellSelector) as HTMLElement | null
+              rowElement.querySelector(cellSelector) as HTMLElement | null
             )?.textContent?.trim() || ''
           );
         };
@@ -8004,55 +7981,43 @@ export class ExplorationEditor extends BaseUser {
         );
       },
       {},
-      explorationListRowTitleSelector,
-      explorationListItemSelector,
-      titleText,
+      row,
       expectedRating,
       expectedOpenThreads,
       expectedPlays
     );
 
-    const rowHandle = await titleElement.evaluateHandle(
-      (element, rowSelector) => element.closest(rowSelector),
-      explorationListItemSelector
-    );
-    const row = rowHandle.asElement();
+    const rowDetails = await this.page.evaluate((rowElement: Element) => {
+      const getCellText = (cellSelector: string): string => {
+        return (
+          (
+            rowElement.querySelector(cellSelector) as HTMLElement | null
+          )?.textContent?.trim() || ''
+        );
+      };
 
-    if (!row) {
-      throw new Error(`Row at index ${index} not found.`);
-    }
+      return {
+        rating: getCellText('td:nth-child(2)'),
+        plays: getCellText('td:nth-child(3)'),
+        openThreads: getCellText('td:nth-child(4)'),
+      };
+    }, row);
 
-    const rating = await row.$eval(
-      'td:nth-child(2)',
-      el => (el as HTMLElement).textContent?.trim() || ''
-    );
-
-    if (rating !== expectedRating) {
+    if (rowDetails.rating !== expectedRating) {
       throw new Error(
-        `Expected rating "${expectedRating}" ` + `but found "${rating}".`
+        `Expected rating "${expectedRating}" but found "${rowDetails.rating}".`
       );
     }
 
-    const plays = await row.$eval(
-      'td:nth-child(3)',
-      el => (el as HTMLElement).textContent?.trim() || ''
-    );
-
-    if (plays !== expectedPlays) {
+    if (rowDetails.openThreads !== expectedOpenThreads) {
       throw new Error(
-        `Expected plays "${expectedPlays}" ` + `but found "${plays}".`
+        `Expected open threads "${expectedOpenThreads}" but found "${rowDetails.openThreads}".`
       );
     }
 
-    const openThreads = await row.$eval(
-      'td:nth-child(4)',
-      el => (el as HTMLElement).textContent?.trim() || ''
-    );
-
-    if (openThreads !== expectedOpenThreads) {
+    if (rowDetails.plays !== expectedPlays) {
       throw new Error(
-        `Expected open threads "${expectedOpenThreads}" ` +
-          `but found "${openThreads}".`
+        `Expected plays "${expectedPlays}" but found "${rowDetails.plays}".`
       );
     }
   }
