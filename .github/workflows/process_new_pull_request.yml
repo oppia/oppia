@@ -21,7 +21,6 @@ jobs:
         with:
           app-id: ${{ secrets.OPPIA_GITHUB_APP_ID }}
           private-key: ${{ secrets.OPPIA_GITHUB_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
           permission-pull-requests: write
           permission-members: read
 
