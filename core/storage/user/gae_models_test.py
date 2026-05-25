@@ -3970,7 +3970,7 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
             language_code=self.language_code,
             topic_id=self.topic_id,
             opportunity_id=self.opportunity_id_1,
-            entity_type='exploration',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
         )
 
     def test_create_and_fetch_model(self) -> None:
@@ -4006,7 +4006,7 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
                 language_code=self.language_code,
                 topic_id=self.topic_id,
                 opportunity_id=self.opportunity_id_1,
-                entity_type='exploration',
+                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             )
 
     def test_pre_put_hook_raises_exception_for_invalid_entity_type(
