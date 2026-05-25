@@ -485,29 +485,6 @@ const explorationGridFeedbackSelector =
 
 const explorationGridViewsSelector = '.e2e-test-exp-summary-tile-num-views';
 
-// const profileDropdown =
-//   '.e2e-test-profile-dropdown';
-
-// const creatorDashboardMenuLink =
-//   '.e2e-test-creator-dashboard-link';
-
-// const creatorDashboardContainerSelector =
-//   '.e2e-test-creator-dashboard-container';
-
-// const avarageRatingSelector =
-//   '.e2e-test-average-rating-value';
-
-// const usersCountInRatingSelector =
-//   '.e2e-test-rating-user-count';
-
-// const totalPlaysSelector =
-//   '.e2e-test-total-plays-stat';
-
-// const numberOfOpenFeedbacksSelector =
-//   '.e2e-test-open-feedback-stat';
-
-const subscribersCountSelector = '.e2e-test-subscribers-stat';
-
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
   CODE_EDITOR = 'Code Editor',
@@ -5656,7 +5633,7 @@ export class ExplorationEditor extends BaseUser {
     if (expectedRating === 'N/A') {
       if (ratingText !== 'N/A') {
         throw new Error(
-          `Expected average rating to be "N/A", ` + `but found "${ratingText}".`
+          'Expected average rating to be "N/A", but found "' + ratingText + '".'
         );
       }
     } else {
@@ -5664,9 +5641,11 @@ export class ExplorationEditor extends BaseUser {
 
       if (ratingValue !== expectedRating) {
         throw new Error(
-          `Expected average rating to be ` +
-            `${expectedRating}, but found ` +
-            `${ratingValue}.`
+          'Expected average rating to be ' +
+            expectedRating +
+            ', but found ' +
+            ratingValue +
+            '.'
         );
       }
     }
@@ -5682,9 +5661,11 @@ export class ExplorationEditor extends BaseUser {
 
     if (totalUsers !== expectedUsers) {
       throw new Error(
-        `Expected ${expectedUsers} users to ` +
-          `have submitted ratings, but found ` +
-          `${totalUsers}.`
+        'Expected ' +
+          expectedUsers +
+          ' users to have submitted ratings, but found ' +
+          totalUsers +
+          '.'
       );
     }
   }
