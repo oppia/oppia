@@ -4,6 +4,9 @@
 READ ME FIRST:
 Please answer *all* questions below and check off every point from the Essential Checklist!
 If there is no corresponding issue number, fill in N/A where it says [fill_in_number_here] below in 1.
+You should delete either `fixes` or `fixes part of` so that line 1 reads
+`This PR fixes #123.` or `This PR fixes part of #123.`, where `#123` is replaced
+with the issue(s) addressed.
 -->
 
 1. This PR fixes #[fill_in_number_here] or fixes part of #[fill_in_number_here].
@@ -15,7 +18,7 @@ If there is no corresponding issue number, fill in N/A where it says [fill_in_nu
 
 Please follow the [instructions for making a code change](https://github.com/oppia/oppia/wiki/Make-a-pull-request).
 
-- [ ] I have linked the issue that this PR fixes in the "Development" section of the sidebar.
+- [ ] I have referenced the issue(s) that this PR fixes or fixes part of on line 1 above. Once I open the PR, I will check that any issues this PR fully fixes are listed in the "Development" section of the sidebar.
 - [ ] I have checked the "Files Changed" tab and confirmed that the changes are what I want to make.
 - [ ] I have written tests for my code.
 - [ ] The **PR title** starts with "Fix #bugnum: " or "Fix part of #bugnum: ...", followed by a short, clear summary of the changes.

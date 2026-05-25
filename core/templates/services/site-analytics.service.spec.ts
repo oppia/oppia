@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for SiteAnalyticsService.
  */
 
-import {TestBed} from '@angular/core/testing';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LocalStorageService} from 'services/local-storage.service';
@@ -47,7 +47,11 @@ describe('Site Analytics Service', () => {
       'getLastPageViewTime',
       'setLastPageViewTime',
     ]);
-    const userServiceSpy = jasmine.createSpyObj('UserService', ['isLoggedIn']);
+    const userServiceSpy = jasmine.createSpyObj('UserService', [
+      'isLoggedIn',
+      'getUserInfoAsync',
+    ]);
+    userServiceSpy.getUserInfoAsync.and.returnValue(Promise.resolve());
     TestBed.configureTestingModule({
       providers: [
         SiteAnalyticsService,
@@ -75,7 +79,8 @@ describe('Site Analytics Service', () => {
   });
 
   describe('when tested using gtag spy', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
+      await Promise.resolve();
       gtagSpy = spyOn(ws.nativeWindow, 'gtag');
     });
 
@@ -692,6 +697,38 @@ describe('Site Analytics Service', () => {
         login_status: 'logged_in',
       });
     });
+
+    it('should wait for user info before sending event if login state is unresolved', fakeAsync(() => {
+      let resolveUserInfoPromise!: () => void;
+      const userInfoPromise = new Promise<void>(resolve => {
+        resolveUserInfoPromise = resolve;
+      });
+
+      userService.getUserInfoAsync.and.returnValue(userInfoPromise);
+      userService.isLoggedIn.and.returnValue(false);
+
+      const delayedInitSas = new SiteAnalyticsService(
+        ws,
+        localStorageService,
+        userService
+      );
+
+      delayedInitSas.registerCommunityLessonStarted(explorationId);
+      expect(gtagSpy).not.toHaveBeenCalled();
+
+      userService.isLoggedIn.and.returnValue(true);
+      resolveUserInfoPromise();
+      flushMicrotasks();
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'community_lesson_started',
+        {
+          exploration_id: explorationId,
+          login_status: 'logged_in',
+        }
+      );
+    }));
 
     it('should register classroom page viewed', () => {
       spyOn(
