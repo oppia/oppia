@@ -3970,6 +3970,7 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
             language_code=self.language_code,
             topic_id=self.topic_id,
             opportunity_id=self.opportunity_id_1,
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
         )
 
     def test_create_and_fetch_model(self) -> None:
@@ -3980,9 +3981,10 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
             fetched_model is not None
         ), 'Expected fetched_model to be not None'
         self.assertEqual(fetched_model.opportunity_id, self.opportunity_id_1)
+        self.assertEqual(fetched_model.entity_type, 'exploration')
 
         user_models.PinnedOpportunityModel.create(
-            'user_id_2', 'en', 'topic_id_1', 'opportunity_id_2'
+            'user_id_2', 'en', 'topic_id_1', 'opportunity_id_2', 'skill'
         )
 
         fetched_model = user_models.PinnedOpportunityModel.get_model(
@@ -3992,6 +3994,7 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
             fetched_model is not None
         ), 'Expected fetched_model to be not None'
         self.assertEqual(fetched_model.opportunity_id, 'opportunity_id_2')
+        self.assertEqual(fetched_model.entity_type, 'skill')
 
     def test_create_raises_exception_for_existing_instance(self) -> None:
         with self.assertRaisesRegex(
@@ -4003,7 +4006,24 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
                 language_code=self.language_code,
                 topic_id=self.topic_id,
                 opportunity_id=self.opportunity_id_1,
+                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             )
+
+    def test_pre_put_hook_raises_exception_for_invalid_entity_type(
+        self,
+    ) -> None:
+        model = user_models.PinnedOpportunityModel(
+            id='id',
+            user_id='user_id',
+            language_code='en',
+            topic_id='topic_id',
+            opportunity_id='opportunity_id',
+            entity_type='invalid_type',
+        )
+        with self.assertRaisesRegex(
+            Exception, 'Invalid entity_type: invalid_type'
+        ):
+            model.put()
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
@@ -4025,6 +4045,7 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
         expected_data = {
             key: {
                 'opportunity_id': self.opportunity_id_1,
+                'entity_type': 'exploration',
             }
         }
 
@@ -4042,6 +4063,7 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'opportunity_id': base_models.EXPORT_POLICY.EXPORTED,
+            'entity_type': base_models.EXPORT_POLICY.EXPORTED,
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
