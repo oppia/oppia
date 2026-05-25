@@ -25,6 +25,6 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 })
 export class CertificateOfferingDashboardPageRootComponent {
   isCertificateOfferingEnabled =
-    this.platformFeatureService.status.EnableCertificateOffering.isEnabled;
+    this.platformFeatureService.status.EnableCertificateAssessment.isEnabled;
   constructor(private platformFeatureService: PlatformFeatureService) {}
 }

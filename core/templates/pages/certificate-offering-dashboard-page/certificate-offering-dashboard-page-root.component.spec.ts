@@ -31,7 +31,7 @@ describe('CertificateOfferingDashboardPageRootComponent', () => {
       [],
       {
         status: {
-          EnableCertificateOffering: {
+          EnableCertificateAssessment: {
             isEnabled: true,
           },
         },
