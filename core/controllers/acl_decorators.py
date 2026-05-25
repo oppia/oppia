@@ -5144,9 +5144,6 @@ def is_from_oppia_android_build(
 
     return test_is_from_oppia_android_build
 
-    # Here we use type Any because this method can accept arbitrary number of
-    # arguments with different types.
-
 
 def can_access_certificate_dashboard(
     handler: Callable[..., _GenericHandlerFunctionReturnType],
@@ -5161,6 +5158,8 @@ def can_access_certificate_dashboard(
         function. The newly decorated function.
     """
 
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
     @functools.wraps(handler)
     def test_can_access_certificate_dashboard(
         self: _SelfBaseHandlerType,
