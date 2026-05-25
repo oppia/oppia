@@ -106,6 +106,7 @@ describe('Topic Viewer Stories List Component', () => {
     ).and.returnValues(true, true, true);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValues(
       false,
+      false,
       false
     );
 
