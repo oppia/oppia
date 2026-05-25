@@ -176,8 +176,7 @@ export class BaseContentComponent {
   }
 
   openFeedbackModal(): void {
-    // TODO[#26195]: Remove the console and Implement feedback modal opening logic..
-    console.log('Opening feedback modal');
+    // TODO(#26195): Implement feedback modal opening logic.
     return;
   }
 

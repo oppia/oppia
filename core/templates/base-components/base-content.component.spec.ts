@@ -272,9 +272,7 @@ describe('Base Content Component', () => {
   });
 
   it('should open the Feedback modal', () => {
-    spyOn(console, 'log');
-    componentInstance.openFeedbackModal();
-    expect(console.log).toHaveBeenCalledWith('Opening feedback modal');
+    expect(() => componentInstance.openFeedbackModal()).not.toThrowError();
   });
 
   it('should show the cookie banner if there is no cookie set', () => {
