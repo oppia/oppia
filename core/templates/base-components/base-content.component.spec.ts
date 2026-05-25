@@ -266,6 +266,17 @@ describe('Base Content Component', () => {
     );
   });
 
+  it('should dismiss the Feedback floater', () => {
+    componentInstance.dismissFeedbackFloater();
+    expect(componentInstance.isFeedbackFloaterDismissed).toBe(true);
+  });
+
+  it('should open the Feedback modal', () => {
+    spyOn(console, 'log');
+    componentInstance.openFeedbackModal();
+    expect(console.log).toHaveBeenCalledWith('Opening feedback modal');
+  });
+
   it('should show the cookie banner if there is no cookie set', () => {
     spyOn(cookieService, 'get').and.returnValue('');
     expect(componentInstance.hasAcknowledgedCookies()).toBe(false);
