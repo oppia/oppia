@@ -70,7 +70,7 @@
   background: #3b82f6;
   border: 1px solid #dbeafe;
   border-radius: 50%;
-  color: #ffffff;
+  color: #fff;
   cursor: pointer;
   display: flex;
   font-size: 14px;
@@ -85,7 +85,7 @@
   border-radius: 8px 0 0 8px;
   border-right-width: 0;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-  color: #ffffff;
+  color: #fff;
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.4px;
