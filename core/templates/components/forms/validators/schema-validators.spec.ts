@@ -261,6 +261,10 @@ describe('Schema validators', () => {
         {controlValue: '1,5', expectedResult: true},
         {controlValue: ',3', expectedResult: true},
         {controlValue: '2,5%', expectedResult: true},
+        // '1.5' is valid in French locale because convertToEnglishDecimal only
+        // replaces the locale separator (','), leaving '1.5' unchanged.
+        // parseFloat('1.5') then succeeds natively, this is not special casing,
+        // it's standard JS number parsing behaviour.
         {controlValue: '1.5', expectedResult: true},
       ];
       testCases.forEach(testCase => {
