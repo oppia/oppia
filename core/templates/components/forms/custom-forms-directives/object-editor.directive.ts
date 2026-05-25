@@ -307,7 +307,7 @@ export class ObjectEditorComponent
       instance.value = this.value;
 
       // Listening to @Output events (valueChanged and validityChange).
-      if (instance.valueChanged instanceof EventEmitter) {
+      if (instance.valueChanged) {
         this.componentSubscriptions.add(
           instance.valueChanged.subscribe(newValue => {
             // Changes to array are not caught if the array reference doesn't
@@ -320,7 +320,7 @@ export class ObjectEditorComponent
           })
         );
       }
-      if (instance.validityChange instanceof EventEmitter) {
+      if (instance.validityChange) {
         this.componentSubscriptions.add(
           instance.validityChange.subscribe(
             (errorsMap: Record<string, boolean>) => {

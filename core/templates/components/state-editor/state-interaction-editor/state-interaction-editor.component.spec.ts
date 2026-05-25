@@ -258,7 +258,9 @@ describe('State Interaction component', () => {
     tick();
 
     expect(stateSolutionService.saveDisplayedValue).toHaveBeenCalled();
-    expect(component.onSaveSolution.emit).not.toHaveBeenCalled();
+    expect(component.onSaveSolution.emit).toHaveBeenCalledWith(
+      null as unknown as Solution
+    );
   }));
 
   it('should not delete interaction when user click on cancel btn', fakeAsync(() => {
