@@ -37,7 +37,11 @@ import {
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {Skill} from 'domain/skill/skill.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
+import {
+  SkillSummary,
+  SkillSummaryBackendDict,
+} from 'domain/skill/skill-summary.model';
 import {of} from 'rxjs';
 
 describe('Skill editor main tab Component', () => {
@@ -134,7 +138,7 @@ describe('Skill editor main tab Component', () => {
       version: 3,
       next_misconception_id: 3,
       prerequisite_skill_ids: ['skill_1'],
-      superseding_skill_id: null,
+      superseding_skill_id: null as unknown as string,
       all_questions_merged: true,
     });
 
@@ -435,13 +439,22 @@ describe('Skill editor main tab Component', () => {
       component.categorizedSkills = {
         'Topic 1': {
           'Subtopic 1': [
-            {id: 'skill1', description: 'test description 1'},
-            {id: 'skill2', description: 'test description 2'},
+            {
+              id: 'skill1',
+              description: 'test description 1',
+            } as unknown as ShortSkillSummary,
+            {
+              id: 'skill2',
+              description: 'test description 2',
+            } as unknown as ShortSkillSummary,
           ],
         },
       };
       component.untriagedSkillSummaries = [
-        {id: '4P77sLaU14DE', description: 'Dummy Skill 3'},
+        {
+          id: '4P77sLaU14DE',
+          description: 'Dummy Skill 3',
+        } as unknown as SkillSummary,
       ];
 
       const validSkillSummary = {
