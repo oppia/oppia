@@ -41,7 +41,7 @@ class MockPlatformFeatureService {
     NewLessonPlayer: {
       isEnabled: false,
     },
-    WebGeneralFeedbackModal: {
+    WebGeneralFeedbackModalEnabled: {
       isEnabled: false,
     },
   };
@@ -213,7 +213,8 @@ describe('Base Content Component', () => {
   it('should return true for isWebGeneralFeedbackModalEnabled when feature is enabled', () => {
     const preResult = componentInstance.isWebGeneralFeedbackModalEnabled();
     expect(preResult).toBe(false);
-    mockPlatformFeatureService.status.WebGeneralFeedbackModal.isEnabled = true;
+    mockPlatformFeatureService.status.WebGeneralFeedbackModalEnabled.isEnabled =
+      true;
     const result = componentInstance.isWebGeneralFeedbackModalEnabled();
     expect(result).toBe(true);
   });
