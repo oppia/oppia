@@ -19,7 +19,7 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 
-import {CreateCertificateOfferingPageRootComponent} from './create-certificate-offering-page-root.component.ts';
+import {CreateCertificateOfferingPageRootComponent} from './create-certificate-offering-page-root.component';
 
 const routes: Routes = [
   {

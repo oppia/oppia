@@ -30,5 +30,5 @@ export class CreateCertificateOfferingPageRootComponent extends BaseRootComponen
       .TITLE;
 
   meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-    .CREATE_CERTIFICATE_OFFERING.META as Readonly<MetaTagData[]>;
+    .CREATE_CERTIFICATE_OFFERING.META as unknown as Readonly<MetaTagData>[];
 }
