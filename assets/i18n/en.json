@@ -653,6 +653,7 @@
     "I18N_FEEDBACK_CREATE_THREAD_SUBJECT_MIN_LENGTH": "Subject must be at least <[min]> characters long.",
     "I18N_FEEDBACK_CREATE_THREAD_SUBJECT_REQUIRED": "Subject is required.",
     "I18N_FEEDBACK_CREATE_THREAD_SUBMIT_BUTTON": "Create Thread",
+    "I18N_FEEDBACK_FLOATING_BUTTON": "Feedback",
     "I18N_FEEDBACK_INSTRUCTION": "Feedback message should be at most <[count]> characters.",
     "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Anonymous",
     "I18N_FEEDBACK_MODAL_HEADER": "Give feedback on this lesson",
@@ -1740,6 +1741,5 @@
     "I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "Your work directly helps underserved students around the world gain access to free, high-quality education.",
     "I18N_WARNING_MODAL_DESCRIPTION": "This will show the full solution. Are you sure?",
     "I18N_WARNING_MODAL_TITLE": "Warning!",
-    "I18N_YES": "Yes",
-    "I18N_FEEDBACK_FLOATING_BUTTON": "Feedback"
+    "I18N_YES": "Yes"
 }
