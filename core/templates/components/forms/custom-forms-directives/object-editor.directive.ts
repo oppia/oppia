@@ -215,11 +215,9 @@ export class ObjectEditorComponent
   }
 
   @Output() valueChange = new EventEmitter();
-  // The 'unknown' type is used here because 'componentRef' points to an
-  // instance of a specific editor component (e.g., BooleanEditorComponent)
-  // that is determined by the 'objType' input at runtime. Since each editor
-  // has a different type for its 'value' property, 'unknown' is used for
-  // the generic parameter of 'ObjectEditor'.
+  // 'unknown' is used because the specific editor component (e.g.,
+  // BooleanEditorComponent) is determined at runtime, and each editor has
+  // a different 'value' property type.
   componentRef!: ComponentRef<ObjectEditor<unknown>>;
   componentSubscriptions = new Subscription();
   onChange: (_: SchemaDefaultValue) => void = () => {};
