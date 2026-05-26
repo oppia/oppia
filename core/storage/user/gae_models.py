@@ -3519,7 +3519,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
         language_code: str,
         topic_id: str,
         opportunity_id: str,
-        entity_type: str = feconf.ENTITY_TYPE_EXPLORATION,
+        entity_type: str,
     ) -> PinnedOpportunityModel:
         """Creates a new PinnedOpportunityModel instance. Fails if the
         model already exists.

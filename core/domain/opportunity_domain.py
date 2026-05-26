@@ -370,7 +370,7 @@ class PinnedOpportunity:
         language_code: str,
         topic_id: str,
         opportunity_id: str,
-        entity_type: str = feconf.ENTITY_TYPE_EXPLORATION,
+        entity_type: str,
     ) -> None:
         """Constructs a PinnedOpportunity domain object.
 
