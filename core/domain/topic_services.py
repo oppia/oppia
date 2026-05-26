@@ -1645,13 +1645,36 @@ def publish_story(topic_id: str, story_id: str, committer_id: str) -> None:
     )
 
 
-def unpublish_story(topic_id: str, story_id: str, committer_id: str) -> None:
+def _cleanup_permanently_unpublished_story(
+    exp_ids: List[str],
+) -> None:
+    """Deletes exploration opportunities and rejects translation suggestions
+    for a permanently unpublished story. This cleanup is intentionally
+    skipped for temporarily unpublished stories so that the content can be
+    restored without data loss when the story is republished.
+
+    Args:
+        exp_ids: list(str). The exploration IDs linked to the story whose
+            opportunities and suggestions should be cleaned up.
+    """
+    opportunity_services.delete_exploration_opportunities(exp_ids)
+    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
+
+
+def unpublish_story(
+    topic_id: str,
+    story_id: str,
+    committer_id: str,
+    unpublish_type: str = topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
+) -> None:
     """Marks the given story as unpublished.
 
     Args:
         topic_id: str. The id of the topic.
         story_id: str. The id of the given story.
         committer_id: str. ID of the committer.
+        unpublish_type: str. Either STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH
+            or STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH. Defaults to permanent.
 
     Raises:
         Exception. The given story does not exist.
@@ -1700,7 +1723,7 @@ def unpublish_story(topic_id: str, story_id: str, committer_id: str) -> None:
                 topic.id,
             )
 
-    topic.unpublish_story(story_id)
+    topic.unpublish_story(story_id, unpublish_type)
     change_list = [
         topic_domain.TopicChange(
             {'cmd': topic_domain.CMD_UNPUBLISH_STORY, 'story_id': story_id}
@@ -1714,11 +1737,13 @@ def unpublish_story(topic_id: str, story_id: str, committer_id: str) -> None:
     )
     generate_topic_summary(topic.id)
 
-    # Delete corresponding exploration opportunities and reject associated
-    # translation suggestions.
-    exp_ids = story.story_contents.get_all_linked_exp_ids()
-    opportunity_services.delete_exploration_opportunities(exp_ids)
-    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
+    if (
+        unpublish_type
+        == topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH
+    ):
+        _cleanup_permanently_unpublished_story(
+            story.story_contents.get_all_linked_exp_ids()
+        )
 
 
 def delete_canonical_story(user_id: str, topic_id: str, story_id: str) -> None:
