@@ -63,17 +63,17 @@ interface VersionMetadataWithTooltip extends VersionMetadata {
 export class HistoryTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  firstVersion: string;
-  secondVersion: string;
-  hideHistoryGraph: boolean;
-  selectedVersionsArray: number[];
-  filteredVersionMetadata: VersionMetadataWithTooltip[] = [];
+  firstVersion: string | null = null;
+  secondVersion: string | null = null;
+  hideHistoryGraph: boolean = true;
+  selectedVersionsArray: number[] = [];
+  filteredVersionMetadata: VersionMetadata[] = [];
 
   // Letiable explorationSnapshots is a list of all snapshots for the
   // exploration in ascending order.
-  explorationSnapshots: ExplorationSnapshot[];
+  explorationSnapshots: ExplorationSnapshot[] = [];
   currentPage: number = 0;
-  explorationVersionMetadata;
+  explorationVersionMetadata: VersionMetadata[] | null = null;
   versionCheckboxArray:
     | {
         vnum: number;
@@ -81,27 +81,30 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
       }[]
     | null = [];
 
-  username: string;
-  displayedCurrentPageNumber: number;
-  versionNumbersToDisplay;
+  username: string = '';
+  displayedCurrentPageNumber: number = 1;
+  versionNumbersToDisplay: number = 0;
   VERSIONS_PER_PAGE: number = 10;
-  startingIndex: number;
-  endIndex: number;
-  versionChoices: number[];
-  explorationId: string;
-  explorationAllSnapshotsUrl: string;
-  checkRevertExplorationValidUrl: string;
-  revertExplorationUrl: string;
-  explorationDownloadUrl: string;
-  earlierVersionHeader: string;
-  laterVersionHeader: string;
-  totalExplorationVersionMetadata = [];
-  compareVersionMetadata;
-  currentVersion: number;
-  comparisonsAreDisabled: boolean;
-  compareVersionsButtonIsHidden: boolean;
-  compareVersions: object;
-  diffData: Metadata | object;
+  startingIndex: number = 1;
+  endIndex: number = 10;
+  versionChoices: number[] = [10, 15, 20];
+  explorationId: string = '';
+  explorationAllSnapshotsUrl: string = '';
+  checkRevertExplorationValidUrl: string = '';
+  revertExplorationUrl: string = '';
+  explorationDownloadUrl: string = '';
+  earlierVersionHeader: string = '';
+  laterVersionHeader: string = '';
+  totalExplorationVersionMetadata: VersionMetadata[] = [];
+  compareVersionMetadata: {
+    earlierVersion?: VersionMetadata;
+    laterVersion?: VersionMetadata;
+  } = {};
+  currentVersion: number = 0;
+  comparisonsAreDisabled: boolean = false;
+  compareVersionsButtonIsHidden: boolean = false;
+  compareVersions: object = {};
+  diffData: Metadata | object | null = null;
 
   constructor(
     private checkRevertService: CheckRevertService,
@@ -177,7 +180,7 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
     this.explorationDataService
       .getDataAsync(() => {})
       .then(data => {
-        let currentVersion = data.version;
+        let currentVersion = data.version ?? 0;
         this.currentVersion = currentVersion;
         // The this.compareVersionMetadata is an object with keys
         // 'earlierVersion' and 'laterVersion' whose values are the
@@ -215,9 +218,6 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
                   this.dateTimeFormatService.getLocaleDateTimeHourString(
                     this.explorationSnapshots[i].created_on_ms
                   ),
-                tooltipText: this.dateTimeFormatService.getDateTimeInWords(
-                  this.explorationSnapshots[i].created_on_ms
-                ),
                 commitMessage: this.explorationSnapshots[i].commit_message,
                 versionNumber: this.explorationSnapshots[i].version_number,
               };
@@ -289,8 +289,9 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
       this.selectedVersionsArray[0],
       this.selectedVersionsArray[1]
     );
-    let earlierIndex = null,
-      laterIndex = null;
+
+    let earlierIndex: number | null = null;
+    let laterIndex: number | null = null;
 
     for (let i = 0; i < this.totalExplorationVersionMetadata.length; i++) {
       if (
@@ -304,13 +305,19 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
       ) {
         laterIndex = i;
       }
+
       if (earlierIndex !== null && laterIndex !== null) {
         break;
       }
     }
 
+    if (earlierIndex === null || laterIndex === null) {
+      return;
+    }
+
     this.compareVersionMetadata.earlierVersion =
       this.totalExplorationVersionMetadata[earlierIndex];
+
     this.compareVersionMetadata.laterVersion =
       this.totalExplorationVersionMetadata[laterIndex];
 
@@ -325,10 +332,10 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
 
       this.diffData = response;
       this.earlierVersionHeader = this.getVersionHeader(
-        this.compareVersionMetadata.earlierVersion
+        this.compareVersionMetadata.earlierVersion!
       );
       this.laterVersionHeader = this.getVersionHeader(
-        this.compareVersionMetadata.laterVersion
+        this.compareVersionMetadata.laterVersion!
       );
     });
   }
@@ -377,7 +384,7 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
       version => {
         let data = {
           revertExplorationUrl: this.revertExplorationUrl,
-          currentVersion: this.explorationDataService.data.version,
+          currentVersion: this.explorationDataService.data.version!,
           revertToVersion: version,
         };
         this.historyTabBackendApiService.postData(data).then(
@@ -444,7 +451,9 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
   }
 
   reverseDateOrder(): void {
-    this.explorationVersionMetadata.reverse();
+    if (this.explorationVersionMetadata) {
+      this.explorationVersionMetadata.reverse();
+    }
   }
 
   showExplorationMetadataDiffModal(): void {
@@ -515,7 +524,7 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
     this.secondVersion = '';
 
     this.displayedCurrentPageNumber = this.currentPage + 1;
-    this.versionNumbersToDisplay = [];
+    this.versionNumbersToDisplay = 0;
     this.VERSIONS_PER_PAGE = 10;
     this.startingIndex = 1;
     this.endIndex = 10;

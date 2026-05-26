@@ -153,6 +153,7 @@ describe('Feedback Tab Component', () => {
           new_value: {html: ''},
           old_value: {html: ''},
           skill_id: '',
+          content_id: '',
         },
         last_updated_msecs: 0,
       }
@@ -174,7 +175,7 @@ describe('Feedback Tab Component', () => {
       ' null',
     () => {
       let addWarningSpy = spyOn(alertsService, 'addWarning').and.callThrough();
-      component.addNewMessage(null, 'Text', 'Open');
+      component.addNewMessage('', 'Text', 'Open');
       expect(addWarningSpy).toHaveBeenCalledWith(
         'Cannot add message to thread with ID: null.'
       );
@@ -183,7 +184,7 @@ describe('Feedback Tab Component', () => {
 
   it('should add warning when trying to add a invalid message in a thread', () => {
     let addWarningSpy = spyOn(alertsService, 'addWarning').and.callThrough();
-    component.addNewMessage('0', 'Text', null);
+    component.addNewMessage('0', 'Text', '');
     expect(addWarningSpy).toHaveBeenCalledWith('Invalid message status: null');
   });
 
@@ -225,6 +226,7 @@ describe('Feedback Tab Component', () => {
               new_value: {html: ''},
               old_value: {html: ''},
               skill_id: '',
+              content_id: '',
             },
             last_updated_msecs: 0,
           }
@@ -283,6 +285,7 @@ describe('Feedback Tab Component', () => {
             new_value: {html: ''},
             old_value: {html: ''},
             skill_id: '',
+            content_id: '',
           },
           last_updated_msecs: 0,
         }
@@ -334,6 +337,7 @@ describe('Feedback Tab Component', () => {
             new_value: {html: ''},
             old_value: {html: ''},
             skill_id: '',
+            content_id: '',
           },
           last_updated_msecs: 0,
         }
@@ -378,6 +382,7 @@ describe('Feedback Tab Component', () => {
             new_value: {html: ''},
             old_value: {html: ''},
             skill_id: '',
+            content_id: '',
           },
           last_updated_msecs: 0,
         }
@@ -423,6 +428,7 @@ describe('Feedback Tab Component', () => {
           new_value: {html: ''},
           old_value: {html: ''},
           skill_id: '',
+          content_id: '',
         },
         last_updated_msecs: 0,
       }
@@ -436,7 +442,7 @@ describe('Feedback Tab Component', () => {
   }));
 
   it('should create a new thread when closing create new thread modal', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+    spyOn(ngbModal, 'open').and.callFake((dlg: any, opt: any) => {
       return {
         result: Promise.resolve({
           newThreadSubject: 'New subject',
@@ -465,7 +471,7 @@ describe('Feedback Tab Component', () => {
 
   it('should not create a new thread when dismissing create new thread modal', () => {
     spyOn(threadDataBackendApiService, 'createNewThreadAsync');
-    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+    spyOn(ngbModal, 'open').and.callFake((dlg: any, opt: any) => {
       return {
         result: Promise.reject(),
       } as NgbModalRef;

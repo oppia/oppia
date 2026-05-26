@@ -120,7 +120,7 @@ describe('State translation component', () => {
       card_is_checkpoint: false,
       interaction: {
         id: 'TextInput',
-        confirmed_unclassified_answers: null,
+        confirmed_unclassified_answers: [],
         customization_args: {
           placeholder: {
             value: {
@@ -137,7 +137,7 @@ describe('State translation component', () => {
         },
         answer_groups: [
           {
-            training_data: null,
+            training_data: [],
             tagged_skill_misconception_id: null,
             rule_specs: [
               {
@@ -160,8 +160,8 @@ describe('State translation component', () => {
               },
             ],
             outcome: {
-              labelled_as_correct: null,
-              param_changes: null,
+              labelled_as_correct: false,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
@@ -173,10 +173,12 @@ describe('State translation component', () => {
             },
           },
           {
+            training_data: [],
+            tagged_skill_misconception_id: null,
             rule_specs: [],
             outcome: {
-              labelled_as_correct: null,
-              param_changes: null,
+              labelled_as_correct: false,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
@@ -190,8 +192,8 @@ describe('State translation component', () => {
         ],
         default_outcome: {
           dest: 'default',
-          labelled_as_correct: null,
-          param_changes: null,
+          labelled_as_correct: false,
+          param_changes: [],
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest_if_really_stuck: null,
@@ -226,6 +228,7 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      inapplicable_skill_misconception_ids: [],
     },
   } as StateObjectsBackendDict;
 
@@ -301,7 +304,7 @@ describe('State translation component', () => {
     explorationStatesService.init(explorationState1, false);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
-    entityTranslationsService.entityTranslation =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       EntityTranslation.createFromBackendDict({
         entity_id: 'exp1',
         entity_type: 'exploration',
@@ -693,12 +696,11 @@ describe('State translation component', () => {
             AnswerGroup.createNew(
               [],
               Outcome.createNew('unused', '1', 'Feedback text', []),
-              Outcome.createNew('unused', '1', 'Feedback text', []),
-              null,
+              [],
               '0'
             ),
             '1',
-            null,
+            [],
             true
           )
         ).toBe('[] Feedback text');
@@ -728,7 +730,7 @@ describe('State translation component', () => {
       card_is_checkpoint: false,
       interaction: {
         id: 'TextInput',
-        confirmed_unclassified_answers: null,
+        confirmed_unclassified_answers: [],
         customization_args: {
           placeholder: {
             value: {
@@ -742,7 +744,7 @@ describe('State translation component', () => {
         },
         answer_groups: [
           {
-            training_data: null,
+            training_data: [],
             tagged_skill_misconception_id: null,
             rule_specs: [
               {
@@ -765,8 +767,8 @@ describe('State translation component', () => {
               },
             ],
             outcome: {
-              labelled_as_correct: null,
-              param_changes: null,
+              labelled_as_correct: false,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
@@ -778,10 +780,12 @@ describe('State translation component', () => {
             },
           },
           {
+            training_data: [],
+            tagged_skill_misconception_id: null,
             rule_specs: [],
             outcome: {
-              labelled_as_correct: null,
-              param_changes: null,
+              labelled_as_correct: false,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
@@ -795,8 +799,8 @@ describe('State translation component', () => {
         ],
         default_outcome: {
           dest: 'default',
-          labelled_as_correct: null,
-          param_changes: null,
+          labelled_as_correct: false,
+          param_changes: [],
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest_if_really_stuck: null,
@@ -831,6 +835,7 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      inapplicable_skill_misconception_ids: [],
     },
   } as StateObjectsBackendDict;
 
@@ -908,7 +913,7 @@ describe('State translation component', () => {
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
-    entityTranslationsService.entityTranslation =
+    entityTranslationsService.languageCodeToLatestEntityTranslations['hi'] =
       EntityTranslation.createFromBackendDict({
         entity_id: 'exp1',
         entity_type: 'exploration',
@@ -1141,7 +1146,7 @@ describe('State translation component', () => {
       card_is_checkpoint: false,
       interaction: {
         id: 'TextInput',
-        confirmed_unclassified_answers: null,
+        confirmed_unclassified_answers: [],
         customization_args: {
           placeholder: {
             value: {
@@ -1155,7 +1160,7 @@ describe('State translation component', () => {
         },
         answer_groups: [
           {
-            training_data: null,
+            training_data: [],
             tagged_skill_misconception_id: null,
             rule_specs: [
               {
@@ -1178,8 +1183,8 @@ describe('State translation component', () => {
               },
             ],
             outcome: {
-              labelled_as_correct: null,
-              param_changes: null,
+              labelled_as_correct: false,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
@@ -1191,10 +1196,12 @@ describe('State translation component', () => {
             },
           },
           {
+            training_data: [],
+            tagged_skill_misconception_id: null,
             rule_specs: [],
             outcome: {
-              labelled_as_correct: null,
-              param_changes: null,
+              labelled_as_correct: false,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
@@ -1208,8 +1215,8 @@ describe('State translation component', () => {
         ],
         default_outcome: {
           dest: 'default',
-          labelled_as_correct: null,
-          param_changes: null,
+          labelled_as_correct: false,
+          param_changes: [],
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest_if_really_stuck: null,
@@ -1244,6 +1251,7 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      inapplicable_skill_misconception_ids: [],
     },
   } as StateObjectsBackendDict;
 
@@ -1256,7 +1264,7 @@ describe('State translation component', () => {
       classifier_model_id: 'null',
       card_is_checkpoint: false,
       interaction: {
-        confirmed_unclassified_answers: null,
+        confirmed_unclassified_answers: [],
         id: 'TextInput',
         customization_args: {
           placeholder: {
@@ -1271,8 +1279,8 @@ describe('State translation component', () => {
         },
         answer_groups: [],
         default_outcome: {
-          labelled_as_correct: null,
-          param_changes: null,
+          labelled_as_correct: false,
+          param_changes: [],
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest: 'default',
@@ -1308,6 +1316,7 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      inapplicable_skill_misconception_ids: [],
     },
   } as StateObjectsBackendDict;
 
@@ -1385,7 +1394,7 @@ describe('State translation component', () => {
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
-    entityTranslationsService.entityTranslation =
+    entityTranslationsService.languageCodeToLatestEntityTranslations['hi'] =
       EntityTranslation.createFromBackendDict({
         entity_id: 'exp1',
         entity_type: 'exploration',
@@ -1441,15 +1450,21 @@ describe('State translation component', () => {
   });
 
   it('should update correct translation with updateTranslatedContent', () => {
-    component.activeTranslatedContent = new TranslatedContent();
+    component.activeTranslatedContent = new TranslatedContent(
+      '',
+      'html',
+      false
+    );
+
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
-      new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
+      new EntityTranslation('entityId', 'entityType', 5, 'hi', {
         content_0: new TranslatedContent('Translated HTML', 'html', true),
       });
 
     translationTabActiveModeService.isVoiceoverModeActive = jasmine
       .createSpy()
       .and.returnValue(false);
+
     spyOn(
       translationTabActiveContentIdService,
       'getActiveContentId'
@@ -1465,7 +1480,7 @@ describe('State translation component', () => {
   it('should format TranslatableSetOfNormalizedString values', () => {
     expect(
       component.getHumanReadableRuleInputValues(
-        {normalizedStrSet: ['input1', 'input2'], unicodeStrSet: null},
+        {normalizedStrSet: ['input1', 'input2'], unicodeStrSet: []},
         'TranslatableSetOfNormalizedString'
       )
     ).toEqual('[input1, input2]');
@@ -1474,7 +1489,7 @@ describe('State translation component', () => {
   it('should format TranslatableSetOfUnicodeString values', () => {
     expect(
       component.getHumanReadableRuleInputValues(
-        {normalizedStrSet: null, unicodeStrSet: ['input1', 'input2']},
+        {normalizedStrSet: [], unicodeStrSet: ['input1', 'input2']},
         'TranslatableSetOfUnicodeString'
       )
     ).toEqual('[input1, input2]');
@@ -1482,7 +1497,13 @@ describe('State translation component', () => {
 
   it('should throw an error on invalid type', () => {
     expect(() => {
-      component.getHumanReadableRuleInputValues(null, 'InvalidType');
+      component.getHumanReadableRuleInputValues(
+        {
+          normalizedStrSet: [],
+          unicodeStrSet: [],
+        },
+        'InvalidType'
+      );
     }).toThrowError('The InvalidType type is not implemented.');
   });
 
@@ -1530,7 +1551,7 @@ describe('State translation component', () => {
 
   it('should return translation html when translation available', () => {
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
-      new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
+      new EntityTranslation('entityId', 'entityType', 1, 'hi', {
         content_0: new TranslatedContent('Translated HTML', 'html', true),
       });
 
@@ -1543,7 +1564,7 @@ describe('State translation component', () => {
 
   it('should return unicode when translation is empty in voiceover mode', () => {
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
-      new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
+      new EntityTranslation('entityId', 'entityType', 1, 'hi', {
         content_0: new TranslatedContent('Translated unicode', 'unicode', true),
       });
     let subtitledObject = SubtitledUnicode.createFromBackendDict({
@@ -1556,7 +1577,7 @@ describe('State translation component', () => {
 
   it('should return translation html when translation no available', () => {
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
-      new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
+      new EntityTranslation('entityId', 'entityType', 1, 'hi', {
         content_1: new TranslatedContent('Translated HTML', 'html', true),
       });
 
@@ -1569,7 +1590,7 @@ describe('State translation component', () => {
 
   it('should return translated unicode in voiceover mode when translation exist', () => {
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
-      new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
+      new EntityTranslation('entityId', 'entityType', 1, 'hi', {
         content_1: new TranslatedContent('Translated UNICODE', 'unicode', true),
       });
     let subtitledObject = SubtitledUnicode.createFromBackendDict({
@@ -1701,21 +1722,15 @@ describe('State translation component', () => {
     const mockinteractionCustomizationArgTranslatableContent = [
       {
         name: 'demo',
-        content: {
-          contentId: 'ca_1',
-        },
+        content: SubtitledUnicode.createDefault('', 'ca_1'),
       },
       {
         name: 'demo',
-        content: {
-          contentId: 'ca_2',
-        },
+        content: SubtitledUnicode.createDefault('', 'ca_2'),
       },
       {
         name: 'demo',
-        content: {
-          contentId: 'ca_3',
-        },
+        content: SubtitledUnicode.createDefault('', 'ca_3'),
       },
     ];
 
@@ -1808,7 +1823,7 @@ describe('State translation component', () => {
       card_is_checkpoint: false,
       interaction: {
         id: 'TextInput',
-        confirmed_unclassified_answers: null,
+        confirmed_unclassified_answers: [],
         customization_args: {
           placeholder: {
             value: {
@@ -1825,7 +1840,7 @@ describe('State translation component', () => {
         },
         answer_groups: [
           {
-            training_data: null,
+            training_data: [],
             tagged_skill_misconception_id: null,
             rule_specs: [
               {
@@ -1848,8 +1863,8 @@ describe('State translation component', () => {
               },
             ],
             outcome: {
-              labelled_as_correct: null,
-              param_changes: null,
+              labelled_as_correct: false,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
@@ -1863,8 +1878,8 @@ describe('State translation component', () => {
           {
             rule_specs: [],
             outcome: {
-              labelled_as_correct: null,
-              param_changes: null,
+              labelled_as_correct: false,
+              param_changes: [],
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'unused',
@@ -1878,8 +1893,8 @@ describe('State translation component', () => {
         ],
         default_outcome: {
           dest: 'default',
-          labelled_as_correct: null,
-          param_changes: null,
+          labelled_as_correct: false,
+          param_changes: [],
           refresher_exploration_id: null,
           missing_prerequisite_skill_id: null,
           dest_if_really_stuck: null,
@@ -1914,20 +1929,21 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      inapplicable_skill_misconception_ids: [],
     },
   } as StateObjectsBackendDict;
 
   let explorationState4 = {
     Introduction: {
       classifier_model_id: null,
-      card_is_checkpoint: null,
+      card_is_checkpoint: false,
       content: {
         content_id: 'content_1',
         html: 'Introduction Content',
       },
       interaction: {
         default_outcome: null,
-        confirmed_unclassified_answers: null,
+        confirmed_unclassified_answers: [],
         solution: null,
         id: 'TextInput',
         customization_args: {
@@ -1947,6 +1963,7 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      inapplicable_skill_misconception_ids: [],
     },
   } as StateObjectsBackendDict;
 
@@ -2106,9 +2123,9 @@ describe('State translation component', () => {
 
       it('should isDisabled return true when stateinteractionId is null', () => {
         component.TAB_ID_CONTENT = 'some_id';
-        component.stateInteractionId = null;
+        component.stateInteractionId = '';
 
-        expect(component.isDisabled('any')).toBeTrue();
+        expect(component.isDisabled('any')).toBe(true);
       });
 
       it('should correctly identify RTL languages', () => {
