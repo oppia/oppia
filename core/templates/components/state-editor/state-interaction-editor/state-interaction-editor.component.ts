@@ -154,7 +154,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      )
+      ) ?? undefined
     );
   }
 
@@ -241,7 +241,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      )
+      ) ?? undefined
     );
   }
 
@@ -279,7 +279,11 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       })
       .result.then(
         () => {
-          this.stateInteractionIdService.displayed = null;
+          this.stateInteractionIdService.displayed =
+            // When an interaction is deleted, the interactionId is set to null
+            // to indicate its absence. We use 'unknown' to bypass the
+            // strict type check for 'InteractionSpecsKey'.
+            null as unknown as InteractionSpecsKey;
           this.stateCustomizationArgsService.displayed = {};
           this.stateSolutionService.displayed = null;
           const savedInteractionId =
