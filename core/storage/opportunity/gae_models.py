@@ -442,6 +442,10 @@ class TranslationOpportunityModel(base_models.BaseModel):
     ) -> Sequence[Optional[TranslationOpportunityModel]]:
         """Returns a list of translation opportunities for the given entity IDs.
 
+        This method encapsulates composite ID generation (entity_type.entity_id)
+        within the storage layer, preventing service layers from needing to
+        know how datastore keys are structured.
+
         Args:
             entity_type: str. The type of the entity.
             entity_ids: list(str). The IDs of the entities.
