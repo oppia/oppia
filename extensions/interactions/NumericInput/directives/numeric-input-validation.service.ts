@@ -182,28 +182,35 @@ export class NumericInputValidationService {
           case 'IsWithinTolerance':
             var x = rule.inputs.x as number;
             var tol = rule.inputs.tol as number;
-            setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
-            if (tol <= 0) {
+            if (tol < 0) {
               warningsList.push({
-                type: AppConstants.WARNING_TYPES.ERROR,
-                message:
-                  'Learner answer ' +
-                  (j + 1) +
-                  ' tolerance must be a positive value',
+                type: AppConstants.WARNING_TYPES.CRITICAL,
+                message: 'The value of tolerance cannot be negative.',
               });
-            }
-            if (
-              x + tol < 0 &&
-              customizationArgs.requireNonnegativeInput.value
-            ) {
-              warningsList.push({
-                type: AppConstants.WARNING_TYPES.ERROR,
-                message:
-                  'Learner answer ' +
-                  (j + 1) +
-                  ' Upper bound of the ' +
-                  'tolerance range should be greater than or equal to zero',
-              });
+            } else {
+              setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
+              if (tol === 0) {
+                warningsList.push({
+                  type: AppConstants.WARNING_TYPES.ERROR,
+                  message:
+                    'Learner answer ' +
+                    String(j + 1) +
+                    ' tolerance must be a positive value',
+                });
+              }
+              if (
+                x + tol < 0 &&
+                customizationArgs.requireNonnegativeInput.value
+              ) {
+                warningsList.push({
+                  type: AppConstants.WARNING_TYPES.ERROR,
+                  message:
+                    'Learner answer ' +
+                    String(j + 1) +
+                    ' Upper bound of the ' +
+                    'tolerance range should be greater than or equal to zero',
+                });
+              }
             }
             break;
           default:

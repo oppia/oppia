@@ -907,6 +907,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             topic_id=self.TOPIC_ID_1,
             language_code=self.SUGGESTION_LANGUAGE_CODE,
             opportunity_id=self.EXPLORATION_IDS[0],
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
         )
 
         suggestion_models.QuestionReviewerTotalContributionStatsModel.create(

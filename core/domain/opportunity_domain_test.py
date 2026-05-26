@@ -376,6 +376,7 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
             'language_code': 'en',
             'topic_id': 'topic_id_1',
             'opportunity_id': 'opportunity_id1',
+            'entity_type': 'exploration',
         }
         self.valid_pinned_opportunity = opportunity_domain.PinnedOpportunity.from_dict(  # pylint: disable=line-too-long
             valid_pinned_opportunity_dict
@@ -386,6 +387,7 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
             'language_code': 'en',
             'topic_id': 'topic_id_1',
             'opportunity_id': 'opportunity_id1',
+            'entity_type': 'exploration',
         }
 
         pinned_opportunity = opportunity_domain.PinnedOpportunity.from_dict(
@@ -401,7 +403,15 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
                 'language_code': 'en',
                 'topic_id': 'topic_id_1',
                 'opportunity_id': 'opportunity_id1',
+                'entity_type': 'exploration',
             },
+        )
+
+    def test_invalid_entity_type_fails_validation(self) -> None:
+        self.valid_pinned_opportunity.entity_type = 'invalid_entity'
+        self._assert_validation_error(
+            self.valid_pinned_opportunity,
+            'Invalid entity_type: invalid_entity',
         )
 
 
@@ -507,6 +517,64 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
             self.valid_translation_opportunity,
             'Expected translation count for language_code en to be '
             r'less than or equal to content_count\(5\), received 10',
+        )
+
+    def test_update_translation_count(self) -> None:
+        # Initial state: content_count=5, translation_counts={'en': 2, 'hi': 1}
+        # incomplete=['en', 'hi']
+        self.valid_translation_opportunity.update_translation_count('hi', 3)
+        self.assertEqual(
+            self.valid_translation_opportunity.translation_counts['hi'], 3
+        )
+        self.assertIn(
+            'hi',
+            self.valid_translation_opportunity.incomplete_translation_language_codes,
+        )
+
+        # Reach content_count.
+        self.valid_translation_opportunity.update_translation_count('hi', 5)
+        self.assertEqual(
+            self.valid_translation_opportunity.translation_counts['hi'], 5
+        )
+        self.assertNotIn(
+            'hi',
+            self.valid_translation_opportunity.incomplete_translation_language_codes,
+        )
+
+        # Drop below content_count (should be added back to incomplete).
+        self.valid_translation_opportunity.update_translation_count('hi', 4)
+        self.assertIn(
+            'hi',
+            self.valid_translation_opportunity.incomplete_translation_language_codes,
+        )
+
+    def test_update_content_count(self) -> None:
+        # Initial: content_count=5, hi_count=1, incomplete=['en', 'hi']
+        self.valid_translation_opportunity.update_translation_count('hi', 5)
+        self.assertNotIn(
+            'hi',
+            self.valid_translation_opportunity.incomplete_translation_language_codes,
+        )
+
+        # Increase content_count -> hi becomes incomplete again.
+        self.valid_translation_opportunity.update_content_count(10)
+        self.assertEqual(self.valid_translation_opportunity.content_count, 10)
+        self.assertIn(
+            'hi',
+            self.valid_translation_opportunity.incomplete_translation_language_codes,
+        )
+
+        # Decrease content_count -> hi becomes complete.
+        self.valid_translation_opportunity.update_content_count(5)
+        self.assertNotIn(
+            'hi',
+            self.valid_translation_opportunity.incomplete_translation_language_codes,
+        )
+
+    def test_update_topic_ids(self) -> None:
+        self.valid_translation_opportunity.update_topic_ids(['topic_2'])
+        self.assertEqual(
+            self.valid_translation_opportunity.topic_ids, ['topic_2']
         )
 
 
