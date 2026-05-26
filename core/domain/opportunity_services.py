@@ -1236,6 +1236,7 @@ def update_pinned_opportunity_model(
             language_code=language_code,
             topic_id=topic_id,
             opportunity_id=lesson_id,
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
         )
     else:
         if pinned_opportunity:
