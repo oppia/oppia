@@ -905,7 +905,6 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
         )
 
 
-
 class WipeoutServiceDeleteAppFeedbackReportModelsTests(
     test_utils.GenericTestBase
 ):
