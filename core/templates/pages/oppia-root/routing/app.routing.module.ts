@@ -559,6 +559,15 @@ const routes: Route[] = [
         'pages/certificate-assessment-pages/create-certificate-assessment-offering/create-certificate-offering-page.module'
       ).then(m => m.CreateCertificateOfferingPageModule),
   },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EDIT_CERTIFICATE_OFFERING
+      .ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import(
+        'pages/certificate-assessment-pages/edit-certificate-assessment-offering/edit-certificate-offering-page.module'
+      ).then(m => m.EditCertificateOfferingPageModule),
+  },
 ];
 
 // Register stewards landing pages.
