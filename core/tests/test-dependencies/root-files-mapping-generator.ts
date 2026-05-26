@@ -110,9 +110,6 @@ const MANUALLY_MAPPED_DEPENDENCIES: Record<string, string[]> = {
   'core/templates/pages/oppia-root/index.ts': [
     'core/templates/pages/oppia-root/oppia-root.mainpage.html',
   ],
-  'core/templates/pages/lightweight-oppia-root/index.ts': [
-    'core/templates/pages/lightweight-oppia-root/lightweight-oppia-root.mainpage.html',
-  ],
 };
 
 const LIGHTHOUSE_MODULES = [

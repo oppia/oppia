@@ -465,7 +465,7 @@ describe('Story editor state service', () => {
 
     tick(1000);
     expect(storyEditorStateService.isSavingStory()).toBe(false);
-    expect(storyEditorStateService.isChangingChapterStatus()).toBeFalse();
+    expect(storyEditorStateService.isChangingChapterStatus()).toBe(false);
   }));
 
   it('should warn user when story fails to save', fakeAsync(() => {
@@ -519,7 +519,7 @@ describe('Story editor state service', () => {
 
     tick(1000);
     expect(storyEditorStateService.isSavingStory()).toBe(false);
-    expect(storyEditorStateService.isChangingChapterStatus()).toBeFalse();
+    expect(storyEditorStateService.isChangingChapterStatus()).toBe(false);
   }));
 
   it("should update stories URL when user updates the storie's URL", fakeAsync(() => {
@@ -589,6 +589,7 @@ describe('Story editor state service', () => {
 
       storyEditorStateService.updateExistenceOfStoryUrlFragment(
         'test_url',
+        () => {},
         () => {}
       );
       tick(1000);
@@ -636,11 +637,11 @@ describe('Story editor state service', () => {
   it(
     'should set _expIdsChanged to true when setExpIdsChanged is ' + 'called',
     () => {
-      expect(storyEditorStateService.areAnyExpIdsChanged()).toBeFalse();
+      expect(storyEditorStateService.areAnyExpIdsChanged()).toBe(false);
 
       storyEditorStateService.setExpIdsChanged();
 
-      expect(storyEditorStateService.areAnyExpIdsChanged()).toBeTrue();
+      expect(storyEditorStateService.areAnyExpIdsChanged()).toBe(true);
     }
   );
 
@@ -649,11 +650,11 @@ describe('Story editor state service', () => {
     () => {
       storyEditorStateService.setExpIdsChanged();
 
-      expect(storyEditorStateService.areAnyExpIdsChanged()).toBeTrue();
+      expect(storyEditorStateService.areAnyExpIdsChanged()).toBe(true);
 
       storyEditorStateService.resetExpIdsChanged();
 
-      expect(storyEditorStateService.areAnyExpIdsChanged()).toBeFalse();
+      expect(storyEditorStateService.areAnyExpIdsChanged()).toBe(false);
     }
   );
 

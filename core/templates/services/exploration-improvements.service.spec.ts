@@ -125,6 +125,7 @@ describe('Exploration Improvements Service', () => {
     param_changes: [],
     solicit_answer_details: false,
     card_is_checkpoint: false,
+    inapplicable_skill_misconception_ids: [],
   };
   const statesBackendDict: StateObjectsBackendDict = {
     [stateName]: stateBackendDict,
@@ -247,7 +248,7 @@ describe('Exploration Improvements Service', () => {
 
     expect(
       await explorationImprovementsService.isImprovementsTabEnabledAsync()
-    ).toBeTrue();
+    ).toBeTruthy();
   }));
 
   it('should disable improvements tab based on back-end response', fakeAsync(async () => {
@@ -266,7 +267,7 @@ describe('Exploration Improvements Service', () => {
 
     expect(
       await explorationImprovementsService.isImprovementsTabEnabledAsync()
-    ).toBeFalse();
+    ).toBeFalsy();
   }));
 
   it('should disable improvements tab for private explorations', fakeAsync(async () => {
@@ -285,7 +286,7 @@ describe('Exploration Improvements Service', () => {
 
     expect(
       await explorationImprovementsService.isImprovementsTabEnabledAsync()
-    ).toBeFalse();
+    ).toBeFalsy();
   }));
 
   it('should disable improvements tab for non-editors when config gives false', fakeAsync(async () => {
@@ -304,7 +305,7 @@ describe('Exploration Improvements Service', () => {
 
     expect(
       await explorationImprovementsService.isImprovementsTabEnabledAsync()
-    ).toBeFalse();
+    ).toBeFalsy();
   }));
 
   it('should disable improvements tab for non-editors when config gives true', fakeAsync(async () => {
@@ -323,7 +324,7 @@ describe('Exploration Improvements Service', () => {
 
     expect(
       await explorationImprovementsService.isImprovementsTabEnabledAsync()
-    ).toBeFalse();
+    ).toBeFalsy();
   }));
 
   it('should propagate errors from the back-end', fakeAsync(async () => {
@@ -492,7 +493,7 @@ describe('Exploration Improvements Service', () => {
       flushMicrotasks();
       await p;
 
-      expect(hbrTask.isOpen()).toBeFalse();
+      expect(hbrTask.isOpen()).toBeFalsy();
       expect(
         explorationImprovementsTaskRegistryService.getOpenHighBounceRateTasks()
           .length
@@ -571,7 +572,7 @@ describe('Exploration Improvements Service', () => {
       explorationImprovementsTaskRegistryService.onStateInteractionSaved(
         explorationStatesService.getState(stateName)
       );
-      expect(ngrTask.isResolved()).toBeTrue();
+      expect(ngrTask.isResolved()).toBeTruthy();
 
       eibasPostTasksAsyncSpy.calls.reset();
       eibasPostTasksAsyncSpy.and.callFake(
@@ -632,7 +633,7 @@ describe('Exploration Improvements Service', () => {
       explorationImprovementsTaskRegistryService.onStateInteractionSaved(
         explorationStatesService.getState(stateName)
       );
-      expect(ngrTask.isResolved()).toBeTrue();
+      expect(ngrTask.isResolved()).toBeTruthy();
 
       // It should not be flushed because it wasn't created by initAsync().
       eibasPostTasksAsyncSpy.and.callFake(

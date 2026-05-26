@@ -482,21 +482,8 @@ describe('TopNavigationBarComponent', () => {
     spyOn(document, 'querySelectorAll')
       .withArgs('.oppia-navbar-tab-content')
       .and.returnValues(
-        [
-          {
-            // This throws "Type '{ innerText: string; }' is not assignable to
-            // type 'Element'.". We need to suppress this error because if i18n
-            // has not run, then the tabs will not have text content and so
-            // their innerText.length value will be 0.
-            // @ts-expect-error
-            innerText: '',
-          },
-        ],
-        [
-          {
-            innerText: 'About',
-          },
-        ]
+        [{innerText: ''}] as unknown as NodeListOf<Element>,
+        [{innerText: 'About'}] as unknown as NodeListOf<Element>
       );
 
     expect(component.checkIfI18NCompleted()).toBe(false);
@@ -554,18 +541,11 @@ describe('TopNavigationBarComponent', () => {
 
   it("should hide navbar if it's height more than 60px", fakeAsync(() => {
     spyOn(wds, 'isWindowNarrow').and.returnValues(false, true);
+    const mockElement = document.createElement('div');
+    Object.defineProperty(mockElement, 'clientHeight', {value: 61});
     spyOn(document, 'querySelector')
       .withArgs('div.collapse.navbar-collapse')
-      // This throws "Type '{ clientWidth: number; }' is missing the following
-      // properties from type 'Element': assignedSlot, attributes, classList,
-      // className, and 122 more.". We need to suppress this error because
-      // typescript expects around 120 more properties than just one
-      // (clientWidth). We need only one 'clientWidth' for
-      // testing purposes.
-      // @ts-expect-error
-      .and.returnValue({
-        clientHeight: 61,
-      });
+      .and.returnValue(mockElement);
 
     component.navElementsVisibilityStatus = {
       I18N_TOPNAV_DONATE: true,
@@ -668,6 +648,7 @@ describe('TopNavigationBarComponent', () => {
     expect(component.isModerator).toBe(false);
     expect(component.isCurriculumAdmin).toBe(false);
     expect(component.isTopicManager).toBe(false);
+    expect(component.isQuestionAdmin).toBe(false);
     expect(component.isSuperAdmin).toBe(false);
     expect(component.userIsLoggedIn).toBe(false);
     expect(component.username).toBe(undefined);
@@ -679,6 +660,7 @@ describe('TopNavigationBarComponent', () => {
     expect(component.isModerator).toBe(true);
     expect(component.isCurriculumAdmin).toBe(false);
     expect(component.isTopicManager).toBe(false);
+    expect(component.isQuestionAdmin).toBe(false);
     expect(component.isSuperAdmin).toBe(false);
     expect(component.userIsLoggedIn).toBe(true);
     expect(component.username).toBe('username1');
@@ -689,18 +671,52 @@ describe('TopNavigationBarComponent', () => {
     );
   }));
 
+  it('should set isQuestionAdmin to true when user is a question admin', fakeAsync(() => {
+    let userInfo = new UserInfo(
+      ['USER_ROLE', 'QUESTION_ADMIN'],
+      true,
+      false,
+      false,
+      false,
+      true,
+      'en',
+      'username1',
+      'tester@example.com',
+      true
+    );
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+
+    expect(component.isModerator).toBe(false);
+    expect(component.isCurriculumAdmin).toBe(false);
+    expect(component.isQuestionAdmin).toBe(false);
+    expect(component.isTopicManager).toBe(false);
+    expect(component.isSuperAdmin).toBe(false);
+    expect(component.userIsLoggedIn).toBe(false);
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.isModerator).toBe(true);
+    expect(component.isCurriculumAdmin).toBe(false);
+    expect(component.isQuestionAdmin).toBe(true);
+    expect(component.isTopicManager).toBe(false);
+    expect(component.isSuperAdmin).toBe(false);
+    expect(component.userIsLoggedIn).toBe(true);
+  }));
+
   it('should set default profile pictures when username is null', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
     let userInfo = {
       isModerator: () => false,
       isCurriculumAdmin: () => false,
       isTopicManager: () => false,
+      isQuestionAdmin: () => false,
       isSuperAdmin: () => false,
       isBlogAdmin: () => false,
       isBlogPostEditor: () => false,
       isTranslationAdmin: () => false,
       isTranslationCoordinator: () => false,
-      isQuestionAdmin: () => false,
       isQuestionCoordinator: () => false,
       isReleaseCoordinator: () => false,
       isLoggedIn: () => true,
@@ -913,14 +929,14 @@ describe('TopNavigationBarComponent', () => {
     () => {
       expect(
         component.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable()
-      ).toBeFalse();
+      ).toBe(false);
 
       mockPlatformFeatureService.status.ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled =
         true;
 
       expect(
         component.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable()
-      ).toBeTrue();
+      ).toBe(true);
     }
   );
 
@@ -936,21 +952,21 @@ describe('TopNavigationBarComponent', () => {
     tick();
 
     expect(learnerGroupSpy).not.toHaveBeenCalled();
-    expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBeFalse();
+    expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBe(false);
   }));
 
   it('should hide menu icon when page contains a back button', () => {
     spyOn(urlService, 'getPathname').and.returnValue('/blog/post123');
     component.PAGES_WITH_BACK_STATE = ['/blog/'];
     component.ngOnInit();
-    expect(component.menuIconIsShown).toBeFalse();
+    expect(component.menuIconIsShown).toBe(false);
   });
 
   it('should show menu icon when page does not contain a back button', () => {
     spyOn(urlService, 'getPathname').and.returnValue('/classroom/math');
     component.PAGES_WITH_BACK_STATE = ['/blog/', '/learner-dashboard/'];
     component.ngOnInit();
-    expect(component.menuIconIsShown).toBeTrue();
+    expect(component.menuIconIsShown).toBe(true);
   });
 
   it('should set classroomSummariesLength from DOM data attribute', () => {

@@ -110,6 +110,13 @@ export class ItemSelectionInputValidationService {
     var minAllowedCount = customizationArgs.minAllowableSelectionCount.value;
     var maxAllowedCount = customizationArgs.maxAllowableSelectionCount.value;
 
+    if (minAllowedCount < 0 || maxAllowedCount < 0) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.CRITICAL,
+        message: 'The minimum/maximum number of selections cannot be negative.',
+      });
+    }
+
     if (minAllowedCount > maxAllowedCount) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,

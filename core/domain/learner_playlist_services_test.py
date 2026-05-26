@@ -571,3 +571,113 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             ),
             [self.COL_ID_0, self.COL_ID_1],
         )
+
+    def test_mark_exploration_to_be_played_later_with_subscribed_exp(
+        self,
+    ) -> None:
+        """Test that mark_exploration_to_be_played_later returns the correct
+        flags when the exploration is subscribed to by the user.
+        """
+        swap_get_exp_ids = self.swap(
+            subscription_services,
+            'get_exploration_ids_subscribed_to',
+            lambda _: [self.EXP_ID_0],
+        )
+        with swap_get_exp_ids:
+            playlist_limit_exceeded, exp_belongs_to_subscribed = (
+                learner_playlist_services.mark_exploration_to_be_played_later(
+                    self.user_id, self.EXP_ID_0
+                )
+            )
+        self.assertFalse(playlist_limit_exceeded)
+        self.assertTrue(exp_belongs_to_subscribed)
+
+    def test_mark_exploration_already_in_playlist_with_no_position(
+        self,
+    ) -> None:
+        """Test that adding an exploration already in the playlist with no
+        position specified does nothing.
+        """
+        learner_playlist_services.mark_exploration_to_be_played_later(
+            self.user_id, self.EXP_ID_0
+        )
+        self.assertEqual(
+            self._get_all_learner_playlist_exp_ids(self.user_id),
+            [self.EXP_ID_0],
+        )
+        learner_playlist_services.mark_exploration_to_be_played_later(
+            self.user_id, self.EXP_ID_0
+        )
+        self.assertEqual(
+            self._get_all_learner_playlist_exp_ids(self.user_id),
+            [self.EXP_ID_0],
+        )
+
+    def test_mark_collection_to_be_played_later_with_subscribed_col(
+        self,
+    ) -> None:
+        """Test that mark_collection_to_be_played_later returns the correct
+        flags when the collection is subscribed to by the user.
+        """
+        swap_get_col_ids = self.swap(
+            subscription_services,
+            'get_collection_ids_subscribed_to',
+            lambda _: [self.COL_ID_0],
+        )
+        with swap_get_col_ids:
+            playlist_limit_exceeded, col_belongs_to_subscribed = (
+                learner_playlist_services.mark_collection_to_be_played_later(
+                    self.user_id, self.COL_ID_0
+                )
+            )
+        self.assertFalse(playlist_limit_exceeded)
+        self.assertTrue(col_belongs_to_subscribed)
+
+    def test_mark_collection_already_in_playlist_with_no_position(
+        self,
+    ) -> None:
+        """Test that adding a collection already in the playlist with no
+        position specified does nothing.
+        """
+        learner_playlist_services.mark_collection_to_be_played_later(
+            self.user_id, self.COL_ID_0
+        )
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(self.user_id),
+            [self.COL_ID_0],
+        )
+        learner_playlist_services.mark_collection_to_be_played_later(
+            self.user_id, self.COL_ID_0
+        )
+        self.assertEqual(
+            self._get_all_learner_playlist_collection_ids(self.user_id),
+            [self.COL_ID_0],
+        )
+
+    def test_remove_exploration_from_playlist_when_no_playlist_exists(
+        self,
+    ) -> None:
+        """Test that remove_exploration_from_learner_playlist does nothing
+        when the user has no learner playlist model.
+        """
+        self.signup('noplaylist@example.com', 'noplaylistuser')
+        no_playlist_user_id = self.get_user_id_from_email(
+            'noplaylist@example.com'
+        )
+        learner_playlist_services.remove_exploration_from_learner_playlist(
+            no_playlist_user_id, self.EXP_ID_0
+        )
+
+    def test_remove_collection_from_playlist_when_no_playlist_exists(
+        self,
+    ) -> None:
+        """Test that remove_collection_from_learner_playlist does nothing
+        when the user has no learner playlist model.
+        """
+        self.signup('noplaylist2@example.com', 'noplaylistuser2')
+        no_playlist_user_id = self.get_user_id_from_email(
+            'noplaylist2@example.com'
+        )
+        learner_playlist_services.remove_collection_from_learner_playlist(
+            no_playlist_user_id, self.COL_ID_0
+        )

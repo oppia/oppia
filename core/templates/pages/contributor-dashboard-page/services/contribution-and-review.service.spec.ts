@@ -181,7 +181,7 @@ describe('Contribution and review service', () => {
             expectedSuggestion2Dict
           );
           expect(Object.keys(response.suggestionIdToDetails).length).toEqual(2);
-          expect(response.more).toBeTrue();
+          expect(response.more).toBe(true);
         });
 
       flushMicrotasks();
@@ -226,7 +226,7 @@ describe('Contribution and review service', () => {
             expectedSuggestion4Dict
           );
           expect(Object.keys(response.suggestionIdToDetails).length).toEqual(2);
-          expect(response.more).toBeFalse();
+          expect(response.more).toBe(false);
         });
     }));
 
@@ -256,7 +256,7 @@ describe('Contribution and review service', () => {
             expectedSuggestion2Dict
           );
           expect(Object.keys(response.suggestionIdToDetails).length).toEqual(2);
-          expect(response.more).toBeTrue();
+          expect(response.more).toBe(true);
         });
 
       flushMicrotasks();
@@ -277,7 +277,7 @@ describe('Contribution and review service', () => {
             expectedSuggestion2Dict
           );
           expect(Object.keys(response.suggestionIdToDetails).length).toEqual(2);
-          expect(response.more).toBeTrue();
+          expect(response.more).toBe(true);
         });
     }));
   });
@@ -582,6 +582,7 @@ describe('Contribution and review service', () => {
               id: 'Continue',
             },
             linked_skill_id: null,
+            inapplicable_skill_misconception_ids: null,
             param_changes: [],
             solicit_answer_details: false,
             card_is_checkpoint: true,
@@ -606,6 +607,7 @@ describe('Contribution and review service', () => {
               id: 'EndExploration',
             },
             linked_skill_id: null,
+            inapplicable_skill_misconception_ids: null,
             param_changes: [],
             solicit_answer_details: false,
             card_is_checkpoint: false,
@@ -1048,6 +1050,7 @@ describe('Contribution and review service', () => {
         id: 'TextInput',
       },
       linked_skill_id: null,
+      inapplicable_skill_misconception_ids: null,
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
@@ -1297,6 +1300,7 @@ describe('Contribution and review service', () => {
           id: 'Continue',
         },
         linked_skill_id: null,
+        inapplicable_skill_misconception_ids: null,
         param_changes: [],
         solicit_answer_details: false,
         card_is_checkpoint: true,
@@ -1321,6 +1325,7 @@ describe('Contribution and review service', () => {
           id: 'EndExploration',
         },
         linked_skill_id: null,
+        inapplicable_skill_misconception_ids: null,
         param_changes: [],
         solicit_answer_details: false,
         card_is_checkpoint: false,
