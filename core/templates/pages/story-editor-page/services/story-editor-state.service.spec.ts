@@ -364,7 +364,7 @@ describe('Story editor state service', () => {
     expect(storyEditorStateService.isStoryPublished()).toBe(false);
     expect(
       storyEditorStateService.changeStoryPublicationStatus(
-        true,
+        'publish',
         successCallback
       )
     ).toBe(true);
@@ -373,8 +373,39 @@ describe('Story editor state service', () => {
     var expectedId = 'storyId_0';
     var publishStorySpy =
       fakeEditableStoryBackendApiService.changeStoryPublicationStatusAsync;
-    expect(publishStorySpy).toHaveBeenCalledWith(expectedId, true);
+    expect(publishStorySpy).toHaveBeenCalledWith(expectedId, 'publish');
     expect(storyEditorStateService.isStoryPublished()).toBe(true);
+    expect(successCallback).toHaveBeenCalled();
+  }));
+
+  it('should be able to unpublish the story', fakeAsync(() => {
+    spyOn(
+      fakeEditableStoryBackendApiService,
+      'changeStoryPublicationStatusAsync'
+    ).and.callThrough();
+    const successCallback = jasmine.createSpy('successCallback');
+
+    storyEditorStateService.loadStory('storyId_0');
+    tick(1000);
+
+    storyEditorStateService._storyIsPublished = true;
+    expect(storyEditorStateService.isStoryPublished()).toBe(true);
+    expect(
+      storyEditorStateService.changeStoryPublicationStatus(
+        'permanent_unpublish',
+        successCallback
+      )
+    ).toBe(true);
+    tick(1000);
+
+    var expectedId = 'storyId_0';
+    var publishStorySpy =
+      fakeEditableStoryBackendApiService.changeStoryPublicationStatusAsync;
+    expect(publishStorySpy).toHaveBeenCalledWith(
+      expectedId,
+      'permanent_unpublish'
+    );
+    expect(storyEditorStateService.isStoryPublished()).toBe(false);
     expect(successCallback).toHaveBeenCalled();
   }));
 
@@ -393,7 +424,7 @@ describe('Story editor state service', () => {
     expect(storyEditorStateService.isStoryPublished()).toBe(false);
     expect(
       storyEditorStateService.changeStoryPublicationStatus(
-        true,
+        'publish',
         successCallback
       )
     ).toBe(true);
@@ -402,7 +433,7 @@ describe('Story editor state service', () => {
     var expectedId = 'storyId_0';
     var publishStorySpy =
       fakeEditableStoryBackendApiService.changeStoryPublicationStatusAsync;
-    expect(publishStorySpy).toHaveBeenCalledWith(expectedId, true);
+    expect(publishStorySpy).toHaveBeenCalledWith(expectedId, 'publish');
     expect(storyEditorStateService.isStoryPublished()).toBe(false);
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'There was an error when publishing/unpublishing the story.'
@@ -417,7 +448,10 @@ describe('Story editor state service', () => {
     spyOn(alertsService, 'fatalWarning');
     storyEditorStateService._storyIsInitialized = false;
 
-    storyEditorStateService.changeStoryPublicationStatus(true, successCallback);
+    storyEditorStateService.changeStoryPublicationStatus(
+      'publish',
+      successCallback
+    );
 
     expect(alertsService.fatalWarning).toHaveBeenCalledWith(
       'Cannot publish a story before one is loaded.'
@@ -465,7 +499,7 @@ describe('Story editor state service', () => {
 
     tick(1000);
     expect(storyEditorStateService.isSavingStory()).toBe(false);
-    expect(storyEditorStateService.isChangingChapterStatus()).toBeFalse();
+    expect(storyEditorStateService.isChangingChapterStatus()).toBe(false);
   }));
 
   it('should warn user when story fails to save', fakeAsync(() => {
@@ -519,7 +553,7 @@ describe('Story editor state service', () => {
 
     tick(1000);
     expect(storyEditorStateService.isSavingStory()).toBe(false);
-    expect(storyEditorStateService.isChangingChapterStatus()).toBeFalse();
+    expect(storyEditorStateService.isChangingChapterStatus()).toBe(false);
   }));
 
   it("should update stories URL when user updates the storie's URL", fakeAsync(() => {
@@ -589,6 +623,7 @@ describe('Story editor state service', () => {
 
       storyEditorStateService.updateExistenceOfStoryUrlFragment(
         'test_url',
+        () => {},
         () => {}
       );
       tick(1000);
@@ -636,11 +671,11 @@ describe('Story editor state service', () => {
   it(
     'should set _expIdsChanged to true when setExpIdsChanged is ' + 'called',
     () => {
-      expect(storyEditorStateService.areAnyExpIdsChanged()).toBeFalse();
+      expect(storyEditorStateService.areAnyExpIdsChanged()).toBe(false);
 
       storyEditorStateService.setExpIdsChanged();
 
-      expect(storyEditorStateService.areAnyExpIdsChanged()).toBeTrue();
+      expect(storyEditorStateService.areAnyExpIdsChanged()).toBe(true);
     }
   );
 
@@ -649,11 +684,11 @@ describe('Story editor state service', () => {
     () => {
       storyEditorStateService.setExpIdsChanged();
 
-      expect(storyEditorStateService.areAnyExpIdsChanged()).toBeTrue();
+      expect(storyEditorStateService.areAnyExpIdsChanged()).toBe(true);
 
       storyEditorStateService.resetExpIdsChanged();
 
-      expect(storyEditorStateService.areAnyExpIdsChanged()).toBeFalse();
+      expect(storyEditorStateService.areAnyExpIdsChanged()).toBe(false);
     }
   );
 
