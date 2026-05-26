@@ -29,6 +29,12 @@
       </ul>
     </div>
   </div>
+  <topic-header
+    [topicName]="topicName"
+    [topicDescription]="topicDescription"
+    [classroomName]="classroomName"
+    [classroomUrlFragment]="classroomUrlFragment">
+  </topic-header>
   <background-banner></background-banner>
   <div class="topic-viewer-page-content" *ngIf="!topicIsLoading">
     <div *ngIf="activeTab === 'story'" class="e2e-test-lessons-tab-container">
