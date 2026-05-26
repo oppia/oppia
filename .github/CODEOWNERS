@@ -683,6 +683,7 @@
 # Certificate Offering Pages.
 /core/templates/pages/certificate-offering-dashboard-page @oppia/core-reviewers
 /core/controllers/certificate_assessment*.py @oppia/core-reviewers
+/core/domain/certificate_assessment*.py @oppia/core-backend-reviewers
 
 # Speed Improvement team.
 /core/templates/google-analytics.initializer.ts @oppia/lace-frontend-reviewers

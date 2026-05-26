@@ -160,6 +160,7 @@ class ValidModelNames(enum.Enum):
     CONFIG = 'CONFIG'
     EMAIL = 'email'
     EXPLORATION = 'exploration'
+    CERTIFICATE_ASSESSMENT_OFFERING = 'certificate_assessment_offering'
     FEEDBACK = 'feedback'
     IMPROVEMENTS = 'improvements'
     JOB = 'job'
