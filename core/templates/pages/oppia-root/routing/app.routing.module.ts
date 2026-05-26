@@ -547,8 +547,17 @@ const routes: Route[] = [
     pathMatch: 'full',
     loadChildren: () =>
       import(
-        'pages/certificate-offering-dashboard-page/certificate-offering-dashboard-page.module'
+        'pages/certificate-assessment-pages/certificate-offering-dashboard-page/certificate-offering-dashboard-page.module'
       ).then(m => m.CertificateOfferingDashboardPageModule),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+      .CREATE_CERTIFICATE_OFFERING.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import(
+        'pages/certificate-assessment-pages/create-certificate-assessment-offering/create-certificate-offering-page.module'
+      ).then(m => m.CreateCertificateOfferingPageModule),
   },
 ];
 
