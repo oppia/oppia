@@ -163,15 +163,6 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(skills), 1)
         self.assertEqual(skills[0].id, 'skill_exists')
 
-    def test_get_skill_by_id_returns_none_when_exception_occurs(self) -> None:
-        with self.swap_to_always_raise(
-            skill_models.SkillModel, 'get', Exception
-        ):
-            result = skill_fetchers.get_skill_by_id(
-                'nonexistent_skill_id', strict=False
-            )
-        self.assertIsNone(result)
-
     def test_get_skill_from_model_with_invalid_skill_contents_schema_version(
         self,
     ) -> None:

@@ -121,7 +121,7 @@ def _create_topic(
     generate_topic_summary(topic.id)
 
 
-def does_topic_have_skill_with_superseding_skill(
+def find_superseded_skill_in_topic(
     topic: topic_domain.Topic,
 ) -> Optional[skill_domain.Skill]:
     """Checks if the topic has a skill with a superseding skill.
@@ -1283,11 +1283,19 @@ def _save_topic(
         )
     topic_rights = topic_fetchers.get_topic_rights(topic.id, strict=True)
     topic.validate(strict=topic_rights.topic_is_published)
-    skill = does_topic_have_skill_with_superseding_skill(topic)
+    skill = find_superseded_skill_in_topic(topic)
     if skill is not None:
+        if skill.id in topic.uncategorized_skill_ids:
+            location = 'uncategorized skills'
+        else:
+            location = 'an unknown location'
+            for subtopic in topic.subtopics:
+                if skill.id in subtopic.skill_ids:
+                    location = 'subtopic \'%s\'' % subtopic.title
+                    break
         raise utils.ValidationError(
-            'The skill \'%s\' has a superseding skill \'%s\''
-            % (skill.id, skill.superseding_skill_id)
+            'The skill \'%s\' in %s has a superseding skill \'%s\''
+            % (skill.id, location, skill.superseding_skill_id)
         )
 
     topic_model = topic_models.TopicModel.get(topic.id, strict=True)

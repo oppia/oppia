@@ -934,7 +934,7 @@ export class TopicEditorStateService {
    */
   async prefetchSkills(skillIds: string[]): Promise<void> {
     if (this._prefetchPromise) {
-      return this._prefetchPromise;
+      return this._prefetchPromise.then(() => this.prefetchSkills(skillIds));
     }
     this._prefetchPromise = (async () => {
       const toFetch = skillIds.filter(id => !this._cachedSkillsMap.has(id));

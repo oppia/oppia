@@ -9,10 +9,10 @@
             class="w-100">
         <button type="button"
                 class="btn btn-light oppia-save-changes-button e2e-test-save-topic-button float-start"
-                [ngClass]="{'btn-success': isTopicSaveable()}"
+                [ngClass]="{'btn-success': topicIsSaveable}"
                 (click)="saveChanges()"
-                [disabled]="!isTopicSaveable()"
-                [style.pointer-events]="!isTopicSaveable() ? 'none' : 'auto'">
+                [disabled]="!topicIsSaveable"
+                [style.pointer-events]="!topicIsSaveable ? 'none' : 'auto'">
           <span *ngIf="!isSaveInProgress()">
             <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon oppia-topic-editor-save-icon"
                alt="Save Topic">
@@ -56,8 +56,8 @@
             *ngIf="!topicRights.isPublished()"
             class="btn btn-light oppia-editor-publish-button e2e-test-publish-topic-button"
             (click)="publishTopic()"
-            [ngClass]="{'btn-success': !isTopicSaveable() && getWarningsCount() === 0 && prepublishValidationIssues.length === 0}"
-            [disabled]="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
+            [ngClass]="{'btn-success': !topicIsSaveable && getWarningsCount() === 0 && prepublishValidationIssues.length === 0}"
+            [disabled]="topicIsSaveable || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
       <i class="fas fa-cloud-upload-alt md-18 md-dark oppia-save-publish-button-icon"
          alt="Publish to Oppia Library">
       </i>
@@ -69,7 +69,7 @@
             (click)="unpublishTopic()"
             *ngIf="topicRights.isPublished() && topicRights.canPublishTopic()"
             class="btn btn-light e2e-test-unpublish-topic-button"
-            [disabled]="isTopicSaveable()">
+            [disabled]="topicIsSaveable">
       Unpublish Topic
     </button>
   </li>
@@ -135,14 +135,14 @@
           <div *ngIf="!topicRights.isPublished()"
                class="e2e-test-mobile-publish-topic-button"
                (click)="publishTopic()"
-               [attr.disabled]="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
+               [attr.disabled]="topicIsSaveable || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
             <i class="fas fa-pen"></i>
             <span>Publish Topic</span>
           </div>
           <div (click)="unpublishTopic()"
                *ngIf="topicRights.isPublished() && topicRights.canPublishTopic()"
                class="e2e-test-mobile-unpublish-topic-button"
-               [attr.disabled]="isTopicSaveable()">
+               [attr.disabled]="topicIsSaveable">
             <i class="fas fa-pen"></i>
             <span>Unpublish Topic</span>
           </div>

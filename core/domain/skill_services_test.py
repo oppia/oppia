@@ -812,7 +812,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill.prerequisite_skill_ids, ['skill_id_1', 'skill_id_2']
         )
         skill_services.remove_prerequisite_skill_id_from_all_skills(
-            'skill_id_1'
+            self.USER_ID, 'skill_id_1'
         )
         target_skills = skill_models.SkillModel.get_by_prerequisite_skill_id(
             'skill_id_1'
@@ -827,7 +827,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill.prerequisite_skill_ids, ['skill_id_1', 'skill_id_2']
         )
         skill_services.replace_prerequisite_skill_id_from_all_skills(
-            'skill_id_1', 'skill_id_3'
+            self.USER_ID, 'skill_id_1', 'skill_id_3'
         )
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         self.assertEqual(
@@ -835,14 +835,14 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         )
 
         skill_services.replace_prerequisite_skill_id_from_all_skills(
-            'skill_id_2', 'skill_id_4'
+            self.USER_ID, 'skill_id_2', 'skill_id_4'
         )
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         self.assertEqual(
             skill.prerequisite_skill_ids, ['skill_id_3', 'skill_id_4']
         )
         skill_services.replace_prerequisite_skill_id_from_all_skills(
-            'skill_id_3', 'skill_id_4'
+            self.USER_ID, 'skill_id_3', 'skill_id_4'
         )
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         self.assertEqual(skill.prerequisite_skill_ids, ['skill_id_4'])
@@ -853,7 +853,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         # This should execute without errors even though no
         # skills have this prerequisite.
         skill_services.replace_prerequisite_skill_id_from_all_skills(
-            'non_existent_skill_id', 'some_new_skill_id'
+            self.USER_ID, 'non_existent_skill_id', 'some_new_skill_id'
         )
 
     def test_successfully_replace_skill_id_in_all_topics(self) -> None:

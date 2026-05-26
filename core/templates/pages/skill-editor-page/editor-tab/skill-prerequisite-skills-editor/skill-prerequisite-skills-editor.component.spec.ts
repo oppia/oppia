@@ -438,6 +438,7 @@ describe('Skill editor main tab Component', () => {
       };
       component.categorizedSkills = {
         'Topic 1': {
+          uncategorized: [],
           'Subtopic 1': [
             {
               id: 'skill1',

@@ -3294,13 +3294,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             Exception,
-            'The skill \'has_superseding\' has a superseding skill \'supersede\'',
+            'The skill \'has_superseding\' in uncategorized skills has a superseding skill \'supersede\'',
         ):  # pylint:disable=line-too-long
             topic_services.add_uncategorized_skill(
                 self.user_id, topic_id, 'has_superseding'
             )
 
-    def test_does_topic_have_skill_with_superseding_skill_returns_skill(
+    def test_find_superseded_skill_in_topic_returns_skill(
         self,
     ) -> None:
         self.save_new_skill('superseding_skill', self.user_id)
@@ -3330,14 +3330,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=['skill_to_merge'],
         )
         topic = topic_fetchers.get_topic_by_id(topic_id)
-        result = topic_services.does_topic_have_skill_with_superseding_skill(
-            topic
-        )
+        result = topic_services.find_superseded_skill_in_topic(topic)
         self.assertIsNotNone(result)
         assert result is not None
         self.assertEqual(result.id, 'skill_to_merge')
 
-    def test_does_topic_have_skill_with_superseding_skill_returns_none(
+    def test_find_superseded_skill_in_topic_returns_none(
         self,
     ) -> None:
         self.save_new_skill('regular_skill', self.user_id)
@@ -3351,12 +3349,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=['regular_skill'],
         )
         topic = topic_fetchers.get_topic_by_id(topic_id)
-        result = topic_services.does_topic_have_skill_with_superseding_skill(
-            topic
-        )
+        result = topic_services.find_superseded_skill_in_topic(topic)
         self.assertIsNone(result)
 
-    def test_does_topic_have_skill_with_superseding_skill_skips_none_skills(
+    def test_find_superseded_skill_in_topic_skips_none_skills(
         self,
     ) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
@@ -3374,11 +3370,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'get_multi_skills',
             lambda skill_ids, strict=True: [None],
         ):
-            result = (
-                topic_services.does_topic_have_skill_with_superseding_skill(
-                    topic
-                )
-            )
+            result = topic_services.find_superseded_skill_in_topic(topic)
         self.assertIsNone(result)
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
