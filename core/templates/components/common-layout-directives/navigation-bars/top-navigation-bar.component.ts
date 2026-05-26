@@ -26,6 +26,7 @@ import {
   Input,
   OnDestroy,
   OnInit,
+  ViewEncapsulation,
 } from '@angular/core';
 import {SidebarStatusService} from 'services/sidebar-status.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -52,7 +53,6 @@ import {FeedbackThreadSummaryBackendDict} from 'domain/feedback_thread/feedback-
 import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 import {SignInEventService} from 'services/sign-in-event.service';
 
-import './top-navigation-bar.component.css';
 import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
 
 interface LanguageInfo {
@@ -64,6 +64,7 @@ interface LanguageInfo {
   selector: 'oppia-top-navigation-bar',
   templateUrl: './top-navigation-bar.component.html',
   styleUrls: ['./top-navigation-bar.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class TopNavigationBarComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
