@@ -18,18 +18,15 @@
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
-import {
-  CertificateOfferingDraft,
-  createEmptyCertificateOfferingDraft,
-} from './certificate-offering-draft.model';
+import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
 
 @Component({
   selector: 'oppia-certificate-offering-review-and-availability',
   templateUrl: './certificate-offering-review-and-availability.component.html',
 })
 export class CertificateOfferingReviewAndAvailabilityComponent {
-  @Input() draft: CertificateOfferingDraft =
-    createEmptyCertificateOfferingDraft();
+  @Input() certificateAssessmentOffering: CertificateAssessmentOfferingData =
+    CertificateAssessmentOfferingData.createEmpty();
   @Input() isEditMode: boolean = false;
   @Output() saveCertificateOffering = new EventEmitter<void>();
   @Output() navigateToAddTopicsSection = new EventEmitter<void>();

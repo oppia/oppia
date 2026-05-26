@@ -19,7 +19,7 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
-import {CertificateOfferingDraft} from 'pages/certificate-assessment-pages/certificate-offering-shared/certificate-offering-draft.model';
+import {CertificateAssessmentOfferingData} from './certificate-assessment-offering.model';
 import {CertificateAssessmentDomainConstants} from './certificate-assessment-domain.constants';
 
 interface CreateCertificateOfferingBackendResponse {
@@ -33,7 +33,7 @@ export class CertificateAssessmentOfferingBackendApiService {
   constructor(private http: HttpClient) {}
 
   async createCertificateAssessmentOfferingAsync(
-    draft: CertificateOfferingDraft
+    certificateAssessmentOffering: CertificateAssessmentOfferingData
   ): Promise<string> {
     return new Promise((resolve, reject) => {
       this.http

@@ -18,23 +18,30 @@
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
+import {
+  CertificateAssessmentOfferingData,
+  CertificateAssessmentOfferingTopicData,
+} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+
 @Component({
   selector: 'oppia-certificate-offering-add-topic-items',
   templateUrl: './certificate-offering-add-topic-items.component.html',
 })
 export class CertificateOfferingAddTopicItemsComponent {
-  @Input() selectedTopicIds: string[] = [];
-  @Output() selectedTopicIdsChange = new EventEmitter<string[]>();
+  @Input() certificateAssessmentOffering: CertificateAssessmentOfferingData =
+    CertificateAssessmentOfferingData.createEmpty();
+  @Output() topicDataChange =
+    new EventEmitter<CertificateAssessmentOfferingTopicData>();
   @Output() navigateToReviewAndAvailabilitySection = new EventEmitter<void>();
   @Output() navigateToDetailsSection = new EventEmitter<void>();
 
   onNextClicked(): void {
-    this.selectedTopicIdsChange.emit(this.selectedTopicIds);
+    this.topicDataChange.emit(this.certificateAssessmentOffering.topicData);
     this.navigateToReviewAndAvailabilitySection.emit();
   }
 
   onBackClicked(): void {
-    this.selectedTopicIdsChange.emit(this.selectedTopicIds);
+    this.topicDataChange.emit(this.certificateAssessmentOffering.topicData);
     this.navigateToDetailsSection.emit();
   }
 }
