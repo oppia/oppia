@@ -48,7 +48,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import opportunity_models, user_models
 
-(opportunity_models, user_models) = models.Registry.import_models(
+opportunity_models, user_models = models.Registry.import_models(
     [models.Names.OPPORTUNITY, models.Names.USER]
 )
 
@@ -1985,6 +1985,7 @@ def update_pinned_opportunity_model(
             language_code=language_code,
             topic_id=topic_id,
             opportunity_id=lesson_id,
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
         )
     else:
         if pinned_opportunity:
