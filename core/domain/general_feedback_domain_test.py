@@ -154,6 +154,21 @@ class WebFeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             self.viewer_id,
         )
         self.assertDictEqual(expected_thread_dict, observed_thread.to_dict())
+        self.assertDictEqual(
+            {
+                'id': self.THREAD_ID1,
+                'category': 'lesson',
+                'status': 'open',
+                'rating': 4,
+                'target_type': 'exploration',
+                'target_id': self.EXP_ID,
+                'has_screenshot': True,
+                'has_session_info': True,
+                'description_preview': 'test description',
+                'created_on_msecs': utils.get_time_in_millisecs(fake_date),
+            },
+            observed_thread.to_summary_dict(),
+        )
 
     def test_to_dict_for_platform_category(self) -> None:
         fake_date = datetime.datetime(2026, 1, 1, 0, 0, 0, 0)
