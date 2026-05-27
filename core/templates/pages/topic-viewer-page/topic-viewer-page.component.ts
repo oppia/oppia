@@ -72,7 +72,8 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {

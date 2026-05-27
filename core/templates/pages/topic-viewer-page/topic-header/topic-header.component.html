@@ -11,8 +11,12 @@
   <div class="topic-header-breadcrumbs-mobile">
     <i class="fa fa-angle-left" aria-hidden="true" *ngIf="!isLanguageRTL()"></i>
     <i class="fa fa-angle-right" aria-hidden="true" *ngIf="isLanguageRTL()"></i>
-    <a *ngIf="classroomName" [href]="getClassroomUrl()">{{ classroomName }}</a>
-    <a *ngIf="!classroomName" href="/learn">{{ 'I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT' | translate }}</a>
+    <a *ngIf="classroomName"
+       [href]="getClassroomUrl()"
+       [innerHTML]="'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomName }"
+       class="e2e-test-mobile-breadcrumbs-classroom">
+    </a>
+    <a *ngIf="!classroomName" href="/learn">{{ 'I18N_BACK_TO_CLASSROOMS' | translate }}</a>
   </div>
 </div>
 

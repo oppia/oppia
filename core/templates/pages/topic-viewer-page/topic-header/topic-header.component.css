@@ -35,8 +35,10 @@
 }
 
 .topic-header-title {
+  color: #00645c;
   font-family: 'Capriola', Roboto, Arial, sans-serif;
   font-size: 32px;
+  font-weight: bold;
   margin: 0 0 8px 0;
 }
 
@@ -55,6 +57,7 @@
     align-items: center;
     display: flex;
     gap: 4px;
+    margin-bottom: 12px;
   }
 
   .topic-header-title {
