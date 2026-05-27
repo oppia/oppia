@@ -564,7 +564,10 @@ class WebFeedbackMessageModel(base_models.BaseModel):
     def has_reference_to_user_id(cls, user_id: str) -> bool:
         """Checks whether message data references the given user ID."""
         return (
-            cls.query(cls.author_id == user_id).get(keys_only=True) is not None
+            cls.query(cls.author_id == user_id)
+            .filter(cls.deleted.IN([False]))
+            .get(keys_only=True)
+            is not None
         )
 
     @classmethod
