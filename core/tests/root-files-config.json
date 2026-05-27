@@ -55,12 +55,15 @@
     "core/templates/pages/library-page/library-page.component.css",
     "core/templates/pages/library-page/search-bar/search-bar.component.css",
     "core/templates/pages/story-viewer-page/story-viewer-page-root.component.css",
+    "core/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.css",
+    "core/templates/pages/learner-dashboard-page/goals-tab.component.css",
+    "core/templates/pages/learner-dashboard-page/home-tab.component.css",
+    "core/templates/pages/topic-viewer-page/deprecations/practice-tab/practice-tab.component.css",
+    "core/templates/pages/topic-viewer-page/deprecations/stories-list/topic-viewer-stories-list.component.css",
     "core/templates/pages/story-viewer-page/story-viewer-page.component.css",
     "core/templates/pages/subtopic-viewer-page/subtopic-viewer-page.component.css",
     "core/templates/pages/teach-page/teach-page.component.css",
     "core/templates/pages/topic-viewer-page/topic-viewer-page.component.css",
-    "core/templates/pages/topic-viewer-page/practice-tab/practice-tab.component.css",
-    "core/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.css",
     "core/templates/pages/topic-viewer-page/subtopics-list/subtopics-list.component.css"
   ],
   "RUN_ALL_TESTS_ROOT_FILES": [
