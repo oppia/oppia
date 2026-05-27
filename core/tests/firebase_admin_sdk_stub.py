@@ -241,14 +241,10 @@ class FirebaseAdminSdkStub:
             str|None. The auth ID associated with the given user ID, or None if
             no association exists.
         """
-        return next(
-            (
-                auth_id
-                for auth_id, user in self._user_id_by_auth_id.items()
-                if user.id == user_id and not user.deleted
-            ),
-            None,
-        )
+        for auth_id, user in self._user_id_by_auth_id.items():
+            if user.id == user_id and not user.deleted:
+                return auth_id
+        return None
 
     def get_user_id_from_auth_id(
         self, auth_id: str, include_deleted: bool = False
