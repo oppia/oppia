@@ -33,7 +33,7 @@ import {
 } from './feedback.model';
 
 interface FeedbackScreenshotSubmissionData {
-  screenshot_filename: string | null;
+  screenshotFilename: string | null;
   screenshot_files: Record<string, string> | null;
 }
 
@@ -73,21 +73,21 @@ export class FeedbackBackendApiService {
   }
 
   async getStagedScreenshotSubmissionDataAsync(
-    screenshot_filename: string | null
+    screenshotFilename: string | null
   ): Promise<FeedbackScreenshotSubmissionData> {
-    if (screenshot_filename === null) {
+    if (screenshotFilename === null) {
       return {
-        screenshot_filename: null,
+        screenshotFilename: null,
         screenshot_files: null,
       };
     }
-    const imageData = this.getStagedScreenshotData(screenshot_filename);
+    const imageData = this.getStagedScreenshotData(screenshotFilename);
     if (imageData === null) {
       throw new Error('No staged feedback screenshot found.');
     }
 
     return {
-      screenshot_filename,
+      screenshotFilename,
       screenshot_files:
         await this.imageLocalStorageService.getFilenameToBase64MappingAsync([
           imageData,
@@ -165,7 +165,7 @@ export class FeedbackBackendApiService {
       files?: Record<string, string> | null;
     } | null = null
   ): Promise<void> {
-    if (message == null && status == null && screenshot == null) {
+    if (message === null && status === null && screenshot === null) {
       throw new Error(
         'At least one of message, status or screenshot must be provided.'
       );
@@ -177,7 +177,7 @@ export class FeedbackBackendApiService {
       .put<void>(url, {
         action: status,
         message,
-        screenshot_filename: screenshot?.filename ?? null,
+        screenshotFilename: screenshot?.filename ?? null,
         files: screenshot?.files ?? null,
       })
       .toPromise();
@@ -185,8 +185,8 @@ export class FeedbackBackendApiService {
 
   // Feedback-admin dashboard.
   // Not part of Milestone-1, will be added in Milestone-2.
-  // 1. fetchFeedbackAdminListAsync
-  // 2. fetchFeedbackAdminDetailAsync
-  // 3. addFeedbackAdminMessageAsync
-  // 4. deleteFeedbackAsync
+  // 1->fetchFeedbackAdminListAsync.
+  // 2->fetchFeedbackAdminDetailAsync.
+  // 3->addFeedbackAdminMessageAsync.
+  // 4->deleteFeedbackAsync.
 }
