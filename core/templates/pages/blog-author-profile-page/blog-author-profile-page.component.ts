@@ -155,9 +155,10 @@ export class BlogAuthorProfilePageComponent implements OnInit {
     );
   }
 
-  onPageChange(): void {
-    this.calculateFirstPostOnPageNum();
-    this.calculateLastPostOnPageNum();
+  onPageChange(page = this.page): void {
+    this.page = page;
+    this.calculateFirstPostOnPageNum(page);
+    this.calculateLastPostOnPageNum(page);
     this.loadPage();
   }
 

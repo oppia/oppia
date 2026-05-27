@@ -35,11 +35,11 @@ import {
 import {PlatformParameter} from 'domain/platform-parameter/platform-parameter.model';
 import {PlatformParameterRule} from 'domain/platform-parameter/platform-parameter-rule.model';
 import {HttpErrorResponse} from '@angular/common/http';
+import {Schema} from 'services/schema-default-value.service';
 
-interface PlatformSchema {
-  type: string;
+type PlatformSchema = Schema & {
   ui_config?: {rows: number};
-}
+};
 
 type FilterType = keyof typeof PlatformParameterFilterType;
 
@@ -64,6 +64,10 @@ export class AdminPlatformParametersTabComponent implements OnInit {
       options?: readonly string[];
       placeholder?: string;
       inputRegex?: RegExp;
+      optionFilter?: (
+        platformParameter: PlatformParameter,
+        option: string
+      ) => boolean;
     };
   } = {
     [PlatformParameterFilterType.PlatformType]: {

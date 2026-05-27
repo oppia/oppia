@@ -51,7 +51,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   windowIsNarrow: boolean = false;
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
-  allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
+  allowedImageFormats: string[] = [...AppConstants.ALLOWED_IMAGE_FORMATS];
   @Output() imageLocallySaved: EventEmitter<string> = new EventEmitter();
   @Output() cancelThumbnailUpload: EventEmitter<void> = new EventEmitter();
   constructor(
@@ -126,6 +126,10 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
       tags: [],
       attrs: [],
     };
+  }
+
+  getInvalidSvgIssueUrl(): string {
+    return this.svgSanitizerService.getIssueURL(this.invalidTagsAndAttributes);
   }
 
   onInvalidImageLoaded(): void {
