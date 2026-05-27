@@ -20,8 +20,8 @@ import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {CertificateOfferingSharedModule} from 'pages/certificate-assessment-pages/certificate-offering-shared/certificate-offering-shared.module';
-import {CreateCertificateOfferingPageComponent} from './create-certificate-offering-page.component.ts';
-import {CreateCertificateOfferingPageRootComponent} from './create-certificate-offering-page-root.component.ts';
+import {CreateCertificateOfferingPageComponent} from './create-certificate-offering-page.component';
+import {CreateCertificateOfferingPageRootComponent} from './create-certificate-offering-page-root.component';
 import {CreateCertificateOfferingPageRoutingModule} from './create-certificate-offering-page-routing.module';
 
 @NgModule({

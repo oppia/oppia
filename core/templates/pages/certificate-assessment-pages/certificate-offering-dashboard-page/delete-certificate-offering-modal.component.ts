@@ -13,22 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Root component for the create certificate offering page.
+ * @fileoverview Modal for confirming certificate offering deletion.
  */
 
 import {Component} from '@angular/core';
-import {AppConstants} from 'app.constants';
-import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-create-certificate-offering-page-root',
-  templateUrl: './create-certificate-offering-page-root.component.html',
+  selector: 'oppia-delete-certificate-offering-modal',
+  templateUrl: './delete-certificate-offering-modal.component.html',
 })
-export class CreateCertificateOfferingPageRootComponent extends BaseRootComponent {
-  title: string =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATE_CERTIFICATE_OFFERING
-      .TITLE;
-
-  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-    .CREATE_CERTIFICATE_OFFERING.META as unknown as Readonly<MetaTagData>[];
+export class DeleteCertificateOfferingModalComponent extends ConfirmOrCancelModal {
+  constructor(ngbActiveModal: NgbActiveModal) {
+    super(ngbActiveModal);
+  }
 }

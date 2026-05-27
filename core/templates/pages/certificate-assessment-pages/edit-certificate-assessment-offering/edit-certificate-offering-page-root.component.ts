@@ -29,5 +29,5 @@ export class EditCertificateOfferingPageRootComponent extends BaseRootComponent 
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EDIT_CERTIFICATE_OFFERING.TITLE;
 
   meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-    .EDIT_CERTIFICATE_OFFERING.META as MetaTagData[];
+    .EDIT_CERTIFICATE_OFFERING.META as unknown as Readonly<MetaTagData>[];
 }

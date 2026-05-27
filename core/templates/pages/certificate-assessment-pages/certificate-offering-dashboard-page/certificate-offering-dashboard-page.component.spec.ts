@@ -16,16 +16,52 @@
  * @fileoverview Unit tests for CertificateOfferingDashboardPageComponent.
  */
 
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  flushMicrotasks,
+} from '@angular/core/testing';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+
 import {CertificateOfferingDashboardPageComponent} from './certificate-offering-dashboard-page.component';
+import {DeleteCertificateOfferingModalComponent} from './delete-certificate-offering-modal.component';
 
 describe('CertificateOfferingDashboardPageComponent', () => {
   let component: CertificateOfferingDashboardPageComponent;
   let fixture: ComponentFixture<CertificateOfferingDashboardPageComponent>;
+  let alertsService: AlertsService;
+  let certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService;
+  let ngbModal: NgbModal;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [CertificateOfferingDashboardPageComponent],
+      providers: [
+        {
+          provide: AlertsService,
+          useValue: {
+            addSuccessMessage: () => {},
+          },
+        },
+        {
+          provide: CertificateAssessmentOfferingBackendApiService,
+          useValue: {
+            deleteCertificateAssessmentOfferingAsync: async () =>
+              Promise.resolve(),
+          },
+        },
+        {
+          provide: NgbModal,
+          useValue: {
+            open: () => ({
+              result: Promise.resolve(),
+            }),
+          },
+        },
+      ],
     }).compileComponents();
   });
 
@@ -34,6 +70,11 @@ describe('CertificateOfferingDashboardPageComponent', () => {
       CertificateOfferingDashboardPageComponent
     );
     component = fixture.componentInstance;
+    alertsService = TestBed.inject(AlertsService);
+    certificateAssessmentOfferingBackendApiService = TestBed.inject(
+      CertificateAssessmentOfferingBackendApiService
+    );
+    ngbModal = TestBed.inject(NgbModal);
     fixture.detectChanges();
   });
 
@@ -42,4 +83,58 @@ describe('CertificateOfferingDashboardPageComponent', () => {
       true
     );
   });
+
+  it('should build the edit certificate offering route', () => {
+    expect(component.getEditCertificateOfferingRoute('mock_id')).toEqual(
+      '/EDIT-certificate-assessment-offering/mock_id'
+    );
+  });
+
+  it('should open delete certificate offering modal', fakeAsync(() => {
+    const deleteSpy = spyOn(
+      component,
+      'deleteCertificateOffering'
+    ).and.returnValue(Promise.resolve());
+    const modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve(),
+    } as NgbModalRef);
+
+    component.openDeleteCertificateOfferingModal('dummy_id');
+    flushMicrotasks();
+
+    expect(modalSpy).toHaveBeenCalledWith(
+      DeleteCertificateOfferingModalComponent,
+      {
+        backdrop: 'static',
+      }
+    );
+    expect(deleteSpy).toHaveBeenCalledWith('dummy_id');
+  }));
+
+  it('should not delete certificate offering when modal is cancelled', fakeAsync(() => {
+    const deleteSpy = spyOn(component, 'deleteCertificateOffering');
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.reject(),
+    } as NgbModalRef);
+
+    component.openDeleteCertificateOfferingModal('dummy_id');
+    flushMicrotasks();
+
+    expect(deleteSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should delete certificate offering and remove it locally', fakeAsync(() => {
+    const deleteSpy = spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'deleteCertificateAssessmentOfferingAsync'
+    ).and.returnValue(Promise.resolve());
+    const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
+
+    component.deleteCertificateOffering('dummy_id');
+    flushMicrotasks();
+
+    expect(deleteSpy).toHaveBeenCalledWith('dummy_id');
+    expect(component.certificateOfferings).toEqual([]);
+    expect(alertsSpy).toHaveBeenCalledWith('Certificate deleted successfully.');
+  }));
 });

@@ -20,9 +20,9 @@ import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {SharedComponentsModule} from 'components/shared-component.module';
 
-import {CertificateOfferingAddTopicItemsComponent} from './certificate-offering-add-topic-items.component.ts';
-import {CertificateOfferingDetailsComponent} from './certificate-offering-details.component.ts';
-import {CertificateOfferingReviewAndAvailabilityComponent} from './certificate-offering-review-and-availability.component.ts';
+import {CertificateOfferingAddTopicItemsComponent} from './certificate-offering-add-topic-items.component';
+import {CertificateOfferingDetailsComponent} from './certificate-offering-details.component';
+import {CertificateOfferingReviewAndAvailabilityComponent} from './certificate-offering-review-and-availability.component';
 
 @NgModule({
   imports: [CommonModule, SharedComponentsModule],

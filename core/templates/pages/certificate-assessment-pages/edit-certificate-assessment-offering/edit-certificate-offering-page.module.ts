@@ -21,8 +21,8 @@ import {NgModule} from '@angular/core';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {CertificateOfferingSharedModule} from 'pages/certificate-assessment-pages/certificate-offering-shared/certificate-offering-shared.module';
 
-import {EditCertificateOfferingPageComponent} from './edit-certificate-offering-page.component.ts';
-import {EditCertificateOfferingPageRootComponent} from './edit-certificate-offering-page-root.component.ts';
+import {EditCertificateOfferingPageComponent} from './edit-certificate-offering-page.component';
+import {EditCertificateOfferingPageRootComponent} from './edit-certificate-offering-page-root.component';
 import {EditCertificateOfferingPageRoutingModule} from './edit-certificate-offering-page-routing.module';
 
 @NgModule({

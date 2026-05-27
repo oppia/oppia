@@ -19,13 +19,16 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 
+import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {
-  CertificateOfferingDetails,
-  CertificateOfferingDraft,
+  CertificateAssessmentOfferingData,
+  CertificateAssessmentOfferingTopicData,
+} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {
   CertificateOfferingSectionId,
   CERTIFICATE_OFFERING_SECTION_IDS,
-  createEmptyCertificateOfferingDraft,
-} from 'pages/certificate-assessment-pages/certificate-offering-shared/certificate-offering-draft.model';
+} from 'pages/certificate-assessment-pages/certificate-offering-shared/certificate-offering-section.model';
+import {AlertsService} from 'services/alerts.service';
 
 @Component({
   selector: 'oppia-edit-certificate-offering-page',
@@ -34,10 +37,13 @@ import {
 export class EditCertificateOfferingPageComponent implements OnInit {
   activeSection!: CertificateOfferingSectionId;
   certificateOfferingId: string = '';
-  draft: CertificateOfferingDraft = createEmptyCertificateOfferingDraft();
+  certificateAssessmentOffering: CertificateAssessmentOfferingData =
+    CertificateAssessmentOfferingData.createEmpty();
 
   constructor(
     private activatedRoute: ActivatedRoute,
+    private alertsService: AlertsService,
+    private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
     private router: Router
   ) {}
 
@@ -46,19 +52,13 @@ export class EditCertificateOfferingPageComponent implements OnInit {
     this.certificateOfferingId =
       this.activatedRoute.snapshot.paramMap.get('certificate_offering_id') ||
       '';
-    this.populateDraftFromCertificateOfferingId();
+    this.populateCertificateAssessmentOfferingFromId();
   }
 
-  populateDraftFromCertificateOfferingId(): void {
+  populateCertificateAssessmentOfferingFromId(): void {
     // Stub: replace this with the certificate offering fetch backend call.
-    this.draft = {
-      ...createEmptyCertificateOfferingDraft(),
-      details: {
-        title: '',
-        description: '',
-        classroomId: '',
-      },
-    };
+    this.certificateAssessmentOffering =
+      CertificateAssessmentOfferingData.createEmpty();
   }
 
   isDetailsSection(): boolean {
@@ -91,22 +91,27 @@ export class EditCertificateOfferingPageComponent implements OnInit {
       CERTIFICATE_OFFERING_SECTION_IDS.REVIEW_AND_AVAILABILITY;
   }
 
-  updateDetails(details: CertificateOfferingDetails): void {
-    this.draft = {
-      ...this.draft,
-      details,
-    };
+  updateCertificateAssessmentOffering(
+    certificateAssessmentOffering: CertificateAssessmentOfferingData
+  ): void {
+    this.certificateAssessmentOffering = certificateAssessmentOffering;
   }
 
-  updateSelectedTopicIds(selectedTopicIds: string[]): void {
-    this.draft = {
-      ...this.draft,
-      selectedTopicIds,
-    };
+  updateTopicData(topicData: CertificateAssessmentOfferingTopicData): void {
+    this.certificateAssessmentOffering.topicData = topicData;
   }
 
   async updateCertificateOffering(): Promise<void> {
-    // Stub: call the certificate offering update backend API here.
+    const certificateId =
+      await this.certificateAssessmentOfferingBackendApiService.updateCertificateAssessmentOfferingAsync(
+        this.certificateOfferingId,
+        this.certificateAssessmentOffering
+      );
+
+    if (certificateId) {
+      this.alertsService.addSuccessMessage('Certificate updated.');
+      this.router.navigate(['/certificate-offering-dashboard']);
+    }
   }
 
   navigateBackToDashboard(): void {

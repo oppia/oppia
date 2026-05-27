@@ -4,23 +4,23 @@
 
   <oppia-certificate-offering-details
     *ngIf="isDetailsSection()"
-    [details]="draft.details"
-    (detailsChange)="updateDetails($event)"
+    [certificateAssessmentOffering]="certificateAssessmentOffering"
+    (certificateAssessmentOfferingChange)="updateCertificateAssessmentOffering($event)"
     (navigateToAddTopicsSection)="navigateToAddTopicsSection()"
     (cancelClicked)="navigateBackToDashboard()">
   </oppia-certificate-offering-details>
 
   <oppia-certificate-offering-add-topic-items
     *ngIf="isAddTopicsSection()"
-    [selectedTopicIds]="draft.selectedTopicIds"
-    (selectedTopicIdsChange)="updateSelectedTopicIds($event)"
+    [certificateAssessmentOffering]="certificateAssessmentOffering"
+    (topicDataChange)="updateTopicData($event)"
     (navigateToReviewAndAvailabilitySection)="navigateToReviewAndAvailabilitySection()"
     (navigateToDetailsSection)="navigateToDetailsSection()">
   </oppia-certificate-offering-add-topic-items>
 
   <oppia-certificate-offering-review-and-availability
     *ngIf="isReviewAndAvailabilitySection()"
-    [draft]="draft"
+    [certificateAssessmentOffering]="certificateAssessmentOffering"
     (saveCertificateOffering)="saveCertificateOffering()"
     (navigateToAddTopicsSection)="navigateToAddTopicsSection()">
   </oppia-certificate-offering-review-and-availability>

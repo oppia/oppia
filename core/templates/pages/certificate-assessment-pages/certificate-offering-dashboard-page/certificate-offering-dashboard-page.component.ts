@@ -16,15 +16,75 @@
  * @fileoverview Component for certificate offering dashboard.
  */
 import {Component} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
+import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+
+import {DeleteCertificateOfferingModalComponent} from './delete-certificate-offering-modal.component';
+
+interface CertificateOfferingDashboardRow {
+  certificateId: string;
+  title: string;
+  topicsLabel: string;
+  timeLabel: string;
+  status: string;
+}
 
 @Component({
   selector: 'oppia-certificate-offering-dashboard-page',
   templateUrl: './certificate-offering-dashboard-page.component.html',
 })
 export class CertificateOfferingDashboardPageComponent {
+  certificateOfferings: CertificateOfferingDashboardRow[] = [
+    {
+      certificateId: 'dummy_id',
+      title: 'Certificate Title',
+      topicsLabel: '-',
+      timeLabel: '-',
+      status: 'Draft',
+    },
+  ];
+
   createCertificateOfferingRoute =
     '/' +
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATE_CERTIFICATE_OFFERING
       .ROUTE;
+
+  constructor(
+    private alertsService: AlertsService,
+    private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
+    private ngbModal: NgbModal
+  ) {}
+
+  getEditCertificateOfferingRoute(certificateId: string): string {
+    return (
+      '/' +
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EDIT_CERTIFICATE_OFFERING.ROUTE.replace(
+        ':certificate_offering_id',
+        certificateId
+      )
+    );
+  }
+
+  openDeleteCertificateOfferingModal(certificateId: string): void {
+    this.ngbModal
+      .open(DeleteCertificateOfferingModalComponent, {
+        backdrop: 'static',
+      })
+      .result.then(
+        () => this.deleteCertificateOffering(certificateId),
+        () => {}
+      );
+  }
+
+  async deleteCertificateOffering(certificateId: string): Promise<void> {
+    await this.certificateAssessmentOfferingBackendApiService.deleteCertificateAssessmentOfferingAsync(
+      certificateId
+    );
+    this.certificateOfferings = this.certificateOfferings.filter(
+      certificateOffering => certificateOffering.certificateId !== certificateId
+    );
+    this.alertsService.addSuccessMessage('Certificate deleted successfully.');
+  }
 }

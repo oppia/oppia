@@ -21,12 +21,13 @@ import {Router} from '@angular/router';
 
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {
-  CertificateOfferingDetails,
-  CertificateOfferingDraft,
+  CertificateAssessmentOfferingData,
+  CertificateAssessmentOfferingTopicData,
+} from 'domain/certificate-assessment/certificate-assessment-offering.model';
+import {
   CertificateOfferingSectionId,
   CERTIFICATE_OFFERING_SECTION_IDS,
-  createEmptyCertificateOfferingDraft,
-} from 'pages/certificate-assessment-pages/certificate-offering-shared/certificate-offering-draft.model';
+} from 'pages/certificate-assessment-pages/certificate-offering-shared/certificate-offering-section.model';
 import {AlertsService} from 'services/alerts.service';
 
 @Component({
@@ -35,7 +36,8 @@ import {AlertsService} from 'services/alerts.service';
 })
 export class CreateCertificateOfferingPageComponent implements OnInit {
   activeSection!: CertificateOfferingSectionId;
-  draft: CertificateOfferingDraft = createEmptyCertificateOfferingDraft();
+  certificateAssessmentOffering: CertificateAssessmentOfferingData =
+    CertificateAssessmentOfferingData.createEmpty();
 
   constructor(
     private alertsService: AlertsService,
@@ -77,24 +79,20 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
       CERTIFICATE_OFFERING_SECTION_IDS.REVIEW_AND_AVAILABILITY;
   }
 
-  updateDetails(details: CertificateOfferingDetails): void {
-    this.draft = {
-      ...this.draft,
-      details,
-    };
+  updateCertificateAssessmentOffering(
+    certificateAssessmentOffering: CertificateAssessmentOfferingData
+  ): void {
+    this.certificateAssessmentOffering = certificateAssessmentOffering;
   }
 
-  updateSelectedTopicIds(selectedTopicIds: string[]): void {
-    this.draft = {
-      ...this.draft,
-      selectedTopicIds,
-    };
+  updateTopicData(topicData: CertificateAssessmentOfferingTopicData): void {
+    this.certificateAssessmentOffering.topicData = topicData;
   }
 
   async saveCertificateOffering(): Promise<void> {
     const certificateId =
       await this.certificateAssessmentOfferingBackendApiService.createCertificateAssessmentOfferingAsync(
-        this.draft
+        this.certificateAssessmentOffering
       );
 
     if (certificateId) {

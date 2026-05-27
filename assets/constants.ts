@@ -6683,7 +6683,7 @@ export default {
       ]
     },
     "EDIT_CERTIFICATE_OFFERING": {
-      "ROUTE": "EDIT-certificate-assessment-offering/certificate_offering_id",
+      "ROUTE": "EDIT-certificate-assessment-offering/:certificate_offering_id",
       "TITLE": "Edit Certificate Offering | Oppia",
       "META": [
         {

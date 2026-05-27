@@ -19,10 +19,14 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
-import {CertificateOfferingDraft} from 'pages/certificate-assessment-pages/certificate-offering-shared/certificate-offering-draft.model';
+import {CertificateAssessmentOfferingData} from './certificate-assessment-offering.model';
 import {CertificateAssessmentDomainConstants} from './certificate-assessment-domain.constants';
 
 interface CreateCertificateOfferingBackendResponse {
+  certificate_id: string;
+}
+
+interface UpdateCertificateOfferingBackendResponse {
   certificate_id: string;
 }
 
@@ -32,8 +36,15 @@ interface CreateCertificateOfferingBackendResponse {
 export class CertificateAssessmentOfferingBackendApiService {
   constructor(private http: HttpClient) {}
 
+  private getCertificateOfferingByIdHandlerUrl(certificateId: string): string {
+    return CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER_URL.replace(
+      '<certificate_id>',
+      certificateId
+    );
+  }
+
   async createCertificateAssessmentOfferingAsync(
-    draft: CertificateOfferingDraft
+    certificateAssessmentOffering: CertificateAssessmentOfferingData
   ): Promise<string> {
     return new Promise((resolve, reject) => {
       this.http
@@ -45,6 +56,46 @@ export class CertificateAssessmentOfferingBackendApiService {
         .then(
           response => {
             resolve(response.certificate_id);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
+    });
+  }
+
+  async updateCertificateAssessmentOfferingAsync(
+    certificateId: string,
+    certificateAssessmentOffering: CertificateAssessmentOfferingData
+  ): Promise<string> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .put<UpdateCertificateOfferingBackendResponse>(
+          this.getCertificateOfferingByIdHandlerUrl(certificateId),
+          {}
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response.certificate_id);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
+    });
+  }
+
+  async deleteCertificateAssessmentOfferingAsync(
+    certificateId: string
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .delete<void>(this.getCertificateOfferingByIdHandlerUrl(certificateId))
+        .toPromise()
+        .then(
+          () => {
+            resolve();
           },
           errorResponse => {
             reject(errorResponse.error.error);

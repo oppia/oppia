@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Draft model for certificate offering create and edit flows.
+ * @fileoverview Section IDs for certificate offering create and edit flows.
  */
 
 export const CERTIFICATE_OFFERING_SECTION_IDS = {
@@ -24,29 +24,3 @@ export const CERTIFICATE_OFFERING_SECTION_IDS = {
 
 export type CertificateOfferingSectionId =
   (typeof CERTIFICATE_OFFERING_SECTION_IDS)[keyof typeof CERTIFICATE_OFFERING_SECTION_IDS];
-
-export interface CertificateOfferingDetails {
-  title: string;
-  description: string;
-  classroomId: string;
-}
-
-export interface CertificateOfferingDraft {
-  details: CertificateOfferingDetails;
-  selectedTopicIds: string[];
-}
-
-export function createEmptyCertificateOfferingDetails(): CertificateOfferingDetails {
-  return {
-    title: '',
-    description: '',
-    classroomId: '',
-  };
-}
-
-export function createEmptyCertificateOfferingDraft(): CertificateOfferingDraft {
-  return {
-    details: createEmptyCertificateOfferingDetails(),
-    selectedTopicIds: [],
-  };
-}
