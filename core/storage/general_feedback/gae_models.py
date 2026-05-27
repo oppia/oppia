@@ -382,8 +382,8 @@ class WebFeedbackThreadModel(base_models.BaseModel):
             entity_id: str. The ID of the entity.
 
         Returns:
-            str. A thread ID that is different from all existing thread IDs
-            within the given entity.
+            str. A globally unique thread ID containing the entity type
+            and entity ID as part of the ID format.
 
         Raises:
             Exception. Raised when too many collisions occur while generating a
@@ -433,10 +433,7 @@ class WebFeedbackThreadModel(base_models.BaseModel):
             )
 
         thread_id = cls.generate_new_thread_id(target_type, target_id)
-        if cls.get_by_id(thread_id):
-            raise Exception(
-                'Generated thread ID already exists: %s' % thread_id
-            )
+
         thread = cls(
             id=thread_id,
             category=category,
@@ -509,7 +506,7 @@ class WebFeedbackMessageModel(base_models.BaseModel):
     author_status = datastore_services.StringProperty(
         required=True, indexed=True, choices=AUTHOR_ROLE_CHOICES
     )
-    text = datastore_services.TextProperty(required=True, indexed=False)
+    text = datastore_services.TextProperty(required=False, indexed=False)
     updated_status = datastore_services.TextProperty(
         required=False,
         choices=STATUS_CHOICES,
