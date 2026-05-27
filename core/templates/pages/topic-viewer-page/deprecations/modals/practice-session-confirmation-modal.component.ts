@@ -23,6 +23,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 @Component({
   selector: 'oppia-practice-session-confirmation-modal',
   templateUrl: './practice-session-confirmation-modal.component.html',
+  styleUrls: ['./practice-session-confirmation-modal.component.css'],
 })
 export class PracticeSessionConfirmationModal extends ConfirmOrCancelModal {
   constructor(private ngbActiveModal: NgbActiveModal) {
