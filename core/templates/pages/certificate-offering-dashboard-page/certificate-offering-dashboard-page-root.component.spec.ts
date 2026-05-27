@@ -19,33 +19,14 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 import {CertificateOfferingDashboardPageRootComponent} from './certificate-offering-dashboard-page-root.component';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 
 describe('CertificateOfferingDashboardPageRootComponent', () => {
   let component: CertificateOfferingDashboardPageRootComponent;
   let fixture: ComponentFixture<CertificateOfferingDashboardPageRootComponent>;
 
   beforeEach(() => {
-    const platformFeatureServiceSpy = jasmine.createSpyObj(
-      'PlatformFeatureService',
-      [],
-      {
-        status: {
-          EnableCertificateAssessment: {
-            isEnabled: true,
-          },
-        },
-      }
-    );
-
     TestBed.configureTestingModule({
       declarations: [CertificateOfferingDashboardPageRootComponent],
-      providers: [
-        {
-          provide: PlatformFeatureService,
-          useValue: platformFeatureServiceSpy,
-        },
-      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 
@@ -59,9 +40,5 @@ describe('CertificateOfferingDashboardPageRootComponent', () => {
     expect(
       component instanceof CertificateOfferingDashboardPageRootComponent
     ).toBeTrue();
-  });
-
-  it('should set isCertificateOfferingEnabled from service', () => {
-    expect(component.isCertificateOfferingEnabled).toEqual(true);
   });
 });

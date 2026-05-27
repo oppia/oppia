@@ -17,14 +17,9 @@
  */
 
 import {Component} from '@angular/core';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-certificate-offering-dashboard-page-root',
   templateUrl: './certificate-offering-dashboard-page-root.component.html',
 })
-export class CertificateOfferingDashboardPageRootComponent {
-  isCertificateOfferingEnabled =
-    this.platformFeatureService.status.EnableCertificateAssessment.isEnabled;
-  constructor(private platformFeatureService: PlatformFeatureService) {}
-}
+export class CertificateOfferingDashboardPageRootComponent {}

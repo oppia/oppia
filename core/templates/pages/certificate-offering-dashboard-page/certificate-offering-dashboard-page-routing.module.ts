@@ -19,12 +19,14 @@
 import {NgModule} from '@angular/core';
 import {Route, RouterModule} from '@angular/router';
 
+import {CertificateOfferingDashboardPageAuthGuard} from './certificate-offering-dashboard-page-auth.guard';
 import {CertificateOfferingDashboardPageRootComponent} from './certificate-offering-dashboard-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
     component: CertificateOfferingDashboardPageRootComponent,
+    canActivate: [CertificateOfferingDashboardPageAuthGuard],
   },
 ];
 
