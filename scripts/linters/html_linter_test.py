@@ -407,22 +407,18 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
     def test_handle_data_updates_indentation_level_for_jinja_blocks(
         self,
     ) -> None:
-        # Initialize the parser
         parser = html_linter.CustomHTMLParser(
             filepath='dummy.html', file_lines=(), failed=False
         )
 
-        # Starts at level 0
         self.assertEqual(parser.indentation_level, 0)
 
-        # Trigger the "opening_block" branch (+= 1)
         parser.handle_data('  {% block some_block %}\n')
         self.assertEqual(parser.indentation_level, 1)
 
         parser.handle_data('  {% if some_condition %}\n')
         self.assertEqual(parser.indentation_level, 2)
 
-        # Trigger the "ending_block" branch (-= 1)
         parser.handle_data('  {% endif %}\n')
         self.assertEqual(parser.indentation_level, 1)
 
