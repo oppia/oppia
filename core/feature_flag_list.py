@@ -135,7 +135,6 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
-    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
@@ -172,6 +171,7 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
     FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST,
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
+    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
     FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
 ]
 
@@ -259,13 +259,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'misconceptions and tag answer groups with misconceptions '
             'for a curated exploration.',
             feature_flag_domain.ServerMode.PROD,
-        )
-    ),
-    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS.value: (
-        (
-            'The flag enables flow for multiple classrooms '
-            'and makes the classrooms page available to learners.',
-            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE.value: (
