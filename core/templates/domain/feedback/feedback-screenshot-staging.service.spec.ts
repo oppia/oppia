@@ -95,10 +95,6 @@ describe('FeedbackScreenshotStagingService', () => {
     imageWidth = 80;
     imageShouldFail = false;
 
-    // This throws "Argument of type 'MockFileReader' is not assignable to
-    // parameter of type 'FileReader'.". We need to suppress this error because
-    // 'FileReader' has browser properties that are not needed by these tests.
-    // @ts-expect-error
     spyOn(window, 'FileReader').and.returnValue(new MockFileReader());
 
     // This throws "Type 'typeof MockImage' is not assignable to type 'typeof
