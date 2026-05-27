@@ -5,7 +5,7 @@
 */
 topic-viewer-page .oppia-redesigned-topic-viewer-container {
   padding: 24px 48px 0;
-  text-align: left;
+  text-align: start;
 }
 
 topic-viewer-page .oppia-topic-viewer-container {
