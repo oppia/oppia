@@ -621,7 +621,7 @@
 /assets/rich_text_components_definitions.ts @oppia/lace-frontend-reviewers
 
 # Web User Feedback project.
-/core/templates/domain/feedback/ @oppia/lace-backend-reviewers
+/core/templates/domain/feedback/ @oppia/lace-frontend-reviewers
 
 # Suggestion and feedback team.
 # Suggestion project.
