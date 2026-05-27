@@ -75,13 +75,17 @@ describe('SkillEditorPageAccess', () => {
       Promise.resolve(true)
     );
 
-    let resultCanBeActivated = guard
+    let resultCanBeActivated = false;
+
+    guard
       .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
-      .then(result => (resultCanBeActivated = result));
+      .then((result: boolean) => {
+        resultCanBeActivated = result;
+      });
 
     tick();
 
-    expect(resultCanBeActivated).toBeTrue();
+    expect(resultCanBeActivated).toBe(true);
     expect(validateAccessSpy).toHaveBeenCalled();
     expect(navigateSpy).not.toHaveBeenCalled();
   }));
@@ -95,13 +99,16 @@ describe('SkillEditorPageAccess', () => {
       Promise.resolve(true)
     );
 
-    let resultCanBeActivated = guard
-      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
-      .then(result => (resultCanBeActivated = result));
+    let resultCanBeActivated = false;
 
+    guard
+      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
+      .then((result: boolean) => {
+        resultCanBeActivated = result;
+      });
     tick();
 
-    expect(resultCanBeActivated).toBeFalse();
+    expect(resultCanBeActivated).toBe(false);
     expect(navigateSpy).toHaveBeenCalledWith([
       `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
     ]);

@@ -112,9 +112,9 @@ describe('Topic Viewer Stories List Component', () => {
 
     component.ngOnInit();
 
-    expect(component.isHackyTopicNameTranslationDisplayed()).toBeTrue();
-    expect(component.isHackyTopicDescTranslationDisplayed()).toBeTrue();
-    expect(component.isHackyClassroomNameTranslationDisplayed()).toBeTrue();
+    expect(component.isHackyTopicNameTranslationDisplayed()).toBe(true);
+    expect(component.isHackyTopicDescTranslationDisplayed()).toBe(true);
+    expect(component.isHackyClassroomNameTranslationDisplayed()).toBe(true);
   });
 
   it('should not return the classroom name i18n key if the topic is not assigned to any classroom', () => {
@@ -126,7 +126,7 @@ describe('Topic Viewer Stories List Component', () => {
     expect(
       i18nLanguageCodeService.getClassroomTranslationKeys
     ).not.toHaveBeenCalled();
-    expect(component.isHackyClassroomNameTranslationDisplayed()).toBeFalse();
+    expect(component.isHackyClassroomNameTranslationDisplayed()).toBe(false);
   });
 
   it('should check if the view is tablet or not', () => {
@@ -142,7 +142,7 @@ describe('Topic Viewer Stories List Component', () => {
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
       true
     );
-    expect(component.isLanguageRTL()).toBeTrue();
+    expect(component.isLanguageRTL()).toBe(true);
   });
 
   it('should generate the correct classroom URL using UrlInterpolationService', () => {
@@ -168,10 +168,10 @@ describe('Topic Viewer Stories List Component', () => {
     component.classroomUrlFragment = '';
     expect(component.getClassroomUrl()).toBe('/learn');
 
-    component.classroomUrlFragment = null;
+    component.classroomUrlFragment = '';
     expect(component.getClassroomUrl()).toBe('/learn');
 
-    component.classroomUrlFragment = undefined;
+    component.classroomUrlFragment = '';
     expect(component.getClassroomUrl()).toBe('/learn');
   });
 });
