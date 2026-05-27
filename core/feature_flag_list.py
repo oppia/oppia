@@ -99,7 +99,6 @@ class FeatureNames(enum.Enum):
     ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE = (
         'enable_financial_literacy_campaign_banner_test_mode'
     )
-    ENABLE_CERTIFICATE_ASSESSMENT = 'enable_certificate_assessment'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -127,7 +126,6 @@ DEV_FEATURES_LIST = [
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
-    FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -344,12 +342,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag enables the financial literacy campaign banner for the fundraising campaign in test mode.',
             feature_flag_domain.ServerMode.TEST,
-        )
-    ),
-    FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT.value: (
-        (
-            'Enables the certificate assessment feature, allowing curriculum admins to create certificate offerings and learners to take certificate assessments.',
-            feature_flag_domain.ServerMode.DEV,
         )
     ),
 }

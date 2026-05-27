@@ -30,7 +30,6 @@ from core.controllers import (
     blog_admin,
     blog_dashboard,
     blog_homepage,
-    certificate_assessment,
     classroom,
     collection_editor,
     collection_viewer,
@@ -1396,10 +1395,6 @@ URLS = [
     get_redirect_route(
         r'/exploration_voiceover_regeneration_status_url/<exploration_id>',
         voiceover.VoiceoverRegenerationRequestToCloudTaskHandler,
-    ),
-    get_redirect_route(
-        feconf.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
-        certificate_assessment.CertificateAssessmentOfferingHandler,
     ),
 ]
 
