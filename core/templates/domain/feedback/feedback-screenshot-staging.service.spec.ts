@@ -23,65 +23,56 @@ import {FeedbackScreenshotStagingService} from 'domain/feedback/feedback-screens
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 
-describe('Feedback screenshot staging service', () => {
+describe('FeedbackScreenshotStagingService', () => {
   let feedbackScreenshotStagingService: FeedbackScreenshotStagingService;
   let imageLocalStorageService: ImageLocalStorageService;
   let imageUploadHelperService: ImageUploadHelperService;
+
+  const PREVIEW_DATA_URL = 'data:image/png;base64,aW1hZ2UtZGF0YQ==';
+  const IMAGE_FILENAME = 'img_filename.png';
+
+  let fileReaderResult: string | null;
+  let fileReaderShouldFail: boolean;
+  let imageHeight: number;
+  let imageWidth: number;
+  let imageShouldFail: boolean;
   let originalImage: typeof Image;
-  const previewDataUrl = 'data:image/png;base64,aW1hZ2UtZGF0YQ==';
 
-  class MockSuccessfulFileReader {
-    result: string | ArrayBuffer | null = previewDataUrl;
-    onload: ((this: FileReader, ev: ProgressEvent<FileReader>) => void) | null =
-      null;
-    onerror:
-      | ((this: FileReader, ev: ProgressEvent<FileReader>) => void)
-      | null = null;
+  class MockFileReader {
+    result = fileReaderResult;
+    onload: (() => void) | null = null;
+    onerror: (() => void) | null = null;
 
-    readAsDataURL(_file: File): void {
-      if (this.onload) {
-        this.onload({} as ProgressEvent<FileReader>);
+    readAsDataURL(file: File): void {
+      if (fileReaderShouldFail) {
+        if (this.onerror !== null) {
+          this.onerror();
+        }
+        return;
+      }
+
+      if (this.onload !== null) {
+        this.onload();
       }
     }
   }
 
-  class MockFailedFileReader {
-    result: string | ArrayBuffer | null = null;
-    onload: ((this: FileReader, ev: ProgressEvent<FileReader>) => void) | null =
-      null;
-    onerror:
-      | ((this: FileReader, ev: ProgressEvent<FileReader>) => void)
-      | null = null;
+  class MockImage {
+    height = imageHeight;
+    width = imageWidth;
+    onload: (() => void) | null = null;
+    onerror: (() => void) | null = null;
 
-    readAsDataURL(_file: File): void {
-      if (this.onerror) {
-        this.onerror({} as ProgressEvent<FileReader>);
+    set src(url: string) {
+      if (imageShouldFail) {
+        if (this.onerror !== null) {
+          this.onerror();
+        }
+        return;
       }
-    }
-  }
 
-  class MockSuccessfulImage {
-    height = 40;
-    width = 80;
-    onload: ((this: GlobalEventHandlers, ev: Event) => void) | null = null;
-    onerror: ((this: GlobalEventHandlers, ev: Event) => void) | null = null;
-
-    set src(_src: string) {
-      if (this.onload) {
-        this.onload(new Event('load'));
-      }
-    }
-  }
-
-  class MockFailedImage {
-    height = 0;
-    width = 0;
-    onload: ((this: GlobalEventHandlers, ev: Event) => void) | null = null;
-    onerror: ((this: GlobalEventHandlers, ev: Event) => void) | null = null;
-
-    set src(_src: string) {
-      if (this.onerror) {
-        this.onerror(new Event('error'));
+      if (this.onload !== null) {
+        this.onload();
       }
     }
   }
@@ -97,33 +88,42 @@ describe('Feedback screenshot staging service', () => {
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     originalImage = window.Image;
+
+    fileReaderResult = PREVIEW_DATA_URL;
+    fileReaderShouldFail = false;
+    imageHeight = 40;
+    imageWidth = 80;
+    imageShouldFail = false;
+
+    // This throws "Argument of type 'MockFileReader' is not assignable to
+    // parameter of type 'FileReader'.". We need to suppress this error because
+    // 'FileReader' has browser properties that are not needed by these tests.
+    // @ts-expect-error
+    spyOn(window, 'FileReader').and.returnValue(new MockFileReader());
+
+    // This throws "Type 'typeof MockImage' is not assignable to type 'typeof
+    // Image'.". We need to suppress this error because 'HTMLImageElement' has
+    // browser properties that are not needed here.
+    // @ts-expect-error
+    window.Image = MockImage;
   });
 
   afterEach(() => {
     window.Image = originalImage;
   });
 
-  it('should stage screenshot and return filename with preview data url', fakeAsync(() => {
+  it('should stage a screenshot and resolve with filename and previewDataUrl', fakeAsync(() => {
     const file = new File(['image-data'], 'feedback.png', {
       type: 'image/png',
     });
-    // This throws "Argument of type 'MockSuccessfulFileReader' is not
-    // assignable to parameter of type 'FileReader'.". We need to suppress
-    // this error because 'FileReader' has around 15 more properties. We have
-    // only defined the properties we need in 'MockSuccessfulFileReader'.
-    spyOn(window, 'FileReader').and.returnValue(new MockSuccessfulFileReader());
-    // This throws "Type 'typeof MockSuccessfulImage' is not assignable to
-    // type 'new() => HTMLImageElement'.". We need to suppress this error
-    // because 'HTMLImageElement' has around 250 more properties. We have only
-    // defined the properties we need in 'MockSuccessfulImage'.
-    window.Image = MockSuccessfulImage;
+
     spyOn(imageUploadHelperService, 'generateImageFilename').and.returnValue(
-      'img_filename.png'
+      IMAGE_FILENAME
     );
     spyOn(imageLocalStorageService, 'saveImage');
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
-    const onSuccess = jasmine.createSpy('onSuccess');
 
+    const onSuccess = jasmine.createSpy('onSuccess');
     feedbackScreenshotStagingService.stageScreenshotAsync(file).then(onSuccess);
     flushMicrotasks();
 
@@ -133,29 +133,48 @@ describe('Feedback screenshot staging service', () => {
       'png'
     );
     expect(imageLocalStorageService.saveImage).toHaveBeenCalledWith(
-      'img_filename.png',
-      previewDataUrl
+      IMAGE_FILENAME,
+      PREVIEW_DATA_URL
     );
     expect(imageLocalStorageService.isInStorage).toHaveBeenCalledWith(
-      'img_filename.png'
+      IMAGE_FILENAME
     );
     expect(onSuccess).toHaveBeenCalledWith({
-      filename: 'img_filename.png',
-      previewDataUrl,
+      filename: IMAGE_FILENAME,
+      previewDataUrl: PREVIEW_DATA_URL,
     });
   }));
 
-  it('should reject when screenshot cannot be read', fakeAsync(() => {
+  it('should derive the file extension from the MIME type of the file', fakeAsync(() => {
+    const jpegFile = new File(['image-data'], 'feedback.jpeg', {
+      type: 'image/jpeg',
+    });
+    imageHeight = 100;
+    imageWidth = 200;
+
+    spyOn(imageUploadHelperService, 'generateImageFilename').and.returnValue(
+      'img_jpeg.jpeg'
+    );
+    spyOn(imageLocalStorageService, 'saveImage');
+    spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
+
+    feedbackScreenshotStagingService.stageScreenshotAsync(jpegFile);
+    flushMicrotasks();
+
+    expect(imageUploadHelperService.generateImageFilename).toHaveBeenCalledWith(
+      100,
+      200,
+      'jpeg'
+    );
+  }));
+
+  it('should reject when the FileReader fails to read the file', fakeAsync(() => {
     const file = new File(['image-data'], 'feedback.png', {
       type: 'image/png',
     });
-    // This throws "Argument of type 'MockFailedFileReader' is not assignable
-    // to parameter of type 'FileReader'.". We need to suppress this error
-    // because 'FileReader' has around 15 more properties. We have only defined
-    // the properties we need in 'MockFailedFileReader'.
-    spyOn(window, 'FileReader').and.returnValue(new MockFailedFileReader());
-    const onFailure = jasmine.createSpy('onFailure');
+    fileReaderShouldFail = true;
 
+    const onFailure = jasmine.createSpy('onFailure');
     feedbackScreenshotStagingService
       .stageScreenshotAsync(file)
       .catch(onFailure);
@@ -166,22 +185,13 @@ describe('Feedback screenshot staging service', () => {
     );
   }));
 
-  it('should reject when screenshot preview cannot be loaded', fakeAsync(() => {
+  it('should reject when the Image element fails to load the data URL', fakeAsync(() => {
     const file = new File(['image-data'], 'feedback.png', {
       type: 'image/png',
     });
-    // This throws "Argument of type 'MockSuccessfulFileReader' is not
-    // assignable to parameter of type 'FileReader'.". We need to suppress
-    // this error because 'FileReader' has around 15 more properties. We have
-    // only defined the properties we need in 'MockSuccessfulFileReader'.
-    spyOn(window, 'FileReader').and.returnValue(new MockSuccessfulFileReader());
-    // This throws "Type 'typeof MockFailedImage' is not assignable to type
-    // 'new() => HTMLImageElement'.". We need to suppress this error because
-    // 'HTMLImageElement' has around 250 more properties. We have only defined
-    // the properties we need in 'MockFailedImage'.
-    window.Image = MockFailedImage;
-    const onFailure = jasmine.createSpy('onFailure');
+    imageShouldFail = true;
 
+    const onFailure = jasmine.createSpy('onFailure');
     feedbackScreenshotStagingService
       .stageScreenshotAsync(file)
       .catch(onFailure);
@@ -192,63 +202,54 @@ describe('Feedback screenshot staging service', () => {
     );
   }));
 
-  it('should reject when screenshot cannot be staged in storage', fakeAsync(() => {
+  it('should reject when saveImage does not persist the file in storage', fakeAsync(() => {
     const file = new File(['image-data'], 'feedback.png', {
       type: 'image/png',
     });
-    // This throws "Argument of type 'MockSuccessfulFileReader' is not
-    // assignable to parameter of type 'FileReader'.". We need to suppress
-    // this error because 'FileReader' has around 15 more properties. We have
-    // only defined the properties we need in 'MockSuccessfulFileReader'.
-    spyOn(window, 'FileReader').and.returnValue(new MockSuccessfulFileReader());
-    // This throws "Type 'typeof MockSuccessfulImage' is not assignable to
-    // type 'new() => HTMLImageElement'.". We need to suppress this error
-    // because 'HTMLImageElement' has around 250 more properties. We have only
-    // defined the properties we need in 'MockSuccessfulImage'.
-    window.Image = MockSuccessfulImage;
+
     spyOn(imageUploadHelperService, 'generateImageFilename').and.returnValue(
-      'img_filename.png'
+      IMAGE_FILENAME
     );
     spyOn(imageLocalStorageService, 'saveImage');
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(false);
-    const onFailure = jasmine.createSpy('onFailure');
 
+    const onFailure = jasmine.createSpy('onFailure');
     feedbackScreenshotStagingService
       .stageScreenshotAsync(file)
       .catch(onFailure);
     flushMicrotasks();
 
     expect(imageLocalStorageService.saveImage).toHaveBeenCalledWith(
-      'img_filename.png',
-      previewDataUrl
+      IMAGE_FILENAME,
+      PREVIEW_DATA_URL
     );
     expect(onFailure).toHaveBeenCalledWith(
       new Error('Unable to stage feedback screenshot.')
     );
   }));
 
-  it('should clear staged screenshot when it is in storage', () => {
+  it('should delete the image from storage when it is present', () => {
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
     spyOn(imageLocalStorageService, 'deleteImage');
 
-    feedbackScreenshotStagingService.clearStagedScreenshot('img_filename.png');
+    feedbackScreenshotStagingService.clearStagedScreenshot(IMAGE_FILENAME);
 
     expect(imageLocalStorageService.isInStorage).toHaveBeenCalledWith(
-      'img_filename.png'
+      IMAGE_FILENAME
     );
     expect(imageLocalStorageService.deleteImage).toHaveBeenCalledWith(
-      'img_filename.png'
+      IMAGE_FILENAME
     );
   });
 
-  it('should not delete staged screenshot when it is not in storage', () => {
+  it('should not call deleteImage when the filename is not in storage', () => {
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(false);
     spyOn(imageLocalStorageService, 'deleteImage');
 
-    feedbackScreenshotStagingService.clearStagedScreenshot('img_filename.png');
+    feedbackScreenshotStagingService.clearStagedScreenshot(IMAGE_FILENAME);
 
     expect(imageLocalStorageService.isInStorage).toHaveBeenCalledWith(
-      'img_filename.png'
+      IMAGE_FILENAME
     );
     expect(imageLocalStorageService.deleteImage).not.toHaveBeenCalled();
   });
