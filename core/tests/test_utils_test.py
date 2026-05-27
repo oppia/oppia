@@ -1005,12 +1005,12 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         already present in the result set, ensuring branch coverage.
         """
         stub = test_utils.ElasticSearchStub()
-
+        # pylint: disable=protected-access
         stub._DB['index1'] = [
             {'id': 'duplicate_id_1', 'data': 'first_doc'},
             {'id': 'duplicate_id_1', 'data': 'second_doc'},
         ]
-
+        # pylint: enable=protected-access
         body = {'query': {'bool': {'filter': [], 'must': []}}}
 
         result = stub.mock_search(body=body, index='index1', size=10, from_=0)
