@@ -1002,6 +1002,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         test_story_dict = {
             'story_id': 'story_id_1',
             'story_is_published': False,
+            'story_unpublish_type': None,
         }
         story_ref_obj = (
             topic_domain.StoryReference.create_default_story_reference(
