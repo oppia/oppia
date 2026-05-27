@@ -267,7 +267,6 @@ class CertificateAssessmentOfferingModel(base_models.VersionedModel):
             async_status=async_status,
         )
 
-        # Enforce tracking generation by passing the explicit feature command tag.
         offering_instance.commit(  # pylint: disable=protected-access
             feconf.SYSTEM_COMMITTER_ID,
             'New certificate assessment offering created.',

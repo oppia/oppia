@@ -41,6 +41,7 @@ Names = feconf.ValidModelNames
 MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
     Names.APP_FEEDBACK_REPORT,
     Names.BLOG,
+    Names.CERTIFICATE_ASSESSMENT_OFFERING,
     Names.COLLECTION,
     Names.CONFIG,
     Names.EXPLORATION,
