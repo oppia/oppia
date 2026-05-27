@@ -577,7 +577,10 @@ class WebFeedbackMessageModel(base_models.BaseModel):
         """Exports feedback message data corresponding to user_id."""
         user_data = {}
         message_models: Sequence[WebFeedbackMessageModel] = (
-            cls.get_all().filter(cls.author_id == user_id).fetch()
+            cls.get_all()
+            .filter(cls.author_id == user_id)
+            .filter(cls.deleted.IN([False]))
+            .fetch()
         )
 
         for message_model in message_models:
@@ -606,6 +609,7 @@ class WebFeedbackMessageModel(base_models.BaseModel):
         """Returns all messages belonging to a given thread, sorted by message_index."""
         return (
             cls.query(cls.thread_id == thread_id)
+            .filter(cls.deleted.IN([False]))
             .order(cls.message_index)
             .fetch()
         )
@@ -627,6 +631,7 @@ class WebFeedbackMessageModel(base_models.BaseModel):
             ]
             message_models: Sequence[WebFeedbackMessageModel] = (
                 cls.query(cls.thread_id.IN(batch_thread_ids))
+                .filter(cls.deleted.IN([False]))
                 .order(cls.thread_id)
                 .order(cls.message_index)
                 .fetch()
@@ -641,7 +646,11 @@ class WebFeedbackMessageModel(base_models.BaseModel):
     @classmethod
     def get_message_count_for_thread(cls, thread_id: str) -> int:
         """Returns the total number of messages in a given thread."""
-        return cls.query(cls.thread_id == thread_id).count()
+        return (
+            cls.query(cls.thread_id == thread_id)
+            .filter(cls.deleted.IN([False]))
+            .count()
+        )
 
     @classmethod
     def create(

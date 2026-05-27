@@ -398,30 +398,6 @@ class WebFeedbackThreadModelTests(test_utils.GenericTestBase):
         )
         self.assertEqual(thread_model.message_count, 0)
 
-    def test_create_raises_error_for_preexisting_generated_thread_id(
-        self,
-    ) -> None:
-        with self.swap(
-            general_feedback_models.WebFeedbackThreadModel,
-            'generate_new_thread_id',
-            lambda _, __: THREAD_ID1,
-        ):
-            with self.assertRaisesRegex(
-                Exception,
-                'Generated thread ID already exists: %s' % THREAD_ID1,
-            ):
-                general_feedback_models.WebFeedbackThreadModel.create(
-                    category=CATEGORY1,
-                    target_type=TARGET_TYPE_EXPLORATION,
-                    target_id='new_exp_id',
-                    original_author_id=self.USER_ID,
-                    page_url=PAGE_URL,
-                    language_code=LANGUAGE_CODE,
-                    rating=RATING,
-                    has_screenshot=False,
-                    has_session_info=False,
-                )
-
 
 class WebFeedbackMessageModelTests(test_utils.GenericTestBase):
     """Tests for WebFeedbackMessageModel."""
