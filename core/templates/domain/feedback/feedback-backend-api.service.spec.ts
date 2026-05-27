@@ -93,7 +93,7 @@ describe('Feedback backend api service', () => {
     flushMicrotasks();
 
     expect(onSuccess).toHaveBeenCalledWith({
-      screenshot_filename: null,
+      screenshotFilename: null,
       screenshot_files: null,
     });
   }));
@@ -135,7 +135,7 @@ describe('Feedback backend api service', () => {
       },
     ]);
     expect(onSuccess).toHaveBeenCalledWith({
-      screenshot_filename: 'reply.png',
+      screenshotFilename: 'reply.png',
       screenshot_files: {'reply.png': 'aW1hZ2UtZGF0YQ=='},
     });
   }));
@@ -321,7 +321,7 @@ describe('Feedback backend api service', () => {
     expect(req.request.body).toEqual({
       action: 'fixed',
       message: 'Thanks for the report.',
-      screenshot_filename: 'reply.png',
+      screenshotFilename: 'reply.png',
       files: {
         'reply.png': 'aW1hZ2UtZGF0YQ==',
       },
@@ -348,7 +348,7 @@ describe('Feedback backend api service', () => {
     expect(req.request.body).toEqual({
       action: null,
       message: 'Thanks for the report.',
-      screenshot_filename: 'reply.png',
+      screenshotFilename: 'reply.png',
       files: null,
     });
     req.flush(null);
@@ -371,7 +371,7 @@ describe('Feedback backend api service', () => {
     expect(req.request.body).toEqual({
       action: 'Compliment',
       message: null,
-      screenshot_filename: null,
+      screenshotFilename: null,
       files: null,
     });
     req.flush(null);
