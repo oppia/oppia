@@ -85,6 +85,15 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             html_validation_service.wrap_with_siblings(tag, soup.new_tag('p'))
             self.assertEqual(str(soup), test_case['expected_output'])
 
+    def test_wrap_with_siblings_with_no_next_siblings(self) -> None:
+        # Tests 69->exit: the tag has no next siblings so the
+        # for loop exits immediately without entering.
+        html_content = '<p>hello</p><b>world</b>'
+        soup = bs4.BeautifulSoup(html_content, 'html.parser')
+        tag = soup.find(name='b')
+        html_validation_service.wrap_with_siblings(tag, soup.new_tag('p'))
+        self.assertEqual(str(soup), '<p>hello</p><p><b>world</b></p>')
+
     def test_validate_rte_format(self) -> None:
         test_cases_for_ckeditor = [
             (
@@ -203,6 +212,23 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             actual_output_for_ckeditor, expected_output_for_ckeditor
         )
 
+    def test_validate_rte_format_with_valid_collapsible(self) -> None:
+        # Tests 441->424: collapsible has valid content-with-value
+        # so validate_soup_for_rte returns False, meaning is_invalid
+        # is False and the if is_invalid block at line 441 is skipped.
+        test_cases = [
+            (
+                '<oppia-noninteractive-collapsible content-with-value="&amp;'
+                'quot;&amp;lt;p&amp;gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;"'
+                ' heading-with-value="&amp;quot;hello&amp;quot;">'
+                '</oppia-noninteractive-collapsible>'
+            ),
+        ]
+        actual_output = html_validation_service.validate_rte_format(
+            test_cases, feconf.RTE_FORMAT_CKEDITOR
+        )
+        self.assertEqual(actual_output['strings'], [])
+
     def test_validate_soup_for_rte(self) -> None:
         test_cases_for_textangular = [
             (
@@ -269,6 +295,94 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 actual_output_for_ckeditor, expected_output_for_ckeditor[index]
             )
+
+    def test_validate_rte_format_with_valid_tab_content(self) -> None:
+        # Tests 457->449: tab content is valid RTE so is_invalid
+        # is False and the if is_invalid block is skipped.
+        test_cases = [
+            (
+                '<oppia-noninteractive-tabs tab_contents-with-value'
+                '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;'
+                'lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;,&amp;quot;title'
+                '&amp;quot;:&amp;quot;tab1&amp;quot;}]\">'
+                '</oppia-noninteractive-tabs>'
+            ),
+        ]
+        actual_output = html_validation_service.validate_rte_format(
+            test_cases, feconf.RTE_FORMAT_CKEDITOR
+        )
+        self.assertEqual(actual_output['strings'], [])
+
+    def test_validate_rte_format_with_valid_workedexample(self) -> None:
+        # Tests 491->460: workedexample has valid question and answer
+        # so is_invalid is False and the if block at line 491 is skipped.
+        test_cases = [
+            (
+                '<oppia-noninteractive-workedexample question-with-value="&amp;'
+                'quot;&amp;lt;p&amp;gt;question&amp;lt;/p&amp;gt;&amp;quot;"'
+                ' answer-with-value="&amp;quot;&amp;lt;p&amp;gt;answer&amp;'
+                'lt;/p&amp;gt;&amp;quot;">'
+                '</oppia-noninteractive-workedexample>'
+            ),
+        ]
+        actual_output = html_validation_service.validate_rte_format(
+            test_cases, feconf.RTE_FORMAT_CKEDITOR
+        )
+        self.assertEqual(actual_output['strings'], [])
+
+    def test_validate_customization_args_with_empty_err_msg(self) -> None:
+        # Tests 582->581: err_msg is empty string so if err_msg is False
+        # and the loop continues to next iteration.
+        # self.swap_to_always_return is Oppia's built-in mocking utility that replaces validate_customization_args_in_tag with a function that always returns ['']
+        html = (
+            '<p><oppia-noninteractive-link text-with-value="&amp;quot;'
+            'What is a link?&amp;quot;" url-with-value="&amp;quot;'
+            'htt://link.com&amp;quot;"></oppia-noninteractive-link></p>'
+        )
+        with self.swap_to_always_return(
+            html_validation_service, 'validate_customization_args_in_tag', ['']
+        ):
+            actual_output = html_validation_service.validate_customization_args(
+                [html]
+            )
+        self.assertEqual(actual_output, {})
+
+    def test_validate_customization_args_with_duplicate_html_string(
+        self,
+    ) -> None:
+        # Tests 585->581: same html_string already exists in err_dict
+        # for the same err_msg so the elif condition is False.
+        duplicate_html = (
+            '<p><oppia-noninteractive-link text-with-value="&amp;quot;What is '
+            'a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com&amp;'
+            'quot;"></oppia-noninteractive-link></p>'
+        )
+        test_cases = [duplicate_html, duplicate_html]
+        actual_output = html_validation_service.validate_customization_args(
+            test_cases
+        )
+        self.assertGreater(len(actual_output), 0)
+
+    def test_validate_customization_args_with_existing_html_string(
+        self,
+    ) -> None:
+        # Tests 585->581: html_string already exists in err_dict[err_msg]
+        # so the elif condition is False and the loop continues.
+        html = (
+            '<p><oppia-noninteractive-link text-with-value="&amp;quot;What is '
+            'a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com&amp;'
+            'quot;"></oppia-noninteractive-link></p>'
+        )
+        err_msg = 'Expected a valid URL, got htt://link.com'
+        with self.swap_to_always_return(
+            html_validation_service,
+            'validate_customization_args_in_tag',
+            [err_msg, err_msg],
+        ):
+            actual_output = html_validation_service.validate_customization_args(
+                [html]
+            )
+        self.assertGreater(len(actual_output), 0)
 
     def test_validate_customization_args(self) -> None:
         test_cases = [
@@ -958,6 +1072,20 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 ),
                 'expected_output': 'blahblah',
             },
+            {
+                # if math tag has svg_filename-with-value
+                'html_content': (
+                    '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;'
+                    'x^2&amp;quot;" svg_filename-with-value="&amp;quot;'
+                    'img.svg&amp;quot;"></oppia-noninteractive-math>'
+                ),
+                'expected_output': (
+                    '<oppia-noninteractive-math math_content-with-value="{&amp;'
+                    'quot;raw_latex&amp;quot;: &amp;quot;x^2&amp;quot;, &amp;'
+                    'quot;svg_filename&amp;quot;: &amp;quot;img.svg&amp;quot;}">'
+                    '</oppia-noninteractive-math>'
+                ),
+            },
         ]
 
         for test_case in test_cases:
@@ -1629,3 +1757,44 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 ),
                 test_case['expected_output'],
             )
+
+    def test_fix_incorrectly_encoded_chars_collapsible_without_content(
+        self,
+    ) -> None:
+        # Tests 1102->1101: collapsible does NOT have content-with-value
+        # so the if block is skipped and loop continues.
+        html = (
+            '<oppia-noninteractive-collapsible '
+            'heading-with-value="&amp;quot;hello&amp;quot;">'
+            '</oppia-noninteractive-collapsible>'
+        )
+        result = html_validation_service.fix_incorrectly_encoded_chars(html)
+        self.assertIn('oppia-noninteractive-collapsible', result)
+
+    def test_fix_incorrectly_encoded_chars_workedexample_without_question(
+        self,
+    ) -> None:
+        # Tests 1133->1147: workedexample does NOT have question-with-value
+        # so the if block is skipped and jumps to line 1147.
+        html = (
+            '<oppia-noninteractive-workedexample '
+            'answer-with-value="&amp;quot;&amp;lt;p&amp;gt;'
+            'answer&amp;lt;/p&amp;gt;&amp;quot;">'
+            '</oppia-noninteractive-workedexample>'
+        )
+        result = html_validation_service.fix_incorrectly_encoded_chars(html)
+        self.assertIn('oppia-noninteractive-workedexample', result)
+
+    def test_fix_incorrectly_encoded_chars_workedexample_without_answer(
+        self,
+    ) -> None:
+        # Tests 1147->1130: workedexample does NOT have answer-with-value
+        # so the if block is skipped and loop goes back to line 1130.
+        html = (
+            '<oppia-noninteractive-workedexample '
+            'question-with-value="&amp;quot;&amp;lt;p&amp;gt;'
+            'question&amp;lt;/p&amp;gt;&amp;quot;">'
+            '</oppia-noninteractive-workedexample>'
+        )
+        result = html_validation_service.fix_incorrectly_encoded_chars(html)
+        self.assertIn('oppia-noninteractive-workedexample', result)
