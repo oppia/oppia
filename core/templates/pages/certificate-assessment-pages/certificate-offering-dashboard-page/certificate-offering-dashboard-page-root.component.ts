@@ -13,13 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Certificate-offering-page-root component.
+ * @fileoverview Certificate offering dashboard page root component.
  */
 
 import {Component} from '@angular/core';
+
+import {AppConstants} from 'app.constants';
+import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 
 @Component({
   selector: 'oppia-certificate-offering-dashboard-page-root',
   templateUrl: './certificate-offering-dashboard-page-root.component.html',
 })
-export class CertificateOfferingDashboardPageRootComponent {}
+export class CertificateOfferingDashboardPageRootComponent extends BaseRootComponent {
+  title: string =
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_DASHBOARD
+      .TITLE;
+
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+    .CERTIFICATE_OFFERING_DASHBOARD.META as unknown as Readonly<MetaTagData>[];
+}
