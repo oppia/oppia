@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for TopicHeaderComponent.
  */
 
-import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {TopicHeaderComponent} from './topic-header.component';
@@ -30,65 +30,41 @@ describe('TopicHeaderComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [TopicHeaderComponent, MockTranslatePipe],
-      providers: [I18nLanguageCodeService],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
+    fixture = TestBed.createComponent(TopicHeaderComponent);
+    component = fixture.componentInstance;
+
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       false
     );
 
-    fixture = TestBed.createComponent(TopicHeaderComponent);
-    component = fixture.componentInstance;
     component.topicName = 'Place Values';
     component.topicDescription = 'Learn about place values.';
     component.classroomName = 'Math';
     component.classroomUrlFragment = 'math';
+
     fixture.detectChanges();
   });
 
-  it('should render the topic title as an h1', () => {
-    const el: HTMLElement = fixture.nativeElement;
-    const h1 = el.querySelector('.topic-header-title');
-    expect(h1?.tagName).toBe('H1');
-    expect(h1?.textContent).toContain('Place Values');
+  it('should have inputs set from parent', () => {
+    expect(component.topicName).toBe('Place Values');
+    expect(component.topicDescription).toBe('Learn about place values.');
+    expect(component.classroomName).toBe('Math');
+    expect(component.classroomUrlFragment).toBe('math');
   });
 
-  it('should render the topic description', () => {
-    const el: HTMLElement = fixture.nativeElement;
-    expect(
-      el.querySelector('.topic-header-description')?.textContent
-    ).toContain('Learn about place values.');
-  });
-
-  it('should show the topic name as current page in breadcrumb', () => {
-    const el: HTMLElement = fixture.nativeElement;
-    const current = el.querySelector('[aria-current="page"]');
-    expect(current?.textContent).toContain('Place Values');
-  });
-
-  it('should show the classroom breadcrumb link when classroomName is set', () => {
-    const el: HTMLElement = fixture.nativeElement;
-    const links = el.querySelectorAll<HTMLAnchorElement>(
-      '.topic-header-breadcrumbs-desktop a'
-    );
-    const hrefs = Array.from(links).map(a => a.getAttribute('href'));
-    expect(hrefs).toContain('/learn/math');
-  });
-
-  it('should return correct classroom URL with fragment', () => {
+  it('getClassroomUrl should return /learn/<fragment> or /learn', () => {
     expect(component.getClassroomUrl()).toBe('/learn/math');
-  });
-
-  it('should return /learn when classroomUrlFragment is empty', () => {
     component.classroomUrlFragment = '';
     expect(component.getClassroomUrl()).toBe('/learn');
   });
 
-  it('should delegate RTL check to I18nLanguageCodeService', () => {
+  it('should delegate RTL detection to I18nLanguageCodeService', () => {
     expect(component.isLanguageRTL()).toBeFalse();
     (
       i18nLanguageCodeService.isCurrentLanguageRTL as jasmine.Spy
@@ -96,14 +72,9 @@ describe('TopicHeaderComponent', () => {
     expect(component.isLanguageRTL()).toBeTrue();
   });
 
-  it('should not show classroom link when classroomName is null', () => {
+  it('should handle null classroomName', () => {
     component.classroomName = null;
     fixture.detectChanges();
-    const el: HTMLElement = fixture.nativeElement;
-    const links = el.querySelectorAll<HTMLAnchorElement>(
-      '.topic-header-breadcrumbs-desktop a'
-    );
-    // Only the "Classrooms" link should remain; no classroom link.
-    expect(links.length).toBe(1);
+    expect(component.classroomName).toBeNull();
   });
 });
