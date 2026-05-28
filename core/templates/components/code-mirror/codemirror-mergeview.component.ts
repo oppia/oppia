@@ -28,6 +28,12 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {
+  diff_match_patch,
+  DIFF_INSERT,
+  DIFF_DELETE,
+  DIFF_EQUAL,
+} from 'diff_match_patch/lib/diff_match_patch';
 
 @Component({
   selector: 'oppia-codemirror-mergeview',
@@ -61,6 +67,17 @@ export class CodemirrorMergeviewComponent
   }
 
   ngAfterViewInit(): void {
+    const nativeWindow = this.windowRef.nativeWindow as Window & {
+      diff_match_patch?: typeof diff_match_patch;
+      DIFF_INSERT?: typeof DIFF_INSERT;
+      DIFF_DELETE?: typeof DIFF_DELETE;
+      DIFF_EQUAL?: typeof DIFF_EQUAL;
+    };
+    nativeWindow.diff_match_patch = diff_match_patch;
+    nativeWindow.DIFF_INSERT = DIFF_INSERT;
+    nativeWindow.DIFF_DELETE = DIFF_DELETE;
+    nativeWindow.DIFF_EQUAL = DIFF_EQUAL;
+
     // 'value', 'orig' are initial values of left and right
     // pane respectively.
     this.ngZone.runOutsideAngular(() => {

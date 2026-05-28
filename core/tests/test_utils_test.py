@@ -38,7 +38,7 @@ from core.tests import test_utils
 
 import elasticsearch
 import webapp2
-from typing import Callable, Final, List, OrderedDict, Tuple
+from typing import Callable, Dict, Final, List, OrderedDict, Tuple
 
 email_services = models.Registry.import_email_services()
 
@@ -1005,14 +1005,13 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         already present in the result set, ensuring branch coverage.
         """
         stub = test_utils.ElasticSearchStub()
-        # pylint: disable=protected-access
-        stub._DB['index1'] = [
+        stub._DB['index1'] = [  # pylint: disable=protected-access
             {'id': 'duplicate_id_1', 'data': 'first_doc'},
             {'id': 'duplicate_id_1', 'data': 'second_doc'},
         ]
-        # pylint: enable=protected-access
-        body = {'query': {'bool': {'filter': [], 'must': []}}}
-
+        body: Dict[str, Dict[str, Dict[str, List[dict]]]] = {
+            'query': {'bool': {'filter': [], 'must': []}}
+        }
         result = stub.mock_search(body=body, index='index1', size=10, from_=0)
 
         hits = result['hits']['hits']

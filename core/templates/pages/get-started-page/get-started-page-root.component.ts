@@ -16,9 +16,10 @@
  * @fileoverview Root component for get started page.
  */
 
-import {Component, OnDestroy} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
+import {Meta} from '@angular/platform-browser';
 
 import {AppConstants} from 'app.constants';
 import {PageHeadService} from 'services/page-head.service';
@@ -27,21 +28,48 @@ import {PageHeadService} from 'services/page-head.service';
   selector: 'oppia-get-started-page-root',
   templateUrl: './get-started-page-root.component.html',
 })
-export class GetStartedPageRootComponent implements OnDestroy {
+export class GetStartedPageRootComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+
   constructor(
     private pageHeadService: PageHeadService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private meta: Meta
   ) {}
 
   setPageTitleAndMetaTags(): void {
-    let translatedTitle = this.translateService.instant(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.TITLE
-    );
-    this.pageHeadService.updateTitleAndMetaTags(
-      translatedTitle,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.META
-    );
+    this.translateService
+      .get(AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.TITLE)
+      .subscribe((translatedTitle: string) => {
+        this.pageHeadService.updateTitleAndMetaTags(
+          translatedTitle,
+          AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.META
+        );
+
+        // 1. The itemprop tags (You already fixed these!)
+        this.meta.updateTag({
+          itemprop: 'name',
+          content: 'Personalized Online Learning from Oppia',
+        });
+        this.meta.updateTag({
+          itemprop: 'description',
+          content: 'Learn how to get started using Oppia.',
+        });
+
+        // 2. NEW: The Open Graph (og:) tags for the current test
+        this.meta.updateTag({
+          property: 'og:title',
+          content: 'Personalized Online Learning from Oppia',
+        });
+        this.meta.updateTag({
+          property: 'og:description',
+          content: 'Learn how to get started using Oppia.',
+        });
+        this.meta.updateTag({
+          property: 'og:url',
+          content: 'https://www.oppia.org/get-started',
+        });
+      });
   }
 
   ngOnInit(): void {
