@@ -1534,7 +1534,18 @@ export class BaseUser {
     visibility: boolean = true,
     context: Page | ElementHandle<Element> = this.page
   ): Promise<void> {
-    await context.waitForSelector(selector, {visible: visibility});
+    if (visibility) {
+      await context.waitForSelector(selector, {visible: true});
+    } else {
+      await context.waitForFunction(
+        (sel: string) => {
+          const el = document.querySelector(sel);
+          return !el || (el as HTMLElement).offsetParent === null;
+        },
+        {},
+        selector
+      );
+    }
     showMessage(`Element ${selector} is ${visibility ? 'visible' : 'hidden'}.`);
   }
 
