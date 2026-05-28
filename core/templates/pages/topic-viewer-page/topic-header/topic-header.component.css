@@ -36,10 +36,10 @@
 
 .topic-header-title {
   font-family: 'Capriola', sans-serif;
-  font-weight: 400;
   font-size: 36px;
+  font-weight: 400;
+  color: #00645c;
   line-height: 56px;
-  color: #00645C;
 }
 
 .topic-header-description {
@@ -59,9 +59,9 @@
   }
   .topic-header-title {
     font-family: 'Capriola', sans-serif;
-    font-weight: 400;
     font-size: 24px;
+    font-weight: 400;
+    color: #00645c;
     line-height: 32px;
-    color: #00645C;
   }
 }
