@@ -1532,7 +1532,7 @@ export class BaseUser {
   async expectElementToBeVisible(
     selector: string,
     visibility: boolean = true,
-    context: Page | ElementHandle<Element> = this.page
+    context: Page = this.page
   ): Promise<void> {
     if (visibility) {
       await context.waitForSelector(selector, {visible: true});

@@ -146,11 +146,8 @@ export class CollectionEditor extends BaseUser {
     }
 
     const nodeElement = nodes[index];
-    await this.expectElementToBeVisible(
-      arrowSelector,
-      shouldBeVisible,
-      nodeElement
-    );
+    const waitConfig = shouldBeVisible ? {visible: true} : {hidden: true};
+    await nodeElement.waitForSelector(arrowSelector, waitConfig);
 
     const visibilityText = shouldBeVisible ? 'visible' : 'hidden';
     showMessage(
