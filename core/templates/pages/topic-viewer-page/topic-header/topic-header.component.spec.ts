@@ -18,7 +18,10 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {
+  I18nLanguageCodeService,
+  TranslationKeyType,
+} from 'services/i18n-language-code.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {TopicHeaderComponent} from './topic-header.component';
 
@@ -39,10 +42,32 @@ describe('TopicHeaderComponent', () => {
     component = fixture.componentInstance;
 
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValues(
+      'topic.title.translation.key',
+      'topic.description.translation.key'
+    );
+    spyOn(
+      i18nLanguageCodeService,
+      'getClassroomTranslationKeys'
+    ).and.returnValue({
+      name: 'classroom.name.translation.key',
+    } as ReturnType<I18nLanguageCodeService['getClassroomTranslationKeys']>);
+    spyOn(
+      i18nLanguageCodeService,
+      'isHackyTranslationAvailable'
+    ).and.returnValue(false);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
+      true
+    );
+    spyOn(
+      i18nLanguageCodeService,
+      'isClassroomnNameTranslationAvailable'
+    ).and.returnValue(false);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       false
     );
 
+    component.topicId = 'topic_id';
     component.topicName = 'Place Values';
     component.topicDescription = 'Learn about place values.';
     component.classroomName = 'Math';
@@ -58,7 +83,7 @@ describe('TopicHeaderComponent', () => {
     expect(component.classroomUrlFragment).toBe('math');
   });
 
-  it('getClassroomUrl should return /learn/<fragment> or /learn', () => {
+  it('should return /learn/<fragment> or /learn', () => {
     expect(component.getClassroomUrl()).toBe('/learn/math');
     component.classroomUrlFragment = '';
     expect(component.getClassroomUrl()).toBe('/learn');
@@ -76,5 +101,88 @@ describe('TopicHeaderComponent', () => {
     component.classroomName = null;
     fixture.detectChanges();
     expect(component.classroomName).toBeNull();
+  });
+
+  it('should initialize topic and classroom translation keys on init', () => {
+    expect(i18nLanguageCodeService.getTopicTranslationKey).toHaveBeenCalledWith(
+      'topic_id',
+      TranslationKeyType.TITLE
+    );
+    expect(i18nLanguageCodeService.getTopicTranslationKey).toHaveBeenCalledWith(
+      'topic_id',
+      TranslationKeyType.DESCRIPTION
+    );
+    expect(
+      i18nLanguageCodeService.getClassroomTranslationKeys
+    ).toHaveBeenCalledWith('Math');
+    expect(component.topicNameTranslationKey).toBe(
+      'topic.title.translation.key'
+    );
+    expect(component.topicDescTranslationKey).toBe(
+      'topic.description.translation.key'
+    );
+    expect(component.classroomNameTranslationKey).toBe(
+      'classroom.name.translation.key'
+    );
+  });
+
+  it('should not fetch classroom translation key when classroomName is null', () => {
+    component.classroomName = null;
+
+    component.ngOnInit();
+
+    expect(
+      i18nLanguageCodeService.getClassroomTranslationKeys
+    ).toHaveBeenCalledTimes(1);
+  });
+
+  it('should show hacky topic name translation when available and non-english', () => {
+    (
+      i18nLanguageCodeService.isHackyTranslationAvailable as jasmine.Spy
+    ).and.returnValue(true);
+    (
+      i18nLanguageCodeService.isCurrentLanguageEnglish as jasmine.Spy
+    ).and.returnValue(false);
+
+    expect(component.isHackyTopicNameTranslationDisplayed()).toBeTrue();
+  });
+
+  it('should not show hacky topic name translation in english', () => {
+    (
+      i18nLanguageCodeService.isHackyTranslationAvailable as jasmine.Spy
+    ).and.returnValue(true);
+    (
+      i18nLanguageCodeService.isCurrentLanguageEnglish as jasmine.Spy
+    ).and.returnValue(true);
+
+    expect(component.isHackyTopicNameTranslationDisplayed()).toBeFalse();
+  });
+
+  it('should show hacky topic description translation when available and non-english', () => {
+    (
+      i18nLanguageCodeService.isHackyTranslationAvailable as jasmine.Spy
+    ).and.returnValue(true);
+    (
+      i18nLanguageCodeService.isCurrentLanguageEnglish as jasmine.Spy
+    ).and.returnValue(false);
+
+    expect(component.isHackyTopicDescTranslationDisplayed()).toBeTrue();
+  });
+
+  it('should not show hacky classroom translation when classroomName is null', () => {
+    component.classroomName = null;
+
+    expect(component.isHackyClassroomNameTranslationDisplayed()).toBeFalse();
+  });
+
+  it('should delegate hacky classroom translation availability to service', () => {
+    (
+      i18nLanguageCodeService.isClassroomnNameTranslationAvailable as jasmine.Spy
+    ).and.returnValue(true);
+
+    expect(component.isHackyClassroomNameTranslationDisplayed()).toBeTrue();
+    expect(
+      i18nLanguageCodeService.isClassroomnNameTranslationAvailable
+    ).toHaveBeenCalledWith('Math');
   });
 });

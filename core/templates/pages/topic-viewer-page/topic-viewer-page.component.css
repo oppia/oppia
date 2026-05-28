@@ -4,23 +4,23 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 topic-viewer-page {
-  background-color: #ffffff;
+  background-color: #fff;
   display: block;
   min-height: 100vh;
 }
 
 topic-viewer-page .oppia-redesigned-topic-viewer-container {
+  background-color: #fff;
   padding: 24px 48px 0;
   text-align: start;
-  background-color: #ffffff;
 }
 
 topic-viewer-page .oppia-topic-viewer-container {
+  background-color: #fff;
   color: black;
   margin: 0 auto;
   text-align: left;
   text-decoration: none;
-  background-color: #ffffff;
 }
 
 topic-viewer-page .navbar-light .navbar-container {
