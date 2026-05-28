@@ -36,11 +36,17 @@ describe('Logged-in User', function () {
 
   beforeAll(
     async function () {
+      console.log('Creating curriculum admin user...');
+
       curriculumAdmin = await UserFactory.createNewUser(
         'curriculumAdm',
         'curriculumAdmin@example.com',
         [ROLES.CURRICULUM_ADMIN]
       );
+
+      console.log('Curriculum admin user created.');
+
+      console.log('Creating release coordinator user...');
 
       releaseCoordinator = await UserFactory.createNewUser(
         'releaseCoordinator',
@@ -48,11 +54,24 @@ describe('Logged-in User', function () {
         [ROLES.RELEASE_COORDINATOR]
       );
 
+      console.log('Release coordinator user created.');
+
+      console.log('Enabling feature flag...');
+
       await releaseCoordinator.enableFeatureFlag(
         'show_redesigned_learner_dashboard'
       );
 
+      console.log('Feature flag enabled.');
+
+      console.log('Creating classroom...');
+
       await curriculumAdmin.createNewClassroom('Math', 'math');
+
+      console.log('Classroom created.');
+
+      console.log('Updating classroom...');
+
       await curriculumAdmin.updateClassroom(
         'Math',
         'Welcome to Math classroom!',
@@ -60,16 +79,29 @@ describe('Logged-in User', function () {
         'In this course, you will learn the following topics: Place Values.'
       );
 
+      console.log('Classroom updated.');
+
+      console.log('Creating and publishing topic...');
+
       await curriculumAdmin.createAndPublishTopic(
         'Place Values',
         'Place Values subtopics',
         'Place Values skills'
       );
+
+      console.log('Topic created and published.');
+
+      console.log('Adding topic to classroom...');
+
       await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
+
+      console.log('Topic added to classroom.');
+
+      console.log('Publishing classroom...');
+
       await curriculumAdmin.publishClassroom('Math');
 
-      await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-      await curriculumAdmin.waitForPageToFullyLoad();
+      console.log('Classroom published.');
 
       const placeValueChapters = [
         'What are the Place Values',
@@ -79,11 +111,22 @@ describe('Logged-in User', function () {
 
       const chapterIds: (string | null)[] = [];
 
+      console.log('Creating and publishing explorations...');
+
       for (const chapter of placeValueChapters) {
+        console.log(`Creating exploration: ${chapter}`);
+
         const id =
           await curriculumAdmin.createAndPublishExplorationWithCards(chapter);
+
+        console.log(`Exploration created and published: ${chapter}`);
+
         chapterIds.push(id);
       }
+
+      console.log('All explorations created.');
+
+      console.log('Adding story to topic...');
 
       await curriculumAdmin.addStoryToTopic(
         "Jamie's Adventures in the Arcade",
@@ -91,23 +134,45 @@ describe('Logged-in User', function () {
         'Place Values'
       );
 
+      console.log('Story added to topic.');
+
+      console.log('Adding chapters to story...');
+
       for (const [index, id] of chapterIds.entries()) {
+        console.log(`Adding chapter: ${placeValueChapters[index]}`);
+
         await curriculumAdmin.addChapter(
           placeValueChapters[index],
           id as string
         );
+
+        console.log(`Chapter added: ${placeValueChapters[index]}`);
       }
 
+      console.log('All chapters added.');
+
+      console.log('Saving story draft...');
+
       await curriculumAdmin.saveStoryDraft();
+
+      console.log('Story draft saved.');
+
+      console.log('Publishing story draft...');
+
       await curriculumAdmin.publishStoryDraft();
 
-      await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-      await curriculumAdmin.waitForPageToFullyLoad();
+      console.log('Story draft published.');
+
+      console.log('Creating logged in user...');
 
       loggedInUser = await UserFactory.createNewUser(
         'loggedInUser1',
         'logged_in_user1@example.com'
       );
+
+      console.log('Logged in user created.');
+
+      console.log('beforeAll setup completed successfully.');
     },
     // Setup takes about 12 minutes to complete.
     12 * 60 * 1000
@@ -129,12 +194,20 @@ describe('Logged-in User', function () {
   it(
     'should navigate to the new learner dashboard',
     async function () {
+      console.log('Navigating to learner dashboard...');
+
       await loggedInUser.navigateToLearnerDashboard();
+
+      console.log('Successfully navigated to learner dashboard.');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {
+    console.log('Closing all browsers...');
+
     await UserFactory.closeAllBrowsers();
+
+    console.log('All browsers closed.');
   });
 });
