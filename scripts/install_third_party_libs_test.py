@@ -808,9 +808,17 @@ class SetupTests(test_utils.GenericTestBase):
     def test_install_playwright_node_with_non_x64_architecture(
         self,
     ) -> None:
+        all_cmd_tokens: List[str] = []
+
+        def mock_check_call(cmd_tokens: List[str]) -> None:
+            all_cmd_tokens.extend(cmd_tokens)
+
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+
         with self.download_swap, self.rename_swap, self.exists_false_swap:
-            with self.is_x64_architecture_false_swap:
-                install_third_party_libs.install_playwright_node()
+            with self.is_x64_architecture_false_swap, self.cd_swap:
+                with check_call_swap:
+                    install_third_party_libs.install_playwright_node()
 
         self.assertEqual(
             self.urls,
@@ -822,6 +830,7 @@ class SetupTests(test_utils.GenericTestBase):
                 )
             ],
         )
+        self.assertEqual(all_cmd_tokens, ['./configure', 'make'])
 
     def test_install_playwright_node_skips_if_already_installed(
         self,

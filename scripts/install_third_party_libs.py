@@ -204,6 +204,11 @@ def install_playwright_node() -> None:
             common.PLAYWRIGHT_NODE_PATH,
         )
 
+        if node_file_name == 'node-v%s' % common.PLAYWRIGHT_NODE_VERSION:
+            with common.CD(common.PLAYWRIGHT_NODE_PATH):
+                subprocess.check_call(['./configure'])
+                subprocess.check_call(['make'])
+
     print('Playwright Node is installed.')
 
 
