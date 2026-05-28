@@ -21,6 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 from core.tests import test_utils
+from core import utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -123,6 +124,27 @@ class CertificateAssessmentOfferingModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             snapshot_model.content['title'], 'Updated Cryptography Course'
         )
+
+    def test_create_raises_error_when_many_id_collisions_occur(self) -> None:
+        """Ensures the ID generator raises after exhausting retries."""
+        get_by_id_swap = self.swap(
+            certificate_models.CertificateAssessmentOfferingModel,
+            'get_by_id',
+            lambda *args, **kwargs: True,
+        )
+        convert_to_hash_swap = self.swap(
+            utils, 'convert_to_hash', lambda *args, **kwargs: 'duplicate-id'
+        )
+
+        with self.assertRaisesRegex(
+            Exception,
+            (
+                'The id generator for CertificateAssessmentOfferingModel '
+                'is producing too many collisions.'
+            ),
+        ):
+            with get_by_id_swap, convert_to_hash_swap:
+                certificate_models.CertificateAssessmentOfferingModel._get_new_id()
 
 
 class CertificateAssessmentOfferingCommitLogEntryModelUnitTest(
