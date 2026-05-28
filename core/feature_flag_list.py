@@ -99,6 +99,10 @@ class FeatureNames(enum.Enum):
     ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE = (
         'enable_financial_literacy_campaign_banner_test_mode'
     )
+    WEB_GENERAL_FEEDBACK_MODAL_ENABLED = 'web_general_feedback_modal_enabled'
+    EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB = (
+        'exploration_editor_new_creator_feedback_tab'
+    )
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -126,6 +130,8 @@ DEV_FEATURES_LIST = [
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
+    FeatureNames.WEB_GENERAL_FEEDBACK_MODAL_ENABLED,
+    FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -335,6 +341,19 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag enables the financial literacy campaign banner for the fundraising campaign in test mode.',
             feature_flag_domain.ServerMode.TEST,
+        )
+    ),
+    FeatureNames.WEB_GENERAL_FEEDBACK_MODAL_ENABLED.value: (
+        (
+            'This flag enables the global feedback entry button and feedback modal across web pages. ',
+            feature_flag_domain.ServerMode.DEV,
+        )
+    ),
+    FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB.value: (
+        (
+            'This flag enables the new creator feedback tab experience in '
+            'the exploration editor along with the updated feedback updates page UI.',
+            feature_flag_domain.ServerMode.DEV,
         )
     ),
 }
