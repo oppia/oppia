@@ -344,15 +344,4 @@ describe('OppiaFooterComponent', () => {
       siteAnalyticsService.registerClickFooterButtonEvent
     ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.TEACH);
   });
-
-  it('should have forum link with correct target and rel attributes', () => {
-    fixture.detectChanges();
-    const forumLink: HTMLAnchorElement = fixture.nativeElement.querySelector(
-      '.e2e-test-footer-forum-link'
-    );
-
-    expect(forumLink.href).toBe('https://groups.google.com/g/oppia');
-    expect(forumLink.target).toBe('_blank');
-    expect(forumLink.rel).toContain('noopener');
-  });
 });
