@@ -1957,6 +1957,10 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
                     'language_code': 'yo',
                     'explanation': 'For learners in Nigeria.',
                 },
+                {
+                    'language_code': 'ne',
+                    'explanation': 'For learners in Nepal.',
+                },
             ]
         }
         self.assertEqual(response, expected_response)
