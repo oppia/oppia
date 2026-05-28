@@ -33,6 +33,10 @@ interface ErrorResponse {
   status: number;
 }
 
+class CertificateAssessmentFeatureDisabledError extends Error {
+  status = 404;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -54,7 +58,7 @@ export class CertificateOfferingDashboardPageAuthGuard implements CanActivate {
         return true;
       }
 
-      throw {status: 404};
+      throw new CertificateAssessmentFeatureDisabledError();
     } catch (err) {
       const errorResponse = err as ErrorResponse;
       await this.router.navigate([
