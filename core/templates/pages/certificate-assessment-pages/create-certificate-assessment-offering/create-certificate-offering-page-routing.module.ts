@@ -19,12 +19,14 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 
+import {CreateCertificateOfferingPageAuthGuard} from './create-certificate-offering-page-auth.guard';
 import {CreateCertificateOfferingPageRootComponent} from './create-certificate-offering-page-root.component';
 
 const routes: Routes = [
   {
     path: '',
     component: CreateCertificateOfferingPageRootComponent,
+    canActivate: [CreateCertificateOfferingPageAuthGuard],
   },
 ];
 
