@@ -1222,6 +1222,18 @@ export class BaseUser {
     // To wait for all images to load and the page to be stable.
     await currentPage.waitForTimeout(5000);
 
+    // Disable all CSS transitions and animations before taking the
+    // screenshot to prevent snapshot mismatches caused by transitions
+    // being mid-way when the screenshot is captured.
+    const styleHandle = await currentPage.addStyleTag({
+      content: `
+        *, *::before, *::after {
+          transition: none !important;
+          animation: none !important;
+        }
+      `,
+    });
+
     /* The variable failureTrigger is the percentage of the difference between the stored screenshot and the current screenshot that would trigger a failure
      * In general, it is set as 0.04/4% (desktop) 0.042/4.2% (mobile) for the randomness of the page that are small enough to be ignored.
      * Based on the existence of the background/library banner, which are randomly selected from a set of four,
@@ -1302,6 +1314,9 @@ export class BaseUser {
         ' folder name should be something like new-snapshots_(suite-name)_desktop_original.' +
         ' The new screenshot(s) should end with "-received". When replacing the screenshot(s), make sure to change the postfix "-received" to "-snap".';
       throw new Error(errorMessage);
+    } finally {
+      // Remove the injected style tag so it doesn't affect subsequent actions.
+      await currentPage.evaluate(el => el.remove(), styleHandle);
     }
   }
 
