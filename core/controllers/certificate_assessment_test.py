@@ -81,13 +81,10 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response, {'certificate_id': 'dummy_id'})
 
     def test_delete_returns_empty_response(self) -> None:
-        csrf_token = self.get_new_csrf_token()
-
         response = self.delete_json(
             feconf.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER.replace(
                 '<certificate_id>', 'dummy_id'
-            ),
-            csrf_token=csrf_token,
+            )
         )
 
         self.assertEqual(response, {})

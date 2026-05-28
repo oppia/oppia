@@ -23,6 +23,7 @@ import {
   flushMicrotasks,
 } from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {RouterTestingModule} from '@angular/router/testing';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 
@@ -38,6 +39,7 @@ describe('CertificateOfferingDashboardPageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
+      imports: [RouterTestingModule],
       declarations: [CertificateOfferingDashboardPageComponent],
       providers: [
         {

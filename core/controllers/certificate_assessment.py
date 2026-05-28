@@ -99,4 +99,5 @@ class CertificateAssessmentOfferingByIdHandler(
         Args:
             certificate_id: str. The ID of the certificate offering.
         """
+        del certificate_id
         self.render_json({})
