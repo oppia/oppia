@@ -43,4 +43,10 @@ export class TopicHeaderComponent {
       ? `/learn/${this.classroomUrlFragment}`
       : '/learn';
   }
+
+  getClassroomRouterLink(): string[] {
+    return this.classroomUrlFragment && this.classroomUrlFragment.length
+      ? ['/learn', this.classroomUrlFragment]
+      : ['/learn'];
+  }
 }

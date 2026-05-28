@@ -1,13 +1,13 @@
 <div class="topic-header-breadcrumbs" dir="auto">
   <div class="topic-header-breadcrumbs-desktop">
-    <span class="crumb"><a href="/learn">{{ 'I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT' | translate }}</a></span>
+    <span class="crumb"><a [routerLink]="['/learn']">{{ 'I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT' | translate }}</a></span>
     <span class="crumb">
       <i class="fa fa-angle-right" aria-hidden="true" *ngIf="!isLanguageRTL()"></i>
       <i class="fa fa-angle-left" aria-hidden="true" *ngIf="isLanguageRTL()"></i>
     </span>
 
     <span class="crumb" *ngIf="classroomName">
-      <a [href]="getClassroomUrl()" class="topic-header-breadcrumbs-link">{{ classroomName }}</a>
+      <a [routerLink]="getClassroomRouterLink()" class="topic-header-breadcrumbs-link">{{ classroomName }}</a>
     </span>
     <span class="crumb" *ngIf="classroomName">
       <i class="fa fa-angle-right" aria-hidden="true" *ngIf="!isLanguageRTL()"></i>
@@ -20,10 +20,10 @@
   </div>
   <div class="topic-header-breadcrumbs-mobile">
      <ng-container *ngIf="classroomName; else backToClassrooms">
-       <a [href]="getClassroomUrl()" class="e2e-test-mobile-breadcrumbs-classroom">Back to {{ classroomName }}</a>
+       <a [routerLink]="getClassroomRouterLink()" class="e2e-test-mobile-breadcrumbs-classroom">Back to {{ classroomName }}</a>
      </ng-container>
      <ng-template #backToClassrooms>
-       <a href="/learn" class="e2e-test-mobile-breadcrumbs-classroom">{{ 'I18N_BACK_TO_CLASSROOMS' | translate }}</a>
+       <a [routerLink]="['/learn']" class="e2e-test-mobile-breadcrumbs-classroom">{{ 'I18N_BACK_TO_CLASSROOMS' | translate }}</a>
      </ng-template>
   </div>
 </div>
