@@ -19,7 +19,7 @@
 .topic-header-breadcrumbs a,
 .topic-header-breadcrumbs span {
   color: #00645c;
-  font-family: 'Roboto', Arial, sans-serif;
+  font-family: Roboto, Arial, sans-serif;
   font-size: 14px;
   font-weight: 500;
 }
@@ -35,7 +35,7 @@
 }
 
 .topic-header-title {
-  font-family: 'Capriola', sans-serif;
+  font-family: Capriola, sans-serif;
   font-size: 36px;
   font-weight: 400;
   color: #00645c;
@@ -58,7 +58,7 @@
     margin-bottom: 12px;
   }
   .topic-header-title {
-    font-family: 'Capriola', sans-serif;
+    font-family: Capriola, sans-serif;
     font-size: 24px;
     font-weight: 400;
     color: #00645c;

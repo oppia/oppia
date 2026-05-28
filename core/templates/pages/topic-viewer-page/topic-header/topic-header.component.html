@@ -1,4 +1,4 @@
-<div class="topic-header-breadcrumbs">
+<nav class="topic-header-breadcrumbs" aria-label="Breadcrumb">
   <div class="topic-header-breadcrumbs-desktop">
     <a href="/learn">{{ 'I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT' | translate }}</a>
     <i class="fa fa-angle-right" aria-hidden="true" *ngIf="classroomName && !isLanguageRTL()"></i>
@@ -25,7 +25,7 @@
     </a>
     <a *ngIf="!classroomName" href="/learn">{{ 'I18N_BACK_TO_CLASSROOMS' | translate }}</a>
   </div>
-</div>
+</nav>
 
 <header class="topic-header">
   <h1 class="topic-header-title">
