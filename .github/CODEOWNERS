@@ -620,6 +620,8 @@
 /extensions/rich_text_components/ @oppia/lace-backend-reviewers
 /assets/rich_text_components_definitions.ts @oppia/lace-frontend-reviewers
 
+# Web User Feedback project.
+/core/templates/domain/feedback/ @oppia/lace-frontend-reviewers
 
 # Suggestion and feedback team.
 # Suggestion project.
@@ -629,7 +631,6 @@
 /core/templates/services/suggestion-modal.service*.ts @oppia/contributor-experience-team
 /core/templates/services/suggestions.service*.ts @oppia/contributor-experience-team
 /core/domain/contribution_stats_services*.py @oppia/contributor-experience-team
-
 
 # Feedback project.
 /core/controllers/feedback*.py @oppia/contributor-experience-team
