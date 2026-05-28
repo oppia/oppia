@@ -143,7 +143,16 @@ class CertificateAssessmentOfferingModelUnitTests(test_utils.GenericTestBase):
             ),
         ):
             with get_by_id_swap, convert_to_hash_swap:
-                certificate_models.CertificateAssessmentOfferingModel._get_new_id()
+                certificate_models.CertificateAssessmentOfferingModel.create(
+                    title='Collision Test',
+                    description='Exercises the retry exhaustion path.',
+                    classroom_id='classroom_id',
+                    topic_ids=['topic_id'],
+                    total_questions=1,
+                    time_limit_in_minutes=5,
+                    demonstrates=['Skill'],
+                    async_status='PENDING',
+                )
 
 
 class CertificateAssessmentOfferingCommitLogEntryModelUnitTest(
