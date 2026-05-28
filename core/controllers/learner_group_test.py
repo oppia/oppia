@@ -1471,6 +1471,8 @@ class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
             'You are not allowed to access this learner progress.',
         )
 
+        self.logout()
+
     def test_facilitator_can_fetch_shared_story_progress(self) -> None:
         learner_group_id = learner_group_fetchers.get_new_learner_group_id()
         learner_group_services.create_learner_group(
@@ -1502,6 +1504,7 @@ class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response[0]['exploration_id'], self.exp_id_1)
         self.assertEqual(response[0]['visited_checkpoints_count'], 1)
         self.assertEqual(response[0]['total_checkpoints_count'], 1)
+        self.logout()
 
 
 class LearnerGroupsFeatureStatusHandlerTests(test_utils.GenericTestBase):
