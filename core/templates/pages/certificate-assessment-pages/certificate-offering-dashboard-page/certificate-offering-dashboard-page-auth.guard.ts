@@ -29,6 +29,10 @@ import {
 import {AppConstants} from 'app.constants';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
+interface ErrorResponse {
+  status: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -43,21 +47,22 @@ export class CertificateOfferingDashboardPageAuthGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Promise<boolean> {
-    if (
-      this.platformFeatureService.status.EnableCertificateAssessment.isEnabled
-    ) {
-      return true;
-    }
+    try {
+      if (
+        this.platformFeatureService.status.EnableCertificateAssessment.isEnabled
+      ) {
+        return true;
+      }
 
-    return new Promise<boolean>(resolve => {
-      this.router
-        .navigate([
-          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
-        ])
-        .then(() => {
-          this.location.replaceState(state.url);
-          resolve(false);
-        });
-    });
+      throw {status: 404};
+    } catch (err) {
+      const errorResponse = err as ErrorResponse;
+      await this.router.navigate([
+        `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/${errorResponse.status}`,
+      ]);
+      this.location.replaceState(state.url);
+
+      return false;
+    }
   }
 }
