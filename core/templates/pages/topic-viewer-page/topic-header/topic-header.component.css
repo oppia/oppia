@@ -35,11 +35,11 @@
 }
 
 .topic-header-title {
-  color: #00645c;
-  font-family: 'Capriola', Roboto, Arial, sans-serif;
-  font-size: 32px;
-  font-weight: bold;
-  margin: 0 0 8px 0;
+  font-family: 'Capriola', sans-serif;
+  font-weight: 400;
+  font-size: 36px;
+  line-height: 56px;
+  color: #00645C;
 }
 
 .topic-header-description {
@@ -58,6 +58,10 @@
     margin-bottom: 12px;
   }
   .topic-header-title {
+    font-family: 'Capriola', sans-serif;
+    font-weight: 400;
     font-size: 24px;
+    line-height: 32px;
+    color: #00645C;
   }
 }
