@@ -424,6 +424,7 @@
         "core.jobs.batch_jobs.audit_non_existent_threads_messages_jobs_test",
         "conftest_test",
         "core.jobs.batch_jobs.audit_threads_with_missing_suggestions_jobs_test",
-        "core.jobs.batch_jobs.audit_stories_with_disconnected_node_ids_job_test"
+        "core.jobs.batch_jobs.audit_stories_with_disconnected_node_ids_job_test",
+        "core.controllers.certificate_assessment_test"
     ]
 }
