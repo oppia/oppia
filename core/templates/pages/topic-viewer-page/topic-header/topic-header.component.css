@@ -5,14 +5,17 @@
   font-size: 14px;
   margin-bottom: 8px;
 }
+
 .topic-header-breadcrumbs-desktop {
   align-items: center;
   display: flex;
   gap: 4px;
 }
+
 .topic-header-breadcrumbs-mobile {
   display: none;
 }
+
 .topic-header-breadcrumbs a,
 .topic-header-breadcrumbs span {
   color: #00645c;
@@ -20,14 +23,17 @@
   font-size: 14px;
   font-weight: 500;
 }
+
 .topic-header-breadcrumb-current {
   color: #333;
   font-weight: 400;
 }
+
 .topic-header {
   padding: 16px 0;
   background-color: #ffffff;
 }
+
 .topic-header-title {
   color: #00645c;
   font-family: 'Capriola', Roboto, Arial, sans-serif;
@@ -35,6 +41,7 @@
   font-weight: bold;
   margin: 0 0 8px 0;
 }
+
 .topic-header-description {
   color: #4a4a4a;
   font-family: Roboto, Arial, sans-serif;
