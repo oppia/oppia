@@ -21,7 +21,7 @@
  */
 
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
-import {TextInputAnswer} from 'interactions/answer-defs';
+import type {TextInputAnswer} from 'interactions/answer-defs';
 import {TextInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
