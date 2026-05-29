@@ -274,18 +274,3 @@ class CertificateAssessmentOfferingModel(base_models.VersionedModel):
         )
 
         return offering_instance
-
-    def save(
-        self,
-        committer_id: str,
-        commit_message: str,
-        commit_cmds: base_models.AllowedCommitCmdsListType,
-    ) -> None:
-        """Commits updates to the certificate assessment offering.
-
-        Args:
-            committer_id: str. ID of user making the change.
-            commit_message: str. Commit description message.
-            commit_cmds: list(dict). List of commands describing updates.
-        """
-        super().commit(committer_id, commit_message, commit_cmds)

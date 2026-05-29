@@ -99,6 +99,7 @@ class CertificateAssessmentOffering:
         self.async_status = async_status
         self.version = version
 
+    # Todo(#24717-M1.11): Implement validation for this domain object.
     def validate(self) -> None:
         """Validates the CertificateAssessmentOffering domain object.
 

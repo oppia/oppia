@@ -63,7 +63,7 @@ class CertificateAssessmentOfferingModelUnitTests(test_utils.GenericTestBase):
             total_questions=10,
             time_limit_in_minutes=25,
             demonstrates=['Data Hashing'],
-            async_status='COMPLETED',
+            async_status='Available',
         )
         offering_id = offering.id
 
@@ -79,7 +79,7 @@ class CertificateAssessmentOfferingModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(fetched_model.version, 1)
 
         fetched_model.title = 'Updated Cryptography Course'
-        fetched_model.save(
+        fetched_model.commit(
             feconf.SYSTEM_COMMITTER_ID,
             'Modified offering course title.',
             [
@@ -151,7 +151,7 @@ class CertificateAssessmentOfferingModelUnitTests(test_utils.GenericTestBase):
                     total_questions=1,
                     time_limit_in_minutes=5,
                     demonstrates=['Skill'],
-                    async_status='PENDING',
+                    async_status='Not_Ready',
                 )
 
 
@@ -175,7 +175,7 @@ class CertificateAssessmentOfferingCommitLogEntryModelUnitTest(
             total_questions=10,
             time_limit_in_minutes=15,
             demonstrates=['Testing Link'],
-            async_status='PENDING',
+            async_status='Blocked',
         )
 
         log_id = certificate_models.CertificateAssessmentOfferingCommitLogEntryModel.get_instance_id(
