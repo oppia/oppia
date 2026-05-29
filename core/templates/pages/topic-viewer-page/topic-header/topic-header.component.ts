@@ -17,6 +17,7 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
+import {UrlService} from 'services/contextual/url.service';
 import {
   I18nLanguageCodeService,
   TranslationKeyType,
@@ -33,13 +34,16 @@ export class TopicHeaderComponent implements OnInit {
   @Input() topicDescription!: string;
   @Input() topicId!: string;
   @Input() classroomName!: string | null;
-  @Input() classroomUrlFragment!: string;
+  classroomUrlFragment!: string;
 
   topicNameTranslationKey!: string;
   topicDescTranslationKey!: string;
   classroomNameTranslationKey!: string;
 
-  constructor(private i18nLanguageCodeService: I18nLanguageCodeService) {}
+  constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private urlService: UrlService
+  ) {}
 
   ngOnInit(): void {
     this.topicNameTranslationKey =
@@ -52,6 +56,9 @@ export class TopicHeaderComponent implements OnInit {
         this.topicId,
         TranslationKeyType.DESCRIPTION
       );
+
+    this.classroomUrlFragment =
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl();
 
     if (this.classroomName) {
       this.classroomNameTranslationKey =
