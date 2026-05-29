@@ -239,6 +239,65 @@ describe('Translation Modal Component', () => {
     expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(0);
   });
 
+  it('should invoke change detection when set of strings is updated', () => {
+    component.activeWrittenTranslation = ['old value'];
+    component.updateHtml(['new value']);
+
+    expect(component.activeWrittenTranslation).toEqual(['new value']);
+  });
+
+  it('should set validation errors and disable save when translation has missing custom tags', () => {
+    spyOn(component, 'ngOnInit').and.stub();
+    spyOn(component, 'computeTranslationEditorOverflowState').and.stub();
+    component.activeDataFormat = 'html';
+    component.loadingData = false;
+    component.textToTranslate =
+      '<p>Original text</p><oppia-noninteractive-skillreview>' +
+      '</oppia-noninteractive-skillreview>';
+
+    component.updateHtml('<p>Translated text</p>');
+    fixture.detectChanges();
+
+    const saveButton: HTMLButtonElement = fixture.nativeElement.querySelector(
+      '.e2e-test-save-button'
+    );
+
+    expect(saveButton).toBeTruthy();
+
+    expect(component.hasIncompleteTranslationError).toBe(true);
+    expect(component.hasSubmitValidationErrors()).toBe(true);
+    expect(saveButton.disabled).toBe(true);
+  });
+
+  it('should clear validation errors and enable save after translated custom tags are added', () => {
+    spyOn(component, 'ngOnInit').and.stub();
+    spyOn(component, 'computeTranslationEditorOverflowState').and.stub();
+    component.activeDataFormat = 'html';
+    component.loadingData = false;
+    component.textToTranslate =
+      '<p>Original text</p><oppia-noninteractive-skillreview>' +
+      '</oppia-noninteractive-skillreview>';
+    component.updateHtml('<p>Translated text</p>');
+    fixture.detectChanges();
+
+    const saveButton: HTMLButtonElement = fixture.nativeElement.querySelector(
+      '.e2e-test-save-button'
+    );
+
+    expect(saveButton).toBeTruthy();
+    expect(saveButton.disabled).toBe(true);
+
+    component.updateHtml(
+      '<p>Translated text</p><oppia-noninteractive-skillreview>' +
+        '</oppia-noninteractive-skillreview>'
+    );
+    fixture.detectChanges();
+
+    expect(component.hasIncompleteTranslationError).toBe(false);
+    expect(component.hasSubmitValidationErrors()).toBe(false);
+    expect(saveButton.disabled).toBe(false);
+  });
+
   it('should return the ExoansionTabType enum', () => {
     let enumVariable = component.expansionTabType;
     expect(typeof enumVariable === typeof ExpansionTabType);
