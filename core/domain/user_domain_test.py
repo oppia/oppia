@@ -1994,7 +1994,7 @@ class UserSettingsProfileNameTests(test_utils.GenericTestBase):
             self.user_settings.validate()
 
     def test_validate_too_long_profile_name_raises_error(self) -> None:
-        self.user_settings.profile_name = 'A' * 51
+        self.user_settings.profile_name = 'A' * 101
         with self.assertRaisesRegex(
             utils.ValidationError, 'profile_name cannot be longer than'
         ):

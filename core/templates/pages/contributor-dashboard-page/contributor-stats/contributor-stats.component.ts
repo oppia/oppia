@@ -252,9 +252,9 @@ export class ContributorStatsComponent {
       this.profileNameErrorMessage = 'Name cannot be empty.';
       return;
     }
-    if (this.profileNameInput.length > 50) {
+    if (this.profileNameInput.length > 100) {
       this.profileNameErrorMessage =
-        'Name cannot be longer than 50 characters.';
+        'Name cannot be longer than 100 characters.';
       return;
     }
     this.isSubmitting = true;

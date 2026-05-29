@@ -26,8 +26,7 @@ from core.constants import constants
 
 from typing import Dict, List, Optional, TypedDict
 
-MAX_PROFILE_NAME_LENGTH = 50
-
+MAX_PROFILE_NAME_LENGTH = 100
 
 # TODO(#15105): Refactor UserSettings to limit the number of Optional
 # fields used in UserSettingsDict.
