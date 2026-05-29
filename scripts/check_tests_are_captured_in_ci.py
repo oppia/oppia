@@ -45,27 +45,16 @@ ACCEPTANCE_TEST_SPECS_DIRECTORY = os.path.join(
 ACCEPTANCE_TEST_SPECS_DIRECTORY_OLD = os.path.join(
     os.getcwd(), 'core', 'tests', 'puppeteer-acceptance-tests', 'specs-old'
 )
-PLAYWRIGHT_ACCEPTANCE_TEST_SPECS_DIRECTORY = os.path.join(
-    os.getcwd(), 'core', 'tests', 'playwright-acceptance-tests', 'specs'
-)
 E2E_WEBDRIVERIO_CONFIG_FILE_PATH = os.path.join(
     os.getcwd(), 'core', 'tests', 'wdio.conf.js'
 )
 
 
-class TestSuiteDictBase(TypedDict):
-    """Base dictionary representing a test suite with required fields."""
+class TestSuiteDict(TypedDict):
+    """Dictionary representing a test suite."""
 
     name: str
     module: str
-
-
-class TestSuiteDict(TestSuiteDictBase, total=False):
-    """Dictionary representing a test suite, with an optional framework field.
-    The framework field is only present for acceptance tests to distinguish
-    between puppeteer and playwright during incremental migration."""
-
-    framework: str
 
 
 def get_acceptance_test_suites_from_ci_config_file() -> List[TestSuiteDict]:
@@ -202,10 +191,9 @@ def get_acceptance_test_suites_from_acceptance_directory() -> (
         specs directory.
     """
     acceptance_test_suites: List[TestSuiteDict] = []
-    for test_specs_directory, framework in [
-        (ACCEPTANCE_TEST_SPECS_DIRECTORY, 'puppeteer'),
-        (ACCEPTANCE_TEST_SPECS_DIRECTORY_OLD, 'puppeteer'),
-        (PLAYWRIGHT_ACCEPTANCE_TEST_SPECS_DIRECTORY, 'playwright'),
+    for test_specs_directory in [
+        ACCEPTANCE_TEST_SPECS_DIRECTORY,
+        ACCEPTANCE_TEST_SPECS_DIRECTORY_OLD,
     ]:
         acceptance_test_files = glob.glob(
             os.path.join(test_specs_directory, '**/*.spec.ts')
@@ -224,7 +212,6 @@ def get_acceptance_test_suites_from_acceptance_directory() -> (
                 {
                     'name': acceptance_test_suite_name,
                     'module': os.path.relpath(module, os.getcwd()),
-                    'framework': framework,
                 }
             )
     return sorted(acceptance_test_suites, key=lambda x: x['name'])

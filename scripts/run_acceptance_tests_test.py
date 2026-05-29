@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 import contextlib
-import json
 import os
 import shutil
 import subprocess
@@ -32,7 +31,7 @@ from scripts import (
     servers,
 )
 
-from typing import ContextManager, Dict, List, Optional, Tuple
+from typing import ContextManager, List, Optional, Tuple
 
 
 class PopenErrorReturn:
@@ -103,11 +102,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
         self.compile_test_ts_files_swap = self.swap(
             run_acceptance_tests, 'compile_test_ts_files', lambda: None
-        )
-        self.install_playwright_dependencies_swap = self.swap(
-            run_acceptance_tests,
-            'install_playwright_dependencies',
-            lambda: None,
         )
 
     def tearDown(self) -> None:
@@ -195,314 +189,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             with shutil_copytree_swap, communicate_swap:
                 run_acceptance_tests.compile_test_ts_files()
 
-    def test_install_playwright_dependencies_success(self) -> None:
-        playwright_dir = os.path.join(
-            common.CURR_DIR, 'core', 'tests', 'playwright-acceptance-tests'
-        )
-        playwright_bin = os.path.join(
-            playwright_dir, 'node_modules', '.bin', 'playwright'
-        )
-        expected_install_env = {
-            **os.environ,
-            'PATH': os.pathsep.join(
-                [
-                    os.path.join(common.PLAYWRIGHT_NODE_PATH, 'bin'),
-                    os.environ['PATH'],
-                ]
-            ),
-            'NODE': os.path.join(common.PLAYWRIGHT_NODE_PATH, 'bin', 'node'),
-        }
-        check_call_swap = self.swap_with_checks(
-            subprocess,
-            'check_call',
-            lambda *_, **__: None,
-            expected_args=[
-                (
-                    [
-                        common.PLAYWRIGHT_NPM_BIN_PATH,
-                        '--prefix',
-                        playwright_dir,
-                        'ci',
-                    ],
-                ),
-                ([playwright_bin, 'install', 'chromium'],),
-            ],
-            expected_kwargs=[
-                {'env': expected_install_env},
-                {'env': expected_install_env},
-            ],
-        )
-        with check_call_swap:
-            run_acceptance_tests.install_playwright_dependencies()
-
-    def test_install_playwright_dependencies_failure(self) -> None:
-        def mock_check_call_failure(
-            *unused_args: str, **unused_kwargs: str
-        ) -> None:
-            raise subprocess.CalledProcessError(1, 'npm')
-
-        check_call_swap = self.swap(
-            subprocess, 'check_call', mock_check_call_failure
-        )
-        with check_call_swap:
-            with self.assertRaisesRegex(
-                subprocess.CalledProcessError,
-                'Command \'npm\' returned non-zero exit status 1.',
-            ):
-                run_acceptance_tests.install_playwright_dependencies()
-
-    def test_run_tests_raises_error_when_suite_not_found(self) -> None:
-        mock_config = {
-            'core': [
-                {
-                    'name': 'someOtherSuite',
-                    'framework': 'puppeteer',
-                    'module': 'some/module',
-                }
-            ]
-        }
-
-        def mock_json_load(unused_f: str) -> Dict[str, List[Dict[str, str]]]:
-            return mock_config
-
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: False
-            )
-        )
-        json_load_swap = self.swap(json, 'load', mock_json_load)
-
-        with json_load_swap:
-            with self.assertRaisesRegex(
-                ValueError, 'Suite \'nonExistentSuite\' not found in config.'
-            ):
-                args = run_acceptance_tests._PARSER.parse_args(  # pylint: disable=protected-access
-                    args=['--suite', 'nonExistentSuite']
-                )
-                run_acceptance_tests.run_tests(args)
-
-    def test_compile_ts_called_for_puppeteer_suite(self) -> None:
-        mock_config = {
-            'core': [
-                {
-                    'name': 'testSuite',
-                    'framework': 'puppeteer',
-                    'module': 'some/module',
-                }
-            ]
-        }
-
-        def mock_json_load(unused_f: str) -> Dict[str, List[Dict[str, str]]]:
-            return mock_config
-
-        compile_called = []
-        playwright_deps_called = []
-
-        def mock_compile_test_ts_files() -> None:
-            compile_called.append(True)
-
-        def mock_install_playwright_dependencies() -> None:
-            playwright_deps_called.append(True)
-
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: False
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'build_js_files',
-                lambda *_, **__: None,
-                expected_args=[(True,)],
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
-                'managed_elasticsearch_dev_server',
-                mock_managed_process,
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
-                'managed_cloud_datastore_emulator',
-                mock_managed_process,
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
-                'managed_acceptance_tests_server',
-                mock_managed_process,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'testSuite',
-                        'headless': False,
-                        'mobile': False,
-                        'prod_env': False,
-                        'stdout': subprocess.PIPE,
-                    }
-                ],
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(0,)]
-            )
-        )
-
-        json_load_swap = self.swap(json, 'load', mock_json_load)
-        compile_swap = self.swap(
-            run_acceptance_tests,
-            'compile_test_ts_files',
-            mock_compile_test_ts_files,
-        )
-        playwright_swap = self.swap(
-            run_acceptance_tests,
-            'install_playwright_dependencies',
-            mock_install_playwright_dependencies,
-        )
-
-        with self.swap_mock_set_constants_to_default:
-            with json_load_swap, compile_swap, playwright_swap:
-                run_acceptance_tests.main(args=['--suite', 'testSuite'])
-
-        self.assertEqual(compile_called, [True])
-        self.assertEqual(playwright_deps_called, [])
-
-    def test_playwright_deps_called_for_playwright_suite(self) -> None:
-        mock_config = {
-            'core': [
-                {
-                    'name': 'testSuite',
-                    'framework': 'playwright',
-                    'module': 'some/module',
-                }
-            ]
-        }
-
-        def mock_json_load(unused_f: str) -> Dict[str, List[Dict[str, str]]]:
-            return mock_config
-
-        compile_called = []
-        playwright_deps_called = []
-
-        def mock_compile_test_ts_files() -> None:
-            compile_called.append(True)
-
-        def mock_install_playwright_dependencies() -> None:
-            playwright_deps_called.append(True)
-
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: False
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'build_js_files',
-                lambda *_, **__: None,
-                expected_args=[(True,)],
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
-                'managed_elasticsearch_dev_server',
-                mock_managed_process,
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
-                'managed_cloud_datastore_emulator',
-                mock_managed_process,
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
-                'managed_acceptance_tests_server',
-                mock_managed_process,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'testSuite',
-                        'headless': False,
-                        'mobile': False,
-                        'prod_env': False,
-                        'stdout': subprocess.PIPE,
-                    }
-                ],
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(0,)]
-            )
-        )
-
-        json_load_swap = self.swap(json, 'load', mock_json_load)
-        compile_swap = self.swap(
-            run_acceptance_tests,
-            'compile_test_ts_files',
-            mock_compile_test_ts_files,
-        )
-        playwright_swap = self.swap(
-            run_acceptance_tests,
-            'install_playwright_dependencies',
-            mock_install_playwright_dependencies,
-        )
-
-        with self.swap_mock_set_constants_to_default:
-            with json_load_swap, compile_swap, playwright_swap:
-                run_acceptance_tests.main(args=['--suite', 'testSuite'])
-
-        self.assertEqual(compile_called, [])
-        self.assertEqual(playwright_deps_called, [True])
-
     def test_start_tests_when_other_instances_not_stopped(self) -> None:
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -525,16 +211,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_start_tests_when_no_other_instance_running(self) -> None:
-        mock_config = {
-            'core': [
-                {
-                    'name': 'testSuite',
-                    'framework': 'puppeteer',
-                    'module': 'some/module',
-                }
-            ]
-        }
-        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 common, 'is_oppia_server_already_running', lambda *_: False
@@ -605,23 +281,10 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
 
         with self.swap_mock_set_constants_to_default:
-            with self.compile_test_ts_files_swap, self.install_playwright_dependencies_swap, (
-                json_load_swap
-            ):
+            with self.compile_test_ts_files_swap:
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_work_with_non_ascii_chars(self) -> None:
-        mock_config = {
-            'core': [
-                {
-                    'name': 'testSuite',
-                    'framework': 'puppeteer',
-                    'module': 'some/module',
-                }
-            ]
-        }
-        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
-
         def mock_managed_acceptance_tests_server(
             **unused_kwargs: str,
         ) -> ContextManager[
@@ -697,9 +360,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
 
         with self.swap_mock_set_constants_to_default:
-            with self.compile_test_ts_files_swap, self.install_playwright_dependencies_swap, (
-                json_load_swap
-            ):
+            with self.compile_test_ts_files_swap:
                 lines, _ = run_acceptance_tests.run_tests(args)
 
         self.assertEqual(
@@ -707,16 +368,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
 
     def test_start_tests_skip_build(self) -> None:
-        mock_config = {
-            'core': [
-                {
-                    'name': 'testSuite',
-                    'framework': 'puppeteer',
-                    'module': 'some/module',
-                }
-            ]
-        }
-        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 common, 'is_oppia_server_already_running', lambda *_: False
@@ -799,24 +450,12 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             )
         )
 
-        with self.compile_test_ts_files_swap, self.install_playwright_dependencies_swap, (
-            json_load_swap
-        ):
+        with self.compile_test_ts_files_swap:
             run_acceptance_tests.main(
                 args=['--suite', 'testSuite', '--skip_build']
             )
 
     def test_start_tests_in_jasmine(self) -> None:
-        mock_config = {
-            'core': [
-                {
-                    'name': 'testSuite',
-                    'framework': 'puppeteer',
-                    'module': 'some/module',
-                }
-            ]
-        }
-        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 common, 'is_oppia_server_already_running', lambda *_: False
@@ -887,22 +526,10 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
 
         with self.swap_mock_set_constants_to_default:
-            with self.compile_test_ts_files_swap, self.install_playwright_dependencies_swap, (
-                json_load_swap
-            ):
+            with self.compile_test_ts_files_swap:
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_start_tests_for_long_lived_process(self) -> None:
-        mock_config = {
-            'core': [
-                {
-                    'name': 'testSuite',
-                    'framework': 'puppeteer',
-                    'module': 'some/module',
-                }
-            ]
-        }
-        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 common, 'is_oppia_server_already_running', lambda *_: False
@@ -970,7 +597,5 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
 
         with self.swap_mock_set_constants_to_default:
-            with self.compile_test_ts_files_swap, self.install_playwright_dependencies_swap, (
-                json_load_swap
-            ):
+            with self.compile_test_ts_files_swap:
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
