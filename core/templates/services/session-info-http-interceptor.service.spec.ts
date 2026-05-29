@@ -32,7 +32,14 @@ import {FeedbackSessionInfoService} from 'services/feedback-session-info.service
 import {SessionInfoHttpInterceptorService} from 'services/session-info-http-interceptor.service';
 
 class MockFeedbackSessionInfoService {
-  recordFailedRequest(): void {}
+  recordFailedRequest(
+    url: string,
+    method: string,
+    statusCode: number,
+    timestampMsecs: number,
+    statusText?: string,
+    errorMessage?: string
+  ): void {}
 }
 
 class SuccessHttpHandler implements HttpHandler {
@@ -94,7 +101,7 @@ describe('SessionInfoHttpInterceptorService', () => {
   });
 
   it('should pass successful requests without recording errors', done => {
-    const request = new HttpRequest('GET', '/test', {
+    const request = new HttpRequest<object>('GET', '/test', {
       headers: new HttpHeaders(),
     });
 
@@ -108,7 +115,7 @@ describe('SessionInfoHttpInterceptorService', () => {
   });
 
   it('should record failed requests', done => {
-    const request = new HttpRequest('GET', '/test', {
+    const request = new HttpRequest<object>('GET', '/test', {
       headers: new HttpHeaders(),
     });
 
@@ -128,7 +135,7 @@ describe('SessionInfoHttpInterceptorService', () => {
   });
 
   it('should record network failures with status 0', done => {
-    const request = new HttpRequest('GET', '/network-test', {
+    const request = new HttpRequest<object>('GET', '/network-test', {
       headers: new HttpHeaders(),
     });
 
@@ -150,7 +157,7 @@ describe('SessionInfoHttpInterceptorService', () => {
   });
 
   it('should not record non-http errors without a failing status', done => {
-    const request = new HttpRequest('GET', '/plain-error', {
+    const request = new HttpRequest<object>('GET', '/plain-error', {
       headers: new HttpHeaders(),
     });
 

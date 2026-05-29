@@ -92,13 +92,13 @@ describe('FeedbackSessionInfoService', () => {
       value: null,
       writable: true,
     });
-
+    mockRouter = new MockRouter();
     TestBed.configureTestingModule({
       providers: [
         FeedbackSessionInfoService,
         {
           provide: Router,
-          useClass: MockRouter,
+          useValue: mockRouter,
         },
         {
           provide: WindowRef,
@@ -112,7 +112,6 @@ describe('FeedbackSessionInfoService', () => {
     });
 
     feedbackSessionInfoService = TestBed.inject(FeedbackSessionInfoService);
-    mockRouter = TestBed.inject(Router) as MockRouter;
     mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
     mockI18nLanguageCodeService = TestBed.inject(
       I18nLanguageCodeService
