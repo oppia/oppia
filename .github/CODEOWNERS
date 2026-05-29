@@ -682,6 +682,9 @@
 /core/templates/components/common-layout-directives/common-elements/classroom-navigation-links.component.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/classroom-navigation-links.component.html @oppia/lace-frontend-reviewers
 
+# Certificate Offering Pages.
+/core/templates/pages/certificate-assessment-pages @oppia/contributor-experience-team
+/core/controllers/certificate_assessment*.py @oppia/contributor-experience-team
 
 # Speed Improvement team.
 /core/templates/google-analytics.initializer.ts @oppia/lace-frontend-reviewers

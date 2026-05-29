@@ -47,6 +47,7 @@ export enum FeatureNames {
   EnableReadyForReviewTest = 'enable_ready_for_review_test',
   EnableCampaignBanner = 'enable_financial_literacy_campaign_banner',
   EnableCampaignBannerTestMode = 'enable_financial_literacy_campaign_banner_test_mode',
+  EnableCertificateAssessment = 'enable_certificate_assessment',
   WebGeneralFeedbackModalEnabled = 'web_general_feedback_modal_enabled',
   ExplorationEditorNewCreatorFeedbackTab = 'exploration_editor_new_creator_feedback_tab',
 }
