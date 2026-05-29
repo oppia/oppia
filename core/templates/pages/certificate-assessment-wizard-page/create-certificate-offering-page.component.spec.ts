@@ -29,7 +29,7 @@ import {Router} from '@angular/router';
 import {CreateCertificateOfferingPageComponent} from './create-certificate-offering-page.component';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
-import {CERTIFICATE_OFFERING_SECTION_IDS} from 'pages/certificate-assessment-pages/certificate-offering-shared/certificate-offering-section.model';
+import {CERTIFICATE_OFFERING_SECTION_IDS} from 'components/certificate-assessment-offering-helper/certificate-offering-section.model';
 import {AlertsService} from 'services/alerts.service';
 
 describe('Create Certificate Offering Page Component', () => {
