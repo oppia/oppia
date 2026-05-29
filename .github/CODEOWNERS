@@ -622,6 +622,8 @@
 
 # Web User Feedback project.
 /core/templates/domain/feedback/ @oppia/lace-frontend-reviewers
+/core/templates/services/feedback-session-info.service.ts @oppia/lace-frontend-reviewers
+/core/templates/services/session-info-http-interceptor.service.ts  @oppia/lace-frontend-reviewers
 
 # Suggestion and feedback team.
 # Suggestion project.
