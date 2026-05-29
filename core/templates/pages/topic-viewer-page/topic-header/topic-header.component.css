@@ -20,8 +20,8 @@
 .topic-header-breadcrumbs span {
   color: #00645c;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 14px;
   font-weight: 500;
+  font-size: 14px;
 }
 
 .topic-header-breadcrumb-current {
@@ -58,10 +58,10 @@
     margin-bottom: 12px;
   }
   .topic-header-title {
-    font-family: Capriola, sans-serif;
-    font-size: 24px;
     color: #00645c;
+    font-family: Capriola, sans-serif;
     font-weight: 400;
+    font-size: 24px;
     line-height: 32px;
   }
 }
