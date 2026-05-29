@@ -16,36 +16,24 @@
  * @fileoverview Unit tests for CertificateOfferingDashboardPageRootComponent.
  */
 
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {TranslateModule} from '@ngx-translate/core';
+
+import {AppConstants} from 'app.constants';
 import {CertificateOfferingDashboardPageRootComponent} from './certificate-offering-dashboard-page-root.component';
-import {PlatformFeatureService} from 'services/platform-feature.service';
+import {PageHeadService} from 'services/page-head.service';
 
 describe('CertificateOfferingDashboardPageRootComponent', () => {
   let component: CertificateOfferingDashboardPageRootComponent;
   let fixture: ComponentFixture<CertificateOfferingDashboardPageRootComponent>;
 
   beforeEach(() => {
-    const platformFeatureServiceSpy = jasmine.createSpyObj(
-      'PlatformFeatureService',
-      [],
-      {
-        status: {
-          EnableCertificateAssessment: {
-            isEnabled: true,
-          },
-        },
-      }
-    );
-
     TestBed.configureTestingModule({
+      imports: [TranslateModule.forRoot(), HttpClientTestingModule],
       declarations: [CertificateOfferingDashboardPageRootComponent],
-      providers: [
-        {
-          provide: PlatformFeatureService,
-          useValue: platformFeatureServiceSpy,
-        },
-      ],
+      providers: [PageHeadService],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 
@@ -61,7 +49,14 @@ describe('CertificateOfferingDashboardPageRootComponent', () => {
     ).toBeTrue();
   });
 
-  it('should set isCertificateOfferingEnabled from service', () => {
-    expect(component.isCertificateOfferingEnabled).toEqual(true);
+  it('should have the title and meta tags set', () => {
+    expect(component.title).toEqual(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_DASHBOARD
+        .TITLE
+    );
+    expect(component.meta).toEqual(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_DASHBOARD
+        .META
+    );
   });
 });

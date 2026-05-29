@@ -35,6 +35,8 @@ import {AlertsService} from 'services/alerts.service';
 import {ExternalSaveService} from 'services/external-save.service';
 import {AnswerGroupEditor} from './answer-group-editor.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {Outcome} from 'domain/exploration/outcome.model';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 class MockPlatformFeatureService {
   status = {
@@ -121,10 +123,10 @@ describe('Answer Group Editor Component', () => {
     spyOn(responsesService, 'getActiveRuleIndex').and.returnValue(1);
     spyOn(responsesService, 'getAnswerChoices').and.returnValue(answerChoices);
 
-    expect(component.rulesMemento).toBe(undefined);
-    expect(component.activeRuleIndex).toBe(undefined);
-    expect(component.editAnswerGroupForm).toBe(undefined);
-    expect(component.answerChoices).toEqual(undefined);
+    expect(component.rulesMemento).toBe(null);
+    expect(component.activeRuleIndex).toBeUndefined();
+    expect(component.editAnswerGroupForm).toEqual({});
+    expect(component.answerChoices).toBeUndefined();
 
     component.ngOnInit();
 
@@ -152,8 +154,15 @@ describe('Answer Group Editor Component', () => {
       component.ngOnInit();
       component.activeRuleIndex = 1;
       component.sendOnSaveTaggedMisconception(null);
-      component.sendOnSaveAnswerGroupCorrectnessLabel(null);
-      component.sendOnSaveAnswerGroupFeedback(null);
+      // The 'unknown' type is used here to bypass type checking for testing
+      // purposes, allowing us to pass 'undefined' to a method that expects
+      // an 'Outcome' object to test error handling or default behavior.
+      component.sendOnSaveAnswerGroupCorrectnessLabel(
+        undefined as unknown as Outcome
+      );
+      // The 'unknown' type is used here to bypass type checking for testing
+      // purposes.
+      component.sendOnSaveAnswerGroupFeedback(undefined as unknown as Outcome);
 
       externalSaveEmitter.emit();
       tick();
@@ -180,8 +189,14 @@ describe('Answer Group Editor Component', () => {
       component.ngOnInit();
       component.activeRuleIndex = 1;
       alertsService.addMessage('info', 'Some other message', 0);
-      component.sendOnSaveAnswerGroupDest(null);
-      component.sendOnSaveAnswerGroupDestIfStuck(null);
+      // The 'unknown' type is used here to bypass type checking for testing
+      // purposes.
+      component.sendOnSaveAnswerGroupDest(undefined as unknown as Outcome);
+      // The 'unknown' type is used here to bypass type checking for testing
+      // purposes.
+      component.sendOnSaveAnswerGroupDestIfStuck(
+        undefined as unknown as Outcome
+      );
 
       externalSaveEmitter.emit();
       tick();
@@ -253,9 +268,9 @@ describe('Answer Group Editor Component', () => {
   });
 
   it("should get current interaction's ID", () => {
-    stateInteractionIdService.savedMemento = 'TextIput';
+    stateInteractionIdService.savedMemento = 'TextInput';
 
-    expect(component.getCurrentInteractionId()).toBe('TextIput');
+    expect(component.getCurrentInteractionId()).toBe('TextInput');
   });
 
   it('should get default input values for different variable type', () => {
@@ -493,8 +508,10 @@ describe('Answer Group Editor Component', () => {
 
     expect(component.isCurrentInteractionTrainable()).toBe(false);
 
-    // An error is thrown if an invalid interaction ID is passed.
-    stateInteractionIdService.savedMemento = 'InvalidInteraction';
+    // The 'unknown' type is used here to force an invalid interaction ID
+    // for testing error handling.
+    stateInteractionIdService.savedMemento =
+      'InvalidInteraction' as unknown as InteractionSpecsKey;
     component.rules = [];
     component.rules.push(
       new Rule(
@@ -536,7 +553,7 @@ describe('Answer Group Editor Component', () => {
 
     component.isEditable = false;
 
-    expect(component.openRuleEditor(null)).toBe(undefined);
+    expect(component.openRuleEditor(0)).toBe(undefined);
     expect(component.changeActiveRuleIndex).not.toHaveBeenCalled();
   });
 
@@ -558,7 +575,7 @@ describe('Answer Group Editor Component', () => {
 
     component.isEditable = true;
 
-    component.openRuleEditor(null);
+    component.openRuleEditor(0);
 
     expect(component.rulesMemento).toEqual([rule1]);
     expect(component.changeActiveRuleIndex).toHaveBeenCalled();
