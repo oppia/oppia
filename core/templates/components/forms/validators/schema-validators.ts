@@ -169,6 +169,7 @@ export class SchemaValidators {
   }
 
   static isFloat(
+    args: null,
     numberConversionService: NumberConversionService
   ): (control: AbstractControl) => ValidationErrors | null {
     return (control: AbstractControl): ValidationErrors | null => {

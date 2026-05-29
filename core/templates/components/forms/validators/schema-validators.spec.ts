@@ -246,7 +246,7 @@ describe('Schema validators', () => {
         {controlValue: '--1.23', expectedResult: false},
         {controlValue: '=1.23', expectedResult: false},
       ];
-      const filter = SchemaValidators.isFloat(numberConversionService);
+      const filter = SchemaValidators.isFloat(null, numberConversionService);
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
@@ -264,7 +264,7 @@ describe('Schema validators', () => {
     it('should validate floats correctly in French locale', () => {
       i18nLanguageCodeService.setI18nLanguageCode('fr');
       const control: MockFormControl = new MockFormControl([], []);
-      const filter = SchemaValidators.isFloat(numberConversionService);
+      const filter = SchemaValidators.isFloat(null, numberConversionService);
 
       const testCases = [
         {controlValue: '1,5', expectedResult: true},
