@@ -16,7 +16,6 @@
  * @fileoverview Acceptance tests for learner dashboard functionalities, specfically
  * interactions with components that use classroom data across all tabs.
  */
-
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
@@ -36,72 +35,58 @@ describe('Logged-in User', function () {
 
   beforeAll(
     async function () {
-      console.log('Creating curriculum admin user...');
+      console.log('beforeAll START');
 
+      console.log('Creating curriculum admin user...');
       curriculumAdmin = await UserFactory.createNewUser(
         'curriculumAdm',
         'curriculumAdmin@example.com',
         [ROLES.CURRICULUM_ADMIN]
       );
+      console.log('curriculum admin created');
 
-      console.log('Curriculum admin user created.');
-
-      console.log('Creating release coordinator user...');
-
+      console.log('Creating release coordinator...');
       releaseCoordinator = await UserFactory.createNewUser(
         'releaseCoordinator',
         'release_coordinator@example.com',
         [ROLES.RELEASE_COORDINATOR]
       );
-
-      console.log('Release coordinator user created.');
+      console.log('release coordinator created');
 
       console.log('Enabling feature flag...');
-
       await releaseCoordinator.enableFeatureFlag(
         'show_redesigned_learner_dashboard'
       );
-
-      console.log('Feature flag enabled.');
+      console.log('feature flag enabled');
 
       console.log('Creating classroom...');
-
       await curriculumAdmin.createNewClassroom('Math', 'math');
-
-      console.log('Classroom created.');
+      console.log('classroom created');
 
       console.log('Updating classroom...');
-
       await curriculumAdmin.updateClassroom(
         'Math',
         'Welcome to Math classroom!',
         'This course covers basic operations.',
         'In this course, you will learn the following topics: Place Values.'
       );
+      console.log('classroom updated');
 
-      console.log('Classroom updated.');
-
-      console.log('Creating and publishing topic...');
-
+      console.log('Creating topic...');
       await curriculumAdmin.createAndPublishTopic(
         'Place Values',
         'Place Values subtopics',
         'Place Values skills'
       );
-
-      console.log('Topic created and published.');
+      console.log('topic created');
 
       console.log('Adding topic to classroom...');
-
       await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
-
-      console.log('Topic added to classroom.');
+      console.log('topic added to classroom');
 
       console.log('Publishing classroom...');
-
       await curriculumAdmin.publishClassroom('Math');
-
-      console.log('Classroom published.');
+      console.log('classroom published');
 
       const placeValueChapters = [
         'What are the Place Values',
@@ -109,32 +94,45 @@ describe('Logged-in User', function () {
         'Comparing Numbers',
       ];
 
-      const chapterIds: (string | null)[] = [];
+      const chapterIds: string[] = [];
 
-      console.log('Creating and publishing explorations...');
+      console.log('Creating explorations...');
 
       for (const chapter of placeValueChapters) {
-        console.log(`Creating exploration: ${chapter}`);
+        console.log(`Starting: ${chapter}`);
 
-        const id =
-          await curriculumAdmin.createAndPublishExplorationWithCards(chapter);
+        const explorationPromise =
+          curriculumAdmin.createAndPublishExplorationWithCards(chapter);
 
-        console.log(`Exploration created and published: ${chapter}`);
+        const id = await Promise.race([
+          explorationPromise,
+          new Promise<null>((_, reject) =>
+            setTimeout(
+              () =>
+                reject(new Error(`Timeout creating exploration: ${chapter}`)),
+              5 * 60 * 1000
+            )
+          ),
+        ]);
+
+        console.log(`Finished: ${chapter}`);
+
+        if (!id) {
+          throw new Error(`Exploration ID missing for: ${chapter}`);
+        }
 
         chapterIds.push(id);
       }
 
-      console.log('All explorations created.');
+      console.log('All explorations created');
 
       console.log('Adding story to topic...');
-
       await curriculumAdmin.addStoryToTopic(
         "Jamie's Adventures in the Arcade",
         'story',
         'Place Values'
       );
-
-      console.log('Story added to topic.');
+      console.log('story added');
 
       console.log('Adding chapters to story...');
 
@@ -146,51 +144,29 @@ describe('Logged-in User', function () {
           id as string
         );
 
-        console.log(`Chapter added: ${placeValueChapters[index]}`);
+        console.log(`chapter added: ${placeValueChapters[index]}`);
       }
 
-      console.log('All chapters added.');
-
       console.log('Saving story draft...');
-
       await curriculumAdmin.saveStoryDraft();
-
-      console.log('Story draft saved.');
+      console.log('story draft saved');
 
       console.log('Publishing story draft...');
-
       await curriculumAdmin.publishStoryDraft();
+      console.log('story draft published');
 
-      console.log('Story draft published.');
-
-      console.log('Creating logged in user...');
-
+      console.log('Creating logged-in user...');
       loggedInUser = await UserFactory.createNewUser(
         'loggedInUser1',
         'logged_in_user1@example.com'
       );
+      console.log('logged-in user created');
 
-      console.log('Logged in user created.');
-
-      console.log('beforeAll setup completed successfully.');
+      console.log('beforeAll completed successfully');
     },
-    // Setup takes about 12 minutes to complete.
     12 * 60 * 1000
   );
 
-  /**
-   * TODO(#22070): Add tests for home tab. Interactions involving recommended
-   * lessons, in-progress lessons, topics available, and saved lessons sections.
-   */
-
-  /**
-   * TODO(#22070): Add tests for goals tab, all interactions.
-   */
-
-  /**
-   * TODO(#22070): Add tests for progress tab. Interactions involving in-progress
-   * and completed classroom lessons & skills sections.
-   */
   it(
     'should navigate to the new learner dashboard',
     async function () {
@@ -198,16 +174,14 @@ describe('Logged-in User', function () {
 
       await loggedInUser.navigateToLearnerDashboard();
 
-      console.log('Successfully navigated to learner dashboard.');
+      console.log('navigation completed');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {
-    console.log('Closing all browsers...');
-
+    console.log('Closing browsers...');
     await UserFactory.closeAllBrowsers();
-
-    console.log('All browsers closed.');
+    console.log('browsers closed');
   });
 });
