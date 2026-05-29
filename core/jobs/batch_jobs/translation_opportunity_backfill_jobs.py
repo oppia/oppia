@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs that backfill TranslationOpportunityModel from existing ExplorationOpportunitySummaryModels."""
+"""Jobs that backfill TranslationOpportunityModel from existing ExplorationModels and StoryModels."""
 
 from __future__ import annotations
 
@@ -33,42 +33,47 @@ from typing import Any, Dict, Iterable, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import exp_models, opportunity_models, translation_models
+    from mypy_imports import (
+        exp_models,
+        opportunity_models,
+        translation_models,
+        story_models,
+    )
 
 (
     exp_models,
     opportunity_models,
     translation_models,
+    story_models,
 ) = models.Registry.import_models(
     [
         models.Names.EXPLORATION,
         models.Names.OPPORTUNITY,
         models.Names.TRANSLATION,
+        models.Names.STORY,
     ]
 )
 datastore_services = models.Registry.import_datastore_services()
 
 
 class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
-    """Backfills TranslationOpportunityModels from existing ExplorationOpportunitySummaryModels."""
+    """Backfills TranslationOpportunityModels from existing ExplorationModels and StoryModels."""
 
     DATASTORE_UPDATES_ALLOWED = True
 
     @staticmethod
     def _create_translation_opportunity(
         # Here we use type Any because the values from the CoGroupByKey
-        # could be ExplorationOpportunitySummaryModel, ExplorationModel, or
-        # EntityTranslationsModel.
+        # could be topic_ids, ExplorationModel, or EntityTranslationsModel.
         element: Tuple[str, Dict[str, Iterable[Any]]],
     ) -> result.Result[opportunity_models.TranslationOpportunityModel, str]:
         """Creates a TranslationOpportunityModel from the grouped data."""
         exp_id = element[0]
         grouped_data = element[1]
 
-        summary_models = list(grouped_data['summary_model'])
-        if not summary_models:
-            return result.Err('Missing ExplorationOpportunitySummaryModel')
-        summary_model = summary_models[0]
+        topic_ids = list(set(grouped_data['topic_ids']))
+        if not topic_ids:
+            return result.Err('Missing topic_id')
 
         exps = list(grouped_data['exp'])
         if not exps:
@@ -108,7 +113,7 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
                 ),
                 entity_type=feconf.TranslatableEntityType.EXPLORATION.value,
                 entity_id=exp_id,
-                topic_ids=[summary_model.topic_id],
+                topic_ids=topic_ids,
                 content_count=content_count,
                 incomplete_translation_language_codes=incomplete_translation_language_codes,
                 translation_counts=translation_counts,
@@ -117,16 +122,24 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
         return result.Ok(model)
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        exp_opportunity_summary_models = (
+        def extract_topic_ids_from_story(
+            story_model: story_models.StoryModel,
+        ) -> Iterable[Tuple[str, str]]:
+            topic_id = story_model.corresponding_topic_id
+            nodes = story_model.story_contents.get('nodes', [])
+            for node in nodes:
+                node_exp_id = node.get('exploration_id')
+                if node_exp_id:
+                    yield (node_exp_id, topic_id)
+
+        story_topic_ids_pcoll = (
             self.pipeline
-            | 'Get all ExplorationOpportunitySummaryModels'
+            | 'Get all StoryModels'
             >> ndb_io.GetModels(
-                opportunity_models.ExplorationOpportunitySummaryModel.get_all(
-                    include_deleted=False
-                )
+                story_models.StoryModel.get_all(include_deleted=False)
             )
-            | 'Map summary models to exp_id'
-            >> beam.Map(lambda model: (model.id, model))
+            | 'Extract exp_id and topic_id'
+            >> beam.FlatMap(extract_topic_ids_from_story)
         )
 
         exp_models_pcoll = (
@@ -158,7 +171,7 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
         )
 
         grouped_data = {
-            'summary_model': exp_opportunity_summary_models,
+            'topic_ids': story_topic_ids_pcoll,
             'exp': exp_models_pcoll,
             'translations': entity_translations_pcoll,
         } | 'Group by exp_id' >> beam.CoGroupByKey()

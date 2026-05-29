@@ -28,14 +28,20 @@ from core.tests import test_utils
 
 MYPY = False
 if MYPY:
-    from mypy_imports import exp_models, opportunity_models, translation_models
+    from mypy_imports import (
+        exp_models,
+        opportunity_models,
+        translation_models,
+        story_models,
+    )
 
-exp_models, opportunity_models, translation_models = (
+exp_models, opportunity_models, translation_models, story_models = (
     models.Registry.import_models(
         [
             models.Names.EXPLORATION,
             models.Names.OPPORTUNITY,
             models.Names.TRANSLATION,
+            models.Names.STORY,
         ]
     )
 )
@@ -91,23 +97,41 @@ class BackfillTranslationOpportunityModelJobTests(
         )
         model.commit(self.author_id, 'commit_message', [commit_cmd.to_dict()])
 
-        # Create ExplorationOpportunitySummaryModel.
-        summary_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.exp_id,
-            topic_id='topic_id',
-            topic_name='topic_name',
-            story_id='story_id',
-            story_title='story_title',
-            chapter_title='chapter_title',
-            content_count=2,
-            incomplete_translation_language_codes=['hi'],
-            translation_counts={'hi': 1},
-            language_codes_needing_voice_artists=['en'],
-            language_codes_with_assigned_voice_artists=[],
+        # Create StoryModel.
+        story_model = self.create_model(
+            story_models.StoryModel,
+            id='story_id',
+            title='story title',
+            description='description',
+            notes='notes',
+            language_code='en',
+            story_contents_schema_version=feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
+            corresponding_topic_id='topic_id',
+            url_fragment='story-frag',
+            story_contents={
+                'initial_node_id': 'node_1',
+                'nodes': [
+                    {
+                        'id': 'node_1',
+                        'title': 'chapter title',
+                        'exploration_id': self.exp_id,
+                        'destination_node_ids': [],
+                        'prerequisite_skill_ids': [],
+                        'acquired_skill_ids': [],
+                        'outline': '',
+                        'outline_is_finalized': False,
+                        'thumbnail_filename': None,
+                        'thumbnail_bg_color': None,
+                        'thumbnail_size_in_bytes': None,
+                    }
+                ],
+                'next_node_id': 'node_2',
+            },
         )
-        summary_model.update_timestamps()
-        summary_model.put()
+        story_model.update_timestamps()
+        story_model.commit(
+            self.author_id, 'commit_message', [{'cmd': 'test_command'}]
+        )
 
         # Create EntityTranslationsModel.
         translation_model = (
@@ -181,17 +205,15 @@ class BackfillTranslationOpportunityModelJobTests(
         )
         self.assertEqual(model.translation_counts, {'hi': 1, 'en': 0})
 
-    def test_fails_if_missing_summary_model(self) -> None:
-        summary_model = (
-            opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
-                self.exp_id
-            )
+    def test_fails_if_missing_story_model(self) -> None:
+        story_model = story_models.StoryModel.get_by_id('story_id')
+        story_model.delete(
+            self.author_id, 'Deleting for test', force_deletion=True
         )
-        summary_model.delete()
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(
-                    stderr='TRANSLATION OPPORTUNITY MODEL CREATION ERROR: "Missing ExplorationOpportunitySummaryModel": 1'
+                    stderr='TRANSLATION OPPORTUNITY MODEL CREATION ERROR: "Missing topic_id": 1'
                 ),
             ]
         )
