@@ -170,22 +170,26 @@ describe('Feedback Tab Component', () => {
     expect(component.feedbackMessage.status).toBe('review');
   }));
 
-  it(
-    'should add warning when trying to add a message in a thread with id' +
-      ' null',
-    () => {
-      let addWarningSpy = spyOn(alertsService, 'addWarning').and.callThrough();
+  it('should throw error when trying to add message to non-existent thread', () => {
+    expect(() => {
       component.addNewMessage('', 'Text', 'Open');
-      expect(addWarningSpy).toHaveBeenCalledWith(
-        'Cannot add message to thread with ID: null.'
-      );
-    }
-  );
+    }).toThrowError('Trying to add message to a non-existent thread.');
+  });
 
   it('should add warning when trying to add a invalid message in a thread', () => {
     let addWarningSpy = spyOn(alertsService, 'addWarning').and.callThrough();
     component.addNewMessage('0', 'Text', '');
-    expect(addWarningSpy).toHaveBeenCalledWith('Invalid message status: null');
+    expect(addWarningSpy).toHaveBeenCalledWith('Invalid message status: ');
+  });
+
+  it('should add warning when trying to add a message in a thread with id null', () => {
+    let addWarningSpy = spyOn(alertsService, 'addWarning').and.callThrough();
+
+    component.addNewMessage(null as never, 'Text', 'Open');
+
+    expect(addWarningSpy).toHaveBeenCalledWith(
+      'Cannot add message to thread with ID: null.'
+    );
   });
 
   it('should throw error when trying to add a message in an invalid thread', () => {
@@ -378,7 +382,7 @@ describe('Feedback Tab Component', () => {
           status: 'review',
           author_name: '',
           change_cmd: {
-            state_name: '',
+            state_name: 'Introduction',
             new_value: {html: ''},
             old_value: {html: ''},
             skill_id: '',
@@ -442,7 +446,7 @@ describe('Feedback Tab Component', () => {
   }));
 
   it('should create a new thread when closing create new thread modal', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake((dlg: any, opt: any) => {
+    spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
       return {
         result: Promise.resolve({
           newThreadSubject: 'New subject',
@@ -471,7 +475,7 @@ describe('Feedback Tab Component', () => {
 
   it('should not create a new thread when dismissing create new thread modal', () => {
     spyOn(threadDataBackendApiService, 'createNewThreadAsync');
-    spyOn(ngbModal, 'open').and.callFake((dlg: any, opt: any) => {
+    spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
       return {
         result: Promise.reject(),
       } as NgbModalRef;
@@ -482,6 +486,29 @@ describe('Feedback Tab Component', () => {
       threadDataBackendApiService.createNewThreadAsync
     ).not.toHaveBeenCalled();
   });
+
+  it('should handle failure when creating a new thread fails', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
+      return {
+        result: Promise.resolve({
+          newThreadSubject: 'New subject',
+          newThreadText: 'New text',
+        }),
+      } as NgbModalRef;
+    });
+
+    spyOn(threadDataBackendApiService, 'createNewThreadAsync').and.returnValue(
+      Promise.reject()
+    );
+
+    component.showCreateThreadModal();
+    tick();
+    tick();
+
+    expect(
+      threadDataBackendApiService.createNewThreadAsync
+    ).toHaveBeenCalledWith('New subject', 'New text');
+  }));
 
   it('should get css classes based on status', () => {
     expect(component.getLabelClass('open')).toBe('badge bg-info');

@@ -913,7 +913,7 @@ describe('State translation component', () => {
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
-    entityTranslationsService.languageCodeToLatestEntityTranslations['hi'] =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       EntityTranslation.createFromBackendDict({
         entity_id: 'exp1',
         entity_type: 'exploration',
@@ -1394,7 +1394,7 @@ describe('State translation component', () => {
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
-    entityTranslationsService.languageCodeToLatestEntityTranslations['hi'] =
+    entityTranslationsService.languageCodeToLatestEntityTranslations.hi =
       EntityTranslation.createFromBackendDict({
         entity_id: 'exp1',
         entity_type: 'exploration',
@@ -1477,6 +1477,21 @@ describe('State translation component', () => {
     );
   });
 
+  it('should return when activeContentId is null in updateTranslatedContent', () => {
+    translationTabActiveModeService.isVoiceoverModeActive = jasmine
+      .createSpy()
+      .and.returnValue(false);
+
+    spyOn(
+      translationTabActiveContentIdService,
+      'getActiveContentId'
+    ).and.returnValue(null);
+
+    expect(() => {
+      component.updateTranslatedContent();
+    }).not.toThrowError();
+  });
+
   it('should format TranslatableSetOfNormalizedString values', () => {
     expect(
       component.getHumanReadableRuleInputValues(
@@ -1536,6 +1551,14 @@ describe('State translation component', () => {
     expect(htmlData).toBe('<p>HTML data</p>');
   });
 
+  it('should return original html when contentId is empty', () => {
+    const htmlData = component.getRequiredHtml(
+      new SubtitledHtml('<p>HTML data</p>', '')
+    );
+
+    expect(htmlData).toBe('<p>HTML data</p>');
+  });
+
   it('should return unicode when translation tab is active', () => {
     spyOn(
       translationTabActiveModeService,
@@ -1546,6 +1569,17 @@ describe('State translation component', () => {
       unicode_str: 'This is the unicode',
     });
     const unicodeData = component.getRequiredUnicode(subtitledObject);
+    expect(unicodeData).toBe('This is the unicode');
+  });
+
+  it('should return unicode when contentId is empty', () => {
+    const subtitledObject = SubtitledUnicode.createFromBackendDict({
+      content_id: '',
+      unicode_str: 'This is the unicode',
+    });
+
+    const unicodeData = component.getRequiredUnicode(subtitledObject);
+
     expect(unicodeData).toBe('This is the unicode');
   });
 
@@ -1795,10 +1829,10 @@ describe('State translation component', () => {
       expect(component.getActiveTab()).toBe('content');
     });
 
-    it('should return active tab name as null when contentId is null', () => {
+    it('should return content tab name when contentId is null', () => {
       spyOn(stateEditorService, 'getInitActiveContentId').and.returnValue(null);
 
-      expect(component.getActiveTab()).toBe(null);
+      expect(component.getActiveTab()).toBe(component.TAB_ID_CONTENT);
     });
   });
 });
@@ -1813,6 +1847,7 @@ describe('State translation component', () => {
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
+  let entityTranslationsService: EntityTranslationsService;
   let explorationState1 = {
     Introduction: {
       content: {
@@ -2128,6 +2163,12 @@ describe('State translation component', () => {
         expect(component.isDisabled('any')).toBe(true);
       });
 
+      it('should return false for unknown tab in isDisabled', () => {
+        component.stateInteractionId = 'TextInput';
+
+        expect(component.isDisabled('unknown_tab')).toBe(false);
+      });
+
       it('should correctly identify RTL languages', () => {
         (
           translationLanguageService.getActiveLanguageCode as jasmine.Spy
@@ -2142,6 +2183,173 @@ describe('State translation component', () => {
         ).and.returnValue('en');
 
         expect(component.isTranslationLanguageRTL()).toBe(false);
+      });
+
+      it('should return when activeContentId is empty in onTabClick', () => {
+        component.stateContent = SubtitledHtml.createDefault('', '');
+
+        spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+        component.onTabClick(component.TAB_ID_CONTENT);
+
+        expect(
+          translationTabActiveContentIdService.setActiveContent
+        ).not.toHaveBeenCalled();
+      });
+
+      it('should return when hint contentId is empty', () => {
+        component.stateHints = [
+          {
+            hintContent: SubtitledHtml.createDefault('Hint', ''),
+          },
+        ] as Hint[];
+
+        component.activeHintIndex = null;
+
+        spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+        component.changeActiveHintIndex(0);
+
+        expect(
+          translationTabActiveContentIdService.setActiveContent
+        ).not.toHaveBeenCalled();
+      });
+
+      it('should return when answer group feedback contentId is empty', () => {
+        component.stateAnswerGroups = [
+          {
+            outcome: {
+              feedback: SubtitledHtml.createDefault('', ''),
+            },
+          },
+        ] as AnswerGroup[];
+
+        component.stateDefaultOutcome = {
+          feedback: SubtitledHtml.createDefault('', ''),
+        } as Outcome;
+
+        spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+        component.changeActiveAnswerGroupIndex(0);
+
+        expect(
+          translationTabActiveContentIdService.setActiveContent
+        ).not.toHaveBeenCalled();
+      });
+
+      it('should return empty string for invalid subtitled content', () => {
+        const summary = component.getSubtitledContentSummary(
+          {} as SubtitledHtml
+        );
+
+        expect(summary).toBe('');
+      });
+
+      it('should skip rule inputs with empty contentId', () => {
+        component.stateAnswerGroups = [
+          {
+            rules: [
+              {
+                inputs: {
+                  x: {
+                    contentId: '',
+                  },
+                },
+              },
+            ],
+          },
+        ] as unknown as AnswerGroup[];
+
+        const result = component.getInteractionRuleTranslatableContents();
+
+        expect(result.length).toBe(0);
+      });
+
+      it('should return when state name is null in initStateTranslation', () => {
+        (stateEditorService.getActiveStateName as jasmine.Spy).and.returnValue(
+          null
+        );
+
+        expect(() => {
+          component.initStateTranslation();
+        }).not.toThrowError();
+      });
+
+      it('should return original html when html contentId is empty', () => {
+        entityTranslationsService.languageCodeToLatestEntityTranslations.en =
+          new EntityTranslation('entityId', 'entityType', 1, 'en', {});
+
+        const result = component.getRequiredHtml(
+          SubtitledHtml.createDefault('<p>Sample HTML</p>', '')
+        );
+
+        expect(result).toBe('<p>Sample HTML</p>');
+      });
+
+      it('should return original unicode when unicode contentId is empty', () => {
+        entityTranslationsService.languageCodeToLatestEntityTranslations.en =
+          new EntityTranslation('entityId', 'entityType', 1, 'en', {});
+
+        const subtitledUnicode = SubtitledUnicode.createDefault(
+          'Sample unicode',
+          ''
+        );
+
+        const result = component.getRequiredUnicode(subtitledUnicode);
+
+        expect(result).toBe('Sample unicode');
+      });
+
+      it('should return when active content id is undefined', () => {
+        translationTabActiveModeService.isVoiceoverModeActive = jasmine
+          .createSpy()
+          .and.returnValue(false);
+
+        spyOn(
+          translationTabActiveContentIdService,
+          'getActiveContentId'
+        ).and.returnValue(undefined);
+
+        expect(() => {
+          component.updateTranslatedContent();
+        }).not.toThrowError();
+      });
+
+      it('should return empty summary when interactionId is empty', () => {
+        const outcome = {
+          hasNonemptyFeedback: () => true,
+          feedback: {
+            html: 'Feedback',
+          },
+        } as Outcome;
+
+        const result = component.summarizeDefaultOutcome(
+          outcome,
+          '',
+          0,
+          'short'
+        );
+
+        expect(result).toBe('');
+      });
+
+      it('should return when customization arg contentId is empty', () => {
+        component.interactionCustomizationArgTranslatableContent = [
+          {
+            name: 'test',
+            content: SubtitledUnicode.createDefault('unicode', ''),
+          },
+        ];
+
+        spyOn(translationTabActiveContentIdService, 'setActiveContent');
+
+        component.activeCustomizationArgContentIndex = -1;
+
+        component.changeActiveCustomizationArgContentIndex(0);
+
+        expect(
+          translationTabActiveContentIdService.setActiveContent
+        ).not.toHaveBeenCalled();
       });
     }
   );

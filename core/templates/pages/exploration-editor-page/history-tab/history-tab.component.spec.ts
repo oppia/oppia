@@ -94,10 +94,12 @@ describe('History tab component', () => {
             data: {
               version: 2,
             },
-            getDataAsync: () =>
-              Promise.resolve({
+            getDataAsync: (cb: () => void) => {
+              cb();
+              return Promise.resolve({
                 version: 2,
-              }),
+              });
+            },
           },
         },
         {
@@ -169,7 +171,18 @@ describe('History tab component', () => {
     expect(component.explorationVersionMetadata).toBe(null);
     expect(component.versionCheckboxArray).toEqual([]);
     expect(component.displayedCurrentPageNumber).toBe(1);
-    expect(component.versionNumbersToDisplay).toEqual([]);
+    expect(component.versionNumbersToDisplay).toEqual(0);
+  });
+
+  it('should get version header', () => {
+    const result = component.getVersionHeader({
+      versionNumber: 1,
+      committerId: 'user1',
+      createdOnMsecsStr: '11/21/2014',
+      commitMessage: 'test commit',
+    });
+
+    expect(result).toBe('Revision #1 by user1 (11/21/2014): test commit');
   });
 
   it(
@@ -270,8 +283,8 @@ describe('History tab component', () => {
     expect(component.hideHistoryGraph).toBe(true);
     expect(component.diffData).toEqual({v1Metadata: null, v2Metadata: null});
 
-    expect(component.earlierVersionHeader).toBe(undefined);
-    expect(component.laterVersionHeader).toBe(undefined);
+    expect(component.earlierVersionHeader).toBe('');
+    expect(component.laterVersionHeader).toBe('');
   }));
 
   it('should show exploration metadata diff modal', () => {
@@ -337,6 +350,27 @@ describe('History tab component', () => {
 
     expect(spyObj).toHaveBeenCalled();
   });
+
+  it('should dismiss exploration metadata diff modal', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        oldMetadata: null,
+        newMetadata: null,
+        headers: null,
+      },
+      result: Promise.reject(),
+    } as NgbModalRef);
+
+    component.diffData = {
+      v1Metadata: null,
+      v2Metadata: null,
+    };
+
+    component.showExplorationMetadataDiffModal();
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
 
   it('should open a new tab for download exploration with version', () => {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
@@ -419,6 +453,22 @@ describe('History tab component', () => {
 
     expect(spyObj).toHaveBeenCalled();
     expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
+  }));
+
+  it('should handle failed revert exploration request', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: new MockNgbModalRef(),
+      result: Promise.resolve(1),
+    } as NgbModalRef);
+
+    spyOn(historyTabBackendApiService, 'postData').and.returnValue(
+      Promise.reject()
+    );
+
+    component.showRevertExplorationModal(1);
+    tick();
+
+    expect(historyTabBackendApiService.postData).toHaveBeenCalled();
   }));
 
   it('should not reload page when dismissing revert exploration modal', () => {
@@ -587,5 +637,64 @@ describe('History tab component', () => {
     expect(component.compareVersionMetadata.laterVersion).toEqual(
       component.totalExplorationVersionMetadata[2]
     );
+  }));
+
+  it('should return when earlierIndex or laterIndex is null', fakeAsync(() => {
+    spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
+      Promise.resolve({v1Metadata: null, v2Metadata: null})
+    );
+
+    component.selectedVersionsArray = [10, 20];
+
+    component.totalExplorationVersionMetadata = [
+      {
+        versionNumber: 1,
+        committerId: 'user1',
+        createdOnMsecsStr: '11/21/2014',
+        commitMessage: 'msg1',
+      },
+      {
+        versionNumber: 2,
+        committerId: 'user2',
+        createdOnMsecsStr: '11/21/2014',
+        commitMessage: 'msg2',
+      },
+    ];
+
+    component.compareVersionMetadata = {
+      earlierVersion: undefined,
+      laterVersion: undefined,
+    };
+
+    component.changeCompareVersion();
+
+    tick();
+
+    expect(component.diffData).toBeNull();
+    expect(component.earlierVersionHeader).toBeUndefined();
+    expect(component.laterVersionHeader).toBeUndefined();
+  }));
+
+  it('should return when earlier or later version is missing', fakeAsync(() => {
+    spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
+      Promise.resolve(null)
+    );
+
+    component.selectedVersionsArray = [1, 2];
+
+    component.totalExplorationVersionMetadata = [
+      {
+        committerId: '1',
+        createdOnMsecsStr: '10',
+        commitMessage: 'msg',
+        versionNumber: 1,
+      },
+    ];
+
+    component.changeCompareVersion();
+    tick();
+
+    expect(component.earlierVersionHeader).toBe('');
+    expect(component.laterVersionHeader).toBe('');
   }));
 });

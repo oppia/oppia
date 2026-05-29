@@ -52,10 +52,6 @@ interface Metadata {
   v2Metadata: ExplorationMetadata;
 }
 
-interface VersionMetadataWithTooltip extends VersionMetadata {
-  tooltipText: string;
-}
-
 @Component({
   selector: 'oppia-history-tab',
   templateUrl: './history-tab.component.html',
@@ -331,12 +327,16 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
       this.loggerService.info(String(response));
 
       this.diffData = response;
-      this.earlierVersionHeader = this.getVersionHeader(
-        this.compareVersionMetadata.earlierVersion!
-      );
-      this.laterVersionHeader = this.getVersionHeader(
-        this.compareVersionMetadata.laterVersion!
-      );
+      const earlierVersion = this.compareVersionMetadata.earlierVersion;
+      const laterVersion = this.compareVersionMetadata.laterVersion;
+
+      if (!earlierVersion || !laterVersion) {
+        return;
+      }
+
+      this.earlierVersionHeader = this.getVersionHeader(earlierVersion);
+
+      this.laterVersionHeader = this.getVersionHeader(laterVersion);
     });
   }
 
@@ -382,9 +382,11 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.version = version;
     modalRef.result.then(
       version => {
-        let data = {
+        const currentVersion = this.explorationDataService.data.version;
+
+        const data = {
           revertExplorationUrl: this.revertExplorationUrl,
-          currentVersion: this.explorationDataService.data.version!,
+          currentVersion: currentVersion,
           revertToVersion: version,
         };
         this.historyTabBackendApiService.postData(data).then(

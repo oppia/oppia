@@ -489,6 +489,7 @@ describe('Exploration editor page component', () => {
     });
 
     it('should start editor tutorial when on main page', fakeAsync(() => {
+      explorationData.version = 1;
       tds.countOfOpenFeedbackThreads = 2;
       isLocationSetToNonStateEditorTabSpy.and.returnValue(false);
       spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
@@ -588,6 +589,7 @@ describe('Exploration editor page component', () => {
     });
 
     it('should navigate to main tab', fakeAsync(() => {
+      explorationData.version = 1;
       tds.countOfOpenFeedbackThreads = 2;
       spyOn(tds, 'getOpenThreadsCount').and.returnValue(0);
       isLocationSetToNonStateEditorTabSpy.and.returnValue(null);
@@ -699,6 +701,20 @@ describe('Exploration editor page component', () => {
       tick();
 
       expect(ngbModal.open).toHaveBeenCalled();
+      flush();
+      discardPeriodicTasks();
+    }));
+
+    it('should handle dismissing the help modal', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.reject(),
+      } as NgbModalRef);
+
+      component.showUserHelpModal();
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalled();
+
       flush();
       discardPeriodicTasks();
     }));
@@ -935,6 +951,16 @@ describe('Exploration editor page component', () => {
       expect(component.areExplorationWarningsVisible).toBe(false);
     });
 
+    it('should throw error when exploration version is null', fakeAsync(() => {
+      explorationData.version = null as never;
+
+      expectAsync(component.initExplorationPage()).toBeRejectedWithError(
+        'Exploration version cannot be null.'
+      );
+
+      flush();
+    }));
+
     it('should navigate to feedback tab', fakeAsync(() => {
       isLocationSetToNonStateEditorTabSpy.and.returnValue(null);
       spyOn(rs, 'getCurrentStateFromLocationPath').and.returnValue(null);
@@ -972,6 +998,7 @@ describe('Exploration editor page component', () => {
     });
 
     it('should react to initExplorationPage broadcasts', fakeAsync(() => {
+      explorationData.version = 1;
       spyOn(ics, 'startCheckingConnection');
       spyOn(cls, 'loadAutosavedChangeList');
       isLocationSetToNonStateEditorTabSpy.and.returnValue(true);
@@ -988,6 +1015,7 @@ describe('Exploration editor page component', () => {
     }));
 
     it('should update entity translations dict with draft changes', fakeAsync(() => {
+      explorationData.version = 1;
       spyOn(EntityTranslation, 'createFromBackendDict').and.callThrough();
       let entityTranslation = EntityTranslation.createFromBackendDict({
         entity_id: explorationId,
@@ -1026,6 +1054,7 @@ describe('Exploration editor page component', () => {
     }));
 
     it('should initialize entity translation object for last published translations', fakeAsync(() => {
+      explorationData.version = 1;
       mockInitExplorationPageEmitter.emit();
       tick();
 
@@ -1038,6 +1067,7 @@ describe('Exploration editor page component', () => {
     }));
 
     it('should initialize only latest draft changes when feature flag is disabled', fakeAsync(() => {
+      explorationData.version = 1;
       spyOn(EntityTranslation, 'createFromBackendDict').and.callThrough();
       let entityTranslation = EntityTranslation.createFromBackendDict({
         entity_id: explorationId,

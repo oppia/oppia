@@ -691,7 +691,14 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     Object.keys(customizationArgs).forEach(caName =>
       traverseValueAndRetrieveSubtitledContent(
         camelCaseToSentenceCase(caName),
-        (customizationArgs as Record<string, any>)[caName].value
+        (
+          customizationArgs as Record<
+            string,
+            {
+              value: unknown;
+            }
+          >
+        )[caName].value
       )
     );
 

@@ -288,12 +288,14 @@ describe('Improvements tab', () => {
         )
       );
 
-      type StateTaskEntry = {
+      interface StateTaskEntry {
         stateName: string;
         ngrTask: NeedsGuidingResponsesTask;
         siaTask: SuccessiveIncorrectAnswersTask;
-        supportingStats: {stateStats: StateStats};
-      };
+        supportingStats: {
+          stateStats: StateStats;
+        };
+      }
 
       const stateTasks: Record<string, StateTaskEntry> = {
         Introduction: {

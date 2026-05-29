@@ -202,7 +202,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  /********************************************
+  /** ******************************************
    * Methods affecting the graph visualization.
    ********************************************/
   toggleExplorationWarningVisibility(): void {
@@ -245,12 +245,17 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         explorationData.states,
         (explorationData as ExplorationData).exploration_is_linked_to_story
       );
+      const version = explorationData.version;
+
+      if (version === undefined || version === null) {
+        throw new Error('Exploration version cannot be null.');
+      }
       this.entityTranslationsService.init(
         this.explorationId,
         'exploration',
-        explorationData.version!
+        version
       );
-      this.pageContextService.setExplorationVersion(explorationData.version!);
+      this.pageContextService.setExplorationVersion(version);
 
       const languageCode =
         this.entityVoiceoversService.languageCode ||
@@ -258,7 +263,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       this.entityVoiceoversService.init(
         this.explorationId,
         'exploration',
-        explorationData.version!,
+        version,
         languageCode
       );
       this.entityVoiceoversService.fetchEntityVoiceovers();
@@ -298,7 +303,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       this.currentUserIsCurriculumAdmin = userInfo.isCurriculumAdmin();
       this.currentUserIsModerator = userInfo.isModerator();
       this.currentUser = (explorationData as ExplorationData).user;
-      this.currentVersion = explorationData.version!;
+      this.currentVersion = version;
 
       this.explorationRightsService.init(
         (explorationData as ExplorationData).rights.owner_names,
@@ -328,7 +333,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           }
         });
 
-      this.versionHistoryService.init(explorationData.version!);
+      this.versionHistoryService.init(version);
 
       this.graphDataService.recompute();
 
@@ -393,14 +398,14 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
             // if they exist.
             this.populateEntityTranslationsWithDraftChanges(
               explorationData.draft_changes,
-              explorationData.version!
+              version
             );
           });
       } else {
         // Simply populate draft changes for the translation tab in case the feature flag is not enabled.
         this.populateEntityTranslationsWithDraftChanges(
           explorationData.draft_changes,
-          explorationData.version!
+          version
         );
       }
 
