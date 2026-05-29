@@ -1506,6 +1506,41 @@ class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response[0]['total_checkpoints_count'], 1)
         self.logout()
 
+    def test_facilitator_cannot_fetch_progress_of_learner_not_in_group(
+        self,
+    ) -> None:
+        outsider_id = self.get_user_id_from_email(self.OUTSIDER_EMAIL)
+        learner_group_id = learner_group_fetchers.get_new_learner_group_id()
+        learner_group_services.create_learner_group(
+            learner_group_id,
+            'Learner Group Name',
+            'Description',
+            [self.USER_ID],
+            [outsider_id],
+            [],
+            [self.story_id],
+        )
+
+        self.login(self.NEW_USER_EMAIL)
+        user_services.update_learner_checkpoint_progress(
+            self.LEARNER_ID, self.exp_id_1, 'Introduction', 1
+        )
+
+        params = {'story_ids': json.dumps([self.story_id])}
+        response = self.get_json(
+            '/user_progress_in_stories_chapters_handler/%s'
+            % (self.LEARNER_USERNAME),
+            params=params,
+            expected_status_int=401,
+        )
+
+        self.assertEqual(
+            response['error'],
+            'You are not allowed to access this learner progress.',
+        )
+
+        self.logout()
+
 
 class LearnerGroupsFeatureStatusHandlerTests(test_utils.GenericTestBase):
     """Unit test for LearnerGroupsFeatureStatusHandler."""
