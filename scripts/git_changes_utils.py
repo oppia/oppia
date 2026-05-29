@@ -395,10 +395,15 @@ def get_changed_files(
         if (ref.local_ref.startswith('refs/heads/') or ref.local_ref == 'HEAD')
     ]
     # Get branch name from e.g. local_ref='refs/heads/lint_hook'.
-    branches = [ref.local_ref.split('/')[-1] for ref in ref_heads_only]
+    branches = [ref.local_ref.removeprefix('refs/heads/') for ref in ref_heads_only]
     hashes = [ref.local_sha1 for ref in ref_heads_only]
     remote_branches = [
-        '%s/%s' % (remote, ref.remote_ref.split('/')[-1])
+        '%s/%s' % (
+            remote,
+            ref.remote_ref.removeprefix('refs/heads/')
+            if ref.remote_ref.startswith('refs/heads/')
+            else '/'.join(ref.remote_ref.split('/', 3)[3:]),
+        )
         for ref in ref_heads_only
         if ref.remote_ref
     ]
