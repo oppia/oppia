@@ -36,8 +36,8 @@ if MYPY:  # pragma: no cover
     from mypy_imports import (
         exp_models,
         opportunity_models,
-        translation_models,
         story_models,
+        translation_models,
     )
 
 (
