@@ -47,7 +47,7 @@ describe('Create Certificate Offering Page Component', () => {
           provide: AlertsService,
           useValue: {
             addSuccessMessage: () => {},
-            addErrorMessage: () => {},
+            addWarning: () => {},
           },
         },
         {
@@ -186,7 +186,7 @@ describe('Create Certificate Offering Page Component', () => {
       certificateAssessmentOfferingBackendApiService,
       'createCertificateAssessmentOfferingAsync'
     ).and.returnValue(Promise.reject('Failed to create certificate.'));
-    const alertsSpy = spyOn(alertsService, 'addErrorMessage');
+    const alertsSpy = spyOn(alertsService, 'addWarning');
     const routerSpy = spyOn(router, 'navigate');
 
     component.saveCertificateOffering();

@@ -101,7 +101,7 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
         this.router.navigate(['/certificate-offering-dashboard']);
       }
     } catch (error: unknown) {
-      this.alertsService.addErrorMessage(
+      this.alertsService.addWarning(
         typeof error === 'string' ? error : 'Failed to create certificate.'
       );
     }
