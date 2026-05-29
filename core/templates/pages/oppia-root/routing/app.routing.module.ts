@@ -556,7 +556,7 @@ const routes: Route[] = [
     pathMatch: 'full',
     loadChildren: () =>
       import(
-        'pages/certificate-assessment-wizard-page/create-certificate-offering-page.module'
+        'pages/create-certificate-offering-page/create-certificate-offering-page.module'
       ).then(m => m.CreateCertificateOfferingPageModule),
   },
 ];
