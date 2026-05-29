@@ -47,7 +47,7 @@ export class CertificateAssessmentOfferingBackendApiService {
             resolve(response.certificate_id);
           },
           errorResponse => {
-            reject(errorResponse.error.error);
+            reject(errorResponse?.error?.error || errorResponse.message);
           }
         );
     });

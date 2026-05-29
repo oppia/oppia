@@ -90,14 +90,20 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
   }
 
   async saveCertificateOffering(): Promise<void> {
-    const certificateId =
-      await this.certificateAssessmentOfferingBackendApiService.createCertificateAssessmentOfferingAsync(
-        this.certificateAssessmentOffering
-      );
+    try {
+      const certificateId =
+        await this.certificateAssessmentOfferingBackendApiService.createCertificateAssessmentOfferingAsync(
+          this.certificateAssessmentOffering
+        );
 
-    if (certificateId) {
-      this.alertsService.addSuccessMessage('Certificate created.');
-      this.router.navigate(['/certificate-offering-dashboard']);
+      if (certificateId) {
+        this.alertsService.addSuccessMessage('Certificate created.');
+        this.router.navigate(['/certificate-offering-dashboard']);
+      }
+    } catch (error: unknown) {
+      this.alertsService.addErrorMessage(
+        typeof error === 'string' ? error : 'Failed to create certificate.'
+      );
     }
   }
 

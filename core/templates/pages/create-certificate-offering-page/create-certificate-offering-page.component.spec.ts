@@ -47,6 +47,7 @@ describe('Create Certificate Offering Page Component', () => {
           provide: AlertsService,
           useValue: {
             addSuccessMessage: () => {},
+            addErrorMessage: () => {},
           },
         },
         {
@@ -177,6 +178,21 @@ describe('Create Certificate Offering Page Component', () => {
     flushMicrotasks();
 
     expect(alertsSpy).not.toHaveBeenCalled();
+    expect(routerSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should show an error message if certificate creation fails', fakeAsync(() => {
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'createCertificateAssessmentOfferingAsync'
+    ).and.returnValue(Promise.reject('Failed to create certificate.'));
+    const alertsSpy = spyOn(alertsService, 'addErrorMessage');
+    const routerSpy = spyOn(router, 'navigate');
+
+    component.saveCertificateOffering();
+    flushMicrotasks();
+
+    expect(alertsSpy).toHaveBeenCalledWith('Failed to create certificate.');
     expect(routerSpy).not.toHaveBeenCalled();
   }));
 });
