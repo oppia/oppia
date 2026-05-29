@@ -49,7 +49,7 @@ describe('InsertScriptService', () => {
     insertScriptService = TestBed.inject(InsertScriptService);
   });
 
-  it('should not reload script if already loaded', (done: jasmine.DoneFn) => {
+  it('should not reload script if already loaded', (done: DoneFn) => {
     const mockScriptElement: Partial<HTMLScriptElement> = {
       onload: null,
       onerror: null,
@@ -76,7 +76,7 @@ describe('InsertScriptService', () => {
     });
   });
 
-  it('should not create new script element if script is still loading', (done: jasmine.DoneFn) => {
+  it('should not create new script element if script is still loading', (done: DoneFn) => {
     const mockScriptElement: Partial<HTMLScriptElement> = {
       onload: null,
       onerror: null,
@@ -105,7 +105,7 @@ describe('InsertScriptService', () => {
     expect(appendChildSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('should handle script load error correctly', (done: jasmine.DoneFn) => {
+  it('should handle script load error correctly', (done: DoneFn) => {
     const mockScriptElement: Partial<HTMLScriptElement> = {
       onload: null,
       onerror: null,
@@ -118,7 +118,7 @@ describe('InsertScriptService', () => {
     spyOn(document.body, 'appendChild').and.callFake(
       (script: HTMLScriptElement) => {
         setTimeout(() => {
-          script.onerror(new ErrorEvent('error'));
+          script.onerror?.(new ErrorEvent('error'));
         }, 10);
       }
     );
@@ -156,7 +156,7 @@ describe('InsertScriptService', () => {
     expect(result).toBe(false);
   });
 
-  it('should load MATHJAX script correctly', (done: jasmine.DoneFn) => {
+  it('should load MATHJAX script correctly', (done: DoneFn) => {
     const mockScriptElement: Partial<HTMLScriptElement> = {
       onload: null,
       onerror: null,
@@ -183,7 +183,7 @@ describe('InsertScriptService', () => {
     expect(result).toBe(true);
   });
 
-  it('should insert script into html', (done: jasmine.DoneFn) => {
+  it('should insert script into html', (done: DoneFn) => {
     const mockScriptElement: Partial<HTMLScriptElement> = {
       onload: null,
       onerror: null,
