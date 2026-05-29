@@ -25,6 +25,7 @@ from core.domain import (
     story_domain,
     story_fetchers,
     story_services,
+    topic_domain,
     topic_fetchers,
     topic_services,
 )
@@ -205,7 +206,7 @@ class StoryPublishHandlerNormalizedPayloadDict(TypedDict):
     normalized_payload dictionary.
     """
 
-    new_story_status_is_public: bool
+    story_publication_action: str
 
 
 class StoryPublishHandler(
@@ -217,9 +218,16 @@ class StoryPublishHandler(
     URL_PATH_ARGS_SCHEMAS = {'story_id': {'schema': SCHEMA_FOR_STORY_ID}}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
-            'new_story_status_is_public': {
-                'schema': {'type': 'bool'},
-            }
+            'story_publication_action': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': [
+                        topic_domain.STORY_PUBLICATION_ACTION_PUBLISH,
+                        topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
+                        topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
+                    ],
+                },
+            },
         }
     }
 
@@ -235,14 +243,22 @@ class StoryPublishHandler(
         story = story_fetchers.get_story_by_id(story_id, strict=True)
         topic_id = story.corresponding_topic_id
 
-        new_story_status_is_public = self.normalized_payload[
-            'new_story_status_is_public'
+        story_publication_action = self.normalized_payload[
+            'story_publication_action'
         ]
 
-        if new_story_status_is_public:
+        if (
+            story_publication_action
+            == topic_domain.STORY_PUBLICATION_ACTION_PUBLISH
+        ):
             topic_services.publish_story(topic_id, story_id, self.user_id)
         else:
-            topic_services.unpublish_story(topic_id, story_id, self.user_id)
+            topic_services.unpublish_story(
+                topic_id,
+                story_id,
+                self.user_id,
+                story_publication_action,
+            )
 
         self.render_json(self.values)
 

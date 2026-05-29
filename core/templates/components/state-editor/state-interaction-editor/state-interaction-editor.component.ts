@@ -48,6 +48,7 @@ import {
   InteractionData,
 } from 'interactions/customization-args-defs';
 import {Solution} from 'domain/exploration/solution.model';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {State} from 'domain/state/state.model';
@@ -79,20 +80,20 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
   @Output() recomputeGraph = new EventEmitter<void>();
 
   @ViewChild('customizeInteractionButton')
-  customizeInteractionButton!: ElementRef;
+  customizeInteractionButton!: ElementRef<HTMLButtonElement>;
 
   @ViewChild('collapseAnswersAndResponsesButton')
-  collapseAnswersAndResponsesButton!: ElementRef;
+  collapseAnswersAndResponsesButton!: ElementRef<HTMLButtonElement>;
 
-  customizationModalReopened: boolean;
-  DEFAULT_TERMINAL_STATE_CONTENT: string;
+  customizationModalReopened!: boolean;
+  DEFAULT_TERMINAL_STATE_CONTENT!: string;
   directiveSubscriptions = new Subscription();
-  hasLoaded: boolean;
-  interactionEditorIsShown: boolean;
-  interactionId: string;
-  interactionIsDisabled: boolean;
-  interactionPreviewHtml: string;
-  windowIsNarrow: boolean;
+  hasLoaded!: boolean;
+  interactionEditorIsShown!: boolean;
+  interactionId!: string;
+  interactionIsDisabled!: boolean;
+  interactionPreviewHtml!: string;
+  windowIsNarrow!: boolean;
 
   constructor(
     private alertsService: AlertsService,
@@ -152,7 +153,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      )
+      ) ?? undefined
     );
   }
 
@@ -215,7 +216,10 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
     };
     this.onSaveInteractionData.emit(interactionData);
 
-    this.onSaveNextContentIdIndex.emit();
+    // We emit 'undefined' as an unknown number because the nextContentIdIndex
+    // is not yet determined at this stage of the customization modal save
+    // process, but the emitter expects a value.
+    this.onSaveNextContentIdIndex.emit(undefined as unknown as number);
     this.interactionDetailsCacheService.set(
       this.stateInteractionIdService.savedMemento,
       this.stateCustomizationArgsService.savedMemento
@@ -235,7 +239,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      )
+      ) ?? undefined
     );
   }
 
@@ -273,7 +277,11 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       })
       .result.then(
         () => {
-          this.stateInteractionIdService.displayed = null;
+          this.stateInteractionIdService.displayed =
+            // When an interaction is deleted, the interactionId is set to null
+            // to indicate its absence. We use 'unknown' to bypass the
+            // strict type check for 'InteractionSpecsKey'.
+            null as unknown as InteractionSpecsKey;
           this.stateCustomizationArgsService.displayed = {};
           this.stateSolutionService.displayed = null;
           this.interactionDetailsCacheService.removeDetails(
@@ -289,7 +297,9 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
           this.onSaveInteractionData.emit(interactionData);
 
           this.stateSolutionService.saveDisplayedValue();
-          this.onSaveSolution.emit(this.stateSolutionService.displayed);
+          this.onSaveSolution.emit(
+            this.stateSolutionService.displayed as unknown as Solution
+          );
 
           this.stateInteractionIdService.onInteractionIdChanged.emit(
             this.stateInteractionIdService.savedMemento
@@ -339,9 +349,9 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
         this.hasLoaded = false;
         this.interactionDetailsCacheService.reset();
         this.responsesService.onInitializeAnswerGroups.emit({
-          interactionId: stateData.interaction.id,
+          interactionId: stateData.interaction.id as string,
           answerGroups: stateData.interaction.answerGroups,
-          defaultOutcome: stateData.interaction.defaultOutcome,
+          defaultOutcome: stateData.interaction.defaultOutcome as Outcome,
           confirmedUnclassifiedAnswers:
             stateData.interaction.confirmedUnclassifiedAnswers,
         });

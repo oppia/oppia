@@ -18,13 +18,16 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {VoiceoverLanguageManagementService} from './voiceover-language-management-service';
+import {
+  LanguageCodesMapping,
+  VoiceoverLanguageManagementService,
+} from './voiceover-language-management-service';
 
 describe('Voiceover language management service', () => {
   let voiceoverLanguageManagementService: VoiceoverLanguageManagementService;
-  let languageAccentMasterList;
-  let languageCodesMapping;
-  let autoGeneratableLanguageAccentCodes;
+  let languageAccentMasterList: Record<string, Record<string, string>>;
+  let languageCodesMapping: LanguageCodesMapping;
+  let autoGeneratableLanguageAccentCodes: string[];
 
   beforeEach(() => {
     voiceoverLanguageManagementService = TestBed.inject(
@@ -95,13 +98,13 @@ describe('Voiceover language management service', () => {
 
     expect(
       voiceoverLanguageManagementService.canVoiceoverForLanguage('en')
-    ).toBeTrue();
+    ).toBe(true);
     expect(
       voiceoverLanguageManagementService.canVoiceoverForLanguage('hi')
-    ).toBeTrue();
+    ).toBe(true);
     expect(
       voiceoverLanguageManagementService.canVoiceoverForLanguage('es')
-    ).toBeFalse();
+    ).toBe(false);
   });
 
   it('should be able to set cloud supported language accents', () => {
@@ -130,11 +133,11 @@ describe('Voiceover language management service', () => {
       voiceoverLanguageManagementService.isAutogenerationSupportedGivenLanguageAccent(
         'en-US'
       )
-    ).toBeTrue();
+    ).toBe(true);
     expect(
       voiceoverLanguageManagementService.isAutogenerationSupportedGivenLanguageAccent(
         'en-GB'
       )
-    ).toBeFalse();
+    ).toBe(false);
   });
 });
