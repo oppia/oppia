@@ -21,6 +21,7 @@ import {
   I18nLanguageCodeService,
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
+import {UrlService} from 'services/contextual/url.service';
 import './topic-header.component.css';
 
 @Component({
@@ -33,15 +34,20 @@ export class TopicHeaderComponent implements OnInit {
   @Input() topicDescription!: string;
   @Input() topicId!: string;
   @Input() classroomName!: string | null;
-  @Input() classroomUrlFragment!: string;
+  classroomUrlFragment!: string;
 
   topicNameTranslationKey!: string;
   topicDescTranslationKey!: string;
   classroomNameTranslationKey!: string;
 
-  constructor(private i18nLanguageCodeService: I18nLanguageCodeService) {}
+  constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private urlService: UrlService
+  ) {}
 
   ngOnInit(): void {
+    this.classroomUrlFragment =
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl();
     this.topicNameTranslationKey =
       this.i18nLanguageCodeService.getTopicTranslationKey(
         this.topicId,
