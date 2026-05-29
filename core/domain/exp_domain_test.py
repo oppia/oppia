@@ -746,6 +746,31 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.exploration.validate(strict=True)
         self.init_state.update_card_is_checkpoint(True)
 
+    def test_continue_state_with_card_is_checkpoint_true_is_invalid(
+        self,
+    ) -> None:
+        second_state = state_domain.State.create_default_state(
+            'Second',
+            self.content_id_generator.generate(
+                translation_domain.ContentType.CONTENT
+            ),
+            self.content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ),
+        )
+        self.set_interaction_for_state(
+            second_state, 'Continue', self.content_id_generator
+        )
+        second_state.update_card_is_checkpoint(True)
+        self.exploration.states['Second'] = second_state
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected checkpoint state Second to have a question '
+            'interaction, but found Continue.',
+        ):
+            self.exploration.validate()
+
     def test_end_state_with_card_is_checkpoint_true_is_invalid(self) -> None:
         default_outcome = self.init_state.interaction.default_outcome
         # Ruling out the possibility of None for mypy type checking.
@@ -792,7 +817,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.exploration.states['State%s' % i].card_is_checkpoint = True
             self.set_interaction_for_state(
                 self.exploration.states['State%s' % i],
-                'Continue',
+                'TextInput',
                 self.content_id_generator,
             )
         with self.assertRaisesRegex(
@@ -3545,6 +3570,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # A terminal interaction without a default outcome or answer group is
         # valid. This resets the exploration back to a valid state.
         init_state.interaction.answer_groups = []
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator
+        )
+        init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
 
         # Restore a valid exploration.
@@ -13879,7 +13908,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'state_name': 'Introduction',
                     'cmd': 'edit_state_property',
                     'property_name': 'widget_id',
-                    'new_value': 'Continue',
+                    'new_value': 'NumericInput',
                     'old_value': None,
                 }
             ),
@@ -13888,16 +13917,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'state_name': 'Introduction',
                     'cmd': 'edit_state_property',
                     'property_name': 'widget_customization_args',
-                    'new_value': {
-                        'buttonText': {
-                            'value': {
-                                'content_id': self.content_id_generator.generate(
-                                    translation_domain.ContentType.CUSTOMIZATION_ARG
-                                ),
-                                'unicode_str': 'Continue',
-                            }
-                        }
-                    },
+                    'new_value': {'requireNonnegativeInput': {'value': False}},
                     'old_value': test_dict,
                 }
             ),
@@ -14175,7 +14195,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ),
             exp_domain.ExplorationChange(
                 {
-                    'new_value': 'Continue',
+                    'new_value': 'NumericInput',
                     'state_name': 'Introduction',
                     'old_value': None,
                     'cmd': 'edit_state_property',
@@ -14184,16 +14204,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ),
             exp_domain.ExplorationChange(
                 {
-                    'new_value': {
-                        'buttonText': {
-                            'value': {
-                                'content_id': self.content_id_generator.generate(
-                                    translation_domain.ContentType.CUSTOMIZATION_ARG
-                                ),
-                                'unicode_str': 'Continue',
-                            }
-                        }
-                    },
+                    'new_value': {'requireNonnegativeInput': {'value': False}},
                     'state_name': 'Introduction',
                     'old_value': test_dict,
                     'cmd': 'edit_state_property',
@@ -14361,7 +14372,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ),
             exp_domain.ExplorationChange(
                 {
-                    'new_value': 'Continue',
+                    'new_value': 'NumericInput',
                     'state_name': 'Introduction',
                     'old_value': None,
                     'cmd': 'edit_state_property',
@@ -14370,16 +14381,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ),
             exp_domain.ExplorationChange(
                 {
-                    'new_value': {
-                        'buttonText': {
-                            'value': {
-                                'content_id': self.content_id_generator.generate(
-                                    translation_domain.ContentType.CUSTOMIZATION_ARG
-                                ),
-                                'unicode_str': 'Continue',
-                            }
-                        }
-                    },
+                    'new_value': {'requireNonnegativeInput': {'value': False}},
                     'state_name': 'Introduction',
                     'old_value': test_dict,
                     'cmd': 'edit_state_property',
@@ -14427,7 +14429,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ),
             exp_domain.ExplorationChange(
                 {
-                    'new_value': 'Continue',
+                    'new_value': 'NumericInput',
                     'state_name': 'Introduction',
                     'old_value': None,
                     'cmd': 'edit_state_property',
@@ -14436,16 +14438,7 @@ class ExplorationChangesMergeabilityUnitTests(
             ),
             exp_domain.ExplorationChange(
                 {
-                    'new_value': {
-                        'buttonText': {
-                            'value': {
-                                'content_id': self.content_id_generator.generate(
-                                    translation_domain.ContentType.CUSTOMIZATION_ARG
-                                ),
-                                'unicode_str': 'Continue',
-                            }
-                        }
-                    },
+                    'new_value': {'requireNonnegativeInput': {'value': False}},
                     'state_name': 'Introduction',
                     'old_value': test_dict,
                     'cmd': 'edit_state_property',

@@ -32,12 +32,15 @@
         <oppia-state-name-editor></oppia-state-name-editor>
       </div>
       <div>
-        <mat-checkbox class="checkpoint-selection-checkbox e2e-test-checkpoint-selection-checkbox"
-                      (change)="onChangeCardIsCheckpoint()"
-                      [(ngModel)]="stateCardIsCheckpointService.displayed"
-                      [disabled]="!isEditable()">
-          Set as a checkpoint for learners
-        </mat-checkbox>
+        <span [ngbTooltip]="getCheckpointSelectionDisabledTooltip()"
+              [disableTooltip]="!checkpointSelectionIsDisabledDueToInteraction()">
+          <mat-checkbox class="checkpoint-selection-checkbox e2e-test-checkpoint-selection-checkbox"
+                        (change)="onChangeCardIsCheckpoint()"
+                        [(ngModel)]="stateCardIsCheckpointService.displayed"
+                        [disabled]="checkpointSelectionIsDisabled()">
+            Set as a checkpoint for learners
+          </mat-checkbox>
+        </span>
       </div>
       <div *ngIf="areParametersEnabled()">
         <state-param-changes-editor></state-param-changes-editor>

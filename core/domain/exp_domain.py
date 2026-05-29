@@ -1901,6 +1901,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 tagged_skill_misconception_id_required=False,
                 strict=strict,
             )
+            if (
+                state_name != self.init_state_name
+                and state.card_is_checkpoint
+                and state.interaction.id == 'Continue'
+            ):
+                raise utils.ValidationError(
+                    'Expected checkpoint state %s to have a question '
+                    'interaction, but found Continue.' % state_name
+                )
             # The checks below perform validation on the Outcome domain object
             # that is specific to answer groups in explorations, but not
             # questions. This logic is here because the validation checks in

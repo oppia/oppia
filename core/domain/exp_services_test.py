@@ -5687,6 +5687,78 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         )
         self.assertEqual(exploration.init_state.card_is_checkpoint, True)
 
+    def test_update_card_is_checkpoint_on_continue_interaction_fails(
+        self,
+    ) -> None:
+        """Test updating card_is_checkpoint on Continue interaction fails."""
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_0_ID,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_ADD_STATE,
+                        'state_name': 'State1',
+                        'content_id_for_state_content': (
+                            content_id_generator.generate(
+                                translation_domain.ContentType.CONTENT
+                            )
+                        ),
+                        'content_id_for_default_outcome': (
+                            content_id_generator.generate(
+                                translation_domain.ContentType.DEFAULT_OUTCOME
+                            )
+                        ),
+                    }
+                ),
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': 'edit_exploration_property',
+                        'property_name': 'next_content_id_index',
+                        'new_value': content_id_generator.next_content_id_index,
+                    }
+                ),
+            ],
+            'Add state name',
+        )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected checkpoint state State1 to have a question interaction, '
+            'but found Continue.',
+        ):
+            exp_services.update_exploration(
+                self.owner_id,
+                self.EXP_0_ID,
+                _get_change_list(
+                    'State1',
+                    exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'Continue',
+                )
+                + _get_change_list(
+                    'State1',
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    {
+                        'buttonText': {
+                            'value': {
+                                'content_id': 'ca_buttonText_1',
+                                'unicode_str': 'Continue',
+                            }
+                        }
+                    },
+                )
+                + _get_change_list(
+                    'State1',
+                    exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                    True,
+                ),
+                '',
+            )
+
     def test_update_content_missing_key(self) -> None:
         """Test that missing keys in content yield an error."""
         with self.assertRaisesRegex(KeyError, 'content_id'):

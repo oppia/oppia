@@ -631,6 +631,51 @@ describe('Exploration editor tab component', () => {
     }
   );
 
+  it('should clear checkpoint when interaction is changed to Continue', () => {
+    stateEditorService.setActiveStateName('First State');
+    stateEditorService.setInteraction(
+      explorationStatesService.getState('First State').interaction
+    );
+    stateEditorService.setCardIsCheckpoint(true);
+    stateCardIsCheckpointService.displayed = true;
+    stateCardIsCheckpointService.savedMemento = true;
+
+    component.saveInteractionData({
+      interactionId: 'Continue',
+      customizationArgs: {},
+    });
+
+    expect(stateEditorService.interaction.id).toBe('Continue');
+    expect(stateEditorService.cardIsCheckpoint).toBe(false);
+    expect(stateCardIsCheckpointService.displayed).toBe(false);
+    expect(
+      explorationStatesService.getState('First State').cardIsCheckpoint
+    ).toBe(false);
+  });
+
+  it('should disable checkpoint selection for Continue interactions', () => {
+    stateEditorService.setActiveStateName('Second State');
+    explorationStatesService.saveInteractionId('Second State', 'Continue');
+
+    expect(
+      component.checkpointSelectionIsDisabledDueToInteraction()
+    ).toBeTrue();
+    expect(component.checkpointSelectionIsDisabled()).toBeTrue();
+    expect(component.getCheckpointSelectionDisabledTooltip()).toBe(
+      'Only question cards can be checkpoints.'
+    );
+  });
+
+  it('should allow checkpoint selection for question interactions', () => {
+    stateEditorService.setActiveStateName('Second State');
+    spyOn(editabilityService, 'isEditable').and.returnValue(true);
+
+    expect(
+      component.checkpointSelectionIsDisabledDueToInteraction()
+    ).toBeFalse();
+    expect(component.checkpointSelectionIsDisabled()).toBeFalse();
+  });
+
   it('should save linked skill id', () => {
     stateEditorService.setActiveStateName('First State');
     expect(

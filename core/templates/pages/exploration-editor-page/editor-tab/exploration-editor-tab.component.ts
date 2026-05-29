@@ -55,6 +55,8 @@ import {AlertsService} from 'services/alerts.service';
   templateUrl: './exploration-editor-tab.component.html',
 })
 export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
+  static readonly CONTINUE_INTERACTION_ID = 'Continue';
+
   @Input() explorationIsLinkedToStory = false;
 
   directiveSubscriptions = new Subscription();
@@ -280,13 +282,12 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
 
   saveInteractionData(displayedValue: InteractionData): void {
     const activeStateName = this.getValidActiveStateName();
+    const interactionId = cloneDeep(displayedValue.interactionId ?? null);
     this.explorationStatesService.saveInteractionId(
       activeStateName,
-      cloneDeep(displayedValue.interactionId ?? null)
+      interactionId
     );
-    this.stateEditorService.setInteractionId(
-      cloneDeep(displayedValue.interactionId ?? null)
-    );
+    this.stateEditorService.setInteractionId(interactionId);
 
     this.explorationStatesService.saveInteractionCustomizationArgs(
       activeStateName,
@@ -295,6 +296,14 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     this.stateEditorService.setInteractionCustomizationArgs(
       cloneDeep(displayedValue.customizationArgs)
     );
+
+    if (
+      interactionId === ExplorationEditorTabComponent.CONTINUE_INTERACTION_ID &&
+      this.stateCardIsCheckpointService.displayed
+    ) {
+      this.stateCardIsCheckpointService.displayed = false;
+      this.onChangeCardIsCheckpoint();
+    }
   }
 
   saveInteractionAnswerGroups(newAnswerGroups: AnswerGroup[]): void {
@@ -366,6 +375,13 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   onChangeCardIsCheckpoint(): void {
+    if (
+      this.stateCardIsCheckpointService.displayed &&
+      this.checkpointSelectionIsDisabledDueToInteraction()
+    ) {
+      this.stateCardIsCheckpointService.displayed = false;
+    }
+
     const activeStateName = this.getValidActiveStateName();
     let displayedValue = this.stateCardIsCheckpointService.displayed;
     this.explorationStatesService.saveCardIsCheckpoint(
@@ -378,6 +394,29 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
 
   isEditable(): boolean {
     return this.editabilityService.isEditable();
+  }
+
+  checkpointSelectionIsDisabledDueToInteraction(): boolean {
+    const activeStateName = this.stateEditorService.getActiveStateName();
+    if (!activeStateName || !this.explorationStatesService.isInitialized()) {
+      return false;
+    }
+
+    const stateData = this.explorationStatesService.getState(activeStateName);
+    return (
+      stateData.interaction.id ===
+      ExplorationEditorTabComponent.CONTINUE_INTERACTION_ID
+    );
+  }
+
+  checkpointSelectionIsDisabled(): boolean {
+    return (
+      !this.isEditable() || this.checkpointSelectionIsDisabledDueToInteraction()
+    );
+  }
+
+  getCheckpointSelectionDisabledTooltip(): string {
+    return 'Only question cards can be checkpoints.';
   }
 
   getStateContentPlaceholder(): string {
