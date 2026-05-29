@@ -60,7 +60,7 @@ export interface FeedbackSessionInfo {
     };
     locale: {
       language_code: string;
-      language_name: string;
+      direction: 'rtl' | 'ltr';
     };
   };
 }
