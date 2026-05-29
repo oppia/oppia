@@ -90,6 +90,8 @@ declare class GuppyOSK {
   constructor(config: Object);
 }
 
+declare module 'guppy-dev/build/guppy-default.min.css';
+
 declare namespace Guppy {
   export function init(config: GuppyInitConfig): void;
   export let instances: Object;

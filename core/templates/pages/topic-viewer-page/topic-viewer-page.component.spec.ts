@@ -32,6 +32,15 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageTitleService} from 'services/page-title.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    RedesignedTopicViewerPage: {
+      isEnabled: false,
+    },
+  };
+}
 
 class MockWindowRef {
   _window = {
@@ -69,6 +78,7 @@ describe('Topic viewer page', () => {
   let windowRef: MockWindowRef;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let translateService: TranslateService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   let topicName = 'Topic Name';
   let topicUrlFragment = 'topic-frag';
@@ -107,6 +117,10 @@ describe('Topic viewer page', () => {
         {
           provide: WindowRef,
           useValue: windowRef,
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
         },
         {
           provide: TranslateService,
@@ -383,5 +397,23 @@ describe('Topic viewer page', () => {
   it('should return false when practice tab is disabled', () => {
     topicViewerPageComponent.practiceTabIsDisplayed = false;
     expect(topicViewerPageComponent.isPracticeTabEnabled()).toBeFalse();
+  });
+
+  it('should return false when redesigned topic viewer page feature is off', () => {
+    mockPlatformFeatureService.status.RedesignedTopicViewerPage.isEnabled =
+      false;
+
+    expect(
+      topicViewerPageComponent.isRedesignedTopicViewerPageFeatureEnabled()
+    ).toBeFalse();
+  });
+
+  it('should return true when redesigned topic viewer page feature is on', () => {
+    mockPlatformFeatureService.status.RedesignedTopicViewerPage.isEnabled =
+      true;
+
+    expect(
+      topicViewerPageComponent.isRedesignedTopicViewerPageFeatureEnabled()
+    ).toBeTrue();
   });
 });

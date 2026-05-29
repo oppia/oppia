@@ -61,7 +61,8 @@
         "core.domain.cloud_task_domain_test",
         "core.jobs.batch_jobs.exploration_voiceover_sync_jobs_test",
         "core.jobs.batch_jobs.cloud_task_run_migration_jobs_test",
-        "core.jobs.batch_jobs.voiceover_synthesis_jobs_test"
+        "core.jobs.batch_jobs.voiceover_synthesis_jobs_test",
+        "core.jobs.batch_jobs.synthesize_voiceover_by_language_accent_jobs_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
@@ -82,6 +83,7 @@
         "core.domain.auth_services_test",
         "core.domain.opportunity_services_test",
         "core.domain.feedback_domain_test",
+        "core.domain.general_feedback_domain_test",
         "core.domain.platform_parameter_domain_test",
         "core.domain.story_fetchers_test",
         "core.domain.rights_domain_test",
@@ -208,7 +210,8 @@
         "core.jobs.batch_jobs.subtopic_migration_jobs_test",
         "core.jobs.batch_jobs.reject_invalid_suggestion_and_delete_invalid_translation_jobs_test",
         "core.domain.voiceover_cloud_task_services_test",
-        "core.jobs.batch_jobs.cleanup_duplicate_translation_suggestions_jobs_test"
+        "core.jobs.batch_jobs.cleanup_duplicate_translation_suggestions_jobs_test",
+        "core.jobs.batch_jobs.recover_orphaned_translations_jobs_test"
     ],
     "4": [
         "core.storage.learner_group.gae_models_test",
@@ -299,10 +302,10 @@
         "core.domain.translation_services_test",
         "core.storage.recommendations.gae_models_test",
         "scripts.linters.other_files_linter_test",
-        "scripts.install_dependencies_json_packages_test",
         "scripts.check_frontend_test_coverage_test",
         "core.platform.models_test",
         "core.storage.feedback.gae_models_test",
+        "core.storage.general_feedback.gae_models_test",
         "scripts.pre_commit_hook_test",
         "core.storage.activity.gae_models_test",
         "core.storage.subtopic.gae_models_test",
@@ -421,6 +424,7 @@
         "core.jobs.batch_jobs.audit_non_existent_threads_messages_jobs_test",
         "conftest_test",
         "core.jobs.batch_jobs.audit_threads_with_missing_suggestions_jobs_test",
-        "core.jobs.batch_jobs.audit_stories_with_disconnected_node_ids_job_test"
+        "core.jobs.batch_jobs.audit_stories_with_disconnected_node_ids_job_test",
+        "core.controllers.certificate_assessment_test"
     ]
 }

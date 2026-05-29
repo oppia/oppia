@@ -1291,6 +1291,44 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.canonical_story_count, 0)
         self.assertEqual(topic_summary.additional_story_count, 0)
 
+    def test_unpublish_story_temporarily_sets_unpublish_type(self) -> None:
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin
+        )
+        topic_services.unpublish_story(
+            self.TOPIC_ID,
+            self.story_id_1,
+            self.user_id_admin,
+            topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
+        )
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        for reference in topic.canonical_story_references:
+            if reference.story_id == self.story_id_1:
+                self.assertEqual(reference.story_is_published, False)
+                self.assertEqual(
+                    reference.story_unpublish_type,
+                    topic_domain.STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH,
+                )
+
+    def test_unpublish_story_permanently_sets_unpublish_type(self) -> None:
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin
+        )
+        topic_services.unpublish_story(
+            self.TOPIC_ID,
+            self.story_id_1,
+            self.user_id_admin,
+            topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
+        )
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        for reference in topic.canonical_story_references:
+            if reference.story_id == self.story_id_1:
+                self.assertEqual(reference.story_is_published, False)
+                self.assertEqual(
+                    reference.story_unpublish_type,
+                    topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
+                )
+
     def test_invalid_publish_and_unpublish_story(self) -> None:
         with self.assertRaisesRegex(
             Exception,
@@ -2845,6 +2883,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.check_can_edit_topic(self.user_admin, topic_rights)
         )
 
+    def test_admin_can_edit_questions_in_topic(self) -> None:
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
+
+        self.assertTrue(
+            topic_services.check_can_edit_question(
+                self.user_admin, topic_rights
+            )
+        )
+
     def test_filter_published_topic_ids(self) -> None:
         published_topic_ids = topic_services.filter_published_topic_ids(
             [self.TOPIC_ID, 'invalid_id']
@@ -4119,6 +4166,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 ],
                 'is_published': True,
                 'can_edit_topic': True,
+                'can_edit_question': True,
                 'classroom': None,
                 'total_upcoming_chapters_count': 0,
                 'total_overdue_chapters_count': 0,
@@ -4206,6 +4254,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                     ],
                     'is_published': True,
                     'can_edit_topic': True,
+                    'can_edit_question': True,
                     'classroom': None,
                     'total_upcoming_chapters_count': 0,
                     'total_overdue_chapters_count': 0,
@@ -4434,6 +4483,7 @@ class StoryReferenceMigrationTests(test_utils.GenericTestBase):
         story_reference_dict = {
             'story_id': 'story_id',
             'story_is_published': False,
+            'story_unpublish_type': None,
         }
         model = topic_models.TopicModel(
             id='topic_id',

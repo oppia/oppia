@@ -87,6 +87,7 @@ export class BaseUser {
   startTimeInMilliseconds: number = -1;
   screenRecorder!: PuppeteerScreenRecorder;
   static instances: BaseUser[] = []; // Track instances.
+  static serverErrors: string[] = []; // Track server errors.
 
   constructor() {
     BaseUser.instances.push(this);
@@ -692,7 +693,7 @@ export class BaseUser {
     // https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space.
     const element = await this.page.waitForXPath(
       `//*[contains(normalize-space(text()), normalize-space("${text}"))]`,
-      {timeout: 10000}
+      {timeout: 60000}
     );
 
     if (!element) {
@@ -1221,6 +1222,18 @@ export class BaseUser {
     // To wait for all images to load and the page to be stable.
     await currentPage.waitForTimeout(5000);
 
+    // Disable all CSS transitions and animations before taking the
+    // screenshot to prevent snapshot mismatches caused by transitions
+    // being mid-way when the screenshot is captured.
+    const styleHandle = await currentPage.addStyleTag({
+      content: `
+        *, *::before, *::after {
+          transition: none !important;
+          animation: none !important;
+        }
+      `,
+    });
+
     /* The variable failureTrigger is the percentage of the difference between the stored screenshot and the current screenshot that would trigger a failure
      * In general, it is set as 0.04/4% (desktop) 0.042/4.2% (mobile) for the randomness of the page that are small enough to be ignored.
      * Based on the existence of the background/library banner, which are randomly selected from a set of four,
@@ -1301,6 +1314,9 @@ export class BaseUser {
         ' folder name should be something like new-snapshots_(suite-name)_desktop_original.' +
         ' The new screenshot(s) should end with "-received". When replacing the screenshot(s), make sure to change the postfix "-received" to "-snap".';
       throw new Error(errorMessage);
+    } finally {
+      // Remove the injected style tag so it doesn't affect subsequent actions.
+      await currentPage.evaluate(el => el.remove(), styleHandle);
     }
   }
 
@@ -1525,8 +1541,18 @@ export class BaseUser {
     visibility: boolean = true,
     context: Page = this.page
   ): Promise<void> {
-    const options = visibility ? {visible: true} : {hidden: true};
-    await context.waitForSelector(selector, options);
+    if (visibility) {
+      await context.waitForSelector(selector, {visible: true});
+    } else {
+      await context.waitForFunction(
+        (sel: string) => {
+          const el = document.querySelector(sel);
+          return !el || (el as HTMLElement).offsetParent === null;
+        },
+        {},
+        selector
+      );
+    }
     showMessage(`Element ${selector} is ${visibility ? 'visible' : 'hidden'}.`);
   }
 
@@ -2176,6 +2202,23 @@ export class BaseUser {
   }
 
   /**
+   * Expects the text content of any toast message to match the given expected message.
+   * @param {string} expectedMessage - The expected message to match the toast message against.
+   */
+  async expectAnyToastMessage(expectedMessage: string): Promise<void> {
+    // Wait until any toast with the expected message is visible.
+    await this.page.waitForFunction(
+      (selector: string, expected: string) =>
+        Array.from(document.querySelectorAll(selector)).some(
+          el => el.textContent?.trim() === expected
+        ),
+      {},
+      toastMessageSelector,
+      expectedMessage
+    );
+  }
+
+  /**
    * Clicks on the button in the modal with the given title and action.
    * @param title - The title of the modal.
    * @param action - The action to click on the button in the modal.
@@ -2384,6 +2427,20 @@ export class BaseUser {
   attachNavigationLogs(page: Page): void {
     page.on('framenavigated', frame => {
       showMessage('NAVIGATED: ' + frame.url());
+    });
+
+    page.on('response', response => {
+      if (response.status() >= 500 && response.url().startsWith(baseURL)) {
+        const url = response.url();
+        // TODO(#18372): Ignore 500 errors from version_history_handler.
+        if (url.includes('/version_history_handler/')) {
+          return;
+        }
+
+        const errorMsg = `Server error: ${response.status()} at ${url}`;
+        showMessage(errorMsg);
+        BaseUser.serverErrors.push(errorMsg);
+      }
     });
   }
 }

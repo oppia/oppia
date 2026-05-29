@@ -152,7 +152,7 @@ why they need to be overriden.  */
 }
 
 .mat-button-success {
-  color: #009688;
+  color: #00645c;
 }
 
 .mat-shadow-bottom-z-1, .mat-button.mat-raised:not([disabled]),
@@ -653,7 +653,7 @@ p:last-child {
 
 .oppia-navbar-nav .show > a {
   background-color: #fff;
-  color: #009688;
+  color: #00645c;
 }
 .oppia-dashboard-container a:hover {
   text-decoration: underline;
@@ -661,7 +661,7 @@ p:last-child {
 
 .oppia-navbar-tabs > li:hover > a {
   background-color: #fff;
-  color: #009688;
+  color: #00645c;
 }
 .oppia-activity-summary-tile span {
   vertical-align: middle;
@@ -725,7 +725,7 @@ p:last-child {
   background-color: #18447e;
 }
 .label-success, .bg-success {
-  background-color: #009688;
+  background-color: #00645c;
 }
 
 /*
