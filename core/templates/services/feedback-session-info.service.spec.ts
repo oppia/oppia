@@ -113,7 +113,6 @@ describe('FeedbackSessionInfoService', () => {
     });
 
     feedbackSessionInfoService = TestBed.inject(FeedbackSessionInfoService);
-    mockWindowRef = TestBed.inject(WindowRef);
     mockI18nLanguageCodeService = TestBed.inject(
       I18nLanguageCodeService
     ) as MockI18nLanguageCodeService;
