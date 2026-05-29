@@ -37,8 +37,8 @@
 .topic-header-title {
   font-family: Capriola, sans-serif;
   font-size: 36px;
-  font-weight: 400;
   color: #00645c;
+  font-weight: 400;
   line-height: 56px;
 }
 
@@ -60,8 +60,8 @@
   .topic-header-title {
     font-family: Capriola, sans-serif;
     font-size: 24px;
-    font-weight: 400;
     color: #00645c;
+    font-weight: 400;
     line-height: 32px;
   }
 }
