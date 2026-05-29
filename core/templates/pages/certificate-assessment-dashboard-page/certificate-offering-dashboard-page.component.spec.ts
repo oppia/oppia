@@ -88,7 +88,7 @@ describe('CertificateOfferingDashboardPageComponent', () => {
 
   it('should build the edit certificate offering route', () => {
     expect(component.getEditCertificateOfferingRoute('mock_id')).toEqual(
-      '/EDIT-certificate-assessment-offering/mock_id'
+      '/edit-certificate-assessment-offering/mock_id'
     );
   });
 

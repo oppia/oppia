@@ -5167,6 +5167,9 @@ def can_access_certificate_dashboard(
     ) -> _GenericHandlerFunctionReturnType:
         """Stub handler for certificate dashboard access checks.
 
+        Args:
+            **kwargs: *. Keyword arguments.
+
         Returns:
             *. The return value of the decorated function.
         """

@@ -63,6 +63,10 @@ export default {
     {
       "language_code": "yo",
       "explanation": "For learners in Nigeria."
+    },
+    {
+      "language_code": "ne",
+      "explanation": "For learners in Nepal."
     }],
 
   "RTE_COMPONENT_CONFIGS": {
@@ -5374,6 +5378,12 @@ export default {
     "decimal_separator": ".",
     "ariaLabelInEnglish": "Marathi"
   }, {
+    "code": "ne",
+    "description": "नेपाली (Nepali)",
+    "direction": "ltr",
+    "decimal_separator": ".",
+    "ariaLabelInEnglish": "Nepali"
+  }, {
     "code": "no",
     "description": "Norsk (Norwegian)",
     "direction": "ltr",
@@ -5820,6 +5830,11 @@ export default {
     "id": "mr",
     "description": "मराठी (Marathi)",
     "relatedLanguages": ["mr"],
+    "direction": "ltr"
+  }, {
+    "id": "ne",
+    "description": "नेपाली (Nepali)",
+    "relatedLanguages": ["ne"],
     "direction": "ltr"
   }, {
     "id": "no",
@@ -6683,7 +6698,7 @@ export default {
       ]
     },
     "EDIT_CERTIFICATE_OFFERING": {
-      "ROUTE": "EDIT-certificate-assessment-offering/:certificate_offering_id",
+      "ROUTE": "edit-certificate-assessment-offering/:certificate_offering_id",
       "TITLE": "Edit Certificate Offering | Oppia",
       "META": [
         {
@@ -6695,7 +6710,7 @@ export default {
         {
           "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
+          // eslint-disable-next-lsine max-len
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
         }
       ]

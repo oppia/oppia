@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for EditCertificateOfferingPageComponent.
+ * @fileoverview Unit tests for CreateCertificateOfferingPageComponent.
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
@@ -24,35 +24,25 @@ import {
   flushMicrotasks,
   waitForAsync,
 } from '@angular/core/testing';
-import {ActivatedRoute, Router} from '@angular/router';
+import {Router} from '@angular/router';
 
-import {EditCertificateOfferingPageComponent} from './edit-certificate-offering-page.component';
+import {CreateCertificateOfferingPageComponent} from './create-certificate-offering-page.component';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
-import {CERTIFICATE_OFFERING_SECTION_IDS} from 'pages/certificate-assessment-pages/certificate-offering-shared/certificate-offering-section.model';
+import {CERTIFICATE_OFFERING_SECTION_IDS} from 'components/certificate-assessment-offering-helper/certificate-offering-section.model';
 import {AlertsService} from 'services/alerts.service';
 
-describe('Edit Certificate Offering Page Component', () => {
-  let component: EditCertificateOfferingPageComponent;
-  let fixture: ComponentFixture<EditCertificateOfferingPageComponent>;
+describe('Create Certificate Offering Page Component', () => {
+  let component: CreateCertificateOfferingPageComponent;
+  let fixture: ComponentFixture<CreateCertificateOfferingPageComponent>;
   let alertsService: AlertsService;
   let certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService;
   let router: Router;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [EditCertificateOfferingPageComponent],
+      declarations: [CreateCertificateOfferingPageComponent],
       providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            snapshot: {
-              paramMap: {
-                get: () => 'certificate_offering_id',
-              },
-            },
-          },
-        },
         {
           provide: AlertsService,
           useValue: {
@@ -62,8 +52,8 @@ describe('Edit Certificate Offering Page Component', () => {
         {
           provide: CertificateAssessmentOfferingBackendApiService,
           useValue: {
-            updateCertificateAssessmentOfferingAsync: async () =>
-              Promise.resolve('certificate_offering_id'),
+            createCertificateAssessmentOfferingAsync: async () =>
+              Promise.resolve('mock_id'),
           },
         },
         {
@@ -78,7 +68,7 @@ describe('Edit Certificate Offering Page Component', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EditCertificateOfferingPageComponent);
+    fixture = TestBed.createComponent(CreateCertificateOfferingPageComponent);
     component = fixture.componentInstance;
     alertsService = TestBed.inject(AlertsService);
     certificateAssessmentOfferingBackendApiService = TestBed.inject(
@@ -88,20 +78,10 @@ describe('Edit Certificate Offering Page Component', () => {
     fixture.detectChanges();
   });
 
-  it('should initialize active section and offering id on ngOnInit', () => {
+  it('should initialize active section to details section on ngOnInit', () => {
     component.ngOnInit();
-
     expect(component.activeSection).toEqual(
       CERTIFICATE_OFFERING_SECTION_IDS.DETAILS
-    );
-    expect(component.certificateOfferingId).toEqual('certificate_offering_id');
-  });
-
-  it('should populate the certificate assessment offering with an empty model', () => {
-    component.populateCertificateAssessmentOfferingFromId();
-
-    expect(component.certificateAssessmentOffering).toEqual(
-      CertificateAssessmentOfferingData.createEmpty()
     );
   });
 
@@ -142,17 +122,15 @@ describe('Edit Certificate Offering Page Component', () => {
 
   it('should update certificate assessment offering instance', () => {
     const updatedOffering = CertificateAssessmentOfferingData.createEmpty();
-    updatedOffering.title = 'Updated Title';
+    updatedOffering.title = 'New Title';
 
     component.updateCertificateAssessmentOffering(updatedOffering);
 
-    expect(component.certificateAssessmentOffering.title).toEqual(
-      'Updated Title'
-    );
+    expect(component.certificateAssessmentOffering.title).toEqual('New Title');
   });
 
   it('should update topic data inside the current offering', () => {
-    const mockTopicData = {topic_id_1: 7};
+    const mockTopicData = {topic_id_1: 4};
 
     component.updateTopicData(mockTopicData);
 
@@ -169,34 +147,33 @@ describe('Edit Certificate Offering Page Component', () => {
     expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
   });
 
-  it('should update certificate offering successfully and navigate away', fakeAsync(() => {
+  it('should save certificate offering successfully and navigate away', fakeAsync(() => {
     const apiSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
-      'updateCertificateAssessmentOfferingAsync'
-    ).and.returnValue(Promise.resolve('certificate_offering_id'));
+      'createCertificateAssessmentOfferingAsync'
+    ).and.returnValue(Promise.resolve('certificate_id_123'));
     const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
     const routerSpy = spyOn(router, 'navigate');
 
-    component.updateCertificateOffering();
+    component.saveCertificateOffering();
     flushMicrotasks();
 
     expect(apiSpy).toHaveBeenCalledWith(
-      'certificate_offering_id',
       component.certificateAssessmentOffering
     );
-    expect(alertsSpy).toHaveBeenCalledWith('Certificate updated.');
+    expect(alertsSpy).toHaveBeenCalledWith('Certificate created.');
     expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
   }));
 
-  it('should not navigate or show alert if certificate update returns falsy value', fakeAsync(() => {
+  it('should not navigate or show alert if certificate creation returns falsy value', fakeAsync(() => {
     spyOn(
       certificateAssessmentOfferingBackendApiService,
-      'updateCertificateAssessmentOfferingAsync'
+      'createCertificateAssessmentOfferingAsync'
     ).and.returnValue(Promise.resolve(''));
     const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
     const routerSpy = spyOn(router, 'navigate');
 
-    component.updateCertificateOffering();
+    component.saveCertificateOffering();
     flushMicrotasks();
 
     expect(alertsSpy).not.toHaveBeenCalled();

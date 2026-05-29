@@ -101,7 +101,7 @@ describe('EditCertificateOfferingPageAuthGuard', () => {
 
     let canActivateResult: boolean | null = null;
     const stateSnapshot = {
-      url: '/EDIT-certificate-assessment-offering/dummy_id',
+      url: '/edit-certificate-assessment-offering/dummy_id',
     } as RouterStateSnapshot;
 
     guard
@@ -117,7 +117,7 @@ describe('EditCertificateOfferingPageAuthGuard', () => {
       `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
     ]);
     expect(replaceStateSpy).toHaveBeenCalledWith(
-      '/EDIT-certificate-assessment-offering/dummy_id'
+      '/edit-certificate-assessment-offering/dummy_id'
     );
   }));
 
@@ -130,7 +130,7 @@ describe('EditCertificateOfferingPageAuthGuard', () => {
 
     let canActivateResult: boolean | null = null;
     const stateSnapshot = {
-      url: '/EDIT-certificate-assessment-offering/dummy_id',
+      url: '/edit-certificate-assessment-offering/dummy_id',
     } as RouterStateSnapshot;
 
     guard

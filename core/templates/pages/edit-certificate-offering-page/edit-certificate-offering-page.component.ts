@@ -27,7 +27,7 @@ import {
 import {
   CertificateOfferingSectionId,
   CERTIFICATE_OFFERING_SECTION_IDS,
-} from 'pages/certificate-assessment-pages/certificate-offering-shared/certificate-offering-section.model';
+} from 'components/certificate-assessment-offering-helper/certificate-offering-section.model';
 import {AlertsService} from 'services/alerts.service';
 
 @Component({

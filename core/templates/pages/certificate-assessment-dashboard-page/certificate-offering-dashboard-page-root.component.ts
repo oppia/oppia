@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Certificate-offering-page-root component.
+ * @fileoverview Certificate-offering-dashboard-page-root component.
  */
 
 import {Component} from '@angular/core';

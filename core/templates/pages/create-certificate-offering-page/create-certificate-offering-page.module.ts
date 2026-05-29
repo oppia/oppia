@@ -13,32 +13,31 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the edit certificate offering page.
+ * @fileoverview Module for the create certificate offering page.
  */
 
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {SharedComponentsModule} from 'components/shared-component.module';
-import {CertificateOfferingSharedModule} from 'pages/certificate-assessment-pages/certificate-offering-shared/certificate-offering-shared.module';
-
-import {EditCertificateOfferingPageComponent} from './edit-certificate-offering-page.component';
-import {EditCertificateOfferingPageRootComponent} from './edit-certificate-offering-page-root.component';
-import {EditCertificateOfferingPageRoutingModule} from './edit-certificate-offering-page-routing.module';
+import {CertificateOfferingSharedModule} from 'components/certificate-assessment-offering-helper/certificate-offering-shared.module';
+import {CreateCertificateOfferingPageComponent} from './create-certificate-offering-page.component';
+import {CreateCertificateOfferingPageRootComponent} from './create-certificate-offering-page-root.component';
+import {CreateCertificateOfferingPageRoutingModule} from './create-certificate-offering-page-routing.module';
 
 @NgModule({
   imports: [
     CommonModule,
     SharedComponentsModule,
     CertificateOfferingSharedModule,
-    EditCertificateOfferingPageRoutingModule,
+    CreateCertificateOfferingPageRoutingModule,
   ],
   declarations: [
-    EditCertificateOfferingPageRootComponent,
-    EditCertificateOfferingPageComponent,
+    CreateCertificateOfferingPageRootComponent,
+    CreateCertificateOfferingPageComponent,
   ],
   entryComponents: [
-    EditCertificateOfferingPageRootComponent,
-    EditCertificateOfferingPageComponent,
+    CreateCertificateOfferingPageRootComponent,
+    CreateCertificateOfferingPageComponent,
   ],
 })
-export class EditCertificateOfferingPageModule {}
+export class CreateCertificateOfferingPageModule {}
