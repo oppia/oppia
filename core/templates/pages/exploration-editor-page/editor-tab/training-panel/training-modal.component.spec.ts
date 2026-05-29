@@ -286,6 +286,13 @@ describe('Training Modal Component', () => {
     expect(explorationStatesService.getState).not.toHaveBeenCalled();
   });
 
+  it('should throw in init if interaction id is null', () => {
+    (TestBed.inject(StateInteractionIdService) as any).savedMemento = null;
+    expect(() => {
+      component.init();
+    }).toThrowError('Expected interaction ID to be non-null.');
+  });
+
   it('should throw in init if interaction rules service is unmapped', () => {
     const unknownRulesServiceName = 'UnknownRulesService';
     spyOn(

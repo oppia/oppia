@@ -338,6 +338,18 @@ describe('Training Data Editor Panel Component', () => {
     ).toHaveBeenCalled();
   });
 
+  it('should throw error when interaction id is null in openTrainUnresolvedAnswerModal', () => {
+    component.answerGroupHasNonEmptyRules = true;
+    component.trainingData = [
+      {answer: 'Answer1', answerTemplate: 'answer'},
+      {answer: 'Answer2', answerTemplate: 'answer'},
+    ];
+    (TestBed.inject(StateInteractionIdService) as any).savedMemento = null;
+    expect(() => component.openTrainUnresolvedAnswerModal(0)).toThrowError(
+      'Cannot open training modal for a state with no interaction.'
+    );
+  });
+
   it('should exit modal', () => {
     spyOn(ngbActiveModal, 'close').and.stub();
 
@@ -361,10 +373,25 @@ describe('Training Data Editor Panel Component', () => {
     }).toThrowError('State name cannot be empty.');
   }));
 
+  it('should throw error when interaction id is null on init', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
+    (TestBed.inject(StateInteractionIdService) as any).savedMemento = null;
+    expect(() => component.ngOnInit()).toThrowError(
+      'Cannot initialize training data editor for a state with no interaction.'
+    );
+  });
+
   it('should throw error if state name is null', fakeAsync(() => {
     component._stateName = null;
     expect(() => {
       component.submitAnswer('answer');
     }).toThrowError('State name cannot be empty.');
   }));
+
+  it('should throw error when interaction id is null in submitAnswer', () => {
+    (TestBed.inject(StateInteractionIdService) as any).savedMemento = null;
+    expect(() => component.submitAnswer('answer')).toThrowError(
+      'Cannot submit answer for a state with no interaction.'
+    );
+  });
 });

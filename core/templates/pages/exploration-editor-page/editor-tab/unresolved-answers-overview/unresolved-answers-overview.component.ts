@@ -73,7 +73,7 @@ export class UnresolvedAnswersOverviewComponent implements OnInit {
   getCurrentInteractionId(): InteractionSpecsKey {
     let stateinteractionId = this.stateInteractionIdService.savedMemento;
     if (stateinteractionId === null) {
-      throw new Error('Expected interaction ID to be non-null.');
+      throw new Error('Expected stateinteraction ID to be non-null.');
     }
     return stateinteractionId;
   }

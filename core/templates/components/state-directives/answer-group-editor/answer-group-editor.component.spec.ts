@@ -219,6 +219,13 @@ describe('Answer Group Editor Component', () => {
     expect(component.changeActiveRuleIndex).not.toHaveBeenCalled();
   });
 
+  it('should throw error when interaction id is null', () => {
+    spyOn(component, 'getCurrentInteractionId').and.returnValue(null);
+    expect(() => component.addNewRule()).toThrowError(
+      'Expected interaction id to be non-null'
+    );
+  });
+
   it('should get answer choices when user updates answer choices', fakeAsync(() => {
     let updateAnswerChoicesEmitter = new EventEmitter();
     spyOnProperty(stateEditorService, 'onUpdateAnswerChoices').and.returnValue(

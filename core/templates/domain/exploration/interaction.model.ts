@@ -452,7 +452,7 @@ export class Interaction extends BaseTranslatableObject {
   }
 
   static convertFromCustomizationArgsBackendDict(
-    interactionId: string | null,
+    interactionId: InteractionSpecsKey | null,
     caBackendDict: InteractionCustomizationArgsBackendDict
   ): InteractionCustomizationArgs {
     if (interactionId === null) {
@@ -521,8 +521,6 @@ export class Interaction extends BaseTranslatableObject {
         return this.createFromTextInputCustomizationArgsBackendDict(
           caBackendDict as TextInputCustomizationArgsBackendDict
         );
-      default:
-        throw new Error(`Unrecognized interaction id ${interactionId}`);
     }
   }
 

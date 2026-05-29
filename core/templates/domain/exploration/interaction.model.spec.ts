@@ -587,24 +587,6 @@ describe('Interaction', () => {
     });
   });
 
-  it(
-    'should throw error when trying to set customization arguments for ' +
-      'interaction id that does not exist',
-    () => {
-      expect(() => {
-        Interaction.createFromBackendDict({
-          answer_groups: answerGroupsDict,
-          confirmed_unclassified_answers: [],
-          customization_args: {},
-          default_outcome: defaultOutcomeDict,
-          hints: hintsDict,
-          id: 'InteractionIDThatDNE' as InteractionSpecsKey,
-          solution: solutionDict,
-        });
-      }).toThrowError('Unrecognized interaction id InteractionIDThatDNE');
-    }
-  );
-
   it('should create an object when default outcome is null', () => {
     const copyInteractionDict = {...interactionDict};
     copyInteractionDict.default_outcome = null;
