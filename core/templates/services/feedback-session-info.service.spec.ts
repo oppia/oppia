@@ -93,6 +93,7 @@ describe('FeedbackSessionInfoService', () => {
       writable: true,
     });
     mockRouter = new MockRouter();
+    mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       providers: [
         FeedbackSessionInfoService,
@@ -102,7 +103,7 @@ describe('FeedbackSessionInfoService', () => {
         },
         {
           provide: WindowRef,
-          useClass: MockWindowRef,
+          useValue: mockWindowRef,
         },
         {
           provide: I18nLanguageCodeService,
@@ -112,7 +113,7 @@ describe('FeedbackSessionInfoService', () => {
     });
 
     feedbackSessionInfoService = TestBed.inject(FeedbackSessionInfoService);
-    mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
+    mockWindowRef = TestBed.inject(WindowRef);
     mockI18nLanguageCodeService = TestBed.inject(
       I18nLanguageCodeService
     ) as MockI18nLanguageCodeService;
