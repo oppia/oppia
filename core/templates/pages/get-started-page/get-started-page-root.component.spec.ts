@@ -28,8 +28,17 @@ import {GetStartedPageRootComponent} from './get-started-page-root.component';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
+
   instant(key: string): string {
     return key;
+  }
+
+  get(key: string) {
+    return {
+      subscribe: (callback: (value: string) => void) => {
+        callback(key);
+      },
+    };
   }
 }
 
@@ -82,14 +91,15 @@ describe('Get Started Page Root', () => {
   });
 
   it('should obtain translated title and set the title and meta tags', () => {
-    spyOn(translateService, 'instant').and.callThrough();
+    spyOn(translateService, 'get').and.callThrough();
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
 
     component.setPageTitleAndMetaTags();
 
-    expect(translateService.instant).toHaveBeenCalledWith(
+    expect(translateService.get).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.TITLE
     );
+
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.TITLE,
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.META

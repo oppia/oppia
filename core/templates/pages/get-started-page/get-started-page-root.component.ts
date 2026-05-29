@@ -46,7 +46,6 @@ export class GetStartedPageRootComponent implements OnInit, OnDestroy {
           AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.META
         );
 
-        // 1. The itemprop tags (You already fixed these!)
         this.meta.updateTag({
           itemprop: 'name',
           content: 'Personalized Online Learning from Oppia',
@@ -56,7 +55,6 @@ export class GetStartedPageRootComponent implements OnInit, OnDestroy {
           content: 'Learn how to get started using Oppia.',
         });
 
-        // 2. NEW: The Open Graph (og:) tags for the current test
         this.meta.updateTag({
           property: 'og:title',
           content: 'Personalized Online Learning from Oppia',

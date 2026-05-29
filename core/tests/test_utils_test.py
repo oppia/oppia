@@ -38,7 +38,7 @@ from core.tests import test_utils
 
 import elasticsearch
 import webapp2
-from typing import Callable, Dict, Final, List, OrderedDict, Tuple
+from typing import Callable, Dict, Final, List, OrderedDict, Tuple, Union
 
 email_services = models.Registry.import_email_services()
 
@@ -1009,7 +1009,10 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
             {'id': 'duplicate_id_1', 'data': 'first_doc'},
             {'id': 'duplicate_id_1', 'data': 'second_doc'},
         ]
-        body: Dict[str, Dict[str, Dict[str, List[dict]]]] = {
+        ElasticQuery = Dict[
+            str, Union[str, int, float, bool, Dict[str, object], List[object]]
+        ]
+        body: Dict[str, Dict[str, Dict[str, List[ElasticQuery]]]] = {
             'query': {'bool': {'filter': [], 'must': []}}
         }
         result = stub.mock_search(body=body, index='index1', size=10, from_=0)

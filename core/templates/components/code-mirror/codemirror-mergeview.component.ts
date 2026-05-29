@@ -29,7 +29,7 @@ import {
 } from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {
-  diff_match_patch,
+  DIFF_MATCH_PATCH,
   DIFF_INSERT,
   DIFF_DELETE,
   DIFF_EQUAL,
@@ -68,12 +68,12 @@ export class CodemirrorMergeviewComponent
 
   ngAfterViewInit(): void {
     const nativeWindow = this.windowRef.nativeWindow as Window & {
-      diff_match_patch?: typeof diff_match_patch;
+      diff_match_patch?: typeof DIFF_MATCH_PATCH;
       DIFF_INSERT?: typeof DIFF_INSERT;
       DIFF_DELETE?: typeof DIFF_DELETE;
       DIFF_EQUAL?: typeof DIFF_EQUAL;
     };
-    nativeWindow.diff_match_patch = diff_match_patch;
+    nativeWindow.diff_match_patch = DIFF_MATCH_PATCH;
     nativeWindow.DIFF_INSERT = DIFF_INSERT;
     nativeWindow.DIFF_DELETE = DIFF_DELETE;
     nativeWindow.DIFF_EQUAL = DIFF_EQUAL;
