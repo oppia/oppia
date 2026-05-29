@@ -682,7 +682,7 @@
 
 # Certificate Offering Pages.
 /core/domain/certificate_assessment*.py @oppia/contributor-experience-team
-core/storage/certificate_assessment @oppia/contributor-experience-team
+/core/storage/certificate_assessment @oppia/contributor-experience-team
 
 # Speed Improvement team.
 /core/templates/google-analytics.initializer.ts @oppia/lace-frontend-reviewers
