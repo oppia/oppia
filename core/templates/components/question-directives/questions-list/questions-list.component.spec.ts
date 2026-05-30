@@ -39,7 +39,9 @@ import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
 import {Skill} from 'domain/skill/skill.model';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {State} from 'domain/state/state.model';
+import {CategorizedSkills} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {SkillEditorRoutingService} from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import {AlertsService} from 'services/alerts.service';
@@ -52,11 +54,11 @@ import {QuestionsListComponent} from './questions-list.component';
 
 class MockNgbModalRef {
   componentInstance = {
-    skillSummaries: null,
-    skillsInSameTopicCount: null,
-    categorizedSkills: null,
-    allowSkillsFromOtherTopics: null,
-    untriagedSkillSummaries: null,
+    skillSummaries: [],
+    skillsInSameTopicCount: 0,
+    categorizedSkills: {} as CategorizedSkills,
+    allowSkillsFromOtherTopics: false,
+    untriagedSkillSummaries: [] as SkillSummary[],
   };
 }
 
@@ -69,7 +71,7 @@ class MockNgbModal {
 }
 
 class MockUrlInterpolationService {
-  interpolateUrl(value) {
+  interpolateUrl(value: string): string {
     return value;
   }
 }
@@ -89,8 +91,8 @@ describe('Questions List Component', () => {
   let pageContextService: PageContextService;
   let questionValidationService: QuestionValidationService;
   let skill: Skill;
-  let question = null;
-  let questionStateData = null;
+  let question: Question | null = null;
+  let questionStateData: State | null = null;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -161,7 +163,7 @@ describe('Questions List Component', () => {
                 missing_prerequisite_skill_id: null,
               },
               rule_specs: [],
-              training_data: null,
+              training_data: [],
               tagged_skill_misconception_id: null,
             },
           ],
@@ -213,8 +215,9 @@ describe('Questions List Component', () => {
         solicit_answer_details: false,
         card_is_checkpoint: false,
         linked_skill_id: null,
+        inapplicable_skill_misconception_ids: [],
       },
-      inapplicable_skill_misconception_ids: null,
+      inapplicable_skill_misconception_ids: [],
       language_code: 'en',
       linked_skill_ids: [],
       next_content_id_index: 5,
@@ -249,9 +252,9 @@ describe('Questions List Component', () => {
       language_code: 'en',
       version: 3,
       prerequisite_skill_ids: [],
-      all_questions_merged: null,
-      next_misconception_id: null,
-      superseding_skill_id: null,
+      all_questions_merged: false,
+      next_misconception_id: 0,
+      superseding_skill_id: '',
     });
 
     component.selectedSkillId = 'skillId1';
@@ -327,7 +330,7 @@ describe('Questions List Component', () => {
         })
       );
 
-      expect(component.misconceptionIdsForSelectedSkill).toEqual(undefined);
+      expect(component.misconceptionIdsForSelectedSkill).toBeUndefined();
 
       component.ngOnInit();
       tick();
@@ -362,9 +365,9 @@ describe('Questions List Component', () => {
         language_code: 'en',
         version: 3,
         prerequisite_skill_ids: [],
-        all_questions_merged: null,
-        next_misconception_id: null,
-        superseding_skill_id: null,
+        all_questions_merged: false,
+        next_misconception_id: 0,
+        superseding_skill_id: '',
       });
 
       spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
@@ -375,7 +378,7 @@ describe('Questions List Component', () => {
         })
       );
 
-      expect(component.difficultyCount).toEqual(undefined);
+      expect(component.difficultyCount).toBeUndefined();
 
       component.ngOnInit();
       tick();
@@ -410,7 +413,7 @@ describe('Questions List Component', () => {
   it('should get selected skill id when a question is created', () => {
     // When modal is not shown, then newQuestionSkillIds get the values of
     // skillIds.
-    expect(component.newQuestionSkillIds).toEqual(undefined);
+    expect(component.newQuestionSkillIds).toBeUndefined();
 
     component.selectSkillModalIsShown = true;
     component.createQuestion();
@@ -449,9 +452,9 @@ describe('Questions List Component', () => {
       language_code: 'en',
       version: 3,
       prerequisite_skill_ids: [],
-      all_questions_merged: null,
-      next_misconception_id: null,
-      superseding_skill_id: null,
+      all_questions_merged: false,
+      next_misconception_id: 0,
+      superseding_skill_id: '',
     });
     spyOn(skillBackendApiService, 'fetchMultiSkillsAsync').and.returnValue(
       Promise.resolve([skill])
@@ -460,7 +463,7 @@ describe('Questions List Component', () => {
       SkillDifficulty.create('skillId1', '', 1),
     ];
 
-    expect(component.misconceptionsBySkill).toEqual(undefined);
+    expect(component.misconceptionsBySkill).toBeUndefined();
 
     component.createQuestion();
     tick();
@@ -566,7 +569,7 @@ describe('Questions List Component', () => {
   it(
     'should not save and publish question if there are' + ' validation errors',
     () => {
-      component.question = question;
+      component.question = question as Question;
       spyOn(alertsService, 'addWarning');
       spyOn(
         questionValidationService,
@@ -587,7 +590,7 @@ describe('Questions List Component', () => {
     'should show an error and not save question if there are' +
       ' errors from question backend api service',
     fakeAsync(() => {
-      component.question = question;
+      component.question = question as Question;
       component.questionIsBeingUpdated = false;
       spyOn(
         editableQuestionBackendApiService,
@@ -611,22 +614,22 @@ describe('Questions List Component', () => {
       ' error on saving and publishing a question when question is not already' +
       ' being updated',
     fakeAsync(() => {
-      component.question = question;
+      component.question = question as Question;
       component.questionIsBeingUpdated = false;
       component.skillLinkageModificationsArray = [
         {
           id: '1',
-          task: null,
+          task: '',
           difficulty: 1,
         },
         {
           id: '2',
-          task: null,
+          task: '',
           difficulty: 2,
         },
         {
           id: '1',
-          task: null,
+          task: '',
           difficulty: 1,
         },
       ];
@@ -657,17 +660,17 @@ describe('Questions List Component', () => {
       ).toHaveBeenCalledWith('qId', [
         {
           id: '1',
-          task: null,
+          task: '',
           difficulty: 1,
         },
         {
           id: '2',
-          task: null,
+          task: '',
           difficulty: 2,
         },
         {
           id: '1',
-          task: null,
+          task: '',
           difficulty: 1,
         },
       ]);
@@ -675,7 +678,7 @@ describe('Questions List Component', () => {
   );
 
   it('should save question when another question is being updated', fakeAsync(() => {
-    component.question = question;
+    component.question = question as Question;
     component.questionIsBeingUpdated = true;
 
     spyOn(
@@ -709,7 +712,7 @@ describe('Questions List Component', () => {
     'should show error if saving question fails when another question' +
       ' is being updated',
     fakeAsync(() => {
-      component.question = question;
+      component.question = question as Question;
       component.questionIsBeingUpdated = true;
       spyOn(
         questionValidationService,
@@ -746,7 +749,7 @@ describe('Questions List Component', () => {
     'should display warning if commit message is not given while saving' +
       ' a question',
     fakeAsync(() => {
-      component.question = question;
+      component.question = question as Question;
       component.questionIsBeingUpdated = true;
       spyOn(
         questionValidationService,
@@ -772,7 +775,7 @@ describe('Questions List Component', () => {
     "should show 'confirm question modal exit' modal when user " +
       'clicks cancel',
     fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
         return {
           result: Promise.resolve(),
         } as NgbModalRef;
@@ -817,7 +820,7 @@ describe('Questions List Component', () => {
     "should close 'confirm question modal exit' modal when user clicks" +
       ' cancel',
     fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
         return {
           result: Promise.reject(),
         } as NgbModalRef;
@@ -879,7 +882,9 @@ describe('Questions List Component', () => {
     it('should return null if editor is already opened', () => {
       component.editorIsOpen = true;
 
-      expect(component.editQuestion(null, null, null)).toBe(undefined);
+      expect(component.editQuestion({} as QuestionSummary, '', 0)).toBe(
+        undefined
+      );
     });
 
     it(
@@ -888,7 +893,7 @@ describe('Questions List Component', () => {
         component.canEditQuestion = false;
         spyOn(alertsService, 'addWarning');
 
-        component.editQuestion(null, null, null);
+        component.editQuestion({} as QuestionSummary, '', 0);
 
         expect(alertsService.addWarning).toHaveBeenCalledWith(
           'User does not have enough rights to edit the question'
@@ -1005,7 +1010,7 @@ describe('Questions List Component', () => {
         'editQuestionSkillLinksAsync'
       ).and.returnValue(Promise.resolve());
 
-      component.removeQuestionFromSkill(questionId);
+      component.removeQuestionFromSkill(questionId, 1);
       tick();
 
       expect(ngbModal.open).toHaveBeenCalled();
@@ -1037,7 +1042,7 @@ describe('Questions List Component', () => {
         'editQuestionSkillLinksAsync'
       ).and.returnValue(Promise.resolve());
 
-      component.removeQuestionFromSkill(questionId);
+      component.removeQuestionFromSkill(questionId, 1);
       tick();
 
       expect(ngbModal.open).toHaveBeenCalled();
@@ -1069,7 +1074,7 @@ describe('Questions List Component', () => {
       ).and.returnValue(Promise.resolve());
       spyOn(component, 'removeQuestionSkillLinkAsync');
 
-      component.removeQuestionFromSkill(questionId);
+      component.removeQuestionFromSkill(questionId, 1);
       tick();
       expect(ngbModal.open).toHaveBeenCalled();
       expect(component.removeQuestionSkillLinkAsync).not.toHaveBeenCalled();
@@ -1085,7 +1090,7 @@ describe('Questions List Component', () => {
     ];
     spyOn(alertsService, 'addInfoMessage');
 
-    component.removeSkill(null);
+    component.removeSkill('');
 
     expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       'A question should be linked to at least one skill.'
@@ -1148,7 +1153,7 @@ describe('Questions List Component', () => {
   });
 
   it('should show solution if interaction can have solution', () => {
-    component.question = question;
+    component.question = question as Question;
     spyOn(component.question, 'getStateData').and.returnValue({
       interaction: {
         id: 'TextInput',
@@ -1156,7 +1161,10 @@ describe('Questions List Component', () => {
     } as State);
 
     expect(component.showSolutionCheckpoint()).toBe(true);
-
+    // This throws "Type 'null' is not assignable to type 'Question'.". We need to
+    // suppress this error because we are testing the component's behavior when
+    // question is null.
+    // @ts-expect-error
     component.question = null;
     expect(component.showSolutionCheckpoint()).toBe(false);
   });
@@ -1340,7 +1348,7 @@ describe('Questions List Component', () => {
       component.skillLinkageModificationsArray = [
         {
           id: '1',
-          task: null,
+          task: '',
           difficulty: 1,
         },
       ];
@@ -1383,12 +1391,12 @@ describe('Questions List Component', () => {
     component.skillLinkageModificationsArray = [
       {
         id: '1',
-        task: null,
+        task: '',
         difficulty: 1,
       },
       {
         id: '2',
-        task: null,
+        task: '',
         difficulty: 2,
       },
     ];
@@ -1408,7 +1416,7 @@ describe('Questions List Component', () => {
       undefined
     );
 
-    expect(component.getQuestionSummariesForOneSkill()).toEqual(undefined);
+    expect(component.getQuestionSummariesForOneSkill()).toBeUndefined();
   });
 
   it('should not toggle difficulty card if window is not narrow', () => {

@@ -653,6 +653,7 @@
     "I18N_FEEDBACK_CREATE_THREAD_SUBJECT_MIN_LENGTH": "Subject must be at least <[min]> characters long.",
     "I18N_FEEDBACK_CREATE_THREAD_SUBJECT_REQUIRED": "Subject is required.",
     "I18N_FEEDBACK_CREATE_THREAD_SUBMIT_BUTTON": "Create Thread",
+    "I18N_FEEDBACK_FLOATING_BUTTON": "Feedback",
     "I18N_FEEDBACK_INSTRUCTION": "Feedback message should be at most <[count]> characters.",
     "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Anonymous",
     "I18N_FEEDBACK_MODAL_HEADER": "Give feedback on this lesson",

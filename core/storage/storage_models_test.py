@@ -208,6 +208,8 @@ class StorageModelsTest(test_utils.GenericTestBase):
             # Feedback models.
             'GeneralFeedbackThreadModel',
             'GeneralFeedbackMessageModel',
+            'WebFeedbackThreadModel',
+            'WebFeedbackMessageModel',
             # Blog models.
             'BlogPostModel',
             'BlogPostSummaryModel',

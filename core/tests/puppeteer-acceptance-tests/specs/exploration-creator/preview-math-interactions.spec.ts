@@ -52,6 +52,8 @@ describe('Exploration Editor', function () {
     await explorationEditor.dismissWelcomeModal(true);
   });
 
+  // Math interactions require heavy MathJax rendering and take significantly
+  // longer to load and evaluate in CI environments, requiring a 10-minute timeout.
   it('should be able to preview "Fraction Input" interaction', async function () {
     // Add Fraction Input Interaction.
     await explorationEditor.updateCardContent('Enter a fraction: 1/2.');
@@ -105,8 +107,10 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
-  });
+  }, 600000);
 
+  // Math interactions require heavy MathJax rendering and take significantly
+  // longer to load and evaluate in CI environments, requiring a 10-minute timeout.
   it('should be able to preview "Set Input" interaction', async function () {
     // Add Set Input Interaction.
     await explorationEditor.updateCardContent('Enter a set.');
@@ -165,8 +169,10 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.FOURTH);
-  });
+  }, 600000);
 
+  // Math interactions require heavy MathJax rendering and take significantly
+  // longer to load and evaluate in CI environments, requiring a 10-minute timeout.
   it('should be able to preview "Numeric Expression" interaction', async function () {
     // Add a numeric expression interaction.
     await explorationEditor.updateCardContent('Enter a numeric expression.');
@@ -226,8 +232,10 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.FIFTH);
-  });
+  }, 600000);
 
+  // Math interactions require heavy MathJax rendering and take significantly
+  // longer to load and evaluate in CI environments, requiring a 10-minute timeout.
   it('should be able to preview "Algebric Expression" intreaction', async function () {
     // Add a algebric expression interaction.
     await explorationEditor.updateCardContent('Enter a algebric expression.');
@@ -295,8 +303,10 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.SIXTH);
-  });
+  }, 600000);
 
+  // Math interactions require heavy MathJax rendering and take significantly
+  // longer to load and evaluate in CI environments, requiring a 10-minute timeout.
   it('should be able to preview "Math Equation" interaction', async function () {
     // Add a math equation interaction.
     await explorationEditor.updateCardContent('Enter a math equation.');
@@ -359,8 +369,10 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.SEVENTH);
-  });
+  }, 600000);
 
+  // Math interactions require heavy MathJax rendering and take significantly
+  // longer to load and evaluate in CI environments, requiring a 10-minute timeout.
   it('should be able to preview "Number With Units" interaction', async function () {
     // Add a number with units input interaction.
     await explorationEditor.updateCardContent('Enter a number with units.');
@@ -418,8 +430,10 @@ describe('Exploration Editor', function () {
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAMES.EIGHTH);
-  });
+  }, 600000);
 
+  // Math interactions require heavy MathJax rendering and take significantly
+  // longer to load and evaluate in CI environments, requiring a 10-minute timeout.
   it('should be able to preview "Ratio Expression Input" interaction', async function () {
     // Add a ratio expression input interaction.
     await explorationEditor.updateCardContent('Enter a ratio expression.');
@@ -470,7 +484,7 @@ describe('Exploration Editor', function () {
     // Submit correct answer.
     await explorationEditor.submitAnswerInInputField('1:2');
     await explorationEditor.expectResponseFeedbackToBe('Great!');
-  });
+  }, 600000);
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
