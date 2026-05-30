@@ -14,6 +14,7 @@ window.MathJax = {
   showProcessingMessages: false,
   SVG: {
     useGlobalCache: false,
+    mtextFontInherit: true,
     linebreaks: {
       automatic: true,
       width: '500px',
