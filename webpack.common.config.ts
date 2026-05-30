@@ -134,7 +134,12 @@ module.exports = {
       lightweight: true,
     }),
     new CleanWebpackPlugin({
-      cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],
+      cleanAfterEveryBuildPatterns: [
+        '**/*',
+        '!*.html',
+        '!fonts/KaTeX_*',
+        '!icons/*.png',
+      ],
     }),
     new webpack.LoaderOptionsPlugin({
       options: {
