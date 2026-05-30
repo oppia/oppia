@@ -3677,12 +3677,21 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(openOutcomeDestButton, {
       visible: true,
     });
+
     await this.clickOnElementWithSelector(openOutcomeDestButton);
+
     await this.waitForElementToBeClickable(destinationCardSelector);
-    // The '/' value is used to select the 'a new card called' option in the dropdown.
+
     await this.select(destinationCardSelector, '/');
+
+    await this.page.waitForSelector(addStateInput, {
+      visible: true,
+    });
+
     await this.typeInInputField(addStateInput, cardName);
+
     await this.clickOnElementWithSelector(saveOutcomeDestButton);
+
     await this.page.waitForSelector(saveOutcomeDestButton, {
       hidden: true,
     });
