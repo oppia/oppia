@@ -56,6 +56,9 @@
       "modules/*": [
         "core/templates/modules/*"
       ],
+      "objects/*": [
+        "extensions/objects/*"
+      ],
       "pages/*": [
         "core/templates/pages/*"
       ],

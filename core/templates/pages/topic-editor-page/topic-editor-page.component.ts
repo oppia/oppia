@@ -129,12 +129,13 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
       } else {
         const subtopicIdFromUrl =
           this.topicEditorRoutingService.getSubtopicIdFromUrl();
-        const subtopicId =
-          subtopicIdFromUrl !== null &&
-          subtopicIdFromUrl !== undefined &&
-          !Number.isNaN(subtopicIdFromUrl)
+        const subtopicId = activeTab.startsWith('subtopic')
+          ? subtopicIdFromUrl !== null &&
+            subtopicIdFromUrl !== undefined &&
+            !Number.isNaN(subtopicIdFromUrl)
             ? subtopicIdFromUrl
-            : lastSubtopicIdVisited;
+            : lastSubtopicIdVisited
+          : lastSubtopicIdVisited;
         this.topicEditorRoutingService.navigateToSubtopicPreviewTab(subtopicId);
       }
     });

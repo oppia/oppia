@@ -1,4 +1,4 @@
-// Copyright 2022 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,19 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for practice session confirmation modal.
+ * @fileoverview Component for certificate offering dashboard.
  */
-
 import {Component} from '@angular/core';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-practice-session-confirmation-modal',
-  templateUrl: './practice-session-confirmation-modal.component.html',
+  selector: 'oppia-certificate-offering-dashboard-page',
+  templateUrl: './certificate-offering-dashboard-page.component.html',
 })
-export class PracticeSessionConfirmationModal extends ConfirmOrCancelModal {
-  constructor(private ngbActiveModal: NgbActiveModal) {
-    super(ngbActiveModal);
-  }
+export class CertificateOfferingDashboardPageComponent {
+  // Stub: no data or logic yet.
 }
