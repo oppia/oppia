@@ -34,6 +34,7 @@ import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import './topic-viewer-page.component.css';
 
@@ -65,6 +66,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     private loaderService: LoaderService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private pageTitleService: PageTitleService,
+    private platformFeatureService: PlatformFeatureService,
     private topicViewerBackendApiService: TopicViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
@@ -206,5 +208,10 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
 
   isPracticeTabEnabled(): boolean {
     return this.practiceTabIsDisplayed;
+  }
+
+  isRedesignedTopicViewerPageFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.RedesignedTopicViewerPage
+      .isEnabled;
   }
 }
