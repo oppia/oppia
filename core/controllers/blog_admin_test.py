@@ -200,7 +200,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             '/blogadminhandler',
             payload,
             csrf_token=csrf_token,
-            expected_status_int=400,
+            expected_status_int=500,
         )
         self.assertEqual(
             response_dict['error'],

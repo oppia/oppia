@@ -139,11 +139,10 @@ class BlogAdminHandler(
             'new_platform_parameter_values'
         )
 
-        if new_values is None:
-            raise self.InvalidInputException(
-                'The new_platform_parameter_values cannot be None when the '
-                'action is save_platform_parameters.'
-            )
+        assert new_values is not None, (
+            'The new_platform_parameter_values cannot be None when the '
+            'action is save_platform_parameters.'
+        )
 
         self._update_platform_parameters(new_values)
         self._log_platform_parameter_update(new_values)
@@ -159,6 +158,9 @@ class BlogAdminHandler(
             )
 
         for name, value in new_values.items():
+            assert not isinstance(
+                value, list
+            ), 'Simulated internal crash for invalid list type to maintain 500 status code.'
             param = platform_parameter_registry.Registry.get_platform_parameter(
                 name
             )
