@@ -29,23 +29,26 @@ from core.domain import (
     feature_flag_services,
     opportunity_domain,
     question_fetchers,
+    skill_domain,
+    skill_fetchers,
     story_domain,
     story_fetchers,
     suggestion_services,
     taskqueue_services,
     topic_domain,
     topic_fetchers,
+    translation_domain,
     translation_services,
 )
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import opportunity_models, user_models
 
-(opportunity_models, user_models) = models.Registry.import_models(
+opportunity_models, user_models = models.Registry.import_models(
     [models.Names.OPPORTUNITY, models.Names.USER]
 )
 
@@ -235,7 +238,7 @@ def create_exp_opportunity_summary(
         complete_translation_language_list
     )
     incomplete_translation_language_codes = (
-        _compute_exploration_incomplete_translation_languages(
+        _compute_incomplete_translation_languages(
             complete_translation_language_list
         )
     )
@@ -305,14 +308,14 @@ def generate_voiceovers_async_for_exp_linked_to_topic(exp_id: str) -> None:
         )
 
 
-def _compute_exploration_incomplete_translation_languages(
+def _compute_incomplete_translation_languages(
     complete_translation_languages: List[str],
 ) -> List[str]:
-    """Computes all languages that are not 100% translated in an exploration.
+    """Computes all languages that are not fully translated in an entity.
 
     Args:
         complete_translation_languages: list(str). List of complete translation
-            language codes in the exploration.
+            language codes in the entity.
 
     Returns:
         list(str). List of incomplete translation language codes sorted
@@ -325,6 +328,469 @@ def _compute_exploration_incomplete_translation_languages(
         complete_translation_languages
     )
     return sorted(list(incomplete_translation_language_codes))
+
+
+def get_entity_by_type_and_id(entity_type: str, entity_id: str) -> Union[
+    exp_domain.Exploration,
+    story_domain.Story,
+    skill_domain.Skill,
+    topic_domain.Topic,
+]:
+    """Helper method to fetch an entity by type and ID.
+
+    Args:
+        entity_type: str. The type of the entity.
+        entity_id: str. The ID of the entity.
+
+    Returns:
+        BaseTranslatableObject. The domain object corresponding to the given ID.
+
+    Raises:
+        ValueError. If an unsupported entity type is provided.
+    """
+    if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+        return exp_fetchers.get_exploration_by_id(entity_id)
+    elif entity_type == feconf.ENTITY_TYPE_STORY:
+        return story_fetchers.get_story_by_id(entity_id)
+    elif entity_type == feconf.ENTITY_TYPE_SKILL:
+        return skill_fetchers.get_skill_by_id(entity_id)
+    elif entity_type == feconf.ENTITY_TYPE_TOPIC:
+        return topic_fetchers.get_topic_by_id(entity_id)
+    else:
+        raise ValueError(f'Unsupported entity type: {entity_type}')
+
+
+def get_translation_opportunity_summary_from_model(
+    model: opportunity_models.TranslationOpportunityModel,
+) -> opportunity_domain.TranslationOpportunity:
+    """Returns a domain object for a translation opportunity from the given model.
+
+    Args:
+        model: TranslationOpportunityModel. The model instance from the datastore.
+
+    Returns:
+        TranslationOpportunity. The corresponding domain object.
+    """
+    return opportunity_domain.TranslationOpportunity(
+        entity_type=model.entity_type,
+        entity_id=model.entity_id,
+        topic_ids=model.topic_ids,
+        content_count=model.content_count,
+        incomplete_translation_language_codes=(
+            model.incomplete_translation_language_codes
+        ),
+        translation_counts=model.translation_counts,
+    )
+
+
+def compute_translation_opportunity_models_with_updated_entity(
+    entity_type: str,
+    entity_id: str,
+    content_count: int,
+    translation_counts: Dict[str, int],
+) -> List[opportunity_models.TranslationOpportunityModel]:
+    """Returns translation opportunity domain objects for the given entity
+    with updated content and translation counts.
+
+    Args:
+        entity_type: str. The type of entity (e.g., 'exploration').
+        entity_id: str. The ID of the entity.
+        content_count: int. Total number of translatable content strings.
+        translation_counts: Dict[str, int]. Map of language code to
+            number of translated content strings.
+
+    Returns:
+        list(TranslationOpportunityModel). A list with one
+        TranslationOpportunityModel object.
+
+    Raises:
+        ValueError. If there is a missing topic ID for the given entity.
+    """
+    topic_ids_by_entity = _compute_topic_ids_of_translation_opportunities(
+        {entity_type: [entity_id]}
+    )
+
+    topic_ids = topic_ids_by_entity.get(entity_id, [])
+
+    if not topic_ids:
+        raise ValueError(
+            f'Missing topic id for {entity_type} with id {entity_id}'
+        )
+
+    complete_translation_language_list = []
+    for language_code, translation_count in translation_counts.items():
+        if translation_count == content_count:
+            complete_translation_language_list.append(language_code)
+
+    model_id = f'{entity_type}.{entity_id}'
+    model = opportunity_models.TranslationOpportunityModel.get(
+        model_id, strict=False
+    )
+    if model is None:
+        # If the model does not exist, we create a new one.
+        create_translation_opportunity({entity_type: [entity_id]})
+        model = opportunity_models.TranslationOpportunityModel.get(model_id)
+
+    translation_opportunity = get_translation_opportunity_summary_from_model(
+        model
+    )
+    translation_opportunity.content_count = content_count
+    translation_opportunity.translation_counts = translation_counts
+    incomplete_translation_language_codes = (
+        _compute_incomplete_translation_languages(
+            complete_translation_language_list
+        )
+    )
+
+    entity = get_entity_by_type_and_id(entity_type, entity_id)
+    if entity.language_code in incomplete_translation_language_codes:
+        incomplete_translation_language_codes.remove(entity.language_code)
+
+    translation_opportunity.incomplete_translation_language_codes = (
+        incomplete_translation_language_codes
+    )
+
+    translation_opportunity.validate()
+
+    return _construct_new_translation_opportunity_models(
+        [translation_opportunity]
+    )
+
+
+def _fetch_entities_by_type(
+    entity_type: str,
+    entity_ids: List[str],
+) -> List[
+    Union[
+        story_domain.Story,
+        skill_domain.Skill,
+        topic_domain.Topic,
+    ]
+]:
+    """Fetches entities of the given type, filtering out None values.
+
+    Args:
+        entity_type: str. The type of entities to fetch.
+        entity_ids: list(str). The IDs of the entities to fetch.
+
+    Returns:
+        list(Story|Skill|Topic). A list of non-None domain objects.
+
+    Raises:
+        Exception. If the entity type is unsupported.
+    """
+    if entity_type == feconf.ENTITY_TYPE_STORY:
+        stories = story_fetchers.get_stories_by_ids(entity_ids)
+        return [s for s in stories if s is not None]
+    elif entity_type == feconf.ENTITY_TYPE_SKILL:
+        skills = skill_fetchers.get_multi_skills(entity_ids, strict=False)
+        return [s for s in skills if s is not None]
+    elif entity_type == feconf.ENTITY_TYPE_TOPIC:
+        topics = topic_fetchers.get_topics_by_ids(entity_ids, strict=False)
+        return [t for t in topics if t is not None]
+    else:
+        raise Exception(f'Unsupported entity type: {entity_type}')
+
+
+def _build_opportunity_for_non_exploration_entity(
+    entity: Union[
+        story_domain.Story,
+        skill_domain.Skill,
+        topic_domain.Topic,
+    ],
+    entity_type: str,
+    translatable_entity_type: feconf.TranslatableEntityType,
+    entity_to_topics: Dict[str, List[str]],
+) -> opportunity_domain.TranslationOpportunity:
+    """Builds a TranslationOpportunity for a non-exploration entity.
+
+    This is shared logic for stories, skills, and topics. Explorations
+    are handled separately because they use
+    get_languages_with_complete_translation which is exploration-specific.
+
+    Args:
+        entity: Story|Skill|Topic. The domain object.
+        entity_type: str. The entity type string constant.
+        translatable_entity_type: TranslatableEntityType. The enum value for
+            translation services.
+        entity_to_topics: dict(str, list(str)). Mapping of entity ID to
+            associated topic IDs.
+
+    Returns:
+        TranslationOpportunity. The constructed opportunity domain object.
+    """
+    # Story, Skill, and Topic do not extend BaseTranslatableObject, so
+    # get_content_count() is not available. Content count defaults to 0
+    # until these entities implement the translatable interface.
+    content_count = 0
+    translation_counts = translation_services.get_translation_counts(
+        translatable_entity_type, entity
+    )
+    complete_langs = [
+        lang
+        for lang, count in translation_counts.items()
+        if count == content_count
+    ]
+    incomplete_langs = _compute_incomplete_translation_languages(complete_langs)
+    # Remove the entity's own language from the incomplete list, since an
+    # entity does not need a translation in its own language.
+    incomplete_langs = [
+        lang for lang in incomplete_langs if lang != entity.language_code
+    ]
+    return opportunity_domain.TranslationOpportunity(
+        topic_ids=entity_to_topics.get(entity.id, []),
+        entity_id=entity.id,
+        content_count=content_count,
+        incomplete_translation_language_codes=incomplete_langs,
+        translation_counts=translation_counts,
+        entity_type=entity_type,
+    )
+
+
+def create_translation_opportunity(
+    entity_types_and_ids: Dict[str, List[str]],
+) -> None:
+    """Creates and stores translation opportunities for the given entities.
+
+    Args:
+        entity_types_and_ids: dict(str, list(str)). A mapping of entity types
+            (e.g., 'exploration') to lists of entity IDs to process.
+    """
+    entity_to_topics = _compute_topic_ids_of_translation_opportunities(
+        entity_types_and_ids
+    )
+
+    opportunities_list = []
+
+    for entity_type, entity_ids in entity_types_and_ids.items():
+        unique_ids = list(set(entity_ids))
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            exp_id_to_exploration = (
+                exp_fetchers.get_multiple_explorations_by_id(unique_ids)
+            )
+            for exploration_id, exploration in exp_id_to_exploration.items():
+                complete_langs = translation_services.get_languages_with_complete_translation(
+                    exploration
+                )
+                incomplete_langs = _compute_incomplete_translation_languages(
+                    complete_langs
+                )
+                incomplete_langs = [
+                    lang
+                    for lang in incomplete_langs
+                    if (lang != exploration.language_code)
+                ]
+                translation_counts = (
+                    translation_services.get_translation_counts(
+                        feconf.TranslatableEntityType.EXPLORATION, exploration
+                    )
+                )
+                opportunity = opportunity_domain.TranslationOpportunity(
+                    topic_ids=entity_to_topics.get(exploration_id, []),
+                    entity_id=exploration_id,
+                    content_count=exploration.get_content_count(),
+                    incomplete_translation_language_codes=incomplete_langs,
+                    translation_counts=translation_counts,
+                    entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+                )
+                opportunities_list.append(opportunity)
+        else:
+            entities = _fetch_entities_by_type(entity_type, unique_ids)
+            translatable_entity_type = feconf.TranslatableEntityType(
+                entity_type
+            )
+            for entity in entities:
+                opportunity = _build_opportunity_for_non_exploration_entity(
+                    entity,
+                    entity_type,
+                    translatable_entity_type,
+                    entity_to_topics,
+                )
+                opportunities_list.append(opportunity)
+
+    if opportunities_list:
+        _save_multi_translation_opportunities(opportunities_list)
+
+
+def _save_multi_translation_opportunities(
+    translation_opportunity_list: List[
+        opportunity_domain.TranslationOpportunity
+    ],
+) -> None:
+    """Converts and saves a list of translation opportunity domain objects.
+
+    Args:
+        translation_opportunity_list: list(TranslationOpportunity). A list of
+            domain objects representing translation opportunities.
+    """
+    models_to_persist = _construct_new_translation_opportunity_models(
+        translation_opportunity_list
+    )
+
+    if models_to_persist:
+        models_to_save = []
+        for model in models_to_persist:
+            existing_model = opportunity_models.TranslationOpportunityModel.get(
+                model.id, strict=False
+            )
+
+            if existing_model is None:
+                models_to_save.append(model)
+            else:
+                if (
+                    existing_model.content_count != model.content_count
+                    or existing_model.translation_counts
+                    != model.translation_counts
+                    or set(existing_model.incomplete_translation_language_codes)
+                    != set(model.incomplete_translation_language_codes)
+                    or existing_model.topic_ids != model.topic_ids
+                ):
+                    models_to_save.append(model)
+
+        if models_to_save:
+            opportunity_models.TranslationOpportunityModel.update_timestamps_multi(
+                models_to_save
+            )
+            opportunity_models.TranslationOpportunityModel.put_multi(
+                models_to_save
+            )
+
+
+def _construct_new_translation_opportunity_models(
+    translation_opportunity_list: List[
+        opportunity_domain.TranslationOpportunity
+    ],
+) -> List[opportunity_models.TranslationOpportunityModel]:
+    """Create TranslationOpportunityModels from domain objects.
+
+    Args:
+        translation_opportunity_list: list(TranslationOpportunity). A list of
+            translation opportunity domain objects.
+
+    Returns:
+        list(TranslationOpportunityModel). A list of
+        TranslationOpportunityModel instances to be stored in the datastore.
+    """
+    translation_opportunity_model_list = []
+    for opportunity in translation_opportunity_list:
+        model = opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type=opportunity.entity_type,
+            entity_id=opportunity.entity_id,
+            topic_ids=opportunity.topic_ids,
+            content_count=opportunity.content_count,
+            incomplete_translation_language_codes=(
+                opportunity.incomplete_translation_language_codes
+            ),
+            translation_counts=opportunity.translation_counts,
+        )
+        translation_opportunity_model_list.append(model)
+
+    return translation_opportunity_model_list
+
+
+def _compute_topic_ids_of_translation_opportunities(
+    entity_types_and_ids: Dict[str, List[str]],
+) -> Dict[str, List[str]]:
+    """Returns the topic IDs associated with the given entity IDs.
+
+    Args:
+        entity_types_and_ids: dict(str, list(str)). A dictionary keyed by entity
+            type with the value being a list of entity IDs.
+
+    Returns:
+        dict(str, list(str)). A dictionary mapping each provided entity ID to a
+        list of topic IDs it is associated with.
+
+    Raises:
+        Exception. If an unsupported entity type is provided.
+    """
+    entity_id_to_topic_ids: Dict[str, List[str]] = {}
+
+    topic_summaries = []
+    if feconf.ENTITY_TYPE_EXPLORATION in entity_types_and_ids or (
+        feconf.ENTITY_TYPE_STORY in entity_types_and_ids
+    ):
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
+
+    all_topics = []
+    if 'skill' in entity_types_and_ids:
+        all_topics = topic_fetchers.get_all_topics()
+
+    for entity_type, entity_ids in entity_types_and_ids.items():
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            exp_ids_set = set(entity_ids)
+            found_exp_ids: Set[str] = set()
+
+            for topic_summary in topic_summaries:
+                topic_id = topic_summary.id
+                for (
+                    exp_ids
+                ) in topic_summary.published_story_exploration_mapping.values():
+                    for exp_id in exp_ids:
+                        if (
+                            exp_id in exp_ids_set
+                            and exp_id not in found_exp_ids
+                        ):
+                            entity_id_to_topic_ids.setdefault(
+                                exp_id, []
+                            ).append(topic_id)
+                            found_exp_ids.add(exp_id)
+                            if found_exp_ids == exp_ids_set:
+                                break
+                if found_exp_ids == exp_ids_set:
+                    break
+
+        elif entity_type == feconf.ENTITY_TYPE_STORY:
+            story_ids_set = set(entity_ids)
+            found_story_ids: Set[str] = set()
+
+            for topic_summary in topic_summaries:
+                topic_id = topic_summary.id
+                for (
+                    story_id
+                ) in topic_summary.published_story_exploration_mapping:
+                    if (
+                        story_id in story_ids_set
+                        and story_id not in found_story_ids
+                    ):
+                        entity_id_to_topic_ids.setdefault(story_id, []).append(
+                            topic_id
+                        )
+                        found_story_ids.add(story_id)
+                        if found_story_ids == story_ids_set:
+                            break
+                if found_story_ids == story_ids_set:
+                    break
+
+        elif entity_type == feconf.ENTITY_TYPE_SKILL:
+            skill_ids_set = set(entity_ids)
+            found_skill_ids: Set[str] = set()
+
+            for topic in all_topics:
+                topic_id = topic.id
+                for skill_id in topic.get_all_skill_ids():
+                    if (
+                        skill_id in skill_ids_set
+                        and skill_id not in found_skill_ids
+                    ):
+                        entity_id_to_topic_ids.setdefault(skill_id, []).append(
+                            topic_id
+                        )
+                        found_skill_ids.add(skill_id)
+                        if found_skill_ids == skill_ids_set:
+                            break
+                if found_skill_ids == skill_ids_set:
+                    break
+
+        elif entity_type == feconf.ENTITY_TYPE_TOPIC:
+            topic_ids_set = set(entity_ids)
+            for topic_id in topic_ids_set:
+                entity_id_to_topic_ids[topic_id] = [topic_id]
+
+        else:
+            raise Exception(f'Unsupported entity type: {entity_type}')
+
+    return entity_id_to_topic_ids
 
 
 def add_new_exploration_opportunities(
@@ -404,7 +870,7 @@ def compute_opportunity_models_with_updated_exploration(
         updated_exploration.get_reviewer_only_content_count()
     )
     incomplete_translation_language_codes = (
-        _compute_exploration_incomplete_translation_languages(
+        _compute_incomplete_translation_languages(
             complete_translation_language_list
         )
     )
@@ -448,63 +914,133 @@ def compute_opportunity_models_with_updated_exploration(
 
 
 def update_translation_opportunity_with_accepted_suggestion(
-    exploration_id: str, language_code: str
+    entity_id: str,
+    language_code: str,
+    entity_type: str = feconf.ENTITY_TYPE_EXPLORATION,
 ) -> None:
-    """Updates the translation opportunity for the accepted suggestion in the
-    ExplorationOpportunitySummaryModel.
+    """Updates the translation opportunity for the accepted suggestion.
 
     Args:
-        exploration_id: str. The ID of the exploration.
+        entity_id: str. The ID of the entity.
         language_code: str. The language code of the accepted translation
             suggestion.
+        entity_type: str. The type of the entity.
     """
-    model = opportunity_models.ExplorationOpportunitySummaryModel.get(
-        exploration_id
-    )
-    exp_opportunity_summary = get_exploration_opportunity_summary_from_model(
-        model
-    )
-
-    # Capture the old stored count before recounting for audit tracking.
-    old_translation_count = exp_opportunity_summary.translation_counts.get(
-        language_code, 0
-    )
-
-    # Recount the translations to ensure that the counts are accurate and to
-    # prevent any double counting of translations.
-    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    current_translation_counts = translation_services.get_translation_counts(
-        feconf.TranslatableEntityType.EXPLORATION, exploration
-    )
-
-    if language_code in current_translation_counts:
-        exp_opportunity_summary.translation_counts[language_code] = (
-            current_translation_counts[language_code]
-        )
-    else:
-        exp_opportunity_summary.translation_counts[language_code] = 0
-
-    if (
-        exp_opportunity_summary.content_count
-        == exp_opportunity_summary.translation_counts[language_code]
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
     ):
+        model_id = f'{entity_type}.{entity_id}'
+        model = opportunity_models.TranslationOpportunityModel.get(
+            model_id, strict=False
+        )
+        if model is None:
+            return
+
+        translation_opportunity = (
+            get_translation_opportunity_summary_from_model(model)
+        )
+        old_translation_count = translation_opportunity.translation_counts.get(
+            language_code, 0
+        )
+
+        entity = get_entity_by_type_and_id(entity_type, entity_id)
+        current_translation_counts = (
+            translation_services.get_translation_counts(
+                feconf.TranslatableEntityType(entity_type), entity
+            )
+        )
+
+        new_count = current_translation_counts.get(language_code, 0)
+        translation_opportunity.translation_counts[language_code] = new_count
+        translation_opportunity.content_count = (
+            entity.get_content_count()
+            if isinstance(entity, translation_domain.BaseTranslatableObject)
+            else 0
+        )
+        translation_opportunity.update_translation_count(
+            language_code, new_count
+        )
+
+        # Remove the entity's own language from the incomplete list, since an
+        # entity does not need a translation in its own language.
         if (
-            language_code
-            in exp_opportunity_summary.incomplete_translation_language_codes
+            entity.language_code
+            in translation_opportunity.incomplete_translation_language_codes
         ):
-            exp_opportunity_summary.incomplete_translation_language_codes.remove(
+            translation_opportunity.incomplete_translation_language_codes.remove(
+                entity.language_code
+            )
+
+        translation_opportunity.validate()
+        _save_multi_translation_opportunities([translation_opportunity])
+
+        # Write audit model only for explorations for backward compatibility.
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            audit_model = opportunity_models.ExplorationOpportunitySummaryAuditModel.create_new(
+                exploration_id=entity_id,
+                language_code=language_code,
+                action='translation_accepted',
+                old_translation_count=old_translation_count,
+                new_translation_count=new_count,
+                content_count=translation_opportunity.content_count,
+            )
+            audit_model.put()
+    else:
+        if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
+            return
+
+        exp_model = opportunity_models.ExplorationOpportunitySummaryModel.get(
+            entity_id
+        )
+        if exp_model is None:
+            return
+
+        exp_opportunity_summary = (
+            get_exploration_opportunity_summary_from_model(exp_model)
+        )
+
+        # Capture the old stored count before recounting for audit tracking.
+        old_translation_count = exp_opportunity_summary.translation_counts.get(
+            language_code, 0
+        )
+
+        # Recount the translations to ensure that the counts are accurate and to
+        # prevent any double counting of translations.
+        exploration = exp_fetchers.get_exploration_by_id(entity_id)
+        current_translation_counts = (
+            translation_services.get_translation_counts(
+                feconf.TranslatableEntityType.EXPLORATION, exploration
+            )
+        )
+
+        if language_code in current_translation_counts:
+            exp_opportunity_summary.translation_counts[language_code] = (
+                current_translation_counts[language_code]
+            )
+        else:
+            exp_opportunity_summary.translation_counts[language_code] = 0
+
+        if (
+            exp_opportunity_summary.content_count
+            == exp_opportunity_summary.translation_counts[language_code]
+        ):
+            if (
+                language_code
+                in exp_opportunity_summary.incomplete_translation_language_codes
+            ):
+                exp_opportunity_summary.incomplete_translation_language_codes.remove(
+                    language_code
+                )
+            exp_opportunity_summary.language_codes_needing_voice_artists.append(
                 language_code
             )
-        exp_opportunity_summary.language_codes_needing_voice_artists.append(
-            language_code
-        )
 
-    exp_opportunity_summary.validate()
-    _save_multi_exploration_opportunity_summary([exp_opportunity_summary])
+        exp_opportunity_summary.validate()
+        _save_multi_exploration_opportunity_summary([exp_opportunity_summary])
 
-    audit_model = (
-        opportunity_models.ExplorationOpportunitySummaryAuditModel.create_new(
-            exploration_id=exploration_id,
+        audit_model = opportunity_models.ExplorationOpportunitySummaryAuditModel.create_new(
+            exploration_id=entity_id,
             language_code=language_code,
             action='translation_accepted',
             old_translation_count=old_translation_count,
@@ -513,8 +1049,7 @@ def update_translation_opportunity_with_accepted_suggestion(
             ],
             content_count=exp_opportunity_summary.content_count,
         )
-    )
-    audit_model.put()
+        audit_model.put()
 
 
 def update_exploration_opportunities_with_story_changes(
@@ -555,6 +1090,36 @@ def update_exploration_opportunities_with_story_changes(
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list
     )
+
+
+def delete_translation_opportunities(
+    entity_types_and_ids: Dict[str, List[str]],
+) -> None:
+    """Deletes translation opportunities for the given entities.
+
+    Args:
+        entity_types_and_ids: dict(str, list(str)). A dictionary mapping entity
+            types (e.g., 'story', 'exploration') to a list of their
+            corresponding entity IDs.
+    """
+    opportunity_ids = [
+        f'{entity_type}.{entity_id}'
+        for entity_type, entity_ids in entity_types_and_ids.items()
+        for entity_id in entity_ids
+    ]
+
+    models_to_delete = [
+        model
+        for model in opportunity_models.TranslationOpportunityModel.get_multi(
+            opportunity_ids
+        )
+        if model is not None
+    ]
+
+    if models_to_delete:
+        opportunity_models.TranslationOpportunityModel.delete_multi(
+            models_to_delete
+        )
 
 
 def delete_exploration_opportunities(exp_ids: List[str]) -> None:
@@ -653,6 +1218,190 @@ def delete_exp_opportunities_corresponding_to_story(story_id: str) -> None:
         .fetch()
     )
     exp_opprtunity_model_class.delete_multi(list(exp_opportunity_models))
+
+
+def get_translation_opportunities_with_new_models(
+    entity_type: str,
+    language_code: str,
+    topic_name: Optional[str] = None,
+    cursor: Optional[str] = None,
+) -> Tuple[
+    List[opportunity_domain.TranslationOpportunityCardInfo],
+    Optional[str],
+    bool,
+]:
+    """Returns a list of translation opportunity card info objects for the given
+    entity type, filtered by topic name and language code.
+
+    Args:
+        entity_type: str. The entity type to fetch opportunities for.
+        language_code: str. The language code to filter by.
+        topic_name: str or None. The name of the topic to filter by.
+        cursor: str or None. The datastore cursor for pagination.
+
+    Returns:
+        3-tuple(opportunities, cursor, more). where:
+            opportunities: list(TranslationOpportunityCardInfo). A list of
+                TranslationOpportunityCardInfo domain objects.
+            cursor: str or None. A query cursor pointing to the next batch of
+                results. If there are no more results, this might be None.
+            more: bool. If True, there are (probably) more results after this
+                batch.
+    """
+    topic_id = None
+    if topic_name:
+        topic = topic_fetchers.get_topic_by_name(topic_name, strict=False)
+        if topic is None:
+            return [], None, False
+        topic_id = topic.id
+
+    page_size = constants.OPPORTUNITIES_PAGE_SIZE
+    opportunity_models_list, cursor, more = (
+        opportunity_models.TranslationOpportunityModel.get_by_entity_type_and_topic(
+            entity_type, topic_id, language_code, page_size, cursor
+        )
+    )
+
+    if not opportunity_models_list:
+        return [], cursor, more
+
+    entity_ids = [model.entity_id for model in opportunity_models_list]
+
+    topic_summaries = topic_fetchers.get_all_topic_summaries()
+    topic_summary_map = {ts.id: ts for ts in topic_summaries if ts is not None}
+
+    story_map = {}
+    skill_map = {}
+    topic_map = {}
+    exp_id_to_story_id = {}
+
+    if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+        for ts in topic_summaries:
+            for (
+                story_id,
+                exp_ids,
+            ) in ts.published_story_exploration_mapping.items():
+                for exp_id in exp_ids:
+                    if exp_id in entity_ids:
+                        exp_id_to_story_id[exp_id] = story_id
+
+        story_ids = list(set(exp_id_to_story_id.values()))
+        if story_ids:
+            stories = story_fetchers.get_stories_by_ids(story_ids)
+            story_map = {
+                story.id: story for story in stories if story is not None
+            }
+
+    elif entity_type == feconf.ENTITY_TYPE_STORY:
+        stories = story_fetchers.get_stories_by_ids(entity_ids)
+        story_map = {story.id: story for story in stories if story is not None}
+
+    elif entity_type == feconf.ENTITY_TYPE_SKILL:
+        skills = skill_fetchers.get_multi_skills(entity_ids, strict=False)
+        skill_map = {skill.id: skill for skill in skills if skill is not None}
+
+    elif entity_type == feconf.ENTITY_TYPE_TOPIC:
+        topics = topic_fetchers.get_topics_by_ids(entity_ids, strict=False)
+        topic_map = {topic.id: topic for topic in topics if topic is not None}
+
+    in_review_counts = {}
+    if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+        in_review_counts = (
+            _build_exp_id_to_translation_suggestion_in_review_count(
+                entity_ids, language_code
+            )
+        )
+
+    published_topic_ids = set()
+    if entity_type == feconf.ENTITY_TYPE_TOPIC:
+        published_topic_ids = {
+            ts.id for ts in topic_fetchers.get_published_topic_summaries()
+        }
+
+    card_infos = []
+    for model in opportunity_models_list:
+        topic_name_val = ''
+        if model.topic_ids:
+            for t_id in model.topic_ids:
+                if t_id in topic_summary_map:
+                    topic_name_val = topic_summary_map[t_id].name
+                    break
+
+        currently_available_to_learners = False
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            for ts in topic_summaries:
+                for (
+                    story_id,
+                    exp_ids,
+                ) in ts.published_story_exploration_mapping.items():
+                    if model.entity_id in exp_ids:
+                        currently_available_to_learners = True
+                        break
+                if currently_available_to_learners:
+                    break
+
+        elif entity_type == feconf.ENTITY_TYPE_STORY:
+            for ts in topic_summaries:
+                if model.entity_id in ts.published_story_exploration_mapping:
+                    currently_available_to_learners = True
+                    break
+
+        elif entity_type == feconf.ENTITY_TYPE_SKILL:
+            if model.topic_ids:
+                currently_available_to_learners = True
+
+        elif entity_type == feconf.ENTITY_TYPE_TOPIC:
+            currently_available_to_learners = (
+                model.entity_id in published_topic_ids
+            )
+
+        entity_description = ''
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            exp_id = model.entity_id
+            story_id_val = exp_id_to_story_id.get(exp_id)
+            if story_id_val and story_id_val in story_map:
+                story_val = story_map[story_id_val]
+                story_node = (
+                    story_val.story_contents.get_node_with_corresponding_exp_id(
+                        exp_id
+                    )
+                )
+                if story_node:
+                    entity_description = story_node.title
+        elif entity_type == feconf.ENTITY_TYPE_STORY:
+            story_val_obj = story_map.get(model.entity_id)
+            if story_val_obj:
+                entity_description = story_val_obj.title
+        elif entity_type == feconf.ENTITY_TYPE_SKILL:
+            skill_val_obj = skill_map.get(model.entity_id)
+            if skill_val_obj:
+                entity_description = skill_val_obj.description
+        elif entity_type == feconf.ENTITY_TYPE_TOPIC:
+            topic_val_obj = topic_map.get(model.entity_id)
+            if topic_val_obj:
+                entity_description = topic_val_obj.name
+
+        card_info = opportunity_domain.TranslationOpportunityCardInfo(
+            topic_ids=model.topic_ids,
+            entity_id=model.entity_id,
+            content_count=model.content_count,
+            incomplete_translation_language_codes=model.incomplete_translation_language_codes,
+            translation_counts=model.translation_counts,
+            entity_type=model.entity_type,
+            topic_name=topic_name_val,
+            entity_description=entity_description,
+            is_pinned=False,
+            currently_available_to_learners=currently_available_to_learners,
+        )
+
+        if model.entity_id in in_review_counts:
+            card_info.translation_in_review_counts = {
+                language_code: in_review_counts[model.entity_id]
+            }
+
+        card_infos.append(card_info)
+
+    return card_infos, cursor, more
 
 
 def get_translation_opportunities(
@@ -1236,6 +1985,7 @@ def update_pinned_opportunity_model(
             language_code=language_code,
             topic_id=topic_id,
             opportunity_id=lesson_id,
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
         )
     else:
         if pinned_opportunity:
