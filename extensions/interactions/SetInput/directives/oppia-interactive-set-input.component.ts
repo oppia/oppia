@@ -27,7 +27,7 @@ import {SetInputRulesService} from './set-input-rules.service';
 import eq from 'lodash/eq';
 import {SetInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {Schema} from 'services/schema-default-value.service';
-import {SetInputAnswer} from 'interactions/answer-defs';
+import type {SetInputAnswer} from 'interactions/answer-defs';
 
 @Component({
   selector: 'oppia-interactive-set-input',

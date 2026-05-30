@@ -29,7 +29,7 @@ import {
   StateEditorService,
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {Rule} from 'domain/exploration/rule.model';
+import {Rule, RuleInputs, RuleInputTypes} from 'domain/exploration/rule.model';
 import isEqual from 'lodash/isEqual';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {TrainingDataEditorPanelService} from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
@@ -42,6 +42,7 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface TaggedMisconception {
   skillId: string | null;
@@ -53,13 +54,13 @@ interface TaggedMisconception {
   templateUrl: './answer-group-editor.component.html',
 })
 export class AnswerGroupEditor implements OnInit, OnDestroy {
-  @Input() displayFeedback: boolean;
-  @Input() taggedSkillMisconceptionId: string;
-  @Input() isEditable: boolean;
-  @Input() outcome: Outcome;
-  @Input() rules: Rule[];
-  @Input() suppressWarnings: boolean;
-  @Input() addState: (value: string) => void;
+  @Input() displayFeedback!: boolean;
+  @Input() taggedSkillMisconceptionId!: string;
+  @Input() isEditable!: boolean;
+  @Input() outcome!: Outcome;
+  @Input() rules!: Rule[];
+  @Input() suppressWarnings!: boolean;
+  @Input() addState!: (value: string) => void;
   @Output() onSaveAnswerGroupRules = new EventEmitter<Rule[]>();
   @Output() onSaveAnswerGroupCorrectnessLabel = new EventEmitter<Outcome>();
   @Output() onSaveNextContentIdIndex = new EventEmitter();
@@ -69,12 +70,18 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   @Output() onSaveTaggedMisconception =
     new EventEmitter<TaggedMisconception | null>();
 
-  rulesMemento: Rule[];
+  rulesMemento: Rule[] | null = null;
   directiveSubscriptions = new Subscription();
-  originalContentIdToContent: object;
-  activeRuleIndex: number;
-  answerChoices: AnswerChoice[];
-  editAnswerGroupForm: object;
+  // The 'unknown' type is used here because rule inputs can be of various
+  // types (e.g., strings, numbers, or complex objects) depending on the
+  // specific interaction and rule.
+  originalContentIdToContent!: Record<string, unknown>;
+  activeRuleIndex!: number;
+  answerChoices!: AnswerChoice[];
+  // The 'unknown' type is used here because 'editAnswerGroupForm' is a
+  // generic container for form state, where keys are form control names
+  // and values can be any type corresponding to the interaction's inputs.
+  editAnswerGroupForm: Record<string, unknown> = {};
   tagMisconceptionsFeatureFlagIsEnabled: boolean = false;
 
   constructor(
@@ -119,9 +126,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     return this.stateInteractionIdService.savedMemento;
   }
 
-  getDefaultInputValue(
-    varType: string
-  ): null | boolean | number | number[] | string | object | object[] {
+  getDefaultInputValue(varType: string): SchemaDefaultValue {
     // TODO(bhenning): Typed objects in the backend should be required
     // to provide a default value specific for their type.
     switch (varType) {
@@ -222,7 +227,15 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   addNewRule(): void {
     // Build an initial blank set of inputs for the initial rule.
     let interactionId = this.getCurrentInteractionId();
-    let ruleDescriptions = INTERACTION_SPECS[interactionId].rule_descriptions;
+    // The 'unknown' type is used here because the structure of rule
+    // descriptions varies across different interactions, and we only
+    // access the 'rule_descriptions' property here.
+    let ruleDescriptions = (
+      INTERACTION_SPECS as unknown as Record<
+        string,
+        {rule_descriptions: Record<string, string>}
+      >
+    )[interactionId].rule_descriptions;
     let ruleTypes = Object.keys(ruleDescriptions);
     if (ruleTypes.length === 0) {
       // This should never happen. An interaction must have at least
@@ -234,11 +247,15 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     let description = ruleDescriptions[ruleType];
 
     let PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-    let inputs = {};
-    const inputTypes = {};
-    while (description.match(PATTERN)) {
-      let varName = description.match(PATTERN)[1];
-      let varType = description.match(PATTERN)[2];
+    // The 'unknown' type is used here because 'inputs' holds the values for
+    // a rule's parameters, which can be any data type (string, number,
+    // object, etc.) depending on the specific rule being created.
+    let inputs: Record<string, unknown> = {};
+    const inputTypes: RuleInputTypes = {};
+    let match;
+    while ((match = description.match(PATTERN))) {
+      let varName = match[1];
+      let varType = match[2];
       if (varType) {
         varType = varType.substring(1);
       }
@@ -255,7 +272,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     // TODO(bhenning): Should use functionality in ruleEditor.js, but
     // move it to ResponsesService in StateResponses.js to properly
     // form a new rule.
-    const rule = Rule.createNew(ruleType, inputs, inputTypes);
+    const rule = Rule.createNew(ruleType, inputs as RuleInputs, inputTypes);
     this.rules.push(rule);
     this.changeActiveRuleIndex(this.rules.length - 1);
   }
@@ -273,8 +290,10 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
 
   cancelActiveRuleEdit(): void {
     this.rules.splice(0, this.rules.length);
-    for (let i = 0; i < this.rulesMemento.length; i++) {
-      this.rules.push(this.rulesMemento[i]);
+    if (this.rulesMemento) {
+      for (let i = 0; i < this.rulesMemento.length; i++) {
+        this.rules.push(this.rulesMemento[i]);
+      }
     }
     this.saveRules();
   }
@@ -291,7 +310,9 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
           updatedContentIdToContent.hasOwnProperty(contentId) &&
           !isEqual(
             this.originalContentIdToContent[contentId],
-            updatedContentIdToContent[contentId]
+            // The 'unknown' type is used here because rule inputs can be
+            // primitives or complex objects.
+            (updatedContentIdToContent as Record<string, unknown>)[contentId]
           )
         ) {
           contentIdsWithModifiedContent.push(contentId);
@@ -336,7 +357,12 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
           this.rules.map(rule => rule.type).join(', ')
       );
     }
-    return INTERACTION_SPECS[interactionId].is_trainable;
+    // The 'unknown' type is used here because the structure of
+    // interaction specifications varies, and we only need to access
+    // the 'is_trainable' property here.
+    return (
+      INTERACTION_SPECS as unknown as Record<string, {is_trainable: boolean}>
+    )[interactionId].is_trainable;
   }
 
   openTrainingDataEditor(): void {
@@ -353,8 +379,11 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
    * @returns {Object} A Mapping of content ids (string) to content
    *   (string).
    */
-  getTranslatableRulesContentIdToContentMap(): object {
-    const contentIdToContentMap = {};
+  // The 'unknown' type is used here because the values in the map are
+  // rule inputs, which can be any type (primitives or complex objects)
+  // depending on the rule and interaction.
+  getTranslatableRulesContentIdToContentMap(): Record<string, unknown> {
+    const contentIdToContentMap: Record<string, unknown> = {};
     this.rules.forEach(rule => {
       Object.keys(rule.inputs).forEach(ruleName => {
         const ruleInput = rule.inputs[ruleName];
@@ -363,7 +392,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
         // as a key.
         if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
           contentIdToContentMap[
-            (ruleInput as BaseTranslatableObject).contentId
+            (ruleInput as BaseTranslatableObject).contentId as string
           ] = ruleInput;
         }
       });

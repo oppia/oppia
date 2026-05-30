@@ -67,6 +67,7 @@ from core.storage.config import gae_models as config_models
 from core.storage.email import gae_models as email_models
 from core.storage.exploration import gae_models as exp_models
 from core.storage.feedback import gae_models as feedback_models
+from core.storage.general_feedback import gae_models as general_feedback_models
 from core.storage.improvements import gae_models as improvements_models
 from core.storage.job import gae_models as job_models
 from core.storage.learner_group import gae_models as learner_group_models
@@ -103,6 +104,7 @@ __all__ = [
     'email_services',
     'exp_models',
     'feedback_models',
+    'general_feedback_models',
     'improvements_models',
     'job_models',
     'learner_group_models',
