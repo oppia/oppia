@@ -601,6 +601,7 @@
 /core/templates/components/ck-editor-helpers/ckeditor4.module.ts @oppia/lace-frontend-reviewers
 /core/templates/directives/mathjax.directive.ts @oppia/lace-frontend-reviewers
 /core/templates/mathjaxConfig.ts @oppia/lace-frontend-reviewers
+/core/templates/mathjaxConfig.spec.ts @oppia/lace-frontend-reviewers
 /core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @oppia/lace-frontend-reviewers
 /core/templates/components/ck-editor-helpers/ck-editor-copy-content.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.html @oppia/lace-frontend-reviewers
