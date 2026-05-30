@@ -27,7 +27,7 @@ import {CurrentInteractionService} from 'pages/exploration-player-page/services/
 import {NumericInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {NumericInputRulesService} from './numeric-input-rules.service';
 import {NumericInputValidationService} from './numeric-input-validation.service';
-import {NumericInputAnswer} from 'interactions/answer-defs';
+import type {NumericInputAnswer} from 'interactions/answer-defs';
 
 interface NumericInputFormSchema {
   type: string;
