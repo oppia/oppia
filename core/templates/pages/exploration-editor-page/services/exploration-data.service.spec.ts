@@ -417,10 +417,10 @@ describe('Exploration data service', function () {
     };
 
     const service = eds as unknown as {
-      _autosaveChangeListAsync: (c: unknown[]) => void;
+      _autosaveChangeListAsync: (c: unknown[]) => Promise<void>;
     };
 
-    expect(() => service._autosaveChangeListAsync([])).toThrowError(
+    expectAsync(service._autosaveChangeListAsync([])).toBeRejectedWithError(
       'Version cannot be undefined'
     );
   }));

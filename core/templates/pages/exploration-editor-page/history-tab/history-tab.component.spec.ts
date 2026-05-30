@@ -661,18 +661,14 @@ describe('History tab component', () => {
       },
     ];
 
-    component.compareVersionMetadata = {
-      earlierVersion: undefined,
-      laterVersion: undefined,
-    };
-
     component.changeCompareVersion();
 
     tick();
 
     expect(component.diffData).toBeNull();
-    expect(component.earlierVersionHeader).toBeUndefined();
-    expect(component.laterVersionHeader).toBeUndefined();
+    expect(component.compareVersionMetadata.earlierVersion).toBeUndefined();
+    expect(component.compareVersionMetadata.laterVersion).toBeUndefined();
+    expect(compareVersionsService.getDiffGraphData).not.toHaveBeenCalled();
   }));
 
   it('should return when earlier or later version is missing', fakeAsync(() => {
@@ -696,5 +692,38 @@ describe('History tab component', () => {
 
     expect(component.earlierVersionHeader).toBe('');
     expect(component.laterVersionHeader).toBe('');
+  }));
+
+  it('should return when earlierVersion becomes undefined in promise callback', fakeAsync(() => {
+    spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
+      Promise.resolve({v1Metadata: null, v2Metadata: null})
+    );
+
+    spyOn(component, 'getVersionHeader');
+
+    component.selectedVersionsArray = [1, 2];
+
+    component.totalExplorationVersionMetadata = [
+      {
+        versionNumber: 1,
+        committerId: 'user1',
+        createdOnMsecsStr: '11/21/2014',
+        commitMessage: 'msg1',
+      },
+      {
+        versionNumber: 2,
+        committerId: 'user2',
+        createdOnMsecsStr: '11/21/2014',
+        commitMessage: 'msg2',
+      },
+    ];
+
+    component.changeCompareVersion();
+
+    component.compareVersionMetadata.earlierVersion = undefined;
+
+    tick();
+
+    expect(component.getVersionHeader).not.toHaveBeenCalled();
   }));
 });

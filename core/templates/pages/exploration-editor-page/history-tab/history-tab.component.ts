@@ -308,6 +308,8 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
     }
 
     if (earlierIndex === null || laterIndex === null) {
+      this.compareVersionMetadata.earlierVersion = undefined;
+      this.compareVersionMetadata.laterVersion = undefined;
       return;
     }
 

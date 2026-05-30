@@ -1482,14 +1482,17 @@ describe('State translation component', () => {
       .createSpy()
       .and.returnValue(false);
 
+    entityTranslationsService.languageCodeToLatestEntityTranslations.en =
+      new EntityTranslation('entityId', 'entityType', 1, 'en', {});
+
     spyOn(
       translationTabActiveContentIdService,
       'getActiveContentId'
     ).and.returnValue(null);
 
-    expect(() => {
-      component.updateTranslatedContent();
-    }).not.toThrowError();
+    component.updateTranslatedContent();
+
+    expect(component.activeTranslatedContent).toBeUndefined();
   });
 
   it('should format TranslatableSetOfNormalizedString values', () => {
@@ -2076,6 +2079,7 @@ describe('State translation component', () => {
     explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService
     );
+    entityTranslationsService = TestBed.inject(EntityTranslationsService);
     spyOnProperty(
       stateEditorService,
       'onRefreshStateTranslation'
