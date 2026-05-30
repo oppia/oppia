@@ -325,8 +325,8 @@ describe('Skills List Component', () => {
 
   it('should show edit options', () => {
     componentInstance.selectedIndex = 'test_index';
-    expect(componentInstance.showEditOptions('test_index')).toBeTrue();
-    expect(componentInstance.showEditOptions('test')).toBeFalse();
+    expect(componentInstance.showEditOptions('test_index')).toBe(true);
+    expect(componentInstance.showEditOptions('test')).toBe(false);
   });
 
   it('should change edit options', () => {
@@ -453,6 +453,7 @@ describe('Skills List Component', () => {
         123,
         23,
         true,
+        true,
         false,
         'sad',
         'asdf',
@@ -478,7 +479,13 @@ describe('Skills List Component', () => {
     );
 
     tick(500);
-    expect(componentInstance.editableTopicSummaries[0].isSelected).toBe(false);
+    expect(
+      (
+        componentInstance.editableTopicSummaries[0] as CreatorTopicSummary & {
+          isSelected: boolean;
+        }
+      ).isSelected
+    ).toBe(false);
     mockNgbModal.cancelCallbackTopics = undefined;
     componentInstance.assignSkillToTopic(
       AugmentedSkillSummary.createFromBackendDict(
