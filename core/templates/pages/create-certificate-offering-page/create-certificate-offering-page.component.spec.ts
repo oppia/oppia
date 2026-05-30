@@ -181,7 +181,24 @@ describe('Create Certificate Offering Page Component', () => {
     expect(routerSpy).not.toHaveBeenCalled();
   }));
 
-  it('should show an error message if certificate creation fails', fakeAsync(() => {
+  it('should show the error message from an Error instance', fakeAsync(() => {
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'createCertificateAssessmentOfferingAsync'
+    ).and.returnValue(
+      Promise.reject(new Error('Failed to create certificate.'))
+    );
+    const alertsSpy = spyOn(alertsService, 'addWarning');
+    const routerSpy = spyOn(router, 'navigate');
+
+    component.saveCertificateOffering();
+    flushMicrotasks();
+
+    expect(alertsSpy).toHaveBeenCalledWith('Failed to create certificate.');
+    expect(routerSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should fall back to a generic message for non-Error failures', fakeAsync(() => {
     spyOn(
       certificateAssessmentOfferingBackendApiService,
       'createCertificateAssessmentOfferingAsync'

@@ -102,7 +102,9 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
       }
     } catch (error: unknown) {
       this.alertsService.addWarning(
-        typeof error === 'string' ? error : 'Failed to create certificate.'
+        error instanceof Error && error.message
+          ? error.message
+          : 'Failed to create certificate.'
       );
     }
   }
