@@ -210,11 +210,23 @@ export class BlogPostEditorComponent implements OnInit {
   }
 
   getDateStringInWords(naiveDateTime: string): string {
-    let normalized = naiveDateTime.replace(
-      /(\d{2}:\d{2}:\d{2}):(\d+)$/,
-      '$1.$2'
+    // Expected format: 'MM/DD/YYYY, HH:mm:ss:ffffff' (UTC).
+    const match = naiveDateTime.match(
+      /^(\d{2})\/(\d{2})\/(\d{4}), (\d{2}):(\d{2}):(\d{2}):(\d{3})\d*$/
     );
-    let millisSinceEpoch = new Date(normalized + ' UTC').getTime();
+    if (!match) {
+      throw new Error(`Invalid datetime string: ${naiveDateTime}.`);
+    }
+    const [, month, day, year, hours, minutes, seconds, millis] = match;
+    const millisSinceEpoch = Date.UTC(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      Number(hours),
+      Number(minutes),
+      Number(seconds),
+      Number(millis)
+    );
     return this.dateTimeFormatService.getDateTimeInWords(millisSinceEpoch);
   }
 
