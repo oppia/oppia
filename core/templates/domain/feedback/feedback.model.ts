@@ -28,7 +28,7 @@ export type FeedbackStatus =
   | 'not_actionable';
 
 export interface FeedbackSessionInfo {
-  console_errors_json: {
+  console_logs_json: {
     error_message: string;
     log_level: 'error' | 'warn' | 'log' | 'info' | 'debug';
     timestamp_msecs: number;

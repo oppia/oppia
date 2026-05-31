@@ -156,14 +156,14 @@ describe('FeedbackSessionInfoService', () => {
     feedbackSessionInfoService.recordConsoleError('Initial error');
     const sessionInfo = feedbackSessionInfoService.getSessionInfo();
 
-    sessionInfo.console_errors_json.push({
+    sessionInfo.console_logs_json.push({
       error_message: 'Mutated error',
       log_level: 'error',
       timestamp_msecs: 1,
     });
 
     expect(
-      feedbackSessionInfoService.getSessionInfo().console_errors_json
+      feedbackSessionInfoService.getSessionInfo().console_logs_json
     ).toEqual([
       {
         error_message: 'Initial error',
@@ -183,7 +183,7 @@ describe('FeedbackSessionInfoService', () => {
     );
 
     expect(
-      feedbackSessionInfoService.getSessionInfo().console_errors_json
+      feedbackSessionInfoService.getSessionInfo().console_logs_json
     ).toEqual([
       {
         error_message: 'Default error',
@@ -205,7 +205,7 @@ describe('FeedbackSessionInfoService', () => {
 
     expect(mockWindowRef.errorSpy).toHaveBeenCalledWith('Wrapped error');
     expect(
-      feedbackSessionInfoService.getSessionInfo().console_errors_json
+      feedbackSessionInfoService.getSessionInfo().console_logs_json
     ).toEqual([
       {
         error_message: 'Wrapped error',
@@ -258,7 +258,7 @@ describe('FeedbackSessionInfoService', () => {
     ]);
 
     const consoleMessage =
-      feedbackSessionInfoService.getSessionInfo().console_errors_json[0];
+      feedbackSessionInfoService.getSessionInfo().console_logs_json[0];
     expect(consoleMessage.log_level).toEqual('debug');
     expect(consoleMessage.stack_trace).toEqual(stackError.stack);
     expect(consoleMessage.error_message).toContain(
@@ -282,7 +282,7 @@ describe('FeedbackSessionInfoService', () => {
     }
 
     const consoleErrors =
-      feedbackSessionInfoService.getSessionInfo().console_errors_json;
+      feedbackSessionInfoService.getSessionInfo().console_logs_json;
 
     expect(consoleErrors.length).toEqual(25);
     expect(consoleErrors[0].error_message).toEqual('Error 1');

@@ -36,7 +36,7 @@ export class FeedbackSessionInfoService {
   private static readonly MAX_NAVIGATION_ENTRIES = 5;
   private static consolePatched = false;
   private static activeInstance: FeedbackSessionInfoService | null = null;
-  private recentConsoleErrors: FeedbackSessionInfo['console_errors_json'] = [];
+  private recentConsoleErrors: FeedbackSessionInfo['console_logs_json'] = [];
   private recentFailedRequests: FeedbackSessionInfo['failed_requests_json'] =
     [];
   private recentNavigationHistory: FeedbackSessionInfo['navigation_history_json'] =
@@ -156,8 +156,8 @@ export class FeedbackSessionInfoService {
     }
   }
 
-  private pushConsoleError(
-    entry: FeedbackSessionInfo['console_errors_json'][number]
+  private pushConsoleLog(
+    entry: FeedbackSessionInfo['console_logs_json'][number]
   ): void {
     this.recentConsoleErrors.push(entry);
     if (
@@ -185,7 +185,7 @@ export class FeedbackSessionInfoService {
     stackTrace?: string,
     logLevel: ConsoleLogLevel = 'error'
   ): void {
-    this.pushConsoleError({
+    this.pushConsoleLog({
       error_message: errorMessage,
       log_level: logLevel,
       stack_trace: stackTrace,
@@ -201,7 +201,7 @@ export class FeedbackSessionInfoService {
       | Error
       | undefined;
     const summary = this.buildConsoleSummary(args);
-    this.pushConsoleError({
+    this.pushConsoleLog({
       error_message: summary,
       log_level: logLevel,
       stack_trace: errorEntry?.stack,
@@ -250,7 +250,7 @@ export class FeedbackSessionInfoService {
       } as const,
     };
     return {
-      console_errors_json: [...this.recentConsoleErrors],
+      console_logs_json: [...this.recentConsoleErrors],
       failed_requests_json: [...this.recentFailedRequests],
       navigation_history_json: [...this.recentNavigationHistory],
       environment_json: environmentInfo,
