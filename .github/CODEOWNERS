@@ -172,6 +172,7 @@
 /core/domain/learner_playlist_services*.py @oppia/lace-backend-reviewers
 /core/domain/learner_progress*.py @oppia/lace-backend-reviewers
 /core/domain/subscription_services*.py @oppia/lace-backend-reviewers
+/core/domain/captcha_services*.py @oppia/lace-backend-reviewers
 /core/templates/domain/creator_dashboard/ @oppia/lace-frontend-reviewers
 /core/templates/domain/email-dashboard/ @oppia/lace-frontend-reviewers
 /core/templates/domain/feedback_updates/feedback-updates-backend-api.service.ts @oppia/lace-frontend-reviewers
