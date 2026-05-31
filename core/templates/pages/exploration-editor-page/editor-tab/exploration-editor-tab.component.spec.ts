@@ -1040,11 +1040,7 @@ describe('Exploration editor tab component', () => {
           {} as Interaction['customizationArgs'],
           null,
           [],
-<<<<<<< HEAD
           'TextInput',
-=======
-          'id' as InteractionSpecsKey,
->>>>>>> 7a8568bf54 (Fix interaction ID typing contracts to use InteractionSpecsKey)
           null
         ),
         [],
