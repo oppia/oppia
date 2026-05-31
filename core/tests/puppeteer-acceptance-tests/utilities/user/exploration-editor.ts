@@ -3732,6 +3732,11 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForElementToBeClickable(destinationCardSelector);
 
     await this.select(destinationCardSelector, '/');
+    const selectedValue = await this.page.$eval(
+      destinationCardSelector,
+      (el: Element) => (el as HTMLSelectElement).value
+    );
+    console.log('Selected destination value:', selectedValue);
 
     await this.page.waitForSelector(addStateInput, {
       visible: true,
