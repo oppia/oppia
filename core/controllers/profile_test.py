@@ -1023,6 +1023,20 @@ class SignupTests(test_utils.GenericTestBase):
         )
 
         response = self.get_html_response(
+            '/signup?return_url=/%09/google.com', expected_status_int=302
+        )
+        self.assertEqual(
+            '', strip_domain_from_location_header(response.headers['location'])
+        )
+
+        response = self.get_html_response(
+            '/signup?return_url=/%5C%5Cgoogle.com', expected_status_int=302
+        )
+        self.assertEqual(
+            '', strip_domain_from_location_header(response.headers['location'])
+        )
+
+        response = self.get_html_response(
             '/signup?return_url=/page#hello', expected_status_int=302
         )
         self.assertEqual(

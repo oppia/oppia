@@ -1125,6 +1125,10 @@ REGENERATE_VOICEOVERS_FOR_EXPLORATION_URL = (
     '<exploration_id>/<language_accent_code>'
 )
 
+CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
+    '/certificate_assessment_offering_handler'
+)
+
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
 EVENT_TYPE_STATE_HIT = 'state_hit'
