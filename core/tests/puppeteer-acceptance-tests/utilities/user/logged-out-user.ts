@@ -606,6 +606,11 @@ const conceptCardCloseButtonSelector = '.e2e-test-close-concept-card';
 const promoBarTextSelector = '.e2e-test-promo-bar-text';
 const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
 
+const metaItempropNameSelector = 'meta[itemprop="name"]';
+const metaOgTitleSelector = 'meta[property="og:title"]';
+const metaDescriptionSelector = 'meta[name="description"]';
+const metaApplicationNameSelector = 'meta[name="application-name"]';
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -7403,6 +7408,36 @@ export class LoggedOutUser extends BaseUser {
     if (suggestedSection) {
       await this.expectElementToBeVisible(blogSuggestedForYouHeadingSelector);
     }
+  }
+
+  /**
+   * Function to verify meta tags on the current page.
+   */
+  async verifyMetaTags(): Promise<void> {
+    await this.page.waitForSelector(metaItempropNameSelector);
+
+    const itempropName = await this.page.$eval(metaItempropNameSelector, el =>
+      el.getAttribute('content')
+    );
+    expect(itempropName).toBe('Personalized Online Learning from Oppia');
+
+    const ogTitle = await this.page.$eval(metaOgTitleSelector, el =>
+      el.getAttribute('content')
+    );
+    expect(ogTitle).toBe('Personalized Online Learning from Oppia');
+
+    const description = await this.page.$eval(metaDescriptionSelector, el =>
+      el.getAttribute('content')
+    );
+    expect(description).toBe(
+      'Learn any subject through free and interactive lessons in easy-to-follow language. ' +
+        'Oppia provides a step-by-step learning process to master any skills you want.'
+    );
+
+    const appName = await this.page.$eval(metaApplicationNameSelector, el =>
+      el.getAttribute('content')
+    );
+    expect(appName).toBe('Oppia.org');
   }
 }
 
