@@ -6,6 +6,13 @@
     [topicId]="topicId"
     [classroomName]="classroomName">
   </topic-header>
+  <div class="redesigned-stories-list">
+    <topic-story-section *ngFor="let s of canonicalStorySummaries"
+      [storySummary]="s"
+      [subtopics]="subtopics"
+      [activeTab]="activeTab">
+    </topic-story-section>
+  </div>
 </div>
 
 <ng-template #legacyTopicViewerContainer>

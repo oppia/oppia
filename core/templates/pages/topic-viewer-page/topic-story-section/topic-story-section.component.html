@@ -1,0 +1,26 @@
+<section class="topic-story-section">
+  <div class="story-card">
+    <div class="story-card-header">
+      <div class="story-card-header-left">
+        <h2 class="story-title">{{ storySummary.getTitle() }}</h2>
+        <p class="story-description">{{ storySummary.getDescription() }}</p>
+        <p class="story-meta">{{ lessonCount }} lessons, {{ practiceCount }} practice</p>
+      </div>
+      <div class="story-card-header-right">
+        <button
+          class="study-skills-cta"
+          aria-label="Open Study Skills for {{ storySummary.getTitle() }}"
+          (click)="onOpenStudySkills()">
+          Study Skills
+        </button>
+      </div>
+    </div>
+
+    <!-- Outer wrapper only: detailed lesson cards and progress will be
+         implemented in a follow-up PR. This area intentionally left empty
+         for this change to focus on the redesigned outer layout. -->
+    <div class="story-card-body" role="region" aria-label="Story summary">
+      <!-- placeholder for future content -->
+    </div>
+  </div>
+</section>
