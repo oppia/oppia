@@ -167,12 +167,10 @@ export class StateEditorComponent implements OnInit, OnDestroy {
   ): void {
     this.interactionIdIsSet = Boolean(newInteractionId);
     this.currentInteractionCanHaveSolution = Boolean(
-      newInteractionId !== null &&
-        INTERACTION_SPECS[newInteractionId].can_have_solution
+      newInteractionId && INTERACTION_SPECS[newInteractionId].can_have_solution
     );
     this.currentStateIsTerminal = Boolean(
-      newInteractionId !== null &&
-        INTERACTION_SPECS[newInteractionId].is_terminal
+      newInteractionId && INTERACTION_SPECS[newInteractionId].is_terminal
     );
   }
 
@@ -259,7 +257,7 @@ export class StateEditorComponent implements OnInit, OnDestroy {
           this.stateName as string,
           stateData.interaction.solution
         );
-        this.updateInteractionVisibility(stateData.interaction.id || '');
+        this.updateInteractionVisibility(stateData.interaction.id || null);
         this.servicesInitialized = true;
       })
     );

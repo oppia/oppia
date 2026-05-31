@@ -56,7 +56,6 @@ import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 export interface InitializeAnswerGroups {
   interactionId: InteractionSpecsKey | null;
@@ -348,7 +347,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
         this.hasLoaded = false;
         this.interactionDetailsCacheService.reset();
         this.responsesService.onInitializeAnswerGroups.emit({
-          interactionId: stateData.interaction.id as string,
+          interactionId: stateData.interaction.id,
           answerGroups: stateData.interaction.answerGroups,
           defaultOutcome: stateData.interaction.defaultOutcome as Outcome,
           confirmedUnclassifiedAnswers:
