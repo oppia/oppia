@@ -134,6 +134,34 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
                 conversion_fn
             )
 
+    def test_set_suggestion_status_to_accepted(self) -> None:
+        self.base_suggestion.set_suggestion_status_to_accepted()
+        self.assertEqual(
+            self.base_suggestion.status, suggestion_models.STATUS_ACCEPTED
+        )
+
+    def test_set_suggestion_status_to_in_review(self) -> None:
+        self.base_suggestion.set_suggestion_status_to_in_review()
+        self.assertEqual(
+            self.base_suggestion.status, suggestion_models.STATUS_IN_REVIEW
+        )
+
+    def test_set_suggestion_status_to_rejected(self) -> None:
+        self.base_suggestion.set_suggestion_status_to_rejected()
+        self.assertEqual(
+            self.base_suggestion.status, suggestion_models.STATUS_REJECTED
+        )
+
+    def test_set_final_reviewer_id(self) -> None:
+        self.base_suggestion.set_final_reviewer_id('reviewer_123')
+        self.assertEqual(self.base_suggestion.final_reviewer_id, 'reviewer_123')
+
+    def test_is_handled(self) -> None:
+        self.base_suggestion.status = suggestion_models.STATUS_ACCEPTED
+        self.assertTrue(self.base_suggestion.is_handled)
+        self.base_suggestion.status = suggestion_models.STATUS_IN_REVIEW
+        self.assertFalse(self.base_suggestion.is_handled)
+
 
 class SuggestionEditStateContentDict(TypedDict):
     """Dictionary representing the SuggestionEditStateContent object."""
@@ -979,6 +1007,98 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         actual_outcome_list = suggestion.get_all_html_content_strings()
         expected_outcome_list = ['new suggestion content']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
+
+    def test_get_all_html_content_strings_with_old_value(self) -> None:
+        change_dict: Dict[str, Union[Optional[str], Dict[str, str]]] = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': {
+                'content_id': 'content',
+                'html': 'new suggestion content',
+            },
+            'old_value': {
+                'content_id': 'content',
+                'html': 'old suggestion content',
+            },
+        }
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            change_dict,
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+        actual_outcome_list = suggestion.get_all_html_content_strings()
+        self.assertIn('new suggestion content', actual_outcome_list)
+        self.assertIn('old suggestion content', actual_outcome_list)
+
+    def test_populate_old_value_of_change_with_valid_state(self) -> None:
+        self.save_new_default_exploration('exp1', self.author_id)
+        change_cmd = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': {'content_id': 'content', 'html': 'new content'},
+            'old_value': None,
+        }
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            self.suggestion_dict['target_version_at_submission'],
+            self.suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            change_cmd,
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+        suggestion.populate_old_value_of_change()
+        self.assertIsNotNone(suggestion.change_cmd.old_value)
+
+    def test_accept_suggestion(self) -> None:
+        self.save_new_default_exploration('exp1', self.author_id)
+        change_cmd = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Introduction',
+            'new_value': {
+                'content_id': 'content_0',
+                'html': '<p>new content</p>',
+            },
+            'old_value': None,
+        }
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            self.suggestion_dict['suggestion_id'],
+            'exp1',
+            1,
+            suggestion_models.STATUS_IN_REVIEW,
+            self.author_id,
+            self.reviewer_id,
+            change_cmd,
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+        suggestion.final_reviewer_id = self.reviewer_id
+        suggestion.accept('Accepted suggestion.')
+        updated_exp = exp_fetchers.get_exploration_by_id('exp1')
+        self.assertEqual(
+            updated_exp.states['Introduction'].content.html,
+            '<p>new content</p>',
+        )
 
     def test_convert_html_in_suggestion_change(self) -> None:
         html_content = (
@@ -4319,6 +4439,82 @@ class ReviewableSuggestionEmailInfoUnitTests(test_utils.GenericTestBase):
         )
 
 
+class TranslationContributionStatsUnitTests(test_utils.GenericTestBase):
+    """Tests for the TranslationContributionStats class."""
+
+    LANGUAGE_CODE: Final = 'es'
+    CONTRIBUTOR_USER_ID: Final = 'uid_01234567890123456789012345678912'
+    TOPIC_ID: Final = 'topic_id'
+    SUBMITTED_TRANSLATIONS_COUNT: Final = 2
+    SUBMITTED_TRANSLATION_WORD_COUNT: Final = 100
+    ACCEPTED_TRANSLATIONS_COUNT: Final = 1
+    ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
+    ACCEPTED_TRANSLATION_WORD_COUNT: Final = 50
+    REJECTED_TRANSLATIONS_COUNT: Final = 0
+    REJECTED_TRANSLATION_WORD_COUNT: Final = 0
+    CONTRIBUTION_DATES: Final = frozenset(
+        [datetime.date.fromtimestamp(1616173836)]
+    )
+
+    def test_to_dict(self) -> None:
+        expected_stats_dict = {
+            'language_code': self.LANGUAGE_CODE,
+            'contributor_user_id': self.CONTRIBUTOR_USER_ID,
+            'topic_id': self.TOPIC_ID,
+            'submitted_translations_count': self.SUBMITTED_TRANSLATIONS_COUNT,
+            'submitted_translation_word_count': (
+                self.SUBMITTED_TRANSLATION_WORD_COUNT
+            ),
+            'accepted_translations_count': self.ACCEPTED_TRANSLATIONS_COUNT,
+            'accepted_translations_without_reviewer_edits_count': (
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
+            ),
+            'accepted_translation_word_count': (
+                self.ACCEPTED_TRANSLATION_WORD_COUNT
+            ),
+            'rejected_translations_count': self.REJECTED_TRANSLATIONS_COUNT,
+            'rejected_translation_word_count': (
+                self.REJECTED_TRANSLATION_WORD_COUNT
+            ),
+            'contribution_dates': self.CONTRIBUTION_DATES,
+        }
+        actual_stats = suggestion_registry.TranslationContributionStats(
+            self.LANGUAGE_CODE,
+            self.CONTRIBUTOR_USER_ID,
+            self.TOPIC_ID,
+            self.SUBMITTED_TRANSLATIONS_COUNT,
+            self.SUBMITTED_TRANSLATION_WORD_COUNT,
+            self.ACCEPTED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT,
+            self.ACCEPTED_TRANSLATION_WORD_COUNT,
+            self.REJECTED_TRANSLATIONS_COUNT,
+            self.REJECTED_TRANSLATION_WORD_COUNT,
+            self.CONTRIBUTION_DATES,
+        )
+        self.assertDictEqual(actual_stats.to_dict(), expected_stats_dict)
+
+    def test_to_frontend_dict(self) -> None:
+        actual_stats = suggestion_registry.TranslationContributionStats(
+            self.LANGUAGE_CODE,
+            self.CONTRIBUTOR_USER_ID,
+            self.TOPIC_ID,
+            self.SUBMITTED_TRANSLATIONS_COUNT,
+            self.SUBMITTED_TRANSLATION_WORD_COUNT,
+            self.ACCEPTED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT,
+            self.ACCEPTED_TRANSLATION_WORD_COUNT,
+            self.REJECTED_TRANSLATIONS_COUNT,
+            self.REJECTED_TRANSLATION_WORD_COUNT,
+            self.CONTRIBUTION_DATES,
+        )
+        result = actual_stats.to_frontend_dict()
+        self.assertEqual(result['language_code'], self.LANGUAGE_CODE)
+        self.assertEqual(
+            result['submitted_translations_count'],
+            self.SUBMITTED_TRANSLATIONS_COUNT,
+        )
+
+
 class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
     """Tests for the TranslationReviewStats class."""
 
@@ -4368,6 +4564,23 @@ class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
 
         self.assertDictEqual(actual_stats.to_dict(), expected_stats_dict)
 
+    def test_to_frontend_dict(self) -> None:
+        actual_stats = suggestion_registry.TranslationReviewStats(
+            self.LANGUAGE_CODE,
+            self.CONTRIBUTOR_USER_ID,
+            self.TOPIC_ID,
+            self.REVIEWED_TRANSLATIONS_COUNT,
+            self.REVIEWED_TRANSLATION_WORD_COUNT,
+            self.ACCEPTED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATION_WORD_COUNT,
+            self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE,
+            self.LAST_CONTRIBUTION_DATE,
+        )
+        result = actual_stats.to_frontend_dict()
+        self.assertEqual(result['language_code'], self.LANGUAGE_CODE)
+        self.assertEqual(result['topic_id'], self.TOPIC_ID)
+
 
 class QuestionContributionStatsUnitTests(test_utils.GenericTestBase):
     """Tests for the QuestionContributionStats class."""
@@ -4405,6 +4618,22 @@ class QuestionContributionStatsUnitTests(test_utils.GenericTestBase):
 
         self.assertDictEqual(actual_stats.to_dict(), expected_stats_dict)
 
+    def test_to_frontend_dict(self) -> None:
+        actual_stats = suggestion_registry.QuestionContributionStats(
+            self.CONTRIBUTOR_USER_ID,
+            self.TOPIC_ID,
+            self.SUBMITTED_QUESTION_COUNT,
+            self.ACCEPTED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE,
+            self.LAST_CONTRIBUTION_DATE,
+        )
+        result = actual_stats.to_frontend_dict()
+        self.assertEqual(result['topic_id'], self.TOPIC_ID)
+        self.assertEqual(
+            result['submitted_questions_count'], self.SUBMITTED_QUESTION_COUNT
+        )
+
 
 class QuestionReviewStatsUnitTests(test_utils.GenericTestBase):
     """Tests for the QuestionReviewStats class."""
@@ -4441,6 +4670,22 @@ class QuestionReviewStatsUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertDictEqual(actual_stats.to_dict(), expected_stats_dict)
+
+    def test_to_frontend_dict(self) -> None:
+        actual_stats = suggestion_registry.QuestionReviewStats(
+            self.CONTRIBUTOR_USER_ID,
+            self.TOPIC_ID,
+            self.REVIEWED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE,
+            self.LAST_CONTRIBUTION_DATE,
+        )
+        result = actual_stats.to_frontend_dict()
+        self.assertEqual(result['topic_id'], self.TOPIC_ID)
+        self.assertEqual(
+            result['reviewed_questions_count'], self.REVIEWED_QUESTIONS_COUNT
+        )
 
 
 class ContributorMilestoneEmailInfoUnitTests(test_utils.GenericTestBase):
@@ -5030,3 +5275,33 @@ class QuestionReviewerTotalContributionStatsUnitTests(
         self.assertDictEqual(
             actual_stats.to_frontend_dict(), expected_stats_dict
         )
+
+
+class ContributorCertificateInfoUnitTests(test_utils.GenericTestBase):
+    """Tests for the ContributorCertificateInfo class."""
+
+    FROM_DATE: Final = '01/01/2024'
+    TO_DATE: Final = '31/01/2024'
+    TEAM_LEAD: Final = 'team_lead_user'
+    CONTRIBUTION_HOURS: Final = '10'
+    CONTRIBUTION_WORD_COUNT: Final = 500
+    LANGUAGE: Final = 'es'
+
+    def test_to_dict(self) -> None:
+        expected_dict = {
+            'from_date': self.FROM_DATE,
+            'to_date': self.TO_DATE,
+            'team_lead': self.TEAM_LEAD,
+            'contribution_hours': self.CONTRIBUTION_HOURS,
+            'contribution_word_count': self.CONTRIBUTION_WORD_COUNT,
+            'language': self.LANGUAGE,
+        }
+        actual_info = suggestion_registry.ContributorCertificateInfo(
+            self.FROM_DATE,
+            self.TO_DATE,
+            self.TEAM_LEAD,
+            self.CONTRIBUTION_HOURS,
+            self.CONTRIBUTION_WORD_COUNT,
+            self.LANGUAGE,
+        )
+        self.assertDictEqual(actual_info.to_dict(), expected_dict)
