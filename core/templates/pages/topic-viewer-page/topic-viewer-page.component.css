@@ -3,6 +3,13 @@
   compilation, here are sme additional rules that can be added to the CSS files:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
+
+topic-viewer-page .oppia-redesigned-topic-viewer-container {
+  background-color: #fff;
+  min-height: 100vh;
+  padding: 24px 48px 0;
+  text-align: start;
+}
 topic-viewer-page .oppia-topic-viewer-container {
   color: black;
   margin: 0 auto;
