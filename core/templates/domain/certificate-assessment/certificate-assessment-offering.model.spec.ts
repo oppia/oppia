@@ -51,7 +51,7 @@ describe('Certificate Assessment Offering Data Model', () => {
     expect(emptyOffering.topicData).toEqual({});
     expect(emptyOffering.totalQuestions).toEqual(0);
     expect(emptyOffering.timeLimitInMinutes).toEqual(0);
-    expect(emptyOffering.asyncStatus).toEqual('Not Ready');
+    expect(emptyOffering.asyncStatus).toEqual('Not_Ready');
     expect(emptyOffering.version).toEqual(0);
   });
 

@@ -135,7 +135,7 @@ export class CertificateAssessmentOfferingData {
       {},
       0,
       0,
-      'Not Ready',
+      'Not_Ready',
       0
     );
   }

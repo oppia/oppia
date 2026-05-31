@@ -7,7 +7,7 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
+// distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
@@ -43,6 +43,7 @@ describe('Certificate Assessment Offering backend api service', () => {
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
 
+    // Mocking an empty object or placeholder data as the payload structure is managed by its model.
     mockCertificateOfferingData = {} as CertificateAssessmentOfferingData;
   });
 
@@ -55,7 +56,7 @@ describe('Certificate Assessment Offering backend api service', () => {
       .createCertificateAssessmentOfferingAsync(mockCertificateOfferingData)
       .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne(
+    let req = httpTestingController.expectOne(
       CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL
     );
     expect(req.request.method).toEqual('POST');
@@ -105,7 +106,7 @@ describe('Certificate Assessment Offering backend api service', () => {
       )
       .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne(
+    let req = httpTestingController.expectOne(
       CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER_URL.replace(
         '<certificate_id>',
         'mock_certificate_id'
