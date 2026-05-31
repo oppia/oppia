@@ -22,17 +22,14 @@
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
 const DEFAULT_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-enum INTERACTION_TYPES {
-  END_EXPLORATION = 'End Exploration',
-}
-
 describe('LC.12 Visit Creator Dashboard', function () {
   let lessonCreator: ExplorationEditor & LoggedInUser;
-  let learner: LoggedInUser;
+  let learner: LoggedInUser & LoggedOutUser;
 
   let positiveNumbersExplorationId: string;
   let negativeNumbersExplorationId: string;
@@ -81,25 +78,21 @@ describe('LC.12 Visit Creator Dashboard', function () {
         'Negative Numbers',
       ]);
 
-      await learner.navigateToCommunityLibrary();
+      await learner.navigateToCommunityLibraryPage();
 
       await learner.playExploration(negativeNumbersExplorationId);
 
       await learner.waitForPageToFullyLoad();
 
-      await learner.starRateExploration(5);
+      await learner.rateExploration(5, 'Great Lesson', false);
 
-      await learner.giveFeedbackAfterRating('Great Lesson');
-
-      await learner.navigateToCommunityLibrary();
+      await learner.navigateToCommunityLibraryPage();
 
       await learner.playExploration(positiveNumbersExplorationId);
 
       await learner.waitForPageToFullyLoad();
 
-      await learner.starRateExploration(3);
-
-      await learner.closeFeedbackPopup();
+      await learner.rateExploration(3, '', false);
 
       await learner.openLessonInfoModal();
 

@@ -783,6 +783,12 @@ export class LoggedInUser extends BaseUser {
       await this.waitForElementToBeClickable(ratingStars[rating - 1]);
       await ratingStars[rating - 1].click();
 
+      // If no feedback string provided, stop after clicking the rating
+      if (!feedback || feedback.trim() === '') {
+        showMessage('No feedback provided; skipping feedback submission.');
+        return;
+      }
+
       await this.typeInInputField(feedbackTextareaSelector, feedback);
       if (stayAnonymous) {
         await this.clickOnElementWithSelector(anonymousCheckboxSelector);
@@ -4727,72 +4733,6 @@ export class LoggedInUser extends BaseUser {
     showMessage(
       'All specified chapters are present in the coming soon chapters list'
     );
-  }
-
-  /**
-   * Navigates to the Community Library page.
-   */
-  async navigateToCommunityLibrary(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
-        visible: true,
-      });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
-      await this.clickOnElementWithSelector(mobileLearnDropdownSelector);
-      await this.clickOnElementWithSelector(
-        communityLibraryLinkInNavMenuSelector
-      );
-    } else {
-      await this.page.waitForSelector(navbarLearnTab, {visible: true});
-      await this.clickOnElementWithSelector(navbarLearnTab);
-      await this.clickOnElementWithSelector(
-        communityLibraryLinkInNavbarSelector
-      );
-    }
-
-    await this.waitForPageToFullyLoad();
-    await this.expectElementToBeVisible(communityLibraryContainerSelector);
-  }
-
-  /**
-   * Star rate the exploration by clicking the specified star.
-   * @param {number} stars - The star index to click (1-based).
-   */
-  async starRateExploration(stars: number): Promise<void> {
-    // Ensure rating stars are visible before interacting.
-    await this.expectElementToBeVisible(ratingStarSelector, true);
-
-    const ratingStars = await this.page.$$(ratingStarSelector);
-
-    if (ratingStars.length < stars) {
-      throw new Error(`Only ${ratingStars.length} stars found`);
-    }
-
-    await ratingStars[stars - 1].click();
-  }
-
-  /**
-   * Submits feedback for the current exploration after rating.
-   * @param {string} feedback - The feedback text to submit.
-   */
-  async giveFeedbackAfterRating(feedback: string): Promise<void> {
-    await this.expectElementToBeVisible(feedbackTextareaSelector, true);
-
-    await this.typeInInputField(feedbackTextareaSelector, feedback);
-    await this.expectElementToBeVisible(submitButtonSelector, true);
-    await this.clickOnElementWithSelector(submitButtonSelector);
-
-    await this.waitForNetworkIdle();
-  }
-
-  /**
-   * Closes the feedback popup dialog.
-   */
-  async closeFeedbackPopup(): Promise<void> {
-    await this.expectElementToBeVisible(feedbackCloseButton, true);
-    await this.clickOnElementWithSelector(feedbackCloseButton);
-
-    await this.waitForPageToFullyLoad();
   }
 
   /**
