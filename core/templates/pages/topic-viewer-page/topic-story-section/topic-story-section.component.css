@@ -1,76 +1,183 @@
 .topic-story-section {
-  margin: 1.5rem 0 2rem;
-  padding: 1.5rem 1rem;
-  background: linear-gradient(180deg, #e9f3fb 0%, #f6fbff 100%);
+  margin: 0;
+  padding: 0;
+}
+
+.story-callout-row {
+  align-items: flex-end;
+  display: flex;
+  gap: 16px;
+  margin: 0 0 16px;
+  max-width: 760px;
+}
+
+.story-callout-avatar {
+  flex: 0 0 auto;
+  height: 72px;
+  object-fit: contain;
+  width: 72px;
+}
+
+.story-description-bubble {
+  background: #fff;
+  border-radius: 20px;
+  border-end-start-radius: 4px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14);
+  color: #3c3c3c;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 680px;
+  padding: 18px 24px;
+  position: relative;
+}
+
+.story-description-bubble::before {
+  border-block-end: 12px solid transparent;
+  border-block-start: 12px solid transparent;
+  border-inline-end: 14px solid #fff;
+  content: '';
+  inset-block-end: 18px;
+  inset-inline-start: -14px;
+  position: absolute;
 }
 
 .story-card {
-  max-width: 1100px;
-  margin: 0 auto;
-  background: #ffffff;
-  border-radius: 12px;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.06);
 }
 
 .story-card-header {
-  display: flex;
   align-items: center;
+  background: #00645c;
+  color: #fff;
+  display: flex;
+  gap: 24px;
   justify-content: space-between;
-  padding: 20px 24px;
-  background: #0f6b5f; /* teal header */
-  color: #ffffff;
+  padding: 22px 28px;
 }
 
 .story-card-header-left {
   flex: 1 1 auto;
+  min-width: 0;
 }
 
 .story-title {
-  margin: 0 0 6px;
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.story-description {
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.3;
   margin: 0;
-  opacity: 0.95;
+  overflow-wrap: anywhere;
 }
 
 .story-meta {
+  color: rgba(255, 255, 255, 0.92);
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.4;
   margin: 8px 0 0;
-  font-size: 0.95rem;
-  opacity: 0.9;
 }
 
 .story-card-header-right {
-  margin-left: 16px;
-  display: flex;
-  align-items: center;
+  flex: 0 0 auto;
 }
 
 .study-skills-cta {
-  background: transparent;
-  border: 2px solid rgba(255,255,255,0.9);
-  color: #ffffff;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
+  background: #fff;
+  border: 2px solid #fff;
+  border-radius: 4px;
+  color: #00645c;
+  display: inline-block;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 10px 18px;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.study-skills-cta:hover,
+.study-skills-cta:focus {
+  background: #e6f2f0;
+  color: #004f48;
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+  text-decoration: none;
 }
 
 .story-card-body {
-  padding: 20px 24px 28px;
   min-height: 80px;
+  padding: 20px 28px 28px;
 }
 
-/* Responsive */
-@media (max-width: 640px) {
-  .story-card-header {
-    flex-direction: column;
-    align-items: flex-start;
+@media (max-width: 768px) {
+  .story-callout-row {
     gap: 12px;
+    max-width: 100%;
   }
 
-  .story-card-header-right { margin-left: 0; }
+  .story-callout-avatar {
+    height: 56px;
+    width: 56px;
+  }
+
+  .story-description-bubble {
+    font-size: 16px;
+    padding: 16px 20px;
+  }
+
+  .story-card-header {
+    padding: 20px 24px;
+  }
+
+  .story-title {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 500px) {
+  .story-callout-row {
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .story-callout-avatar {
+    height: 44px;
+    width: 44px;
+  }
+
+  .story-description-bubble {
+    border-radius: 16px;
+    border-end-start-radius: 4px;
+    font-size: 15px;
+    padding: 14px 16px;
+  }
+
+  .story-description-bubble::before {
+    inset-block-end: auto;
+    inset-block-start: 12px;
+  }
+
+  .story-card-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+    padding: 18px 20px;
+  }
+
+  .story-card-header-right,
+  .study-skills-cta {
+    width: 100%;
+  }
+
+  .story-card-body {
+    padding: 18px 20px 24px;
+  }
 }

@@ -1,26 +1,30 @@
-<section class="topic-story-section">
-  <div class="story-card">
+<section class="topic-story-section"
+         [attr.aria-label]="storyTitle ? ('Story section: ' + storyTitle) : 'Story section'">
+  <div *ngIf="storyDescription" class="story-callout-row">
+    <img class="story-callout-avatar" [src]="oppiaAvatarImageUrl" alt="" aria-hidden="true">
+    <p class="story-description-bubble">
+      {{ storyDescription }}
+    </p>
+  </div>
+
+  <article class="story-card"
+           [attr.aria-label]="storyTitle ? ('Story summary: ' + storyTitle) : 'Story summary'">
     <div class="story-card-header">
       <div class="story-card-header-left">
-        <h2 class="story-title">{{ storySummary.getTitle() }}</h2>
-        <p class="story-description">{{ storySummary.getDescription() }}</p>
-        <p class="story-meta">{{ lessonCount }} lessons, {{ practiceCount }} practice</p>
+        <h3 class="story-title">{{ storyTitle }}</h3>
+        <p class="story-meta" [attr.aria-label]="getStoryMetaAriaLabel()">
+          {{ getStoryMetaText() }}
+        </p>
       </div>
       <div class="story-card-header-right">
-        <button
-          class="study-skills-cta"
-          aria-label="Open Study Skills for {{ storySummary.getTitle() }}"
-          (click)="onOpenStudySkills()">
+        <a class="study-skills-cta"
+           [href]="studyGuideUrl"
+           [attr.aria-label]="'Open Study Skills for ' + (storyTitle || 'this story')">
           Study Skills
-        </button>
+        </a>
       </div>
     </div>
 
-    <!-- Outer wrapper only: detailed lesson cards and progress will be
-         implemented in a follow-up PR. This area intentionally left empty
-         for this change to focus on the redesigned outer layout. -->
-    <div class="story-card-body" role="region" aria-label="Story summary">
-      <!-- placeholder for future content -->
-    </div>
-  </div>
+    <div class="story-card-body"></div>
+  </article>
 </section>

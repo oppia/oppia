@@ -7,9 +7,32 @@
 topic-viewer-page .oppia-redesigned-topic-viewer-container {
   background-color: #fff;
   min-height: 100vh;
-  padding: 24px 48px 0;
   text-align: start;
 }
+
+topic-viewer-page .redesigned-topic-viewer-content {
+  padding: 24px 48px 0;
+}
+
+topic-viewer-page .redesigned-stories-section {
+  /* The banner artwork is reused from the shared background-banner component. */
+  background-color: #aed2e9;
+  background-image: url('/assets/images/background/bannerB.svg');
+  background-position: top center;
+  background-repeat: repeat;
+  background-size: 1173px 82px;
+  margin-top: 24px;
+  padding: 48px 48px 64px;
+}
+
+topic-viewer-page .redesigned-stories-list {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin: 0 auto;
+  max-width: 884px;
+}
+
 topic-viewer-page .oppia-topic-viewer-container {
   color: black;
   margin: 0 auto;
@@ -159,6 +182,18 @@ topic-viewer-page .topic-viewer-page-content .coming-soon-text {
 }
 
 @media(max-width: 1024px) {
+  topic-viewer-page .redesigned-topic-viewer-content {
+    padding: 24px 32px 0;
+  }
+
+  topic-viewer-page .redesigned-stories-section {
+    padding: 40px 32px 56px;
+  }
+
+  topic-viewer-page .redesigned-stories-list {
+    max-width: 80vw;
+  }
+
   topic-viewer-page .topic-viewer-tabs-list {
     width: 80vw;
   }
@@ -178,7 +213,36 @@ topic-viewer-page .topic-viewer-page-content .coming-soon-text {
   }
 }
 
+@media(max-width: 768px) {
+  topic-viewer-page .redesigned-topic-viewer-content {
+    padding: 20px 24px 0;
+  }
+
+  topic-viewer-page .redesigned-stories-section {
+    margin-top: 20px;
+    padding: 32px 24px 48px;
+  }
+
+  topic-viewer-page .redesigned-stories-list {
+    gap: 24px;
+    max-width: 100%;
+  }
+}
+
 @media(max-width: 500px) {
+  topic-viewer-page .redesigned-topic-viewer-content {
+    padding: 16px 16px 0;
+  }
+
+  topic-viewer-page .redesigned-stories-section {
+    margin-top: 16px;
+    padding: 28px 16px 40px;
+  }
+
+  topic-viewer-page .redesigned-stories-list {
+    gap: 20px;
+  }
+
   topic-viewer-page .topic-viewer-tabs-list {
     width: 90vw;
   }

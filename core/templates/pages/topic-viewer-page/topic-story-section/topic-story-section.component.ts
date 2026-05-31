@@ -13,24 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Story section for the redesigned topic viewer page.
+ * @fileoverview Slimmed-down story section for the redesigned topic viewer
+ * page. This component intentionally exposes a minimal, input-driven API so
+ * parents can supply precomputed values (title, description, URL fragments,
+ * and counts) and the component remains presentational.
  */
 
-import {
-  Component,
-  Input,
-  OnChanges,
-  OnInit,
-  SimpleChanges,
-} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 
-import {StorySummary} from 'domain/story/story-summary.model';
-import {Subtopic} from 'domain/topic/subtopic.model';
+import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
-
-import {TopicContentTab} from '../topic-content-filter/topic-content-filter.component';
-import {TopicFlowOrderingService} from '../services/topic-flow-ordering.service';
-import {TopicProgressNode} from '../topic-progress/topic-progress.component';
 
 import './topic-story-section.component.css';
 
@@ -39,84 +32,75 @@ import './topic-story-section.component.css';
   templateUrl: './topic-story-section.component.html',
   styleUrls: ['./topic-story-section.component.css'],
 })
-export class TopicStorySectionComponent implements OnInit, OnChanges {
-  @Input() storySummary!: StorySummary;
-  @Input() subtopics!: Subtopic[];
-  @Input() nodes: TopicProgressNode[] = [];
-  @Input() activeNodeId = '';
-  @Input() activeTab: TopicContentTab = 'all';
+export class TopicStorySectionComponent implements OnInit {
+  @Input() storyTitle!: string;
+  @Input() storyDescription!: string;
 
-  classroomUrlFragment = '';
-  topicUrlFragment = '';
+  @Input() classroomUrlFragment!: string;
+  @Input() topicUrlFragment!: string;
 
-  lessonCount = 0;
-  practiceCount = 0;
-  visibleNodes: TopicProgressNode[] = [];
+  @Input() practiceCount: number = 0;
+  @Input() lessonCount: number = 0;
+
+  oppiaAvatarImageUrl: string = '';
+  studyGuideUrl: string = '#';
 
   constructor(
-    private topicFlowOrderingService: TopicFlowOrderingService,
+    private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService
   ) {}
 
   ngOnInit(): void {
-    this.classroomUrlFragment =
-      this.urlService.getClassroomUrlFragmentFromLearnerUrl();
-    this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
-    this.lessonCount = this.storySummary.getNodeTitles().length;
-    this.practiceCount = this.getPracticeCount();
-
-    if (!this.nodes.length) {
-      this.nodes = this.topicFlowOrderingService
-        .buildTopicProgressData([this.storySummary], this.subtopics)
-        .nodes.filter(
-          node => node.storySummary?.getId() === this.storySummary.getId()
-        );
+    if (!this.classroomUrlFragment) {
+      this.classroomUrlFragment =
+        this.urlService.getClassroomUrlFragmentFromLearnerUrl();
     }
-
-    this.updateVisibleNodes();
+    if (!this.topicUrlFragment) {
+      this.topicUrlFragment =
+        this.urlService.getTopicUrlFragmentFromLearnerUrl();
+    }
+    this.oppiaAvatarImageUrl =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/avatar/oppia_avatar_100px.svg'
+      );
+    this.studyGuideUrl = this.getStudyGuideUrl();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes['activeTab'] !== undefined ||
-      changes['nodes'] !== undefined ||
-      changes['storySummary'] !== undefined
-    ) {
-      this.updateVisibleNodes();
-    }
+  getLessonCountText(): string {
+    return this.lessonCount === 1
+      ? this.lessonCount + ' lesson'
+      : this.lessonCount + ' lessons';
   }
 
-  // Open the Study Skills modal or navigate to study skills page.
-  // For now this is a placeholder that can be wired to a real modal or
-  // navigation handler in a follow-up change.
-  onOpenStudySkills(): void {
-    // TODO: integrate with Study Skills flow. Emit event or navigate.
-    // For now we simply log to console for manual verification in UI.
-    try {
-      // eslint-disable-next-line no-console
-      console.log('Open Study Skills for story', this.storySummary.getId());
-    } catch (e) {
-      // ignore
-    }
+  getPracticeCountText(): string {
+    return this.practiceCount === 1
+      ? this.practiceCount + ' practice'
+      : this.practiceCount + ' practices';
   }
 
-  getPracticeCount(): number {
-    return this.subtopics.filter(
-      subtopic => subtopic.getSkillSummaries().length > 0
-    ).length;
+  getStoryMetaText(): string {
+    return this.getLessonCountText() + ', ' + this.getPracticeCountText();
   }
 
-  shouldShowNode(node: TopicProgressNode): boolean {
-    if (this.activeTab === 'all') {
-      return true;
-    }
-    if (this.activeTab === 'lessons') {
-      return node.type === 'lesson';
-    }
-    return node.type === 'practice';
+  getStoryMetaAriaLabel(): string {
+    return (
+      this.getLessonCountText() +
+      ' and ' +
+      this.getPracticeCountText() +
+      ' available'
+    );
   }
 
-  private updateVisibleNodes(): void {
-    this.visibleNodes = this.nodes.filter(node => this.shouldShowNode(node));
+  private getStudyGuideUrl(): string {
+    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
+      return '#';
+    }
+    return this.urlInterpolationService.interpolateUrl(
+      ClassroomDomainConstants.TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE,
+      {
+        classroom_url_fragment: this.classroomUrlFragment,
+        topic_url_fragment: this.topicUrlFragment,
+      }
+    );
   }
 }

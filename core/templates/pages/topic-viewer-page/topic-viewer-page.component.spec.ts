@@ -183,6 +183,23 @@ describe('Topic viewer page', () => {
     expect(topicViewerPageComponent.skillDescriptions).toEqual({});
     expect(topicViewerPageComponent.topicIsLoading).toBe(false);
     expect(topicViewerPageComponent.practiceTabIsDisplayed).toBe(true);
+    expect(
+      topicViewerPageComponent.topicViewerDataService.getClassroomUrlFragment()
+    ).toBe('math');
+    expect(
+      topicViewerPageComponent.topicViewerDataService.getTopicUrlFragment()
+    ).toBe(topicUrlFragment);
+    expect(
+      topicViewerPageComponent.topicViewerDataService.getCanonicalStoryData()
+    ).toEqual([
+      {
+        storyId: '2',
+        storyTitle: 'Story Title',
+        storyDescription: 'Story Description',
+        lessonCount: 2,
+        practiceCount: 0,
+      },
+    ]);
   }));
 
   it(

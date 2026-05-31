@@ -35,6 +35,10 @@ import {PageTitleService} from 'services/page-title.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {
+  TopicViewerDataService,
+  TopicViewerStorySectionData,
+} from './services/topic-viewer-data.service';
 
 import './topic-viewer-page.component.css';
 
@@ -62,7 +66,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
   practiceTabIsDisplayed: boolean = false;
 
   constructor(
-    private alertsService: AlertsService,
+    public alertsService: AlertsService,
     private loaderService: LoaderService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private pageTitleService: PageTitleService,
@@ -72,7 +76,8 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    public topicViewerDataService: TopicViewerDataService
   ) {}
 
   ngOnInit(): void {
@@ -124,6 +129,12 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
           this.loaderService.hideLoadingScreen();
           this.practiceTabIsDisplayed =
             readOnlyTopic.getPracticeTabIsDisplayed();
+
+          this.topicViewerDataService.setFromReadOnlyTopic(
+            readOnlyTopic,
+            this.classroomUrlFragment,
+            this.topicUrlFragment
+          );
         },
         errorResponse => {
           let errorCodes = AppConstants.FATAL_ERROR_CODES;
@@ -135,6 +146,13 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
           }
         }
       );
+  }
+
+  trackStoryDataById(
+    index: number,
+    storyData: TopicViewerStorySectionData
+  ): string {
+    return storyData.storyId;
   }
 
   ngOnDestroy(): void {

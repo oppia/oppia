@@ -1,18 +1,29 @@
 <div *ngIf="isRedesignedTopicViewerPageFeatureEnabled(); else legacyTopicViewerContainer" class="oppia-redesigned-topic-viewer-container e2e-test-redesigned-topic-viewer-container">
-
-  <topic-header
-    [topicName]="topicName"
-    [topicDescription]="topicDescription"
-    [topicId]="topicId"
-    [classroomName]="classroomName">
-  </topic-header>
-  <div class="redesigned-stories-list">
-    <topic-story-section *ngFor="let s of canonicalStorySummaries"
-      [storySummary]="s"
-      [subtopics]="subtopics"
-      [activeTab]="activeTab">
-    </topic-story-section>
+  <div class="redesigned-topic-viewer-content">
+    <topic-header
+      [topicName]="topicName"
+      [topicDescription]="topicDescription"
+      [topicId]="topicId"
+      [classroomName]="classroomName">
+    </topic-header>
   </div>
+  <section *ngIf="topicViewerDataService.getCanonicalStoryData().length"
+           class="redesigned-stories-section"
+           aria-labelledby="redesigned-stories-section-heading">
+    <h2 id="redesigned-stories-section-heading" class="visually-hidden">
+      {{ 'I18N_TOPIC_VIEWER_STORIES_HEAD' | translate }}
+    </h2>
+    <div class="redesigned-stories-list">
+      <topic-story-section *ngFor="let storyData of topicViewerDataService.getCanonicalStoryData(); trackBy: trackStoryDataById"
+                           [storyTitle]="storyData.storyTitle"
+                           [storyDescription]="storyData.storyDescription"
+                           [classroomUrlFragment]="classroomUrlFragment"
+                           [topicUrlFragment]="topicUrlFragment"
+                           [lessonCount]="storyData.lessonCount"
+                           [practiceCount]="storyData.practiceCount">
+      </topic-story-section>
+    </div>
+  </section>
 </div>
 
 <ng-template #legacyTopicViewerContainer>
