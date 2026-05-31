@@ -140,6 +140,7 @@ describe('Training Data Editor Panel Component', () => {
   let truncateInputBasedOnInteractionAnswerTypePipe: TruncateInputBasedOnInteractionAnswerTypePipe;
   let answerClassificationService: AnswerClassificationService;
   let stateEditorService: StateEditorService;
+  let stateInteractionIdService: StateInteractionIdService;
   let trainingModalServiceeventEmitter = new EventEmitter();
 
   class MockTrainingModalService {
@@ -222,6 +223,7 @@ describe('Training Data Editor Panel Component', () => {
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     focusManagerService = TestBed.inject(FocusManagerService);
     stateEditorService = TestBed.inject(StateEditorService);
+    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     truncateInputBasedOnInteractionAnswerTypePipe = TestBed.inject(
       TruncateInputBasedOnInteractionAnswerTypePipe
@@ -344,7 +346,7 @@ describe('Training Data Editor Panel Component', () => {
       {answer: 'Answer1', answerTemplate: 'answer'},
       {answer: 'Answer2', answerTemplate: 'answer'},
     ];
-    (TestBed.inject(StateInteractionIdService) as any).savedMemento = null;
+    stateInteractionIdService.savedMemento = null;
     expect(() => component.openTrainUnresolvedAnswerModal(0)).toThrowError(
       'Cannot open training modal for a state with no interaction.'
     );
@@ -375,7 +377,7 @@ describe('Training Data Editor Panel Component', () => {
 
   it('should throw error when interaction id is null on init', () => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
-    (TestBed.inject(StateInteractionIdService) as any).savedMemento = null;
+    stateInteractionIdService.savedMemento = null;
     expect(() => component.ngOnInit()).toThrowError(
       'Cannot initialize training data editor for a state with no interaction.'
     );
@@ -389,7 +391,7 @@ describe('Training Data Editor Panel Component', () => {
   }));
 
   it('should throw error when interaction id is null in submitAnswer', () => {
-    (TestBed.inject(StateInteractionIdService) as any).savedMemento = null;
+    stateInteractionIdService.savedMemento = null;
     expect(() => component.submitAnswer('answer')).toThrowError(
       'Cannot submit answer for a state with no interaction.'
     );
