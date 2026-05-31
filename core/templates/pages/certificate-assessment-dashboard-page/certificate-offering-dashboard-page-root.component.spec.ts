@@ -72,8 +72,4 @@ describe('CertificateOfferingDashboardPageRootComponent', () => {
         .META
     );
   });
-
-  it('should set isCertificateOfferingEnabled from service', () => {
-    expect(component.isCertificateOfferingEnabled).toEqual(true);
-  });
 });

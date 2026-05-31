@@ -21,22 +21,14 @@ import {AppConstants} from 'app.constants';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 
-import {DeleteCertificateOfferingModalComponent} from './delete-certificate-offering-modal.component';
-
-interface CertificateOfferingDashboardRow {
-  certificateId: string;
-  title: string;
-  topicsLabel: string;
-  timeLabel: string;
-  status: string;
-}
+import {DeleteCertificateOfferingModalComponent} from 'components/certificate-assessment-offering-helper/delete-certificate-offering-modal.component';
 
 @Component({
   selector: 'oppia-certificate-offering-dashboard-page',
   templateUrl: './certificate-offering-dashboard-page.component.html',
 })
 export class CertificateOfferingDashboardPageComponent {
-  certificateOfferings: CertificateOfferingDashboardRow[] = [
+  certificateOfferings = [
     {
       certificateId: 'dummy_id',
       title: 'Certificate Title',

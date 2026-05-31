@@ -21,7 +21,7 @@ import {SharedComponentsModule} from 'components/shared-component.module';
 import {CertificateOfferingDashboardPageComponent} from './certificate-offering-dashboard-page.component';
 import {CertificateOfferingDashboardPageRoutingModule} from './certificate-offering-dashboard-page-routing.module';
 import {CertificateOfferingDashboardPageRootComponent} from './certificate-offering-dashboard-page-root.component';
-import {DeleteCertificateOfferingModalComponent} from './delete-certificate-offering-modal.component';
+import {DeleteCertificateOfferingModalComponent} from 'components/certificate-assessment-offering-helper/delete-certificate-offering-modal.component';
 
 @NgModule({
   imports: [

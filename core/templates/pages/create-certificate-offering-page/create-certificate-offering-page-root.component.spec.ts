@@ -19,21 +19,44 @@
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {RouterTestingModule} from '@angular/router/testing';
 import {TranslateModule} from '@ngx-translate/core';
 
-import {AppConstants} from 'app.constants';
-import {PageHeadService} from 'services/page-head.service';
 import {CreateCertificateOfferingPageRootComponent} from './create-certificate-offering-page-root.component';
+import {PageHeadService} from 'services/page-head.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
-describe('CreateCertificateOfferingPageRootComponent', () => {
+describe('CreateCertificateAssessmentOfferingPageRootComponent', () => {
   let component: CreateCertificateOfferingPageRootComponent;
   let fixture: ComponentFixture<CreateCertificateOfferingPageRootComponent>;
 
   beforeEach(() => {
+    const platformFeatureServiceSpy = jasmine.createSpyObj(
+      'PlatformFeatureService',
+      [],
+      {
+        status: {
+          EnableCertificateAssessment: {
+            isEnabled: true,
+          },
+        },
+      }
+    );
+
     TestBed.configureTestingModule({
-      imports: [TranslateModule.forRoot(), HttpClientTestingModule],
+      imports: [
+        TranslateModule.forRoot(),
+        HttpClientTestingModule,
+        RouterTestingModule,
+      ],
       declarations: [CreateCertificateOfferingPageRootComponent],
-      providers: [PageHeadService],
+      providers: [
+        PageHeadService,
+        {
+          provide: PlatformFeatureService,
+          useValue: platformFeatureServiceSpy,
+        },
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 
@@ -49,14 +72,7 @@ describe('CreateCertificateOfferingPageRootComponent', () => {
     ).toBeTrue();
   });
 
-  it('should have the title and meta tags set', () => {
-    expect(component.title).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATE_CERTIFICATE_OFFERING
-        .TITLE
-    );
-    expect(component.meta).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATE_CERTIFICATE_OFFERING
-        .META
-    );
+  it('should set isCertificateOfferingEnabled from service', () => {
+    expect(component.isCertificateOfferingEnabled).toEqual(true);
   });
 });

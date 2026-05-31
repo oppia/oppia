@@ -7,7 +7,7 @@
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
+// distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
@@ -47,6 +47,7 @@ describe('Create Certificate Offering Page Component', () => {
           provide: AlertsService,
           useValue: {
             addSuccessMessage: () => {},
+            addWarning: () => {},
           },
         },
         {
@@ -177,6 +178,38 @@ describe('Create Certificate Offering Page Component', () => {
     flushMicrotasks();
 
     expect(alertsSpy).not.toHaveBeenCalled();
+    expect(routerSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should show the error message from an Error instance', fakeAsync(() => {
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'createCertificateAssessmentOfferingAsync'
+    ).and.returnValue(
+      Promise.reject(new Error('Failed to create certificate.'))
+    );
+    const alertsSpy = spyOn(alertsService, 'addWarning');
+    const routerSpy = spyOn(router, 'navigate');
+
+    component.saveCertificateOffering();
+    flushMicrotasks();
+
+    expect(alertsSpy).toHaveBeenCalledWith('Failed to create certificate.');
+    expect(routerSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should fall back to a generic message for non-Error failures', fakeAsync(() => {
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'createCertificateAssessmentOfferingAsync'
+    ).and.returnValue(Promise.reject('Failed to create certificate.'));
+    const alertsSpy = spyOn(alertsService, 'addWarning');
+    const routerSpy = spyOn(router, 'navigate');
+
+    component.saveCertificateOffering();
+    flushMicrotasks();
+
+    expect(alertsSpy).toHaveBeenCalledWith('Failed to create certificate.');
     expect(routerSpy).not.toHaveBeenCalled();
   }));
 });

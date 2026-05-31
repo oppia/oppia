@@ -17,18 +17,37 @@
  */
 
 import {Component} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from 'app.constants';
 import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
+import {PageHeadService} from 'services/page-head.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-create-certificate-offering-page-root',
   templateUrl: './create-certificate-offering-page-root.component.html',
 })
 export class CreateCertificateOfferingPageRootComponent extends BaseRootComponent {
+  isCertificateOfferingEnabled: boolean;
+  createCertificateOfferingRoute =
+    '/' +
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATE_CERTIFICATE_OFFERING
+      .ROUTE;
+
   title: string =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATE_CERTIFICATE_OFFERING
       .TITLE;
 
   meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
     .CREATE_CERTIFICATE_OFFERING.META as unknown as Readonly<MetaTagData>[];
+
+  constructor(
+    pageHeadService: PageHeadService,
+    translateService: TranslateService,
+    private platformFeatureService: PlatformFeatureService
+  ) {
+    super(pageHeadService, translateService);
+    this.isCertificateOfferingEnabled =
+      this.platformFeatureService.status.EnableCertificateAssessment.isEnabled;
+  }
 }

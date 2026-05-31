@@ -28,7 +28,7 @@ import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate
 import {AlertsService} from 'services/alerts.service';
 
 import {CertificateOfferingDashboardPageComponent} from './certificate-offering-dashboard-page.component';
-import {DeleteCertificateOfferingModalComponent} from './delete-certificate-offering-modal.component';
+import {DeleteCertificateOfferingModalComponent} from 'components/certificate-assessment-offering-helper/delete-certificate-offering-modal.component';
 
 describe('CertificateOfferingDashboardPageComponent', () => {
   let component: CertificateOfferingDashboardPageComponent;
