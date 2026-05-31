@@ -241,7 +241,7 @@ describe('Conversation flow service', () => {
     const mockDisplayedCard = jasmine.createSpyObj('StateCard', [
       'getStateName',
     ]);
-    mockDisplayedCard.getStateName.and.returnValue(null);
+    mockDisplayedCard.getStateName.and.returnValue('');
 
     conversationFlowService.displayedCard = mockDisplayedCard;
 
@@ -707,7 +707,7 @@ describe('Conversation flow service', () => {
 
   it('should show upcoming card', () => {
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
-    spyOn(displayedCard, 'getStateName').and.returnValue(null);
+    spyOn(displayedCard, 'getStateName').and.returnValue('');
     conversationFlowService.displayedCard = displayedCard;
     spyOn(explorationModeService, 'isInQuestionMode').and.returnValues(
       false,

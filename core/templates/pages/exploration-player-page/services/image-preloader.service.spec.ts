@@ -356,6 +356,8 @@ describe('Image preloader service', () => {
       edits_allowed: true,
     },
   } as unknown as ExplorationBackendDict;
+  // FileReader is mocked here as a partial implementation and cast once so
+  // the tests can reuse it without repeating unsafe casts at each use site.
   class mockReaderObject {
     result = null;
     onloadend: () => string;
@@ -370,6 +372,9 @@ describe('Image preloader service', () => {
       return 'The file is loaded';
     }
   }
+  const MockFileReader = mockReaderObject as unknown as {
+    new (): FileReader;
+  };
   const filename1 = 'sIMChoice1_height_32_width_42.png';
   const filename2 = 'sIMChoice2_height_30_width_40.png';
   const filename3 = 'sIOFeedback_height_50_width_50.png';
@@ -714,9 +719,7 @@ describe('Image preloader service', () => {
 
     const onSuccess = jasmine.createSpy('success');
     const onFailure = jasmine.createSpy('fail');
-    spyOn(window, 'FileReader').and.returnValue(
-      new mockReaderObject() as unknown as FileReader
-    );
+    spyOn(window, 'FileReader').and.returnValue(new MockFileReader());
 
     imagePreloaderService
       .getImageUrlAsync(filename1)
@@ -753,9 +756,7 @@ describe('Image preloader service', () => {
 
     const onSuccess = jasmine.createSpy('success');
     const onFailure = jasmine.createSpy('fail');
-    spyOn(window, 'FileReader').and.returnValue(
-      new mockReaderObject() as unknown as FileReader
-    );
+    spyOn(window, 'FileReader').and.returnValue(new MockFileReader());
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl');
 
     imagePreloaderService
@@ -797,9 +798,7 @@ describe('Image preloader service', () => {
 
       const onSuccess = jasmine.createSpy('success');
       const onFailure = jasmine.createSpy('fail');
-      spyOn(window, 'FileReader').and.returnValue(
-        new mockReaderObject() as unknown as FileReader
-      );
+      spyOn(window, 'FileReader').and.returnValue(new MockFileReader());
 
       imagePreloaderService
         .getImageUrlAsync(filename1)
@@ -866,9 +865,7 @@ describe('Image preloader service', () => {
 
       const onSuccess = jasmine.createSpy('success');
       const onFailure = jasmine.createSpy('fail');
-      spyOn(window, 'FileReader').and.returnValue(
-        new mockReaderObject() as unknown as FileReader
-      );
+      spyOn(window, 'FileReader').and.returnValue(new MockFileReader());
 
       imagePreloaderService
         .getImageUrlAsync(filename1)
