@@ -285,13 +285,6 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
       cloneDeep(displayedValue.interactionId)
     );
     this.stateEditorService.setInteractionId(
-<<<<<<< HEAD
-      cloneDeep(displayedValue.interactionId)
-=======
-      cloneDeep(
-        displayedValue.interactionId ?? null
-      ) as InteractionSpecsKey | null
->>>>>>> c10de93762 (Fix interaction ID typing contracts to use InteractionSpecsKey)
       cloneDeep(displayedValue.interactionId)
     );
 

@@ -221,11 +221,13 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
     // is not yet determined at this stage of the customization modal save
     // process, but the emitter expects a value.
     this.onSaveNextContentIdIndex.emit(undefined as unknown as number);
-    this.interactionDetailsCacheService.set(
-      this.stateInteractionIdService.savedMemento,
-      this.stateCustomizationArgsService.savedMemento
-    );
-
+    const savedInteractionId = this.stateInteractionIdService.savedMemento;
+    if (savedInteractionId !== null) {
+      this.interactionDetailsCacheService.set(
+        savedInteractionId,
+        this.stateCustomizationArgsService.savedMemento
+      );
+    }
     // This must be called here so that the rules are updated before the
     // state graph is recomputed.
     if (hasInteractionIdChanged) {

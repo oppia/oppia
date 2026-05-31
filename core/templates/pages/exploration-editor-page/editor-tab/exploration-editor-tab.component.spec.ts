@@ -62,7 +62,6 @@ import {Router} from '@angular/router';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 import {State, StateBackendDict} from 'domain/state/state.model';
 import {Interaction} from 'domain/exploration/interaction.model';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ExplorationNextContentIdIndexService} from '../services/exploration-next-content-id-index.service';
@@ -177,7 +176,7 @@ describe('Exploration editor tab component', () => {
         JoyrideStepService,
         {
           provide: Router,
-          useClas: MockRouter,
+          useClass: MockRouter,
         },
         TemplatesService,
         {
@@ -1084,15 +1083,7 @@ describe('Exploration editor tab component', () => {
         {} as Interaction['customizationArgs'],
         null,
         [],
-<<<<<<< HEAD
-<<<<<<< HEAD
         'TextInput',
-=======
-        'id' as InteractionSpecsKey,
->>>>>>> c10de93762 (Fix interaction ID typing contracts to use InteractionSpecsKey)
-=======
-        'TextInput',
->>>>>>> ab384b6b80 (Fix typing issues)
         null
       ),
       [],
