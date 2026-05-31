@@ -51,6 +51,10 @@ CURRENT_PYTHON_BIN = sys.executable
 # Node version.
 NODE_VERSION = '16.13.0'
 
+# Dedicated Node version for Playwright acceptance tests. This is intentionally
+# isolated from NODE_VERSION so existing frontend tooling remains unchanged.
+PLAYWRIGHT_NODE_VERSION = '20.11.1'
+
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = '1.22.15'
 
@@ -92,6 +96,9 @@ NG_BIN_PATH = os.path.join(CURR_DIR, 'node_modules', '.bin', 'ng')
 DEV_APPSERVER_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'dev_appserver.py')
 GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
+PLAYWRIGHT_NODE_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'node-%s' % PLAYWRIGHT_NODE_VERSION
+)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
@@ -244,6 +251,10 @@ def is_x64_architecture() -> bool:
 
 NODE_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'node')
 NPX_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'npx')
+
+# Binaries for running Playwright with a newer Node runtime only.
+PLAYWRIGHT_NPM_BIN_PATH = os.path.join(PLAYWRIGHT_NODE_PATH, 'bin', 'npm')
+PLAYWRIGHT_NPX_BIN_PATH = os.path.join(PLAYWRIGHT_NODE_PATH, 'bin', 'npx')
 
 # Add path for node which is required by the node_modules.
 os.environ['PATH'] = os.pathsep.join(

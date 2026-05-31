@@ -73,17 +73,47 @@ describe('Story Editor Unpublish Modal Component', () => {
     expect(dismissSpy).toHaveBeenCalled();
   });
 
-  it('should close by proceeding with unpublishing', () => {
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
-      false;
-    const confirmSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
-    component.confirm();
-    expect(confirmSpy).toHaveBeenCalled();
-
+  it('should close directly when feature flag is enabled', () => {
     mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
       true;
+    const spy = spyOn(ngbActiveModal, 'close');
     component.confirm();
-    expect(confirmSpy).toHaveBeenCalledWith(component.unpublishingReason);
+    expect(spy).toHaveBeenCalledWith({
+      mode: 'permanent_unpublish',
+      reason: component.unpublishingReason,
+    });
+  });
+
+  it('should not close when showing the choice screen', () => {
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+      false;
+    const spy = spyOn(ngbActiveModal, 'close');
+    component.confirm();
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('should close with temporary mode after selecting temporary', () => {
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+      false;
+    const spy = spyOn(ngbActiveModal, 'close');
+    component.selectTemporary();
+    component.confirm();
+    expect(spy).toHaveBeenCalledWith({
+      mode: 'temporary_unpublish',
+      reason: null,
+    });
+  });
+
+  it('should close with permanent mode after selecting permanent', () => {
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+      false;
+    const spy = spyOn(ngbActiveModal, 'close');
+    component.selectPermanent();
+    component.confirm();
+    expect(spy).toHaveBeenCalledWith({
+      mode: 'permanent_unpublish',
+      reason: null,
+    });
   });
 
   it('should get status of Serial Chapter Launch Feature flag', () => {
