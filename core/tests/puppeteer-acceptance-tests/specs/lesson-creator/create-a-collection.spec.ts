@@ -55,20 +55,14 @@ describe('LC.12 Visit Creator Dashboard', function () {
       );
 
       positiveNumbersExplorationId =
-        await lessonCreator.createAndPublishMinimalExploration(
+        await lessonCreator.createAndPublishAMinimalExplorationWithTitle(
           'Positive Numbers',
-          INTERACTION_TYPES.END_EXPLORATION,
-          'Positive Numbers',
-          'This is the goal of exploration.',
           'Math'
         );
 
       negativeNumbersExplorationId =
-        await lessonCreator.createAndPublishMinimalExploration(
+        await lessonCreator.createAndPublishAMinimalExplorationWithTitle(
           'Negative Numbers',
-          INTERACTION_TYPES.END_EXPLORATION,
-          'Negative Numbers',
-          'This is the goal of exploration.',
           'Math'
         );
 
@@ -97,8 +91,6 @@ describe('LC.12 Visit Creator Dashboard', function () {
 
       await learner.giveFeedbackAfterRating('Great Lesson');
 
-      await learner.waitForNetworkIdle();
-
       await learner.navigateToCommunityLibrary();
 
       await learner.playExploration(positiveNumbersExplorationId);
@@ -117,8 +109,6 @@ describe('LC.12 Visit Creator Dashboard', function () {
 
       await lessonCreator.page.reload();
 
-      await lessonCreator.waitForNetworkIdle();
-
       await lessonCreator.waitForPageToFullyLoad();
 
       await lessonCreator.expectAverageRatingAndUsersToBe(4, 2);
@@ -136,8 +126,6 @@ describe('LC.12 Visit Creator Dashboard', function () {
     'should view explorations in grid view',
     async function () {
       await lessonCreator.page.reload();
-
-      await lessonCreator.waitForNetworkIdle();
 
       await lessonCreator.waitForPageToFullyLoad();
 
@@ -161,12 +149,7 @@ describe('LC.12 Visit Creator Dashboard', function () {
   it(
     'should view explorations in list view',
     async function () {
-      const viewport = lessonCreator.page.viewport();
-
-      if (
-        viewport &&
-        viewport.width >= testConstants.ViewportWidthBreakpoints.MOBILE_PX
-      ) {
+      if (!lessonCreator.isViewportAtMobileWidth()) {
         await lessonCreator.switchToListView();
 
         await lessonCreator.expectExplorationsInListInOrder([

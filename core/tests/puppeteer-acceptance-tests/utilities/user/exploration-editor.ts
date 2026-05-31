@@ -5654,18 +5654,12 @@ export class ExplorationEditor extends BaseUser {
       usersCountInRatingSelector,
       el => (el as HTMLElement).innerText.trim() || ''
     );
-
+    // Extract number from text (e.g., "by 3 users" → 3).
     const totalUsersMatch = totalUsersText.match(/\d+/);
-
     const totalUsers = totalUsersMatch ? parseInt(totalUsersMatch[0], 10) : 0;
-
     if (totalUsers !== expectedUsers) {
       throw new Error(
-        'Expected ' +
-          expectedUsers +
-          ' users to have submitted ratings, but found ' +
-          totalUsers +
-          '.'
+        `Expected ${expectedUsers} users to have submitted ratings, but found only ${totalUsers} instead.`
       );
     }
   }
@@ -8013,43 +8007,6 @@ export class ExplorationEditor extends BaseUser {
 
     await this.expectElementToBeVisible(explorationListSelector, true);
     await this.waitForCreatorDashboardToLoad();
-  }
-
-  /**
-   * Function to create and publish a minimal exploration.
-   * @param content - Content of the exploration.
-   * @param interaction - Interaction to be added.
-   * @param title - Title of the exploration.
-   * @param goal - Goal of the exploration.
-   * @param category - Category of the exploration.
-   * @returns Exploration id.
-   */
-  async createAndPublishMinimalExploration(
-    content: string,
-    interaction: string,
-    title: string,
-    goal: string,
-    category: string
-  ): Promise<string> {
-    await this.navigateToExplorationEditorFromCreatorDashboard();
-
-    await this.dismissWelcomeModal(false);
-
-    await this.createMinimalExploration(content, interaction);
-
-    await this.saveExplorationDraft();
-
-    const explorationId = await this.publishExplorationWithMetadata(
-      title,
-      goal,
-      category
-    );
-
-    await this.waitForPageToFullyLoad();
-
-    await this.navigateToCreatorDashboardUsingProfileDropdown();
-
-    return explorationId;
   }
 
   /**

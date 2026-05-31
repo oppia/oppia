@@ -364,6 +364,10 @@ const mobileGetInvolvedMenuContainerSelector =
 const mobileLearnDropdownSelector = '.e2e-mobile-test-learn';
 const mobileLearnSubMenuSelector = '.e2e-test-mobile-learn-submenu';
 const mobileNavBarOpenSelector = '.oppia-sidebar-menu-open';
+const communityLibraryLinkInNavbarSelector =
+  '.e2e-test-topnb-go-to-community-library-link';
+const communityLibraryContainerSelector = '.e2e-test-library-container';
+const communityLibraryLinkInNavMenuSelector = '.e2e-mobile-test-library-link';
 
 const commonPlayLaterIconSelector = '.e2e-test-lesson-playlist-icon';
 const learnerDashboardIconsSelector = 'oppia-learner-dashboard-icons';
@@ -4729,8 +4733,25 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the Community Library page.
    */
   async navigateToCommunityLibrary(): Promise<void> {
-    await this.goto(testConstants.URLs.CommunityLibrary);
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
+        visible: true,
+      });
+      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.clickOnElementWithSelector(mobileLearnDropdownSelector);
+      await this.clickOnElementWithSelector(
+        communityLibraryLinkInNavMenuSelector
+      );
+    } else {
+      await this.page.waitForSelector(navbarLearnTab, {visible: true});
+      await this.clickOnElementWithSelector(navbarLearnTab);
+      await this.clickOnElementWithSelector(
+        communityLibraryLinkInNavbarSelector
+      );
+    }
+
     await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(communityLibraryContainerSelector);
   }
 
   /**
