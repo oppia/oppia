@@ -63,6 +63,7 @@ if MYPY:  # pragma: no cover
         datastore_services,
         exp_models,
         feedback_models,
+        general_feedback_models,
         improvements_models,
         learner_group_models,
         question_models,
@@ -83,6 +84,7 @@ if MYPY:  # pragma: no cover
     email_models,
     exp_models,
     feedback_models,
+    general_feedback_models,
     improvements_models,
     learner_group_models,
     question_models,
@@ -102,6 +104,7 @@ if MYPY:  # pragma: no cover
         models.Names.EMAIL,
         models.Names.EXPLORATION,
         models.Names.FEEDBACK,
+        models.Names.GENERAL_FEEDBACK,
         models.Names.IMPROVEMENTS,
         models.Names.LEARNER_GROUP,
         models.Names.QUESTION,
@@ -2786,6 +2789,127 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         )
 
 
+class WipeoutServiceDeleteGeneralFeedbackModelsTests(
+    test_utils.GenericTestBase
+):
+    """Provides testing of the web feedback wipeout flow."""
+
+    THREAD_1_ID: Final = 'general.thread.1'
+    THREAD_2_ID: Final = 'general.thread.2'
+    MESSAGE_1_ID: Final = 'general.thread.1.0'
+    MESSAGE_2_ID: Final = 'general.thread.2.0'
+    USER_1_EMAIL: Final = 'some@email.com'
+    USER_1_USERNAME: Final = 'username1'
+    USER_2_EMAIL: Final = 'some-other@email.com'
+    USER_2_USERNAME: Final = 'username2'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+
+        general_feedback_models.WebFeedbackThreadModel(
+            id=self.THREAD_1_ID,
+            category=general_feedback_models.CATEGORY_PLATFORM,
+            target_type=general_feedback_models.TARGET_TYPE_GENERAL,
+            target_id='platform_target_1',
+            original_author_id=self.user_1_id,
+            page_url='/learn/math',
+            language_code='en',
+            rating=4,
+            has_screenshot=False,
+            has_session_info=False,
+            status=general_feedback_models.STATUS_CHOICES_OPEN,
+            message_count=1,
+        ).put()
+        general_feedback_models.WebFeedbackMessageModel(
+            id=self.MESSAGE_1_ID,
+            thread_id=self.THREAD_1_ID,
+            message_index=0,
+            author_id=self.user_1_id,
+            author_status=general_feedback_models.AUTHOR_ROLE_LEARNER,
+            text='Some text.',
+            updated_status=None,
+        ).put()
+        general_feedback_models.WebFeedbackThreadModel(
+            id=self.THREAD_2_ID,
+            category=general_feedback_models.CATEGORY_PLATFORM,
+            target_type=general_feedback_models.TARGET_TYPE_GENERAL,
+            target_id='platform_target_2',
+            original_author_id=self.user_2_id,
+            page_url='/learn/science',
+            language_code='en',
+            rating=3,
+            has_screenshot=False,
+            has_session_info=False,
+            status=general_feedback_models.STATUS_CHOICES_OPEN,
+            message_count=1,
+        ).put()
+        general_feedback_models.WebFeedbackMessageModel(
+            id=self.MESSAGE_2_ID,
+            thread_id=self.THREAD_2_ID,
+            message_index=0,
+            author_id=self.user_1_id,
+            author_status=general_feedback_models.AUTHOR_ROLE_LEARNER,
+            text='Some other text.',
+            updated_status=None,
+        ).put()
+
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+
+    def test_general_feedback_models_are_pseudonymized_by_thread(
+        self,
+    ) -> None:
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id)
+        )
+
+        general_feedback_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id
+            ).pseudonymizable_entity_mappings[
+                models.Names.GENERAL_FEEDBACK.value
+            ]
+        )
+        thread_1_model = (
+            general_feedback_models.WebFeedbackThreadModel.get_by_id(
+                self.THREAD_1_ID
+            )
+        )
+        message_1_model = (
+            general_feedback_models.WebFeedbackMessageModel.get_by_id(
+                self.MESSAGE_1_ID
+            )
+        )
+        thread_2_model = (
+            general_feedback_models.WebFeedbackThreadModel.get_by_id(
+                self.THREAD_2_ID
+            )
+        )
+        message_2_model = (
+            general_feedback_models.WebFeedbackMessageModel.get_by_id(
+                self.MESSAGE_2_ID
+            )
+        )
+
+        self.assertEqual(
+            thread_1_model.original_author_id,
+            general_feedback_mappings[self.THREAD_1_ID],
+        )
+        self.assertEqual(
+            message_1_model.author_id,
+            general_feedback_mappings[self.THREAD_1_ID],
+        )
+        self.assertEqual(thread_2_model.original_author_id, self.user_2_id)
+        self.assertEqual(
+            message_2_model.author_id,
+            general_feedback_mappings[self.THREAD_2_ID],
+        )
+
+
 class WipeoutServiceVerifyDeleteFeedbackModelsTests(test_utils.GenericTestBase):
     """Provides testing of the verification part of wipeout service."""
 
@@ -4854,6 +4978,7 @@ class WipeoutServiceDeletePinnedOpportunitiesModelsTest(
             topic_id=self.TOPIC_ID,
             opportunity_id=self.OPPORTUNITY_ID,
             language_code='en',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
         )
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()

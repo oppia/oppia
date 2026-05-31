@@ -22,14 +22,15 @@ import {RouterModule} from '@angular/router';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {TopicViewerPageComponent} from 'pages/topic-viewer-page/topic-viewer-page.component';
 import {toastrConfig} from 'pages/oppia-root/app.module';
-import {PracticeSessionConfirmationModal} from './modals/practice-session-confirmation-modal.component';
+import {PracticeSessionConfirmationModal} from './deprecations/modals/practice-session-confirmation-modal.component';
 import {ToastrModule} from 'ngx-toastr';
 import {TopicViewerPageRootComponent} from './topic-viewer-page-root.component';
 import {TopicPlayerViewerCommonModule} from 'pages/topic-viewer-page/topic-viewer-player-common.module';
-import {StoriesListComponent} from './stories-list/topic-viewer-stories-list.component';
-import {PracticeTabComponent} from './practice-tab/practice-tab.component';
+import {StoriesListComponent} from './deprecations/stories-list/topic-viewer-stories-list.component';
+import {PracticeTabComponent} from './deprecations/practice-tab/practice-tab.component';
 import {SubtopicsListComponent} from './subtopics-list/subtopics-list.component';
 import {TopicViewerAccessGuard} from './topic-viewer-page-auth.guard';
+import {TopicHeaderComponent} from './topic-header/topic-header.component';
 
 @NgModule({
   imports: [
@@ -62,6 +63,7 @@ import {TopicViewerAccessGuard} from './topic-viewer-page-auth.guard';
   declarations: [
     TopicViewerPageRootComponent,
     TopicViewerPageComponent,
+    TopicHeaderComponent,
     PracticeSessionConfirmationModal,
   ],
   entryComponents: [TopicViewerPageComponent, PracticeSessionConfirmationModal],

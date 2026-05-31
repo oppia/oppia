@@ -88,6 +88,32 @@ class CommonTests(test_utils.GenericTestBase):
         with maxsize_swap:
             self.assertTrue(common.is_x64_architecture())
 
+    def test_playwright_node_path_uses_playwright_node_version(self) -> None:
+        self.assertIn(
+            common.PLAYWRIGHT_NODE_VERSION,
+            common.PLAYWRIGHT_NODE_PATH,
+        )
+
+    def test_playwright_npm_bin_path_uses_playwright_node_path(self) -> None:
+        self.assertTrue(
+            common.PLAYWRIGHT_NPM_BIN_PATH.startswith(
+                common.PLAYWRIGHT_NODE_PATH
+            )
+        )
+        self.assertTrue(
+            common.PLAYWRIGHT_NPM_BIN_PATH.endswith(os.path.join('bin', 'npm'))
+        )
+
+    def test_playwright_npx_bin_path_uses_playwright_node_path(self) -> None:
+        self.assertTrue(
+            common.PLAYWRIGHT_NPX_BIN_PATH.startswith(
+                common.PLAYWRIGHT_NODE_PATH
+            )
+        )
+        self.assertTrue(
+            common.PLAYWRIGHT_NPX_BIN_PATH.endswith(os.path.join('bin', 'npx'))
+        )
+
     def test_is_mac_os(self) -> None:
         with self.swap(common, 'OS_NAME', 'Darwin'):
             self.assertTrue(common.is_mac_os())

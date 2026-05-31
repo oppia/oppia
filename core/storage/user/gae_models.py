@@ -3498,6 +3498,19 @@ class PinnedOpportunityModel(base_models.BaseModel):
     )
     topic_id = datastore_services.StringProperty(required=True, indexed=True)
     opportunity_id = datastore_services.StringProperty(indexed=True)
+    # TODO(#24933): A Beam job (BackfillPinnedOpportunityModelJob) is planned
+    # in Milestone 1.10 to backfill this field to the default value
+    # ('exploration') for all existing datastore entities, ensuring they are
+    # properly indexed for future entity-type based queries.
+    entity_type = datastore_services.StringProperty(
+        indexed=True, default=feconf.ENTITY_TYPE_EXPLORATION
+    )
+
+    def _pre_put_hook(self) -> None:
+        """Validates the model before it is put into the datastore."""
+        super()._pre_put_hook()
+        if self.entity_type not in feconf.TRANSLATABLE_ENTITY_TYPES:
+            raise Exception('Invalid entity_type: %s' % self.entity_type)
 
     @classmethod
     def _generate_id(
@@ -3523,6 +3536,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
         language_code: str,
         topic_id: str,
         opportunity_id: str,
+        entity_type: str,
     ) -> PinnedOpportunityModel:
         """Creates a new PinnedOpportunityModel instance. Fails if the
         model already exists.
@@ -3532,6 +3546,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
             language_code: str. The code of the language.
             topic_id: str. The ID of the topic.
             opportunity_id: str. The ID of the pinned opportunity.
+            entity_type: str. The type of the entity.
 
         Returns:
             PinnedOpportunityModel. The created instance.
@@ -3553,6 +3568,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
             language_code=language_code,
             topic_id=topic_id,
             opportunity_id=opportunity_id,
+            entity_type=entity_type,
         )
         instance.update_timestamps()
         instance.put()
@@ -3616,6 +3632,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
                 'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'opportunity_id': base_models.EXPORT_POLICY.EXPORTED,
+                'entity_type': base_models.EXPORT_POLICY.EXPORTED,
             },
         )
 
@@ -3643,6 +3660,7 @@ class PinnedOpportunityModel(base_models.BaseModel):
             )
             user_data[key] = {
                 'opportunity_id': model.opportunity_id,
+                'entity_type': model.entity_type,
             }
         return user_data
 
