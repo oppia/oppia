@@ -33,8 +33,6 @@ type ExplorationOpportunitiesFetcherFunction = (
   more: boolean;
 }>;
 
-const SEARCH_DEBOUNCE_TIME_MS = 300;
-
 @Component({
   selector: 'oppia-opportunities-list',
   templateUrl: './opportunities-list.component.html',
@@ -73,6 +71,7 @@ export class OpportunitiesListComponent {
   visibleOpportunities: ExplorationOpportunity[] = [];
   searchQuery: string = '';
   searchQueryChanged: Subject<string> = new Subject<string>();
+  private readonly SEARCH_DEBOUNCE_TIME_MS = 300;
   directiveSubscriptions = new Subscription();
   activePageNumber: number = 1;
   OPPORTUNITIES_PAGE_SIZE = AppConstants.OPPORTUNITIES_PAGE_SIZE;
@@ -149,7 +148,7 @@ export class OpportunitiesListComponent {
 
     this.directiveSubscriptions.add(
       this.searchQueryChanged
-        .pipe(debounceTime(SEARCH_DEBOUNCE_TIME_MS))
+        .pipe(debounceTime(this.SEARCH_DEBOUNCE_TIME_MS))
         .subscribe(query => {
           this.searchQuery = query;
           this.activePageNumber = 1;
