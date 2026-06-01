@@ -1,52 +1,61 @@
 .topic-story-section {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  width: 100%;
 }
 
 .story-callout-row {
-  align-items: flex-end;
+  align-items: center;
   display: flex;
-  gap: 16px;
-  margin: 0 0 16px;
-  max-width: 760px;
+  gap: 0;
+  margin: 0 0 -18px 8px;
+  max-width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .story-callout-avatar {
   flex: 0 0 auto;
-  height: 72px;
+  height: 130px;
   object-fit: contain;
-  width: 72px;
+  object-position: bottom;
+  width: 130px;
 }
 
 .story-description-bubble {
   background: #fff;
   border-radius: 20px;
-  border-end-start-radius: 4px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.14);
-  color: #3c3c3c;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.14);
+  color: #222;
+  display: inline-block;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 18px;
-  line-height: 1.5;
-  margin: 0;
-  max-width: 680px;
-  padding: 18px 24px;
+  font-size: 16px;
+  line-height: 1.55;
+  margin: 0 0 0 6px;
+  max-width: 520px;
+  padding: 14px 20px;
   position: relative;
+  width: fit-content;
 }
 
-.story-description-bubble::before {
-  border-block-end: 12px solid transparent;
-  border-block-start: 12px solid transparent;
-  border-inline-end: 14px solid #fff;
+.story-description-bubble::after {
+  /* Small lower-left triangular tail that points toward the mascot. */
   content: '';
-  inset-block-end: 18px;
-  inset-inline-start: -14px;
+  height: 12px;
+  inset-block-end: 14px;
+  inset-inline-start: -6px;
   position: absolute;
+  width: 14px;
+  clip-path: polygon(100% 0, 0 100%, 100% 100%);
+  background: #fff;
 }
 
 .story-card {
   background: #fff;
   border-radius: 4px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
+  max-width: 100%;
   overflow: hidden;
 }
 
@@ -55,9 +64,10 @@
   background: #00645c;
   color: #fff;
   display: flex;
-  gap: 24px;
+  gap: 20px;
   justify-content: space-between;
-  padding: 22px 28px;
+  min-height: 88px;
+  padding: 20px 28px;
 }
 
 .story-card-header-left {
@@ -67,19 +77,22 @@
 
 .story-title {
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-  font-size: 24px;
-  font-weight: 400;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
   line-height: 1.3;
   margin: 0;
   overflow-wrap: anywhere;
 }
 
 .story-meta {
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(255, 255, 255, 0.88);
   font-family: Roboto, Arial, sans-serif;
   font-size: 15px;
+  font-weight: 400;
   line-height: 1.4;
-  margin: 8px 0 0;
+  margin: 0;
+  padding-top: 5px;
 }
 
 .story-card-header-right {
@@ -87,15 +100,18 @@
 }
 
 .study-skills-cta {
-  background: #fff;
+  align-items: center;
+  background: transparent;
   border: 2px solid #fff;
-  border-radius: 4px;
-  color: #00645c;
-  display: inline-block;
+  border-radius: 6px;
+  color: #fff;
+  display: inline-flex;
+  gap: 8px;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.2;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  min-height: 44px;
   padding: 10px 18px;
   text-align: center;
   text-decoration: none;
@@ -104,72 +120,99 @@
 
 .study-skills-cta:hover,
 .study-skills-cta:focus {
-  background: #e6f2f0;
-  color: #004f48;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
   outline: 2px solid #fff;
   outline-offset: 2px;
   text-decoration: none;
 }
 
+.study-skills-cta i {
+  font-size: 15px;
+}
+
 .story-card-body {
-  min-height: 80px;
-  padding: 20px 28px 28px;
+  min-height: 390px;
+  padding: 0;
 }
 
 @media (max-width: 768px) {
   .story-callout-row {
-    gap: 12px;
+    gap: 0;
+    margin: 0 0 -14px 6px;
     max-width: 100%;
   }
 
   .story-callout-avatar {
-    height: 56px;
-    width: 56px;
+    height: 96px;
+    width: 96px;
   }
 
   .story-description-bubble {
-    font-size: 16px;
-    padding: 16px 20px;
+    font-size: 15px;
+    max-width: 420px;
+    padding: 12px 16px;
   }
 
   .story-card-header {
-    padding: 20px 24px;
+    min-height: 0;
+    padding: 18px 20px;
   }
 
   .story-title {
-    font-size: 22px;
+    font-size: 18px;
+  }
+
+  .story-meta {
+    font-size: 16px;
+  }
+
+  .study-skills-cta {
+    font-size: 16px;
+    min-height: 40px;
+  }
+
+  .study-skills-cta i {
+    font-size: 14px;
+  }
+
+  .story-card-body {
+    min-height: 260px;
   }
 }
 
 @media (max-width: 500px) {
   .story-callout-row {
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 12px;
+    align-items: center;
+    gap: 0;
+    margin: 0 0 -10px 4px;
   }
 
   .story-callout-avatar {
-    height: 44px;
-    width: 44px;
+    height: 72px;
+    width: 72px;
   }
 
   .story-description-bubble {
-    border-radius: 16px;
-    border-end-start-radius: 4px;
-    font-size: 15px;
-    padding: 14px 16px;
-  }
-
-  .story-description-bubble::before {
-    inset-block-end: auto;
-    inset-block-start: 12px;
+    border-radius: 14px;
+    font-size: 13px;
+    max-width: calc(100% - 80px);
+    padding: 10px 14px;
   }
 
   .story-card-header {
     align-items: flex-start;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
     padding: 18px 20px;
+  }
+
+  .story-title {
+    font-size: 17px;
+  }
+
+  .story-meta {
+    font-size: 15px;
   }
 
   .story-card-header-right,
@@ -178,6 +221,6 @@
   }
 
   .story-card-body {
-    padding: 18px 20px 24px;
+    min-height: 180px;
   }
 }

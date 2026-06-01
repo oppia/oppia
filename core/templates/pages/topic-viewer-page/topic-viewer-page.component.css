@@ -11,26 +11,56 @@ topic-viewer-page .oppia-redesigned-topic-viewer-container {
 }
 
 topic-viewer-page .redesigned-topic-viewer-content {
-  padding: 24px 48px 0;
+  padding: 24px 36px 0;
+}
+
+topic-viewer-page .redesigned-topic-viewer-content topic-header {
+  display: block;
+  margin: 0 auto;
+  max-width: 1160px;
+  width: 100%;
 }
 
 topic-viewer-page .redesigned-stories-section {
-  /* The banner artwork is reused from the shared background-banner component. */
-  background-color: #aed2e9;
+  /* Light-blue patterned background reusing the shared bannerB pattern tile. */
+  background-color: #c8e3f0;
   background-image: url('/assets/images/background/bannerB.svg');
-  background-position: top center;
+  background-position: top left;
   background-repeat: repeat;
-  background-size: 1173px 82px;
+  background-size: 586px 41px;
   margin-top: 24px;
-  padding: 48px 48px 64px;
+  padding: 28px 36px 56px;
+}
+
+topic-viewer-page .redesigned-secondary-section {
+  padding-top: 24px;
 }
 
 topic-viewer-page .redesigned-stories-list {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 34px;
   margin: 0 auto;
-  max-width: 884px;
+  max-width: 1160px;
+  width: 100%;
+}
+
+topic-viewer-page .redesigned-secondary-section .oppia-page-card {
+  margin: 0 auto;
+  max-width: 1160px;
+  width: 100%;
+}
+
+topic-viewer-page .redesigned-secondary-section subtopics-list .oppia-page-card,
+topic-viewer-page .redesigned-secondary-section practice-tab .oppia-page-card {
+  margin-top: 0;
+}
+
+topic-viewer-page .redesigned-secondary-section subtopics-list .oppia-page-card.oppia-long-text,
+topic-viewer-page .redesigned-secondary-section practice-tab .oppia-page-card {
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
 }
 
 topic-viewer-page .oppia-topic-viewer-container {
@@ -183,15 +213,15 @@ topic-viewer-page .topic-viewer-page-content .coming-soon-text {
 
 @media(max-width: 1024px) {
   topic-viewer-page .redesigned-topic-viewer-content {
-    padding: 24px 32px 0;
+    padding: 24px 28px 0;
   }
 
   topic-viewer-page .redesigned-stories-section {
-    padding: 40px 32px 56px;
+    padding: 26px 28px 52px;
   }
 
   topic-viewer-page .redesigned-stories-list {
-    max-width: 80vw;
+    max-width: 100%;
   }
 
   topic-viewer-page .topic-viewer-tabs-list {
@@ -215,32 +245,36 @@ topic-viewer-page .topic-viewer-page-content .coming-soon-text {
 
 @media(max-width: 768px) {
   topic-viewer-page .redesigned-topic-viewer-content {
-    padding: 20px 24px 0;
+    padding: 20px 20px 0;
   }
 
   topic-viewer-page .redesigned-stories-section {
     margin-top: 20px;
-    padding: 32px 24px 48px;
+    padding: 24px 20px 44px;
   }
 
   topic-viewer-page .redesigned-stories-list {
-    gap: 24px;
+    gap: 26px;
     max-width: 100%;
+  }
+
+  topic-viewer-page .redesigned-secondary-section {
+    padding-top: 16px;
   }
 }
 
 @media(max-width: 500px) {
   topic-viewer-page .redesigned-topic-viewer-content {
-    padding: 16px 16px 0;
+    padding: 16px 12px 0;
   }
 
   topic-viewer-page .redesigned-stories-section {
     margin-top: 16px;
-    padding: 28px 16px 40px;
+    padding: 18px 12px 34px;
   }
 
   topic-viewer-page .redesigned-stories-list {
-    gap: 20px;
+    gap: 22px;
   }
 
   topic-viewer-page .topic-viewer-tabs-list {

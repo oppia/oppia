@@ -1,8 +1,12 @@
 <section class="topic-story-section"
          [attr.aria-label]="storyTitle ? ('Story section: ' + storyTitle) : 'Story section'">
-  <div *ngIf="storyDescription" class="story-callout-row">
-    <img class="story-callout-avatar" [src]="oppiaAvatarImageUrl" alt="" aria-hidden="true">
-    <p class="story-description-bubble">
+  <div class="story-callout-row">
+    <img class="story-callout-avatar"
+         [src]="oppiaAvatarImageUrl"
+         (error)="onAvatarImageError()"
+         alt=""
+         aria-hidden="true">
+    <p *ngIf="storyDescription" class="story-description-bubble">
       {{ storyDescription }}
     </p>
   </div>
@@ -20,6 +24,7 @@
         <a class="study-skills-cta"
            [href]="studyGuideUrl"
            [attr.aria-label]="'Open Study Skills for ' + (storyTitle || 'this story')">
+          <i class="fas fa-book-open" aria-hidden="true"></i>
           Study Skills
         </a>
       </div>

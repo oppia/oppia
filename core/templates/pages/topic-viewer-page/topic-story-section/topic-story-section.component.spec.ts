@@ -23,8 +23,8 @@ describe('TopicStorySectionComponent', () => {
   let fixture: ComponentFixture<TopicStorySectionComponent>;
 
   class MockUrlInterpolationService {
-    getStaticCopyrightedImageUrl(imagePath: string): string {
-      return '/assets/copyrighted-images' + imagePath;
+    getStaticImageUrl(imagePath: string): string {
+      return '/assets/images' + imagePath;
     }
 
     interpolateUrl(
@@ -80,7 +80,7 @@ describe('TopicStorySectionComponent', () => {
 
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.story-title')?.textContent).toContain(
-      'My Story'
+      'Story: "My Story"'
     );
     expect(
       compiled.querySelector('.story-description-bubble')?.textContent
@@ -90,7 +90,7 @@ describe('TopicStorySectionComponent', () => {
     );
     expect(
       compiled.querySelector('.story-callout-avatar')?.getAttribute('src')
-    ).toBe('/assets/copyrighted-images/avatar/oppia_avatar_100px.svg');
+    ).toBe('/assets/images/avatar/oppia_avatar_large_100px.svg');
     expect(
       compiled.querySelector('.study-skills-cta')?.getAttribute('href')
     ).toBe('/learn/science/forces/studyguide');

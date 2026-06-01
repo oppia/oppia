@@ -42,6 +42,11 @@ export class TopicStorySectionComponent implements OnInit {
   @Input() practiceCount: number = 0;
   @Input() lessonCount: number = 0;
 
+  private readonly primaryAvatarImagePath: string =
+    '/avatar/oppia_avatar_large_100px.svg';
+  private readonly fallbackAvatarImagePath: string =
+    '/general/collection_mascot.svg';
+
   oppiaAvatarImageUrl: string = '';
   studyGuideUrl: string = '#';
 
@@ -59,11 +64,14 @@ export class TopicStorySectionComponent implements OnInit {
       this.topicUrlFragment =
         this.urlService.getTopicUrlFragmentFromLearnerUrl();
     }
-    this.oppiaAvatarImageUrl =
-      this.urlInterpolationService.getStaticCopyrightedImageUrl(
-        '/avatar/oppia_avatar_100px.svg'
-      );
+    this.oppiaAvatarImageUrl = this.getPrimaryAvatarImageUrl();
     this.studyGuideUrl = this.getStudyGuideUrl();
+  }
+
+  onAvatarImageError(): void {
+    if (this.oppiaAvatarImageUrl !== this.getFallbackAvatarImageUrl()) {
+      this.oppiaAvatarImageUrl = this.getFallbackAvatarImageUrl();
+    }
   }
 
   getLessonCountText(): string {
@@ -101,6 +109,18 @@ export class TopicStorySectionComponent implements OnInit {
         classroom_url_fragment: this.classroomUrlFragment,
         topic_url_fragment: this.topicUrlFragment,
       }
+    );
+  }
+
+  private getPrimaryAvatarImageUrl(): string {
+    return this.urlInterpolationService.getStaticImageUrl(
+      this.primaryAvatarImagePath
+    );
+  }
+
+  private getFallbackAvatarImageUrl(): string {
+    return this.urlInterpolationService.getStaticCopyrightedImageUrl(
+      this.fallbackAvatarImagePath
     );
   }
 }
