@@ -153,7 +153,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      )
+      ) ?? undefined
     );
   }
 
@@ -242,7 +242,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      )
+      ) ?? undefined
     );
   }
 
@@ -280,7 +280,11 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       })
       .result.then(
         () => {
-          this.stateInteractionIdService.displayed = null;
+          this.stateInteractionIdService.displayed =
+            // When an interaction is deleted, the interactionId is set to null
+            // to indicate its absence. We use 'unknown' to bypass the
+            // strict type check for 'InteractionSpecsKey'.
+            null as unknown as InteractionSpecsKey;
           this.stateCustomizationArgsService.displayed = {};
           this.stateSolutionService.displayed = null;
           const savedInteractionId =
@@ -299,7 +303,9 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
           });
 
           this.stateSolutionService.saveDisplayedValue();
-          this.onSaveSolution.emit(this.stateSolutionService.displayed);
+          this.onSaveSolution.emit(
+            this.stateSolutionService.displayed as unknown as Solution
+          );
 
           this.stateInteractionIdService.onInteractionIdChanged.emit(
             this.stateInteractionIdService.savedMemento
@@ -349,7 +355,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
         this.hasLoaded = false;
         this.interactionDetailsCacheService.reset();
         this.responsesService.onInitializeAnswerGroups.emit({
-          interactionId: stateData.interaction.id,
+          interactionId: stateData.interaction.id as string,
           answerGroups: stateData.interaction.answerGroups,
           defaultOutcome: stateData.interaction.defaultOutcome as Outcome,
           confirmedUnclassifiedAnswers:
