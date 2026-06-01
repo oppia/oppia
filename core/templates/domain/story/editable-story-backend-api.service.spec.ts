@@ -279,7 +279,23 @@ describe('Editable story backend API service', () => {
 
     // Send a request to update story.
     editableStoryBackendApiService
-      .changeStoryPublicationStatusAsync('storyId', true)
+      .changeStoryPublicationStatusAsync('storyId', 'publish')
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne('/story_publish_handler/storyId');
+    expect(req.request.method).toEqual('PUT');
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+  it('should unpublish a story', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    // Send a request to update story.
+    editableStoryBackendApiService
+      .changeStoryPublicationStatusAsync('storyId', 'permanent_unpublish')
       .then(successHandler, failHandler);
     let req = httpTestingController.expectOne('/story_publish_handler/storyId');
     expect(req.request.method).toEqual('PUT');
@@ -400,7 +416,7 @@ describe('Editable story backend API service', () => {
 
     // Loading a story the first time should fetch it from the backend.
     editableStoryBackendApiService
-      .changeStoryPublicationStatusAsync('storyId', true)
+      .changeStoryPublicationStatusAsync('storyId', 'publish')
       .then(successHandler, failHandler);
     let req = httpTestingController.expectOne('/story_publish_handler/storyId');
     expect(req.request.method).toEqual('PUT');

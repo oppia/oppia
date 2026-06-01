@@ -63,6 +63,7 @@ describe('LearnerAnswerInfoCard', () => {
     spyOn(explorationEngineService, 'getState').and.returnValue(
       State.createFromBackendDict('stateName', {
         classifier_model_id: null,
+        inapplicable_skill_misconception_ids: [],
         content: {
           html: '',
           content_id: 'content',
