@@ -161,7 +161,6 @@ const explorationCategoryDropdown =
 const lessonInfoButton = 'button.oppia-lesson-info';
 const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
 const closeLessonInfoButton = '.e2e-test-close-lesson-info-modal-button';
-const feedbackCloseButton = '.e2e-test-exploration-feedback-close-button';
 const contributorProfileLink = '.e2e-test-contributor-icon';
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = '.e2e-test-confirm-publish';
@@ -364,11 +363,6 @@ const mobileGetInvolvedMenuContainerSelector =
 const mobileLearnDropdownSelector = '.e2e-mobile-test-learn';
 const mobileLearnSubMenuSelector = '.e2e-test-mobile-learn-submenu';
 const mobileNavBarOpenSelector = '.oppia-sidebar-menu-open';
-const communityLibraryLinkInNavbarSelector =
-  '.e2e-test-topnb-go-to-community-library-link';
-const communityLibraryContainerSelector = '.e2e-test-library-container';
-const communityLibraryLinkInNavMenuSelector = '.e2e-mobile-test-library-link';
-
 const commonPlayLaterIconSelector = '.e2e-test-lesson-playlist-icon';
 const learnerDashboardIconsSelector = 'oppia-learner-dashboard-icons';
 
@@ -782,8 +776,6 @@ export class LoggedInUser extends BaseUser {
       const ratingStars = await this.page.$$(ratingStarSelector);
       await this.waitForElementToBeClickable(ratingStars[rating - 1]);
       await ratingStars[rating - 1].click();
-
-      // If no feedback string provided, stop after clicking the rating
       if (!feedback || feedback.trim() === '') {
         showMessage('No feedback provided; skipping feedback submission.');
         return;
