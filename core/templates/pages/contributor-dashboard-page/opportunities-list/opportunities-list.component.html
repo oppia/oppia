@@ -5,7 +5,7 @@
              class="oppia-search-bar-input"
              placeholder="Search Skill or Topic ..."
              [value]="searchQuery"
-             (input)="onSearchQueryChange($event.target.value)">
+             (input)="onSearchQueryChange($any($event.target).value)">
     </div>
   </div>
   <div [hidden]="loadingOpportunityData" *ngFor="let opportunity of visibleOpportunities">
