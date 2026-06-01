@@ -267,6 +267,14 @@ describe('NumberWithUnits', () => {
           Units.fromRawInputString('$')
         )
       );
+      expect(NumberWithUnits.fromRawInputString('Rs 5')).toEqual(
+        new NumberWithUnits(
+          'real',
+          5,
+          new Fraction(false, 0, 0, 1),
+          Units.fromRawInputString('Rs')
+        )
+      );
       expect(NumberWithUnits.fromRawInputString('Rs 2 / 3 per hour')).toEqual(
         new NumberWithUnits(
           'fraction',
@@ -305,23 +313,29 @@ describe('NumberWithUnits', () => {
         NumberWithUnits.fromRawInputString('3# m/s');
       }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
+        NumberWithUnits.fromRawInputString('blah');
+      }).toThrowError(errors.INVALID_VALUE);
+      expect(() => {
+        NumberWithUnits.fromRawInputString('blah 123');
+      }).toThrowError(errors.INVALID_VALUE);
+      expect(() => {
         NumberWithUnits.fromRawInputString('3 $');
       }).toThrowError(errors.INVALID_CURRENCY_FORMAT);
       expect(() => {
         NumberWithUnits.fromRawInputString('Rs5');
-      }).toThrowError(errors.INVALID_CURRENCY);
+      }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
         NumberWithUnits.fromRawInputString('$');
       }).toThrowError(errors.INVALID_CURRENCY);
       expect(() => {
         NumberWithUnits.fromRawInputString('kg 2 s^2');
-      }).toThrowError(errors.INVALID_CURRENCY);
+      }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
         NumberWithUnits.fromRawInputString('2 m/s#');
       }).toThrowError(errors.INVALID_UNIT_CHARS);
       expect(() => {
         NumberWithUnits.fromRawInputString('@ 2');
-      }).toThrowError(errors.INVALID_CURRENCY);
+      }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
         NumberWithUnits.fromRawInputString('2 / 3 kg&^-2');
       }).toThrowError(errors.INVALID_UNIT_CHARS);

@@ -49,7 +49,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple, Union, cast
+from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -410,13 +410,14 @@ def _collect_study_guide_changes(
     """
     # Remove union and StudyGuideChange once the study
     # guide logic when updating a subtopic page is
-    # removed from line 695.
+    # removed from line 506.
     update_study_guide_property_cmd: Union[
         study_guide_domain.UpdateStudyGuidePropertyCmd,
         study_guide_domain.StudyGuideChange,
     ]
-    # Here we use cast because we are narrowing down the type from
-    # TopicChange to a specific change command.
+    # Here we use cast because we are narrowing down the type from BaseChange
+    # to UpdateStudyGuidePropertyCmd after confirming the command type through
+    # the CMD_UPDATE_STUDY_GUIDE_PROPERTY check in the caller function.
     update_study_guide_property_cmd = cast(
         study_guide_domain.UpdateStudyGuidePropertyCmd, change
     )
@@ -430,6 +431,186 @@ def _collect_study_guide_changes(
         )
         modified_study_guide_change_cmds[study_guide_id].append(
             update_study_guide_property_cmd
+        )
+
+
+def _collect_subtopic_page_changes(
+    change: change_domain.BaseChange,
+    topic: topic_domain.Topic,
+    topic_id: str,
+    existing_subtopic_page_ids_to_be_modified: List[int],
+    modified_subtopic_change_cmds: Dict[
+        str, List[subtopic_page_domain.SubtopicPageChange]
+    ],
+    existing_study_guide_ids_to_be_modified: List[int],
+    modified_study_guide_change_cmds: Dict[
+        str, List[study_guide_domain.StudyGuideChange]
+    ],
+    ensure_study_guide_exists: Callable[[int], Optional[str]],
+) -> None:
+    """Collects subtopic page preprocessing changes from a change command.
+
+    When page contents HTML is updated, this also queues the matching study
+    guide change (if a study guide exists) so both can be loaded together.
+
+    Args:
+        change: BaseChange. Incoming change command with subtopic page updates.
+        topic: Topic. The topic object being updated.
+        topic_id: str. ID of the topic.
+        existing_subtopic_page_ids_to_be_modified: list(int). List tracking
+            subtopic page ids to be fetched and modified.
+        modified_subtopic_change_cmds: dict(str, list(SubtopicPageChange)).
+            Subtopic page change commands grouped by subtopic page id.
+        existing_study_guide_ids_to_be_modified: list(int). List tracking
+            study guide ids to be fetched and modified.
+        modified_study_guide_change_cmds: dict(str, list(StudyGuideChange)).
+            Study guide change commands grouped by study guide id.
+        ensure_study_guide_exists: function. Helper that returns a study guide
+            id when it exists or can be fetched.
+    """
+    # Here we use cast because we are narrowing down the type from
+    # TopicChange to a specific change command.
+    update_subtopic_page_property_cmd = cast(
+        subtopic_page_domain.UpdateSubtopicPagePropertyCmd, change
+    )
+
+    if update_subtopic_page_property_cmd.subtopic_id < topic.next_subtopic_id:
+        existing_subtopic_page_ids_to_be_modified.append(
+            update_subtopic_page_property_cmd.subtopic_id
+        )
+        subtopic_page_id = (
+            subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                topic_id, update_subtopic_page_property_cmd.subtopic_id
+            )
+        )
+        modified_subtopic_change_cmds[subtopic_page_id].append(
+            update_subtopic_page_property_cmd
+        )
+
+        if update_subtopic_page_property_cmd.property_name == (
+            subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
+        ):
+            # Only update study guide if it exists.
+            potential_study_guide_id: Optional[str] = ensure_study_guide_exists(
+                update_subtopic_page_property_cmd.subtopic_id
+            )
+            if potential_study_guide_id is not None:
+                # Here we use cast because we are sure that the
+                # new_value is subtitled html as written
+                # translations and recorded voiceovers are
+                # not used.
+                subtitled_html = cast(
+                    state_domain.SubtitledHtmlDict,
+                    update_subtopic_page_property_cmd.new_value,
+                )
+                update_study_guide_property_cmd = (
+                    study_guide_domain.StudyGuideChange
+                )(
+                    {
+                        'cmd': 'update_study_guide_property',
+                        'property_name': 'sections_content',
+                        'new_value': (subtitled_html['html']),
+                        'old_value': 'section_content_1',
+                        'subtopic_id': (
+                            # We use update_subtopic_page_property_cmd
+                            # here to avoid mypy errors. We will replace
+                            # this with a study guide alternative once
+                            # we start using study guides exclusively.
+                            update_subtopic_page_property_cmd.subtopic_id
+                        ),
+                    }
+                )
+                # We use update_subtopic_page_property_cmd
+                # here to avoid mypy errors. We will replace
+                # this with a study guide alternative once
+                # we start using study guides exclusively.
+                existing_study_guide_ids_to_be_modified.append(
+                    update_subtopic_page_property_cmd.subtopic_id
+                )
+                modified_study_guide_change_cmds[
+                    potential_study_guide_id
+                ].append(update_study_guide_property_cmd)
+
+
+def _apply_subtopic_page_change(
+    change: change_domain.BaseChange,
+    topic_id: str,
+    deleted_subtopic_ids: List[int],
+    modified_subtopic_pages: Dict[str, subtopic_page_domain.SubtopicPage],
+    modified_study_guides: Dict[str, study_guide_domain.StudyGuide],
+) -> None:
+    """Applies a subtopic page property update.
+
+    Args:
+        change: BaseChange. Incoming subtopic page update command.
+        topic_id: str. ID of the topic.
+        deleted_subtopic_ids: list(int). IDs of deleted subtopics.
+        modified_subtopic_pages: dict(str, SubtopicPage). Modified pages map.
+        modified_study_guides: dict(str, StudyGuide). Modified guides map.
+
+    Raises:
+        Exception. The subtopic doesn't exist.
+    """
+    assert isinstance(change.subtopic_id, int)
+
+    subtopic_page_id = subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+        topic_id, change.subtopic_id
+    )
+    study_guide_id = study_guide_domain.StudyGuide.get_study_guide_id(
+        topic_id, change.subtopic_id
+    )
+
+    if (
+        subtopic_page_id not in modified_subtopic_pages
+        or modified_subtopic_pages[subtopic_page_id] is None
+        or change.subtopic_id in deleted_subtopic_ids
+    ):
+        raise Exception(
+            'The subtopic with id %s doesn\'t exist' % change.subtopic_id
+        )
+
+    if (
+        change.property_name
+        == subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
+    ):
+        # Here we use cast because this 'if' condition forces change to have type
+        # UpdateSubtopicPagePropertyPageContentsHtmlCmd, which is a specific
+        # subtype of BaseChange with the required property_name and new_value.
+        update_cmd = cast(
+            subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsHtmlCmd,
+            change,
+        )
+
+        page_contents = state_domain.SubtitledHtml.from_dict(
+            update_cmd.new_value
+        )
+        page_contents.validate()
+
+        modified_subtopic_pages[subtopic_page_id].update_page_contents_html(
+            page_contents
+        )
+
+        if study_guide_id in modified_study_guides:
+            html_content = update_cmd.new_value['html']
+            modified_study_guides[study_guide_id].update_section_content(
+                html_content,
+                'section_content_1',
+            )
+
+    elif (
+        change.property_name
+        == subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO
+    ):
+        # Here we use cast because this 'elif' condition forces change to have type
+        # UpdateSubtopicPagePropertyPageContentsAudioCmd, which is a specific
+        # subtype of BaseChange with the required property_name and new_value.
+        update_cmd = cast(
+            subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsAudioCmd,
+            change,
+        )
+
+        modified_subtopic_pages[subtopic_page_id].update_page_contents_audio(
+            state_domain.RecordedVoiceovers.from_dict(update_cmd.new_value)
         )
 
 
@@ -654,71 +835,16 @@ def apply_change_list(
             )
         # Remove this entire if block once study guides become standard.
         if change.cmd == subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY:
-            # Here we use cast because we are narrowing down the type from
-            # TopicChange to a specific change command.
-            update_subtopic_page_property_cmd = cast(
-                subtopic_page_domain.UpdateSubtopicPagePropertyCmd, change
+            _collect_subtopic_page_changes(
+                change,
+                topic,
+                topic_id,
+                existing_subtopic_page_ids_to_be_modified,
+                modified_subtopic_change_cmds,
+                existing_study_guide_ids_to_be_modified,
+                modified_study_guide_change_cmds,
+                _ensure_study_guide_exists,
             )
-
-            if (
-                update_subtopic_page_property_cmd.subtopic_id
-                < topic.next_subtopic_id
-            ):
-                existing_subtopic_page_ids_to_be_modified.append(
-                    update_subtopic_page_property_cmd.subtopic_id
-                )
-                subtopic_page_id = (
-                    subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-                        topic_id, update_subtopic_page_property_cmd.subtopic_id
-                    )
-                )
-                modified_subtopic_change_cmds[subtopic_page_id].append(
-                    update_subtopic_page_property_cmd
-                )
-
-                if update_subtopic_page_property_cmd.property_name == (
-                    subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
-                ):
-                    # Only update study guide if it exists.
-                    potential_study_guide_id: Optional[str] = (
-                        _ensure_study_guide_exists
-                    )(update_subtopic_page_property_cmd.subtopic_id)
-                    if potential_study_guide_id is not None:
-                        # Here we use cast because we are sure that the
-                        # new_value is subtitled html as written
-                        # translations and recorded voiceovers are
-                        # not used.
-                        subtitled_html = cast(
-                            state_domain.SubtitledHtmlDict,
-                            update_subtopic_page_property_cmd.new_value,
-                        )
-                        update_study_guide_property_cmd = (
-                            study_guide_domain.StudyGuideChange
-                        )(
-                            {
-                                'cmd': 'update_study_guide_property',
-                                'property_name': 'sections_content',
-                                'new_value': (subtitled_html['html']),
-                                'old_value': 'section_content_1',
-                                'subtopic_id': (
-                                    # We use update_subtopic_page_property_cmd
-                                    # here to avoid mypy errors. We will replace
-                                    # this with a study guide alternative once
-                                    # we start using study guides exclusively.
-                                    update_subtopic_page_property_cmd.subtopic_id
-                                ),
-                            }
-                        )
-                        # We use update_subtopic_page_property_cmd
-                        # here to avoid mypy errors. We will replace
-                        # this with a study guide alternative once
-                        # we start using study guides exclusively.
-                        existing_study_guide_ids_to_be_modified.append(
-                            update_subtopic_page_property_cmd.subtopic_id
-                        )
-                        modified_study_guide_change_cmds[
-                            potential_study_guide_id
-                        ].append(update_study_guide_property_cmd)
 
     modified_subtopic_pages_list = (
         subtopic_page_services.get_subtopic_pages_with_ids(
@@ -743,476 +869,447 @@ def apply_change_list(
             assert study_guide is not None
             modified_study_guides[study_guide.id] = study_guide
 
-    try:
-        for change in change_list:
-            if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
-                # Here we use cast because we are narrowing down the type from
-                # TopicChange to a specific change command.
-                add_subtopic_cmd = cast(topic_domain.AddSubtopicCmd, change)
-                _handle_add_subtopic(
-                    topic,
-                    topic_id,
-                    add_subtopic_cmd,
-                    modified_subtopic_pages,
-                    modified_study_guides,
-                    modified_subtopic_change_cmds,
-                    modified_study_guide_change_cmds,
-                    newly_created_subtopic_ids,
-                )
-            elif change.cmd == topic_domain.CMD_DELETE_SUBTOPIC:
-                # Here we use cast because we are narrowing down the type from
-                # TopicChange to a specific change command.
-                delete_subtopic_cmd = cast(
-                    topic_domain.DeleteSubtopicCmd, change
-                )
-                _handle_delete_subtopic(
-                    topic,
-                    delete_subtopic_cmd,
-                    newly_created_subtopic_ids,
-                    deleted_subtopic_ids,
-                )
-            elif change.cmd == topic_domain.CMD_ADD_CANONICAL_STORY:
-                # Here we use cast because we are narrowing down the type from
-                # TopicChange to a specific change command.
-                add_canonical_story_cmd = cast(
-                    topic_domain.AddCanonicalStoryCmd, change
-                )
-                _handle_add_canonical_story(
-                    topic,
-                    add_canonical_story_cmd,
-                )
-            elif change.cmd == topic_domain.CMD_DELETE_CANONICAL_STORY:
-                # Here we use cast because we are narrowing down the type from
-                # TopicChange to a specific change command.
-                delete_canonical_story_cmd = cast(
-                    topic_domain.DeleteCanonicalStoryCmd, change
-                )
-                _handle_delete_canonical_story(
-                    topic,
-                    delete_canonical_story_cmd,
-                )
-            elif change.cmd == topic_domain.CMD_REARRANGE_CANONICAL_STORY:
-                # Here we use cast because we are narrowing down the type from
-                # TopicChange to a specific change command.
-                rearrange_canonical_story_cmd = cast(
-                    topic_domain.RearrangeCanonicalStoryCmd, change
-                )
-                _handle_rearrange_canonical_story(
-                    topic,
-                    rearrange_canonical_story_cmd,
-                )
-            elif change.cmd == topic_domain.CMD_ADD_ADDITIONAL_STORY:
-                # Here we use cast because we are narrowing down the type from
-                # TopicChange to a specific change command.
-                add_additional_story_cmd = cast(
-                    topic_domain.AddAdditionalStoryCmd, change
-                )
-                _handle_add_additional_story(
-                    topic,
-                    add_additional_story_cmd,
-                )
-            elif change.cmd == topic_domain.CMD_DELETE_ADDITIONAL_STORY:
-                # Here we use cast because we are narrowing down the type from
-                # TopicChange to a specific change command.
-                delete_additional_story_cmd = cast(
-                    topic_domain.DeleteAdditionalStoryCmd, change
-                )
-                _handle_delete_additional_story(
-                    topic,
-                    delete_additional_story_cmd,
-                )
-            elif change.cmd == topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID:
-                # Here we use cast because we are narrowing down the type from
-                # TopicChange to a specific change command.
-                add_uncategorized_skill_id_cmd = cast(
-                    topic_domain.AddUncategorizedSkillIdCmd, change
-                )
-                _handle_add_uncategorized_skill_id(
-                    topic,
-                    add_uncategorized_skill_id_cmd,
-                )
-            elif change.cmd == topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
-                # Here we use cast because we are narrowing down the type from
-                # TopicChange to a specific change command.
-                remove_uncategorized_skill_id_cmd = cast(
-                    topic_domain.RemoveUncategorizedSkillIdCmd, change
-                )
-                _handle_remove_uncategorized_skill_id(
-                    topic,
-                    remove_uncategorized_skill_id_cmd,
-                )
-            elif change.cmd == topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC:
-                # Here we use cast because we are narrowing down the type from
-                # TopicChange to a specific change command.
-                move_skill_id_to_subtopic_cmd = cast(
-                    topic_domain.MoveSkillIdToSubtopicCmd, change
-                )
-                _handle_move_skill_id_to_subtopic(
-                    topic,
-                    move_skill_id_to_subtopic_cmd,
-                )
-            elif change.cmd == topic_domain.CMD_REARRANGE_SKILL_IN_SUBTOPIC:
-                # Here we use cast because we are narrowing down the type from
-                # TopicChange to a specific change command.
-                rearrange_skill_in_subtopic_cmd = cast(
-                    topic_domain.RearrangeSkillInSubtopicCmd, change
-                )
-                _handle_rearrange_skill_in_subtopic(
-                    topic,
-                    rearrange_skill_in_subtopic_cmd,
-                )
-            elif change.cmd == topic_domain.CMD_REARRANGE_SUBTOPIC:
-                # Here we use cast because we are narrowing down the type from
-                # TopicChange to a specific change command.
-                rearrange_subtopic_cmd = cast(
-                    topic_domain.RearrangeSubtopicCmd, change
-                )
-                _handle_rearrange_subtopic(
-                    topic,
-                    rearrange_subtopic_cmd,
-                )
-            elif change.cmd == topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC:
-                # Here we use cast because we are narrowing down the type from
-                # TopicChange to a specific change command.
-                remove_skill_id_from_subtopic_cmd = cast(
-                    topic_domain.RemoveSkillIdFromSubtopicCmd, change
-                )
-                _handle_remove_skill_id_from_subtopic(
-                    topic,
-                    remove_skill_id_from_subtopic_cmd,
-                )
-            elif change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
-                if change.property_name == topic_domain.TOPIC_PROPERTY_NAME:
-                    # Here we use cast because this 'if' condition forces
-                    # change to have type UpdateTopicPropertyNameCmd.
-                    update_topic_name_cmd = cast(
-                        topic_domain.UpdateTopicPropertyNameCmd, change
-                    )
-                    topic.update_name(update_topic_name_cmd.new_value)
-                elif (
-                    change.property_name
-                    == topic_domain.TOPIC_PROPERTY_ABBREVIATED_NAME
-                ):
-                    # Here we use cast because this 'elif' condition forces
-                    # change to have type UpdateTopicPropertyAbbreviatedNameCmd.
-                    update_abbreviated_name_cmd = cast(
-                        topic_domain.UpdateTopicPropertyAbbreviatedNameCmd,
-                        change,
-                    )
-                    topic.update_abbreviated_name(
-                        update_abbreviated_name_cmd.new_value
-                    )
-                elif (
-                    change.property_name
-                    == topic_domain.TOPIC_PROPERTY_URL_FRAGMENT
-                ):
-                    # Here we use cast because this 'elif' condition forces
-                    # change to have type UpdateTopicPropertyUrlFragmentCmd.
-                    update_url_fragment_cmd = cast(
-                        topic_domain.UpdateTopicPropertyUrlFragmentCmd, change
-                    )
-                    topic.update_url_fragment(update_url_fragment_cmd.new_value)
-                elif (
-                    change.property_name
-                    == topic_domain.TOPIC_PROPERTY_DESCRIPTION
-                ):
-                    # Here we use cast because this 'elif' condition forces
-                    # change to have type UpdateTopicPropertyDescriptionCmd.
-                    update_topic_description_cmd = cast(
-                        topic_domain.UpdateTopicPropertyDescriptionCmd, change
-                    )
-                    topic.update_description(
-                        update_topic_description_cmd.new_value
-                    )
-                elif (
-                    change.property_name
-                    == topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE
-                ):
-                    # Here we use cast because this 'elif' condition forces
-                    # change to have type UpdateTopicPropertyLanguageCodeCmd.
-                    update_topic_language_code_cmd = cast(
-                        topic_domain.UpdateTopicPropertyLanguageCodeCmd, change
-                    )
-                    topic.update_language_code(
-                        update_topic_language_code_cmd.new_value
-                    )
-                elif (
-                    change.property_name
-                    == topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME
-                ):
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # UpdateTopicPropertyThumbnailFilenameCmd.
-                    update_topic_thumbnail_filename_cmd = cast(
-                        topic_domain.UpdateTopicPropertyThumbnailFilenameCmd,
-                        change,
-                    )
-                    update_thumbnail_filename(
-                        topic, update_topic_thumbnail_filename_cmd.new_value
-                    )
-                elif (
-                    change.property_name
-                    == topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR
-                ):
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # UpdateTopicPropertyThumbnailBGColorCmd.
-                    update_topic_thumbnail_bg_color_cmd = cast(
-                        topic_domain.UpdateTopicPropertyThumbnailBGColorCmd,
-                        change,
-                    )
-                    topic.update_thumbnail_bg_color(
-                        update_topic_thumbnail_bg_color_cmd.new_value
-                    )
-                elif (
-                    change.property_name
-                    == topic_domain.TOPIC_PROPERTY_META_TAG_CONTENT
-                ):
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # UpdateTopicPropertyMetaTagContentCmd.
-                    update_topic_meta_tag_content_cmd = cast(
-                        topic_domain.UpdateTopicPropertyMetaTagContentCmd,
-                        change,
-                    )
-                    topic.update_meta_tag_content(
-                        update_topic_meta_tag_content_cmd.new_value
-                    )
-                elif (
-                    change.property_name
-                    == topic_domain.TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED
-                ):
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # UpdateTopicPropertyPracticeTabIsDisplayedCmd.
-                    update_practice_tab_is_displayed_cmd = cast(
-                        topic_domain.UpdateTopicPropertyPracticeTabIsDisplayedCmd,  # pylint: disable=line-too-long
-                        change,
-                    )
-                    topic.update_practice_tab_is_displayed(
-                        update_practice_tab_is_displayed_cmd.new_value
-                    )
-                elif (
-                    change.property_name
-                    == topic_domain.TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB
-                ):
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # UpdateTopicPropertyTitleFragmentForWebCmd.
-                    update_title_fragment_for_web_cmd = cast(
-                        topic_domain.UpdateTopicPropertyTitleFragmentForWebCmd,
-                        change,
-                    )
-                    topic.update_page_title_fragment_for_web(
-                        update_title_fragment_for_web_cmd.new_value
-                    )
-                elif (
-                    change.property_name
-                    == topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST
-                ):
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # UpdateTopicPropertySkillIdsForDiagnosticTestCmd.
-                    update_skill_ids_for_diagnostic_test_cmd = cast(
-                        topic_domain.UpdateTopicPropertySkillIdsForDiagnosticTestCmd,  # pylint: disable=line-too-long
-                        change,
-                    )
-                    topic.update_skill_ids_for_diagnostic_test(
-                        update_skill_ids_for_diagnostic_test_cmd.new_value
-                    )
-            elif (
-                change.cmd == study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY
+    def _handle_add_subtopic_cmd(change: change_domain.BaseChange) -> None:
+        # Here we use cast because we are narrowing down the type from
+        # TopicChange to a specific change command.
+        add_subtopic_cmd = cast(topic_domain.AddSubtopicCmd, change)
+        _handle_add_subtopic(
+            topic,
+            topic_id,
+            add_subtopic_cmd,
+            modified_subtopic_pages,
+            modified_study_guides,
+            modified_subtopic_change_cmds,
+            modified_study_guide_change_cmds,
+            newly_created_subtopic_ids,
+        )
+
+    def _handle_delete_subtopic_cmd(change: change_domain.BaseChange) -> None:
+        # Here we use cast because we are narrowing down the type from
+        # TopicChange to a specific change command.
+        delete_subtopic_cmd = cast(topic_domain.DeleteSubtopicCmd, change)
+        _handle_delete_subtopic(
+            topic,
+            delete_subtopic_cmd,
+            newly_created_subtopic_ids,
+            deleted_subtopic_ids,
+        )
+
+    def _handle_add_canonical_story_cmd(
+        change: change_domain.BaseChange,
+    ) -> None:
+        # Here we use cast because we are narrowing down the type from
+        # TopicChange to a specific change command.
+        add_canonical_story_cmd = cast(
+            topic_domain.AddCanonicalStoryCmd, change
+        )
+        _handle_add_canonical_story(topic, add_canonical_story_cmd)
+
+    def _handle_delete_canonical_story_cmd(
+        change: change_domain.BaseChange,
+    ) -> None:
+        # Here we use cast because we are narrowing down the type from
+        # TopicChange to a specific change command.
+        delete_canonical_story_cmd = cast(
+            topic_domain.DeleteCanonicalStoryCmd, change
+        )
+        _handle_delete_canonical_story(topic, delete_canonical_story_cmd)
+
+    def _handle_rearrange_canonical_story_cmd(
+        change: change_domain.BaseChange,
+    ) -> None:
+        # Here we use cast because we are narrowing down the type from
+        # TopicChange to a specific change command.
+        rearrange_canonical_story_cmd = cast(
+            topic_domain.RearrangeCanonicalStoryCmd, change
+        )
+        _handle_rearrange_canonical_story(topic, rearrange_canonical_story_cmd)
+
+    def _handle_add_additional_story_cmd(
+        change: change_domain.BaseChange,
+    ) -> None:
+        # Here we use cast because we are narrowing down the type from
+        # TopicChange to a specific change command.
+        add_additional_story_cmd = cast(
+            topic_domain.AddAdditionalStoryCmd, change
+        )
+        _handle_add_additional_story(topic, add_additional_story_cmd)
+
+    def _handle_delete_additional_story_cmd(
+        change: change_domain.BaseChange,
+    ) -> None:
+        # Here we use cast because we are narrowing down the type from
+        # TopicChange to a specific change command.
+        delete_additional_story_cmd = cast(
+            topic_domain.DeleteAdditionalStoryCmd, change
+        )
+        _handle_delete_additional_story(topic, delete_additional_story_cmd)
+
+    def _handle_add_uncategorized_skill_id_cmd(
+        change: change_domain.BaseChange,
+    ) -> None:
+        # Here we use cast because we are narrowing down the type from
+        # TopicChange to a specific change command.
+        add_uncategorized_skill_id_cmd = cast(
+            topic_domain.AddUncategorizedSkillIdCmd, change
+        )
+        _handle_add_uncategorized_skill_id(
+            topic, add_uncategorized_skill_id_cmd
+        )
+
+    def _handle_remove_uncategorized_skill_id_cmd(
+        change: change_domain.BaseChange,
+    ) -> None:
+        # Here we use cast because we are narrowing down the type from
+        # TopicChange to a specific change command.
+        remove_uncategorized_skill_id_cmd = cast(
+            topic_domain.RemoveUncategorizedSkillIdCmd, change
+        )
+        _handle_remove_uncategorized_skill_id(
+            topic, remove_uncategorized_skill_id_cmd
+        )
+
+    def _handle_move_skill_id_to_subtopic_cmd(
+        change: change_domain.BaseChange,
+    ) -> None:
+        # Here we use cast because we are narrowing down the type from
+        # TopicChange to a specific change command.
+        move_skill_id_to_subtopic_cmd = cast(
+            topic_domain.MoveSkillIdToSubtopicCmd, change
+        )
+        _handle_move_skill_id_to_subtopic(topic, move_skill_id_to_subtopic_cmd)
+
+    def _handle_rearrange_skill_in_subtopic_cmd(
+        change: change_domain.BaseChange,
+    ) -> None:
+        # Here we use cast because we are narrowing down the type from
+        # TopicChange to a specific change command.
+        rearrange_skill_in_subtopic_cmd = cast(
+            topic_domain.RearrangeSkillInSubtopicCmd, change
+        )
+        _handle_rearrange_skill_in_subtopic(
+            topic, rearrange_skill_in_subtopic_cmd
+        )
+
+    def _handle_rearrange_subtopic_cmd(
+        change: change_domain.BaseChange,
+    ) -> None:
+        # Here we use cast because we are narrowing down the type from
+        # TopicChange to a specific change command.
+        rearrange_subtopic_cmd = cast(topic_domain.RearrangeSubtopicCmd, change)
+        _handle_rearrange_subtopic(topic, rearrange_subtopic_cmd)
+
+    def _handle_remove_skill_id_from_subtopic_cmd(
+        change: change_domain.BaseChange,
+    ) -> None:
+        # Here we use cast because we are narrowing down the type from
+        # TopicChange to a specific change command.
+        remove_skill_id_from_subtopic_cmd = cast(
+            topic_domain.RemoveSkillIdFromSubtopicCmd, change
+        )
+        _handle_remove_skill_id_from_subtopic(
+            topic, remove_skill_id_from_subtopic_cmd
+        )
+
+    def _handle_update_topic_property_cmd(
+        change: change_domain.BaseChange,
+    ) -> None:
+        if change.property_name == topic_domain.TOPIC_PROPERTY_NAME:
+            # Here we use cast because this 'if' condition forces
+            # change to have type UpdateTopicPropertyNameCmd.
+            update_topic_name_cmd = cast(
+                topic_domain.UpdateTopicPropertyNameCmd, change
+            )
+            topic.update_name(update_topic_name_cmd.new_value)
+        elif (
+            change.property_name == topic_domain.TOPIC_PROPERTY_ABBREVIATED_NAME
+        ):
+            # Here we use cast because this 'elif' condition forces
+            # change to have type UpdateTopicPropertyAbbreviatedNameCmd.
+            update_abbreviated_name_cmd = cast(
+                topic_domain.UpdateTopicPropertyAbbreviatedNameCmd,
+                change,
+            )
+            topic.update_abbreviated_name(update_abbreviated_name_cmd.new_value)
+        elif change.property_name == topic_domain.TOPIC_PROPERTY_URL_FRAGMENT:
+            # Here we use cast because this 'elif' condition forces
+            # change to have type UpdateTopicPropertyUrlFragmentCmd.
+            update_url_fragment_cmd = cast(
+                topic_domain.UpdateTopicPropertyUrlFragmentCmd, change
+            )
+            topic.update_url_fragment(update_url_fragment_cmd.new_value)
+        elif change.property_name == topic_domain.TOPIC_PROPERTY_DESCRIPTION:
+            # Here we use cast because this 'elif' condition forces
+            # change to have type UpdateTopicPropertyDescriptionCmd.
+            update_topic_description_cmd = cast(
+                topic_domain.UpdateTopicPropertyDescriptionCmd, change
+            )
+            topic.update_description(update_topic_description_cmd.new_value)
+        elif change.property_name == topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE:
+            # Here we use cast because this 'elif' condition forces
+            # change to have type UpdateTopicPropertyLanguageCodeCmd.
+            update_topic_language_code_cmd = cast(
+                topic_domain.UpdateTopicPropertyLanguageCodeCmd, change
+            )
+            topic.update_language_code(update_topic_language_code_cmd.new_value)
+        elif (
+            change.property_name
+            == topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME
+        ):
+            # Here we use cast because this 'elif'
+            # condition forces change to have type
+            # UpdateTopicPropertyThumbnailFilenameCmd.
+            update_topic_thumbnail_filename_cmd = cast(
+                topic_domain.UpdateTopicPropertyThumbnailFilenameCmd,
+                change,
+            )
+            update_thumbnail_filename(
+                topic, update_topic_thumbnail_filename_cmd.new_value
+            )
+        elif (
+            change.property_name
+            == topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR
+        ):
+            # Here we use cast because this 'elif'
+            # condition forces change to have type
+            # UpdateTopicPropertyThumbnailBGColorCmd.
+            update_topic_thumbnail_bg_color_cmd = cast(
+                topic_domain.UpdateTopicPropertyThumbnailBGColorCmd,
+                change,
+            )
+            topic.update_thumbnail_bg_color(
+                update_topic_thumbnail_bg_color_cmd.new_value
+            )
+        elif (
+            change.property_name == topic_domain.TOPIC_PROPERTY_META_TAG_CONTENT
+        ):
+            # Here we use cast because this 'elif'
+            # condition forces change to have type
+            # UpdateTopicPropertyMetaTagContentCmd.
+            update_topic_meta_tag_content_cmd = cast(
+                topic_domain.UpdateTopicPropertyMetaTagContentCmd,
+                change,
+            )
+            topic.update_meta_tag_content(
+                update_topic_meta_tag_content_cmd.new_value
+            )
+        elif (
+            change.property_name
+            == topic_domain.TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED
+        ):
+            # Here we use cast because this 'elif'
+            # condition forces change to have type
+            # UpdateTopicPropertyPracticeTabIsDisplayedCmd.
+            update_practice_tab_is_displayed_cmd = cast(
+                topic_domain.UpdateTopicPropertyPracticeTabIsDisplayedCmd,  # pylint: disable=line-too-long
+                change,
+            )
+            topic.update_practice_tab_is_displayed(
+                update_practice_tab_is_displayed_cmd.new_value
+            )
+        elif (
+            change.property_name
+            == topic_domain.TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB
+        ):
+            # Here we use cast because this 'elif'
+            # condition forces change to have type
+            # UpdateTopicPropertyTitleFragmentForWebCmd.
+            update_title_fragment_for_web_cmd = cast(
+                topic_domain.UpdateTopicPropertyTitleFragmentForWebCmd,
+                change,
+            )
+            topic.update_page_title_fragment_for_web(
+                update_title_fragment_for_web_cmd.new_value
+            )
+        elif (
+            change.property_name
+            == topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST
+        ):
+            # Here we use cast because this 'elif'
+            # condition forces change to have type
+            # UpdateTopicPropertySkillIdsForDiagnosticTestCmd.
+            update_skill_ids_for_diagnostic_test_cmd = cast(
+                topic_domain.UpdateTopicPropertySkillIdsForDiagnosticTestCmd,  # pylint: disable=line-too-long
+                change,
+            )
+            topic.update_skill_ids_for_diagnostic_test(
+                update_skill_ids_for_diagnostic_test_cmd.new_value
+            )
+
+    def _handle_update_subtopic_property_cmd(
+        change: change_domain.BaseChange,
+    ) -> None:
+        # Here we use cast because we are narrowing down the type from
+        # TopicChange to a specific change command.
+        update_subtopic_property_cmd = cast(
+            topic_domain.UpdateSubtopicPropertyCmd, change
+        )
+        if (
+            update_subtopic_property_cmd.property_name
+            == topic_domain.SUBTOPIC_PROPERTY_TITLE
+        ):
+            topic.update_subtopic_title(
+                update_subtopic_property_cmd.subtopic_id,
+                update_subtopic_property_cmd.new_value,
+            )
+            if not feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+                committer_id,
             ):
-                _apply_study_guide_change(
+                # Here we use cast because we are narrowing down the
+                # type from TopicChange to a specific change command.
+                update_study_guide_sections_heading_cmd = cast(
+                    study_guide_domain.UpdateStudyGuidePropertySectionsHeadingCmd,  # pylint: disable=line-too-long
                     change,
-                    topic_id,
-                    modified_study_guides,
-                    deleted_subtopic_ids,
-                    modified_subtopic_pages,
-                    modified_subtopic_change_cmds,
-                )
-            elif (
-                change.cmd
-                == subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY
-            ):
-                # Ruling out the possibility of any other type for mypy
-                # type checking.
-                assert isinstance(change.subtopic_id, int)
-                subtopic_page_id = (
-                    subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-                        topic_id, change.subtopic_id
-                    )
                 )
                 study_guide_id = (
                     study_guide_domain.StudyGuide.get_study_guide_id(
-                        topic_id, change.subtopic_id
+                        topic_id,
+                        update_study_guide_sections_heading_cmd.subtopic_id,
                     )
                 )
-                if (modified_subtopic_pages[subtopic_page_id] is None) or (
-                    change.subtopic_id in deleted_subtopic_ids
-                ):
-                    raise Exception(
-                        'The subtopic with id %s doesn\'t exist'
-                        % (change.subtopic_id)
-                    )
 
-                if (
-                    change.property_name
-                    == subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
-                ):
-                    # Here we use cast because this 'if'
-                    # condition forces change to have type
-                    # UpdateSubtopicPagePropertyPageContentsHtmlCmd.
-                    update_subtopic_page_contents_html_cmd = cast(
-                        subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsHtmlCmd,  # pylint: disable=line-too-long
-                        change,
-                    )
-                    # Here we use cast because this 'if'
-                    # condition will force change to have type
-                    # UpdateStudyGuidePropertySectionsContentCmd
-                    # once the subtopic is deprecated.
-                    update_study_guide_sections_content_cmd = cast(
-                        study_guide_domain.UpdateStudyGuidePropertySectionsContentCmd,  # pylint: disable=line-too-long
-                        change,
-                    )
-                    page_contents = state_domain.SubtitledHtml.from_dict(
-                        update_subtopic_page_contents_html_cmd.new_value
-                    )
-                    page_contents.validate()
-                    modified_subtopic_pages[
-                        subtopic_page_id
-                    ].update_page_contents_html(page_contents)
-                    # Only update study guide if it exists.
-                    if study_guide_id in modified_study_guides:
-                        (
-                            modified_study_guides[
-                                study_guide_id
-                            ].update_section_content
-                        )(
-                            (
-                                update_study_guide_sections_content_cmd.new_value.get(
-                                    'html'
-                                )
-                            ),
-                            'section_content_1',
-                        )
-
-                elif (
-                    change.property_name
-                    == subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO
-                ):
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # UpdateSubtopicPagePropertyPageContentsAudioCmd.
-                    update_subtopic_page_contents_audio_cmd = cast(
-                        subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsAudioCmd,  # pylint: disable=line-too-long
-                        change,
-                    )
-                    modified_subtopic_pages[
-                        subtopic_page_id
-                    ].update_page_contents_audio(
-                        state_domain.RecordedVoiceovers.from_dict(
-                            update_subtopic_page_contents_audio_cmd.new_value
-                        )
-                    )
-            elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:
-                # Here we use cast because we are narrowing down the type from
-                # TopicChange to a specific change command.
-                update_subtopic_property_cmd = cast(
-                    topic_domain.UpdateSubtopicPropertyCmd, change
+                # Only update study guide if it exists or can be
+                # fetched.
+                existing_study_guide_id = _ensure_study_guide_exists(
+                    update_study_guide_sections_heading_cmd.subtopic_id
                 )
-                if (
-                    update_subtopic_property_cmd.property_name
-                    == topic_domain.SUBTOPIC_PROPERTY_TITLE
-                ):
-                    topic.update_subtopic_title(
-                        update_subtopic_property_cmd.subtopic_id,
-                        update_subtopic_property_cmd.new_value,
-                    )
-                    if not feature_flag_services.is_feature_flag_enabled(
-                        feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
-                        committer_id,
-                    ):
-                        # Here we use cast because we are narrowing down the
-                        # type from TopicChange to a specific change command.
-                        update_study_guide_sections_heading_cmd = cast(
-                            study_guide_domain.UpdateStudyGuidePropertySectionsHeadingCmd,  # pylint: disable=line-too-long
-                            change,
-                        )
-                        study_guide_id = study_guide_domain.StudyGuide.get_study_guide_id(
-                            topic_id,
-                            update_study_guide_sections_heading_cmd.subtopic_id,
-                        )
 
-                        # Only update study guide if it exists or can be
-                        # fetched.
-                        existing_study_guide_id = _ensure_study_guide_exists(
-                            update_study_guide_sections_heading_cmd.subtopic_id
-                        )
-
-                        if existing_study_guide_id is not None:
-                            modified_study_guide_change_cmds[
-                                study_guide_id
-                            ].append(
-                                study_guide_domain.StudyGuideChange(
-                                    {
-                                        'cmd': 'update_study_guide_property',
-                                        'property_name': 'sections_content',
-                                        'new_value': (
-                                            update_study_guide_sections_heading_cmd.new_value
-                                        ),
-                                        'old_value': 'section_heading_0',
-                                        'subtopic_id': (
-                                            update_study_guide_sections_heading_cmd.subtopic_id
-                                        ),
-                                    }
-                                )
-                            )
-                            (
-                                modified_study_guides[
-                                    study_guide_id
-                                ].update_section_heading
-                            )(
-                                (
+                if existing_study_guide_id is not None:
+                    modified_study_guide_change_cmds[study_guide_id].append(
+                        study_guide_domain.StudyGuideChange(
+                            {
+                                'cmd': 'update_study_guide_property',
+                                'property_name': 'sections_content',
+                                'new_value': (
                                     update_study_guide_sections_heading_cmd.new_value
                                 ),
-                                'section_heading_0',
-                            )
-                if (
-                    update_subtopic_property_cmd.property_name
-                    == topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME
-                ):
-                    update_subtopic_thumbnail_filename(
-                        topic,
-                        update_subtopic_property_cmd.subtopic_id,
-                        update_subtopic_property_cmd.new_value,
+                                'old_value': 'section_heading_0',
+                                'subtopic_id': (
+                                    update_study_guide_sections_heading_cmd.subtopic_id
+                                ),
+                            }
+                        )
                     )
-                if (
-                    update_subtopic_property_cmd.property_name
-                    == topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR
-                ):
-                    topic.update_subtopic_thumbnail_bg_color(
-                        update_subtopic_property_cmd.subtopic_id,
-                        update_subtopic_property_cmd.new_value,
+                    (
+                        modified_study_guides[
+                            study_guide_id
+                        ].update_section_heading
+                    )(
+                        (update_study_guide_sections_heading_cmd.new_value),
+                        'section_heading_0',
                     )
-                if (
-                    update_subtopic_property_cmd.property_name
-                    == topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT
-                ):
-                    topic.update_subtopic_url_fragment(
-                        update_subtopic_property_cmd.subtopic_id,
-                        update_subtopic_property_cmd.new_value,
-                    )
+        if (
+            update_subtopic_property_cmd.property_name
+            == topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME
+        ):
+            update_subtopic_thumbnail_filename(
+                topic,
+                update_subtopic_property_cmd.subtopic_id,
+                update_subtopic_property_cmd.new_value,
+            )
+        if (
+            update_subtopic_property_cmd.property_name
+            == topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR
+        ):
+            topic.update_subtopic_thumbnail_bg_color(
+                update_subtopic_property_cmd.subtopic_id,
+                update_subtopic_property_cmd.new_value,
+            )
+        if (
+            update_subtopic_property_cmd.property_name
+            == topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT
+        ):
+            topic.update_subtopic_url_fragment(
+                update_subtopic_property_cmd.subtopic_id,
+                update_subtopic_property_cmd.new_value,
+            )
 
-            elif (
-                change.cmd
-                == topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION
-            ):
-                # Loading the topic model from the datastore into a
-                # Topic domain object automatically converts it to use the
-                # latest schema version. As a result, simply resaving the
-                # topic is sufficient to apply the schema migration.
-                continue
+    def _handle_update_study_guide_property_cmd(
+        change: change_domain.BaseChange,
+    ) -> None:
+        _apply_study_guide_change(
+            change,
+            topic_id,
+            modified_study_guides,
+            deleted_subtopic_ids,
+            modified_subtopic_pages,
+            modified_subtopic_change_cmds,
+        )
+
+    def _handle_update_subtopic_page_property_cmd(
+        change: change_domain.BaseChange,
+    ) -> None:
+        _apply_subtopic_page_change(
+            change,
+            topic_id,
+            deleted_subtopic_ids,
+            modified_subtopic_pages,
+            modified_study_guides,
+        )
+
+    def _handle_migrate_subtopic_schema_cmd(
+        _change: change_domain.BaseChange,
+    ) -> None:
+        # Loading the topic model from the datastore into a
+        # Topic domain object automatically converts it to use the
+        # latest schema version. As a result, simply resaving the
+        # topic is sufficient to apply the schema migration.
+        return None
+
+    command_handlers: Dict[str, Callable[[change_domain.BaseChange], None]] = {
+        topic_domain.CMD_ADD_SUBTOPIC: _handle_add_subtopic_cmd,
+        topic_domain.CMD_DELETE_SUBTOPIC: _handle_delete_subtopic_cmd,
+        topic_domain.CMD_ADD_CANONICAL_STORY: _handle_add_canonical_story_cmd,
+        topic_domain.CMD_DELETE_CANONICAL_STORY: (
+            _handle_delete_canonical_story_cmd
+        ),
+        topic_domain.CMD_REARRANGE_CANONICAL_STORY: (
+            _handle_rearrange_canonical_story_cmd
+        ),
+        topic_domain.CMD_ADD_ADDITIONAL_STORY: _handle_add_additional_story_cmd,
+        topic_domain.CMD_DELETE_ADDITIONAL_STORY: (
+            _handle_delete_additional_story_cmd
+        ),
+        topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID: (
+            _handle_add_uncategorized_skill_id_cmd
+        ),
+        topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID: (
+            _handle_remove_uncategorized_skill_id_cmd
+        ),
+        topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC: (
+            _handle_move_skill_id_to_subtopic_cmd
+        ),
+        topic_domain.CMD_REARRANGE_SKILL_IN_SUBTOPIC: (
+            _handle_rearrange_skill_in_subtopic_cmd
+        ),
+        topic_domain.CMD_REARRANGE_SUBTOPIC: _handle_rearrange_subtopic_cmd,
+        topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC: (
+            _handle_remove_skill_id_from_subtopic_cmd
+        ),
+        topic_domain.CMD_UPDATE_TOPIC_PROPERTY: _handle_update_topic_property_cmd,
+        topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY: (
+            _handle_update_subtopic_property_cmd
+        ),
+        study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY: (
+            _handle_update_study_guide_property_cmd
+        ),
+        subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY: (
+            _handle_update_subtopic_page_property_cmd
+        ),
+        topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION: (
+            _handle_migrate_subtopic_schema_cmd
+        ),
+    }
+
+    try:
+        for change in change_list:
+            # Here we use cast because BaseChange defines cmd as a broadly
+            # typed attribute, but our handler map only accepts string keys.
+            cmd = cast(str, change.cmd)
+            handler = command_handlers.get(cmd)
+            if handler is not None:
+                handler(change)
         return (
             topic,
             modified_subtopic_pages,
@@ -1548,13 +1645,36 @@ def publish_story(topic_id: str, story_id: str, committer_id: str) -> None:
     )
 
 
-def unpublish_story(topic_id: str, story_id: str, committer_id: str) -> None:
+def _cleanup_permanently_unpublished_story(
+    exp_ids: List[str],
+) -> None:
+    """Deletes exploration opportunities and rejects translation suggestions
+    for a permanently unpublished story. This cleanup is intentionally
+    skipped for temporarily unpublished stories so that the content can be
+    restored without data loss when the story is republished.
+
+    Args:
+        exp_ids: list(str). The exploration IDs linked to the story whose
+            opportunities and suggestions should be cleaned up.
+    """
+    opportunity_services.delete_exploration_opportunities(exp_ids)
+    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
+
+
+def unpublish_story(
+    topic_id: str,
+    story_id: str,
+    committer_id: str,
+    unpublish_type: str = topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
+) -> None:
     """Marks the given story as unpublished.
 
     Args:
         topic_id: str. The id of the topic.
         story_id: str. The id of the given story.
         committer_id: str. ID of the committer.
+        unpublish_type: str. Either STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH
+            or STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH. Defaults to permanent.
 
     Raises:
         Exception. The given story does not exist.
@@ -1603,7 +1723,7 @@ def unpublish_story(topic_id: str, story_id: str, committer_id: str) -> None:
                 topic.id,
             )
 
-    topic.unpublish_story(story_id)
+    topic.unpublish_story(story_id, unpublish_type)
     change_list = [
         topic_domain.TopicChange(
             {'cmd': topic_domain.CMD_UNPUBLISH_STORY, 'story_id': story_id}
@@ -1617,11 +1737,13 @@ def unpublish_story(topic_id: str, story_id: str, committer_id: str) -> None:
     )
     generate_topic_summary(topic.id)
 
-    # Delete corresponding exploration opportunities and reject associated
-    # translation suggestions.
-    exp_ids = story.story_contents.get_all_linked_exp_ids()
-    opportunity_services.delete_exploration_opportunities(exp_ids)
-    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
+    if (
+        unpublish_type
+        == topic_domain.STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH
+    ):
+        _cleanup_permanently_unpublished_story(
+            story.story_contents.get_all_linked_exp_ids()
+        )
 
 
 def delete_canonical_story(user_id: str, topic_id: str, story_id: str) -> None:

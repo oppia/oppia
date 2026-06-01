@@ -108,13 +108,27 @@ describe('Translation tab component', () => {
   class MockUserExplorationPermissionsService {
     getPermissionsAsync() {
       return Promise.resolve({
+        canUnpublish: false,
+        canReleaseOwnership: false,
+        canPublish: false,
         canVoiceover: true,
+        canDelete: false,
+        canModifyRoles: false,
+        canEdit: false,
+        canManageVoiceArtist: false,
       } as ExplorationPermissions);
     }
 
     fetchPermissionsAsync() {
       return Promise.resolve({
+        canUnpublish: false,
+        canReleaseOwnership: false,
+        canPublish: false,
         canVoiceover: true,
+        canDelete: false,
+        canModifyRoles: false,
+        canEdit: false,
+        canManageVoiceArtist: false,
       } as ExplorationPermissions);
     }
   }
@@ -283,6 +297,7 @@ describe('Translation tab component', () => {
           linked_skill_id: null,
           param_changes: [],
           solicit_answer_details: false,
+          inapplicable_skill_misconception_ids: null,
         },
       },
       false
@@ -300,7 +315,14 @@ describe('Translation tab component', () => {
       'getPermissionsAsync'
     ).and.returnValue(
       Promise.resolve({
+        canUnpublish: false,
+        canReleaseOwnership: false,
+        canPublish: false,
         canVoiceover: true,
+        canDelete: false,
+        canModifyRoles: false,
+        canEdit: false,
+        canManageVoiceArtist: false,
       } as ExplorationPermissions)
     );
 
@@ -321,7 +343,14 @@ describe('Translation tab component', () => {
         'getPermissionsAsync'
       ).and.returnValue(
         Promise.resolve({
+          canUnpublish: false,
+          canReleaseOwnership: false,
+          canPublish: false,
           canVoiceover: true,
+          canDelete: false,
+          canModifyRoles: false,
+          canEdit: false,
+          canManageVoiceArtist: false,
         } as ExplorationPermissions)
       );
 
@@ -348,7 +377,14 @@ describe('Translation tab component', () => {
         'getPermissionsAsync'
       ).and.returnValue(
         Promise.resolve({
+          canUnpublish: false,
+          canReleaseOwnership: false,
+          canPublish: false,
           canVoiceover: true,
+          canDelete: false,
+          canModifyRoles: false,
+          canEdit: false,
+          canManageVoiceArtist: false,
         } as ExplorationPermissions)
       );
 
@@ -376,7 +412,18 @@ describe('Translation tab component', () => {
       spyOn(
         userExplorationPermissionsService,
         'getPermissionsAsync'
-      ).and.returnValue(Promise.resolve({} as ExplorationPermissions));
+      ).and.returnValue(
+        Promise.resolve({
+          canUnpublish: false,
+          canReleaseOwnership: false,
+          canPublish: false,
+          canVoiceover: false,
+          canDelete: false,
+          canModifyRoles: false,
+          canEdit: false,
+          canManageVoiceArtist: false,
+        } as ExplorationPermissions)
+      );
 
       editabilityService.onStartTutorial();
       component.ngOnInit();
@@ -394,7 +441,14 @@ describe('Translation tab component', () => {
       'getPermissionsAsync'
     ).and.returnValue(
       Promise.resolve({
+        canUnpublish: false,
+        canReleaseOwnership: false,
+        canPublish: false,
         canVoiceover: true,
+        canDelete: false,
+        canModifyRoles: false,
+        canEdit: false,
+        canManageVoiceArtist: false,
       } as ExplorationPermissions)
     );
 
@@ -418,7 +472,14 @@ describe('Translation tab component', () => {
         'getPermissionsAsync'
       ).and.returnValue(
         Promise.resolve({
+          canUnpublish: false,
+          canReleaseOwnership: false,
+          canPublish: false,
           canVoiceover: true,
+          canDelete: false,
+          canModifyRoles: false,
+          canEdit: false,
+          canManageVoiceArtist: false,
         } as ExplorationPermissions)
       );
 
@@ -442,7 +503,14 @@ describe('Translation tab component', () => {
       'getPermissionsAsync'
     ).and.returnValue(
       Promise.resolve({
+        canUnpublish: false,
+        canReleaseOwnership: false,
+        canPublish: false,
         canVoiceover: true,
+        canDelete: false,
+        canModifyRoles: false,
+        canEdit: false,
+        canManageVoiceArtist: false,
       } as ExplorationPermissions)
     );
 
