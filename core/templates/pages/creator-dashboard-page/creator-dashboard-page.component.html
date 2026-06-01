@@ -254,7 +254,8 @@
     <div *ngIf="myExplorationsView === 'card' && explorationsList?.length > 0"
          class="oppia-card-view-wrap">
       <mat-card *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction(exploration?.ratings)"
-                class="oppia-activity-summary-tile oppia-dashboard-card-view-item e2e-test-exploration-dashboard-card"
+            class="oppia-activity-summary-tile oppia-dashboard-card-view-item e2e-test-exploration-dashboard-card"
+            [ngClass]="{'small-width': checkMobileView()}"
                 is-private="exploration.status === 'private'">
         <a [href]="'/create/' + exploration.id">
           <div class="title-section"
