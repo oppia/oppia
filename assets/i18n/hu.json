@@ -278,6 +278,7 @@
 	"I18N_PREFERENCES_USERNAME_NOT_SELECTED": "Még nincs kiválasztva",
 	"I18N_PROGRESS_REMINDER_CONTINUE_TEXT": "Szeretnéd folytatni?",
 	"I18N_SIDEBAR_ABOUT_LINK": "Névjegy",
+	"I18N_SIDEBAR_BLOG": "Blog",
 	"I18N_SIDEBAR_CONTACT_US": "Kapcsolatfelvétel",
 	"I18N_SIDEBAR_DONATE": "Adományozás",
 	"I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION": "A négyzet bejelölésével, a szöveg bal oldalán, elismered és elfogadod, hogy be fogod tartani az <[sitename]> Felhasználási feltételeit, amelyeket <a href=\"/terms\" target=\"_blank\">itt találsz meg</a>.",
