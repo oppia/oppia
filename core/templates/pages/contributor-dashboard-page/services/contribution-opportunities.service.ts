@@ -64,7 +64,7 @@ export class ContributionOpportunitiesService {
 
   private async _getSkillOpportunitiesAsync(
     cursor: string,
-    searchQuery?: string
+    searchQuery: string = ''
   ): Promise<SkillOpportunitiesDict> {
     return this.contributionOpportunitiesBackendApiService
       .fetchSkillOpportunitiesAsync(cursor, searchQuery)
@@ -104,7 +104,7 @@ export class ContributionOpportunitiesService {
   }
 
   async getSkillOpportunitiesAsync(
-    searchQuery?: string
+    searchQuery: string = ''
   ): Promise<SkillOpportunitiesDict> {
     return this._getSkillOpportunitiesAsync('', searchQuery);
   }
@@ -117,7 +117,7 @@ export class ContributionOpportunitiesService {
   }
 
   async getMoreSkillOpportunitiesAsync(
-    searchQuery?: string
+    searchQuery: string = ''
   ): Promise<SkillOpportunitiesDict> {
     if (this._moreSkillOpportunitiesAvailable) {
       return this._getSkillOpportunitiesAsync(

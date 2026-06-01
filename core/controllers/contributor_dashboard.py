@@ -227,6 +227,9 @@ class ContributionOpportunitiesHandler(
                         'skill_description'
                     ]
 
+                    # This conditional bypasses filtering if no search query exists.
+                    # Otherwise, it performs a case-insensitive substring match on
+                    # both the skill description and topic name.
                     if search_query is None or (
                         search_query.lower() in skill_description.lower()
                         or search_query.lower() in topic_name.lower()

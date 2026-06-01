@@ -128,7 +128,7 @@ export class QuestionOpportunitiesComponent implements OnInit {
     );
   }
 
-  loadMoreOpportunities(searchQuery?: string): Promise<{
+  loadMoreOpportunities(searchQuery: string = ''): Promise<{
     opportunitiesDicts: Opportunity[];
     more: boolean;
   }> {
@@ -137,7 +137,7 @@ export class QuestionOpportunitiesComponent implements OnInit {
       .then(this.getPresentableOpportunitiesData.bind(this));
   }
 
-  loadOpportunities(searchQuery?: string): Promise<{
+  loadOpportunities(searchQuery: string = ''): Promise<{
     opportunitiesDicts: Opportunity[];
     more: boolean;
   }> {

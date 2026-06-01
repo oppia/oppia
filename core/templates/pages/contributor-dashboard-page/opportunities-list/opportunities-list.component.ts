@@ -71,6 +71,7 @@ export class OpportunitiesListComponent {
   visibleOpportunities: ExplorationOpportunity[] = [];
   searchQuery: string = '';
   searchQueryChanged: Subject<string> = new Subject<string>();
+  private readonly SEARCH_DEBOUNCE_TIME_MS = 300;
   directiveSubscriptions = new Subscription();
   activePageNumber: number = 1;
   OPPORTUNITIES_PAGE_SIZE = AppConstants.OPPORTUNITIES_PAGE_SIZE;
@@ -146,11 +147,13 @@ export class OpportunitiesListComponent {
     this.subscribeToPinnedOpportunities();
 
     this.directiveSubscriptions.add(
-      this.searchQueryChanged.pipe(debounceTime(300)).subscribe(query => {
-        this.searchQuery = query;
-        this.activePageNumber = 1;
-        this.fetchAndLoadOpportunities();
-      })
+      this.searchQueryChanged
+        .pipe(debounceTime(this.SEARCH_DEBOUNCE_TIME_MS))
+        .subscribe(query => {
+          this.searchQuery = query;
+          this.activePageNumber = 1;
+          this.fetchAndLoadOpportunities();
+        })
     );
   }
 

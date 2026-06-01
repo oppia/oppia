@@ -105,7 +105,7 @@ export class ContributionOpportunitiesBackendApiService {
 
   async fetchSkillOpportunitiesAsync(
     cursor: string,
-    searchQuery?: string
+    searchQuery: string = ''
   ): Promise<SkillContributionOpportunities> {
     const params: Record<string, string> = {cursor};
     if (searchQuery) {
