@@ -1,6 +1,4 @@
-<div *ngIf="isRedesignedTopicViewerPageFeatureEnabled(); else legacyTopicViewerContainer"
-  class="oppia-redesigned-topic-viewer-container e2e-test-redesigned-topic-viewer-container"
-  [class.studyguide-active]="activeTab === 'subtopics'">
+<div *ngIf="isRedesignedTopicViewerPageFeatureEnabled(); else legacyTopicViewerContainer" class="oppia-redesigned-topic-viewer-container e2e-test-redesigned-topic-viewer-container" [class.studyguide-active]="activeTab === 'subtopics'">
   <div class="redesigned-topic-viewer-content">
     <topic-header
       [topicName]="topicViewerDataService.getTopicName() || topicName"

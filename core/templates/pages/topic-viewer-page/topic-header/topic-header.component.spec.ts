@@ -35,6 +35,7 @@ describe('TopicHeaderComponent', () => {
   beforeEach(waitForAsync(() => {
     urlService = jasmine.createSpyObj('UrlService', [
       'getClassroomUrlFragmentFromLearnerUrl',
+      'getTopicUrlFragmentFromLearnerUrl',
     ]);
     TestBed.configureTestingModule({
       declarations: [TopicHeaderComponent, MockTranslatePipe],
@@ -50,6 +51,9 @@ describe('TopicHeaderComponent', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     urlService = TestBed.inject(UrlService) as jasmine.SpyObj<UrlService>;
     urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('math');
+    urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue(
+      'place-values'
+    );
 
     spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValues(
       'topic.title.translation.key',

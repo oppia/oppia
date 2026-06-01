@@ -138,7 +138,7 @@ export class TopicViewerDataService {
     return this.data.practiceCount ?? 0;
   }
 
-  getCanonicalStoryData(): ReadonlyArray<TopicViewerStorySectionData> {
+  getCanonicalStoryData(): readonly TopicViewerStorySectionData[] {
     return this.data.canonicalStoryData;
   }
 
