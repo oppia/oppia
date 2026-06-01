@@ -190,9 +190,8 @@ describe('Release coordinator page feature tab', function () {
     component.resetUserGroupSearch(featureFlagVM);
 
     expect(
-      (component.userGroupInputs as unknown as {_results: ElementRef[]})
-        ._results[0].nativeElement.value
-    ).toEqual('UserGroup1');
+      (component.userGroupInputs.toArray()[0].nativeElement.value
+    ).toBe('UserGroup1');
     expect(featureFlagVM.filteredUserGroups).toEqual(component.allUserGroups);
   }));
 
