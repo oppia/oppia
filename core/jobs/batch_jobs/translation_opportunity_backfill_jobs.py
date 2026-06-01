@@ -29,7 +29,7 @@ from core.platform import models
 
 import apache_beam as beam
 import result
-from typing import Dict, Iterable, Tuple, Union
+from typing import Dict, Iterable, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -84,16 +84,24 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
         exp_id = element[0]
         grouped_data = element[1]
 
-        topic_ids = list(set(grouped_data['topic_ids']))
+        # Here we use cast because we are narrowing down the type of topic_ids.
+        topic_ids = list(set(cast(Iterable[str], grouped_data['topic_ids'])))
         if not topic_ids:
             return result.Err('Missing topic_id')
 
-        exps = list(grouped_data['exp'])
+        # Here we use cast because we are narrowing down the type of exps.
+        exps = list(cast(Iterable[exp_domain.Exploration], grouped_data['exp']))
         if not exps:
             return result.Err('Missing ExplorationModel')
         exp = exps[0]
 
-        translations = list(grouped_data['translations'])
+        # Here we use cast because we are narrowing down the type of translations.
+        translations = list(
+            cast(
+                Iterable[translation_models.EntityTranslationsModel],
+                grouped_data['translations'],
+            )
+        )
         content_count = exp.get_content_count()
 
         translation_counts = {}
