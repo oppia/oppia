@@ -914,9 +914,27 @@ export class CurriculumAdmin extends TopicManager {
         `${closeSaveModalButton}:not([disabled])`
       );
       await this.clickOnElementWithSelector(closeSaveModalButton);
-      await this.page.waitForSelector('oppia-topic-editor-save-modal', {
-        hidden: true,
-      });
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const el = document.querySelector(selector) as HTMLElement | null;
+          if (!el) {
+            return true;
+          }
+          const style = window.getComputedStyle(el);
+          if (
+            style &&
+            (style.display === 'none' || style.visibility === 'hidden')
+          ) {
+            return true;
+          }
+          if ((el as HTMLElement).offsetParent === null) {
+            return true;
+          }
+          return false;
+        },
+        {},
+        'oppia-topic-editor-save-modal'
+      );
       if (topicName) {
         await this.openTopicEditor(topicName);
       }
@@ -2266,7 +2284,21 @@ export class CurriculumAdmin extends TopicManager {
    */
   async editClassroom(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
-    await this.page.waitForSelector(classroomTileSelector);
+    await this.page.waitForFunction(
+      (selector: string, name: string) => {
+        const tiles = Array.from(document.querySelectorAll(selector));
+        return tiles.some(tile => {
+          const span =
+            tile.querySelector('.e2e-test-classroom-tile-name') ||
+            tile.querySelector('span');
+          return span && span.textContent?.trim() === name;
+        });
+      },
+      {},
+      classroomTileSelector,
+      classroomName
+    );
+
     const classroomTiles = await this.page.$$(classroomTileSelector);
 
     if (classroomTiles.length === 0) {

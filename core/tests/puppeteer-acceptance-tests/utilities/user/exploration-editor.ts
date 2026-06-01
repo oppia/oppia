@@ -3726,26 +3726,11 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(openOutcomeDestButton, {
       visible: true,
     });
-
     await this.clickOnElementWithSelector(openOutcomeDestButton);
-
     await this.waitForElementToBeClickable(destinationCardSelector);
-
     await this.select(destinationCardSelector, '/');
-    const selectedValue = await this.page.$eval(
-      destinationCardSelector,
-      (el: Element) => (el as HTMLSelectElement).value
-    );
-    console.log('Selected destination value:', selectedValue);
-
-    await this.page.waitForSelector(addStateInput, {
-      visible: true,
-    });
-
     await this.typeInInputField(addStateInput, cardName);
-
     await this.clickOnElementWithSelector(saveOutcomeDestButton);
-
     await this.page.waitForSelector(saveOutcomeDestButton, {
       hidden: true,
     });
