@@ -14,6 +14,14 @@ topic-viewer-page .redesigned-topic-viewer-content {
   padding: 24px 36px 0;
 }
 
+topic-viewer-page .oppia-redesigned-topic-viewer-container.studyguide-active .redesigned-topic-viewer-content {
+  background-color: #f4f6f7;
+  background-image: url('/assets/images/background/conversation_skin.svg');
+  background-position: top center;
+  background-repeat: repeat;
+  background-size: 1024px auto;
+}
+
 topic-viewer-page .redesigned-topic-viewer-content topic-header {
   display: block;
   margin: 0 auto;
@@ -34,6 +42,74 @@ topic-viewer-page .redesigned-stories-section {
 
 topic-viewer-page .redesigned-secondary-section {
   padding-top: 24px;
+}
+
+topic-viewer-page .redesigned-studyguide-section {
+  background-color: #f4f6f7;
+  background-image: url('/assets/images/background/conversation_skin.svg');
+  background-position: top center;
+  background-repeat: repeat;
+  background-size: 1024px auto;
+  margin-top: 0;
+  min-height: calc(100vh - 64px);
+  padding: 24px 36px 56px;
+}
+
+topic-viewer-page .oppia-redesigned-topic-viewer-container.studyguide-active .topic-header {
+  background-color: transparent;
+  padding-bottom: 4px;
+}
+
+topic-viewer-page .oppia-redesigned-topic-viewer-container.studyguide-active .topic-header-title,
+topic-viewer-page .oppia-redesigned-topic-viewer-container.studyguide-active .topic-header-description {
+  display: none;
+}
+
+topic-viewer-page .redesigned-studyguide-section subtopics-list .oppia-subtopics-list-container {
+  margin: 0 auto;
+  max-width: 1160px;
+  width: 100%;
+}
+
+topic-viewer-page .redesigned-studyguide-section subtopics-list .oppia-page-card,
+topic-viewer-page .redesigned-studyguide-section subtopics-list .oppia-page-card.oppia-long-text {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
+  max-width: 100%;
+  padding: 0;
+  width: 100%;
+}
+
+topic-viewer-page .redesigned-studyguide-section subtopics-list .tab-title {
+  color: #00645c;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 8px;
+}
+
+topic-viewer-page .redesigned-studyguide-section subtopics-list .subtopic-subheading {
+  color: #4a4a4a;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.35;
+  margin-bottom: 24px;
+}
+
+topic-viewer-page .redesigned-studyguide-section subtopics-list .subtopics-container {
+  display: grid;
+  gap: 28px;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 170px));
+  justify-content: start;
+  margin-top: 0;
+}
+
+topic-viewer-page .redesigned-studyguide-section subtopics-list .subtopic-summary-tile {
+  margin-right: 0;
 }
 
 topic-viewer-page .redesigned-stories-list {
@@ -216,6 +292,18 @@ topic-viewer-page .topic-viewer-page-content .coming-soon-text {
     padding: 24px 28px 0;
   }
 
+  topic-viewer-page .redesigned-studyguide-section {
+    padding: 22px 28px 48px;
+  }
+
+  topic-viewer-page .redesigned-studyguide-section subtopics-list .tab-title {
+    font-size: 34px;
+  }
+
+  topic-viewer-page .redesigned-studyguide-section subtopics-list .subtopic-subheading {
+    font-size: 18px;
+  }
+
   topic-viewer-page .redesigned-stories-section {
     padding: 26px 28px 52px;
   }
@@ -248,6 +336,24 @@ topic-viewer-page .topic-viewer-page-content .coming-soon-text {
     padding: 20px 20px 0;
   }
 
+  topic-viewer-page .redesigned-studyguide-section {
+    padding: 18px 20px 42px;
+  }
+
+  topic-viewer-page .redesigned-studyguide-section subtopics-list .tab-title {
+    font-size: 30px;
+  }
+
+  topic-viewer-page .redesigned-studyguide-section subtopics-list .subtopic-subheading {
+    font-size: 17px;
+    margin-bottom: 20px;
+  }
+
+  topic-viewer-page .redesigned-studyguide-section subtopics-list .subtopics-container {
+    gap: 22px;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 170px));
+  }
+
   topic-viewer-page .redesigned-stories-section {
     margin-top: 20px;
     padding: 24px 20px 44px;
@@ -266,6 +372,25 @@ topic-viewer-page .topic-viewer-page-content .coming-soon-text {
 @media(max-width: 500px) {
   topic-viewer-page .redesigned-topic-viewer-content {
     padding: 16px 12px 0;
+  }
+
+  topic-viewer-page .redesigned-studyguide-section {
+    padding: 16px 12px 34px;
+  }
+
+  topic-viewer-page .redesigned-studyguide-section subtopics-list .tab-title {
+    font-size: 25px;
+    line-height: 1.25;
+  }
+
+  topic-viewer-page .redesigned-studyguide-section subtopics-list .subtopic-subheading {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  topic-viewer-page .redesigned-studyguide-section subtopics-list .subtopics-container {
+    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 
   topic-viewer-page .redesigned-stories-section {

@@ -24,9 +24,19 @@
   font-weight: 500;
 }
 
+.topic-header-breadcrumbs a:hover,
+.topic-header-breadcrumbs a:focus {
+  text-decoration: underline;
+}
+
 .topic-header-breadcrumb-current {
   color: #333;
   font-weight: 400;
+}
+
+.topic-header-breadcrumb-study-skills {
+  color: #00645c;
+  font-weight: 500;
 }
 
 .topic-header {

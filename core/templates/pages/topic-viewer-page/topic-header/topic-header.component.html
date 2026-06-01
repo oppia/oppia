@@ -1,18 +1,38 @@
 <nav class="topic-header-breadcrumbs" aria-label="Breadcrumb">
   <div class="topic-header-breadcrumbs-desktop">
-    <a href="/learn">{{ 'I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT' | translate }}</a>
-    <i class="fa fa-angle-right" aria-hidden="true" *ngIf="classroomName && !isLanguageRTL()"></i>
-    <i class="fa fa-angle-left" aria-hidden="true" *ngIf="classroomName && isLanguageRTL()"></i>
-    <a *ngIf="classroomName" [href]="getClassroomUrl()">
-      <ng-container *ngIf="isHackyClassroomNameTranslationDisplayed(); else rawClassroomName">{{ classroomNameTranslationKey | translate }}</ng-container>
-      <ng-template #rawClassroomName>{{ classroomName }}</ng-template>
-    </a>
-    <i class="fa fa-angle-right" aria-hidden="true" *ngIf="!isLanguageRTL()"></i>
-    <i class="fa fa-angle-left" aria-hidden="true" *ngIf="isLanguageRTL()"></i>
-    <span class="topic-header-breadcrumb-current" aria-current="page">
-      <ng-container *ngIf="isHackyTopicNameTranslationDisplayed(); else rawTopicName">{{ topicNameTranslationKey | translate }}</ng-container>
-      <ng-template #rawTopicName>{{ topicName }}</ng-template>
-    </span>
+    <ng-container *ngIf="!showStudySkillsBreadcrumb; else studySkillsBreadcrumb">
+      <a href="/learn">{{ 'I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT' | translate }}</a>
+      <i class="fa fa-angle-right" aria-hidden="true" *ngIf="classroomName && !isLanguageRTL()"></i>
+      <i class="fa fa-angle-left" aria-hidden="true" *ngIf="classroomName && isLanguageRTL()"></i>
+      <a *ngIf="classroomName" [href]="getClassroomUrl()">
+        <ng-container *ngIf="isHackyClassroomNameTranslationDisplayed(); else rawClassroomName">{{ classroomNameTranslationKey | translate }}</ng-container>
+        <ng-template #rawClassroomName>{{ classroomName }}</ng-template>
+      </a>
+      <i class="fa fa-angle-right" aria-hidden="true" *ngIf="!isLanguageRTL()"></i>
+      <i class="fa fa-angle-left" aria-hidden="true" *ngIf="isLanguageRTL()"></i>
+      <span class="topic-header-breadcrumb-current" aria-current="page">
+        <ng-container *ngIf="isHackyTopicNameTranslationDisplayed(); else rawTopicName">{{ topicNameTranslationKey | translate }}</ng-container>
+        <ng-template #rawTopicName>{{ topicName }}</ng-template>
+      </span>
+    </ng-container>
+
+    <ng-template #studySkillsBreadcrumb>
+      <a *ngIf="classroomName" [href]="getClassroomUrl()">
+        <ng-container *ngIf="isHackyClassroomNameTranslationDisplayed(); else rawStudyClassroomName">{{ classroomNameTranslationKey | translate }}</ng-container>
+        <ng-template #rawStudyClassroomName>{{ classroomName }}</ng-template>
+      </a>
+      <i class="fa fa-angle-right" aria-hidden="true" *ngIf="!isLanguageRTL()"></i>
+      <i class="fa fa-angle-left" aria-hidden="true" *ngIf="isLanguageRTL()"></i>
+      <a [href]="getTopicStoryUrl()">
+        <ng-container *ngIf="isHackyTopicNameTranslationDisplayed(); else rawStudyTopicName">{{ topicNameTranslationKey | translate }}</ng-container>
+        <ng-template #rawStudyTopicName>{{ topicName }}</ng-template>
+      </a>
+      <i class="fa fa-angle-right" aria-hidden="true" *ngIf="!isLanguageRTL()"></i>
+      <i class="fa fa-angle-left" aria-hidden="true" *ngIf="isLanguageRTL()"></i>
+      <span class="topic-header-breadcrumb-current topic-header-breadcrumb-study-skills" aria-current="page">
+          Study Skills
+      </span>
+    </ng-template>
   </div>
   <div class="topic-header-breadcrumbs-mobile">
     <i class="fa fa-angle-left" aria-hidden="true" *ngIf="!isLanguageRTL()"></i>

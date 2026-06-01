@@ -1,10 +1,13 @@
-<div *ngIf="isRedesignedTopicViewerPageFeatureEnabled(); else legacyTopicViewerContainer" class="oppia-redesigned-topic-viewer-container e2e-test-redesigned-topic-viewer-container">
+<div *ngIf="isRedesignedTopicViewerPageFeatureEnabled(); else legacyTopicViewerContainer"
+  class="oppia-redesigned-topic-viewer-container e2e-test-redesigned-topic-viewer-container"
+  [class.studyguide-active]="activeTab === 'subtopics'">
   <div class="redesigned-topic-viewer-content">
     <topic-header
       [topicName]="topicViewerDataService.getTopicName() || topicName"
       [topicDescription]="topicViewerDataService.getTopicDescription() || topicDescription"
       [topicId]="topicViewerDataService.getTopicId() || topicId"
-      [classroomName]="topicViewerDataService.getClassroomName() || classroomName">
+      [classroomName]="topicViewerDataService.getClassroomName() || classroomName"
+      [showStudySkillsBreadcrumb]="activeTab === 'subtopics'">
     </topic-header>
   </div>
   <section *ngIf="activeTab === 'story' && topicViewerDataService.getCanonicalStoryData().length"
@@ -37,7 +40,8 @@
   </section>
 
   <section *ngIf="!topicIsLoading && (activeTab === 'practice' || activeTab === 'subtopics')"
-           class="redesigned-stories-section redesigned-secondary-section">
+           class="redesigned-secondary-section"
+           [ngClass]="activeTab === 'subtopics' ? 'redesigned-studyguide-section' : 'redesigned-stories-section'">
     <div *ngIf="activeTab === 'practice'">
       <practice-tab *ngIf="isPracticeTabEnabled() && topicId"
                     [subtopicsList]="subtopics"
