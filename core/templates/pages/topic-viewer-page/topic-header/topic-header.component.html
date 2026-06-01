@@ -2,11 +2,15 @@
   <div class="topic-header-breadcrumbs-desktop">
     <ng-container *ngIf="!showStudySkillsBreadcrumb; else studySkillsBreadcrumb">
       <a href="/learn">{{ 'I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT' | translate }}</a>
-      <i class="fa fa-angle-right" aria-hidden="true" *ngIf="classroomName && !isLanguageRTL()"></i>
-      <i class="fa fa-angle-left" aria-hidden="true" *ngIf="classroomName && isLanguageRTL()"></i>
-      <a *ngIf="classroomName" [href]="getClassroomUrl()">
-        <ng-container *ngIf="isHackyClassroomNameTranslationDisplayed(); else rawClassroomName">{{ classroomNameTranslationKey | translate }}</ng-container>
-        <ng-template #rawClassroomName>{{ classroomName }}</ng-template>
+      <i class="fa fa-angle-right" aria-hidden="true" *ngIf="(classroomName || classroomUrlFragment) && !isLanguageRTL()"></i>
+      <i class="fa fa-angle-left" aria-hidden="true" *ngIf="(classroomName || classroomUrlFragment) && isLanguageRTL()"></i>
+      <a *ngIf="classroomName || classroomUrlFragment" [href]="getClassroomUrl()">
+        <ng-container *ngIf="classroomName; else classroomFromUrlFragmentInDefaultBreadcrumb">
+          <bdi>{{ classroomName }}</bdi>
+        </ng-container>
+        <ng-template #classroomFromUrlFragmentInDefaultBreadcrumb>
+          <bdi>{{ classroomUrlFragment }}</bdi>
+        </ng-template>
       </a>
       <i class="fa fa-angle-right" aria-hidden="true" *ngIf="!isLanguageRTL()"></i>
       <i class="fa fa-angle-left" aria-hidden="true" *ngIf="isLanguageRTL()"></i>
@@ -17,9 +21,13 @@
     </ng-container>
 
     <ng-template #studySkillsBreadcrumb>
-      <a *ngIf="classroomName" [href]="getClassroomUrl()">
-        <ng-container *ngIf="isHackyClassroomNameTranslationDisplayed(); else rawStudyClassroomName">{{ classroomNameTranslationKey | translate }}</ng-container>
-        <ng-template #rawStudyClassroomName>{{ classroomName }}</ng-template>
+      <a [href]="getClassroomUrl()">
+        <ng-container *ngIf="classroomName; else classroomFromUrlFragment">
+          <bdi>{{ classroomName }}</bdi>
+        </ng-container>
+        <ng-template #classroomFromUrlFragment>
+          <bdi>{{ classroomUrlFragment || ('I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT' | translate) }}</bdi>
+        </ng-template>
       </a>
       <i class="fa fa-angle-right" aria-hidden="true" *ngIf="!isLanguageRTL()"></i>
       <i class="fa fa-angle-left" aria-hidden="true" *ngIf="isLanguageRTL()"></i>
@@ -51,10 +59,11 @@
       <a *ngIf="classroomName"
          [href]="getClassroomUrl()"
          class="e2e-test-mobile-breadcrumbs-classroom">
-        <ng-container *ngIf="isHackyClassroomNameTranslationDisplayed(); else rawMobileClassroomName">{{ 'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: (classroomNameTranslationKey | translate) } }}</ng-container>
-        <ng-template #rawMobileClassroomName>{{ 'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomName } }}</ng-template>
+        {{ 'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomName } }}
       </a>
-      <a *ngIf="!classroomName" href="/learn">{{ 'I18N_BACK_TO_CLASSROOMS' | translate }}</a>
+      <a *ngIf="!classroomName && classroomUrlFragment"
+         [href]="getClassroomUrl()">{{ 'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomUrlFragment } }}</a>
+      <a *ngIf="!classroomName && !classroomUrlFragment" href="/learn">{{ 'I18N_BACK_TO_CLASSROOMS' | translate }}</a>
     </ng-template>
   </div>
 </nav>

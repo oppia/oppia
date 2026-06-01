@@ -225,4 +225,32 @@ describe('TopicHeaderComponent', () => {
     );
     expect(mobileTopicBackLink?.textContent).toContain('Place Values');
   });
+
+  it('should show classroom URL fragment in study skills breadcrumb when classroomName is missing', () => {
+    component.classroomName = null;
+    component.showStudySkillsBreadcrumb = true;
+    fixture.detectChanges();
+
+    const studySkillsLinks: NodeListOf<HTMLAnchorElement> =
+      fixture.nativeElement.querySelectorAll(
+        '.topic-header-breadcrumbs-desktop a'
+      );
+
+    expect(studySkillsLinks.length).toBeGreaterThan(0);
+    expect(studySkillsLinks[0].textContent).toContain('math');
+  });
+
+  it('should show classroom URL fragment in default desktop breadcrumb when classroomName is missing', () => {
+    component.classroomName = null;
+    component.showStudySkillsBreadcrumb = false;
+    fixture.detectChanges();
+
+    const desktopLinks: NodeListOf<HTMLAnchorElement> =
+      fixture.nativeElement.querySelectorAll(
+        '.topic-header-breadcrumbs-desktop a'
+      );
+
+    expect(desktopLinks.length).toBeGreaterThan(1);
+    expect(desktopLinks[1].textContent).toContain('math');
+  });
 });
