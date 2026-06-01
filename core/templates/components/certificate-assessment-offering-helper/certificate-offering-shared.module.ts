@@ -17,22 +17,26 @@
  */
 
 import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
 import {NgModule} from '@angular/core';
 import {SharedComponentsModule} from 'components/shared-component.module';
 
 import {CertificateOfferingAddTopicItemsComponent} from './certificate-offering-add-topic-items.component';
 import {CertificateOfferingDetailsComponent} from './certificate-offering-details.component';
+import {CertificateOfferingProgressComponent} from './certificate-offering-progress.component';
 import {CertificateOfferingReviewAndAvailabilityComponent} from './certificate-offering-review-and-availability.component';
 
 @NgModule({
-  imports: [CommonModule, SharedComponentsModule],
+  imports: [CommonModule, FormsModule, SharedComponentsModule],
   declarations: [
     CertificateOfferingDetailsComponent,
+    CertificateOfferingProgressComponent,
     CertificateOfferingAddTopicItemsComponent,
     CertificateOfferingReviewAndAvailabilityComponent,
   ],
   exports: [
     CertificateOfferingDetailsComponent,
+    CertificateOfferingProgressComponent,
     CertificateOfferingAddTopicItemsComponent,
     CertificateOfferingReviewAndAvailabilityComponent,
   ],
