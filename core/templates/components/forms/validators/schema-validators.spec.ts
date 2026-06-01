@@ -16,22 +16,41 @@
  * @fileoverview Tests for schema-validators.
  */
 
-import {AbstractControl, ValidationErrors} from '@angular/forms';
+import {
+  AbstractControl,
+  AsyncValidatorFn,
+  ValidationErrors,
+  ValidatorFn,
+} from '@angular/forms';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {SchemaValidators} from './schema-validators';
+interface ValidatorTestCase {
+  controlValue: SchemaDefaultValue;
+  expectedResult: boolean;
+}
 
 class MockFormControl extends AbstractControl {
   value: SchemaDefaultValue = '1';
 
-  patchValue(value: SchemaDefaultValue, options?: Object): void {
+  constructor(
+    validator: ValidatorFn | ValidatorFn[] | null = null,
+    asyncValidator: AsyncValidatorFn | AsyncValidatorFn[] | null = null
+  ) {
+    super(validator, asyncValidator);
+  }
+
+  patchValue(
+    value: SchemaDefaultValue,
+    options?: Record<string, unknown>
+  ): void {
     return;
   }
 
-  reset(value?: SchemaDefaultValue, options?: Object): void {
+  reset(value?: SchemaDefaultValue, options?: Record<string, unknown>): void {
     return;
   }
 
-  setValue(value: SchemaDefaultValue, options?: Object): void {
+  setValue(value: SchemaDefaultValue, options?: Record<string, unknown>): void {
     this.value = value;
   }
 }
@@ -39,37 +58,35 @@ class MockFormControl extends AbstractControl {
 describe('Schema validators', () => {
   describe('when validating "has-length-at-least"', () => {
     it('should impose minimum length bounds', () => {
-      const control: MockFormControl = new MockFormControl([], []);
+      const control: MockFormControl = new MockFormControl();
       control.setValue('1');
 
       const args = {
         minValue: 3,
       };
 
-      const testCases = [
+      const testCases: ValidatorTestCase[] = [
         {controlValue: '12', expectedResult: false},
         {controlValue: '123', expectedResult: true},
         {controlValue: '1234', expectedResult: true},
         {controlValue: ['1', '2'], expectedResult: false},
-        {controlValue: undefined, expectedResult: false},
+        {controlValue: null, expectedResult: false},
         {controlValue: ['1', '2', '3'], expectedResult: true},
         {controlValue: ['1', '2', '3', '4'], expectedResult: true},
       ];
       const filter = SchemaValidators.hasLengthAtLeast(args);
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBeNull();
           return;
         }
-        expect(errorsReturned.hasLengthAtLeast)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        expect(errorsReturned?.hasLengthAtLeast).toBeDefined();
       });
     });
     it('should throw an error when the value is not a string', () => {
-      const control: MockFormControl = new MockFormControl([], []);
+      const control: MockFormControl = new MockFormControl();
       control.setValue(1);
 
       const args = {
@@ -84,38 +101,36 @@ describe('Schema validators', () => {
   });
   describe('when validating "has-length-at-most"', () => {
     it('should impose maximum length bounds', () => {
-      const control: MockFormControl = new MockFormControl([], []);
+      const control: MockFormControl = new MockFormControl();
       control.setValue('1');
 
       const args = {
         maxValue: 3,
       };
 
-      const testCases = [
+      const testCases: ValidatorTestCase[] = [
         {controlValue: '12', expectedResult: true},
         {controlValue: '123', expectedResult: true},
         {controlValue: '1234', expectedResult: false},
-        {controlValue: undefined, expectedResult: false},
+        {controlValue: null, expectedResult: false},
         {controlValue: ['1', '2'], expectedResult: true},
         {controlValue: ['1', '2', '3'], expectedResult: true},
         {controlValue: ['1', '2', '3', '4'], expectedResult: false},
       ];
       const filter = SchemaValidators.hasLengthAtMost(args);
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBeNull();
           return;
         }
-        expect(errorsReturned.hasLengthAtMost)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        expect(errorsReturned?.hasLengthAtMost).toBeDefined();
       });
     });
 
     it('should throw an error when the value is not a string', () => {
-      const control: MockFormControl = new MockFormControl([], []);
+      const control: MockFormControl = new MockFormControl();
       control.setValue(1);
 
       const args = {
@@ -131,14 +146,14 @@ describe('Schema validators', () => {
 
   describe('when validating "is-at-least"', () => {
     it('should impose minimum bounds', () => {
-      const control: MockFormControl = new MockFormControl([], []);
+      const control: MockFormControl = new MockFormControl();
       control.setValue(1);
 
       const args = {
         minValue: -2.0,
       };
 
-      const testCases = [
+      const testCases: ValidatorTestCase[] = [
         {controlValue: 1.23, expectedResult: true},
         {controlValue: -1.23, expectedResult: true},
         {controlValue: -1.99, expectedResult: true},
@@ -148,29 +163,27 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.isAtLeast(args);
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBeNull();
           return;
         }
-        expect(errorsReturned.isAtLeast)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        expect(errorsReturned?.isAtLeast).toBeDefined();
       });
     });
   });
 
   describe('when validating "is-at-most"', () => {
     it('should impose maximum bounds', () => {
-      const control: MockFormControl = new MockFormControl([], []);
+      const control: MockFormControl = new MockFormControl();
       control.setValue(1);
 
       const args = {
         maxValue: -2.0,
       };
 
-      const testCases = [
+      const testCases: ValidatorTestCase[] = [
         {controlValue: 1.23, expectedResult: false},
         {controlValue: -1.23, expectedResult: false},
         {controlValue: -1.99, expectedResult: false},
@@ -180,25 +193,23 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.isAtMost(args);
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBeNull();
           return;
         }
-        expect(errorsReturned.isAtMost)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        expect(errorsReturned?.isAtMost).toBeDefined();
       });
     });
   });
 
   describe('when validating float', () => {
     it('should validate floats correctly', () => {
-      const control: MockFormControl = new MockFormControl([], []);
+      const control: MockFormControl = new MockFormControl();
       control.setValue(1);
 
-      const testCases = [
+      const testCases: ValidatorTestCase[] = [
         {controlValue: '1.23', expectedResult: true},
         {controlValue: '-1.23', expectedResult: true},
         {controlValue: '0', expectedResult: true},
@@ -216,7 +227,7 @@ describe('Schema validators', () => {
         {controlValue: ' 3.2% ', expectedResult: true},
         {controlValue: '0.', expectedResult: true},
         {controlValue: '', expectedResult: true},
-        {controlValue: undefined, expectedResult: true},
+        {controlValue: null, expectedResult: true},
         {controlValue: '3%%', expectedResult: false},
         {controlValue: '-', expectedResult: false},
         {controlValue: '.', expectedResult: false},
@@ -230,28 +241,26 @@ describe('Schema validators', () => {
       ];
       const filter = SchemaValidators.isFloat();
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBeNull();
           return;
         }
         if (errorsReturned === null) {
-          throw new Error(testCase.controlValue);
+          throw new Error(testCase.controlValue as string);
         }
-        expect(errorsReturned.isFloat)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        expect(errorsReturned?.isFloat).toBeDefined();
       });
     });
   });
 
   describe('when validating integer', () => {
     it('should validate int correctly', () => {
-      const control: MockFormControl = new MockFormControl([], []);
+      const control: MockFormControl = new MockFormControl();
       control.setValue(1);
 
-      const testCases = [
+      const testCases: ValidatorTestCase[] = [
         {controlValue: '3', expectedResult: true},
         {controlValue: '-3', expectedResult: true},
         {controlValue: '3.0', expectedResult: true},
@@ -260,47 +269,43 @@ describe('Schema validators', () => {
 
       const filter = SchemaValidators.isInteger();
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBeNull();
           return;
         }
-        expect(errorsReturned.isInteger)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        expect(errorsReturned?.isInteger).toBeDefined();
       });
     });
   });
 
   describe('when validating non-empty', () => {
     it('should check for non-empty strings', () => {
-      const control: MockFormControl = new MockFormControl([], []);
+      const control: MockFormControl = new MockFormControl();
       control.setValue(1);
 
-      const testCases = [
+      const testCases: ValidatorTestCase[] = [
         {controlValue: 'a', expectedResult: true},
         {controlValue: '', expectedResult: false},
       ];
 
       const filter = SchemaValidators.isNonempty();
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
         const errorsReturned = filter(control);
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBeNull();
           return;
         }
-        expect(errorsReturned.isNonempty)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        expect(errorsReturned?.isNonempty).toBeDefined();
       });
     });
   });
 
   describe('when validating isRegexMatched', () => {
     let filter!: (control: AbstractControl) => ValidationErrors | null;
-    const control: MockFormControl = new MockFormControl([], []);
+    const control: MockFormControl = new MockFormControl();
     const errorMsg = {
       isRegexMatched: "Control Value doesn't match given regex",
     };
@@ -311,7 +316,7 @@ describe('Schema validators', () => {
 
     const expectValidationToPass = (controlValue: string) => {
       control.setValue(controlValue);
-      expect(filter(control)).withContext(controlValue).toBe(null);
+      expect(filter(control)).toBeNull();
     };
 
     const expectValidationToFail = (controlValue: string) => {
@@ -364,7 +369,7 @@ describe('Schema validators', () => {
     });
 
     it('should validate non-emptiness', () => {
-      const control: MockFormControl = new MockFormControl([], []);
+      const control: MockFormControl = new MockFormControl();
       control.setValue('abc');
       expect(filter(control)).toBe(null);
       control.setValue('');
@@ -372,7 +377,7 @@ describe('Schema validators', () => {
     });
 
     it('should fail when there are caps characters', () => {
-      const control: MockFormControl = new MockFormControl([], []);
+      const control: MockFormControl = new MockFormControl();
       control.setValue('aBc');
       expect(filter(control)).toEqual(errorMsg);
       control.setValue('aaaAAA');
@@ -380,7 +385,7 @@ describe('Schema validators', () => {
     });
 
     it('should fail when there are numeric characters', () => {
-      const control: MockFormControl = new MockFormControl([], []);
+      const control: MockFormControl = new MockFormControl();
       control.setValue('abc-123');
       expect(filter(control)).toEqual(errorMsg);
       control.setValue('h4ck3r');
@@ -388,8 +393,8 @@ describe('Schema validators', () => {
     });
 
     it('should fail when there are special characters other than hyphen', () => {
-      const control: MockFormControl = new MockFormControl([], []);
-      const testCases = [
+      const control: MockFormControl = new MockFormControl();
+      const testCases: ValidatorTestCase[] = [
         {controlValue: 'special~chars', expectedResult: false},
         {controlValue: 'special`chars', expectedResult: false},
         {controlValue: 'special!chars', expectedResult: false},
@@ -423,15 +428,13 @@ describe('Schema validators', () => {
         {controlValue: 'special\\chars', expectedResult: false},
       ];
       testCases.forEach(testCase => {
-        control.setValue(testCase.controlValue);
-        expect(filter(control))
-          .withContext(testCase.toString())
-          .toEqual(errorMsg);
+        control.setValue(testCase.controlValue as SchemaDefaultValue);
+        expect(filter(control)).toEqual(errorMsg);
       });
     });
 
     it('should fail when there are spaces', () => {
-      const control: MockFormControl = new MockFormControl([], []);
+      const control: MockFormControl = new MockFormControl();
       control.setValue('url with spaces');
       expect(filter(control)).toEqual(errorMsg);
       control.setValue(' trailing space ');
@@ -439,13 +442,13 @@ describe('Schema validators', () => {
     });
 
     it('should fail when the length of the input is greater than the char limit', () => {
-      const control: MockFormControl = new MockFormControl([], []);
+      const control: MockFormControl = new MockFormControl();
       control.setValue('a-lengthy-url-fragment');
       expect(filter(control)).toEqual(errorMsg);
     });
 
     it('should pass when the passed value is a valid url fragment', () => {
-      const control: MockFormControl = new MockFormControl([], []);
+      const control: MockFormControl = new MockFormControl();
       control.setValue('math');
       expect(filter(control)).toBe(null);
       control.setValue('computer-sciencet');

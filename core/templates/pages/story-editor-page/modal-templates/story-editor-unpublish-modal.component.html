@@ -77,25 +77,58 @@
 </div>
 
 <div *ngIf="!isSerialChapterFeatureFlagEnabled()">
-  <div class="modal-header">
-    <p>
-      Are you sure you want to unpublish this story? Unpublishing a story will
-      delete any corresponding translation opportunities from the Contributor
-      Dashboard and reject any related pending translation suggestions.
-    </p>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-secondary"
-            (click)="cancel()"
-            (keydown.enter)="cancel()"
-            type="button">
+  <div *ngIf="showingChoiceScreen">
+    <div class="modal-header">
+      <p>Are you unpublishing this story temporarily or permanently?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary"
+              (click)="cancel()"
+              (keydown.enter)="cancel()"
+              type="button">
             Cancel
-    </button>
-    <button class="btn btn-success e2e-test-close-save-modal-button"
-            (click)="confirm()"
-            (keydown.enter)="confirm()">
-      Unpublish Story
-    </button>
+      </button>
+      <button class="btn btn-success e2e-test-close-save-modal-button"
+              (click)="selectTemporary()"
+              (keydown.enter)="selectTemporary()">
+            Temporarily
+      </button>
+      <button class="btn btn-success e2e-test-close-save-modal-button"
+              (click)="selectPermanent()"
+              (keydown.enter)="selectPermanent()">
+            Permanently
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="!showingChoiceScreen">
+    <div class="modal-header">
+      <p *ngIf="mode === 'temporary_unpublish'">
+        Are you sure you want to temporarily unpublish this story? Temporarily
+        unpublishing a story will retain any corresponding translation
+        opportunities on the Contributor Dashboard. Please republish the story
+        within 24 hours to avoid disrupting learners currently engaged with it.
+      </p>
+      <p *ngIf="mode === 'permanent_unpublish'">
+        Are you sure you want to permanently unpublish this story? Permanently
+        unpublishing a story will delete any corresponding translation
+        opportunities from the Contributor Dashboard and reject any related
+        pending translation suggestions.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary"
+              (click)="cancel()"
+              (keydown.enter)="cancel()"
+              type="button">
+            Cancel
+      </button>
+      <button class="btn btn-success e2e-test-close-save-modal-button"
+              (click)="confirm()"
+              (keydown.enter)="confirm()">
+            Unpublish Story
+      </button>
+    </div>
   </div>
 </div>
 

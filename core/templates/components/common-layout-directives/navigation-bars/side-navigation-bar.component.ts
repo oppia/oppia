@@ -147,4 +147,11 @@ export class SideNavigationBarComponent {
     );
     this.windowRef.nativeWindow.location.href = '/teach';
   }
+
+  navigateToBlogPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.BLOG
+    );
+    this.windowRef.nativeWindow.location.href = '/blog';
+  }
 }

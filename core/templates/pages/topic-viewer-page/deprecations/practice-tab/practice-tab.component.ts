@@ -29,7 +29,7 @@ import {
   I18nLanguageCodeService,
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
-import {PracticeSessionConfirmationModal} from 'pages/topic-viewer-page/modals/practice-session-confirmation-modal.component';
+import {PracticeSessionConfirmationModal} from 'pages/topic-viewer-page/deprecations/modals/practice-session-confirmation-modal.component';
 import {LoaderService} from 'services/loader.service';
 
 import './practice-tab.component.css';
