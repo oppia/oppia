@@ -63,7 +63,6 @@ describe('Lesson Creator Profile Deletion', function () {
 
     await expEditor1.navigateToCreatorDashboardPage();
     await expEditor1.navigateToExplorationEditorFromCreatorDashboard();
-    await expEditor1.dismissWelcomeModal();
     negativeNumbersExpId = await expEditor1.getExplorationId();
     await expEditor1.updateCardContent('Negative Numbers Intro');
     await expEditor1.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
@@ -77,7 +76,6 @@ describe('Lesson Creator Profile Deletion', function () {
 
     await expEditor1.navigateToCreatorDashboardPage();
     await expEditor1.navigateToExplorationEditorFromCreatorDashboard();
-    await expEditor1.dismissWelcomeModal();
     wholeNumbersExpId = await expEditor1.getExplorationId();
     await expEditor1.updateCardContent('Draft that will be deleted.');
     await expEditor1.saveExplorationDraft();
@@ -98,9 +96,10 @@ describe('Lesson Creator Profile Deletion', function () {
 
     // 3. Verify ownership and access permissions for published explorations.
     await expEditor2.navigateToExplorationEditor(negativeNumbersExpId);
+    await expEditor2.dismissWelcomeModal();
     await expEditor2.navigateToSettingsTab();
     await expEditor2.expectExplorationToBeCommunityOwned(
-      'This exploration is public and community-editable. It is available in the Oppia library.'
+      'This exploration is public and community-editable.  It is available in the Oppia library.'
     );
     await expEditor2.navigateToExplorationEditor(positiveNumbersExpId);
     await expEditor2.navigateToSettingsTab();
