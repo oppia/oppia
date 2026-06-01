@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.domain import exp_fetchers
+from core.domain import exp_domain, exp_fetchers, topic_domain, topic_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -29,7 +29,7 @@ from core.platform import models
 
 import apache_beam as beam
 import result
-from typing import Any, Dict, Iterable, Tuple
+from typing import Dict, Iterable, Tuple, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -37,6 +37,7 @@ if MYPY:  # pragma: no cover
         exp_models,
         opportunity_models,
         story_models,
+        topic_models,
         translation_models,
     )
 
@@ -45,12 +46,14 @@ if MYPY:  # pragma: no cover
     opportunity_models,
     translation_models,
     story_models,
+    topic_models,
 ) = models.Registry.import_models(
     [
         models.Names.EXPLORATION,
         models.Names.OPPORTUNITY,
         models.Names.TRANSLATION,
         models.Names.STORY,
+        models.Names.TOPIC,
     ]
 )
 datastore_services = models.Registry.import_datastore_services()
@@ -63,9 +66,19 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
 
     @staticmethod
     def _create_translation_opportunity(
-        # Here we use type Any because the values from the CoGroupByKey
-        # could be topic_ids, ExplorationModel, or EntityTranslationsModel.
-        element: Tuple[str, Dict[str, Iterable[Any]]],
+        element: Tuple[
+            str,
+            Dict[
+                str,
+                Iterable[
+                    Union[
+                        str,
+                        exp_domain.Exploration,
+                        translation_models.EntityTranslationsModel,
+                    ]
+                ],
+            ],
+        ],
     ) -> result.Result[opportunity_models.TranslationOpportunityModel, str]:
         """Creates a TranslationOpportunityModel from the grouped data."""
         exp_id = element[0]
@@ -122,6 +135,16 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
         return result.Ok(model)
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        def get_published_story_ids(
+            topic: topic_domain.Topic,
+        ) -> Iterable[str]:
+            for reference in topic.canonical_story_references:
+                if reference.story_is_published:
+                    yield reference.story_id
+            for reference in topic.additional_story_references:
+                if reference.story_is_published:
+                    yield reference.story_id
+
         def extract_topic_ids_from_story(
             story_model: story_models.StoryModel,
         ) -> Iterable[Tuple[str, str]]:
@@ -132,11 +155,30 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
                 if node_exp_id:
                     yield (node_exp_id, topic_id)
 
+        published_story_ids_pcoll = (
+            self.pipeline
+            | 'Get all TopicModels'
+            >> ndb_io.GetModels(
+                topic_models.TopicModel.get_all(include_deleted=False)
+            )
+            | 'Get topic from model'
+            >> beam.Map(topic_fetchers.get_topic_from_model)
+            | 'Extract published story IDs'
+            >> beam.FlatMap(get_published_story_ids)
+            | 'Distinct story IDs'
+            >> beam.Distinct()  # pylint: disable=no-value-for-parameter
+        )
+
         story_topic_ids_pcoll = (
             self.pipeline
             | 'Get all StoryModels'
             >> ndb_io.GetModels(
                 story_models.StoryModel.get_all(include_deleted=False)
+            )
+            | 'Filter published StoryModels'
+            >> beam.Filter(
+                lambda story, published_ids: story.id in published_ids,
+                beam.pvalue.AsList(published_story_ids_pcoll),
             )
             | 'Extract exp_id and topic_id'
             >> beam.FlatMap(extract_topic_ids_from_story)

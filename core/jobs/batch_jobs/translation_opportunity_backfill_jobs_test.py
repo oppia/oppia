@@ -32,19 +32,26 @@ if MYPY:
         exp_models,
         opportunity_models,
         story_models,
+        topic_models,
         translation_models,
     )
 
-exp_models, opportunity_models, translation_models, story_models = (
-    models.Registry.import_models(
-        [
-            models.Names.EXPLORATION,
-            models.Names.OPPORTUNITY,
-            models.Names.TRANSLATION,
-            models.Names.STORY,
-        ]
-    )
+(
+    exp_models,
+    opportunity_models,
+    translation_models,
+    story_models,
+    topic_models,
+) = models.Registry.import_models(
+    [
+        models.Names.EXPLORATION,
+        models.Names.OPPORTUNITY,
+        models.Names.TRANSLATION,
+        models.Names.STORY,
+        models.Names.TOPIC,
+    ]
 )
+datastore_services = models.Registry.import_datastore_services()
 
 
 class BackfillTranslationOpportunityModelJobTests(
@@ -96,6 +103,33 @@ class BackfillTranslationOpportunityModelJobTests(
             }
         )
         model.commit(self.author_id, 'commit_message', [commit_cmd.to_dict()])
+
+        # Create TopicModel and TopicRightsModel.
+        topic_model = self.create_model(
+            topic_models.TopicModel,
+            id='topic_id',
+            name='topic title',
+            canonical_name='topic title',
+            story_reference_schema_version=1,
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='en',
+            url_fragment='topic',
+            canonical_story_references=[
+                {'story_id': 'story_id', 'story_is_published': True}
+            ],
+            page_title_fragment_for_web='fragm',
+        )
+        topic_model.update_timestamps()
+
+        topic_rights_model = self.create_model(
+            topic_models.TopicRightsModel,
+            id='topic_id',
+            topic_is_published=True,
+        )
+        topic_rights_model.update_timestamps()
+
+        datastore_services.put_multi([topic_model, topic_rights_model])
 
         # Create StoryModel.
         story_model = self.create_model(
@@ -225,6 +259,28 @@ class BackfillTranslationOpportunityModelJobTests(
             [
                 job_run_result.JobRunResult(
                     stderr='TRANSLATION OPPORTUNITY MODEL CREATION ERROR: "Missing ExplorationModel": 1'
+                ),
+            ]
+        )
+
+    def test_skips_explorations_linked_to_unpublished_stories(self) -> None:
+        # Mark the story as unpublished in the topic's references.
+        topic_model = topic_models.TopicModel.get_by_id('topic_id')
+        topic_model.canonical_story_references = [
+            {'story_id': 'story_id', 'story_is_published': False}
+        ]
+        topic_model.update_timestamps()
+        datastore_services.put_multi([topic_model])
+
+        # The exploration exists and has translations, but the story is
+        # unpublished so no opportunity should be created.
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'TRANSLATION OPPORTUNITY MODEL CREATION'
+                        ' ERROR: "Missing topic_id": 1'
+                    )
                 ),
             ]
         )
