@@ -84,6 +84,8 @@
         "core.domain.opportunity_services_test",
         "core.domain.feedback_domain_test",
         "core.domain.general_feedback_domain_test",
+        "core.domain.general_feedback_services_test",
+        "core.domain.captcha_services_test",
         "core.domain.platform_parameter_domain_test",
         "core.domain.story_fetchers_test",
         "core.domain.rights_domain_test",
