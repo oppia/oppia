@@ -2584,6 +2584,7 @@ export class ExplorationEditor extends BaseUser {
    * Expands the specified settings tab section.
    * Supports Basic Settings, Advanced Features, Roles, Voice Artists,
    * Permissions, Feedback, and Controls sections.
+   * Note: Roles and Voice Artists sections are only available for exploration creators.
    * @param section - The name of the section to expand.
    */
   async expandSettingsTabSection(
@@ -2608,6 +2609,17 @@ export class ExplorationEditor extends BaseUser {
     const identifier = section.replace(' ', '-').toLowerCase();
     const sectionContentSelector = `.e2e-test-${identifier}-content`;
     const sectionHeaderSelector = `.e2e-test-${identifier}-header`;
+
+    // Check if the section header exists (some sections like Roles and Voice Artists
+    // are only available for exploration creators).
+    const sectionHeaderExists = await this.page.$(sectionHeaderSelector);
+    if (!sectionHeaderExists) {
+      showMessage(
+        `Skipped: Expanding ${section} section.\n` +
+          'Reason: Section is not available (only available for exploration creators).'
+      );
+      return;
+    }
 
     // Skip if the section is already expanded.
     if (await this.isElementVisible(sectionContentSelector)) {
