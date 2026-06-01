@@ -729,11 +729,13 @@ export class TopicUpdateService {
   /**
    * Moves a skill to a subtopic from either another subtopic or
    * uncategorized skills and records the change in the undo/redo service.
+   * @param oldSubtopicId - Null when moving a skill from uncategorized skills.
+   * @param newSubtopicId - Null when moving a skill to uncategorized skills.
    */
   moveSkillToSubtopic(
     topic: Topic,
     oldSubtopicId: number | null,
-    newSubtopicId: number,
+    newSubtopicId: number | null,
     skillSummary: ShortSkillSummary
   ): void {
     if (!newSubtopicId) {
