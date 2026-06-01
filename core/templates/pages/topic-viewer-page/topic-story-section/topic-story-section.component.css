@@ -6,10 +6,13 @@
 }
 
 .story-callout-row {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
   gap: 0;
-  margin: 0 0 -18px 8px;
+
+  /* Lift the whole bubble slightly */
+  margin: -4px 0 -18px 8px;
+
   max-width: 100%;
   position: relative;
   z-index: 1;
@@ -25,30 +28,30 @@
 
 .story-description-bubble {
   background: #fff;
-  border-radius: 20px;
+  border-radius: 12px;
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.14);
   color: #222;
   display: inline-block;
   font-family: Roboto, Arial, sans-serif;
   font-size: 16px;
   line-height: 1.55;
-  margin: 0 0 0 6px;
-  max-width: 520px;
-  padding: 14px 20px;
+  margin-left: 24px;
+  margin-top: 12px;
+  max-width: 700px;
+  padding: 18px 28px;
   position: relative;
   width: fit-content;
 }
 
 .story-description-bubble::after {
-  /* Small lower-left triangular tail that points toward the mascot. */
-  background: #fff;
-  clip-path: polygon(100% 0, 0 100%, 100% 100%);
   content: '';
-  height: 12px;
-  inset-block-end: 14px;
-  inset-inline-start: -6px;
   position: absolute;
-  width: 14px;
+  background: #fff;
+  left: -10px;
+  bottom: 0;
+  width: 24px;
+  height: 24px;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
 }
 
 .story-card {

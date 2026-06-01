@@ -62,8 +62,13 @@
         {{ 'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomName } }}
       </a>
       <a *ngIf="!classroomName && classroomUrlFragment"
-         [href]="getClassroomUrl()">{{ 'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomUrlFragment } }}</a>
-      <a *ngIf="!classroomName && !classroomUrlFragment" href="/learn">{{ 'I18N_BACK_TO_CLASSROOMS' | translate }}</a>
+   [href]="getClassroomUrl()">
+  {{ 'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomUrlFragment } }}
+</a>
+<a *ngIf="!classroomName && !classroomUrlFragment"
+   href="/learn">
+  {{ 'I18N_BACK_TO_CLASSROOMS' | translate }}
+</a>
     </ng-template>
   </div>
 </nav>

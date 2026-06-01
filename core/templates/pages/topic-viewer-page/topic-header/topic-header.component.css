@@ -26,7 +26,7 @@
 
 .topic-header-breadcrumbs a:hover,
 .topic-header-breadcrumbs a:focus {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .topic-header-breadcrumb-current {
