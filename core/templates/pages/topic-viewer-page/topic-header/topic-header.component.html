@@ -37,13 +37,25 @@
   <div class="topic-header-breadcrumbs-mobile">
     <i class="fa fa-angle-left" aria-hidden="true" *ngIf="!isLanguageRTL()"></i>
     <i class="fa fa-angle-right" aria-hidden="true" *ngIf="isLanguageRTL()"></i>
-    <a *ngIf="classroomName"
-       [href]="getClassroomUrl()"
-       class="e2e-test-mobile-breadcrumbs-classroom">
-      <ng-container *ngIf="isHackyClassroomNameTranslationDisplayed(); else rawMobileClassroomName">{{ 'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: (classroomNameTranslationKey | translate) } }}</ng-container>
-      <ng-template #rawMobileClassroomName>{{ 'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomName } }}</ng-template>
-    </a>
-    <a *ngIf="!classroomName" href="/learn">{{ 'I18N_BACK_TO_CLASSROOMS' | translate }}</a>
+    <ng-container *ngIf="showStudySkillsBreadcrumb; else classroomMobileBreadcrumb">
+      <a [href]="getTopicStoryUrl()" class="e2e-test-mobile-breadcrumbs-topic">
+        <ng-container *ngIf="isHackyTopicNameTranslationDisplayed(); else rawMobileTopicName">
+          {{ 'I18N_SUBTOPIC_VIEWER_BACK_TO_TOPIC' | translate }} {{ topicNameTranslationKey | translate }}
+        </ng-container>
+        <ng-template #rawMobileTopicName>
+          {{ 'I18N_SUBTOPIC_VIEWER_BACK_TO_TOPIC' | translate }} {{ topicName }}
+        </ng-template>
+      </a>
+    </ng-container>
+    <ng-template #classroomMobileBreadcrumb>
+      <a *ngIf="classroomName"
+         [href]="getClassroomUrl()"
+         class="e2e-test-mobile-breadcrumbs-classroom">
+        <ng-container *ngIf="isHackyClassroomNameTranslationDisplayed(); else rawMobileClassroomName">{{ 'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: (classroomNameTranslationKey | translate) } }}</ng-container>
+        <ng-template #rawMobileClassroomName>{{ 'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomName } }}</ng-template>
+      </a>
+      <a *ngIf="!classroomName" href="/learn">{{ 'I18N_BACK_TO_CLASSROOMS' | translate }}</a>
+    </ng-template>
   </div>
 </nav>
 

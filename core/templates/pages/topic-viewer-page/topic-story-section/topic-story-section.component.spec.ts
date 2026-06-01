@@ -101,4 +101,39 @@ describe('TopicStorySectionComponent', () => {
       '/assets/copyrighted-images/general/collection_mascot.svg'
     );
   });
+
+  it('should not modify avatar URL when already on fallback image', () => {
+    component.onAvatarImageError();
+    const fallbackUrl = component.oppiaAvatarImageUrl;
+
+    component.onAvatarImageError();
+
+    expect(component.oppiaAvatarImageUrl).toBe(fallbackUrl);
+  });
+
+  it('should return singular and plural story meta strings correctly', () => {
+    component.lessonCount = 1;
+    component.practiceCount = 2;
+
+    expect(component.getLessonCountText()).toBe('1 lesson');
+    expect(component.getPracticeCountText()).toBe('2 practices');
+    expect(component.getStoryMetaText()).toBe('1 lesson, 2 practices');
+    expect(component.getStoryMetaAriaLabel()).toBe(
+      '1 lesson and 2 practices available'
+    );
+  });
+
+  it('should keep study guide URL as # when URL fragments are unavailable', () => {
+    component.classroomUrlFragment = '';
+    component.topicUrlFragment = '';
+
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      ''
+    );
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
+
+    component.ngOnInit();
+
+    expect(component.studyGuideUrl).toBe('#');
+  });
 });

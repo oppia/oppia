@@ -319,6 +319,38 @@ describe('Topic viewer page', () => {
     );
   }));
 
+  it('should not show warning for non-fatal fetch errors', fakeAsync(() => {
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      topicUrlFragment
+    );
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'math'
+    );
+    spyOn(alertsService, 'addWarning').and.callThrough();
+
+    topicViewerPageComponent.ngOnInit();
+    let req = httpTestingController.expectOne(
+      `/topic_data_handler/math/${topicUrlFragment}`
+    );
+    let errorObject = {status: 403, statusText: 'Forbidden'};
+    req.flush({error: errorObject}, errorObject);
+    flushMicrotasks();
+
+    expect(alertsService.addWarning).not.toHaveBeenCalled();
+  }));
+
+  it('should track story data by story id', () => {
+    expect(
+      topicViewerPageComponent.trackStoryDataById(0, {
+        storyId: 'story_1',
+        storyTitle: 'Story 1',
+        storyDescription: 'Description',
+        lessonCount: 3,
+        practiceCount: 2,
+      })
+    ).toBe('story_1');
+  });
+
   it('should get static image url', () => {
     var imagePath = '/path/to/image.png';
     var staticImageUrl = topicViewerPageComponent.getStaticImageUrl(imagePath);

@@ -102,6 +102,17 @@ describe('TopicHeaderComponent', () => {
     expect(component.getClassroomUrl()).toBe('/learn');
   });
 
+  it('should return topic story URL when fragments exist and /learn otherwise', () => {
+    expect(component.getTopicStoryUrl()).toBe('/learn/math/place-values/story');
+
+    component.classroomUrlFragment = '';
+    expect(component.getTopicStoryUrl()).toBe('/learn');
+
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = '';
+    expect(component.getTopicStoryUrl()).toBe('/learn');
+  });
+
   it('should delegate RTL detection to I18nLanguageCodeService', () => {
     expect(component.isLanguageRTL()).toBeFalse();
     (
@@ -197,5 +208,21 @@ describe('TopicHeaderComponent', () => {
     expect(
       i18nLanguageCodeService.isClassroomnNameTranslationAvailable
     ).toHaveBeenCalledWith('Math');
+  });
+
+  it('should show mobile back-to-topic breadcrumb for study skills route', () => {
+    component.showStudySkillsBreadcrumb = true;
+    fixture.detectChanges();
+
+    const mobileTopicBackLink: HTMLAnchorElement | null =
+      fixture.nativeElement.querySelector('.e2e-test-mobile-breadcrumbs-topic');
+    expect(mobileTopicBackLink).not.toBeNull();
+    expect(mobileTopicBackLink?.getAttribute('href')).toBe(
+      '/learn/math/place-values/story'
+    );
+    expect(mobileTopicBackLink?.textContent).toContain(
+      'I18N_SUBTOPIC_VIEWER_BACK_TO_TOPIC'
+    );
+    expect(mobileTopicBackLink?.textContent).toContain('Place Values');
   });
 });
