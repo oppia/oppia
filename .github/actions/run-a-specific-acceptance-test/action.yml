@@ -34,7 +34,7 @@ runs:
       run: |
         if fuser 8181/tcp >/dev/null 2>&1; then
           echo "Port 8181 is occupied. Stopping stale process..."
-          fuser -TERM -k 8181/tcp || true 
+          fuser -TERM -k 8181/tcp || true
           sleep 2
           if fuser 8181/tcp >/dev/null 2>&1; then
             echo "Port 8181 is still occupied after SIGTERM. Force stopping..."
