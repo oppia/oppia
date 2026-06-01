@@ -282,11 +282,7 @@ describe('Moderator Page Component', () => {
     });
 
     spyOn(
-      (
-        componentInstance as unknown as {
-          moderatorPageBackendApiService: ModeratorPageBackendApiService;
-        }
-      ).moderatorPageBackendApiService,
+      moderatorPageBackendApiService,
       'saveFeaturedActivityReferencesAsync'
     ).and.callFake(() => {
       return {
@@ -329,11 +325,7 @@ describe('Moderator Page Component', () => {
     });
 
     spyOn(
-      (
-        componentInstance as unknown as {
-          moderatorPageBackendApiService: ModeratorPageBackendApiService;
-        }
-      ).moderatorPageBackendApiService,
+      moderatorPageBackendApiService,
       'saveFeaturedActivityReferencesAsync'
     ).and.callFake(() => {
       return {
@@ -376,11 +368,7 @@ describe('Moderator Page Component', () => {
     });
 
     spyOn(
-      (
-        componentInstance as unknown as {
-          moderatorPageBackendApiService: ModeratorPageBackendApiService;
-        }
-      ).moderatorPageBackendApiService,
+      moderatorPageBackendApiService,
       'saveFeaturedActivityReferencesAsync'
     ).and.callFake(() => {
       return {
@@ -423,11 +411,7 @@ describe('Moderator Page Component', () => {
     });
 
     spyOn(
-      (
-        componentInstance as unknown as {
-          moderatorPageBackendApiService: ModeratorPageBackendApiService;
-        }
-      ).moderatorPageBackendApiService,
+      moderatorPageBackendApiService,
       'saveFeaturedActivityReferencesAsync'
     ).and.callFake(() => {
       return {
@@ -459,11 +443,7 @@ describe('Moderator Page Component', () => {
     });
 
     spyOn(
-      (
-        componentInstance as unknown as {
-          moderatorPageBackendApiService: ModeratorPageBackendApiService;
-        }
-      ).moderatorPageBackendApiService,
+      moderatorPageBackendApiService,
       'saveFeaturedActivityReferencesAsync'
     ).and.callFake(() => {
       return {
