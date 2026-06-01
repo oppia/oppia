@@ -67,4 +67,16 @@ describe('Certificate Offering Add Topic Items Component', () => {
     expect(topicDataChangeSpy).toHaveBeenCalledWith({topic_id_2: 10});
     expect(navigateSpy).toHaveBeenCalled();
   });
+
+  it('should show the empty selected-topics message when no topics are selected', () => {
+    const emptyStateEl: HTMLElement | null =
+      fixture.nativeElement.querySelector(
+        '.oppia-certificate-offering-empty-selected-topics'
+      );
+
+    expect(emptyStateEl).not.toBeNull();
+    expect(emptyStateEl?.textContent?.trim()).toBe(
+      'You have not added any topic. Start by adding one!'
+    );
+  });
 });
