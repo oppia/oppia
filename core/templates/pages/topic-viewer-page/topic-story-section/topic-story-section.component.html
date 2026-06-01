@@ -2,8 +2,7 @@
          [attr.aria-label]="storyTitle ? ('Story section: ' + storyTitle) : 'Story section'">
   <div class="story-callout-row">
     <img class="story-callout-avatar"
-         [src]="oppiaAvatarImageUrl"
-         (error)="onAvatarImageError()"
+         [src]="lessonThumbnailUrl"
          alt=""
          aria-hidden="true">
     <p *ngIf="storyDescription" class="story-description-bubble">
@@ -28,15 +27,20 @@
         <a class="study-skills-cta"
            [href]="studyGuideUrl"
            [attr.aria-label]="'Open Study Skills for ' + (storyTitle || 'this story')">
-          <img class="study-skills-icon"
-               src="/assets/images/icons/study-skills-icon.png"
-               alt=""
-               aria-hidden="true">
-          <span>Study Skills</span>
+          <i class="fas fa-book-open" aria-hidden="true"></i>
+          Study Skills
         </a>
       </div>
     </div>
 
     <div class="story-card-body"></div>
   </article>
+
+  <div class="story-lesson-card-wrapper">
+    <topic-lesson-card
+      [lessonTitle]="lessonTitle"
+      [lessonDescription]="storyDescription"
+      [thumbnailUrl]="lessonThumbnailUrl">
+    </topic-lesson-card>
+  </div>
 </section>

@@ -20,120 +20,49 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {UrlService} from 'services/contextual/url.service';
 
+import {TopicLessonCardComponent} from './topic-lesson-card/topic-lesson-card.component';
 import {TopicStorySectionComponent} from './topic-story-section.component';
 
 describe('TopicStorySectionComponent', () => {
   let component: TopicStorySectionComponent;
   let fixture: ComponentFixture<TopicStorySectionComponent>;
-  let urlService: UrlService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [TopicStorySectionComponent],
-      providers: [UrlInterpolationService, UrlService],
-      schemas: [NO_ERRORS_SCHEMA],
+      declarations: [TopicStorySectionComponent, TopicLessonCardComponent],
+      providers: [UrlInterpolationService],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TopicStorySectionComponent);
     component = fixture.componentInstance;
-    urlService = TestBed.inject(UrlService);
 
     component.storyTitle = 'Help Jaime win the Arcade Game';
     component.storyDescription =
       "In this story, we'll follow Jaime and his sister Nic as they learn.";
-    component.classroomUrlFragment = 'math';
-    component.topicUrlFragment = 'place-values';
-    component.lessonCount = 2;
-    component.practiceCount = 1;
 
     fixture.detectChanges();
   });
 
-  it('should render story title and story meta text', () => {
+  it('should render the callout and lesson card', () => {
     const el: HTMLElement = fixture.nativeElement;
-    expect(el.querySelector('.story-title')?.textContent).toContain(
-      'Help Jaime win the Arcade Game'
+    expect(
+      el.querySelector('.story-description-bubble')?.textContent
+    ).toContain(
+      "In this story, we'll follow Jaime and his sister Nic as they learn."
     );
-    expect(el.querySelector('.story-meta')?.textContent).toContain(
-      '2 lessons, 1 practice'
+    expect(el.querySelector('.topic-lesson-card-title')?.textContent).toContain(
+      'Lesson 1: Help Jaime win the Arcade Game'
     );
   });
 
-  it('should build the study guide URL for Study Skills CTA', () => {
-    const el: HTMLElement = fixture.nativeElement;
-    const link = el.querySelector<HTMLAnchorElement>('.study-skills-cta');
-
-    expect(link).toBeTruthy();
-    expect(link?.getAttribute('href')).toContain(
-      '/learn/math/place-values/studyguide'
-    );
-  });
-
-  it('should read URL fragments from URL service when inputs are absent', () => {
-    component.classroomUrlFragment = '';
-    component.topicUrlFragment = '';
-
-    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
-      'science'
-    );
-    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-      'matter'
-    );
-
+  it('should use the default thumbnail image for the lesson card', () => {
     component.ngOnInit();
 
-    expect(component.studyGuideUrl).toContain(
-      '/learn/science/matter/studyguide'
+    expect(component.lessonThumbnailUrl).toContain(
+      '/assets/images/splash/student_desk1x.webp'
     );
-  });
-
-  it('should switch to fallback avatar URL when image load fails', () => {
-    const primaryUrl = component.oppiaAvatarImageUrl;
-
-    component.onAvatarImageError();
-
-    expect(component.oppiaAvatarImageUrl).not.toBe(primaryUrl);
-    expect(component.oppiaAvatarImageUrl).toContain(
-      '/assets/copyrighted-images/general/collection_mascot.svg'
-    );
-  });
-
-  it('should not modify avatar URL when already on fallback image', () => {
-    component.onAvatarImageError();
-    const fallbackUrl = component.oppiaAvatarImageUrl;
-
-    component.onAvatarImageError();
-
-    expect(component.oppiaAvatarImageUrl).toBe(fallbackUrl);
-  });
-
-  it('should return singular and plural story meta strings correctly', () => {
-    component.lessonCount = 1;
-    component.practiceCount = 2;
-
-    expect(component.getLessonCountText()).toBe('1 lesson');
-    expect(component.getPracticeCountText()).toBe('2 practices');
-    expect(component.getStoryMetaText()).toBe('1 lesson, 2 practices');
-    expect(component.getStoryMetaAriaLabel()).toBe(
-      '1 lesson and 2 practices available'
-    );
-  });
-
-  it('should keep study guide URL as # when URL fragments are unavailable', () => {
-    component.classroomUrlFragment = '';
-    component.topicUrlFragment = '';
-
-    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
-      ''
-    );
-    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
-
-    component.ngOnInit();
-
-    expect(component.studyGuideUrl).toBe('#');
   });
 });

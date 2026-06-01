@@ -1,0 +1,123 @@
+.topic-lesson-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+}
+
+.topic-lesson-card-thumbnail {
+  background: #9fbfbb;
+  flex: 0 0 296px;
+  min-height: 184px;
+}
+
+.topic-lesson-card-image {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.topic-lesson-card-content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 26px 24px 24px 28px;
+}
+
+.topic-lesson-card-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.topic-lesson-card-title {
+  color: #3b3b3b;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 29px;
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.topic-lesson-card-description {
+  color: #3d3d3d;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 21px;
+  line-height: 1.38;
+  margin: 0;
+}
+
+.topic-lesson-card-start-button {
+  align-self: flex-end;
+  background: #00645c;
+  border: 0;
+  border-radius: 4px;
+  color: #fff;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  min-width: 132px;
+  padding: 18px 24px;
+}
+
+@media (max-width: 768px) {
+  .topic-lesson-card-thumbnail {
+    flex-basis: 244px;
+    min-height: 176px;
+  }
+
+  .topic-lesson-card-content {
+    padding: 22px 20px 20px 22px;
+  }
+
+  .topic-lesson-card-title {
+    font-size: 24px;
+  }
+
+  .topic-lesson-card-description {
+    font-size: 18px;
+  }
+
+  .topic-lesson-card-start-button {
+    font-size: 18px;
+    min-width: 120px;
+    padding: 16px 22px;
+  }
+}
+
+@media (max-width: 500px) {
+  .topic-lesson-card {
+    flex-direction: column;
+  }
+
+  .topic-lesson-card-thumbnail {
+    flex-basis: auto;
+    min-height: 168px;
+    width: 100%;
+  }
+
+  .topic-lesson-card-content {
+    gap: 18px;
+    padding: 18px 18px 20px;
+  }
+
+  .topic-lesson-card-title {
+    font-size: 20px;
+  }
+
+  .topic-lesson-card-description {
+    font-size: 16px;
+  }
+
+  .topic-lesson-card-start-button {
+    align-self: stretch;
+    font-size: 17px;
+    width: 100%;
+  }
+}

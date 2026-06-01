@@ -21,7 +21,6 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 
-import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
@@ -43,13 +42,11 @@ export class TopicStorySectionComponent implements OnInit {
   @Input() practiceCount: number = 0;
   @Input() lessonCount: number = 0;
 
-  private readonly primaryAvatarImagePath: string =
-    '/avatar/oppia_avatar_large_100px.svg';
-  private readonly fallbackAvatarImagePath: string =
-    '/general/collection_mascot.svg';
+  lessonThumbnailUrl: string = '';
+  lessonTitle: string = '';
 
-  oppiaAvatarImageUrl: string = '';
-  studyGuideUrl: string = '#';
+  private readonly fallbackLessonThumbnailPath: string =
+    '/splash/student_desk1x.webp';
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -58,75 +55,21 @@ export class TopicStorySectionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    if (!this.classroomUrlFragment) {
-      this.classroomUrlFragment =
-        this.urlService.getClassroomUrlFragmentFromLearnerUrl();
-    }
-    if (!this.topicUrlFragment) {
-      this.topicUrlFragment =
-        this.urlService.getTopicUrlFragmentFromLearnerUrl();
-    }
-    this.oppiaAvatarImageUrl = this.getPrimaryAvatarImageUrl();
-    this.studyGuideUrl = this.getStudyGuideUrl();
+    this.lessonTitle = this.storyTitle
+      ? 'Lesson 1: ' + this.storyTitle
+      : 'Lesson 1';
+    this.lessonThumbnailUrl = this.getLessonThumbnailUrl();
   }
 
-  onAvatarImageError(): void {
-    if (this.oppiaAvatarImageUrl !== this.getFallbackAvatarImageUrl()) {
-      this.oppiaAvatarImageUrl = this.getFallbackAvatarImageUrl();
-    }
-  }
-
-  getLessonCountText(): string {
-    return this.lessonCount === 1
-      ? this.lessonCount + ' lesson'
-      : this.lessonCount + ' lessons';
-  }
-
-  getPracticeCountText(): string {
-    return this.practiceCount === 1
-      ? this.practiceCount + ' practice'
-      : this.practiceCount + ' practices';
-  }
-
-  getStoryMetaText(): string {
-    return this.getLessonCountText() + ', ' + this.getPracticeCountText();
-  }
-
-  getStoryMetaAriaLabel(): string {
-    return (
-      this.getLessonCountText() +
-      ' and ' +
-      this.getPracticeCountText() +
-      ' available'
-    );
-  }
-
-  private getStudyGuideUrl(): string {
-    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
-      return '#';
-    }
-    return this.urlInterpolationService.interpolateUrl(
-      ClassroomDomainConstants.TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE,
-      {
-        classroom_url_fragment: this.classroomUrlFragment,
-        topic_url_fragment: this.topicUrlFragment,
-      }
-    );
-  }
-
-  private getPrimaryAvatarImageUrl(): string {
+  private getLessonThumbnailUrl(): string {
     return this.urlInterpolationService.getStaticImageUrl(
-      this.primaryAvatarImagePath
+      this.fallbackLessonThumbnailPath
     );
   }
 
   private getFallbackAvatarImageUrl(): string {
-    return this.urlInterpolationService.getStaticCopyrightedImageUrl(
-      this.fallbackAvatarImagePath
+    return this.urlInterpolationService.getStaticImageUrl(
+      this.fallbackLessonThumbnailPath
     );
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }

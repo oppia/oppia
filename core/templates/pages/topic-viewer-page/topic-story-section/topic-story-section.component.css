@@ -143,6 +143,10 @@
   padding: 0;
 }
 
+.story-lesson-card-wrapper {
+  margin-top: 20px;
+}
+
 @media (max-width: 768px) {
   .story-callout-row {
     gap: 16px;
