@@ -29,9 +29,10 @@ import {ExplorationEngineService} from './exploration-engine.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {State} from '../../../domain/state/state.model';
 import {Interaction} from '../../../domain/exploration/interaction.model';
-import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-
+import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
+import {SubtitledHtml} from '../../../domain/exploration/subtitled-html.model';
+import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 class MockNgbModalRef {
   componentInstance = {
     skillId: null,
@@ -133,7 +134,6 @@ describe('ConceptCardManager service', () => {
           },
         },
       }),
-      RecordedVoiceovers.createEmpty(),
       'content'
     );
 
@@ -175,17 +175,18 @@ describe('ConceptCardManager service', () => {
         ],
         solution: null,
       }),
-      RecordedVoiceovers.createEmpty(),
       'content'
     );
 
-    mockConceptCard = {
-      getExplanation: () => ({
-        getHtml: () => 'Test explanation',
+    mockConceptCard = new ConceptCard(
+      SubtitledHtml.createFromBackendDict({
+        content_id: 'explanation',
+        html: 'Test explanation',
       }),
-      getWorkedExamples: () => [],
-      getSkillDescription: () => 'Test skill',
-    } as ConceptCard;
+      RecordedVoiceovers.createFromBackendDict({
+        voiceovers_mapping: {},
+      })
+    );
   });
 
   it('should show concept card icon at the right time', fakeAsync(() => {
@@ -209,7 +210,7 @@ describe('ConceptCardManager service', () => {
   }));
 
   it('should open concept card modal', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
       return {
         componentInstance: MockNgbModalRef,
         result: Promise.resolve(),
@@ -315,9 +316,13 @@ describe('ConceptCardManager service', () => {
             value: 1,
           },
           placeholder: {
-            value: 'Enter text here',
+            value: {
+              content_id: 'ca_placeholder_0',
+              unicode_str: 'Enter text here',
+            },
           },
-        },
+          catchMisspellings: {value: false},
+        } as InteractionCustomizationArgs,
         answer_groups: [],
         default_outcome: null,
       },
