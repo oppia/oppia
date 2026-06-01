@@ -94,7 +94,7 @@ describe('Feedback backend api service', () => {
 
     expect(onSuccess).toHaveBeenCalledWith({
       screenshotFilename: null,
-      screenshot_files: null,
+      screenshotFile: null,
     });
   }));
 
@@ -136,7 +136,7 @@ describe('Feedback backend api service', () => {
     ]);
     expect(onSuccess).toHaveBeenCalledWith({
       screenshotFilename: 'reply.png',
-      screenshot_files: {'reply.png': 'aW1hZ2UtZGF0YQ=='},
+      screenshotFile: {'reply.png': 'aW1hZ2UtZGF0YQ=='},
     });
   }));
 

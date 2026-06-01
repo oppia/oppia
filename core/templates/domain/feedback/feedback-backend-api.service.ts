@@ -34,7 +34,7 @@ import {
 
 interface FeedbackScreenshotSubmissionData {
   screenshotFilename: string | null;
-  screenshot_files: Record<string, string> | null;
+  screenshotFile: Record<string, string> | null;
 }
 
 @Injectable({
@@ -78,7 +78,7 @@ export class FeedbackBackendApiService {
     if (screenshotFilename === null) {
       return {
         screenshotFilename: null,
-        screenshot_files: null,
+        screenshotFile: null,
       };
     }
     const imageData = this.getStagedScreenshotData(screenshotFilename);
@@ -88,7 +88,7 @@ export class FeedbackBackendApiService {
 
     return {
       screenshotFilename,
-      screenshot_files:
+      screenshotFile:
         await this.imageLocalStorageService.getFilenameToBase64MappingAsync([
           imageData,
         ]),
