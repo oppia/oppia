@@ -5957,9 +5957,6 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
                 expected_status_int=404,
             )
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
-    )
     def test_can_access_subtopic_when_topic_is_published_with_flag(
         self,
     ) -> None:
@@ -6000,9 +5997,6 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
                 expected_status_int=200,
             )
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
-    )
     def test_can_access_subtopic_when_all_url_fragments_are_valid_with_flag(
         self,
     ) -> None:
@@ -6049,9 +6043,6 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
                 response.headers['location'],
             )
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
-    )
     def test_fall_back_to_studyguide_page_when_study_guide_does_not_exist(
         self,
     ) -> None:

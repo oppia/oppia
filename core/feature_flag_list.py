@@ -72,7 +72,6 @@ class FeatureNames(enum.Enum):
     HIGHLIGHT_SENTENCES_DURING_AUTOMATIC_VOICEOVER_PLAYBACK = (
         'highlight_sentences_during_automatic_voiceover_playback'
     )
-    SHOW_RESTRUCTURED_STUDY_GUIDES = 'show_restructured_study_guides'
     ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS = (
         'enable_translation_opps_with_new_opp_models'
     )
@@ -159,7 +158,6 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
-    FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
     FeatureNames.ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER,
 ]
 
@@ -285,15 +283,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'The flag enables the voiceover tab for non-curated explorations.',
             feature_flag_domain.ServerMode.TEST,
-        )
-    ),
-    FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value: (
-        (
-            'Allows the creators to access the updated study guide editor page '
-            'and learners to access the updated study guide user interface '
-            '(the actual content displayed by the study guides will be the '
-            'same, just the user interface will be different).',
-            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value: (

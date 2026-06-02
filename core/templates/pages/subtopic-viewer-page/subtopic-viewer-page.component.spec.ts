@@ -40,7 +40,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AppConstants} from 'app.constants';
@@ -52,14 +51,6 @@ class MockTranslateService {
   instant(key: string, interpolateParams?: Object): string {
     return key;
   }
-}
-
-class MockPlatformFeatureService {
-  status = {
-    ShowRestructuredStudyGuides: {
-      isEnabled: false,
-    },
-  };
 }
 
 class MockWindowRef {
@@ -90,7 +81,6 @@ describe('Subtopic viewer page', function () {
   let loaderService: LoaderService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let translateService: TranslateService;
-  let platformFeatureService: PlatformFeatureService;
   let windowRef: WindowRef;
   let urlInterpolationService: UrlInterpolationService;
   let siteAnalyticsService: SiteAnalyticsService;
@@ -211,10 +201,6 @@ describe('Subtopic viewer page', function () {
           useClass: MockTranslateService,
         },
         {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
-        },
-        {
           provide: WindowRef,
           useClass: MockWindowRef,
         },
@@ -242,7 +228,6 @@ describe('Subtopic viewer page', function () {
     urlService = TestBed.inject(UrlService);
     loaderService = TestBed.inject(LoaderService);
     translateService = TestBed.inject(TranslateService);
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
     windowRef = TestBed.inject(WindowRef);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
@@ -301,9 +286,7 @@ describe('Subtopic viewer page', function () {
       component.ngOnInit();
       tick();
 
-      expect(component.pageContents).toEqual(
-        subtopicDataObject.getPageContents()
-      );
+      expect(component.sections).toEqual(subtopicDataObject.getSections());
       expect(component.subtopicTitle).toEqual(
         subtopicDataObject.getSubtopicTitle()
       );
@@ -346,8 +329,7 @@ describe('Subtopic viewer page', function () {
     })
   );
 
-  it('should successfully get topic/subtopic data with restructured study guides enabled', fakeAsync(() => {
-    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = true;
+  it('should successfully get topic/subtopic data with sections', fakeAsync(() => {
     spyOn(component, 'subscribeToOnLangChange');
     spyOn(pageContextService, 'setCustomEntityContext');
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
@@ -373,7 +355,6 @@ describe('Subtopic viewer page', function () {
     tick();
 
     expect(component.sections).toEqual(subtopicDataObject.getSections());
-    expect(component.pageContents).toBeNull();
   }));
 
   it(
@@ -439,8 +420,8 @@ describe('Subtopic viewer page', function () {
     component.ngOnInit();
     tick();
 
-    expect(component.pageContents).toEqual(
-      subtopicDataObjectWithPrevSubtopic.getPageContents()
+    expect(component.sections).toEqual(
+      subtopicDataObjectWithPrevSubtopic.getSections()
     );
     expect(component.subtopicTitle).toEqual(
       subtopicDataObjectWithPrevSubtopic.getSubtopicTitle()
@@ -491,13 +472,6 @@ describe('Subtopic viewer page', function () {
 
     widthSpy.and.returnValue(700);
     expect(component.checkMobileView()).toBe(false);
-  });
-
-  it('should check if restructured study guides feature is enabled', () => {
-    expect(component.isShowRestructuredStudyGuidesFeatureEnabled()).toBe(false);
-
-    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = true;
-    expect(component.isShowRestructuredStudyGuidesFeatureEnabled()).toBe(true);
   });
 
   it('should open study guide when openStudyGuide is called', () => {

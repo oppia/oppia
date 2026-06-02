@@ -1998,9 +1998,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertIsNotNone(subtopic_page)
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
-    )
     def test_update_topic_and_study_guide(self) -> None:
         changelist: List[
             Union[topic_domain.TopicChange, study_guide_domain.StudyGuideChange]

@@ -746,9 +746,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 3)
         self.logout()
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
-    )
     def test_load_new_structures_data_with_study_guides(self) -> None:
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)

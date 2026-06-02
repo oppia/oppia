@@ -4461,31 +4461,41 @@ def can_access_subtopic_viewer_page(
             )
             return None
 
-        verified_classroom_url_fragment = (
-            classroom_config_services.get_classroom_url_fragment_for_topic_id(
+        if classroom_url_fragment != 'staging':
+            verified_classroom_url_fragment = classroom_config_services.get_classroom_url_fragment_for_topic_id(
                 topic.id
             )
-        )
-        if classroom_url_fragment != verified_classroom_url_fragment:
-            url_substring = '%s/studyguide/%s' % (
-                topic_url_fragment,
-                subtopic_url_fragment,
-            )
-            _redirect_based_on_return_type(
-                self,
-                '/learn/%s/%s'
-                % (verified_classroom_url_fragment, url_substring),
-                self.GET_HANDLER_ERROR_RETURN_TYPE,
-            )
-            return None
+            if classroom_url_fragment != verified_classroom_url_fragment:
+                url_substring = '%s/studyguide/%s' % (
+                    topic_url_fragment,
+                    subtopic_url_fragment,
+                )
+                _redirect_based_on_return_type(
+                    self,
+                    '/learn/%s/%s'
+                    % (verified_classroom_url_fragment, url_substring),
+                    self.GET_HANDLER_ERROR_RETURN_TYPE,
+                )
+                return None
 
-        if feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
-            self.user_id,
-        ):
-            study_guide = study_guide_services.get_study_guide_by_id(
-                topic.id, subtopic_id, strict=False
-            )
+        request_path = self.request.path
+        study_guide = study_guide_services.get_study_guide_by_id(
+            topic.id, subtopic_id, strict=False
+        )
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            topic.id, subtopic_id, strict=False
+        )
+
+        if self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_JSON:
+            if study_guide is None and subtopic_page is None:
+                _redirect_based_on_return_type(
+                    self,
+                    '/learn/%s/%s/studyguide'
+                    % (classroom_url_fragment, topic_url_fragment),
+                    self.GET_HANDLER_ERROR_RETURN_TYPE,
+                )
+                return None
+        elif '/mock_study_guide/' in request_path:
             if study_guide is None:
                 _redirect_based_on_return_type(
                     self,
@@ -4494,12 +4504,7 @@ def can_access_subtopic_viewer_page(
                     self.GET_HANDLER_ERROR_RETURN_TYPE,
                 )
                 return None
-            else:
-                return handler(self, topic.name, subtopic_id, **kwargs)
         else:
-            subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
-                topic.id, subtopic_id, strict=False
-            )
             if subtopic_page is None:
                 _redirect_based_on_return_type(
                     self,
@@ -4508,8 +4513,8 @@ def can_access_subtopic_viewer_page(
                     self.GET_HANDLER_ERROR_RETURN_TYPE,
                 )
                 return None
-            else:
-                return handler(self, topic.name, subtopic_id, **kwargs)
+
+        return handler(self, topic.name, subtopic_id, **kwargs)
 
     return test_can_access
 

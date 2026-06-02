@@ -22,7 +22,6 @@ import {Subscription} from 'rxjs';
 
 import {AppConstants} from 'app.constants';
 import {SubtopicViewerBackendApiService} from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
-import {SubtopicPageContents} from 'domain/topic/subtopic-page-contents.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
@@ -38,7 +37,6 @@ import {PageTitleService} from 'services/page-title.service';
 
 import './subtopic-viewer-page.component.css';
 import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -58,10 +56,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   topicUrlFragment!: string;
   classroomUrlFragment!: string;
   subtopicUrlFragment!: string;
-  // Remove pageContents once study guides become standard.
-  pageContents!: SubtopicPageContents | null;
-  // Remove '| null' once study guides become standard.
-  sections: StudyGuideSection[] | null;
+  sections: StudyGuideSection[] = [];
   subtopicTitle!: string;
   subtopicTitleTranslationKey!: string;
   parentTopicTitle!: string;
@@ -87,12 +82,8 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     private windowRef: WindowRef,
     private windowDimensionsService: WindowDimensionsService,
     private translateService: TranslateService,
-    private platformFeatureService: PlatformFeatureService,
     private siteAnalyticsService: SiteAnalyticsService
-  ) {
-    this.sections = null;
-    this.pageContents = null;
-  }
+  ) {}
 
   checkMobileView(): boolean {
     return this.windowDimensionsService.getWidth() < 500;
@@ -114,11 +105,6 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
       }
     );
     this.pageTitleService.setDocumentTitle(translatedTitle);
-  }
-
-  isShowRestructuredStudyGuidesFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.ShowRestructuredStudyGuides
-      .isEnabled;
   }
 
   ngOnInit(): void {
@@ -144,11 +130,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
 
     Promise.all([subtopicPromise, topicPromise]).then(
       ([subtopicDataObject, topicDataObject]) => {
-        if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
-          this.sections = subtopicDataObject.getSections();
-        } else {
-          this.pageContents = subtopicDataObject.getPageContents();
-        }
+        this.sections = subtopicDataObject.getSections() || [];
         this.subtopicTitle = subtopicDataObject.getSubtopicTitle();
         this.parentTopicId = subtopicDataObject.getParentTopicId();
         this.pageContextService.setCustomEntityContext(

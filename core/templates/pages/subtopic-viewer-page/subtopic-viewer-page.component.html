@@ -1,32 +1,5 @@
 <background-banner></background-banner>
-<div *ngIf="!isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-subtopic-viewer-container">
-  <div class="oppia-subtopic-viewer-container-card" tabindex="0">
-    <div class="oppia-topic-title">
-      <span *ngIf="!isHackyTopicTitleTranslationDisplayed()">
-        {{ parentTopicTitle }}
-      </span>
-      <span *ngIf="isHackyTopicTitleTranslationDisplayed()">
-        {{ parentTopicTitleTranslationKey | translate }}
-      </span>
-    </div>
-    <div class="oppia-subtopic-title">
-      <span *ngIf="!isHackySubtopicTitleTranslationDisplayed()">
-        {{ subtopicTitle }}
-      </span>
-      <span *ngIf="isHackySubtopicTitleTranslationDisplayed()">
-        {{ subtopicTitleTranslationKey | translate }}
-      </span>
-    </div>
-    <div class="oppia-page-contents-viewer">
-      <div>
-        <oppia-rte-output-display *ngIf="pageContents" [rteString]="pageContents.getHtml()">
-        </oppia-rte-output-display>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-subtopic-viewer-container new-subtopic-viewer-container">
+<div class="oppia-subtopic-viewer-container new-subtopic-viewer-container">
   <div class="breadcrumb-container">
     <button (click)="backToTopic($event)" class="btn e2e-test-go-back-to-topic-button btn-back-to-topic">
       <i class="material-icons md-18 icon-next-study-guide">arrow_back</i>
@@ -73,7 +46,7 @@
   </div>
 </div>
 
-<div *ngIf="subtopicSummaryIsShown && !isShowRestructuredStudyGuidesFeatureEnabled()"
+<div *ngIf="subtopicSummaryIsShown"
      class="oppia-subtopic-viewer-next-subtopic-summary pb-4"
      [ngClass]="{'justify-content-start': prevSubtopic, 'justify-content-end': nextSubtopic}">
   <div class="next-subtopic-section">

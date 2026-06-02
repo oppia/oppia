@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list, feconf
+from core import feconf
 from core.domain import (
     state_domain,
     study_guide_domain,
@@ -465,14 +465,6 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             '%s/staging/%s/%s'
             % (feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one')
         )
-        expected_page_contents_dict = {
-            'recorded_voiceovers': self.recorded_voiceovers_dict,
-            'subtitled_html': {
-                'content_id': 'content',
-                'html': '<p>hello world</p>',
-            },
-            'written_translations': self.written_translations_dict,
-        }
         expected_next_subtopic_dict = {
             'thumbnail_bg_color': None,
             'skill_ids': ['skill_id_2'],
@@ -485,7 +477,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
 
         expected_dict = {
             'topic_id': 'topic_id',
-            'page_contents': expected_page_contents_dict,
+            'sections': [],
             'subtopic_title': 'Subtopic Title',
             'current_subtopic_id': 1,
             'next_subtopic_dict': expected_next_subtopic_dict,
@@ -493,9 +485,6 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
-    )
     def test_get_for_first_subtopic_with_study_guides_in_topic(self) -> None:
         json_response = self.get_json(
             '%s/staging/%s/%s'
@@ -533,9 +522,6 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
-    )
     def test_get_for_last_subtopic_with_study_guides_in_topic(self) -> None:
         json_response = self.get_json(
             '%s/staging/%s/%s'
@@ -578,7 +564,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             '%s/staging/%s/%s'
             % (feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-two')
         )
-        expected_page_contents_dict = {
+        _expected_page_contents_dict = {
             'recorded_voiceovers': self.recorded_voiceovers_dict,
             'subtitled_html': {
                 'content_id': 'content',
@@ -598,7 +584,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
 
         expected_dict = {
             'topic_id': 'topic_id',
-            'page_contents': expected_page_contents_dict,
+            'sections': [],
             'subtopic_title': 'Subtopic Title 2',
             'current_subtopic_id': 2,
             'next_subtopic_dict': None,

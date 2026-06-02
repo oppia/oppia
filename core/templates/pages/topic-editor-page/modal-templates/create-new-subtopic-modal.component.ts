@@ -22,9 +22,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {Topic} from 'domain/topic/topic-object.model';
-import {SubtopicPage} from 'domain/topic/subtopic-page.model';
 import {TopicUpdateService} from 'domain/topic/topic-update.service';
 import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
 import {SubtopicValidationService} from 'pages/topic-editor-page/services/subtopic-validation.service';
@@ -49,10 +47,8 @@ export class CreateNewSubtopicModalComponent
   classroomUrlFragment!: string | null;
   topic!: Topic;
   SUBTOPIC_PAGE_SCHEMA!: object;
-  htmlData!: string;
   sectionHeadingPlaintext!: string;
   sectionContentHtml!: string;
-  schemaEditorIsShown!: boolean;
   editableThumbnailFilename!: string;
   editableThumbnailBgColor!: string;
   editableUrlFragment!: string;
@@ -76,7 +72,6 @@ export class CreateNewSubtopicModalComponent
     private subtopicValidationService: SubtopicValidationService,
     private topicUpdateService: TopicUpdateService,
     private topicEditorStateService: TopicEditorStateService,
-    private platformFeatureService: PlatformFeatureService,
     private htmlLengthService: HtmlLengthService,
     private windowRef: WindowRef
   ) {
@@ -95,10 +90,8 @@ export class CreateNewSubtopicModalComponent
         rows: 100,
       },
     };
-    this.htmlData = '';
     this.sectionHeadingPlaintext = '';
     this.sectionContentHtml = '';
-    this.schemaEditorIsShown = false;
     this.editableThumbnailFilename = '';
     this.editableThumbnailBgColor = '';
     this.editableUrlFragment = '';
@@ -117,10 +110,6 @@ export class CreateNewSubtopicModalComponent
 
   getSchema(): object {
     return this.SUBTOPIC_PAGE_SCHEMA;
-  }
-
-  showSchemaEditor(): void {
-    this.schemaEditorIsShown = true;
   }
 
   addSubtopic(): void {
@@ -165,24 +154,14 @@ export class CreateNewSubtopicModalComponent
   }
 
   isSubtopicValid(): boolean {
-    if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
-      return Boolean(
-        this.editableThumbnailFilename &&
-          this.subtopicTitle &&
-          this.sectionHeadingPlaintext &&
-          this.sectionContentHtml &&
-          this.editableUrlFragment &&
-          this.isUrlFragmentValid()
-      );
-    } else {
-      return Boolean(
-        this.editableThumbnailFilename &&
-          this.subtopicTitle &&
-          this.htmlData &&
-          this.editableUrlFragment &&
-          this.isUrlFragmentValid()
-      );
-    }
+    return Boolean(
+      this.editableThumbnailFilename &&
+        this.subtopicTitle &&
+        this.sectionHeadingPlaintext &&
+        this.sectionContentHtml &&
+        this.editableUrlFragment &&
+        this.isUrlFragmentValid()
+    );
   }
 
   cancel(): void {
@@ -198,11 +177,6 @@ export class CreateNewSubtopicModalComponent
     return this.subtopicValidationService.isUrlFragmentValid(
       this.editableUrlFragment.trim()
     );
-  }
-
-  isShowRestructuredStudyGuidesFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.ShowRestructuredStudyGuides
-      .isEnabled;
   }
 
   checkSubtopicExistence(): void {
@@ -238,43 +212,24 @@ export class CreateNewSubtopicModalComponent
       this.editableUrlFragment
     );
 
-    if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
-      this.studyGuide = StudyGuide.createDefault(
-        this.topic.getId(),
-        this.subtopicId
-      );
+    this.studyGuide = StudyGuide.createDefault(
+      this.topic.getId(),
+      this.subtopicId
+    );
 
-      let sections = cloneDeep(this.studyGuide.getSections());
-      let section = sections[0];
-      section.setHeadingPlaintext(this.sectionHeadingPlaintext);
-      section.setContentHtml(this.sectionContentHtml);
-      this.topicUpdateService.updateSection(
-        this.studyGuide,
-        0,
-        this.sectionHeadingPlaintext,
-        this.sectionContentHtml,
-        this.subtopicId
-      );
-      this.studyGuide.setSections([section]);
-      this.topicEditorStateService.setStudyGuide(this.studyGuide);
-    } else {
-      this.subtopicPage = SubtopicPage.createDefault(
-        this.topic.getId(),
-        this.subtopicId
-      );
-
-      let subtitledHtml = cloneDeep(
-        this.subtopicPage.getPageContents().getSubtitledHtml()
-      );
-      subtitledHtml.html = this.htmlData;
-      this.topicUpdateService.setSubtopicPageContentsHtml(
-        this.subtopicPage,
-        this.subtopicId,
-        subtitledHtml
-      );
-      this.subtopicPage.getPageContents().setHtml(this.htmlData);
-      this.topicEditorStateService.setSubtopicPage(this.subtopicPage);
-    }
+    let sections = cloneDeep(this.studyGuide.getSections());
+    let section = sections[0];
+    section.setHeadingPlaintext(this.sectionHeadingPlaintext);
+    section.setContentHtml(this.sectionContentHtml);
+    this.topicUpdateService.updateSection(
+      this.studyGuide,
+      0,
+      this.sectionHeadingPlaintext,
+      this.sectionContentHtml,
+      this.subtopicId
+    );
+    this.studyGuide.setSections([section]);
+    this.topicEditorStateService.setStudyGuide(this.studyGuide);
     this.topicUpdateService.setSubtopicTitle(
       this.topic,
       this.subtopicId,
@@ -283,9 +238,6 @@ export class CreateNewSubtopicModalComponent
     this.ngbActiveModal.close(this.subtopicId);
   }
 
-  localValueChange(event: string): void {
-    this.htmlData = event;
-  }
   localContentValueChange(event: string): void {
     this.sectionContentHtml = event;
   }

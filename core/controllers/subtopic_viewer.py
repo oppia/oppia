@@ -16,14 +16,12 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list, feconf
+from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
-    feature_flag_services,
     study_guide_services,
     subtopic_page_domain,
-    subtopic_page_services,
     topic_fetchers,
 )
 
@@ -81,6 +79,7 @@ class SubtopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         # bottom of the subtopic page which isn't expected.
         elif len(topic.subtopics) > 1:
             prev_subtopic_dict = topic.subtopics[index - 1].to_dict()
+
         study_guide_sections_dicts_list = []
         subtopic_page_contents_dict: (
             subtopic_page_domain.SubtopicPageContentsDict
@@ -89,24 +88,14 @@ class SubtopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             'recorded_voiceovers': {'voiceovers_mapping': {}},
             'written_translations': {'translations_mapping': {}},
         }
-        if feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
-            self.user_id,
-        ):
-            study_guide_sections = (
-                study_guide_services.get_study_guide_sections_by_id(
-                    topic.id, subtopic_id
-                )
+        study_guide_sections = (
+            study_guide_services.get_study_guide_sections_by_id(
+                topic.id, subtopic_id, strict=False
             )
-            for section in study_guide_sections:
-                study_guide_sections_dicts_list.append(section.to_dict())
-        else:
-            subtopic_page_contents = (
-                subtopic_page_services.get_subtopic_page_contents_by_id(
-                    topic.id, subtopic_id
-                )
-            )
-            subtopic_page_contents_dict = subtopic_page_contents.to_dict()
+            or []
+        )
+        for section in study_guide_sections:
+            study_guide_sections_dicts_list.append(section.to_dict())
 
         self.values.update(
             {
