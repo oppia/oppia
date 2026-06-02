@@ -9,10 +9,7 @@
   align-items: flex-start;
   display: flex;
   gap: 0;
-
-  /* Lift the whole bubble slightly */
   margin: -4px 0 -18px 8px;
-
   max-width: 100%;
   position: relative;
   z-index: 1;
@@ -20,10 +17,11 @@
 
 .story-callout-avatar {
   flex: 0 0 auto;
-  height: 130px;
+  width: clamp(64px, 12vw, 130px);
+  height: clamp(64px, 12vw, 130px);
   object-fit: contain;
   object-position: bottom;
-  width: 130px;
+  align-self: flex-end;
 }
 
 .story-description-bubble {
@@ -139,22 +137,30 @@
   padding: 0;
 }
 
+/* Tablet */
 @media (max-width: 768px) {
   .story-callout-row {
-    gap: 0;
-    margin: 0 0 -14px 6px;
-    max-width: 100%;
+    margin: -12px 0 -12px 4px;
   }
 
   .story-callout-avatar {
-    height: 96px;
-    width: 96px;
+    width: 88px;
+    height: 88px;
   }
 
   .story-description-bubble {
-    font-size: 15px;
-    max-width: 420px;
+    margin-left: 12px;
+    margin-top: 0;
+    max-width: calc(100% - 105px);
     padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .story-description-bubble::after {
+    width: 18px;
+    height: 18px;
+    left: -7px;
   }
 
   .story-card-header {
@@ -175,32 +181,37 @@
     min-height: 40px;
   }
 
-  .study-skills-cta i {
-    font-size: 14px;
-  }
-
   .story-card-body {
     min-height: 260px;
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 480px) {
   .story-callout-row {
-    align-items: center;
-    gap: 0;
-    margin: 0 0 -10px 4px;
+    margin: -12px 0 -12px 4px;
   }
 
   .story-callout-avatar {
-    height: 72px;
-    width: 72px;
-  }
+  width: 72px;
+  height: 72px;
+  position: relative;
+  top: -2px;
+}
 
   .story-description-bubble {
-    border-radius: 14px;
-    font-size: 13px;
-    max-width: calc(100% - 80px);
-    padding: 10px 14px;
+    margin-left: 8px;
+    margin-top: 0;
+    max-width: calc(100% - 88px);
+    padding: 8px 10px;
+    font-size: 12px;
+    line-height: 1.35;
+    border-radius: 10px;
+  }
+
+  .story-description-bubble::after {
+    width: 14px;
+    height: 14px;
+    left: -5px;
   }
 
   .story-card-header {
