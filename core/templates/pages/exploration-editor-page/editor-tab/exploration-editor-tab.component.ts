@@ -183,6 +183,13 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
             joyrideTitle?.focus();
           }
 
+          if (value.number === 3) {
+            const element = document.getElementById('tutorialStateInteraction');
+            if (element) {
+              this.smoothScrollTo(element.offsetTop - 500, 1000);
+            }
+          }
+
           if (value.number === 4) {
             let idToScrollTo = true
               ? this._ID_TUTORIAL_PREVIEW_TAB

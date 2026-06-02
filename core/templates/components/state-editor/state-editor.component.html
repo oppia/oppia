@@ -52,6 +52,15 @@
 </mat-card>
 
 <div joyrideStep="editorTabTourSlideStateInteractionEditorTab" [stepContent]="StateInteractionEditorTab">
+    <div *ngIf="!interactionIsShown" class="tour-interaction-placeholder">
+        <h3 class="oppia-editor-card-holder-heading"> Interaction </h3>
+        <div class="oppia-editable-section-mask e2e-test-state-edit-content">
+            <p>
+                You can only add interaction once you added a Content in the box above.
+            </p>
+        </div>
+    </div>
+
   <oppia-state-interaction-editor (onSaveStateContent)="sendOnSaveStateContent($event)"
                                   (onSaveInteractionData)="sendOnSaveInteractionData($event)"
                                   (onSaveNextContentIdIndex)="sendOnSaveNextContentIdIndex($event)"
@@ -61,6 +70,16 @@
   </oppia-state-interaction-editor>
 </div>
 <div joyrideStep="editorTabTourStateResponsesTab" [stepContent]="StateResponsesTab">
+
+    <div *ngIf="!interactionIdIsSet" class="tour-interaction-placeholder">
+        <h3 class="oppia-editor-card-holder-heading"> Responses </h3>
+        <div class="oppia-editable-section-mask e2e-test-state-edit-content">
+            <p>
+                You can only add response once you added a Content and Interaction from above.
+            </p>
+        </div>
+   </div>
+
   <div [hidden]="!interactionIdIsSet || currentStateIsTerminal">
     <oppia-state-responses [addState]="addState"
                            (navigateToState)="sendNavigateToState($event)"
@@ -93,9 +112,31 @@
 
 <style>
   .state-content-header-container {
-    display: none;
-    padding: 0 30px;
+    display: block;
   }
+
+  .tour-interaction-placeholder {
+      padding: 16px 16px 36px 16px;
+      border-radius: 4px;
+      text-align: center;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      background:#fff;
+      box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+}
+
+  .oppia-editor-card-holder-heading{
+      text-align: left;
+  }
+
+    .state-content-header{
+        padding:0 !important;
+    }
+
+    .state-content-header h3{
+       margin: 18px 0 18px 0 !important;
+        width: 100%;
+    }
 
   .state-content-header {
     align-content: center;
@@ -103,6 +144,11 @@
     display: flex;
     justify-content: space-between;
     padding: 30px 0 15px;
+  }
+
+  .oppia-editable-section-mask p{
+      color: #707070;
+      font-style: italic;
   }
 
   .state-content-header i {

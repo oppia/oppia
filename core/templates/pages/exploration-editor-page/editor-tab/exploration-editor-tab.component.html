@@ -1,6 +1,8 @@
 <ng-template #EditorTabTourContainer>
-  <h3 class="e2e-test-joyride-title" tabindex="0">Creating in Oppia</h3>
-  <p tabindex="0">Explorations are learning experiences that you create using Oppia. Think of explorations as a conversation between a student and a tutor.</p>
+
+      <h3 class="e2e-test-joyride-title" tabindex="0">Creating in Oppia</h3>
+
+    <p tabindex="0">Explorations are learning experiences that you create using Oppia. Think of explorations as a conversation between a student and a tutor.</p>
 </ng-template>
 
 <ng-template #EditorTabTourTutorialComplete>
@@ -25,8 +27,10 @@
   </div>
 </ng-template>
 
-<div class="exp-editor-content-container"  joyrideStep="editorTabTourContainer" [stepContent]="EditorTabTourContainer">
+<div class="exp-editor-content-container">
   <div class="exp-editor-main-editor">
+      <span joyrideStep="editorTabTourContainer" [stepContent]="EditorTabTourContainer" stepPosition="center" style="display:none;">
+      </span>
     <div class="oppia-editor-cards-container e2e-test-editor-cards-container">
       <div class="oppia-editor-header">
         <oppia-state-name-editor></oppia-state-name-editor>
@@ -59,14 +63,18 @@
                           (onSaveSolicitAnswerDetails)="saveSolicitAnswerDetails($event)"
                           (recomputeGraph)="recomputeGraph()"
                           (navigateToState)="navigateToState($event)"
-                          (refreshWarnings)="refreshWarnings()">
+                          (refreshWarnings)="refreshWarnings()"
+                          class="state-editor-container">
       </oppia-state-editor>
     </div>
   </div>
   <div class="exp-editor-overview">
     <div class="exp-editor-overview-content">
       <oppia-exploration-graph></oppia-exploration-graph>
-      <div class="exp-editor-content-container"  joyrideStep="editorTabTourTutorialComplete" [stepContent]="EditorTabTourTutorialComplete"></div>
+      <div class="exp-editor-content-container"  >
+          <span joyrideStep="editorTabTourTutorialComplete" stepPosition="center" [stepContent]="EditorTabTourTutorialComplete" style="display:none;">
+          </span>
+      </div>
       <oppia-unresolved-answers-overview></oppia-unresolved-answers-overview>
     </div>
     <div class="exp-state-version-history">
@@ -78,11 +86,47 @@
 </div>
 
 <style>
-  .exp-editor-content-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
+
+    .state-editor-container{
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .tour-anchor-top {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 1px;
+      height: 1px;
+    }
+
+    .exp-editor-content-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .tour-step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tour-close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      color: #666;
+      padding: 0 4px;
+      line-height: 1;
+    }
+
+    .tour-close-btn:hover {
+        color: #000;
+    }
+
   .exp-editor-main-editor {
     margin-right: 3%;
     width: 40%;

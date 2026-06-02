@@ -65,7 +65,7 @@
         </a>
       </li>
 
-      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'preview', 'oppia-disabled-tab': !connectedToInternet}" id="tutorialPreviewTab" class="nav-item icon nav-list-item e2e-test-preview-tab" joyrideStep="editorTabTourPreviewTab" [stepContent]="EditorTabTourPreviewTab"
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'preview', 'oppia-disabled-tab': !connectedToInternet}" id="tutorialPreviewTab" class="nav-item icon nav-list-item e2e-test-preview-tab"
           (click)="!connectedToInternet || selectPreviewTab()" [ngbTooltip]="'Preview does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <a class="nav-link  navbar-tab"
            [ngbTooltip]="'Preview'"
@@ -74,7 +74,7 @@
            aria-label="Exploration Preview Button"
            role="button"
            (keydown.enter)="!connectedToInternet || selectPreviewTab()">
-          <i class="fas fa-play navbar-tab-icon nav-bar-preview-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'preview'}"></i>
+          <i class="fas fa-play navbar-tab-icon nav-bar-preview-icon" [ngClass]="{'navbar-tab-active-icon': getActiveTabName() === 'preview'}"  joyrideStep="editorTabTourPreviewTab" [stepContent]="EditorTabTourPreviewTab" stepPosition="bottom"></i>
         </a>
       </li>
 

@@ -1573,9 +1573,9 @@ span.sort-explorations-select .sort-order {
 
 .oppia-editor-card-avatar {
   height: 36px;
-  left: -18px;
+  left: 0;
   position: absolute;
-  top: 28px;
+  top: 0;
   width: 36px;
 }
 
@@ -1627,7 +1627,7 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-editor-card-section {
-  padding: 20px 50px 20px 35px;
+  padding: 0 50px 0 48px !important;
   word-break: break-word;
   word-wrap: break-word;
 }
@@ -2374,6 +2374,16 @@ oppia-parameter {
   -webkit-transition: -webkit-transform .3s ease-out;
   -o-transition: -o-transform .3s ease-out;
   transition: transform .3s ease-out;
+}
+
+/* Tour modal size override */
+.joyride-step__container {
+  max-width: 450px !important;
+}
+
+.state-editor-container .mat-card{
+  width:100%;
+  padding-bottom: 36px;
 }
 
 @media(min-width: 768px) {
