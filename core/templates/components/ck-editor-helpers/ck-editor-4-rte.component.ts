@@ -52,6 +52,7 @@ import {
 } from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
+import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {PageContextService} from 'services/page-context.service';
 import {CkEditorCopyContentService} from './ck-editor-copy-content.service';
 import {InternetConnectivityService} from 'services/internet-connectivity.service';
@@ -113,6 +114,7 @@ export class CkEditor4RteComponent
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private pageContextService: PageContextService,
     private elementRef: ElementRef,
+    private externalRteSaveService: ExternalRteSaveService,
     private internetConnectivityService: InternetConnectivityService,
     private renderer: Renderer2
   ) {
@@ -135,6 +137,18 @@ export class CkEditor4RteComponent
           }
         }
       )
+    );
+
+    // The 'change' event above can fire asynchronously, so if the user
+    // types quickly and clicks save immediately, the model may still hold
+    // stale data. This subscription guarantees a synchronous flush right
+    // before the save logic runs, eliminating the race condition.
+    this.subscriptions.add(
+      this.externalRteSaveService.onExternalRteSave.subscribe(() => {
+        if (this.ck) {
+          this.syncEditorData(this.ck);
+        }
+      })
     );
   }
 
@@ -817,67 +831,10 @@ export class CkEditor4RteComponent
       20
     );
 
+    // The 'change' event fires asynchronously as the user edits content,
+    // keeping the Angular model in sync during normal editing.
     ck.on('change', () => {
-      if (ck.getData() === this.value) {
-        return;
-      }
-
-      // Clear paste errors when user types or makes changes.
-      this.clearPasteError();
-
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(ck.getData(), 'text/html');
-      const wrapperDiv = doc.body;
-
-      const textElt = wrapperDiv.childNodes;
-
-      for (let i = textElt.length; i > 0; i--) {
-        const parent = textElt[i - 1];
-        for (let j = parent.childNodes.length; j > 0; j--) {
-          const node = parent.childNodes[j - 1];
-          if (
-            node.nodeName === 'BR' ||
-            (node.nodeName === '#text' &&
-              node.nodeValue &&
-              node.nodeValue.trim() === '')
-          ) {
-            node.remove();
-          } else {
-            break;
-          }
-        }
-        if (parent.childNodes.length === 0) {
-          if (
-            parent.nodeName === 'BR' ||
-            (parent.nodeName === '#text' &&
-              parent.nodeValue &&
-              parent.nodeValue.trim() === '') ||
-            parent.nodeName === 'P'
-          ) {
-            parent.remove();
-            continue;
-          }
-        } else {
-          break;
-        }
-      }
-      const serializer = new XMLSerializer();
-      let html = Array.from(wrapperDiv.childNodes)
-        .map(node => serializer.serializeToString(node))
-        .join('');
-      this.value = html;
-      // Refer to the note at the top of the file for the reason behind replace.
-      html = html.replace(
-        /<oppia-noninteractive-ckeditor-/g,
-        '<oppia-noninteractive-'
-      );
-      // Refer to the note at the top of the file for the reason behind replace.
-      html = html.replace(
-        /<\/oppia-noninteractive-ckeditor-/g,
-        '</oppia-noninteractive-'
-      );
-      this.valueChange.emit(html);
-      this.currentValue = html;
+      this.syncEditorData(ck);
     });
     ck.setData(this.value);
     this.ck = ck;
@@ -920,5 +877,68 @@ export class CkEditor4RteComponent
       this.ck.destroy();
     }
     this.subscriptions.unsubscribe();
+  }
+
+  private syncEditorData(ck: CKEDITOR.editor): void {
+    if (ck.getData() === this.value) {
+      return;
+    }
+
+    // Clear paste errors when user types or makes changes.
+    this.clearPasteError();
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(ck.getData(), 'text/html');
+    const wrapperDiv = doc.body;
+
+    const textElt = wrapperDiv.childNodes;
+
+    for (let i = textElt.length; i > 0; i--) {
+      const parent = textElt[i - 1];
+      for (let j = parent.childNodes.length; j > 0; j--) {
+        const node = parent.childNodes[j - 1];
+        if (
+          node.nodeName === 'BR' ||
+          (node.nodeName === '#text' &&
+            node.nodeValue &&
+            node.nodeValue.trim() === '')
+        ) {
+          node.remove();
+        } else {
+          break;
+        }
+      }
+      if (parent.childNodes.length === 0) {
+        if (
+          parent.nodeName === 'BR' ||
+          (parent.nodeName === '#text' &&
+            parent.nodeValue &&
+            parent.nodeValue.trim() === '') ||
+          parent.nodeName === 'P'
+        ) {
+          parent.remove();
+          continue;
+        }
+      } else {
+        break;
+      }
+    }
+    const serializer = new XMLSerializer();
+    let html = Array.from(wrapperDiv.childNodes)
+      .map(node => serializer.serializeToString(node))
+      .join('');
+    this.value = html;
+    // Refer to the note at the top of the file for the reason behind replace.
+    html = html.replace(
+      /<oppia-noninteractive-ckeditor-/g,
+      '<oppia-noninteractive-'
+    );
+    // Refer to the note at the top of the file for the reason behind replace.
+    html = html.replace(
+      /<\/oppia-noninteractive-ckeditor-/g,
+      '</oppia-noninteractive-'
+    );
+    this.valueChange.emit(html);
+    this.currentValue = html;
   }
 }
