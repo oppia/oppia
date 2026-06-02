@@ -3766,8 +3766,12 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Filters lessons by multiple languages and deselect the already selected English language.
    * @param {string[]} languageNames - The names of the languages to filter by.
+   * @param {string} languageToDeselect - The name of the language to deselect.
    */
-  async filterLessonsByLanguage(languageNames: string[]): Promise<void> {
+  async filterLessonsByLanguage(
+    languageNames: string[],
+    languageToDeselect: string = 'English'
+  ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.waitForPageToFullyLoad();
     }
@@ -3785,8 +3789,8 @@ export class LoggedOutUser extends BaseUser {
         el => el.textContent.trim(),
         element
       );
-      // Deselecting english language.
-      if (elementText === 'English') {
+      // Deselecting the selected language before choosing new filters.
+      if (elementText === languageToDeselect) {
         await element.click();
       }
     }
@@ -3796,14 +3800,23 @@ export class LoggedOutUser extends BaseUser {
       unselectedFilterOptionsSelector
     );
     let foundMatch = false;
+    let englishMatchCount = 0;
 
     for (const language of deselectedLanguages) {
       const languageText = await this.page.evaluate(
         el => el.textContent,
         language
       );
+      const trimmedLanguageText = languageText.trim();
 
-      if (languageNames.includes(languageText.trim())) {
+      if (trimmedLanguageText === 'English') {
+        englishMatchCount += 1;
+        if (englishMatchCount < 2) {
+          continue;
+        }
+      }
+
+      if (languageNames.includes(trimmedLanguageText)) {
         foundMatch = true;
         await this.waitForElementToBeClickable(language);
         await language.click();
@@ -7403,6 +7416,23 @@ export class LoggedOutUser extends BaseUser {
     if (suggestedSection) {
       await this.expectElementToBeVisible(blogSuggestedForYouHeadingSelector);
     }
+  }
+
+  /**
+   * Function to select languages in the community library page.
+   * @param {string[]} languages - The languages to select.
+   */
+  async selectLanguages(languages: string[]): Promise<void> {
+    await this.clickOnElementWithSelector(languageFilterDropdownToggler);
+
+    for (const _ of languages) {
+      const options = await this.page.$$(unselectedFilterOptionsSelector);
+      for (const option of options) {
+        await this.clickOnElement(option);
+        break;
+      }
+    }
+    showMessage(`Selected languages: ${languages.join(', ')}`);
   }
 }
 

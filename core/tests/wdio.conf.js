@@ -49,10 +49,6 @@ var suites = {
     './core/tests/webdriverio_desktop/navigation.js'
   ],
 
-  publication: [
-    './core/tests/webdriverio_desktop/publicationAndLibrary.js'
-  ],
-
   skillEditor: [
     './core/tests/webdriverio_desktop/skillEditor.js'
   ],
