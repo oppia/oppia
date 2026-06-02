@@ -319,7 +319,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
                                     target_type='exploration',
                                     target_id='exp1',
                                     session_info={
-                                        'console_errors_json': 'bad',
+                                        'console_logs_json': 'bad',
                                         'failed_requests_json': {},
                                         'navigation_history_json': 'bad',
                                         'environment_json': [],
@@ -328,7 +328,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
                                 )
 
         self.assertEqual(
-            create_session_log_mock.call_args.kwargs['console_errors_json'], []
+            create_session_log_mock.call_args.kwargs['console_logs_json'], []
         )
         self.assertEqual(
             create_session_log_mock.call_args.kwargs['failed_requests_json'], []
@@ -385,7 +385,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
                                 target_type='exploration',
                                 target_id='exp1',
                                 session_info={
-                                    'console_errors_json': console_errors,
+                                    'console_logs_json': console_errors,
                                     'failed_requests_json': failed_requests,
                                     'navigation_history_json': (
                                         navigation_history
@@ -397,7 +397,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
 
         self.assertEqual(thread_id, 't-2')
         self.assertEqual(
-            create_session_log_mock.call_args.kwargs['console_errors_json'],
+            create_session_log_mock.call_args.kwargs['console_logs_json'],
             console_errors,
         )
         self.assertEqual(
@@ -585,7 +585,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             )
         ]
         thread = getattr(general_feedback_services, '_thread_model_to_domain')(
-            model, messages, {'console_errors_json': {}}
+            model, messages, {'console_logs_json': {}}
         )
         self.assertEqual(thread.id, 't1')
         self.assertEqual(thread.description, 'desc')
@@ -678,7 +678,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
         session_model = mock.Mock()
         session_model.id = 't1'
         session_model.to_dict.return_value = {
-            'console_errors_json': [{'message': 'error'}]
+            'console_logs_json': [{'message': 'error'}]
         }
         with self.swap(
             general_feedback_models.FeedbackSessionLogModel,
@@ -690,7 +690,7 @@ class GeneralFeedbackServicesTests(test_utils.GenericTestBase):
             )(['missing', 't1'])
         self.assertEqual(
             session_info,
-            {'t1': {'console_errors_json': [{'message': 'error'}]}},
+            {'t1': {'console_logs_json': [{'message': 'error'}]}},
         )
 
     def test_get_threads_by_ids(self) -> None:
