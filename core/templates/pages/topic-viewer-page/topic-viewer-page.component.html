@@ -1,6 +1,11 @@
-<div *ngIf="isRedesignedTopicViewerPageFeatureEnabled(); else legacyTopicViewerContainer"
-     class="oppia-redesigned-topic-viewer-container e2e-test-redesigned-topic-viewer-container">
-  <!-- Placeholder for redesigned topic viewer page container. -->
+<div *ngIf="isRedesignedTopicViewerPageFeatureEnabled(); else legacyTopicViewerContainer" class="oppia-redesigned-topic-viewer-container e2e-test-redesigned-topic-viewer-container">
+
+  <topic-header
+    [topicName]="topicName"
+    [topicDescription]="topicDescription"
+    [topicId]="topicId"
+    [classroomName]="classroomName">
+  </topic-header>
 </div>
 
 <ng-template #legacyTopicViewerContainer>
