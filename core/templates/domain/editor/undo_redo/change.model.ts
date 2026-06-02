@@ -100,25 +100,41 @@ export type CollectionChange =
   | CollectionSwapNodeChange
   | CollectionDeleteNodeChange;
 
-interface QuestionLanguageCodeChange {
+export interface QuestionLanguageCodeChange {
   cmd: 'update_question_property';
   property_name: 'language_code';
   new_value: string;
   old_value: string;
 }
 
-interface QuestionStateDataChange {
+export interface QuestionStateDataChange {
   cmd: 'update_question_property';
   property_name: 'question_state_data';
   new_value: StateBackendDict;
   old_value: StateBackendDict;
 }
 
+export interface QuestionInapplicableSkillMisconceptionIdsChange {
+  cmd: 'update_question_property';
+  property_name: 'inapplicable_skill_misconception_ids';
+  new_value: string[];
+  old_value: string[];
+}
+
+export interface QuestionNextContentIdIndexChange {
+  cmd: 'update_question_property';
+  property_name: 'next_content_id_index';
+  new_value: number;
+  old_value: number;
+}
+
 type QuestionPropertyChange =
   | QuestionLanguageCodeChange
-  | QuestionStateDataChange;
+  | QuestionStateDataChange
+  | QuestionInapplicableSkillMisconceptionIdsChange
+  | QuestionNextContentIdIndexChange;
 
-type QuestionChange = QuestionPropertyChange;
+export type QuestionChange = QuestionPropertyChange;
 
 interface SkillDescriptionChange {
   cmd: 'update_skill_property';

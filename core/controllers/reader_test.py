@@ -1299,6 +1299,20 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             expected_status_int=400,
         )
 
+    def test_logged_in_with_no_col_and_sysexps_disabled_has_only_authexps(
+        self,
+    ) -> None:
+        """Check that when system recommendations are explicitly disabled and
+        there's no collection, only author recommended explorations are returned.
+        """
+        self.login(self.NEW_USER_EMAIL)
+        recommendation_ids = self._get_recommendation_ids(
+            self.EXP_ID_0,
+            include_system_recommendations=False,
+            author_recommended_ids_str='["7","9"]',
+        )
+        self.assertEqual(recommendation_ids, [self.EXP_ID_7, self.EXP_ID_9])
+
 
 class FlagExplorationHandlerTests(test_utils.EmailTestBase):
     """Backend integration tests for flagging an exploration."""
@@ -1608,7 +1622,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         payload = {
             'client_time_spent_in_secs': 0,
-            'params': {},
+            'params': {'answer': 1.1},
             'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
             'state_name': 'final',
             'version': 1,
@@ -1745,7 +1759,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         payload = {
             'client_time_spent_in_secs': 0,
-            'params': {},
+            'params': {'answer': 1.1},
             'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
             'state_name': 'middle',
             'version': 1,
@@ -2010,6 +2024,79 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             ),
             [],
         )
+
+    def test_exp_complete_event_handler_for_logged_out_user(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'params': {},
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': 'final',
+            'version': 1,
+        }
+        self.post_json(
+            '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_0,
+            payload,
+            csrf_token=csrf_token,
+        )
+
+    def test_exp_maybe_leave_handler_for_logged_out_user(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'params': {},
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': 'middle',
+            'version': 1,
+        }
+        self.post_json(
+            '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
+            payload,
+            csrf_token=csrf_token,
+        )
+
+    def test_exp_maybe_leave_handler_for_logged_out_user_with_story(
+        self,
+    ) -> None:
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'client_time_spent_in_secs': 0,
+            'params': {},
+            'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+            'state_name': 'middle',
+            'version': 1,
+            'collection_id': self.COL_ID_1,
+        }
+        self.post_json(
+            '/explorehandler/exploration_maybe_leave_event/%s'
+            % self.EXP_ID_2_0,
+            payload,
+            csrf_token=csrf_token,
+        )
+
+    def test_exp_maybe_leave_handler_with_story_having_no_topic(
+        self,
+    ) -> None:
+        self.login(self.USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        setattr(story, 'corresponding_topic_id', None)
+
+        with self.swap(story_fetchers, 'get_story_by_id', lambda _: story):
+            payload = {
+                'client_time_spent_in_secs': 0,
+                'params': {},
+                'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+                'state_name': 'middle',
+                'version': 1,
+            }
+            self.post_json(
+                '/explorehandler/exploration_maybe_leave_event/%s'
+                % self.EXP_ID_2_0,
+                payload,
+                csrf_token=csrf_token,
+            )
 
 
 class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
@@ -2601,6 +2688,42 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
 
+    def test_submit_answer_for_exp_with_decimal_answer(
+        self,
+    ) -> None:
+        """Test that a decimal answer does not cause a schema validation error."""
+
+        # Load demo exploration.
+        exp_id = '1'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        version = 1
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
+        )
+        state_name_1 = exploration_dict['exploration']['init_state_name']
+
+        self.post_json(
+            '/explorehandler/answer_submitted_event/%s' % exp_id,
+            {
+                'old_state_name': state_name_1,
+                'answer': 1.1,
+                'version': version,
+                'client_time_spent_in_secs': 0,
+                'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
+                'answer_group_index': 0,
+                'rule_spec_index': 0,
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION
+                ),
+            },
+        )
+        self.logout()
+
     def test_submit_answer_for_exploration_raises_error_with_no_version(
         self,
     ) -> None:
@@ -2637,47 +2760,6 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
             'At \'http://localhost/explorehandler/answer_submitted_event/6\' '
             'these errors are happening:\n'
             'Missing key in handler args: version.',
-        )
-
-    def test_submit_answer_for_exp_raises_error_with_no_answer_matching_type(
-        self,
-    ) -> None:
-        # Load demo exploration.
-        exp_id = '6'
-        exp_services.delete_demo(exp_id)
-        exp_services.load_demo(exp_id)
-        version = 1
-
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.login(self.VIEWER_EMAIL)
-
-        exploration_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
-        )
-        state_name_1 = exploration_dict['exploration']['init_state_name']
-
-        response = self.post_json(
-            '/explorehandler/answer_submitted_event/%s' % exp_id,
-            {
-                'old_state_name': state_name_1,
-                'answer': 1.1,
-                'version': version,
-                'client_time_spent_in_secs': 0,
-                'session_id': '1PZTCw9JY8y-8lqBeuoJS2ILZMxa5m8N',
-                'answer_group_index': 0,
-                'rule_spec_index': 0,
-                'classification_categorization': (
-                    exp_domain.EXPLICIT_CLASSIFICATION
-                ),
-            },
-            expected_status_int=400,
-        )
-        self.assertEqual(
-            response['error'],
-            'At \'http://localhost/explorehandler/answer_submitted_event/6\' '
-            'these errors are happening:\n'
-            'Schema validation for \'answer\' failed: '
-            'Type of 1.1 is not present in options',
         )
 
     def test_submit_answer_for_exp_raises_error_with_invalid_algebraic_answer(
@@ -3489,6 +3571,41 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                 expected_status_int=500,
             )
 
+    def test_submit_learner_answer_details_for_question_with_decimal_answer(
+        self,
+    ) -> None:
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
+        self.save_new_question(
+            question_id,
+            editor_id,
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index,
+        )
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
+        ):
+            self.put_json(
+                '%s/%s/%s'
+                % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    feconf.ENTITY_TYPE_QUESTION,
+                    question_id,
+                ),
+                {
+                    'interaction_id': 'TextInput',
+                    'answer': 1.1,
+                    'answer_details': 'This is an answer details.',
+                },
+                csrf_token=csrf_token,
+            )
+        self.logout()
+
 
 class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
     """Tests for checkpoint reached event handler."""
@@ -3614,6 +3731,21 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_checkpoint_reached_for_logged_out_user(self) -> None:
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/checkpoint_reached/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!',
+            },
+            csrf_token=csrf_token,
+        )
+
 
 class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
     """Tests for exploration restart event handler."""
@@ -3701,6 +3833,58 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
         )
 
         self.logout()
+
+    def test_restart_handler_for_logged_out_user(self) -> None:
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/restart/%s' % exp_id,
+            {'most_recently_reached_checkpoint_state_name': 'Welcome!'},
+            csrf_token=csrf_token,
+        )
+
+    def test_restart_handler_clears_progress_when_state_name_is_none(
+        self,
+    ) -> None:
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        self.login(self.VIEWER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        self.put_json(
+            '/explorehandler/checkpoint_reached/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!',
+            },
+            csrf_token=csrf_token,
+        )
+
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/restart/%s' % exp_id,
+            {'most_recently_reached_checkpoint_state_name': None},
+            csrf_token=csrf_token,
+        )
+        self.logout()
+
+    def test_restart_handler_for_logged_out_user_with_none_state(self) -> None:
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/restart/%s' % exp_id,
+            {'most_recently_reached_checkpoint_state_name': None},
+            csrf_token=csrf_token,
+        )
 
 
 class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
@@ -4053,6 +4237,18 @@ class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
         )
 
         self.logout()
+
+    def test_sync_handler_for_logged_out_user(self) -> None:
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/sync_logged_out_and_logged_in_progress/%s' % exp_id,
+            {'unique_progress_url_id': 'pidABC'},
+            csrf_token=csrf_token,
+        )
 
 
 class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):

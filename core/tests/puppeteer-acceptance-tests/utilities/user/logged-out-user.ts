@@ -1754,9 +1754,12 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(footerForumlink, {
       visible: true,
     });
-    await this.clickAndWaitForNavigation(footerForumlink, true);
-
-    expect(this.page.url()).toBe(googleGroupsOppiaUrl);
+    await this.clickLinkButtonToNewTab(
+      footerForumlink,
+      'Forum',
+      googleGroupsOppiaUrl,
+      'Forum'
+    );
   }
 
   /**
@@ -2439,8 +2442,10 @@ export class LoggedOutUser extends BaseUser {
         window.scrollTo(0, 0);
       });
     }
-    await this.page.waitForSelector(languageDropdown);
-    const languageDropdownElement = await this.page.$(languageDropdown);
+    const languageDropdownElement = await this.page.waitForSelector(
+      languageDropdown,
+      {visible: true}
+    );
     if (!languageDropdownElement) {
       throw new Error('Language dropdown element not found');
     }
@@ -2448,7 +2453,7 @@ export class LoggedOutUser extends BaseUser {
       languageDropdown,
       el => el.textContent
     );
-    await languageDropdownElement.click();
+    await this.clickOnElement(languageDropdownElement);
     await this.clickOnElementWithSelector(languageOption);
     // Here we need to reload the page again to confirm the language change.
     await this.page.reload();
@@ -2479,12 +2484,14 @@ export class LoggedOutUser extends BaseUser {
         window.scrollTo(0, 0);
       });
     }
-    await this.page.waitForSelector(languageDropdown);
-    const languageDropdownElement = await this.page.$(languageDropdown);
+    const languageDropdownElement = await this.page.waitForSelector(
+      languageDropdown,
+      {visible: true}
+    );
     if (!languageDropdownElement) {
       throw new Error('Language dropdown element not found');
     }
-    await languageDropdownElement.click();
+    await this.clickOnElement(languageDropdownElement);
     await this.clickOnElementWithSelector(languageOption);
     await this.waitForNetworkIdle();
     await this.waitForPageToFullyLoad();
