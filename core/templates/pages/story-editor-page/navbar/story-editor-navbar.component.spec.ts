@@ -479,9 +479,14 @@ describe('Story editor navbar component', () => {
     ).and.returnValue(mockStoryInitializedEventEmitter);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
       return {
-        result: Promise.resolve('success'),
+        result: Promise.resolve({mode: 'permanent'}),
       } as NgbModalRef;
     });
+
+    spyOn(
+      storyEditorStateService,
+      'changeStoryPublicationStatus'
+    ).and.callThrough();
 
     component.ngOnInit();
     mockStoryInitializedEventEmitter.emit();
