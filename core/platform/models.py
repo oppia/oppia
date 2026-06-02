@@ -45,6 +45,7 @@ MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
     Names.CONFIG,
     Names.EXPLORATION,
     Names.FEEDBACK,
+    Names.GENERAL_FEEDBACK,
     Names.QUESTION,
     Names.SKILL,
     Names.STORY,
@@ -172,6 +173,12 @@ class _Gae(Platform):
                 from core.storage.feedback import gae_models as feedback_models
 
                 returned_models.append(feedback_models)
+            elif name == Names.GENERAL_FEEDBACK:
+                from core.storage.general_feedback import (
+                    gae_models as general_feedback_models,
+                )
+
+                returned_models.append(general_feedback_models)
             elif name == Names.IMPROVEMENTS:
                 from core.storage.improvements import (
                     gae_models as improvements_models,

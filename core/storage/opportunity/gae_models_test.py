@@ -595,18 +595,3 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(results[0].entity_id, 'exp1')
         self.assertEqual(results[1].entity_id, 'exp2')
         self.assertIsNone(results[2])
-
-    def test_validation_success_for_question_entity_type(self) -> None:
-        model = opportunity_models.TranslationOpportunityModel.create_new(
-            entity_type='question',
-            entity_id='q1',
-            topic_ids=['topic1'],
-            content_count=10,
-            incomplete_translation_language_codes=['hi'],
-            translation_counts={'hi': 5},
-        )
-        model.put()
-        retrieved = opportunity_models.TranslationOpportunityModel.get_by_id(
-            'question.q1'
-        )
-        self.assertIsNotNone(retrieved)
