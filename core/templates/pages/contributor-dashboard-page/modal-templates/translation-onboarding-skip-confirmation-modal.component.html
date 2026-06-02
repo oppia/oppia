@@ -1,0 +1,39 @@
+<div class="oppia-translation-skip-confirmation-modal e2e-test-translation-skip-confirmation-modal">
+  <button type="button"
+          class="oppia-translation-skip-confirmation-close-button e2e-test-cancel-translation-skip"
+          aria-label="Close"
+          (click)="cancel()">
+    &#215;
+  </button>
+
+  <h2 class="oppia-translation-skip-confirmation-title">Skip tour?</h2>
+  <p class="oppia-translation-skip-confirmation-description">
+    Replay your tour at any time from <strong>"Tutorials"</strong>
+    under <strong>"Getting Started"</strong> in
+    <strong>"My Contributions".</strong>
+  </p>
+
+  <div class="oppia-translation-skip-confirmation-checkbox">
+    <input #dontShowAgainCheckbox
+           id="oppia-translation-dont-show-tour-again"
+           type="checkbox"
+           class="e2e-test-dont-show-translation-tour-again">
+    <label for="oppia-translation-dont-show-tour-again">
+      Don't show this again.
+    </label>
+  </div>
+
+  <div class="oppia-translation-skip-confirmation-actions">
+    <button type="button"
+            class="btn oppia-translation-skip-confirmation-skip-button e2e-test-confirm-skip-translation-tour"
+            (click)="skipTour(dontShowAgainCheckbox.checked)">
+      Skip
+    </button>
+    <button type="button"
+            class="btn oppia-translation-skip-confirmation-cancel-button e2e-test-keep-translation-tour"
+            (click)="cancel()">
+      Cancel
+    </button>
+  </div>
+</div>
+

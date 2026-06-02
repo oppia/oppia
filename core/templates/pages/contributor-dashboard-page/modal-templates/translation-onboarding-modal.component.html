@@ -1,0 +1,42 @@
+<div class="oppia-translation-onboarding-modal e2e-test-translation-onboarding-modal">
+  <div class="oppia-translation-onboarding-header">
+    <div class="oppia-translation-onboarding-pattern" aria-hidden="true"></div>
+    <img [src]="oppiaAvatarImageUrl"
+         class="oppia-translation-onboarding-avatar"
+         alt="">
+    <h2 class="oppia-translation-onboarding-mobile-title">
+      Great news! You now have access to the Translations feature!
+    </h2>
+  </div>
+
+  <div class="oppia-translation-onboarding-body">
+    <h2 class="oppia-translation-onboarding-title oppia-translation-onboarding-desktop-text">
+      You have full translation access!
+    </h2>
+    <p class="oppia-translation-onboarding-description oppia-translation-onboarding-desktop-text">
+      Thanks for making Oppia lessons multilingual!
+      <br>
+      <strong>Want a quick tour before you start translating?</strong>
+    </p>
+    <p class="oppia-translation-onboarding-description oppia-translation-onboarding-mobile-text">
+      Thank you for making Oppia's lessons more accessible to non-English
+      speaking learners worldwide.
+      <br>
+      <br>
+      Would you like a tour of this feature before you start translating?
+    </p>
+
+    <div class="oppia-translation-onboarding-actions">
+      <button type="button"
+              class="btn oppia-translation-onboarding-skip-button e2e-test-skip-translation-tour"
+              (click)="skipTour()">
+        Skip
+      </button>
+      <button type="button"
+              class="btn oppia-translation-onboarding-begin-button e2e-test-begin-translation-tour"
+              (click)="beginTour()">
+        Begin tour
+      </button>
+    </div>
+  </div>
+</div>

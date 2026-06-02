@@ -32,12 +32,36 @@ import {TranslationTopicService} from 'pages/exploration-editor-page/translation
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {UserService} from 'services/user.service';
 import {LocalStorageService} from 'services/local-storage.service';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {UserInfo} from 'domain/user/user-info.model';
 import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {JoyrideService} from 'ngx-joyride';
+import {TranslationOnboardingModalComponent} from './modal-templates/translation-onboarding-modal.component';
+import {TranslationOnboardingSkipConfirmationModalComponent} from './modal-templates/translation-onboarding-skip-confirmation-modal.component';
+import {TranslationModalComponent} from './modal-templates/translation-modal.component';
+import {TranslationTutorialCompletionModalComponent} from './modal-templates/translation-tutorial-completion-modal.component';
 
 describe('Contributor dashboard page', () => {
+  class MockJoyrideService {
+    startTour() {
+      return {
+        subscribe: (
+          onNext: () => void,
+          onError: () => void,
+          onComplete: () => void
+        ) => {
+          onNext();
+          onError();
+          onComplete();
+        },
+      };
+    }
+
+    closeTour(): void {}
+  }
+
   let component: ContributorDashboardPageComponent;
   let fixture: ComponentFixture<ContributorDashboardPageComponent>;
   let localStorageService: LocalStorageService;
@@ -56,6 +80,8 @@ describe('Contributor dashboard page', () => {
   let getUserInfoAsyncSpy: jasmine.Spy;
   let urlInterpolationService: UrlInterpolationService;
   let contributionAndReviewService: ContributionAndReviewService;
+  let ngbModal: NgbModal;
+  let joyride: JoyrideService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -68,6 +94,11 @@ describe('Contributor dashboard page', () => {
         TranslationTopicService,
         ContributionOpportunitiesService,
         ContributionAndReviewService,
+        NgbModal,
+        {
+          provide: JoyrideService,
+          useClass: MockJoyrideService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -82,6 +113,8 @@ describe('Contributor dashboard page', () => {
       ContributionOpportunitiesService
     );
     localStorageService = TestBed.inject(LocalStorageService);
+    ngbModal = TestBed.inject(NgbModal);
+    joyride = TestBed.inject(JoyrideService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTopicService = TestBed.inject(TranslationTopicService);
     userService = TestBed.inject(UserService);
@@ -103,6 +136,18 @@ describe('Contributor dashboard page', () => {
       localStorageService,
       'getLastSelectedTranslationTopicName'
     ).and.returnValue('Topic 1');
+    spyOn(
+      localStorageService,
+      'hasSeenContributorDashboardTranslationOnboarding'
+    ).and.returnValue(true);
+    spyOn(
+      localStorageService,
+      'getContributorDashboardTranslationTutorialProgress'
+    ).and.returnValue(0);
+    spyOn(
+      localStorageService,
+      'saveContributorDashboardTranslationTutorialProgress'
+    );
     spyOn(
       translationLanguageService,
       'setActiveLanguageCode'
@@ -233,6 +278,382 @@ describe('Contributor dashboard page', () => {
 
       expect(component.topicName).toBeUndefined();
       expect(translationTopicService.setActiveTopicName).toHaveBeenCalled();
+    }));
+
+    it('should begin translation onboarding for a new contributor', fakeAsync(() => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      flush();
+      (
+        localStorageService.hasSeenContributorDashboardTranslationOnboarding as jasmine.Spy
+      ).and.returnValue(false);
+      const modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve('begin'),
+      } as NgbModalRef);
+      const markOnboardingAsSeenSpy = spyOn(
+        localStorageService,
+        'markContributorDashboardTranslationOnboardingAsSeen'
+      );
+      const startTourSpy = spyOn(joyride, 'startTour').and.callThrough();
+
+      component.ngOnInit();
+      flush();
+
+      expect(component.activeTabName).toBe('translateTextTab');
+      expect(component.showTranslationTutorialOpportunity).toBeTrue();
+      expect(component.languageCode).toBe('es');
+      expect(
+        translationLanguageService.setActiveLanguageCode
+      ).toHaveBeenCalledWith('es');
+      expect(modalSpy).toHaveBeenCalledWith(
+        TranslationOnboardingModalComponent,
+        {
+          backdrop: 'static',
+          centered: true,
+          keyboard: false,
+          windowClass: 'oppia-translation-onboarding-modal-window',
+        }
+      );
+      expect(markOnboardingAsSeenSpy).toHaveBeenCalledWith('username1');
+      expect(startTourSpy).toHaveBeenCalledWith({
+        steps: component.joyRideSteps,
+        stepDefaultPosition: 'bottom',
+        themeColor: '#1354a5',
+      });
+    }));
+
+    it('should continue the translation tour from the opportunity step', fakeAsync(() => {
+      const startTourSpy = spyOn(joyride, 'startTour').and.callThrough();
+
+      component.translationTutorialProgressPercentage = 25;
+      component.activeTabName = 'myContributionTab';
+      component.replayTranslationTour();
+      flush();
+
+      expect(component.activeTabName).toBe('translateTextTab');
+      expect(component.showTranslationTutorialOpportunity).toBeTrue();
+      expect(startTourSpy).toHaveBeenCalledWith({
+        steps: component.joyRideSteps,
+        startWith: 'contributorDashboardTranslationOpportunity',
+        stepDefaultPosition: 'bottom',
+        themeColor: '#1354a5',
+      });
+    }));
+
+    it('should continue the translation tour from the editor modal step', fakeAsync(() => {
+      const openTranslationTutorialSpy = spyOn(
+        component,
+        'openTranslationTutorial'
+      );
+
+      component.translationTutorialProgressPercentage = 75;
+      component.activeTabName = 'myContributionTab';
+      component.replayTranslationTour();
+      flush();
+
+      expect(component.activeTabName).toBe('translateTextTab');
+      expect(component.showTranslationTutorialOpportunity).toBeTrue();
+      expect(openTranslationTutorialSpy).toHaveBeenCalledWith(
+        'contributorDashboardTranslationCopyTool',
+        4
+      );
+    }));
+
+    it('should let contributors use the dashboard while the tour is open', () => {
+      const backdropContainer = document.createElement('div');
+      const backdropPart = document.createElement('div');
+      backdropContainer.className = 'backdrop-container';
+      backdropPart.className = 'joyride-backdrop';
+      backdropContainer.appendChild(backdropPart);
+      document.body.appendChild(backdropContainer);
+
+      component.startTranslationTour();
+
+      expect(backdropContainer.style.pointerEvents).toBe('none');
+      expect(backdropPart.style.pointerEvents).toBe('none');
+
+      backdropContainer.remove();
+    });
+
+    it('should replay the translation tour from My Contributions', fakeAsync(() => {
+      const startTourSpy = spyOn(joyride, 'startTour').and.callThrough();
+
+      component.activeTabName = 'myContributionTab';
+      component.replayTranslationTour();
+      flush();
+
+      expect(component.activeTabName).toBe('translateTextTab');
+      expect(component.showTranslationTutorialOpportunity).toBeTrue();
+      expect(component.languageCode).toBe('es');
+      expect(
+        translationLanguageService.setActiveLanguageCode
+      ).toHaveBeenCalledWith('es');
+      expect(startTourSpy).toHaveBeenCalledWith({
+        steps: component.joyRideSteps,
+        stepDefaultPosition: 'bottom',
+        themeColor: '#1354a5',
+      });
+    }));
+
+    it('should open the tutorial translation and highlight its editor', fakeAsync(() => {
+      const modalRef = {
+        componentInstance: {
+          tutorialEditorReady: new EventEmitter<void>(),
+          tutorialProgressChange: new EventEmitter<number>(),
+        },
+        result: Promise.resolve(),
+      } as NgbModalRef;
+      const modalSpy = spyOn(ngbModal, 'open').and.returnValue(modalRef);
+      const startTourSpy = spyOn(joyride, 'startTour').and.callThrough();
+
+      component.openTranslationTutorial();
+
+      expect(modalSpy).toHaveBeenCalledWith(TranslationModalComponent, {
+        size: 'lg',
+        backdrop: 'static',
+        injector: jasmine.any(Object),
+        backdropClass: 'forced-modal-stack',
+        windowClass: 'forced-modal-stack',
+      });
+      expect(modalRef.componentInstance.opportunity).toBe(
+        component.TRANSLATION_TUTORIAL_MODAL_OPPORTUNITY
+      );
+      expect(modalRef.componentInstance.isTranslationTutorial).toBeTrue();
+      expect(
+        modalRef.componentInstance.initialTranslationTutorialStepNumber
+      ).toBe(3);
+      expect(component.translationEditorJoyRideSteps).toEqual([
+        'contributorDashboardTranslationOpportunity',
+        'contributorDashboardTranslationEditor',
+        'contributorDashboardTranslationCopyTool',
+        'contributorDashboardTranslationSubmit',
+      ]);
+
+      modalRef.componentInstance.tutorialEditorReady.emit();
+      flush();
+
+      expect(startTourSpy).toHaveBeenCalledWith({
+        steps: component.translationEditorJoyRideSteps,
+        startWith: 'contributorDashboardTranslationEditor',
+        stepDefaultPosition: 'right',
+        themeColor: '#1354a5',
+      });
+
+      modalRef.componentInstance.tutorialProgressChange.emit(3);
+      flush();
+
+      expect(
+        component.TRANSLATION_TUTORIAL_OPPORTUNITY.progressPercentage
+      ).toBe(50);
+      expect(component.TRANSLATION_TUTORIAL_OPPORTUNITY.translationsCount).toBe(
+        50
+      );
+      expect(
+        component.TRANSLATION_TUTORIAL_MODAL_OPPORTUNITY.progressPercentage
+      ).toBe('50');
+    }));
+
+    it('should show the completion modal when tutorial is completed', fakeAsync(() => {
+      const tutorialModalRef = {
+        componentInstance: {
+          tutorialEditorReady: new EventEmitter<void>(),
+          tutorialProgressChange: new EventEmitter<number>(),
+        },
+        result: Promise.resolve('translationTutorialComplete'),
+      } as NgbModalRef;
+      const completionModalRef = {
+        componentInstance: {},
+        result: Promise.resolve(),
+      } as NgbModalRef;
+      const modalSpy = spyOn(ngbModal, 'open').and.returnValues(
+        tutorialModalRef,
+        completionModalRef
+      );
+      const closeTourSpy = spyOn(joyride, 'closeTour');
+
+      component.openTranslationTutorial();
+      flush();
+
+      expect(closeTourSpy).toHaveBeenCalled();
+      expect(modalSpy).toHaveBeenCalledWith(
+        TranslationTutorialCompletionModalComponent,
+        {
+          backdrop: 'static',
+          centered: true,
+          keyboard: false,
+          windowClass: 'oppia-translation-tutorial-completion-modal-window',
+        }
+      );
+      expect(
+        component.TRANSLATION_TUTORIAL_OPPORTUNITY.progressPercentage
+      ).toBe(100);
+      expect(component.TRANSLATION_TUTORIAL_OPPORTUNITY.translationsCount).toBe(
+        100
+      );
+    }));
+
+    it('should display the editor tour above the translation modal', () => {
+      const backdropContainer = document.createElement('div');
+      const editorTourPopup = document.createElement('div');
+      const copyToolTourPopup = document.createElement('div');
+      const submitTourPopup = document.createElement('div');
+      backdropContainer.className = 'backdrop-container';
+      editorTourPopup.id = 'joyride-step-contributorDashboardTranslationEditor';
+      copyToolTourPopup.id =
+        'joyride-step-contributorDashboardTranslationCopyTool';
+      submitTourPopup.id = 'joyride-step-contributorDashboardTranslationSubmit';
+      document.body.appendChild(backdropContainer);
+      document.body.appendChild(editorTourPopup);
+      document.body.appendChild(copyToolTourPopup);
+      document.body.appendChild(submitTourPopup);
+
+      component.startTranslationEditorTour();
+
+      expect(backdropContainer.style.zIndex).toBe('1060');
+      expect(editorTourPopup.style.zIndex).toBe('1061');
+      expect(copyToolTourPopup.style.zIndex).toBe('1061');
+      expect(submitTourPopup.style.zIndex).toBe('1061');
+
+      backdropContainer.remove();
+      editorTourPopup.remove();
+      copyToolTourPopup.remove();
+      submitTourPopup.remove();
+    });
+
+    it('should close the translation tour using Joyride', () => {
+      const closeTourSpy = spyOn(joyride, 'closeTour');
+
+      component.closeTranslationTour();
+
+      expect(closeTourSpy).toHaveBeenCalled();
+    });
+
+    it('should show a confirmation when a contributor skips the tour', fakeAsync(() => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      flush();
+      (
+        localStorageService.hasSeenContributorDashboardTranslationOnboarding as jasmine.Spy
+      ).and.returnValue(false);
+      const modalSpy = spyOn(ngbModal, 'open').and.returnValues(
+        {
+          result: Promise.reject('skip'),
+        } as NgbModalRef,
+        {
+          result: Promise.resolve(false),
+        } as NgbModalRef
+      );
+
+      component.ngOnInit();
+      flush();
+
+      expect(modalSpy).toHaveBeenCalledWith(
+        TranslationOnboardingSkipConfirmationModalComponent,
+        {
+          backdrop: 'static',
+          centered: true,
+          keyboard: false,
+          windowClass: 'oppia-translation-skip-confirmation-modal-window',
+        }
+      );
+    }));
+
+    it('should remember a confirmed skip when requested', fakeAsync(() => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      flush();
+      (
+        localStorageService.hasSeenContributorDashboardTranslationOnboarding as jasmine.Spy
+      ).and.returnValue(false);
+      spyOn(ngbModal, 'open').and.returnValues(
+        {
+          result: Promise.reject('skip'),
+        } as NgbModalRef,
+        {
+          result: Promise.resolve(true),
+        } as NgbModalRef
+      );
+      const markOnboardingAsSeenSpy = spyOn(
+        localStorageService,
+        'markContributorDashboardTranslationOnboardingAsSeen'
+      );
+
+      component.ngOnInit();
+      flush();
+
+      expect(markOnboardingAsSeenSpy).toHaveBeenCalledWith('username1');
+    }));
+
+    it('should allow the skip prompt to be shown on a later visit', fakeAsync(() => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      flush();
+      (
+        localStorageService.hasSeenContributorDashboardTranslationOnboarding as jasmine.Spy
+      ).and.returnValue(false);
+      spyOn(ngbModal, 'open').and.returnValues(
+        {
+          result: Promise.reject('skip'),
+        } as NgbModalRef,
+        {
+          result: Promise.resolve(false),
+        } as NgbModalRef
+      );
+      const markOnboardingAsSeenSpy = spyOn(
+        localStorageService,
+        'markContributorDashboardTranslationOnboardingAsSeen'
+      );
+
+      component.ngOnInit();
+      flush();
+
+      expect(markOnboardingAsSeenSpy).not.toHaveBeenCalled();
+    }));
+
+    it('should show onboarding again when skipping is cancelled', fakeAsync(() => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      flush();
+      (
+        localStorageService.hasSeenContributorDashboardTranslationOnboarding as jasmine.Spy
+      ).and.returnValue(false);
+      const modalSpy = spyOn(ngbModal, 'open').and.returnValues(
+        {
+          result: Promise.reject('skip'),
+        } as NgbModalRef,
+        {
+          result: Promise.reject('cancel'),
+        } as NgbModalRef,
+        {
+          result: Promise.resolve('begin'),
+        } as NgbModalRef
+      );
+
+      component.ngOnInit();
+      flush();
+
+      expect(modalSpy.calls.count()).toBe(3);
+      expect(modalSpy.calls.argsFor(2)[0]).toBe(
+        TranslationOnboardingModalComponent
+      );
+    }));
+
+    it('should not show translation onboarding when it has been seen', fakeAsync(() => {
+      spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(userContributionRights)
+      );
+      const modalSpy = spyOn(ngbModal, 'open');
+
+      component.ngOnInit();
+      flush();
+
+      expect(modalSpy).not.toHaveBeenCalled();
+      expect(component.activeTabName).toBe('myContributionTab');
     }));
 
     it('should return language description in kebab case format', () => {

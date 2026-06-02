@@ -24,6 +24,7 @@ import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {OppiaCkEditorCopyToolBarModule} from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
 import {ToastrModule} from 'ngx-toastr';
+import {JoyrideModule} from 'ngx-joyride';
 
 import {TranslationLanguageSelectorComponent} from './translation-language-selector/translation-language-selector.component';
 import {ReviewTranslationLanguageSelectorComponent} from './translation-language-selector/review-translation-language-selector.component';
@@ -40,6 +41,10 @@ import {QuestionOpportunitiesComponent} from './question-opportunities/question-
 import {ContributorDashboardPageComponent} from './contributor-dashboard-page.component';
 import {ContributorStatsComponent} from './contributor-stats/contributor-stats.component';
 import {CertificateDownloadModalComponent} from './modal-templates/certificate-download-modal.component';
+import {TranslationOnboardingModalComponent} from './modal-templates/translation-onboarding-modal.component';
+import {TranslationOnboardingSkipConfirmationModalComponent} from './modal-templates/translation-onboarding-skip-confirmation-modal.component';
+import {TranslationTutorialCompletionModalComponent} from './modal-templates/translation-tutorial-completion-modal.component';
+import {TranslationTutorialImageCustomizationModalComponent} from './modal-templates/translation-tutorial-image-customization-modal.component';
 import {ContributorBadgesComponent} from './contributor-badges/contributor-badges.component';
 import {BadgeComponent} from './badge/badge.component';
 import {ContributorDashboardPageRootComponent} from './contributor-dashboard-page-root.component';
@@ -50,6 +55,7 @@ import {RteHelperService} from 'services/rte-helper.service';
   imports: [
     InteractionExtensionsModule,
     SharedComponentsModule,
+    JoyrideModule.forRoot(),
     NgbModalModule,
     SharedFormsModule,
     OppiaCkEditorCopyToolBarModule,
@@ -64,6 +70,10 @@ import {RteHelperService} from 'services/rte-helper.service';
   ],
   declarations: [
     CertificateDownloadModalComponent,
+    TranslationOnboardingModalComponent,
+    TranslationOnboardingSkipConfirmationModalComponent,
+    TranslationTutorialCompletionModalComponent,
+    TranslationTutorialImageCustomizationModalComponent,
     ContributorBadgesComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,
@@ -84,6 +94,10 @@ import {RteHelperService} from 'services/rte-helper.service';
   ],
   entryComponents: [
     CertificateDownloadModalComponent,
+    TranslationOnboardingModalComponent,
+    TranslationOnboardingSkipConfirmationModalComponent,
+    TranslationTutorialCompletionModalComponent,
+    TranslationTutorialImageCustomizationModalComponent,
     ContributorBadgesComponent,
     LoginRequiredMessageComponent,
     LoginRequiredModalContent,

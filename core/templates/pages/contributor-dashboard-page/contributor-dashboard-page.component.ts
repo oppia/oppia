@@ -17,7 +17,7 @@
  */
 
 import {AppConstants} from 'app.constants';
-import {Component, OnInit} from '@angular/core';
+import {Component, Injector, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {
@@ -31,6 +31,18 @@ import {LocalStorageService} from 'services/local-storage.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {UserService} from 'services/user.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {JoyrideService} from 'ngx-joyride';
+import {TranslationOnboardingModalComponent} from './modal-templates/translation-onboarding-modal.component';
+import {TranslationOnboardingSkipConfirmationModalComponent} from './modal-templates/translation-onboarding-skip-confirmation-modal.component';
+import {ExplorationOpportunity} from './opportunities-list-item/opportunities-list-item.component';
+import {
+  TranslationModalComponent,
+  TranslationOpportunity,
+} from './modal-templates/translation-modal.component';
+import {TranslationTutorialCompletionModalComponent} from './modal-templates/translation-tutorial-completion-modal.component';
+
+const TRANSLATION_TUTORIAL_BACKDROP_COLOR = 'rgba(0, 0, 0, 0.55)';
 
 @Component({
   selector: 'contributor-dashboard-page',
@@ -51,9 +63,55 @@ export class ContributorDashboardPageComponent implements OnInit {
   userCanReviewQuestions!: boolean;
   tabsDetails!: ContributorDashboardTabsDetails;
   OPPIA_AVATAR_IMAGE_URL!: string;
+  confettiDesktopUrl!: string;
+  confettiMobileUrl!: string;
   languageCode!: string;
   topicName!: string;
   activeTabName!: string;
+  showTranslationTutorialOpportunity: boolean = false;
+  translationTutorialProgressPercentage: number = 0;
+  showTranslationTutorialReplaySectionTour: boolean = false;
+  showCompletionConfetti: boolean = false;
+  currentTourStep: string = '';
+  TRANSLATION_TUTORIAL_OPPORTUNITY_TYPE: string =
+    AppConstants.OPPORTUNITY_TYPE_TRANSLATION;
+  TRANSLATION_TUTORIAL_LANGUAGE_CODE: string = 'es';
+  TRANSLATION_TUTORIAL_OPPORTUNITY: ExplorationOpportunity = {
+    id: 'translation-tutorial',
+    labelText: '',
+    labelColor: '',
+    progressPercentage: 0.01,
+    subheading: 'Translation Tutorial',
+    heading: "Let's translate your first lesson card",
+    actionButtonTitle: 'Translate',
+    inReviewCount: 0,
+    totalCount: 1,
+    translationsCount: 0,
+    topicName: '',
+  };
+  TRANSLATION_TUTORIAL_MODAL_OPPORTUNITY: TranslationOpportunity = {
+    id: 'translation-tutorial',
+    subheading: 'Translation Tutorial',
+    heading: "Let's translate your first lesson card",
+    progressPercentage: '0',
+    actionButtonTitle: 'Translate',
+    inReviewCount: 0,
+    totalCount: 1,
+    translationsCount: 0,
+    reviewerOnlyContentCount: 0,
+  };
+  TRANSLATION_TOUR_TOTAL_STEPS: number = 5;
+  TRANSLATION_TUTORIAL_PROGRESS_TOTAL_COUNT: number = 100;
+  joyRideSteps: string[] = [
+    'contributorDashboardTranslationSelectors',
+    'contributorDashboardTranslationOpportunity',
+  ];
+  translationEditorJoyRideSteps: string[] = [
+    'contributorDashboardTranslationOpportunity',
+    'contributorDashboardTranslationEditor',
+    'contributorDashboardTranslationCopyTool',
+    'contributorDashboardTranslationSubmit',
+  ];
   // The following property is set to null when the
   // user is not logged in.
   username: string | null = null;
@@ -64,6 +122,9 @@ export class ContributorDashboardPageComponent implements OnInit {
     private focusManagerService: FocusManagerService,
     private languageUtilService: LanguageUtilService,
     private localStorageService: LocalStorageService,
+    private injector: Injector,
+    private ngbModal: NgbModal,
+    private joyride: JoyrideService,
     private translationLanguageService: TranslationLanguageService,
     private translationTopicService: TranslationTopicService,
     private urlInterpolationService: UrlInterpolationService,
@@ -146,6 +207,339 @@ export class ContributorDashboardPageComponent implements OnInit {
     return languageDescriptions;
   }
 
+  private prepareTranslationTutorial(
+    shouldResetProgress: boolean = true
+  ): void {
+    this.showTranslationTutorialOpportunity = true;
+    if (shouldResetProgress) {
+      this.updateTranslationTutorialProgress(0);
+    }
+    this.languageCode = this.TRANSLATION_TUTORIAL_LANGUAGE_CODE;
+    this.translationLanguageService.setActiveLanguageCode(this.languageCode);
+    this.onTabClick('translateTextTab');
+  }
+
+  private updateTranslationTutorialProgressForStep(stepNumber: number): void {
+    const progressPercentage =
+      ((stepNumber - 1) / (this.TRANSLATION_TOUR_TOTAL_STEPS - 1)) * 100;
+    this.updateTranslationTutorialProgress(progressPercentage);
+  }
+
+  private updateTranslationTutorialProgress(
+    progressPercentage: number,
+    shouldSaveProgress: boolean = true
+  ): void {
+    const boundedProgressPercentage = Math.min(
+      100,
+      Math.max(0, progressPercentage)
+    );
+    const visibleProgressPercentage =
+      boundedProgressPercentage === 0 ? 0.01 : boundedProgressPercentage;
+
+    this.translationTutorialProgressPercentage = boundedProgressPercentage;
+    this.TRANSLATION_TUTORIAL_OPPORTUNITY.progressPercentage =
+      visibleProgressPercentage;
+    this.TRANSLATION_TUTORIAL_OPPORTUNITY.totalCount =
+      this.TRANSLATION_TUTORIAL_PROGRESS_TOTAL_COUNT;
+    this.TRANSLATION_TUTORIAL_OPPORTUNITY.translationsCount =
+      boundedProgressPercentage;
+    this.TRANSLATION_TUTORIAL_OPPORTUNITY.inReviewCount = 0;
+    this.TRANSLATION_TUTORIAL_MODAL_OPPORTUNITY.progressPercentage = `${Math.floor(boundedProgressPercentage)}`;
+
+    if (shouldSaveProgress && this.username) {
+      this.localStorageService.saveContributorDashboardTranslationTutorialProgress(
+        this.username,
+        boundedProgressPercentage
+      );
+    }
+  }
+
+  private loadSavedTranslationTutorialProgress(username: string): void {
+    this.updateTranslationTutorialProgress(
+      this.localStorageService.getContributorDashboardTranslationTutorialProgress(
+        username
+      ),
+      false
+    );
+  }
+
+  showTranslationOnboardingModalIfNeeded(username: string): void {
+    if (
+      this.localStorageService.hasSeenContributorDashboardTranslationOnboarding(
+        username
+      )
+    ) {
+      return;
+    }
+
+    this.prepareTranslationTutorial();
+    this.showTranslationOnboardingModal(username);
+  }
+
+  async loadTranslationTutorialOpportunityAsync(): Promise<{
+    opportunitiesDicts: ExplorationOpportunity[];
+    more: boolean;
+  }> {
+    return {
+      opportunitiesDicts: [this.TRANSLATION_TUTORIAL_OPPORTUNITY],
+      more: false,
+    };
+  }
+
+  showTranslationOnboardingModal(username: string): void {
+    this.ngbModal
+      .open(TranslationOnboardingModalComponent, {
+        backdrop: 'static',
+        centered: true,
+        keyboard: false,
+        windowClass: 'oppia-translation-onboarding-modal-window',
+      })
+      .result.then(
+        () => {
+          this.localStorageService.markContributorDashboardTranslationOnboardingAsSeen(
+            username
+          );
+          this.startTranslationTour();
+        },
+        reason => {
+          if (reason === 'skip') {
+            this.showTranslationOnboardingSkipConfirmationModal(username);
+          }
+        }
+      );
+  }
+
+  private getTranslationTourStepName(stepNumber: number): string {
+    return this.joyRideSteps[stepNumber - 1];
+  }
+
+  private getTranslationEditorTourStepName(stepNumber: number): string {
+    return this.translationEditorJoyRideSteps[stepNumber - 2];
+  }
+
+  private getTranslationTutorialStepNumberForCurrentProgress(): number {
+    return Math.min(
+      this.TRANSLATION_TOUR_TOTAL_STEPS,
+      Math.max(
+        1,
+        Math.round(
+          (this.translationTutorialProgressPercentage / 100) *
+            (this.TRANSLATION_TOUR_TOTAL_STEPS - 1)
+        ) + 1
+      )
+    );
+  }
+
+  startTranslationTour(startWith?: string): void {
+    const tourOptions: {
+      steps: string[];
+      startWith?: string;
+      stepDefaultPosition: string;
+      themeColor: string;
+    } = {
+      steps: this.joyRideSteps,
+      stepDefaultPosition: 'bottom',
+      themeColor: '#1354a5',
+    };
+    if (startWith) {
+      tourOptions.startWith = startWith;
+    }
+
+    this.joyride.startTour(tourOptions).subscribe(
+      step => {
+        if (step?.number) {
+          this.updateTranslationTutorialProgressForStep(step.number);
+        }
+        this.setTranslationTutorialBackdropColor();
+        this.allowInteractionsBehindTranslationTour();
+      },
+      () => {},
+      () => {
+        this.closeTranslationTour();
+      }
+    );
+  }
+
+  replayTranslationTour(): void {
+    const tutorialStepNumber =
+      this.getTranslationTutorialStepNumberForCurrentProgress();
+
+    if (
+      this.translationTutorialProgressPercentage > 0 &&
+      this.translationTutorialProgressPercentage < 100
+    ) {
+      this.prepareTranslationTutorial(false);
+      setTimeout(() => {
+        if (tutorialStepNumber <= 2) {
+          this.startTranslationTour(
+            this.getTranslationTourStepName(tutorialStepNumber)
+          );
+          return;
+        }
+
+        this.openTranslationTutorial(
+          this.getTranslationEditorTourStepName(tutorialStepNumber),
+          tutorialStepNumber
+        );
+      });
+      return;
+    }
+
+    this.prepareTranslationTutorial();
+    setTimeout(() => {
+      this.startTranslationTour();
+    });
+  }
+
+  openTranslationTutorial(
+    startWith: string = 'contributorDashboardTranslationEditor',
+    tutorialStepNumber: number = 3
+  ): void {
+    this.closeTranslationTour();
+    const modalRef = this.ngbModal.open(TranslationModalComponent, {
+      size: 'lg',
+      backdrop: 'static',
+      injector: this.injector,
+      backdropClass: 'forced-modal-stack',
+      windowClass: 'forced-modal-stack',
+    });
+    modalRef.componentInstance.opportunity =
+      this.TRANSLATION_TUTORIAL_MODAL_OPPORTUNITY;
+    modalRef.componentInstance.isTranslationTutorial = true;
+    modalRef.componentInstance.initialTranslationTutorialStepNumber =
+      tutorialStepNumber;
+    modalRef.componentInstance.tutorialEditorReady.subscribe(() => {
+      this.startTranslationEditorTour(startWith);
+    });
+    modalRef.componentInstance.tutorialProgressChange.subscribe(
+      (stepNumber: number) => {
+        this.updateTranslationTutorialProgressForStep(stepNumber);
+      }
+    );
+    modalRef.result.then(
+      result => {
+        if (result === 'translationTutorialComplete') {
+          this.updateTranslationTutorialProgress(100);
+          this.showTranslationTutorialCompletionModal();
+        }
+      },
+      () => {}
+    );
+  }
+
+  showTranslationTutorialCompletionModal(): void {
+    this.closeTranslationTour();
+    this.showCompletionConfetti = true;
+    const modalRef = this.ngbModal.open(
+      TranslationTutorialCompletionModalComponent,
+      {
+        backdrop: 'static',
+        centered: true,
+        keyboard: false,
+        windowClass: 'oppia-translation-tutorial-completion-modal-window',
+      }
+    );
+    modalRef.result.then(
+      () => {
+        this.showCompletionConfetti = false;
+        this.showTranslationTutorialReplaySectionTour = true;
+        this.onTabClick('myContributionTab');
+      },
+      () => {
+        this.showCompletionConfetti = false;
+      }
+    );
+  }
+
+  startTranslationEditorTour(
+    startWith: string = 'contributorDashboardTranslationEditor'
+  ): void {
+    this.joyride
+      .startTour({
+        steps: this.translationEditorJoyRideSteps,
+        startWith,
+        stepDefaultPosition: 'right',
+        themeColor: '#1354a5',
+      })
+      .subscribe(
+        step => {
+          if (step?.number) {
+            this.updateTranslationTutorialProgressForStep(step.number + 1);
+          }
+          this.displayTranslationEditorTourAboveModal();
+          this.allowInteractionsBehindTranslationTour();
+        },
+        () => {},
+        () => {
+          this.closeTranslationTour();
+        }
+      );
+  }
+
+  private displayTranslationEditorTourAboveModal(): void {
+    const backdropContainer = document.querySelector<HTMLElement>(
+      '.backdrop-container'
+    );
+    const editorTourPopups = document.querySelectorAll<HTMLElement>(
+      '#joyride-step-contributorDashboardTranslationEditor, ' +
+        '#joyride-step-contributorDashboardTranslationCopyTool, ' +
+        '#joyride-step-contributorDashboardTranslationSubmit'
+    );
+
+    if (backdropContainer) {
+      backdropContainer.style.zIndex = '1060';
+    }
+    this.setTranslationTutorialBackdropColor();
+    editorTourPopups.forEach(editorTourPopup => {
+      editorTourPopup.style.zIndex = '1061';
+    });
+  }
+
+  private setTranslationTutorialBackdropColor(): void {
+    document
+      .querySelectorAll<HTMLElement>('.joyride-backdrop')
+      .forEach(backdropElement => {
+        backdropElement.style.backgroundColor =
+          TRANSLATION_TUTORIAL_BACKDROP_COLOR;
+      });
+  }
+
+  closeTranslationTour(): void {
+    this.joyride.closeTour();
+  }
+
+  private allowInteractionsBehindTranslationTour(): void {
+    document
+      .querySelectorAll<HTMLElement>(
+        '.backdrop-container, .backdrop-container *'
+      )
+      .forEach(element => {
+        element.style.pointerEvents = 'none';
+      });
+  }
+
+  showTranslationOnboardingSkipConfirmationModal(username: string): void {
+    this.ngbModal
+      .open(TranslationOnboardingSkipConfirmationModalComponent, {
+        backdrop: 'static',
+        centered: true,
+        keyboard: false,
+        windowClass: 'oppia-translation-skip-confirmation-modal-window',
+      })
+      .result.then(
+        dontShowAgain => {
+          if (dontShowAgain) {
+            this.localStorageService.markContributorDashboardTranslationOnboardingAsSeen(
+              username
+            );
+          }
+        },
+        () => {
+          this.showTranslationOnboardingModal(username);
+        }
+      );
+  }
+
   ngOnInit(): void {
     this.username = '';
     this.userInfoIsLoading = true;
@@ -203,6 +597,8 @@ export class ContributorDashboardPageComponent implements OnInit {
         if (this.username !== null) {
           [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] =
             this.userService.getProfileImageDataUrl(this.username);
+          this.loadSavedTranslationTutorialProgress(this.username);
+          this.showTranslationOnboardingModalIfNeeded(this.username);
         }
       } else {
         this.userIsLoggedIn = false;
@@ -240,6 +636,12 @@ export class ContributorDashboardPageComponent implements OnInit {
       this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
+    this.confettiDesktopUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/contributor_dashboard/confetti_desktop.gif'
+    );
+    this.confettiMobileUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/contributor_dashboard/confetti_mobile.gif'
+    );
     this.languageCode = this.translationLanguageService.getActiveLanguageCode();
   }
 }
