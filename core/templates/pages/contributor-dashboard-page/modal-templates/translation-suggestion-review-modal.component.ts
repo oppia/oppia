@@ -441,7 +441,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         this.isSubmitting = false;
         this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
       },
-      this.showTranslationSuggestionUpdateError
+      error => this.showTranslationSuggestionUpdateError(error)
     );
     this.suggestionImagesString = this.getImageInfoForSuggestion(
       this.translationHtml
