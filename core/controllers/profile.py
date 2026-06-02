@@ -451,6 +451,19 @@ class SignupPageNormalizedRequestDict(TypedDict):
     return_url: Optional[str]
 
 
+def _is_safe_internal_return_url(return_url: str) -> bool:
+    """Checks whether return_url is safe for same-origin redirection."""
+    # Allow only absolute paths on the current origin.
+    if not return_url.startswith('/'):
+        return False
+    if return_url.startswith('//'):
+        return False
+
+    # Block control characters and spaces that browsers may strip/normalize,
+    # as well as backslashes that some user agents normalize into slashes.
+    return re.search(r'[\x00-\x20\x7f\\]', return_url) is None
+
+
 class SignupPage(
     base.BaseHandler[Dict[str, str], SignupPageNormalizedRequestDict]
 ):
@@ -475,7 +488,7 @@ class SignupPage(
         fetched_url = self.normalized_request.get('return_url')
         return_url = self.request.uri if fetched_url is None else fetched_url
         # Validating return_url for no external redirections.
-        if re.match('^/[^//]', return_url) is None:
+        if not _is_safe_internal_return_url(return_url):
             return_url = '/'
         if user_services.has_fully_registered_account(self.user_id):
             self.redirect(return_url)

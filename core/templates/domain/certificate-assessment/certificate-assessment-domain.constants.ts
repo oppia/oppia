@@ -16,9 +16,18 @@
  * @fileoverview Constants for certificate assessment backend APIs.
  */
 
+import {AppConstants} from 'app.constants';
+
 export const CertificateAssessmentDomainConstants = {
   CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL:
     '/certificate_assessment_offering_handler',
   CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER_URL:
     '/certificate_assessment_offering_handler/<certificate_id>',
 } as const;
+
+export class CertificateOfferingDashboardPageComponent {
+  createCertificateOfferingRoute =
+    '/' +
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATE_CERTIFICATE_OFFERING
+      .ROUTE;
+}

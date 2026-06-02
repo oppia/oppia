@@ -23,6 +23,13 @@ import {AlertsService} from 'services/alerts.service';
 
 import {DeleteCertificateOfferingModalComponent} from 'components/certificate-assessment-offering-helper/delete-certificate-offering-modal.component';
 
+export const CertificateAssessmentDomainConstants = {
+  CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL:
+    '/certificate_assessment_offering_handler',
+  CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER_URL:
+    '/certificate_assessment_offering_handler/<certificate_id>',
+} as const;
+
 @Component({
   selector: 'oppia-certificate-offering-dashboard-page',
   templateUrl: './certificate-offering-dashboard-page.component.html',
