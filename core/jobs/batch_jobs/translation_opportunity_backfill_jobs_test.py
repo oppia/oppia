@@ -417,6 +417,143 @@ class BackfillTranslationOpportunityModelJobTests(
         self.assertEqual(opportunity.content_count, 2)
         self.assertEqual(opportunity.translation_counts, {'hi': 1})
 
+    def test_additional_story_references_and_missing_exploration_ids(
+        self,
+    ) -> None:
+        # Create a new exploration 'exp_3'.
+        exp_id = 'exp_3'
+        rights_manager.create_new_exploration_rights(exp_id, self.author_id)
+
+        exploration = exp_domain.Exploration.create_default_exploration(exp_id)
+        model = self.create_model(
+            exp_models.ExplorationModel,
+            id=exp_id,
+            title='Test Exploration 3',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code='en',
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            states={
+                feconf.DEFAULT_INIT_STATE_NAME: (
+                    exploration.states[feconf.DEFAULT_INIT_STATE_NAME].to_dict()
+                )
+            },
+        )
+        commit_cmd = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_CREATE_NEW,
+                'title': 'title',
+                'category': 'category',
+            }
+        )
+        model.commit(self.author_id, 'commit_message', [commit_cmd.to_dict()])
+
+        # Create TopicModel with additional story references.
+        topic_model_3 = self.create_model(
+            topic_models.TopicModel,
+            id='topic_id_3',
+            name='topic title 3',
+            canonical_name='topic title 3',
+            story_reference_schema_version=1,
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='en',
+            url_fragment='topic-three',
+            canonical_story_references=[],
+            additional_story_references=[
+                {'story_id': 'story_id_3', 'story_is_published': True},
+                {'story_id': 'story_id_4', 'story_is_published': False},
+            ],
+            page_title_fragment_for_web='fragm3',
+        )
+        topic_model_3.update_timestamps()
+
+        topic_rights_model_3 = self.create_model(
+            topic_models.TopicRightsModel,
+            id='topic_id_3',
+            topic_is_published=True,
+        )
+        topic_rights_model_3.update_timestamps()
+
+        datastore_services.put_multi([topic_model_3, topic_rights_model_3])
+
+        # Create StoryModel 3 with a node having no exploration_id.
+        story_model_3 = self.create_model(
+            story_models.StoryModel,
+            id='story_id_3',
+            title='story title 3',
+            description='description 3',
+            notes='notes 3',
+            language_code='en',
+            story_contents_schema_version=feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
+            corresponding_topic_id='topic_id_3',
+            url_fragment='story-frag-3',
+            story_contents={
+                'initial_node_id': 'node_1',
+                'nodes': [
+                    {
+                        'id': 'node_1',
+                        'title': 'chapter title 3',
+                        'exploration_id': exp_id,
+                        'destination_node_ids': [],
+                        'prerequisite_skill_ids': [],
+                        'acquired_skill_ids': [],
+                        'outline': '',
+                        'outline_is_finalized': False,
+                        'thumbnail_filename': None,
+                        'thumbnail_bg_color': None,
+                        'thumbnail_size_in_bytes': None,
+                    },
+                    {
+                        'id': 'node_2',
+                        'title': 'chapter title 4',
+                        'exploration_id': None,
+                        'destination_node_ids': [],
+                        'prerequisite_skill_ids': [],
+                        'acquired_skill_ids': [],
+                        'outline': '',
+                        'outline_is_finalized': False,
+                        'thumbnail_filename': None,
+                        'thumbnail_bg_color': None,
+                        'thumbnail_size_in_bytes': None,
+                    },
+                ],
+                'next_node_id': 'node_3',
+            },
+        )
+        story_model_3.update_timestamps()
+        story_model_3.commit(
+            self.author_id, 'commit_message', [{'cmd': 'test_command'}]
+        )
+
+        # Create EntityTranslationsModel for exp_3.
+        translation_model_3 = (
+            translation_models.EntityTranslationsModel.create_new(
+                'exploration',
+                exp_id,
+                1,
+                'hi',
+                {},
+            )
+        )
+        translation_model_3.update_timestamps()
+        translation_model_3.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 2'
+                ),
+            ]
+        )
+
 
 class AuditBackfillTranslationOpportunityModelJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase
