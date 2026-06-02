@@ -35,7 +35,23 @@
     </button>
   </div>
 
-  <div contenteditable="true" class="oppia-rte-resizer oppia-rte e2e-test-rte" #oppiaRTE></div>
+  <div *ngIf="!joyrideStepName"
+       contenteditable="true"
+       class="oppia-rte-resizer oppia-rte e2e-test-rte"
+       #oppiaRTE>
+  </div>
+  <div *ngIf="joyrideStepName"
+       contenteditable="true"
+       class="oppia-rte-resizer oppia-rte e2e-test-rte"
+       [joyrideStep]="joyrideStepName"
+       [stepPosition]="joyrideStepPosition"
+       [stepContent]="joyrideStepContent"
+       [prevTemplate]="joyridePrevTemplate"
+       [nextTemplate]="joyrideNextTemplate"
+       [doneTemplate]="joyrideDoneTemplate"
+       [counterTemplate]="joyrideCounterTemplate"
+       #oppiaRTE>
+  </div>
 </div>
 
 <!-- Error message box shown when configuration is missing -->

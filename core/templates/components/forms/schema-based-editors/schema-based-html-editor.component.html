@@ -4,7 +4,15 @@ focusManager to manage the focus activity automatically. -->
                  *ngIf="!disabled"
                  [value]="localValue"
                  (valueChange)="updateValue($event)"
-                 [uiConfig]="uiConfig">
+                 [uiConfig]="uiConfig"
+                 [joyrideStepName]="joyrideStepName"
+                 [joyrideStepPosition]="joyrideStepPosition"
+                 [joyrideStepContent]="joyrideStepContent"
+                 [joyridePrevTemplate]="joyridePrevTemplate"
+                 [joyrideNextTemplate]="joyrideNextTemplate"
+                 [joyrideDoneTemplate]="joyrideDoneTemplate"
+                 [joyrideCounterTemplate]="joyrideCounterTemplate"
+                 (editorReady)="editorReady.emit()">
 </ck-editor-4-rte>
 
 <span *ngIf="disabled"

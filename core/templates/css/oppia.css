@@ -2366,6 +2366,379 @@ oppia-parameter {
   width: 70%;
 }
 
+.oppia-translation-onboarding-modal-window .modal-dialog {
+  max-width: 560px;
+}
+.oppia-translation-tutorial-completion-modal-window .modal-dialog {
+  max-width: 675px;
+}
+.oppia-translation-onboarding-modal {
+  border-radius: 4px;
+  color: #1d1d1d;
+  font-family: "Roboto", Arial, sans-serif;
+  overflow: hidden;
+  text-align: center;
+}
+.oppia-translation-onboarding-header {
+  align-items: center;
+  background-color: #a9dbf0;
+  display: flex;
+  height: 205px;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+.oppia-translation-onboarding-pattern {
+  background-image: url('/assets/images/background/bannerF.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+.oppia-translation-onboarding-avatar {
+  height: 146px;
+  position: relative;
+  width: 146px;
+  z-index: 1;
+}
+.oppia-translation-onboarding-mobile-title,
+.oppia-translation-onboarding-mobile-text {
+  display: none;
+}
+.oppia-translation-onboarding-body {
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  min-height: 210px;
+  padding: 18px 24px;
+}
+.oppia-translation-onboarding-title {
+  color: #1354a5;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 24px;
+  font-weight: normal;
+  line-height: 20px;
+  margin: 0 auto 12px;
+}
+.oppia-translation-onboarding-description {
+  font-size: 18px;
+  line-height: 20px;
+  margin: 8px auto 0;
+  text-align: center;
+}
+.oppia-translation-onboarding-actions {
+  align-items: center;
+  display: flex;
+  gap: 38px;
+  justify-content: flex-end;
+  margin-top: auto;
+}
+.oppia-translation-onboarding-skip-button {
+  background: transparent;
+  border: 0;
+  color: #00645c;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 10px 2px;
+  text-decoration: underline;
+}
+.oppia-translation-onboarding-begin-button {
+  background-color: #00645c;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 10px 16px;
+}
+.oppia-translation-onboarding-begin-button:hover,
+.oppia-translation-onboarding-begin-button:focus {
+  background-color: #004e48;
+  color: #fff;
+}
+.oppia-pulse-indicator {
+  height: 20px;
+  pointer-events: none;
+  position: relative;
+  width: 20px;
+}
+.oppia-pulse-dot {
+  animation: oppia-pulse-dot 1.5s ease-out infinite;
+  background-color: #28a745;
+  border-radius: 50%;
+  height: 12px;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+}
+@keyframes oppia-pulse-dot {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.2); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+.oppia-pulse-ring {
+  animation: oppia-pulse 1.5s ease-out infinite;
+  background-color: rgba(31, 132, 54, 0.5);
+  border-radius: 50%;
+  height: 20px;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 20px;
+}
+@keyframes oppia-pulse {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(0) }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(2.2) }
+}
+@media only screen and (max-width: 700px) {
+  .oppia-pulse-indicator {
+    display: none;
+  }
+}
+@media (max-width: 560px) {
+  .oppia-translation-onboarding-modal-window .modal-dialog {
+    margin: 0 20px;
+  }
+  .oppia-translation-onboarding-avatar {
+    height: 118px;
+    width: 118px;
+  }
+  .oppia-translation-onboarding-mobile-title {
+    color: #103b46;
+    display: block;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 16px;
+    font-weight: normal;
+    line-height: 1.2;
+    margin: 8px auto 0;
+    max-width: 250px;
+    position: relative;
+    z-index: 1;
+  }
+  .oppia-translation-onboarding-desktop-text {
+    display: none;
+  }
+  .oppia-translation-onboarding-mobile-text {
+    display: block;
+  }
+  .oppia-translation-onboarding-title {
+    font-size: 16px;
+  }
+  .oppia-translation-onboarding-description {
+    font-size: 14px;
+  }
+  .oppia-translation-onboarding-actions {
+    flex-direction: column-reverse;
+    gap: 12px;
+    margin-top: 30px;
+  }
+  .oppia-translation-onboarding-skip-button {
+    background: #fff;
+    border: 1px solid #00645c;
+    border-radius: 4px;
+    text-decoration: none;
+  }
+  .oppia-translation-onboarding-skip-button,
+  .oppia-translation-onboarding-begin-button {
+    width: 100%;
+  }
+}
+.oppia-translation-tutorial-completion-modal {
+  border-radius: 4px;
+  color: #1d1d1d;
+  font-family: "Roboto", Arial, sans-serif;
+  overflow: hidden;
+  text-align: center;
+}
+.oppia-translation-tutorial-completion-header {
+  align-items: center;
+  background-color: #a9dbf0;
+  display: flex;
+  height: 205px;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+.oppia-translation-tutorial-completion-pattern {
+  background-image: url('/assets/images/background/bannerF.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+.oppia-translation-tutorial-completion-avatar {
+  height: 168px;
+  position: relative;
+  width: 168px;
+  z-index: 1;
+}
+.oppia-translation-tutorial-completion-body {
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  min-height: 210px;
+  padding: 18px 24px;
+}
+.oppia-translation-tutorial-completion-title {
+  color: #0d48a1;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 22px;
+  margin: 0 auto 24px;
+  max-width: 560px;
+  width: 90%;
+}
+.oppia-translation-tutorial-completion-description {
+  font-size: 18px;
+  line-height: 22px;
+  margin: 0 auto 24px;
+  width: 90%;
+}
+.oppia-translation-tutorial-completion-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+}
+.oppia-translation-tutorial-completion-close-button {
+  background-color: #00645c;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  min-width: 165px;
+  padding: 10px 16px;
+}
+.oppia-translation-tutorial-completion-close-button:hover,
+.oppia-translation-tutorial-completion-close-button:focus {
+  background-color: #004e48;
+  color: #fff;
+}
+@media (max-width: 560px) {
+  .oppia-translation-tutorial-completion-header {
+    height: 150px;
+  }
+  .oppia-translation-tutorial-completion-avatar {
+    height: 122px;
+    width: 122px;
+  }
+  .oppia-translation-tutorial-completion-title {
+    font-size: 16px;
+  }
+  .oppia-translation-tutorial-completion-description {
+    font-size: 14px;
+  }
+  .oppia-translation-tutorial-completion-actions {
+    justify-content: stretch;
+  }
+  .oppia-translation-tutorial-completion-close-button {
+    font-size: 16px;
+    min-width: 130px;
+    width: 100%;
+  }
+}
+
+.oppia-translation-skip-confirmation-modal {
+  background: #fff;
+  border-radius: 4px;
+  color: #333;
+  font-family: "Roboto", Arial, sans-serif;
+  min-height: 260px;
+  padding: 35px 16px 16px;
+  position: relative;
+  text-align: center;
+}
+.oppia-translation-skip-confirmation-close-button {
+  background: transparent;
+  border: 0;
+  color: #333;
+  font-size: 29px;
+  line-height: 1;
+  padding: 0;
+  position: absolute;
+  right: 12px;
+  top: 9px;
+}
+.oppia-translation-skip-confirmation-title {
+  color: #00645c;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 22px;
+  font-weight: normal;
+  line-height: 1.3;
+  margin: 0 0 24px;
+}
+.oppia-translation-skip-confirmation-description {
+  font-size: 17px;
+  line-height: 1.2;
+  margin: 0 auto 23px;
+  max-width: 395px;
+}
+.oppia-translation-skip-confirmation-checkbox {
+  align-items: center;
+  display: flex;
+  font-size: 16px;
+  gap: 10px;
+  justify-content: center;
+  margin: 0 auto 25px;
+}
+.oppia-translation-skip-confirmation-checkbox input[type="checkbox"] {
+  height: 19px;
+  margin: 0;
+  width: 19px;
+}
+.oppia-translation-skip-confirmation-checkbox label {
+  margin: 0;
+}
+.oppia-translation-skip-confirmation-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.oppia-translation-skip-confirmation-skip-button,
+.oppia-translation-skip-confirmation-cancel-button {
+  border: 1px solid #00645c;
+  font-size: 16px;
+  font-weight: bold;
+  min-width: 120px;
+  padding: 10px 16px;
+}
+.oppia-translation-skip-confirmation-skip-button {
+  background: #fff;
+  color: #00645c;
+}
+.oppia-translation-skip-confirmation-cancel-button {
+  background-color: #00645c;
+  color: #fff;
+}
+.oppia-translation-skip-confirmation-cancel-button:hover,
+.oppia-translation-skip-confirmation-cancel-button:focus {
+  background-color: #004e48;
+  color: #fff;
+}
+@media (max-width: 560px) {
+  .oppia-translation-skip-confirmation-modal {
+    padding: 34px 14px 14px;
+  }
+  .oppia-translation-skip-confirmation-description {
+    font-size: 15px;
+  }
+  .oppia-translation-skip-confirmation-actions {
+    gap: 12px;
+  }
+  .oppia-translation-skip-confirmation-skip-button,
+  .oppia-translation-skip-confirmation-cancel-button {
+    flex: 1;
+  }
+}
+
 .modal.in .modal-dialog {
   -webkit-transform: translate(0,0);
   -ms-transform: translate(0,0);

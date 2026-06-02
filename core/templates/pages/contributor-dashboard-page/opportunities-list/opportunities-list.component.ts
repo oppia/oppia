@@ -50,6 +50,8 @@ export class OpportunitiesListComponent {
   @Input() showOpportunityButton: boolean = true;
   @Input() showPinUnpinButton: boolean = false;
 
+  @Input() isInCDTutorial: boolean = false;
+
   @Output() clickActionButton: EventEmitter<string> = new EventEmitter();
 
   @Output() clickPinButton: EventEmitter<{

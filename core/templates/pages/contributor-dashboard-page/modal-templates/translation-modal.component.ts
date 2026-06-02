@@ -20,7 +20,10 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  EventEmitter,
   Input,
+  Output,
+  TemplateRef,
   ViewChild,
 } from '@angular/core';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -52,6 +55,9 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {JoyrideService} from 'ngx-joyride';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {TranslationTutorialImageCustomizationModalComponent} from './translation-tutorial-image-customization-modal.component';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -98,6 +104,10 @@ export interface ImageDetails {
   descriptions: string[];
 }
 
+const TRANSLATION_TUTORIAL_EXPECTED_TRANSLATION =
+  'Nos encantan las matemáticas';
+const TRANSLATION_TUTORIAL_BACKDROP_COLOR = 'rgba(0, 0, 0, 0.55)';
+
 @Component({
   selector: 'oppia-translation-modal',
   templateUrl: './translation-modal.component.html',
@@ -108,6 +118,10 @@ export class TranslationModalComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() opportunity!: TranslationOpportunity;
   @Input() modifyTranslationOpportunity!: ModifyTranslationOpportunity;
+  @Input() isTranslationTutorial: boolean = false;
+  @Input() initialTranslationTutorialStepNumber: number = 3;
+  @Output() tutorialEditorReady: EventEmitter<void> = new EventEmitter();
+  @Output() tutorialProgressChange: EventEmitter<number> = new EventEmitter();
   activeDataFormat!: string;
   activeWrittenTranslation: string | string[] = '';
   activeContentType!: string;
@@ -137,6 +151,10 @@ export class TranslationModalComponent {
   };
 
   TRANSLATION_TIPS = AppConstants.TRANSLATION_TIPS;
+  translationTutorialImageUrl: string = '';
+  copyToolTourPreviewImageUrl: string = '';
+  translationTutorialImageWasClicked: boolean = false;
+  translationTutorialImageWasCopied: boolean = false;
   isActiveLanguageReviewer: boolean = false;
   hadCopyParagraphError: boolean = false;
   hasImgTextError: boolean = false;
@@ -167,11 +185,44 @@ export class TranslationModalComponent {
   @ViewChild('translationContainer')
   translationContainer!: ElementRef;
 
+  @ViewChild('TranslationCopyToolTourStep')
+  translationCopyToolTourStep!: TemplateRef<unknown>;
+
+  @ViewChild('TranslationTourPreviousButton')
+  translationTourPreviousButton!: TemplateRef<unknown>;
+
+  @ViewChild('TranslationTourNextButton')
+  translationTourNextButton!: TemplateRef<unknown>;
+
+  @ViewChild('TranslationTourDoneButton')
+  translationTourDoneButton!: TemplateRef<unknown>;
+
+  @ViewChild('TranslationTourCounter')
+  translationTourCounter!: TemplateRef<unknown>;
+
+  private translationTutorialModalElement: HTMLElement | null = null;
+  private translationTutorialImageModalElement: HTMLElement | null = null;
+  private readonly translationEditorJoyRideSteps: string[] = [
+    'contributorDashboardTranslationOpportunity',
+    'contributorDashboardTranslationEditor',
+    'contributorDashboardTranslationCopyTool',
+    'contributorDashboardTranslationSubmit',
+  ];
+  activeTranslationTutorialJoyrideStep: string = '';
+  isEditorFocused: boolean = false;
+
   private beforeUnloadHandler: (e: BeforeUnloadEvent) => string | undefined =
     () => undefined;
+  private readonly redrawTranslationTourOnModalScroll = (): void => {
+    this.windowRef.nativeWindow.dispatchEvent(new Event('resize'));
+    setTimeout(() => {
+      this.positionTranslationCopyToolTourPopup();
+    });
+  };
 
   constructor(
     public readonly activeModal: NgbActiveModal,
+    private readonly hostElement: ElementRef,
     private readonly alertsService: AlertsService,
     private readonly ckEditorCopyContentService: CkEditorCopyContentService,
     private readonly pageContextService: PageContextService,
@@ -184,8 +235,19 @@ export class TranslationModalComponent {
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly wds: WindowDimensionsService,
     private readonly translationValidationService: TranslationValidationService,
-    private readonly windowRef: WindowRef
-  ) {}
+    private readonly windowRef: WindowRef,
+    private readonly joyride: JoyrideService,
+    private readonly urlInterpolationService: UrlInterpolationService
+  ) {
+    this.translationTutorialImageUrl =
+      this.urlInterpolationService.getStaticImageUrl(
+        '/contributor_dashboard/translation_tutorial_students.png'
+      );
+    this.copyToolTourPreviewImageUrl =
+      this.urlInterpolationService.getStaticImageUrl(
+        '/contributor_dashboard/translation-editor-copy-tool.gif'
+      );
+  }
 
   public get expansionTabType(): typeof ExpansionTabType {
     return ExpansionTabType;
@@ -204,7 +266,20 @@ export class TranslationModalComponent {
     this.languageDescription =
       this.translationLanguageService.getActiveLanguageDescription();
 
-    if (!this.modifyTranslationOpportunity) {
+    if (this.isTranslationTutorial) {
+      this.textToTranslate = 'We love math.';
+      this.activeContentType = 'card';
+      this.activeWrittenTranslation =
+        this.getInitialTranslationTutorialWrittenTranslation();
+      this.translationTutorialImageWasCopied =
+        this.initialTranslationTutorialStepNumber >= 5;
+      this.ckEditorCopyContentService.copyModeActive = false;
+      this.activeDataFormat = 'html';
+      this.loadingData = false;
+      this.activeTranslationTutorialJoyrideStep =
+        'contributorDashboardTranslationEditor';
+      this.isEditorFocused = false;
+    } else if (!this.modifyTranslationOpportunity) {
       // We need to set the context here so that the rte fetches
       // images for the given ENTITY_TYPE and targetId.
       this.pageContextService.setCustomEntityContext(
@@ -286,12 +361,363 @@ export class TranslationModalComponent {
     );
   }
 
+  private getInitialTranslationTutorialWrittenTranslation(): string {
+    if (this.initialTranslationTutorialStepNumber < 4) {
+      return '';
+    }
+
+    if (this.initialTranslationTutorialStepNumber < 5) {
+      return TRANSLATION_TUTORIAL_EXPECTED_TRANSLATION;
+    }
+
+    return (
+      TRANSLATION_TUTORIAL_EXPECTED_TRANSLATION +
+      `<p><img src="${this.translationTutorialImageUrl}" ` +
+      'alt="Three students smiling around a pizza"></p>'
+    );
+  }
+
   ngAfterViewInit(): void {
     this.computePanelOverflowState();
+    if (this.isTranslationTutorial) {
+      this.translationTutorialModalElement = (
+        this.hostElement.nativeElement as HTMLElement
+      ).closest('.modal');
+      this.translationTutorialModalElement?.addEventListener(
+        'scroll',
+        this.redrawTranslationTourOnModalScroll
+      );
+    }
   }
 
   ngAfterContentChecked(): void {
     this.computeTranslationEditorOverflowState();
+  }
+
+  onHtmlEditorReady(): void {
+    if (this.isTranslationTutorial) {
+      this.tutorialEditorReady.emit();
+    }
+  }
+
+  onEditorFocused(): void {
+    this.isEditorFocused = true;
+  }
+
+  isTranslationTutorialAnswerComplete(): boolean {
+    if (
+      !this.isTranslationTutorial ||
+      typeof this.activeWrittenTranslation !== 'string'
+    ) {
+      return false;
+    }
+
+    const parsedTranslation = new DOMParser().parseFromString(
+      this.activeWrittenTranslation,
+      'text/html'
+    );
+    const translationText = (
+      parsedTranslation.body.textContent || this.activeWrittenTranslation
+    )
+      .trim()
+      .replace(/\s+/g, ' ')
+      .replace(/[.!?]$/, '')
+      .toLowerCase();
+
+    return (
+      translationText ===
+      TRANSLATION_TUTORIAL_EXPECTED_TRANSLATION.toLowerCase()
+    );
+  }
+
+  isTranslationTutorialNextButtonEnabled(): boolean {
+    if (
+      this.activeTranslationTutorialJoyrideStep ===
+      'contributorDashboardTranslationCopyTool'
+    ) {
+      return this.translationTutorialImageWasCopied;
+    }
+
+    return this.isTranslationTutorialAnswerComplete();
+  }
+
+  private getTranslationTutorialStepNumber(stepName: string): number {
+    switch (stepName) {
+      case 'contributorDashboardTranslationEditor':
+        return 3;
+      case 'contributorDashboardTranslationCopyTool':
+        return 4;
+      case 'contributorDashboardTranslationSubmit':
+        return 5;
+      default:
+        return 1;
+    }
+  }
+
+  private setActiveTranslationTutorialJoyrideStep(stepName: string): void {
+    this.activeTranslationTutorialJoyrideStep = stepName;
+    this.tutorialProgressChange.emit(
+      this.getTranslationTutorialStepNumber(stepName)
+    );
+  }
+
+  onTranslationTutorialNextButtonClick(event: MouseEvent): void {
+    if (!this.isTranslationTutorialNextButtonEnabled()) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    if (
+      !this.activeTranslationTutorialJoyrideStep ||
+      this.activeTranslationTutorialJoyrideStep ===
+        'contributorDashboardTranslationEditor'
+    ) {
+      this.setActiveTranslationTutorialJoyrideStep(
+        'contributorDashboardTranslationCopyTool'
+      );
+    } else if (
+      this.activeTranslationTutorialJoyrideStep ===
+      'contributorDashboardTranslationCopyTool'
+    ) {
+      this.setActiveTranslationTutorialJoyrideStep(
+        'contributorDashboardTranslationSubmit'
+      );
+    }
+  }
+
+  onTranslationTutorialCopyToolToggled(): void {
+    if (!this.isTranslationTutorial || !this.isCopyModeActive()) {
+      return;
+    }
+
+    this.changeDetectorRef.detectChanges();
+    setTimeout(() => {
+      this.restartTranslationEditorTourAtStep(
+        'contributorDashboardTranslationCopyTool'
+      );
+    });
+  }
+
+  onTranslationTutorialImageClick(event: MouseEvent | KeyboardEvent): void {
+    if (!this.isTranslationTutorial || !this.isCopyModeActive()) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    this.translationTutorialImageWasClicked = true;
+    const modalRef = this.ngbModal.open(
+      TranslationTutorialImageCustomizationModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'oppia-translation-tutorial-image-customization-modal',
+      }
+    );
+    modalRef.componentInstance.imageUrl = this.translationTutorialImageUrl;
+    modalRef.componentInstance.translationCopyToolTourStep =
+      this.translationCopyToolTourStep;
+    modalRef.componentInstance.translationTourPreviousButton =
+      this.translationTourPreviousButton;
+    modalRef.componentInstance.translationTourNextButton =
+      this.translationTourNextButton;
+    modalRef.componentInstance.translationTourDoneButton =
+      this.translationTourDoneButton;
+    modalRef.componentInstance.translationTourCounter =
+      this.translationTourCounter;
+    modalRef.result.then(
+      result => {
+        this.detachTranslationTutorialImageModalScrollListener();
+        if (result === 'done') {
+          this.completeTranslationTutorialImageCopy();
+        }
+      },
+      () => this.detachTranslationTutorialImageModalScrollListener()
+    );
+
+    this.changeDetectorRef.detectChanges();
+    setTimeout(() => {
+      this.attachTranslationTutorialImageModalScrollListener();
+      this.restartTranslationEditorTourAtStep(
+        'contributorDashboardTranslationCopyTool'
+      );
+    });
+  }
+
+  private completeTranslationTutorialImageCopy(): void {
+    this.translationTutorialImageWasCopied = true;
+    this.setActiveTranslationTutorialJoyrideStep(
+      'contributorDashboardTranslationCopyTool'
+    );
+    this.ckEditorCopyContentService.copyModeActive = false;
+    document.body.style.cursor = '';
+
+    if (
+      typeof this.activeWrittenTranslation === 'string' &&
+      !this.activeWrittenTranslation.includes(this.translationTutorialImageUrl)
+    ) {
+      const imageHtml =
+        `<p><img src="${this.translationTutorialImageUrl}" ` +
+        'alt="Three students smiling"></p>';
+      this.activeWrittenTranslation = `${this.activeWrittenTranslation}${imageHtml}`;
+    }
+
+    this.changeDetectorRef.detectChanges();
+    setTimeout(() => {
+      this.restartTranslationEditorTourAtStep(
+        'contributorDashboardTranslationCopyTool'
+      );
+    });
+  }
+
+  private restartTranslationEditorTourAtStep(startWith: string): void {
+    this.joyride.closeTour();
+    this.joyride
+      .startTour({
+        steps: this.translationEditorJoyRideSteps,
+        startWith,
+        stepDefaultPosition: 'right',
+        themeColor: '#1354a5',
+      })
+      .subscribe(step => {
+        if (step) {
+          this.setActiveTranslationTutorialJoyrideStep(step.name);
+        } else {
+          this.activeTranslationTutorialJoyrideStep =
+            'contributorDashboardTranslationEditor';
+        }
+        this.redrawActiveTranslationTourStep();
+      });
+  }
+
+  private attachTranslationTutorialImageModalScrollListener(): void {
+    this.detachTranslationTutorialImageModalScrollListener();
+    this.translationTutorialImageModalElement =
+      document.querySelector<HTMLElement>(
+        '.oppia-translation-tutorial-image-customization-modal'
+      );
+    this.translationTutorialImageModalElement?.addEventListener(
+      'scroll',
+      this.redrawTranslationTourOnModalScroll
+    );
+  }
+
+  private detachTranslationTutorialImageModalScrollListener(): void {
+    this.translationTutorialImageModalElement?.removeEventListener(
+      'scroll',
+      this.redrawTranslationTourOnModalScroll
+    );
+    this.translationTutorialImageModalElement = null;
+  }
+
+  private redrawActiveTranslationTourStep(): void {
+    this.windowRef.nativeWindow.dispatchEvent(new Event('resize'));
+    this.displayTranslationEditorTourAboveModal();
+    this.allowInteractionsBehindTranslationTour();
+    setTimeout(() => {
+      this.windowRef.nativeWindow.dispatchEvent(new Event('resize'));
+      this.positionTranslationCopyToolTourPopup();
+    });
+  }
+
+  private displayTranslationEditorTourAboveModal(): void {
+    const backdropContainer = document.querySelector<HTMLElement>(
+      '.backdrop-container'
+    );
+    const editorTourPopups = document.querySelectorAll<HTMLElement>(
+      '#joyride-step-contributorDashboardTranslationEditor, ' +
+        '#joyride-step-contributorDashboardTranslationCopyTool, ' +
+        '#joyride-step-contributorDashboardTranslationSubmit'
+    );
+
+    if (backdropContainer) {
+      backdropContainer.style.zIndex = '1060';
+      backdropContainer.style.opacity = '1';
+    }
+    document
+      .querySelectorAll<HTMLElement>('.joyride-backdrop')
+      .forEach(backdropElement => {
+        backdropElement.style.backgroundColor =
+          TRANSLATION_TUTORIAL_BACKDROP_COLOR;
+      });
+    editorTourPopups.forEach(editorTourPopup => {
+      editorTourPopup.style.zIndex = '1061';
+    });
+    this.positionTranslationCopyToolTourPopup();
+    setTimeout(() => {
+      this.positionTranslationCopyToolTourPopup();
+    });
+  }
+
+  private allowInteractionsBehindTranslationTour(): void {
+    document
+      .querySelectorAll<HTMLElement>(
+        '.backdrop-container, .backdrop-container *'
+      )
+      .forEach(element => {
+        element.style.pointerEvents = 'none';
+      });
+  }
+
+  private positionTranslationCopyToolTourPopup(): void {
+    if (!this.isTranslationTutorial) {
+      return;
+    }
+
+    const copyToolTourPopup = document.querySelector<HTMLElement>(
+      '#joyride-step-contributorDashboardTranslationCopyTool'
+    );
+
+    if (!copyToolTourPopup) {
+      return;
+    }
+
+    const isImageCustomizationStep =
+      this.translationTutorialImageWasClicked &&
+      !this.translationTutorialImageWasCopied;
+
+    copyToolTourPopup.style.position = 'fixed';
+    copyToolTourPopup.style.left = 'auto';
+    copyToolTourPopup.style.right = '0px';
+    copyToolTourPopup.style.top = isImageCustomizationStep ? '150px' : 'auto';
+    copyToolTourPopup.style.bottom = isImageCustomizationStep ? 'auto' : '16px';
+    copyToolTourPopup.style.width = isImageCustomizationStep ? '400px' : 'auto';
+    copyToolTourPopup.style.maxWidth = isImageCustomizationStep
+      ? '400px'
+      : 'none';
+    copyToolTourPopup.style.transform = 'none';
+    copyToolTourPopup.style.zIndex = '1061';
+
+    const copyToolTourArrow = copyToolTourPopup.querySelector<HTMLElement>(
+      '.joyride-step__arrow'
+    );
+    if (copyToolTourArrow) {
+      copyToolTourArrow.style.display = 'none';
+    }
+
+    this.hideTranslationCopyToolBackdropTarget();
+  }
+
+  private hideTranslationCopyToolBackdropTarget(): void {
+    if (
+      !this.translationTutorialImageWasClicked ||
+      !this.translationTutorialImageWasCopied
+    ) {
+      return;
+    }
+
+    const backdropContainer = document.querySelector<HTMLElement>(
+      '#backdrop-contributorDashboardTranslationCopyTool'
+    );
+
+    const backdropTarget =
+      backdropContainer?.querySelector<HTMLElement>('.backdrop-target');
+
+    if (!backdropTarget) {
+      return;
+    }
+
+    backdropTarget.style.backgroundColor = TRANSLATION_TUTORIAL_BACKDROP_COLOR;
   }
 
   computeTranslationEditorOverflowState(): void {
@@ -531,6 +957,14 @@ export class TranslationModalComponent {
   }
 
   suggestTranslatedText(): void {
+    if (this.isTranslationTutorial) {
+      this.joyride.closeTour();
+      this.pageContextService.resetImageSaveDestination();
+      this.activeModal.close('translationTutorialComplete');
+      this.ckEditorCopyContentService.copyModeActive = false;
+      return;
+    }
+
     if (!this.canTranslatedTextBeSubmitted()) {
       return;
     }
@@ -619,6 +1053,11 @@ export class TranslationModalComponent {
   }
 
   ngOnDestroy(): void {
+    this.translationTutorialModalElement?.removeEventListener(
+      'scroll',
+      this.redrawTranslationTourOnModalScroll
+    );
+    this.detachTranslationTutorialImageModalScrollListener();
     this.windowRef.nativeWindow.removeEventListener(
       'beforeunload',
       this.beforeUnloadHandler

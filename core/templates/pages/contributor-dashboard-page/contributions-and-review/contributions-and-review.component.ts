@@ -17,9 +17,14 @@
  */
 
 import {
+  AfterViewInit,
   Component,
+  EventEmitter,
+  OnChanges,
   OnDestroy,
   OnInit,
+  Output,
+  SimpleChanges,
   ViewChild,
   HostListener,
   Input,
@@ -57,6 +62,10 @@ import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {JoyrideService} from 'ngx-joyride';
+
+const TRANSLATION_TUTORIAL_BACKDROP_COLOR = 'rgba(0, 0, 0, 0.55)';
+
 export interface Suggestion {
   change_cmd: {
     skill_id: string;
@@ -123,14 +132,28 @@ export interface CustomMatSnackBarRef {
   onAction: () => Observable<void>;
 }
 
+interface TutorialContributionTypeOption {
+  displayName: string;
+  contributionType: string;
+}
+
 const COMMIT_TIMEOUT_DURATION = 30000;
+const TRANSLATION_REPLAY_SECTION_TOUR_STEP =
+  'contributorDashboardTranslationReplaySection';
 
 @Component({
   selector: 'oppia-contributions-and-review',
   templateUrl: './contributions-and-review.component.html',
 })
-export class ContributionsAndReview implements OnInit, OnDestroy {
+export class ContributionsAndReview
+  implements OnInit, OnChanges, AfterViewInit, OnDestroy
+{
   @Input() activeTopicName: string;
+  @Input() translationTutorialProgressPercentage: number = 0;
+  @Input() showTranslationTutorialReplaySectionTour: boolean = false;
+  @Output() replayTranslationTour: EventEmitter<void> = new EventEmitter();
+  @Output() translationTutorialReplaySectionTourShown: EventEmitter<void> =
+    new EventEmitter();
   @ViewChild('opportunitiesList')
   opportunitiesListRef!: OpportunitiesListComponent;
 
@@ -143,6 +166,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   TAB_TYPE_CONTRIBUTIONS: string;
   TAB_TYPE_REVIEWS: string;
   TAB_TYPE_ACCOMPLISHMENTS: string;
+  TAB_TYPE_GETTING_STARTED: string;
+  GETTING_STARTED_TYPE_TUTORIALS: string;
   REVIEWABLE_QUESTIONS_SORT_KEYS: string[];
   activeExplorationId: string;
   contributions: Record<string, SuggestionDetails> | object;
@@ -155,6 +180,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   reviewTabs: TabDetails[] = [];
   accomplishmentsTabs: TabDetails[] = [];
   contributionTabs: TabDetails[] = [];
+  gettingStartedTabs: TabDetails[] = [];
   languageCode: string;
   userCreatedQuestionsSortKey: string;
   reviewableQuestionsSortKey: string;
@@ -175,6 +201,27 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   opportunities: ExplorationOpportunitySummary[] = [];
 
   defaultContributionType: string = 'translationContribution';
+  selectedTutorialContributionType: string = 'translationContribution';
+  tutorialContributionDropdownShown: boolean = false;
+  tutorialContributionTypeOptions: TutorialContributionTypeOption[] = [
+    {
+      displayName:
+        AppConstants.CONTRIBUTION_STATS_TYPES.TRANSLATION_CONTRIBUTION
+          .DISPLAY_NAME,
+      contributionType:
+        AppConstants.CONTRIBUTION_STATS_TYPES.TRANSLATION_CONTRIBUTION.NAME,
+    },
+    {
+      displayName:
+        AppConstants.CONTRIBUTION_STATS_TYPES.QUESTION_CONTRIBUTION
+          .DISPLAY_NAME,
+      contributionType:
+        AppConstants.CONTRIBUTION_STATS_TYPES.QUESTION_CONTRIBUTION.NAME,
+    },
+  ];
+  replaySectionTourStep: string = TRANSLATION_REPLAY_SECTION_TOUR_STEP;
+  private viewHasInitialized: boolean = false;
+  private replaySectionTourHasStarted: boolean = false;
   SUGGESTION_LABELS = {
     review: {
       text: 'Awaiting review',
@@ -205,7 +252,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     private htmlLengthService: HtmlLengthService,
     private htmlEscaperService: HtmlEscaperService,
     private snackBar: MatSnackBar,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private joyride: JoyrideService
   ) {}
 
   getQuestionContributionsSummary(
@@ -636,7 +684,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   getActiveDropdownTabText(tabType: string, subType: string): string {
     const tabs = this.contributionTabs.concat(
       this.reviewTabs,
-      this.accomplishmentsTabs
+      this.accomplishmentsTabs,
+      this.gettingStartedTabs
     );
     const tab = tabs.find(
       tab => tab.tabType === tabType && tab.tabSubType === subType
@@ -661,14 +710,109 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     this.activeTabSubtype = subType;
     this.contributionAndReviewService.setActiveTabType(tabType);
     this.contributionAndReviewService.setActiveSuggestionType(subType);
-    if (!this.isAccomplishmentsTabActive()) {
+    if (!this.isAccomplishmentsTabActive() && !this.isTutorialsTabActive()) {
       this.activeExplorationId = null;
       this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
     }
   }
 
+  onClickReplayTranslationTour(): void {
+    this.replayTranslationTour.emit();
+  }
+
+  getBoundedTranslationTutorialProgressPercentage(): number {
+    return Math.floor(
+      Math.min(100, Math.max(0, this.translationTutorialProgressPercentage))
+    );
+  }
+
+  getTranslationTutorialActionButtonLabel(): string {
+    const progressPercentage =
+      this.getBoundedTranslationTutorialProgressPercentage();
+
+    if (progressPercentage === 0) {
+      return 'Start';
+    } else if (progressPercentage === 100) {
+      return 'Replay';
+    }
+
+    return 'Continue';
+  }
+
+  getTranslationTutorialActionButtonIconClass(): string {
+    return this.getBoundedTranslationTutorialProgressPercentage() === 100
+      ? 'fa-redo-alt'
+      : 'fa-play';
+  }
+
+  private showTranslationReplaySectionTourIfNeeded(): void {
+    if (
+      !this.showTranslationTutorialReplaySectionTour ||
+      this.replaySectionTourHasStarted ||
+      !this.viewHasInitialized ||
+      !this.userIsLoggedIn ||
+      !this.TAB_TYPE_GETTING_STARTED ||
+      !this.GETTING_STARTED_TYPE_TUTORIALS
+    ) {
+      return;
+    }
+
+    this.replaySectionTourHasStarted = true;
+    this.switchToTab(
+      this.TAB_TYPE_GETTING_STARTED,
+      this.GETTING_STARTED_TYPE_TUTORIALS
+    );
+    setTimeout(() => {
+      this.joyride
+        .startTour({
+          steps: [this.replaySectionTourStep],
+          stepDefaultPosition: 'right',
+          themeColor: '#1354a5',
+        })
+        .subscribe(() => {
+          this.setTranslationTutorialBackdropColor();
+        });
+      this.translationTutorialReplaySectionTourShown.emit();
+    });
+  }
+
+  private setTranslationTutorialBackdropColor(): void {
+    document
+      .querySelectorAll<HTMLElement>('.joyride-backdrop')
+      .forEach(backdropElement => {
+        backdropElement.style.backgroundColor =
+          TRANSLATION_TUTORIAL_BACKDROP_COLOR;
+      });
+  }
+
   toggleDropdown(): void {
     this.dropdownShown = !this.dropdownShown;
+  }
+
+  toggleTutorialContributionDropdown(): void {
+    this.tutorialContributionDropdownShown =
+      !this.tutorialContributionDropdownShown;
+  }
+
+  selectTutorialContributionType(contributionType: string): void {
+    this.selectedTutorialContributionType = contributionType;
+    this.tutorialContributionDropdownShown = false;
+  }
+
+  getSelectedTutorialContributionTypeDisplayName(): string {
+    return (
+      this.tutorialContributionTypeOptions.find(
+        option =>
+          option.contributionType === this.selectedTutorialContributionType
+      )?.displayName || ''
+    );
+  }
+
+  isTranslationTutorialContributionTypeSelected(): boolean {
+    return (
+      this.selectedTutorialContributionType ===
+      AppConstants.CONTRIBUTION_STATS_TYPES.TRANSLATION_CONTRIBUTION.NAME
+    );
   }
 
   loadReviewableTranslationOpportunities(): Promise<GetOpportunitiesResponse> {
@@ -744,7 +888,11 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     if (shouldResetOffset) {
       this.contributions = {};
     }
-    if (!this.activeTabType || !this.activeTabSubtype) {
+    if (
+      !this.activeTabType ||
+      !this.activeTabSubtype ||
+      this.isTutorialsTabActive()
+    ) {
       return new Promise((resolve, reject) => {
         resolve({opportunitiesDicts: [], more: false});
       });
@@ -777,23 +925,37 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
 
   @HostListener('document:click', ['$event'])
   closeDropdownWhenClickedOutside(clickEvent: {target: Node}): void {
-    const dropdown = document.querySelector(
+    const mobileDropdown = document.querySelector(
       '.oppia-contributions-dropdown-container'
     );
-    if (!dropdown) {
+    const tutorialContributionTypeDropdown = document.querySelector(
+      '.oppia-tutorials-contribution-type-dropdown'
+    );
+
+    if (!clickEvent) {
       return;
     }
 
-    const clickOccurredWithinDropdown = dropdown.contains(clickEvent.target);
+    const clickOccurredWithinDropdown =
+      mobileDropdown?.contains(clickEvent.target) ||
+      tutorialContributionTypeDropdown?.contains(clickEvent.target);
     if (clickOccurredWithinDropdown) {
       return;
     }
 
     this.dropdownShown = false;
+    this.tutorialContributionDropdownShown = false;
   }
 
   isAccomplishmentsTabActive(): boolean {
     return this.activeTabType === this.TAB_TYPE_ACCOMPLISHMENTS;
+  }
+
+  isTutorialsTabActive(): boolean {
+    return (
+      this.activeTabType === this.TAB_TYPE_GETTING_STARTED &&
+      this.activeTabSubtype === this.GETTING_STARTED_TYPE_TUTORIALS
+    );
   }
 
   setReviewableQuestionsSortKey(sortKey: string): void {
@@ -809,6 +971,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     this.TAB_TYPE_CONTRIBUTIONS = 'contributions';
     this.TAB_TYPE_REVIEWS = 'reviews';
     this.TAB_TYPE_ACCOMPLISHMENTS = 'accomplishments';
+    this.TAB_TYPE_GETTING_STARTED = 'getting_started';
+    this.GETTING_STARTED_TYPE_TUTORIALS = 'tutorials';
     this.REVIEWABLE_QUESTIONS_SORT_KEYS = [
       AppConstants.SUGGESTIONS_SORT_KEY_DATE,
     ];
@@ -853,6 +1017,14 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         tabSubType: 'badges',
         tabType: this.TAB_TYPE_ACCOMPLISHMENTS,
         text: 'Badges',
+        enabled: true,
+      },
+    ];
+    this.gettingStartedTabs = [
+      {
+        tabSubType: this.GETTING_STARTED_TYPE_TUTORIALS,
+        tabType: this.TAB_TYPE_GETTING_STARTED,
+        text: 'Tutorials',
         enabled: true,
       },
     ];
@@ -941,6 +1113,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
                 this.SUGGESTION_TYPE_TRANSLATE
               );
             }
+            this.showTranslationReplaySectionTourIfNeeded();
           });
       }
     });
@@ -1013,6 +1186,19 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   onChangeLanguage(languageCode: string): void {
     this.languageCode = languageCode;
     this.opportunitiesListRef.onChangeLanguage(languageCode);
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.showTranslationTutorialReplaySectionTour) {
+      this.showTranslationReplaySectionTourIfNeeded();
+    }
+  }
+
+  ngAfterViewInit(): void {
+    this.viewHasInitialized = true;
+    setTimeout(() => {
+      this.showTranslationReplaySectionTourIfNeeded();
+    });
   }
 
   ngOnDestroy(): void {

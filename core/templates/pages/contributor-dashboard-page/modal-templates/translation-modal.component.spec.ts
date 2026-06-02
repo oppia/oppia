@@ -31,12 +31,15 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {NgbModal, NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {JoyrideService} from 'ngx-joyride';
+import {of} from 'rxjs';
 import {AppConstants} from 'app.constants';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import {
   TranslationModalComponent,
   TranslationOpportunity,
 } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
+import {TranslationTutorialImageCustomizationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-tutorial-image-customization-modal.component';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {PageContextService} from 'services/page-context.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -66,7 +69,7 @@ class MockChangeDetectorRef {
 }
 
 class MockConfirmTranslationExitModal {
-  componentInstance = {};
+  componentInstance: {imageUrl?: string} = {};
   result = Promise.resolve();
   close(): void {}
   dismiss(): void {}
@@ -113,6 +116,7 @@ describe('Translation Modal Component', () => {
   let mockWindow: {
     addEventListener: jasmine.Spy;
     removeEventListener: jasmine.Spy;
+    dispatchEvent: jasmine.Spy;
     gtag: jasmine.Spy;
   };
 
@@ -142,6 +146,7 @@ describe('Translation Modal Component', () => {
     mockWindow = {
       addEventListener: jasmine.createSpy('addEventListener'),
       removeEventListener: jasmine.createSpy('removeEventListener'),
+      dispatchEvent: jasmine.createSpy('dispatchEvent'),
       gtag: jasmine.createSpy('gtag'),
     };
 
@@ -175,6 +180,13 @@ describe('Translation Modal Component', () => {
         {
           provide: ImageLocalStorageService,
           useClass: MockImageLocalStorageService,
+        },
+        {
+          provide: JoyrideService,
+          useValue: {
+            closeTour: () => {},
+            startTour: () => of(null),
+          },
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -600,6 +612,196 @@ describe('Translation Modal Component', () => {
         'Current translated content.'
       );
       expect(modifyOnlyComponent.activeDataFormat).toBe('html');
+    });
+
+    it('should initialize the translation tutorial with sample text', () => {
+      const initSpy = spyOn(translateTextService, 'init');
+      component.isTranslationTutorial = true;
+
+      component.ngOnInit();
+
+      expect(initSpy).not.toHaveBeenCalled();
+      expect(component.textToTranslate).toBe('We love math.');
+      expect(component.activeContentType).toBe('card');
+      expect(component.activeWrittenTranslation).toBe('');
+      expect(component.activeDataFormat).toBe('html');
+      expect(component.loadingData).toBeFalsy();
+    });
+
+    it('should initialize the resumed translation tutorial at copy tool step', () => {
+      component.isTranslationTutorial = true;
+      component.initialTranslationTutorialStepNumber = 4;
+
+      component.ngOnInit();
+
+      expect(component.activeWrittenTranslation).toBe(
+        'Nos encantan las matemáticas'
+      );
+      expect(component.translationTutorialImageWasCopied).toBeFalsy();
+    });
+
+    it('should initialize the resumed translation tutorial at submit step', () => {
+      component.isTranslationTutorial = true;
+      component.initialTranslationTutorialStepNumber = 5;
+
+      component.ngOnInit();
+
+      expect(component.activeWrittenTranslation as string).toContain(
+        'Nos encantan las matemáticas'
+      );
+      expect(component.activeWrittenTranslation as string).toContain(
+        component.translationTutorialImageUrl
+      );
+      expect(component.translationTutorialImageWasCopied).toBeTruthy();
+    });
+
+    it('should announce when the tutorial editor is ready', () => {
+      const editorReadySpy = spyOn(component.tutorialEditorReady, 'emit');
+      component.isTranslationTutorial = true;
+
+      component.onHtmlEditorReady();
+
+      expect(editorReadySpy).toHaveBeenCalled();
+    });
+
+    it('should enable the next step after the tutorial answer is complete', () => {
+      component.isTranslationTutorial = true;
+
+      component.activeWrittenTranslation =
+        '<p>Nos encantan las matemáticas.</p>';
+
+      expect(component.isTranslationTutorialAnswerComplete()).toBeTruthy();
+    });
+
+    it('should accept the tutorial answer without final punctuation', () => {
+      component.isTranslationTutorial = true;
+
+      component.activeWrittenTranslation = 'Nos encantan las matemáticas';
+
+      expect(component.isTranslationTutorialAnswerComplete()).toBeTruthy();
+    });
+
+    it('should not enable the next step for a wrong tutorial answer', () => {
+      component.isTranslationTutorial = true;
+
+      component.activeWrittenTranslation = '<p>Nos gusta matemáticas.</p>';
+
+      expect(component.isTranslationTutorialAnswerComplete()).toBeFalsy();
+    });
+
+    it('should block the tutorial next button until the answer is complete', () => {
+      const clickEvent = jasmine.createSpyObj<MouseEvent>('clickEvent', [
+        'preventDefault',
+        'stopPropagation',
+      ]);
+      component.isTranslationTutorial = true;
+      component.activeWrittenTranslation = '';
+
+      component.onTranslationTutorialNextButtonClick(clickEvent);
+
+      expect(clickEvent.preventDefault).toHaveBeenCalled();
+      expect(clickEvent.stopPropagation).toHaveBeenCalled();
+    });
+
+    it('should allow the tutorial next button after the answer is complete', () => {
+      const clickEvent = jasmine.createSpyObj<MouseEvent>('clickEvent', [
+        'preventDefault',
+        'stopPropagation',
+      ]);
+      component.isTranslationTutorial = true;
+      component.activeWrittenTranslation =
+        '<p>Nos encantan las matemáticas.</p>';
+
+      component.onTranslationTutorialNextButtonClick(clickEvent);
+
+      expect(clickEvent.preventDefault).not.toHaveBeenCalled();
+      expect(clickEvent.stopPropagation).not.toHaveBeenCalled();
+    });
+
+    it('should open the image customization modal when tutorial image is clicked', () => {
+      const clickEvent = jasmine.createSpyObj<MouseEvent>('clickEvent', [
+        'preventDefault',
+        'stopPropagation',
+      ]);
+      const openSpy = spyOn(ngbModal, 'open').and.returnValue(
+        mockModalRef as never
+      );
+      component.isTranslationTutorial = true;
+      ckEditorCopyContentService.copyModeActive = true;
+
+      component.onTranslationTutorialImageClick(clickEvent);
+
+      expect(clickEvent.preventDefault).toHaveBeenCalled();
+      expect(clickEvent.stopPropagation).toHaveBeenCalled();
+      expect(component.translationTutorialImageWasClicked).toBeTruthy();
+      expect(openSpy).toHaveBeenCalledWith(
+        TranslationTutorialImageCustomizationModalComponent,
+        {
+          backdrop: 'static',
+          windowClass: 'oppia-translation-tutorial-image-customization-modal',
+        }
+      );
+      expect(mockModalRef.componentInstance.imageUrl).toBe(
+        component.translationTutorialImageUrl
+      );
+    });
+
+    it('should not open image customization modal outside tutorial copy mode', () => {
+      const clickEvent = jasmine.createSpyObj<MouseEvent>('clickEvent', [
+        'preventDefault',
+        'stopPropagation',
+      ]);
+      const openSpy = spyOn(ngbModal, 'open').and.returnValue(
+        mockModalRef as never
+      );
+      component.isTranslationTutorial = true;
+      ckEditorCopyContentService.copyModeActive = false;
+
+      component.onTranslationTutorialImageClick(clickEvent);
+
+      expect(clickEvent.preventDefault).not.toHaveBeenCalled();
+      expect(clickEvent.stopPropagation).not.toHaveBeenCalled();
+      expect(component.translationTutorialImageWasClicked).toBeFalsy();
+      expect(openSpy).not.toHaveBeenCalled();
+    });
+
+    it('should redraw the tutorial highlight when its modal is scrolled', () => {
+      const modal = document.createElement('div');
+      modal.className = 'modal';
+      modal.appendChild(fixture.nativeElement);
+      component.isTranslationTutorial = true;
+      component.ngAfterViewInit();
+
+      modal.dispatchEvent(new Event('scroll'));
+
+      expect(mockWindow.dispatchEvent).toHaveBeenCalledWith(jasmine.any(Event));
+
+      component.ngOnDestroy();
+      mockWindow.dispatchEvent.calls.reset();
+      modal.dispatchEvent(new Event('scroll'));
+
+      expect(mockWindow.dispatchEvent).not.toHaveBeenCalled();
+    });
+
+    it('should close the tutorial modal as completed without submitting a suggestion', () => {
+      const closeSpy = spyOn(activeModal, 'close');
+      const closeTourSpy = spyOn(TestBed.inject(JoyrideService), 'closeTour');
+      const resetImageSaveDestinationSpy = spyOn(
+        pageContextService,
+        'resetImageSaveDestination'
+      );
+      const suggestTranslatedTextSpy = spyOn(
+        translateTextService,
+        'suggestTranslatedText'
+      );
+      component.isTranslationTutorial = true;
+
+      component.suggestTranslatedText();
+
+      expect(closeTourSpy).toHaveBeenCalled();
+      expect(resetImageSaveDestinationSpy).toHaveBeenCalled();
+      expect(closeSpy).toHaveBeenCalledWith('translationTutorialComplete');
+      expect(suggestTranslatedTextSpy).not.toHaveBeenCalled();
     });
   });
 
@@ -1203,6 +1405,7 @@ describe('Translation Modal Component', () => {
       interface MockWindow {
         addEventListener: jasmine.Spy;
         removeEventListener: jasmine.Spy;
+        dispatchEvent: jasmine.Spy;
       }
 
       let mockWindow: MockWindow;
@@ -1214,6 +1417,7 @@ describe('Translation Modal Component', () => {
         mockWindow = {
           addEventListener: jasmine.createSpy('addEventListener'),
           removeEventListener: jasmine.createSpy('removeEventListener'),
+          dispatchEvent: jasmine.createSpy('dispatchEvent'),
         };
 
         mockEvent = jasmine.createSpyObj<MockBeforeUnloadEvent>(
@@ -1300,6 +1504,13 @@ describe('Translation Modal Component', () => {
                 getEntityType: () => 'exploration',
                 getEntityId: () => '1',
                 getImageSaveDestination: () => 'localStorage',
+              },
+            },
+            {
+              provide: JoyrideService,
+              useValue: {
+                closeTour: () => {},
+                startTour: () => of(null),
               },
             },
           ],

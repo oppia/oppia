@@ -1,3 +1,21 @@
+<ng-template #TranslationReplaySectionTourStep>
+  <div class="oppia-translation-replay-section-tour-content">
+    <h3 tabindex="0">Check out the replay section!</h3>
+    <p tabindex="0">
+      You are able to replay your product tours at any time.
+    </p>
+  </div>
+</ng-template>
+
+<ng-template #TranslationReplaySectionTourDoneButton>
+  <button type="button"
+          class="oppia-translation-replay-section-tour-done-button">
+    Got it!
+  </button>
+</ng-template>
+
+<ng-template #TranslationReplaySectionTourCounter></ng-template>
+
 <div class="oppia-contributions-show-review">
   <div class="oppia-contributions-dropdown-section">
     <div class="dropdown-label">View</div>
@@ -43,6 +61,18 @@
             {{ tab.text }}
           </div>
         </div>
+        <div class="oppia-contributions-option-group-label"
+             *ngIf="userIsLoggedIn">
+          Getting Started
+        </div>
+        <div class="oppia-contributions-dropdown-list-option" *ngFor="let tab of gettingStartedTabs">
+          <div *ngIf="tab && tab.enabled"
+               class="e2e-test-mobile-contribution-dropdown-option e2e-test-tutorials-tab"
+               (click)="switchToTab(TAB_TYPE_GETTING_STARTED, tab.tabSubType)"
+               [ngClass]="isActiveTab(TAB_TYPE_GETTING_STARTED, tab.tabSubType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
+            {{ tab.text }}
+          </div>
+        </div>
       </div>
 
     </div>
@@ -75,6 +105,22 @@
                     class="oppia-contributions-navbar-button e2e-test-contribution-tab"
                     (click)="switchToTab(TAB_TYPE_ACCOMPLISHMENTS, tab.tabSubType)"
                     [ngClass]="isActiveTab(TAB_TYPE_ACCOMPLISHMENTS, tab.tabSubType) ? 'oppia-contributions-active-navbar e2e-test-active' : ''">{{tab.text}}
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="oppia-contributions-side-navbar-part" *ngIf="userIsLoggedIn" tabindex="0">
+        <div class="oppia-contributions-navbar-items-list" navbar-label="Getting Started" aria-label="Getting started">
+          <div class="oppia-contributions-navbar-item" *ngFor="let tab of gettingStartedTabs">
+            <button *ngIf="tab && tab.enabled"
+                    class="oppia-contributions-navbar-button e2e-test-tutorials-tab"
+                    [joyrideStep]="replaySectionTourStep"
+                    stepPosition="right"
+                    [stepContent]="TranslationReplaySectionTourStep"
+                    [doneTemplate]="TranslationReplaySectionTourDoneButton"
+                    [counterTemplate]="TranslationReplaySectionTourCounter"
+                    (click)="switchToTab(TAB_TYPE_GETTING_STARTED, tab.tabSubType)"
+                    [ngClass]="isActiveTab(TAB_TYPE_GETTING_STARTED, tab.tabSubType) ? 'oppia-contributions-active-navbar e2e-test-active' : ''">{{tab.text}}
             </button>
           </div>
         </div>
@@ -118,7 +164,7 @@
                                 [showPinUnpinButton]="true"
                                 #opportunitiesList>
       </oppia-opportunities-list>
-      <div *ngIf="(activeExplorationId !== null || !isReviewTranslationsTab()) && !isAccomplishmentsTabActive()">
+      <div *ngIf="(activeExplorationId !== null || !isReviewTranslationsTab()) && !isAccomplishmentsTabActive() && !isTutorialsTabActive()">
         <div *ngIf="isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
           <button aria-label="Back to reviewable lessons"
                   (click)="onClickBackToReviewableLessons()"
@@ -143,6 +189,59 @@
       <div *ngIf="isAccomplishmentsTabActive() && activeTabSubtype === 'badges'">
         <contributor-badges>
         </contributor-badges>
+      </div>
+      <div *ngIf="isTutorialsTabActive()"
+           class="oppia-tutorials-panel e2e-test-tutorials-panel">
+        <div class="oppia-tutorials-contribution-type-selector">
+          <div class="oppia-tutorials-contribution-type-label">
+            Contribution Type
+          </div>
+          <div class="oppia-tutorials-contribution-type-dropdown e2e-test-tutorials-contribution-type-dropdown"
+               (click)="toggleTutorialContributionDropdown()">
+            <span>
+              {{ tutorialContributionDropdownShown ? 'Choose Contribution Type' : getSelectedTutorialContributionTypeDisplayName() }}
+            </span>
+            <span class="fas fa-caret-down oppia-tutorials-contribution-type-arrow"
+                  [ngStyle]="{ 'transform': tutorialContributionDropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+            </span>
+            <div *ngIf="tutorialContributionDropdownShown"
+                 class="oppia-tutorials-contribution-type-dropdown-list">
+              <button type="button"
+                      class="oppia-tutorials-contribution-type-option"
+                      *ngFor="let option of tutorialContributionTypeOptions"
+                      [ngClass]="{
+                        'oppia-tutorials-contribution-type-option-selected': option.contributionType === selectedTutorialContributionType
+                      }"
+                      (click)="selectTutorialContributionType(option.contributionType); $event.stopPropagation()">
+                {{ option.displayName }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="oppia-translation-tutorial-card"
+             *ngIf="isTranslationTutorialContributionTypeSelected()">
+          <div class="oppia-translation-tutorial-details">
+            <div class="oppia-translation-tutorial-label">Translation Tutorial</div>
+            <h3>Let's translate your first lesson card</h3>
+          </div>
+          <div class="oppia-translation-tutorial-progress-container">
+            <div class="oppia-translation-tutorial-progress-bar">
+              <div class="oppia-translation-tutorial-progress-complete"
+                   [style.width.%]="getBoundedTranslationTutorialProgressPercentage()">
+              </div>
+            </div>
+            <span>({{ getBoundedTranslationTutorialProgressPercentage() }}%)</span>
+          </div>
+          <button type="button"
+                  class="oppia-replay-translation-tour-button e2e-test-replay-translation-tour"
+                  (click)="onClickReplayTranslationTour()">
+            {{ getTranslationTutorialActionButtonLabel() }}
+            <i class="fas"
+               [ngClass]="getTranslationTutorialActionButtonIconClass()"
+               aria-hidden="true">
+            </i>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -176,6 +275,33 @@
     font-size: 20px;
     margin-right: 10px;
     width: 175px;
+  }
+
+  .oppia-translation-replay-section-tour-content {
+    width: 300px;
+  }
+
+  .oppia-translation-replay-section-tour-content h3 {
+    color: #1354a5;
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 14px;
+  }
+
+  .oppia-translation-replay-section-tour-content p {
+    font-size: 14px;
+    line-height: 1.35;
+    margin: 0;
+  }
+
+  .oppia-translation-replay-section-tour-done-button {
+    background: transparent;
+    border: 0;
+    color: #00645c;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 4px 0;
+    text-decoration: underline;
   }
 
   .oppia-contributions-dropdown-container {
@@ -241,6 +367,125 @@
 
   .oppia-contributor-accomplishments-container {
     width: 75%;
+  }
+
+  .oppia-tutorials-panel {
+    padding: 46px 34px;
+  }
+
+  .oppia-tutorials-contribution-type-selector {
+    margin-bottom: 10px;
+    position: relative;
+    width: 260px;
+  }
+
+  .oppia-tutorials-contribution-type-label {
+    color: #4a4a4a;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 18px;
+  }
+
+  .oppia-tutorials-contribution-type-dropdown {
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+    color: #4a4a4a;
+    cursor: pointer;
+    display: flex;
+    font-size: 16px;
+    height: 34px;
+    justify-content: space-between;
+    padding: 0 14px;
+    position: relative;
+  }
+
+  .oppia-tutorials-contribution-type-arrow {
+    color: #4a4a4a;
+    font-size: 12px;
+    margin-left: 12px;
+  }
+
+  .oppia-tutorials-contribution-type-dropdown-list {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
+    left: 0;
+    padding: 7px 5px;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: 2;
+  }
+
+  .oppia-tutorials-contribution-type-option {
+    background-color: #fff;
+    border: 0;
+    color: #686868;
+    display: block;
+    font-size: 14px;
+    padding: 10px 12px;
+    text-align: left;
+    width: 100%;
+  }
+
+  .oppia-tutorials-contribution-type-option-selected {
+    background-color: #eee;
+  }
+
+  .oppia-translation-tutorial-card {
+    align-items: center;
+    border: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    padding: 24px 32px;
+  }
+
+  .oppia-translation-tutorial-label {
+    color: #009688;
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .oppia-translation-tutorial-details h3 {
+    color: #4a4a4a;
+    font-size: 19px;
+    font-weight: bold;
+    margin: 0;
+  }
+
+  .oppia-translation-tutorial-progress-container {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+  }
+
+  .oppia-translation-tutorial-progress-bar {
+    background: #eee;
+    height: 10px;
+    width: 140px;
+  }
+
+  .oppia-translation-tutorial-progress-complete {
+    background-color: #35a853;
+    height: 100%;
+  }
+
+  .oppia-replay-translation-tour-button {
+    background: #fff;
+    border: 2px solid #00645d;
+    border-radius: 4px;
+    color: #00645d;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 8px 18px;
+  }
+
+  .oppia-replay-translation-tour-button i {
+    margin-left: 4px;
   }
 
   .oppia-contributions-show-review-container::-webkit-scrollbar {
@@ -411,6 +656,12 @@
     .oppia-contributions-show-review-container {
       background-color: transparent;
       width: 95%;
+    }
+    .oppia-translation-tutorial-card {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 20px;
+      padding: 20px;
     }
   }
 

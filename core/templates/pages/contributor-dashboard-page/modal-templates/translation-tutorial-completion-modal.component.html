@@ -1,0 +1,25 @@
+<div class="oppia-translation-tutorial-completion-modal e2e-test-translation-tutorial-completion-modal">
+  <div class="oppia-translation-tutorial-completion-header">
+    <div class="oppia-translation-tutorial-completion-pattern" aria-hidden="true"></div>
+    <img [src]="oppiaAvatarImageUrl"
+         class="oppia-translation-tutorial-completion-avatar"
+         alt="">
+  </div>
+
+  <div class="oppia-translation-tutorial-completion-body">
+    <h2 class="oppia-translation-tutorial-completion-title">
+      Congratulations, you're ready to start translating!
+    </h2>
+    <p class="oppia-translation-tutorial-completion-description">
+      We hope this tour was helpful and informative.
+    </p>
+
+    <div class="oppia-translation-tutorial-completion-actions">
+      <button type="button"
+              class="btn oppia-translation-tutorial-completion-close-button e2e-test-close-translation-tutorial-completion"
+              (click)="close()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

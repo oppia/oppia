@@ -47,6 +47,7 @@ import {
   Output,
   SimpleChanges,
   OnInit,
+  TemplateRef,
   ViewChild,
   Renderer2,
 } from '@angular/core';
@@ -90,7 +91,15 @@ export class CkEditor4RteComponent
 {
   @Input() uiConfig!: UiConfig;
   @Input() value: string = '';
+  @Input() joyrideStepName: string | null = null;
+  @Input() joyrideStepPosition!: string;
+  @Input() joyrideStepContent: TemplateRef<object> | null = null;
+  @Input() joyridePrevTemplate: TemplateRef<object> | null = null;
+  @Input() joyrideNextTemplate: TemplateRef<object> | null = null;
+  @Input() joyrideDoneTemplate: TemplateRef<object> | null = null;
+  @Input() joyrideCounterTemplate: TemplateRef<object> | null = null;
   @Output() valueChange: EventEmitter<string> = new EventEmitter();
+  @Output() editorReady: EventEmitter<void> = new EventEmitter();
   rteHelperService: RteHelperService;
   ck!: CKEDITOR.editor;
   currentValue: string = '';
@@ -692,6 +701,7 @@ export class CkEditor4RteComponent
       );
       // Remove the loading text.
       this.elementRef.nativeElement.parentElement.removeChild(loadingDiv);
+      this.editorReady.emit();
       // Set the css and icons for each toolbar button.
       names.forEach((name, index) => {
         var icon = icons[index];

@@ -16,7 +16,16 @@
  * @fileoverview Component for a schema-based editor for HTML.
  */
 
-import {Component, forwardRef, Input, OnInit, NgZone} from '@angular/core';
+import {
+  Component,
+  forwardRef,
+  Input,
+  OnInit,
+  NgZone,
+  Output,
+  EventEmitter,
+  TemplateRef,
+} from '@angular/core';
 import {
   NG_VALUE_ACCESSOR,
   NG_VALIDATORS,
@@ -52,6 +61,14 @@ export class SchemaBasedHtmlEditorComponent
   @Input() disabled!: boolean;
   @Input() labelForFocusTarget!: string;
   @Input() uiConfig!: {add_element_text: string};
+  @Input() joyrideStepName: string | null = null;
+  @Input() joyrideStepPosition!: string;
+  @Input() joyrideStepContent: TemplateRef<object> | null = null;
+  @Input() joyridePrevTemplate: TemplateRef<object> | null = null;
+  @Input() joyrideNextTemplate: TemplateRef<object> | null = null;
+  @Input() joyrideDoneTemplate: TemplateRef<object> | null = null;
+  @Input() joyrideCounterTemplate: TemplateRef<object> | null = null;
+  @Output() editorReady: EventEmitter<void> = new EventEmitter();
   localValue!: string;
   onChange: (val: string) => void = () => {};
 

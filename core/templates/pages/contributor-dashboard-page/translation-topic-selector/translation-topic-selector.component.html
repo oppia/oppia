@@ -4,8 +4,11 @@
        (keydown.enter)="toggleDropdown()"
        (click)="toggleDropdown()">
     {{activeTopicName}}
-    <span class="fas fa-caret-down oppia-translation-topic-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
-    </span>
+    <div class="oppia-translation-topic-selector-right-container">
+      <oppia-pulse-indicator [isVisible]="isInCDTutorial"></oppia-pulse-indicator>
+      <span class="fas fa-caret-down oppia-translation-topic-selector-inner-container-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+      </span>
+    </div>
   </div>
 
   <div *ngIf="dropdownShown" class="oppia-translation-topic-selector-dropdown-container e2e-test-topic-selector-dropdown">
@@ -55,6 +58,12 @@
     display: flex;
     flex: 1;
     justify-content: space-between;
+  }
+
+  .oppia-translation-topic-selector-right-container {
+    align-items: center;
+    display: flex;
+    gap: 12px;
   }
 
   .oppia-translation-topic-selector-inner-container-arrow {

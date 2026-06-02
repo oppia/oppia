@@ -112,6 +112,7 @@
 
 <ng-template #OpportunitiesButton>
   <div class="oppia-opportunities-button-container oppia-animate-fadein">
+    <oppia-pulse-indicator [isVisible]="isInCDTutorial"></oppia-pulse-indicator>
     <div class="oppia-opportunities-button-wrapper"
          [disableTooltip]="!opportunityButtonDisabled"
          ngbTooltip="All available translations are currently in review."
@@ -267,6 +268,7 @@
   .oppia-opportunities-button-container {
     align-items: center;
     display: flex;
+    gap: 16px;
     justify-content: flex-end;
     margin: 1% 0;
     width: 20%;
@@ -352,6 +354,9 @@
       margin-top: 12px;
       width: 100%;
     }
+    .oppia-opportunities-heading {
+      font-size: 16px;
+    }
     .oppia-opportunities-progress-bar {
       width: 100%;
     }
@@ -374,7 +379,7 @@
       height: 56px;
     }
     .oppia-opportunities-heading {
-      font-size: 18px;
+      font-size: 16px;
     }
     .oppia-opportunities-button-container,
     .oppia-opportunities-button,

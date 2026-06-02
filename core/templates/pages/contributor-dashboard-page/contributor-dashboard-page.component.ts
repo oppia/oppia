@@ -350,11 +350,13 @@ export class ContributorDashboardPageComponent implements OnInit {
         if (step?.number) {
           this.updateTranslationTutorialProgressForStep(step.number);
         }
+        this.currentTourStep = step?.name ?? '';
         this.setTranslationTutorialBackdropColor();
         this.allowInteractionsBehindTranslationTour();
       },
       () => {},
       () => {
+        this.currentTourStep = '';
         this.closeTranslationTour();
       }
     );

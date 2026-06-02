@@ -60,12 +60,8 @@ describe('Translation language selector', () => {
     {
       fetchFeaturedTranslationLanguagesAsync: async () =>
         Promise.resolve(featuredLanguages),
-      getPreferredTranslationLanguageAsync: async () => {
-        if (preferredLanguageCode) {
-          component.populateLanguageSelection(preferredLanguageCode);
-        }
-        return Promise.resolve(preferredLanguageCode);
-      },
+      getPreferredTranslationLanguageAsync: async () =>
+        Promise.resolve(preferredLanguageCode),
       savePreferredTranslationLanguageAsync: async () => Promise.resolve(),
     };
 
@@ -233,6 +229,17 @@ describe('Translation language selector', () => {
       });
     })
   );
+
+  it('should keep the active language during the translation tutorial', fakeAsync(() => {
+    component.activeLanguageCode = 'es';
+    component.useActiveLanguageCodeOnly = true;
+    preferredLanguageCode = 'en';
+
+    component.ngOnInit();
+    flush();
+
+    expect(component.languageSelection).toBe('español (Spanish)');
+  }));
 
   it(
     'should ask user to select a language when the preferred' +

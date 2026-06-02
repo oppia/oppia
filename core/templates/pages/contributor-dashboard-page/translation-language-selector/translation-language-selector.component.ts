@@ -49,6 +49,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() activeLanguageCode!: string | null;
+  @Input() useActiveLanguageCodeOnly: boolean = false;
   @Output() setActiveLanguageCode: EventEmitter<string> = new EventEmitter();
   @ViewChild('dropdown', {static: false}) dropdownRef!: ElementRef;
   @ViewChild('filterDiv') filterDivRef!: ElementRef;
@@ -100,7 +101,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
     this.contributionOpportunitiesBackendApiService
       .getPreferredTranslationLanguageAsync()
       .then((preferredLanguageCode: string | null) => {
-        if (preferredLanguageCode) {
+        if (preferredLanguageCode && !this.useActiveLanguageCodeOnly) {
           this.populateLanguageSelection(preferredLanguageCode);
         }
       });

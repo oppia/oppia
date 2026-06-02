@@ -23,9 +23,10 @@ import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {CkEditor4RteComponent} from './ck-editor-4-rte.component';
 import {TranslateModule} from '@ngx-translate/core';
+import {JoyrideModule} from 'ngx-joyride';
 
 @NgModule({
-  imports: [CommonModule, TranslateModule],
+  imports: [CommonModule, TranslateModule, JoyrideModule.forChild()],
   declarations: [CkEditor4RteComponent],
   entryComponents: [CkEditor4RteComponent],
   exports: [CkEditor4RteComponent],

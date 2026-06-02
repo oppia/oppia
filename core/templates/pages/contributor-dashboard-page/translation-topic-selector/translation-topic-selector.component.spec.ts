@@ -26,6 +26,7 @@ import {
   ContributionOpportunitiesBackendApiService,
   // eslint-disable-next-line max-len
 } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
+import {PulseIndicatorComponent} from 'components/common-layout-directives/common-elements/pulse-indicator.component';
 
 describe('Translation language selector', () => {
   let component: TranslationTopicSelectorComponent;
@@ -48,7 +49,10 @@ describe('Translation language selector', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [TranslationTopicSelectorComponent],
+      declarations: [
+        TranslationTopicSelectorComponent,
+        PulseIndicatorComponent,
+      ],
       providers: [
         {
           provide: ContributionOpportunitiesBackendApiService,

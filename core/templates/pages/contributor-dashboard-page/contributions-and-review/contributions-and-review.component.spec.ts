@@ -62,6 +62,7 @@ import {of, Subject} from 'rxjs';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {delay} from 'rxjs/operators';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {JoyrideService} from 'ngx-joyride';
 
 class MockNgbModal {
   open() {
@@ -83,6 +84,16 @@ class MockPlatformFeatureService {
       isEnabled: false,
     },
   };
+}
+
+class MockJoyrideService {
+  startTour() {
+    return {
+      subscribe: (onNext: () => void) => {
+        onNext();
+      },
+    };
+  }
 }
 
 describe('Contributions and review component', () => {
@@ -108,6 +119,7 @@ describe('Contributions and review component', () => {
   let snackBar: MatSnackBar;
   let snackBarRefMock;
   let snackBarSpy: jasmine.Spy;
+  let joyride: JoyrideService;
 
   class MockMatSnackBarRef {
     instance = {message: ''};
@@ -142,6 +154,10 @@ describe('Contributions and review component', () => {
         {
           provide: WindowRef,
           useClass: MockWindowRef,
+        },
+        {
+          provide: JoyrideService,
+          useClass: MockJoyrideService,
         },
         PageContextService,
         ContributionAndReviewService,
@@ -181,6 +197,7 @@ describe('Contributions and review component', () => {
     htmlEscaperService = TestBed.inject(HtmlEscaperService);
     translationTopicService = TestBed.inject(TranslationTopicService);
     snackBar = TestBed.inject(MatSnackBar);
+    joyride = TestBed.inject(JoyrideService);
     snackBarRefMock = TestBed.inject(MatSnackBarRef);
     spyOn(snackBarRefMock, 'onAction').and.returnValue(of({}).pipe(delay(1)));
 
@@ -2390,6 +2407,116 @@ describe('Contributions and review component', () => {
       expect(component.dropdownShown).toBe(false);
     });
 
+    it('should show tutorials without loading contribution opportunities', fakeAsync(() => {
+      const reloadOpportunitiesSpy = contributionOpportunitiesService
+        .reloadOpportunitiesEventEmitter.emit as jasmine.Spy;
+      reloadOpportunitiesSpy.calls.reset();
+
+      component.switchToTab(
+        component.TAB_TYPE_GETTING_STARTED,
+        component.GETTING_STARTED_TYPE_TUTORIALS
+      );
+
+      expect(component.isTutorialsTabActive()).toBeTrue();
+      expect(component.activeDropdownTabChoice).toBe('Tutorials');
+      expect(reloadOpportunitiesSpy).not.toHaveBeenCalled();
+
+      component.loadContributions(true).then(response => {
+        expect(response).toEqual({opportunitiesDicts: [], more: false});
+      });
+      flush();
+    }));
+
+    it('should highlight the replay section when requested', fakeAsync(() => {
+      const startTourSpy = spyOn(joyride, 'startTour').and.callThrough();
+      const tourShownSpy = spyOn(
+        component.translationTutorialReplaySectionTourShown,
+        'emit'
+      );
+      component.showTranslationTutorialReplaySectionTour = true;
+
+      component.ngAfterViewInit();
+      component.ngOnInit();
+      flush();
+
+      expect(component.isTutorialsTabActive()).toBeTrue();
+      expect(component.activeDropdownTabChoice).toBe('Tutorials');
+      expect(startTourSpy).toHaveBeenCalledWith({
+        steps: [component.replaySectionTourStep],
+        stepDefaultPosition: 'right',
+        themeColor: '#1354a5',
+      });
+      expect(tourShownSpy).toHaveBeenCalled();
+    }));
+
+    it('should emit when replaying the translation tutorial', () => {
+      const replayTranslationTourSpy = spyOn(
+        component.replayTranslationTour,
+        'emit'
+      );
+
+      component.onClickReplayTranslationTour();
+
+      expect(replayTranslationTourSpy).toHaveBeenCalled();
+    });
+
+    it('should select tutorial contribution type from the dropdown', () => {
+      expect(component.getSelectedTutorialContributionTypeDisplayName()).toBe(
+        'Translation Contributions'
+      );
+      expect(
+        component.isTranslationTutorialContributionTypeSelected()
+      ).toBeTrue();
+
+      component.toggleTutorialContributionDropdown();
+
+      expect(component.tutorialContributionDropdownShown).toBeTrue();
+
+      component.selectTutorialContributionType('questionContribution');
+
+      expect(component.tutorialContributionDropdownShown).toBeFalse();
+      expect(component.getSelectedTutorialContributionTypeDisplayName()).toBe(
+        'Question Contributions'
+      );
+      expect(
+        component.isTranslationTutorialContributionTypeSelected()
+      ).toBeFalse();
+    });
+
+    it('should close tutorial contribution type dropdown when clicking outside', () => {
+      component.tutorialContributionDropdownShown = true;
+
+      component.closeDropdownWhenClickedOutside({
+        target: document.createElement('button'),
+      });
+
+      expect(component.tutorialContributionDropdownShown).toBeFalse();
+    });
+
+    it('should show the correct translation tutorial action label', () => {
+      component.translationTutorialProgressPercentage = 0;
+      expect(component.getTranslationTutorialActionButtonLabel()).toBe('Start');
+      expect(component.getTranslationTutorialActionButtonIconClass()).toBe(
+        'fa-play'
+      );
+
+      component.translationTutorialProgressPercentage = 50;
+      expect(component.getTranslationTutorialActionButtonLabel()).toBe(
+        'Continue'
+      );
+      expect(component.getTranslationTutorialActionButtonIconClass()).toBe(
+        'fa-play'
+      );
+
+      component.translationTutorialProgressPercentage = 100;
+      expect(component.getTranslationTutorialActionButtonLabel()).toBe(
+        'Replay'
+      );
+      expect(component.getTranslationTutorialActionButtonIconClass()).toBe(
+        'fa-redo-alt'
+      );
+    });
+
     it('should set active dropdown choice correctly', () => {
       component.contributionTabs = [
         {
@@ -2454,6 +2581,9 @@ describe('Contributions and review component', () => {
       expect(
         component.getActiveDropdownTabText('accomplishments', 'badges')
       ).toBe('Badges');
+      expect(
+        component.getActiveDropdownTabText('getting_started', 'tutorials')
+      ).toBe('Tutorials');
     });
 
     it('should throw an error when invalid tab names given', () => {

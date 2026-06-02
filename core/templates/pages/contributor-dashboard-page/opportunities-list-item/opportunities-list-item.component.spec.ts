@@ -28,6 +28,7 @@ import {
   OpportunitiesListItemComponent,
 } from './opportunities-list-item.component';
 import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import {PulseIndicatorComponent} from 'components/common-layout-directives/common-elements/pulse-indicator.component';
 import {MatIconModule} from '@angular/material/icon';
 
 class MockWindowDimensionsService {
@@ -53,6 +54,7 @@ describe('Opportunities List Item Component', () => {
         OpportunitiesListItemComponent,
         LazyLoadingComponent,
         WrapTextWithEllipsisPipe,
+        PulseIndicatorComponent,
       ],
       providers: [
         {

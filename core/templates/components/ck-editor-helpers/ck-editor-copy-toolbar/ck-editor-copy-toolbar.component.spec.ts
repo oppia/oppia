@@ -17,6 +17,7 @@
  */
 
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {JoyrideModule} from 'ngx-joyride';
 
 import {
   CkEditorCopyToolbarComponent,
@@ -32,6 +33,7 @@ describe('CkEditor copy toolbar', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [JoyrideModule.forChild()],
       declarations: [CkEditorCopyToolbarComponent],
       providers: [
         {

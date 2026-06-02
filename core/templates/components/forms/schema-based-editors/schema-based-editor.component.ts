@@ -25,6 +25,7 @@ import {
   AfterViewInit,
   ViewChild,
   OnDestroy,
+  TemplateRef,
 } from '@angular/core';
 import {
   NG_VALUE_ACCESSOR,
@@ -68,10 +69,18 @@ export class SchemaBasedEditorComponent
   @Input() disabled: boolean = false;
   @Input() labelForFocusTarget!: string;
   @Input() notRequired: boolean = false;
+  @Input() joyrideStepName: string | null = null;
+  @Input() joyrideStepPosition!: string;
+  @Input() joyrideStepContent: TemplateRef<object> | null = null;
+  @Input() joyridePrevTemplate: TemplateRef<object> | null = null;
+  @Input() joyrideNextTemplate: TemplateRef<object> | null = null;
+  @Input() joyrideDoneTemplate: TemplateRef<object> | null = null;
+  @Input() joyrideCounterTemplate: TemplateRef<object> | null = null;
 
   @Output() inputBlur = new EventEmitter<void>();
   @Output() inputFocus = new EventEmitter<void>();
   @Output() localValueChange = new EventEmitter<SchemaDefaultValue>();
+  @Output() htmlEditorReady = new EventEmitter<void>();
 
   private onChange: (val: SchemaDefaultValue) => void = () => {};
   private onTouched: () => void = () => {};

@@ -1,0 +1,58 @@
+<div class="oppia-translation-tutorial-image-modal e2e-test-translation-tutorial-image-modal">
+  <div class="modal-header">
+    <h3>Customize This Component</h3>
+    <button type="button"
+            class="btn-close e2e-test-close-translation-tutorial-image-modal"
+            aria-label="Close"
+            (click)="close()">
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="oppia-translation-tutorial-image-field">
+      <strong>This image (Allowed extensions: gif, jpeg, jpg, png, svg)</strong>
+      <div class="oppia-translation-tutorial-image-preview-container">
+        <img [src]="imageUrl"
+             alt="Three students smiling around a pizza"
+             class="oppia-translation-tutorial-image-preview">
+        <button type="button"
+                class="oppia-translation-tutorial-delete-image-button"
+                aria-label="Delete image"
+                (click)="delete()">
+          <i class="material-icons" aria-hidden="true">&#xE872;</i>
+        </button>
+      </div>
+    </div>
+    <label class="oppia-translation-tutorial-image-label">
+      Caption for Image (optional)
+      <input type="text" class="form-control">
+    </label>
+    <label class="oppia-translation-tutorial-image-label">
+      Briefly explain this image to a visually impaired learner
+      <textarea class="form-control" rows="3">{{ imageAltText }}</textarea>
+    </label>
+  </div>
+  <div class="modal-footer">
+    <button type="button"
+            class="btn btn-danger e2e-test-delete-translation-tutorial-image"
+            (click)="delete()">
+      Delete
+    </button>
+    <button type="button"
+            class="btn btn-secondary e2e-test-cancel-translation-tutorial-image"
+            (click)="cancel()">
+      Cancel
+    </button>
+    <button type="button"
+            class="btn btn-success e2e-test-done-translation-tutorial-image"
+            joyrideStep="contributorDashboardTranslationCopyTool"
+            stepPosition="right"
+            [stepContent]="translationCopyToolTourStep"
+            [prevTemplate]="translationTourPreviousButton"
+            [nextTemplate]="translationTourNextButton"
+            [doneTemplate]="translationTourDoneButton"
+            [counterTemplate]="translationTourCounter"
+            (click)="done()">
+      Done
+    </button>
+  </div>
+</div>

@@ -1,0 +1,67 @@
+
+.oppia-translation-tutorial-image-customization-modal .modal-dialog {
+  max-width: 720px;
+}
+.oppia-translation-tutorial-image-modal {
+  color: #053c43;
+}
+.oppia-translation-tutorial-image-modal .modal-header {
+  align-items: center;
+  border-bottom: 1px solid #80cbc4;
+  padding: 18px 22px;
+}
+.oppia-translation-tutorial-image-modal .modal-header h3 {
+  color: #333;
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+}
+.oppia-translation-tutorial-image-modal .modal-body {
+  padding: 24px 22px;
+}
+.oppia-translation-tutorial-image-field {
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+.oppia-translation-tutorial-image-preview-container {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin-top: 22px;
+  position: relative;
+}
+.oppia-translation-tutorial-image-preview {
+  max-height: 170px;
+  max-width: 360px;
+}
+.oppia-translation-tutorial-delete-image-button {
+  background: none;
+  border: 0;
+  color: #111;
+  margin-left: 18px;
+  padding: 0;
+}
+.oppia-translation-tutorial-delete-image-button .material-icons {
+  font-size: 25px;
+}
+.oppia-translation-tutorial-image-label {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+.oppia-translation-tutorial-image-label .form-control {
+  border: 1px solid #ccc;
+  border-radius: 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: normal;
+  margin-top: 10px;
+}
+.oppia-translation-tutorial-image-modal .modal-footer {
+  border-top: 1px solid #80cbc4;
+  padding: 12px 22px;
+}
+.oppia-translation-tutorial-image-modal .modal-footer .btn {
+  min-width: 110px;
+}

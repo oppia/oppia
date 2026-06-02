@@ -14,9 +14,20 @@
       Use the copy tool to copy text and images.
     </span>
   </div>
-  <button type="button"
+  <button *ngIf="!joyrideStepName"
+          type="button"
           class="btn btn-secondary e2e-test-copy-button"
           [ngClass]="{'oppia-ck-editor-copy-toolbar-tip-button-active': ckEditorCopyContentService.copyModeActive}"
+          (click)="toggleToolActive()">
+    {{ckEditorCopyContentService.copyModeActive ? "On" : "Off"}}
+  </button>
+  <button *ngIf="joyrideStepName"
+          type="button"
+          class="btn btn-secondary e2e-test-copy-button"
+          [ngClass]="{'oppia-ck-editor-copy-toolbar-tip-button-active': ckEditorCopyContentService.copyModeActive}"
+          [joyrideStep]="joyrideStepName"
+          [stepPosition]="joyrideStepPosition"
+          [stepContent]="joyrideStepContent"
           (click)="toggleToolActive()">
     {{ckEditorCopyContentService.copyModeActive ? "On" : "Off"}}
   </button>

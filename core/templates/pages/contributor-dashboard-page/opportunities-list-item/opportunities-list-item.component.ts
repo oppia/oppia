@@ -57,6 +57,7 @@ export class OpportunitiesListItemComponent {
   @Input() progressBarRequired: boolean = false;
   @Input() showOpportunityButton: boolean = true;
   @Input() showPinUnpinButton: boolean = false;
+  @Input() isInCDTutorial: boolean = false;
 
   labelText!: string;
   labelStyle!: {'background-color': string};
@@ -102,6 +103,10 @@ export class OpportunitiesListItemComponent {
   correspondingOpportunityDeleted: boolean = false;
   translationProgressBar: boolean = false;
   opportunityButtonDisabled: boolean = false;
+  private lastProgressPercentage?: number;
+  private lastInReviewCount?: number;
+  private lastTotalCount?: number;
+  private lastTranslationsCount?: number;
 
   ngOnInit(): void {
     this.onMobile =
@@ -124,41 +129,7 @@ export class OpportunitiesListItemComponent {
       this.opportunityHeadingTruncationLength = 40;
     }
     if (this.opportunity) {
-      if (this.opportunity.progressPercentage) {
-        this.progressPercentage = `${Math.floor(this.opportunity.progressPercentage)}%`;
-        if (
-          this.opportunityType === AppConstants.OPPORTUNITY_TYPE_TRANSLATION
-        ) {
-          this.translationProgressBar = true;
-          const translatedPercentage =
-            (this.opportunity.translationsCount / this.opportunity.totalCount) *
-            100;
-          const inReviewTranslationsPercentage =
-            (this.opportunity.inReviewCount / this.opportunity.totalCount) *
-            100;
-          const untranslatedPercentage =
-            100 - (translatedPercentage + inReviewTranslationsPercentage);
-
-          this.cardsAvailable =
-            this.opportunity.totalCount -
-            (this.opportunity.translationsCount +
-              this.opportunity.inReviewCount);
-
-          this.translatedProgressStyle = {width: translatedPercentage + '%'};
-          this.untranslatedProgressStyle = {
-            width: untranslatedPercentage + '%',
-          };
-          this.inReviewProgressStyle = {
-            width: inReviewTranslationsPercentage + '%',
-          };
-          this.opportunityButtonDisabled =
-            this.opportunity.translationsCount +
-              this.opportunity.inReviewCount ===
-            this.opportunity.totalCount;
-        } else {
-          this.progressBarStyle = {width: this.progressPercentage};
-        }
-      }
+      this.updateProgressBar();
       this.opportunityDataIsLoading = false;
       if (
         this.opportunity.subheading ===
@@ -168,6 +139,63 @@ export class OpportunitiesListItemComponent {
       }
     } else {
       this.opportunityDataIsLoading = true;
+    }
+  }
+
+  ngDoCheck(): void {
+    if (!this.opportunity) {
+      return;
+    }
+
+    if (
+      this.lastProgressPercentage !== this.opportunity.progressPercentage ||
+      this.lastInReviewCount !== this.opportunity.inReviewCount ||
+      this.lastTotalCount !== this.opportunity.totalCount ||
+      this.lastTranslationsCount !== this.opportunity.translationsCount
+    ) {
+      this.updateProgressBar();
+    }
+  }
+
+  private updateProgressBar(): void {
+    if (!this.opportunity.progressPercentage) {
+      return;
+    }
+
+    this.lastProgressPercentage = this.opportunity.progressPercentage;
+    this.lastInReviewCount = this.opportunity.inReviewCount;
+    this.lastTotalCount = this.opportunity.totalCount;
+    this.lastTranslationsCount = this.opportunity.translationsCount;
+    this.progressPercentage = `${Math.floor(
+      this.opportunity.progressPercentage
+    )}%`;
+
+    if (this.opportunityType === AppConstants.OPPORTUNITY_TYPE_TRANSLATION) {
+      this.translationProgressBar = true;
+      const translatedPercentage =
+        (this.opportunity.translationsCount / this.opportunity.totalCount) *
+        100;
+      const inReviewTranslationsPercentage =
+        (this.opportunity.inReviewCount / this.opportunity.totalCount) * 100;
+      const untranslatedPercentage =
+        100 - (translatedPercentage + inReviewTranslationsPercentage);
+
+      this.cardsAvailable =
+        this.opportunity.totalCount -
+        (this.opportunity.translationsCount + this.opportunity.inReviewCount);
+
+      this.translatedProgressStyle = {width: translatedPercentage + '%'};
+      this.untranslatedProgressStyle = {
+        width: untranslatedPercentage + '%',
+      };
+      this.inReviewProgressStyle = {
+        width: inReviewTranslationsPercentage + '%',
+      };
+      this.opportunityButtonDisabled =
+        this.opportunity.translationsCount + this.opportunity.inReviewCount ===
+        this.opportunity.totalCount;
+    } else {
+      this.progressBarStyle = {width: this.progressPercentage};
     }
   }
 

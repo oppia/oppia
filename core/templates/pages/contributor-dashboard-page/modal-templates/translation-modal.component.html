@@ -1,3 +1,132 @@
+<ng-template #TranslationEditorTourStep>
+  <div class="oppia-translation-tour-content">
+    <h3 class="oppia-translation-tour-desktop-text" tabindex="0">Start translating the text</h3>
+    <h3 class="oppia-translation-tour-mobile-text" tabindex="0">
+      Try it out! Translate the text
+    </h3>
+    <p class="oppia-translation-tour-desktop-text" tabindex="0">
+      Enter the Spanish translation of 'We love math' in the text box.
+    </p>
+    <p class="oppia-translation-tour-mobile-text" tabindex="0">
+      Type the Spanish translation of "We love math" into the text field.
+    </p>
+    <p class="oppia-translation-tour-desktop-text" tabindex="0"><strong>Hint:</strong> 'Nos encantan las matemáticas.'</p>
+    <p class="oppia-translation-tour-mobile-text" tabindex="0">
+      <strong>Hint:</strong> The Spanish translation is "Nos encantan las
+      matem&aacute;ticas."
+    </p>
+  </div>
+</ng-template>
+
+<ng-template #TranslationCopyToolTourStep>
+  <div class="oppia-translation-copy-tool-tour-content"
+       [ngClass]="{
+         'oppia-translation-copy-tool-tour-content-compact': translationTutorialImageWasClicked && !translationTutorialImageWasCopied
+       }">
+    <h3 tabindex="0">
+      Try it out! Use the Copy Tool to include images and concept cards in your
+      translation
+    </h3>
+    <div class="oppia-copy-tool-tour-body">
+      <img [src]="copyToolTourPreviewImageUrl"
+           alt="Editor preview"
+           class="oppia-copy-tool-tour-preview-image">
+      <ul class="oppia-copy-tool-tour-steps">
+        <li [ngClass]="{
+              'oppia-copy-tool-tour-step-active': !isCopyModeActive() && !translationTutorialImageWasClicked && !translationTutorialImageWasCopied,
+              'oppia-copy-tool-tour-step-completed': isCopyModeActive() || translationTutorialImageWasClicked || translationTutorialImageWasCopied
+            }">
+          <span class="oppia-copy-tool-tour-radio">
+            <i *ngIf="isCopyModeActive() || translationTutorialImageWasClicked || translationTutorialImageWasCopied"
+               class="fas fa-check"
+               aria-hidden="true">
+            </i>
+          </span>
+          <span class="oppia-copy-tool-tour-step-text">
+            <strong>Click the "Off" button</strong> to turn on the Copy Tool.
+          </span>
+        </li>
+        <li [ngClass]="{
+              'oppia-copy-tool-tour-step-active': isCopyModeActive() && !translationTutorialImageWasClicked && !translationTutorialImageWasCopied,
+              'oppia-copy-tool-tour-step-completed': translationTutorialImageWasClicked || translationTutorialImageWasCopied
+            }">
+          <span class="oppia-copy-tool-tour-radio">
+            <i *ngIf="translationTutorialImageWasClicked || translationTutorialImageWasCopied"
+               class="fas fa-check"
+               aria-hidden="true">
+            </i>
+          </span>
+          <span class="oppia-copy-tool-tour-step-text">
+            <strong>Click on the image or concept card.</strong> Here, you can
+            add a caption or alternative text to help visually impaired
+            learners.
+          </span>
+        </li>
+        <li [ngClass]="{
+              'oppia-copy-tool-tour-step-active': translationTutorialImageWasClicked && !translationTutorialImageWasCopied,
+              'oppia-copy-tool-tour-step-completed': translationTutorialImageWasCopied
+            }">
+          <span class="oppia-copy-tool-tour-radio">
+            <i *ngIf="translationTutorialImageWasCopied"
+               class="fas fa-check"
+               aria-hidden="true">
+            </i>
+          </span>
+          <span class="oppia-copy-tool-tour-step-text">
+            <strong>Click "Done."</strong> The image will automatically be
+            copied into the text field.
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #TranslationSubmitTourStep>
+  <div class="oppia-translation-tour-content">
+    <h3 tabindex="0">Don't forget to save your work!</h3>
+    <p tabindex="0">
+      Once you're done translating and all images are copied, click
+      <strong>here</strong> to save your work and continue on to the next lesson
+      chapter.
+    </p>
+  </div>
+</ng-template>
+
+<ng-template #TranslationTourPreviousButton>
+  <button type="button"
+          class="oppia-translation-tour-navigation-button"
+          aria-label="Previous tour step">
+    <i class="fas fa-arrow-left" aria-hidden="true"></i>
+  </button>
+</ng-template>
+
+<ng-template #TranslationTourNextButton>
+  <button type="button"
+          class="oppia-translation-tour-navigation-button"
+          [ngClass]="{'oppia-translation-tour-navigation-button-disabled': !isTranslationTutorialNextButtonEnabled()}"
+          [attr.aria-disabled]="!isTranslationTutorialNextButtonEnabled()"
+          (click)="onTranslationTutorialNextButtonClick($event)"
+          aria-label="Next tour step">
+    <i class="fas fa-arrow-right" aria-hidden="true"></i>
+  </button>
+</ng-template>
+
+<ng-template #TranslationTourDoneButton>
+  <button type="button"
+          class="oppia-translation-tour-navigation-button oppia-translation-tour-navigation-button-disabled"
+          aria-label="No further tour step available yet"
+          disabled>
+    <i class="fas fa-arrow-right" aria-hidden="true"></i>
+  </button>
+</ng-template>
+
+<ng-template #TranslationTourCounter let-step="step">
+  <span class="oppia-translation-tour-counter">
+    Steps ({{step + 1}}/5)
+  </span>
+</ng-template>
+
 <div class="oppia-translate-text-header-container e2e-test-translate-text-header-container">
   <div class="oppia-translate-text-header">
     <div class="oppia-opportunities-details">
@@ -47,22 +176,69 @@
          (click)="skipActiveTranslation()">Skip
       </a>
     </div>
-    <div *ngIf="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container"
-      [ngClass]="isContentExpanded ? 'oppia-container-expanded' : 'oppia-container-contracted'" #contentContainer>
-      <!-- textToTranslate contains the html content of an exploration state -->
-      <oppia-rte-output-display *ngIf="activeDataFormat === 'html' || activeDataFormat === 'unicode'"
-        [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}" (click)="onContentClick($event)"
-        [rteString]="textToTranslate" class="oppia-rte-editor" #contentPanel>
-      </oppia-rte-output-display>
-      <div *ngIf="isSetOfStringDataFormat()">
-        <strong>{{ activeRuleDescription }}</strong>
-        <ul class="oppia-option-list oppia-translate-rule-list" role="tablist">
-          <li *ngFor="let ruleContent of textToTranslate">
-            {{ ruleContent }}
-          </li>
-        </ul>
+    <ng-template #TranslationTutorialCardContent>
+      <div class="oppia-translation-tutorial-text-card oppia-rte-editor"
+            [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}">
+        <div class="oppia-translation-tutorial-card-pulse-container">
+          <oppia-pulse-indicator
+            [isVisible]="activeTranslationTutorialJoyrideStep === 'contributorDashboardTranslationCopyTool' && isCopyModeActive()">
+          </oppia-pulse-indicator>
+        </div>
+        <p>We love math.</p>
+        <img [src]="translationTutorialImageUrl"
+             alt="Three students smiling around a pizza"
+             class="oppia-translation-tutorial-image"
+             [ngClass]="{'oppia-translation-tutorial-image-clickable': isCopyModeActive()}"
+             [attr.tabindex]="isCopyModeActive() ? 0 : null"
+             [attr.role]="isCopyModeActive() ? 'button' : null"
+             (click)="onTranslationTutorialImageClick($event)"
+             (keydown.enter)="onTranslationTutorialImageClick($event)"
+             (keydown.space)="onTranslationTutorialImageClick($event)">
       </div>
-    </div>
+    </ng-template>
+    <ng-container *ngIf="!loadingData && !uploadingTranslation">
+      <div *ngIf="isTranslationTutorial && isCopyModeActive() && !translationTutorialImageWasClicked"
+           class="oppia-text-to-translate-container"
+           [ngClass]="isContentExpanded ? 'oppia-container-expanded' : 'oppia-container-contracted'"
+           joyrideStep="contributorDashboardTranslationCopyTool"
+           stepPosition="bottom"
+          [stepContent]="TranslationCopyToolTourStep"
+          [prevTemplate]="TranslationTourPreviousButton"
+          [nextTemplate]="TranslationTourNextButton"
+          [doneTemplate]="TranslationTourDoneButton"
+          [counterTemplate]="TranslationTourCounter"
+          #contentContainer>
+        <ng-container *ngTemplateOutlet="TranslationTutorialCardContent">
+        </ng-container>
+      </div>
+      <div *ngIf="!isTranslationTutorial || !isCopyModeActive() || translationTutorialImageWasClicked"
+           class="oppia-text-to-translate-container"
+           [ngClass]="isContentExpanded ? 'oppia-container-expanded' : 'oppia-container-contracted'"
+           #contentContainer>
+        <ng-container *ngIf="isTranslationTutorial; else NonTutorialTranslatableContent">
+          <ng-container *ngTemplateOutlet="TranslationTutorialCardContent">
+          </ng-container>
+        </ng-container>
+        <ng-template #NonTutorialTranslatableContent>
+          <!-- textToTranslate contains the html content of an exploration state -->
+          <oppia-rte-output-display *ngIf="activeDataFormat === 'html' || activeDataFormat === 'unicode'"
+                                    [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                    (click)="onContentClick($event)"
+                                    [rteString]="textToTranslate"
+                                    class="oppia-rte-editor"
+                                    #contentPanel>
+          </oppia-rte-output-display>
+          <div *ngIf="isSetOfStringDataFormat()">
+            <strong>{{ activeRuleDescription }}</strong>
+            <ul class="oppia-option-list oppia-translate-rule-list" role="tablist">
+              <li *ngFor="let ruleContent of textToTranslate">
+                {{ ruleContent }}
+              </li>
+            </ul>
+          </div>
+        </ng-template>
+      </div>
+    </ng-container>
     <div class="oppia-collapse-content"
          *ngIf="isContentOverflowing"
          (click)="toggleExpansionState(expansionTabType.CONTENT)">
@@ -70,13 +246,35 @@
     </div>
     <div *ngIf="!isSubmitted()" class="oppia-translation-editor-section">
       <div class="e2e-test-state-translation-editor">
-        <ck-editor-copy-toolbar *ngIf="activeDataFormat === 'html'"></ck-editor-copy-toolbar>
+        <ck-editor-copy-toolbar *ngIf="activeDataFormat === 'html'"
+                                [joyrideStepName]="isTranslationTutorial && !isCopyModeActive() ? 'contributorDashboardTranslationCopyTool' : null"
+                                [joyrideStepPosition]="'bottom'"
+                                [joyrideStepContent]="TranslationCopyToolTourStep"
+                                (copyToolActive)="onTranslationTutorialCopyToolToggled()">
+        </ck-editor-copy-toolbar>
         <div class="oppia-editor-container"
-          [ngClass]="isTranslationExpanded ? 'oppia-container-expanded' : 'oppia-container-contracted'"
-          #translationContainer>
+             [ngClass]="isTranslationExpanded ? 'oppia-container-expanded' : 'oppia-container-contracted'"
+             #translationContainer
+             (click)="onEditorFocused()">
+          <div class="oppia-translation-editor-pulse-container">
+            <oppia-pulse-indicator
+              [isVisible]="activeTranslationTutorialJoyrideStep === 'contributorDashboardTranslationEditor' && !isEditorFocused">
+            </oppia-pulse-indicator>
+          </div>
           <p class="oppia-keybaord-accessibility-text" tabindex="0">Alt+0 for keyboard accessibility</p>
-          <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'html'" [schema]="HTML_SCHEMA"
-            [localValue]="activeWrittenTranslation" (localValueChange)="updateHtml($event)" #oppiaRTE>
+          <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'html'"
+                               [joyrideStepName]="isTranslationTutorial ? 'contributorDashboardTranslationEditor' : null"
+                               [joyrideStepPosition]="'bottom'"
+                               [joyrideStepContent]="TranslationEditorTourStep"
+                               [joyridePrevTemplate]="TranslationTourPreviousButton"
+                               [joyrideNextTemplate]="TranslationTourNextButton"
+                               [joyrideDoneTemplate]="TranslationTourDoneButton"
+                               [joyrideCounterTemplate]="TranslationTourCounter"
+                               [schema]="HTML_SCHEMA"
+                               [localValue]="activeWrittenTranslation"
+                               (htmlEditorReady)="onHtmlEditorReady()"
+                               (localValueChange)="updateHtml($event)"
+                               #oppiaRTE>
           </schema-based-editor>
           <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'unicode'" [schema]="UNICODE_SCHEMA"
             [localValue]="activeWrittenTranslation" (localValueChange)="updateHtml($event)" #oppiaRTE>
@@ -135,7 +333,8 @@
           (click)="returnToPreviousTranslation()">
     Go back
   </button>
-  <button class="btn btn-success oppia-upload-translated-text-button e2e-test-save-button"
+  <button *ngIf="!isTranslationTutorial"
+          class="btn btn-success oppia-upload-translated-text-button e2e-test-save-button"
           [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted() || hasSubmitValidationErrors()"
           (click)="suggestTranslatedText()">
     <i [hidden]="!uploadingTranslation" class="fa fa-spinner"></i>
@@ -143,6 +342,21 @@
       Save and close
     </span>
     <span [hidden]="uploadingTranslation || !moreAvailable">
+      Save and translate another
+    </span>
+  </button>
+  <button *ngIf="isTranslationTutorial"
+          class="btn btn-success oppia-upload-translated-text-button e2e-test-save-button"
+          [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted() || hasSubmitValidationErrors()"
+          joyrideStep="contributorDashboardTranslationSubmit"
+          stepPosition="top"
+          [stepContent]="TranslationSubmitTourStep"
+          [prevTemplate]="TranslationTourPreviousButton"
+          [doneTemplate]="TranslationTourDoneButton"
+          [counterTemplate]="TranslationTourCounter"
+          (click)="suggestTranslatedText()">
+    <i [hidden]="!uploadingTranslation" class="fa fa-spinner"></i>
+    <span [hidden]="uploadingTranslation">
       Save and translate another
     </span>
   </button>
@@ -178,7 +392,152 @@
     flex-direction: row;
     justify-content: flex-end;
   }
-
+  .oppia-translation-tour-content {
+    max-width: 350px;
+  }
+  .oppia-translation-tour-mobile-text {
+    display: none;
+    margin-bottom: 0;
+  }
+  .oppia-translation-tour-content h3 {
+    color: #0d48a1;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 16px;
+  }
+  .oppia-translation-tour-content p {
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.35;
+    margin-bottom: 12px;
+  }
+  .oppia-translation-tour-counter {
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 13px;
+    font-weight: normal;
+  }
+  .oppia-translation-tour-navigation-button {
+    align-items: center;
+    background-color: #1354a5;
+    border: 1px solid #1354a5;
+    border-radius: 4px;
+    color: #fff;
+    display: flex;
+    font-size: 29px;
+    height: 56px;
+    justify-content: center;
+    width: 56px;
+  }
+  .oppia-translation-tour-navigation-button-disabled {
+    background-color: #ddd;
+    border-color: #ddd;
+    color: #757575;
+  }
+  .oppia-editor-container {
+    position: relative;
+  }
+  .oppia-translation-editor-pulse-container {
+    left: 18%;
+    position: absolute;
+    top: 62%;
+  }
+  .oppia-translation-tutorial-card-pulse-container {
+    left: 30%;
+    position: absolute;
+    top: 50%;
+  }
+  .oppia-translation-copy-tool-tour-content {
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    max-width: 620px;
+    width: fit-content;
+  }
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep #joyride-step-contributorDashboardTranslationCopyTool .joyride-step__container {
+    width: fit-content;
+  }
+  .oppia-translation-copy-tool-tour-content-compact {
+    max-width: 320px;
+    width: fit-content;
+  }
+  .oppia-translation-copy-tool-tour-content h3 {
+    color: #0d48a1;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    margin: 0 0 24px;
+  }
+  .oppia-translation-copy-tool-tour-content-compact h3 {
+    font-size: 14px;
+    line-height: 1.18;
+    margin-bottom: 20px;
+  }
+  .oppia-copy-tool-tour-body {
+    align-items: stretch;
+    display: flex;
+    gap: 20px;
+  }
+  .oppia-translation-copy-tool-tour-content-compact .oppia-copy-tool-tour-body {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .oppia-copy-tool-tour-preview-image {
+    max-width: 50%;
+  }
+  .oppia-translation-copy-tool-tour-content-compact .oppia-copy-tool-tour-preview-image {
+    max-width: 100%;
+    width: 100%;
+  }
+  .oppia-copy-tool-tour-steps {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    list-style: none;
+    margin: 0;
+    max-width: 320px;
+    padding: 0;
+  }
+  .oppia-translation-copy-tool-tour-content-compact .oppia-copy-tool-tour-steps {
+    gap: 20px;
+    max-width: 420px;
+  }
+  .oppia-copy-tool-tour-steps li {
+    align-items: flex-start;
+    color: #cfcfcf;
+    display: flex;
+  }
+  .oppia-translation-copy-tool-tour-content-compact .oppia-copy-tool-tour-steps li {
+    line-height: 1.2;
+  }
+  .oppia-copy-tool-tour-step-active {
+    color: #000 !important;
+  }
+  .oppia-copy-tool-tour-step-completed {
+    color: #cfcfcf;
+  }
+  .oppia-copy-tool-tour-step-completed .oppia-copy-tool-tour-step-text {
+    text-decoration: line-through;
+  }
+  .oppia-copy-tool-tour-radio {
+    align-items: center;
+    border: 2px solid #cfcfcf;
+    border-radius: 50%;
+    display: flex;
+    flex: 0 0 auto;
+    font-size: 12px;
+    height: 22px;
+    justify-content: center;
+    margin: 0 12px 0 0;
+    width: 22px;
+  }
+  .oppia-copy-tool-tour-step-active .oppia-copy-tool-tour-radio {
+    border-color: #000;
+  }
+  .oppia-copy-tool-tour-step-completed .oppia-copy-tool-tour-radio {
+    border-color: #28a745;
+    color: #28a745;
+  }
   .oppia-translate-text-header-container .oppia-opportunities-heading {
     display: block;
   }
@@ -218,7 +577,7 @@
   .oppia-translate-text-header,
   .oppia-translatable-text-section {
     display: flex;
-    justify-content: space-between;
+    gap: 20px;
   }
 
   .oppia-translate-rule-list {
@@ -257,7 +616,21 @@
     margin-bottom: 0;
     padding: 20px;
   }
-
+  .oppia-translation-tutorial-text-card {
+    position: relative;
+  }
+  .oppia-translation-tutorial-text-card p {
+    font-size: 20px;
+    margin: 0 0 16px;
+  }
+  .oppia-translation-tutorial-image {
+    display: block;
+    max-height: 95px;
+    max-width: 210px;
+  }
+  .oppia-translation-tutorial-image-clickable {
+    cursor: pointer;
+  }
   .oppia-rules-to-translate-container {
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -329,6 +702,22 @@
   }
 
   @media screen and (max-width: 700px) {
+    .oppia-translation-tour-desktop-text {
+      display: none;
+    }
+
+    .oppia-translation-tour-mobile-text {
+      display: block;
+    }
+
+    .oppia-translation-tour-content h3 {
+      font-size: 14px;
+    }
+    .oppia-translation-tour-content p {
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
     .oppia-container-expanded {
       height: fit-content;
       max-height: none;
@@ -371,6 +760,11 @@
 
     .oppia-text-to-translate-container {
       font-size: 16px;
+    }
+
+    .oppia-translation-tour-navigation-button {
+      height: 40px;
+      width: 40px;
     }
   }
 

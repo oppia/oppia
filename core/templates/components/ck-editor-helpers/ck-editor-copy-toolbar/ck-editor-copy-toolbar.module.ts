@@ -21,10 +21,11 @@ import 'zone.js';
 
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
+import {JoyrideModule} from 'ngx-joyride';
 import {CkEditorCopyToolbarComponent} from './ck-editor-copy-toolbar.component';
 
 @NgModule({
-  imports: [CommonModule],
+  imports: [CommonModule, JoyrideModule.forChild()],
   declarations: [CkEditorCopyToolbarComponent],
   entryComponents: [CkEditorCopyToolbarComponent],
   exports: [CkEditorCopyToolbarComponent],

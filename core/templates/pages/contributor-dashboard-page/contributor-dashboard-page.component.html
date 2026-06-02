@@ -1,21 +1,39 @@
 <ng-template #TranslationSubjectSelectionTourStep>
   <div class="oppia-translation-tour-content">
-    <h3 class="e2e-test-joyride-title" tabindex="0">
+    <h3 class="e2e-test-joyride-title oppia-translation-tour-desktop-text" tabindex="0">
       Choose a subject to translate
     </h3>
-    <p tabindex="0">
+    <h3 class="e2e-test-joyride-title oppia-translation-tour-mobile-text" tabindex="0">
+      Select a subject to translate
+    </h3>
+    <p class="oppia-translation-tour-desktop-text" tabindex="0">
       Use the <strong>'Subject'</strong> drop-down to find lessons for
       translation. In this tour we'll translate a sample lesson from English
       to Spanish.
     </p>
+    <div class="oppia-translation-tour-mobile-text">
+      <p tabindex="0">
+        You can use the drop-down under <strong>'Subject'</strong> to see which
+        lessons need to be translated.
+      </p>
+      <p tabindex="0">
+        For this tour, we'll translate a sample lesson from English to Spanish.
+      </p>
+    </div>
   </div>
 </ng-template>
 
 <ng-template #TranslationOpportunityTourStep>
   <div class="oppia-translation-tour-content">
-    <h3 class="e2e-test-joyride-title" tabindex="0">Start translating now!</h3>
-    <p tabindex="0">
+    <h3 class="e2e-test-joyride-title oppia-translation-tour-desktop-text" tabindex="0">Start translating now!</h3>
+    <h3 class="e2e-test-joyride-title oppia-translation-tour-mobile-text" tabindex="0">
+      Try it out! Tap the button below to translate a sample lesson
+    </h3>
+    <p class="oppia-translation-tour-desktop-text" tabindex="0">
       Select <strong>'Translate'</strong> to start your sample lesson.
+    </p>
+    <p class="oppia-translation-tour-mobile-text" tabindex="0">
+      Easy, right?
     </p>
   </div>
 </ng-template>
@@ -183,7 +201,7 @@
             <div class="oppia-dropdown-container"
                  *ngIf="showLanguageSelector() || showTopicSelector()"
                  joyrideStep="contributorDashboardTranslationSelectors"
-                 stepPosition="left"
+                 stepPosition="bottom"
                  [stepContent]="TranslationSubjectSelectionTourStep"
                  [prevTemplate]="TranslationTourPreviousButton"
                  [nextTemplate]="TranslationTourNextButton"
@@ -201,6 +219,7 @@
               <div class="oppia-dashboard-topic-container" *ngIf="showTopicSelector()">
                 <div class="oppia-dashboard-topic-container-label" tabindex="0">Subject</div>
                 <translation-topic-selector class="oppia-topic-selector"
+                                            [isInCDTutorial]="currentTourStep === 'contributorDashboardTranslationSelectors'"
                                             [activeTopicName]="topicName"
                                             (setActiveTopicName)="onChangeTopic($event)">
                 </translation-topic-selector>
@@ -227,7 +246,7 @@
   <div *ngIf="activeTabName === 'translateTextTab'"
        class="oppia-opportunities"
        joyrideStep="contributorDashboardTranslationOpportunity"
-       stepPosition="top"
+       stepPosition="bottom"
        [stepContent]="TranslationOpportunityTourStep">
     <oppia-opportunities-list
         *ngIf="showTranslationTutorialOpportunity"
@@ -235,6 +254,7 @@
         [loadMoreOpportunities]="loadTranslationTutorialOpportunityAsync.bind(this)"
         [progressBarRequired]="true"
         [opportunityType]="TRANSLATION_TUTORIAL_OPPORTUNITY_TYPE"
+        [isInCDTutorial]="currentTourStep === 'contributorDashboardTranslationOpportunity'"
         (clickActionButton)="openTranslationTutorial()">
     </oppia-opportunities-list>
     <oppia-translation-opportunities *ngIf="!showTranslationTutorialOpportunity">
@@ -252,6 +272,15 @@
   </div>
 </div>
 <style>
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .joyride-step__container {
+    border-radius: 8px;
+  }
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .joyride-step__container .joyride-step__body {
+    padding-bottom: 0;
+    padding-top: 0;
+  }
   .oppia-tabs-container {
     padding-top: 5px;
     text-align: center;
@@ -270,19 +299,25 @@
   .oppia-translation-tour-content {
     width: 420px;
   }
+  .oppia-translation-tour-mobile-text {
+    display: none;
+  }
+  .oppia-translation-tour-desktop-text {
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1;
+    margin: 0 0 10px;
+  }
   .oppia-translation-tour-content h3 {
     color: #1354a5;
-    font-size: 24px;
-    font-weight: 500;
-    margin: 0 0 22px;
-  }
-  .oppia-translation-tour-content p {
-    font-size: 18px;
-    line-height: 1.35;
-    margin: 0 0 8px;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    margin: 0 0 16px;
+    width: 96%;
   }
   .oppia-translation-tour-counter {
-    font-size: 14px;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 13px;
     font-weight: normal;
   }
   .oppia-translation-tour-navigation-button {
@@ -561,6 +596,23 @@
     }
   }
   @media only screen and (max-width: 700px) {
+    .oppia-translation-tour-desktop-text {
+      display: none;
+    }
+    .oppia-translation-tour-mobile-text {
+      display: block;
+      font-family: "Roboto", Arial, sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1;
+      margin: 0 0 8px;
+    }
+    .oppia-translation-tour-content h3 {
+      color: #1354a5;
+      font-family: "Capriola", "Roboto", Arial, sans-serif;
+      font-size: 14px;
+      margin: 0 0 12px;
+    }
     .oppia-translation-tour-content {
       max-width: calc(100vw - 100px);
       width: 420px;
@@ -677,6 +729,7 @@
       font-size: 15px;
       padding: 10px 5px;
       text-align: center;
+      white-space: nowrap;
     }
   }
   @media only screen and (max-width: 420px) {
