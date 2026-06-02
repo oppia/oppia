@@ -3375,23 +3375,6 @@ export class TopicManager extends BaseUser {
    * @param {string} topicName - The name of the topic.
    */
   async openStoryEditor(storyName: string, topicName?: string): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      const currentStoryName = await this.getCurrentStoryNameInStoryFlow();
-      const activeTab = await this.getStoryEditorActiveTab();
-
-      if (currentStoryName === storyName) {
-        if (activeTab === 'story_editor') {
-          await this.expectElementToBeVisible(storyEditorContainerSelector);
-          return;
-        }
-
-        if (activeTab === 'chapter_editor') {
-          await this.returnToStoryEditorInMobile();
-          return;
-        }
-      }
-    }
-
     // If topic name is given, navigate to topic.
     if (topicName) {
       await this.openTopicEditor(topicName);
