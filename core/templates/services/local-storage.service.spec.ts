@@ -192,6 +192,106 @@ describe('LocalStorageService', () => {
       ).toBeNull();
     });
 
+    it('should save that a contributor has seen translation onboarding', () => {
+      expect(
+        localStorageService.hasSeenContributorDashboardTranslationOnboarding(
+          'new_contributor'
+        )
+      ).toBeFalse();
+
+      localStorageService.markContributorDashboardTranslationOnboardingAsSeen(
+        'new_contributor'
+      );
+
+      expect(
+        localStorageService.hasSeenContributorDashboardTranslationOnboarding(
+          'new_contributor'
+        )
+      ).toBeTrue();
+      expect(
+        localStorageService.hasSeenContributorDashboardTranslationOnboarding(
+          'another_contributor'
+        )
+      ).toBeFalse();
+    });
+
+    it('should not save onboarding state when storage is not available', () => {
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+
+      localStorageService.markContributorDashboardTranslationOnboardingAsSeen(
+        'new_contributor'
+      );
+
+      expect(
+        localStorageService.hasSeenContributorDashboardTranslationOnboarding(
+          'new_contributor'
+        )
+      ).toBeFalse();
+    });
+
+    it('should save contributor dashboard translation tutorial progress', () => {
+      expect(
+        localStorageService.getContributorDashboardTranslationTutorialProgress(
+          'new_contributor'
+        )
+      ).toBe(0);
+
+      localStorageService.saveContributorDashboardTranslationTutorialProgress(
+        'new_contributor',
+        50
+      );
+
+      expect(
+        localStorageService.getContributorDashboardTranslationTutorialProgress(
+          'new_contributor'
+        )
+      ).toBe(50);
+      expect(
+        localStorageService.getContributorDashboardTranslationTutorialProgress(
+          'another_contributor'
+        )
+      ).toBe(0);
+    });
+
+    it('should bound saved contributor dashboard translation tutorial progress', () => {
+      localStorageService.saveContributorDashboardTranslationTutorialProgress(
+        'new_contributor',
+        125
+      );
+
+      expect(
+        localStorageService.getContributorDashboardTranslationTutorialProgress(
+          'new_contributor'
+        )
+      ).toBe(100);
+
+      localStorageService.saveContributorDashboardTranslationTutorialProgress(
+        'new_contributor',
+        -20
+      );
+
+      expect(
+        localStorageService.getContributorDashboardTranslationTutorialProgress(
+          'new_contributor'
+        )
+      ).toBe(0);
+    });
+
+    it('should not save tutorial progress when storage is not available', () => {
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+
+      localStorageService.saveContributorDashboardTranslationTutorialProgress(
+        'new_contributor',
+        50
+      );
+
+      expect(
+        localStorageService.getContributorDashboardTranslationTutorialProgress(
+          'new_contributor'
+        )
+      ).toBe(0);
+    });
+
     it('should correctly save and retrieve sign up section preference', () => {
       expect(
         localStorageService.getEndChapterSignUpSectionHiddenPreference()

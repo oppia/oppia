@@ -59,6 +59,12 @@ export class LocalStorageService {
 
   LAST_SELECTED_LANGUAGE_ACCENT_KEY = 'last_selected_language_accent_key';
 
+  CONTRIBUTOR_DASHBOARD_TRANSLATION_ONBOARDING_SEEN_KEY_PREFIX =
+    'contributor_dashboard_translation_onboarding_seen_';
+
+  CONTRIBUTOR_DASHBOARD_TRANSLATION_TUTORIAL_PROGRESS_KEY_PREFIX =
+    'contributor_dashboard_translation_tutorial_progress_';
+
   HIDE_SIGN_UP_SECTION_PREFERENCE = 'hide_sign_up_section';
 
   /**
@@ -254,6 +260,77 @@ export class LocalStorageService {
       );
     }
     return null;
+  }
+
+  /**
+   * Save that a user has responded to the translation onboarding modal.
+   * @param username
+   */
+  markContributorDashboardTranslationOnboardingAsSeen(username: string): void {
+    if (this.isStorageAvailable()) {
+      (this.storage as Storage).setItem(
+        this.CONTRIBUTOR_DASHBOARD_TRANSLATION_ONBOARDING_SEEN_KEY_PREFIX +
+          username,
+        'true'
+      );
+    }
+  }
+
+  /**
+   * Return whether a user has responded to the translation onboarding modal.
+   * @param username
+   */
+  hasSeenContributorDashboardTranslationOnboarding(username: string): boolean {
+    if (this.isStorageAvailable()) {
+      return (
+        (this.storage as Storage).getItem(
+          this.CONTRIBUTOR_DASHBOARD_TRANSLATION_ONBOARDING_SEEN_KEY_PREFIX +
+            username
+        ) === 'true'
+      );
+    }
+    return false;
+  }
+
+  /**
+   * Save a user's translation tutorial progress percentage.
+   * @param username
+   * @param progressPercentage
+   */
+  saveContributorDashboardTranslationTutorialProgress(
+    username: string,
+    progressPercentage: number
+  ): void {
+    if (this.isStorageAvailable()) {
+      const boundedProgressPercentage = Math.min(
+        100,
+        Math.max(0, progressPercentage)
+      );
+      (this.storage as Storage).setItem(
+        this.CONTRIBUTOR_DASHBOARD_TRANSLATION_TUTORIAL_PROGRESS_KEY_PREFIX +
+          username,
+        `${Math.floor(boundedProgressPercentage)}`
+      );
+    }
+  }
+
+  /**
+   * Retrieve a user's translation tutorial progress percentage.
+   * @param username
+   */
+  getContributorDashboardTranslationTutorialProgress(username: string): number {
+    if (this.isStorageAvailable()) {
+      const savedProgressPercentage = (this.storage as Storage).getItem(
+        this.CONTRIBUTOR_DASHBOARD_TRANSLATION_TUTORIAL_PROGRESS_KEY_PREFIX +
+          username
+      );
+      const parsedProgressPercentage = Number(savedProgressPercentage);
+
+      if (!Number.isNaN(parsedProgressPercentage)) {
+        return Math.min(100, Math.max(0, parsedProgressPercentage));
+      }
+    }
+    return 0;
   }
 
   updateUniqueProgressIdOfLoggedOutLearner(uniqueProgressUrlId: string): void {
