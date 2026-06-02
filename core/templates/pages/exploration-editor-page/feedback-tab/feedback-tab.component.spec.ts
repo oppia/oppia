@@ -446,6 +446,10 @@ describe('Feedback Tab Component', () => {
   }));
 
   it('should create a new thread when closing create new thread modal', fakeAsync(() => {
+    // Use 'unknown' (rather than 'any') because the spy is only stubbing the
+    // return value; the actual argument types are irrelevant here. 'unknown'
+    // preserves type safety by requiring an explicit cast before the values
+    // could be used, while still accepting any argument.
     spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
       return {
         result: Promise.resolve({
@@ -475,6 +479,10 @@ describe('Feedback Tab Component', () => {
 
   it('should not create a new thread when dismissing create new thread modal', () => {
     spyOn(threadDataBackendApiService, 'createNewThreadAsync');
+    // Use 'unknown' (rather than 'any') because the spy is only stubbing the
+    // return value; the actual argument types are irrelevant here. 'unknown'
+    // preserves type safety by requiring an explicit cast before the values
+    // could be used, while still accepting any argument.
     spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
       return {
         result: Promise.reject(),
