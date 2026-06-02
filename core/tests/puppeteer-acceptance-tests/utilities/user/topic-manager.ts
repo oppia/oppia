@@ -3248,7 +3248,7 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(selector, {timeout: 15000});
     try {
       await this.page.waitForFunction(
-        sel => {
+        (sel: string) => {
           const elements = Array.from(
             document.querySelectorAll(sel)
           ) as HTMLButtonElement[];
