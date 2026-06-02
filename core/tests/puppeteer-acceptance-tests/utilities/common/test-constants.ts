@@ -90,6 +90,7 @@ export default {
     PendingAccountDeletion: 'http://localhost:8181/pending-account-deletion',
     PrivacyPolicy: 'http://localhost:8181/privacy-policy',
     ReleaseCoordinator: 'http://localhost:8181/release-coordinator',
+    SitemapXml: 'http://localhost:8181/sitemap.xml',
     VoiceoverAdmin: 'http://localhost:8181/voiceover-admin',
     splash: 'http://localhost:8181/splash',
     Teach: 'http://localhost:8181/teach',

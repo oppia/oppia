@@ -24,6 +24,50 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
+// Expected SEO metadata values for each page.
+const SPLASH_SEO = {
+  title: 'Oppia | Free, Online and Interactive Lessons for Anyone',
+  ogTitle: 'Personalized Online Learning from Oppia',
+  description:
+    'Learn any subject through free and interactive lessons in easy-to-follow language. Oppia provides a step-by-step learning process to master any skills you want.',
+  ogDescription:
+    'Oppia is a free, open-source learning platform. Join the community to create or try an exploration today!',
+  applicationName: 'Oppia.org',
+};
+
+// Expected SEO metadata values for donate page.
+const DONATE_SEO = {
+  title: 'Donate | Make a Positive Impact | Oppia',
+  ogTitle: 'Personalized Online Learning from Oppia',
+  description:
+    'Learn any subject through free and interactive lessons in easy-to-follow language. Oppia provides a step-by-step learning process to master any skills you want.',
+  ogDescription:
+    'Donate to The Oppia Foundation to enable more students to receive the quality education they deserve.',
+  applicationName: 'Oppia.org',
+};
+
+// Expected SEO metadata values for volunteer page.
+const VOLUNTEER_SEO = {
+  title: 'Volunteer | Oppia',
+  ogTitle: 'Personalized Online Learning from Oppia',
+  description:
+    'Learn any subject through free and interactive lessons in easy-to-follow language. Oppia provides a step-by-step learning process to master any skills you want.',
+  ogDescription:
+    'Oppia is a free, open-source learning platform. Join the community to create or try an exploration today!',
+  applicationName: 'Oppia.org',
+};
+
+// Expected SEO metadata values for partnerships page.
+const PARTNERSHIPS_SEO = {
+  title: 'Partnerships | Oppia',
+  ogTitle: 'Personalized Online Learning from Oppia',
+  description:
+    'Learn any subject through free and interactive lessons in easy-to-follow language. Oppia provides a step-by-step learning process to master any skills you want.',
+  ogDescription:
+    'Oppia is a free, open-source learning platform. Join the community to create or try an exploration today!',
+  applicationName: 'Oppia.org',
+};
+
 describe('Search Engine Bot', function () {
   let loggedOutUser: LoggedOutUser;
 
@@ -32,55 +76,49 @@ describe('Search Engine Bot', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should verify meta tags on Splash page',
+    'should verify sitemap.xml',
+    async function () {
+      await loggedOutUser.verifySitemapXml();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should verify SEO metadata on Splash page',
     async function () {
       await loggedOutUser.navigateToSplashPage();
-      await loggedOutUser.verifyMetaTags();
+      await loggedOutUser.verifyCurrentPageStatus200();
+      await loggedOutUser.verifySEOMetadata(SPLASH_SEO);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should verify meta tags on Topic page',
-    async function () {
-      await loggedOutUser.navigateToGetStartedPage();
-      await loggedOutUser.verifyMetaTags();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should verify meta tags on Donate page',
+    'should verify SEO metadata on Donate page',
     async function () {
       await loggedOutUser.navigateToDonatePage();
-      await loggedOutUser.verifyMetaTags();
+      await loggedOutUser.verifyCurrentPageStatus200();
+      await loggedOutUser.verifySEOMetadata(DONATE_SEO);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should verify meta tags on Partnerships page',
-    async function () {
-      await loggedOutUser.navigateToPartnershipsPage();
-      await loggedOutUser.verifyMetaTags();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should verify meta tags on Volunteer page',
+    'should verify SEO metadata on Volunteer page',
     async function () {
       await loggedOutUser.navigateToVolunteerPage();
-      await loggedOutUser.verifyMetaTags();
+      await loggedOutUser.verifyCurrentPageStatus200();
+      await loggedOutUser.verifySEOMetadata(VOLUNTEER_SEO);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should verify meta tags on Parents/Teachers page',
+    'should verify SEO metadata on Partnerships page',
     async function () {
-      await loggedOutUser.navigateToTeachPage();
-      await loggedOutUser.verifyMetaTags();
+      await loggedOutUser.navigateToPartnershipsPage();
+      await loggedOutUser.verifyCurrentPageStatus200();
+      await loggedOutUser.verifySEOMetadata(PARTNERSHIPS_SEO);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

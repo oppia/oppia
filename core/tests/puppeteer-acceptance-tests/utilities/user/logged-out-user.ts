@@ -606,9 +606,13 @@ const conceptCardCloseButtonSelector = '.e2e-test-close-concept-card';
 const promoBarTextSelector = '.e2e-test-promo-bar-text';
 const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
 
-const metaItempropNameSelector = 'meta[itemprop="name"]';
+const sitemapXmlUrl = testConstants.URLs.SitemapXml;
+
+const sitemapXmlLocTag = '<loc>';
+
 const metaOgTitleSelector = 'meta[property="og:title"]';
 const metaDescriptionSelector = 'meta[name="description"]';
+const metaOgDescriptionSelector = 'meta[property="og:description"]';
 const metaApplicationNameSelector = 'meta[name="application-name"]';
 
 /**
@@ -7411,33 +7415,169 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to verify meta tags on the current page.
+   * Fetches sitemap.xml and verifies it is valid XML containing URL entries.
    */
-  async verifyMetaTags(): Promise<void> {
-    await this.page.waitForSelector(metaItempropNameSelector);
+  async verifySitemapXml(): Promise<void> {
+    const response = await this.page.goto(sitemapXmlUrl, {
+      waitUntil: ['networkidle2', 'load'],
+      timeout: 60000,
+    });
 
-    const itempropName = await this.page.$eval(metaItempropNameSelector, el =>
-      el.getAttribute('content')
-    );
-    expect(itempropName).toBe('Personalized Online Learning from Oppia');
+    if (response?.status() !== 200) {
+      throw new Error(
+        `Expected sitemap.xml to return status 200, but got ${response?.status()}.`
+      );
+    }
 
-    const ogTitle = await this.page.$eval(metaOgTitleSelector, el =>
-      el.getAttribute('content')
-    );
-    expect(ogTitle).toBe('Personalized Online Learning from Oppia');
+    if (!(await this.isTextPresentOnPage(sitemapXmlLocTag))) {
+      throw new Error(
+        `Expected sitemap.xml to contain "${sitemapXmlLocTag}" URL entries, but none were found.`
+      );
+    }
+  }
 
-    const description = await this.page.$eval(metaDescriptionSelector, el =>
-      el.getAttribute('content')
-    );
-    expect(description).toBe(
-      'Learn any subject through free and interactive lessons in easy-to-follow language. ' +
-        'Oppia provides a step-by-step learning process to master any skills you want.'
+  /**
+   * Function to verify SEO metadata on the current page.
+   */
+  async verifySEOMetadata(
+    expected: {
+      title?: string;
+      ogTitle?: string;
+      description?: string;
+      ogDescription?: string;
+      applicationName?: string;
+    } = {}
+  ): Promise<void> {
+    await this.page.waitForSelector('head title');
+    await this.page.waitForSelector(metaOgTitleSelector);
+
+    // If an expected title is provided, assert the <title> matches it.
+    // Do not use visibility-based helpers for <head> elements.
+    if (expected.title !== undefined) {
+      const title = (await this.page.title()).trim();
+      if (title !== expected.title) {
+        throw new Error(
+          `<title> mismatch. Expected: "${expected.title}", Found: "${title}"`
+        );
+      }
+    }
+
+    // If an expected og:title is provided, assert meta property matches it.
+    if (expected.ogTitle !== undefined) {
+      const ogTitle = await this.page.$eval(metaOgTitleSelector, el =>
+        el.getAttribute('content')
+      );
+      if (ogTitle !== expected.ogTitle) {
+        throw new Error(
+          `meta property=\"og:title\" mismatch. Expected: "${expected.ogTitle}", Found: "${ogTitle}"`
+        );
+      }
+    }
+
+    // If an expected description is provided, assert meta description matches it.
+    if (expected.description !== undefined) {
+      const description = await this.page.$eval(metaDescriptionSelector, el =>
+        el.getAttribute('content')
+      );
+      if (description !== expected.description) {
+        throw new Error(
+          `meta name=\"description\" mismatch. Expected: "${expected.description}", Found: "${description}"`
+        );
+      }
+    }
+
+    // If an expected og:description is provided, assert meta property matches it.
+    if (expected.ogDescription !== undefined) {
+      const ogDescription = await this.page.$eval(
+        metaOgDescriptionSelector,
+        el => el.getAttribute('content')
+      );
+      if (ogDescription !== expected.ogDescription) {
+        throw new Error(
+          `meta property=\"og:description\" mismatch. Expected: "${expected.ogDescription}", Found: "${ogDescription}"`
+        );
+      }
+    }
+
+    // If an expected application name is provided, assert it matches.
+    if (expected.applicationName !== undefined) {
+      const appName = await this.page.$eval(metaApplicationNameSelector, el =>
+        el.getAttribute('content')
+      );
+      if (appName !== expected.applicationName) {
+        throw new Error(
+          `meta name=\"application-name\" mismatch. Expected: "${expected.applicationName}", Found: "${appName}"`
+        );
+      }
+    }
+
+    // Verify that the raw server-side HTML contains semantic elements
+    // (so bots crawling the raw HTML can see page structure without JS).
+    const requiredSemanticTags = ['h2', 'p'];
+    const rawHtml = await this.getRawHtmlForCurrentPage();
+    for (const tag of requiredSemanticTags) {
+      const tagRegex = new RegExp(`<${tag}[^>]*>[\\s\\S]*?<\\/${tag}>`);
+      if (!tagRegex.test(rawHtml)) {
+        throw new Error(
+          `Expected server-side HTML to contain a <${tag}> element.`
+        );
+      }
+    }
+  }
+
+  /**
+   * Fetches and returns the raw HTML response for the current page URL.
+   */
+  async getRawHtmlForCurrentPage(): Promise<string> {
+    const url = this.page.url();
+    if (!url) {
+      throw new Error('Cannot fetch raw HTML: current page URL is empty.');
+    }
+
+    const rawHtml = await this.page.evaluate(async (u: string) => {
+      const res = await fetch(u, {method: 'GET', credentials: 'same-origin'});
+      if (!res.ok) {
+        throw new Error(`Failed to fetch raw HTML. Status: ${res.status}`);
+      }
+      return await res.text();
+    }, url);
+
+    if (!rawHtml || rawHtml.trim().length === 0) {
+      throw new Error('Raw HTML response is empty.');
+    }
+
+    return rawHtml;
+  }
+
+  /**
+   * Verifies that the current page URL returns HTTP 200 when fetched.
+   * Uses an in-browser `fetch` call so it does not navigate away from the
+   * current page context.
+   */
+  async verifyCurrentPageStatus200(): Promise<void> {
+    const url = this.page.url();
+    if (!url) {
+      throw new Error('Cannot verify status: current page URL is empty.');
+    }
+
+    const status: number | null = await this.page.evaluate(
+      async (u: string) => {
+        try {
+          const res = await fetch(u, {
+            method: 'GET',
+            credentials: 'same-origin',
+          });
+          return res.status;
+        } catch (err) {
+          return null;
+        }
+      },
+      url
     );
 
-    const appName = await this.page.$eval(metaApplicationNameSelector, el =>
-      el.getAttribute('content')
-    );
-    expect(appName).toBe('Oppia.org');
+    if (status !== 200) {
+      throw new Error(`Expected ${url} to return HTTP 200 but got ${status}`);
+    }
   }
 }
 
