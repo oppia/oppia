@@ -34,18 +34,12 @@
   font-family: Roboto, Arial, sans-serif;
   font-size: 16px;
   line-height: 1.55;
-
   margin-left: 0;
   margin-top: 0;
-
   max-width: 700px;
   padding: 18px 28px;
-
   position: relative;
-
-  /* move bubble slightly lower */
   top: 20px;
-
   width: fit-content;
 }
 
@@ -151,7 +145,6 @@
   padding: 0;
 }
 
-/* Tablet */
 @media (max-width: 768px) {
   .story-callout-row {
     gap: 16px;
@@ -206,69 +199,6 @@
   }
 }
 
-@media (max-width: 480px) {
-  .story-callout-row {
-    gap: 12px;
-    margin: -12px 0 -12px 4px;
-  }
-
-  .story-callout-avatar {
-    width: 72px;
-    height: 72px;
-    position: relative;
-    top: -2px;
-  }
-
-  .story-description-bubble {
-    margin-left: 0;
-    margin-top: 0;
-    top: 10px;
-
-    max-width: calc(100% - 88px);
-    padding: 8px 10px;
-
-    font-size: 12px;
-    line-height: 1.35;
-
-    border-radius: 10px;
-    border-bottom-left-radius: 0;
-  }
-
-  .story-description-bubble .left-side-curve {
-    left: -16px;
-    bottom: -5px;
-
-    width: 22px;
-    height: 28px;
-  }
-
-  .story-card-header {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 14px;
-    padding: 18px 20px;
-  }
-
-  .story-title {
-    font-size: 17px;
-  }
-
-  .story-meta {
-    font-size: 15px;
-  }
-
-  .story-card-header-right,
-  .study-skills-cta {
-    width: 100%;
-  }
-
-  .story-card-body {
-    min-height: 180px;
-  }
-}
-
-/* Extra-small mobile: nudges the card up and reduces bubble size/fonts
-   if there's not enough space (screens <= 475px) */
 @media (max-width: 475px) {
   .story-callout-row {
     margin: -14px 0 -10px 4px;
@@ -281,13 +211,9 @@
   }
 
   .story-description-bubble {
-    /* move bubble slightly lower but keep it compact */
     top: 6px;
-
     max-width: calc(100% - 76px);
     padding: 6px 8px;
-
-    /* reduce font if layout is constrained */
     font-size: 11px;
     line-height: 1.25;
 
@@ -303,7 +229,6 @@
     height: 24px;
   }
 
-  /* Nudge the story card upward so it doesn't overlap the bubble tail. */
   .story-card {
     margin-top: -12px;
   }
@@ -317,7 +242,6 @@
   }
 }
 
-/* Very small mobile: screens narrower than 325px */
 @media (max-width: 324px) {
   .story-callout-row {
     gap: 8px;
@@ -337,11 +261,12 @@
     font-size: 10px;
     line-height: 1.2;
     border-radius: 8px;
+    border-bottom-left-radius: 0;
   }
 
   .story-description-bubble .left-side-curve {
     left: -12px;
-    bottom: -3px;
+    bottom: -4px;
     width: 16px;
     height: 20px;
   }

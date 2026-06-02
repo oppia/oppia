@@ -66,7 +66,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
   practiceTabIsDisplayed: boolean = false;
 
   constructor(
-    public alertsService: AlertsService,
+    private alertsService: AlertsService,
     private loaderService: LoaderService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private pageTitleService: PageTitleService,
@@ -77,7 +77,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
     private translateService: TranslateService,
-    public topicViewerDataService: TopicViewerDataService
+    private topicViewerDataService: TopicViewerDataService
   ) {}
 
   ngOnInit(): void {
