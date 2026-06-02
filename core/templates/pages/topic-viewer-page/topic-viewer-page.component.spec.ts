@@ -33,6 +33,7 @@ import {PageTitleService} from 'services/page-title.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {TopicViewerDataService} from './services/topic-viewer-data.service';
 
 class MockPlatformFeatureService {
   status = {
@@ -79,6 +80,7 @@ describe('Topic viewer page', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let translateService: TranslateService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
+  let topicViewerDataService: TopicViewerDataService;
 
   let topicName = 'Topic Name';
   let topicUrlFragment = 'topic-frag';
@@ -136,6 +138,7 @@ describe('Topic viewer page', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     translateService = TestBed.inject(TranslateService);
+    topicViewerDataService = TestBed.inject(TopicViewerDataService);
     let fixture = TestBed.createComponent(TopicViewerPageComponent);
     topicViewerPageComponent = fixture.componentInstance;
 
@@ -183,15 +186,9 @@ describe('Topic viewer page', () => {
     expect(topicViewerPageComponent.skillDescriptions).toEqual({});
     expect(topicViewerPageComponent.topicIsLoading).toBe(false);
     expect(topicViewerPageComponent.practiceTabIsDisplayed).toBe(true);
-    expect(
-      topicViewerPageComponent.topicViewerDataService.getClassroomUrlFragment()
-    ).toBe('math');
-    expect(
-      topicViewerPageComponent.topicViewerDataService.getTopicUrlFragment()
-    ).toBe(topicUrlFragment);
-    expect(
-      topicViewerPageComponent.topicViewerDataService.getCanonicalStoryData()
-    ).toEqual([
+    expect(topicViewerDataService.getClassroomUrlFragment()).toBe('math');
+    expect(topicViewerDataService.getTopicUrlFragment()).toBe(topicUrlFragment);
+    expect(topicViewerDataService.getCanonicalStoryData()).toEqual([
       {
         storyId: '2',
         storyTitle: 'Story Title',
@@ -440,12 +437,12 @@ describe('Topic viewer page', () => {
 
   it('should return true when practice tab is enabled', () => {
     topicViewerPageComponent.practiceTabIsDisplayed = true;
-    expect(topicViewerPageComponent.isPracticeTabEnabled()).toBeTrue();
+    expect(topicViewerPageComponent.isPracticeTabEnabled()).toBe(true);
   });
 
   it('should return false when practice tab is disabled', () => {
     topicViewerPageComponent.practiceTabIsDisplayed = false;
-    expect(topicViewerPageComponent.isPracticeTabEnabled()).toBeFalse();
+    expect(topicViewerPageComponent.isPracticeTabEnabled()).toBe(false);
   });
 
   it('should return false when redesigned topic viewer page feature is off', () => {
@@ -454,7 +451,7 @@ describe('Topic viewer page', () => {
 
     expect(
       topicViewerPageComponent.isRedesignedTopicViewerPageFeatureEnabled()
-    ).toBeFalse();
+    ).toBe(false);
   });
 
   it('should return true when redesigned topic viewer page feature is on', () => {
@@ -463,6 +460,6 @@ describe('Topic viewer page', () => {
 
     expect(
       topicViewerPageComponent.isRedesignedTopicViewerPageFeatureEnabled()
-    ).toBeTrue();
+    ).toBe(true);
   });
 });

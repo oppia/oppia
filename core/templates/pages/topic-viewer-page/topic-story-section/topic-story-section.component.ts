@@ -20,8 +20,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {DomSanitizer} from '@angular/platform-browser';
-import {MatIconRegistry} from '@angular/material/icon';
 
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -56,17 +54,8 @@ export class TopicStorySectionComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
-    private matIconRegistry: MatIconRegistry,
-    private sanitizer: DomSanitizer
-  ) {
-    this.matIconRegistry.addSvgIcon(
-      'skills',
-      this.sanitizer.bypassSecurityTrustResourceUrl(
-        '/assets/images/icons/skills-icon.svg'
-      )
-    );
-  }
+    private i18nLanguageCodeService: I18nLanguageCodeService
+  ) {}
 
   ngOnInit(): void {
     if (!this.classroomUrlFragment) {
