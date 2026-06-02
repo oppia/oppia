@@ -621,6 +621,31 @@ describe('Translation Suggestion Review Modal Component', function () {
       );
     });
 
+    it('should handle error when updating translation suggestion fails', function () {
+      component.ngOnInit();
+      const error = new Error('Test error');
+      spyOn(
+        component,
+        'showTranslationSuggestionUpdateError'
+      ).and.callThrough();
+      spyOn(
+        contributionAndReviewService,
+        'updateTranslationSuggestionAsync'
+      ).and.callFake(
+        (suggestionId, translationHtml, successCallback, errorCallback) => {
+          errorCallback(error);
+          return Promise.resolve();
+        }
+      );
+
+      component.updateSuggestion();
+
+      expect(
+        component.showTranslationSuggestionUpdateError
+      ).toHaveBeenCalledWith(error);
+      expect(component.isSubmitting).toBeFalse();
+    });
+
     it('should emit queuedSuggestion Emit when suggestions are accepted', () => {
       component.ngOnInit();
       spyOn(component, 'generateCommitMessage').and.returnValue(
@@ -1424,6 +1449,31 @@ describe('Translation Suggestion Review Modal Component', function () {
         jasmine.any(Function),
         jasmine.any(Function)
       );
+    });
+
+    it('should handle error when updating translation suggestion fails', function () {
+      component.ngOnInit();
+      const error = new Error('Test error');
+      spyOn(
+        component,
+        'showTranslationSuggestionUpdateError'
+      ).and.callThrough();
+      spyOn(
+        contributionAndReviewService,
+        'updateTranslationSuggestionAsync'
+      ).and.callFake(
+        (suggestionId, translationHtml, successCallback, errorCallback) => {
+          errorCallback(error);
+          return Promise.resolve();
+        }
+      );
+
+      component.updateSuggestion();
+
+      expect(
+        component.showTranslationSuggestionUpdateError
+      ).toHaveBeenCalledWith(error);
+      expect(component.isSubmitting).toBeFalse();
     });
 
     describe('isHtmlContentEqual', function () {
