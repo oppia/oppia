@@ -285,6 +285,138 @@ class BackfillTranslationOpportunityModelJobTests(
             ]
         )
 
+    def test_creates_translation_opportunity_model_with_non_zero_content_count(
+        self,
+    ) -> None:
+        # Create a new exploration 'exp_2' with non-empty content.
+        exp_id = 'exp_2'
+        rights_manager.create_new_exploration_rights(exp_id, self.author_id)
+
+        exploration = exp_domain.Exploration.create_default_exploration(exp_id)
+        exploration.states[feconf.DEFAULT_INIT_STATE_NAME].content.html = (
+            '<p>HTML Content</p>'
+        )
+        default_outcome = exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME
+        ].interaction.default_outcome
+        assert default_outcome is not None
+        default_outcome.feedback.html = '<p>Feedback HTML</p>'
+
+        model = self.create_model(
+            exp_models.ExplorationModel,
+            id=exp_id,
+            title='Test Exploration 2',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code='en',
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            states={
+                feconf.DEFAULT_INIT_STATE_NAME: (
+                    exploration.states[feconf.DEFAULT_INIT_STATE_NAME].to_dict()
+                )
+            },
+        )
+        commit_cmd = exp_domain.ExplorationChange(
+            {
+                'cmd': exp_domain.CMD_CREATE_NEW,
+                'title': 'title',
+                'category': 'category',
+            }
+        )
+        model.commit(self.author_id, 'commit_message', [commit_cmd.to_dict()])
+
+        # Create StoryModel 2 pointing to exp_2.
+        story_model_2 = self.create_model(
+            story_models.StoryModel,
+            id='story_id_2',
+            title='story title 2',
+            description='description 2',
+            notes='notes 2',
+            language_code='en',
+            story_contents_schema_version=feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
+            corresponding_topic_id='topic_id',
+            url_fragment='story-frag-2',
+            story_contents={
+                'initial_node_id': 'node_1',
+                'nodes': [
+                    {
+                        'id': 'node_1',
+                        'title': 'chapter title 2',
+                        'exploration_id': exp_id,
+                        'destination_node_ids': [],
+                        'prerequisite_skill_ids': [],
+                        'acquired_skill_ids': [],
+                        'outline': '',
+                        'outline_is_finalized': False,
+                        'thumbnail_filename': None,
+                        'thumbnail_bg_color': None,
+                        'thumbnail_size_in_bytes': None,
+                    }
+                ],
+                'next_node_id': 'node_2',
+            },
+        )
+        story_model_2.update_timestamps()
+        story_model_2.commit(
+            self.author_id, 'commit_message', [{'cmd': 'test_command'}]
+        )
+
+        # Add canonical story reference to TopicModel.
+        topic_model = topic_models.TopicModel.get_by_id('topic_id')
+        topic_model.canonical_story_references.append(
+            {'story_id': 'story_id_2', 'story_is_published': True}
+        )
+        topic_model.update_timestamps()
+        datastore_services.put_multi([topic_model])
+
+        # Create EntityTranslationsModel for exp_2.
+        translation_model = (
+            translation_models.EntityTranslationsModel.create_new(
+                'exploration',
+                exp_id,
+                1,
+                'hi',
+                {
+                    'content': {
+                        'content_format': 'html',
+                        'content_value': '<p>Translated Content</p>',
+                        'needs_update': False,
+                    },
+                    'default_outcome': {
+                        'content_format': 'html',
+                        'content_value': '<p>Translated Feedback</p>',
+                        'needs_update': True,
+                    },
+                },
+            )
+        )
+        translation_model.update_timestamps()
+        translation_model.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 2'
+                ),
+            ]
+        )
+
+        opportunity = opportunity_models.TranslationOpportunityModel.get(
+            opportunity_models.TranslationOpportunityModel._generate_id(  # pylint: disable=protected-access
+                feconf.TranslatableEntityType.EXPLORATION.value, exp_id
+            )
+        )
+        self.assertIsNotNone(opportunity)
+        self.assertEqual(opportunity.content_count, 2)
+        self.assertEqual(opportunity.translation_counts, {'hi': 1})
+
 
 class AuditBackfillTranslationOpportunityModelJobTests(
     job_test_utils.JobTestBase, test_utils.GenericTestBase
