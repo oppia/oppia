@@ -236,7 +236,7 @@
 
   .story-description-bubble .left-side-curve {
     left: -16px;
-    bottom: -5.5px;
+    bottom: -5px;
 
     width: 22px;
     height: 28px;
@@ -264,5 +264,97 @@
 
   .story-card-body {
     min-height: 180px;
+  }
+}
+
+/* Extra-small mobile: nudges the card up and reduces bubble size/fonts
+   if there's not enough space (screens <= 475px) */
+@media (max-width: 475px) {
+  .story-callout-row {
+    margin: -14px 0 -10px 4px;
+  }
+
+  .story-callout-avatar {
+    width: 64px;
+    height: 64px;
+    top: -4px;
+  }
+
+  .story-description-bubble {
+    /* move bubble slightly lower but keep it compact */
+    top: 6px;
+
+    max-width: calc(100% - 76px);
+    padding: 6px 8px;
+
+    /* reduce font if layout is constrained */
+    font-size: 11px;
+    line-height: 1.25;
+
+    border-radius: 9px;
+    border-bottom-left-radius: 0;
+  }
+
+  .story-description-bubble .left-side-curve {
+    left: -14px;
+    bottom: -5px;
+
+    width: 18px;
+    height: 24px;
+  }
+
+  /* Nudge the story card upward so it doesn't overlap the bubble tail. */
+  .story-card {
+    margin-top: -12px;
+  }
+
+  .story-card-header {
+    padding: 14px 16px;
+  }
+
+  .story-title {
+    font-size: 16px;
+  }
+}
+
+/* Very small mobile: screens narrower than 325px */
+@media (max-width: 324px) {
+  .story-callout-row {
+    gap: 8px;
+    margin: -16px 0 -8px 4px;
+  }
+
+  .story-callout-avatar {
+    width: 56px;
+    height: 56px;
+    top: -6px;
+  }
+
+  .story-description-bubble {
+    top: 4px;
+    max-width: calc(100% - 64px);
+    padding: 4px 6px;
+    font-size: 10px;
+    line-height: 1.2;
+    border-radius: 8px;
+  }
+
+  .story-description-bubble .left-side-curve {
+    left: -12px;
+    bottom: -3px;
+    width: 16px;
+    height: 20px;
+  }
+
+  .story-card {
+    margin-top: -18px;
+  }
+
+  .story-card-header {
+    padding: 12px 14px;
+  }
+
+  .story-title {
+    font-size: 15px;
   }
 }
