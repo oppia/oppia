@@ -1265,6 +1265,31 @@ def get_translation_opportunities_with_new_models(
     if not opportunity_models_list:
         return [], cursor, more
 
+    card_infos = _get_translation_opportunity_cards_from_models(
+        opportunity_models_list, entity_type, language_code
+    )
+
+    return card_infos, cursor, more
+
+
+def _get_translation_opportunity_cards_from_models(
+    opportunity_models_list: Sequence[
+        opportunity_models.TranslationOpportunityModel
+    ],
+    entity_type: str,
+    language_code: str,
+) -> List[opportunity_domain.TranslationOpportunityCardInfo]:
+    """Returns a list of translation opportunity card info objects for the given
+    list of models.
+
+    Args:
+        opportunity_models_list: list(TranslationOpportunityModel). The list of models.
+        entity_type: str. The entity type.
+        language_code: str. The language code.
+
+    Returns:
+        list(TranslationOpportunityCardInfo). A list of TranslationOpportunityCardInfo.
+    """
     entity_ids = [model.entity_id for model in opportunity_models_list]
 
     topic_summaries = topic_fetchers.get_all_topic_summaries()
@@ -1401,7 +1426,43 @@ def get_translation_opportunities_with_new_models(
 
         card_infos.append(card_info)
 
-    return card_infos, cursor, more
+    return card_infos
+
+
+def get_translation_opportunity_cards_by_entity_ids_with_new_models(
+    entity_type: str,
+    entity_ids: List[str],
+    language_code: str,
+) -> List[opportunity_domain.TranslationOpportunityCardInfo]:
+    """Returns a list of translation opportunity card info objects for the given
+    entity IDs and type.
+
+    Args:
+        entity_type: str. The entity type.
+        entity_ids: list(str). The entity IDs.
+        language_code: str. The language code to filter by.
+
+    Returns:
+        list(TranslationOpportunityCardInfo). A list of TranslationOpportunityCardInfo domain objects.
+    """
+    if not entity_ids:
+        return []
+
+    opportunity_models_from_db = (
+        opportunity_models.TranslationOpportunityModel.get_by_entity_ids(
+            entity_type, entity_ids
+        )
+    )
+
+    opportunity_models_list = [
+        model for model in opportunity_models_from_db if model is not None
+    ]
+    if not opportunity_models_list:
+        return []
+
+    return _get_translation_opportunity_cards_from_models(
+        opportunity_models_list, entity_type, language_code
+    )
 
 
 def get_translation_opportunities(
