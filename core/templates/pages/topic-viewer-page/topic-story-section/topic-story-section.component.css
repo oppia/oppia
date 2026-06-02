@@ -44,14 +44,14 @@
 }
 
 .story-description-bubble::after {
-  content: '';
-  position: absolute;
   background: #fff;
-  left: -10px;
   bottom: 0;
-  width: 24px;
-  height: 24px;
   clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  content: '';
+  height: 24px;
+  left: -10px;
+  position: absolute;
+  width: 24px;
 }
 
 .story-card {
