@@ -17,7 +17,6 @@
  */
 
 import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
 import {NgModule} from '@angular/core';
 import {SharedComponentsModule} from 'components/shared-component.module';
 
@@ -25,6 +24,7 @@ import {CertificateOfferingAddTopicItemsComponent} from './certificate-offering-
 import {CertificateOfferingDetailsComponent} from './certificate-offering-details.component';
 import {CertificateOfferingProgressComponent} from './certificate-offering-progress.component';
 import {CertificateOfferingReviewAndAvailabilityComponent} from './certificate-offering-review-and-availability.component';
+import {FormsModule} from '@angular/forms';
 
 @NgModule({
   imports: [CommonModule, FormsModule, SharedComponentsModule],

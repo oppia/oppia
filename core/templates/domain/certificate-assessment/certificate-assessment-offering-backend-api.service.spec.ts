@@ -76,7 +76,7 @@ describe('Certificate Assessment Offering backend api service', () => {
       .createCertificateAssessmentOfferingAsync(mockCertificateOfferingData)
       .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne(
+    let req = httpTestingController.expectOne(
       CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL
     );
     expect(req.request.method).toEqual('POST');
