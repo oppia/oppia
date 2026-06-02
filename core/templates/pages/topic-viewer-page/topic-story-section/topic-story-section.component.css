@@ -8,7 +8,7 @@
 .story-callout-row {
   align-items: flex-start;
   display: flex;
-  gap: 0;
+  gap: 24px;
   margin: -4px 0 -18px 8px;
   max-width: 100%;
   position: relative;
@@ -27,31 +27,44 @@
 .story-description-bubble {
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.14);
+  border-bottom-left-radius: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.10);
   color: #222;
   display: inline-block;
   font-family: Roboto, Arial, sans-serif;
   font-size: 16px;
   line-height: 1.55;
-  margin-left: 24px;
-  margin-top: 12px;
+
+  margin-left: 0;
+  margin-top: 0;
+
   max-width: 700px;
   padding: 18px 28px;
+
   position: relative;
+
+  /* move bubble slightly lower */
+  top: 20px;
+
   width: fit-content;
 }
 
-.story-description-bubble::after {
-  background: #fff;
-  bottom: 0;
-  clip-path: polygon(100% 0, 100% 100%, 0 100%);
-  content: '';
-  height: 24px;
-  left: -10px;
+.story-description-bubble .left-side-curve {
   position: absolute;
-  width: 24px;
+  left: -28px;
+
+  bottom: -10.3px;
+
+  width: 40px;
+  height: 52px;
 }
 
+
+/* Flip the SVG path vertically via CSS so template's horizontal flip composes correctly. */
+.story-description-bubble .left-side-curve path {
+  transform: scaleY(-1);
+  transform-origin: center;
+}
 .story-card {
   background: #fff;
   border-radius: 4px;
@@ -65,7 +78,8 @@
   background: #00645c;
   color: #fff;
   display: flex;
-  gap: 20px;
+  position: relative;
+  z-index: 2;
   justify-content: space-between;
   min-height: 88px;
   padding: 20px 28px;
@@ -140,6 +154,7 @@
 /* Tablet */
 @media (max-width: 768px) {
   .story-callout-row {
+    gap: 16px;
     margin: -12px 0 -12px 4px;
   }
 
@@ -149,18 +164,23 @@
   }
 
   .story-description-bubble {
-    margin-left: 12px;
+    margin-left: 0;
     margin-top: 0;
+    top: 14px;
+
     max-width: calc(100% - 105px);
     padding: 12px 16px;
+
     font-size: 14px;
     line-height: 1.45;
   }
 
-  .story-description-bubble::after {
-    width: 18px;
-    height: 18px;
-    left: -7px;
+  .story-description-bubble .left-side-curve {
+    left: -20px;
+    bottom: -7px;
+
+    width: 28px;
+    height: 36px;
   }
 
   .story-card-header {
@@ -188,30 +208,38 @@
 
 @media (max-width: 480px) {
   .story-callout-row {
+    gap: 12px;
     margin: -12px 0 -12px 4px;
   }
 
   .story-callout-avatar {
-  width: 72px;
-  height: 72px;
-  position: relative;
-  top: -2px;
-}
-
-  .story-description-bubble {
-    margin-left: 8px;
-    margin-top: 0;
-    max-width: calc(100% - 88px);
-    padding: 8px 10px;
-    font-size: 12px;
-    line-height: 1.35;
-    border-radius: 10px;
+    width: 72px;
+    height: 72px;
+    position: relative;
+    top: -2px;
   }
 
-  .story-description-bubble::after {
-    width: 14px;
-    height: 14px;
-    left: -5px;
+  .story-description-bubble {
+    margin-left: 0;
+    margin-top: 0;
+    top: 10px;
+
+    max-width: calc(100% - 88px);
+    padding: 8px 10px;
+
+    font-size: 12px;
+    line-height: 1.35;
+
+    border-radius: 10px;
+    border-bottom-left-radius: 0;
+  }
+
+  .story-description-bubble .left-side-curve {
+    left: -16px;
+    bottom: -5.5px;
+
+    width: 22px;
+    height: 28px;
   }
 
   .story-card-header {

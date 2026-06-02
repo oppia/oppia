@@ -24,6 +24,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 import './topic-story-section.component.css';
 
@@ -52,7 +53,8 @@ export class TopicStorySectionComponent implements OnInit {
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   ngOnInit(): void {
@@ -122,5 +124,9 @@ export class TopicStorySectionComponent implements OnInit {
     return this.urlInterpolationService.getStaticCopyrightedImageUrl(
       this.fallbackAvatarImagePath
     );
+  }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
