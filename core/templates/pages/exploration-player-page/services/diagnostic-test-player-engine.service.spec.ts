@@ -27,7 +27,6 @@ import {
 import {State} from '../../../domain/state/state.model';
 import {DiagnosticTestTopicTrackerModel} from '../../../pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import {DiagnosticTestPlayerEngineService} from './diagnostic-test-player-engine.service';
-import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
 import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
 import {Outcome} from '../../../domain/exploration/outcome.model';
 import {
@@ -56,7 +55,7 @@ describe('Diagnostic test engine service', () => {
       DiagnosticTestPlayerEngineService
     );
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
-    textInputService = TestBed.inject(TextInputRulesService);
+
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     alertsService = TestBed.inject(AlertsService);
     expressionInterpolationService = TestBed.inject(
@@ -142,6 +141,7 @@ describe('Diagnostic test engine service', () => {
         },
         linked_skill_id: null,
         card_is_checkpoint: true,
+        inapplicable_skill_misconception_ids: [],
       },
       question_state_data_schema_version: 2,
       language_code: '',
@@ -710,9 +710,9 @@ describe('Diagnostic test engine service', () => {
       'getMatchingClassificationResult'
     ).and.returnValue(answerClassificationResult);
 
-    expect(
-      diagnosticTestPlayerEngineService.isDiagnosticTestFinished()
-    ).toBeFalse();
+    expect(diagnosticTestPlayerEngineService.isDiagnosticTestFinished()).toBe(
+      false
+    );
 
     // Submitting the correct answer.
     diagnosticTestPlayerEngineService.submitAnswer(
@@ -722,9 +722,9 @@ describe('Diagnostic test engine service', () => {
     );
     tick();
 
-    expect(
-      diagnosticTestPlayerEngineService.isDiagnosticTestFinished()
-    ).toBeTrue();
+    expect(diagnosticTestPlayerEngineService.isDiagnosticTestFinished()).toBe(
+      true
+    );
   }));
 
   it(
@@ -807,9 +807,9 @@ describe('Diagnostic test engine service', () => {
         question2
       );
 
-      expect(
-        diagnosticTestPlayerEngineService.isDiagnosticTestFinished()
-      ).toBeFalse();
+      expect(diagnosticTestPlayerEngineService.isDiagnosticTestFinished()).toBe(
+        false
+      );
 
       expect(diagnosticTestPlayerEngineService.getCurrentTopicId()).toEqual(
         'topicId2'
@@ -834,9 +834,9 @@ describe('Diagnostic test engine service', () => {
       ).toEqual(2);
       // Since the learner has attempted the maximum number of questions (2) in
       // the test so the test should be terminated.
-      expect(
-        diagnosticTestPlayerEngineService.isDiagnosticTestFinished()
-      ).toBeTrue();
+      expect(diagnosticTestPlayerEngineService.isDiagnosticTestFinished()).toBe(
+        true
+      );
     })
   );
 

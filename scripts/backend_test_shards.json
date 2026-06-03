@@ -427,6 +427,8 @@
         "conftest_test",
         "core.jobs.batch_jobs.audit_threads_with_missing_suggestions_jobs_test",
         "core.jobs.batch_jobs.audit_stories_with_disconnected_node_ids_job_test",
+        "core.domain.certificate_assessment_domain_test",
+        "core.storage.certificate_assessment.gae_models_test",
         "core.controllers.certificate_assessment_test"
     ]
 }
