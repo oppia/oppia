@@ -38,7 +38,7 @@
 .topic-lesson-card-title {
   color: #3b3b3b;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 29px;
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.2;
   margin: 0;
@@ -47,8 +47,8 @@
 .topic-lesson-card-description {
   color: #3d3d3d;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 21px;
-  line-height: 1.38;
+  font-size: 14px;
+  line-height: 1.4;
   margin: 0;
 }
 
@@ -80,17 +80,17 @@
   }
 
   .topic-lesson-card-title {
-    font-size: 24px;
+    font-size: 16px;
   }
 
   .topic-lesson-card-description {
-    font-size: 18px;
+    font-size: 14px;
   }
 
   .topic-lesson-card-start-button {
-    font-size: 18px;
+    font-size: 16px;
     min-width: 120px;
-    padding: 16px 22px;
+    padding: 12px 20px;
   }
 }
 
@@ -111,16 +111,16 @@
   }
 
   .topic-lesson-card-title {
-    font-size: 20px;
+    font-size: 14px;
   }
 
   .topic-lesson-card-description {
-    font-size: 16px;
+    font-size: 12px;
   }
 
   .topic-lesson-card-start-button {
     align-self: stretch;
-    font-size: 17px;
+    font-size: 14px;
     width: 100%;
   }
 }

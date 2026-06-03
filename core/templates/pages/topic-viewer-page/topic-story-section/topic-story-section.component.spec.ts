@@ -45,8 +45,8 @@ describe('TopicStorySectionComponent', () => {
             interpolateUrl: jasmine
               .createSpy()
               .and.callFake((template: string, params: Object) => {
-                if (template === '/lesson/<exp_id>') {
-                  return '/lesson/exp_1';
+                if (template === '/explore/<exp_id>') {
+                  return '/explore/exp_1';
                 }
                 if (template.includes('studyguide')) {
                   return '/learn/math/fractions/studyguide';
@@ -151,6 +151,6 @@ describe('TopicStorySectionComponent', () => {
     );
     expect(component.studyGuideUrl).toBe('/learn/math/fractions/studyguide');
     expect(component.lessonCards.length).toBe(2);
-    expect(component.lessonCards[0].startUrl).toContain('/lesson/exp_1');
+    expect(component.lessonCards[0].startUrl).toContain('/explore/exp_1');
   });
 });

@@ -190,7 +190,7 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
     }
 
     let lessonUrl = this.urlInterpolationService.interpolateUrl(
-      '/lesson/<exp_id>',
+      '/explore/<exp_id>',
       {exp_id: explorationId}
     );
     lessonUrl = this.urlService.addField(
