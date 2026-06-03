@@ -20,6 +20,9 @@ from __future__ import annotations
 
 from core.domain import learner_group_fetchers, learner_group_services
 from core.tests import test_utils
+from core.platform import models
+
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
@@ -152,3 +155,31 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(learner_groups), 1)
         self.assertEqual(learner_groups[0].group_id, self.LEARNER_GROUP_ID)
+    
+    def test_get_learner_group_models_by_ids_strict_false(self) -> None:
+        models = learner_group_fetchers.get_learner_group_models_by_ids(
+            ['unknown_user'], strict=False)
+        self.assertEqual(models, [None])
+
+    def test_can_multi_learners_share_progress_loop_branches(self) -> None:
+        model = user_models.LearnerGroupsUserModel(
+            id='user_abc',
+            learner_groups_user_details=[
+                {
+                    'group_id': 'other_group',
+                    'progress_sharing_is_turned_on': False
+                },
+                {
+                    'group_id': 'target_group',
+                    'progress_sharing_is_turned_on': True
+                }
+            ]
+        )
+        model.update_timestamps()
+        model.put()
+        permissions = learner_group_fetchers.can_multi_learners_share_progress(
+            ['user_abc'], 'target_group')
+        self.assertEqual(permissions, [True])
+        permissions_empty = learner_group_fetchers.can_multi_learners_share_progress(
+            ['user_abc'], 'non_existent_group')
+        self.assertEqual(permissions_empty, [])
