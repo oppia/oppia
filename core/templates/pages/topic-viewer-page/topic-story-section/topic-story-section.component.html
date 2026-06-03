@@ -2,7 +2,8 @@
          [attr.aria-label]="storyTitle ? ('Story section: ' + storyTitle) : 'Story section'">
   <div class="story-callout-row">
     <img class="story-callout-avatar"
-         [src]="lessonThumbnailUrl"
+         [src]="oppiaAvatarImageUrl"
+         (error)="onAvatarImageError()"
          alt=""
          aria-hidden="true">
     <p *ngIf="storyDescription" class="story-description-bubble">
@@ -33,14 +34,16 @@
       </div>
     </div>
 
-    <div class="story-card-body"></div>
+    <div class="story-card-body">
+      <div class="story-lesson-card-wrapper"
+           *ngFor="let lessonCard of lessonCards">
+        <topic-lesson-card
+          [lessonTitle]="lessonCard.lessonTitle"
+          [lessonDescription]="lessonCard.lessonDescription"
+          [thumbnailUrl]="lessonCard.thumbnailUrl"
+          [startUrl]="lessonCard.startUrl">
+        </topic-lesson-card>
+      </div>
+    </div>
   </article>
-
-  <div class="story-lesson-card-wrapper">
-    <topic-lesson-card
-      [lessonTitle]="lessonTitle"
-      [lessonDescription]="storyDescription"
-      [thumbnailUrl]="lessonThumbnailUrl">
-    </topic-lesson-card>
-  </div>
 </section>

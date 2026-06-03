@@ -58,12 +58,15 @@
   border: 0;
   border-radius: 4px;
   color: #fff;
+  display: inline-flex;
   font-family: Roboto, Arial, sans-serif;
   font-size: 20px;
   font-weight: 700;
+  justify-content: center;
   line-height: 1;
   min-width: 132px;
   padding: 18px 24px;
+  text-decoration: none;
 }
 
 @media (max-width: 768px) {

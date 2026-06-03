@@ -31,6 +31,7 @@ export class TopicLessonCardComponent implements OnInit {
   @Input() lessonTitle: string = '';
   @Input() lessonDescription: string = '';
   @Input() thumbnailUrl: string = '';
+  @Input() startUrl: string | null = null;
 
   resolvedThumbnailUrl: string = '';
 

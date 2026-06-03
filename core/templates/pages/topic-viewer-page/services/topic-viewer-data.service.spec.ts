@@ -112,22 +112,20 @@ describe('TopicViewerDataService', () => {
     expect(service.getStoryDescription()).toBe('Start by finding equal parts.');
     expect(service.getLessonCount()).toBe(3);
     expect(service.getPracticeCount()).toBe(1);
-    expect(service.getCanonicalStoryData()).toEqual([
-      {
-        storyId: 'story_1',
-        storyTitle: 'Finding Parts',
-        storyDescription: 'Start by finding equal parts.',
-        lessonCount: 2,
-        practiceCount: 1,
-      },
-      {
-        storyId: 'story_2',
-        storyTitle: 'Comparing Fractions',
-        storyDescription: 'Compare fractions with common denominators.',
-        lessonCount: 1,
-        practiceCount: 1,
-      },
-    ]);
+
+    const canonicalStoryData = service.getCanonicalStoryData();
+    expect(canonicalStoryData.length).toBe(2);
+    expect(canonicalStoryData[0].storyId).toBe('story_1');
+    expect(canonicalStoryData[0].storyTitle).toBe('Finding Parts');
+    expect(canonicalStoryData[0].storyDescription).toBe(
+      'Start by finding equal parts.'
+    );
+    expect(canonicalStoryData[0].lessonCount).toBe(2);
+    expect(canonicalStoryData[0].practiceCount).toBe(1);
+    expect(canonicalStoryData[0].storySummary.getTitle()).toBe('Finding Parts');
+    expect(canonicalStoryData[1].storySummary.getTitle()).toBe(
+      'Comparing Fractions'
+    );
   });
 
   it('should use topic text when readonly topic has no canonical stories', () => {

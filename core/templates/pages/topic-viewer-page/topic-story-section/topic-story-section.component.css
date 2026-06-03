@@ -138,13 +138,22 @@
   font-size: 15px;
 }
 
+
 .story-card-body {
   min-height: 390px;
-  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 28px 28px;
+  justify-content: flex-end;
 }
 
 .story-lesson-card-wrapper {
-  margin-top: 20px;
+  width: 100%;
+}
+
+.story-card {
+  position: relative;
 }
 
 @media (max-width: 768px) {

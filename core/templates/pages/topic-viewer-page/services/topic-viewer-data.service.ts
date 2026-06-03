@@ -29,6 +29,7 @@ export interface TopicViewerStorySectionData {
   storyDescription: string;
   lessonCount: number;
   practiceCount: number;
+  storySummary: StorySummary;
 }
 
 export interface TopicViewerData {
@@ -75,6 +76,7 @@ export class TopicViewerDataService {
         storyDescription: storySummary.getDescription() || '',
         lessonCount: storySummary.getNodeTitles().length,
         practiceCount,
+        storySummary,
       };
     });
 
