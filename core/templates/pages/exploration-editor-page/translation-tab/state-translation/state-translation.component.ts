@@ -67,6 +67,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   activatedTabId!: string;
   activeAnswerGroupIndex!: number | null;
   directiveSubscriptions = new Subscription();
+  INTERACTION_SPECS = INTERACTION_SPECS;
   stateAnswerGroups!: AnswerGroup[];
   RULE_INPUT_TYPES_TO_DATA_FORMATS!: Record<string, string>;
   TAB_ID_RULE_INPUTS!: string;
