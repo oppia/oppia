@@ -37,7 +37,7 @@ from core.domain import (
     wipeout_service,
 )
 
-from typing import Any, Callable, Dict, Optional, TypedDict
+from typing import Any, Callable, Dict, List, Optional, TypedDict
 
 
 class ProfileHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -261,10 +261,73 @@ class MailingListSubscriptionHandler(
         self.render_json({'status': status})
 
 
-class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+class PreferencesUpdateDict(TypedDict):
+    """Dict representation of a single preference update."""
+
+    update_type: str
+    # Here we use type Any because the type of 'data' varies depending on the
+    # update_type: it can be a string, a list of strings, or a dict.
+    data: Any
+
+
+class PreferencesHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of PreferencesHandler's
+    normalized_payload dictionary.
+    """
+
+    updates: List[PreferencesUpdateDict]
+
+
+class PreferencesHandler(
+    base.BaseHandler[
+        PreferencesHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
     """Provides data for the preferences page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'updates': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'dict',
+                        'properties': [{
+                            'name': 'update_type',
+                            'schema': {
+                                'type': 'basestring',
+                                'choices': [
+                                    'user_bio',
+                                    'subject_interests',
+                                    'preferred_language_codes',
+                                    'preferred_site_language_code',
+                                    'preferred_audio_language_code',
+                                    'preferred_translation_language_code',
+                                    'default_dashboard',
+                                    'profile_picture_data_url',
+                                    'email_preferences',
+                                ],
+                            },
+                        }, {
+                            'name': 'data',
+                            'schema': {
+                                'type': 'weak_multiple',
+                                'options': [
+                                    'basestring',
+                                    'dict',
+                                    'list',
+                                ],
+                            },
+                        }],
+                    },
+                },
+            },
+        },
+    }
+
 
     # Here we use type Any because we don't know the data type of input.
     def __validate_data_type(
@@ -353,7 +416,8 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     def put(self) -> None:
         """Handles PUT requests."""
         assert self.user_id is not None
-        updates = self.payload['updates']
+        assert self.normalized_payload is not None
+        updates = self.normalized_payload['updates']
         bulk_email_signup_message_should_be_shown = False
         user_settings = user_services.get_user_settings(self.user_id)
 

@@ -514,16 +514,23 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        with self.assertRaisesRegex(Exception, 'Invalid update type:'):
-            self.put_json(
-                feconf.PREFERENCES_DATA_URL,
-                {
-                    'updates': [
-                        {'update_type': 'invalid_update_type', 'data': 'data'}
-                    ]
-                },
-                csrf_token=csrf_token,
-            )
+        # The invalid update type is now caught at the schema validation
+        # layer via the 'choices' constraint on 'update_type'.
+        response = self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {
+                'updates': [
+                    {'update_type': 'invalid_update_type', 'data': 'data'}
+                ]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+        self.assertEqual(response['status_code'], 400)
+        self.assertIn(
+            'not in the allowed range of choices',
+            response['error'],
+        )
         self.logout()
 
     def test_update_subject_interests_non_list_input_raises_exception(
@@ -655,15 +662,18 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
             'default_dashboard',
             'profile_picture_data_url',
         ]
+        # Non-str inputs (like int) are now rejected at the schema
+        # validation layer because the 'data' field uses
+        # weak_multiple with options ['basestring', 'dict', 'list'],
+        # and int is not in those options.
         for update_type in update_types:
-            with self.assertRaisesRegex(
-                Exception, 'Expected %s to be a str' % update_type
-            ):
-                self.put_json(
-                    feconf.PREFERENCES_DATA_URL,
-                    {'updates': [{'update_type': update_type, 'data': 1}]},
-                    csrf_token=csrf_token,
-                )
+            response = self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {'updates': [{'update_type': update_type, 'data': 1}]},
+                csrf_token=csrf_token,
+                expected_status_int=400,
+            )
+            self.assertEqual(response['status_code'], 400)
         self.logout()
 
 
