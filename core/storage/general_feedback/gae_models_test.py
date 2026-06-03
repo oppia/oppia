@@ -155,7 +155,7 @@ class WebFeedbackThreadModelTests(test_utils.GenericTestBase):
 
         general_feedback_models.FeedbackSessionLogModel.create(
             THREAD_ID1,
-            console_errors_json=[{'message': 'err'}],
+            console_logs_json=[{'message': 'err'}],
             failed_requests_json=[{'url': '/test'}],
             navigation_history_json=[{'url': '/learn/math'}],
             environment_json={'user_agent': 'test-agent'},
@@ -660,7 +660,7 @@ class FeedbackSessionLogModelTests(test_utils.GenericTestBase):
             general_feedback_models.FeedbackSessionLogModel.get_export_policy(),
             {
                 'session_info_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'console_errors_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'console_logs_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'failed_requests_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'navigation_history_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'environment_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -673,7 +673,7 @@ class FeedbackSessionLogModelTests(test_utils.GenericTestBase):
     def test_create(self) -> None:
         general_feedback_models.FeedbackSessionLogModel.create(
             thread_id=THREAD_ID1,
-            console_errors_json=[{'message': 'err'}],
+            console_logs_json=[{'message': 'err'}],
             failed_requests_json=[{'url': '/test'}],
             navigation_history_json=[{'url': '/learn/math'}],
             environment_json={'user_agent': 'test-agent'},
@@ -686,7 +686,7 @@ class FeedbackSessionLogModelTests(test_utils.GenericTestBase):
         self.assertIsNotNone(session_log_model)
         self.assertEqual(session_log_model.id, THREAD_ID1)
         self.assertEqual(
-            session_log_model.console_errors_json, [{'message': 'err'}]
+            session_log_model.console_logs_json, [{'message': 'err'}]
         )
         self.assertEqual(
             session_log_model.failed_requests_json, [{'url': '/test'}]
@@ -702,7 +702,7 @@ class FeedbackSessionLogModelTests(test_utils.GenericTestBase):
     def test_create_raises_error_for_duplicate_thread_id(self) -> None:
         general_feedback_models.FeedbackSessionLogModel.create(
             thread_id=THREAD_ID1,
-            console_errors_json=[{'message': 'err'}],
+            console_logs_json=[{'message': 'err'}],
             failed_requests_json=[{'url': '/test'}],
             navigation_history_json=[{'url': '/learn/math'}],
             environment_json={'user_agent': 'test-agent'},
@@ -713,7 +713,7 @@ class FeedbackSessionLogModelTests(test_utils.GenericTestBase):
         ):
             general_feedback_models.FeedbackSessionLogModel.create(
                 thread_id=THREAD_ID1,
-                console_errors_json=[{'message': 'err2'}],
+                console_logs_json=[{'message': 'err2'}],
                 failed_requests_json=[{'url': '/test2'}],
                 navigation_history_json=[{'url': '/learn/science'}],
                 environment_json={'user_agent': 'test-agent-2'},
