@@ -200,20 +200,18 @@ describe('Translation Modal Component', () => {
     component.contentContainer = new ElementRef({offsetHeight: 150});
     component.translationContainer = new ElementRef({offsetHeight: 150});
     component.contentPanel = new RteOutputDisplayComponent(
-      // This throws "Type null is not assignable to type". We need to suppress this error because we are testing the null case.
-      // @ts-ignore
-      null,
-      null,
+      null as never,
+      null as never,
       new ElementRef({offsetHeight: 200}),
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never,
+      null as never
     );
     getUserContributionRightsDataAsyncSpy = spyOn(
       userService,
