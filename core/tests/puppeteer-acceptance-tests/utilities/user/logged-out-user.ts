@@ -1071,7 +1071,10 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(blogTagFilterSelector, {
       visible: true,
     });
-    await this.clickOnElementWithSelector(blogTagFilterSelector);
+    await this.typeInInputField(
+      '.e2e-test-tag-filter-selection-input',
+      tagName
+    );
     await this.clickOnElementWithSelector(`.e2e-test-select-${tagName}`);
     await this.page.waitForSelector(blogTagFilterDropdownSelector, {
       hidden: true,
