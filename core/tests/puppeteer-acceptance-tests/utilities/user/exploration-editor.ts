@@ -4820,8 +4820,10 @@ export class ExplorationEditor extends BaseUser {
     const lastInteraction = 'Last Card';
     await this.waitForElementToBeClickable(destinationCardSelector);
     await this.select(destinationCardSelector, '/');
+    await this.expectElementToBeVisible(addStateInput);
     await this.typeInInputField(addStateInput, lastInteraction);
     await this.clickOnElementWithSelector(addNewResponseButton);
+    await this.expectElementToBeVisible(correctAnswerInTheGroupSelector);
     await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
 
     await this.editDefaultResponseFeedbackInExplorationEditorPage(
@@ -4837,7 +4839,7 @@ export class ExplorationEditor extends BaseUser {
     const explorationId = await this.publishExplorationWithMetadata(
       'Simple Math Exploration',
       'This is goal here',
-      'Algebra'
+      'Mathematics'
     );
 
     // Check if publish button is disabled (post-check)
