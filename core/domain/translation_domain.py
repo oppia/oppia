@@ -41,6 +41,7 @@ class ContentType(enum.Enum):
     HINT = 'hint'
     SOLUTION = 'solution'
     SECTION = 'section'
+    METADATA = 'metadata'
 
 
 class TranslatableContentFormat(enum.Enum):
