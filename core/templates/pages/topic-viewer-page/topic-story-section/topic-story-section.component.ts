@@ -107,4 +107,20 @@ export class TopicStorySectionComponent implements OnInit {
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
+
+  getLessonCountText(): string {
+    return `${this.lessonCount} lesson${this.lessonCount === 1 ? '' : 's'}`;
+  }
+
+  getPracticeCountText(): string {
+    return `${this.practiceCount} practice${this.practiceCount === 1 ? '' : 's'}`;
+  }
+
+  getStoryMetaText(): string {
+    return `${this.getLessonCountText()}, ${this.getPracticeCountText()}`;
+  }
+
+  getStoryMetaAriaLabel(): string {
+    return `${this.getLessonCountText()} and ${this.getPracticeCountText()} available`;
+  }
 }
