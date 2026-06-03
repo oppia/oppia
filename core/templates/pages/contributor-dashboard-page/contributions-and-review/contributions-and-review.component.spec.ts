@@ -31,7 +31,6 @@ import {AppConstants} from 'app.constants';
 import {
   ContributionDetails,
   ContributionsAndReview,
-  Opportunity,
   Suggestion,
   SuggestionDetails,
 } from './contributions-and-review.component';

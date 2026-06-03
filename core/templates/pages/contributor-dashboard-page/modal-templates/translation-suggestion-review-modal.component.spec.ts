@@ -141,7 +141,8 @@ describe('Translation Suggestion Review Modal Component', function () {
 
     component.contentContainer = new ElementRef({offsetHeight: 150});
     component.translationContainer = new ElementRef({offsetHeight: 150});
-    // @ts-ignore This throws "Expected 12 arguments". We need to suppress this error because we pass nulls for testing.
+    // This throws "Expected 12 arguments". We need to suppress this error because we pass nulls for testing.
+    // @ts-ignore
     component.contentPanel = new RteOutputDisplayComponent(
       null,
       null,
@@ -156,7 +157,8 @@ describe('Translation Suggestion Review Modal Component', function () {
       null,
       null
     );
-    // @ts-ignore This throws "Expected 12 arguments". We need to suppress this error because we pass nulls for testing.
+    // This throws "Expected 12 arguments". We need to suppress this error because we pass nulls for testing.
+    // @ts-ignore
     component.translationPanel = new RteOutputDisplayComponent(
       null,
       null,

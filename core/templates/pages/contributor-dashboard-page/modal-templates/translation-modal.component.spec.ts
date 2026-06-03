@@ -200,7 +200,8 @@ describe('Translation Modal Component', () => {
     component.contentContainer = new ElementRef({offsetHeight: 150});
     component.translationContainer = new ElementRef({offsetHeight: 150});
     component.contentPanel = new RteOutputDisplayComponent(
-      // @ts-ignore This throws "Type null is not assignable to type". We need to suppress this error because we are testing the null case.
+      // This throws "Type null is not assignable to type". We need to suppress this error because we are testing the null case.
+      // @ts-ignore
       null,
       null,
       new ElementRef({offsetHeight: 200}),
