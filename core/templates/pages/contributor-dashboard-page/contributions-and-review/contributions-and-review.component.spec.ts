@@ -803,7 +803,7 @@ describe('Contributions and review component', () => {
       mockActiveTopicEventEmitter.emit();
       tick();
 
-      expect(component.activeExplorationId).toBeNull();
+      expect(component.activeExplorationId).toBe('');
     }));
 
     it('should be able to change language', fakeAsync(() => {
@@ -1217,7 +1217,7 @@ describe('Contributions and review component', () => {
     }));
 
     it('should set activeExplorationId', () => {
-      expect(component.activeExplorationId).toBeNull();
+      expect(component.activeExplorationId).toBe('');
       component.onClickReviewableTranslations('explorationId');
       expect(component.activeExplorationId).toBe('explorationId');
     });
@@ -1226,7 +1226,7 @@ describe('Contributions and review component', () => {
       component.onClickReviewableTranslations('explorationId');
       expect(component.activeExplorationId).toBe('explorationId');
       component.onClickBackToReviewableLessons();
-      expect(component.activeExplorationId).toBeNull();
+      expect(component.activeExplorationId).toBe('');
     });
 
     describe('loadContributions', () => {
@@ -1678,18 +1678,18 @@ describe('Contributions and review component', () => {
               id: '1',
               heading: 'Chapter 1',
               subheading: 'Topic 1 - Story 1',
+              labelText: '',
+              labelColor: '',
               actionButtonTitle: 'Translations',
-              isPinned: false,
-              topicName: 'Topic 1',
-            } as unknown as Opportunity,
+            },
             {
               id: '2',
               heading: 'Chapter 2',
               subheading: 'Topic 2 - Story 2',
+              labelText: '',
+              labelColor: '',
               actionButtonTitle: 'Translations',
-              isPinned: false,
-              topicName: 'Topic 2',
-            } as unknown as Opportunity,
+            },
           ]);
           expect(more).toEqual(false);
         });
@@ -3006,4 +3006,57 @@ describe('Contributions and review component', () => {
       expect(summaryList[3].labelText).toBe('Obsolete');
     }));
   });
+
+  it('should clear commitTimeout when startCommitTimeout is called and commitTimeout exists', () => {
+    component.commitTimeout = setTimeout(() => {}, 1000);
+    component.startCommitTimeout();
+    expect(component.commitTimeout).toBeDefined();
+  });
+
+  it('should clear commit timeout when committing queued suggestion', () => {
+    component.queuedSuggestionSummary = {
+      target_id: 'target',
+      suggestion_id: 'sug_id',
+      action_status: 'accept',
+      reviewer_message: 'msg',
+      commit_message: 'msg',
+    } as any;
+    component.commitTimeout = setTimeout(() => {}, 1000);
+    spyOn(
+      contributionAndReviewService,
+      'reviewExplorationSuggestion'
+    ).and.callFake(
+      (
+        targetId,
+        suggestionId,
+        action,
+        message,
+        commitMessage,
+        successCb,
+        errorCb
+      ) => {
+        successCb();
+      }
+    );
+    component.commitQueuedSuggestion();
+    expect(component.commitTimeout).toBeDefined();
+  });
+
+  it('should clear timeout in undoReviewAction', () => {
+    component.commitTimeout = setTimeout(() => {}, 1000);
+    component.undoReviewAction();
+  });
+
+  it('should return empty list from getContributionSummaries if subtype is unknown', () => {
+    component.activeTabSubtype = 'UNKNOWN';
+    expect(component.getContributionSummaries({})).toEqual([]);
+  });
+
+  it('should return early if user contribution rights is null', fakeAsync(() => {
+    (
+      userService.getUserContributionRightsDataAsync as jasmine.Spy
+    ).and.returnValue(Promise.resolve(null));
+    component.ngOnInit();
+    tick();
+  }));
 });

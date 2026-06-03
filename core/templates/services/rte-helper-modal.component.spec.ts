@@ -1064,4 +1064,68 @@ describe('RteHelperModalComponent', () => {
       flush();
     }));
   });
+
+  it('should dismiss modal if svg file is missing when saving', fakeAsync(() => {
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    component.componentId = 'math';
+    component.customizationArgSpecs = [
+      {
+        name: 'math_content',
+        default_value: '',
+      },
+    ] as any;
+    component.attrsCustomizationArgsDict = {
+      math_content: {
+        raw_latex: '',
+        svg_filename: '',
+      },
+    } as any;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2',
+      svgFile: null,
+      svg_filename: 'mathImage.svg',
+    };
+    spyOn(alertsService, 'addWarning');
+    component.save();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'SVG file is missing.'
+    );
+    expect(activeModal.dismiss).toHaveBeenCalledWith('cancel');
+  }));
+
+  it('should dismiss modal if resampled svg file is null when saving', fakeAsync(() => {
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    component.componentId = 'math';
+    component.customizationArgSpecs = [
+      {
+        name: 'math_content',
+        default_value: '',
+      },
+    ] as any;
+    component.attrsCustomizationArgsDict = {
+      math_content: {
+        raw_latex: '',
+        svg_filename: '',
+      },
+    } as any;
+    component.ngOnInit();
+    flush();
+    component.customizationArgsForm.value[0] = {
+      raw_latex: 'x^2',
+      svgFile: 'some_svg_file',
+      svg_filename: 'mathImage.svg',
+    };
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(null);
+    spyOn(alertsService, 'addWarning');
+    component.save();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Failed to process SVG file.'
+    );
+    expect(activeModal.dismiss).toHaveBeenCalledWith('cancel');
+  }));
 });

@@ -561,7 +561,9 @@ describe('Collection player page component', () => {
     () => {
       component.collection = sampleCollection;
 
-      component.getCollectionNodeForExplorationId('invalidId');
+      expect(() => {
+        component.getCollectionNodeForExplorationId('invalidId');
+      }).toThrowError('Collection node not found for exploration: invalidId');
 
       expect(alertsSpy).toHaveBeenCalledWith(
         'There was an error loading the collection.'
@@ -674,4 +676,79 @@ describe('Collection player page component', () => {
       expect(component.explorationCardIsShown).toBe(false);
     })
   );
+
+  it('should throw error if next exploration ID is not available', () => {
+    component.collectionPlaythrough = {
+      getNextExplorationId: () => null,
+      getCompletedExplorationIds: () => [],
+      getNextRecommendedCollectionNodeCount: () => 0,
+      getCompletedExplorationNodeCount: () => 0,
+    };
+    expect(() => {
+      component.getNextRecommendedCollectionNodes();
+    }).toThrowError('No next exploration ID available');
+  });
+
+  it('should throw error if completed exploration IDs are not available', () => {
+    component.collectionPlaythrough = {
+      getNextExplorationId: () => null,
+      getCompletedExplorationIds: () => [],
+      getNextRecommendedCollectionNodeCount: () => 0,
+      getCompletedExplorationNodeCount: () => 0,
+    };
+    expect(() => {
+      component.getCompletedExplorationNodes();
+    }).toThrowError('No completed exploration IDs available');
+  });
+
+  it('should return 0 for non recommended collection node count if playthrough is undefined', () => {
+    component.collectionPlaythrough = undefined as any;
+    expect(component.getNonRecommendedCollectionNodeCount()).toEqual(0);
+  });
+
+  it('should return empty icon parameters if first summary is missing', () => {
+    component.collection = Collection.create({
+      id: 'collectionId',
+      title: 'title',
+      objective: 'objective',
+      category: 'category',
+      version: 1,
+      nodes: [],
+      language_code: null,
+      schema_version: null,
+      tags: null,
+      playthrough_dict: {
+        next_exploration_id: 'expId',
+        completed_exploration_ids: ['expId2'],
+      },
+    } as any);
+    expect(component.generatePathIconParameters()).toEqual([]);
+  });
+
+  it('should return 0px for getExplorationTitlePosition for index 2.5', () => {
+    expect(component.getExplorationTitlePosition(2.5)).toEqual('0px');
+  });
+
+  it('should set collection summary correctly', fakeAsync(() => {
+    (
+      collectionPlayerBackendApiService.fetchCollectionSummariesAsync as jasmine.Spy
+    ).and.returnValue(
+      Promise.resolve({
+        is_admin: false,
+        is_topic_manager: false,
+        summaries: ['summary1'],
+        user_email: 'tester@example.com',
+        username: false,
+      })
+    );
+    component.fetchSummaryAsync('collectionId');
+    tick();
+    expect(component.collectionSummary.summaries).toEqual(['summary1']);
+  }));
+
+  it('should return early in updateCollection if collection is null', () => {
+    component.collection = sampleCollection;
+    component.updateCollection(null);
+    expect(component.collection).toEqual(sampleCollection);
+  });
 });
