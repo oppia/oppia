@@ -196,13 +196,16 @@
 
 @media (max-width: 475px) {
   .story-callout-row {
+    gap: 8px;
     margin: -14px 0 -10px 4px;
   }
 
   .story-callout-avatar {
-    height: 64px;
-    top: -4px;
-    width: 64px;
+    height: 72px;
+    position: relative;
+    top: 0;
+    width: 72px;
+    z-index: 3;
   }
 
   .story-description-bubble {
@@ -210,9 +213,9 @@
     border-bottom-left-radius: 0;
     font-size: 11px;
     line-height: 1.25;
-    max-width: calc(100% - 76px);
+    max-width: calc(100% - 84px);
     padding: 6px 8px;
-    top: 6px;
+    top: 8px;
   }
 
   .story-description-bubble .left-side-curve {
@@ -223,7 +226,7 @@
   }
 
   .story-card {
-    margin-top: -12px;
+    margin-top: -10px;
   }
 
   .story-card-header {
@@ -243,8 +246,10 @@
 
   .story-callout-avatar {
     height: 56px;
-    top: -6px;
+    position: relative;
+    top: 0;
     width: 56px;
+    z-index: 3;
   }
 
   .story-description-bubble {
@@ -265,7 +270,7 @@
   }
 
   .story-card {
-    margin-top: -18px;
+    margin-top: -8px;
   }
 
   .story-card-header {
