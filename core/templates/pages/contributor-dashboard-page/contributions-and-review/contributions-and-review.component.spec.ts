@@ -3019,20 +3019,20 @@ describe('Contributions and review component', () => {
       action_status: 'accept',
       reviewer_message: 'msg',
       commit_message: 'msg',
-    } as unknown as Suggestion;
+    };
     component.commitTimeout = setTimeout(() => {}, 1000);
     spyOn(
       contributionAndReviewService,
       'reviewExplorationSuggestion'
     ).and.callFake(
       (
-        targetId,
-        suggestionId,
-        action,
-        message,
-        commitMessage,
-        successCb,
-        errorCb
+        targetId: string,
+        suggestionId: string,
+        action: string,
+        message: string,
+        commitMessage: string,
+        successCb: () => void,
+        errorCb: () => void
       ) => {
         successCb();
       }
