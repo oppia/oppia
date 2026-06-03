@@ -14,14 +14,15 @@
     <h2 id="redesigned-stories-section-heading" class="visually-hidden">
       {{ 'I18N_TOPIC_VIEWER_STORIES_HEAD' | translate }}
     </h2>
-      <div class="redesigned-stories-list">
-      <topic-story-section *ngFor="let storyData of canonicalStorySectionData; trackBy: trackStoryDataById"
-                           [storyTitle]="storyData.storyTitle"
-                           [storyDescription]="storyData.storyDescription"
-                           [classroomUrlFragment]="classroomUrlFragment"
-                           [topicUrlFragment]="topicUrlFragment"
-                           [lessonCount]="storyData.lessonCount"
-                           [practiceCount]="storyData.practiceCount">
+    <div class="redesigned-stories-list">
+      <topic-story-section
+        *ngFor="let storyData of canonicalStorySectionData; trackBy: trackStoryDataById"
+        [storyTitle]="storyData.storyTitle"
+        [storyDescription]="storyData.storyDescription"
+        [classroomUrlFragment]="classroomUrlFragment"
+        [topicUrlFragment]="topicUrlFragment"
+        [lessonCount]="storyData.lessonCount"
+        [practiceCount]="storyData.practiceCount">
       </topic-story-section>
     </div>
   </section>

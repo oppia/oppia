@@ -20,7 +20,7 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {TranslateService} from '@ngx-translate/core';
+// TranslateService removed for localized strings revert.
 
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -55,8 +55,7 @@ export class TopicStorySectionComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
-    private translateService: TranslateService
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   ngOnInit(): void {
@@ -78,34 +77,7 @@ export class TopicStorySectionComponent implements OnInit {
     }
   }
 
-  getLessonCountText(): string {
-    return this.translateService.instant('I18N_TOPIC_VIEWER_LESSON_COUNT', {
-      lessonCountValue: this.lessonCount,
-      messageFormat: true,
-    });
-  }
-
-  getPracticeCountText(): string {
-    return this.translateService.instant('I18N_TOPIC_VIEWER_PRACTICE_COUNT', {
-      practiceCountValue: this.practiceCount,
-      messageFormat: true,
-    });
-  }
-
-  getStoryMetaText(): string {
-    // Compose meta text from translated count fragments. We join with a
-    // comma here; some locales may prefer a different ordering — the ARIA
-    // label below uses a single translation key for full sentence.
-    return this.getLessonCountText() + ', ' + this.getPracticeCountText();
-  }
-
-  getStoryMetaAriaLabel(): string {
-    return this.translateService.instant('I18N_TOPIC_VIEWER_STORY_META_ARIA', {
-      lessonCountValue: this.lessonCount,
-      practiceCountValue: this.practiceCount,
-      messageFormat: true,
-    });
-  }
+  // Note: lesson/practice meta text is rendered directly in the template.
 
   private getStudyGuideUrl(): string {
     if (!this.classroomUrlFragment || !this.topicUrlFragment) {
