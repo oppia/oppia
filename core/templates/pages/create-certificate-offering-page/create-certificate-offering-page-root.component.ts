@@ -38,6 +38,8 @@ export class CreateCertificateOfferingPageRootComponent extends BaseRootComponen
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATE_CERTIFICATE_OFFERING
       .TITLE;
 
+  // TODO(#26274): Make the root-page meta tag contract readonly across BaseRootComponent
+  // and all subclasses, then remove this cast and align AppConstants META values.
   meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
     .CREATE_CERTIFICATE_OFFERING.META as unknown as Readonly<MetaTagData>[];
 
