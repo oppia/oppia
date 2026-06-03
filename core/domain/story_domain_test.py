@@ -1759,6 +1759,92 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(published_node_count, 2)
 
+    def test_get_published_node_count_respects_connection_order(self) -> None:
+        self.story.story_contents.next_node_id = 'node_4'
+        node_1: story_domain.StoryNodeDict = {
+            'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
+            'thumbnail_size_in_bytes': 21131,
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': 'a',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_1',
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None,
+        }
+        node_2: story_domain.StoryNodeDict = {
+            'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
+            'thumbnail_size_in_bytes': 21131,
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': 'a',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_2',
+            'status': 'Draft',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None,
+        }
+        node_3: story_domain.StoryNodeDict = {
+            'id': 'node_3',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'
+            ][0],
+            'thumbnail_size_in_bytes': 21131,
+            'title': 'Title 3',
+            'description': 'Description 3',
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': 'a',
+            'outline_is_finalized': False,
+            'exploration_id': 'exp_3',
+            'status': 'Published',
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
+            'first_publication_date_msecs': None,
+            'unpublishing_reason': None,
+        }
+        # Place them out of order in the nodes list.
+        # Although node_3 is published, since it is preceded by node_2 (Draft)
+        # in the graph connection order, only node_1 should be counted
+        # as published.
+        self.story.story_contents.initial_node_id = 'node_1'
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_3),
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+        ]
+
+        published_node_count = (
+            self.story.story_contents.get_published_node_count()
+        )
+        self.assertEqual(published_node_count, 1)
+
+        exp_ids = (
+            self.story.story_contents.get_linked_exp_ids_of_published_nodes()
+        )
+        self.assertEqual(exp_ids, ['exp_1'])
+
     def test_update_story_contents_from_model_with_all_versions(self) -> None:
         node_1: story_domain.StoryNodeDict = {
             'id': 'node_1',
