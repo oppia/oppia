@@ -94,6 +94,8 @@ export class CertificateOfferingAddTopicItemsComponent
 {
   @Input() certificateAssessmentOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
+  // TODO: Replace this display name input with classroomId once step 1
+  // starts passing the actual classroom identifier to this component.
   @Input() classroomName: string = 'Math Grade 5';
   @Output() topicDataChange =
     new EventEmitter<CertificateAssessmentOfferingTopicData>();
@@ -103,9 +105,8 @@ export class CertificateOfferingAddTopicItemsComponent
   searchQuery: string = '';
   selectedTopics: TopicOption[] = [];
 
-  // TODO: Replace with a backend service call, e.g.:
-  //   this.topicBackendApiService.getTopicsForClassroomAsync(classroomId)
-  //     .then(topics => this.availableTopics = topics);
+  // TODO: Replace this stub with the classroom-backed fetch once the flow
+  // passes classroomId from the first step.
   availableTopics: TopicOption[] = STUB_TOPICS;
 
   ngOnInit(): void {
@@ -118,6 +119,8 @@ export class CertificateOfferingAddTopicItemsComponent
     }
   }
 
+  // TODO: When the real classroomId is available, fetch the classroom data
+  // here and map classroomData.getTopicSummaries() into TopicOption values.
   private syncSelectedFromOffering(): void {
     const selectedIds = Object.keys(
       this.certificateAssessmentOffering.topicData ?? {}
@@ -138,29 +141,6 @@ export class CertificateOfferingAddTopicItemsComponent
         topic.classroomName.toLowerCase().includes(query);
       return queryMatches;
     });
-  }
-
-  /**
-   * Returns topics grouped by classroomName, derived from filteredTopics.
-   * Used in the template to render a classroom label above each group.
-   * When the parent passes classroomName, only that classroom's group shows.
-   */
-  get groupedTopics(): {classroomName: string; topics: TopicOption[]}[] {
-    const filtered = this.classroomName
-      ? this.filteredTopics.filter(t => t.classroomName === this.classroomName)
-      : this.filteredTopics;
-
-    const map = new Map<string, TopicOption[]>();
-    for (const topic of filtered) {
-      if (!map.has(topic.classroomName)) {
-        map.set(topic.classroomName, []);
-      }
-      map.get(topic.classroomName)!.push(topic);
-    }
-    return Array.from(map.entries()).map(([classroomName, topics]) => ({
-      classroomName,
-      topics,
-    }));
   }
 
   isAdded(topicId: string): boolean {
@@ -194,10 +174,11 @@ export class CertificateOfferingAddTopicItemsComponent
   }
 
   onNextClicked(): void {
-    if (this.selectedTopics.length === 0) {
+    const topicData = this.certificateAssessmentOffering.topicData;
+    if (!topicData || Object.keys(topicData).length === 0) {
       return;
     }
-    this.topicDataChange.emit(this.certificateAssessmentOffering.topicData);
+    this.topicDataChange.emit(topicData);
     this.navigateToReviewAndAvailabilitySection.emit();
   }
 
