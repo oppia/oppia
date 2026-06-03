@@ -39,10 +39,6 @@ export interface TopicOption {
   thumbnailBgColor?: string;
 }
 
-// ---------------------------------------------------------------------------
-// STUB DATA — replace this with a real backend call when ready.
-// Shape to return from the API: TopicOption[]
-// ---------------------------------------------------------------------------
 const STUB_TOPICS: TopicOption[] = [
   {
     id: 'topic_1',
@@ -87,7 +83,6 @@ const STUB_TOPICS: TopicOption[] = [
     thumbnailBgColor: '#fde68a',
   },
 ];
-// ---------------------------------------------------------------------------
 
 @Component({
   selector: 'oppia-certificate-offering-add-topic-items',
