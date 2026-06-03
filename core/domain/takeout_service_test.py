@@ -47,6 +47,7 @@ if MYPY:  # pragma: no cover
         auth_models,
         base_models,
         blog_models,
+        certificate_assessment_offering_models,
         collection_models,
         config_models,
     )
@@ -70,6 +71,7 @@ if MYPY:  # pragma: no cover
     auth_models,
     base_models,
     blog_models,
+    certificate_assessment_offering_models,
     collection_models,
     config_models,
     exploration_models,
@@ -90,6 +92,7 @@ if MYPY:  # pragma: no cover
         models.Names.AUTH,
         models.Names.BASE_MODEL,
         models.Names.BLOG,
+        models.Names.CERTIFICATE_ASSESSMENT_OFFERING,
         models.Names.COLLECTION,
         models.Names.CONFIG,
         models.Names.EXPLORATION,
@@ -1057,6 +1060,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             commit_message=self.COMMIT_MESSAGE,
             commit_cmds=self.COMMIT_CMDS,
         ).put()
+        certificate_assessment_offering_models.CertificateAssessmentOfferingSnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID,
+            committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE,
+            commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS,
+        ).put()
 
         user_models.UserEmailPreferencesModel(
             id=self.USER_ID_1,
@@ -1326,6 +1336,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_platform_parameter_sm: Dict[str, Dict[str, Dict[str, str]]] = (
             {}
         )
+        expected_certificate_assessment_offering_sm: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
         expected_user_auth_details: Dict[str, str] = {}
         expected_user_email_preferences: Dict[str, str] = {}
         expected_blog_post_data: Dict[str, Union[str, float, List[str]]] = {}
@@ -1403,6 +1416,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'exploration_rights_snapshot_metadata': expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
             'platform_parameter_snapshot_metadata': expected_platform_parameter_sm,
+            'certificate_assessment_offering_snapshot_metadata': (
+                expected_certificate_assessment_offering_sm
+            ),
             'user_auth_details': expected_user_auth_details,
             'user_email_preferences': expected_user_email_preferences,
             'web_feedback_message': expected_web_feedback_message_data,
@@ -1985,6 +2001,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'commit_message': self.COMMIT_MESSAGE,
             }
         }
+        expected_certificate_assessment_offering_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+            }
+        }
         expected_user_email_preferences: Dict[str, str] = {}
         expected_user_auth_details: Dict[str, str] = {}
         expected_app_feedback_report = {
@@ -2392,6 +2414,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'exploration_rights_snapshot_metadata': expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
             'platform_parameter_snapshot_metadata': expected_platform_parameter_sm,
+            'certificate_assessment_offering_snapshot_metadata': (
+                expected_certificate_assessment_offering_sm
+            ),
             'user_email_preferences': expected_user_email_preferences,
             'user_auth_details': expected_user_auth_details,
             'app_feedback_report': expected_app_feedback_report,

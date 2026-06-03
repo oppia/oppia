@@ -854,7 +854,7 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
         # Here we use object because session-info diagnostics are heterogeneous
         # JSON-like payloads (nested dict/list values) from client logs.
         self.session_info: Dict[str, object] = {
-            'console_errors_json': [
+            'console_logs_json': [
                 {
                     'error_message': 'TypeError: Cannot read properties of undefined',
                     'log_level': 'error',
@@ -1036,9 +1036,9 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
     ) -> None:
         test_cases = [
             (
-                'console_errors_json',
+                'console_logs_json',
                 'not_a_list',
-                'console_errors_json should be a list.',
+                'console_logs_json should be a list.',
             ),
             (
                 'failed_requests_json',
@@ -1070,7 +1070,7 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         invalid_session_info = copy.deepcopy(self.session_info)
-        invalid_session_info['console_errors_json'] = [{}] * (
+        invalid_session_info['console_logs_json'] = [{}] * (
             feconf.MAX_SESSION_INFO_LOG_ENTRIES + 1
         )
         with self.assertRaisesRegex(
@@ -1084,37 +1084,37 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         invalid_session_info = copy.deepcopy(self.session_info)
-        invalid_session_info['console_errors_json'] = ['not_a_dict']
+        invalid_session_info['console_logs_json'] = ['not_a_dict']
         with self.assertRaisesRegex(
-            Exception, 'console_errors_json should be a list of dicts.'
+            Exception, 'console_logs_json should be a list of dicts.'
         ):
             domain_objects_validator.validate_general_feedback_session_info_log_entries(
                 invalid_session_info
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        console_errors_json = self._as_list_of_dicts(
-            invalid_session_info['console_errors_json']
+        console_logs_json = self._as_list_of_dicts(
+            invalid_session_info['console_logs_json']
         )
-        console_errors_json[0]['error_message'] = 1
+        console_logs_json[0]['error_message'] = 1
         with self.assertRaisesRegex(
             Exception,
-            'error_message in console_errors_json should be a string.',
+            'error_message in console_logs_json should be a string.',
         ):
             domain_objects_validator.validate_general_feedback_session_info_log_entries(
                 invalid_session_info
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        console_errors_json = self._as_list_of_dicts(
-            invalid_session_info['console_errors_json']
+        console_logs_json = self._as_list_of_dicts(
+            invalid_session_info['console_logs_json']
         )
-        console_errors_json[0]['error_message'] = 'a' * (
+        console_logs_json[0]['error_message'] = 'a' * (
             feconf.MAX_SESSION_INFO_LOG_MESSAGE_LENGTH + 1
         )
         with self.assertRaisesRegex(
             Exception,
-            'error_message in console_errors_json exceeds maximum length of %d characters.'
+            'error_message in console_logs_json exceeds maximum length of %d characters.'
             % feconf.MAX_SESSION_INFO_LOG_MESSAGE_LENGTH,
         ):
             domain_objects_validator.validate_general_feedback_session_info_log_entries(
@@ -1122,52 +1122,52 @@ class ValidateGeneralFeedbackSessionInfoTests(test_utils.GenericTestBase):
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        console_errors_json = self._as_list_of_dicts(
-            invalid_session_info['console_errors_json']
+        console_logs_json = self._as_list_of_dicts(
+            invalid_session_info['console_logs_json']
         )
-        console_errors_json[0]['timestamp_msecs'] = 'not_an_int'
+        console_logs_json[0]['timestamp_msecs'] = 'not_an_int'
         with self.assertRaisesRegex(
             Exception,
-            'Session info console_errors_json.timestamp_msecs should be an int.',
+            'Session info console_logs_json.timestamp_msecs should be an int.',
         ):
             domain_objects_validator.validate_general_feedback_session_info_log_entries(
                 invalid_session_info
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        console_errors_json = self._as_list_of_dicts(
-            invalid_session_info['console_errors_json']
+        console_logs_json = self._as_list_of_dicts(
+            invalid_session_info['console_logs_json']
         )
-        console_errors_json[0]['log_level'] = 'not_a_valid_log_level'
+        console_logs_json[0]['log_level'] = 'not_a_valid_log_level'
         with self.assertRaisesRegex(
-            Exception, 'Invalid log_level in console_errors_json.'
+            Exception, 'Invalid log_level in console_logs_json.'
         ):
             domain_objects_validator.validate_general_feedback_session_info_log_entries(
                 invalid_session_info
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        console_errors_json = self._as_list_of_dicts(
-            invalid_session_info['console_errors_json']
+        console_logs_json = self._as_list_of_dicts(
+            invalid_session_info['console_logs_json']
         )
-        console_errors_json[0]['stack_trace'] = 1
+        console_logs_json[0]['stack_trace'] = 1
         with self.assertRaisesRegex(
-            Exception, 'stack_trace in console_errors_json should be a string.'
+            Exception, 'stack_trace in console_logs_json should be a string.'
         ):
             domain_objects_validator.validate_general_feedback_session_info_log_entries(
                 invalid_session_info
             )
 
         invalid_session_info = copy.deepcopy(self.session_info)
-        console_errors_json = self._as_list_of_dicts(
-            invalid_session_info['console_errors_json']
+        console_logs_json = self._as_list_of_dicts(
+            invalid_session_info['console_logs_json']
         )
-        console_errors_json[0]['stack_trace'] = 'a' * (
+        console_logs_json[0]['stack_trace'] = 'a' * (
             feconf.MAX_SESSION_INFO_STACK_TRACE_LENGTH + 1
         )
         with self.assertRaisesRegex(
             Exception,
-            'stack_trace in console_errors_json exceeds maximum length of %d characters.'
+            'stack_trace in console_logs_json exceeds maximum length of %d characters.'
             % feconf.MAX_SESSION_INFO_STACK_TRACE_LENGTH,
         ):
             domain_objects_validator.validate_general_feedback_session_info_log_entries(
