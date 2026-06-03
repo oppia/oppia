@@ -703,7 +703,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     }
     if (node.nodeType === 'component') {
       return new TemplatePortal(
-        (this as unknown as Record<string, TemplatePortal<unknown>>)[
+        (this as unknown as Record<string, TemplateRef<unknown>>)[
           node.selector.split('oppia-noninteractive-')[1] + 'TagPortal'
         ],
         this._viewContainerRef,
@@ -711,12 +711,12 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       );
     }
     if (
-      (this as unknown as Record<string, TemplatePortal<unknown>>)[
+      (this as unknown as Record<string, TemplateRef<unknown>>)[
         node.selector + 'TagPortal'
       ] !== undefined
     ) {
       return new TemplatePortal(
-        (this as unknown as Record<string, TemplatePortal<unknown>>)[
+        (this as unknown as Record<string, TemplateRef<unknown>>)[
           node.selector + 'TagPortal'
         ],
         this._viewContainerRef,
