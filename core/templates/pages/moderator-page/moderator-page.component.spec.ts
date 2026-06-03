@@ -45,6 +45,7 @@ import {HttpErrorResponse} from '@angular/common/http';
 describe('Moderator Page Component', () => {
   let fixture: ComponentFixture<ModeratorPageComponent>;
   let componentInstance: ModeratorPageComponent;
+  let moderatorPageBackendApiService: ModeratorPageBackendApiService;
   let loaderService: LoaderService;
   let datetimeFormatService: DateTimeFormatService;
   let alertsService: AlertsService;
@@ -141,6 +142,7 @@ describe('Moderator Page Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ModeratorPageComponent);
     componentInstance = fixture.componentInstance;
+    moderatorPageBackendApiService = TestBed.inject(ModeratorPageBackendApiService);
     loaderService = TestBed.inject(
       LoaderService
     ) as jasmine.SpyObj<LoaderService>;
