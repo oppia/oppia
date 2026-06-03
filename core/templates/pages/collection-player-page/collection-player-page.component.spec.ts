@@ -702,7 +702,8 @@ describe('Collection player page component', () => {
   });
 
   it('should return 0 for non recommended collection node count if playthrough is undefined', () => {
-    component.collectionPlaythrough = undefined as any;
+    component.collectionPlaythrough =
+      undefined as unknown as CollectionPlaythrough;
     expect(component.getNonRecommendedCollectionNodeCount()).toEqual(0);
   });
 
@@ -721,7 +722,7 @@ describe('Collection player page component', () => {
         next_exploration_id: 'expId',
         completed_exploration_ids: ['expId2'],
       },
-    } as any);
+    } as unknown as CollectionBackendDict);
     expect(component.generatePathIconParameters()).toEqual([]);
   });
 

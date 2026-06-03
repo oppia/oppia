@@ -3020,7 +3020,7 @@ describe('Contributions and review component', () => {
       action_status: 'accept',
       reviewer_message: 'msg',
       commit_message: 'msg',
-    } as any;
+    } as unknown as Suggestion;
     component.commitTimeout = setTimeout(() => {}, 1000);
     spyOn(
       contributionAndReviewService,

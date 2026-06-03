@@ -141,33 +141,35 @@ describe('Translation Suggestion Review Modal Component', function () {
 
     component.contentContainer = new ElementRef({offsetHeight: 150});
     component.translationContainer = new ElementRef({offsetHeight: 150});
+    // @ts-ignore This throws "Expected 12 arguments". We need to suppress this error because we pass nulls for testing.
     component.contentPanel = new RteOutputDisplayComponent(
-      null as any,
-      null as any,
+      null,
+      null,
       new ElementRef({offsetHeight: 200}),
-      null as any,
-      null as any,
-      null as any,
-      null as any,
-      null as any,
-      null as any,
-      null as any,
-      null as any,
-      null as any
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
     );
+    // @ts-ignore This throws "Expected 12 arguments". We need to suppress this error because we pass nulls for testing.
     component.translationPanel = new RteOutputDisplayComponent(
-      null as any,
-      null as any,
+      null,
+      null,
       new ElementRef({offsetHeight: 200}),
-      null as any,
-      null as any,
-      null as any,
-      null as any,
-      null as any,
-      null as any,
-      null as any,
-      null as any,
-      null as any
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
     );
     component.initialSuggestionId = 'suggestion_1';
     component.suggestionIdToContribution = {
@@ -1012,8 +1014,8 @@ describe('Translation Suggestion Review Modal Component', function () {
             action: string,
             reviewMessage: string,
             commitMessage: string,
-            successCallback: (val?: any) => void,
-            errorCallback: (val?: any) => void
+            successCallback: (val?: unknown) => void,
+            errorCallback: (val?: unknown) => void
           ) => {
             return Promise.resolve(successCallback(suggestionId));
           }
@@ -1099,8 +1101,8 @@ describe('Translation Suggestion Review Modal Component', function () {
             action: string,
             reviewMessage: string,
             commitMessage: string,
-            successCallback: (val?: any) => void,
-            errorCallback: (val?: any) => void
+            successCallback: (val?: unknown) => void,
+            errorCallback: (val?: unknown) => void
           ) => {
             return Promise.resolve(successCallback(suggestionId));
           }
@@ -1148,8 +1150,8 @@ describe('Translation Suggestion Review Modal Component', function () {
             action: string,
             reviewMessage: string,
             commitMessage: string,
-            successCallback: (val?: any) => void,
-            errorCallback: (val?: any) => void
+            successCallback: (val?: unknown) => void,
+            errorCallback: (val?: unknown) => void
           ) => {
             return Promise.resolve(successCallback(suggestionId));
           }
@@ -1229,8 +1231,8 @@ describe('Translation Suggestion Review Modal Component', function () {
             action: string,
             reviewMessage: string,
             commitMessage: string,
-            successCallback: (val?: any) => void,
-            errorCallback: (val?: any) => void
+            successCallback: (val?: unknown) => void,
+            errorCallback: (val?: unknown) => void
           ) => {
             return Promise.reject(errorCallback(responseMessage));
           }
@@ -1531,8 +1533,8 @@ describe('Translation Suggestion Review Modal Component', function () {
             action: string,
             reviewMessage: string,
             commitMessage: string,
-            successCallback: (val?: any) => void,
-            errorCallback: (val?: any) => void
+            successCallback: (val?: unknown) => void,
+            errorCallback: (val?: unknown) => void
           ) => {
             return Promise.resolve(successCallback(suggestionId));
           }

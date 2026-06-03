@@ -1073,13 +1073,13 @@ describe('RteHelperModalComponent', () => {
         name: 'math_content',
         default_value: '',
       },
-    ] as any;
+    ] as unknown as CustomizationArgsSpecsType;
     component.attrsCustomizationArgsDict = {
       math_content: {
         raw_latex: '',
         svg_filename: '',
       },
-    } as any;
+    } as unknown as CustomizationArgsForRteType;
     component.ngOnInit();
     flush();
     component.customizationArgsForm.value[0] = {
@@ -1103,13 +1103,13 @@ describe('RteHelperModalComponent', () => {
         name: 'math_content',
         default_value: '',
       },
-    ] as any;
+    ] as unknown as CustomizationArgsSpecsType;
     component.attrsCustomizationArgsDict = {
       math_content: {
         raw_latex: '',
         svg_filename: '',
       },
-    } as any;
+    } as unknown as CustomizationArgsForRteType;
     component.ngOnInit();
     flush();
     component.customizationArgsForm.value[0] = {
