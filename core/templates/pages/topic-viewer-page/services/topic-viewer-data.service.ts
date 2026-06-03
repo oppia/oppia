@@ -139,7 +139,7 @@ export class TopicViewerDataService {
   }
 
   getCanonicalStoryData(): readonly TopicViewerStorySectionData[] {
-    return this.data.canonicalStoryData;
+    return this.data.canonicalStoryData.slice();
   }
 
   private getTotalLessonCount(storySummaries: StorySummary[]): number {

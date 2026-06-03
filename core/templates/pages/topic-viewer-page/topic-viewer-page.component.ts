@@ -51,6 +51,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   activeTab: string = '';
   canonicalStorySummaries: StorySummary[] = [];
+  canonicalStorySectionData: readonly TopicViewerStorySectionData[] = [];
   topicUrlFragment: string = '';
   classroomUrlFragment: string = '';
   classroomName: string | null = '';
@@ -135,6 +136,8 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
             this.classroomUrlFragment,
             this.topicUrlFragment
           );
+          this.canonicalStorySectionData =
+            this.topicViewerDataService.getCanonicalStoryData();
         },
         errorResponse => {
           let errorCodes = AppConstants.FATAL_ERROR_CODES;
