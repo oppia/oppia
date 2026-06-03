@@ -486,6 +486,18 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectResponseFeedbackToBe('Great!');
   }, 600000);
 
+  it(
+    'should render Arabic text in math formulas as a continuous ' +
+      'string inside a foreignObject (Fixes #26148)',
+    async function () {
+      // Navigate to editor tab and update the current card's content
+      // with a math formula containing Arabic text.
+      await explorationEditor.navigateToEditorTab();
+      await explorationEditor.addMathFormulaToCardContent('\\text{سم}', 'سم');
+      await explorationEditor.saveExplorationDraft();
+    }
+  );
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });

@@ -7619,6 +7619,89 @@ export class ExplorationEditor extends BaseUser {
   async expectFeedbackPageTobeVisible(): Promise<void> {
     await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
   }
+
+  /**
+   * Adds a math formula to the current card's content using the RTE toolbar.
+   * This opens the state content editor, inserts a math formula via the
+   * CKEditor math button, and saves the content.
+   * @param {string} latex - The LaTeX expression to insert.
+   */
+  async addMathFormulaToCardContent(
+    latex: string,
+    expectedArabicText?: string
+  ): Promise<void> {
+    await this.page.waitForSelector(stateEditSelector, {visible: true});
+    await this.clickOnElementWithSelector(stateEditSelector);
+    await this.clearAllTextFrom(stateContentInputField);
+
+    // Insert mathematical formula via the RTE toolbar.
+    await this.clickOnRTEOptionWithTitle('Insert mathematical formula');
+    await this.waitForNetworkIdle();
+    const textareaElement = await this.page.$(
+      'textarea[placeholder*="Enter a math expression using LaTeX"]'
+    );
+    if (!textareaElement) {
+      throw new Error('Math formula textarea not found.');
+    }
+    await textareaElement.type(latex);
+    // Press Tab to blur the textarea. This triggers Angular's ngModel change
+    // detection, which validates the LaTeX input and enables the "Done" button.
+    await this.page.keyboard.press('Tab');
+    await this.waitForNetworkIdle();
+
+    if (expectedArabicText) {
+      await this.expectMathJaxToRenderArabicTextInSvgTextNode(
+        expectedArabicText
+      );
+    }
+
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
+    await this.waitForNetworkIdle();
+
+    await this.clickOnElementWithSelector(saveContentButton);
+    await this.page.waitForSelector(stateContentInputField, {hidden: true});
+    showMessage('Math formula added to card content successfully.');
+  }
+
+  /**
+   * Asserts that Arabic text in a MathJax-rendered formula is preserved as a
+   * single contiguous string inside a text element, rather than being
+   * split into disconnected SVG text nodes. This verifies that the
+   * mtextFontInherit configuration is working correctly (Fixes #26148).
+   * @param {string} expectedText - The Arabic text expected inside the
+   *   text node.
+   */
+  async expectMathJaxToRenderArabicTextInSvgTextNode(
+    expectedText: string
+  ): Promise<void> {
+    // Math interactions require heavy MathJax rendering and take significantly
+    // longer to load than other interactions.
+    await this.page.waitForSelector('.MathJax_SVG svg', {timeout: 15000});
+
+    const {arabicTextContent, rawSvgHtml} = await this.page.evaluate(() => {
+      const svgElement = document.querySelector('.MathJax_SVG svg');
+      const textNodes = document.querySelectorAll('.MathJax_SVG text');
+      return {
+        arabicTextContent:
+          textNodes.length > 0
+            ? textNodes[0].textContent?.trim() || null
+            : null,
+        rawSvgHtml: svgElement ? svgElement.textContent : 'No SVG found',
+      };
+    });
+
+    if (!arabicTextContent || !arabicTextContent.includes(expectedText)) {
+      throw new Error(
+        `Expected MathJax to render Arabic text "${expectedText}" inside an ` +
+          `SVG <text> element, but found: "${arabicTextContent}". ` +
+          `Raw SVG HTML for debugging: \n${rawSvgHtml}\n ` +
+          'This indicates that mtextFontInherit is not working correctly.'
+      );
+    }
+    showMessage(
+      'Arabic text rendered correctly inside text node: ' + arabicTextContent
+    );
+  }
 }
 
 export let ExplorationEditorFactory = (): ExplorationEditor =>
