@@ -142,7 +142,9 @@ describe('Moderator Page Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ModeratorPageComponent);
     componentInstance = fixture.componentInstance;
-    moderatorPageBackendApiService = TestBed.inject(ModeratorPageBackendApiService);
+    moderatorPageBackendApiService = TestBed.inject(
+      ModeratorPageBackendApiService
+    );
     loaderService = TestBed.inject(
       LoaderService
     ) as jasmine.SpyObj<LoaderService>;
