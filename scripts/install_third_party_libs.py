@@ -166,6 +166,52 @@ def install_node() -> None:
     print('Node is installed.')
 
 
+def install_playwright_node() -> None:
+    """Download and install Node.js for Playwright (Node 20)."""
+
+    if not os.path.exists(common.PLAYWRIGHT_NODE_PATH):
+        print(
+            'Playwright Node not found. Installing Node.js %s...'
+            % common.PLAYWRIGHT_NODE_VERSION
+        )
+
+        outfile_name = 'node-playwright-download'
+
+        if common.is_x64_architecture():
+            if common.is_mac_os():
+                node_file_name = (
+                    'node-v%s-darwin-x64' % common.PLAYWRIGHT_NODE_VERSION
+                )
+            elif common.is_linux_os():
+                node_file_name = (
+                    'node-v%s-linux-x64' % common.PLAYWRIGHT_NODE_VERSION
+                )
+            else:
+                raise Exception('Unsupported OS')
+        else:
+            node_file_name = 'node-v%s' % common.PLAYWRIGHT_NODE_VERSION
+
+        # Download.
+        download_and_install_package(
+            'https://nodejs.org/dist/v%s/%s.tar.gz'
+            % (common.PLAYWRIGHT_NODE_VERSION, node_file_name),
+            outfile_name,
+        )
+
+        # Rename.
+        os.rename(
+            os.path.join(common.OPPIA_TOOLS_DIR, node_file_name),
+            common.PLAYWRIGHT_NODE_PATH,
+        )
+
+        if node_file_name == 'node-v%s' % common.PLAYWRIGHT_NODE_VERSION:
+            with common.CD(common.PLAYWRIGHT_NODE_PATH):
+                subprocess.check_call(['./configure'])
+                subprocess.check_call(['make'])
+
+    print('Playwright Node is installed.')
+
+
 def install_yarn() -> None:
     """Download and install yarn to Oppia tools directory."""
     if not os.path.exists(common.YARN_PATH):
@@ -445,6 +491,7 @@ def main() -> None:
     pathlib.Path(common.THIRD_PARTY_DIR).mkdir(exist_ok=True)
 
     install_node()
+    install_playwright_node()
     install_yarn()
     install_redis_cli()
     install_elasticsearch_dev_server()

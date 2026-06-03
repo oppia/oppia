@@ -22,7 +22,6 @@ import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate
 import {AlertsService} from 'services/alerts.service';
 
 import {DeleteCertificateOfferingModalComponent} from 'components/certificate-assessment-offering-helper/delete-certificate-offering-modal.component';
-
 @Component({
   selector: 'oppia-certificate-offering-dashboard-page',
   templateUrl: './certificate-offering-dashboard-page.component.html',
