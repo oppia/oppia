@@ -83,6 +83,9 @@
         "core.domain.auth_services_test",
         "core.domain.opportunity_services_test",
         "core.domain.feedback_domain_test",
+        "core.domain.general_feedback_domain_test",
+        "core.domain.general_feedback_services_test",
+        "core.domain.captcha_services_test",
         "core.domain.platform_parameter_domain_test",
         "core.domain.story_fetchers_test",
         "core.domain.rights_domain_test",
@@ -209,7 +212,8 @@
         "core.jobs.batch_jobs.subtopic_migration_jobs_test",
         "core.jobs.batch_jobs.reject_invalid_suggestion_and_delete_invalid_translation_jobs_test",
         "core.domain.voiceover_cloud_task_services_test",
-        "core.jobs.batch_jobs.cleanup_duplicate_translation_suggestions_jobs_test"
+        "core.jobs.batch_jobs.cleanup_duplicate_translation_suggestions_jobs_test",
+        "core.jobs.batch_jobs.recover_orphaned_translations_jobs_test"
     ],
     "4": [
         "core.storage.learner_group.gae_models_test",
@@ -303,6 +307,7 @@
         "scripts.check_frontend_test_coverage_test",
         "core.platform.models_test",
         "core.storage.feedback.gae_models_test",
+        "core.storage.general_feedback.gae_models_test",
         "scripts.pre_commit_hook_test",
         "core.storage.activity.gae_models_test",
         "core.storage.subtopic.gae_models_test",
@@ -421,6 +426,9 @@
         "core.jobs.batch_jobs.audit_non_existent_threads_messages_jobs_test",
         "conftest_test",
         "core.jobs.batch_jobs.audit_threads_with_missing_suggestions_jobs_test",
-        "core.jobs.batch_jobs.audit_stories_with_disconnected_node_ids_job_test"
+        "core.jobs.batch_jobs.audit_stories_with_disconnected_node_ids_job_test",
+        "core.domain.certificate_assessment_domain_test",
+        "core.storage.certificate_assessment.gae_models_test",
+        "core.controllers.certificate_assessment_test"
     ]
 }

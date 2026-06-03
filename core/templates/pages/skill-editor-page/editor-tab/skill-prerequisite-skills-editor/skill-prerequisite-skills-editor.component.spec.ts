@@ -198,6 +198,7 @@ describe('Skill editor main tab Component', () => {
           uncategorizedSkillCount: 0,
           totalPublishedNodeCount: 0,
           canEditTopic: true,
+          canEditQuestion: true,
           isPublished: false,
           id: 'HLEn0XQiV9XE',
           topicModelCreatedOn: 1623851496406.576,
@@ -253,8 +254,8 @@ describe('Skill editor main tab Component', () => {
           getTopicModelLastUpdated(): number {
             return this.topicModelLastUpdated;
           },
-          getClassroom(): string | undefined {
-            return this.classroom;
+          getClassroom(): string | null {
+            return this.classroom ?? null;
           },
           getUrlFragment(): string {
             return this.urlFragment;
@@ -633,14 +634,14 @@ describe('Skill editor main tab Component', () => {
       mockEventEmitter
     );
 
-    expect(component.prerequisiteSkillsAreShown).toBeFalse();
+    expect(component.prerequisiteSkillsAreShown).toBe(false);
 
     component.windowIsNarrow = true;
 
     component.ngOnInit();
     mockEventEmitter.emit();
 
-    expect(component.windowIsNarrow).toBeFalse();
+    expect(component.windowIsNarrow).toBe(false);
   });
 
   it('should toggle skill editor card on clicking', () => {
@@ -649,11 +650,11 @@ describe('Skill editor main tab Component', () => {
 
     component.toggleSkillEditorCard();
 
-    expect(component.skillEditorCardIsShown).toBeFalse();
+    expect(component.skillEditorCardIsShown).toBe(false);
 
     component.toggleSkillEditorCard();
 
-    expect(component.skillEditorCardIsShown).toBeTrue();
+    expect(component.skillEditorCardIsShown).toBe(true);
   });
 
   it('should show prerequisites list when the window is narrow', () => {
