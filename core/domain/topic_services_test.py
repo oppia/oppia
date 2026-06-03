@@ -3303,6 +3303,81 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.user_id, topic_id, changelist, 'Update topic name'
             )
 
+    def test_does_not_save_topic_with_superseding_skill_in_subtopic(
+        self,
+    ) -> None:
+        self.save_new_skill('supersede2', self.user_id)
+        self.save_new_skill('has_superseding2', self.user_id)
+        topic_id = topic_fetchers.get_new_topic_id()
+        subtopic = topic_domain.Subtopic(
+            1,
+            'Test Subtopic',
+            [],
+            'image.svg',
+            '#FFFFFF',
+            None,
+            'test-subtopic',
+        )
+        self.save_new_topic(
+            topic_id,
+            self.user_id,
+            name='topic-supersede2',
+            description='desc',
+            url_fragment='topic-url-supersede',
+            uncategorized_skill_ids=['has_superseding2'],
+            subtopics=[subtopic],
+            next_subtopic_id=2,
+        )
+        move_changelist = [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                    'old_subtopic_id': None,
+                    'new_subtopic_id': 1,
+                    'skill_id': 'has_superseding2',
+                }
+            )
+        ]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id, topic_id, move_changelist, 'Move skill to subtopic.'
+        )
+        skill_changelist = [
+            skill_domain.SkillChange(
+                {
+                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                    'property_name': (
+                        skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID
+                    ),
+                    'old_value': '',
+                    'new_value': 'supersede2',
+                }
+            )
+        ]
+        skill_services.update_skill(
+            self.user_id,
+            'has_superseding2',
+            skill_changelist,
+            'Merging skill.',
+        )
+        update_changelist = [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                    'property_name': topic_domain.TOPIC_PROPERTY_DESCRIPTION,
+                    'old_value': 'desc',
+                    'new_value': 'updated desc',
+                }
+            )
+        ]
+        with self.assertRaisesRegex(
+            Exception,
+            'The skill \'has_superseding2\' in subtopic \'Test Subtopic\' '
+            'has a superseding skill \'supersede2\'',
+        ):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, topic_id, update_changelist, 'Update topic.'
+            )
+
     def test_does_not_add_skill_with_superseding_skill_to_topic(self) -> None:
         self.save_new_skill('supersede', self.user_id)
         self.save_new_skill('has_superseding', self.user_id)

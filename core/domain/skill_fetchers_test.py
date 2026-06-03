@@ -138,6 +138,14 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             skill_fetchers.get_skill_by_id('Does Not Exist', strict=False), None
         )
 
+    def test_get_skill_by_id_raises_when_strict_and_skill_not_found(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(
+            Exception, 'No skill exists with ID: nonexistent_id'
+        ):
+            skill_fetchers.get_skill_by_id('nonexistent_id', strict=True)
+
     def test_get_multi_skills_with_strict_false_skips_missing_skills(
         self,
     ) -> None:
