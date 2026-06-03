@@ -42,9 +42,6 @@ E2E_CI_TEST_SUITE_CONFIG_FILE_PATH = os.path.join(
 ACCEPTANCE_TEST_SPECS_DIRECTORY = os.path.join(
     os.getcwd(), 'core', 'tests', 'puppeteer-acceptance-tests', 'specs'
 )
-ACCEPTANCE_TEST_SPECS_DIRECTORY_OLD = os.path.join(
-    os.getcwd(), 'core', 'tests', 'puppeteer-acceptance-tests', 'specs-old'
-)
 PLAYWRIGHT_ACCEPTANCE_TEST_SPECS_DIRECTORY = os.path.join(
     os.getcwd(), 'core', 'tests', 'playwright-acceptance-tests', 'specs'
 )
@@ -60,6 +57,9 @@ class TestSuiteDictBase(TypedDict):
     module: str
 
 
+# TODO(#26296): Remove the TestSuiteDictBase class once the
+# migration from e2e to acceptance tests is complete
+# and e2e tests are removed.
 class TestSuiteDict(TestSuiteDictBase, total=False):
     """Dictionary representing a test suite, with an optional framework field.
     The framework field is only present for acceptance tests to distinguish
@@ -204,7 +204,6 @@ def get_acceptance_test_suites_from_acceptance_directory() -> (
     acceptance_test_suites: List[TestSuiteDict] = []
     for test_specs_directory, framework in [
         (ACCEPTANCE_TEST_SPECS_DIRECTORY, 'puppeteer'),
-        (ACCEPTANCE_TEST_SPECS_DIRECTORY_OLD, 'puppeteer'),
         (PLAYWRIGHT_ACCEPTANCE_TEST_SPECS_DIRECTORY, 'playwright'),
     ]:
         acceptance_test_files = glob.glob(
