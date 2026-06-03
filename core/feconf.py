@@ -227,7 +227,7 @@ ALLOWED_FEEDBACK_PAGE_HOSTS = (
     '::1',
 )
 ALLOWED_SESSION_INFO_TOP_LEVEL_KEYS = (
-    'console_errors_json',
+    'console_logs_json',
     'failed_requests_json',
     'navigation_history_json',
     'environment_json',
