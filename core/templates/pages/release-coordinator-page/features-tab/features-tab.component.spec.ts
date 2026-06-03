@@ -191,9 +191,10 @@ describe('Release coordinator page feature tab', function () {
 
     expect(
       // Accessing private _results field for test verification.
-      (component.userGroupInputs as unknown as {_results: ElementRef[]})._results[0].nativeElement.value
+      (component.userGroupInputs as unknown as {_results: ElementRef[]})
+        ._results[0].nativeElement.value
     ).toEqual('UserGroup1');
-    
+
     expect(featureFlagVM.filteredUserGroups).toEqual(component.allUserGroups);
   }));
 
