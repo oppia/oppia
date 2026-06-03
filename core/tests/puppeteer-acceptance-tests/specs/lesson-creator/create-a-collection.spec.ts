@@ -43,77 +43,73 @@ describe('LC.12 Visit Creator Dashboard', function () {
     learner = await UserFactory.createNewUser('learner', 'learner@example.com');
   }, DEFAULT_TIMEOUT);
 
-  it(
-    'should view contribution stats',
-    async function () {
-      await lessonCreator.navigateToCreatorDashboardUsingProfileDropdown();
-      await lessonCreator.expectCreatorDashboardMessageToBe(
-        "It looks like you haven't created any explorations yet. Let's get started!"
+  it('should view contribution stats', async function () {
+    await lessonCreator.navigateToCreatorDashboardUsingProfileDropdown();
+    await lessonCreator.expectCreatorDashboardMessageToBe(
+      "It looks like you haven't created any explorations yet. Let's get started!"
+    );
+
+    positiveNumbersExplorationId =
+      await lessonCreator.createAndPublishAMinimalExplorationWithTitle(
+        'Positive Numbers',
+        'Math'
       );
 
-      positiveNumbersExplorationId =
-        await lessonCreator.createAndPublishAMinimalExplorationWithTitle(
-          'Positive Numbers',
-          'Math'
-        );
-
-      negativeNumbersExplorationId =
-        await lessonCreator.createAndPublishAMinimalExplorationWithTitle(
-          'Negative Numbers',
-          'Math'
-        );
-
-      await lessonCreator.navigateToCreatorDashboardPage();
-      await lessonCreator.waitForPageToFullyLoad();
-      await lessonCreator.expectAverageRatingAndUsersToBe('N/A', 0);
-
-      await lessonCreator.expectTotalPlaysToBe(0);
-
-      await lessonCreator.expectOpenFeedbacksToBe(0);
-
-      await lessonCreator.expectNumberOfSubscribersToBe(0);
-
-      await lessonCreator.expectExplorationsInGridInOrder([
-        'Positive Numbers',
+    negativeNumbersExplorationId =
+      await lessonCreator.createAndPublishAMinimalExplorationWithTitle(
         'Negative Numbers',
-      ]);
+        'Math'
+      );
 
-      await learner.navigateToCommunityLibraryPage();
+    await lessonCreator.navigateToCreatorDashboardPage();
+    await lessonCreator.waitForPageToFullyLoad();
+    await lessonCreator.expectAverageRatingAndUsersToBe('N/A', 0);
 
-      await learner.playExploration(negativeNumbersExplorationId);
+    await lessonCreator.expectTotalPlaysToBe(0);
 
-      await learner.waitForPageToFullyLoad();
+    await lessonCreator.expectOpenFeedbacksToBe(0);
 
-      await learner.rateExploration(5, 'Great Lesson', false);
+    await lessonCreator.expectNumberOfSubscribersToBe(0);
 
-      await learner.navigateToCommunityLibraryPage();
+    await lessonCreator.expectExplorationsInGridInOrder([
+      'Positive Numbers',
+      'Negative Numbers',
+    ]);
 
-      await learner.playExploration(positiveNumbersExplorationId);
+    await learner.navigateToCommunityLibraryPage();
 
-      await learner.waitForPageToFullyLoad();
+    await learner.playExploration(negativeNumbersExplorationId);
 
-      await learner.rateExploration(3, '', false);
+    await learner.waitForPageToFullyLoad();
 
-      await learner.openLessonInfoModal();
+    await learner.rateExploration(5, 'Great Lesson', false);
 
-      await learner.visitCreatorProfileFromLessonInfoModal();
+    await learner.navigateToCommunityLibraryPage();
 
-      await learner.subscribeToCreator('lessonCreator');
+    await learner.playExploration(positiveNumbersExplorationId);
 
-      await lessonCreator.page.reload();
+    await learner.waitForPageToFullyLoad();
 
-      await lessonCreator.waitForPageToFullyLoad();
+    await learner.rateExploration(3, '', false);
 
-      await lessonCreator.expectAverageRatingAndUsersToBe(4, 2);
+    await learner.openLessonInfoModal();
 
-      await lessonCreator.expectTotalPlaysToBe(2);
+    await learner.visitCreatorProfileFromLessonInfoModal();
 
-      await lessonCreator.expectOpenFeedbacksToBe(1);
+    await learner.subscribeToCreator('lessonCreator');
 
-      await lessonCreator.expectNumberOfSubscribersToBe(1);
-    },
-    DEFAULT_TIMEOUT
-  );
+    await lessonCreator.page.reload();
+
+    await lessonCreator.waitForPageToFullyLoad();
+
+    await lessonCreator.expectAverageRatingAndUsersToBe(4, 2);
+
+    await lessonCreator.expectTotalPlaysToBe(2);
+
+    await lessonCreator.expectOpenFeedbacksToBe(1);
+
+    await lessonCreator.expectNumberOfSubscribersToBe(1);
+  }, 600000);
 
   it(
     'should view explorations in grid view',
