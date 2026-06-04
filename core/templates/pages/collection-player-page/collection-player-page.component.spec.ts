@@ -731,20 +731,35 @@ describe('Collection player page component', () => {
   });
 
   it('should set collection summary correctly', fakeAsync(() => {
+    const summaryDict = {
+      category: 'category',
+      community_owned: false,
+      last_updated_msec: 1000,
+      id: 'collectionId',
+      created_on: 1000,
+      language_code: 'en',
+      objective: 'objective',
+      status: 'public',
+      thumbnail_bg_color: 'bg_color',
+      thumbnail_icon_url: 'icon_url',
+      title: 'title',
+    };
     (
       collectionPlayerBackendApiService.fetchCollectionSummariesAsync as jasmine.Spy
     ).and.returnValue(
       Promise.resolve({
         is_admin: false,
         is_topic_manager: false,
-        summaries: ['summary1'],
+        summaries: [summaryDict],
         user_email: 'tester@example.com',
-        username: false,
+        username: 'username',
       })
     );
     component.fetchSummaryAsync('collectionId');
     tick();
-    expect(component.collectionSummary.summaries).toEqual(['summary1']);
+    expect(component.collectionSummary).toEqual(
+      summaryDict as unknown as import('domain/collection/collection-summary.model').CollectionSummaryBackendDict
+    );
   }));
 
   it('should return early in updateCollection if collection is null', () => {

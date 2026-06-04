@@ -32,6 +32,7 @@ import {CollectionNode} from 'domain/collection/collection-node.model';
 import {Collection} from 'domain/collection/collection.model';
 import {CollectionPlayerBackendApiService} from './services/collection-player-backend-api.service';
 import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
+import {CollectionSummaryBackendDict} from 'domain/collection/collection-summary.model';
 
 import './collection-player-page.component.css';
 
@@ -42,12 +43,12 @@ export interface IconParametersArray {
   thumbnailBgColor: string;
 }
 
-export interface CollectionSummary {
+export interface FetchCollectionSummariesResponse {
   is_admin: boolean;
-  summaries: string[];
+  summaries: CollectionSummaryBackendDict[];
   user_email: string;
   is_topic_manager: boolean;
-  username: boolean;
+  username: string;
 }
 
 export interface CollectionHandler {
@@ -95,13 +96,7 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   ICON_X_RIGHT_PX!: number;
   collectionId!: string;
   nextExplorationId!: string | null;
-  collectionSummary!: {
-    is_admin: boolean;
-    summaries: string[];
-    user_email: string;
-    is_topic_manager: boolean;
-    username: boolean;
-  };
+  collectionSummary!: CollectionSummaryBackendDict;
   isLoggedIn: boolean = false;
   explorationCardIsShown: boolean = false;
   elementToScrollTo: string = '';
@@ -327,19 +322,9 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   async fetchSummaryAsync(collectionId: string): Promise<void> {
     this.collectionPlayerBackendApiService
       .fetchCollectionSummariesAsync(collectionId)
-      .then(collectionSummary => {
-        if (
-          collectionSummary &&
-          collectionSummary.summaries &&
-          collectionSummary.summaries.length > 0
-        ) {
-          this.collectionSummary = {
-            is_admin: false,
-            summaries: collectionSummary.summaries,
-            user_email: '',
-            is_topic_manager: false,
-            username: false,
-          };
+      .then(response => {
+        if (response && response.summaries && response.summaries.length > 0) {
+          this.collectionSummary = response.summaries[0];
         }
       });
   }

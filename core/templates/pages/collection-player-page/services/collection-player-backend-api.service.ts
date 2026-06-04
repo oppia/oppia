@@ -18,7 +18,7 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {CollectionSummary} from '../collection-player-page.component';
+import {FetchCollectionSummariesResponse} from '../collection-player-page.component';
 
 @Injectable({
   providedIn: 'root',
@@ -28,13 +28,16 @@ export class CollectionPlayerBackendApiService {
 
   async fetchCollectionSummariesAsync(
     collectionId: string
-  ): Promise<CollectionSummary> {
+  ): Promise<FetchCollectionSummariesResponse> {
     return this.http
-      .get<CollectionSummary>('/collectionsummarieshandler/data', {
-        params: {
-          stringified_collection_ids: JSON.stringify([collectionId]),
-        },
-      })
+      .get<FetchCollectionSummariesResponse>(
+        '/collectionsummarieshandler/data',
+        {
+          params: {
+            stringified_collection_ids: JSON.stringify([collectionId]),
+          },
+        }
+      )
       .toPromise();
   }
 }
