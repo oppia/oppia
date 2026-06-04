@@ -148,6 +148,11 @@
   margin-top: auto;
 }
 
+.story-practice-card-wrapper {
+  width: 100%;
+  margin-top: auto;
+}
+
 @media (max-width: 768px) {
   .story-callout-row {
     align-items: flex-start;
@@ -309,6 +314,10 @@
 }
 
 .story-lesson-card-wrapper {
+  margin-top: auto;
+}
+
+.story-practice-card-wrapper {
   margin-top: auto;
 }
 }

@@ -1,0 +1,201 @@
+.topic-practice-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  display: flex;
+  min-height: 200px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.topic-practice-card-thumbnail {
+  align-items: center;
+  background: #f8f1f1;
+  display: flex;
+  flex: 0 0 260px;
+  justify-content: center;
+  min-height: 200px;
+  padding: 18px;
+}
+
+.topic-practice-card-image {
+  display: block;
+  height: 100%;
+  max-height: 150px;
+  max-width: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+.topic-practice-card-content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 24px 26px 24px 30px;
+}
+
+.topic-practice-card-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.topic-practice-card-title {
+  color: #3b3b3b;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.topic-practice-card-description {
+  color: #3d3d3d;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.topic-practice-card-progress {
+  align-items: center;
+  display: flex;
+  margin-top: 4px;
+  max-width: 360px;
+  width: 100%;
+}
+
+.practice-progress-step-active {
+  background: #fff;
+  border: 2px solid #c85f44;
+  border-radius: 50%;
+  flex-shrink: 0;
+  height: 18px;
+  width: 18px;
+}
+
+.practice-progress-line {
+  background: #ddd;
+  border-radius: 999px;
+  flex: 1 1 auto;
+  height: 8px;
+  margin-left: 10px;
+}
+
+.topic-practice-card-actions {
+  align-items: center;
+  align-self: flex-end;
+  display: inline-flex;
+  gap: 22px;
+  margin-top: 14px;
+}
+
+.topic-practice-card-study-link {
+  color: #c85f44;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: underline;
+}
+
+.topic-practice-card-study-link[aria-disabled='true'] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.topic-practice-card-practice-button {
+  align-items: center;
+  background: #c85f44;
+  border-radius: 6px;
+  color: #fff;
+  display: inline-flex;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  justify-content: center;
+  line-height: 1;
+  min-width: 124px;
+  padding: 16px 24px;
+  text-decoration: none;
+}
+
+.topic-practice-card-practice-button-disabled {
+  background: #c4c4c4;
+  color: #fff;
+  cursor: default;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .topic-practice-card {
+    min-height: 170px;
+  }
+
+  .topic-practice-card-thumbnail {
+    flex-basis: 200px;
+    min-height: 170px;
+    padding: 14px;
+  }
+
+  .topic-practice-card-content {
+    padding: 18px 18px 18px 20px;
+  }
+
+  .topic-practice-card-progress {
+    max-width: 260px;
+  }
+
+  .practice-progress-step-active {
+    height: 14px;
+    width: 14px;
+  }
+
+  .practice-progress-line {
+    height: 6px;
+    margin-left: 8px;
+  }
+
+  .topic-practice-card-actions {
+    gap: 18px;
+  }
+
+  .topic-practice-card-study-link,
+  .topic-practice-card-practice-button {
+    font-size: 14px;
+  }
+
+  .topic-practice-card-practice-button {
+    min-width: 110px;
+    padding: 12px 18px;
+  }
+}
+
+@media (max-width: 500px) {
+  .topic-practice-card {
+    flex-direction: column;
+  }
+
+  .topic-practice-card-thumbnail {
+    flex-basis: auto;
+    min-height: 145px;
+    width: 100%;
+  }
+
+  .topic-practice-card-content {
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .topic-practice-card-actions {
+    align-self: stretch;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .topic-practice-card-practice-button {
+    min-width: 112px;
+  }
+}

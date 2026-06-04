@@ -1,0 +1,35 @@
+<article class="topic-practice-card" [attr.aria-label]="practiceTitle || 'Practice card'">
+  <div class="topic-practice-card-thumbnail">
+    <img class="topic-practice-card-image"
+         [src]="resolvedThumbnailUrl"
+         alt="{{ getThumbnailAltText() }}"
+         title="{{ getThumbnailAltText() }}">
+  </div>
+
+  <div class="topic-practice-card-content">
+    <div class="topic-practice-card-copy">
+      <h3 class="topic-practice-card-title">{{ practiceTitle }}</h3>
+      <p class="topic-practice-card-description">{{ getResolvedDescription() }}</p>
+      <div class="topic-practice-card-progress" aria-hidden="true">
+        <div class="practice-progress-step-active"></div>
+        <div class="practice-progress-line"></div>
+      </div>
+    </div>
+
+    <div class="topic-practice-card-actions">
+      <a class="topic-practice-card-study-link"
+         [attr.href]="studyUrl || '#'"
+         [attr.aria-disabled]="studyUrl ? null : 'true'">
+        Study
+      </a>
+
+      <a class="topic-practice-card-practice-button"
+         [class.topic-practice-card-practice-button-disabled]="isPracticeActionDisabled()"
+         [attr.href]="isPracticeActionDisabled() ? null : practiceUrl"
+         [attr.aria-disabled]="isPracticeActionDisabled() ? 'true' : null"
+         [attr.tabindex]="isPracticeActionDisabled() ? -1 : null">
+        {{ getPracticeButtonText() }}
+      </a>
+    </div>
+  </div>
+</article>

@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for TopicStorySectionComponent.
  */
 
-import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
@@ -25,6 +24,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {UrlService} from 'services/contextual/url.service';
 
 import {TopicLessonCardComponent} from './topic-lesson-card/topic-lesson-card.component';
+import {TopicPracticeCardComponent} from './topic-practice-card/topic-practice-card.component';
 import {TopicStorySectionComponent} from './topic-story-section.component';
 
 describe('TopicStorySectionComponent', () => {
@@ -33,7 +33,11 @@ describe('TopicStorySectionComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [TopicStorySectionComponent, TopicLessonCardComponent],
+      declarations: [
+        TopicStorySectionComponent,
+        TopicLessonCardComponent,
+        TopicPracticeCardComponent,
+      ],
       providers: [
         {
           provide: UrlInterpolationService,
@@ -152,5 +156,25 @@ describe('TopicStorySectionComponent', () => {
     expect(component.studyGuideUrl).toBe('/learn/math/fractions/studyguide');
     expect(component.lessonCards.length).toBe(2);
     expect(component.lessonCards[0].startUrl).toContain('/explore/exp_1');
+  });
+
+  it('should render practice card when story has no lessons', () => {
+    component.storySummary = {
+      getId: () => 'story_2',
+      getTitle: () => 'Practice Story',
+      getDescription: () => 'Practice-only story.',
+      getNodeTitles: () => [],
+      getUrlFragment: () => 'practice-story',
+      getAllNodes: () => [],
+    } as never;
+    component.practiceCount = 1;
+
+    fixture.detectChanges();
+
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelectorAll('.topic-lesson-card-title').length).toBe(0);
+    expect(
+      el.querySelector('.topic-practice-card-title')?.textContent
+    ).toContain('Practice 1: Practice Story');
   });
 });

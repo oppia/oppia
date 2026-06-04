@@ -45,6 +45,16 @@ interface LessonCardData {
   startUrl: string;
 }
 
+interface PracticeCardData {
+  practiceTitle: string;
+  practiceDescription: string;
+  relatedLessonNumber: number | null;
+  thumbnailUrl: string;
+  studyUrl: string | null;
+  practiceUrl: string | null;
+  practiceState: 'available' | 'locked' | 'completed';
+}
+
 @Component({
   selector: 'topic-story-section',
   templateUrl: './topic-story-section.component.html',
@@ -64,6 +74,7 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
   oppiaAvatarImageUrl: string = '';
   studyGuideUrl: string = '#';
   lessonCards: LessonCardData[] = [];
+  practiceCard: PracticeCardData | null = null;
 
   private readonly primaryAvatarImagePath: string =
     '/avatar/oppia_avatar_large_100px.svg';
@@ -147,6 +158,7 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
 
     if (!this.storySummary) {
       this.lessonCards = [];
+      this.practiceCard = null;
       return;
     }
 
@@ -164,6 +176,24 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
           startUrl: this.getLessonStartUrl(node),
         };
       });
+
+    this.practiceCard = this.getPracticeCardData();
+  }
+
+  private getPracticeCardData(): PracticeCardData | null {
+    if (this.lessonCards.length > 0 || this.practiceCount < 1) {
+      return null;
+    }
+
+    return {
+      practiceTitle: 'Practice 1: ' + this.storyTitle,
+      practiceDescription: '',
+      relatedLessonNumber: 1,
+      thumbnailUrl: this.getFallbackLessonThumbnailUrl(),
+      studyUrl: this.studyGuideUrl,
+      practiceUrl: null,
+      practiceState: 'locked',
+    };
   }
 
   private getLessonThumbnailUrl(node: StoryNode): string {

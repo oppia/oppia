@@ -44,6 +44,19 @@
           [startUrl]="lessonCard.startUrl">
         </topic-lesson-card>
       </div>
+
+      <div class="story-practice-card-wrapper"
+           *ngIf="lessonCards.length === 0 && practiceCard">
+        <topic-practice-card
+          [practiceTitle]="practiceCard.practiceTitle"
+          [practiceDescription]="practiceCard.practiceDescription"
+          [relatedLessonNumber]="practiceCard.relatedLessonNumber"
+          [thumbnailUrl]="practiceCard.thumbnailUrl"
+          [studyUrl]="practiceCard.studyUrl"
+          [practiceUrl]="practiceCard.practiceUrl"
+          [practiceState]="practiceCard.practiceState">
+        </topic-practice-card>
+      </div>
     </div>
   </article>
 </section>
