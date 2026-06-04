@@ -809,7 +809,21 @@ describe('New Conversation skin component', () => {
     let isIframed = true;
     let collectionSummary = {
       is_admin: true,
-      summaries: [],
+      summaries: [
+        {
+          category: 'category',
+          community_owned: false,
+          last_updated_msec: 1000,
+          id: 'collectionId',
+          created_on: 1000,
+          language_code: 'en',
+          objective: 'objective',
+          status: 'public',
+          thumbnail_bg_color: 'bg_color',
+          thumbnail_icon_url: 'icon_url',
+          title: 'title',
+        },
+      ],
       user_email: '',
       is_topic_manager: false,
       username: true,
@@ -1063,7 +1077,21 @@ describe('New Conversation skin component', () => {
     let isIframed = false;
     let collectionSummary = {
       is_admin: true,
-      summaries: [],
+      summaries: [
+        {
+          category: 'category',
+          community_owned: false,
+          last_updated_msec: 1000,
+          id: 'collectionId',
+          created_on: 1000,
+          language_code: 'en',
+          objective: 'objective',
+          status: 'public',
+          thumbnail_bg_color: 'bg_color',
+          thumbnail_icon_url: 'icon_url',
+          title: 'title',
+        },
+      ],
       user_email: '',
       is_topic_manager: false,
       username: true,
@@ -1202,7 +1230,21 @@ describe('New Conversation skin component', () => {
     let isIframed = false;
     let collectionSummary = {
       is_admin: true,
-      summaries: [],
+      summaries: [
+        {
+          category: 'category',
+          community_owned: false,
+          last_updated_msec: 1000,
+          id: 'collectionId',
+          created_on: 1000,
+          language_code: 'en',
+          objective: 'objective',
+          status: 'public',
+          thumbnail_bg_color: 'bg_color',
+          thumbnail_icon_url: 'icon_url',
+          title: 'title',
+        },
+      ],
       user_email: '',
       is_topic_manager: false,
       username: true,
@@ -1341,7 +1383,21 @@ describe('New Conversation skin component', () => {
       let isIframed = false;
       let collectionSummary = {
         is_admin: true,
-        summaries: [],
+        summaries: [
+          {
+            category: 'category',
+            community_owned: false,
+            last_updated_msec: 1000,
+            id: 'collectionId',
+            created_on: 1000,
+            language_code: 'en',
+            objective: 'objective',
+            status: 'public',
+            thumbnail_bg_color: 'bg_color',
+            thumbnail_icon_url: 'icon_url',
+            title: 'title',
+          },
+        ],
         user_email: '',
         is_topic_manager: false,
         username: true,
