@@ -19,10 +19,10 @@
   align-self: flex-end;
   flex: 0 0 auto;
   height: clamp(64px, 12vw, 130px);
-  width: clamp(64px, 12vw, 130px);
   object-fit: contain;
   object-position: bottom;
   transform: translateY(35px);
+  width: clamp(64px, 12vw, 130px);
   z-index: 4;
 }
 
@@ -39,8 +39,8 @@
   max-width: 700px;
   padding: 18px 28px;
   position: relative;
-  width: fit-content;
   top: 27px;
+  width: fit-content;
 }
 
 .story-description-bubble .left-side-curve {
@@ -59,8 +59,8 @@
   background: #fff;
   border-radius: 4px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
-  max-width: 100%;
   margin-top: 16px;
+  max-width: 100%;
 }
 
 .story-card-header {
@@ -76,14 +76,17 @@
 }
 
 .story-card-header-left {
+  display: flex;
   flex: 1 1 auto;
+  flex-direction: column;
+  gap: 12px;
   min-width: 0;
 }
 
 .story-title {
   color: #fff;
   font-family: Capriola, Roboto, Arial, sans-serif;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   line-height: 1.3;
   margin: 0;
@@ -91,13 +94,13 @@
 }
 
 .story-meta {
-  color: rgba(255, 255, 255, 0.88);
+  color: #fff;
   font-family: Roboto, Arial, sans-serif;
   font-size: 20px;
   font-weight: 400;
-  line-height: 1.2;
-  margin: 12px 0 0;
-  padding-top: 0;
+  line-height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .story-card-header-right {
@@ -122,7 +125,6 @@
   text-decoration: none;
   white-space: nowrap;
 }
-
 
 .study-skills-cta:hover,
 .study-skills-cta:focus {
@@ -151,8 +153,8 @@
     align-self: flex-end;
     flex-shrink: 0;
     height: 88px;
-    width: 88px;
     transform: translateY(32px);
+    width: 88px;
     z-index: 4;
   }
 
@@ -171,9 +173,9 @@
 
   .story-description-bubble .left-side-curve {
     bottom: -7px;
+    height: 36px;
     left: -20px;
     width: 28px;
-    height: 36px;
   }
 
   .story-card {
@@ -187,7 +189,7 @@
   }
 
   .story-title {
-    font-size: 18px;
+    font-size: 20px;
     line-height: 1.3;
   }
 
@@ -223,8 +225,8 @@
     align-self: flex-end;
     flex-shrink: 0;
     height: 88px;
-    width: 88px;
     transform: translateY(30px);
+    width: 88px;
     z-index: 4;
   }
 
@@ -238,14 +240,14 @@
     min-width: 0;
     padding: 12px 14px;
     position: relative;
-    top: 0px;
+    top: 0;
   }
 
   .story-description-bubble .left-side-curve {
     bottom: -5px;
+    height: 28px;
     left: -16px;
     width: 22px;
-    height: 28px;
   }
 
   .story-card {
@@ -291,8 +293,10 @@
     width: 22px;
   }
 
+
   .story-card-body {
     min-height: 500px;
   }
 }
+
 
