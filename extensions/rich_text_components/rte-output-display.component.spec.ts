@@ -1016,4 +1016,10 @@ describe('RTE display component', () => {
 
     expect(component.shouldHighlightContent()).toBeFalse();
   });
+
+  it('should return null when getting element matching class and text content with undefined classname', () => {
+    expect(
+      component.getElementMatchingClassAndTextContent(undefined)
+    ).toBeNull();
+  });
 });
