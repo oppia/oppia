@@ -189,11 +189,9 @@ describe('Release coordinator page feature tab', function () {
     let featureFlagVM = component.featureFlagViewModels[0];
     component.resetUserGroupSearch(featureFlagVM);
 
-    expect(
-      // Accessing private _results field for test verification.
-      (component.userGroupInputs as unknown as {_results: ElementRef[]})
-        ._results[0].nativeElement.value
-    ).toEqual('UserGroup1');
+    expect(component.userGroupInputs.toArray()[0].nativeElement.value).toEqual(
+      'UserGroup1'
+    );
 
     expect(featureFlagVM.filteredUserGroups).toEqual(component.allUserGroups);
   }));
