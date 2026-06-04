@@ -49,11 +49,13 @@ if MYPY:  # pragma: no cover
         base_models,
         blog_models,
         bulk_email_services,
+        certificate_assessment_offering_models,
         collection_models,
         config_models,
         datastore_services,
         exp_models,
         feedback_models,
+        general_feedback_models,
         improvements_models,
         question_models,
         skill_models,
@@ -69,10 +71,12 @@ if MYPY:  # pragma: no cover
     app_feedback_report_models,
     base_models,
     blog_models,
+    certificate_assessment_offering_models,
     collection_models,
     config_models,
     exp_models,
     feedback_models,
+    general_feedback_models,
     improvements_models,
     question_models,
     skill_models,
@@ -86,10 +90,12 @@ if MYPY:  # pragma: no cover
         models.Names.APP_FEEDBACK_REPORT,
         models.Names.BASE_MODEL,
         models.Names.BLOG,
+        models.Names.CERTIFICATE_ASSESSMENT_OFFERING,
         models.Names.COLLECTION,
         models.Names.CONFIG,
         models.Names.EXPLORATION,
         models.Names.FEEDBACK,
+        models.Names.GENERAL_FEEDBACK,
         models.Names.IMPROVEMENTS,
         models.Names.QUESTION,
         models.Names.SKILL,
@@ -552,6 +558,7 @@ def delete_user(
     """
     user_id = pending_deletion_request.user_id
     user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+    cert_models = certificate_assessment_offering_models
 
     auth_services.delete_external_auth_associations(user_id)
 
@@ -584,6 +591,7 @@ def delete_user(
             models.Names.APP_FEEDBACK_REPORT,
         )
         _pseudonymize_feedback_models(pending_deletion_request)
+        _pseudonymize_general_feedback_models(pending_deletion_request)
         _pseudonymize_activity_models_without_associated_rights_models(
             pending_deletion_request,
             models.Names.QUESTION,
@@ -618,6 +626,13 @@ def delete_user(
             subtopic_models.StudyGuideSnapshotMetadataModel,
             subtopic_models.StudyGuideCommitLogEntryModel,
             'study_guide_id',
+        )
+        _pseudonymize_activity_models_without_associated_rights_models(
+            pending_deletion_request,
+            models.Names.CERTIFICATE_ASSESSMENT_OFFERING,
+            cert_models.CertificateAssessmentOfferingSnapshotMetadataModel,
+            cert_models.CertificateAssessmentOfferingCommitLogEntryModel,
+            'offering_id',
         )
         _pseudonymize_activity_models_with_associated_rights_models(
             pending_deletion_request,
@@ -1720,6 +1735,105 @@ def _pseudonymize_feedback_models(
         for suggestion_model in general_suggestion_models:
             if suggestion_model.id == feedback_id:
                 feedback_related_models.append(suggestion_model)
+        for i in range(
+            0,
+            len(feedback_related_models),
+            feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION,
+        ):
+            _pseudonymize_models_transactional(
+                feedback_related_models[
+                    i : i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION
+                ],
+                pseudonymized_id,
+            )
+
+
+def _pseudonymize_general_feedback_models(
+    pending_deletion_request: wipeout_domain.PendingDeletionRequest,
+) -> None:
+    """Pseudonymize web feedback models for the user with user_id.
+
+    Args:
+        pending_deletion_request: PendingDeletionRequest. The pending deletion
+            request object to be saved in the datastore.
+    """
+    user_id = pending_deletion_request.user_id
+
+    feedback_thread_model_class = general_feedback_models.WebFeedbackThreadModel
+    feedback_thread_models: Sequence[
+        general_feedback_models.WebFeedbackThreadModel
+    ] = feedback_thread_model_class.query(
+        feedback_thread_model_class.original_author_id == user_id
+    ).fetch()
+    feedback_ids = set(model.id for model in feedback_thread_models)
+
+    feedback_message_model_class = (
+        general_feedback_models.WebFeedbackMessageModel
+    )
+    feedback_message_models: Sequence[
+        general_feedback_models.WebFeedbackMessageModel
+    ] = feedback_message_model_class.query(
+        feedback_message_model_class.author_id == user_id
+    ).fetch()
+    feedback_ids |= set(model.thread_id for model in feedback_message_models)
+
+    _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
+        pending_deletion_request,
+        models.Names.GENERAL_FEEDBACK,
+        list(feedback_ids),
+    )
+
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(
+        feedback_related_models: List[base_models.BaseModel],
+        pseudonymized_id: str,
+    ) -> None:
+        """Pseudonymize user ID fields in the models.
+
+        Args:
+            feedback_related_models: list(BaseModel). Models whose user IDs
+                should be pseudonymized.
+            pseudonymized_id: str. New pseudonymized user ID to be used for
+                the models.
+        """
+        feedback_thread_models = [
+            model
+            for model in feedback_related_models
+            if isinstance(model, feedback_thread_model_class)
+        ]
+        for feedback_thread_model in feedback_thread_models:
+            feedback_thread_model.original_author_id = pseudonymized_id
+            feedback_thread_model.update_timestamps()
+
+        feedback_message_models = [
+            model
+            for model in feedback_related_models
+            if isinstance(model, feedback_message_model_class)
+        ]
+        for feedback_message_model in feedback_message_models:
+            feedback_message_model.author_id = pseudonymized_id
+            feedback_message_model.update_timestamps()
+
+        all_models: List[base_models.BaseModel] = []
+        for feedback_thread_model in feedback_thread_models:
+            all_models.append(feedback_thread_model)
+        for feedback_message_model in feedback_message_models:
+            all_models.append(feedback_message_model)
+        datastore_services.put_multi(all_models)
+
+    feedback_ids_to_pids = (
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            models.Names.GENERAL_FEEDBACK.value
+        ]
+    )
+    for feedback_id, pseudonymized_id in feedback_ids_to_pids.items():
+        feedback_related_models: List[base_models.BaseModel] = [
+            model for model in feedback_thread_models if model.id == feedback_id
+        ]
+        for feedback_message_model in feedback_message_models:
+            if feedback_message_model.thread_id == feedback_id:
+                feedback_related_models.append(feedback_message_model)
+
         for i in range(
             0,
             len(feedback_related_models),

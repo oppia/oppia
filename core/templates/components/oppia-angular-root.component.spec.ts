@@ -120,6 +120,7 @@ describe('OppiaAngularRootComponent', function () {
     spyOn(CkEditorInitializerService, 'ckEditorInitializer').and.callFake(
       () => {}
     );
+    component.ngOnInit();
     component.ngAfterViewInit();
     TestBed.inject(I18nLanguageCodeService).setI18nLanguageCode('en');
 
@@ -129,7 +130,7 @@ describe('OppiaAngularRootComponent', function () {
   it('should detect change in direction', () => {
     let newDirection = 'rtl';
 
-    component.ngAfterViewInit();
+    component.ngOnInit();
     i18nService.directionChangeEventEmitter.emit(newDirection);
     fixture.detectChanges();
     expect(component.direction).toEqual(newDirection);

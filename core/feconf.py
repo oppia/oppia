@@ -154,6 +154,7 @@ class ValidModelNames(enum.Enum):
     BEAM_JOB = 'beam_job'
     BLOG = 'blog'
     BLOG_STATISTICS = 'blog_statistics'
+    CERTIFICATE_ASSESSMENT_OFFERING = 'certificate_assessment_offering'
     CLASSROOM = 'classroom'
     CLOUD_TASK = 'cloud_task'
     COLLECTION = 'collection'
@@ -161,6 +162,7 @@ class ValidModelNames(enum.Enum):
     EMAIL = 'email'
     EXPLORATION = 'exploration'
     FEEDBACK = 'feedback'
+    GENERAL_FEEDBACK = 'general_feedback'
     IMPROVEMENTS = 'improvements'
     JOB = 'job'
     LEARNER_GROUP = 'learner_group'
@@ -226,7 +228,7 @@ ALLOWED_FEEDBACK_PAGE_HOSTS = (
     '::1',
 )
 ALLOWED_SESSION_INFO_TOP_LEVEL_KEYS = (
-    'console_errors_json',
+    'console_logs_json',
     'failed_requests_json',
     'navigation_history_json',
     'environment_json',
@@ -254,6 +256,7 @@ ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_USER = 'user'
 ENTITY_TYPE_CLASSROOM = 'classroom'
+ENTITY_TYPE_FEEDBACK_SCREENSHOT = 'feedback_screenshot'
 
 DIAGNOSTIC_TEST_QUESTION_TYPE_MAIN = 'main_question'
 DIAGNOSTIC_TEST_QUESTION_TYPE_BACKUP = 'backup_question'
@@ -373,6 +376,13 @@ CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION = 1
 # This value should be updated if the schema of PlatformParameterRule dict
 # schema changes.
 CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION = 1
+
+# This value should be updated if the schema of FeedbackSessionLogModel
+# schema changes.
+CURRENT_SESSION_INFO_SCHEMA_VERSION = 1
+
+# This is the minimum version of the FeedbackSessionLogModel schema that is supported.
+MINIMUM_SESSION_INFO_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the search
 # results page.
@@ -1114,6 +1124,10 @@ REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL = (
 REGENERATE_VOICEOVERS_FOR_EXPLORATION_URL = (
     '/regenerate_voiceovers_for_exploration/'
     '<exploration_id>/<language_accent_code>'
+)
+
+CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
+    '/certificate_assessment_offering_handler'
 )
 
 # Event types.
