@@ -26,6 +26,7 @@ from core.tests import test_utils
 
 import requests
 from typing import Any, Dict, Optional
+from core import feconf
 
 
 class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
@@ -79,6 +80,7 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
     def test_task_handler_will_create_the_correct_post_request(self) -> None:
         queue_name = 'dummy_queue'
         dummy_url = '/dummy_handler'
+        correct_host = dev_mode_taskqueue_services.GOOGLE_APP_ENGINE_HOST
         correct_port = dev_mode_taskqueue_services.GOOGLE_APP_ENGINE_PORT
         correct_payload = {
             'fn_identifier': (
@@ -112,7 +114,7 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             timeout: int,
         ) -> None:
             self.assertEqual(
-                url, 'http://localhost:%s%s' % (correct_port, dummy_url)
+                url, 'http://%s:%s%s' % (correct_host, correct_port, dummy_url)
             )
             self.assertEqual(json, correct_payload)
             self.assertEqual(headers, correct_headers)
@@ -128,4 +130,39 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             # exit the context before actually calling _task_handler().
             dev_mode_taskqueue_services._task_handler(  # pylint: disable=protected-access
                 dummy_url, correct_payload, queue_name, task_name=task_name
+            )
+
+    def test_task_handler_uses_configured_app_engine_host(self) -> None:
+        queue_name = 'dummy_queue'
+        dummy_url = '/dummy_handler'
+        correct_payload: Dict[str, Any] = {}
+        configured_host = '0.0.0.0'
+
+        def mock_post(
+            url: str,
+            json: Dict[str, Any],
+            headers: Dict[str, str],
+            timeout: int,
+        ) -> None:
+            self.assertEqual(
+                url,
+                'http://%s:%s%s'
+                % (
+                    configured_host,
+                    dev_mode_taskqueue_services.GOOGLE_APP_ENGINE_PORT,
+                    dummy_url,
+                ),
+            )
+            self.assertEqual(json, correct_payload)
+            self.assertEqual(timeout, feconf.DEFAULT_TASKQUEUE_TIMEOUT_SECONDS)
+
+        swap_host = self.swap(
+            dev_mode_taskqueue_services,
+            'GOOGLE_APP_ENGINE_HOST',
+            configured_host,
+        )
+        swap_post = self.swap(requests, 'post', mock_post)
+        with swap_host, swap_post:
+            dev_mode_taskqueue_services._task_handler(  # pylint: disable=protected-access
+                dummy_url, correct_payload, queue_name
             )

@@ -29,6 +29,7 @@ from typing import TYPE_CHECKING, Any, Dict, Optional
 if TYPE_CHECKING:  # pragma: no cover
     import datetime
 
+GOOGLE_APP_ENGINE_HOST = os.environ.get('APP_ENGINE_HOST', 'localhost')
 GOOGLE_APP_ENGINE_PORT = os.environ['PORT'] if 'PORT' in os.environ else '8181'
 
 
@@ -59,7 +60,11 @@ def _task_handler(
     # handlers in DEV_MODE.
     headers['X-AppEngine-Fake-Is-Admin'] = '1'
     headers['method'] = 'POST'
-    complete_url = 'http://localhost:%s%s' % (GOOGLE_APP_ENGINE_PORT, url)
+    complete_url = 'http://%s:%s%s' % (
+        GOOGLE_APP_ENGINE_HOST,
+        GOOGLE_APP_ENGINE_PORT,
+        url,
+    )
     requests.post(
         complete_url,
         json=payload,
