@@ -36,6 +36,8 @@ describe('TopicHeaderComponent', () => {
     urlService = jasmine.createSpyObj('UrlService', [
       'getClassroomUrlFragmentFromLearnerUrl',
       'getTopicUrlFragmentFromLearnerUrl',
+      'getLearnerClassroomUrl',
+      'getLearnerTopicStoryUrl',
     ]);
     TestBed.configureTestingModule({
       declarations: [TopicHeaderComponent, MockTranslatePipe],
@@ -53,6 +55,15 @@ describe('TopicHeaderComponent', () => {
     urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('math');
     urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue(
       'place-values'
+    );
+    urlService.getLearnerClassroomUrl.and.callFake((fragment: string) =>
+      fragment ? `/learn/${fragment}` : '/learn'
+    );
+    urlService.getLearnerTopicStoryUrl.and.callFake(
+      (classroomFragment: string, topicFragment: string) =>
+        classroomFragment && topicFragment
+          ? `/learn/${classroomFragment}/${topicFragment}/story`
+          : '/learn'
     );
 
     spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValues(
@@ -98,12 +109,17 @@ describe('TopicHeaderComponent', () => {
 
   it('should return /learn/<fragment> or /learn', () => {
     expect(component.getClassroomUrl()).toBe('/learn/math');
+    expect(urlService.getLearnerClassroomUrl).toHaveBeenCalledWith('math');
     component.classroomUrlFragment = '';
     expect(component.getClassroomUrl()).toBe('/learn');
   });
 
   it('should return topic story URL when fragments exist and /learn otherwise', () => {
     expect(component.getTopicStoryUrl()).toBe('/learn/math/place-values/story');
+    expect(urlService.getLearnerTopicStoryUrl).toHaveBeenCalledWith(
+      'math',
+      'place-values'
+    );
 
     component.classroomUrlFragment = '';
     expect(component.getTopicStoryUrl()).toBe('/learn');

@@ -20,7 +20,6 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 
-import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
@@ -39,11 +38,11 @@ export class TopicStorySectionComponent implements OnInit {
   @Input() storyTitle!: string;
   @Input() storyDescription!: string;
 
-  @Input() classroomUrlFragment!: string;
-  @Input() topicUrlFragment!: string;
-
   @Input() practiceCount: number = 0;
   @Input() lessonCount: number = 0;
+
+  classroomUrlFragment!: string;
+  topicUrlFragment!: string;
 
   oppiaAvatarImageUrl: string = '';
   studyGuideUrl: string = '#';
@@ -55,14 +54,9 @@ export class TopicStorySectionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    if (!this.classroomUrlFragment) {
-      this.classroomUrlFragment =
-        this.urlService.getClassroomUrlFragmentFromLearnerUrl();
-    }
-    if (!this.topicUrlFragment) {
-      this.topicUrlFragment =
-        this.urlService.getTopicUrlFragmentFromLearnerUrl();
-    }
+    this.classroomUrlFragment =
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl();
+    this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
     this.oppiaAvatarImageUrl = this.getPrimaryAvatarImageUrl();
     this.studyGuideUrl = this.getStudyGuideUrl();
   }
@@ -103,15 +97,9 @@ export class TopicStorySectionComponent implements OnInit {
   }
 
   private getStudyGuideUrl(): string {
-    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
-      return '#';
-    }
-    return this.urlInterpolationService.interpolateUrl(
-      ClassroomDomainConstants.TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE,
-      {
-        classroom_url_fragment: this.classroomUrlFragment,
-        topic_url_fragment: this.topicUrlFragment,
-      }
+    return this.urlService.getLearnerTopicStudyGuideUrl(
+      this.classroomUrlFragment,
+      this.topicUrlFragment
     );
   }
 

@@ -27,12 +27,20 @@ import {TopicStorySectionComponent} from './topic-story-section.component';
 describe('TopicStorySectionComponent', () => {
   let component: TopicStorySectionComponent;
   let fixture: ComponentFixture<TopicStorySectionComponent>;
-  let urlService: UrlService;
+  let urlService: jasmine.SpyObj<UrlService>;
 
   beforeEach(waitForAsync(() => {
+    urlService = jasmine.createSpyObj('UrlService', [
+      'getClassroomUrlFragmentFromLearnerUrl',
+      'getTopicUrlFragmentFromLearnerUrl',
+      'getLearnerTopicStudyGuideUrl',
+    ]);
     TestBed.configureTestingModule({
       declarations: [TopicStorySectionComponent],
-      providers: [UrlInterpolationService, UrlService],
+      providers: [
+        UrlInterpolationService,
+        {provide: UrlService, useValue: urlService},
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -40,15 +48,24 @@ describe('TopicStorySectionComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TopicStorySectionComponent);
     component = fixture.componentInstance;
-    urlService = TestBed.inject(UrlService);
+    urlService = TestBed.inject(UrlService) as jasmine.SpyObj<UrlService>;
 
     component.storyTitle = 'Help Jaime win the Arcade Game';
     component.storyDescription =
       "In this story, we'll follow Jaime and his sister Nic as they learn.";
-    component.classroomUrlFragment = 'math';
-    component.topicUrlFragment = 'place-values';
     component.lessonCount = 2;
     component.practiceCount = 1;
+
+    urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('math');
+    urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue(
+      'place-values'
+    );
+    urlService.getLearnerTopicStudyGuideUrl.and.callFake(
+      (classroomFragment: string, topicFragment: string) =>
+        classroomFragment && topicFragment
+          ? `/learn/${classroomFragment}/${topicFragment}/studyguide`
+          : '#'
+    );
 
     fixture.detectChanges();
   });
@@ -63,32 +80,19 @@ describe('TopicStorySectionComponent', () => {
     );
   });
 
-  it('should build the study guide URL for Study Skills CTA', () => {
-    const el: HTMLElement = fixture.nativeElement;
-    const link = el.querySelector<HTMLAnchorElement>('.study-skills-cta');
-
-    expect(link).toBeTruthy();
-    expect(link?.getAttribute('href')).toContain(
-      '/learn/math/place-values/studyguide'
-    );
+  it('should set the study guide url on init', () => {
+    expect(component.studyGuideUrl).toBe('/learn/math/place-values/studyguide');
   });
 
-  it('should read URL fragments from URL service when inputs are absent', () => {
-    component.classroomUrlFragment = '';
-    component.topicUrlFragment = '';
-
-    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
-      'science'
+  it('should read URL fragments from URL service on init', () => {
+    expect(urlService.getClassroomUrlFragmentFromLearnerUrl).toHaveBeenCalled();
+    expect(urlService.getTopicUrlFragmentFromLearnerUrl).toHaveBeenCalled();
+    expect(urlService.getLearnerTopicStudyGuideUrl).toHaveBeenCalledWith(
+      'math',
+      'place-values'
     );
-    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-      'matter'
-    );
-
-    component.ngOnInit();
-
-    expect(component.studyGuideUrl).toContain(
-      '/learn/science/matter/studyguide'
-    );
+    expect(component.classroomUrlFragment).toBe('math');
+    expect(component.topicUrlFragment).toBe('place-values');
   });
 
   it('should switch to fallback avatar URL when image load fails', () => {
@@ -124,16 +128,14 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should keep study guide URL as # when URL fragments are unavailable', () => {
-    component.classroomUrlFragment = '';
-    component.topicUrlFragment = '';
-
-    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
-      ''
-    );
-    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
-
+    urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('');
+    urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue('');
     component.ngOnInit();
 
     expect(component.studyGuideUrl).toBe('#');
+    expect(urlService.getLearnerTopicStudyGuideUrl).toHaveBeenCalledWith(
+      '',
+      ''
+    );
   });
 });

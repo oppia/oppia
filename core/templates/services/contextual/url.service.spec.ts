@@ -236,6 +236,21 @@ describe('Url Service', () => {
     }).toThrowError('Invalid URL for classroom');
   });
 
+  it('should correctly construct learner classroom and story urls', () => {
+    expect(urlService.getLearnerClassroomUrl('math')).toBe('/learn/math');
+    expect(urlService.getLearnerClassroomUrl('')).toBe('/learn');
+    expect(urlService.getLearnerTopicStoryUrl('math', 'place-values')).toBe(
+      '/learn/math/place-values/story'
+    );
+    expect(urlService.getLearnerTopicStoryUrl('', 'place-values')).toBe(
+      '/learn'
+    );
+    expect(
+      urlService.getLearnerTopicStudyGuideUrl('math', 'place-values')
+    ).toBe('/learn/math/place-values/studyguide');
+    expect(urlService.getLearnerTopicStudyGuideUrl('math', '')).toBe('#');
+  });
+
   it('should correctly retrieve selected subtopics from url', () => {
     mockLocation.pathname = '/practice_session/topicName';
     mockLocation.search = '?selected_subtopic_ids=abcdefgijklm';

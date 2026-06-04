@@ -19,8 +19,6 @@
         *ngFor="let storyData of canonicalStorySectionData; trackBy: trackStoryDataById"
         [storyTitle]="storyData.storyTitle"
         [storyDescription]="storyData.storyDescription"
-        [classroomUrlFragment]="classroomUrlFragment"
-        [topicUrlFragment]="topicUrlFragment"
         [lessonCount]="storyData.lessonCount"
         [practiceCount]="storyData.practiceCount">
       </topic-story-section>
