@@ -110,6 +110,7 @@ describe('Exploration editor tab component', () => {
         ) => {
           value1({number: 1});
           value1({number: 2});
+          value1({number: 3});
           value1({number: 4});
           value1({number: 5});
           value1({number: 6});
@@ -1198,5 +1199,30 @@ describe('Exploration editor tab component', () => {
     flush();
 
     expect(component.validationErrorIsShown).toBe(true);
+  }));
+
+  it('should scroll to interaction element when tutorial reaches step 3', fakeAsync(() => {
+    stateEditorService.setActiveStateName('First State');
+    editabilityService.onStartTutorial();
+
+    component.startTutorial();
+    tick(1000);
+
+    expect(document.getElementById).toHaveBeenCalledWith(
+      'tutorialStateInteraction'
+    );
+    flush();
+  }));
+
+  it('should set tutorialInProgress to false when tutorial ends', fakeAsync(() => {
+    stateEditorService.setActiveStateName('First State');
+    editabilityService.onStartTutorial();
+    component.initStateEditor();
+
+    component.leaveTutorial();
+    expect(component.tutorialInProgress).toBe(false);
+
+    flush();
+    flush();
   }));
 });
