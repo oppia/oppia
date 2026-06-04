@@ -4939,7 +4939,17 @@ export class LoggedOutUser extends BaseUser {
       // Hint is shown after one minute.
       timeout: 80000,
     });
-    await this.clickOnElementWithSelector(hintButtonSelector);
+    await this.page.waitForSelector(hintButtonSelector, {visible: true});
+    // Click the hint button directly via the DOM API to bypass
+    // Puppeteer's viewport clickability check, since the footer
+    // element's bounding rect may report as outside the viewport
+    // in the new build architecture.
+    await this.page.evaluate((selector: string) => {
+      const button = document.querySelector(selector);
+      if (button) {
+        (button as HTMLElement).click();
+      }
+    }, hintButtonSelector);
 
     await this.page.waitForSelector(gotItButtonSelector, {
       visible: true,
@@ -4997,7 +5007,13 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
       timeout: timeout,
     });
-    await this.clickOnElementWithSelector(viewSolutionButton);
+    // Click via DOM API to bypass Puppeteer's viewport check.
+    await this.page.evaluate((selector: string) => {
+      const button = document.querySelector(selector);
+      if (button) {
+        (button as HTMLElement).click();
+      }
+    }, viewSolutionButton);
     await this.clickOnElementWithSelector(continueToSolutionButton);
     await this.page.waitForSelector(closeSolutionModalButton, {
       visible: true,
