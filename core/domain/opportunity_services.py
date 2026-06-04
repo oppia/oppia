@@ -1325,7 +1325,7 @@ def _get_translation_opportunity_cards_from_models(
         skills = skill_fetchers.get_multi_skills(entity_ids, strict=False)
         skill_map = {skill.id: skill for skill in skills if skill is not None}
 
-    elif entity_type == feconf.ENTITY_TYPE_TOPIC:
+    else:
         topics = topic_fetchers.get_topics_by_ids(entity_ids, strict=False)
         topic_map = {topic.id: topic for topic in topics if topic is not None}
 
@@ -1375,7 +1375,7 @@ def _get_translation_opportunity_cards_from_models(
             if model.topic_ids:
                 currently_available_to_learners = True
 
-        elif entity_type == feconf.ENTITY_TYPE_TOPIC:
+        else:
             currently_available_to_learners = (
                 model.entity_id in published_topic_ids
             )
@@ -1401,7 +1401,7 @@ def _get_translation_opportunity_cards_from_models(
             skill_val_obj = skill_map.get(model.entity_id)
             if skill_val_obj:
                 entity_description = skill_val_obj.description
-        elif entity_type == feconf.ENTITY_TYPE_TOPIC:
+        else:
             topic_val_obj = topic_map.get(model.entity_id)
             if topic_val_obj:
                 entity_description = topic_val_obj.name

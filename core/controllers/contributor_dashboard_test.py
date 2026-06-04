@@ -2993,6 +2993,213 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
             expected_status_int=400,
         )
 
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_handler_returns_empty_opportunities_when_logged_out(self) -> None:
+        self.logout()
+        response = self.get_json(
+            '%s?language_code=hi&entity_type=exploration'
+            % feconf.REVIEWABLE_OPPORTUNITIES_V2_URL
+        )
+        self.assertEqual(response['opportunities'], [])
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_handler_handles_language_code_none(self) -> None:
+        user_services.allow_user_to_review_translation_in_language(
+            self.admin_id, 'hi'
+        )
+        self.signup('suggester@example.com', 'suggester')
+        suggester_id = self.get_user_id_from_email('suggester@example.com')
+        change_dict: Dict[str, change_domain.AcceptableChangeDictTypes] = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': '<p>Content</p>',
+            'translation_html': '<p>Translation</p>',
+            'data_format': 'html',
+        }
+
+        subtopics_1 = [
+            topic_domain.Subtopic(
+                1,
+                'Title 1',
+                ['skill_id_1'],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'dummy-subtopic-one',
+            )
+        ]
+        self.save_new_topic(
+            'topic_id_1',
+            self.admin_id,
+            name='Topic 1',
+            abbreviated_name='topic-one',
+            url_fragment='topic-one',
+            subtopics=subtopics_1,
+            next_subtopic_id=2,
+        )
+        topic_services.publish_topic('topic_id_1', self.admin_id)
+
+        self.save_new_valid_exploration('exp_1', self.admin_id)
+        exp = exp_fetchers.get_exploration_by_id('exp_1')
+        # Here we use cast because change_dict values are AcceptableChangeDictTypes
+        # (Union), but state_name is always a str for this change cmd.
+        state_name = cast(str, change_dict['state_name'])
+        # Here we use cast because change_dict values are AcceptableChangeDictTypes
+        # (Union), but content_id is always a str for this change cmd.
+        content_id = cast(str, change_dict['content_id'])
+        change_dict['content_html'] = exp.get_content_html(
+            state_name, content_id
+        )
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp_1',
+            exp.version,
+            suggester_id,
+            change_dict,
+            'Translation suggestion',
+        )
+
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='exp_1',
+            topic_ids=['topic_id_1'],
+            content_count=2,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+        ).put()
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        response = self.get_json(
+            '%s?entity_type=exploration'
+            % feconf.REVIEWABLE_OPPORTUNITIES_V2_URL
+        )
+        self.assertEqual(len(response['opportunities']), 1)
+        self.assertEqual(response['opportunities'][0]['entity_id'], 'exp_1')
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_handler_filters_opportunities_by_topic_name(self) -> None:
+        user_services.allow_user_to_review_translation_in_language(
+            self.admin_id, 'hi'
+        )
+        self.signup('suggester@example.com', 'suggester')
+        suggester_id = self.get_user_id_from_email('suggester@example.com')
+        change_dict: Dict[str, change_domain.AcceptableChangeDictTypes] = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': '<p>Content</p>',
+            'translation_html': '<p>Translation</p>',
+            'data_format': 'html',
+        }
+
+        subtopics_1 = [
+            topic_domain.Subtopic(
+                1,
+                'Title 1',
+                ['skill_id_1'],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'dummy-subtopic-one',
+            )
+        ]
+        self.save_new_topic(
+            'topic_id_1',
+            self.admin_id,
+            name='Topic 1',
+            abbreviated_name='topic-one',
+            url_fragment='topic-one',
+            subtopics=subtopics_1,
+            next_subtopic_id=2,
+        )
+        topic_services.publish_topic('topic_id_1', self.admin_id)
+
+        subtopics_2 = [
+            topic_domain.Subtopic(
+                1,
+                'Title 2',
+                ['skill_id_2'],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'dummy-subtopic-two',
+            )
+        ]
+        self.save_new_topic(
+            'topic_id_2',
+            self.admin_id,
+            name='Topic 2',
+            abbreviated_name='topic-two',
+            url_fragment='topic-two',
+            subtopics=subtopics_2,
+            next_subtopic_id=2,
+        )
+        topic_services.publish_topic('topic_id_2', self.admin_id)
+
+        self.save_new_valid_exploration('exp_1', self.admin_id)
+        exp = exp_fetchers.get_exploration_by_id('exp_1')
+        # Here we use cast because change_dict values are AcceptableChangeDictTypes
+        # (Union), but state_name is always a str for this change cmd.
+        state_name = cast(str, change_dict['state_name'])
+        # Here we use cast because change_dict values are AcceptableChangeDictTypes
+        # (Union), but content_id is always a str for this change cmd.
+        content_id = cast(str, change_dict['content_id'])
+        change_dict['content_html'] = exp.get_content_html(
+            state_name, content_id
+        )
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp_1',
+            exp.version,
+            suggester_id,
+            change_dict,
+            'Translation suggestion',
+        )
+
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='exp_1',
+            topic_ids=['topic_id_1'],
+            content_count=2,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+        ).put()
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        # Query filtering by topic name 'Topic 1'.
+        response = self.get_json(
+            '%s?language_code=hi&entity_type=exploration&topic_name=Topic+1'
+            % feconf.REVIEWABLE_OPPORTUNITIES_V2_URL
+        )
+        self.assertEqual(len(response['opportunities']), 1)
+        self.assertEqual(response['opportunities'][0]['entity_id'], 'exp_1')
+
+        # Query filtering by topic name 'Topic 2', which should return empty list.
+        response = self.get_json(
+            '%s?language_code=hi&entity_type=exploration&topic_name=Topic+2'
+            % feconf.REVIEWABLE_OPPORTUNITIES_V2_URL
+        )
+        self.assertEqual(response['opportunities'], [])
+
 
 class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
     """Unit test for the TranslatableContentsHandlerV2."""
