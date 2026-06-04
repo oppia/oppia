@@ -277,7 +277,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
       .addContributionReviewerAsync(
         formResponse.category ?? '',
         formResponse.username,
-        formResponse.languageCode ?? ''
+        formResponse.languageCode
       )
       .then(
         () => {
@@ -307,7 +307,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
       this.contributorDashboardAdminBackendApiService
         .viewContributionReviewersAsync(
           formResponse.category ?? '',
-          formResponse.languageCode ?? ''
+          formResponse.languageCode
         )
         .then(usersObject => {
           this.contributionReviewersResult.usernames = usersObject.usernames;
@@ -369,7 +369,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
       .removeContributionReviewerAsync(
         formResponse.category ?? '',
         formResponse.username,
-        formResponse.languageCode ?? ''
+        formResponse.languageCode
       )
       .then(
         () => {

@@ -95,6 +95,8 @@ export interface Opportunity {
   labelColor: string;
   actionButtonTitle: string;
   translationWordCount?: number;
+  isPinned?: boolean;
+  topicName?: string;
 }
 
 export interface GetOpportunitiesResponse {
@@ -744,6 +746,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
                 labelText: '',
                 labelColor: '',
                 actionButtonTitle: 'Translations',
+                isPinned: opportunity.isPinned,
+                topicName: opportunity.topicName,
               };
               opportunitiesDicts.push(opportunityDict);
             }

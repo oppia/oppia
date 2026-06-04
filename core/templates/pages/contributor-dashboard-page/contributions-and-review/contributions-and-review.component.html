@@ -86,7 +86,7 @@
       <login-required-message></login-required-message>
     </div>
     <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
-      <div *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive()" class="oppia-language-selector-container">
+      <div *ngIf="activeExplorationId === '' && isReviewTranslationsTab() && !isAccomplishmentsTabActive()" class="oppia-language-selector-container">
         <review-translation-language-selector class="oppia-language-selector e2e-test-language-dropdown"
                                               [activeLanguageCode]="languageCode"
                                               (setActiveLanguageCode)="onChangeLanguage($event)">
@@ -107,8 +107,8 @@
           </select>
         </span>
       </div>
-      <lazy-loading *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive() && !topicReady"></lazy-loading>
-      <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive() && topicReady"
+      <lazy-loading *ngIf="activeExplorationId === '' && isReviewTranslationsTab() && !isAccomplishmentsTabActive() && !topicReady"></lazy-loading>
+      <oppia-opportunities-list *ngIf="activeExplorationId === '' && isReviewTranslationsTab() && !isAccomplishmentsTabActive() && topicReady"
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
                                 (clickPinButton)="pinReviewableTranslationOpportunity($event)"
@@ -118,7 +118,7 @@
                                 [showPinUnpinButton]="true"
                                 #opportunitiesList>
       </oppia-opportunities-list>
-      <div *ngIf="(activeExplorationId !== null || !isReviewTranslationsTab()) && !isAccomplishmentsTabActive()">
+      <div *ngIf="(activeExplorationId !== '' || !isReviewTranslationsTab()) && !isAccomplishmentsTabActive()">
         <div *ngIf="isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
           <button aria-label="Back to reviewable lessons"
                   (click)="onClickBackToReviewableLessons()"
