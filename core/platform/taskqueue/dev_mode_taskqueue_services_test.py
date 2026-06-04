@@ -134,10 +134,14 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
     def test_task_handler_uses_configured_app_engine_host(self) -> None:
         queue_name = 'dummy_queue'
         dummy_url = '/dummy_handler'
-        # Here we use type Any because the payload has no constraints.
+        # Here we use type Any because the payload has no constraints on its
+        # values, so Dict[str, Any] is the appropriate type.
         correct_payload: Dict[str, Any] = {}
         configured_host = '0.0.0.0'
 
+        # Here we use type Any because this function mocks requests.post
+        # function where the type of JSON has been defined as Any, hence using
+        # Dict[str, Any] here.
         def mock_post(
             url: str,
             json: Dict[str, Any],
