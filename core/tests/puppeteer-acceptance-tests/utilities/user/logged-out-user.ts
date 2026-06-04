@@ -1757,9 +1757,12 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(footerForumlink, {
       visible: true,
     });
-    await this.clickAndWaitForNavigation(footerForumlink, true);
-
-    expect(this.page.url()).toBe(googleGroupsOppiaUrl);
+    await this.clickLinkButtonToNewTab(
+      footerForumlink,
+      'Forum',
+      googleGroupsOppiaUrl,
+      'Forum'
+    );
   }
 
   /**
