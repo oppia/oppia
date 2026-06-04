@@ -57,7 +57,7 @@
   font-family: Roboto, Arial, sans-serif;
   margin: 0;
 }
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .topic-header-breadcrumbs-desktop {
     display: none;
   }

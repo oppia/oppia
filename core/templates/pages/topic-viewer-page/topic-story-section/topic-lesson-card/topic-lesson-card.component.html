@@ -9,6 +9,13 @@
     <div class="topic-lesson-card-copy">
       <h3 class="topic-lesson-card-title">{{ lessonTitle }}</h3>
       <p class="topic-lesson-card-description">{{ lessonDescription }}</p>
+      <div class="topic-lesson-card-progress">
+  <div class="progress-step progress-step-active"></div>
+  <div class="progress-line"></div>
+  <div class="progress-step"></div>
+  <div class="progress-line"></div>
+  <div class="progress-step"></div>
+</div>
     </div>
     <a class="topic-lesson-card-start-button"
        [attr.href]="startUrl || '#'"
