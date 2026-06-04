@@ -153,7 +153,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      ) ?? undefined
+      )
     );
   }
 
@@ -242,7 +242,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      ) ?? undefined
+      )
     );
   }
 
@@ -355,7 +355,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
         this.hasLoaded = false;
         this.interactionDetailsCacheService.reset();
         this.responsesService.onInitializeAnswerGroups.emit({
-          interactionId: stateData.interaction.id as string,
+          interactionId: stateData.interaction.id,
           answerGroups: stateData.interaction.answerGroups,
           defaultOutcome: stateData.interaction.defaultOutcome as Outcome,
           confirmedUnclassifiedAnswers:
