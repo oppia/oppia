@@ -27,6 +27,9 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 import './topic-story-section.component.css';
 
+const PRIMARY_AVATAR_IMAGE_PATH = '/avatar/oppia_avatar_large_100px.svg';
+const FALLBACK_AVATAR_IMAGE_PATH = '/general/collection_mascot.svg';
+
 @Component({
   selector: 'topic-story-section',
   templateUrl: './topic-story-section.component.html',
@@ -44,11 +47,6 @@ export class TopicStorySectionComponent implements OnInit {
 
   oppiaAvatarImageUrl: string = '';
   studyGuideUrl: string = '#';
-
-  private readonly primaryAvatarImagePath: string =
-    '/avatar/oppia_avatar_large_100px.svg';
-  private readonly fallbackAvatarImagePath: string =
-    '/general/collection_mascot.svg';
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -119,13 +117,13 @@ export class TopicStorySectionComponent implements OnInit {
 
   private getPrimaryAvatarImageUrl(): string {
     return this.urlInterpolationService.getStaticImageUrl(
-      this.primaryAvatarImagePath
+      PRIMARY_AVATAR_IMAGE_PATH
     );
   }
 
   private getFallbackAvatarImageUrl(): string {
     return this.urlInterpolationService.getStaticCopyrightedImageUrl(
-      this.fallbackAvatarImagePath
+      FALLBACK_AVATAR_IMAGE_PATH
     );
   }
 }
