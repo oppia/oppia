@@ -1258,7 +1258,13 @@ class StoryContents:
         Returns:
             list(str). A list of exploration ids from published nodes.
         """
-        return self.get_all_linked_exp_ids()[: self.get_published_node_count()]
+        exp_ids = []
+        for node in self.get_ordered_nodes():
+            if node.status != constants.STORY_NODE_STATUS_PUBLISHED:
+                break
+            if node.exploration_id is not None:
+                exp_ids.append(node.exploration_id)
+        return exp_ids
 
     def get_published_node_count(self) -> int:
         """Returns the number of published nodes of story content.
@@ -1267,7 +1273,7 @@ class StoryContents:
             int. Number of published nodes.
         """
         published_node_count = 0
-        for node in self.nodes:
+        for node in self.get_ordered_nodes():
             if node.status != constants.STORY_NODE_STATUS_PUBLISHED:
                 break
             published_node_count += 1
