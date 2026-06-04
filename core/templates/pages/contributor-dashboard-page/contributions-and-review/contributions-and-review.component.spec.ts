@@ -1680,6 +1680,8 @@ describe('Contributions and review component', () => {
               labelText: '',
               labelColor: '',
               actionButtonTitle: 'Translations',
+              isPinned: false,
+              topicName: 'Topic 1',
             },
             {
               id: '2',
@@ -1688,6 +1690,8 @@ describe('Contributions and review component', () => {
               labelText: '',
               labelColor: '',
               actionButtonTitle: 'Translations',
+              isPinned: false,
+              topicName: 'Topic 2',
             },
           ]);
           expect(more).toEqual(false);
