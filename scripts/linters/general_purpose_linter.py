@@ -737,7 +737,7 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
 
             file_content = self.file_cache.read(filepath)
 
-            # Load allowlist and skip if filepath is allowlisted
+            # Load allowlist and skip if filepath is allowlisted.
             allowlist_path = os.path.join(
                 os.getcwd(), 'scripts', 'linters', 'modal_allowlist.json'
             )

@@ -231,5 +231,11 @@
     "core/templates/pages/voiceover-admin-page/voiceover-admin-page.component.ts",
     "core/templates/services/keyboard-shortcut.service.ts",
     "core/templates/services/rte-helper-modal.component.ts",
-    "core/templates/services/suggestion-modal.service.ts"
+    "core/templates/services/suggestion-modal.service.ts",
+    "extensions/interactions/NumberWithUnits/directives/oppia-help-modal-number-with-units.component.ts",
+    "extensions/interactions/PencilCodeEditor/directives/pencil-code-reset-confirmation.component.ts",
+    "extensions/objects/templates/image-with-regions-reset-confirmation.component.ts",
+    "extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component.ts",
+    "extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component.ts",
+    "extensions/visualizations/oppia-visualization-sorted-tiles.component.ts"
 ]

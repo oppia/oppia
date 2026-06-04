@@ -761,3 +761,25 @@ class GeneralLintTests(test_utils.LinterTestBase):
         self.assertEqual(lint_task_report.trimmed_messages, [])
         self.assertEqual('Modal component pattern', lint_task_report.name)
         self.assertFalse(lint_task_report.failed)
+
+    def test_spec_files_are_skipped(self) -> None:
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            ['scripts/linters/test_files/valid_modal_component.spec.ts'],
+            FILE_CACHE,
+        )
+        lint_task_report = linter.check_modal_component_patterns()
+        self.assertEqual(lint_task_report.trimmed_messages, [])
+        self.assertEqual('Modal component pattern', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
+
+    def test_allowlisted_files_are_skipped(self) -> None:
+        allowlisted_file = (
+            'core/templates/base-components/oppia-footer.component.ts'
+        )
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [allowlisted_file], FILE_CACHE
+        )
+        lint_task_report = linter.check_modal_component_patterns()
+        self.assertEqual(lint_task_report.trimmed_messages, [])
+        self.assertEqual('Modal component pattern', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
