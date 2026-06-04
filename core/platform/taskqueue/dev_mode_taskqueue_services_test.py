@@ -26,7 +26,6 @@ from core.tests import test_utils
 
 import requests
 from typing import Any, Dict, Optional
-from core import feconf
 
 
 class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
@@ -135,13 +134,14 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
     def test_task_handler_uses_configured_app_engine_host(self) -> None:
         queue_name = 'dummy_queue'
         dummy_url = '/dummy_handler'
+        # Here we use type Any because the payload has no constraints.
         correct_payload: Dict[str, Any] = {}
         configured_host = '0.0.0.0'
 
         def mock_post(
             url: str,
             json: Dict[str, Any],
-            headers: Dict[str, str],
+            headers: Dict[str, str],  # pylint: disable=unused-argument
             timeout: int,
         ) -> None:
             self.assertEqual(
