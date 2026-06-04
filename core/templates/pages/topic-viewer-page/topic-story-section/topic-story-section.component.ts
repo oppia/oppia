@@ -13,14 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Slimmed-down story section for the redesigned topic viewer
- * page. This component intentionally exposes a minimal, input-driven API so
- * parents can supply precomputed values (title, description, URL fragments,
- * and counts) and the component remains presentational.
+ * @fileoverview Redesigned story section for the topic viewer page.
+ * The component now derives lesson cards from the full StorySummary so the
+ * rendered UI can show real lesson metadata and direct lesson links.
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-// TranslateService removed for localized strings revert.
 
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -44,13 +42,13 @@ export class TopicStorySectionComponent implements OnInit {
   @Input() practiceCount: number = 0;
   @Input() lessonCount: number = 0;
 
+  oppiaAvatarImageUrl: string = '';
+  studyGuideUrl: string = '#';
+
   private readonly primaryAvatarImagePath: string =
     '/avatar/oppia_avatar_large_100px.svg';
   private readonly fallbackAvatarImagePath: string =
     '/general/collection_mascot.svg';
-
-  oppiaAvatarImageUrl: string = '';
-  studyGuideUrl: string = '#';
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -102,6 +100,10 @@ export class TopicStorySectionComponent implements OnInit {
     );
   }
 
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
   private getStudyGuideUrl(): string {
     if (!this.classroomUrlFragment || !this.topicUrlFragment) {
       return '#';
@@ -125,9 +127,5 @@ export class TopicStorySectionComponent implements OnInit {
     return this.urlInterpolationService.getStaticCopyrightedImageUrl(
       this.fallbackAvatarImagePath
     );
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }

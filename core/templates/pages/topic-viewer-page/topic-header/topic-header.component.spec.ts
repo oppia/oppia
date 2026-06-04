@@ -223,7 +223,9 @@ describe('TopicHeaderComponent', () => {
     expect(mobileTopicBackLink?.textContent).toContain(
       'I18N_SUBTOPIC_VIEWER_BACK_TO_TOPIC'
     );
-    expect(mobileTopicBackLink?.textContent).toContain('Place Values');
+    expect(mobileTopicBackLink?.getAttribute('href')).toContain(
+      '/learn/math/place-values'
+    );
   });
 
   it('should show classroom URL fragment in study skills breadcrumb when classroomName is missing', () => {
@@ -237,7 +239,7 @@ describe('TopicHeaderComponent', () => {
       );
 
     expect(studySkillsLinks.length).toBeGreaterThan(0);
-    expect(studySkillsLinks[0].textContent).toContain('math');
+    expect(studySkillsLinks[0].getAttribute('href')).toContain('/learn/math');
   });
 
   it('should show classroom URL fragment in default desktop breadcrumb when classroomName is missing', () => {
@@ -251,6 +253,6 @@ describe('TopicHeaderComponent', () => {
       );
 
     expect(desktopLinks.length).toBeGreaterThan(1);
-    expect(desktopLinks[1].textContent).toContain('math');
+    expect(desktopLinks[1].getAttribute('href')).toContain('/learn/math');
   });
 });

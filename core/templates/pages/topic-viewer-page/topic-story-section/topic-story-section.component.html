@@ -18,14 +18,14 @@
            [attr.aria-label]="storyTitle ? ('Story summary: ' + storyTitle) : 'Story summary'">
     <div class="story-card-header">
       <div class="story-card-header-left">
-        <h3 class="story-title">{{ storyTitle }}</h3>
+        <h3 class="story-title"><span class="story-label">Story: </span>“{{ storyTitle }}”</h3>
         <p class="story-meta" [attr.aria-label]="getStoryMetaAriaLabel()">
           {{ getStoryMetaText() }}
         </p>
       </div>
       <div class="story-card-header-right">
         <a class="study-skills-cta" [href]="studyGuideUrl" [attr.aria-label]="'Open Study Skills for ' + (storyTitle || 'this story')">
-          <img class="study-skills-icon" src="/assets/images/icons/study-skills-icon.png" alt="" aria-hidden="true">
+          <mat-icon class="study-skills-icon" aria-hidden="true">sticky_note_2</mat-icon>
           <span>Study Skills</span>
         </a>
       </div>
