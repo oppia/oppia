@@ -62,6 +62,7 @@ import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
 import {MobileMenuService} from 'pages/exploration-player-page/services/mobile-menu.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import {CollectionSummary} from 'domain/collection/collection-summary.model';
 
 @Component({
   selector: 'oppia-new-conversation-skin',
@@ -88,7 +89,7 @@ export class NewConversationSkinComponent {
   isIframed!: boolean;
   OPPIA_AVATAR_IMAGE_URL!: string;
   correctnessFooterIsShown: boolean = true;
-  collectionSummary: string | null = null;
+  collectionSummary: CollectionSummary | null = null;
   pidInUrl!: string | null;
   submitButtonIsDisabled = true;
   isLearnerReallyStuck: boolean = false;
@@ -351,7 +352,11 @@ export class NewConversationSkinComponent {
         this.collectionPlayerBackendApiService
           .fetchCollectionSummariesAsync(collectionId)
           .then(response => {
-            this.collectionSummary = response.summaries[0];
+            if (response.summaries && response.summaries.length > 0) {
+              this.collectionSummary = CollectionSummary.createFromBackendDict(
+                response.summaries[0]
+              );
+            }
           })
           .catch(() => {
             this.alertsService.addWarning(
