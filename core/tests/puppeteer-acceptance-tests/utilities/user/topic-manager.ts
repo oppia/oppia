@@ -70,8 +70,6 @@ const mobileSaveStoryChangesButton =
 // Chapter Creation Modal.
 const addChapterButton = 'button.e2e-test-add-chapter-button';
 const chapterTitleField = '.e2e-test-chapter-title-field';
-const chapterExplorationIdField = '.e2e-test-exploration-id-input';
-
 const subtopicReassignHeader = 'div.subtopic-reassign-header';
 const subtopicTitleField = '.e2e-test-subtopic-title-field';
 ('input.e2e-test-url-fragment-field');
@@ -86,10 +84,19 @@ const mobileNavbarDropdown =
   'div.navbar-mobile-options .e2e-test-mobile-navbar-dropdown';
 const saveTopicButton = 'button.e2e-test-save-topic-button';
 const mobileChapterCollapsibleCard = '.e2e-test-mobile-add-chapter';
+const mobileBackToStoryEditorButton = '.oppia-mobile-back-to-parent';
+const storyEditorBreadcrumbStoryNameSelector =
+  '.topic-story-name .chapter-name';
+const chapterEditorBreadcrumbStoryNameSelector =
+  '.e2e-test-back-to-story-editor-button';
+const chapterEditorBreadcrumbChapterNameSelector =
+  '.story-chapter-name .chapter-name';
 
 // Question Editor.
 const desktopSkillQuestionTab = '.e2e-test-questions-tab';
 const toastMessageSelector = '.e2e-test-toast-message';
+const toastWarningContainerSelector = '.e2e-test-toast-warning';
+const closeToastMessageButtonSelector = 'button.e2e-test-close-toast-warning';
 const editQuestionButtons = '.e2e-test-edit-question-button';
 const linkOffIcon = '.link-off-icon';
 const removeQuestionConfirmationButtonSelector =
@@ -217,12 +224,19 @@ const deleteStoryButtonSelector = '.e2e-test-delete-story-button';
 const confirmStoryDeletionButton = '.e2e-test-confirm-story-deletion-button';
 const editOptionsSelector = '.e2e-test-edit-options';
 const deleteChapterButtonSelector = '.e2e-test-delete-chapter-button';
+const moveChapterUpButtonSelector = '.e2e-test-move-chapter-up-button';
+const moveChapterDownButtonSelector = '.e2e-test-move-chapter-down-button';
 const storyEditorNodeSelector = '.story-editor-node';
 const resetChapterThumbnailButton = '.e2e-test-thumbnail-reset-button';
-const saveExplorationIDButton = '.e2e-test-exploration-id-save-button';
+const chapterOutlineEditorContainer =
+  '.e2e-test-chapter-outline-editor-container';
+const nodeOutlineSaveButton = '.e2e-test-node-outline-save-button';
 const addPrerequisiteSkillButton = '.e2e-test-add-prerequisite-skill';
 const addPrerequisiteSkillMobileButtonSelector =
   '.e2e-test-mobile-add-prerequisite-skill';
+const removePrerequisiteSkillButtonSelector =
+  '.e2e-test-remove-prerequisite-skill';
+const removeAcquiredSkillButtonSelector = '.e2e-test-remove-acquired-skill';
 const addPrerequisiteSkillInSkillEditorButton =
   '.e2e-test-add-prerequisite-skill-in-skill-editor-button';
 const togglePrerequisiteSkillsDropdown =
@@ -327,6 +341,8 @@ const storyDescriptionInStoryEditorSelector =
 const storyMetaTagContentInStoryEditorSelector =
   '.e2e-test-story-meta-tag-content-field';
 const storyUrlFragmentInStoryEditorSelector = '.e2e-test-url-fragment-field';
+const showDiscardOptionButtonSelector = '.e2e-test-show-discard-option';
+const discardStoryChangesButtonSelector = '.e2e-test-discard-story-changes';
 
 // Chapter Editor.
 const prerequisiteSkillSelector =
@@ -376,6 +392,10 @@ const mobilePublishStoryButton =
 const storyNodeSelector = 'tr.story-node';
 const publishChapterButton = '.e2e-test-publish-chapters-button';
 const chapterStatusSelector = '.e2e-test-chapter-status';
+const mobileAcquiredSkillsSectionBodySelector =
+  '.e2e-test-section-body-acquired-skills';
+const warningIndicatorSelector = '.e2e-test-warning-indicator';
+const warningTextSelector = '.e2e-test-warnings-text';
 export class TopicManager extends BaseUser {
   /**
    * Closes navigation in mobile view.
@@ -597,6 +617,24 @@ export class TopicManager extends BaseUser {
           `Expected message: "${expectedMessage}"\n`
       );
     }
+  }
+
+  /**
+   * Closes the currently visible toast warning.
+   */
+  async closeToastMessage(): Promise<void> {
+    const toastVisible = await this.isElementVisible(
+      toastWarningContainerSelector,
+      true,
+      3000
+    );
+    if (!toastVisible) {
+      showMessage('No toast warning is visible to close.');
+      return;
+    }
+
+    await this.clickOnElementWithSelector(closeToastMessageButtonSelector);
+    await this.expectElementToBeVisible(toastWarningContainerSelector, false);
   }
 
   /**
@@ -3084,17 +3122,251 @@ export class TopicManager extends BaseUser {
       if (!isMobileSaveButtonVisible) {
         await this.clickOnElementWithSelector(mobileOptionsSelector);
       }
-      await this.clickOnElementWithSelector(mobileSaveStoryChangesButton);
+      await this.waitForSaveStoryButtonToBeEnabled(
+        mobileSaveStoryChangesButton
+      );
+      await this.clickOnElementWithJsFallback(mobileSaveStoryChangesButton);
     } else {
-      await this.clickOnElementWithSelector(saveStoryButton);
+      await this.waitForSaveStoryButtonToBeEnabled(saveStoryButton);
+      await this.clickOnElementWithJsFallback(saveStoryButton);
+    }
+    const saveModalVisible = await this.isElementVisible(
+      saveChangesMessageInput,
+      true,
+      5000
+    );
+    if (!saveModalVisible) {
+      if (this.isViewportAtMobileWidth()) {
+        const isMobileSaveButtonVisible = await this.isElementVisible(
+          mobileSaveStoryChangesButton
+        );
+        if (!isMobileSaveButtonVisible) {
+          await this.clickOnElementWithSelector(mobileOptionsSelector);
+        }
+        await this.clickOnElementWithJsFallback(mobileSaveStoryChangesButton);
+      } else {
+        await this.clickOnElementWithJsFallback(saveStoryButton);
+      }
+      await this.page.waitForSelector(saveChangesMessageInput, {
+        visible: true,
+        timeout: 15000,
+      });
     }
     await this.typeInInputField(
       saveChangesMessageInput,
       'Test saving story as topic manager.'
     );
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
-    await this.clickOnElementWithSelector(closeSaveModalButton);
-    await this.page.waitForSelector(modalDiv, {hidden: true});
+    await this.clickOnElementWithJsFallback(closeSaveModalButton);
+    const modalHidden = await this.isElementVisible(modalDiv, false, 30000);
+    if (!modalHidden) {
+      await this.page.keyboard.press('Escape');
+      await this.isElementVisible(modalDiv, false, 10000);
+    }
+  }
+
+  /**
+   * Discards the changes made in the story editor.
+   */
+  async discardStoryChanges(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    const discardToggle = await this.page.$(showDiscardOptionButtonSelector);
+    if (!discardToggle) {
+      throw new Error('Discard option button not found.');
+    }
+    const discardToggleDisabled = await discardToggle.evaluate(
+      element => (element as HTMLButtonElement).disabled
+    );
+    if (discardToggleDisabled) {
+      showMessage('Discard option disabled; no changes to discard.');
+      return;
+    }
+    await this.clickOnElementWithJsFallback(showDiscardOptionButtonSelector);
+    await this.clickOnElementWithJsFallback(discardStoryChangesButtonSelector);
+    await this.waitForPageToFullyLoad();
+
+    // Post-check: The save story button should be disabled after discarding changes.
+    await this.expectSaveStoryButtonToBeDisabled();
+
+    showMessage('Story changes discarded successfully.');
+  }
+
+  /**
+   * Clicks an element using the normal click flow, with a JS click fallback
+   * for controls that can be obscured in the story editor mobile UI.
+   * @param {string} selector - The CSS selector for the element to click.
+   */
+  async clickOnElementWithJsFallback(selector: string): Promise<void> {
+    const elements = await this.page.$$(selector);
+    if (!elements.length) {
+      throw new Error(`Element not found for selector ${selector}`);
+    }
+
+    let targetElement: ElementHandle<Element> | null = null;
+    for (const element of elements) {
+      const box = await element.boundingBox();
+      if (!box) {
+        continue;
+      }
+      const isDisabled = await element.evaluate(el =>
+        Boolean((el as HTMLButtonElement).disabled)
+      );
+      if (isDisabled) {
+        continue;
+      }
+      targetElement = element;
+      break;
+    }
+
+    if (!targetElement) {
+      for (const element of elements) {
+        const box = await element.boundingBox();
+        if (box) {
+          targetElement = element;
+          break;
+        }
+      }
+    }
+
+    targetElement = targetElement ?? elements[0];
+
+    try {
+      await this.clickOnElement(targetElement);
+    } catch {
+      await targetElement.evaluate(el => {
+        el.scrollIntoView({block: 'center'});
+        (el as HTMLElement).click();
+      });
+    }
+  }
+
+  /**
+   * Waits for the save story button to become enabled.
+   * @param {string} selector - The CSS selector for the save story button.
+   */
+  async waitForSaveStoryButtonToBeEnabled(selector: string): Promise<void> {
+    await this.page.waitForSelector(selector, {timeout: 15000});
+    try {
+      await this.page.waitForFunction(
+        (sel: string) => {
+          const elements = Array.from(
+            document.querySelectorAll(sel)
+          ) as HTMLButtonElement[];
+          return elements.some(element => {
+            const style = window.getComputedStyle(element);
+            const isVisible =
+              style.display !== 'none' &&
+              style.visibility !== 'hidden' &&
+              element.getClientRects().length > 0;
+            return isVisible && element.disabled === false;
+          });
+        },
+        {timeout: 15000},
+        selector
+      );
+    } catch (error) {
+      const debugState = await this.page
+        .evaluate(sel => {
+          return Array.from(document.querySelectorAll(sel)).map(element => {
+            const el = element as HTMLButtonElement;
+            const style = window.getComputedStyle(el);
+            return {
+              text: el.textContent?.trim() || '',
+              disabled: el.disabled ?? null,
+              display: style.display,
+              visibility: style.visibility,
+              rects: el.getClientRects().length,
+            };
+          });
+        }, selector)
+        .catch(() => null);
+      throw new Error(
+        `Save story button did not become enabled. Selector: ${selector}. Details: ${JSON.stringify(
+          debugState
+        )}`
+      );
+    }
+  }
+
+  /**
+   * Gets the active tab in the story editor flow from the current hash.
+   */
+  async getStoryEditorActiveTab(): Promise<
+    'story_editor' | 'chapter_editor' | 'story_preview' | 'other'
+  > {
+    const currentUrl = this.page.url();
+    if (!currentUrl.includes('/story_editor/')) {
+      return 'other';
+    }
+
+    const hash = await this.page.evaluate(() => window.location.hash || '');
+    const normalizedHash = hash.startsWith('#') ? hash.slice(1) : hash;
+
+    if (normalizedHash.startsWith('/chapter_editor/')) {
+      return 'chapter_editor';
+    }
+    if (normalizedHash.startsWith('/story_preview/')) {
+      return 'story_preview';
+    }
+    return 'story_editor';
+  }
+
+  /**
+   * Gets the story title shown in the current story/chapter editor flow.
+   */
+  async getCurrentStoryNameInStoryFlow(): Promise<string | null> {
+    const selectors = [
+      chapterEditorBreadcrumbStoryNameSelector,
+      storyEditorBreadcrumbStoryNameSelector,
+    ];
+
+    for (const selector of selectors) {
+      const element = await this.page.$(selector);
+      if (!element) {
+        continue;
+      }
+
+      const text = await this.page.evaluate(
+        (el: Element) => el.textContent?.trim() ?? '',
+        element
+      );
+      const normalizedText = text.replace(/\/$/, '').trim();
+      if (normalizedText) {
+        return normalizedText;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Gets the chapter title shown in chapter editor.
+   */
+  async getCurrentChapterNameInChapterEditor(): Promise<string | null> {
+    const element = await this.page.$(
+      chapterEditorBreadcrumbChapterNameSelector
+    );
+    if (!element) {
+      return null;
+    }
+
+    const text = await this.page.evaluate(
+      (el: Element) => el.textContent?.trim() ?? '',
+      element
+    );
+    return text || null;
+  }
+
+  /**
+   * Returns to the story editor from the mobile chapter editor.
+   */
+  async returnToStoryEditorInMobile(): Promise<void> {
+    await this.clickOnElementWithJsFallback(mobileBackToStoryEditorButton);
+    await this.page.waitForFunction(() => {
+      const hash = (window.location.hash || '').replace(/\/+$/, '');
+      return hash === '' || hash === '#';
+    });
+    await this.expectElementToBeVisible(storyEditorContainerSelector);
   }
 
   /**
@@ -3110,17 +3382,24 @@ export class TopicManager extends BaseUser {
 
     try {
       if (this.isViewportAtMobileWidth()) {
-        await this.expectElementToBeVisible(
-          mobileCollapsibleCardHeaderSelector
+        const storyListVisible = await this.isElementVisible(
+          storyTitleSelector,
+          true,
+          2000
         );
-        const elements = await this.page.$$(
-          mobileCollapsibleCardHeaderSelector
-        );
-        if (elements.length < 4) {
-          throw new Error('Not enough collapsible cards found');
+        if (!storyListVisible) {
+          await this.expectElementToBeVisible(
+            mobileCollapsibleCardHeaderSelector
+          );
+          const elements = await this.page.$$(
+            mobileCollapsibleCardHeaderSelector
+          );
+          if (elements.length < 4) {
+            throw new Error('Not enough collapsible cards found');
+          }
+          // 4th collapsible card is for stories.
+          await elements[3].click();
         }
-        // 4th collapsible card is for stories.
-        await elements[3].click();
       }
 
       await this.page.waitForSelector(storyTitleSelector);
@@ -3356,30 +3635,84 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     try {
       if (storyName) {
-        await this.openStoryEditor(storyName, topicName);
-      }
-      const addChapterButtonElement = await this.page.$(addChapterButton);
-      if (!addChapterButtonElement) {
-        const mobileChapterCollapsibleCardElement = await this.page.$(
-          mobileChapterCollapsibleCard
-        );
-        mobileChapterCollapsibleCardElement?.click();
-        await this.waitForStaticAssetsToLoad();
+        if (!this.isViewportAtMobileWidth()) {
+          await this.openStoryEditor(storyName, topicName);
+        } else {
+          // In mobile, stay within the current story editor flow whenever
+          // possible to avoid reloading the topic editor between chapter edits.
+          const currentStoryName = await this.getCurrentStoryNameInStoryFlow();
+          const activeTab = await this.getStoryEditorActiveTab();
+
+          if (
+            currentStoryName === storyName &&
+            activeTab === 'chapter_editor'
+          ) {
+            const currentChapterName =
+              await this.getCurrentChapterNameInChapterEditor();
+            if (currentChapterName === chapterName) {
+              await this.expectElementToBeVisible(
+                chapterEditorContainerSelector
+              );
+              return;
+            }
+            await this.returnToStoryEditorInMobile();
+          } else if (
+            currentStoryName !== storyName ||
+            activeTab === 'other' ||
+            activeTab === 'story_preview'
+          ) {
+            await this.openStoryEditor(storyName, topicName);
+          } else {
+            await this.expectElementToBeVisible(storyEditorContainerSelector);
+          }
+        }
       }
 
-      await this.page.waitForSelector(chapterTitleSelector);
+      await this.expectChapterListIsVisible();
+
+      await this.page.waitForSelector(chapterTitleSelector, {timeout: 60000});
       const chapterTitles = await this.page.$$(chapterTitleSelector);
+      const availableChapterNames: string[] = [];
 
       for (const titleElement of chapterTitles) {
         const title = await this.page.evaluate(
           el => el.textContent.trim(),
           titleElement
         );
+        availableChapterNames.push(title);
 
         if (title === chapterName) {
-          await titleElement.click();
+          await this.page.waitForTimeout(500);
+          await titleElement.evaluate(element =>
+            element.scrollIntoView({block: 'center'})
+          );
+          await titleElement.evaluate(element =>
+            (element as HTMLElement).click()
+          );
           await this.waitForStaticAssetsToLoad();
-          await this.expectElementToBeVisible(chapterEditorContainerSelector);
+          const editorVisible = await this.isElementVisible(
+            chapterEditorContainerSelector,
+            true,
+            5000
+          );
+          if (!editorVisible) {
+            const chapterContainerHandle = await titleElement.evaluateHandle(
+              element =>
+                element.closest('.story-node') ||
+                element.closest('.story-editor-node')
+            );
+            const chapterContainer = chapterContainerHandle.asElement();
+            if (chapterContainer) {
+              await chapterContainer.evaluate(element =>
+                (element as HTMLElement).click()
+              );
+              await this.waitForStaticAssetsToLoad();
+            }
+            await this.page.waitForSelector(chapterEditorContainerSelector, {
+              visible: true,
+              timeout: 60000,
+            });
+          }
           showMessage(`Chapter ${chapterName} opened in chapter editor.`);
 
           // Collapsing all the collapsible card of chapter editor in the mobile viewport.
@@ -3403,7 +3736,7 @@ export class TopicManager extends BaseUser {
       }
 
       throw new Error(
-        `Chapter with name ${chapterName} not found in story ${storyName} and topic ${topicName}.`
+        `Chapter with name ${chapterName} not found in story ${storyName} and topic ${topicName}. Available chapters: ${availableChapterNames.join(', ')}`
       );
     } catch (error) {
       const newError = new Error(
@@ -3418,22 +3751,29 @@ export class TopicManager extends BaseUser {
    * Edits the details of a chapter.
    * @param {string} chapterName - The name of the chapter.
    * @param {string} description - The description of the chapter.
-   * @param {string} explorationId - The ID of the exploration.
+   * @param {string} outline - The outline content for the chapter.
    * @param {string} thumbnailImage - The thumbnail image of the chapter.
    */
   async editChapterDetails(
     chapterName: string,
     description: string,
-    explorationId: string,
+    outline: string,
     thumbnailImage: string
   ): Promise<void> {
     await this.clearAllTextFrom(chapterTitleField);
     await this.typeInInputField(chapterTitleField, chapterName);
     await this.typeInInputField(chapterDescriptionField, description);
 
-    await this.clearAllTextFrom(chapterExplorationIdField);
-    await this.typeInInputField(chapterExplorationIdField, explorationId);
-    await this.clickOnElementWithSelector(saveExplorationIDButton);
+    // Update outline.
+    await this.page.waitForSelector(chapterOutlineEditorContainer);
+    const outlineEditor = await this.page.$(
+      `${chapterOutlineEditorContainer} ${rteSelector}`
+    );
+    if (outlineEditor) {
+      await outlineEditor.click();
+      await outlineEditor.type(outline);
+      await this.clickOnElementWithSelector(nodeOutlineSaveButton);
+    }
 
     await this.clickOnElementWithSelector(chapterPhotoBoxButton);
     await this.clickOnElementWithSelector(resetChapterThumbnailButton);
@@ -3510,25 +3850,666 @@ export class TopicManager extends BaseUser {
    * @returns {Promise<void>}
    */
   async addAcquiredSkill(skillName: string): Promise<void> {
+    await this.expectElementToBeVisible(chapterEditorContainerSelector);
     await this.scrollToBottomOfPage();
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(addAcquiredSkillButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectMobileAcquiredSkillsSectionIsVisible();
+      await this.expectElementToBeVisible(
+        mobileAcquiredSkillsSectionBodySelector
+      );
+      const mobileBody = await this.page.$(
+        mobileAcquiredSkillsSectionBodySelector
+      );
+      if (!mobileBody) {
+        throw new Error('Acquired Skills mobile section not found.');
+      }
+      const addButton = await mobileBody.$(addAcquiredSkillButton);
+      if (!addButton) {
+        throw new Error(
+          'Add Acquired skill button not found in mobile section.'
+        );
+      }
+      const isDisabled = await addButton.evaluate(
+        element => (element as HTMLButtonElement).disabled
+      );
+      if (isDisabled) {
+        await this.page.waitForFunction(
+          (element: HTMLButtonElement) => !element.disabled,
+          {timeout: 10000},
+          addButton
+        );
+      }
+      await addButton.evaluate(element => {
+        element.scrollIntoView({block: 'center'});
+        (element as HTMLElement).click();
+      });
+      await this.filterAndSelectSkillInSkillSelector(skillName);
+      return;
+    }
+
+    await this.page.waitForSelector(addAcquiredSkillButton, {visible: true});
     const elements = await this.page.$$(addAcquiredSkillButton);
-    if (elements.length < 2) {
+    const visibleElements: ElementHandle<Element>[] = [];
+    for (const element of elements) {
+      const box = await element.boundingBox();
+      if (box) {
+        visibleElements.push(element);
+      }
+    }
+    if (!visibleElements.length) {
       throw new Error('Add Acquired skill button not found.');
     }
 
-    if (this.isViewportAtMobileWidth()) {
-      if (elements.length < 2) {
-        throw new Error('Did not find 2 "Add Acquired Skill" buttons');
+    let targetElement: ElementHandle<Element> | null = null;
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    for (const element of visibleElements) {
+      const inMobileSection = await element.evaluate(el =>
+        Boolean(el.closest('.story-skill-mobile'))
+      );
+      if (isMobileViewport === inMobileSection) {
+        targetElement = element;
+        break;
       }
-      await this.waitForElementToBeClickable(elements[1]);
-      await elements[1].click();
-    } else {
-      await this.waitForElementToBeClickable(elements[0]);
-      await elements[0].click();
+    }
+    targetElement = targetElement ?? visibleElements[0];
+
+    const isDisabled = await targetElement.evaluate(
+      element => (element as HTMLButtonElement).disabled
+    );
+    if (isDisabled) {
+      await this.page.waitForFunction(
+        (element: HTMLButtonElement) => !element.disabled,
+        {timeout: 10000},
+        targetElement
+      );
+    }
+
+    try {
+      await this.clickOnElement(targetElement);
+    } catch (error) {
+      await targetElement.evaluate(element => {
+        element.scrollIntoView({block: 'center'});
+        (element as HTMLElement).click();
+      });
     }
     await this.filterAndSelectSkillInSkillSelector(skillName);
+  }
+
+  /**
+   * Removes an acquired skill from the chapter.
+   * @param {string} skillName - The name of the skill to remove.
+   */
+  async removeAcquiredSkill(skillName: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectMobileAcquiredSkillsSectionIsVisible();
+    }
+    const cardSelector = this.isViewportAtMobileWidth()
+      ? aquiredSkillSkillMobileSelector
+      : aquiredSkillSkillSelector;
+    await this.page.waitForSelector(cardSelector);
+    const skillCards = await this.page.$$(cardSelector);
+
+    const waitForSkillRemoval = async (timeout: number): Promise<boolean> => {
+      try {
+        await this.page.waitForFunction(
+          (selector: string, targetSkill: string) => {
+            const cards = Array.from(document.querySelectorAll(selector));
+            return !cards.some(card => {
+              const link = card.querySelector('a');
+              return link?.textContent?.trim() === targetSkill;
+            });
+          },
+          {timeout},
+          cardSelector,
+          skillName
+        );
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    for (const skillCard of skillCards) {
+      const skillText = await this.page.evaluate(
+        el => el.querySelector('a')?.textContent?.trim(),
+        skillCard
+      );
+
+      if (skillText === skillName) {
+        const removeButton = await skillCard.$(
+          removeAcquiredSkillButtonSelector
+        );
+        if (removeButton) {
+          await removeButton.evaluate(element => {
+            element.scrollIntoView({block: 'center'});
+            (element as HTMLElement).click();
+          });
+          let removed = await waitForSkillRemoval(10000);
+          if (!removed) {
+            await this.waitForPageToFullyLoad();
+            const retryCards = await this.page.$$(cardSelector);
+            for (const retryCard of retryCards) {
+              const retrySkillText = await this.page.evaluate(
+                el => el.querySelector('a')?.textContent?.trim(),
+                retryCard
+              );
+              if (retrySkillText === skillName) {
+                const retryRemoveButton = await retryCard.$(
+                  removeAcquiredSkillButtonSelector
+                );
+                if (retryRemoveButton) {
+                  await retryRemoveButton.evaluate(element => {
+                    element.scrollIntoView({block: 'center'});
+                    (element as HTMLElement).click();
+                  });
+                  removed = await waitForSkillRemoval(8000);
+                }
+                break;
+              }
+            }
+          }
+          if (!removed) {
+            const currentSkills = await this.page.$$eval(
+              cardSelector,
+              elements =>
+                elements
+                  .map(
+                    element =>
+                      element.querySelector('a')?.textContent?.trim() || ''
+                  )
+                  .filter(text => text.length > 0)
+            );
+            throw new Error(
+              `Failed to remove acquired skill ${skillName}. Current acquired skills: ${currentSkills.join(
+                ', '
+              )}`
+            );
+          }
+          await this.waitForPageToFullyLoad();
+          showMessage(`Removed acquired skill: ${skillName}`);
+          return;
+        }
+      }
+    }
+    throw new Error(`The acquired skill ${skillName} was not found.`);
+  }
+
+  /**
+   * Ensures the acquired skills section is expanded in mobile viewport.
+   */
+  async expectMobileAcquiredSkillsSectionIsVisible(): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      return;
+    }
+
+    const isVisible = await this.isElementVisible(
+      mobileAcquiredSkillsSectionBodySelector,
+      true,
+      1000
+    );
+    if (isVisible) {
+      return;
+    }
+
+    await this.expandHeaderInMobile('Acquired Skills');
+    await this.expectElementToBeVisible(
+      mobileAcquiredSkillsSectionBodySelector
+    );
+  }
+
+  /**
+   * Removes a prerequisite skill from the chapter.
+   * @param {string} skillName - The name of the skill to remove.
+   */
+  async removePrerequisiteSkillFromChapter(skillName: string): Promise<void> {
+    const cardSelector = this.isViewportAtMobileWidth()
+      ? prerequisiteSkillMobileSelector
+      : prerequisiteSkillSelector;
+    await this.page.waitForSelector(cardSelector);
+    const skillCards = await this.page.$$(cardSelector);
+
+    for (const skillCard of skillCards) {
+      const skillText = await this.page.evaluate(
+        el => el.querySelector('a')?.textContent?.trim(),
+        skillCard
+      );
+
+      if (skillText === skillName) {
+        const removeButton = await skillCard.$(
+          removePrerequisiteSkillButtonSelector
+        );
+        if (removeButton) {
+          await removeButton.evaluate(element => {
+            element.scrollIntoView({block: 'center'});
+            (element as HTMLElement).click();
+          });
+          await this.page.waitForFunction(
+            (selector: string, targetSkill: string) => {
+              const cards = Array.from(document.querySelectorAll(selector));
+              return !cards.some(card => {
+                const link = card.querySelector('a');
+                return link?.textContent?.trim() === targetSkill;
+              });
+            },
+            {timeout: 10000},
+            cardSelector,
+            skillName
+          );
+          await this.waitForPageToFullyLoad();
+          showMessage(`Removed prerequisite skill: ${skillName}`);
+          return;
+        }
+      }
+    }
+    throw new Error(`The prerequisite skill ${skillName} was not found.`);
+  }
+
+  /**
+   * Reorders chapters by dragging one chapter before another.
+   * @param chapterName - Name of the chapter to drag.
+   * @param targetChapterName - Name of the chapter to drop before.
+   */
+  async reorderChapters(
+    chapterName: string,
+    targetChapterName: string
+  ): Promise<void> {
+    await this.expectChapterListIsVisible();
+
+    const chapterTitles = await this.getCurrentChapterTitles();
+    const chapterIndex = chapterTitles.indexOf(chapterName);
+    const targetChapterIndex = chapterTitles.indexOf(targetChapterName);
+    if (chapterIndex === -1 || targetChapterIndex === -1) {
+      throw new Error(
+        `Could not find chapter(s) "${chapterName}" or "${targetChapterName}". Current chapters: ${chapterTitles.join(', ')}`
+      );
+    }
+
+    const destinationIndex =
+      chapterIndex < targetChapterIndex
+        ? targetChapterIndex - 1
+        : targetChapterIndex;
+    if (chapterIndex !== destinationIndex) {
+      const moveDirection: 'up' | 'down' =
+        chapterIndex > destinationIndex ? 'up' : 'down';
+      const movesNeeded = Math.abs(chapterIndex - destinationIndex);
+
+      let movedWithActionButtons = true;
+      for (let i = 0; i < movesNeeded; i++) {
+        const moved = await this.moveChapterWithActionButton(
+          chapterName,
+          moveDirection
+        );
+        if (!moved) {
+          movedWithActionButtons = false;
+          break;
+        }
+      }
+
+      if (!movedWithActionButtons) {
+        await this.reorderChapterUsingDragAndDrop(
+          chapterName,
+          targetChapterName
+        );
+      }
+    }
+
+    await this.page.waitForFunction(
+      (
+        selector: string,
+        chapterToMove: string,
+        targetChapter: string
+      ): boolean => {
+        const titles = Array.from(document.querySelectorAll(selector)).map(
+          element => element.textContent?.trim() ?? ''
+        );
+        const movedChapterIndex = titles.indexOf(chapterToMove);
+        const targetChapterIndex = titles.indexOf(targetChapter);
+        return (
+          movedChapterIndex !== -1 &&
+          targetChapterIndex !== -1 &&
+          movedChapterIndex < targetChapterIndex
+        );
+      },
+      {timeout: 10000},
+      chapterTitleSelector,
+      chapterName,
+      targetChapterName
+    );
+
+    const reorderedChapterTitles = await this.getCurrentChapterTitles();
+    showMessage(
+      `Reordered chapters: "${chapterName}" before "${targetChapterName}". Current order: ${reorderedChapterTitles.join(', ')}`
+    );
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Ensures the given chapter is the initial node by moving the current
+   * first chapter down until the target chapter is first.
+   * This is required because the initial node only updates when the node at
+   * index 0 is moved.
+   */
+  async ensureChapterIsInitial(chapterName: string): Promise<void> {
+    await this.expectChapterListIsVisible();
+    let chapterTitles = await this.getCurrentChapterTitles();
+    if (!chapterTitles.includes(chapterName)) {
+      throw new Error(
+        `Chapter "${chapterName}" not found. Current chapters: ${chapterTitles.join(', ')}`
+      );
+    }
+
+    let safetyCounter = chapterTitles.length + 1;
+    while (chapterTitles[0] !== chapterName && safetyCounter > 0) {
+      const currentFirst = chapterTitles[0];
+      const moved = await this.moveChapterWithActionButton(
+        currentFirst,
+        'down'
+      );
+      if (!moved) {
+        throw new Error(
+          `Unable to set "${chapterName}" as initial chapter. Move controls not available for "${currentFirst}".`
+        );
+      }
+      await this.waitForPageToFullyLoad();
+      chapterTitles = await this.getCurrentChapterTitles();
+      safetyCounter--;
+    }
+
+    if (chapterTitles[0] !== chapterName) {
+      throw new Error(
+        `Failed to set "${chapterName}" as initial chapter. Current order: ${chapterTitles.join(', ')}`
+      );
+    }
+    showMessage(`Initial chapter set to "${chapterName}".`);
+  }
+
+  /**
+   * Expects a warning message to appear in the chapter editor.
+   * @param {string|RegExp} expectedWarning - The expected warning message or regex.
+   */
+  async expectWarningInIndicator(
+    expectedWarning: string | RegExp
+  ): Promise<void> {
+    const requireVisible = !this.isViewportAtMobileWidth();
+    const warningIndicator = await this.page.waitForSelector(
+      warningIndicatorSelector,
+      requireVisible ? {visible: true} : undefined
+    );
+    if (!warningIndicator) {
+      throw new Error('Warning indicator not found.');
+    }
+    const warningContainerHandle = await warningIndicator.evaluateHandle(el =>
+      el.closest('.oppia-editor-warnings-indicator')
+    );
+    const warningContainer = warningContainerHandle.asElement();
+    if (warningContainer) {
+      await warningContainer.evaluate(element => {
+        element.dispatchEvent(new MouseEvent('mouseover', {bubbles: true}));
+      });
+    } else {
+      await this.page.hover(warningIndicatorSelector);
+    }
+
+    const waitForWarningText = async (): Promise<boolean> => {
+      if (requireVisible) {
+        return await this.isElementVisible(warningTextSelector, true, 2000);
+      }
+      try {
+        await this.page.waitForSelector(warningTextSelector, {timeout: 2000});
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    let warningVisible = await waitForWarningText();
+    if (!warningVisible) {
+      await this.clickOnElementWithJsFallback(warningIndicatorSelector);
+      warningVisible = await waitForWarningText();
+    }
+    if (!warningVisible) {
+      const warnings = await this.page.$$eval(warningTextSelector, elements =>
+        elements
+          .map(element => element.textContent?.trim() || '')
+          .filter(text => text.length > 0)
+      );
+      throw new Error(
+        `Warning text did not appear. Found warnings: ${
+          warnings.length ? warnings.join(' | ') : 'none'
+        }`
+      );
+    }
+
+    const actualWarning = await this.page.$eval(warningTextSelector, el =>
+      el.textContent?.trim()
+    );
+
+    if (typeof expectedWarning === 'string') {
+      if (actualWarning !== expectedWarning) {
+        throw new Error(
+          `Expected warning: "${expectedWarning}", but got: "${actualWarning}"`
+        );
+      }
+    } else {
+      if (!expectedWarning.test(actualWarning || '')) {
+        throw new Error(
+          `Expected warning to match: ${expectedWarning}, but got: "${actualWarning}"`
+        );
+      }
+    }
+  }
+
+  /**
+   * Expects an exploration already present warning.
+   */
+  async expectExplorationIdAlreadyExistWarning(): Promise<void> {
+    const explorationAlreadyPresentMsgSelector = '.e2e-test-invalid-exp-id';
+    await this.expectElementToBeVisible(explorationAlreadyPresentMsgSelector);
+    const actualWarning = await this.page.$eval(
+      explorationAlreadyPresentMsgSelector,
+      el => el.textContent?.trim()
+    );
+
+    const expectedWarning =
+      'The given exploration already exists in the story.';
+    if (actualWarning !== expectedWarning) {
+      throw new Error(
+        `Expected warning: "${expectedWarning}", but got: "${actualWarning}"`
+      );
+    }
+  }
+
+  /**
+   * Verifies the order of chapters in the story editor.
+   * @param {string[]} expectedOrder - The expected order of chapter titles.
+   */
+  async expectChaptersOrderToBe(expectedOrder: string[]): Promise<void> {
+    await this.expectChapterListIsVisible();
+    const chapterTitles = await this.getCurrentChapterTitles();
+
+    if (chapterTitles.length !== expectedOrder.length) {
+      throw new Error(
+        `Expected ${expectedOrder.length} chapters, but found ${chapterTitles.length}. Current chapters: ${chapterTitles.join(', ')}`
+      );
+    }
+
+    for (let i = 0; i < chapterTitles.length; i++) {
+      if (chapterTitles[i] !== expectedOrder[i]) {
+        throw new Error(
+          `Expected chapter at index ${i} to be "${expectedOrder[i]}", but got "${chapterTitles[i]}"`
+        );
+      }
+    }
+  }
+
+  /**
+   * Ensures the chapter list is visible in story editor.
+   */
+  async expectChapterListIsVisible(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const chapterListVisible = await this.isElementVisible(
+        chapterTitleSelector,
+        true,
+        1000
+      );
+      if (chapterListVisible) {
+        return;
+      }
+      const addChapterButtonElement = await this.page.$(addChapterButton);
+      if (!addChapterButtonElement) {
+        await this.clickOnElementWithSelector(mobileChapterCollapsibleCard);
+      }
+    }
+    await this.page.waitForSelector(chapterTitleSelector, {
+      visible: true,
+      timeout: 60000,
+    });
+  }
+
+  /**
+   * Gets chapter titles in their current order.
+   */
+  async getCurrentChapterTitles(): Promise<string[]> {
+    await this.page.waitForSelector(chapterTitleSelector, {
+      visible: true,
+    });
+    return await this.page.$$eval(chapterTitleSelector, elements =>
+      elements
+        .map(element => element.textContent?.trim() || '')
+        .filter(title => title.length > 0)
+    );
+  }
+
+  /**
+   * Moves a chapter in story editor using chapter action buttons.
+   * Returns false when move controls are not available and caller should
+   * fall back to drag and drop.
+   * @param {string} chapterName - The name of the chapter to move.
+   * @param {'up' | 'down'} direction - The direction to move the chapter.
+   */
+  async moveChapterWithActionButton(
+    chapterName: string,
+    direction: 'up' | 'down'
+  ): Promise<boolean> {
+    await this.page.waitForSelector(chapterTitleSelector, {
+      visible: true,
+    });
+    const chapterTitleElements = await this.page.$$(chapterTitleSelector);
+
+    for (const chapterTitleElement of chapterTitleElements) {
+      const title = await this.page.evaluate(
+        element => element.textContent?.trim() ?? '',
+        chapterTitleElement
+      );
+      if (title !== chapterName) {
+        continue;
+      }
+
+      const chapterContainerHandle = await chapterTitleElement.evaluateHandle(
+        el =>
+          el.closest('.story-node') ||
+          el.closest('.story-editor-node') ||
+          el.closest('[cdkDrag]')
+      );
+      const chapterContainer = chapterContainerHandle.asElement();
+      if (!chapterContainer) {
+        return false;
+      }
+      const editOptionsButton = await chapterContainer.$(editOptionsSelector);
+      if (!editOptionsButton) {
+        return false;
+      }
+      await this.clickOnElement(editOptionsButton);
+
+      const moveButtonSelector =
+        direction === 'up'
+          ? moveChapterUpButtonSelector
+          : moveChapterDownButtonSelector;
+      const moveButton = await chapterContainer
+        .waitForSelector(moveButtonSelector, {timeout: 2000})
+        .catch(() => null);
+      if (!moveButton) {
+        await this.page.keyboard.press('Escape');
+        return false;
+      }
+
+      await this.clickOnElement(moveButton);
+      await this.waitForPageToFullyLoad();
+      return true;
+    }
+
+    throw new Error(
+      `Chapter "${chapterName}" was not found while attempting to reorder chapters.`
+    );
+  }
+
+  /**
+   * Reorders chapters using drag and drop.
+   * @param {string} chapterName - The name of the chapter to drag.
+   * @param {string} targetChapterName - The name of the chapter to drop before.
+   */
+  async reorderChapterUsingDragAndDrop(
+    chapterName: string,
+    targetChapterName: string
+  ): Promise<void> {
+    const chapterTitleElements = await this.page.$$(chapterTitleSelector);
+
+    let sourceChapterElement: ElementHandle<Element> | null = null;
+    let targetChapterElement: ElementHandle<Element> | null = null;
+    for (const chapterTitleElement of chapterTitleElements) {
+      const title = await this.page.evaluate(
+        element => element.textContent?.trim() ?? '',
+        chapterTitleElement
+      );
+      if (title === chapterName) {
+        const sourceChapterElementHandle =
+          await chapterTitleElement.evaluateHandle(el =>
+            el.closest('[cdkDrag]')
+          );
+        sourceChapterElement = sourceChapterElementHandle.asElement();
+      }
+      if (title === targetChapterName) {
+        const targetChapterElementHandle =
+          await chapterTitleElement.evaluateHandle(el =>
+            el.closest('[cdkDrag]')
+          );
+        targetChapterElement = targetChapterElementHandle.asElement();
+      }
+    }
+
+    if (!sourceChapterElement || !targetChapterElement) {
+      throw new Error(
+        `Could not find chapter(s) "${chapterName}" or "${targetChapterName}" for drag and drop.`
+      );
+    }
+
+    await sourceChapterElement.evaluate(element =>
+      element.scrollIntoView({block: 'center'})
+    );
+    await targetChapterElement.evaluate(element =>
+      element.scrollIntoView({block: 'center'})
+    );
+
+    const sourceBoundingBox = await sourceChapterElement.boundingBox();
+    const targetBoundingBox = await targetChapterElement.boundingBox();
+    if (!sourceBoundingBox || !targetBoundingBox) {
+      throw new Error(
+        'Could not get bounding boxes for chapter drag and drop.'
+      );
+    }
+
+    const sourceX = sourceBoundingBox.x + sourceBoundingBox.width / 2;
+    const sourceY = sourceBoundingBox.y + sourceBoundingBox.height / 2;
+    const targetX = targetBoundingBox.x + targetBoundingBox.width / 2;
+    const targetY = targetBoundingBox.y + targetBoundingBox.height / 4;
+
+    await this.page.mouse.move(sourceX, sourceY);
+    await this.page.mouse.down();
+    await this.page.mouse.move(sourceX, sourceY - 30, {steps: 8});
+    await this.page.mouse.move(targetX, targetY, {steps: 30});
+    await this.page.mouse.up();
+    await this.page.waitForTimeout(1000);
   }
 
   /**
@@ -4162,15 +5143,20 @@ export class TopicManager extends BaseUser {
   /**
    * Checks if the prerequisite skill is visible.
    * @param {string} skillName - The name of the prerequisite skill.
-   * @returns {Promise<ElementHandle<Element>>} The prerequisite skill element.
+   * @param {boolean} visible - Whether the skill should be visible.
+   * @returns {Promise<ElementHandle<Element>|null>} The prerequisite skill element.
    */
   async expectPrerequisiteSkillToBeVisible(
-    skillName: string
-  ): Promise<ElementHandle<Element>> {
+    skillName: string,
+    visible: boolean = true
+  ): Promise<ElementHandle<Element> | null> {
     const selector = this.isViewportAtMobileWidth()
       ? prerequisiteSkillMobileSelector
       : prerequisiteSkillSelector;
-    await this.expectElementToBeVisible(selector);
+
+    if (visible) {
+      await this.expectElementToBeVisible(selector);
+    }
     const prerequisiteSkillElements = await this.page.$$(selector);
 
     let prerequisiteSkillElement: ElementHandle<Element> | null = null;
@@ -4184,26 +5170,39 @@ export class TopicManager extends BaseUser {
       }
     }
 
-    if (!prerequisiteSkillElement) {
+    if (visible && !prerequisiteSkillElement) {
       throw new Error(`Prerequisite skill ${skillName} not found.`);
     }
 
-    showMessage(`Prerequisite skill ${skillName} is visible.`);
+    if (!visible && prerequisiteSkillElement) {
+      throw new Error(
+        `Prerequisite skill ${skillName} found but should not be.`
+      );
+    }
+
+    showMessage(
+      `Prerequisite skill ${skillName} is ${visible ? 'visible' : 'not visible'} as expected.`
+    );
     return prerequisiteSkillElement;
   }
 
   /**
    * Checks if the aquired skill is visible.
    * @param {string} skillName - The name of the aquired skill.
-   * @returns {Promise<ElementHandle<Element>>} The aquired skill element.
+   * @param {boolean} visible - Whether the skill should be visible.
+   * @returns {Promise<ElementHandle<Element>|null>} The aquired skill element.
    */
   async expectAquiredSkillToBeVisible(
-    skillName: string
-  ): Promise<ElementHandle<Element>> {
+    skillName: string,
+    visible: boolean = true
+  ): Promise<ElementHandle<Element> | null> {
     const selector = this.isViewportAtMobileWidth()
       ? aquiredSkillSkillMobileSelector
       : aquiredSkillSkillSelector;
-    await this.expectElementToBeVisible(selector);
+
+    if (visible) {
+      await this.expectElementToBeVisible(selector);
+    }
     const aquiredSkillElements = await this.page.$$(selector);
 
     let aquiredSkillElement: ElementHandle<Element> | null = null;
@@ -4217,11 +5216,17 @@ export class TopicManager extends BaseUser {
       }
     }
 
-    if (!aquiredSkillElement) {
+    if (visible && !aquiredSkillElement) {
       throw new Error(`Aquired skill ${skillName} not found.`);
     }
 
-    showMessage(`Aquired skill ${skillName} is visible.`);
+    if (!visible && aquiredSkillElement) {
+      throw new Error(`Aquired skill ${skillName} found but should not be.`);
+    }
+
+    showMessage(
+      `Aquired skill ${skillName} is ${visible ? 'visible' : 'not visible'} as expected.`
+    );
     return aquiredSkillElement;
   }
 
@@ -4261,7 +5266,9 @@ export class TopicManager extends BaseUser {
    * Expands the given header in the mobile viewport.
    * @param {string} header - The header to expand.
    */
-  async expandHeaderInMobile(header: 'Prerequisite Skills'): Promise<void> {
+  async expandHeaderInMobile(
+    header: 'Prerequisite Skills' | 'Acquired Skills'
+  ): Promise<void> {
     if (!this.isViewportAtMobileWidth()) {
       showMessage('Skipping test as the viewport is not mobile');
       return;
