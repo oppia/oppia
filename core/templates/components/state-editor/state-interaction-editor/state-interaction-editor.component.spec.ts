@@ -189,7 +189,7 @@ describe('State Interaction component', () => {
           {} as unknown as InteractionCustomizationArgs,
           null,
           [],
-          'id',
+          'TextInput',
           null
         ),
         [],

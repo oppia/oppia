@@ -100,6 +100,23 @@ describe('Rule Editor Component', () => {
     component.ngOnDestroy();
   });
 
+  it('should throw error when computing rule description without interaction', () => {
+    component.rule = new Rule(
+      'Equals',
+      {
+        x: 'Text',
+      },
+      {
+        x: 'TranslatableSetOfNormalizedString',
+      }
+    );
+    component.currentInteractionId = null;
+
+    expect(() => component.computeRuleDescriptionFragments()).toThrowError(
+      'Cannot compute rule descriptions without interaction.'
+    );
+  });
+
   it('should intitialize properties of ListOfSetsOfTranslatableHtmlContentIds', fakeAsync(() => {
     spyOn(component, 'computeRuleDescriptionFragments').and.stub();
     component.rule = new Rule(

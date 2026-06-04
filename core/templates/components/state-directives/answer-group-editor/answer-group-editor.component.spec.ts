@@ -219,6 +219,14 @@ describe('Answer Group Editor Component', () => {
     expect(component.changeActiveRuleIndex).not.toHaveBeenCalled();
   });
 
+  it('should throw error when adding rule before interaction is selected', () => {
+    spyOn(component, 'getCurrentInteractionId').and.returnValue(null);
+
+    expect(() => component.addNewRule()).toThrowError(
+      'Cannot add a rule before an interaction is selected.'
+    );
+  });
+
   it('should get answer choices when user updates answer choices', fakeAsync(() => {
     let updateAnswerChoicesEmitter = new EventEmitter();
     spyOnProperty(stateEditorService, 'onUpdateAnswerChoices').and.returnValue(

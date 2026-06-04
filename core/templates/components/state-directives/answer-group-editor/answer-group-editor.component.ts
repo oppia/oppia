@@ -78,7 +78,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   // specific interaction and rule.
   originalContentIdToContent!: Record<string, unknown>;
   activeRuleIndex!: number;
-  answerChoices!: AnswerChoice[];
+  answerChoices!: AnswerChoice[] | null;
   // The 'unknown' type is used here because 'editAnswerGroupForm' is a
   // generic container for form state, where keys are form control names
   // and values can be any type corresponding to the interaction's inputs.
@@ -228,6 +228,9 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   addNewRule(): void {
     // Build an initial blank set of inputs for the initial rule.
     let interactionId = this.getCurrentInteractionId();
+    if (interactionId === null) {
+      throw new Error('Cannot add a rule before an interaction is selected.');
+    }
     // The 'unknown' type is used here because the structure of rule
     // descriptions varies across different interactions, and we only
     // access the 'rule_descriptions' property here.
@@ -237,6 +240,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
         {rule_descriptions: Record<string, string>}
       >
     )[interactionId].rule_descriptions;
+
     let ruleTypes = Object.keys(ruleDescriptions);
     if (ruleTypes.length === 0) {
       // This should never happen. An interaction must have at least
@@ -350,7 +354,10 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
 
   isCurrentInteractionTrainable(): boolean {
     let interactionId = this.getCurrentInteractionId();
-    if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
+    if (
+      interactionId === null ||
+      !INTERACTION_SPECS.hasOwnProperty(interactionId)
+    ) {
       throw new Error(
         'Invalid interaction id - ' +
           interactionId +
@@ -365,7 +372,6 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
       INTERACTION_SPECS as unknown as Record<string, {is_trainable: boolean}>
     )[interactionId].is_trainable;
   }
-
   openTrainingDataEditor(): void {
     this.trainingDataEditorPanelService.openTrainingDataEditor();
   }

@@ -74,7 +74,7 @@ export class RuleEditorComponent
   @Input() modalId!: symbol;
 
   ruleDescriptionFragments!: RuleDescriptionFragment[];
-  currentInteractionId!: string;
+  currentInteractionId!: string | null;
   ruleDescriptionChoices!: Choice[];
   isInvalid: boolean = false;
   eventBusGroup: EventBusGroup;
@@ -96,6 +96,10 @@ export class RuleEditorComponent
     if (!this.rule.type) {
       this.ruleDescriptionFragments = [];
       return '';
+    }
+
+    if (this.currentInteractionId === null) {
+      throw new Error('Cannot compute rule descriptions without interaction.');
     }
 
     // The 'unknown' type is used here because the generic type of
