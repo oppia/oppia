@@ -25,6 +25,7 @@ from unittest import mock
 from core import feconf
 from core.domain import beam_job_services
 from core.jobs import base_jobs, job_options, jobs_manager
+from core.jobs.batch_jobs import firebase_sync_jobs, firebase_validation_jobs
 from core.jobs.types import job_run_result
 from core.storage.beam_job import gae_models as beam_job_models
 from core.tests import test_utils
@@ -309,4 +310,68 @@ class LimitJobResourcesTests(test_utils.GenericTestBase):
         self.assertEqual(
             beam_job_services.get_beam_job_run_result(run.id).to_dict(),
             {'stdout': 'o', 'stderr': 'e'},
+        )
+
+
+class FirebaseAdminServiceAccountTests(test_utils.GenericTestBase):
+
+    @mock.patch(
+        'core.jobs.batch_jobs.firebase_validation_jobs.'
+        'FirebaseAuditRecordsJob.__new__'
+    )
+    def test_job_with_firebase_viewer_access(self, mock_new: mock.Mock) -> None:
+        mock_inst = mock.MagicMock()
+        mock_new.return_value = mock_inst
+
+        jobs_manager.run_job(
+            firebase_validation_jobs.FirebaseAuditRecordsJob,
+            True,
+            namespace=self.namespace,
+        )
+
+        self.assertEqual(mock_new.call_count, 1)
+        (cls, pipeline), unused_kwargs = mock_new.call_args_list[0]
+        self.assertIs(cls, firebase_validation_jobs.FirebaseAuditRecordsJob)
+        self.assertIsInstance(pipeline, beam.Pipeline)
+        self.assertEqual(
+            pipeline.options.get_all_options().get('service_account_email'),
+            feconf.FIREBASE_AUTHENTICATION_VIEWER_SERVICE_ACCOUNT,
+        )
+
+    @mock.patch(
+        'core.jobs.batch_jobs.firebase_sync_jobs.'
+        'FirebaseSyncRecordsJob.__new__'
+    )
+    def test_job_with_firebase_admin_access(self, mock_new: mock.Mock) -> None:
+        mock_inst = mock.MagicMock()
+        mock_new.return_value = mock_inst
+
+        jobs_manager.run_job(
+            firebase_sync_jobs.FirebaseSyncRecordsJob,
+            True,
+            namespace=self.namespace,
+        )
+
+        self.assertEqual(mock_new.call_count, 1)
+        (cls, pipeline), unused_kwargs = mock_new.call_args_list[0]
+        self.assertIs(cls, firebase_sync_jobs.FirebaseSyncRecordsJob)
+        self.assertIsInstance(pipeline, beam.Pipeline)
+        self.assertEqual(
+            pipeline.options.get_all_options().get('service_account_email'),
+            feconf.FIREBASE_AUTHENTICATION_ADMIN_SERVICE_ACCOUNT,
+        )
+
+    @mock.patch('core.jobs.jobs_manager_test.WorkingJob.__new__')
+    def test_job_without_firebase_access(self, mock_new: mock.Mock) -> None:
+        mock_inst = mock.MagicMock()
+        mock_new.return_value = mock_inst
+
+        jobs_manager.run_job(WorkingJob, True, namespace=self.namespace)
+
+        self.assertEqual(mock_new.call_count, 1)
+        (cls, pipeline), unused_kwargs = mock_new.call_args_list[0]
+        self.assertIs(cls, WorkingJob)
+        self.assertIsInstance(pipeline, beam.Pipeline)
+        self.assertIsNone(
+            pipeline.options.get_all_options().get('service_account_email')
         )

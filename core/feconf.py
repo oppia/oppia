@@ -589,7 +589,12 @@ DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 #
 # NOTE TO RELEASE COORDINATORS: Replace this service account email with the
 # correct service account email when switching to the prod server.
-DATAFLOW_SERVICE_ACCOUNT_EMAIL = 'test-dataflow-service-account@example.com'
+FIREBASE_AUTHENTICATION_VIEWER_SERVICE_ACCOUNT = (
+    'firebase-authentication-viewer@example.com'
+)
+FIREBASE_AUTHENTICATION_ADMIN_SERVICE_ACCOUNT = (
+    'firebase-authentication-admin@example.com'
+)
 
 OPPIA_VERSION = '3.5.1'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION

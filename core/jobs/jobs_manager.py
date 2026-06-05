@@ -139,6 +139,21 @@ def run_job(
             'autoscaling_algorithm': 'THROUGHPUT_BASED',
         }
 
+    if does_job_require_firebase_auth_viewer_access_only(job_name):
+        # Jobs that must interact with our Firebase Authentication servers need
+        # to run as a privileged service account with read-only permissions.
+        # https://firebase.google.com/docs/projects/iam/roles-predefined-product#auth
+        additional_options['service_account_email'] = (
+            feconf.FIREBASE_AUTHENTICATION_VIEWER_SERVICE_ACCOUNT
+        )
+    elif does_job_require_firebase_auth_admin_access(job_name):
+        # Jobs that must interact with our Firebase Authentication servers need
+        # to run as a privileged service account with admin permissions.
+        # https://firebase.google.com/docs/projects/iam/roles-predefined-product#auth
+        additional_options['service_account_email'] = (
+            feconf.FIREBASE_AUTHENTICATION_ADMIN_SERVICE_ACCOUNT
+        )
+
     if parameterized_args:
         additional_options.update(parameterized_args)
 
@@ -336,3 +351,27 @@ def does_job_requires_limiting_workers(job_name: str) -> bool:
         'VoiceoverSynthesisForTestingJob',
     ]
     return job_name in jobs_requiring_limiting_workers
+
+
+def does_job_require_firebase_auth_admin_access(job_name: str) -> bool:
+    """Determines if job needs _both_ read and write access to Firebase Auth.
+
+    Args:
+        job_name: str. The name of the job.
+
+    Returns:
+        bool. Whether the given job requires Firebase Admin access.
+    """
+    return job_name == 'FirebaseSyncRecordsJob'
+
+
+def does_job_require_firebase_auth_viewer_access_only(job_name: str) -> bool:
+    """Determines if job _only_ needs read access to Firebase Auth.
+
+    Args:
+        job_name: str. The name of the job.
+
+    Returns:
+        bool. Whether the given job requires _only_ Firebase Viewer access.
+    """
+    return job_name == 'FirebaseAuditRecordsJob'
