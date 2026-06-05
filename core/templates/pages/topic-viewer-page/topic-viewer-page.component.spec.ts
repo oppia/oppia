@@ -368,6 +368,31 @@ describe('Topic viewer page', () => {
     );
   }));
 
+  it('should set story tab when practice url is opened in redesigned mode', fakeAsync(() => {
+    mockPlatformFeatureService.status.RedesignedTopicViewerPage.isEnabled =
+      true;
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      topicUrlFragment
+    );
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'math'
+    );
+    spyOn(urlService, 'getPathname').and.returnValue(
+      `/learn/math/${topicUrlFragment}/practice`
+    );
+
+    topicViewerPageComponent.ngOnInit();
+    const req = httpTestingController.expectOne(
+      `/topic_data_handler/math/${topicUrlFragment}`
+    );
+    req.flush(topicDict);
+    flushMicrotasks();
+
+    expect(topicViewerPageComponent.activeView).toBe(
+      topicViewerPageComponent.VIEW_NAMES.STORY
+    );
+  }));
+
   it('should use reject handler when fetching subtopic data fails', fakeAsync(() => {
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       topicUrlFragment
@@ -497,6 +522,30 @@ describe('Topic viewer page', () => {
       );
     }
   );
+
+  it('should map practice tab to story tab in redesigned mode', () => {
+    mockPlatformFeatureService.status.RedesignedTopicViewerPage.isEnabled =
+      true;
+    spyOn(windowRef.nativeWindow.history, 'pushState');
+    topicViewerPageComponent.activeView =
+      topicViewerPageComponent.VIEW_NAMES.STUDYGUIDE;
+    spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
+      'http://localhost/test_path/studyguide'
+    );
+
+    topicViewerPageComponent.setActiveView(
+      topicViewerPageComponent.VIEW_NAMES.PRACTICE
+    );
+
+    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
+      {},
+      '',
+      'http://localhost/test_path/story'
+    );
+    expect(topicViewerPageComponent.activeView).toBe(
+      topicViewerPageComponent.VIEW_NAMES.STORY
+    );
+  });
 
   it(
     'should set url hash accordingly when user changes active tab to' +
