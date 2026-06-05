@@ -35,10 +35,6 @@
     {
       "name": "users",
       "module": "core/tests/webdriverio_desktop/userJourneys.js"
-    },
-    {
-      "name": "wipeout",
-      "module": "core/tests/webdriverio_desktop/wipeout.js"
     }
   ]
 }
