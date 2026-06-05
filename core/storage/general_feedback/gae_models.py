@@ -698,7 +698,7 @@ class FeedbackSessionLogModel(base_models.BaseModel):
     Fields:
         id: str. Feedback thread ID associated with the session log.
         session_info_schema_version: int. Schema version for FeedbackSessionLogModel schema.
-        console_errors_json: List[Dict]. Console errors captured during session.
+        console_logs_json: List[Dict]. Console errors captured during session.
         failed_requests_json: List[Dict]. Failed HTTP request logs.
         navigation_history_json: List[Dict]. Recent navigation history.
         environment_json: Dict. Browser and device metadata.
@@ -714,7 +714,7 @@ class FeedbackSessionLogModel(base_models.BaseModel):
         required=True,
         indexed=True,
     )
-    console_errors_json = datastore_services.JsonProperty(
+    console_logs_json = datastore_services.JsonProperty(
         required=False,
         indexed=False,
     )
@@ -750,7 +750,7 @@ class FeedbackSessionLogModel(base_models.BaseModel):
             super(cls, cls).get_export_policy(),
             **{
                 'session_info_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'console_errors_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'console_logs_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'failed_requests_json': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'navigation_history_json': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -766,7 +766,7 @@ class FeedbackSessionLogModel(base_models.BaseModel):
     def create(
         cls,
         thread_id: str,
-        console_errors_json: Optional[List[Dict[str, str]]],
+        console_logs_json: Optional[List[Dict[str, str]]],
         failed_requests_json: Optional[List[Dict[str, str]]],
         navigation_history_json: Optional[List[Dict[str, str]]],
         environment_json: Optional[Dict[str, str]],
@@ -779,7 +779,7 @@ class FeedbackSessionLogModel(base_models.BaseModel):
         session_log = cls(
             id=thread_id,
             session_info_schema_version=feconf.CURRENT_SESSION_INFO_SCHEMA_VERSION,
-            console_errors_json=console_errors_json,
+            console_logs_json=console_logs_json,
             failed_requests_json=failed_requests_json,
             navigation_history_json=navigation_history_json,
             environment_json=environment_json,

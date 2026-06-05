@@ -1,0 +1,39 @@
+<nav class="topic-header-breadcrumbs" aria-label="Breadcrumb">
+  <div class="topic-header-breadcrumbs-desktop">
+    <a href="/learn">{{ 'I18N_CLASSROOM_TOP_NAV_CLASSROOMS_TEXT' | translate }}</a>
+    <i class="fa fa-angle-right" aria-hidden="true" *ngIf="classroomName && !isLanguageRTL()"></i>
+    <i class="fa fa-angle-left" aria-hidden="true" *ngIf="classroomName && isLanguageRTL()"></i>
+    <a *ngIf="classroomName" [href]="getClassroomUrl()">
+      <ng-container *ngIf="isHackyClassroomNameTranslationDisplayed(); else rawClassroomName">{{ classroomNameTranslationKey | translate }}</ng-container>
+      <ng-template #rawClassroomName>{{ classroomName }}</ng-template>
+    </a>
+    <i class="fa fa-angle-right" aria-hidden="true" *ngIf="!isLanguageRTL()"></i>
+    <i class="fa fa-angle-left" aria-hidden="true" *ngIf="isLanguageRTL()"></i>
+    <span class="topic-header-breadcrumb-current" aria-current="page">
+      <ng-container *ngIf="isHackyTopicNameTranslationDisplayed(); else rawTopicName">{{ topicNameTranslationKey | translate }}</ng-container>
+      <ng-template #rawTopicName>{{ topicName }}</ng-template>
+    </span>
+  </div>
+  <div class="topic-header-breadcrumbs-mobile">
+    <i class="fa fa-angle-left" aria-hidden="true" *ngIf="!isLanguageRTL()"></i>
+    <i class="fa fa-angle-right" aria-hidden="true" *ngIf="isLanguageRTL()"></i>
+    <a *ngIf="classroomName"
+       [href]="getClassroomUrl()"
+       class="e2e-test-mobile-breadcrumbs-classroom">
+      <ng-container *ngIf="isHackyClassroomNameTranslationDisplayed(); else rawMobileClassroomName">{{ 'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: (classroomNameTranslationKey | translate) } }}</ng-container>
+      <ng-template #rawMobileClassroomName>{{ 'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomName } }}</ng-template>
+    </a>
+    <a *ngIf="!classroomName" href="/learn">{{ 'I18N_BACK_TO_CLASSROOMS' | translate }}</a>
+  </div>
+</nav>
+
+<header class="topic-header">
+  <h1 class="topic-header-title">
+    <ng-container *ngIf="isHackyTopicNameTranslationDisplayed(); else rawHeaderTopicName">{{ topicNameTranslationKey | translate }}</ng-container>
+    <ng-template #rawHeaderTopicName>{{ topicName }}</ng-template>
+  </h1>
+  <p class="topic-header-description">
+    <ng-container *ngIf="isHackyTopicDescTranslationDisplayed(); else rawTopicDesc">{{ topicDescTranslationKey | translate }}</ng-container>
+    <ng-template #rawTopicDesc>{{ topicDescription }}</ng-template>
+  </p>
+</header>
