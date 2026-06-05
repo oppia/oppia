@@ -117,6 +117,8 @@ describe('Logged-Out Learner', function () {
   it('should use all RTE components in the exploration', async function () {
     // Navigate to community library page and expect it to contain 3
     // different explorations.
+    // LO.4 - First step of the test is to verify that the community library page
+    // does not have any translation ids, both before and after filtering by language.
     await loggedOutLearner.navigateToCommunityLibraryPage();
     // Expect page has no translation ids.
     await loggedOutLearner.expectPageHasNoTranslationIds();

@@ -7417,23 +7417,6 @@ export class LoggedOutUser extends BaseUser {
       await this.expectElementToBeVisible(blogSuggestedForYouHeadingSelector);
     }
   }
-
-  /**
-   * Function to select languages in the community library page.
-   * @param {string[]} languages - The languages to select.
-   */
-  async selectLanguages(languages: string[]): Promise<void> {
-    await this.clickOnElementWithSelector(languageFilterDropdownToggler);
-
-    for (const _ of languages) {
-      const options = await this.page.$$(unselectedFilterOptionsSelector);
-      for (const option of options) {
-        await this.clickOnElement(option);
-        break;
-      }
-    }
-    showMessage(`Selected languages: ${languages.join(', ')}`);
-  }
 }
 
 export let LoggedOutUserFactory = (): LoggedOutUser => new LoggedOutUser();
