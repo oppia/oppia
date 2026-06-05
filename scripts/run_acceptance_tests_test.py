@@ -256,8 +256,32 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 {'env': expected_install_env},
             ],
         )
-        with check_call_swap:
+        os_path_exists_swap = self.swap(os.path, 'exists', lambda _: False)
+        with check_call_swap, os_path_exists_swap:
             run_acceptance_tests.install_playwright_dependencies()
+
+    def test_install_playwright_dependencies_skips_if_node_modules_exist(
+        self,
+    ) -> None:
+        playwright_dir = os.path.join(
+            common.CURR_DIR, 'core', 'tests', 'playwright-acceptance-tests'
+        )
+        playwright_node_modules = os.path.join(playwright_dir, 'node_modules')
+
+        check_call_called = []
+
+        def mock_check_call(*unused_args: str, **unused_kwargs: str) -> None:
+            check_call_called.append(True)
+
+        os_path_exists_swap = self.swap(
+            os.path, 'exists', lambda path: path == playwright_node_modules
+        )
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+
+        with os_path_exists_swap, check_call_swap:
+            run_acceptance_tests.install_playwright_dependencies()
+
+        self.assertEqual(check_call_called, [])
 
     def test_install_playwright_dependencies_failure(self) -> None:
         def mock_check_call_failure(
@@ -268,7 +292,8 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call_failure
         )
-        with check_call_swap:
+        os_path_exists_swap = self.swap(os.path, 'exists', lambda _: False)
+        with check_call_swap, os_path_exists_swap:
             with self.assertRaisesRegex(
                 subprocess.CalledProcessError,
                 'Command \'npm\' returned non-zero exit status 1.',
@@ -374,7 +399,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         self.assertEqual(compile_called, [True])
         self.assertEqual(playwright_deps_called, [])
 
-    def test_playwright_deps_called_when_node_modules_not_present(self) -> None:
+    def test_playwright_deps_called_for_playwright_suite(self) -> None:
         mock_config = {
             'suites': [
                 {
@@ -393,9 +418,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
 
         def mock_install_playwright_dependencies() -> None:
             playwright_deps_called.append(True)
-
-        # Simulate node_modules not existing so install is triggered.
-        os_path_exists_swap = self.swap(os.path, 'exists', lambda _: False)
 
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -448,97 +470,11 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
 
         with self.swap_mock_set_constants_to_default:
-            with (
-                json_load_swap
-            ), compile_swap, playwright_swap, os_path_exists_swap:
+            with json_load_swap, compile_swap, playwright_swap:
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
         self.assertEqual(compile_called, [])
         self.assertEqual(playwright_deps_called, [True])
-
-    def test_playwright_deps_not_called_when_node_modules_already_present(
-        self,
-    ) -> None:
-        mock_config = {
-            'suites': [
-                {
-                    'name': 'testSuite',
-                    'framework': 'playwright',
-                    'module': 'some/module',
-                }
-            ]
-        }
-
-        compile_called = []
-        playwright_deps_called = []
-
-        def mock_compile_test_ts_files() -> None:
-            compile_called.append(True)
-
-        def mock_install_playwright_dependencies() -> None:
-            playwright_deps_called.append(True)
-
-        # Simulate node_modules already existing so install is skipped.
-        os_path_exists_swap = self.swap(os.path, 'exists', lambda _: True)
-
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: False
-            )
-        )
-        self.exit_stack.enter_context(self.build_js_files_swap)
-        self.exit_stack.enter_context(self.managed_redis_server_swap)
-        self.exit_stack.enter_context(
-            self.managed_elasticsearch_dev_server_swap
-        )
-        self.exit_stack.enter_context(self.managed_firebase_auth_emulator_swap)
-        self.exit_stack.enter_context(self.managed_dev_appserver_swap)
-        self.exit_stack.enter_context(self.managed_portserver_swap)
-        self.exit_stack.enter_context(
-            self.managed_cloud_datastore_emulator_swap
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
-                'managed_acceptance_tests_server',
-                mock_managed_process,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'testSuite',
-                        'headless': False,
-                        'mobile': False,
-                        'prod_env': False,
-                        'stdout': subprocess.PIPE,
-                    }
-                ],
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(0,)]
-            )
-        )
-
-        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
-        compile_swap = self.swap(
-            run_acceptance_tests,
-            'compile_test_ts_files',
-            mock_compile_test_ts_files,
-        )
-        playwright_swap = self.swap(
-            run_acceptance_tests,
-            'install_playwright_dependencies',
-            mock_install_playwright_dependencies,
-        )
-
-        with self.swap_mock_set_constants_to_default:
-            with (
-                json_load_swap
-            ), compile_swap, playwright_swap, os_path_exists_swap:
-                run_acceptance_tests.main(args=['--suite', 'testSuite'])
-
-        self.assertEqual(compile_called, [])
-        self.assertEqual(playwright_deps_called, [])
 
     def test_start_tests_when_other_instances_not_stopped(self) -> None:
         self.exit_stack.enter_context(

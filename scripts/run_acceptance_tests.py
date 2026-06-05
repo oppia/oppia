@@ -115,6 +115,11 @@ def install_playwright_dependencies() -> None:
     playwright_dir = os.path.join(
         common.CURR_DIR, 'core', 'tests', 'playwright-acceptance-tests'
     )
+    playwright_node_modules = os.path.join(playwright_dir, 'node_modules')
+
+    if os.path.exists(playwright_node_modules):
+        return
+
     install_env = {
         **os.environ,
         'PATH': os.pathsep.join(
@@ -178,14 +183,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
 
         # Install Playwright deps for Playwright suites.
         if suite_framework == 'playwright':
-            playwright_dir = os.path.join(
-                common.CURR_DIR, 'core', 'tests', 'playwright-acceptance-tests'
-            )
-            playwright_node_modules = os.path.join(
-                playwright_dir, 'node_modules'
-            )
-            if not os.path.exists(playwright_node_modules):
-                install_playwright_dependencies()
+            install_playwright_dependencies()
 
         if args.skip_build:
             common.modify_constants(prod_env=args.prod_env)
