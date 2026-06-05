@@ -145,6 +145,8 @@ describe('Topic viewer page', () => {
   };
 
   beforeEach(() => {
+    mockPlatformFeatureService.status.RedesignedTopicViewerPage.isEnabled =
+      false;
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       declarations: [TopicViewerPageComponent, MockTranslatePipe],
@@ -196,7 +198,9 @@ describe('Topic viewer page', () => {
 
     topicViewerPageComponent.ngOnInit();
     expect(topicViewerPageComponent.canonicalStorySummaries).toEqual([]);
-    expect(topicViewerPageComponent.activeView).toBe('story');
+    expect(topicViewerPageComponent.activeView).toBe(
+      topicViewerPageComponent.VIEW_NAMES.STORY
+    );
     expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
       {},
       '',
@@ -319,7 +323,9 @@ describe('Topic viewer page', () => {
     );
     req.flush(topicDict);
     flushMicrotasks();
-    expect(topicViewerPageComponent.activeView).toBe('story');
+    expect(topicViewerPageComponent.activeView).toBe(
+      topicViewerPageComponent.VIEW_NAMES.STORY
+    );
   }));
 
   it('should set study tab correctly', fakeAsync(() => {
@@ -337,7 +343,9 @@ describe('Topic viewer page', () => {
       `/topic_data_handler/math/${topicUrlFragment}`
     );
     req.flush(topicDict);
-    expect(topicViewerPageComponent.activeView).toBe('subtopics');
+    expect(topicViewerPageComponent.activeView).toBe(
+      topicViewerPageComponent.VIEW_NAMES.STUDYGUIDE
+    );
   }));
 
   it('should set practice tab correctly', fakeAsync(() => {
@@ -355,7 +363,9 @@ describe('Topic viewer page', () => {
       `/topic_data_handler/math/${topicUrlFragment}`
     );
     req.flush(topicDict);
-    expect(topicViewerPageComponent.activeView).toBe('practice');
+    expect(topicViewerPageComponent.activeView).toBe(
+      topicViewerPageComponent.VIEW_NAMES.PRACTICE
+    );
   }));
 
   it('should use reject handler when fetching subtopic data fails', fakeAsync(() => {
@@ -441,19 +451,24 @@ describe('Topic viewer page', () => {
     'should set url accordingly when user changes active tab to' + ' story tab',
     () => {
       spyOn(windowRef.nativeWindow.history, 'pushState');
-      topicViewerPageComponent.activeView = 'subtopics';
+      topicViewerPageComponent.activeView =
+        topicViewerPageComponent.VIEW_NAMES.STUDYGUIDE;
       spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
         'http://localhost/test_path/studyguide'
       );
 
-      topicViewerPageComponent.setActiveView('story');
+      topicViewerPageComponent.setActiveView(
+        topicViewerPageComponent.VIEW_NAMES.STORY
+      );
 
       expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
         {},
         '',
         'http://localhost/test_path/story'
       );
-      expect(topicViewerPageComponent.activeView).toBe('story');
+      expect(topicViewerPageComponent.activeView).toBe(
+        topicViewerPageComponent.VIEW_NAMES.STORY
+      );
     }
   );
 
@@ -462,40 +477,50 @@ describe('Topic viewer page', () => {
       ' practice tab',
     () => {
       spyOn(windowRef.nativeWindow.history, 'pushState');
-      topicViewerPageComponent.activeView = 'subtopics';
+      topicViewerPageComponent.activeView =
+        topicViewerPageComponent.VIEW_NAMES.STUDYGUIDE;
       spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
         'http://localhost/test_path/studyguide'
       );
 
-      topicViewerPageComponent.setActiveView('practice');
+      topicViewerPageComponent.setActiveView(
+        topicViewerPageComponent.VIEW_NAMES.PRACTICE
+      );
 
       expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
         {},
         '',
         'http://localhost/test_path/practice'
       );
-      expect(topicViewerPageComponent.activeView).toBe('practice');
+      expect(topicViewerPageComponent.activeView).toBe(
+        topicViewerPageComponent.VIEW_NAMES.PRACTICE
+      );
     }
   );
 
   it(
     'should set url hash accordingly when user changes active tab to' +
-      ' subtopics tab',
+      ' studyguide tab',
     () => {
       spyOn(windowRef.nativeWindow.history, 'pushState');
-      topicViewerPageComponent.activeView = 'story';
+      topicViewerPageComponent.activeView =
+        topicViewerPageComponent.VIEW_NAMES.STORY;
       spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
         'http://localhost/test_path/story'
       );
 
-      topicViewerPageComponent.setActiveView('subtopics');
+      topicViewerPageComponent.setActiveView(
+        topicViewerPageComponent.VIEW_NAMES.STUDYGUIDE
+      );
 
       expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
         {},
         '',
         'http://localhost/test_path/studyguide'
       );
-      expect(topicViewerPageComponent.activeView).toBe('subtopics');
+      expect(topicViewerPageComponent.activeView).toBe(
+        topicViewerPageComponent.VIEW_NAMES.STUDYGUIDE
+      );
     }
   );
 

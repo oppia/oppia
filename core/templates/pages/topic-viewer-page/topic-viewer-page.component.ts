@@ -53,9 +53,9 @@ interface TopicViewerStorySectionData {
 export class TopicViewerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   readonly VIEW_NAMES = {
-    story: 'story',
-    practice: 'practice',
-    studyguide: 'studyguide',
+    STORY: 'story',
+    PRACTICE: 'practice',
+    STUDYGUIDE: 'studyguide',
   } as const;
 
   activeView: string = '';
@@ -91,20 +91,20 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const pathname = this.urlService.getPathname();
-    if (pathname.endsWith(this.VIEW_NAMES.studyguide)) {
-      this.activeView = this.VIEW_NAMES.studyguide;
-    } else if (pathname.endsWith(this.VIEW_NAMES.practice)) {
+    if (pathname.endsWith(this.VIEW_NAMES.STUDYGUIDE)) {
+      this.activeView = this.VIEW_NAMES.STUDYGUIDE;
+    } else if (pathname.endsWith(this.VIEW_NAMES.PRACTICE)) {
       if (this.isRedesignedTopicViewerPageFeatureEnabled()) {
         // In the redesigned UI, practice is part of the story view.
-        this.activeView = this.VIEW_NAMES.story;
+        this.activeView = this.VIEW_NAMES.STORY;
       } else {
-        this.activeView = this.VIEW_NAMES.practice;
+        this.activeView = this.VIEW_NAMES.PRACTICE;
       }
     } else {
-      if (!pathname.endsWith(this.VIEW_NAMES.story)) {
-        this.updateUrlForActiveView(this.VIEW_NAMES.story);
+      if (!pathname.endsWith(this.VIEW_NAMES.STORY)) {
+        this.updateUrlForActiveView(this.VIEW_NAMES.STORY);
       }
-      this.activeView = this.VIEW_NAMES.story;
+      this.activeView = this.VIEW_NAMES.STORY;
     }
     this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
     this.classroomUrlFragment =
@@ -219,27 +219,25 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
   }
 
   setActiveView(newViewName: string): void {
-    if (newViewName === this.VIEW_NAMES.story) {
-      this.updateUrlForActiveView(this.VIEW_NAMES.story);
-      this.activeView = this.VIEW_NAMES.story;
+    if (newViewName === this.VIEW_NAMES.STORY) {
+      this.updateUrlForActiveView(this.VIEW_NAMES.STORY);
+      this.activeView = this.VIEW_NAMES.STORY;
       return;
     }
 
-    if (newViewName === this.VIEW_NAMES.practice) {
+    if (newViewName === this.VIEW_NAMES.PRACTICE) {
       if (this.isRedesignedTopicViewerPageFeatureEnabled()) {
-        // Map practice -> story in redesigned UI.
-        this.updateUrlForActiveView(this.VIEW_NAMES.story);
-        this.activeView = this.VIEW_NAMES.story;
+        this.updateUrlForActiveView(this.VIEW_NAMES.STORY);
+        this.activeView = this.VIEW_NAMES.STORY;
         return;
       }
-      this.updateUrlForActiveView(this.VIEW_NAMES.practice);
-      this.activeView = this.VIEW_NAMES.practice;
+      this.updateUrlForActiveView(this.VIEW_NAMES.PRACTICE);
+      this.activeView = this.VIEW_NAMES.PRACTICE;
       return;
     }
 
-    // studyguide
-    this.updateUrlForActiveView(this.VIEW_NAMES.studyguide);
-    this.activeView = this.VIEW_NAMES.studyguide;
+    this.updateUrlForActiveView(this.VIEW_NAMES.STUDYGUIDE);
+    this.activeView = this.VIEW_NAMES.STUDYGUIDE;
   }
 
   updateUrlForActiveView(newViewName: string): void {
@@ -250,11 +248,11 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
         '',
         getCurrentLocation + '/' + newViewName
       );
-    } else if (this.activeView === this.VIEW_NAMES.studyguide) {
+    } else if (this.activeView === this.VIEW_NAMES.STUDYGUIDE) {
       this.windowRef.nativeWindow.history.pushState(
         {},
         '',
-        getCurrentLocation.replace(this.VIEW_NAMES.studyguide, newViewName)
+        getCurrentLocation.replace(this.VIEW_NAMES.STUDYGUIDE, newViewName)
       );
     } else {
       this.windowRef.nativeWindow.history.pushState(
