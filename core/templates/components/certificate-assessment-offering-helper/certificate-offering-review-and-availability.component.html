@@ -1,0 +1,12 @@
+<div class="oppia-certificate-offering-review-and-availability">
+  <h2>Review & Availability</h2>
+  <!--
+    Real certificate summary, readiness breakdown, and validation errors are
+    added after the details and topic-selection data contracts are finalized.
+  -->
+
+  <div class="oppia-certificate-offering-review-actions">
++    <button type="button" (click)="onBackClicked()">Back</button>
++    <button type="button" (click)="onSaveClicked()">{{ getSaveButtonText() }}</button>
+  </div>
+</div>
