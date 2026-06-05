@@ -31,8 +31,6 @@ describe('TopicStorySectionComponent', () => {
 
   beforeEach(waitForAsync(() => {
     urlService = jasmine.createSpyObj('UrlService', [
-      'getClassroomUrlFragmentFromLearnerUrl',
-      'getTopicUrlFragmentFromLearnerUrl',
       'getLearnerTopicStudyGuideUrl',
     ]);
     TestBed.configureTestingModule({
@@ -55,11 +53,9 @@ describe('TopicStorySectionComponent', () => {
       "In this story, we'll follow Jaime and his sister Nic as they learn.";
     component.lessonCount = 2;
     component.practiceCount = 1;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'place-values';
 
-    urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('math');
-    urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue(
-      'place-values'
-    );
     urlService.getLearnerTopicStudyGuideUrl.and.callFake(
       (classroomFragment: string, topicFragment: string) =>
         classroomFragment && topicFragment
@@ -84,9 +80,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.studyGuideUrl).toBe('/learn/math/place-values/studyguide');
   });
 
-  it('should read URL fragments from URL service on init', () => {
-    expect(urlService.getClassroomUrlFragmentFromLearnerUrl).toHaveBeenCalled();
-    expect(urlService.getTopicUrlFragmentFromLearnerUrl).toHaveBeenCalled();
+  it('should use input URL fragments on init', () => {
     expect(urlService.getLearnerTopicStudyGuideUrl).toHaveBeenCalledWith(
       'math',
       'place-values'
@@ -128,14 +122,11 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should keep study guide URL as # when URL fragments are unavailable', () => {
-    urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('');
-    urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue('');
+    component.classroomUrlFragment = '';
+    component.topicUrlFragment = '';
     component.ngOnInit();
 
     expect(component.studyGuideUrl).toBe('#');
-    expect(urlService.getLearnerTopicStudyGuideUrl).toHaveBeenCalledWith(
-      '',
-      ''
-    );
+    expect(urlService.getLearnerTopicStudyGuideUrl).toHaveBeenCalledTimes(1);
   });
 });

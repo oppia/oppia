@@ -35,12 +35,15 @@ import {PageTitleService} from 'services/page-title.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {
-  TopicViewerDataService,
-  TopicViewerStorySectionData,
-} from './services/topic-viewer-data.service';
-
 import './topic-viewer-page.component.css';
+
+interface TopicViewerStorySectionData {
+  storyId: string;
+  storyTitle: string;
+  storyDescription: string;
+  lessonCount: number;
+  practiceCount: number;
+}
 
 @Component({
   selector: 'topic-viewer-page',
@@ -77,8 +80,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
-    private translateService: TranslateService,
-    private topicViewerDataService: TopicViewerDataService
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -130,14 +132,8 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
           this.loaderService.hideLoadingScreen();
           this.practiceTabIsDisplayed =
             readOnlyTopic.getPracticeTabIsDisplayed();
-
-          this.topicViewerDataService.setFromReadOnlyTopic(
-            readOnlyTopic,
-            this.classroomUrlFragment,
-            this.topicUrlFragment
-          );
           this.canonicalStorySectionData =
-            this.topicViewerDataService.getCanonicalStoryData();
+            this.getCanonicalStorySectionData(readOnlyTopic);
         },
         errorResponse => {
           let errorCodes = AppConstants.FATAL_ERROR_CODES;
@@ -156,6 +152,23 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     storyData: TopicViewerStorySectionData
   ): string {
     return storyData.storyId;
+  }
+
+  private getCanonicalStorySectionData(
+    readOnlyTopic: ReadOnlyTopic
+  ): readonly TopicViewerStorySectionData[] {
+    const practiceCount = readOnlyTopic.getSubtopics().filter(subtopic => {
+      return subtopic.getSkillSummaries().length > 0;
+    }).length;
+    return readOnlyTopic.getCanonicalStorySummaries().map(storySummary => {
+      return {
+        storyId: storySummary.getId(),
+        storyTitle: storySummary.getTitle(),
+        storyDescription: storySummary.getDescription() || '',
+        lessonCount: storySummary.getNodeTitles().length,
+        practiceCount,
+      };
+    });
   }
 
   ngOnDestroy(): void {

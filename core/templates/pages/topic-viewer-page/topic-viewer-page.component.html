@@ -1,10 +1,10 @@
 <div *ngIf="isRedesignedTopicViewerPageFeatureEnabled(); else legacyTopicViewerContainer" class="oppia-redesigned-topic-viewer-container e2e-test-redesigned-topic-viewer-container" [class.studyguide-active]="activeTab === 'subtopics'">
   <div class="redesigned-topic-viewer-content">
     <topic-header
-      [topicName]="topicViewerDataService.getTopicName() || topicName"
-      [topicDescription]="topicViewerDataService.getTopicDescription() || topicDescription"
-      [topicId]="topicViewerDataService.getTopicId() || topicId"
-      [classroomName]="topicViewerDataService.getClassroomName() || classroomName"
+      [topicName]="topicName"
+      [topicDescription]="topicDescription"
+      [topicId]="topicId"
+      [classroomName]="classroomName"
       [showStudySkillsBreadcrumb]="activeTab === 'subtopics'">
     </topic-header>
   </div>
@@ -19,6 +19,8 @@
         *ngFor="let storyData of canonicalStorySectionData; trackBy: trackStoryDataById"
         [storyTitle]="storyData.storyTitle"
         [storyDescription]="storyData.storyDescription"
+        [classroomUrlFragment]="classroomUrlFragment"
+        [topicUrlFragment]="topicUrlFragment"
         [lessonCount]="storyData.lessonCount"
         [practiceCount]="storyData.practiceCount">
       </topic-story-section>

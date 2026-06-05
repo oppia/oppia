@@ -37,12 +37,11 @@ const FALLBACK_AVATAR_IMAGE_PATH = '/general/collection_mascot.svg';
 export class TopicStorySectionComponent implements OnInit {
   @Input() storyTitle!: string;
   @Input() storyDescription!: string;
+  @Input() classroomUrlFragment: string = '';
+  @Input() topicUrlFragment: string = '';
 
   @Input() practiceCount: number = 0;
   @Input() lessonCount: number = 0;
-
-  classroomUrlFragment!: string;
-  topicUrlFragment!: string;
 
   oppiaAvatarImageUrl: string = '';
   studyGuideUrl: string = '#';
@@ -54,9 +53,6 @@ export class TopicStorySectionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.classroomUrlFragment =
-      this.urlService.getClassroomUrlFragmentFromLearnerUrl();
-    this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
     this.oppiaAvatarImageUrl = this.getPrimaryAvatarImageUrl();
     this.studyGuideUrl = this.getStudyGuideUrl();
   }
@@ -97,6 +93,9 @@ export class TopicStorySectionComponent implements OnInit {
   }
 
   private getStudyGuideUrl(): string {
+    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
+      return '#';
+    }
     return this.urlService.getLearnerTopicStudyGuideUrl(
       this.classroomUrlFragment,
       this.topicUrlFragment
