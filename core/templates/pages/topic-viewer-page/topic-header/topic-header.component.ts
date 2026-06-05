@@ -35,6 +35,8 @@ export class TopicHeaderComponent implements OnInit {
   @Input() topicId!: string;
   @Input() classroomName!: string | null;
   @Input() showStudySkillsBreadcrumb: boolean = false;
+  classroomUrlFragment!: string;
+  topicUrlFragment!: string;
 
   topicNameTranslationKey!: string;
   topicDescTranslationKey!: string;
@@ -56,6 +58,10 @@ export class TopicHeaderComponent implements OnInit {
         this.topicId,
         TranslationKeyType.DESCRIPTION
       );
+
+    this.classroomUrlFragment =
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl();
+    this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
 
     if (this.classroomName) {
       this.classroomNameTranslationKey =
@@ -95,10 +101,13 @@ export class TopicHeaderComponent implements OnInit {
   }
 
   getClassroomUrl(): string {
-    return this.urlService.getLearnerClassroomUrl();
+    return this.urlService.getLearnerClassroomUrl(this.classroomUrlFragment);
   }
 
   getTopicStoryUrl(): string {
-    return this.urlService.getLearnerTopicStoryUrl();
+    return this.urlService.getLearnerTopicStoryUrl(
+      this.classroomUrlFragment,
+      this.topicUrlFragment
+    );
   }
 }
