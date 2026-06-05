@@ -249,6 +249,20 @@ describe('Url Service', () => {
       urlService.getLearnerTopicStudyGuideUrl('math', 'place-values')
     ).toBe('/learn/math/place-values/studyguide');
     expect(urlService.getLearnerTopicStudyGuideUrl('math', '')).toBe('#');
+
+    mockLocation.pathname = '/learn/math/place-values';
+    expect(urlService.getLearnerClassroomUrl()).toBe('/learn/math');
+    expect(urlService.getLearnerTopicStoryUrl()).toBe(
+      '/learn/math/place-values/story'
+    );
+    expect(urlService.getLearnerTopicStudyGuideUrl()).toBe(
+      '/learn/math/place-values/studyguide'
+    );
+
+    mockLocation.pathname = '/topic/invalid';
+    expect(urlService.getLearnerClassroomUrl()).toBe('/learn');
+    expect(urlService.getLearnerTopicStoryUrl()).toBe('/learn');
+    expect(urlService.getLearnerTopicStudyGuideUrl()).toBe('#');
   });
 
   it('should correctly retrieve selected subtopics from url', () => {

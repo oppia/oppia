@@ -56,14 +56,9 @@ describe('TopicHeaderComponent', () => {
     urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue(
       'place-values'
     );
-    urlService.getLearnerClassroomUrl.and.callFake((fragment: string) =>
-      fragment ? `/learn/${fragment}` : '/learn'
-    );
-    urlService.getLearnerTopicStoryUrl.and.callFake(
-      (classroomFragment: string, topicFragment: string) =>
-        classroomFragment && topicFragment
-          ? `/learn/${classroomFragment}/${topicFragment}/story`
-          : '/learn'
+    urlService.getLearnerClassroomUrl.and.returnValue('/learn/math');
+    urlService.getLearnerTopicStoryUrl.and.returnValue(
+      '/learn/math/place-values/story'
     );
 
     spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValues(
@@ -109,19 +104,18 @@ describe('TopicHeaderComponent', () => {
 
   it('should return /learn/<fragment> or /learn', () => {
     expect(component.getClassroomUrl()).toBe('/learn/math');
-    expect(urlService.getLearnerClassroomUrl).toHaveBeenCalledWith('math');
+    expect(urlService.getLearnerClassroomUrl).toHaveBeenCalledWith();
     component.classroomUrlFragment = '';
+    urlService.getLearnerClassroomUrl.and.returnValue('/learn');
     expect(component.getClassroomUrl()).toBe('/learn');
   });
 
   it('should return topic story URL when fragments exist and /learn otherwise', () => {
     expect(component.getTopicStoryUrl()).toBe('/learn/math/place-values/story');
-    expect(urlService.getLearnerTopicStoryUrl).toHaveBeenCalledWith(
-      'math',
-      'place-values'
-    );
+    expect(urlService.getLearnerTopicStoryUrl).toHaveBeenCalledWith();
 
     component.classroomUrlFragment = '';
+    urlService.getLearnerTopicStoryUrl.and.returnValue('/learn');
     expect(component.getTopicStoryUrl()).toBe('/learn');
 
     component.classroomUrlFragment = 'math';

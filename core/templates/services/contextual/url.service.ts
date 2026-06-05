@@ -192,8 +192,10 @@ export class UrlService {
    * @param {string} classroomUrlFragment - The classroom URL fragment.
    * @return {string} The classroom URL.
    */
-  getLearnerClassroomUrl(classroomUrlFragment: string): string {
-    return classroomUrlFragment ? `/learn/${classroomUrlFragment}` : '/learn';
+  getLearnerClassroomUrl(classroomUrlFragment?: string): string {
+    const classroomFragment =
+      classroomUrlFragment ?? this.getClassroomUrlFragmentSafely();
+    return classroomFragment ? `/learn/${classroomFragment}` : '/learn';
   }
 
   /**
@@ -203,13 +205,17 @@ export class UrlService {
    * @return {string} The story URL.
    */
   getLearnerTopicStoryUrl(
-    classroomUrlFragment: string,
-    topicUrlFragment: string
+    classroomUrlFragment?: string,
+    topicUrlFragment?: string
   ): string {
-    return classroomUrlFragment && topicUrlFragment
+    const classroomFragment =
+      classroomUrlFragment ?? this.getClassroomUrlFragmentSafely();
+    const topicFragment = topicUrlFragment ?? this.getTopicUrlFragmentSafely();
+
+    return classroomFragment && topicFragment
       ? this.getLearnerTopicUrl(
-          classroomUrlFragment,
-          topicUrlFragment,
+          classroomFragment,
+          topicFragment,
           ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE
         )
       : '/learn';
@@ -222,16 +228,36 @@ export class UrlService {
    * @return {string} The study guide URL.
    */
   getLearnerTopicStudyGuideUrl(
-    classroomUrlFragment: string,
-    topicUrlFragment: string
+    classroomUrlFragment?: string,
+    topicUrlFragment?: string
   ): string {
-    return classroomUrlFragment && topicUrlFragment
+    const classroomFragment =
+      classroomUrlFragment ?? this.getClassroomUrlFragmentSafely();
+    const topicFragment = topicUrlFragment ?? this.getTopicUrlFragmentSafely();
+
+    return classroomFragment && topicFragment
       ? this.getLearnerTopicUrl(
-          classroomUrlFragment,
-          topicUrlFragment,
+          classroomFragment,
+          topicFragment,
           ClassroomDomainConstants.TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE
         )
       : '#';
+  }
+
+  private getClassroomUrlFragmentSafely(): string {
+    try {
+      return this.getClassroomUrlFragmentFromLearnerUrl();
+    } catch {
+      return '';
+    }
+  }
+
+  private getTopicUrlFragmentSafely(): string {
+    try {
+      return this.getTopicUrlFragmentFromLearnerUrl();
+    } catch {
+      return '';
+    }
   }
 
   private getLearnerTopicUrl(
