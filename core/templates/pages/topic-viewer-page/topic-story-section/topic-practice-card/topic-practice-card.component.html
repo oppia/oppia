@@ -24,11 +24,8 @@
       </a>
 
       <a class="topic-practice-card-practice-button"
-         [class.topic-practice-card-practice-button-disabled]="isPracticeActionDisabled()"
-         [attr.href]="isPracticeActionDisabled() ? null : practiceUrl"
-         [attr.aria-disabled]="isPracticeActionDisabled() ? 'true' : null"
-         [attr.tabindex]="isPracticeActionDisabled() ? -1 : null">
-        {{ getPracticeButtonText() }}
+         [attr.href]="practiceUrl || '#'">
+        Practice
       </a>
     </div>
   </div>

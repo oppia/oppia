@@ -58,6 +58,11 @@ describe('TopicPracticeCardComponent', () => {
     expect(
       element.querySelector('.topic-practice-card-practice-button')?.textContent
     ).toContain('Practice');
+    expect(
+      element
+        .querySelector('.topic-practice-card-practice-button')
+        ?.getAttribute('href')
+    ).toBe('/practice_session/create/math/place-values');
   });
 
   it('should use fallback thumbnail when none is provided', () => {
@@ -68,15 +73,15 @@ describe('TopicPracticeCardComponent', () => {
     );
   });
 
-  it('should disable practice action when state is locked', () => {
-    component.practiceState = 'locked';
+  it('should fall back to # when no practice url is provided', () => {
+    component.practiceUrl = null;
 
     fixture.detectChanges();
 
     const button = fixture.nativeElement.querySelector(
       '.topic-practice-card-practice-button'
     ) as HTMLAnchorElement;
-    expect(button.textContent).toContain('Locked');
-    expect(button.getAttribute('aria-disabled')).toBe('true');
+    expect(button.textContent).toContain('Practice');
+    expect(button.getAttribute('href')).toBe('#');
   });
 });

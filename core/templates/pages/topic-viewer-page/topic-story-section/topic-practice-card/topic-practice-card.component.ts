@@ -34,7 +34,6 @@ export class TopicPracticeCardComponent implements OnInit {
   @Input() thumbnailUrl: string = '';
   @Input() studyUrl: string | null = null;
   @Input() practiceUrl: string | null = null;
-  @Input() practiceState: 'available' | 'locked' | 'completed' = 'available';
 
   resolvedThumbnailUrl: string = '';
 
@@ -56,22 +55,6 @@ export class TopicPracticeCardComponent implements OnInit {
     const lessonSuffix =
       this.relatedLessonNumber !== null ? ` ${this.relatedLessonNumber}` : '';
     return `Practice the skills you've learned in lesson${lessonSuffix}.`;
-  }
-
-  isPracticeActionDisabled(): boolean {
-    return this.practiceState === 'locked' || !this.practiceUrl;
-  }
-
-  getPracticeButtonText(): string {
-    if (this.practiceState === 'completed') {
-      return 'Review';
-    }
-
-    if (this.practiceState === 'locked') {
-      return 'Locked';
-    }
-
-    return 'Practice';
   }
 
   getThumbnailAltText(): string {

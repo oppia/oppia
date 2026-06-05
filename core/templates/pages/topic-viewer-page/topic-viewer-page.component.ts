@@ -62,6 +62,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
   chapterCount: number = 0;
   degreesOfMastery: DegreesOfMastery = {};
   subtopics: Subtopic[] = [];
+  practiceSubtopicIds: number[] = [];
   skillDescriptions: SkillIdToDescriptionMap = {};
   practiceTabIsDisplayed: boolean = false;
 
@@ -124,6 +125,11 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
           }
           this.degreesOfMastery = readOnlyTopic.getDegreesOfMastery();
           this.subtopics = readOnlyTopic.getSubtopics();
+          this.practiceSubtopicIds = this.subtopics
+            .filter(subtopic => {
+              return subtopic.getSkillSummaries().length > 0;
+            })
+            .map(subtopic => subtopic.getId());
           this.skillDescriptions = readOnlyTopic.getSkillDescriptions();
           this.topicIsLoading = false;
           this.loaderService.hideLoadingScreen();

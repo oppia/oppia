@@ -31,6 +31,7 @@ import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.consta
 import {StoryNode} from 'domain/story/story-node.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlService} from 'services/contextual/url.service';
@@ -52,7 +53,6 @@ interface PracticeCardData {
   thumbnailUrl: string;
   studyUrl: string | null;
   practiceUrl: string | null;
-  practiceState: 'available' | 'locked' | 'completed';
 }
 
 @Component({
@@ -67,6 +67,7 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
 
   @Input() classroomUrlFragment!: string;
   @Input() topicUrlFragment!: string;
+  @Input() practiceSubtopicIds: number[] = [];
 
   @Input() practiceCount: number = 0;
   @Input() lessonCount: number = 0;
@@ -191,9 +192,28 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
       relatedLessonNumber: 1,
       thumbnailUrl: this.getFallbackLessonThumbnailUrl(),
       studyUrl: this.studyGuideUrl,
-      practiceUrl: null,
-      practiceState: 'locked',
+      practiceUrl: this.getPracticeSessionUrl(),
     };
+  }
+
+  private getPracticeSessionUrl(): string | null {
+    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
+      return null;
+    }
+
+    const practiceSubtopicId = this.practiceSubtopicIds[0];
+    if (practiceSubtopicId === undefined) {
+      return null;
+    }
+
+    return this.urlInterpolationService.interpolateUrl(
+      PracticeSessionPageConstants.PRACTICE_SESSIONS_URL,
+      {
+        classroom_url_fragment: this.classroomUrlFragment,
+        topic_url_fragment: this.topicUrlFragment,
+        stringified_subtopic_ids: JSON.stringify([practiceSubtopicId]),
+      }
+    );
   }
 
   private getLessonThumbnailUrl(node: StoryNode): string {

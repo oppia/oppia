@@ -52,6 +52,12 @@ describe('TopicStorySectionComponent', () => {
                 if (template === '/explore/<exp_id>') {
                   return '/explore/exp_1';
                 }
+                if (template.includes('/practice/session')) {
+                  return (
+                    '/learn/math/fractions/practice/session?' +
+                    'selected_subtopic_ids=%5B1%5D'
+                  );
+                }
                 if (template.includes('studyguide')) {
                   return '/learn/math/fractions/studyguide';
                 }
@@ -127,6 +133,7 @@ describe('TopicStorySectionComponent', () => {
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'fractions';
     component.practiceCount = 1;
+    component.practiceSubtopicIds = [1];
 
     fixture.detectChanges();
   });
@@ -176,5 +183,9 @@ describe('TopicStorySectionComponent', () => {
     expect(
       el.querySelector('.topic-practice-card-title')?.textContent
     ).toContain('Practice 1: Practice Story');
+    expect(component.practiceCard?.practiceUrl).toBe(
+      '/learn/math/fractions/practice/session?' +
+        'selected_subtopic_ids=%5B1%5D'
+    );
   });
 });
