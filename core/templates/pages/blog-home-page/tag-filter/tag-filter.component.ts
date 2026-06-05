@@ -39,10 +39,10 @@ import {BlogPostSearchService} from 'services/blog-search.service';
 import {BlogHomePageConstants} from '../blog-home-page.constants';
 import isEqual from 'lodash/isEqual';
 
-import '../blog-home-page.component.css';
 @Component({
   selector: 'oppia-tag-filter',
   templateUrl: './tag-filter.component.html',
+  styleUrls: ['../blog-home-page.component.css'],
 })
 export class TagFilterComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

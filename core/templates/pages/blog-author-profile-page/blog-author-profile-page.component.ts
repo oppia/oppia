@@ -31,11 +31,10 @@ import {AlertsService} from 'services/alerts.service';
 import {AppConstants} from 'app.constants';
 import {UserService} from 'services/user.service';
 
-import './blog-author-profile-page.component.css';
-
 @Component({
   selector: 'oppia-blog-author-page',
   templateUrl: './blog-author-profile-page.component.html',
+  styleUrls: ['./blog-author-profile-page.component.css'],
 })
 export class BlogAuthorProfilePageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

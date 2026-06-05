@@ -223,27 +223,52 @@ oppia-blog-home-page .blog-post-card {
 }
 
 .blog-homepage .oppia-navbar-breadcrumb {
-  align-items: center;
-  display: inline-flex;
-  flex-direction: row;
+  display: -webkit-inline-box;
+  flex-flow: column;
   margin-left: -10px;
   overflow-wrap: break-word;
+  padding-top: 3px;
 }
 
 @media(max-width:500px) {
   .oppia-navbar-breadcrumb.main-blog-homepage-mobile-breadcrumb {
     line-height: 12px;
-    padding-top: 0;
+    padding-top: 15px;
   }
 }
 
 .mobile-navbar-blog-homepage {
-  color: #fff;
+  color: inherit;
   cursor: pointer;
   text-decoration: none;
 }
 
 .mobile-navbar-blog-homepage:hover {
-  color: #fff;
+  color: inherit;
   text-decoration: none;
+}
+
+.primary-button {
+  background-color: #00645c;
+  color: rgba(255, 255, 255, 1.0);
+  font-family: "Roboto", Arial, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.7px;
+}
+
+.primary-button:hover,
+.primary-button:focus {
+  background-color: #3d9991;
+  color: rgba(255, 255, 255, 1);
+}
+
+a.primary-button {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.primary-button:disabled {
+  background: rgba(0, 0, 0, .2);
+  opacity: 0.65;
 }

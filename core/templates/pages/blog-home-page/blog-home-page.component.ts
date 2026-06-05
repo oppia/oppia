@@ -43,6 +43,7 @@ import {Router, ActivatedRoute} from '@angular/router';
 @Component({
   selector: 'oppia-blog-home-page',
   templateUrl: './blog-home-page.component.html',
+  styleUrls: ['./blog-home-page.component.css'],
 })
 export class BlogHomePageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
