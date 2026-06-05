@@ -107,6 +107,42 @@ describe('Topic viewer page', () => {
     meta_tag_content: 'Topic Meta Tag',
     page_title_fragment_for_web: 'Topic page title',
   };
+  let topicDictWithPractice = {
+    topic_id: '1',
+    topic_name: 'Topic Name',
+    topic_description: 'Topic Description',
+    canonical_story_dicts: [
+      {
+        id: '2',
+        title: 'Story Title',
+        node_titles: ['Node title 1', 'Node title 2'],
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+        description: '',
+        story_is_published: true,
+        all_node_dicts: [],
+      },
+    ],
+    additional_story_dicts: [],
+    uncategorized_skill_ids: [],
+    subtopics: [
+      {
+        id: 1,
+        title: 'Subtopic Title',
+        skill_ids: ['skill_1'],
+        thumbnail_filename: 'thumb.png',
+        thumbnail_bg_color: '#ffffff',
+        url_fragment: 'subtopic-frag',
+      },
+    ],
+    degrees_of_mastery: {},
+    skill_descriptions: {
+      skill_1: 'Skill description',
+    },
+    practice_tab_is_displayed: true,
+    meta_tag_content: 'Topic Meta Tag',
+    page_title_fragment_for_web: 'Topic page title',
+  };
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
@@ -193,6 +229,39 @@ describe('Topic viewer page', () => {
       },
     ]);
   }));
+
+  it(
+    'should build canonical story section data with practice count when ' +
+      'subtopics contain skills',
+    fakeAsync(() => {
+      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+        topicUrlFragment
+      );
+      spyOn(
+        urlService,
+        'getClassroomUrlFragmentFromLearnerUrl'
+      ).and.returnValue('math');
+      spyOn(topicViewerPageComponent, 'subscribeToOnLangChange');
+      spyOn(windowRef.nativeWindow.history, 'pushState');
+
+      topicViewerPageComponent.ngOnInit();
+      const req = httpTestingController.expectOne(
+        `/topic_data_handler/math/${topicUrlFragment}`
+      );
+      req.flush(topicDictWithPractice);
+      flushMicrotasks();
+
+      expect(topicViewerPageComponent.canonicalStorySectionData).toEqual([
+        {
+          storyId: '2',
+          storyTitle: 'Story Title',
+          storyDescription: '',
+          lessonCount: 2,
+          practiceCount: 1,
+        },
+      ]);
+    })
+  );
 
   it(
     'should obtain translated title and set it whenever the ' +
