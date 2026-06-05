@@ -857,3 +857,28 @@ class SwapWithCheckTestClass:
         """Run a few functions with kwargs."""
         os.getenv('123', default='456')
         os.getenv('678', default='900')
+
+
+class TestUtilsCoverageTests(test_utils.GenericTestBase):
+    """Testes adicionais para garantir 100% de cobertura no test_utils.py."""
+
+    def test_login_and_logout_branches(self) -> None:
+        """Cobre a linha do is_super_admin no método login."""
+        self.login('superadmin@example.com', is_super_admin=True)
+        self.assertEqual(os.environ['USER_IS_ADMIN'], '1')
+        self.logout()
+
+        self.login('normal@example.com', is_super_admin=False)
+        self.assertEqual(os.environ['USER_IS_ADMIN'], '0')
+        self.logout()
+
+    def test_delete_json_with_none_params(self) -> None:
+        """Cobre a linha 2649 (params is None) do delete_json."""
+        mock_response = mock.Mock()
+        mock_response.status_int = 200
+
+        with self.swap(
+            self.testapp, 'delete', mock.Mock(return_value=mock_response)
+        ), self.swap(self, '_parse_json_response', mock.Mock(return_value={})):
+            response = self.delete_json('/dummy_url')
+            self.assertEqual(response, {})

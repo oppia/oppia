@@ -204,3 +204,22 @@ class FirebaseAdminSdkStubTests(test_utils.TestBase):
 
     def test_delete_association_when_it_is_missing_does_not_raise(self) -> None:
         self.stub.delete_external_auth_associations('does_not_exist')
+
+    def test_get_auth_id_from_user_id_for_deleted_user_returns_none(
+        self,
+    ) -> None:
+        self.stub.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
+        self.stub.mark_user_for_deletion('uid')
+        self.assertIsNone(self.stub.get_auth_id_from_user_id('uid'))
+
+    def test_get_user_id_from_auth_id_with_include_deleted_true(self) -> None:
+        self.stub.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid')
+        )
+        self.stub.mark_user_for_deletion('uid')
+        self.assertEqual(
+            self.stub.get_user_id_from_auth_id('aid', include_deleted=True),
+            'uid',
+        )

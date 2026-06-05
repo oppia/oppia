@@ -35,7 +35,7 @@ if MYPY:  # pragma: no cover
         platform_auth_services,
     )
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from core.tests import test_utils
 
 (auth_models,) = models.Registry.import_models([models.Names.AUTH])
