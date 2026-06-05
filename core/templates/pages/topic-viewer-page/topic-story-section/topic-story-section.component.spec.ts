@@ -66,13 +66,11 @@ describe('TopicStorySectionComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should render story title and story meta text', () => {
-    const el: HTMLElement = fixture.nativeElement;
-    expect(el.querySelector('.story-title')?.textContent).toContain(
-      'Help Jaime win the Arcade Game'
-    );
-    expect(el.querySelector('.story-meta')?.textContent).toContain(
-      '2 lessons, 1 practice'
+  it('should return story title and meta text helpers', () => {
+    expect(component.storyTitle).toBe('Help Jaime win the Arcade Game');
+    expect(component.getStoryMetaText()).toBe('2 lessons, 1 practice');
+    expect(component.getStoryMetaAriaLabel()).toBe(
+      '2 lessons and 1 practice available'
     );
   });
 
