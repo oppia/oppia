@@ -189,49 +189,46 @@ export class UrlService {
 
   /**
    * This function is used to construct the classroom URL for learner pages.
-   * @param {string} classroomUrlFragment - The classroom URL fragment.
    * @return {string} The classroom URL.
    */
-  getLearnerClassroomUrl(classroomUrlFragment: string): string {
-    return classroomUrlFragment ? `/learn/${classroomUrlFragment}` : '/learn';
+  getLearnerClassroomUrl(): string {
+    try {
+      return `/learn/${this.getClassroomUrlFragmentFromLearnerUrl()}`;
+    } catch {
+      return '/learn';
+    }
   }
 
   /**
    * This function is used to construct the story URL for learner pages.
-   * @param {string} classroomUrlFragment - The classroom URL fragment.
-   * @param {string} topicUrlFragment - The topic URL fragment.
    * @return {string} The story URL.
    */
-  getLearnerTopicStoryUrl(
-    classroomUrlFragment: string,
-    topicUrlFragment: string
-  ): string {
-    return classroomUrlFragment && topicUrlFragment
-      ? this.getLearnerTopicUrl(
-          classroomUrlFragment,
-          topicUrlFragment,
-          ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE
-        )
-      : '/learn';
+  getLearnerTopicStoryUrl(): string {
+    try {
+      return this.getLearnerTopicUrl(
+        this.getClassroomUrlFragmentFromLearnerUrl(),
+        this.getTopicUrlFragmentFromLearnerUrl(),
+        ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE
+      );
+    } catch {
+      return '/learn';
+    }
   }
 
   /**
    * This function is used to construct the study guide URL for learner pages.
-   * @param {string} classroomUrlFragment - The classroom URL fragment.
-   * @param {string} topicUrlFragment - The topic URL fragment.
    * @return {string} The study guide URL.
    */
-  getLearnerTopicStudyGuideUrl(
-    classroomUrlFragment: string,
-    topicUrlFragment: string
-  ): string {
-    return classroomUrlFragment && topicUrlFragment
-      ? this.getLearnerTopicUrl(
-          classroomUrlFragment,
-          topicUrlFragment,
-          ClassroomDomainConstants.TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE
-        )
-      : '#';
+  getLearnerTopicStudyGuideUrl(): string {
+    try {
+      return this.getLearnerTopicUrl(
+        this.getClassroomUrlFragmentFromLearnerUrl(),
+        this.getTopicUrlFragmentFromLearnerUrl(),
+        ClassroomDomainConstants.TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE
+      );
+    } catch {
+      return '#';
+    }
   }
 
   private getLearnerTopicUrl(

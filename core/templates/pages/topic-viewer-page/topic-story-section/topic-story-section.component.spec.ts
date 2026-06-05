@@ -21,6 +21,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 import {TopicStorySectionComponent} from './topic-story-section.component';
 
@@ -34,7 +35,7 @@ describe('TopicStorySectionComponent', () => {
       'getLearnerTopicStudyGuideUrl',
     ]);
     TestBed.configureTestingModule({
-      declarations: [TopicStorySectionComponent],
+      declarations: [TopicStorySectionComponent, MockTranslatePipe],
       providers: [
         UrlInterpolationService,
         {provide: UrlService, useValue: urlService},
@@ -53,14 +54,8 @@ describe('TopicStorySectionComponent', () => {
       "In this story, we'll follow Jaime and his sister Nic as they learn.";
     component.lessonCount = 2;
     component.practiceCount = 1;
-    component.classroomUrlFragment = 'math';
-    component.topicUrlFragment = 'place-values';
-
-    urlService.getLearnerTopicStudyGuideUrl.and.callFake(
-      (classroomFragment: string, topicFragment: string) =>
-        classroomFragment && topicFragment
-          ? `/learn/${classroomFragment}/${topicFragment}/studyguide`
-          : '#'
+    urlService.getLearnerTopicStudyGuideUrl.and.returnValue(
+      '/learn/math/place-values/studyguide'
     );
 
     fixture.detectChanges();
@@ -78,15 +73,6 @@ describe('TopicStorySectionComponent', () => {
 
   it('should set the study guide url on init', () => {
     expect(component.studyGuideUrl).toBe('/learn/math/place-values/studyguide');
-  });
-
-  it('should use input URL fragments on init', () => {
-    expect(urlService.getLearnerTopicStudyGuideUrl).toHaveBeenCalledWith(
-      'math',
-      'place-values'
-    );
-    expect(component.classroomUrlFragment).toBe('math');
-    expect(component.topicUrlFragment).toBe('place-values');
   });
 
   it('should switch to fallback avatar URL when image load fails', () => {
@@ -122,8 +108,8 @@ describe('TopicStorySectionComponent', () => {
   });
 
   it('should keep study guide URL as # when URL fragments are unavailable', () => {
-    component.classroomUrlFragment = '';
-    component.topicUrlFragment = '';
+    urlService.getLearnerTopicStudyGuideUrl.calls.reset();
+    urlService.getLearnerTopicStudyGuideUrl.and.returnValue('#');
     component.ngOnInit();
 
     expect(component.studyGuideUrl).toBe('#');
