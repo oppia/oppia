@@ -196,7 +196,7 @@ describe('Topic viewer page', () => {
 
     topicViewerPageComponent.ngOnInit();
     expect(topicViewerPageComponent.canonicalStorySummaries).toEqual([]);
-    expect(topicViewerPageComponent.activeTab).toBe('story');
+    expect(topicViewerPageComponent.activeView).toBe('story');
     expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
       {},
       '',
@@ -319,7 +319,7 @@ describe('Topic viewer page', () => {
     );
     req.flush(topicDict);
     flushMicrotasks();
-    expect(topicViewerPageComponent.activeTab).toBe('story');
+    expect(topicViewerPageComponent.activeView).toBe('story');
   }));
 
   it('should set study tab correctly', fakeAsync(() => {
@@ -337,7 +337,7 @@ describe('Topic viewer page', () => {
       `/topic_data_handler/math/${topicUrlFragment}`
     );
     req.flush(topicDict);
-    expect(topicViewerPageComponent.activeTab).toBe('subtopics');
+    expect(topicViewerPageComponent.activeView).toBe('subtopics');
   }));
 
   it('should set practice tab correctly', fakeAsync(() => {
@@ -355,7 +355,7 @@ describe('Topic viewer page', () => {
       `/topic_data_handler/math/${topicUrlFragment}`
     );
     req.flush(topicDict);
-    expect(topicViewerPageComponent.activeTab).toBe('practice');
+    expect(topicViewerPageComponent.activeView).toBe('practice');
   }));
 
   it('should use reject handler when fetching subtopic data fails', fakeAsync(() => {
@@ -441,19 +441,19 @@ describe('Topic viewer page', () => {
     'should set url accordingly when user changes active tab to' + ' story tab',
     () => {
       spyOn(windowRef.nativeWindow.history, 'pushState');
-      topicViewerPageComponent.activeTab = 'subtopics';
+      topicViewerPageComponent.activeView = 'subtopics';
       spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
         'http://localhost/test_path/studyguide'
       );
 
-      topicViewerPageComponent.setActiveTab('story');
+      topicViewerPageComponent.setActiveView('story');
 
       expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
         {},
         '',
         'http://localhost/test_path/story'
       );
-      expect(topicViewerPageComponent.activeTab).toBe('story');
+      expect(topicViewerPageComponent.activeView).toBe('story');
     }
   );
 
@@ -462,19 +462,19 @@ describe('Topic viewer page', () => {
       ' practice tab',
     () => {
       spyOn(windowRef.nativeWindow.history, 'pushState');
-      topicViewerPageComponent.activeTab = 'subtopics';
+      topicViewerPageComponent.activeView = 'subtopics';
       spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
         'http://localhost/test_path/studyguide'
       );
 
-      topicViewerPageComponent.setActiveTab('practice');
+      topicViewerPageComponent.setActiveView('practice');
 
       expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
         {},
         '',
         'http://localhost/test_path/practice'
       );
-      expect(topicViewerPageComponent.activeTab).toBe('practice');
+      expect(topicViewerPageComponent.activeView).toBe('practice');
     }
   );
 
@@ -483,19 +483,19 @@ describe('Topic viewer page', () => {
       ' subtopics tab',
     () => {
       spyOn(windowRef.nativeWindow.history, 'pushState');
-      topicViewerPageComponent.activeTab = 'story';
+      topicViewerPageComponent.activeView = 'story';
       spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
         'http://localhost/test_path/story'
       );
 
-      topicViewerPageComponent.setActiveTab('subtopics');
+      topicViewerPageComponent.setActiveView('subtopics');
 
       expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
         {},
         '',
         'http://localhost/test_path/studyguide'
       );
-      expect(topicViewerPageComponent.activeTab).toBe('subtopics');
+      expect(topicViewerPageComponent.activeView).toBe('subtopics');
     }
   );
 

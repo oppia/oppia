@@ -52,7 +52,7 @@ interface TopicViewerStorySectionData {
 })
 export class TopicViewerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  activeTab: string = '';
+  activeView: string = '';
   canonicalStorySummaries: StorySummary[] = [];
   canonicalStorySectionData: readonly TopicViewerStorySectionData[] = [];
   topicUrlFragment: string = '';
@@ -85,14 +85,14 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.urlService.getPathname().endsWith('studyguide')) {
-      this.activeTab = 'subtopics';
+      this.activeView = 'subtopics';
     } else if (this.urlService.getPathname().endsWith('practice')) {
-      this.activeTab = 'practice';
+      this.activeView = 'practice';
     } else {
       if (!this.urlService.getPathname().endsWith('story')) {
-        this.setUrlAccordingToActiveTab('story');
+        this.updateUrlForActiveView('story');
       }
-      this.activeTab = 'story';
+      this.activeView = 'story';
     }
     this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
     this.classroomUrlFragment =
@@ -206,36 +206,36 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  setActiveTab(newActiveTabName: string): void {
-    if (newActiveTabName === 'story') {
-      this.setUrlAccordingToActiveTab('story');
-    } else if (newActiveTabName === 'practice') {
-      this.setUrlAccordingToActiveTab('practice');
+  setActiveView(newViewName: string): void {
+    if (newViewName === 'story') {
+      this.updateUrlForActiveView('story');
+    } else if (newViewName === 'practice') {
+      this.updateUrlForActiveView('practice');
     } else {
-      this.setUrlAccordingToActiveTab('studyguide');
+      this.updateUrlForActiveView('studyguide');
     }
-    this.activeTab = newActiveTabName;
+    this.activeView = newViewName;
   }
 
-  setUrlAccordingToActiveTab(newTabName: string): void {
+  updateUrlForActiveView(newViewName: string): void {
     let getCurrentLocation = this.windowRef.nativeWindow.location.toString();
-    if (this.activeTab === '') {
+    if (this.activeView === '') {
       this.windowRef.nativeWindow.history.pushState(
         {},
         '',
-        getCurrentLocation + '/' + newTabName
+        getCurrentLocation + '/' + newViewName
       );
-    } else if (this.activeTab === 'subtopics') {
+    } else if (this.activeView === 'subtopics') {
       this.windowRef.nativeWindow.history.pushState(
         {},
         '',
-        getCurrentLocation.replace('studyguide', newTabName)
+        getCurrentLocation.replace('studyguide', newViewName)
       );
     } else {
       this.windowRef.nativeWindow.history.pushState(
         {},
         '',
-        getCurrentLocation.replace(this.activeTab, newTabName)
+        getCurrentLocation.replace(this.activeView, newViewName)
       );
     }
   }

@@ -189,7 +189,6 @@ export class UrlService {
 
   /**
    * This function is used to construct the classroom URL for learner pages.
-   * @param {string} classroomUrlFragment - The classroom URL fragment.
    * @return {string} The classroom URL.
    */
   getLearnerClassroomUrl(): string {
@@ -199,8 +198,6 @@ export class UrlService {
 
   /**
    * This function is used to construct the story URL for learner pages.
-   * @param {string} classroomUrlFragment - The classroom URL fragment.
-   * @param {string} topicUrlFragment - The topic URL fragment.
    * @return {string} The story URL.
    */
   getLearnerTopicStoryUrl(): string {
@@ -218,13 +215,12 @@ export class UrlService {
 
   /**
    * This function is used to construct the study guide URL for learner pages.
-   * @param {string} classroomUrlFragment - The classroom URL fragment.
-   * @param {string} topicUrlFragment - The topic URL fragment.
    * @return {string} The study guide URL.
    */
   getLearnerTopicStudyGuideUrl(): string {
     const classroomFragment = this.getClassroomUrlFragmentFromLearnerUrl();
     const topicFragment = this.getTopicUrlFragmentFromLearnerUrl();
+
     return classroomFragment && topicFragment
       ? this.getLearnerTopicUrl(
           classroomFragment,
