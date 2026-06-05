@@ -930,6 +930,7 @@ def managed_acceptance_tests_server(
             'HEADLESS': 'true' if headless else 'false',
             'MOBILE': 'true' if mobile else 'false',
             'PROD_ENV': 'true' if prod_env else 'false',
+            'SPEC_NAME': suite_name,
         }
         playwright_args = [
             playwright_bin,
