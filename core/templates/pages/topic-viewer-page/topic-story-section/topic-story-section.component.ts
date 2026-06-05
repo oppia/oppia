@@ -14,8 +14,6 @@
 
 /**
  * @fileoverview Redesigned story section for the topic viewer page.
- * The component now derives lesson cards from the full StorySummary so the
- * rendered UI can show real lesson metadata and direct lesson links.
  */
 
 import {Component, Input, OnInit} from '@angular/core';
