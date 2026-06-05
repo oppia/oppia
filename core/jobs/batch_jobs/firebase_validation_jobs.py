@@ -31,7 +31,7 @@ from typing import Iterable, TypedDict
 # CORRUPT outputs are **unexpected**, and require a SERVER ADMIN to investigate.
 TAG_CORRUPT = 'CORRUPT'
 
-# FIXABLE outputs are _expected_, and can be fixed with manual intervention.
+# FIXABLE outputs are _expected_, and can be fixed by running `FirebaseSyncJob`.
 TAG_FIXABLE = 'FIXABLE'
 
 # CORRECT outputs are _expected_, and can be used to confirm that things are OK.
@@ -121,7 +121,8 @@ class _AuditRecords(beam.DoFn):  # type: ignore[misc]
 
             yield beam.TaggedOutput(
                 TAG_FIXABLE,
-                f'Firebase record ({firebase_id=!r}) linked to non-existent Oppia user',
+                f'Firebase record ({firebase_id=!r}) linked to non-existent '
+                'Oppia user',
             )
         elif oppia_record != firebase_record:
             oppia_dict = dataclasses.asdict(oppia_record)
