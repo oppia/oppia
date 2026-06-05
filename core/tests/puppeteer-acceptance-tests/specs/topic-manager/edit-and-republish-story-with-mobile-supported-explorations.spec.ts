@@ -56,7 +56,6 @@ describe('Topic Manager', function () {
     // Create an exploration with Set Input interaction.
     await curriculumAdmin.navigateToCreatorDashboardPage();
     await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
-    await curriculumAdmin.waitForPageToFullyLoad();
 
     // Create an exlporation unsupported by mobile.
     unsupportedExplorationId =
@@ -87,8 +86,6 @@ describe('Topic Manager', function () {
     );
 
     await curriculumAdmin.saveStoryDraft();
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdmin.waitForPageToFullyLoad();
 
     // Create topic Manager.
     topicManager = await UserFactory.createNewUser(
