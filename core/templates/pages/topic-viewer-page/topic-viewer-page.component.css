@@ -86,16 +86,6 @@ topic-viewer-page .redesigned-studyguide-section {
   padding: 24px 36px 56px;
 }
 
-topic-viewer-page .oppia-redesigned-topic-viewer-container.studyguide-view-active .topic-header {
-  background-color: transparent;
-  padding-bottom: 4px;
-}
-
-topic-viewer-page .oppia-redesigned-topic-viewer-container.studyguide-view-active .topic-header-title,
-topic-viewer-page .oppia-redesigned-topic-viewer-container.studyguide-view-active .topic-header-description {
-  display: none;
-}
-
 topic-viewer-page .redesigned-studyguide-section subtopics-list .oppia-subtopics-list-container {
   margin: 0 auto;
   max-width: 1160px;

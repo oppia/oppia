@@ -237,19 +237,6 @@ describe('Url Service', () => {
   });
 
   it('should correctly construct learner classroom and story urls', () => {
-    expect(urlService.getLearnerClassroomUrl('math')).toBe('/learn/math');
-    expect(urlService.getLearnerClassroomUrl('')).toBe('/learn');
-    expect(urlService.getLearnerTopicStoryUrl('math', 'place-values')).toBe(
-      '/learn/math/place-values/story'
-    );
-    expect(urlService.getLearnerTopicStoryUrl('', 'place-values')).toBe(
-      '/learn'
-    );
-    expect(
-      urlService.getLearnerTopicStudyGuideUrl('math', 'place-values')
-    ).toBe('/learn/math/place-values/studyguide');
-    expect(urlService.getLearnerTopicStudyGuideUrl('math', '')).toBe('#');
-
     mockLocation.pathname = '/learn/math/place-values';
     expect(urlService.getLearnerClassroomUrl()).toBe('/learn/math');
     expect(urlService.getLearnerTopicStoryUrl()).toBe(
@@ -260,9 +247,15 @@ describe('Url Service', () => {
     );
 
     mockLocation.pathname = '/topic/invalid';
-    expect(urlService.getLearnerClassroomUrl()).toBe('/learn');
-    expect(urlService.getLearnerTopicStoryUrl()).toBe('/learn');
-    expect(urlService.getLearnerTopicStudyGuideUrl()).toBe('#');
+    expect(function () {
+      urlService.getLearnerClassroomUrl();
+    }).toThrowError('Invalid URL for classroom');
+    expect(function () {
+      urlService.getLearnerTopicStoryUrl();
+    }).toThrowError('Invalid URL for classroom');
+    expect(function () {
+      urlService.getLearnerTopicStudyGuideUrl();
+    }).toThrowError('Invalid URL for classroom');
   });
 
   it('should correctly retrieve selected subtopics from url', () => {

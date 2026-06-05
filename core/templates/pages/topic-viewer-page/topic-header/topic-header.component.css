@@ -44,6 +44,11 @@
   padding: 16px 0;
 }
 
+.topic-header.studyguide-view-active {
+  background-color: transparent;
+  padding-bottom: 4px;
+}
+
 .topic-header-title {
   color: #00645c;
   font-family: Capriola, sans-serif;
@@ -56,6 +61,11 @@
   color: #4a4a4a;
   font-family: Roboto, Arial, sans-serif;
   margin: 0;
+}
+
+.topic-header.studyguide-view-active .topic-header-title,
+.topic-header.studyguide-view-active .topic-header-description {
+  display: none;
 }
 @media (max-width: 767px) {
   .topic-header-breadcrumbs-desktop {
