@@ -192,9 +192,8 @@ export class UrlService {
    * @param {string} classroomUrlFragment - The classroom URL fragment.
    * @return {string} The classroom URL.
    */
-  getLearnerClassroomUrl(classroomUrlFragment?: string): string {
-    const classroomFragment =
-      classroomUrlFragment ?? this.getClassroomUrlFragmentSafely();
+  getLearnerClassroomUrl(): string {
+    const classroomFragment = this.getClassroomUrlFragmentFromLearnerUrl();
     return classroomFragment ? `/learn/${classroomFragment}` : '/learn';
   }
 
@@ -204,13 +203,9 @@ export class UrlService {
    * @param {string} topicUrlFragment - The topic URL fragment.
    * @return {string} The story URL.
    */
-  getLearnerTopicStoryUrl(
-    classroomUrlFragment?: string,
-    topicUrlFragment?: string
-  ): string {
-    const classroomFragment =
-      classroomUrlFragment ?? this.getClassroomUrlFragmentSafely();
-    const topicFragment = topicUrlFragment ?? this.getTopicUrlFragmentSafely();
+  getLearnerTopicStoryUrl(): string {
+    const classroomFragment = this.getClassroomUrlFragmentFromLearnerUrl();
+    const topicFragment = this.getTopicUrlFragmentFromLearnerUrl();
 
     return classroomFragment && topicFragment
       ? this.getLearnerTopicUrl(
@@ -227,14 +222,9 @@ export class UrlService {
    * @param {string} topicUrlFragment - The topic URL fragment.
    * @return {string} The study guide URL.
    */
-  getLearnerTopicStudyGuideUrl(
-    classroomUrlFragment?: string,
-    topicUrlFragment?: string
-  ): string {
-    const classroomFragment =
-      classroomUrlFragment ?? this.getClassroomUrlFragmentSafely();
-    const topicFragment = topicUrlFragment ?? this.getTopicUrlFragmentSafely();
-
+  getLearnerTopicStudyGuideUrl(): string {
+    const classroomFragment = this.getClassroomUrlFragmentFromLearnerUrl();
+    const topicFragment = this.getTopicUrlFragmentFromLearnerUrl();
     return classroomFragment && topicFragment
       ? this.getLearnerTopicUrl(
           classroomFragment,
@@ -242,22 +232,6 @@ export class UrlService {
           ClassroomDomainConstants.TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE
         )
       : '#';
-  }
-
-  private getClassroomUrlFragmentSafely(): string {
-    try {
-      return this.getClassroomUrlFragmentFromLearnerUrl();
-    } catch {
-      return '';
-    }
-  }
-
-  private getTopicUrlFragmentSafely(): string {
-    try {
-      return this.getTopicUrlFragmentFromLearnerUrl();
-    } catch {
-      return '';
-    }
   }
 
   private getLearnerTopicUrl(
