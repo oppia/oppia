@@ -501,16 +501,24 @@ export class BaseUser {
    * by the ElementHandle.
    */
   async waitForElementToBeClickable(
-    selector: string | ElementHandle<Element>
+    selector: string | ElementHandle<Element>,
+    timeout: number = 15000
   ): Promise<void> {
     const elementDesc = await this.getElementDescription(selector);
     showMessage(`Checking if element ${elementDesc} is clickable...`);
     const element =
       typeof selector === 'string'
-        ? await this.page.waitForSelector(selector)
+        ? await this.page.waitForSelector(selector, {
+            timeout: timeout,
+            visible: true,
+          })
         : selector;
     try {
-      await this.page.waitForFunction(isElementClickable, {}, element);
+      await this.page.waitForFunction(
+        isElementClickable,
+        {timeout: timeout},
+        element
+      );
     } catch (error) {
       if (error instanceof Error) {
         const clickabilityDiagnostics = await this.page.evaluate(
@@ -623,7 +631,7 @@ export class BaseUser {
             : 'No specific reason detected from diagnostics.';
 
         error.message =
-          `Element ${elementDesc} took too long to be clickable.\n` +
+          `Element ${elementDesc} took too long to be clickable (timeout ${timeout} ms).\n` +
           `Detected reasons:\n${reasonsText}\n` +
           'Original Error:\n' +
           error.message;

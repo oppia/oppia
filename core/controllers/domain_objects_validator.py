@@ -459,10 +459,10 @@ def validate_general_feedback_session_info_log_entries(
         raise base.BaseHandler.InvalidInputException(
             'Session info contains unknown keys: %s' % ', '.join(unknown_keys)
         )
-    console_errors_json = session_info.get('console_errors_json', [])
-    if not isinstance(console_errors_json, list):
+    console_logs_json = session_info.get('console_logs_json', [])
+    if not isinstance(console_logs_json, list):
         raise base.BaseHandler.InvalidInputException(
-            'console_errors_json should be a list.'
+            'console_logs_json should be a list.'
         )
     failed_requests_json = session_info.get('failed_requests_json', [])
     if not isinstance(failed_requests_json, list):
@@ -480,7 +480,7 @@ def validate_general_feedback_session_info_log_entries(
             'environment_json should be a dict.'
         )
     if (
-        len(console_errors_json) > feconf.MAX_SESSION_INFO_LOG_ENTRIES
+        len(console_logs_json) > feconf.MAX_SESSION_INFO_LOG_ENTRIES
         or len(failed_requests_json) > feconf.MAX_SESSION_INFO_LOG_ENTRIES
         or len(navigation_history_json) > feconf.MAX_NAVIGATION_HISTORY_ENTRIES
     ):
@@ -488,24 +488,24 @@ def validate_general_feedback_session_info_log_entries(
             'Session info log entries exceed maximum allowed limit.'
         )
 
-    for entry in console_errors_json:
+    for entry in console_logs_json:
         if not isinstance(entry, dict):
             raise base.BaseHandler.InvalidInputException(
-                'console_errors_json should be a list of dicts.'
+                'console_logs_json should be a list of dicts.'
             )
         error_message = entry.get('error_message')
         if not isinstance(error_message, str):
             raise base.BaseHandler.InvalidInputException(
-                'error_message in console_errors_json should be a string.'
+                'error_message in console_logs_json should be a string.'
             )
         if len(error_message) > feconf.MAX_SESSION_INFO_LOG_MESSAGE_LENGTH:
             raise base.BaseHandler.InvalidInputException(
-                'error_message in console_errors_json exceeds maximum length of %d characters.'
+                'error_message in console_logs_json exceeds maximum length of %d characters.'
                 % feconf.MAX_SESSION_INFO_LOG_MESSAGE_LENGTH
             )
         if not isinstance(entry.get('timestamp_msecs'), int):
             raise base.BaseHandler.InvalidInputException(
-                'Session info console_errors_json.timestamp_msecs '
+                'Session info console_logs_json.timestamp_msecs '
                 'should be an int.'
             )
         log_level = entry.get('log_level')
@@ -517,17 +517,17 @@ def validate_general_feedback_session_info_log_entries(
             'debug',
         ):
             raise base.BaseHandler.InvalidInputException(
-                'Invalid log_level in console_errors_json.'
+                'Invalid log_level in console_logs_json.'
             )
         stack_trace = entry.get('stack_trace')
         if stack_trace is not None:
             if not isinstance(stack_trace, str):
                 raise base.BaseHandler.InvalidInputException(
-                    'stack_trace in console_errors_json should be a string.'
+                    'stack_trace in console_logs_json should be a string.'
                 )
             if len(stack_trace) > feconf.MAX_SESSION_INFO_STACK_TRACE_LENGTH:
                 raise base.BaseHandler.InvalidInputException(
-                    'stack_trace in console_errors_json exceeds maximum length of %d characters.'
+                    'stack_trace in console_logs_json exceeds maximum length of %d characters.'
                     % feconf.MAX_SESSION_INFO_STACK_TRACE_LENGTH
                 )
     for entry in failed_requests_json:
@@ -678,7 +678,7 @@ def validate_general_feedback_session_info_log_entries(
         )
 
     return {
-        'console_errors_json': console_errors_json,
+        'console_logs_json': console_logs_json,
         'failed_requests_json': failed_requests_json,
         'navigation_history_json': navigation_history_json,
         'environment_json': {
