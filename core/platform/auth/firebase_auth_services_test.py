@@ -198,7 +198,7 @@ class FirebaseAdminSdkStub:
             email: str|None. The email address for the user, or None.
             disabled: bool. Whether the user account is to be disabled.
             password: str|None. The password for the user. Accepted but not
-                stored by the stub.
+                stored by the stub for API parity with the real Firebase SDK.
 
         Returns:
             firebase_auth.UserRecord. The final state of the account.
