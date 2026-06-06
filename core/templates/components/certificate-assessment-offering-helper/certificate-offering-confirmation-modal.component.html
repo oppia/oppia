@@ -23,19 +23,11 @@
 
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-  <button
-    class="btn btn-success e2e-test-confirm-save-certificate"
-    [disabled]="!isCertificateValid"
-    (click)="confirm()">
+  <button class="btn btn-success e2e-test-confirm-save-certificate" [disabled]="!isCertificateValid"
+          (click)="confirm()">
     Create Certificate
   </button>
   <button class="btn btn-warning" (click)="saveAsNotReady()">
     Save as Not Ready
   </button>
 </div>
-
-<style>
-.save-certificate-option {
-  margin-left: 1.25rem;
-}
-</style>

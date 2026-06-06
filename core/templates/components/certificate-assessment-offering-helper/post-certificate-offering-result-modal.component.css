@@ -1,0 +1,48 @@
+.oppia-certificate-avatar {
+  width: 120px;
+  position: relative;
+  z-index: 2;
+  margin-bottom: -30px;
+}
+
+.oppia-certificate-card {
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  padding: 60px;
+  max-width: 560px;
+  z-index: 1;
+  text-align: left;
+}
+
+.oppia-certificate-message {
+  color: #00897b;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.oppia-certificate-message strong {
+  color: #00897b;
+}
+
+.oppia-certificate-link-row {
+  text-align: center;
+  font-size: 14px;
+  color: #333;
+}
+
+.oppia-certificate-link-row a {
+  color: #1a73e8;
+  word-break: break-all;
+}
+
+.oppia-certificate-link-row .fa-copy {
+  cursor: pointer;
+  color: #555;
+  font-size: 15px;
+}
+
+.oppia-certificate-link-row .fa-copy:hover {
+  color: #000;
+}

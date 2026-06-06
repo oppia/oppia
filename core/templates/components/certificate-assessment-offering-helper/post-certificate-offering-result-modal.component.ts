@@ -21,6 +21,7 @@ import {Clipboard} from '@angular/cdk/clipboard';
 import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import './post-certificate-offering-result-modal.component.css';
 
 type CertificateOfferingResultAction = 'created' | 'updated';
 
@@ -31,7 +32,7 @@ type CertificateOfferingResultAction = 'created' | 'updated';
 export class PostCertificateOfferingResultModalComponent {
   @Input() action: CertificateOfferingResultAction = 'created';
 
-  // TODO: Replace with dynamic values once backend is wired up.
+  // TODO(#24717 - M1.11): Replace with dynamic values once backend is wired up.
   @Input() certificateName: string = 'Everyday Arithmetic & Number Confidence';
   @Input() certificateUrl: string =
     'https://www.oppia.org/certificate-offering/math/tYHbzfYwyzOP';
