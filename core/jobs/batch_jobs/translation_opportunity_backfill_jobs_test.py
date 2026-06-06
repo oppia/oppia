@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.domain import exp_domain, rights_manager
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import translation_opportunity_backfill_jobs
@@ -211,6 +211,35 @@ class BackfillTranslationOpportunityModelJobTests(
         self.assertEqual(model.topic_ids, ['topic_id'])
         # Exploration currently has 0 content_count from create_default_exploration.
         self.assertEqual(model.content_count, 0)
+        self.assertEqual(model.translation_counts, {'hi': 1})
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_creates_translation_opportunity_model_with_new_opp_models_flag_enabled(
+        self,
+    ) -> None:
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+            ]
+        )
+
+        model = opportunity_models.TranslationOpportunityModel.get(
+            opportunity_models.TranslationOpportunityModel._generate_id(  # pylint: disable=protected-access
+                feconf.TranslatableEntityType.EXPLORATION.value, self.exp_id
+            )
+        )
+        self.assertIsNotNone(model)
+        self.assertEqual(model.entity_type, 'exploration')
+        self.assertEqual(model.entity_id, self.exp_id)
+        self.assertEqual(model.topic_ids, ['topic_id'])
+        # Exploration has 2 non-empty metadata fields (title and 1 tag).
+        self.assertEqual(model.content_count, 2)
         self.assertEqual(model.translation_counts, {'hi': 1})
 
     def test_creates_translation_opportunity_model_with_complete_native_language(
