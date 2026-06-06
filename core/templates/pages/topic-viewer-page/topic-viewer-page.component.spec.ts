@@ -109,8 +109,46 @@ describe('Topic viewer page', () => {
     meta_tag_content: 'Topic Meta Tag',
     page_title_fragment_for_web: 'Topic page title',
   };
+  let topicDictWithPractice = {
+    topic_id: '1',
+    topic_name: 'Topic Name',
+    topic_description: 'Topic Description',
+    canonical_story_dicts: [
+      {
+        id: '2',
+        title: 'Story Title',
+        node_titles: ['Node title 1', 'Node title 2'],
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+        description: '',
+        story_is_published: true,
+        all_node_dicts: [],
+      },
+    ],
+    additional_story_dicts: [],
+    uncategorized_skill_ids: [],
+    subtopics: [
+      {
+        id: 1,
+        title: 'Subtopic Title',
+        skill_ids: ['skill_1'],
+        thumbnail_filename: 'thumb.png',
+        thumbnail_bg_color: '#ffffff',
+        url_fragment: 'subtopic-frag',
+      },
+    ],
+    degrees_of_mastery: {},
+    skill_descriptions: {
+      skill_1: 'Skill description',
+    },
+    practice_tab_is_displayed: true,
+    meta_tag_content: 'Topic Meta Tag',
+    page_title_fragment_for_web: 'Topic page title',
+  };
 
   beforeEach(() => {
+    mockPlatformFeatureService.status.RedesignedTopicViewerPage.isEnabled =
+      false;
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       declarations: [TopicViewerPageComponent, MockTranslatePipe],
@@ -163,7 +201,9 @@ describe('Topic viewer page', () => {
 
     topicViewerPageComponent.ngOnInit();
     expect(topicViewerPageComponent.canonicalStorySummaries).toEqual([]);
-    expect(topicViewerPageComponent.activeTab).toBe('story');
+    expect(topicViewerPageComponent.activeView).toBe(
+      topicViewerPageComponent.VIEW_NAMES.STORY
+    );
     expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
       {},
       '',
@@ -198,6 +238,39 @@ describe('Topic viewer page', () => {
       },
     ]);
   }));
+
+  it(
+    'should build canonical story section data with practice count when ' +
+      'subtopics contain skills',
+    fakeAsync(() => {
+      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+        topicUrlFragment
+      );
+      spyOn(
+        urlService,
+        'getClassroomUrlFragmentFromLearnerUrl'
+      ).and.returnValue('math');
+      spyOn(topicViewerPageComponent, 'subscribeToOnLangChange');
+      spyOn(windowRef.nativeWindow.history, 'pushState');
+
+      topicViewerPageComponent.ngOnInit();
+      const req = httpTestingController.expectOne(
+        `/topic_data_handler/math/${topicUrlFragment}`
+      );
+      req.flush(topicDictWithPractice);
+      flushMicrotasks();
+
+      expect(topicViewerPageComponent.canonicalStorySectionData).toEqual([
+        {
+          storyId: '2',
+          storyTitle: 'Story Title',
+          storyDescription: '',
+          lessonCount: 2,
+          practiceCount: 1,
+        },
+      ]);
+    })
+  );
 
   it(
     'should obtain translated title and set it whenever the ' +
@@ -255,7 +328,9 @@ describe('Topic viewer page', () => {
     );
     req.flush(topicDict);
     flushMicrotasks();
-    expect(topicViewerPageComponent.activeTab).toBe('story');
+    expect(topicViewerPageComponent.activeView).toBe(
+      topicViewerPageComponent.VIEW_NAMES.STORY
+    );
   }));
 
   it('should set study tab correctly', fakeAsync(() => {
@@ -273,7 +348,9 @@ describe('Topic viewer page', () => {
       `/topic_data_handler/math/${topicUrlFragment}`
     );
     req.flush(topicDict);
-    expect(topicViewerPageComponent.activeTab).toBe('subtopics');
+    expect(topicViewerPageComponent.activeView).toBe(
+      topicViewerPageComponent.VIEW_NAMES.STUDYGUIDE
+    );
   }));
 
   it('should set practice tab correctly', fakeAsync(() => {
@@ -291,7 +368,34 @@ describe('Topic viewer page', () => {
       `/topic_data_handler/math/${topicUrlFragment}`
     );
     req.flush(topicDict);
-    expect(topicViewerPageComponent.activeTab).toBe('practice');
+    expect(topicViewerPageComponent.activeView).toBe(
+      topicViewerPageComponent.VIEW_NAMES.PRACTICE
+    );
+  }));
+
+  it('should set story tab when practice url is opened in redesigned mode', fakeAsync(() => {
+    mockPlatformFeatureService.status.RedesignedTopicViewerPage.isEnabled =
+      true;
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      topicUrlFragment
+    );
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'math'
+    );
+    spyOn(urlService, 'getPathname').and.returnValue(
+      `/learn/math/${topicUrlFragment}/practice`
+    );
+
+    topicViewerPageComponent.ngOnInit();
+    const req = httpTestingController.expectOne(
+      `/topic_data_handler/math/${topicUrlFragment}`
+    );
+    req.flush(topicDict);
+    flushMicrotasks();
+
+    expect(topicViewerPageComponent.activeView).toBe(
+      topicViewerPageComponent.VIEW_NAMES.STORY
+    );
   }));
 
   it('should use reject handler when fetching subtopic data fails', fakeAsync(() => {
@@ -377,19 +481,24 @@ describe('Topic viewer page', () => {
     'should set url accordingly when user changes active tab to' + ' story tab',
     () => {
       spyOn(windowRef.nativeWindow.history, 'pushState');
-      topicViewerPageComponent.activeTab = 'subtopics';
+      topicViewerPageComponent.activeView =
+        topicViewerPageComponent.VIEW_NAMES.STUDYGUIDE;
       spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
         'http://localhost/test_path/studyguide'
       );
 
-      topicViewerPageComponent.setActiveTab('story');
+      topicViewerPageComponent.setActiveView(
+        topicViewerPageComponent.VIEW_NAMES.STORY
+      );
 
       expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
         {},
         '',
         'http://localhost/test_path/story'
       );
-      expect(topicViewerPageComponent.activeTab).toBe('story');
+      expect(topicViewerPageComponent.activeView).toBe(
+        topicViewerPageComponent.VIEW_NAMES.STORY
+      );
     }
   );
 
@@ -398,40 +507,74 @@ describe('Topic viewer page', () => {
       ' practice tab',
     () => {
       spyOn(windowRef.nativeWindow.history, 'pushState');
-      topicViewerPageComponent.activeTab = 'subtopics';
+      topicViewerPageComponent.activeView =
+        topicViewerPageComponent.VIEW_NAMES.STUDYGUIDE;
       spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
         'http://localhost/test_path/studyguide'
       );
 
-      topicViewerPageComponent.setActiveTab('practice');
+      topicViewerPageComponent.setActiveView(
+        topicViewerPageComponent.VIEW_NAMES.PRACTICE
+      );
 
       expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
         {},
         '',
         'http://localhost/test_path/practice'
       );
-      expect(topicViewerPageComponent.activeTab).toBe('practice');
+      expect(topicViewerPageComponent.activeView).toBe(
+        topicViewerPageComponent.VIEW_NAMES.PRACTICE
+      );
     }
   );
 
+  it('should map practice tab to story tab in redesigned mode', () => {
+    mockPlatformFeatureService.status.RedesignedTopicViewerPage.isEnabled =
+      true;
+    spyOn(windowRef.nativeWindow.history, 'pushState');
+    topicViewerPageComponent.activeView =
+      topicViewerPageComponent.VIEW_NAMES.STUDYGUIDE;
+    spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
+      'http://localhost/test_path/studyguide'
+    );
+
+    topicViewerPageComponent.setActiveView(
+      topicViewerPageComponent.VIEW_NAMES.PRACTICE
+    );
+
+    expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
+      {},
+      '',
+      'http://localhost/test_path/story'
+    );
+    expect(topicViewerPageComponent.activeView).toBe(
+      topicViewerPageComponent.VIEW_NAMES.STORY
+    );
+  });
+
   it(
     'should set url hash accordingly when user changes active tab to' +
-      ' subtopics tab',
+      ' studyguide tab',
     () => {
       spyOn(windowRef.nativeWindow.history, 'pushState');
-      topicViewerPageComponent.activeTab = 'story';
+      topicViewerPageComponent.activeView =
+        topicViewerPageComponent.VIEW_NAMES.STORY;
       spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
         'http://localhost/test_path/story'
       );
 
-      topicViewerPageComponent.setActiveTab('subtopics');
+      topicViewerPageComponent.setActiveView(
+        topicViewerPageComponent.VIEW_NAMES.STUDYGUIDE
+      );
 
       expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
         {},
         '',
         'http://localhost/test_path/studyguide'
       );
-      expect(topicViewerPageComponent.activeTab).toBe('subtopics');
+      expect(topicViewerPageComponent.activeView).toBe(
+        topicViewerPageComponent.VIEW_NAMES.STUDYGUIDE
+      );
     }
   );
 

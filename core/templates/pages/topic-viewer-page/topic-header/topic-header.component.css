@@ -44,6 +44,11 @@
   padding: 16px 0;
 }
 
+.topic-header.studyguide-view-active {
+  background-color: transparent;
+  padding-bottom: 4px;
+}
+
 .topic-header-title {
   color: #00645c;
   font-family: Capriola, sans-serif;

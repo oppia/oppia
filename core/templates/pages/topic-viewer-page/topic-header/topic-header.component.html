@@ -73,7 +73,7 @@
   </div>
 </nav>
 
-<header class="topic-header">
+<header class="topic-header" [class.studyguide-view-active]="showStudySkillsBreadcrumb">
   <h1 class="topic-header-title">
     <ng-container *ngIf="isHackyTopicNameTranslationDisplayed(); else rawHeaderTopicName">{{ topicNameTranslationKey | translate }}</ng-container>
     <ng-template #rawHeaderTopicName>{{ topicName }}</ng-template>
