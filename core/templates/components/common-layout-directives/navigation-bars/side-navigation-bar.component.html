@@ -311,6 +311,11 @@
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
+          <a tabindex="-1" (click)="navigateToBlogPage()" class="oppia-sidebar-menu-link e2e-mobile-test-sidebar-blog-button">
+            <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_BLOG' | translate }}</span>
+          </a>
+        </div>
+        <div class="oppia-sidebar-submenu-upperborder">
           <div (click)="toggleImpactReportSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandable-button e2e-mobile-test-sidebar-expand-impactreport-submenu">
             <span [ngClass]="{'oppia-sidebar-submenu-toggle': impactReportSubmenuIsShown}" class="text-uppercase">{{ 'I18N_SIDEBAR_IMPACT_REPORT' | translate }}</span>
             <i [ngClass]="{'oppia-sidebar-menu-icon-transition': impactReportSubmenuIsShown}" class="fas fa-angle-down oppia-sidebar-expand-icon expand-icon">

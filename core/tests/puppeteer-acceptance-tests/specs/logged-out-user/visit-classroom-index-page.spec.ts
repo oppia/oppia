@@ -22,7 +22,6 @@ import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
-import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -34,7 +33,6 @@ ConsoleReporter.setConsoleErrorsToIgnore([
 describe('Logged-out User', function () {
   let loggedOutUser: LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin;
-  let releaseCoordinator: ReleaseCoordinator;
 
   beforeAll(async function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
@@ -43,13 +41,6 @@ describe('Logged-out User', function () {
       'curriculum_admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
-    releaseCoordinator = await UserFactory.createNewUser(
-      'releaseCoordinator',
-      'release_coordinator@example.com',
-      [ROLES.RELEASE_COORDINATOR]
-    );
-
-    await releaseCoordinator.enableFeatureFlag('enable_multiple_classrooms');
     await curriculumAdmin.createTopic('Test Topic 2', 'test-topic-two');
     await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
