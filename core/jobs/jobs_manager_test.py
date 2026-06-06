@@ -328,6 +328,7 @@ class FirebaseAuthenticationServiceAccountTests(test_utils.GenericTestBase):
         )
 
         _, kwargs = mock_pipeline_class.call_args
+        self.assertIsInstance(kwargs['options'], job_options.JobOptions)
         self.assertDictContainsSubset(
             {
                 'service_account_email': feconf.FIREBASE_AUTHENTICATION_READ_ONLY_SERVICE_ACCOUNT
@@ -347,6 +348,7 @@ class FirebaseAuthenticationServiceAccountTests(test_utils.GenericTestBase):
         )
 
         _, kwargs = mock_pipeline_class.call_args
+        self.assertIsInstance(kwargs['options'], job_options.JobOptions)
         self.assertDictContainsSubset(
             {
                 'service_account_email': feconf.FIREBASE_AUTHENTICATION_READ_AND_WRITE_SERVICE_ACCOUNT
@@ -360,6 +362,7 @@ class FirebaseAuthenticationServiceAccountTests(test_utils.GenericTestBase):
         jobs_manager.run_job(WorkingJob, True, namespace=self.namespace)
 
         _, kwargs = mock_pipeline_class.call_args
+        self.assertIsInstance(kwargs['options'], job_options.JobOptions)
         self.assertDictContainsSubset(
             {'service_account_email': None}, kwargs['options'].get_all_options()
         )
