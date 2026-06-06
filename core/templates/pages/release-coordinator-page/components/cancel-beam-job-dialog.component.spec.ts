@@ -38,7 +38,15 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Cancel beam job dialog', () => {
-  const beamJobRun = new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false);
+  const beamJobRun = new BeamJobRun(
+    '123',
+    'FooJob',
+    'RUNNING',
+    0,
+    0,
+    false,
+    null
+  );
 
   let fixture: ComponentFixture<CancelBeamJobDialogComponent>;
   let component: CancelBeamJobDialogComponent;
@@ -93,7 +101,8 @@ describe('Cancel beam job dialog', () => {
       'CANCELLED',
       0,
       0,
-      false
+      false,
+      null
     );
     const caneclBeamJobRunSpy = spyOn(
       backendApiService,

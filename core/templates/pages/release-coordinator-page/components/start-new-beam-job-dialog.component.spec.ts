@@ -88,7 +88,8 @@ describe('Start new beam job dialog', () => {
       'PENDING',
       0,
       0,
-      false
+      false,
+      null
     );
     const startNewBeamJobSpy = spyOn(
       backendApiService,
@@ -96,13 +97,13 @@ describe('Start new beam job dialog', () => {
     ).and.returnValue(of(newBeamJobRun));
     const closeDialogSpy = spyOn(matDialogRef, 'close');
 
-    expect(component.isRunning).toBeFalse();
-    expect(matDialogRef.disableClose).toBeFalse();
+    expect(component.isRunning).toBe(false);
+    expect(matDialogRef.disableClose).toBe(false);
 
     component.onActionClick();
 
-    expect(component.isRunning).toBeTrue();
-    expect(matDialogRef.disableClose).toBeTrue();
+    expect(component.isRunning).toBe(true);
+    expect(matDialogRef.disableClose).toBe(true);
 
     fixture.detectChanges();
 

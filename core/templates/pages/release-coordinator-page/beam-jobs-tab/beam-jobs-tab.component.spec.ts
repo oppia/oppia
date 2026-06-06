@@ -69,9 +69,25 @@ describe('Beam Jobs Tab Component', () => {
   const bazJob = new BeamJob('BazJob');
   const beamJobs = [fooJob, barJob, bazJob];
 
-  const runningFooJob = new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false);
-  const pendingBarJob = new BeamJobRun('456', 'BarJob', 'PENDING', 0, 0, false);
-  const doneBarJob = new BeamJobRun('789', 'BarJob', 'DONE', 0, 0, false);
+  const runningFooJob = new BeamJobRun(
+    '123',
+    'FooJob',
+    'RUNNING',
+    0,
+    0,
+    false,
+    null
+  );
+  const pendingBarJob = new BeamJobRun(
+    '456',
+    'BarJob',
+    'PENDING',
+    0,
+    0,
+    false,
+    null
+  );
+  const doneBarJob = new BeamJobRun('789', 'BarJob', 'DONE', 0, 0, false, null);
   const beamJobRuns = [runningFooJob, pendingBarJob, doneBarJob];
   const terminalBeamJobRuns = [doneBarJob];
 
@@ -109,9 +125,21 @@ describe('Beam Jobs Tab Component', () => {
               getBeamJobs: () => of(beamJobs),
               getBeamJobRuns: () => of(beamJobRuns),
               startNewBeamJob: () =>
-                of(new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false)),
+                of(
+                  new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false, null)
+                ),
               cancelBeamJobRun: () =>
-                of(new BeamJobRun('123', 'FooJob', 'CANCELLED', 0, 0, false)),
+                of(
+                  new BeamJobRun(
+                    '123',
+                    'FooJob',
+                    'CANCELLED',
+                    0,
+                    0,
+                    false,
+                    null
+                  )
+                ),
               getBeamJobRunOutput: () => of(new BeamJobRunResult('abc', '123')),
             } as Partial<ReleaseCoordinatorBackendApiService>
           ),
@@ -252,7 +280,8 @@ describe('Beam Jobs Tab Component', () => {
       'PENDING',
       0,
       0,
-      false
+      false,
+      null
     );
     const startNewJobSpy = spyOn(
       backendApiService,
@@ -296,10 +325,11 @@ describe('Beam Jobs Tab Component', () => {
     const cancellingFooJob = new BeamJobRun(
       '123',
       'FooJob',
-      'CANCELLED',
+      'CANCELLING',
       0,
       0,
-      false
+      false,
+      null
     );
     const cancelBeamJobRunSpy = spyOn(
       backendApiService,
