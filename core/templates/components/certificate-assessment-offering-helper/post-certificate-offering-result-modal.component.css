@@ -1,18 +1,18 @@
 .oppia-certificate-avatar {
-  width: 120px;
-  position: relative;
-  z-index: 2;
   margin-bottom: -30px;
+  position: relative;
+  width: 120px;
+  z-index: 2;
 }
 
 .oppia-certificate-card {
-  background: #ffffff;
-  border-radius: 8px;
+  background: #fff;
   border: 1px solid #e0e0e0;
-  padding: 60px;
+  border-radius: 8px;
   max-width: 560px;
-  z-index: 1;
+  padding: 60px;
   text-align: left;
+  z-index: 1;
 }
 
 .oppia-certificate-message {
@@ -27,9 +27,9 @@
 }
 
 .oppia-certificate-link-row {
-  text-align: center;
-  font-size: 14px;
   color: #333;
+  font-size: 14px;
+  text-align: center;
 }
 
 .oppia-certificate-link-row a {
@@ -38,8 +38,8 @@
 }
 
 .oppia-certificate-link-row .fa-copy {
-  cursor: pointer;
   color: #555;
+  cursor: pointer;
   font-size: 15px;
 }
 
