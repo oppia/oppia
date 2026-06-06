@@ -18,6 +18,7 @@
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {SimpleChange} from '@angular/core';
 
 import {StoryNode} from 'domain/story/story-node.model';
 import {StorySummary} from 'domain/story/story-summary.model';
@@ -331,5 +332,55 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.practiceCard).not.toBeNull();
     expect(component.practiceCard?.practiceUrl).toContain('practice/session');
+  });
+
+  it('should not create practice card when practice count is zero', () => {
+    component.storySummary = createStorySummarySpy([], []);
+    component.lessonCount = 0;
+    component.practiceCount = 0;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'place-values';
+    component.practiceSubtopicIds = [1];
+
+    component.ngOnInit();
+
+    expect(component.lessonCards.length).toBe(0);
+    expect(component.practiceCard).toBeNull();
+  });
+
+  it('should use empty string when story description is missing', () => {
+    const storySummary = createStorySummarySpy([], []);
+    storySummary.getDescription.and.returnValue(null as unknown as string);
+
+    component.storySummary = storySummary;
+    component.lessonCount = 0;
+    component.practiceCount = 0;
+
+    component.ngOnInit();
+
+    expect(component.storyDescription).toBe('');
+  });
+
+  it('should sync on relevant ngOnChanges input updates', () => {
+    const initialStudyGuideUrl = component.studyGuideUrl;
+    urlService.getLearnerTopicStudyGuideUrl.and.returnValue('/learn/new/study');
+
+    component.ngOnChanges({
+      storySummary: new SimpleChange(null, null, false),
+    });
+
+    expect(component.studyGuideUrl).not.toBe(initialStudyGuideUrl);
+    expect(component.studyGuideUrl).toBe('/learn/new/study');
+  });
+
+  it('should not sync on unrelated ngOnChanges input updates', () => {
+    component.studyGuideUrl = 'unchanged-value';
+    urlService.getLearnerTopicStudyGuideUrl.and.returnValue('/learn/new/study');
+
+    component.ngOnChanges({
+      practiceSubtopicIds: new SimpleChange([], [1], false),
+    });
+
+    expect(component.studyGuideUrl).toBe('unchanged-value');
   });
 });
