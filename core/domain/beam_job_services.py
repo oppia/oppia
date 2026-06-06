@@ -248,4 +248,5 @@ def get_beam_job_run_from_model(
         beam_job_run_model.created_on,
         beam_job_run_model.last_updated,
         beam_job_run_model.dataflow_job_id is None,
+        dataflow_job_id=beam_job_run_model.dataflow_job_id,
     )
