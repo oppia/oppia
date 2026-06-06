@@ -342,7 +342,11 @@ class ServiceAccountEmailOptionTests(test_utils.GenericTestBase):
                     expected_id=expected_id,
                 ),
             ):
-                jobs_manager.run_job(job_class, True, namespace=self.namespace)
+                jobs_manager.run_job(
+                    job_class,
+                    sync=True,
+                    namespace=self.namespace,
+                )
 
                 self.assertTrue(mocked_pipeline_class.called)
                 unused_args, kwargs = mocked_pipeline_class.call_args
