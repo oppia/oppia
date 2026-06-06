@@ -119,13 +119,13 @@ export class CertificateOfferingReviewAndAvailabilityComponent
     },
     topic_fractions: {
       easy: {required: 5, available: 6},
-      medium: {required: 10, available: 13},
-      hard: {required: 3, available: 10},
+      medium: {required: 10, available: 3},
+      hard: {required: 3, available: 0},
     },
     topic_percentages: {
-      easy: {required: 5, available: 7},
+      easy: {required: 5, available: 4},
       medium: {required: 5, available: 5},
-      hard: {required: 3, available: 6},
+      hard: {required: 3, available: 2},
     },
   };
 

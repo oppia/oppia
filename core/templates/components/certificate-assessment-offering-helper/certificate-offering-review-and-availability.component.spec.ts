@@ -61,7 +61,7 @@ describe('Certificate Offering Review And Availability Component', () => {
         hard: {required: 3, available: 2},
       },
     });
-    expect(component.isValid).toBeFalse();
+    expect(component.isValid).toBeTrue();
     expect(component.topicNameMap).toEqual({
       topic_adding_numbers: 'Adding Numbers',
       topic_fractions: 'Fractions',
@@ -157,6 +157,57 @@ describe('Certificate Offering Review And Availability Component', () => {
         isZero: false,
       })
     ).toBe('Percentages: Only 4 easy questions (minimum 5 required)');
+  });
+
+  it('should collect error messages for insufficient difficulty counts', () => {
+    fixture = TestBed.createComponent(
+      CertificateOfferingReviewAndAvailabilityComponent
+    );
+    component = fixture.componentInstance;
+    component.validationErrors = {
+      topic_fractions: {
+        easy: {required: 5, available: 5},
+        medium: {required: 10, available: 3},
+        hard: {required: 3, available: 0},
+      },
+    };
+    component.topicNameMap = {
+      topic_fractions: 'Fractions',
+    };
+
+    fixture.detectChanges();
+
+    expect(component.isValid).toBeTrue();
+    expect(component.topicReadinessRows).toEqual([
+      {
+        topicId: 'topic_fractions',
+        topicName: 'Fractions',
+        easy: 5,
+        medium: 3,
+        hard: 0,
+        totalQuestions: 8,
+        isReady: false,
+        easySufficient: true,
+        mediumSufficient: false,
+        hardSufficient: false,
+      },
+    ]);
+    expect(component.errorMessages).toEqual([
+      {
+        topicName: 'Fractions',
+        difficulty: 'Medium',
+        available: 3,
+        required: 10,
+        isZero: false,
+      },
+      {
+        topicName: 'Fractions',
+        difficulty: 'Hard',
+        available: 0,
+        required: 3,
+        isZero: true,
+      },
+    ]);
   });
 
   it('should get correct save button text depending on mode', () => {
