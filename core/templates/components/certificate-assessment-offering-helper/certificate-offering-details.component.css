@@ -199,10 +199,9 @@
 }
 
 .oppia-certificate-btn-next {
-  background: none;
+  background: #00645c;
   border: none;
   border-radius: 4px;
-  background: #00645c;
   color: #fff;
   cursor: pointer;
   font-family: inherit;
