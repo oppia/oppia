@@ -27,6 +27,7 @@ import {StudyGuide} from 'domain/topic/study-guide.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {EventEmitter} from '@angular/core';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {PageContextService} from 'services/page-context.service';
 
 describe('SubtopicPreviewTab', () => {
   let component: SubtopicPreviewTab;
@@ -34,10 +35,12 @@ describe('SubtopicPreviewTab', () => {
   let topicEditorStateService: TopicEditorStateService;
   let topicEditorRoutingService: TopicEditorRoutingService;
   let windowDimensionsService: WindowDimensionsService;
+  let pageContextService: PageContextService;
   let subtopic: Subtopic;
   let topic: Topic;
   let studyGuide: StudyGuide;
   let topicInitializedEventEmitter = new EventEmitter();
+  let topicReinitializedEventEmitter = new EventEmitter();
   let studyGuideLoadedEventEmitter = new EventEmitter();
 
   beforeEach(async(() => {
@@ -61,6 +64,7 @@ describe('SubtopicPreviewTab', () => {
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
     topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    pageContextService = TestBed.inject(PageContextService);
 
     fixture = TestBed.createComponent(SubtopicPreviewTab);
     component = fixture.componentInstance;
@@ -124,6 +128,8 @@ describe('SubtopicPreviewTab', () => {
     spyOn(topicEditorStateService, 'getStudyGuide').and.returnValue(studyGuide);
     spyOn(topicEditorRoutingService, 'getSubtopicIdFromUrl').and.returnValue(1);
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    spyOn(pageContextService, 'setSubtopicPreviewIsOpen');
+    spyOn(pageContextService, 'setSubtopicPreviewIsClosed');
   });
 
   it('should initialize when subtopic preview tab is opened', () => {
@@ -140,6 +146,13 @@ describe('SubtopicPreviewTab', () => {
     expect(component.studyGuide).toEqual(studyGuide);
     expect(component.sections).toEqual(studyGuide.getSections());
     expect(component.thumbnailIsShown).toBe(true);
+    expect(pageContextService.setSubtopicPreviewIsOpen).toHaveBeenCalled();
+  });
+
+  it('should close subtopic preview when component is destroyed', () => {
+    component.ngOnDestroy();
+
+    expect(pageContextService.setSubtopicPreviewIsClosed).toHaveBeenCalled();
   });
 
   it('should get study guide contents when study guide is loaded', () => {
@@ -168,6 +181,24 @@ describe('SubtopicPreviewTab', () => {
     component.editableThumbnailFilename = 'random_file_name.svg';
 
     topicInitializedEventEmitter.emit();
+
+    expect(component.subtopicId).toBe(1);
+    expect(component.editableTitle).toBe('Subtopic1');
+    expect(component.editableThumbnailFilename).toBe('thumbnailFilename.svg');
+  });
+
+  it('should call initEditor when topic is reinitialized', () => {
+    spyOnProperty(
+      topicEditorStateService,
+      'onTopicReinitialized'
+    ).and.returnValue(topicReinitializedEventEmitter);
+
+    component.ngOnInit();
+    component.subtopicId = 2;
+    component.editableTitle = 'random title';
+    component.editableThumbnailFilename = 'random_file_name.svg';
+
+    topicReinitializedEventEmitter.emit();
 
     expect(component.subtopicId).toBe(1);
     expect(component.editableTitle).toBe('Subtopic1');

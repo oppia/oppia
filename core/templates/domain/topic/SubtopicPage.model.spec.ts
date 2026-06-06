@@ -105,4 +105,31 @@ describe('Subtopic page Model', () => {
     expect(firstSubtopicPage).not.toBe(secondSubtopicPage);
     expect(firstSubtopicPage).toEqual(secondSubtopicPage);
   });
+
+  it('should be able to set subtopic page id', () => {
+    let subtopicPage = SubtopicPage.createDefault('topic_id', 2);
+
+    subtopicPage.setId('new_topic_id-3');
+
+    expect(subtopicPage.getId()).toBe('new_topic_id-3');
+  });
+
+  it('should be able to set page contents', () => {
+    let subtopicPage = SubtopicPage.createDefault('topic_id', 2);
+    let pageContents = new SubtopicPageContents(
+      SubtitledHtml.createDefault('<p>New content</p>', 'content'),
+      RecordedVoiceovers.createEmpty()
+    );
+
+    subtopicPage.setPageContents(pageContents);
+    pageContents.setHtml('<p>Updated content</p>');
+
+    expect(subtopicPage.getPageContents().getHtml()).toBe(
+      '<p>New content</p>'
+    );
+  });
+
+  it('should generate subtopic page id from topic and subtopic ids', () => {
+    expect(SubtopicPage.getSubtopicPageId('topic_id', 3)).toBe('topic_id-3');
+  });
 });

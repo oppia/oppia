@@ -58,7 +58,6 @@ export class CreateNewSubtopicModalComponent
   // Null when no error is raised.
   errorMsg!: string | null;
   subtopicUrlFragmentExists!: boolean;
-  subtopicPage!: SubtopicPage;
   studyGuide!: StudyGuide;
   MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT!: number;
   MAX_CHARS_IN_SUBTOPIC_TITLE!: number;
