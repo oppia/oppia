@@ -136,22 +136,20 @@
 }
 
 .story-card-body {
-  min-height: 390px;
-
   display: flex;
   flex-direction: column;
-
+  min-height: 390px;
   padding: 0 28px 28px;
 }
 
 .story-lesson-card-wrapper {
-  width: 100%;
   margin-top: auto;
+  width: 100%;
 }
 
 .story-practice-card-wrapper {
-  width: 100%;
   margin-top: auto;
+  width: 100%;
 }
 @media (max-width: 768px) {
   .story-callout-row {
@@ -302,22 +300,17 @@
     width: 100%;
   }
 
-  .study-skills-icon {
-    height: 22px;
-    width: 22px;
+  .story-card-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 462px;
   }
 
-  .story-card-body {
-  min-height: 462px;
-  display: flex;
-  flex-direction: column;
-}
+  .story-lesson-card-wrapper {
+    margin-top: auto;
+  }
 
-.story-lesson-card-wrapper {
-  margin-top: auto;
-}
-
-.story-practice-card-wrapper {
-  margin-top: auto;
-}
+  .story-practice-card-wrapper {
+    margin-top: auto;
+  }
 }

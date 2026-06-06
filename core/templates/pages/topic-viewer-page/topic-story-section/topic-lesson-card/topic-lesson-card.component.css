@@ -1,29 +1,29 @@
 .topic-lesson-card {
-  display: flex;
-  width: 100%;
-  min-height: 140px;
   background: #fff;
   border-radius: 12px;
-  overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  display: flex;
+  min-height: 140px;
+  overflow: hidden;
+  width: 100%;
 }
 
 .topic-lesson-card-thumbnail {
+  background: #9fbfbb;
   flex: 0 0 210px;
   min-height: 140px;
-  background: #9fbfbb;
 }
 
 .topic-lesson-card-image {
   display: block;
-  width: 100%;
   height: 100%;
   object-fit: cover;
+  width: 100%;
 }
 
 .topic-lesson-card-content {
-  flex: 1;
   display: flex;
+  flex: 1;
   flex-direction: column;
   justify-content: space-between;
   min-width: 0;
@@ -37,75 +37,70 @@
 }
 
 .topic-lesson-card-title {
-  margin: 0;
   color: #3b3b3b;
   font-family: Roboto, Arial, sans-serif;
   font-size: 24px;
   font-weight: 500;
   line-height: 1.2;
+  margin: 0;
 }
 
 .topic-lesson-card-description {
-  margin: 0;
   color: #3d3d3d;
   font-family: Roboto, Arial, sans-serif;
   font-size: 20px;
   line-height: 1.2;
+  margin: 0;
 }
 
 .topic-lesson-card-progress {
-  display: flex;
   align-items: center;
-  width: 100%;
-  max-width: 280px;
+  display: flex;
   margin-top: 4px;
+  max-width: 280px;
+  width: 100%;
 }
 
 .progress-line {
+  background: #c4c4c4;
   flex: 1;
   height: 2px;
-  background: #c4c4c4;
 }
 
 .progress-step {
-  width: 12px;
-  height: 12px;
+  background: #fff;
   border: 2px solid #c4c4c4;
   border-radius: 50%;
-  background: #fff;
   flex-shrink: 0;
+  height: 12px;
+  width: 12px;
 }
 
 .progress-step-active {
-  width: 22px;
-  height: 22px;
+  background: #fff;
   border: 3px solid #00645c;
   border-radius: 50%;
-  background: #fff;
   flex-shrink: 0;
+  height: 22px;
+  width: 22px;
 }
 
 .topic-lesson-card-start-button {
-  align-self: flex-end;
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
-
-  min-width: 96px;
-  height: 42px;
-
+  align-self: flex-end;
   background: #00645c;
   border-radius: 4px;
-
   color: #fff;
-  text-decoration: none;
-
+  display: inline-flex;
   font-family: Roboto, Arial, sans-serif;
   font-size: 14px;
   font-weight: 700;
+  height: 42px;
+  justify-content: center;
+  min-width: 96px;
+  text-decoration: none;
 }
 
-/* Tablet */
 @media (max-width: 768px) {
   .topic-lesson-card {
     min-height: 100px;
@@ -135,49 +130,48 @@
   }
 
   .topic-lesson-card-progress {
-    max-width: 180px;
     margin-top: 4px;
+    max-width: 180px;
   }
 
   .progress-step {
-    width: 8px;
     height: 8px;
+    width: 8px;
   }
 
   .progress-step-active {
-    width: 16px;
-    height: 16px;
     border-width: 2px;
+    height: 16px;
+    width: 16px;
   }
 
   .topic-lesson-card-start-button {
-    min-width: 72px;
-    height: 32px;
     font-size: 12px;
+    height: 32px;
+    min-width: 72px;
   }
 }
 
-/* Mobile */
 @media (max-width: 450px) {
   .topic-lesson-card {
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
-    border-radius: 8px;
     overflow: hidden;
   }
 
   .topic-lesson-card-thumbnail {
-    width: 100%;
+    flex: none;
     height: 130px;
     min-height: 130px;
-    flex: none;
+    width: 100%;
   }
 
   .topic-lesson-card-content {
-    padding: 4px;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    padding: 4px;
   }
 
   .topic-lesson-card-copy {
@@ -198,33 +192,33 @@
   }
 
   .topic-lesson-card-progress {
-    width: 100%;
-    max-width: none;
     margin-top: 2px;
+    max-width: none;
+    width: 100%;
   }
 
   .progress-step {
-    width: 12px;
-    height: 12px;
+    background: #fff;
     border: 1px solid #c4c4c4;
     border-radius: 50%;
-    background: #fff;
+    height: 12px;
+    width: 12px;
   }
 
   .progress-step.progress-step-active {
-    width: 20px;
-    height: 20px;
+    background: #fff;
     border: 2px solid #00645c;
     border-radius: 50%;
-    background: #fff;
+    height: 20px;
+    width: 20px;
   }
 
   .topic-lesson-card-start-button {
-    width: 100%;
-    height: 40px;
-    min-width: 0;
     align-self: stretch;
     font-size: 14px;
+    height: 40px;
     margin-top: 0;
+    min-width: 0;
+    width: 100%;
   }
 }
