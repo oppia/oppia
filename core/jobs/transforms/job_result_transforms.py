@@ -23,7 +23,7 @@ from core.jobs.types import job_run_result
 import apache_beam as beam
 import result
 from apache_beam import pvalue
-from typing import Any, Optional, Tuple
+from typing import Any, Optional
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
@@ -156,7 +156,7 @@ class ResultsToJobRunResults(beam.PTransform):  # type: ignore[misc]
 
     @staticmethod
     def _add_count_to_job_run_result(
-        job_result_and_count: Tuple[job_run_result.JobRunResult, int],
+        job_result_and_count: tuple[job_run_result.JobRunResult, int],
     ) -> job_run_result.JobRunResult:
         """Adds count to the stdout or stderr of the JobRunResult.
 

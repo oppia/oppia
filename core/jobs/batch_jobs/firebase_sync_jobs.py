@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from collections import abc
+
 from core.domain import feature_flag_domain
 from core.jobs import base_jobs
 from core.jobs.io import firebase_io
@@ -25,7 +27,7 @@ from core.jobs.transforms import firebase_transforms, job_result_transforms
 from core.jobs.types import firebase_adapters, job_run_result
 
 import apache_beam as beam
-from typing import Iterable, TypedDict
+from typing import TypedDict
 
 SKIPPED_TAG = 'SKIPPED'
 DELETED_TAG = 'DELETED'
@@ -124,10 +126,12 @@ class _GetTaggedRecords(beam.DoFn):  # type: ignore[misc]
     class GroupedByUserId(TypedDict):
         """Typings for the CoGroupByKey() output joined by email."""
 
-        from_oppia: Iterable[firebase_adapters.WeakRecord]
-        from_firebase: Iterable[firebase_adapters.StrongRecord]
+        from_oppia: abc.Iterable[firebase_adapters.WeakRecord]
+        from_firebase: abc.Iterable[firebase_adapters.StrongRecord]
 
-    def process(self, grouped: GroupedByUserId) -> Iterable[beam.TaggedOutput]:
+    def process(
+        self, grouped: GroupedByUserId
+    ) -> abc.Iterable[beam.TaggedOutput]:
         """Categorizes records by yielding tagged outputs."""
 
         from_oppia = frozenset(grouped['from_oppia'])

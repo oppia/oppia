@@ -36,7 +36,7 @@ import firebase_admin
 import webapp2
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
-from typing import Any, ContextManager, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -46,15 +46,15 @@ auth_models, user_models = models.Registry.import_models(
     [models.Names.AUTH, models.Names.USER]
 )
 
-UidsPartitionTupleType = Tuple[List[Tuple[int, str]], List[Tuple[int, str]]]
+UidsPartitionTupleType = tuple[list[tuple[int, str]], list[tuple[int, str]]]
 
-UidsZipPartitionTupleType = Tuple[
-    List[Tuple[int, Tuple[str, str]]], List[Tuple[int, Tuple[str, str]]]
+UidsZipPartitionTupleType = tuple[
+    list[tuple[int, tuple[str, str]]], list[tuple[int, tuple[str, str]]]
 ]
 
-RecordsPartitionTupleType = Tuple[
-    List[Tuple[int, Tuple[firebase_auth.ImportUserRecord, str]]],
-    List[Tuple[int, Tuple[firebase_auth.ImportUserRecord, str]]],
+RecordsPartitionTupleType = tuple[
+    list[tuple[int, tuple[firebase_auth.ImportUserRecord, str]]],
+    list[tuple[int, tuple[firebase_auth.ImportUserRecord, str]]],
 ]
 
 
@@ -116,10 +116,10 @@ class FirebaseAdminSdkStub:
     ]
 
     def __init__(self) -> None:
-        self._users_by_uid: Dict[str, firebase_auth.UserRecord] = {}
-        self._uid_by_session_cookie: Dict[str, str] = {}
-        self._swap_stack: Optional[contextlib.ExitStack] = None
-        self._test: Optional[test_utils.TestBase] = None
+        self._users_by_uid: dict[str, firebase_auth.UserRecord] = {}
+        self._uid_by_session_cookie: dict[str, str] = {}
+        self._swap_stack: contextlib.ExitStack | None = None
+        self._test: test_utils.TestBase | None = None
 
     def install(self, test: test_utils.TestBase) -> None:
         """Installs the stub on the given test instance. Idempotent.
@@ -185,10 +185,10 @@ class FirebaseAdminSdkStub:
 
     def create_user(  # pylint: disable=unused-argument
         self,
-        uid: Optional[str] = None,
-        email: Optional[str] = None,
+        uid: str | None = None,
+        email: str | None = None,
         disabled: bool = False,
-        password: Optional[str] = None,
+        password: str | None = None,
     ) -> firebase_auth.UserRecord:
         """Adds user to storage if new, otherwise raises an error.
 
@@ -232,7 +232,7 @@ class FirebaseAdminSdkStub:
             raise firebase_auth.UserNotFoundError(f'{uid} not found')
         del self._users_by_uid[uid]
 
-    def delete_users(self, uids: List[str]) -> firebase_auth.DeleteUsersResult:
+    def delete_users(self, uids: list[str]) -> firebase_auth.DeleteUsersResult:
         """Deletes the users identified by the specified user ids.
 
         Deleting a non-existing user does not generate an error (the method is
@@ -280,7 +280,7 @@ class FirebaseAdminSdkStub:
         return users[0]
 
     def get_users(
-        self, identifiers: List[firebase_auth.UidIdentifier]
+        self, identifiers: list[firebase_auth.UidIdentifier]
     ) -> firebase_auth.GetUsersResult:
         """Returns user with given ID if found, otherwise raises an error.
 
@@ -325,7 +325,7 @@ class FirebaseAdminSdkStub:
         return user
 
     def import_users(
-        self, records: List[firebase_auth.ImportUserRecord]
+        self, records: list[firebase_auth.ImportUserRecord]
     ) -> firebase_auth.UserImportResult:
         """Adds the given user records to the stub's storage.
 
@@ -347,7 +347,7 @@ class FirebaseAdminSdkStub:
         return self._create_user_import_result_fragile(len(records), [])
 
     def list_users(
-        self, page_token: Optional[str] = None, max_results: int = 1000
+        self, page_token: str | None = None, max_results: int = 1000
     ) -> firebase_auth.ListUsersPage:
         """Retrieves a page of user accounts from a Firebase project.
 
@@ -412,13 +412,13 @@ class FirebaseAdminSdkStub:
         }
 
     def set_custom_user_claims(
-        self, uid: str, custom_claims: Optional[Dict[str, str] | str]
+        self, uid: str, custom_claims: dict[str, str] | str | None
     ) -> None:
         """Updates the custom claims of the given user.
 
         Args:
             uid: str. The Firebase account ID of the user.
-            custom_claims: Dict[str, str] | str | None. A JSON dict with string
+            custom_claims: dict[str, str] | str | None. A JSON dict with string
                 keys and values, or a string-encoded JSON dict with string keys
                 and values, or None.
 
@@ -438,7 +438,7 @@ class FirebaseAdminSdkStub:
             email: str|None. The email address for the user, or None to erase
                 the email if it exists.
             disabled: bool. Whether the user account is to be disabled.
-            custom_claims: Dict[str, str] | str | None. A JSON dict with
+            custom_claims: dict[str, str] | str | None. A JSON dict with
                 string keys and values, or a string-encoded JSON dict with
                 string keys and values, or None.
 
@@ -463,9 +463,7 @@ class FirebaseAdminSdkStub:
         custom_claims = kwargs.get('custom_claims', user.custom_claims)
         return self._set_user_fragile(uid, email, disabled, custom_claims)
 
-    def verify_id_token(
-        self, token: str
-    ) -> Dict[str, Optional[Union[str, bool]]]:
+    def verify_id_token(self, token: str) -> dict[str, str | bool | None]:
         """Returns claims for the corresponding user if the ID token is valid.
 
         Args:
@@ -483,7 +481,7 @@ class FirebaseAdminSdkStub:
 
     def verify_session_cookie(
         self, session_cookie: str, check_revoked: bool = False
-    ) -> Dict[str, Optional[Union[str, bool]]]:
+    ) -> dict[str, str | bool | None]:
         """Returns claims for the corresponding user if the cookie is valid.
 
         Args:
@@ -596,7 +594,7 @@ class FirebaseAdminSdkStub:
         assert self._test is not None
         self._test.assertFalse(self.get_user(uid).disabled)
 
-    def assert_is_user_multi(self, uids: List[str]) -> None:
+    def assert_is_user_multi(self, uids: list[str]) -> None:
         """Asserts that every account with the given ids exist.
 
         NOTE: This method can only be called after the stub has been installed
@@ -613,7 +611,7 @@ class FirebaseAdminSdkStub:
             msg=f'Firebase accounts not found: uids={not_found!r}',
         )
 
-    def assert_is_not_user_multi(self, uids: List[str]) -> None:
+    def assert_is_not_user_multi(self, uids: list[str]) -> None:
         """Asserts that every account with the given ids do not exist.
 
         NOTE: This method can only be called after the stub has been installed
@@ -632,9 +630,9 @@ class FirebaseAdminSdkStub:
 
     def mock_delete_users_error(
         self,
-        batch_error_pattern: Tuple[Optional[Exception], ...] = (None,),
-        individual_error_pattern: Tuple[Optional[str], ...] = (None,),
-    ) -> ContextManager[None]:
+        batch_error_pattern: tuple[Exception | None, ...] = (None,),
+        individual_error_pattern: tuple[str | None, ...] = (None,),
+    ) -> contextlib.AbstractContextManager[None]:
         """Returns a context in which `delete_users` fails according to the
         given patterns.
 
@@ -665,7 +663,7 @@ class FirebaseAdminSdkStub:
         )
 
         def mock_delete_users(
-            uids: List[str],
+            uids: list[str],
         ) -> firebase_auth.DeleteUsersResult:
             """Mock function that fails according to the input patterns."""
             error_to_raise = next(updated_batch_error_pattern)
@@ -673,7 +671,7 @@ class FirebaseAdminSdkStub:
                 raise error_to_raise
 
             # Here we use cast because method 'utils.partition' returns a
-            # broader type Tuple[Iterable[...], Iterable[...]], thus to
+            # broader type tuple[Iterable[...], Iterable[...]], thus to
             # narrow down the type to 'UidsZipPartitionTupleType' we used
             # cast here.
             uids_to_delete, uids_to_fail = cast(
@@ -697,9 +695,9 @@ class FirebaseAdminSdkStub:
 
     def mock_import_users_error(
         self,
-        batch_error_pattern: Tuple[Optional[Exception], ...] = (None,),
-        individual_error_pattern: Tuple[Optional[str], ...] = (None,),
-    ) -> ContextManager[None]:
+        batch_error_pattern: tuple[Exception | None, ...] = (None,),
+        individual_error_pattern: tuple[str | None, ...] = (None,),
+    ) -> contextlib.AbstractContextManager[None]:
         """Returns a context in which `import_users` fails according to the
         given patterns.
 
@@ -730,7 +728,7 @@ class FirebaseAdminSdkStub:
         )
 
         def mock_import_users(
-            records: List[firebase_auth.ImportUserRecord],
+            records: list[firebase_auth.ImportUserRecord],
         ) -> firebase_auth.UserImportResult:
             """Mock function that fails according to the input patterns."""
             error_to_raise = next(updated_batch_error_pattern)
@@ -738,7 +736,7 @@ class FirebaseAdminSdkStub:
                 raise error_to_raise
 
             # Here we use cast because method 'utils.partition' returns a
-            # broader type Tuple[Iterable[...], Iterable[...]], thus to
+            # broader type tuple[Iterable[...], Iterable[...]], thus to
             # narrow down the type to 'RecordsPartitionTupleType' we used
             # cast here.
             records_to_import, records_to_fail = cast(
@@ -783,7 +781,7 @@ class FirebaseAdminSdkStub:
 
     def _decode_user_claims(
         self, encoded_claims: str
-    ) -> Optional[Dict[str, Optional[Union[str, bool]]]]:
+    ) -> dict[str, str | bool | None] | None:
         """Returns the given decoded claims.
 
         Args:
@@ -797,7 +795,7 @@ class FirebaseAdminSdkStub:
             # returns 'Any' from json.loads.
             # https://github.com/python/typeshed/blob/30ad9e945f42cca1190cdba58c65bdcfc313480f/stdlib/json/__init__.pyi#L36
             return cast(
-                Dict[str, Optional[Union[str, bool]]],
+                dict[str, str | bool | None],
                 json.loads(encoded_claims),
             )
         except ValueError:
@@ -806,9 +804,9 @@ class FirebaseAdminSdkStub:
     def _set_user_fragile(
         self,
         uid: str,
-        email: Optional[str],
+        email: str | None,
         disabled: bool,
-        custom_claims: Optional[Dict[str, str] | str],
+        custom_claims: dict[str, str] | str | None,
     ) -> firebase_auth.UserRecord:
         """Sets the given properties for the corresponding user.
 
@@ -819,7 +817,7 @@ class FirebaseAdminSdkStub:
             uid: str. The Firebase account ID of the user.
             email: str|None. The email address for the user.
             disabled: bool. Whether the user account is to be disabled.
-            custom_claims: Dict[str, str] | str | None. A JSON dict with string
+            custom_claims: dict[str, str] | str | None. A JSON dict with string
                 keys and values, or a string-encoded JSON dict with string keys
                 and values, or None.
 
@@ -839,7 +837,7 @@ class FirebaseAdminSdkStub:
         return self._users_by_uid[uid]
 
     def _create_list_users_page_fragile(
-        self, page_list: List[List[firebase_auth.UserRecord]], page_index: int
+        self, page_list: list[list[firebase_auth.UserRecord]], page_index: int
     ) -> mock.Mock:
         """Creates a new ListUsersPage mock.
 
@@ -891,7 +889,7 @@ class FirebaseAdminSdkStub:
         return page
 
     def _create_delete_users_result_fragile(
-        self, errors: List[Tuple[int, str]], total: int
+        self, errors: list[tuple[int, str]], total: int
     ) -> firebase_auth.DeleteUsersResult:
         """Creates a result with the given values.
 
@@ -913,7 +911,7 @@ class FirebaseAdminSdkStub:
         return firebase_auth.DeleteUsersResult(mock_response, total)
 
     def _create_user_import_result_fragile(
-        self, total: int, errors: List[Tuple[int, str]]
+        self, total: int, errors: list[tuple[int, str]]
     ) -> firebase_auth.UserImportResult:
         """Creates a new UserImportResult instance with the given values.
 
@@ -1021,7 +1019,7 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
 
     def capture_logging(
         self, min_level: int = logging.INFO
-    ) -> contextlib._GeneratorContextManager[List[str]]:
+    ) -> contextlib._GeneratorContextManager[list[str]]:
         """Context manager that captures logs into a list.
 
         Overridden to set the minimum logging level as INFO.
@@ -1039,8 +1037,8 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
 
     def create_request(
         self,
-        id_token: Optional[str] = None,
-        session_cookie: Optional[str] = None,
+        id_token: str | None = None,
+        session_cookie: str | None = None,
     ) -> webapp2.Request:
         """Returns a new request with the given auth values.
 
@@ -1063,7 +1061,7 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         return req
 
     def create_response(
-        self, session_cookie: Optional[str] = None
+        self, session_cookie: str | None = None
     ) -> webapp2.Response:
         """Returns a new response with the given session cookie.
 
@@ -1677,7 +1675,7 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
 
     def swap_get_users_to_return_non_empty_users_result(
         self,
-    ) -> ContextManager[None]:
+    ) -> contextlib.AbstractContextManager[None]:
         """Swaps the get_user function so that it always fails."""
         return self.swap_to_always_return(
             firebase_auth,
@@ -1687,7 +1685,9 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
             ),
         )
 
-    def swap_get_users_to_raise_error(self) -> ContextManager[None]:
+    def swap_get_users_to_raise_error(
+        self,
+    ) -> contextlib.AbstractContextManager[None]:
         """Swaps the get_user function so that it always fails."""
         return self.swap_to_always_raise(
             firebase_auth,
@@ -1695,7 +1695,9 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
             firebase_exceptions.FirebaseError(message='error', code='E111'),
         )
 
-    def swap_delete_user_to_always_fail(self) -> ContextManager[None]:
+    def swap_delete_user_to_always_fail(
+        self,
+    ) -> contextlib.AbstractContextManager[None]:
         """Swaps the delete_user function so that it always fails."""
         return self.swap_to_always_raise(
             firebase_auth, 'delete_user', error=self.UNKNOWN_ERROR

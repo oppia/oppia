@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import dataclasses
+from collections import abc
 
 from core.jobs import base_jobs
 from core.jobs.io import firebase_io
@@ -26,7 +27,7 @@ from core.jobs.transforms import job_result_transforms
 from core.jobs.types import firebase_adapters, job_run_result
 
 import apache_beam as beam
-from typing import Iterable, TypedDict
+from typing import TypedDict
 
 # CORRUPT outputs are **unexpected**, and require a SERVER ADMIN to investigate.
 TAG_CORRUPT = 'CORRUPT'
@@ -76,10 +77,12 @@ class _AuditRecords(beam.DoFn):  # type: ignore[misc]
     class GroupedByEmail(TypedDict):
         """Typings for the CoGroupByKey() output joined by email."""
 
-        from_oppia: Iterable[firebase_adapters.WeakRecord]
-        from_firebase: Iterable[firebase_adapters.StrongRecord]
+        from_oppia: abc.Iterable[firebase_adapters.WeakRecord]
+        from_firebase: abc.Iterable[firebase_adapters.StrongRecord]
 
-    def process(self, grouped: GroupedByEmail) -> Iterable[beam.TaggedOutput]:
+    def process(
+        self, grouped: GroupedByEmail
+    ) -> abc.Iterable[beam.TaggedOutput]:
         """Yields tagged outputs which will group audit findings by severity."""
 
         from_oppia = frozenset(grouped['from_oppia'])
