@@ -312,6 +312,12 @@ describe('Certificate Offering Details Component', () => {
     );
   });
 
+  it('should return no title validation error when title is within the limit', () => {
+    component.title = 'a'.repeat(80);
+
+    expect(component.getTitleValidationError()).toEqual('');
+  });
+
   it('should return classroom validation errors for empty and invalid classroom ids', async () => {
     await component.loadClassrooms();
 
@@ -322,6 +328,14 @@ describe('Certificate Offering Details Component', () => {
     expect(component.getClassroomValidationError()).toContain(
       'valid classroom'
     );
+  });
+
+  it('should return no classroom validation error for a valid classroom id', async () => {
+    await component.loadClassrooms();
+
+    component.classroomId = 'science';
+
+    expect(component.getClassroomValidationError()).toEqual('');
   });
 
   it('should return a demonstrates validation error when outcomes exceed the limit', () => {
