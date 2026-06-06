@@ -141,10 +141,10 @@ def run_job(
         }
 
     if service_account_id := choose_service_account_id_for_job(job_class):
-        app_id = app_identity_services.get_application_id()
         additional_options['service_account_email'] = (
             feconf.CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE.format(
-                service_account_id=service_account_id, app_id=app_id
+                service_account_id=service_account_id,
+                app_id=app_identity_services.get_application_id(),
             )
         )
 
