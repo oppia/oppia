@@ -313,7 +313,7 @@ class LimitJobResourcesTests(test_utils.GenericTestBase):
         )
 
 
-@mock.patch('core.jobs.jobs_manager.beam.Pipeline')
+@mock.patch('apache_beam.Pipeline')
 class FirebaseAdminServiceAccountTests(test_utils.GenericTestBase):
 
     def test_job_with_firebase_viewer_access(
