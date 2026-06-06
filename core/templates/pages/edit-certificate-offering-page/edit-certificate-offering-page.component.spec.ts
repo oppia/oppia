@@ -25,6 +25,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {ActivatedRoute, Router} from '@angular/router';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
 import {EditCertificateOfferingPageComponent} from './edit-certificate-offering-page.component';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
@@ -37,6 +38,7 @@ describe('Edit Certificate Offering Page Component', () => {
   let fixture: ComponentFixture<EditCertificateOfferingPageComponent>;
   let alertsService: AlertsService;
   let certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService;
+  let ngbModal: NgbModal;
   let router: Router;
 
   beforeEach(waitForAsync(() => {
@@ -67,6 +69,18 @@ describe('Edit Certificate Offering Page Component', () => {
           },
         },
         {
+          provide: NgbModal,
+          useValue: {
+            open: () =>
+              ({
+                componentInstance: {
+                  isCertificateValid: true,
+                },
+                result: Promise.resolve('update'),
+              }) as NgbModalRef,
+          },
+        },
+        {
           provide: Router,
           useValue: {
             navigate: () => {},
@@ -84,6 +98,7 @@ describe('Edit Certificate Offering Page Component', () => {
     certificateAssessmentOfferingBackendApiService = TestBed.inject(
       CertificateAssessmentOfferingBackendApiService
     );
+    ngbModal = TestBed.inject(NgbModal);
     router = TestBed.inject(Router);
     fixture.detectChanges();
   });
@@ -170,12 +185,47 @@ describe('Edit Certificate Offering Page Component', () => {
   });
 
   it('should update certificate offering successfully and navigate away', fakeAsync(() => {
+    const modalRef = {
+      componentInstance: {
+        isCertificateValid: true,
+        action: undefined as string | undefined,
+      },
+      result: Promise.resolve('update'),
+    } as NgbModalRef;
     const apiSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
       'updateCertificateAssessmentOfferingAsync'
     ).and.returnValue(Promise.resolve('certificate_offering_id'));
     const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
     const routerSpy = spyOn(router, 'navigate');
+    const modalSpy = spyOn(ngbModal, 'open').and.returnValue(modalRef);
+
+    component.updateCertificateOffering();
+    flushMicrotasks();
+
+    expect(modalSpy).toHaveBeenCalled();
+    expect(modalRef.componentInstance.action).toBe('update');
+    expect(apiSpy).toHaveBeenCalledWith(
+      'certificate_offering_id',
+      component.certificateAssessmentOffering
+    );
+    expect(alertsSpy).toHaveBeenCalledWith('Certificate updated.');
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+  }));
+
+  it('should save certificate offering as not ready and navigate away', fakeAsync(() => {
+    const apiSpy = spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'updateCertificateAssessmentOfferingAsync'
+    ).and.returnValue(Promise.resolve('certificate_offering_id'));
+    const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
+    const routerSpy = spyOn(router, 'navigate');
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        isCertificateValid: true,
+      },
+      result: Promise.resolve('not_ready'),
+    } as NgbModalRef);
 
     component.updateCertificateOffering();
     flushMicrotasks();
@@ -184,7 +234,7 @@ describe('Edit Certificate Offering Page Component', () => {
       'certificate_offering_id',
       component.certificateAssessmentOffering
     );
-    expect(alertsSpy).toHaveBeenCalledWith('Certificate updated.');
+    expect(alertsSpy).toHaveBeenCalledWith('Certificate saved as not ready.');
     expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
   }));
 
@@ -195,10 +245,38 @@ describe('Edit Certificate Offering Page Component', () => {
     ).and.returnValue(Promise.resolve(''));
     const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
     const routerSpy = spyOn(router, 'navigate');
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        isCertificateValid: true,
+      },
+      result: Promise.resolve('update'),
+    } as NgbModalRef);
 
     component.updateCertificateOffering();
     flushMicrotasks();
 
+    expect(alertsSpy).not.toHaveBeenCalled();
+    expect(routerSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should return early when the confirmation modal is dismissed', fakeAsync(() => {
+    const apiSpy = spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'updateCertificateAssessmentOfferingAsync'
+    );
+    const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
+    const routerSpy = spyOn(router, 'navigate');
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        isCertificateValid: true,
+      },
+      result: Promise.reject('dismissed'),
+    } as NgbModalRef);
+
+    component.updateCertificateOffering();
+    flushMicrotasks();
+
+    expect(apiSpy).not.toHaveBeenCalled();
     expect(alertsSpy).not.toHaveBeenCalled();
     expect(routerSpy).not.toHaveBeenCalled();
   }));

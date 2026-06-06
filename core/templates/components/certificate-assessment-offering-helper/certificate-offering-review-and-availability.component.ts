@@ -28,6 +28,7 @@ export class CertificateOfferingReviewAndAvailabilityComponent {
   @Input() certificateAssessmentOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
   @Input() isEditMode: boolean = false;
+  @Input() isCertificateValid: boolean = true;
   @Output() saveCertificateOffering = new EventEmitter<void>();
   @Output() navigateToAddTopicsSection = new EventEmitter<void>();
 

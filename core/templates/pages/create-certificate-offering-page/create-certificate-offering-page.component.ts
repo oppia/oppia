@@ -18,6 +18,7 @@
 
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {
@@ -28,6 +29,8 @@ import {
   CertificateOfferingSectionId,
   CERTIFICATE_OFFERING_SECTION_IDS,
 } from 'components/certificate-assessment-offering-helper/certificate-offering-section.model';
+import {CertificateOfferingConfirmationModalComponent} from 'components/certificate-assessment-offering-helper/certificate-offering-confirmation-modal.component';
+import {PostCertificateOfferingResultModalComponent} from 'components/certificate-assessment-offering-helper/post-certificate-offering-result-modal.component';
 import {AlertsService} from 'services/alerts.service';
 
 @Component({
@@ -38,10 +41,12 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
   activeSection!: CertificateOfferingSectionId;
   certificateAssessmentOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
+  isCertificateValid: boolean = true;
 
   constructor(
     private alertsService: AlertsService,
     private certificateAssessmentOfferingBackendApiService: CertificateAssessmentOfferingBackendApiService,
+    private ngbModal: NgbModal,
     private router: Router
   ) {}
 
@@ -91,15 +96,44 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
 
   async saveCertificateOffering(): Promise<void> {
     try {
+      const modalRef = this.ngbModal.open(
+        CertificateOfferingConfirmationModalComponent,
+        {backdrop: 'static'}
+      );
+      modalRef.componentInstance.action = 'create';
+      modalRef.componentInstance.isCertificateValid = this.isCertificateValid;
+
+      const action = await modalRef.result.catch(() => null);
+      if (action !== 'not_ready' && action !== 'create') {
+        return;
+      }
+
       const certificateId =
         await this.certificateAssessmentOfferingBackendApiService.createCertificateAssessmentOfferingAsync(
           this.certificateAssessmentOffering
         );
 
-      if (certificateId) {
-        this.alertsService.addSuccessMessage('Certificate created.');
-        this.router.navigate(['/certificate-offering-dashboard']);
+      if (!certificateId) {
+        return;
       }
+
+      if (action === 'not_ready') {
+        this.alertsService.addSuccessMessage('Certificate saved as not ready.');
+        this.navigateToCertificateOfferingDashboard();
+        return;
+      }
+
+      this.alertsService.addSuccessMessage('Certificate created.');
+      const postModalRef = this.ngbModal.open(
+        PostCertificateOfferingResultModalComponent,
+        {
+          centered: true,
+          windowClass: 'oppia-certificate-result-modal',
+        }
+      );
+      postModalRef.componentInstance.action = 'created';
+      await postModalRef.result.catch(() => undefined);
+      this.navigateToCertificateOfferingDashboard();
     } catch (error: unknown) {
       this.alertsService.addWarning(
         error instanceof Error && error.message
@@ -110,6 +144,10 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
   }
 
   navigateBackToDashboard(): void {
+    this.navigateToCertificateOfferingDashboard();
+  }
+
+  private navigateToCertificateOfferingDashboard(): void {
     this.router.navigate(['/certificate-offering-dashboard']);
   }
 }

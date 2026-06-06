@@ -2323,6 +2323,17 @@ oppia-parameter {
   width: 80%;
 }
 
+.oppia-certificate-result-modal .modal-content {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.oppia-certificate-result-modal .modal-body {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
 .oppia-modal-lesson-information-card .modal-dialog {
   margin: 25px auto;
   max-width: 400px;

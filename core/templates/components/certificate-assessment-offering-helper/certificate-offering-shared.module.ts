@@ -21,8 +21,10 @@ import {NgModule} from '@angular/core';
 import {SharedComponentsModule} from 'components/shared-component.module';
 
 import {CertificateOfferingAddTopicItemsComponent} from './certificate-offering-add-topic-items.component';
+import {CertificateOfferingConfirmationModalComponent} from './certificate-offering-confirmation-modal.component';
 import {CertificateOfferingDetailsComponent} from './certificate-offering-details.component';
 import {CertificateOfferingReviewAndAvailabilityComponent} from './certificate-offering-review-and-availability.component';
+import {PostCertificateOfferingResultModalComponent} from './post-certificate-offering-result-modal.component';
 
 @NgModule({
   imports: [CommonModule, SharedComponentsModule],
@@ -30,11 +32,19 @@ import {CertificateOfferingReviewAndAvailabilityComponent} from './certificate-o
     CertificateOfferingDetailsComponent,
     CertificateOfferingAddTopicItemsComponent,
     CertificateOfferingReviewAndAvailabilityComponent,
+    CertificateOfferingConfirmationModalComponent,
+    PostCertificateOfferingResultModalComponent,
   ],
   exports: [
     CertificateOfferingDetailsComponent,
     CertificateOfferingAddTopicItemsComponent,
     CertificateOfferingReviewAndAvailabilityComponent,
+    CertificateOfferingConfirmationModalComponent,
+    PostCertificateOfferingResultModalComponent,
+  ],
+  entryComponents: [
+    CertificateOfferingConfirmationModalComponent,
+    PostCertificateOfferingResultModalComponent,
   ],
 })
 export class CertificateOfferingSharedModule {}

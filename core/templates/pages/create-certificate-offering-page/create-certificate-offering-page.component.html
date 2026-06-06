@@ -1,5 +1,3 @@
-<!-- create-certificate-offering-page.component.html -->
-
 <div class="oppia-create-certificate-offering-container">
 
   <oppia-certificate-offering-details
@@ -21,6 +19,7 @@
   <oppia-certificate-offering-review-and-availability
     *ngIf="isReviewAndAvailabilitySection()"
     [certificateAssessmentOffering]="certificateAssessmentOffering"
+    [isCertificateValid]="isCertificateValid"
     (saveCertificateOffering)="saveCertificateOffering()"
     (navigateToAddTopicsSection)="navigateToAddTopicsSection()">
   </oppia-certificate-offering-review-and-availability>
