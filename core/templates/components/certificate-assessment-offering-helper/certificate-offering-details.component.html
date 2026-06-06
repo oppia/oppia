@@ -39,7 +39,8 @@
             rows="6"
             [attr.maxlength]="DESCRIPTION_MAX_LENGTH"
             [(ngModel)]="description"
-            placeholder="Enter description"></textarea>
+            placeholder="Enter description">
+          </textarea>
           <small class="form-text text-muted">
             <em> Certificate description should be at most {{DESCRIPTION_MAX_LENGTH}} characters.</em>
             <span *ngIf="description?.length > 0">
