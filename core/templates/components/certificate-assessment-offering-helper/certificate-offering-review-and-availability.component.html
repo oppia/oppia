@@ -5,7 +5,7 @@
     <h3 class="oppia-certificate-review-section-heading">
       Certificate Summary
     </h3>
-    <hr class="oppia-certificate-review-divider" />
+    <hr class="oppia-certificate-review-divider">
     <p class="oppia-certificate-review-cert-title">
       {{ certificateAssessmentOffering.title ||
          'Everyday Arithmetic & Number Confidence' }}
@@ -42,44 +42,34 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          *ngFor="let row of topicReadinessRows"
-          [class.oppia-certificate-review-row--fail]="!row.isReady">
+        <tr *ngFor="let row of topicReadinessRows"
+            [class.oppia-certificate-review-row--fail]="!row.isReady">
 
           <td>{{ row.topicName }}</td>
 
-          <td
-            [class.oppia-certificate-review-cell--fail]="
+          <td [class.oppia-certificate-review-cell--fail]="
               !row.easySufficient">
             {{ row.easy }}
           </td>
 
-          <td
-            [class.oppia-certificate-review-cell--fail]="
-              !row.mediumSufficient">
+          <td [class.oppia-certificate-review-cell--fail]="!row.mediumSufficient">
             {{ row.medium }}
           </td>
 
-          <td
-            [class.oppia-certificate-review-cell--fail]="
-              !row.hardSufficient">
+          <td [class.oppia-certificate-review-cell--fail]="!row.hardSufficient">
             {{ row.hard }}
           </td>
 
           <td>{{ row.totalQuestions }}</td>
 
           <td>
-            <span
-              *ngIf="row.isReady"
-              class="oppia-certificate-review-badge--pass"
-              aria-label="Ready">
+            <span *ngIf="row.isReady" class="oppia-certificate-review-badge--pass"
+                  aria-label="Ready">
               <mat-icon>check_circle</mat-icon>
               Ready
             </span>
-            <span
-              *ngIf="!row.isReady"
-              class="oppia-certificate-review-badge--fail"
-              aria-label="Not Ready">
+            <span *ngIf="!row.isReady" class="oppia-certificate-review-badge--fail"
+                  aria-label="Not Ready">
               <mat-icon>cancel</mat-icon>
               Not Ready
             </span>
@@ -93,8 +83,6 @@
     <h3 class="oppia-certificate-review-section-heading">
       Overall Status
     </h3>
-
-    <!-- Requirements Not Met -->
     <ng-container *ngIf="!isValid">
       <p class="oppia-certificate-review-overall-status
                 oppia-certificate-review-overall-status--fail">
@@ -113,17 +101,13 @@
         <strong>What still needs to be fixed:</strong>
       </p>
       <ul class="oppia-certificate-review-errors-list">
-        <li
-          *ngFor="let error of errorMessages"
-          class="oppia-certificate-review-error-item">
+        <li *ngFor="let error of errorMessages" class="oppia-certificate-review-error-item">
           {{ getErrorText(error) }}
         </li>
       </ul>
 
       <div class="oppia-certificate-review-info-box">
-        <span
-          aria-hidden="true"
-          class="oppia-certificate-review-info-icon">
+        <span aria-hidden="true" class="oppia-certificate-review-info-icon">
           <mat-icon>info_outline</mat-icon>
         </span>
         <div>
@@ -143,28 +127,20 @@
       </div>
 
       <div class="oppia-certificate-review-actions">
-        <button
-          type="button"
-          class="oppia-certificate-review-btn--back
-                 e2e-test-certificate-review-back-btn"
-          (click)="onBackClicked()">
+        <button type="button" class="oppia-certificate-review-btn--back e2e-test-certificate-review-back-btn"
+                (click)="onBackClicked()">
           ‹ Back
         </button>
-        <button
-          type="button"
-          class="oppia-certificate-review-btn--save
-                 e2e-test-certificate-review-save-btn"
-          (click)="onSaveClicked()">
+        <button type="button" class="oppia-certificate-review-btn--save e2e-test-certificate-review-save-btn"
+                (click)="onSaveClicked()">
           {{ getSaveButtonText() }}
         </button>
       </div>
     </ng-container>
 
     <ng-container *ngIf="isValid">
-      <p class="oppia-certificate-review-overall-status
-                oppia-certificate-review-overall-status--pass">
-        <mat-icon class="oppia-certificate-review-status-icon
-                         oppia-certificate-review-status-icon--pass">
+      <p class="oppia-certificate-review-overall-status oppia-certificate-review-overall-status--pass">
+        <mat-icon class="oppia-certificate-review-status-icon oppia-certificate-review-status-icon--pass">
           check_circle
         </mat-icon>
         <strong>Requirements Met</strong>
@@ -175,18 +151,12 @@
       </p>
 
       <div class="oppia-certificate-review-actions">
-        <button
-          type="button"
-          class="oppia-certificate-review-btn--back
-                 e2e-test-certificate-review-back-btn"
-          (click)="onBackClicked()">
+        <button type="button" class="oppia-certificate-review-btn--back e2e-test-certificate-review-back-btn"
+                (click)="onBackClicked()">
           ‹ Back
         </button>
-        <button
-          type="button"
-          class="oppia-certificate-review-btn--save
-                 e2e-test-certificate-review-save-btn"
-          (click)="onSaveClicked()">
+        <button type="button" class="oppia-certificate-review-btn--save e2e-test-certificate-review-save-btn"
+                (click)="onSaveClicked()">
           {{ getSaveButtonText() }}
         </button>
       </div>

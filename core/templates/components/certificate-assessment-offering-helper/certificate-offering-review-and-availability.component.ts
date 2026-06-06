@@ -37,12 +37,12 @@ export interface TopicValidationResult {
   hard: DifficultyValidation;
 }
 
-// Full validation_errors map: topic_id → TopicValidationResult.
+// Full validation_errors map: topic_id TopicValidationResult.
 export interface ValidationErrors {
   [topicId: string]: TopicValidationResult;
 }
 
-// Derived row shape used by the template — built from
+// Derived row shape used by the template built from
 // ValidationErrors + topic name map.
 export interface TopicReadinessRow {
   topicId: string;
@@ -82,13 +82,13 @@ export class CertificateOfferingReviewAndAvailabilityComponent
   @Input() isEditMode: boolean = false;
 
   // These two inputs will be wired from the real validation API response.
-  // TODO(#0): Replace the stub path below with the backend contract once the
+  // TODO(##24717 - M1.13): Replace the stub path below with the backend contract once the
   // validation endpoint is implemented.
-  @Input() isValid: boolean = false;
+  @Input() isValid: boolean = true;
   @Input() validationErrors: ValidationErrors = {};
 
-  // Map of topic_id → human-readable topic name.
-  // Wired from real data in PR 11.
+  // Map of topic_id to human-readable topic name.
+  // Wired from real data.
   @Input() topicNameMap: {[topicId: string]: string} = {};
 
   @Output() saveCertificateOffering = new EventEmitter<void>();
@@ -100,7 +100,7 @@ export class CertificateOfferingReviewAndAvailabilityComponent
 
   // Stub data.
   // Mirrors the exact shape the validation API returns.
-  // Replaced by real @Input() values in PR 11.
+  // Replaced by real @Input() values.
   private readonly STUB_TOPIC_NAME_MAP: {
     [topicId: string]: string;
   } = {
@@ -109,7 +109,7 @@ export class CertificateOfferingReviewAndAvailabilityComponent
     topic_percentages: 'Percentages',
   };
 
-  private readonly STUB_IS_VALID: boolean = false;
+  private readonly STUB_IS_VALID: boolean = true;
 
   private readonly STUB_VALIDATION_ERRORS: ValidationErrors = {
     topic_adding_numbers: {
@@ -119,18 +119,17 @@ export class CertificateOfferingReviewAndAvailabilityComponent
     },
     topic_fractions: {
       easy: {required: 5, available: 6},
-      medium: {required: 10, available: 3},
-      hard: {required: 3, available: 0},
+      medium: {required: 10, available: 13},
+      hard: {required: 3, available: 10},
     },
     topic_percentages: {
-      easy: {required: 5, available: 4},
+      easy: {required: 5, available: 7},
       medium: {required: 5, available: 5},
-      hard: {required: 3, available: 2},
+      hard: {required: 3, available: 6},
     },
   };
 
   ngOnInit(): void {
-    // Use stub data until real inputs are wired in PR 11.
     if (Object.keys(this.validationErrors).length === 0) {
       this.validationErrors = this.STUB_VALIDATION_ERRORS;
       this.isValid = this.STUB_IS_VALID;
