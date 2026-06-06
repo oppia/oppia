@@ -139,19 +139,19 @@ def run_job(
             'autoscaling_algorithm': 'THROUGHPUT_BASED',
         }
 
-    if does_job_require_firebase_auth_viewer_access_only(job_name):
-        # Jobs that must interact with our Firebase Authentication servers need
-        # to run as a privileged service account with read-only permissions.
-        # https://firebase.google.com/docs/projects/iam/roles-predefined-product#auth
-        additional_options['service_account_email'] = (
-            feconf.FIREBASE_AUTHENTICATION_VIEWER_SERVICE_ACCOUNT
-        )
-    elif does_job_require_firebase_auth_admin_access(job_name):
+    if does_job_require_firebase_authentication_read_and_write_access(job_name):
         # Jobs that must interact with our Firebase Authentication servers need
         # to run as a privileged service account with admin permissions.
         # https://firebase.google.com/docs/projects/iam/roles-predefined-product#auth
         additional_options['service_account_email'] = (
-            feconf.FIREBASE_AUTHENTICATION_ADMIN_SERVICE_ACCOUNT
+            feconf.FIREBASE_AUTHENTICATION_READ_AND_WRITE_SERVICE_ACCOUNT
+        )
+    elif does_job_require_firebase_authentication_read_only_access(job_name):
+        # Jobs that must interact with our Firebase Authentication servers need
+        # to run as a privileged service account with read-only permissions.
+        # https://firebase.google.com/docs/projects/iam/roles-predefined-product#auth
+        additional_options['service_account_email'] = (
+            feconf.FIREBASE_AUTHENTICATION_READ_ONLY_SERVICE_ACCOUNT
         )
 
     if parameterized_args:
@@ -353,25 +353,37 @@ def does_job_requires_limiting_workers(job_name: str) -> bool:
     return job_name in jobs_requiring_limiting_workers
 
 
-def does_job_require_firebase_auth_admin_access(job_name: str) -> bool:
-    """Determines if job needs _both_ read and write access to Firebase Auth.
+def does_job_require_firebase_authentication_read_and_write_access(
+    job_name: str,
+) -> bool:
+    """Determines if a job needs read and write Firebase Authentication access.
 
     Args:
         job_name: str. The name of the job.
 
     Returns:
-        bool. Whether the given job requires Firebase Admin access.
+        bool. Whether the given job requires read and write access.
     """
-    return job_name == 'FirebaseSyncRecordsJob'
+    match job_name:
+        case 'FirebaseSyncRecordsJob':
+            return True
+        case _:
+            return False
 
 
-def does_job_require_firebase_auth_viewer_access_only(job_name: str) -> bool:
-    """Determines if job _only_ needs read access to Firebase Auth.
+def does_job_require_firebase_authentication_read_only_access(
+    job_name: str,
+) -> bool:
+    """Determines if a job needs read-only Firebase Authentication access.
 
     Args:
         job_name: str. The name of the job.
 
     Returns:
-        bool. Whether the given job requires _only_ Firebase Viewer access.
+        bool. Whether the given job requires read-only access.
     """
-    return job_name == 'FirebaseAuditRecordsJob'
+    match job_name:
+        case 'FirebaseAuditRecordsJob':
+            return True
+        case _:
+            return False

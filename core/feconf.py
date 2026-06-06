@@ -582,18 +582,13 @@ DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
 DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 
-# This email is used to uniquely identify ALL of our Apache Beam job workers.
-# This is necessary because those workers require additional permissions to
-# read/write from our Firebawse Authentication Server. The prod email account is
-# not shared here and will be injected during the release process.
-#
-# NOTE TO RELEASE COORDINATORS: Replace this service account email with the
+# NOTE TO RELEASE COORDINATORS: Replace these service account email with the
 # correct service account email when switching to the prod server.
-FIREBASE_AUTHENTICATION_VIEWER_SERVICE_ACCOUNT = (
-    'firebase-authentication-viewer@example.com'
+FIREBASE_AUTHENTICATION_READ_ONLY_SERVICE_ACCOUNT = (
+    'firebase-authentication-read-only@example.com'
 )
-FIREBASE_AUTHENTICATION_ADMIN_SERVICE_ACCOUNT = (
-    'firebase-authentication-admin@example.com'
+FIREBASE_AUTHENTICATION_READ_AND_WRITE_SERVICE_ACCOUNT = (
+    'firebase-authentication-read-and-write@example.com'
 )
 
 OPPIA_VERSION = '3.5.1'

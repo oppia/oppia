@@ -314,9 +314,9 @@ class LimitJobResourcesTests(test_utils.GenericTestBase):
 
 
 @mock.patch('apache_beam.Pipeline')
-class FirebaseAdminServiceAccountTests(test_utils.GenericTestBase):
+class FirebaseAuthenticationServiceAccountTests(test_utils.GenericTestBase):
 
-    def test_job_with_firebase_viewer_access(
+    def test_job_with_read_only_access(
         self, mock_pipeline_class: mock.Mock
     ) -> None:
         mock_pipeline_class.return_value = mock.MagicMock()
@@ -330,12 +330,12 @@ class FirebaseAdminServiceAccountTests(test_utils.GenericTestBase):
         _, kwargs = mock_pipeline_class.call_args
         self.assertDictContainsSubset(
             {
-                'service_account_email': feconf.FIREBASE_AUTHENTICATION_VIEWER_SERVICE_ACCOUNT
+                'service_account_email': feconf.FIREBASE_AUTHENTICATION_READ_ONLY_SERVICE_ACCOUNT
             },
             kwargs['options'].get_all_options(),
         )
 
-    def test_job_with_firebase_admin_access(
+    def test_job_with_read_and_write_access(
         self, mock_pipeline_class: mock.Mock
     ) -> None:
         mock_pipeline_class.return_value = mock.MagicMock()
@@ -349,14 +349,12 @@ class FirebaseAdminServiceAccountTests(test_utils.GenericTestBase):
         _, kwargs = mock_pipeline_class.call_args
         self.assertDictContainsSubset(
             {
-                'service_account_email': feconf.FIREBASE_AUTHENTICATION_ADMIN_SERVICE_ACCOUNT
+                'service_account_email': feconf.FIREBASE_AUTHENTICATION_READ_AND_WRITE_SERVICE_ACCOUNT
             },
             kwargs['options'].get_all_options(),
         )
 
-    def test_job_without_firebase_access(
-        self, mock_pipeline_class: mock.Mock
-    ) -> None:
+    def test_job_without_access(self, mock_pipeline_class: mock.Mock) -> None:
         mock_pipeline_class.return_value = mock.MagicMock()
 
         jobs_manager.run_job(WorkingJob, True, namespace=self.namespace)
