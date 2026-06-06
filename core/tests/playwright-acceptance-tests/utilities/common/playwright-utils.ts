@@ -594,6 +594,9 @@ export class BaseUser {
           },
           element
         );
+        showMessage(
+          `Clickability diagnostics: ${JSON.stringify(clickabilityDiagnostics)}`
+        );
         await this.page.evaluate(({el, a, b}) => isElementClickable(el, a, b), {
           el: element,
           a: true,

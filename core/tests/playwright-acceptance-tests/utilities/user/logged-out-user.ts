@@ -21,6 +21,8 @@ import {BaseUser} from '../common/playwright-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
 
+const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
+
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 
 const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
@@ -32,6 +34,9 @@ const nextCardArrowButton = '.e2e-test-next-button';
 const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 
 const stateConversationContent = '.e2e-test-conversation-content';
+
+const searchInputSelector = '.e2e-test-search-input';
+const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 
 const communityLibraryLinkInNavbarSelector =
   '.e2e-test-topnb-go-to-community-library-link';
@@ -171,6 +176,15 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Navigates to the community library page.
+   */
+  async navigateToCommunityLibraryPage(
+    verifyURL: boolean = true
+  ): Promise<void> {
+    await this.goto(communityLibraryUrl, verifyURL);
+  }
+
+  /**
    * Opens the mobile sidebar and waits for the animation to complete.
    * This ensures the sidebar is fully visible before interacting with elements
    * inside it.
@@ -251,11 +265,67 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Searches for a specific lesson in the search results and opens it.
+   * @param {string} lessonTitle - The title of the lesson to search for.
+   */
+  async playLessonFromSearchResults(lessonTitle: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(lessonCardTitleSelector);
+      const searchResultsElements = await this.page.$$(lessonCardTitleSelector);
+      const searchResults = await Promise.all(
+        searchResultsElements.map(result =>
+          this.page.evaluate(el => el.textContent.trim(), result)
+        )
+      );
+
+      const lessonIndex = searchResults.indexOf(lessonTitle);
+      if (lessonIndex === -1) {
+        throw new Error(
+          `Lesson "${lessonTitle}" not found in search results.\nFound: ${searchResults.join(', ')}`
+        );
+      }
+
+      await this.waitForElementToBeClickable(
+        searchResultsElements[lessonIndex]
+      );
+      await searchResultsElements[lessonIndex].click();
+      await this.waitForStaticAssetsToLoad();
+
+      await this.page.waitForSelector(lessonCardTitleSelector, {
+        state: 'hidden',
+      });
+      showMessage(`Lesson "${lessonTitle}" opened from search results.`);
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      const newError = new Error(
+        `Failed to open lesson from search results: ${err.message}`
+      );
+      newError.stack = err.stack;
+      throw newError;
+    }
+  }
+
+  /**
    * Return to Learner Dashboard from exploration completion card.
    */
   async returnToLibraryFromExplorationCompletion(): Promise<void> {
     await this.expectElementToBeVisible(returnToLibraryButtonSelector);
     await this.clickOnElementWithSelector(returnToLibraryButtonSelector);
+  }
+
+  /**
+   * Searches for a lesson in the search bar present in the community library.
+   * @param {string} lessonName - The name of the lesson to search for.
+   */
+  async searchForLessonInSearchBar(lessonName: string): Promise<void> {
+    await this.page.waitForSelector(searchInputSelector, {
+      state: 'visible',
+    });
+    await this.clickOnElementWithSelector(searchInputSelector);
+    await this.typeInInputField(searchInputSelector, lessonName);
+
+    await this.page.keyboard.press('Enter');
+    await this.page.waitForNavigation({waitUntil: 'load'});
   }
 }
 

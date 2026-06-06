@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@
  * LI. Learner can report a lesson from the lesson player
  */
 
+test.describe.configure({mode: 'serial'});
+
+import {test} from '@playwright/test';
 import {showMessage} from '../../utilities/common/show-message';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {
@@ -28,12 +31,12 @@ import {
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-describe('Logged-In Learner', function () {
+test.describe('Logged-In Learner', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
   let explorationEditor: ExplorationEditor;
   let explorationId: string;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
     // in mobile viewport which is required for testing the feedback messages tab),
     // remove this part of skipping the test and make the test to run in mobile viewport as well.
@@ -46,7 +49,8 @@ describe('Logged-In Learner', function () {
 
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -100,11 +104,12 @@ describe('Logged-In Learner', function () {
 
     loggedInLearner = await UserFactory.createNewUser(
       'loggedInUser',
-      'logged_in_user@example.com'
+      'logged_in_user@example.com',
+      browser
     );
   });
 
-  it('should be able to report the lesson from the sidebar', async function () {
+  test('should be able to report the lesson from the sidebar', async function () {
     // Navigate to a lesson.
     await loggedInLearner.navigateToCommunityLibraryPage();
     await loggedInLearner.searchForLessonInSearchBar('Algebra Basics');
@@ -115,7 +120,7 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.reportExploration('It is an ad');
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
