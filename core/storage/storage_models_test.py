@@ -236,6 +236,9 @@ class StorageModelsTest(test_utils.GenericTestBase):
             'StudyGuideCommitLogEntryModel',
             # Config models.
             'PlatformParameterSnapshotMetadataModel',
+            # Certificate assessment offering models.
+            'CertificateAssessmentOfferingSnapshotMetadataModel',
+            'CertificateAssessmentOfferingCommitLogEntryModel',
             # User models.
             'UserGroupModel',
             # App feedback report models.
