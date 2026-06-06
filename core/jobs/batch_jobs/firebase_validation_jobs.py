@@ -42,16 +42,17 @@ class FirebaseAuditRecordsJob(base_jobs.JobBase):
     """Audit Firebase records against the records that Oppia claims to exist."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        key_by_email = lambda record: (record.email, record)
         weak_records = (
             self.pipeline
             | 'Get Weak Records' >> firebase_io.GetWeakRecords()
-            | 'Key Weak Records by Email' >> beam.Map(key_by_email)
+            | 'Key Weak Records by Email'
+            >> beam.Map((lambda record: (record.email, record)))
         )
         strong_records = (
             self.pipeline
             | 'Get Strong Records' >> firebase_io.GetStrongRecords()
-            | 'Key Strong Records by Email' >> beam.Map(key_by_email)
+            | 'Key Strong Records by Email'
+            >> beam.Map((lambda record: (record.email, record)))
         )
         return (
             {'from_oppia': weak_records, 'from_firebase': strong_records}

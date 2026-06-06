@@ -43,16 +43,17 @@ class FirebaseSyncRecordsJob(base_jobs.JobBase):
             job_name = self.__class__.__name__
             raise PermissionError(f'{job_name} must never be run in production')
 
-        key_by_email = lambda record: (record.email, record)
         weak_records = (
             self.pipeline
             | 'Get Weak Records' >> firebase_io.GetWeakRecords()
-            | 'Key Weak Records by Email' >> beam.Map(key_by_email)
+            | 'Key Weak Records by Email'
+            >> beam.Map((lambda record: (record.email, record)))
         )
         strong_records = (
             self.pipeline
             | 'Get Strong Records' >> firebase_io.GetStrongRecords()
-            | 'Key Strong Records by Email' >> beam.Map(key_by_email)
+            | 'Key Strong Records by Email'
+            >> beam.Map((lambda record: (record.email, record)))
         )
 
         tagged_records = (

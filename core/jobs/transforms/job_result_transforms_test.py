@@ -94,11 +94,12 @@ class FromTaggedOutputsTests(job_test_utils.PipelinedTestBase):
     ) -> pvalue.DoOutputsTuple:
         """Runs a pipeline to run FromTaggedOutputs with the given test data."""
 
-        into_tagged_output = lambda args: [pvalue.TaggedOutput(*args)]
         return (
             self.pipeline
             | beam.Create(args_list)
-            | beam.ParDo(into_tagged_output).with_outputs(*tags)
+            | beam.ParDo(
+                lambda args: [pvalue.TaggedOutput(*args)]
+            ).with_outputs(*tags)
             | job_result_transforms.FromTaggedOutputs(*tags, prefix=prefix)
         )
 
