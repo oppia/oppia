@@ -114,7 +114,7 @@ export class CertificateOfferingAddTopicItemsComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['certificateAssessmentOffering']) {
+    if (changes.certificateAssessmentOffering) {
       this.syncSelectedFromOffering();
     }
   }
