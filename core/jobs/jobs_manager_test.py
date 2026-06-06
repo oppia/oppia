@@ -313,65 +313,44 @@ class LimitJobResourcesTests(test_utils.GenericTestBase):
         )
 
 
-@mock.patch('apache_beam.Pipeline')
-class FirebaseAuthenticationServiceAccountTests(test_utils.GenericTestBase):
+class ServiceAccountEmailOptionTests(test_utils.GenericTestBase):
 
-    READ_AND_WRITE_EMAIL = feconf.CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE.format(
-        service_account_id=(
-            feconf.FIREBASE_AUTHENTICATION_READ_AND_WRITE_SERVICE_ACCOUNT_ID
-        ),
-        app_id=feconf.OPPIA_PROJECT_ID,
-    )
-    READ_ONLY_EMAIL = feconf.CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE.format(
-        service_account_id=(
-            feconf.FIREBASE_AUTHENTICATION_READ_ONLY_SERVICE_ACCOUNT_ID
-        ),
-        app_id=feconf.OPPIA_PROJECT_ID,
-    )
-
-    def test_job_with_read_only_access(
-        self, mock_pipeline_class: mock.Mock
-    ) -> None:
-        mock_pipeline_class.return_value = mock.MagicMock()
-
-        jobs_manager.run_job(
+    TEST_CASES = (
+        (
             firebase_validation_jobs.FirebaseAuditRecordsJob,
-            True,
-            namespace=self.namespace,
-        )
-
-        _, kwargs = mock_pipeline_class.call_args
-        self.assertIsInstance(kwargs['options'], job_options.JobOptions)
-        self.assertDictContainsSubset(
-            {'service_account_email': self.READ_ONLY_EMAIL},
-            kwargs['options'].get_all_options(),
-        )
-
-    def test_job_with_read_and_write_access(
-        self, mock_pipeline_class: mock.Mock
-    ) -> None:
-        mock_pipeline_class.return_value = mock.MagicMock()
-
-        jobs_manager.run_job(
+            feconf.FIREBASE_AUTHENTICATION_READ_ONLY_SERVICE_ACCOUNT_ID,
+        ),
+        (
             firebase_sync_jobs.FirebaseSyncRecordsJob,
-            True,
-            namespace=self.namespace,
-        )
+            feconf.FIREBASE_AUTHENTICATION_READ_AND_WRITE_SERVICE_ACCOUNT_ID,
+        ),
+        (
+            WorkingJob,
+            None,
+        ),
+    )
 
-        _, kwargs = mock_pipeline_class.call_args
-        self.assertIsInstance(kwargs['options'], job_options.JobOptions)
-        self.assertDictContainsSubset(
-            {'service_account_email': self.READ_AND_WRITE_EMAIL},
-            kwargs['options'].get_all_options(),
-        )
+    def test_service_account_email_option(self) -> None:
+        for job_class, expected_id in self.TEST_CASES:
+            with (
+                mock.patch(
+                    'apache_beam.Pipeline',
+                    return_value=mock.MagicMock(),
+                ) as mocked_pipeline_class,
+                self.subTest(
+                    job_class=job_class,
+                    expected_id=expected_id,
+                ),
+            ):
+                jobs_manager.run_job(job_class, True, namespace=self.namespace)
 
-    def test_job_without_access(self, mock_pipeline_class: mock.Mock) -> None:
-        mock_pipeline_class.return_value = mock.MagicMock()
-
-        jobs_manager.run_job(WorkingJob, True, namespace=self.namespace)
-
-        _, kwargs = mock_pipeline_class.call_args
-        self.assertIsInstance(kwargs['options'], job_options.JobOptions)
-        self.assertDictContainsSubset(
-            {'service_account_email': None}, kwargs['options'].get_all_options()
-        )
+                self.assertTrue(mocked_pipeline_class.called)
+                unused_args, kwargs = mocked_pipeline_class.call_args
+                self.assertIsInstance(
+                    options := kwargs.get('options'), job_options.JobOptions
+                )
+                self.assertEqual(
+                    options.get_all_options().get('service_account_email'),
+                    expected_id
+                    and f'{expected_id}@dev-project-id.iam.gserviceaccount.com',
+                )
