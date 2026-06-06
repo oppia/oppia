@@ -35,8 +35,15 @@ import {PageTitleService} from 'services/page-title.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-
 import './topic-viewer-page.component.css';
+
+interface TopicViewerStorySectionData {
+  storyId: string;
+  storyTitle: string;
+  storyDescription: string;
+  lessonCount: number;
+  practiceCount: number;
+}
 
 @Component({
   selector: 'topic-viewer-page',
@@ -45,8 +52,15 @@ import './topic-viewer-page.component.css';
 })
 export class TopicViewerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  activeTab: string = '';
+  readonly VIEW_NAMES = {
+    STORY: 'story',
+    PRACTICE: 'practice',
+    STUDYGUIDE: 'studyguide',
+  } as const;
+
+  activeView: string = '';
   canonicalStorySummaries: StorySummary[] = [];
+  canonicalStorySectionData: readonly TopicViewerStorySectionData[] = [];
   topicUrlFragment: string = '';
   classroomUrlFragment: string = '';
   classroomName: string | null = '';
@@ -76,15 +90,21 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    if (this.urlService.getPathname().endsWith('studyguide')) {
-      this.activeTab = 'subtopics';
-    } else if (this.urlService.getPathname().endsWith('practice')) {
-      this.activeTab = 'practice';
-    } else {
-      if (!this.urlService.getPathname().endsWith('story')) {
-        this.setUrlAccordingToActiveTab('story');
+    const pathname = this.urlService.getPathname();
+    if (pathname.endsWith(this.VIEW_NAMES.STUDYGUIDE)) {
+      this.activeView = this.VIEW_NAMES.STUDYGUIDE;
+    } else if (pathname.endsWith(this.VIEW_NAMES.PRACTICE)) {
+      if (this.isRedesignedTopicViewerPageFeatureEnabled()) {
+        // In the redesigned UI, practice is part of the story view.
+        this.activeView = this.VIEW_NAMES.STORY;
+      } else {
+        this.activeView = this.VIEW_NAMES.PRACTICE;
       }
-      this.activeTab = 'story';
+    } else {
+      if (!pathname.endsWith(this.VIEW_NAMES.STORY)) {
+        this.updateUrlForActiveView(this.VIEW_NAMES.STORY);
+      }
+      this.activeView = this.VIEW_NAMES.STORY;
     }
     this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
     this.classroomUrlFragment =
@@ -124,6 +144,8 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
           this.loaderService.hideLoadingScreen();
           this.practiceTabIsDisplayed =
             readOnlyTopic.getPracticeTabIsDisplayed();
+          this.canonicalStorySectionData =
+            this.getCanonicalStorySectionData(readOnlyTopic);
         },
         errorResponse => {
           let errorCodes = AppConstants.FATAL_ERROR_CODES;
@@ -135,6 +157,30 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
           }
         }
       );
+  }
+
+  trackStoryDataById(
+    index: number,
+    storyData: TopicViewerStorySectionData
+  ): string {
+    return storyData.storyId;
+  }
+
+  private getCanonicalStorySectionData(
+    readOnlyTopic: ReadOnlyTopic
+  ): readonly TopicViewerStorySectionData[] {
+    const practiceCount = readOnlyTopic.getSubtopics().filter(subtopic => {
+      return subtopic.getSkillSummaries().length > 0;
+    }).length;
+    return readOnlyTopic.getCanonicalStorySummaries().map(storySummary => {
+      return {
+        storyId: storySummary.getId(),
+        storyTitle: storySummary.getTitle(),
+        storyDescription: storySummary.getDescription() || '',
+        lessonCount: storySummary.getNodeTitles().length,
+        practiceCount,
+      };
+    });
   }
 
   ngOnDestroy(): void {
@@ -172,36 +218,47 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  setActiveTab(newActiveTabName: string): void {
-    if (newActiveTabName === 'story') {
-      this.setUrlAccordingToActiveTab('story');
-    } else if (newActiveTabName === 'practice') {
-      this.setUrlAccordingToActiveTab('practice');
-    } else {
-      this.setUrlAccordingToActiveTab('studyguide');
+  setActiveView(newViewName: string): void {
+    if (newViewName === this.VIEW_NAMES.STORY) {
+      this.updateUrlForActiveView(this.VIEW_NAMES.STORY);
+      this.activeView = this.VIEW_NAMES.STORY;
+      return;
     }
-    this.activeTab = newActiveTabName;
+
+    if (newViewName === this.VIEW_NAMES.PRACTICE) {
+      if (this.isRedesignedTopicViewerPageFeatureEnabled()) {
+        this.updateUrlForActiveView(this.VIEW_NAMES.STORY);
+        this.activeView = this.VIEW_NAMES.STORY;
+        return;
+      }
+      this.updateUrlForActiveView(this.VIEW_NAMES.PRACTICE);
+      this.activeView = this.VIEW_NAMES.PRACTICE;
+      return;
+    }
+
+    this.updateUrlForActiveView(this.VIEW_NAMES.STUDYGUIDE);
+    this.activeView = this.VIEW_NAMES.STUDYGUIDE;
   }
 
-  setUrlAccordingToActiveTab(newTabName: string): void {
+  updateUrlForActiveView(newViewName: string): void {
     let getCurrentLocation = this.windowRef.nativeWindow.location.toString();
-    if (this.activeTab === '') {
+    if (this.activeView === '') {
       this.windowRef.nativeWindow.history.pushState(
         {},
         '',
-        getCurrentLocation + '/' + newTabName
+        getCurrentLocation + '/' + newViewName
       );
-    } else if (this.activeTab === 'subtopics') {
+    } else if (this.activeView === this.VIEW_NAMES.STUDYGUIDE) {
       this.windowRef.nativeWindow.history.pushState(
         {},
         '',
-        getCurrentLocation.replace('studyguide', newTabName)
+        getCurrentLocation.replace(this.VIEW_NAMES.STUDYGUIDE, newViewName)
       );
     } else {
       this.windowRef.nativeWindow.history.pushState(
         {},
         '',
-        getCurrentLocation.replace(this.activeTab, newTabName)
+        getCurrentLocation.replace(this.activeView, newViewName)
       );
     }
   }

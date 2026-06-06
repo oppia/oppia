@@ -1,0 +1,39 @@
+<section class="topic-story-section"
+         [attr.aria-label]="storyTitle ? ('Story section: ' + storyTitle) : 'Story section'">
+  <div class="story-callout-row">
+    <img class="story-callout-avatar"
+         [src]="oppiaAvatarImageUrl"
+         (error)="onAvatarImageError()"
+         alt=""
+         aria-hidden="true">
+    <p *ngIf="storyDescription" class="story-description-bubble">
+      <svg width="30" class="left-side-curve" height="24" viewBox="0 0 30 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" [ngStyle]="isLanguageRTL() ? {'transform': 'scaleX(-1)'} : {}">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M0.832031 0C12.8267 5.31326 22.692 13.4676 29.1014 23.3701V0H0.832031Z" fill="white" />
+      </svg>
+      {{ storyDescription }}
+    </p>
+  </div>
+
+  <article class="story-card"
+           [attr.aria-label]="storyTitle ? ('Story summary: ' + storyTitle) : 'Story summary'">
+    <div class="story-card-header">
+      <div class="story-card-header-left">
+        <h3 class="story-title"><span class="story-label">Story: </span>“{{ storyTitle }}”</h3>
+        <p class="story-meta" [attr.aria-label]="getStoryMetaAriaLabel()">
+          {{ getStoryMetaText() }}
+        </p>
+      </div>
+      <div class="story-card-header-right">
+        <a class="study-skills-cta" [href]="studyGuideUrl" [attr.aria-label]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_CTA_ARIA_LABEL' | translate: {storyTitle: storyTitle || 'this story'}">
+          <img class="study-skills-icon"
+               src="/assets/images/icons/study-skills-icon.png"
+               alt=""
+               aria-hidden="true">
+          <span [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_CTA' | translate"></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="story-card-body"></div>
+  </article>
+</section>
