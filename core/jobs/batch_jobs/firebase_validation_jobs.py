@@ -47,13 +47,13 @@ class FirebaseAuditRecordsJob(base_jobs.JobBase):
             self.pipeline
             | 'Get Weak Records' >> firebase_io.GetWeakRecords()
             | 'Key Weak Records by Email'
-            >> beam.Map((lambda record: (record.email, record)))
+            >> beam.Map(lambda record: (record.email, record))
         )
         strong_records = (
             self.pipeline
             | 'Get Strong Records' >> firebase_io.GetStrongRecords()
             | 'Key Strong Records by Email'
-            >> beam.Map((lambda record: (record.email, record)))
+            >> beam.Map(lambda record: (record.email, record))
         )
         return (
             {'from_oppia': weak_records, 'from_firebase': strong_records}
