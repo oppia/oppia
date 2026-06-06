@@ -34,6 +34,28 @@
       </div>
     </div>
 
-    <div class="story-card-body"></div>
+    <div class="story-card-body">
+      <div class="story-lesson-card-wrapper"
+           *ngFor="let lessonCard of lessonCards">
+        <topic-lesson-card
+          [lessonTitle]="lessonCard.lessonTitle"
+          [lessonDescription]="lessonCard.lessonDescription"
+          [thumbnailUrl]="lessonCard.thumbnailUrl"
+          [startUrl]="lessonCard.startUrl">
+        </topic-lesson-card>
+      </div>
+
+      <div class="story-practice-card-wrapper"
+         *ngIf="practiceCard">
+        <topic-practice-card
+          [practiceTitle]="practiceCard.practiceTitle"
+          [practiceDescription]="practiceCard.practiceDescription"
+          [relatedLessonNumber]="practiceCard.relatedLessonNumber"
+          [thumbnailUrl]="practiceCard.thumbnailUrl"
+          [studyUrl]="practiceCard.studyUrl"
+          [practiceUrl]="practiceCard.practiceUrl">
+        </topic-practice-card>
+      </div>
+    </div>
   </article>
 </section>

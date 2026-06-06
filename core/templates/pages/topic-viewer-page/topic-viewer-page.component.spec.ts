@@ -223,15 +223,19 @@ describe('Topic viewer page', () => {
     expect(topicViewerPageComponent.skillDescriptions).toEqual({});
     expect(topicViewerPageComponent.topicIsLoading).toBe(false);
     expect(topicViewerPageComponent.practiceTabIsDisplayed).toBe(true);
-    expect(topicViewerPageComponent.canonicalStorySectionData).toEqual([
-      {
+    expect(topicViewerPageComponent.canonicalStorySectionData.length).toBe(1);
+    expect(topicViewerPageComponent.canonicalStorySectionData[0]).toEqual(
+      jasmine.objectContaining({
         storyId: '2',
         storyTitle: 'Story Title',
         storyDescription: 'Story Description',
         lessonCount: 2,
         practiceCount: 0,
-      },
-    ]);
+        practiceSubtopicIds: [],
+        classroomUrlFragment: 'math',
+        topicUrlFragment,
+      })
+    );
   }));
 
   it(
@@ -255,15 +259,19 @@ describe('Topic viewer page', () => {
       req.flush(topicDictWithPractice);
       flushMicrotasks();
 
-      expect(topicViewerPageComponent.canonicalStorySectionData).toEqual([
-        {
+      expect(topicViewerPageComponent.canonicalStorySectionData.length).toBe(1);
+      expect(topicViewerPageComponent.canonicalStorySectionData[0]).toEqual(
+        jasmine.objectContaining({
           storyId: '2',
           storyTitle: 'Story Title',
           storyDescription: '',
           lessonCount: 2,
           practiceCount: 1,
-        },
-      ]);
+          practiceSubtopicIds: [1],
+          classroomUrlFragment: 'math',
+          topicUrlFragment,
+        })
+      );
     })
   );
 
