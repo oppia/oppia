@@ -199,8 +199,6 @@ describe('TopicStorySectionComponent', () => {
     component.storySummary = createStorySummarySpy([], []);
     component.lessonCount = 0;
     component.practiceCount = 1;
-    // Ensure URL service returns empty fragments so syncFromInputs doesn't
-    // repopulate them from the learner URL.
     urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('');
     urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue('');
     component.classroomUrlFragment = '';
@@ -279,7 +277,6 @@ describe('TopicStorySectionComponent', () => {
       ['Node title 1'],
       [storyNodeSpy as unknown as StoryNode]
     );
-    // force story id to be missing
     storySummary.getId.and.returnValue(null as unknown as string);
 
     component.storySummary = storySummary;
@@ -316,5 +313,23 @@ describe('TopicStorySectionComponent', () => {
     expect(component.getStoryMetaAriaLabel()).toBe(
       '1 lesson and 1 practice available'
     );
+  });
+
+  it('should construct practice session url when fragments and subtopic id present', () => {
+    component.storySummary = createStorySummarySpy([], []);
+    component.lessonCount = 0;
+    component.practiceCount = 1;
+    urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('math');
+    urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue(
+      'place-values'
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'place-values';
+    component.practiceSubtopicIds = [3];
+
+    component.ngOnInit();
+
+    expect(component.practiceCard).not.toBeNull();
+    expect(component.practiceCard?.practiceUrl).toContain('practice/session');
   });
 });
