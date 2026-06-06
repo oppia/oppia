@@ -84,4 +84,25 @@ describe('TopicPracticeCardComponent', () => {
     expect(button.textContent).toContain('Practice');
     expect(button.getAttribute('href')).toBe('#');
   });
+
+  it('should use provided thumbnail when available', () => {
+    component.thumbnailUrl = '/images/custom.png';
+    fixture.detectChanges();
+    expect(component.resolvedThumbnailUrl).toBe('/images/custom.png');
+  });
+
+  it('should use provided description when available', () => {
+    component.practiceDescription = 'A custom practice description';
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+    expect(
+      element.querySelector('.topic-practice-card-description')?.textContent
+    ).toContain('A custom practice description');
+  });
+
+  it('should provide generic alt text when title is empty', () => {
+    component.practiceTitle = '';
+    fixture.detectChanges();
+    expect(component.getThumbnailAltText()).toBe('Practice thumbnail');
+  });
 });

@@ -194,4 +194,127 @@ describe('TopicStorySectionComponent', () => {
       '/learn/math/place-values/studyguide'
     );
   });
+
+  it('should not provide practice session url when fragments are missing', () => {
+    component.storySummary = createStorySummarySpy([], []);
+    component.lessonCount = 0;
+    component.practiceCount = 1;
+    // Ensure URL service returns empty fragments so syncFromInputs doesn't
+    // repopulate them from the learner URL.
+    urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('');
+    urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue('');
+    component.classroomUrlFragment = '';
+    component.topicUrlFragment = '';
+    component.practiceSubtopicIds = [1];
+
+    component.ngOnInit();
+
+    expect(component.lessonCards.length).toBe(0);
+    expect(component.practiceCard).not.toBeNull();
+    expect(component.practiceCard?.practiceUrl).toBeNull();
+  });
+
+  it('should not provide practice session url when no subtopic id present', () => {
+    component.storySummary = createStorySummarySpy([], []);
+    component.lessonCount = 0;
+    component.practiceCount = 1;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+    component.practiceSubtopicIds = [];
+
+    component.ngOnInit();
+
+    expect(component.lessonCards.length).toBe(0);
+    expect(component.practiceCard).not.toBeNull();
+    expect(component.practiceCard?.practiceUrl).toBeNull();
+  });
+
+  it('should build lesson start url with all fields when exploration id present', () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+
+    const storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy as unknown as StoryNode]
+    );
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+    component.practiceSubtopicIds = [1];
+
+    component.ngOnInit();
+
+    expect(component.lessonCards.length).toBe(1);
+    const startUrl = component.lessonCards[0].startUrl;
+    expect(startUrl).toContain('/explore/exp_1');
+    expect(startUrl).toContain('?node_id=node_1');
+    expect(startUrl).toContain('?story_url_fragment=story-url-fragment');
+  });
+
+  it('should fallback lesson thumbnail when story id is missing', () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
+    storyNodeSpy.getExplorationId.and.returnValue(null);
+    storyNodeSpy.getId.and.returnValue('node_1');
+
+    const storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy as unknown as StoryNode]
+    );
+    // force story id to be missing
+    storySummary.getId.and.returnValue(null as unknown as string);
+
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.lessonCards.length).toBe(1);
+    expect(component.lessonCards[0].thumbnailUrl).toContain(
+      '/assets/images/splash/student_desk1x.webp'
+    );
+  });
+
+  it('should not change avatar when already using fallback', () => {
+    component.oppiaAvatarImageUrl =
+      '/assets/copyrighted-images/general/collection_mascot.svg';
+    component.onAvatarImageError();
+    expect(component.oppiaAvatarImageUrl).toContain(
+      '/assets/copyrighted-images/general/collection_mascot.svg'
+    );
+  });
+
+  it('should respect RTL language flag', () => {
+    i18nLanguageCodeService.isCurrentLanguageRTL.and.returnValue(true);
+    expect(component.isLanguageRTL()).toBeTrue();
+  });
+
+  it('should correctly singularize lesson and practice counts', () => {
+    component.lessonCount = 1;
+    component.practiceCount = 1;
+    expect(component.getLessonCountText()).toBe('1 lesson');
+    expect(component.getPracticeCountText()).toBe('1 practice');
+    expect(component.getStoryMetaAriaLabel()).toBe(
+      '1 lesson and 1 practice available'
+    );
+  });
 });

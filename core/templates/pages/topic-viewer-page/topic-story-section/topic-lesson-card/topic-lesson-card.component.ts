@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Presentational lesson card used in the redesigned topic
- * viewer story section.
+ * @fileoverview Lesson card component used in the redesigned topic viewer story section.
  */
 
 import {Component, Input, OnInit} from '@angular/core';
