@@ -94,7 +94,7 @@ export class CertificateOfferingAddTopicItemsComponent
 {
   @Input() certificateAssessmentOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
-  // TODO: Replace this display name input with classroomId once step 1
+  // TODO(#24717 - M1.11): Replace this display name input with classroomId once step 1
   // starts passing the actual classroom identifier to this component.
   @Input() classroomName: string = 'Math Grade 5';
   @Output() topicDataChange =
@@ -105,7 +105,7 @@ export class CertificateOfferingAddTopicItemsComponent
   searchQuery: string = '';
   selectedTopics: TopicOption[] = [];
 
-  // TODO: Replace this stub with the classroom-backed fetch once the flow
+  // TODO(#24717 - M1.11): Replace this stub with the classroom-backed fetch once the flow
   // passes classroomId from the first step.
   availableTopics: TopicOption[] = STUB_TOPICS;
 
@@ -119,7 +119,7 @@ export class CertificateOfferingAddTopicItemsComponent
     }
   }
 
-  // TODO: When the real classroomId is available, fetch the classroom data
+  // TODO(#24717 - M1.11): When the real classroomId is available, fetch the classroom data
   // here and map classroomData.getTopicSummaries() into TopicOption values.
   private syncSelectedFromOffering(): void {
     const selectedIds = Object.keys(

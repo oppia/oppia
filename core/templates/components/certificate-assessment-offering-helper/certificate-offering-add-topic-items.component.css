@@ -85,6 +85,7 @@
 .oppia-certificate-offering-card {
   background: #fff;
   border: 1px solid #dfe3e8;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -96,7 +97,7 @@
 
 .oppia-certificate-offering-hint {
   color: #00645c;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   margin: 0;
 }
@@ -135,7 +136,6 @@
 
 .oppia-certificate-offering-topic-thumbnail {
   background: #dbeafe;
-  border-radius: 8px;
   flex-shrink: 0;
   height: 78px;
   width: 78px;
@@ -195,17 +195,17 @@
 .oppia-certificate-offering-classroom-label {
   background: #80808017;
   color: #00645c;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   margin: 0;
-  min-height: 35px;
-  padding: 10px;
+  min-height: 15px;
+  padding: 15px;
 }
 
 .oppia-certificate-offering-topic-list {
   display: flex;
   flex-direction: column;
-  max-height: 260px;
+  max-height: 240px;
   overflow-y: auto;
 }
 
@@ -230,13 +230,13 @@
 .oppia-certificate-offering-topic-toggle {
   background: #fff;
   border: 1px solid #27635c;
-  border-radius: 6px;
+  border-radius: 4px;
   color: #27635c;
   cursor: pointer;
   flex-shrink: 0;
   font-size: 13px;
   font-weight: 500;
-  min-width: 130px;
+  min-width: 110px;
   padding: 6px 16px;
   transition: background 0.15s;
   white-space: nowrap;
@@ -266,23 +266,25 @@
 .oppia-certificate-offering-secondary-button {
   background: #fff;
   border: 1px solid #cfd5dc;
-  border-radius: 8px;
-  color: #222;
+  border-radius: 4px;
+  color: #27635c;
   cursor: pointer;
   flex-shrink: 0;
   font-size: 14px;
   font-weight: 600;
+  min-width: 110px;
   padding: 10px 20px;
 }
 
 .oppia-certificate-offering-primary-button {
   background: #00645c;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   color: #fff;
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
+  min-width: 110px;
   padding: 10px 32px;
 }
 
