@@ -20,12 +20,13 @@ from __future__ import annotations
 
 import base64
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base, domain_objects_validator
 from core.domain import (
     change_domain,
     exp_fetchers,
+    feature_flag_services,
     fs_services,
     html_cleaner,
     image_validation_services,
@@ -34,6 +35,7 @@ from core.domain import (
     skill_domain,
     skill_fetchers,
     state_domain,
+    story_fetchers,
     suggestion_registry,
     suggestion_services,
     topic_fetchers,
@@ -1227,14 +1229,89 @@ def _get_target_id_to_exploration_opportunity_dict(
         summary dict.
     """
     target_ids = set(s.target_id for s in suggestions)
-    opportunity_id_to_opportunity_dict = {
-        opp_id: (opp.to_dict() if opp is not None else None)
-        for opp_id, opp in (
-            opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                list(target_ids)
-            ).items()
+    opportunity_id_to_opportunity_dict: Dict[
+        str,
+        Optional[opportunity_domain.PartialExplorationOpportunitySummaryDict],
+    ] = {}
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        translation_opportunities = (
+            opportunity_services.get_translation_opportunities_by_entity_ids(
+                feconf.ENTITY_TYPE_EXPLORATION, list(target_ids)
+            )
         )
-    }
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
+        topic_summary_map = {
+            ts.id: ts for ts in topic_summaries if ts is not None
+        }
+
+        exp_id_to_story_id = {}
+        for ts in topic_summaries:
+            if ts is not None:
+                for (
+                    story_id,
+                    exp_ids,
+                ) in ts.published_story_exploration_mapping.items():
+                    for exp_id in exp_ids:
+                        if exp_id in target_ids:
+                            exp_id_to_story_id[exp_id] = story_id
+
+        story_ids = list(set(exp_id_to_story_id.values()))
+        story_map = {}
+        if story_ids:
+            stories = story_fetchers.get_stories_by_ids(story_ids)
+            story_map = {
+                story.id: story for story in stories if story is not None
+            }
+
+        for exp_id, model in translation_opportunities.items():
+            if model is None:
+                opportunity_id_to_opportunity_dict[exp_id] = None
+                continue
+
+            topic_name_val = ''
+            if model.topic_ids:
+                for t_id in model.topic_ids:
+                    if t_id in topic_summary_map:
+                        topic_name_val = topic_summary_map[t_id].name
+                        break
+
+            story_title_val = ''
+            chapter_title_val = ''
+            story_id_val = exp_id_to_story_id.get(exp_id)
+            if story_id_val and story_id_val in story_map:
+                story_val = story_map[story_id_val]
+                story_title_val = story_val.title
+                story_node = (
+                    story_val.story_contents.get_node_with_corresponding_exp_id(
+                        exp_id
+                    )
+                )
+                if story_node:
+                    chapter_title_val = story_node.title
+
+            opportunity_id_to_opportunity_dict[exp_id] = {
+                'id': exp_id,
+                'topic_name': topic_name_val,
+                'story_title': story_title_val,
+                'chapter_title': chapter_title_val,
+                'content_count': model.content_count,
+                'translation_counts': model.translation_counts,
+                'translation_in_review_counts': {},
+                'reviewer_only_content_count': 0,
+                'is_pinned': False,
+            }
+    else:
+        opportunity_id_to_opportunity_dict = {
+            opp_id: (opp.to_dict() if opp is not None else None)
+            for opp_id, opp in (
+                opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                    list(target_ids)
+                ).items()
+            )
+        }
     return opportunity_id_to_opportunity_dict
 
 

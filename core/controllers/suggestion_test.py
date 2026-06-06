@@ -21,7 +21,7 @@ from __future__ import annotations
 import base64
 import os
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     exp_domain,
@@ -2699,7 +2699,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion_post_accept['status'], suggestion_models.STATUS_ACCEPTED
         )
-        (questions, merged_question_skill_links) = (
+        questions, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
                 1, [self.SKILL_ID], 0
             )
@@ -3567,6 +3567,32 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
         self.assertEqual(response['next_offset'], 1)
 
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_exploration_handler_returns_data_with_new_opportunity_models(
+        self,
+    ) -> None:
+        self.login(self.AUTHOR_EMAIL)
+        topic_services.generate_topic_summary(self.TOPIC_ID)
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_EXPLORATION: [self.EXP_ID]}
+        )
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+            },
+        )
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+        self.assertEqual(response['next_offset'], 1)
+
         response = self.get_json(
             '/getsubmittedsuggestions/topic/translate_content',
             {
@@ -4116,6 +4142,47 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             },
         )
         self.assertEqual(response['next_offset'], 1)
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_exploration_handler_returns_data_with_new_opportunity_models(
+        self,
+    ) -> None:
+        topic_services.generate_topic_summary(self.TOPIC_ID)
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_EXPLORATION: [self.EXP_ID]}
+        )
+
+        response = self.get_json(
+            '/getreviewablesuggestions/exploration/translate_content',
+            params={
+                'exploration_id': self.EXP_ID,
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+            },
+        )
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(response['next_offset'], 1)
+        self.assertDictEqual(
+            response['target_id_to_opportunity_dict'],
+            {
+                'exp1': {
+                    'chapter_title': 'Node1',
+                    'content_count': 1,
+                    'reviewer_only_content_count': 0,
+                    'id': 'exp1',
+                    'is_pinned': False,
+                    'story_title': 'A story',
+                    'topic_name': 'topic',
+                    'translation_counts': {},
+                    'translation_in_review_counts': {},
+                }
+            },
+        )
 
     def test_topic_translate_handler_returns_no_data(self) -> None:
         response = self.get_json(
