@@ -1,6 +1,6 @@
 <div class="oppia-certificate-offering-details">
   <div class="oppia-certificate-section">
-    <h3 class="oppia-certificate-section-title">Certificate Details</h3>
+    <h3 class="oppia-certificate-section-title">Add Certificate Details</h3>
 
       <div class="form-group">
         <label class="oppia-certificate-label" for="certificate-offering-title">
@@ -40,9 +40,6 @@
             [attr.maxlength]="DESCRIPTION_MAX_LENGTH"
             [(ngModel)]="description"
             placeholder="Enter description"></textarea>
-          <span class="oppia-certificate-char-count">
-            {{ description.length }} / {{ DESCRIPTION_MAX_LENGTH }}
-          </span>
           <small class="form-text text-muted">
             <em> Certificate description should be at most {{DESCRIPTION_MAX_LENGTH}} characters.</em>
             <span *ngIf="description?.length > 0">
@@ -149,7 +146,7 @@
         </div>
       </div>
     </div>
-  <div class="oppia-certificate-section oppia-certificate-section--demonstrates">
+  <div class="oppia-certificate-section">
     <h3 class="oppia-certificate-section-title">What This Certificate Demonstrates</h3>
     <p class="oppia-certificate-section-subtitle">
       List what learners will be able to do after completing this certificate.
@@ -188,12 +185,6 @@
   </div>
 
   <div class="oppia-certificate-offering-details-actions">
-    <button
-      class="oppia-certificate-btn-secondary"
-      type="button"
-      (click)="onCancelClicked()">
-      Cancel
-    </button>
     <button
       class="e2e-test-certificate-offering-details-next-button oppia-certificate-btn-next"
       type="button"

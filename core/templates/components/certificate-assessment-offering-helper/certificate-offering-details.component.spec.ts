@@ -210,8 +210,8 @@ describe('Certificate Offering Details Component', () => {
     component.title = 'a'.repeat(81);
     component.description = '';
     component.classroomId = 'invalid';
-    component.timeLimitInMinutes = 0;
-    component.totalQuestions = 0;
+    component.timeLimitInMinutes = 61;
+    component.totalQuestions = 51;
     component.demonstratesList = [''];
 
     expect(component.getTitleValidationError()).toContain(
@@ -221,9 +221,11 @@ describe('Certificate Offering Details Component', () => {
       'valid classroom'
     );
     expect(component.getDescriptionValidationError()).toEqual('');
-    expect(component.getTimeLimitValidationError()).toContain('greater than 0');
+    expect(component.getTimeLimitValidationError()).toContain(
+      'at most 60 minutes'
+    );
     expect(component.getTotalQuestionsValidationError()).toContain(
-      'greater than 0'
+      'at most 50'
     );
     expect(component.getDemonstratesValidationError()).toEqual('');
   });
