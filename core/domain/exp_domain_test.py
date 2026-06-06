@@ -3143,6 +3143,113 @@ class ExplorationDomainValidationTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'RuleSpec \'Equals\' is missing inputs'
         )
+    def test_validation_fails_for_rulespec_inputs_not_dict(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+
+        state = state_domain.State.create_default_state(
+            'ABC',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT
+            ),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ),
+        )
+
+        self.set_interaction_for_state(
+            state, 'TextInput', content_id_generator
+        )
+        exploration.states = {'ABC': state}
+        exploration.init_state_name = 'ABC'
+
+        interaction = state.interaction
+        interaction.answer_groups.append(
+            state_domain.AnswerGroup(
+                outcome=state_domain.Outcome(
+                    dest='End',
+                    feedback=state_domain.SubtitledHtml(
+                        '', 'default_outcome'
+                    ),
+                    labelled_as_correct=False,
+                    dest_if_really_stuck=None,
+                    param_changes=[],
+                    refresher_exploration_id=None,
+                    missing_prerequisite_skill_id=None,
+                ),
+                rule_specs=[
+                    state_domain.RuleSpec(
+                        rule_type='Contains',
+                        inputs={'x': 'Test'}
+                    )
+                ],
+                training_data=[],
+                tagged_skill_misconception_id=None,
+            )
+        )
+
+        rule_spec = interaction.answer_groups[0].rule_specs[0]
+        rule_spec.inputs = 'Inputs string'  # type: ignore[assignment]
+
+        self._assert_validation_error(
+            exploration, 'Expected inputs to be a dict'
+    )
+
+    def test_validation_fails_for_unrecognized_rule_type(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+
+        state = state_domain.State.create_default_state(
+            'ABC',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT
+            ),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ),
+        )
+
+        self.set_interaction_for_state(
+            state, 'TextInput', content_id_generator
+        )
+        exploration.states = {'ABC': state}
+        exploration.init_state_name = 'ABC'
+
+        interaction = state.interaction
+        interaction.answer_groups.append(
+            state_domain.AnswerGroup(
+                outcome=state_domain.Outcome(
+                    dest='End',
+                    feedback=state_domain.SubtitledHtml(
+                        '', 'default_outcome'
+                    ),
+                    labelled_as_correct=False,
+                    dest_if_really_stuck=None,
+                    param_changes=[],
+                    refresher_exploration_id=None,
+                    missing_prerequisite_skill_id=None,
+                ),
+                rule_specs=[
+                    state_domain.RuleSpec(
+                        rule_type='Contains',
+                        inputs={'x': 'Test'}
+                    )
+                ],
+                training_data=[],
+                tagged_skill_misconception_id=None,
+            )
+        )
+
+        rule_spec = interaction.answer_groups[0].rule_specs[0]
+        rule_spec.rule_type = 'FakeRuleType'
+
+        self._assert_validation_error(
+            exploration, 'Unrecognized rule type'
+        )
 
     def test_validation_fails_for_invalid_interaction(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -3153,6 +3260,16 @@ class ExplorationDomainValidationTests(test_utils.GenericTestBase):
         interaction.id = 15  # type: ignore[assignment]
         self._assert_validation_error(
             exploration, 'Expected interaction id to be a string'
+        )
+    def test_validation_fails_for_invalid_interaction_id(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        state = list(exploration.states.values())[0]
+
+        interaction = state.interaction
+        interaction.id = 'SomeInteractionTypeThatDoesNotExist'
+
+        self._assert_validation_error(
+            exploration, 'Invalid interaction id'
         )
 
     def test_validation_fails_for_invalid_language_code(self) -> None:
