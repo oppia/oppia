@@ -28,6 +28,7 @@ import {GraphViz} from '../common/interactions/graph-viz';
 import {PencilCode} from '../common/interactions/pencil-code';
 import {ImageAreaSelection} from '../common/interactions/image-area-selection';
 import {ExplorationEditorModal} from '../common/exploration-editor';
+import {RTEEditor, RTE_BUTTON_TITLES} from '../common/rte-editor';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -7625,17 +7626,21 @@ export class ExplorationEditor extends BaseUser {
    * This opens the state content editor, inserts a math formula via the
    * CKEditor math button, and saves the content.
    * @param {string} latex - The LaTeX expression to insert.
+   * @param {string} [expectedText] - The text expected to be rendered inside the MathJax SVG text node.
    */
   async addMathFormulaToCardContent(
     latex: string,
-    expectedArabicText?: string
+    expectedText?: string
   ): Promise<void> {
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOnElementWithSelector(stateEditSelector);
     await this.clearAllTextFrom(stateContentInputField);
 
     // Insert mathematical formula via the RTE toolbar.
-    await this.clickOnRTEOptionWithTitle('Insert mathematical formula');
+    const rteEditor = new RTEEditor(this.page, this.page);
+    await rteEditor.clickOnRTEOptionWithTitle(
+      RTE_BUTTON_TITLES.MATH_FORMULA.EN
+    );
     await this.waitForNetworkIdle();
     const textareaElement = await this.page.$(
       'textarea[placeholder*="Enter a math expression using LaTeX"]'
@@ -7649,10 +7654,8 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('Tab');
     await this.waitForNetworkIdle();
 
-    if (expectedArabicText) {
-      await this.expectMathJaxToRenderArabicTextInSvgTextNode(
-        expectedArabicText
-      );
+    if (expectedText) {
+      await this.expectMathJaxToRenderArabicTextInSvgTextNode(expectedText);
     }
 
     await this.clickOnElementWithSelector(closeButtonForExtraModel);
