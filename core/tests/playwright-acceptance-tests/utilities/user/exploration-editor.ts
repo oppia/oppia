@@ -71,6 +71,7 @@ const customizeInteractionHeaderSelector =
 
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
+const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
@@ -136,6 +137,10 @@ export class ExplorationEditor extends BaseUser {
       state: 'visible',
     });
 
+    // Wait for any loading overlays to detach before clicking.
+    await this.page.waitForSelector(loadingFullPageOverlaySelector, {
+      state: 'hidden',
+    });
     await this.clickOnElementWithSelector(addInteractionButton);
 
     // Check if modal title is correct.
@@ -145,8 +150,18 @@ export class ExplorationEditor extends BaseUser {
       interactionToAdd as INTERACTION_TYPES
     );
 
-    await this.waitForNetworkIdle();
-    await this.clickOnElementWithText(interactionToAdd);
+    await this.page.waitForLoadState('networkidle');
+    // Use a higher timeout for math interactions as they are heavy to render.
+    let tileText = interactionToAdd;
+
+    const interactionElement = await this.page.waitForSelector(
+      `xpath=//*[contains(normalize-space(text()), "${tileText}")]`,
+      {timeout: 90000}
+    );
+    if (!interactionElement) {
+      throw new Error(`Interaction "${interactionToAdd}" not found in modal.`);
+    }
+    await this.clickOnElement(interactionElement);
     if (skipInteractionCustoization) {
       await this.expectCustomizeInteractionTitleToBe(
         `Customize Interaction (${interactionToAdd})`
@@ -460,21 +475,6 @@ export class ExplorationEditor extends BaseUser {
       await publishExploration();
       return await confirmPublish();
     }
-  }
-
-  /**
-   * Waits for the page to fully load.
-   */
-  async waitForPageToFullyLoad(): Promise<void> {
-    await this.page.waitForLoadState('networkidle');
-  }
-
-  /**
-   * Waits for network to be idle.
-   * @param idleTime Time in milliseconds to wait for network to be idle.
-   */
-  async waitForNetworkIdle(): Promise<void> {
-    await this.page.waitForLoadState('networkidle');
   }
 }
 

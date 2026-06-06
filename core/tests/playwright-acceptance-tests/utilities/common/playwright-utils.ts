@@ -425,6 +425,13 @@ export class BaseUser {
     }
   }
 
+  /**
+   * The function clicks the element using the text on the button
+   * and wait until the new page is fully loaded.
+   * @param selector - The selector of button to click.
+   * @param useSelector - Whether to use the selector or the text.
+   * @param options - The navigation options.
+   */
   async clickAndWaitForNavigation(
     selector: string,
     useSelector: boolean = false,
