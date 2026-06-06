@@ -21,6 +21,7 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {showMessage} from '../../utilities/common/show-message';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
@@ -34,66 +35,92 @@ describe('Topic Manager', function () {
   let unsupportedExplorationId: string | null;
 
   beforeAll(async function () {
+    showMessage('beforeAll: create curriculumAdmin');
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculumAdmin1@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
+    showMessage('after: create curriculumAdmin');
 
     // Create two simple explorations.
+    showMessage('before: createAndPublishAMinimalExplorationWithTitle 1');
     explorationId1 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'Exploring Quadratic Equations',
         'Algebra',
         true
       );
+    showMessage('after: createAndPublishAMinimalExplorationWithTitle 1');
 
+    showMessage('before: createAndPublishAMinimalExplorationWithTitle 2');
     explorationId2 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'Understanding Polynomial Functions'
       );
+    showMessage('after: createAndPublishAMinimalExplorationWithTitle 2');
 
     // Create an exploration with Set Input interaction.
+    showMessage('before: navigateToCreatorDashboardPage');
     await curriculumAdmin.navigateToCreatorDashboardPage();
+    showMessage('after: navigateToCreatorDashboardPage');
+    showMessage('before: navigateToExplorationEditorFromCreatorDashboard');
     await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
+    showMessage('after: navigateToExplorationEditorFromCreatorDashboard');
 
     // Create an exlporation unsupported by mobile.
+    showMessage('before: createSimpleUnsupportedExploration');
     unsupportedExplorationId =
       await curriculumAdmin.createSimpleUnsupportedExploration();
+    showMessage('after: createSimpleUnsupportedExploration');
 
     // Create Topics and add skills.
+    showMessage('before: createTopic');
     await curriculumAdmin.createTopic('Algebra II', 'algebra-ii');
+    showMessage('after: createTopic');
+    showMessage('before: createSkillForTopic 1');
     await curriculumAdmin.createSkillForTopic(
       'Quadratic Equations',
       'Algebra II',
       false
     );
+    showMessage('after: createSkillForTopic 1');
+    showMessage('before: createSkillForTopic 2');
     await curriculumAdmin.createSkillForTopic(
       'Polynomial Functions',
       'Algebra II',
       false
     );
+    showMessage('after: createSkillForTopic 2');
 
     // Add story to topic.
+    showMessage('before: addStoryToTopic');
     await curriculumAdmin.addStoryToTopic(
       'Journey into Quadratic Equations',
       'journey-into-quadratic-equations',
       'Algebra II'
     );
+    showMessage('after: addStoryToTopic');
+    showMessage('before: addChapter');
     await curriculumAdmin.addChapter(
       'Quadratic Equations Basics',
       explorationId1 as string
     );
+    showMessage('after: addChapter');
 
+    showMessage('before: saveStoryDraft');
     await curriculumAdmin.saveStoryDraft();
+    showMessage('after: saveStoryDraft');
 
     // Create topic Manager.
+    showMessage('before: create topicManager user');
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topicManager1@example.com',
       [ROLES.TOPIC_MANAGER],
       'Algebra II'
     );
+    showMessage('after: create topicManager user');
     // Setup is taking longer than the Default timeout of 300000 ms.
   }, 380000);
 
