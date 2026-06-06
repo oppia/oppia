@@ -124,9 +124,7 @@ describe('Subtopic page Model', () => {
     subtopicPage.setPageContents(pageContents);
     pageContents.setHtml('<p>Updated content</p>');
 
-    expect(subtopicPage.getPageContents().getHtml()).toBe(
-      '<p>New content</p>'
-    );
+    expect(subtopicPage.getPageContents().getHtml()).toBe('<p>New content</p>');
   });
 
   it('should generate subtopic page id from topic and subtopic ids', () => {
