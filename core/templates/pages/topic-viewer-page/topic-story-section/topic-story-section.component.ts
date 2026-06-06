@@ -175,7 +175,7 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
   }
 
   private getPracticeCardData(): PracticeCardData | null {
-    if (this.practiceCount < 1) {
+    if (this.lessonCards.length > 0 || this.practiceCount < 1) {
       return null;
     }
 

@@ -82,8 +82,6 @@
   height: 8px;
   background: #ececf0;
   border-radius: 8px;
-
-  /* Overlap beneath the circle */
   margin-left: -10px;
 }
 
@@ -112,26 +110,20 @@
   align-items: center;
   justify-content: center;
   display: inline-flex;
-
   width: 101px;
   height: 44px;
-
   padding: 10px;
   gap: 10px;
-
   background: #c85f44;
   border-radius: 4px;
-
   color: #fff;
   text-decoration: none;
-
   font-family: Roboto, Arial, sans-serif;
   font-size: 16px;
   font-weight: 700;
   line-height: 24px;
 }
 
-/* Tablet */
 @media (max-width: 768px) {
   .topic-practice-card {
     min-height: 100px;
@@ -191,7 +183,6 @@
   }
 }
 
-/* Mobile */
 @media (max-width: 450px) {
   .topic-practice-card {
     display: flex;

@@ -46,7 +46,7 @@
       </div>
 
       <div class="story-practice-card-wrapper"
-         *ngIf="practiceCard">
+        *ngIf="lessonCards.length === 0 && practiceCard">
         <topic-practice-card
           [practiceTitle]="practiceCard.practiceTitle"
           [practiceDescription]="practiceCard.practiceDescription"

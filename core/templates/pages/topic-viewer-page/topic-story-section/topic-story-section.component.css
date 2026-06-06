@@ -137,9 +137,22 @@
 
 .story-card-body {
   min-height: 390px;
-  padding: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 0 28px 28px;
 }
 
+.story-lesson-card-wrapper {
+  width: 100%;
+  margin-top: auto;
+}
+
+.story-practice-card-wrapper {
+  width: 100%;
+  margin-top: auto;
+}
 @media (max-width: 768px) {
   .story-callout-row {
     align-items: flex-start;
@@ -204,7 +217,8 @@
   }
 
   .story-card-body {
-    min-height: 260px;
+    min-height: 300px;
+    padding: 0 12px 12px;
   }
 }
 
@@ -294,6 +308,16 @@
   }
 
   .story-card-body {
-    min-height: 500px;
-  }
+  min-height: 462px;
+  display: flex;
+  flex-direction: column;
+}
+
+.story-lesson-card-wrapper {
+  margin-top: auto;
+}
+
+.story-practice-card-wrapper {
+  margin-top: auto;
+}
 }

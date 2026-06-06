@@ -19,6 +19,8 @@
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
+import {StoryNode} from 'domain/story/story-node.model';
+import {StorySummary} from 'domain/story/story-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -33,6 +35,9 @@ describe('TopicStorySectionComponent', () => {
   beforeEach(waitForAsync(() => {
     urlService = jasmine.createSpyObj('UrlService', [
       'getLearnerTopicStudyGuideUrl',
+      'getClassroomUrlFragmentFromLearnerUrl',
+      'getTopicUrlFragmentFromLearnerUrl',
+      'addField',
     ]);
     TestBed.configureTestingModule({
       declarations: [TopicStorySectionComponent, MockTranslatePipe],
@@ -58,9 +63,39 @@ describe('TopicStorySectionComponent', () => {
     urlService.getLearnerTopicStudyGuideUrl.and.returnValue(
       '/learn/math/place-values/studyguide'
     );
+    urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('math');
+    urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue('topic');
+    urlService.addField.and.callFake(
+      (url: string, key: string, value: string | number) => {
+        return `${url}?${key}=${value}`;
+      }
+    );
 
     fixture.detectChanges();
   });
+
+  const createStorySummarySpy = (
+    nodeTitles: string[],
+    nodes: StoryNode[]
+  ): jasmine.SpyObj<StorySummary> => {
+    const storySummarySpy = jasmine.createSpyObj('StorySummary', [
+      'getTitle',
+      'getDescription',
+      'getNodeTitles',
+      'getAllNodes',
+      'getId',
+      'getUrlFragment',
+    ]);
+
+    storySummarySpy.getTitle.and.returnValue('Story Title');
+    storySummarySpy.getDescription.and.returnValue('Story Description');
+    storySummarySpy.getNodeTitles.and.returnValue(nodeTitles);
+    storySummarySpy.getAllNodes.and.returnValue(nodes);
+    storySummarySpy.getId.and.returnValue('story_id_1');
+    storySummarySpy.getUrlFragment.and.returnValue('story-url-fragment');
+
+    return storySummarySpy as jasmine.SpyObj<StorySummary>;
+  };
 
   it('should return story title and meta text helpers', () => {
     expect(component.storyTitle).toBe('Help Jaime win the Arcade Game');
@@ -116,5 +151,49 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.studyGuideUrl).toBe('#');
     expect(urlService.getLearnerTopicStudyGuideUrl).toHaveBeenCalledTimes(2);
+  });
+
+  it('should not create practice card when lesson cards are present', () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue('');
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+
+    component.storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy as StoryNode]
+    );
+    component.lessonCount = 1;
+    component.practiceCount = 1;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+    component.practiceSubtopicIds = [1];
+
+    component.ngOnInit();
+
+    expect(component.lessonCards.length).toBe(1);
+    expect(component.practiceCard).toBeNull();
+  });
+
+  it('should create practice card only when there are zero lessons', () => {
+    component.storySummary = createStorySummarySpy([], []);
+    component.lessonCount = 0;
+    component.practiceCount = 1;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+    component.practiceSubtopicIds = [1];
+
+    component.ngOnInit();
+
+    expect(component.lessonCards.length).toBe(0);
+    expect(component.practiceCard).not.toBeNull();
   });
 });
