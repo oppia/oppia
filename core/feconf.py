@@ -582,13 +582,14 @@ DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
 DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 
-# NOTE TO RELEASE COORDINATORS: Replace these service account email with the
-# correct service account email when switching to the prod server.
-FIREBASE_AUTHENTICATION_READ_ONLY_SERVICE_ACCOUNT = (
-    'firebase-authentication-read-only@example.com'
+FIREBASE_AUTHENTICATION_READ_ONLY_SERVICE_ACCOUNT_ID = (
+    'firebase-authentication-read-only'
 )
-FIREBASE_AUTHENTICATION_READ_AND_WRITE_SERVICE_ACCOUNT = (
-    'firebase-authentication-read-and-write@example.com'
+FIREBASE_AUTHENTICATION_READ_AND_WRITE_SERVICE_ACCOUNT_ID = (
+    'firebase-authentication-read-and-write'
+)
+CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE = (
+    '{service_account_id}@{app_id}.iam.gserviceaccount.com'
 )
 
 OPPIA_VERSION = '3.5.1'

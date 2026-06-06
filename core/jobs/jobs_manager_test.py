@@ -316,6 +316,19 @@ class LimitJobResourcesTests(test_utils.GenericTestBase):
 @mock.patch('apache_beam.Pipeline')
 class FirebaseAuthenticationServiceAccountTests(test_utils.GenericTestBase):
 
+    READ_AND_WRITE_EMAIL = feconf.CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE.format(
+        service_account_id=(
+            feconf.FIREBASE_AUTHENTICATION_READ_AND_WRITE_SERVICE_ACCOUNT_ID
+        ),
+        app_id=feconf.OPPIA_PROJECT_ID,
+    )
+    READ_ONLY_EMAIL = feconf.CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE.format(
+        service_account_id=(
+            feconf.FIREBASE_AUTHENTICATION_READ_ONLY_SERVICE_ACCOUNT_ID
+        ),
+        app_id=feconf.OPPIA_PROJECT_ID,
+    )
+
     def test_job_with_read_only_access(
         self, mock_pipeline_class: mock.Mock
     ) -> None:
@@ -330,9 +343,7 @@ class FirebaseAuthenticationServiceAccountTests(test_utils.GenericTestBase):
         _, kwargs = mock_pipeline_class.call_args
         self.assertIsInstance(kwargs['options'], job_options.JobOptions)
         self.assertDictContainsSubset(
-            {
-                'service_account_email': feconf.FIREBASE_AUTHENTICATION_READ_ONLY_SERVICE_ACCOUNT
-            },
+            {'service_account_email': self.READ_ONLY_EMAIL},
             kwargs['options'].get_all_options(),
         )
 
@@ -350,9 +361,7 @@ class FirebaseAuthenticationServiceAccountTests(test_utils.GenericTestBase):
         _, kwargs = mock_pipeline_class.call_args
         self.assertIsInstance(kwargs['options'], job_options.JobOptions)
         self.assertDictContainsSubset(
-            {
-                'service_account_email': feconf.FIREBASE_AUTHENTICATION_READ_AND_WRITE_SERVICE_ACCOUNT
-            },
+            {'service_account_email': self.READ_AND_WRITE_EMAIL},
             kwargs['options'].get_all_options(),
         )
 

@@ -26,6 +26,7 @@ import traceback
 from core import feconf
 from core.domain import beam_job_services, caching_services
 from core.jobs import base_jobs, job_options
+from core.jobs.batch_jobs import firebase_sync_jobs, firebase_validation_jobs
 from core.jobs.io import cache_io, job_io
 from core.platform import models
 from core.storage.beam_job import gae_models as beam_job_models
@@ -139,19 +140,12 @@ def run_job(
             'autoscaling_algorithm': 'THROUGHPUT_BASED',
         }
 
-    if does_job_require_firebase_authentication_read_and_write_access(job_name):
-        # Jobs that must interact with our Firebase Authentication servers need
-        # to run as a privileged service account with admin permissions.
-        # https://firebase.google.com/docs/projects/iam/roles-predefined-product#auth
+    if service_account_id := choose_service_account_id_for_job(job_class):
+        app_id = app_identity_services.get_application_id()
         additional_options['service_account_email'] = (
-            feconf.FIREBASE_AUTHENTICATION_READ_AND_WRITE_SERVICE_ACCOUNT
-        )
-    elif does_job_require_firebase_authentication_read_only_access(job_name):
-        # Jobs that must interact with our Firebase Authentication servers need
-        # to run as a privileged service account with read-only permissions.
-        # https://firebase.google.com/docs/projects/iam/roles-predefined-product#auth
-        additional_options['service_account_email'] = (
-            feconf.FIREBASE_AUTHENTICATION_READ_ONLY_SERVICE_ACCOUNT
+            feconf.CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE.format(
+                service_account_id=service_account_id, app_id=app_id
+            )
         )
 
     if parameterized_args:
@@ -353,37 +347,24 @@ def does_job_requires_limiting_workers(job_name: str) -> bool:
     return job_name in jobs_requiring_limiting_workers
 
 
-def does_job_require_firebase_authentication_read_and_write_access(
-    job_name: str,
-) -> bool:
-    """Determines if a job needs read and write Firebase Authentication access.
+def choose_service_account_id_for_job(
+    job_class: type[base_jobs.JobBase],
+) -> Optional[str]:
+    """Returns the service account ID that should be used to run the given job.
 
     Args:
-        job_name: str. The name of the job.
+        job_class: type[base_jobs.JobBase]. The job.
 
     Returns:
-        bool. Whether the given job requires read and write access.
+        str|None. The service account ID that should be used to run the given
+        job, or None if no custom service account is required.
     """
-    match job_name:
-        case 'FirebaseSyncRecordsJob':
-            return True
+    match job_class:
+        case firebase_sync_jobs.FirebaseSyncRecordsJob:
+            return (
+                feconf.FIREBASE_AUTHENTICATION_READ_AND_WRITE_SERVICE_ACCOUNT_ID
+            )
+        case firebase_validation_jobs.FirebaseAuditRecordsJob:
+            return feconf.FIREBASE_AUTHENTICATION_READ_ONLY_SERVICE_ACCOUNT_ID
         case _:
-            return False
-
-
-def does_job_require_firebase_authentication_read_only_access(
-    job_name: str,
-) -> bool:
-    """Determines if a job needs read-only Firebase Authentication access.
-
-    Args:
-        job_name: str. The name of the job.
-
-    Returns:
-        bool. Whether the given job requires read-only access.
-    """
-    match job_name:
-        case 'FirebaseAuditRecordsJob':
-            return True
-        case _:
-            return False
+            return None
