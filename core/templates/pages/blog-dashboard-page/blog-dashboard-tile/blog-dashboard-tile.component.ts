@@ -37,7 +37,7 @@ export class BlogDashboardTileComponent implements OnInit {
   @Input() blogPostSummary!: BlogPostSummary;
   @Input() activeView!: string;
   @Input() blogPostIsPublished: boolean = false;
-  @Input() last: boolean = false;
+  @Input() isLastBlogPostInList: boolean = false;
   lastUpdatedDateString: string = '';
   summaryContent!: string;
   @Output() unpublisedBlogPost: EventEmitter<void> = new EventEmitter();

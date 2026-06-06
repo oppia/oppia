@@ -92,10 +92,11 @@
           </div>
           <mat-list class="blog-dashboard-tiles-container e2e-test-drafts-blog-post-table e2e-test-list-view-dashboard"
                     *ngIf="activeView === 'listView'">
-            <mat-list-item *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts; last as last">
+            <mat-list-item *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts; last as isLastBlogPostInList">
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
                                          [blogPostIsPublished]="false"
                                          [activeView]="activeView"
+                                         [isLastBlogPostInList]="isLastBlogPostInList"
                                          class="d-flex flex-grow-1 blog-tiles-list e2e-test-blog-post-list-item">
               </oppia-blog-dashboard-tile>
             </mat-list-item>
@@ -135,10 +136,11 @@
           </div>
           <mat-list class="blog-dashboard-tiles-container e2e-test-published-blog-post-table e2e-test-published-blogs-tab"
                     *ngIf="activeView === 'listView'">
-            <mat-list-item *ngFor="let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts; last as last">
+            <mat-list-item *ngFor="let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts; last as isLastBlogPostInList">
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
                                          [blogPostIsPublished]="false"
                                          [activeView]="activeView"
+                                         [isLastBlogPostInList]="isLastBlogPostInList"
                                          class="d-flex flex-grow-1 blog-tiles-list e2e-test-blog-post-list-item">
               </oppia-blog-dashboard-tile>
             </mat-list-item>
