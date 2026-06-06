@@ -154,6 +154,7 @@ class ValidModelNames(enum.Enum):
     BEAM_JOB = 'beam_job'
     BLOG = 'blog'
     BLOG_STATISTICS = 'blog_statistics'
+    CERTIFICATE_ASSESSMENT_OFFERING = 'certificate_assessment_offering'
     CLASSROOM = 'classroom'
     CLOUD_TASK = 'cloud_task'
     COLLECTION = 'collection'
@@ -227,7 +228,7 @@ ALLOWED_FEEDBACK_PAGE_HOSTS = (
     '::1',
 )
 ALLOWED_SESSION_INFO_TOP_LEVEL_KEYS = (
-    'console_errors_json',
+    'console_logs_json',
     'failed_requests_json',
     'navigation_history_json',
     'environment_json',
@@ -1123,6 +1124,10 @@ REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL = (
 REGENERATE_VOICEOVERS_FOR_EXPLORATION_URL = (
     '/regenerate_voiceovers_for_exploration/'
     '<exploration_id>/<language_accent_code>'
+)
+
+CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
+    '/certificate_assessment_offering_handler'
 )
 
 # Event types.
