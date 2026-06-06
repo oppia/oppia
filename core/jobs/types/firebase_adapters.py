@@ -103,11 +103,11 @@ class WeakRecord(StrongRecord):
             auth_details: UserAuthDetailsModel. Auth details of a given user.
 
         Returns:
-            WeakRecord | None. A record when the models are valid and correspond
-            to a non-merged user, otherwise None.
+            WeakRecord | None. A record if the given models are consistent with
+            each other, i.e. they have the same user id and same deleted status.
 
         Raises:
-            ValueError. If the models have inconsistent ids or deleted status.
+            ValueError. If given models have inconsistent fields.
         """
         if settings.id != auth_details.id:
             raise ValueError(
