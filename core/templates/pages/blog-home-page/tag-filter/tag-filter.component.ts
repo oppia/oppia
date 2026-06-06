@@ -24,6 +24,7 @@ import {
   Input,
   Output,
   EventEmitter,
+  ViewEncapsulation,
 } from '@angular/core';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {MatAutocompleteTrigger} from '@angular/material/autocomplete';
@@ -43,6 +44,7 @@ import isEqual from 'lodash/isEqual';
   selector: 'oppia-tag-filter',
   templateUrl: './tag-filter.component.html',
   styleUrls: ['../blog-home-page.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class TagFilterComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
