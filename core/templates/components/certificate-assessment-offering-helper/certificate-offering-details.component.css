@@ -202,18 +202,14 @@
   background: none;
   border: none;
   border-radius: 4px;
-  color: #333;
+  background: #00645c;
+  color: #fff;
   cursor: pointer;
   font-family: inherit;
   font-size: 14px;
   font-weight: 500;
   padding: 10px 28px;
   transition: background 0.15s, opacity 0.15s;
-}
-
-.oppia-certificate-btn-next {
-  background: #00645c;
-  color: #fff;
 }
 
 .oppia-certificate-btn-next:hover:not([disabled]) {
