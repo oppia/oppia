@@ -52,7 +52,12 @@ class StrongRecord:
         )
 
     def into_import(self) -> firebase_auth.ImportUserRecord:
-        """Converts self into firebase_auth.ImportUserRecord."""
+        """Converts self into firebase_auth.ImportUserRecord.
+
+        Returns:
+            firebase_auth.ImportUserRecord. Holds the same auth_id, email, and
+            disabled values.
+        """
         return firebase_auth.ImportUserRecord(
             uid=self.auth_id, email=self.email, disabled=self.disabled
         )
@@ -61,7 +66,12 @@ class StrongRecord:
     def from_export(
         cls, record: firebase_auth.ExportedUserRecord
     ) -> 'StrongRecord':
-        """Creates a strong record corresponding to the ExportedUserRecord."""
+        """Creates a strong record corresponding to the ExportedUserRecord.
+
+        Returns:
+            firebase_adapters.StrongRecord. Holds the same auth_id, email, and
+            disabled values.
+        """
         return StrongRecord(record.uid, record.email, record.disabled)
 
 
@@ -86,7 +96,19 @@ class WeakRecord(StrongRecord):
         settings: user_models.UserSettingsModel,
         auth_details: auth_models.UserAuthDetailsModel,
     ) -> 'WeakRecord | None':
-        """Returns WeakRecord from Oppia's user models if valid, else None."""
+        """Returns WeakRecord from Oppia's user models if valid, else None.
+
+        Args:
+            settings: UserSettingsModel. User settings of a given user.
+            auth_details: UserAuthDetailsModel. Auth details of a given user.
+
+        Returns:
+            WeakRecord | None. A record when the models are valid and correspond
+            to a non-merged user, otherwise None.
+
+        Raises:
+            ValueError. If the models have inconsistent ids or deleted status.
+        """
         if settings.id != auth_details.id:
             raise ValueError(
                 f'UserSettingsModel.id={settings.id} does not match '
