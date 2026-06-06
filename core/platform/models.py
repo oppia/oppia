@@ -41,6 +41,7 @@ Names = feconf.ValidModelNames
 MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
     Names.APP_FEEDBACK_REPORT,
     Names.BLOG,
+    Names.CERTIFICATE_ASSESSMENT_OFFERING,
     Names.COLLECTION,
     Names.CONFIG,
     Names.EXPLORATION,
@@ -255,6 +256,12 @@ class _Gae(Platform):
                 )
 
                 returned_models.append(voiceover_models)
+            elif name == Names.CERTIFICATE_ASSESSMENT_OFFERING:
+                from core.storage.certificate_assessment import (
+                    gae_models as certificate_assessment_offering_models,
+                )
+
+                returned_models.append(certificate_assessment_offering_models)
             else:
                 raise Exception('Invalid model name: %s' % name)
 
