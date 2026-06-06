@@ -457,7 +457,7 @@ export class ConversationFlowService {
    */
   isLearnAgainButton(): boolean {
     let conceptCardIsBeingShown =
-      this.displayedCard.getStateName() === '' &&
+      this.displayedCard.getStateName() === null &&
       !this.explorationModeService.isInQuestionMode();
     if (conceptCardIsBeingShown) {
       return false;
@@ -556,7 +556,7 @@ export class ConversationFlowService {
   showUpcomingCard(): void {
     let currentIndex = this.playerPositionService.getDisplayedCardIndex();
     let conceptCardIsBeingShown =
-      this.displayedCard.getStateName() === '' &&
+      this.displayedCard.getStateName() === null &&
       !this.explorationModeService.isInQuestionMode();
     if (
       conceptCardIsBeingShown &&

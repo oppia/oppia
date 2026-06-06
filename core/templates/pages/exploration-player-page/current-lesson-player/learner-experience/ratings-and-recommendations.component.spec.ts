@@ -168,8 +168,7 @@ describe('Ratings and recommendations component', () => {
         {} as LearnerExplorationSummary,
         false,
         'bg_color_1',
-        'filename_1',
-        'published'
+        'filename_1'
       );
       const readOnlyStoryNode2 = new ReadOnlyStoryNode(
         'node_2',
@@ -184,8 +183,7 @@ describe('Ratings and recommendations component', () => {
         {} as LearnerExplorationSummary,
         false,
         'bg_color_2',
-        'filename_2',
-        'published'
+        'filename_2'
       );
 
       expect(componentInstance.inStoryMode).toBe(undefined);
@@ -253,8 +251,7 @@ describe('Ratings and recommendations component', () => {
             {},
             true,
             'metatag',
-            'page_title_fragment',
-            null
+            'page_title_fragment'
           )
         )
       );

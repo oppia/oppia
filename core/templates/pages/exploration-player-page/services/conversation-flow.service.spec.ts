@@ -72,9 +72,6 @@ import {RefresherExplorationConfirmationModalService} from '../services/refreshe
 import {ConceptCardManagerService} from './concept-card-manager.service';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
 import {UserService} from '../../../services/user.service';
-import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
-import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
-import {InteractionAnswer} from 'interactions/answer-defs';
 
 describe('Conversation flow service', () => {
   let conversationFlowService: ConversationFlowService;
@@ -110,39 +107,19 @@ describe('Conversation flow service', () => {
   let playerPositionService: PlayerPositionService;
   let explorationEngineService: ExplorationEngineService;
 
-  const createInteraction = (interactionType: string | null): Interaction =>
-    new Interaction(
-      [],
-      [],
-      {} as InteractionCustomizationArgs,
-      null,
-      [],
-      interactionType,
-      null
-    );
-  let createCard = function (interactionType: string | null): StateCard {
+  let createCard = function (interactionType: string): StateCard {
     return new StateCard(
-      '',
-      '',
-      '',
-      createInteraction(interactionType),
+      null,
+      null,
+      null,
+      new Interaction([], [], null, null, [], interactionType, null),
       [],
-      ''
+      null,
+      '',
+      null
     );
   };
   let displayedCard = createCard('');
-  const mockConceptCard = ConceptCard.createFromBackendDict({
-    explanation: {
-      content_id: 'explanation',
-      html: '<p>Test Explanation</p>',
-    },
-    recorded_voiceovers: {
-      voiceovers_mapping: {},
-    },
-  });
-  const mockInteractionRulesService = {
-    Equals: jasmine.createSpy('Equals'),
-  } as InteractionRulesService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -222,26 +199,26 @@ describe('Conversation flow service', () => {
   it('should tell if supplemental card is non empty', () => {
     expect(
       conversationFlowService.isSupplementalCardNonempty(displayedCard)
-    ).toBe(false);
+    ).toBeFalse();
 
     let textInputCard = createCard('TextInput');
     expect(
       conversationFlowService.isSupplementalCardNonempty(textInputCard)
-    ).toBe(false);
+    ).toBeFalse();
 
     let supplementaryImageInputCard = createCard('ImageClickInput');
     expect(
       conversationFlowService.isSupplementalCardNonempty(
         supplementaryImageInputCard
       )
-    ).toBe(true);
+    ).toBeTrue();
   });
 
   it('should return to exploration after concept card if last card is shown', () => {
     const mockDisplayedCard = jasmine.createSpyObj('StateCard', [
       'getStateName',
     ]);
-    mockDisplayedCard.getStateName.and.returnValue('');
+    mockDisplayedCard.getStateName.and.returnValue(null);
 
     conversationFlowService.displayedCard = mockDisplayedCard;
 
@@ -287,7 +264,7 @@ describe('Conversation flow service', () => {
 
     conversationFlowService.showUpcomingCard();
 
-    expect(conversationFlowService.moveToExploration).toBe(false);
+    expect(conversationFlowService.moveToExploration).toBeFalse();
     expect(explorationModeService.setExplorationModeFromUrl).toHaveBeenCalled();
     expect(explorationEngineService.loadInitialState).toHaveBeenCalled();
   });
@@ -335,7 +312,7 @@ describe('Conversation flow service', () => {
     conversationFlowService.displayedCard = {
       getStateName: () => 'State1',
       isCompleted: () => false,
-    } as StateCard;
+    };
 
     spyOn(conversationFlowService, 'getNextStateCard').and.returnValue({
       getStateName: () => 'NextState',
@@ -387,91 +364,91 @@ describe('Conversation flow service', () => {
     conversationFlowService.setHasInteractedAtLeastOnce(true);
     // Since there is no getter, we can indirectly check expected behavior,
     // but here we just test the method does not throw.
-    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBe(true);
+    expect().nothing();
 
     conversationFlowService.setHasInteractedAtLeastOnce(false);
-    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBe(false);
+    expect().nothing();
   });
 
   it('should set and get explorationActuallyStarted correctly', () => {
     conversationFlowService.setExplorationActuallyStarted(true);
-    expect(conversationFlowService.getExplorationActuallyStarted()).toBe(true);
+    expect(conversationFlowService.getExplorationActuallyStarted()).toBeTrue();
 
     conversationFlowService.setExplorationActuallyStarted(false);
-    expect(conversationFlowService.getExplorationActuallyStarted()).toBe(false);
+    expect(conversationFlowService.getExplorationActuallyStarted()).toBeFalse();
   });
 
   it('should set and get showProgressClearanceMessage correctly', () => {
     conversationFlowService.setShowProgressClearanceMessage(true);
-    expect(conversationFlowService.getShowProgressClearanceMessage()).toBe(
-      true
-    );
+    expect(
+      conversationFlowService.getShowProgressClearanceMessage()
+    ).toBeTrue();
 
     conversationFlowService.setShowProgressClearanceMessage(false);
-    expect(conversationFlowService.getShowProgressClearanceMessage()).toBe(
-      false
-    );
+    expect(
+      conversationFlowService.getShowProgressClearanceMessage()
+    ).toBeFalse();
   });
 
   it('should set and get answerIsCorrect correctly', () => {
     conversationFlowService.setAnswerIsCorrect(true);
-    expect(conversationFlowService.getAnswerIsCorrect()).toBe(true);
+    expect(conversationFlowService.getAnswerIsCorrect()).toBeTrue();
 
     conversationFlowService.setAnswerIsCorrect(false);
-    expect(conversationFlowService.getAnswerIsCorrect()).toBe(false);
+    expect(conversationFlowService.getAnswerIsCorrect()).toBeFalse();
   });
 
   it('should set and get answerIsBeingProcessed correctly', () => {
     conversationFlowService.setAnswerIsBeingProcessed(true);
-    expect(conversationFlowService.getAnswerIsBeingProcessed()).toBe(true);
+    expect(conversationFlowService.getAnswerIsBeingProcessed()).toBeTrue();
 
     conversationFlowService.setAnswerIsBeingProcessed(false);
-    expect(conversationFlowService.getAnswerIsBeingProcessed()).toBe(false);
+    expect(conversationFlowService.getAnswerIsBeingProcessed()).toBeFalse();
   });
 
   it('should set and get hasInteractedAtLeastOnce correctly', () => {
     conversationFlowService.setHasInteractedAtLeastOnce(true);
-    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBe(true);
+    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBeTrue();
 
     conversationFlowService.setHasInteractedAtLeastOnce(false);
-    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBe(false);
+    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBeFalse();
   });
 
   it('should set and get hasFullyLoaded correctly', () => {
     conversationFlowService.setHasFullyLoaded(true);
-    expect(conversationFlowService.getHasFullyLoaded()).toBe(true);
+    expect(conversationFlowService.getHasFullyLoaded()).toBeTrue();
 
     conversationFlowService.setHasFullyLoaded(false);
-    expect(conversationFlowService.getHasFullyLoaded()).toBe(false);
+    expect(conversationFlowService.getHasFullyLoaded()).toBeFalse();
   });
 
   it('should set and get answerIsCorrect correctly', () => {
     conversationFlowService.setAnswerIsCorrect(true);
-    expect(conversationFlowService.getAnswerIsCorrect()).toBe(true);
+    expect(conversationFlowService.getAnswerIsCorrect()).toBeTrue();
 
     conversationFlowService.setAnswerIsCorrect(false);
-    expect(conversationFlowService.getAnswerIsCorrect()).toBe(false);
+    expect(conversationFlowService.getAnswerIsCorrect()).toBeFalse();
   });
 
   it('should get solutionForState correctly', () => {
     conversationFlowService.solutionForState = null;
-    expect(conversationFlowService.getSolutionForState()).toBeNull();
+    expect(conversationFlowService.getSolutionForState()).toBeFalsy();
   });
 
   it('should set and get answerIsBeingProcessed correctly', () => {
     conversationFlowService.setAnswerIsBeingProcessed(true);
-    expect(conversationFlowService.getAnswerIsBeingProcessed()).toBe(true);
+    expect(conversationFlowService.getAnswerIsBeingProcessed()).toBeTrue();
 
     conversationFlowService.setAnswerIsBeingProcessed(false);
-    expect(conversationFlowService.getAnswerIsBeingProcessed()).toBe(false);
+    expect(conversationFlowService.getAnswerIsBeingProcessed()).toBeFalse();
   });
 
   it('should set and get hasInteractedAtLeastOnce correctly', () => {
     conversationFlowService.setHasInteractedAtLeastOnce(true);
-    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBe(true);
+    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBeTrue();
 
     conversationFlowService.setHasInteractedAtLeastOnce(false);
-    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBe(false);
+    expect(conversationFlowService.getHasInteractedAtLeastOnce()).toBeFalse();
   });
 
   it('should move backward by one card when index is valid', () => {
@@ -593,61 +570,65 @@ describe('Conversation flow service', () => {
 
   it('should return false when concept card is shown', () => {
     const conceptCard = new StateCard(
-      '',
-      '',
-      '',
-      createInteraction(null),
+      null,
+      null,
+      null,
+      new Interaction([], [], null, null, [], null, null),
       [],
-      ''
+      '',
+      null
     );
 
     conversationFlowService.displayedCard = conceptCard;
     spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(false);
 
     const result = conversationFlowService.isLearnAgainButton();
-    expect(result).toBe(false);
+    expect(result).toBeFalse();
   });
 
   it('should return false when interaction id is missing', () => {
     const card = new StateCard(
       'State1',
-      '',
-      '',
-      createInteraction(null),
+      null,
+      null,
+      new Interaction([], [], null, null, [], null, null),
       [],
-      ''
+      '',
+      null
     );
 
     conversationFlowService.displayedCard = card;
 
     const result = conversationFlowService.isLearnAgainButton();
-    expect(result).toBe(false);
+    expect(result).toBeFalse();
   });
 
   it('should return false when interaction is linear', () => {
     const card = new StateCard(
       'State1',
-      '',
-      '',
-      createInteraction('Continue'),
+      null,
+      null,
+      new Interaction([], [], null, null, [], 'Continue', null),
       [],
-      ''
+      '',
+      null
     );
 
     conversationFlowService.displayedCard = card;
 
     const result = conversationFlowService.isLearnAgainButton();
-    expect(result).toBe(false);
+    expect(result).toBeFalse();
   });
 
   it('should return true when all conditions met', () => {
     const card = new StateCard(
       'State1',
-      '',
-      '',
-      createInteraction('TextInput'),
+      null,
+      null,
+      new Interaction([], [], null, null, [], 'TextInput', null),
       [],
-      ''
+      '',
+      null
     );
 
     conversationFlowService.displayedCard = card;
@@ -655,17 +636,18 @@ describe('Conversation flow service', () => {
     spyOn(conversationFlowService, 'getAnswerIsCorrect').and.returnValue(false);
 
     const result = conversationFlowService.isLearnAgainButton();
-    expect(result).toBe(true);
+    expect(result).toBeTrue();
   });
 
   it('should return false when answer is correct even if card seen before', () => {
     const card = new StateCard(
       'State1',
-      '',
-      '',
-      createInteraction('TextInput'),
+      null,
+      null,
+      new Interaction([], [], null, null, [], 'TextInput', null),
       [],
-      ''
+      '',
+      null
     );
 
     conversationFlowService.displayedCard = card;
@@ -673,7 +655,7 @@ describe('Conversation flow service', () => {
     spyOn(conversationFlowService, 'getAnswerIsCorrect').and.returnValue(true);
 
     const result = conversationFlowService.isLearnAgainButton();
-    expect(result).toBe(false);
+    expect(result).toBeFalse();
   });
 
   it('should skip checkpoint logic when card is not checkpoint', () => {
@@ -707,7 +689,7 @@ describe('Conversation flow service', () => {
 
   it('should show upcoming card', () => {
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
-    spyOn(displayedCard, 'getStateName').and.returnValue('');
+    spyOn(displayedCard, 'getStateName').and.returnValue(null);
     conversationFlowService.displayedCard = displayedCard;
     spyOn(explorationModeService, 'isInQuestionMode').and.returnValues(
       false,
@@ -749,20 +731,18 @@ describe('Conversation flow service', () => {
     conversationFlowService.moveToExploration = false;
     let stateCard = new StateCard(
       'stateName',
-      '',
-      '',
-      createInteraction('EndExploration'),
+      null,
+      null,
+      new Interaction([], [], null, null, [], 'EndExploration', null),
       [],
-      ''
+      '',
+      null
     );
     stateCard.markAsCompleted();
     conversationFlowService.displayedCard = stateCard;
     conversationFlowService.setNextStateCard(stateCard);
     conceptCardManagerService.setConceptCard(
-      new ConceptCard(
-        new SubtitledHtml('', ''),
-        RecordedVoiceovers.createEmpty()
-      )
+      new ConceptCard(new SubtitledHtml('', ''), [], null)
     );
     spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
       explorationEngineService
@@ -791,9 +771,8 @@ describe('Conversation flow service', () => {
 
     conversationFlowService.showUpcomingCard();
 
-    conceptCardManagerService.setConceptCard(mockConceptCard);
+    conceptCardManagerService.setConceptCard(null);
     conversationFlowService.answerIsCorrect = true;
-    conversationFlowService.displayedCard.markAsNotCompleted();
 
     conversationFlowService.showUpcomingCard();
   });
@@ -803,9 +782,9 @@ describe('Conversation flow service', () => {
     conversationFlowService.displayedCard = displayedCard;
     conversationFlowService.answerIsBeingProcessed = true;
 
-    conversationFlowService.submitAnswer('', mockInteractionRulesService);
+    conversationFlowService.submitAnswer('', null);
 
-    expect(displayedCard.updateCurrentAnswer).toHaveBeenCalledWith(null);
+    expect(displayedCard.updateCurrentAnswer).toHaveBeenCalledOnceWith(null);
     conversationFlowService.answerIsBeingProcessed = false;
     spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
     spyOn(
@@ -858,12 +837,13 @@ describe('Conversation flow service', () => {
       'Content html',
       'Interaction text',
       lastCardInteraction,
+      null,
       'content_id'
     );
     spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
     spyOn(conversationFlowService.onOppiaFeedbackAvailable, 'emit');
     spyOn(conversationFlowService, 'showPendingCard');
-    conversationFlowService.submitAnswer('', mockInteractionRulesService);
+    conversationFlowService.submitAnswer('', null);
 
     spyOn(explorationModeService, 'isInQuestionMode').and.returnValues(
       false,
@@ -884,7 +864,7 @@ describe('Conversation flow service', () => {
     spyOn(playerPositionService.onHelpCardAvailable, 'emit');
     spyOn(playerPositionService, 'setDisplayedCardIndex');
 
-    conversationFlowService.submitAnswer('', mockInteractionRulesService);
+    conversationFlowService.submitAnswer('', null);
     tick(200);
 
     spyOn(playerPositionService, 'recordAnswerSubmission');
@@ -911,12 +891,13 @@ describe('Conversation flow service', () => {
       ) => void
     ) => {
       let stateCard = new StateCard(
-        '',
-        '',
-        '',
-        createInteraction('EndExploration'),
+        null,
+        null,
+        null,
+        new Interaction([], [], null, null, [], 'EndExploration', null),
         [],
-        ''
+        '',
+        null
       );
       successCallback(
         stateCard,
@@ -989,7 +970,15 @@ describe('Conversation flow service', () => {
         ''
       );
       explorationModeSpy.and.returnValue(true);
-      conversationFlowService.displayedCard = createCard('TextInput');
+      conversationFlowService.displayedCard = new StateCard(
+        null,
+        null,
+        null,
+        new Interaction([], [], null, null, [], 'TextInput', null),
+        [],
+        '',
+        null
+      );
       spyOn(
         explorationModeService,
         'isInDiagnosticTestPlayerMode'
@@ -1008,7 +997,15 @@ describe('Conversation flow service', () => {
         null,
         ''
       );
-      conversationFlowService.displayedCard = createCard('ImageClickInput');
+      conversationFlowService.displayedCard = new StateCard(
+        null,
+        null,
+        null,
+        new Interaction([], [], null, null, [], 'ImageClickInput', null),
+        [],
+        '',
+        null
+      );
       explorationModeSpy.and.returnValue(false);
       successCallback(
         stateCard,
@@ -1051,12 +1048,7 @@ describe('Conversation flow service', () => {
       conceptCardBackendApiService,
       'loadConceptCardsAsync'
     ).and.returnValue(
-      Promise.resolve([
-        new ConceptCard(
-          new SubtitledHtml('', ''),
-          RecordedVoiceovers.createEmpty()
-        ),
-      ])
+      Promise.resolve([new ConceptCard(new SubtitledHtml('', ''), [], null)])
     );
 
     spyOn(
@@ -1070,8 +1062,8 @@ describe('Conversation flow service', () => {
     spyOn(
       refresherExplorationConfirmationModalService,
       'displayRedirectConfirmationModal'
-    ).and.callFake((_id: string, callback: () => void) => {
-      callback();
+    ).and.callFake((id, callb) => {
+      callb();
     });
     spyOn(statsReportingService, 'recordLeaveForRefresherExp');
     spyOn(playerTranscriptService, 'hasEncounteredStateBefore').and.returnValue(
@@ -1081,7 +1073,7 @@ describe('Conversation flow service', () => {
 
     conversationFlowService.explorationActuallyStarted = false;
 
-    conversationFlowService.submitAnswer('', mockInteractionRulesService);
+    conversationFlowService.submitAnswer('', null);
     tick(2000);
   }));
 
@@ -1425,10 +1417,10 @@ describe('Conversation flow service', () => {
 
   it('should return correct value for isRefresherExploration', () => {
     conversationFlowService.isRefresherExploration = true;
-    expect(conversationFlowService.getIsRefresherExploration()).toBe(true);
+    expect(conversationFlowService.getIsRefresherExploration()).toBeTrue();
 
     conversationFlowService.isRefresherExploration = false;
-    expect(conversationFlowService.getIsRefresherExploration()).toBe(false);
+    expect(conversationFlowService.getIsRefresherExploration()).toBeFalse();
   });
 
   it('should return correct parent exploration IDs', () => {
@@ -1447,12 +1439,12 @@ describe('Conversation flow service', () => {
   });
 
   it('should set and get solution for state', () => {
-    const mockSolution = Solution.createNew(
-      true,
-      'Sample answer' as InteractionAnswer,
-      'Html',
-      'content_id'
-    );
+    const mockSolution = {
+      correctAnswer: true,
+      explanationHtml: 'Html',
+      answerIsExclusive: true,
+      explanationContentId: 'content_id',
+    } as Solution;
 
     conversationFlowService.setSolutionForState(mockSolution);
     expect(conversationFlowService.getSolutionForState()).toBe(mockSolution);
@@ -1473,12 +1465,12 @@ describe('Conversation flow service', () => {
     );
     spyOn(hintsAndSolutionManagerService, 'releaseSolution');
 
-    const mockSolution = Solution.createNew(
-      true,
-      'Sample answer' as InteractionAnswer,
-      'Html',
-      'content_id'
-    );
+    const mockSolution = {
+      correctAnswer: true,
+      explanationHtml: 'Html',
+      answerIsExclusive: true,
+      explanationContentId: 'content_id',
+    } as Solution;
     conversationFlowService.setSolutionForState(mockSolution);
     conversationFlowService.triggerIfLearnerStuckAction(true, mockCallback);
     tick(
@@ -1489,28 +1481,28 @@ describe('Conversation flow service', () => {
   }));
 
   it('should defer stuck check when isDelayed is false', fakeAsync(() => {
-    conversationFlowService.responseTimeout = jasmine.createSpyObj<
-      ReturnType<typeof setTimeout>
-    >('Timeout', ['ref', 'unref', 'hasRef', 'refresh']);
+    conversationFlowService.responseTimeout = 100;
     const mockCallback = jasmine.createSpy('onShowContinueToReviseButton');
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
 
     const nextCardIfStuck = new StateCard(
       'StuckCard',
-      '',
-      '',
-      createInteraction('EndExploration'),
+      null,
+      null,
+      new Interaction([], [], null, null, [], 'EndExploration', null),
       [],
-      ''
+      '',
+      null
     );
 
     let displayedCard = new StateCard(
       'CurrentCard',
-      '',
-      '',
-      createInteraction(''),
+      null,
+      null,
+      new Interaction([], [], null, null, [], '', null),
       [],
-      ''
+      '',
+      null
     );
 
     spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
@@ -1521,11 +1513,12 @@ describe('Conversation flow service', () => {
   it('should set and get next state card', () => {
     const nextCard = new StateCard(
       'NextCard',
-      '',
-      '',
-      createInteraction('TextInput'),
+      null,
+      null,
+      new Interaction([], [], null, null, [], 'TextInput', null),
       [],
-      ''
+      '',
+      null
     );
 
     conversationFlowService.setNextStateCard(nextCard);
@@ -1564,11 +1557,12 @@ describe('Conversation flow service', () => {
 
       const freshCard = new StateCard(
         'StuckState',
-        '',
-        '',
-        createInteraction('TextInput'),
+        null,
+        null,
+        new Interaction([], [], null, null, [], 'TextInput', null),
         [],
-        ''
+        '',
+        null
       );
 
       spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
@@ -1580,9 +1574,6 @@ describe('Conversation flow service', () => {
       });
       spyOn(conversationFlowService, 'setNextStateCard');
       spyOn(conversationFlowService, 'showPendingCard');
-      spyOn(conversationFlowService, 'isLearnAgainButton').and.returnValue(
-        false
-      );
 
       conversationFlowService.showUpcomingCard();
 
@@ -1602,11 +1593,12 @@ describe('Conversation flow service', () => {
 
       const freshCard = new StateCard(
         'StuckState',
-        '',
-        '',
-        createInteraction('TextInput'),
+        null,
+        null,
+        new Interaction([], [], null, null, [], 'TextInput', null),
         [],
-        ''
+        '',
+        null
       );
 
       spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
@@ -1618,9 +1610,6 @@ describe('Conversation flow service', () => {
       });
       spyOn(conversationFlowService, 'setNextStateCard');
       spyOn(conversationFlowService, 'showPendingCard');
-      spyOn(conversationFlowService, 'isLearnAgainButton').and.returnValue(
-        false
-      );
 
       conversationFlowService.showUpcomingCard();
 

@@ -154,7 +154,6 @@ class ValidModelNames(enum.Enum):
     BEAM_JOB = 'beam_job'
     BLOG = 'blog'
     BLOG_STATISTICS = 'blog_statistics'
-    CERTIFICATE_ASSESSMENT_OFFERING = 'certificate_assessment_offering'
     CLASSROOM = 'classroom'
     CLOUD_TASK = 'cloud_task'
     COLLECTION = 'collection'
@@ -228,7 +227,7 @@ ALLOWED_FEEDBACK_PAGE_HOSTS = (
     '::1',
 )
 ALLOWED_SESSION_INFO_TOP_LEVEL_KEYS = (
-    'console_logs_json',
+    'console_errors_json',
     'failed_requests_json',
     'navigation_history_json',
     'environment_json',

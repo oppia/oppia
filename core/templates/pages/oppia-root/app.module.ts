@@ -37,7 +37,6 @@ import {
   PlatformFeatureService,
 } from 'services/platform-feature.service';
 import {RequestInterceptor} from 'services/request-interceptor.service';
-import {SessionInfoHttpInterceptorService} from 'services/session-info-http-interceptor.service';
 import {CookieModule} from 'ngx-cookie';
 import {ToastrModule} from 'ngx-toastr';
 import {
@@ -104,11 +103,6 @@ export class MyHammerConfig extends HammerGestureConfig {
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
-      multi: true,
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: SessionInfoHttpInterceptorService,
       multi: true,
     },
     {

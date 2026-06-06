@@ -99,9 +99,6 @@ def get_skill_by_id(
     Returns:
         Skill or None. The domain object representing a skill with the
         given id, or None if it does not exist.
-
-    Raises:
-        Exception. No skill exists with the given ID and strict is True.
     """
     sub_namespace = str(version) if version else None
     cached_skill = caching_services.get_multi(
@@ -112,7 +109,7 @@ def get_skill_by_id(
         return cached_skill
     else:
         skill_model = skill_models.SkillModel.get(
-            skill_id, strict=False, version=version
+            skill_id, strict=strict, version=version
         )
         if skill_model:
             skill = get_skill_from_model(skill_model)
@@ -122,8 +119,6 @@ def get_skill_by_id(
                 {skill_id: skill},
             )
             return skill
-        elif strict:
-            raise Exception('No skill exists with ID: %s' % skill_id)
         else:
             return None
 

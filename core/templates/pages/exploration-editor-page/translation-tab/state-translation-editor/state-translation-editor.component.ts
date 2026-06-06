@@ -26,7 +26,6 @@ import {ExplorationStatesService} from 'pages/exploration-editor-page/services/e
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {EditabilityService} from 'services/editability.service';
 import {ExternalSaveService} from 'services/external-save.service';
-import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {TranslationLanguageService} from '../services/translation-language.service';
 import {TranslationStatusService} from '../services/translation-status.service';
 import {TranslationTabActiveContentIdService} from '../services/translation-tab-active-content-id.service';
@@ -93,7 +92,6 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
     private explorationStatesService: ExplorationStatesService,
     private changeListService: ChangeListService,
     private externalSaveService: ExternalSaveService,
-    private externalRteSaveService: ExternalRteSaveService,
     private graphDataService: GraphDataService,
     private ngbModal: NgbModal,
     private stateEditorService: StateEditorService,
@@ -241,7 +239,6 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
   }
 
   onSaveTranslationButtonClicked(): void {
-    this.externalRteSaveService.onExternalRteSave.emit();
     this.activeWrittenTranslation = this
       .activeWrittenTranslation as TranslatedContent;
     this.activeWrittenTranslation.needsUpdate = false;

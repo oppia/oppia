@@ -98,9 +98,7 @@ describe('TopicHeaderComponent', () => {
 
   it('should return /learn/<fragment> or /learn', () => {
     expect(component.getClassroomUrl()).toBe('/learn/math');
-    expect(urlService.getLearnerClassroomUrl).toHaveBeenCalledWith();
     component.classroomUrlFragment = '';
-    urlService.getLearnerClassroomUrl.and.returnValue('/learn');
     expect(component.getClassroomUrl()).toBe('/learn');
   });
 

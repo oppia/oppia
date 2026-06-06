@@ -49,7 +49,6 @@ if MYPY:  # pragma: no cover
         base_models,
         blog_models,
         bulk_email_services,
-        certificate_assessment_offering_models,
         collection_models,
         config_models,
         datastore_services,
@@ -71,7 +70,6 @@ if MYPY:  # pragma: no cover
     app_feedback_report_models,
     base_models,
     blog_models,
-    certificate_assessment_offering_models,
     collection_models,
     config_models,
     exp_models,
@@ -90,7 +88,6 @@ if MYPY:  # pragma: no cover
         models.Names.APP_FEEDBACK_REPORT,
         models.Names.BASE_MODEL,
         models.Names.BLOG,
-        models.Names.CERTIFICATE_ASSESSMENT_OFFERING,
         models.Names.COLLECTION,
         models.Names.CONFIG,
         models.Names.EXPLORATION,
@@ -558,7 +555,6 @@ def delete_user(
     """
     user_id = pending_deletion_request.user_id
     user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-    cert_models = certificate_assessment_offering_models
 
     auth_services.delete_external_auth_associations(user_id)
 
@@ -626,13 +622,6 @@ def delete_user(
             subtopic_models.StudyGuideSnapshotMetadataModel,
             subtopic_models.StudyGuideCommitLogEntryModel,
             'study_guide_id',
-        )
-        _pseudonymize_activity_models_without_associated_rights_models(
-            pending_deletion_request,
-            models.Names.CERTIFICATE_ASSESSMENT_OFFERING,
-            cert_models.CertificateAssessmentOfferingSnapshotMetadataModel,
-            cert_models.CertificateAssessmentOfferingCommitLogEntryModel,
-            'offering_id',
         )
         _pseudonymize_activity_models_with_associated_rights_models(
             pending_deletion_request,

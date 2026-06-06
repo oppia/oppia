@@ -109,7 +109,6 @@ describe('Audio preloader service', () => {
         card_is_checkpoint: false,
         linked_skill_id: null,
         classifier_model_id: null,
-        inapplicable_skill_misconception_ids: [],
       },
       'State 3': {
         param_changes: [],
@@ -134,7 +133,6 @@ describe('Audio preloader service', () => {
         card_is_checkpoint: false,
         linked_skill_id: null,
         classifier_model_id: null,
-        inapplicable_skill_misconception_ids: [],
       },
       'State 2': {
         param_changes: [],
@@ -170,7 +168,6 @@ describe('Audio preloader service', () => {
         card_is_checkpoint: false,
         linked_skill_id: null,
         classifier_model_id: null,
-        inapplicable_skill_misconception_ids: [],
       },
       Introduction: {
         param_changes: [],
@@ -267,7 +264,6 @@ describe('Audio preloader service', () => {
         card_is_checkpoint: true,
         linked_skill_id: null,
         classifier_model_id: null,
-        inapplicable_skill_misconception_ids: [],
       },
     },
     param_specs: {},

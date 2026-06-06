@@ -74,24 +74,24 @@
     <div class="oppia-topic-viewer-tabs-container position-relative" headroom>
       <div class="topic-viewer-tabs-list">
         <ul class="topic-viewer-tabs" [ngClass]="checkTabletView() ? 'pad-top-mobile': 'pad-top-desktop'">
-          <li [ngClass]="{'topic-viewer-tabs-active': activeView === VIEW_NAMES.STORY}" tabindex="0" (keydown.enter)="setActiveView(VIEW_NAMES.STORY)">
-            <div class="topic-viewer-tabs-text" (click)="setActiveView(VIEW_NAMES.STORY)">
+          <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'story'}" tabindex="0" (keydown.enter)="setActiveTab('story')">
+            <div class="topic-viewer-tabs-text" (click)="setActiveTab('story')">
               <img *ngIf="!checkTabletView()" alt="play story icon" class="tab-icon" [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
               <a class="tab-title e2e-test-lesson-tab-link"
                  [innerHTML]="'I18N_TOPIC_VIEWER_LEARN' | translate">
               </a>
             </div>
           </li>
-          <li [ngClass]="{'topic-viewer-tabs-active': activeView === VIEW_NAMES.PRACTICE}" tabindex="0" (keydown.enter)="setActiveView(VIEW_NAMES.PRACTICE)">
-            <div class="topic-viewer-tabs-text" (click)="setActiveView(VIEW_NAMES.PRACTICE)">
+          <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'practice'}" tabindex="0" (keydown.enter)="setActiveTab('practice')">
+            <div class="topic-viewer-tabs-text" (click)="setActiveTab('practice')">
               <img *ngIf="!checkTabletView()" alt="practice icon" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
               <a class="tab-title e2e-test-practice-tab-link"
                  [innerHTML]="'I18N_TOPIC_VIEWER_PRACTICE' | translate">
               </a>
             </div>
           </li>
-          <li [ngClass]="{'topic-viewer-tabs-active': activeView === VIEW_NAMES.STUDYGUIDE}" tabindex="0" (keydown.enter)="setActiveView(VIEW_NAMES.STUDYGUIDE)">
-            <div class="topic-viewer-tabs-text" (click)="setActiveView(VIEW_NAMES.STUDYGUIDE)">
+          <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'subtopics'}" tabindex="0" (keydown.enter)="setActiveTab('subtopics')">
+            <div class="topic-viewer-tabs-text" (click)="setActiveTab('subtopics')">
               <img *ngIf="!checkTabletView()" alt="revision icon" class="tab-icon" [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
               <a class="tab-title e2e-test-study-tab-link"
                  [innerHTML]="'I18N_TOPIC_VIEWER_STUDY' | translate">
@@ -103,7 +103,7 @@
     </div>
     <background-banner></background-banner>
     <div class="topic-viewer-page-content" *ngIf="!topicIsLoading">
-      <div *ngIf="activeView === VIEW_NAMES.STORY" class="e2e-test-lessons-tab-container">
+      <div *ngIf="activeTab === 'story'" class="e2e-test-lessons-tab-container">
         <stories-list *ngIf="canonicalStorySummaries.length"
                       [topicName]="topicName"
                       [topicId]="topicId"
@@ -120,7 +120,7 @@
           </div>
         </mat-card>
       </div>
-      <div *ngIf="activeView === VIEW_NAMES.PRACTICE">
+      <div *ngIf="activeTab === 'practice'">
         <practice-tab *ngIf="isPracticeTabEnabled() && topicId"
                       [subtopicsList]="subtopics"
                       [topicName]="topicName"
@@ -135,7 +135,7 @@
           </div>
         </mat-card>
       </div>
-      <div *ngIf="activeView === VIEW_NAMES.STUDYGUIDE" class="e2e-test-topic-viewer-revision-tab">
+      <div *ngIf="activeTab === 'subtopics'" class="e2e-test-topic-viewer-revision-tab">
         <subtopics-list [classroomUrlFragment]="classroomUrlFragment"
                         [subtopicsList]="subtopics"
                         [topicId]="topicId"

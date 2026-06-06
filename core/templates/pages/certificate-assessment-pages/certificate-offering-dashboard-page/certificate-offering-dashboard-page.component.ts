@@ -13,10 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for certificate assessment backend APIs.
+ * @fileoverview Component for certificate offering dashboard.
  */
+import {Component} from '@angular/core';
 
-export const CertificateAssessmentDomainConstants = {
-  CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL:
-    '/certificate_assessment_offering_handler',
-} as const;
+@Component({
+  selector: 'oppia-certificate-offering-dashboard-page',
+  templateUrl: './certificate-offering-dashboard-page.component.html',
+})
+export class CertificateOfferingDashboardPageComponent {
+  // Stub: no data or logic yet.
+}

@@ -24,7 +24,6 @@ import {TranslateModule} from '@ngx-translate/core';
 import {AppConstants} from 'app.constants';
 import {CertificateOfferingDashboardPageRootComponent} from './certificate-offering-dashboard-page-root.component';
 import {PageHeadService} from 'services/page-head.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 
 describe('CertificateOfferingDashboardPageRootComponent', () => {
   let component: CertificateOfferingDashboardPageRootComponent;
@@ -34,19 +33,7 @@ describe('CertificateOfferingDashboardPageRootComponent', () => {
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot(), HttpClientTestingModule],
       declarations: [CertificateOfferingDashboardPageRootComponent],
-      providers: [
-        PageHeadService,
-        {
-          provide: PlatformFeatureService,
-          useValue: {
-            status: {
-              EnableCertificateAssessment: {
-                isEnabled: true,
-              },
-            },
-          },
-        },
-      ],
+      providers: [PageHeadService],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 

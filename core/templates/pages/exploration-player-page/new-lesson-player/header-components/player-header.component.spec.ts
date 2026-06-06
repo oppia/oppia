@@ -452,8 +452,7 @@ describe('Lesson player header component', () => {
 
   describe('getHeaderTitleText', () => {
     it('should return practice session title', () => {
-      componentInstance.explorationContext =
-        componentInstance.explorationContextConstants.PRACTICE_PAGE;
+      componentInstance.explorationContext = 'practice';
       componentInstance.topicName = 'Math Topic';
 
       expect(componentInstance.getHeaderTitleText()).toBe(
@@ -462,8 +461,7 @@ describe('Lesson player header component', () => {
     });
 
     it('should return diagnostic test title', () => {
-      componentInstance.explorationContext =
-        componentInstance.explorationContextConstants.DIAGNOSTIC_PAGE;
+      componentInstance.explorationContext = 'diagnostic';
       componentInstance.classroomName = 'Math Classroom';
 
       expect(componentInstance.getHeaderTitleText()).toBe(
@@ -472,8 +470,7 @@ describe('Lesson player header component', () => {
     });
 
     it('should return chapter title for linked exploration', () => {
-      componentInstance.explorationContext =
-        componentInstance.explorationContextConstants.EXPLORATION_PAGE;
+      componentInstance.explorationContext = 'exploration';
       componentInstance.isLinkedToTopic = true;
       componentInstance.chapterNumber = 1;
       componentInstance.explorationTitle = 'Test Exploration';
@@ -484,8 +481,7 @@ describe('Lesson player header component', () => {
     });
 
     it('should return exploration title for non-linked exploration', () => {
-      componentInstance.explorationContext =
-        componentInstance.explorationContextConstants.EXPLORATION_PAGE;
+      componentInstance.explorationContext = 'exploration';
       componentInstance.isLinkedToTopic = false;
       componentInstance.explorationTitle = 'Test Exploration';
 
@@ -493,8 +489,7 @@ describe('Lesson player header component', () => {
     });
 
     it('should return empty string for unknown context', () => {
-      (componentInstance as {explorationContext: string}).explorationContext =
-        'unknown';
+      componentInstance.explorationContext = 'unknown';
 
       expect(componentInstance.getHeaderTitleText()).toBe('');
     });
@@ -569,8 +564,7 @@ describe('Lesson player header component', () => {
 
   describe('closePlayer', () => {
     it('should navigate to story page for linked exploration when confirmed', () => {
-      componentInstance.explorationContext =
-        componentInstance.explorationContextConstants.EXPLORATION_PAGE;
+      componentInstance.explorationContext = 'exploration';
       componentInstance.isLinkedToTopic = true;
       componentInstance.classroomUrlFragment = 'classroom1';
       componentInstance.topicUrlFragment = 'topic1';
@@ -589,8 +583,7 @@ describe('Lesson player header component', () => {
     });
 
     it('should not navigate when user cancels for linked exploration', () => {
-      componentInstance.explorationContext =
-        componentInstance.explorationContextConstants.EXPLORATION_PAGE;
+      componentInstance.explorationContext = 'exploration';
       componentInstance.isLinkedToTopic = true;
       spyOn(componentInstance, 'confirmExit').and.returnValue(false);
 
@@ -600,8 +593,7 @@ describe('Lesson player header component', () => {
     });
 
     it('should navigate to community library for non-linked exploration when confirmed', () => {
-      componentInstance.explorationContext =
-        componentInstance.explorationContextConstants.EXPLORATION_PAGE;
+      componentInstance.explorationContext = 'exploration';
       componentInstance.isLinkedToTopic = false;
       spyOn(componentInstance, 'confirmExit').and.returnValue(true);
 
@@ -612,8 +604,7 @@ describe('Lesson player header component', () => {
 
     it('should navigate to practice page parent for practice session when confirmed', () => {
       mockWindowRef.setPathname('/learn/classroom1/topic1/practice');
-      componentInstance.explorationContext =
-        componentInstance.explorationContextConstants.PRACTICE_PAGE;
+      componentInstance.explorationContext = 'practice';
       componentInstance.classroomUrlFragment = 'classroom1';
       componentInstance.topicUrlFragment = 'topic1';
       spyOn(componentInstance, 'confirmExit').and.returnValue(true);
@@ -629,8 +620,7 @@ describe('Lesson player header component', () => {
 
     it('should navigate to classroom page for diagnostic test when confirmed', () => {
       mockWindowRef.setPathname('/learn/classroom1/diagnostic');
-      componentInstance.explorationContext =
-        componentInstance.explorationContextConstants.DIAGNOSTIC_PAGE;
+      componentInstance.explorationContext = 'diagnostic';
       componentInstance.classroomUrlFragment = 'classroom1';
       spyOn(componentInstance, 'confirmExit').and.returnValue(true);
 
@@ -640,8 +630,7 @@ describe('Lesson player header component', () => {
     });
 
     it('should not navigate when user cancels for any context', () => {
-      componentInstance.explorationContext =
-        componentInstance.explorationContextConstants.DIAGNOSTIC_PAGE;
+      componentInstance.explorationContext = 'diagnostic';
       spyOn(componentInstance, 'confirmExit').and.returnValue(false);
 
       componentInstance.closePlayer();

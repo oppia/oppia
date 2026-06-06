@@ -45,9 +45,10 @@ class MockWindowRef {
       },
     },
     localStorage: {
+      last_uploaded_audio_lang: 'en',
       removeItem: (name: string) => {},
-    } as Storage,
-    gtag: (() => {}) as Function,
+    },
+    gtag: () => {},
     history: {
       pushState(data: object, title: string, url?: string | null) {},
     },

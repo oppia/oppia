@@ -44,6 +44,7 @@ import {SchemaFormSubmittedService} from '../../../../services/schema-form-submi
 import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {Interaction} from '../../../../domain/exploration/interaction.model';
+import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
 
 describe('Progress nav component', () => {
   let fixture: ComponentFixture<CardNavigationControlComponent>;
@@ -58,13 +59,22 @@ describe('Progress nav component', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let schemaFormSubmittedService: SchemaFormSubmittedService;
   let contentTranslationManagerService: ContentTranslationManagerService;
-  let mockDisplayedCard = new StateCard('', '', '', {} as Interaction, [], '');
+  let mockDisplayedCard = new StateCard(
+    '',
+    '',
+    '',
+    {} as Interaction,
+    [],
+    {} as RecordedVoiceovers,
+    ''
+  );
   let mockDisplayedCard2 = new StateCard(
     'state',
     'name',
     'html',
     {} as Interaction,
     [],
+    {} as RecordedVoiceovers,
     ''
   );
 
@@ -142,9 +152,9 @@ describe('Progress nav component', () => {
     tick();
 
     expect(componentInstance.isIframed).toEqual(isIframed);
-    expect(componentInstance.helpCardHasContinueButton).toBe(true);
+    expect(componentInstance.helpCardHasContinueButton).toBeTrue();
     expect(componentInstance.submit.emit).toHaveBeenCalled();
-    expect(componentInstance.progressTrackerIsVisible).toBe(true);
+    expect(componentInstance.progressTrackerIsVisible).toBeTrue();
   }));
 
   it('should update displayed card info', fakeAsync(() => {
@@ -165,7 +175,7 @@ describe('Progress nav component', () => {
 
     expect(playerPositionService.getDisplayedCardIndex).toHaveBeenCalled();
     expect(playerTranscriptService.isLastCard).toHaveBeenCalled();
-    expect(componentInstance.helpCardHasContinueButton).toBe(false);
+    expect(componentInstance.helpCardHasContinueButton).toBeFalse();
     expect(componentInstance.interactionIsInline).toEqual(
       mockDisplayedCard.isInteractionInline()
     );
@@ -195,12 +205,12 @@ describe('Progress nav component', () => {
   it('should tell if continue button should be shown', () => {
     componentInstance.conceptCardIsBeingShown = true;
 
-    expect(componentInstance.shouldContinueButtonBeShown()).toBe(true);
+    expect(componentInstance.shouldContinueButtonBeShown()).toBeTrue();
 
     componentInstance.conceptCardIsBeingShown = false;
     componentInstance.interactionIsInline = false;
 
-    expect(componentInstance.shouldContinueButtonBeShown()).toBe(false);
+    expect(componentInstance.shouldContinueButtonBeShown()).toBeFalse();
   });
 
   it('should be able to skip the question', () => {
@@ -214,7 +224,7 @@ describe('Progress nav component', () => {
   it('should tell if interaction have submit nav button', () => {
     componentInstance.interactionId = 'ImageClickInput';
 
-    expect(componentInstance.doesInteractionHaveNavSubmitButton()).toBe(false);
+    expect(componentInstance.doesInteractionHaveNavSubmitButton()).toBeFalse();
 
     componentInstance.interactionId = 'not_valid';
 

@@ -37,18 +37,6 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageContextService} from 'services/page-context.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
-interface MockLocation {
-  href: string;
-  origin: string;
-  pathname: string;
-  protocol: string;
-  host: string;
-}
-
-interface MockWindow {
-  location: MockLocation;
-}
-
 @Pipe({name: 'translate'})
 class MockTranslatePipe implements PipeTransform {
   transform(value: string): string {
@@ -66,8 +54,8 @@ describe('ShareLessonModalComponent', () => {
   let attributionService: jasmine.SpyObj<AttributionService>;
   let pageContextService: jasmine.SpyObj<PageContextService>;
   let windowDimensionsService: jasmine.SpyObj<WindowDimensionsService>;
-  let mockWindow: MockWindow;
-  let mockLocation: MockLocation;
+  let mockWindow;
+  let mockLocation;
 
   beforeEach(waitForAsync(() => {
     const ngbActiveModalSpy = jasmine.createSpyObj('NgbActiveModal', [
@@ -330,7 +318,7 @@ describe('ShareLessonModalComponent', () => {
   }));
 
   it('should set modal state when showModal is called', () => {
-    component.showModal(component.modalStates.EMBED);
+    component.showModal('embed');
 
     expect(component.modalState).toBe('embed');
   });

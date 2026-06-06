@@ -29,6 +29,7 @@ import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {Interaction} from '../../../../../domain/exploration/interaction.model';
+import {RecordedVoiceovers} from '../../../../../domain/exploration/recorded-voiceovers.model';
 import {StateCard} from '../../../../../domain/state_card/state-card.model';
 import {ExplorationModeService} from '../../../../../pages/exploration-player-page/services/exploration-mode.service';
 import {HintAndSolutionModalService} from '../../../../../pages/exploration-player-page/services/hint-and-solution-modal.service';
@@ -182,6 +183,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       '<p>Content</p>',
       '<interaction></interaction>',
       Interaction.createFromBackendDict(defaultInteractionBackendDict),
+      RecordedVoiceovers.createEmpty(),
       'content'
     );
   });
@@ -197,7 +199,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
 
     component.ngOnInit();
 
-    expect(pageContextService.isInExplorationEditorPage).toHaveBeenCalled();
+    expect(component._editorPreviewMode).toBe(false);
     expect(component.iframed).toBe(false);
     expect(component.hintIndexes).toEqual([0, 1]);
   });
@@ -211,7 +213,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
 
     component.ngOnInit();
 
-    expect(pageContextService.isInExplorationEditorPage).toHaveBeenCalled();
+    expect(component._editorPreviewMode).toBe(true);
     expect(component.iframed).toBe(true);
   });
 
@@ -242,6 +244,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       'Content html',
       'Interaction html',
       interaction,
+      RecordedVoiceovers.createEmpty(),
       'content'
     );
     spyOn(component, 'resetLocalHintsArray');
@@ -261,6 +264,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       'Content html',
       'Interaction html',
       interaction,
+      RecordedVoiceovers.createEmpty(),
       'content'
     );
     spyOn(component, 'resetLocalHintsArray');
@@ -302,6 +306,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
         '<p>Content</p>',
         '<interaction></interaction>',
         {} as Interaction,
+        RecordedVoiceovers.createEmpty(),
         'content'
       );
       spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(1);
@@ -416,6 +421,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
           hints: [],
           solution: null,
         }),
+        RecordedVoiceovers.createEmpty(),
         'content'
       );
 
@@ -568,15 +574,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
   );
 
   it('should not record solution hit in editor preview mode', fakeAsync(() => {
-    pageContextService.isInExplorationEditorPage = jasmine
-      .createSpy()
-      .and.returnValue(true);
-
-    component.ngOnInit();
-
-    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
-      'state1'
-    );
+    component._editorPreviewMode = true;
     spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
       true
     );
@@ -596,11 +594,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
   }));
 
   it('should not record solution hit in question mode', fakeAsync(() => {
-    pageContextService.isInExplorationEditorPage = jasmine
-      .createSpy()
-      .and.returnValue(false);
-
-    component.ngOnInit();
+    component._editorPreviewMode = false;
     spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
       true
     );

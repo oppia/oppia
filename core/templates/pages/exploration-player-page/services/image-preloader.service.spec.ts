@@ -356,8 +356,6 @@ describe('Image preloader service', () => {
       edits_allowed: true,
     },
   } as unknown as ExplorationBackendDict;
-  // FileReader is mocked here as a partial implementation and cast once so
-  // the tests can reuse it without repeating unsafe casts at each use site.
   class mockReaderObject {
     result = null;
     onloadend: () => string;
@@ -372,9 +370,6 @@ describe('Image preloader service', () => {
       return 'The file is loaded';
     }
   }
-  const MockFileReader = mockReaderObject as unknown as {
-    new (): FileReader;
-  };
   const filename1 = 'sIMChoice1_height_32_width_42.png';
   const filename2 = 'sIMChoice2_height_30_width_40.png';
   const filename3 = 'sIOFeedback_height_50_width_50.png';
@@ -412,7 +407,7 @@ describe('Image preloader service', () => {
     spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
     spyOn(pageContextService, 'getEntityId').and.returnValue('1');
     spyOn(entityTranslationsService, 'getHtmlTranslations').and.callFake(
-      (_unusedLanguageCode: string, _unusedContentIds: string[]) => {
+      (unusedLanguageCode, unusedContentIds) => {
         return [];
       }
     );
@@ -717,9 +712,14 @@ describe('Image preloader service', () => {
     ).toEqual([filename2, filename3, filename4]);
     expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeFalsy();
 
-    const onSuccess = jasmine.createSpy('success');
-    const onFailure = jasmine.createSpy('fail');
-    spyOn(window, 'FileReader').and.returnValue(new MockFileReader());
+    var onSuccess = jasmine.createSpy('success');
+    var onFailure = jasmine.createSpy('fail');
+    // This throws "Argument of type 'mockReaderObject' is not assignable
+    // to parameter of type 'FileReader'.". We need to suppress this error
+    // because 'FileReader' has around 15 more properties. We have only defined
+    // the properties we need in 'mockReaderObject'.
+    // @ts-expect-error
+    spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
     imagePreloaderService
       .getImageUrlAsync(filename1)
@@ -754,9 +754,14 @@ describe('Image preloader service', () => {
     ).toEqual([filename2, filename3, filename4]);
     expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeFalsy();
 
-    const onSuccess = jasmine.createSpy('success');
-    const onFailure = jasmine.createSpy('fail');
-    spyOn(window, 'FileReader').and.returnValue(new MockFileReader());
+    var onSuccess = jasmine.createSpy('success');
+    var onFailure = jasmine.createSpy('fail');
+    // This throws "Argument of type 'mockReaderObject' is not assignable
+    // to parameter of type 'FileReader'.". We need to suppress this error
+    // because 'FileReader' has around 15 more properties. We have only defined
+    // the properties we need in 'mockReaderObject'.
+    // @ts-expect-error
+    spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl');
 
     imagePreloaderService
@@ -796,9 +801,14 @@ describe('Image preloader service', () => {
       ).toEqual([filename2, filename3, filename4]);
       expect(imagePreloaderService.isInFailedDownload(filename1)).toBeTruthy();
 
-      const onSuccess = jasmine.createSpy('success');
-      const onFailure = jasmine.createSpy('fail');
-      spyOn(window, 'FileReader').and.returnValue(new MockFileReader());
+      var onSuccess = jasmine.createSpy('success');
+      var onFailure = jasmine.createSpy('fail');
+      // This throws "Argument of type 'mockReaderObject' is not assignable
+      // to parameter of type 'FileReader'.". We need to suppress this error
+      // because 'FileReader' has around 15 more properties. We have only defined
+      // the properties we need in 'mockReaderObject'.
+      // @ts-expect-error
+      spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
       imagePreloaderService
         .getImageUrlAsync(filename1)
@@ -863,9 +873,14 @@ describe('Image preloader service', () => {
 
       flushFeatureFlagsIfQueued();
 
-      const onSuccess = jasmine.createSpy('success');
-      const onFailure = jasmine.createSpy('fail');
-      spyOn(window, 'FileReader').and.returnValue(new MockFileReader());
+      var onSuccess = jasmine.createSpy('success');
+      var onFailure = jasmine.createSpy('fail');
+      // This throws "Argument of type 'mockReaderObject' is not assignable
+      // to parameter of type 'FileReader'.". We need to suppress this error
+      // because 'FileReader' has around 15 more properties. We have only defined
+      // the properties we need in 'mockReaderObject'.
+      // @ts-expect-error
+      spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
       imagePreloaderService
         .getImageUrlAsync(filename1)

@@ -101,11 +101,9 @@ export class TopicHeaderComponent implements OnInit {
   }
 
   getClassroomUrl(): string {
-    return this.urlService.getLearnerClassroomUrl();
-  }
-
-  getTopicStoryUrl(): string {
-    return this.urlService.getLearnerTopicStoryUrl();
+    return this.classroomUrlFragment
+      ? `/learn/${this.classroomUrlFragment}`
+      : '/learn';
   }
 
   getTopicStoryUrl(): string {

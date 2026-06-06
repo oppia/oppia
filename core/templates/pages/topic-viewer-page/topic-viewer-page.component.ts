@@ -42,14 +42,6 @@ import {
 
 import './topic-viewer-page.component.css';
 
-interface TopicViewerStorySectionData {
-  storyId: string;
-  storyTitle: string;
-  storyDescription: string;
-  lessonCount: number;
-  practiceCount: number;
-}
-
 @Component({
   selector: 'topic-viewer-page',
   templateUrl: './topic-viewer-page.component.html',
@@ -57,15 +49,8 @@ interface TopicViewerStorySectionData {
 })
 export class TopicViewerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  readonly VIEW_NAMES = {
-    STORY: 'story',
-    PRACTICE: 'practice',
-    STUDYGUIDE: 'studyguide',
-  } as const;
-
-  activeView: string = '';
+  activeTab: string = '';
   canonicalStorySummaries: StorySummary[] = [];
-  canonicalStorySectionData: readonly TopicViewerStorySectionData[] = [];
   topicUrlFragment: string = '';
   classroomUrlFragment: string = '';
   classroomName: string | null = '';
@@ -97,21 +82,15 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    const pathname = this.urlService.getPathname();
-    if (pathname.endsWith(this.VIEW_NAMES.STUDYGUIDE)) {
-      this.activeView = this.VIEW_NAMES.STUDYGUIDE;
-    } else if (pathname.endsWith(this.VIEW_NAMES.PRACTICE)) {
-      if (this.isRedesignedTopicViewerPageFeatureEnabled()) {
-        // In the redesigned UI, practice is part of the story view.
-        this.activeView = this.VIEW_NAMES.STORY;
-      } else {
-        this.activeView = this.VIEW_NAMES.PRACTICE;
-      }
+    if (this.urlService.getPathname().endsWith('studyguide')) {
+      this.activeTab = 'subtopics';
+    } else if (this.urlService.getPathname().endsWith('practice')) {
+      this.activeTab = 'practice';
     } else {
-      if (!pathname.endsWith(this.VIEW_NAMES.STORY)) {
-        this.updateUrlForActiveView(this.VIEW_NAMES.STORY);
+      if (!this.urlService.getPathname().endsWith('story')) {
+        this.setUrlAccordingToActiveTab('story');
       }
-      this.activeView = this.VIEW_NAMES.STORY;
+      this.activeTab = 'story';
     }
     this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
     this.classroomUrlFragment =
@@ -217,47 +196,36 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  setActiveView(newViewName: string): void {
-    if (newViewName === this.VIEW_NAMES.STORY) {
-      this.updateUrlForActiveView(this.VIEW_NAMES.STORY);
-      this.activeView = this.VIEW_NAMES.STORY;
-      return;
+  setActiveTab(newActiveTabName: string): void {
+    if (newActiveTabName === 'story') {
+      this.setUrlAccordingToActiveTab('story');
+    } else if (newActiveTabName === 'practice') {
+      this.setUrlAccordingToActiveTab('practice');
+    } else {
+      this.setUrlAccordingToActiveTab('studyguide');
     }
-
-    if (newViewName === this.VIEW_NAMES.PRACTICE) {
-      if (this.isRedesignedTopicViewerPageFeatureEnabled()) {
-        this.updateUrlForActiveView(this.VIEW_NAMES.STORY);
-        this.activeView = this.VIEW_NAMES.STORY;
-        return;
-      }
-      this.updateUrlForActiveView(this.VIEW_NAMES.PRACTICE);
-      this.activeView = this.VIEW_NAMES.PRACTICE;
-      return;
-    }
-
-    this.updateUrlForActiveView(this.VIEW_NAMES.STUDYGUIDE);
-    this.activeView = this.VIEW_NAMES.STUDYGUIDE;
+    this.activeTab = newActiveTabName;
   }
 
-  updateUrlForActiveView(newViewName: string): void {
+  setUrlAccordingToActiveTab(newTabName: string): void {
     let getCurrentLocation = this.windowRef.nativeWindow.location.toString();
-    if (this.activeView === '') {
+    if (this.activeTab === '') {
       this.windowRef.nativeWindow.history.pushState(
         {},
         '',
-        getCurrentLocation + '/' + newViewName
+        getCurrentLocation + '/' + newTabName
       );
-    } else if (this.activeView === this.VIEW_NAMES.STUDYGUIDE) {
+    } else if (this.activeTab === 'subtopics') {
       this.windowRef.nativeWindow.history.pushState(
         {},
         '',
-        getCurrentLocation.replace(this.VIEW_NAMES.STUDYGUIDE, newViewName)
+        getCurrentLocation.replace('studyguide', newTabName)
       );
     } else {
       this.windowRef.nativeWindow.history.pushState(
         {},
         '',
-        getCurrentLocation.replace(this.activeView, newViewName)
+        getCurrentLocation.replace(this.activeTab, newTabName)
       );
     }
   }

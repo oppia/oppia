@@ -19,13 +19,7 @@
 import {Subscription} from 'rxjs';
 import {TopicEditorSendMailComponent} from '../modal-templates/topic-editor-send-mail-modal.component';
 import {TopicEditorSaveModalComponent} from '../modal-templates/topic-editor-save-modal.component';
-import {
-  AfterContentChecked,
-  ChangeDetectorRef,
-  Component,
-  OnDestroy,
-  OnInit,
-} from '@angular/core';
+import {AfterContentChecked, Component, OnDestroy, OnInit} from '@angular/core';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
@@ -77,8 +71,7 @@ export class TopicEditorNavbarComponent
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private topicEditorRoutingService: TopicEditorRoutingService,
-    private windowRef: WindowRef,
-    private changeDetectorRef: ChangeDetectorRef
+    private windowRef: WindowRef
   ) {}
 
   directiveSubscriptions = new Subscription();
@@ -106,12 +99,6 @@ export class TopicEditorNavbarComponent
     this.prepublishValidationIssues = prepublishTopicValidationIssues.concat(
       subtopicPrepublishValidationIssues
     );
-    this.validationIssues = this.validationIssues.concat(
-      this.topicEditorStateService.getSupersedingSkillIssues(
-        this.topic.getSkillIds()
-      )
-    );
-    this.changeDetectorRef.detectChanges();
   }
 
   publishTopic(): void {
@@ -175,8 +162,7 @@ export class TopicEditorNavbarComponent
   }
 
   isWarningTooltipDisabled(): boolean {
-    const result = this.isTopicSaveable() || this.getTotalWarningsCount() === 0;
-    return result;
+    return this.isTopicSaveable() || this.getTotalWarningsCount() === 0;
   }
 
   getAllTopicWarnings(): string {
@@ -377,17 +363,13 @@ export class TopicEditorNavbarComponent
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicInitialized.subscribe(() => {
         this.topic = this.topicEditorStateService.getTopic();
-        this.topicEditorStateService
-          .prefetchSkills(this.topic.getSkillIds())
-          .then(() => this._validateTopic());
+        this._validateTopic();
       })
     );
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicReinitialized.subscribe(() => {
         this.topic = this.topicEditorStateService.getTopic();
-        this.topicEditorStateService
-          .prefetchSkills(this.topic.getSkillIds())
-          .then(() => this._validateTopic());
+        this._validateTopic();
       })
     );
     this.preventPageUnloadEventService.addListener(() => {
@@ -407,33 +389,10 @@ export class TopicEditorNavbarComponent
     this.validationIssues = [];
     this.prepublishValidationIssues = [];
     this.topicRights = this.topicEditorStateService.getTopicRights();
-    if (this.topicEditorStateService.hasLoadedTopic()) {
-      this.topicEditorStateService
-        .prefetchSkills(this.topic.getSkillIds())
-        .then(() => this._validateTopic());
-    }
     this.directiveSubscriptions.add(
       this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(() => {
         this.topic = this.topicEditorStateService.getTopic();
-        const changeList = this.undoRedoService.getChangeList();
-        if (changeList.length === 0) {
-          this._validateTopic();
-          return;
-        }
-        const lastChange =
-          changeList[changeList.length - 1].getBackendChangeObject();
-        const isSkillChange =
-          lastChange.cmd === 'add_uncategorized_skill_id' ||
-          lastChange.cmd === 'remove_uncategorized_skill_id' ||
-          lastChange.cmd === 'move_skill_id_to_subtopic' ||
-          lastChange.cmd === 'remove_skill_id_from_subtopic';
-        if (isSkillChange) {
-          this.topicEditorStateService
-            .updateSkillCache(this.topic.getSkillIds())
-            .then(() => this._validateTopic());
-        } else {
-          this._validateTopic();
-        }
+        this._validateTopic();
       })
     );
   }

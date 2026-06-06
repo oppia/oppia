@@ -35,7 +35,7 @@ describe('Learner answer info service', () => {
   let firstState: State;
   let secondState: State;
   let thirdState: State;
-  let tirs: TextInputRulesService;
+  let tirs: InteractionRulesService;
   let mockAnswer: string;
   let ladbas: LearnerAnswerDetailsBackendApiService;
   let learnerAnswerInfoService: LearnerAnswerInfoService;
@@ -160,7 +160,6 @@ describe('Learner answer info service', () => {
       solicit_answer_details: true,
       card_is_checkpoint: false,
       linked_skill_id: null,
-      inapplicable_skill_misconception_ids: [],
       classifier_model_id: '',
     };
 
@@ -172,8 +171,7 @@ describe('Learner answer info service', () => {
     firstState = State.createFromBackendDict('new state', stateDict);
     secondState = State.createFromBackendDict('fake state', stateDict);
     thirdState = State.createFromBackendDict('demo state', stateDict);
-    tirs = TestBed.inject(TextInputRulesService) as InteractionRulesService &
-      TextInputRulesService;
+    tirs = TestBed.inject(TextInputRulesService);
 
     spyOn(
       answerClassificationService,
@@ -202,7 +200,8 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs as InteractionRulesService & TextInputRulesService
+        tirs,
+        false
       );
     });
 
@@ -231,7 +230,8 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs as InteractionRulesService & TextInputRulesService
+        tirs,
+        false
       );
     });
 
@@ -247,7 +247,8 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs as InteractionRulesService & TextInputRulesService
+        tirs,
+        false
       );
       expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
         false
@@ -262,7 +263,8 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs as InteractionRulesService & TextInputRulesService
+        tirs,
+        false
       );
     });
 
@@ -280,7 +282,8 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs as InteractionRulesService & TextInputRulesService
+        tirs,
+        false
       );
     });
     it('should return can ask learner for answer info false', () => {
@@ -296,7 +299,8 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs as InteractionRulesService & TextInputRulesService
+        tirs,
+        false
       );
     });
 
@@ -319,14 +323,16 @@ describe('Learner answer info service', () => {
         '10',
         firstState,
         mockAnswer,
-        tirs as InteractionRulesService & TextInputRulesService
+        tirs,
+        false
       );
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details 1');
       learnerAnswerInfoService.initLearnerAnswerInfoService(
         '10',
         secondState,
         mockAnswer,
-        tirs as InteractionRulesService & TextInputRulesService
+        tirs,
+        false
       );
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details 1');
     });
@@ -336,7 +342,8 @@ describe('Learner answer info service', () => {
         '10',
         thirdState,
         mockAnswer,
-        tirs as InteractionRulesService & TextInputRulesService
+        tirs,
+        false
       );
       expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
         false

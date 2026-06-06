@@ -28,7 +28,7 @@ export type FeedbackStatus =
   | 'not_actionable';
 
 export interface FeedbackSessionInfo {
-  console_logs_json: {
+  console_errors_json: {
     error_message: string;
     log_level: 'error' | 'warn' | 'log' | 'info' | 'debug';
     timestamp_msecs: number;
@@ -60,7 +60,7 @@ export interface FeedbackSessionInfo {
     };
     locale: {
       language_code: string;
-      direction: 'rtl' | 'ltr';
+      language_name: string;
     };
   };
 }
@@ -127,10 +127,4 @@ export interface FeedbackThreadDetail {
   session_info: FeedbackSessionInfo | null;
   can_edit_exploration?: boolean;
   messages: FeedbackMessage[];
-}
-
-export interface FeedbackListResponse {
-  results: FeedbackThreadSummary[];
-  cursor: string | null;
-  more: boolean;
 }

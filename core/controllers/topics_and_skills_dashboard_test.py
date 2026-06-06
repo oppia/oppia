@@ -61,14 +61,6 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
         self.save_new_skill(
             self.linked_skill_id, self.admin_id, description='Description 3'
         )
-        # Skill that has the linked skill as a prerequisite.
-        self.skill_with_prerequisite = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            self.skill_with_prerequisite,
-            self.admin_id,
-            description='Has linked_skill as prerequisite.',
-            prerequisite_skill_ids=[self.linked_skill_id],
-        )
         self.subtopic_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.subtopic_skill_id, self.admin_id, description='Subtopic Skill'
@@ -129,19 +121,15 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(
             json_response['topic_summary_dicts'][0]['id'], self.topic_id
         )
-        self.assertEqual(len(json_response['untriaged_skill_summary_dicts']), 2)
+        self.assertEqual(len(json_response['untriaged_skill_summary_dicts']), 1)
         self.assertEqual(len(json_response['mergeable_skill_summary_dicts']), 2)
 
         for skill_dict in json_response['mergeable_skill_summary_dicts']:
             if skill_dict['description'] == 'Description 3':
                 self.assertEqual(skill_dict['id'], self.linked_skill_id)
-        for skill_dict in json_response['untriaged_skill_summary_dicts']:
-            if skill_dict['description'] == 'Description':
-                self.assertEqual(skill_dict['id'], skill_id)
         self.assertEqual(len(json_response['categorized_skills_dict']), 1)
-        self.assertIn(
-            skill_id,
-            [s['id'] for s in json_response['untriaged_skill_summary_dicts']],
+        self.assertEqual(
+            json_response['untriaged_skill_summary_dicts'][0]['id'], skill_id
         )
         self.assertEqual(len(json_response['all_classroom_names']), 1)
         self.assertEqual(json_response['all_classroom_names'], ['math'])
@@ -171,14 +159,13 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(
             json_response['topic_summary_dicts'][0]['id'], self.topic_id
         )
-        self.assertEqual(len(json_response['untriaged_skill_summary_dicts']), 2)
+        self.assertEqual(len(json_response['untriaged_skill_summary_dicts']), 1)
         self.assertEqual(len(json_response['mergeable_skill_summary_dicts']), 2)
         for skill_dict in json_response['mergeable_skill_summary_dicts']:
             if skill_dict['description'] == 'Description 3':
                 self.assertEqual(skill_dict['id'], self.linked_skill_id)
-        self.assertIn(
-            skill_id,
-            [s['id'] for s in json_response['untriaged_skill_summary_dicts']],
+        self.assertEqual(
+            json_response['untriaged_skill_summary_dicts'][0]['id'], skill_id
         )
         self.assertEqual(len(json_response['all_classroom_names']), 1)
         self.assertEqual(json_response['all_classroom_names'], ['math'])
@@ -207,14 +194,14 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(
             json_response['topic_summary_dicts'][0]['id'], self.topic_id
         )
-        self.assertEqual(len(json_response['untriaged_skill_summary_dicts']), 2)
+        self.assertEqual(len(json_response['untriaged_skill_summary_dicts']), 1)
         self.assertEqual(len(json_response['mergeable_skill_summary_dicts']), 2)
         for skill_dict in json_response['mergeable_skill_summary_dicts']:
             if skill_dict['description'] == 'Description 3':
                 self.assertEqual(skill_dict['id'], self.linked_skill_id)
-        for skill_dict in json_response['untriaged_skill_summary_dicts']:
-            if skill_dict['description'] == 'Description':
-                self.assertEqual(skill_dict['id'], skill_id)
+        self.assertEqual(
+            json_response['untriaged_skill_summary_dicts'][0]['id'], skill_id
+        )
         self.assertEqual(len(json_response['all_classroom_names']), 1)
         self.assertEqual(json_response['all_classroom_names'], ['math'])
         self.assertEqual(json_response['can_delete_topic'], False)
@@ -262,7 +249,11 @@ class CategorizedAndUntriagedSkillsDataHandlerTests(
             'categorized_and_untriaged_skills_data',
             expected_status_int=200,
         )
-        self.assertEqual(len(json_response['untriaged_skill_summary_dicts']), 2)
+        self.assertEqual(len(json_response['untriaged_skill_summary_dicts']), 1)
+        self.assertEqual(
+            json_response['untriaged_skill_summary_dicts'][0]['skill_id'],
+            skill_id,
+        )
         self.assertEqual(len(json_response['categorized_skills_dict']), 1)
 
         # Check that logged in users can access the categorized and
@@ -273,7 +264,11 @@ class CategorizedAndUntriagedSkillsDataHandlerTests(
             'categorized_and_untriaged_skills_data',
             expected_status_int=200,
         )
-        self.assertEqual(len(json_response['untriaged_skill_summary_dicts']), 2)
+        self.assertEqual(len(json_response['untriaged_skill_summary_dicts']), 1)
+        self.assertEqual(
+            json_response['untriaged_skill_summary_dicts'][0]['skill_id'],
+            skill_id,
+        )
         self.assertEqual(len(json_response['categorized_skills_dict']), 1)
         self.logout()
 
@@ -370,16 +365,12 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             csrf_token=csrf_token,
         )
 
-        self.assertEqual(len(json_response['skill_summary_dicts']), 3)
+        self.assertEqual(len(json_response['skill_summary_dicts']), 2)
         self.assertEqual(
             json_response['skill_summary_dicts'][0]['id'], self.linked_skill_id
         )
         self.assertEqual(
             json_response['skill_summary_dicts'][1]['id'],
-            self.skill_with_prerequisite,
-        )
-        self.assertEqual(
-            json_response['skill_summary_dicts'][2]['id'],
             self.subtopic_skill_id,
         )
         self.assertFalse(json_response['more'])
@@ -397,17 +388,13 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             csrf_token=csrf_token,
         )
 
-        self.assertEqual(len(json_response['skill_summary_dicts']), 3)
+        self.assertEqual(len(json_response['skill_summary_dicts']), 2)
         self.assertEqual(
             json_response['skill_summary_dicts'][0]['id'],
             self.subtopic_skill_id,
         )
         self.assertEqual(
-            json_response['skill_summary_dicts'][1]['id'],
-            self.skill_with_prerequisite,
-        )
-        self.assertEqual(
-            json_response['skill_summary_dicts'][2]['id'], self.linked_skill_id
+            json_response['skill_summary_dicts'][1]['id'], self.linked_skill_id
         )
 
         json_response = self.post_json(
@@ -422,17 +409,13 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             csrf_token=csrf_token,
         )
 
-        self.assertEqual(len(json_response['skill_summary_dicts']), 3)
+        self.assertEqual(len(json_response['skill_summary_dicts']), 2)
         self.assertEqual(
             json_response['skill_summary_dicts'][0]['id'],
             self.subtopic_skill_id,
         )
         self.assertEqual(
-            json_response['skill_summary_dicts'][1]['id'],
-            self.skill_with_prerequisite,
-        )
-        self.assertEqual(
-            json_response['skill_summary_dicts'][2]['id'], self.linked_skill_id
+            json_response['skill_summary_dicts'][1]['id'], self.linked_skill_id
         )
         self.assertFalse(json_response['more'])
         self.assertEqual(json_response['next_cursor'], None)
@@ -520,7 +503,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             csrf_token=csrf_token,
         )
 
-        self.assertEqual(len(json_response['skill_summary_dicts']), 1)
+        self.assertEqual(len(json_response['skill_summary_dicts']), 0)
         self.assertFalse(json_response['more'])
         self.assertEqual(json_response['next_cursor'], None)
 
@@ -574,13 +557,9 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             csrf_token=csrf_token,
         )
 
-        self.assertEqual(len(json_response['skill_summary_dicts']), 2)
+        self.assertEqual(len(json_response['skill_summary_dicts']), 1)
         self.assertEqual(
-            json_response['skill_summary_dicts'][0]['id'],
-            self.skill_with_prerequisite,
-        )
-        self.assertEqual(
-            json_response['skill_summary_dicts'][1]['id'], self.linked_skill_id
+            json_response['skill_summary_dicts'][0]['id'], self.linked_skill_id
         )
 
     def test_fetch_filtered_skills_with_invalid_num_skills_to_fetch(
@@ -1219,9 +1198,6 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         old_skill_id = self.linked_skill_id
         new_skill_id = skill_services.get_new_skill_id()
-        skill_with_prereq = skill_fetchers.get_skill_by_id(
-            self.skill_with_prerequisite
-        )
         self.save_new_skill(
             new_skill_id, self.admin_id, description='Skill Description'
         )
@@ -1231,12 +1207,10 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         new_links = question_services.get_question_skill_links_of_skill(
             new_skill_id, 'Skill Description'
         )
-        old_prerequisites = skill_with_prereq.prerequisite_skill_ids
 
         self.assertEqual(len(old_links), 1)
         self.assertEqual(old_links[0].skill_id, old_skill_id)
         self.assertEqual(len(new_links), 0)
-        self.assertEqual(old_prerequisites, [old_skill_id])
 
         csrf_token = self.get_new_csrf_token()
         payload = {'old_skill_id': old_skill_id, 'new_skill_id': new_skill_id}
@@ -1253,14 +1227,6 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(len(old_links), 0)
         self.assertEqual(len(new_links), 1)
         self.assertEqual(new_links[0].skill_id, new_skill_id)
-        # The old_skill should be replaced by the new skill in the
-        # prerequisite_skills array of skill_with_prereq as the
-        # old_skill is merged to the new skill.
-        skill_with_prereq = skill_fetchers.get_skill_by_id(
-            self.skill_with_prerequisite
-        )
-        new_prerequisites = skill_with_prereq.prerequisite_skill_ids
-        self.assertEqual(new_prerequisites, [new_skill_id])
 
         self.logout()
 
