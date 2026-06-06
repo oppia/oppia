@@ -75,8 +75,8 @@ class BackfillTranslationOpportunityModelJobTests(
             id=self.exp_id,
             title='Test Exploration',
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
-            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            category='Category',
+            objective='Objective',
             language_code='en',
             tags=['Topic'],
             blurb='blurb',
@@ -238,8 +238,8 @@ class BackfillTranslationOpportunityModelJobTests(
         self.assertEqual(model.entity_type, 'exploration')
         self.assertEqual(model.entity_id, self.exp_id)
         self.assertEqual(model.topic_ids, ['topic_id'])
-        # Exploration has 2 non-empty metadata fields (title and 1 tag).
-        self.assertEqual(model.content_count, 2)
+        # Exploration has 4 metadata fields (title, objective, category, 1 tag).
+        self.assertEqual(model.content_count, 4)
         self.assertEqual(model.translation_counts, {'hi': 1})
 
     def test_creates_translation_opportunity_model_with_complete_native_language(
