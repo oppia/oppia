@@ -24,6 +24,9 @@ from core.domain import (
     exp_fetchers,
     fs_services,
     general_feedback_services,
+    rights_domain,
+    rights_manager,
+    user_services,
 )
 from core.platform import models
 from core.tests import test_utils
@@ -381,3 +384,140 @@ class GeneralFeedbackCaptchaConfigHandlerTests(test_utils.GenericTestBase):
             response = self.get_json(feconf.GENERAL_FEEDBACK_CAPTCHA_CONFIG_URL)
 
         self.assertEqual(response, {'site_key': 'site-key'})
+
+
+class CreatorFeedbackListHandlerTests(test_utils.GenericTestBase):
+    """Tests for CreatorFeedbackListHandler."""
+
+    PLAYTESTER_EMAIL = 'playtester@example.com'
+    PLAYTESTER_USERNAME = 'playtester'
+    EXP_ID = 'exp1'
+
+    def setUp(self) -> None:
+
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.PLAYTESTER_EMAIL, self.PLAYTESTER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.playtester_id = self.get_user_id_from_email(self.PLAYTESTER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id)
+        self.playtester = user_services.get_user_actions_info(
+            self.playtester_id
+        )
+        self.viewer = user_services.get_user_actions_info(self.viewer_id)
+        owner_actions_info = user_services.get_user_actions_info(self.owner_id)
+        assert owner_actions_info is not None
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id)
+        rights_manager.assign_role_for_exploration(
+            owner_actions_info,
+            self.EXP_ID,
+            self.playtester_id,
+            rights_domain.ROLE_VIEWER,
+        )
+        self.thread_id = general_feedback_services.create_thread(
+            category='lesson',
+            rating=2,
+            description='Lesson feedback.',
+            page_url='/explore/%s' % self.EXP_ID,
+            language_code='en',
+            target_type='exploration',
+            target_id=self.EXP_ID,
+            user_id=self.playtester_id,
+        )
+
+    def test_playtester_can_view_creator_feedback_list_and_detail(self) -> None:
+        self.login(self.PLAYTESTER_EMAIL)
+
+        list_response = self.get_json(
+            '%s/%s' % (feconf.CREATOR_FEEDBACK_HANDLER_URL, self.EXP_ID)
+        )
+        self.assertEqual(len(list_response['thread_summaries']), 1)
+        self.assertEqual(
+            list_response['thread_summaries'][0]['id'], self.thread_id
+        )
+
+        detail_response = self.get_json(
+            '%s/%s/%s'
+            % (feconf.CREATOR_FEEDBACK_HANDLER_URL, self.EXP_ID, self.thread_id)
+        )
+        self.assertEqual(detail_response['id'], self.thread_id)
+        self.assertEqual(len(detail_response['messages']), 1)
+        self.assertIsNone(detail_response['session_info'])
+        self.assertFalse(detail_response['can_edit_exploration'])
+
+    def test_owner_can_view_creator_feedback_and_have_edit_permission_flag_true(
+        self,
+    ) -> None:
+        self.login(self.OWNER_EMAIL)
+        detail_response = self.get_json(
+            '%s/%s/%s'
+            % (feconf.CREATOR_FEEDBACK_HANDLER_URL, self.EXP_ID, self.thread_id)
+        )
+
+        self.assertTrue(detail_response['can_edit_exploration'])
+
+    def test_logged_out_user_cannot_view_creator_feedback(self) -> None:
+        self.get_json(
+            '%s/%s' % (feconf.CREATOR_FEEDBACK_HANDLER_URL, self.EXP_ID),
+            expected_status_int=404,
+        )
+
+    def test_playtester_can_reply_but_cannot_change_status(self) -> None:
+        self.login(self.PLAYTESTER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '%s/%s/%s'
+            % (
+                feconf.CREATOR_FEEDBACK_HANDLER_URL,
+                self.EXP_ID,
+                self.thread_id,
+            ),
+            {'message': 'Following up as learner.'},
+            csrf_token=csrf_token,
+            expected_status_int=200,
+        )
+        thread = general_feedback_services.get_thread(self.thread_id)
+        self.assertIsNotNone(thread)
+        assert thread is not None
+        self.assertEqual(thread.status, 'open')
+        self.assertEqual(thread.messages[-1].author_status, 'learner')
+
+        response = self.put_json(
+            '%s/%s/%s'
+            % (
+                feconf.CREATOR_FEEDBACK_HANDLER_URL,
+                self.EXP_ID,
+                self.thread_id,
+            ),
+            {'action': 'fixed'},
+            csrf_token=csrf_token,
+            expected_status_int=401,
+        )
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to update lesson feedback status.',
+        )
+
+    def test_owner_can_change_status_and_reply_as_editor(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        self.put_json(
+            '%s/%s/%s'
+            % (
+                feconf.CREATOR_FEEDBACK_HANDLER_URL,
+                self.EXP_ID,
+                self.thread_id,
+            ),
+            {'action': 'fixed', 'message': 'Issue fixed.'},
+            csrf_token=csrf_token,
+            expected_status_int=200,
+        )
+
+        thread = general_feedback_services.get_thread(self.thread_id)
+        self.assertIsNotNone(thread)
+        assert thread is not None
+        self.assertEqual(thread.status, 'fixed')
+        self.assertEqual(thread.messages[-1].author_status, 'editor')

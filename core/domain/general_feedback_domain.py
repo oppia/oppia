@@ -237,3 +237,29 @@ class GeneralFeedbackNormalizedSubmitPayloadDict(TypedDict):
     session_info: Optional[Dict[str, object]]
     captcha_token: Optional[str]
     screenshot_file: Optional[Dict[str, str]]
+
+
+class CreatorFeedbackListHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of CreatorFeedbackListHandler's normalized_request
+    dictionary.
+    """
+
+    cursor: Optional[str]
+    date_from_msecs: Optional[int]
+    date_to_msecs: Optional[int]
+    status_filter: Optional[str]
+
+
+class CreatorFeedbackDetailHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of CreatorFeedbackDetailHandler's normalized_payload
+    dictionary.
+    """
+
+    action: Optional[str]
+    message: Optional[str]
+    screenshot_filename: Optional[str]
+    screenshot_file: Optional[Dict[str, str]]
+
+
+class CreatorFeedbackDetailHandlerNormalizedResponseDict(WebFeedbackThreadDict):
+    can_edit_exploration: bool
