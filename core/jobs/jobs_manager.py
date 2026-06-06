@@ -349,11 +349,15 @@ def does_job_requires_limiting_workers(job_name: str) -> bool:
 
 def choose_service_account_id_for_job(
     job_class: type[base_jobs.JobBase],
-) -> Optional[str]:
+) -> str | None:
     """Returns the service account ID that should be used to run the given job.
 
+    Service accounts are used to grant an Apache Beam worker access to external
+    resources. As of 2026-06, the only external resources that Oppia interacts
+    with from Apache Beam jobs are from the Firebase Authentication server.
+
     Args:
-        job_class: type[base_jobs.JobBase]. The job.
+        job_class: type[base_jobs.JobBase]. The job's class.
 
     Returns:
         str|None. The service account ID that should be used to run the given
