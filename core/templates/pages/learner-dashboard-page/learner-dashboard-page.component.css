@@ -9,6 +9,9 @@
   max-width: 1400px;
   text-align: left;
 }
+[dir="rtl"] .oppia-learner-dashboard-container {
+  text-align: right;
+}
 
 .oppia-learner-dashboard-button-menu {
   padding: 8px;
