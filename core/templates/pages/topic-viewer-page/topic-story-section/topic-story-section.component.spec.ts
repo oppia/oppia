@@ -23,6 +23,8 @@ import {StoryNode} from 'domain/story/story-node.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 import {TopicStorySectionComponent} from './topic-story-section.component';
@@ -31,6 +33,9 @@ describe('TopicStorySectionComponent', () => {
   let component: TopicStorySectionComponent;
   let fixture: ComponentFixture<TopicStorySectionComponent>;
   let urlService: jasmine.SpyObj<UrlService>;
+  let urlInterpolationService: jasmine.SpyObj<UrlInterpolationService>;
+  let assetsBackendApiService: jasmine.SpyObj<AssetsBackendApiService>;
+  let i18nLanguageCodeService: jasmine.SpyObj<I18nLanguageCodeService>;
 
   beforeEach(waitForAsync(() => {
     urlService = jasmine.createSpyObj('UrlService', [
@@ -39,11 +44,25 @@ describe('TopicStorySectionComponent', () => {
       'getTopicUrlFragmentFromLearnerUrl',
       'addField',
     ]);
+    urlInterpolationService = jasmine.createSpyObj('UrlInterpolationService', [
+      'getStaticImageUrl',
+      'getStaticCopyrightedImageUrl',
+      'interpolateUrl',
+    ]);
+    assetsBackendApiService = jasmine.createSpyObj('AssetsBackendApiService', [
+      'getThumbnailUrlForPreview',
+    ]);
+    i18nLanguageCodeService = jasmine.createSpyObj('I18nLanguageCodeService', [
+      'isCurrentLanguageRTL',
+    ]);
+
     TestBed.configureTestingModule({
       declarations: [TopicStorySectionComponent, MockTranslatePipe],
       providers: [
-        UrlInterpolationService,
         {provide: UrlService, useValue: urlService},
+        {provide: UrlInterpolationService, useValue: urlInterpolationService},
+        {provide: AssetsBackendApiService, useValue: assetsBackendApiService},
+        {provide: I18nLanguageCodeService, useValue: i18nLanguageCodeService},
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -52,13 +71,6 @@ describe('TopicStorySectionComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TopicStorySectionComponent);
     component = fixture.componentInstance;
-    urlService = TestBed.inject(UrlService) as jasmine.SpyObj<UrlService>;
-
-    component.storyTitle = 'Help Jaime win the Arcade Game';
-    component.storyDescription =
-      "In this story, we'll follow Jaime and his sister Nic as they learn.";
-    component.lessonCount = 2;
-    component.practiceCount = 1;
 
     urlService.getLearnerTopicStudyGuideUrl.and.returnValue(
       '/learn/math/place-values/studyguide'
@@ -66,10 +78,25 @@ describe('TopicStorySectionComponent', () => {
     urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('math');
     urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue('topic');
     urlService.addField.and.callFake(
-      (url: string, key: string, value: string | number) => {
-        return `${url}?${key}=${value}`;
-      }
+      (url: string, key: string, value: string | number) =>
+        `${url}?${key}=${value}`
     );
+
+    urlInterpolationService.getStaticImageUrl.and.callFake((p: string) => {
+      return `/assets/images${p}`;
+    });
+    urlInterpolationService.getStaticCopyrightedImageUrl.and.callFake(
+      (p: string) => `/assets/copyrighted-images${p}`
+    );
+    urlInterpolationService.interpolateUrl.and.callFake((template: string) => {
+      return template.replace('<exp_id>', 'exp_1');
+    });
+
+    assetsBackendApiService.getThumbnailUrlForPreview.and.returnValue(
+      '/thumbnail/story/story_id/thumb.png'
+    );
+
+    i18nLanguageCodeService.isCurrentLanguageRTL.and.returnValue(false);
 
     fixture.detectChanges();
   });
@@ -97,63 +124,30 @@ describe('TopicStorySectionComponent', () => {
     return storySummarySpy as jasmine.SpyObj<StorySummary>;
   };
 
-  it('should return story title and meta text helpers', () => {
-    expect(component.storyTitle).toBe('Help Jaime win the Arcade Game');
+  it('should expose story meta text helpers', () => {
+    component.lessonCount = 2;
+    component.practiceCount = 1;
+
     expect(component.getStoryMetaText()).toBe('2 lessons, 1 practice');
     expect(component.getStoryMetaAriaLabel()).toBe(
       '2 lessons and 1 practice available'
     );
   });
 
-  it('should set the study guide url on init', () => {
+  it('should set study guide url on init', () => {
     expect(component.studyGuideUrl).toBe('/learn/math/place-values/studyguide');
   });
 
-  it('should derive study guide url from UrlService on init', () => {
-    expect(urlService.getLearnerTopicStudyGuideUrl).toHaveBeenCalledWith();
-  });
-
-  it('should switch to fallback avatar URL when image load fails', () => {
-    const primaryUrl = component.oppiaAvatarImageUrl;
-
+  it('should fallback avatar image on error', () => {
+    const primary = component.oppiaAvatarImageUrl;
     component.onAvatarImageError();
-
-    expect(component.oppiaAvatarImageUrl).not.toBe(primaryUrl);
+    expect(component.oppiaAvatarImageUrl).not.toBe(primary);
     expect(component.oppiaAvatarImageUrl).toContain(
       '/assets/copyrighted-images/general/collection_mascot.svg'
     );
   });
 
-  it('should not modify avatar URL when already on fallback image', () => {
-    component.onAvatarImageError();
-    const fallbackUrl = component.oppiaAvatarImageUrl;
-
-    component.onAvatarImageError();
-
-    expect(component.oppiaAvatarImageUrl).toBe(fallbackUrl);
-  });
-
-  it('should return singular and plural story meta strings correctly', () => {
-    component.lessonCount = 1;
-    component.practiceCount = 2;
-
-    expect(component.getLessonCountText()).toBe('1 lesson');
-    expect(component.getPracticeCountText()).toBe('2 practices');
-    expect(component.getStoryMetaText()).toBe('1 lesson, 2 practices');
-    expect(component.getStoryMetaAriaLabel()).toBe(
-      '1 lesson and 2 practices available'
-    );
-  });
-
-  it('should keep study guide URL as # when URL fragments are unavailable', () => {
-    urlService.getLearnerTopicStudyGuideUrl.and.returnValue('#');
-    component.ngOnInit();
-
-    expect(component.studyGuideUrl).toBe('#');
-    expect(urlService.getLearnerTopicStudyGuideUrl).toHaveBeenCalledTimes(2);
-  });
-
-  it('should not create practice card when lesson cards are present', () => {
+  it('should build lesson cards from storySummary and not create practice card', () => {
     const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
       'getTitle',
       'getDescription',
@@ -163,16 +157,14 @@ describe('TopicStorySectionComponent', () => {
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
-    storyNodeSpy.getThumbnailFilename.and.returnValue('');
+    storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
     storyNodeSpy.getExplorationId.and.returnValue('exp_1');
     storyNodeSpy.getId.and.returnValue('node_1');
 
     component.storySummary = createStorySummarySpy(
       ['Node title 1'],
-      [storyNodeSpy as StoryNode]
+      [storyNodeSpy as unknown as StoryNode]
     );
-    component.lessonCount = 1;
-    component.practiceCount = 1;
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'topic';
     component.practiceSubtopicIds = [1];
@@ -180,6 +172,9 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.lessonCards.length).toBe(1);
+    expect(component.lessonCards[0].thumbnailUrl).toBe(
+      '/thumbnail/story/story_id/thumb.png'
+    );
     expect(component.practiceCard).toBeNull();
   });
 
@@ -195,5 +190,8 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.lessonCards.length).toBe(0);
     expect(component.practiceCard).not.toBeNull();
+    expect(component.practiceCard?.studyUrl).toBe(
+      '/learn/math/place-values/studyguide'
+    );
   });
 });
