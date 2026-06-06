@@ -114,6 +114,27 @@ describe('Certificate Offering Details Component', () => {
     expect(component.demonstratesList).toEqual(['Learn math', 'Learn science']);
   });
 
+  it('should restore values from initial values when provided', () => {
+    component.initialValues = {
+      title: 'Initial title',
+      description: 'Initial description',
+      classroomId: 'math',
+      classroomName: 'Math',
+      timeLimitInMinutes: 45,
+      totalQuestions: 8,
+      demonstrates: ['Initial outcome'],
+    };
+
+    component.setFormValues();
+
+    expect(component.title).toEqual('Initial title');
+    expect(component.description).toEqual('Initial description');
+    expect(component.classroomId).toEqual('math');
+    expect(component.timeLimitInMinutes).toEqual(45);
+    expect(component.totalQuestions).toEqual(8);
+    expect(component.demonstratesList).toEqual(['Initial outcome']);
+  });
+
   it('should restore demonstrates from the offering when no initial values are set', () => {
     component.certificateAssessmentOffering.demonstrates = [
       'Learn math',
@@ -144,6 +165,14 @@ describe('Certificate Offering Details Component', () => {
     expect(component.demonstratesList.length).toEqual(1);
   });
 
+  it('should not remove the only outcome row', () => {
+    component.demonstratesList = ['Only'];
+
+    component.removeOutcome(0);
+
+    expect(component.demonstratesList).toEqual(['Only']);
+  });
+
   it('should validate the form only when required fields are present', () => {
     expect(component.isFormValid()).toBeFalse();
 
@@ -168,6 +197,12 @@ describe('Certificate Offering Details Component', () => {
     expect(component.isTimeLimitInvalid()).toBeTrue();
     expect(component.isTotalQuestionsInvalid()).toBeTrue();
     expect(component.isFormValid()).toBeFalse();
+  });
+
+  it('should return an empty classroom name when the classroom is not found', () => {
+    component.classroomId = 'unknown';
+
+    expect(component.getSelectedClassroomName()).toEqual('');
   });
 
   it('should mark time limit and question count as invalid when out of range', () => {
@@ -197,11 +232,46 @@ describe('Certificate Offering Details Component', () => {
     expect(component.isFormValid()).toBeFalse();
   });
 
+  it('should not emit events when the form is invalid', () => {
+    const offeringChangeSpy = spyOn(
+      component.certificateAssessmentOfferingChange,
+      'emit'
+    );
+    const stepCompletedSpy = spyOn(component.stepCompleted, 'emit');
+    const navigateSpy = spyOn(component.navigateToAddTopicsSection, 'emit');
+
+    component.onNextClicked();
+
+    expect(offeringChangeSpy).not.toHaveBeenCalled();
+    expect(stepCompletedSpy).not.toHaveBeenCalled();
+    expect(navigateSpy).not.toHaveBeenCalled();
+  });
+
   it('should resolve the classroom name from the selected classroom id', async () => {
     await component.loadClassrooms();
     component.classroomId = 'science';
 
     expect(component.getSelectedClassroomName()).toEqual('Science');
+  });
+
+  it('should return normalized form data', async () => {
+    await component.loadClassrooms();
+    component.title = '  Certificate title  ';
+    component.description = '  Certificate description  ';
+    component.classroomId = 'science';
+    component.timeLimitInMinutes = 30;
+    component.totalQuestions = 5;
+    component.demonstratesList = [' Learn math ', ''];
+
+    expect(component.getFormData()).toEqual({
+      title: 'Certificate title',
+      description: 'Certificate description',
+      classroomId: 'science',
+      classroomName: 'Science',
+      timeLimitInMinutes: 30,
+      totalQuestions: 5,
+      demonstrates: ['Learn math'],
+    });
   });
 
   it('should show field validation errors for invalid values', async () => {
@@ -228,5 +298,37 @@ describe('Certificate Offering Details Component', () => {
       'at most 50'
     );
     expect(component.getDemonstratesValidationError()).toEqual('');
+  });
+
+  it('should return title and description validation errors when over max length', () => {
+    component.title = 'a'.repeat(81);
+    component.description = 'b'.repeat(501);
+
+    expect(component.getTitleValidationError()).toContain(
+      'at most 80 characters'
+    );
+    expect(component.getDescriptionValidationError()).toContain(
+      'at most 500 characters'
+    );
+  });
+
+  it('should return classroom validation errors for empty and invalid classroom ids', async () => {
+    await component.loadClassrooms();
+
+    component.classroomId = '';
+    expect(component.getClassroomValidationError()).toEqual('');
+
+    component.classroomId = 'invalid';
+    expect(component.getClassroomValidationError()).toContain(
+      'valid classroom'
+    );
+  });
+
+  it('should return a demonstrates validation error when outcomes exceed the limit', () => {
+    component.demonstratesList = ['a'.repeat(201)];
+
+    expect(component.getDemonstratesValidationError()).toContain(
+      'at most 200 characters'
+    );
   });
 });
