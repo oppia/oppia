@@ -20,6 +20,7 @@ import {Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
+import isElementClickable from '../../functions/is-element-clickable';
 
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 
@@ -307,8 +308,32 @@ export class LoggedOutUser extends BaseUser {
       }, targetElement);
       showMessage(`Pre-click debug: ${JSON.stringify(debugInfo)}`);
 
-      await this.waitForElementToBeClickable(targetElement);
-      await targetElement.click();
+      await this.page.waitForFunction(
+        ({selector, index, clickableFn}) => {
+          const element = document.querySelectorAll(selector)[index];
+          if (!element) return false;
+          const fn = new Function(
+            'element',
+            `return (${clickableFn})(element)`
+          );
+          return fn(element);
+        },
+        {
+          selector: lessonCardTitleSelector,
+          index: lessonIndex,
+          clickableFn: isElementClickable.toString(),
+        }
+      );
+
+      await this.page.evaluate(
+        ({selector, index}) => {
+          const element = document.querySelectorAll(selector)[
+            index
+          ] as HTMLElement;
+          element.click();
+        },
+        {selector: lessonCardTitleSelector, index: lessonIndex}
+      );
       await this.waitForStaticAssetsToLoad();
 
       await this.page.waitForSelector(lessonCardTitleSelector, {
