@@ -1,20 +1,17 @@
 .topic-lesson-card {
   background: #fff;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  box-shadow: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   display: flex;
-  height: 212px;
-  min-height: 212px;
-  max-width: 912px;
-  width: 100%;
+  min-height: 140px;
   overflow: hidden;
+  width: 100%;
 }
 
 .topic-lesson-card-thumbnail {
   background: #9fbfbb;
-  flex: 0 0 276px;
-  height: 212px;
+  flex: 0 0 210px;
+  min-height: 140px;
 }
 
 .topic-lesson-card-image {
@@ -30,7 +27,7 @@
   flex-direction: column;
   justify-content: space-between;
   min-width: 0;
-  padding: 28px;
+  padding: 18px 22px;
 }
 
 .topic-lesson-card-copy {
