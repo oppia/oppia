@@ -172,6 +172,7 @@
 /core/domain/learner_playlist_services*.py @oppia/lace-backend-reviewers
 /core/domain/learner_progress*.py @oppia/lace-backend-reviewers
 /core/domain/subscription_services*.py @oppia/lace-backend-reviewers
+/core/domain/captcha_services*.py @oppia/lace-backend-reviewers
 /core/templates/domain/creator_dashboard/ @oppia/lace-frontend-reviewers
 /core/templates/domain/email-dashboard/ @oppia/lace-frontend-reviewers
 /core/templates/domain/feedback_updates/feedback-updates-backend-api.service.ts @oppia/lace-frontend-reviewers
@@ -622,6 +623,9 @@
 
 # Web User Feedback project.
 /core/templates/domain/feedback/ @oppia/lace-frontend-reviewers
+/core/controllers/general_feedback*.py @oppia/lace-backend-reviewers
+/core/templates/services/feedback-session-info.service.ts @oppia/lace-frontend-reviewers
+/core/templates/services/session-info-http-interceptor.service.ts  @oppia/lace-frontend-reviewers
 
 # Suggestion and feedback team.
 # Suggestion project.
@@ -683,7 +687,12 @@
 /core/templates/components/common-layout-directives/common-elements/classroom-navigation-links.component.html @oppia/lace-frontend-reviewers
 
 # Certificate Offering Pages.
-/core/templates/pages/certificate-assessment-pages @oppia/contributor-experience-team
+/core/domain/certificate_assessment*.py @oppia/contributor-experience-team
+/core/storage/certificate_assessment @oppia/contributor-experience-team
+/core/templates/pages/certificate-assessment-dashboard-page/ @oppia/contributor-experience-team
+/core/templates/pages/create-certificate-offering-page/ @oppia/contributor-experience-team
+/core/templates/components/certificate-assessment-offering-helper/ @oppia/contributor-experience-team
+/core/templates/domain/certificate-assessment/ @oppia/contributor-experience-team
 /core/controllers/certificate_assessment*.py @oppia/contributor-experience-team
 
 # Speed Improvement team.

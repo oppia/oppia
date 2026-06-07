@@ -18,6 +18,8 @@
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {NumberConversionService} from 'services/number-conversion.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {NumberWithUnitsEditorComponent} from './number-with-units-editor.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
@@ -28,6 +30,7 @@ describe('NumberWithUnitsEditorComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [MockTranslatePipe, NumberWithUnitsEditorComponent],
+      providers: [NumberConversionService, I18nLanguageCodeService],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -114,5 +117,18 @@ describe('NumberWithUnitsEditorComponent', () => {
     component.updateValue('23 kf');
 
     expect(component.errorMessageI18nKey).toBe('Unit "kf" not found.');
+  });
+
+  it('should correctly parse number with comma as decimal separator', () => {
+    const i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    i18nLanguageCodeService.setI18nLanguageCode('pt-br');
+    spyOn(component.valueChanged, 'emit');
+
+    component.updateValue('1,5 kg');
+
+    expect(component.value?.real).toBe(1.5);
+    expect(component.value?.units[0].unit).toBe('kg');
+    expect(component.errorMessageI18nKey).toBe('');
+    expect(component.valueChanged.emit).toHaveBeenCalledWith(component.value);
   });
 });

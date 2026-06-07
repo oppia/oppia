@@ -29,6 +29,9 @@ from core.domain import (
     fs_services,
     question_domain,
     rights_manager,
+    skill_domain,
+    skill_fetchers,
+    skill_services,
     story_domain,
     story_fetchers,
     story_services,
@@ -3299,6 +3302,189 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id, topic_id, changelist, 'Update topic name'
             )
+
+    def test_does_not_save_topic_with_superseding_skill_in_subtopic(
+        self,
+    ) -> None:
+        self.save_new_skill('supersede2', self.user_id)
+        self.save_new_skill('has_superseding2', self.user_id)
+        topic_id = topic_fetchers.get_new_topic_id()
+        subtopic = topic_domain.Subtopic(
+            1,
+            'Test Subtopic',
+            [],
+            'image.svg',
+            '#FFFFFF',
+            None,
+            'test-subtopic',
+        )
+        self.save_new_topic(
+            topic_id,
+            self.user_id,
+            name='topic-supersede2',
+            description='desc',
+            url_fragment='topic-url-supersede',
+            uncategorized_skill_ids=['has_superseding2'],
+            subtopics=[subtopic],
+            next_subtopic_id=2,
+        )
+        move_changelist = [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                    'old_subtopic_id': None,
+                    'new_subtopic_id': 1,
+                    'skill_id': 'has_superseding2',
+                }
+            )
+        ]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id, topic_id, move_changelist, 'Move skill to subtopic.'
+        )
+        skill_changelist = [
+            skill_domain.SkillChange(
+                {
+                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                    'property_name': (
+                        skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID
+                    ),
+                    'old_value': '',
+                    'new_value': 'supersede2',
+                }
+            )
+        ]
+        skill_services.update_skill(
+            self.user_id,
+            'has_superseding2',
+            skill_changelist,
+            'Merging skill.',
+        )
+        update_changelist = [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                    'property_name': topic_domain.TOPIC_PROPERTY_DESCRIPTION,
+                    'old_value': 'desc',
+                    'new_value': 'updated desc',
+                }
+            )
+        ]
+        with self.assertRaisesRegex(
+            Exception,
+            'The skill \'has_superseding2\' in subtopic \'Test Subtopic\' '
+            'has a superseding skill \'supersede2\'',
+        ):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, topic_id, update_changelist, 'Update topic.'
+            )
+
+    def test_does_not_add_skill_with_superseding_skill_to_topic(self) -> None:
+        self.save_new_skill('supersede', self.user_id)
+        self.save_new_skill('has_superseding', self.user_id)
+        changelist = [
+            skill_domain.SkillChange(
+                {
+                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                    'property_name': (
+                        skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID
+                    ),
+                    'old_value': '',
+                    'new_value': 'supersede',
+                }
+            )
+        ]
+        skill_services.update_skill(
+            self.user_id, 'has_superseding', changelist, 'Merging skill.'
+        )
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id,
+            self.user_id,
+            name='topic-supersede',
+            description='desc',
+            url_fragment='topic-url-frag',
+            uncategorized_skill_ids=[],
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            'The skill \'has_superseding\' in uncategorized skills has a superseding skill \'supersede\'',
+        ):  # pylint:disable=line-too-long
+            topic_services.add_uncategorized_skill(
+                self.user_id, topic_id, 'has_superseding'
+            )
+
+    def test_find_superseded_skill_in_topic_returns_skill(
+        self,
+    ) -> None:
+        self.save_new_skill('superseding_skill', self.user_id)
+        self.save_new_skill('skill_to_merge', self.user_id)
+        changelist = [
+            skill_domain.SkillChange(
+                {
+                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                    'property_name': (
+                        skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID
+                    ),
+                    'old_value': '',
+                    'new_value': 'superseding_skill',
+                }
+            )
+        ]
+        skill_services.update_skill(
+            self.user_id, 'skill_to_merge', changelist, 'Merging skill.'
+        )
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id,
+            self.user_id,
+            name='Topic With Superseding',
+            description='desc',
+            url_fragment='topic-with-super',
+            uncategorized_skill_ids=['skill_to_merge'],
+        )
+        topic = topic_fetchers.get_topic_by_id(topic_id)
+        result = topic_services.find_superseded_skill_in_topic(topic)
+        self.assertIsNotNone(result)
+        assert result is not None
+        self.assertEqual(result.id, 'skill_to_merge')
+
+    def test_find_superseded_skill_in_topic_returns_none(
+        self,
+    ) -> None:
+        self.save_new_skill('regular_skill', self.user_id)
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id,
+            self.user_id,
+            name='Topic Without Superseding',
+            description='desc',
+            url_fragment='topic-no-super',
+            uncategorized_skill_ids=['regular_skill'],
+        )
+        topic = topic_fetchers.get_topic_by_id(topic_id)
+        result = topic_services.find_superseded_skill_in_topic(topic)
+        self.assertIsNone(result)
+
+    def test_find_superseded_skill_in_topic_skips_none_skills(
+        self,
+    ) -> None:
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id,
+            self.user_id,
+            name='Topic For None Skill Test',
+            description='desc',
+            url_fragment='topic-none-test',
+            uncategorized_skill_ids=['dummy_skill_id'],
+        )
+        topic = topic_fetchers.get_topic_by_id(topic_id)
+        with self.swap(
+            skill_fetchers,
+            'get_multi_skills',
+            lambda skill_ids, strict=True: [None],
+        ):
+            result = topic_services.find_superseded_skill_in_topic(topic)
+        self.assertIsNone(result)
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
