@@ -50,7 +50,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, Union, cast
+from typing import Dict, Final, List, Optional, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -3821,7 +3821,9 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         # - story_node is None (swap get_node_with_corresponding_exp_id to return None)
         topic_summaries = topic_fetchers.get_all_topic_summaries()
 
-        def mock_get_all_topic_summaries():
+        def mock_get_all_topic_summaries() -> (
+            List[Optional[topic_domain.TopicSummary]]
+        ):
             return [None] + topic_summaries
 
         orig_get_opps = (
@@ -3829,43 +3831,44 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         )
 
         def mock_get_translation_opportunities_by_entity_ids(
-            entity_type, entity_ids
-        ):
+            entity_type: str, entity_ids: List[str]
+        ) -> Dict[str, Optional[opportunity_domain.TranslationOpportunity]]:
             opps = orig_get_opps(entity_type, entity_ids)
-            if self.EXP_ID in opps and opps[self.EXP_ID] is not None:
-                opps[self.EXP_ID].topic_ids = ['invalid_topic_id'] + opps[
-                    self.EXP_ID
-                ].topic_ids
-            if 'exp_no_opp' in opps:
-                opps['exp_no_opp'] = None
+            opp = opps.get(self.EXP_ID)
+            if opp is not None:
+                opp.topic_ids = ["invalid_topic_id"] + opp.topic_ids
+            if "exp_no_opp" in opps:
+                opps["exp_no_opp"] = None
             return opps
 
         with self.swap(
             topic_fetchers,
-            'get_all_topic_summaries',
+            "get_all_topic_summaries",
             mock_get_all_topic_summaries,
         ), self.swap(
             opportunity_services,
-            'get_translation_opportunities_by_entity_ids',
+            "get_translation_opportunities_by_entity_ids",
             mock_get_translation_opportunities_by_entity_ids,
         ), self.swap(
             story_domain.StoryContents,
-            'get_node_with_corresponding_exp_id',
+            "get_node_with_corresponding_exp_id",
             lambda *args, **kwargs: None,
         ):
             response = self.get_json(
-                '/getsubmittedsuggestions/exploration/translate_content',
+                "/getsubmittedsuggestions/exploration/translate_content",
                 {
-                    'limit': constants.OPPORTUNITIES_PAGE_SIZE,
-                    'offset': 0,
-                    'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                    "limit": constants.OPPORTUNITIES_PAGE_SIZE,
+                    "offset": 0,
+                    "sort_key": constants.SUGGESTIONS_SORT_KEY_DATE,
                 },
             )
 
-        self.assertEqual(len(response['suggestions']), 3)
+        self.assertEqual(len(response["suggestions"]), 3)
 
         # 5. Swap get_all_topic_summaries to empty list to cover story_ids is empty branch.
-        def mock_get_all_topic_summaries_empty():
+        def mock_get_all_topic_summaries_empty() -> (
+            List[topic_domain.TopicSummary]
+        ):
             return []
 
         with self.swap(
