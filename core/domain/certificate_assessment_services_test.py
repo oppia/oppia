@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import topic_fetchers
-from core.domain import certificate_assessment_services
+from core.domain import certificate_assessment_services, topic_fetchers
 from core.tests import test_utils
 
 
