@@ -58,6 +58,7 @@ class BeamJobRunTests(test_utils.TestBase):
         self.assertEqual(run.job_started_on, self.NOW)
         self.assertEqual(run.job_updated_on, self.NOW)
         self.assertTrue(run.job_is_synchronous)
+        self.assertIsNone(run.dataflow_job_id)
 
     def test_to_dict(self) -> None:
         run = beam_job_domain.BeamJobRun(
@@ -73,6 +74,7 @@ class BeamJobRunTests(test_utils.TestBase):
                 'job_started_on_msecs': utils.get_time_in_millisecs(self.NOW),
                 'job_updated_on_msecs': utils.get_time_in_millisecs(self.NOW),
                 'job_is_synchronous': True,
+                'dataflow_job_id': None,
             },
         )
 

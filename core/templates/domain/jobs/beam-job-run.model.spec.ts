@@ -516,7 +516,9 @@ describe('Beam Job Run', () => {
         true,
         null
       );
-      expect(beamJobRun.getDataflowUrl()).toBeNull();
+      expect(beamJobRun.getDataflowUrl()).toEqual(
+        'https://console.cloud.google.com/dataflow/jobs'
+      );
     });
 
     it('should return the correct Dataflow URL if dataflowJobId is provided', () => {
@@ -530,7 +532,7 @@ describe('Beam Job Run', () => {
         'def-456'
       );
       expect(beamJobRun.getDataflowUrl()).toEqual(
-        'https://console.cloud.google.com/dataflow/jobsDetail/locations/us-central1/jobs/def-456?project=oppiaserver'
+        'https://console.cloud.google.com/dataflow/jobs/us-central1/def-456;graphView=0'
       );
     });
   });
