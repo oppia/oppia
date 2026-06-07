@@ -72,6 +72,22 @@ def create_certificate_assessment_offering(
     #             'topic_ids must belong to the specified classroom.'
     #         )
 
+    certificate_assessment_offering = (
+        certificate_assessment_domain.CertificateAssessmentOffering(
+            certificate_id='temporary_certificate_id',
+            title=title,
+            description=description,
+            classroom_id=classroom_id,
+            topic_ids=topic_ids,
+            total_questions=total_questions,
+            time_limit_in_minutes=time_limit_in_minutes,
+            demonstrates=demonstrates,
+            async_status=async_status,
+            version=1,
+        )
+    )
+    certificate_assessment_offering.validate()
+
     certificate_assessment_offering_model = (
         gae_models.CertificateAssessmentOfferingModel.create(
             title=title,
@@ -87,7 +103,6 @@ def create_certificate_assessment_offering(
     certificate_assessment_offering = _model_to_domain(
         certificate_assessment_offering_model
     )
-    certificate_assessment_offering.validate()
     return certificate_assessment_offering
 
 

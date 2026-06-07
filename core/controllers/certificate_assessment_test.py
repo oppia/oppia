@@ -65,6 +65,38 @@ class CertificateAssessmentOfferingHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(stored_offerings[0].version, 1)
         self.assertEqual(stored_offerings[0].title, payload['title'])
 
+    def test_post_rejects_empty_demonstrates(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'title': 'Everyday Arithmetic & Number Confidence',
+            'description': 'Covers place values, addition and subtraction.',
+            'classroom_id': 'math_classroom_01',
+            'topics': [
+                {
+                    'topic_id': 'topic_place_values',
+                }
+            ],
+            'total_questions': 12,
+            'time_limit_in_minutes': 60,
+            'demonstrates': [],
+            'async_status': 'Available',
+        }
+
+        response = self.post_json(
+            feconf.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
+            payload,
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+
+        self.assertEqual(
+            response['error'],
+            "At 'http://localhost/certificate_assessment_offering_handler' "
+            "these errors are happening:\nSchema validation for "
+            "'demonstrates' failed: Validation failed: "
+            "has_length_at_least ({'min_value': 1}) for object []",
+        )
+
     def test_get_returns_real_certificate_offerings(self) -> None:
         certificate_assessment_services.create_certificate_assessment_offering(
             title='Physics Basics',

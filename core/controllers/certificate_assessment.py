@@ -54,7 +54,16 @@ class CertificateAssessmentOfferingHandler(
             'total_questions': {'schema': {'type': 'int'}},
             'time_limit_in_minutes': {'schema': {'type': 'int'}},
             'demonstrates': {
-                'schema': {'type': 'list', 'items': {'type': 'basestring'}}
+                'schema': {
+                    'type': 'list',
+                    'items': {'type': 'basestring'},
+                    'validators': [
+                        {
+                            'id': 'has_length_at_least',
+                            'min_value': 1,
+                        }
+                    ],
+                }
             },
             'async_status': {'schema': {'type': 'basestring'}},
         },
@@ -90,7 +99,7 @@ class CertificateAssessmentOfferingHandler(
             time_limit_in_minutes=self.normalized_payload[
                 'time_limit_in_minutes'
             ],
-            demonstrates=self.normalized_payload.get('demonstrates', []),
+            demonstrates=self.normalized_payload['demonstrates'],
             async_status=self.normalized_payload['async_status'],
         )
         self.render_json(

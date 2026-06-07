@@ -81,7 +81,7 @@ class CertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         self.assertEqual(offering.async_status, 'Available')
         self.assertEqual(offering.version, 1)
 
-    def test_validate_raises_not_implemented_error(self) -> None:
+    def test_validate_succeeds_for_valid_offering(self) -> None:
         offering = self._get_sample_offering()
         offering.validate()
 
