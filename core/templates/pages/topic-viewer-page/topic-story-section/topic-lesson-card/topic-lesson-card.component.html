@@ -10,10 +10,12 @@
       <h3 class="topic-lesson-card-title">{{ lessonTitle }}</h3>
       <p class="topic-lesson-card-description">{{ lessonDescription }}</p>
     </div>
-    <a class="topic-lesson-card-start-button"
-       [attr.href]="startUrl || '#'"
-       [attr.aria-disabled]="startUrl ? null : 'true'">
-      Start
-    </a>
+    <button
+  class="topic-lesson-card-start-button"
+  type="button"
+  [disabled]="!startUrl"
+  (click)="startUrl && (window.location.href = startUrl)">
+  Start
+</button>
   </div>
 </div>
