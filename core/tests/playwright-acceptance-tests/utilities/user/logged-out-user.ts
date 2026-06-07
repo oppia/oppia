@@ -296,6 +296,7 @@ export class LoggedOutUser extends BaseUser {
         const centerX = cardRect.left + cardRect.width / 2;
         const centerY = cardRect.top + cardRect.height / 2;
         return {
+          isConnected: el.isConnected,
           navbarBottom: navbarRect?.bottom,
           cardTop: cardRect.top,
           cardCenterY: centerY,
