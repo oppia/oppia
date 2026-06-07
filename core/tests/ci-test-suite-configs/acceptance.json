@@ -447,8 +447,8 @@
     },
     {
       "name": "logged-in-learner/access-pages-that-require-higher-privileges",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/access-pages-that-require-higher-privileges.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/access-pages-that-require-higher-privileges.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/goes-through-the-sign-in-flow",

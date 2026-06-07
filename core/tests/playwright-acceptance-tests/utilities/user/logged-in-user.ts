@@ -22,12 +22,20 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const baseUrl = testConstants.URLs.BaseURL;
+const contributorDashboardAdminUrl =
+  testConstants.URLs.ContributorDashboardAdmin;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
+const moderatorPageUrl = testConstants.URLs.ModeratorPage;
+const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
+const siteAdminPageUrl = testConstants.URLs.AdminPage;
+const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 
 const anonymousCheckboxSelector = '.e2e-test-stay-anonymous-checkbox';
 const feedbackTextareaSelector = '.e2e-test-exploration-feedback-textarea';
 const submitButtonSelector = '.e2e-test-exploration-feedback-submit-btn';
 const submittedMessageSelector = '.e2e-test-rating-submitted-message';
+const errorContainerSelector = '.e2e-test-error-container';
+const errorPageHeadingSelector = '.e2e-test-error-page-heading';
 
 const explorationCard = '.e2e-test-exploration-dashboard-card';
 const desktopLessonCardTitleSelector = '.e2e-test-exploration-tile-title';
@@ -341,6 +349,75 @@ export class LoggedInUser extends BaseUser {
 
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(goalsSectionContainerSelector);
+  }
+
+  /**
+   * Navigates to the Contributor Admin Dashboard page.
+   */
+  async navigateToContributorAdminDashboardPage(): Promise<void> {
+    await this.goto(contributorDashboardAdminUrl);
+  }
+
+  /**
+   * Navigates to the Moderator page.
+   */
+  async navigateToModeratorPage(): Promise<void> {
+    await this.goto(moderatorPageUrl);
+  }
+
+  /**
+   * Navigates to the Release Coordinator page.
+   */
+  async navigateToReleaseCoordinatorPage(): Promise<void> {
+    await this.goto(releaseCoordinatorPageUrl);
+  }
+
+  /**
+   * Navigates to the Admin page.
+   */
+  async navigateToSiteAdminPage(): Promise<void> {
+    await this.goto(siteAdminPageUrl);
+  }
+
+  /**
+   * Navigates to the Topics and Skills Dashboard page.
+   */
+  async navigateToTopicsAndSkillsDashboardPage(): Promise<void> {
+    await this.goto(topicsAndSkillsDashboardUrl);
+  }
+
+  /**
+   * Checks if the error page with the given status code is displayed.
+   * @param {number} statusCode - The expected error status code.
+   */
+  async expectErrorPage(statusCode: number): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(errorContainerSelector);
+    await this.page.waitForFunction(
+      ({selector, expectedText}: {selector: string; expectedText: string}) => {
+        const errorContainer = document.querySelector(selector);
+        return Boolean(
+          errorContainer && errorContainer.textContent?.includes(expectedText)
+        );
+      },
+      {selector: errorContainerSelector, expectedText: `Error ${statusCode}`},
+      {timeout: 30000}
+    );
+
+    const errorHeading = await this.page.$(errorPageHeadingSelector);
+    if (errorHeading) {
+      const errorHeadingText = await this.page.evaluate(
+        element => element.textContent,
+        errorHeading
+      );
+      if (!errorHeadingText?.includes(`Error ${statusCode}`)) {
+        throw new Error(
+          `Expected "Error ${statusCode}" to be present on the page, but it was not.`
+        );
+      }
+    }
+
+    showMessage(`User is on error page with status code ${statusCode}.`);
   }
 
   /**
