@@ -25,6 +25,7 @@
     "core/templates/pages/about-page/about-page.constants.ts",
     "core/templates/pages/exploration-player-page/new-lesson-player/README.md",
     "core/templates/pages/exploration-player-page/current-lesson-player/README.md",
+    "core/templates/pages/learner-dashboard-page/learner-groups-tab.component.css",
     "core/templates/pages/exploration-player-page/README.md",
     "core/templates/pages/exploration-player-page/services/README.md",
     "core/templates/pages/exploration-player-page/new-lesson-player/lesson-player-page.constants.ts",
