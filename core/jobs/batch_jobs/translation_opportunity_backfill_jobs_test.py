@@ -19,12 +19,15 @@
 from __future__ import annotations
 
 from core import feature_flag_list, feconf
+from core.constants import constants
 from core.domain import exp_domain, rights_manager
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import translation_opportunity_backfill_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
+
+from typing import List, cast
 
 MYPY = False
 if MYPY:
@@ -54,12 +57,10 @@ if MYPY:
 datastore_services = models.Registry.import_datastore_services()
 
 
-class BackfillTranslationOpportunityModelJobTests(
+class TranslationOpportunityJobTestBase(
     job_test_utils.JobTestBase, test_utils.GenericTestBase
 ):
-    JOB_CLASS = (
-        translation_opportunity_backfill_jobs.BackfillTranslationOpportunityModelJob
-    )
+    """Base class for testing translation opportunity jobs."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -190,6 +191,14 @@ class BackfillTranslationOpportunityModelJobTests(
         )
         translation_model.update_timestamps()
         translation_model.put()
+
+
+class BackfillTranslationOpportunityModelJobTests(
+    TranslationOpportunityJobTestBase
+):
+    JOB_CLASS = (
+        translation_opportunity_backfill_jobs.BackfillTranslationOpportunityModelJob
+    )
 
     def test_creates_translation_opportunity_model(self) -> None:
         self.assert_job_output_is(
@@ -585,11 +594,218 @@ class BackfillTranslationOpportunityModelJobTests(
 
 
 class AuditBackfillTranslationOpportunityModelJobTests(
-    job_test_utils.JobTestBase, test_utils.GenericTestBase
+    TranslationOpportunityJobTestBase
 ):
+    """Tests for AuditBackfillTranslationOpportunityModelJob."""
+
     JOB_CLASS = (
         translation_opportunity_backfill_jobs.AuditBackfillTranslationOpportunityModelJob
     )
 
     def test_empty_job_output(self) -> None:
-        self.assert_job_output_is_empty()
+        # Here we use cast because we are narrowing down the type of models.
+        exp_models_list = cast(
+            List[exp_models.ExplorationModel],
+            exp_models.ExplorationModel.get_all().fetch(),
+        )
+        datastore_services.delete_multi(
+            [model.key for model in exp_models_list]
+        )
+        # Here we use cast because we are narrowing down the type of models.
+        topic_models_list = cast(
+            List[topic_models.TopicModel],
+            topic_models.TopicModel.get_all().fetch(),
+        )
+        datastore_services.delete_multi(
+            [model.key for model in topic_models_list]
+        )
+        # Here we use cast because we are narrowing down the type of models.
+        story_models_list = cast(
+            List[story_models.StoryModel],
+            story_models.StoryModel.get_all().fetch(),
+        )
+        datastore_services.delete_multi(
+            [model.key for model in story_models_list]
+        )
+        # Here we use cast because we are narrowing down the type of models.
+        translation_models_list = cast(
+            List[translation_models.EntityTranslationsModel],
+            translation_models.EntityTranslationsModel.get_all().fetch(),
+        )
+        datastore_services.delete_multi(
+            [model.key for model in translation_models_list]
+        )
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'Audit Summary:\n'
+                        '- Matches: 0\n'
+                        '- Missing in Datastore: 0\n'
+                        '- Discrepancies: 0\n'
+                        '- Orphaned in Datastore: 0'
+                    )
+                ),
+            ]
+        )
+
+    def test_audit_identifies_matching_model(self) -> None:
+        exp_model = exp_models.ExplorationModel.get_by_id(self.exp_id)
+        exp_model.states[feconf.DEFAULT_INIT_STATE_NAME]['content'][
+            'html'
+        ] = '<p>Content</p>'
+        exp_model.update_timestamps()
+        exp_model.commit(
+            self.author_id,
+            'Update content',
+            [{'cmd': 'edit_exploration_property'}],
+        )
+
+        matching_model = opportunity_models.TranslationOpportunityModel(
+            id='exploration.exp_1',
+            entity_type=feconf.TranslatableEntityType.EXPLORATION.value,
+            entity_id=self.exp_id,
+            topic_ids=['topic_id'],
+            content_count=1,
+            incomplete_translation_language_codes=[
+                lang['id']
+                for lang in constants.SUPPORTED_AUDIO_LANGUAGES
+                if lang['id'] != 'en'
+            ],
+            translation_counts={'hi': 1},
+        )
+        matching_model.update_timestamps()
+        matching_model.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'Audit Summary:\n'
+                        '- Matches: 1\n'
+                        '- Missing in Datastore: 0\n'
+                        '- Discrepancies: 0\n'
+                        '- Orphaned in Datastore: 0'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stdout='TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+            ]
+        )
+
+    def test_audit_identifies_missing_model(self) -> None:
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'Audit Summary:\n'
+                        '- Matches: 0\n'
+                        '- Missing in Datastore: 1\n'
+                        '- Discrepancies: 0\n'
+                        '- Orphaned in Datastore: 0'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stdout='TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+            ]
+        )
+
+    def test_audit_identifies_discrepancy_model(self) -> None:
+        discrepant_model = opportunity_models.TranslationOpportunityModel(
+            id='exploration.exp_1',
+            entity_type=feconf.TranslatableEntityType.EXPLORATION.value,
+            entity_id=self.exp_id,
+            topic_ids=['topic_id'],
+            content_count=10,
+            incomplete_translation_language_codes=[],
+            translation_counts={},
+        )
+        discrepant_model.update_timestamps()
+        discrepant_model.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'Audit Summary:\n'
+                        '- Matches: 0\n'
+                        '- Missing in Datastore: 0\n'
+                        '- Discrepancies: 1\n'
+                        '- Orphaned in Datastore: 0'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'Discrepancy for model exploration.exp_1: '
+                        'Existing (content_count=10, translation_counts={}), '
+                        'Computed (content_count=0, translation_counts={\'hi\': 1})'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stdout='TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                ),
+            ]
+        )
+
+    def test_audit_identifies_orphaned_model(self) -> None:
+        # Here we use cast because we are narrowing down the type of models.
+        exp_models_list = cast(
+            List[exp_models.ExplorationModel],
+            exp_models.ExplorationModel.get_all().fetch(),
+        )
+        datastore_services.delete_multi(
+            [model.key for model in exp_models_list]
+        )
+        # Here we use cast because we are narrowing down the type of models.
+        topic_models_list = cast(
+            List[topic_models.TopicModel],
+            topic_models.TopicModel.get_all().fetch(),
+        )
+        datastore_services.delete_multi(
+            [model.key for model in topic_models_list]
+        )
+        # Here we use cast because we are narrowing down the type of models.
+        story_models_list = cast(
+            List[story_models.StoryModel],
+            story_models.StoryModel.get_all().fetch(),
+        )
+        datastore_services.delete_multi(
+            [model.key for model in story_models_list]
+        )
+        # Here we use cast because we are narrowing down the type of models.
+        translation_models_list = cast(
+            List[translation_models.EntityTranslationsModel],
+            translation_models.EntityTranslationsModel.get_all().fetch(),
+        )
+        datastore_services.delete_multi(
+            [model.key for model in translation_models_list]
+        )
+
+        orphaned_model = opportunity_models.TranslationOpportunityModel(
+            id='exploration.exp_1',
+            entity_type=feconf.TranslatableEntityType.EXPLORATION.value,
+            entity_id=self.exp_id,
+            topic_ids=['topic_id'],
+            content_count=0,
+            incomplete_translation_language_codes=[],
+            translation_counts={},
+        )
+        orphaned_model.update_timestamps()
+        orphaned_model.put()
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'Audit Summary:\n'
+                        '- Matches: 0\n'
+                        '- Missing in Datastore: 0\n'
+                        '- Discrepancies: 0\n'
+                        '- Orphaned in Datastore: 1'
+                    )
+                ),
+            ]
+        )

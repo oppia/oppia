@@ -29,7 +29,7 @@ from core.platform import models
 
 import apache_beam as beam
 import result
-from typing import Dict, Iterable, Tuple, Union, cast
+from typing import Dict, Iterable, List, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -102,32 +102,35 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
                 grouped_data['translations'],
             )
         )
-        content_count = exp.get_content_count()
-
-        translation_counts = {}
-        for translation_model in translations:
-            lang_code = translation_model.language_code
-            count = 0
-            for translated_content in translation_model.translations.values():
-                if not translated_content['needs_update']:
-                    count += 1
-            translation_counts[lang_code] = count
-
-        audio_language_codes = set(
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
-        )
-        complete_languages = [
-            lang
-            for lang, count in translation_counts.items()
-            if count == content_count
-        ]
-        incomplete_translation_language_codes = sorted(
-            list(audio_language_codes - set(complete_languages))
-        )
-        if exp.language_code in incomplete_translation_language_codes:
-            incomplete_translation_language_codes.remove(exp.language_code)
-
         with datastore_services.get_ndb_context():
+            content_count = exp.get_content_count()
+
+            translation_counts = {}
+            for translation_model in translations:
+                lang_code = translation_model.language_code
+                count = 0
+                for (
+                    translated_content
+                ) in translation_model.translations.values():
+                    if not translated_content['needs_update']:
+                        count += 1
+                translation_counts[lang_code] = count
+
+            audio_language_codes = set(
+                language['id']
+                for language in constants.SUPPORTED_AUDIO_LANGUAGES
+            )
+            complete_languages = [
+                lang
+                for lang, count in translation_counts.items()
+                if count == content_count
+            ]
+            incomplete_translation_language_codes = sorted(
+                list(audio_language_codes - set(complete_languages))
+            )
+            if exp.language_code in incomplete_translation_language_codes:
+                incomplete_translation_language_codes.remove(exp.language_code)
+
             model = opportunity_models.TranslationOpportunityModel(
                 id=opportunity_models.TranslationOpportunityModel._generate_id(  # pylint: disable=protected-access
                     feconf.TranslatableEntityType.EXPLORATION.value, exp_id
@@ -142,7 +145,13 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
             model.update_timestamps()
         return result.Ok(model)
 
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+    def _compute_translation_opportunities(
+        self,
+    ) -> beam.PCollection[
+        result.Result[opportunity_models.TranslationOpportunityModel, str]
+    ]:
+        """Computes the new translation opportunity models from datastore."""
+
         def get_published_story_ids(
             topic: topic_domain.Topic,
         ) -> Iterable[str]:
@@ -226,11 +235,12 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
             'translations': entity_translations_pcoll,
         } | 'Group by exp_id' >> beam.CoGroupByKey()
 
-        created_models_results = (
-            grouped_data
-            | 'Create TranslationOpportunityModels'
-            >> beam.Map(self._create_translation_opportunity)
+        return grouped_data | 'Create TranslationOpportunityModels' >> beam.Map(
+            self._create_translation_opportunity
         )
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        created_models_results = self._compute_translation_opportunities()
 
         if self.DATASTORE_UPDATES_ALLOWED:
             unused_put_results = (
@@ -255,3 +265,111 @@ class AuditBackfillTranslationOpportunityModelJob(
     """Audit job for BackfillTranslationOpportunityModelJob."""
 
     DATASTORE_UPDATES_ALLOWED = False
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        created_models_results = self._compute_translation_opportunities()
+
+        computed_opp_models_pcoll = (
+            created_models_results
+            | 'Filter OK results' >> beam.Filter(lambda res: res.is_ok())
+            | 'Unwrap models' >> beam.Map(lambda res: res.unwrap())
+            | 'Map computed models' >> beam.Map(lambda model: (model.id, model))
+        )
+
+        existing_opp_models_pcoll = (
+            self.pipeline
+            | 'Get all TranslationOpportunityModels'
+            >> ndb_io.GetModels(
+                opportunity_models.TranslationOpportunityModel.get_all(
+                    include_deleted=False
+                )
+            )
+            | 'Map existing models' >> beam.Map(lambda model: (model.id, model))
+        )
+
+        def compare_models(
+            element: Tuple[
+                str,
+                Dict[
+                    str,
+                    Iterable[opportunity_models.TranslationOpportunityModel],
+                ],
+            ],
+        ) -> Iterable[Tuple[str, int]]:
+            opp_id, grouped_data = element
+            existing = list(grouped_data['existing'])
+            computed = list(grouped_data['computed'])
+
+            if not computed:
+                if existing:
+                    yield ('orphaned', 1)
+                return
+
+            comp_model = computed[0]
+            if not existing:
+                yield ('missing', 1)
+                return
+
+            exist_model = existing[0]
+            if (
+                exist_model.content_count != comp_model.content_count
+                or exist_model.translation_counts
+                != comp_model.translation_counts
+            ):
+                yield ('discrepancy', 1)
+                yield (
+                    f'error_details: Discrepancy for model {opp_id}: '
+                    f'Existing (content_count={exist_model.content_count}, '
+                    f'translation_counts={exist_model.translation_counts}), '
+                    f'Computed (content_count={comp_model.content_count}, '
+                    f'translation_counts={comp_model.translation_counts})',
+                    1,
+                )
+            else:
+                yield ('match', 1)
+
+        def generate_audit_results(
+            key_and_counts: Iterable[Tuple[str, int]],
+        ) -> Iterable[job_run_result.JobRunResult]:
+            totals: Dict[str, int] = {}
+            error_details: List[str] = []
+            for key, count in key_and_counts:
+                if key.startswith('error_details:'):
+                    error_details.append(key.split('error_details: ')[1])
+                else:
+                    totals[key] = totals.get(key, 0) + count
+
+            yield job_run_result.JobRunResult.as_stdout(
+                f'Audit Summary:\n'
+                f'- Matches: {totals.get("match", 0)}\n'
+                f'- Missing in Datastore: {totals.get("missing", 0)}\n'
+                f'- Discrepancies: {totals.get("discrepancy", 0)}\n'
+                f'- Orphaned in Datastore: {totals.get("orphaned", 0)}'
+            )
+
+            for detail in error_details:
+                yield job_run_result.JobRunResult.as_stderr(detail)
+
+        compare_results = (
+            {
+                'existing': existing_opp_models_pcoll,
+                'computed': computed_opp_models_pcoll,
+            }
+            | 'Group opp models' >> beam.CoGroupByKey()
+            | 'Compare models' >> beam.FlatMap(compare_models)
+            | 'Combine counts' >> beam.combiners.ToList()
+            | 'Generate audit results' >> beam.FlatMap(generate_audit_results)
+        )
+
+        summary_results = (
+            created_models_results
+            | 'Generate results'
+            >> job_result_transforms.ResultsToJobRunResults(
+                'TRANSLATION OPPORTUNITY MODEL CREATION'
+            )
+        )
+
+        return (
+            compare_results,
+            summary_results,
+        ) | 'Flatten results' >> beam.Flatten()
