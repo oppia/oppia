@@ -190,13 +190,13 @@ export class ExplorationEditor extends BaseUser {
       interactionToAdd as INTERACTION_TYPES
     );
 
-    await this.page.waitForResponse(response =>
-      response.url().includes('internetconnectivityhandler')
-    );
-
     await this.page.waitForLoadState('networkidle');
     // Use a higher timeout for math interactions as they are heavy to render.
     let tileText = interactionToAdd;
+    // Wait for active tab panel fade transition to complete.
+    await this.page.waitForSelector('css=.tab-pane.active.show', {
+      timeout: 90000,
+    });
 
     const interactionElement = await this.page.waitForSelector(
       `xpath=//*[contains(normalize-space(text()), "${tileText}")]`,
