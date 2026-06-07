@@ -15,7 +15,7 @@
 /**
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/spreadsheets/d/1IrxN13IC5xwWdAFnGMu_4p3FU1ADL4QO-eLZIuTowIA/edit?gid=1002825365#gid=1002825365
- * SE.1. Crawl the main Oppia pages
+ * SE.1. Crawl the main marketing and transactional pages
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -76,46 +76,30 @@ describe('Search Engine Bot', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should verify sitemap.xml',
+    'should discover the site map architecture, respect crawling restrictions,' +
+      ' and extract unique, high-fidelity metadata from core public pages',
     async function () {
-      await loggedOutUser.verifySitemapXml();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+      // Issue an HTTP GET request to oppia.org/sitemap.xml.
+      await loggedOutUser.navigateToSitemapXml();
+      await loggedOutUser.verifyCurrentPageStatus200();
+      await loggedOutUser.verifySitemapXmlContent();
 
-  it(
-    'should verify SEO metadata on Splash page',
-    async function () {
+      // Issue an HTTP GET request to the site root directory (oppia.org/).
       await loggedOutUser.navigateToSplashPage();
       await loggedOutUser.verifyCurrentPageStatus200();
       await loggedOutUser.verifySEOMetadata(SPLASH_SEO);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
 
-  it(
-    'should verify SEO metadata on Donate page',
-    async function () {
+      // Issue an HTTP GET request to oppia.org/donate.
       await loggedOutUser.navigateToDonatePage();
       await loggedOutUser.verifyCurrentPageStatus200();
       await loggedOutUser.verifySEOMetadata(DONATE_SEO);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
 
-  it(
-    'should verify SEO metadata on Volunteer page',
-    async function () {
+      // Issue an HTTP GET request to oppia.org/volunteer.
       await loggedOutUser.navigateToVolunteerPage();
       await loggedOutUser.verifyCurrentPageStatus200();
       await loggedOutUser.verifySEOMetadata(VOLUNTEER_SEO);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
 
-  it(
-    'should verify SEO metadata on Partnerships page',
-    async function () {
+      // Issue an HTTP GET request to oppia.org/partnerships.
       await loggedOutUser.navigateToPartnershipsPage();
       await loggedOutUser.verifyCurrentPageStatus200();
       await loggedOutUser.verifySEOMetadata(PARTNERSHIPS_SEO);

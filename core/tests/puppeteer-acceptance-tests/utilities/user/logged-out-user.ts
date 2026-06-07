@@ -967,6 +967,13 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to navigate to the Sitemap page.
+   */
+  async navigateToSitemapXml(): Promise<void> {
+    await this.goto(sitemapXmlUrl);
+  }
+
+  /**
    * Navigates to the splash page.
    * @param expectedURL - The expected URL after navigation. Defaults to `${baseUrl}/`.
    */
@@ -7415,20 +7422,9 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Fetches sitemap.xml and verifies it is valid XML containing URL entries.
+   * Verifies that sitemap.xml contains valid XML URL entries.
    */
-  async verifySitemapXml(): Promise<void> {
-    const response = await this.page.goto(sitemapXmlUrl, {
-      waitUntil: ['networkidle2', 'load'],
-      timeout: 60000,
-    });
-
-    if (response?.status() !== 200) {
-      throw new Error(
-        `Expected sitemap.xml to return status 200, but got ${response?.status()}.`
-      );
-    }
-
+  async verifySitemapXmlContent(): Promise<void> {
     if (!(await this.isTextPresentOnPage(sitemapXmlLocTag))) {
       throw new Error(
         `Expected sitemap.xml to contain "${sitemapXmlLocTag}" URL entries, but none were found.`
