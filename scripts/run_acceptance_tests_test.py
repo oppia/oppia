@@ -256,8 +256,32 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 {'env': expected_install_env},
             ],
         )
-        with check_call_swap:
+        os_path_exists_swap = self.swap(os.path, 'exists', lambda _: False)
+        with check_call_swap, os_path_exists_swap:
             run_acceptance_tests.install_playwright_dependencies()
+
+    def test_install_playwright_dependencies_skips_if_node_modules_exist(
+        self,
+    ) -> None:
+        playwright_dir = os.path.join(
+            common.CURR_DIR, 'core', 'tests', 'playwright-acceptance-tests'
+        )
+        playwright_node_modules = os.path.join(playwright_dir, 'node_modules')
+
+        check_call_called = []
+
+        def mock_check_call(*unused_args: str, **unused_kwargs: str) -> None:
+            check_call_called.append(True)
+
+        os_path_exists_swap = self.swap(
+            os.path, 'exists', lambda path: path == playwright_node_modules
+        )
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+
+        with os_path_exists_swap, check_call_swap:
+            run_acceptance_tests.install_playwright_dependencies()
+
+        self.assertEqual(check_call_called, [])
 
     def test_install_playwright_dependencies_failure(self) -> None:
         def mock_check_call_failure(
@@ -268,7 +292,8 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call_failure
         )
-        with check_call_swap:
+        os_path_exists_swap = self.swap(os.path, 'exists', lambda _: False)
+        with check_call_swap, os_path_exists_swap:
             with self.assertRaisesRegex(
                 subprocess.CalledProcessError,
                 'Command \'npm\' returned non-zero exit status 1.',

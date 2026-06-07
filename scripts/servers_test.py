@@ -1385,6 +1385,7 @@ class ManagedProcessTests(test_utils.TestBase):
         env = popen_calls[0].kwargs['env']
         self.assertEqual(env['MOBILE'], 'false')
         self.assertEqual(env['PROD_ENV'], 'false')
+        self.assertEqual(env['SPEC_NAME'], 'testSuite')
 
     def test_managed_acceptance_test_server_playwright_headless(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -1413,6 +1414,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertNotIn('--headed', program_args)
         env = popen_calls[0].kwargs['env']
         self.assertEqual(env['HEADLESS'], 'true')
+        self.assertEqual(env['SPEC_NAME'], 'testSuite')
 
     def test_managed_acceptance_test_server_playwright_mobile(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -1437,6 +1439,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
         env = popen_calls[0].kwargs['env']
         self.assertEqual(env['MOBILE'], 'true')
+        self.assertEqual(env['SPEC_NAME'], 'testSuite')
 
     def test_managed_acceptance_test_server_with_invalid_framework(
         self,
