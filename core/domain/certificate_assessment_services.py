@@ -95,11 +95,11 @@ def get_certificate_assessment_offerings() -> (
     List[certificate_assessment_domain.CertificateAssessmentOffering]
 ):
     """Returns all certificate assessment offerings from datastore."""
-    # Here use cast because the datastore fetch returns a generic sequence and
-    # mypy cannot infer the concrete CertificateAssessmentOfferingModel item
-    # type from this storage-layer API.
     certificate_assessment_offering_models: List[
         gae_models.CertificateAssessmentOfferingModel
+        # Here we use cast because the datastore fetch returns a generic sequence and
+        # mypy cannot infer the concrete CertificateAssessmentOfferingModel item
+        # type from this storage-layer API.
     ] = cast(
         List[gae_models.CertificateAssessmentOfferingModel],
         gae_models.CertificateAssessmentOfferingModel.get_all().fetch(),
