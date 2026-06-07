@@ -64,6 +64,7 @@
 import {
   Component,
   Output,
+  OnInit,
   AfterViewInit,
   EventEmitter,
   Injector,
@@ -181,7 +182,7 @@ export const registerCustomElements = (injector: Injector): void => {
   selector: 'oppia-angular-root',
   templateUrl: './oppia-angular-root.component.html',
 })
-export class OppiaAngularRootComponent implements AfterViewInit {
+export class OppiaAngularRootComponent implements OnInit, AfterViewInit {
   @Output() public initialized: EventEmitter<void> = new EventEmitter();
   direction: string = 'ltr';
 
@@ -227,6 +228,12 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     OppiaAngularRootComponent.rteElementsAreInitialized = true;
   }
 
+  public ngOnInit(): void {
+    this.i18nService.directionChangeEventEmitter.subscribe(direction => {
+      this.direction = direction;
+    });
+    this.i18nService.initialize();
+  }
   public ngAfterViewInit(): void {
     if (!OppiaAngularRootComponent.pageContextService) {
       OppiaAngularRootComponent.pageContextService = this.pageContextService;
@@ -304,12 +311,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
         ),
       },
     ]);
-
-    // Initialize translations.
-    this.i18nService.directionChangeEventEmitter.subscribe(direction => {
-      this.direction = direction;
-    });
-    this.i18nService.initialize();
 
     // This emit triggers ajs to start its app.
     this.initialized.emit();

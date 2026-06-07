@@ -30,6 +30,7 @@ from core.controllers import (
     blog_admin,
     blog_dashboard,
     blog_homepage,
+    certificate_assessment,
     classroom,
     collection_editor,
     collection_viewer,
@@ -47,6 +48,7 @@ from core.controllers import (
     feedback,
     feedback_updates,
     firebase,
+    general_feedback,
     improvements,
     incoming_app_feedback_report,
     learner_dashboard,
@@ -463,6 +465,10 @@ URLS = [
         contributor_dashboard.ContributionOpportunitiesHandler,
     ),
     get_redirect_route(
+        r'%s' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_V2_URL,
+        contributor_dashboard.ContributionOpportunitiesHandlerV2,
+    ),
+    get_redirect_route(
         r'/preferredtranslationlanguage',
         contributor_dashboard.TranslationPreferenceHandler,
     ),
@@ -471,12 +477,20 @@ URLS = [
         contributor_dashboard.ReviewableOpportunitiesHandler,
     ),
     get_redirect_route(
+        r'%s' % feconf.REVIEWABLE_OPPORTUNITIES_V2_URL,
+        contributor_dashboard.ReviewableOpportunitiesHandlerV2,
+    ),
+    get_redirect_route(
         r'%s' % feconf.PINNED_OPPORTUNITIES_URL,
         contributor_dashboard.LessonsPinningHandler,
     ),
     get_redirect_route(
         r'/gettranslatabletexthandler',
         contributor_dashboard.TranslatableTextHandler,
+    ),
+    get_redirect_route(
+        r'%s' % feconf.TRANSLATABLE_CONTENTS_V2_URL,
+        contributor_dashboard.TranslatableContentsHandlerV2,
     ),
     get_redirect_route(
         r'%s' % feconf.MACHINE_TRANSLATION_DATA_URL,
@@ -1044,6 +1058,14 @@ URLS = [
         feedback.FeedbackStatsHandler,
     ),
     get_redirect_route(
+        r'%s' % feconf.GENERAL_FEEDBACK_SUBMISSION_URL,
+        general_feedback.GeneralFeedbackSubmitHandler,
+    ),
+    get_redirect_route(
+        r'%s' % feconf.GENERAL_FEEDBACK_CAPTCHA_CONFIG_URL,
+        general_feedback.GeneralFeedbackCaptchaConfigHandler,
+    ),
+    get_redirect_route(
         r'%s/' % feconf.SUGGESTION_URL_PREFIX, suggestion.SuggestionHandler
     ),
     get_redirect_route(
@@ -1395,6 +1417,10 @@ URLS = [
     get_redirect_route(
         r'/exploration_voiceover_regeneration_status_url/<exploration_id>',
         voiceover.VoiceoverRegenerationRequestToCloudTaskHandler,
+    ),
+    get_redirect_route(
+        feconf.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER,
+        certificate_assessment.CertificateAssessmentOfferingHandler,
     ),
 ]
 

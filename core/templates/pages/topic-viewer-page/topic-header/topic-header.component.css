@@ -1,0 +1,87 @@
+/* NOTE to developers: We generate RTL CSS from this file in the webpack
+   compilation, here are some additional rules that can be added to the
+   CSS files: https://rtlcss.com/learn/usage-guide/control-directives/ */
+.topic-header-breadcrumbs {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.topic-header-breadcrumbs-desktop {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+}
+
+.topic-header-breadcrumbs-mobile {
+  display: none;
+}
+
+.topic-header-breadcrumbs a,
+.topic-header-breadcrumbs span {
+  color: #00645c;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.topic-header-breadcrumbs a:hover,
+.topic-header-breadcrumbs a:focus {
+  text-decoration: none;
+}
+
+.topic-header-breadcrumb-current {
+  color: #333;
+  font-weight: 400;
+}
+
+.topic-header-breadcrumb-study-skills {
+  color: #00645c;
+  font-weight: 500;
+}
+
+.topic-header {
+  background-color: #fff;
+  padding: 16px 0;
+}
+
+.topic-header.studyguide-view-active {
+  background-color: transparent;
+  padding-bottom: 4px;
+}
+
+.topic-header-title {
+  color: #00645c;
+  font-family: Capriola, sans-serif;
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 56px;
+}
+
+.topic-header-description {
+  color: #4a4a4a;
+  font-family: Roboto, Arial, sans-serif;
+  margin: 0;
+}
+
+.topic-header.studyguide-view-active .topic-header-title,
+.topic-header.studyguide-view-active .topic-header-description {
+  display: none;
+}
+@media (max-width: 767px) {
+  .topic-header-breadcrumbs-desktop {
+    display: none;
+  }
+  .topic-header-breadcrumbs-mobile {
+    align-items: center;
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+  .topic-header-title {
+    color: #00645c;
+    font-family: Capriola, sans-serif;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 32px;
+  }
+}

@@ -293,6 +293,26 @@ describe('NumberWithUnits', () => {
       );
     });
 
+    it('should parse number with comma as decimal separator', () => {
+      expect(NumberWithUnits.fromRawInputString('1,2 hr', ',')).toEqual(
+        new NumberWithUnits(
+          'real',
+          1.2,
+          new Fraction(false, 0, 0, 1),
+          Units.fromRawInputString('hr')
+        )
+      );
+
+      expect(NumberWithUnits.fromRawInputString('2,5 kg / m^3', ',')).toEqual(
+        new NumberWithUnits(
+          'real',
+          2.5,
+          new Fraction(false, 0, 0, 1),
+          Units.fromRawInputString('kg / m^3')
+        )
+      );
+    });
+
     it('should throw errors for invalid number with units', () => {
       expect(() => {
         NumberWithUnits.fromRawInputString('3* kg');
