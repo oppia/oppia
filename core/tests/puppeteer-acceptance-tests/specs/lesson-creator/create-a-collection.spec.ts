@@ -84,7 +84,7 @@ describe('LC.12 Visit Creator Dashboard', function () {
 
     await learner.rateExploration(5, 'Great Lesson', false);
 
-    await learner.navigateToCommunityLibraryPage();
+    await learner.returnToLibraryFromExplorationCompletion();
 
     await learner.playExploration(positiveNumbersExplorationId);
 
