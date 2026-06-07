@@ -336,8 +336,8 @@ class CreatorFeedbackListHandler(
         now_msecs = utils.get_current_time_in_millisecs()
         three_months_ago_msecs = now_msecs - 90 * 24 * 60 * 60 * 1000
 
-        date_from_msecs = req.get('date_from_msecs')
-        date_to_msecs = req.get('date_to_msecs')
+        date_from_msecs: float | None = req.get('date_from_msecs')
+        date_to_msecs: float | None = req.get('date_to_msecs')
 
         if date_from_msecs is None:
             date_from_msecs = three_months_ago_msecs
@@ -450,10 +450,24 @@ class CreatorFeedbackDetailHandler(
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id
         )
+        thread_dict = thread.to_dict()
         feedback_dict: (
             general_feedback_domain.CreatorFeedbackDetailHandlerNormalizedResponseDict
         ) = {
-            **thread.to_dict(),
+            'id': thread_dict['id'],
+            'category': thread_dict['category'],
+            'description': thread_dict['description'],
+            'page_url': thread_dict['page_url'],
+            'language_code': thread_dict['language_code'],
+            'status': thread_dict['status'],
+            'rating': thread_dict['rating'],
+            'target_type': thread_dict['target_type'],
+            'target_id': thread_dict['target_id'],
+            'has_screenshot': thread_dict['has_screenshot'],
+            'user_id': thread_dict['user_id'],
+            'message_count': thread_dict['message_count'],
+            'messages': thread_dict['messages'],
+            'created_on_msecs': thread_dict['created_on_msecs'],
             # Session info is restricted in creator-facing endpoint.
             'session_info': None,
             'can_edit_exploration': bool(

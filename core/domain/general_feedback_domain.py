@@ -245,8 +245,8 @@ class CreatorFeedbackListHandlerNormalizedRequestDict(TypedDict):
     """
 
     cursor: Optional[str]
-    date_from_msecs: Optional[int]
-    date_to_msecs: Optional[int]
+    date_from_msecs: Optional[float]
+    date_to_msecs: Optional[float]
     status_filter: Optional[str]
 
 
@@ -262,4 +262,6 @@ class CreatorFeedbackDetailHandlerNormalizedPayloadDict(TypedDict):
 
 
 class CreatorFeedbackDetailHandlerNormalizedResponseDict(WebFeedbackThreadDict):
+    """Dict representation of CreatorFeedbackDetailHandler's response."""
+
     can_edit_exploration: bool
