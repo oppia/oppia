@@ -876,6 +876,8 @@ def managed_acceptance_tests_server(
     module = suite_config['module']
     framework = suite_config['framework']
 
+    # TODO(#24715): Remove the puppeteer framework once the
+    # migration from Puppeteer to Playwright is complete.
     if framework == 'puppeteer':
         os.environ['HEADLESS'] = 'true' if headless else 'false'
         os.environ['MOBILE'] = 'true' if mobile else 'false'
@@ -928,6 +930,7 @@ def managed_acceptance_tests_server(
             'HEADLESS': 'true' if headless else 'false',
             'MOBILE': 'true' if mobile else 'false',
             'PROD_ENV': 'true' if prod_env else 'false',
+            'SPEC_NAME': suite_name,
         }
         playwright_args = [
             playwright_bin,
