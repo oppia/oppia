@@ -21,7 +21,7 @@ from __future__ import annotations
 from core.domain import certificate_assessment_domain
 from core.storage.certificate_assessment import gae_models
 
-from typing import List
+from typing import List, cast
 
 
 def _model_to_domain(
@@ -48,10 +48,10 @@ def create_certificate_assessment_offering(
     title: str,
     description: str,
     classroom_id: str,
-    topic_ids: List[str],
+    topic_ids: list[str],
     total_questions: int,
     time_limit_in_minutes: int,
-    demonstrates: List[str],
+    demonstrates: list[str],
     async_status: str,
 ) -> certificate_assessment_domain.CertificateAssessmentOffering:
     """Creates and stores a certificate assessment offering."""
@@ -95,8 +95,14 @@ def get_certificate_assessment_offerings() -> (
     List[certificate_assessment_domain.CertificateAssessmentOffering]
 ):
     """Returns all certificate assessment offerings from datastore."""
-    certificate_assessment_offering_models = (
-        gae_models.CertificateAssessmentOfferingModel.get_all().fetch()
+    # Here use cast because the datastore fetch returns a generic sequence and
+    # mypy cannot infer the concrete CertificateAssessmentOfferingModel item
+    # type from this storage-layer API.
+    certificate_assessment_offering_models: List[
+        gae_models.CertificateAssessmentOfferingModel
+    ] = cast(
+        List[gae_models.CertificateAssessmentOfferingModel],
+        gae_models.CertificateAssessmentOfferingModel.get_all().fetch(),
     )
     return [
         _model_to_domain(certificate_assessment_offering_model)

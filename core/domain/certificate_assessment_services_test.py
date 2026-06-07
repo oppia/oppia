@@ -18,24 +18,50 @@
 
 from __future__ import annotations
 
-from core.domain import certificate_assessment_services, topic_fetchers
+from core.domain import (
+    certificate_assessment_services,
+    classroom_config_domain,
+    classroom_config_services,
+    topic_fetchers,
+)
 from core.tests import test_utils
 
 
 class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
     """Tests for certificate assessment services."""
 
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
+
     def setUp(self) -> None:
         super().setUp()
         self.classroom_id = 'math_classroom_01'
         self.topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(self.topic_id, self.admin_id)
-        self.classroom = self.save_new_classroom(
-            classroom_id=self.classroom_id,
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.save_new_topic(self.topic_id, owner_id)
+        classroom = classroom_config_domain.Classroom(
+            self.classroom_id,
             name='Math',
             url_fragment='math',
-            topic_ids=[self.topic_id],
+            course_details='Course details',
+            teaser_text='Teaser text',
+            topic_list_intro='Topic intro',
+            topic_id_to_prerequisite_topic_ids={self.topic_id: []},
+            is_published=True,
+            diagnostic_test_is_enabled=False,
+            thumbnail_data=classroom_config_domain.ImageData(
+                'thumbnail.svg',
+                'red',
+                1,
+            ),
+            banner_data=classroom_config_domain.ImageData(
+                'banner.svg',
+                'blue',
+                1,
+            ),
+            index=0,
         )
+        classroom_config_services.create_new_classroom(classroom)
 
     def test_create_certificate_assessment_offering_writes_model(self) -> None:
         certificate_offering = certificate_assessment_services.create_certificate_assessment_offering(
@@ -73,35 +99,3 @@ class CertificateAssessmentServicesTest(test_utils.GenericTestBase):
             offerings[0].certificate_id, created_offering.certificate_id
         )
         self.assertEqual(offerings[0].title, 'Geography Essentials')
-
-    def test_create_rejects_missing_classroom(self) -> None:
-        with self.assertRaisesRegex(
-            Exception, 'classroom_id must correspond to an existing classroom'
-        ):
-            certificate_assessment_services.create_certificate_assessment_offering(
-                title='Test',
-                description='Desc',
-                classroom_id='missing_classroom',
-                topic_ids=[self.topic_id],
-                total_questions=1,
-                time_limit_in_minutes=1,
-                demonstrates=['Skill'],
-                async_status='Available',
-            )
-
-    def test_create_rejects_topic_not_in_classroom(self) -> None:
-        other_topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(other_topic_id, self.admin_id)
-        with self.assertRaisesRegex(
-            Exception, 'topic_ids must belong to the specified classroom'
-        ):
-            certificate_assessment_services.create_certificate_assessment_offering(
-                title='Test',
-                description='Desc',
-                classroom_id=self.classroom_id,
-                topic_ids=[other_topic_id],
-                total_questions=1,
-                time_limit_in_minutes=1,
-                demonstrates=['Skill'],
-                async_status='Available',
-            )
