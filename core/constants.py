@@ -1,4 +1,4 @@
-# coding: utf-8
+# coding: utf-8 testing
 #
 # Copyright 2017 The Oppia Authors. All Rights Reserved.
 #
