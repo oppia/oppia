@@ -83,10 +83,55 @@ class CertificateAssessmentOfferingTest(test_utils.GenericTestBase):
 
     def test_validate_raises_not_implemented_error(self) -> None:
         offering = self._get_sample_offering()
+        offering.validate()
+
+    def test_validate_rejects_empty_title(self) -> None:
+        offering = self._get_sample_offering()
+        offering.title = '   '
+
+        with self.assertRaisesRegex(Exception, 'title must be a non-empty'):
+            offering.validate()
+
+    def test_validate_rejects_long_title(self) -> None:
+        offering = self._get_sample_offering()
+        offering.title = 'a' * 81
+
+        with self.assertRaisesRegex(Exception, 'title must be at most 80'):
+            offering.validate()
+
+    def test_validate_rejects_long_description(self) -> None:
+        offering = self._get_sample_offering()
+        offering.description = 'a' * 501
+
         with self.assertRaisesRegex(
-            NotImplementedError,
-            'validate\\(\\) is not yet implemented for '
-            'CertificateAssessmentOffering',
+            Exception, 'description must be at most 500'
+        ):
+            offering.validate()
+
+    def test_validate_rejects_too_many_questions(self) -> None:
+        offering = self._get_sample_offering()
+        offering.total_questions = 51
+
+        with self.assertRaisesRegex(
+            Exception, 'total_questions must be at most 50'
+        ):
+            offering.validate()
+
+    def test_validate_rejects_too_long_time_limit(self) -> None:
+        offering = self._get_sample_offering()
+        offering.time_limit_in_minutes = 61
+
+        with self.assertRaisesRegex(
+            Exception, 'time_limit_in_minutes must be at most 60'
+        ):
+            offering.validate()
+
+    def test_validate_rejects_empty_demonstrates(self) -> None:
+        offering = self._get_sample_offering()
+        offering.demonstrates = []
+
+        with self.assertRaisesRegex(
+            Exception, 'demonstrates must contain at least one item'
         ):
             offering.validate()
 
