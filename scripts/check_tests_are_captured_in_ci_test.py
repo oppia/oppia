@@ -134,11 +134,6 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             'PLAYWRIGHT_ACCEPTANCE_TEST_SPECS_DIRECTORY',
             self.dummy_playwright_acceptance_specs_directory,
         )
-        self.playwright_acceptance_test_specs_directory_swap = self.swap(
-            check_tests_are_captured_in_ci,
-            'PLAYWRIGHT_ACCEPTANCE_TEST_SPECS_DIRECTORY',
-            self.dummy_playwright_acceptance_specs_directory,
-        )
 
     def tearDown(self) -> None:
         super().tearDown()

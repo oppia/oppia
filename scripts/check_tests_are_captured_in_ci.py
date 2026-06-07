@@ -45,9 +45,6 @@ ACCEPTANCE_TEST_SPECS_DIRECTORY = os.path.join(
 PLAYWRIGHT_ACCEPTANCE_TEST_SPECS_DIRECTORY = os.path.join(
     os.getcwd(), 'core', 'tests', 'playwright-acceptance-tests', 'specs'
 )
-PLAYWRIGHT_ACCEPTANCE_TEST_SPECS_DIRECTORY = os.path.join(
-    os.getcwd(), 'core', 'tests', 'playwright-acceptance-tests', 'specs'
-)
 E2E_WEBDRIVERIO_CONFIG_FILE_PATH = os.path.join(
     os.getcwd(), 'core', 'tests', 'wdio.conf.js'
 )
