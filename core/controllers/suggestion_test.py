@@ -29,6 +29,7 @@ from core.domain import (
     exp_services,
     feedback_services,
     fs_services,
+    opportunity_domain,
     opportunity_services,
     question_domain,
     question_services,
@@ -41,6 +42,7 @@ from core.domain import (
     suggestion_registry,
     suggestion_services,
     topic_domain,
+    topic_fetchers,
     topic_services,
     translation_domain,
     user_services,
@@ -3602,6 +3604,284 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             },
         )
         self.assertEqual(response, {})
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_exploration_handler_returns_data_with_new_opportunity_models_coverage_edge_cases(
+        self,
+    ) -> None:
+        self.login(self.AUTHOR_EMAIL)
+
+        # 1. Setup 'exp_no_opp' (will have no translation opportunity).
+        self.save_new_valid_exploration(
+            'exp_no_opp',
+            self.owner_id,
+            title='Exploration title no opp',
+            category='Algebra',
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, 'exp_no_opp')
+
+        self.login(self.EDITOR_EMAIL)
+        exp_services.update_exploration(
+            self.owner_id,
+            'exp_no_opp',
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'Introduction',
+                        'new_value': {
+                            'content_id': 'content_0',
+                            'html': '<p>new content html</p>',
+                        },
+                    }
+                )
+            ],
+            'Add content',
+        )
+        self.logout()
+
+        self.login(self.AUTHOR_EMAIL)
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_EXPLORATION: ['exp_no_opp']}
+        )
+        csrf_token = self.get_new_csrf_token()
+        allowed_language_codes = [
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+        ]
+        dummy_opp_no_opp = opportunity_domain.ExplorationOpportunitySummary(
+            'exp_no_opp',
+            self.TOPIC_ID,
+            'Topic',
+            self.STORY_ID,
+            'Story',
+            'Node',
+            1,
+            allowed_language_codes,
+            {},
+            [],
+            [],
+            {},
+        )
+        with self.swap(
+            opportunity_services,
+            'get_exploration_opportunity_summary_by_id',
+            lambda exp_id: dummy_opp_no_opp,
+        ):
+            self.post_json(
+                '%s/' % feconf.SUGGESTION_URL_PREFIX,
+                {
+                    'suggestion_type': (
+                        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                    ),
+                    'target_type': (feconf.ENTITY_TYPE_EXPLORATION),
+                    'target_id': 'exp_no_opp',
+                    'target_version_at_submission': 1,
+                    'change_cmd': {
+                        'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                        'state_name': 'Introduction',
+                        'content_id': 'content_0',
+                        'language_code': 'hi',
+                        'content_html': '<p>new content html</p>',
+                        'translation_html': '<p>new content html in Hindi</p>',
+                        'data_format': 'html',
+                    },
+                    'description': 'Adds translation for no opp',
+                },
+                csrf_token=csrf_token,
+            )
+
+        # 2. Setup 'exp_empty_topics' (opportunity but no topics / story).
+        self.save_new_valid_exploration(
+            'exp_empty_topics',
+            self.owner_id,
+            title='Exploration title empty topics',
+            category='Algebra',
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, 'exp_empty_topics')
+
+        self.login(self.EDITOR_EMAIL)
+        exp_services.update_exploration(
+            self.owner_id,
+            'exp_empty_topics',
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'Introduction',
+                        'new_value': {
+                            'content_id': 'content_0',
+                            'html': '<p>new content html</p>',
+                        },
+                    }
+                )
+            ],
+            'Add content',
+        )
+        self.logout()
+
+        self.login(self.AUTHOR_EMAIL)
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_EXPLORATION: ['exp_empty_topics']}
+        )
+
+        csrf_token = self.get_new_csrf_token()
+        allowed_language_codes = [
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+        ]
+        dummy_opp_empty = opportunity_domain.ExplorationOpportunitySummary(
+            'exp_empty_topics',
+            self.TOPIC_ID,
+            'Topic',
+            self.STORY_ID,
+            'Story',
+            'Node',
+            1,
+            allowed_language_codes,
+            {},
+            [],
+            [],
+            {},
+        )
+        with self.swap(
+            opportunity_services,
+            'get_exploration_opportunity_summary_by_id',
+            lambda exp_id: dummy_opp_empty,
+        ):
+            self.post_json(
+                '%s/' % feconf.SUGGESTION_URL_PREFIX,
+                {
+                    'suggestion_type': (
+                        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                    ),
+                    'target_type': (feconf.ENTITY_TYPE_EXPLORATION),
+                    'target_id': 'exp_empty_topics',
+                    'target_version_at_submission': 1,
+                    'change_cmd': {
+                        'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                        'state_name': 'Introduction',
+                        'content_id': 'content_0',
+                        'language_code': 'hi',
+                        'content_html': '<p>new content html</p>',
+                        'translation_html': '<p>new content html in Hindi</p>',
+                        'data_format': 'html',
+                    },
+                    'description': 'Adds translation for empty topics',
+                },
+                csrf_token=csrf_token,
+            )
+
+        # 3. Setup 'exp_not_in_targets' (maps in topic summary but has no suggestions).
+        self.save_new_valid_exploration(
+            'exp_not_in_targets',
+            self.owner_id,
+            title='Exploration title not in targets',
+            category='Algebra',
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, 'exp_not_in_targets')
+
+        story_services.update_story(
+            self.owner_id,
+            self.STORY_ID,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': 'add_story_node',
+                        'node_id': 'node_2',
+                        'title': 'Node2',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': 'update_story_node_property',
+                        'property_name': 'exploration_id',
+                        'node_id': 'node_2',
+                        'old_value': None,
+                        'new_value': 'exp_not_in_targets',
+                    }
+                ),
+            ],
+            'Add node 2',
+        )
+
+        # Re-generate topic summary with the new mapping.
+        topic_services.generate_topic_summary(self.TOPIC_ID)
+
+        # 4. Swaps to cover edge cases:
+        # - ts is None inside topic_summaries
+        # - t_id not in topic_summary_map (using a mock invalid topic ID)
+        # - story_node is None (swap get_node_with_corresponding_exp_id to return None)
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
+
+        def mock_get_all_topic_summaries():
+            return [None] + topic_summaries
+
+        orig_get_opps = (
+            opportunity_services.get_translation_opportunities_by_entity_ids
+        )
+
+        def mock_get_translation_opportunities_by_entity_ids(
+            entity_type, entity_ids
+        ):
+            opps = orig_get_opps(entity_type, entity_ids)
+            if self.EXP_ID in opps and opps[self.EXP_ID] is not None:
+                opps[self.EXP_ID].topic_ids = ['invalid_topic_id'] + opps[
+                    self.EXP_ID
+                ].topic_ids
+            if 'exp_no_opp' in opps:
+                opps['exp_no_opp'] = None
+            return opps
+
+        with self.swap(
+            topic_fetchers,
+            'get_all_topic_summaries',
+            mock_get_all_topic_summaries,
+        ), self.swap(
+            opportunity_services,
+            'get_translation_opportunities_by_entity_ids',
+            mock_get_translation_opportunities_by_entity_ids,
+        ), self.swap(
+            story_domain.StoryContents,
+            'get_node_with_corresponding_exp_id',
+            lambda *args, **kwargs: None,
+        ):
+            response = self.get_json(
+                '/getsubmittedsuggestions/exploration/translate_content',
+                {
+                    'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                    'offset': 0,
+                    'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                },
+            )
+
+        self.assertEqual(len(response['suggestions']), 3)
+
+        # 5. Swap get_all_topic_summaries to empty list to cover story_ids is empty branch.
+        def mock_get_all_topic_summaries_empty():
+            return []
+
+        with self.swap(
+            topic_fetchers,
+            'get_all_topic_summaries',
+            mock_get_all_topic_summaries_empty,
+        ):
+            response = self.get_json(
+                '/getsubmittedsuggestions/exploration/translate_content',
+                {
+                    'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                    'offset': 0,
+                    'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                },
+            )
+        self.assertEqual(len(response['suggestions']), 3)
 
     def test_skill_handler_returns_data(self) -> None:
         self.login(self.AUTHOR_EMAIL)
