@@ -653,6 +653,55 @@ indexes:
   - name: realtime_layer
   - name: created_on
 
+- kind: WebFeedbackThreadModel
+  properties:
+  - name: deleted
+  - name: status
+  - name: created_on
+    direction: desc
+
+- kind: WebFeedbackThreadModel
+  properties:
+  - name: category
+  - name: deleted
+  - name: status
+  - name: target_id
+  - name: target_type
+  - name: created_on
+    direction: desc
+
+- kind: WebFeedbackThreadModel
+  properties:
+  - name: category
+  - name: deleted
+  - name: target_id
+  - name: target_type
+  - name: created_on
+    direction: desc
+
+- kind: WebFeedbackThreadModel
+  properties:
+  - name: category
+  - name: deleted
+  - name: original_author_id
+  - name: target_type
+  - name: created_on
+    direction: desc
+
+- kind: WebFeedbackThreadModel
+  properties:
+  - name: category
+  - name: deleted
+  - name: status
+  - name: created_on
+    direction: desc
+
+- kind: WebFeedbackThreadModel
+  properties:
+  - name: deleted
+  - name: created_on
+    direction: desc
+
 - kind: _AE_Pipeline_Record
   properties:
   - name: is_root_pipeline
