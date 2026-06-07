@@ -55,7 +55,7 @@ def create_certificate_assessment_offering(
     async_status: str,
 ) -> certificate_assessment_domain.CertificateAssessmentOffering:
     """Creates and stores a certificate assessment offering."""
-    # TODO(#): Re-enable classroom and topic existence checks once the
+    # TODO(#24717-M1.14): Re-enable classroom and topic existence checks once the
     # frontend create flow sends real classroom/topic selections instead of
     # temporary hardcoded stub values.
 
