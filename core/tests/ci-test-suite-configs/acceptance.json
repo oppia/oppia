@@ -217,7 +217,8 @@
     },
     {
       "name": "logged-out-user/crawl-main-oppia-pages",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/crawl-main-oppia-pages.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/crawl-main-oppia-pages.spec.ts",
+      "framework": "puppeteer"
     },
     {
       "name": "logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers",
