@@ -285,10 +285,29 @@ export class LoggedOutUser extends BaseUser {
         );
       }
 
-      await this.waitForElementToBeClickable(
-        searchResultsElements[lessonIndex]
-      );
-      await searchResultsElements[lessonIndex].click();
+      const targetElement = searchResultsElements[lessonIndex];
+
+      const debugInfo = await this.page.evaluate(el => {
+        const navbar = document.querySelector(
+          '.navbar-container'
+        ) as HTMLElement;
+        const navbarRect = navbar?.getBoundingClientRect();
+        const cardRect = el.getBoundingClientRect();
+        const centerX = cardRect.left + cardRect.width / 2;
+        const centerY = cardRect.top + cardRect.height / 2;
+        return {
+          navbarBottom: navbarRect?.bottom,
+          cardTop: cardRect.top,
+          cardCenterY: centerY,
+          elementAtCardCenter: document.elementFromPoint(centerX, centerY)
+            ?.className,
+          scrollY: window.scrollY,
+        };
+      }, targetElement);
+      showMessage(`Pre-click debug: ${JSON.stringify(debugInfo)}`);
+
+      await this.waitForElementToBeClickable(targetElement);
+      await targetElement.click();
       await this.waitForStaticAssetsToLoad();
 
       await this.page.waitForSelector(lessonCardTitleSelector, {
