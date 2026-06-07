@@ -2953,7 +2953,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             ),
         ]
     )
-    def test_error_cases_when_can_send_emails_param_is_false(self) -> None:
+    def test_error_cases_for_moderator_email_actions(self) -> None:
         # Log in as a moderator.
         self.login(self.MODERATOR_EMAIL)
 
@@ -3010,7 +3010,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             ),
         ]
     )
-    def test_error_cases_when_can_send_emails_param_is_true(self) -> None:
+    def test_successful_moderator_email_action(self) -> None:
         # Log in as a moderator.
         self.login(self.MODERATOR_EMAIL)
 
