@@ -69,25 +69,9 @@ describe('Beam Jobs Tab Component', () => {
   const bazJob = new BeamJob('BazJob');
   const beamJobs = [fooJob, barJob, bazJob];
 
-  const runningFooJob = new BeamJobRun(
-    '123',
-    'FooJob',
-    'RUNNING',
-    0,
-    0,
-    false,
-    null
-  );
-  const pendingBarJob = new BeamJobRun(
-    '456',
-    'BarJob',
-    'PENDING',
-    0,
-    0,
-    false,
-    null
-  );
-  const doneBarJob = new BeamJobRun('789', 'BarJob', 'DONE', 0, 0, false, null);
+  const runningFooJob = new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false);
+  const pendingBarJob = new BeamJobRun('456', 'BarJob', 'PENDING', 0, 0, false);
+  const doneBarJob = new BeamJobRun('789', 'BarJob', 'DONE', 0, 0, false);
   const beamJobRuns = [runningFooJob, pendingBarJob, doneBarJob];
   const terminalBeamJobRuns = [doneBarJob];
 
@@ -125,21 +109,9 @@ describe('Beam Jobs Tab Component', () => {
               getBeamJobs: () => of(beamJobs),
               getBeamJobRuns: () => of(beamJobRuns),
               startNewBeamJob: () =>
-                of(
-                  new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false, null)
-                ),
+                of(new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false)),
               cancelBeamJobRun: () =>
-                of(
-                  new BeamJobRun(
-                    '123',
-                    'FooJob',
-                    'CANCELLED',
-                    0,
-                    0,
-                    false,
-                    null
-                  )
-                ),
+                of(new BeamJobRun('123', 'FooJob', 'CANCELLED', 0, 0, false)),
               getBeamJobRunOutput: () => of(new BeamJobRunResult('abc', '123')),
             } as Partial<ReleaseCoordinatorBackendApiService>
           ),

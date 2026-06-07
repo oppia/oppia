@@ -42,7 +42,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('View beam job output dialog', () => {
-  const beamJobRun = new BeamJobRun('123', 'FooJob', 'DONE', 0, 0, false, null);
+  const beamJobRun = new BeamJobRun('123', 'FooJob', 'DONE', 0, 0, false);
 
   let fixture: ComponentFixture<ViewBeamJobOutputDialogComponent>;
   let component: ViewBeamJobOutputDialogComponent;

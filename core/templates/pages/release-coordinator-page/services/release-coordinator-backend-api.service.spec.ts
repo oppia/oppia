@@ -194,7 +194,7 @@ describe('Release coordinator backend api service', () => {
     flushMicrotasks();
 
     expect(await beamJobRunsPromise).toEqual([
-      new BeamJobRun('abc', 'FooJob', 'RUNNING', 0, 0, false, null),
+      new BeamJobRun('abc', 'FooJob', 'RUNNING', 0, 0, false),
     ]);
   }));
 
@@ -215,20 +215,12 @@ describe('Release coordinator backend api service', () => {
     flushMicrotasks();
 
     expect(await beamJobRunPromise).toEqual(
-      new BeamJobRun('abc', 'FooJob', 'RUNNING', 0, 0, false, null)
+      new BeamJobRun('abc', 'FooJob', 'RUNNING', 0, 0, false)
     );
   }));
 
   it('should cancel a running beam job', fakeAsync(async () => {
-    const beamJobRun = new BeamJobRun(
-      'abc',
-      'FooJob',
-      'RUNNING',
-      0,
-      0,
-      false,
-      null
-    );
+    const beamJobRun = new BeamJobRun('abc', 'FooJob', 'RUNNING', 0, 0, false);
     const beamJobRunPromise = rcbas.cancelBeamJobRun(beamJobRun).toPromise();
     const req = httpTestingController.expectOne('/beam_job_run?job_id=abc');
     expect(req.request.method).toEqual('DELETE');
@@ -243,20 +235,12 @@ describe('Release coordinator backend api service', () => {
     flushMicrotasks();
 
     expect(await beamJobRunPromise).toEqual(
-      new BeamJobRun('abc', 'FooJob', 'CANCELLING', 0, 0, false, null)
+      new BeamJobRun('abc', 'FooJob', 'CANCELLING', 0, 0, false)
     );
   }));
 
   it('should get the output of a beam job run', fakeAsync(async () => {
-    const beamJobRun = new BeamJobRun(
-      'abc',
-      'FooJob',
-      'DONE',
-      0,
-      0,
-      false,
-      null
-    );
+    const beamJobRun = new BeamJobRun('abc', 'FooJob', 'DONE', 0, 0, false);
     const resultPromise = rcbas.getBeamJobRunOutput(beamJobRun).toPromise();
     const req = httpTestingController.expectOne(
       '/beam_job_run_result?job_id=abc'

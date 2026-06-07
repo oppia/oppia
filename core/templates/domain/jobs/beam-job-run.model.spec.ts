@@ -60,15 +60,7 @@ describe('Beam Job Run', () => {
   });
 
   describe('That is running', () => {
-    const beamJobRun = new BeamJobRun(
-      '123',
-      'FooJob',
-      'RUNNING',
-      0,
-      0,
-      true,
-      null
-    );
+    const beamJobRun = new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, true);
 
     it('should return the appropriate material tooltip', () => {
       expect(beamJobRun.getJobStatusTooltipString()).toEqual('Running...');
@@ -100,15 +92,7 @@ describe('Beam Job Run', () => {
   });
 
   describe('That is done', () => {
-    const beamJobRun = new BeamJobRun(
-      '123',
-      'FooJob',
-      'DONE',
-      0,
-      0,
-      true,
-      null
-    );
+    const beamJobRun = new BeamJobRun('123', 'FooJob', 'DONE', 0, 0, true);
 
     it('should return the appropriate material tooltip', () => {
       expect(beamJobRun.getJobStatusTooltipString()).toEqual('Done!');
@@ -140,15 +124,7 @@ describe('Beam Job Run', () => {
   });
 
   describe('That is failed', () => {
-    const beamJobRun = new BeamJobRun(
-      '123',
-      'FooJob',
-      'FAILED',
-      0,
-      0,
-      true,
-      null
-    );
+    const beamJobRun = new BeamJobRun('123', 'FooJob', 'FAILED', 0, 0, true);
 
     it('should return the appropriate material tooltip', () => {
       expect(beamJobRun.getJobStatusTooltipString()).toEqual('Failed!');
@@ -180,15 +156,7 @@ describe('Beam Job Run', () => {
   });
 
   describe('That is cancelled', () => {
-    const beamJobRun = new BeamJobRun(
-      '123',
-      'FooJob',
-      'CANCELLED',
-      0,
-      0,
-      true,
-      null
-    );
+    const beamJobRun = new BeamJobRun('123', 'FooJob', 'CANCELLED', 0, 0, true);
 
     it('should return the appropriate material tooltip', () => {
       expect(beamJobRun.getJobStatusTooltipString()).toEqual('Cancelled');
@@ -220,15 +188,7 @@ describe('Beam Job Run', () => {
   });
 
   describe('That is unknown', () => {
-    const beamJobRun = new BeamJobRun(
-      '123',
-      'FooJob',
-      'UNKNOWN',
-      0,
-      0,
-      true,
-      null
-    );
+    const beamJobRun = new BeamJobRun('123', 'FooJob', 'UNKNOWN', 0, 0, true);
 
     it('should return the appropriate material tooltip', () => {
       expect(beamJobRun.getJobStatusTooltipString()).toEqual('Unknown');
@@ -260,15 +220,7 @@ describe('Beam Job Run', () => {
   });
 
   describe('That is updated', () => {
-    const beamJobRun = new BeamJobRun(
-      '123',
-      'FooJob',
-      'UPDATED',
-      0,
-      0,
-      true,
-      null
-    );
+    const beamJobRun = new BeamJobRun('123', 'FooJob', 'UPDATED', 0, 0, true);
 
     it('should return the appropriate material tooltip', () => {
       expect(beamJobRun.getJobStatusTooltipString()).toEqual('Updated');
@@ -302,15 +254,7 @@ describe('Beam Job Run', () => {
   });
 
   describe('That is draining', () => {
-    const beamJobRun = new BeamJobRun(
-      '123',
-      'FooJob',
-      'DRAINING',
-      0,
-      0,
-      true,
-      null
-    );
+    const beamJobRun = new BeamJobRun('123', 'FooJob', 'DRAINING', 0, 0, true);
 
     it('should return the appropriate material tooltip', () => {
       expect(beamJobRun.getJobStatusTooltipString()).toEqual('Draining...');
@@ -344,15 +288,7 @@ describe('Beam Job Run', () => {
   });
 
   describe('That is drained', () => {
-    const beamJobRun = new BeamJobRun(
-      '123',
-      'FooJob',
-      'DRAINED',
-      0,
-      0,
-      true,
-      null
-    );
+    const beamJobRun = new BeamJobRun('123', 'FooJob', 'DRAINED', 0, 0, true);
 
     it('should return the appropriate material tooltip', () => {
       expect(beamJobRun.getJobStatusTooltipString()).toEqual('Drained');
@@ -386,15 +322,7 @@ describe('Beam Job Run', () => {
   });
 
   describe('That is stopped', () => {
-    const beamJobRun = new BeamJobRun(
-      '123',
-      'FooJob',
-      'STOPPED',
-      0,
-      0,
-      true,
-      null
-    );
+    const beamJobRun = new BeamJobRun('123', 'FooJob', 'STOPPED', 0, 0, true);
 
     it('should return the appropriate material tooltip', () => {
       expect(beamJobRun.getJobStatusTooltipString()).toEqual('Paused');
@@ -426,15 +354,7 @@ describe('Beam Job Run', () => {
   });
 
   describe('That is pending', () => {
-    const beamJobRun = new BeamJobRun(
-      '123',
-      'FooJob',
-      'PENDING',
-      0,
-      0,
-      true,
-      null
-    );
+    const beamJobRun = new BeamJobRun('123', 'FooJob', 'PENDING', 0, 0, true);
 
     it('should return the appropriate material tooltip', () => {
       expect(beamJobRun.getJobStatusTooltipString()).toEqual('Pending...');
@@ -472,8 +392,7 @@ describe('Beam Job Run', () => {
       'CANCELLING',
       0,
       0,
-      true,
-      null
+      true
     );
 
     it('should return the appropriate material tooltip', () => {
@@ -506,16 +425,8 @@ describe('Beam Job Run', () => {
   });
 
   describe('getDataflowUrl', () => {
-    it('should return null if dataflowJobId is not provided', () => {
-      const beamJobRun = new BeamJobRun(
-        '123',
-        'FooJob',
-        'FAILED',
-        0,
-        0,
-        true,
-        null
-      );
+    it('should return the base Dataflow URL if dataflowJobId is not provided', () => {
+      const beamJobRun = new BeamJobRun('123', 'FooJob', 'FAILED', 0, 0, false);
       expect(beamJobRun.getDataflowUrl()).toEqual(
         'https://console.cloud.google.com/dataflow/jobs'
       );

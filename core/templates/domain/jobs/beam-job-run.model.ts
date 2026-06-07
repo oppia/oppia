@@ -95,7 +95,7 @@ export class BeamJobRun {
     public readonly jobStartedOnMsecs: number,
     public readonly jobUpdatedOnMsecs: number,
     public readonly jobIsSynchronous: boolean,
-    public readonly dataflowJobId: string | null
+    public readonly dataflowJobId: string | null = null
   ) {
     switch (jobState) {
       case 'RUNNING':
@@ -207,7 +207,7 @@ export class BeamJobRun {
       backendDict.job_started_on_msecs,
       backendDict.job_updated_on_msecs,
       backendDict.job_is_synchronous,
-      backendDict.dataflow_job_id
+      backendDict.dataflow_job_id ?? null
     );
   }
 }

@@ -88,8 +88,7 @@ describe('Start new beam job dialog', () => {
       'PENDING',
       0,
       0,
-      false,
-      null
+      false
     );
     const startNewBeamJobSpy = spyOn(
       backendApiService,
