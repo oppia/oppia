@@ -594,9 +594,6 @@ export class BaseUser {
           },
           element
         );
-        showMessage(
-          `Clickability diagnostics: ${JSON.stringify(clickabilityDiagnostics)}`
-        );
         const reasonsText =
           clickabilityDiagnostics.reasons.length > 0
             ? clickabilityDiagnostics.reasons
