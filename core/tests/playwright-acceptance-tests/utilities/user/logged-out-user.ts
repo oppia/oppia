@@ -286,32 +286,12 @@ export class LoggedOutUser extends BaseUser {
         );
       }
 
-      const targetElement = searchResultsElements[lessonIndex];
-
-      const debugInfo = await this.page.evaluate(el => {
-        const navbar = document.querySelector(
-          '.navbar-container'
-        ) as HTMLElement;
-        const navbarRect = navbar?.getBoundingClientRect();
-        const cardRect = el.getBoundingClientRect();
-        const centerX = cardRect.left + cardRect.width / 2;
-        const centerY = cardRect.top + cardRect.height / 2;
-        return {
-          isConnected: el.isConnected,
-          navbarBottom: navbarRect?.bottom,
-          cardTop: cardRect.top,
-          cardCenterY: centerY,
-          elementAtCardCenter: document.elementFromPoint(centerX, centerY)
-            ?.className,
-          scrollY: window.scrollY,
-        };
-      }, targetElement);
-      showMessage(`Pre-click debug: ${JSON.stringify(debugInfo)}`);
-
       await this.page.waitForFunction(
         ({selector, index, clickableFn}) => {
           const element = document.querySelectorAll(selector)[index];
-          if (!element) return false;
+          if (!element) {
+            return false;
+          }
           const fn = new Function(
             'element',
             `return (${clickableFn})(element)`
