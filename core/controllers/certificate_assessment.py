@@ -20,7 +20,7 @@ from core import feconf
 from core.controllers import acl_decorators, base
 from core.domain import certificate_assessment_services
 
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 
 class CertificateAssessmentOfferingHandler(

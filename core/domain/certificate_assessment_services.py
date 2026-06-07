@@ -59,11 +59,11 @@ def create_certificate_assessment_offering(
     # frontend create flow sends real classroom/topic selections instead of
     # temporary hardcoded stub values.
 
-    # classroom = classroom_config_services.get_classroom_by_id(classroom_id)
+    # Classroom = classroom_config_services.get_classroom_by_id(classroom_id)
     # if classroom is None:
     #     raise Exception('classroom_id must correspond to an existing classroom.')
 
-    # for topic_id in topic_ids:
+    # For topic_id in topic_ids:
     #     topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
     #     if topic is None:
     #         raise Exception('topic_ids must refer to existing topics.')
