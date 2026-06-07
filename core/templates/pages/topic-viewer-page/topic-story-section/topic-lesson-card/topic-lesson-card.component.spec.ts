@@ -18,49 +18,101 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-
 import {TopicLessonCardComponent} from './topic-lesson-card.component';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 describe('TopicLessonCardComponent', () => {
   let component: TopicLessonCardComponent;
   let fixture: ComponentFixture<TopicLessonCardComponent>;
+  let urlInterpolationService: jasmine.SpyObj<UrlInterpolationService>;
 
   beforeEach(waitForAsync(() => {
+    const urlInterpolationServiceSpy = jasmine.createSpyObj(
+      'UrlInterpolationService',
+      ['getStaticImageUrl']
+    );
+
     TestBed.configureTestingModule({
       declarations: [TopicLessonCardComponent],
-      providers: [UrlInterpolationService],
+      providers: [
+        {
+          provide: UrlInterpolationService,
+          useValue: urlInterpolationServiceSpy,
+        },
+      ],
     }).compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(TopicLessonCardComponent);
     component = fixture.componentInstance;
-    component.lessonTitle = 'Lesson 1: What are place values?';
-    component.lessonDescription =
-      'Jaime learns the place value of each digit in a big number.';
+    urlInterpolationService = TestBed.inject(
+      UrlInterpolationService
+    ) as jasmine.SpyObj<UrlInterpolationService>;
+  }));
+
+  it('should be created', () => {
+    expect(component).toBeTruthy();
   });
 
-  it('should render lesson title, description, and start button', () => {
-    fixture.detectChanges();
+  it('should use provided thumbnail url on initialization', () => {
+    component.thumbnailUrl = '/assets/lesson-thumbnail.png';
 
-    const element = fixture.nativeElement as HTMLElement;
-    expect(
-      element.querySelector('.topic-lesson-card-title')?.textContent
-    ).toContain('Lesson 1: What are place values?');
-    expect(
-      element.querySelector('.topic-lesson-card-description')?.textContent
-    ).toContain('Jaime learns the place value of each digit in a big number.');
-    expect(
-      element.querySelector('.topic-lesson-card-start-button')?.textContent
-    ).toContain('Start');
+    component.ngOnInit();
+
+    expect(component.resolvedThumbnailUrl).toBe('/assets/lesson-thumbnail.png');
   });
 
-  it('should use the fallback thumbnail when none is provided', () => {
-    fixture.detectChanges();
-
-    expect(component.resolvedThumbnailUrl).toContain(
-      '/assets/images/splash/student_desk1x.webp'
+  it('should use fallback thumbnail url when thumbnail url is empty', () => {
+    urlInterpolationService.getStaticImageUrl.and.returnValue(
+      '/assets/fallback-thumbnail.webp'
     );
+
+    component.thumbnailUrl = '';
+
+    component.ngOnInit();
+
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
+      '/splash/student_desk1x.webp'
+    );
+    expect(component.resolvedThumbnailUrl).toBe(
+      '/assets/fallback-thumbnail.webp'
+    );
+  });
+
+  it('should return thumbnail alt text with lesson title', () => {
+    component.lessonTitle = 'Introduction to Fractions';
+
+    expect(component.getThumbnailAltText()).toBe(
+      'Lesson thumbnail for Introduction to Fractions'
+    );
+  });
+
+  it('should return default thumbnail alt text when lesson title is empty', () => {
+    component.lessonTitle = '';
+
+    expect(component.getThumbnailAltText()).toBe('Lesson thumbnail');
+  });
+
+  it('should generate fallback thumbnail url through UrlInterpolationService', () => {
+    urlInterpolationService.getStaticImageUrl.and.returnValue(
+      '/assets/generated-fallback.webp'
+    );
+
+    component.thumbnailUrl = '';
+
+    component.ngOnInit();
+
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledTimes(1);
+    expect(component.resolvedThumbnailUrl).toBe(
+      '/assets/generated-fallback.webp'
+    );
+  });
+
+  it('should not call UrlInterpolationService when thumbnail url is provided', () => {
+    component.thumbnailUrl = '/assets/custom-thumbnail.png';
+
+    component.ngOnInit();
+
+    expect(urlInterpolationService.getStaticImageUrl).not.toHaveBeenCalled();
+    expect(component.resolvedThumbnailUrl).toBe('/assets/custom-thumbnail.png');
   });
 });

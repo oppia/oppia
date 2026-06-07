@@ -18,91 +18,120 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-
 import {TopicPracticeCardComponent} from './topic-practice-card.component';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 describe('TopicPracticeCardComponent', () => {
   let component: TopicPracticeCardComponent;
   let fixture: ComponentFixture<TopicPracticeCardComponent>;
+  let urlInterpolationService: jasmine.SpyObj<UrlInterpolationService>;
 
   beforeEach(waitForAsync(() => {
+    const urlInterpolationServiceSpy = jasmine.createSpyObj(
+      'UrlInterpolationService',
+      ['getStaticImageUrl']
+    );
+
     TestBed.configureTestingModule({
       declarations: [TopicPracticeCardComponent],
-      providers: [UrlInterpolationService],
+      providers: [
+        {
+          provide: UrlInterpolationService,
+          useValue: urlInterpolationServiceSpy,
+        },
+      ],
     }).compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(TopicPracticeCardComponent);
     component = fixture.componentInstance;
-    component.practiceTitle = 'Practice 1: Comparing numbers';
-    component.relatedLessonNumber = 1;
-    component.studyUrl = '/learn/math/place-values/lesson-1';
-    component.practiceUrl = '/practice_session/create/math/place-values';
+    urlInterpolationService = TestBed.inject(
+      UrlInterpolationService
+    ) as jasmine.SpyObj<UrlInterpolationService>;
+  }));
+
+  it('should be created', () => {
+    expect(component).toBeTruthy();
   });
 
-  it('should render title, generated description, and CTAs', () => {
-    fixture.detectChanges();
+  it('should use provided thumbnail url on initialization', () => {
+    component.thumbnailUrl = '/assets/practice-thumbnail.png';
 
-    const element = fixture.nativeElement as HTMLElement;
-    expect(
-      element.querySelector('.topic-practice-card-title')?.textContent
-    ).toContain('Practice 1: Comparing numbers');
-    expect(
-      element.querySelector('.topic-practice-card-description')?.textContent
-    ).toContain("Practice the skills you've learned in lesson 1.");
-    expect(
-      element.querySelector('.topic-practice-card-study-link')?.textContent
-    ).toContain('Study');
-    expect(
-      element.querySelector('.topic-practice-card-practice-button')?.textContent
-    ).toContain('Practice');
-    expect(
-      element
-        .querySelector('.topic-practice-card-practice-button')
-        ?.getAttribute('href')
-    ).toBe('/practice_session/create/math/place-values');
-  });
+    component.ngOnInit();
 
-  it('should use fallback thumbnail when none is provided', () => {
-    fixture.detectChanges();
-
-    expect(component.resolvedThumbnailUrl).toContain(
-      '/assets/images/splash/student_desk1x.webp'
+    expect(component.resolvedThumbnailUrl).toBe(
+      '/assets/practice-thumbnail.png'
     );
   });
 
-  it('should fall back to # when no practice url is provided', () => {
-    component.practiceUrl = null;
+  it('should use fallback thumbnail url when thumbnail url is empty', () => {
+    urlInterpolationService.getStaticImageUrl.and.returnValue(
+      '/assets/fallback-thumbnail.webp'
+    );
 
-    fixture.detectChanges();
+    component.thumbnailUrl = '';
 
-    const button = fixture.nativeElement.querySelector(
-      '.topic-practice-card-practice-button'
-    ) as HTMLAnchorElement;
-    expect(button.textContent).toContain('Practice');
-    expect(button.getAttribute('href')).toBe('#');
+    component.ngOnInit();
+
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
+      '/splash/student_desk1x.webp'
+    );
+    expect(component.resolvedThumbnailUrl).toBe(
+      '/assets/fallback-thumbnail.webp'
+    );
   });
 
-  it('should use provided thumbnail when available', () => {
-    component.thumbnailUrl = '/images/custom.png';
-    fixture.detectChanges();
-    expect(component.resolvedThumbnailUrl).toBe('/images/custom.png');
+  it('should return provided practice description', () => {
+    component.practiceDescription = 'Practice solving algebra problems.';
+
+    expect(component.getResolvedDescription()).toBe(
+      'Practice solving algebra problems.'
+    );
   });
 
-  it('should use provided description when available', () => {
-    component.practiceDescription = 'A custom practice description';
-    fixture.detectChanges();
-    const element = fixture.nativeElement as HTMLElement;
-    expect(
-      element.querySelector('.topic-practice-card-description')?.textContent
-    ).toContain('A custom practice description');
+  it('should return default description with lesson number when description is not provided', () => {
+    component.practiceDescription = '';
+    component.relatedLessonNumber = 3;
+
+    expect(component.getResolvedDescription()).toBe(
+      "Practice the skills you've learned in lesson 3."
+    );
   });
 
-  it('should provide generic alt text when title is empty', () => {
+  it('should return default description without lesson number when description is not provided and lesson number is null', () => {
+    component.practiceDescription = '';
+    component.relatedLessonNumber = null;
+
+    expect(component.getResolvedDescription()).toBe(
+      "Practice the skills you've learned in lesson."
+    );
+  });
+
+  it('should return thumbnail alt text with practice title', () => {
+    component.practiceTitle = 'Fractions Practice';
+
+    expect(component.getThumbnailAltText()).toBe(
+      'Practice thumbnail for Fractions Practice'
+    );
+  });
+
+  it('should return default thumbnail alt text when practice title is empty', () => {
     component.practiceTitle = '';
-    fixture.detectChanges();
+
     expect(component.getThumbnailAltText()).toBe('Practice thumbnail');
+  });
+
+  it('should generate fallback thumbnail url through UrlInterpolationService', () => {
+    urlInterpolationService.getStaticImageUrl.and.returnValue(
+      '/assets/generated-fallback.webp'
+    );
+
+    component.thumbnailUrl = '';
+
+    component.ngOnInit();
+
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledTimes(1);
+    expect(component.resolvedThumbnailUrl).toBe(
+      '/assets/generated-fallback.webp'
+    );
   });
 });

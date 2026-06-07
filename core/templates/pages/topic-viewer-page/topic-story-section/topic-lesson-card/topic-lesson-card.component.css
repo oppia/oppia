@@ -1,17 +1,20 @@
 .topic-lesson-card {
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  border: 1px solid #eee;
+  border-radius: 8px;
+  box-shadow: none;
   display: flex;
-  min-height: 140px;
-  overflow: hidden;
+  height: 212px;
+  min-height: 212px;
+  max-width: 912px;
   width: 100%;
+  overflow: hidden;
 }
 
 .topic-lesson-card-thumbnail {
   background: #9fbfbb;
-  flex: 0 0 210px;
-  min-height: 140px;
+  flex: 0 0 276px;
+  height: 212px;
 }
 
 .topic-lesson-card-image {
@@ -27,7 +30,7 @@
   flex-direction: column;
   justify-content: space-between;
   min-width: 0;
-  padding: 18px 22px;
+  padding: 28px;
 }
 
 .topic-lesson-card-copy {
@@ -53,38 +56,6 @@
   margin: 0;
 }
 
-.topic-lesson-card-progress {
-  align-items: center;
-  display: flex;
-  margin-top: 4px;
-  max-width: 280px;
-  width: 100%;
-}
-
-.progress-line {
-  background: #c4c4c4;
-  flex: 1;
-  height: 2px;
-}
-
-.progress-step {
-  background: #fff;
-  border: 2px solid #c4c4c4;
-  border-radius: 50%;
-  flex-shrink: 0;
-  height: 12px;
-  width: 12px;
-}
-
-.progress-step-active {
-  background: #fff;
-  border: 3px solid #00645c;
-  border-radius: 50%;
-  flex-shrink: 0;
-  height: 22px;
-  width: 22px;
-}
-
 .topic-lesson-card-start-button {
   align-items: center;
   align-self: flex-end;
@@ -95,9 +66,9 @@
   font-family: Roboto, Arial, sans-serif;
   font-size: 14px;
   font-weight: 700;
-  height: 42px;
+  height: 44px;
   justify-content: center;
-  min-width: 96px;
+  min-width: 106px;
   text-decoration: none;
 }
 
@@ -129,21 +100,6 @@
     line-height: 1.3;
   }
 
-  .topic-lesson-card-progress {
-    margin-top: 4px;
-    max-width: 180px;
-  }
-
-  .progress-step {
-    height: 8px;
-    width: 8px;
-  }
-
-  .progress-step-active {
-    border-width: 2px;
-    height: 16px;
-    width: 16px;
-  }
 
   .topic-lesson-card-start-button {
     font-size: 12px;
@@ -190,28 +146,7 @@
     line-height: 16px;
     margin: 0;
   }
-
-  .topic-lesson-card-progress {
-    margin-top: 2px;
-    max-width: none;
-    width: 100%;
-  }
-
-  .progress-step {
-    background: #fff;
-    border: 1px solid #c4c4c4;
-    border-radius: 50%;
-    height: 12px;
-    width: 12px;
-  }
-
-  .progress-step.progress-step-active {
-    background: #fff;
-    border: 2px solid #00645c;
-    border-radius: 50%;
-    height: 20px;
-    width: 20px;
-  }
+ 
 
   .topic-lesson-card-start-button {
     align-self: stretch;

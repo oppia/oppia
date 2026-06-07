@@ -1,4 +1,4 @@
-<article class="topic-lesson-card" [attr.aria-label]="lessonTitle || 'Lesson card'">
+<div class="topic-lesson-card" role="article" [attr.aria-label]="lessonTitle || 'Lesson card'">
   <div class="topic-lesson-card-thumbnail">
     <img class="topic-lesson-card-image"
          [src]="resolvedThumbnailUrl"
@@ -9,13 +9,6 @@
     <div class="topic-lesson-card-copy">
       <h3 class="topic-lesson-card-title">{{ lessonTitle }}</h3>
       <p class="topic-lesson-card-description">{{ lessonDescription }}</p>
-      <div class="topic-lesson-card-progress">
-        <div class="progress-step progress-step-active"></div>
-        <div class="progress-line"></div>
-        <div class="progress-step"></div>
-        <div class="progress-line"></div>
-        <div class="progress-step"></div>
-      </div>
     </div>
     <a class="topic-lesson-card-start-button"
        [attr.href]="startUrl || '#'"
@@ -23,4 +16,4 @@
       Start
     </a>
   </div>
-</article>
+</div>

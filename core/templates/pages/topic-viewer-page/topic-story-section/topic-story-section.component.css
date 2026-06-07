@@ -1,8 +1,9 @@
 .topic-story-section {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+  margin: 0 auto;
+  max-width: 960px;
   width: 100%;
+  padding: 0;
 }
 
 .story-callout-row {
@@ -55,12 +56,14 @@
   transform: scaleY(-1);
   transform-origin: center;
 }
+
 .story-card {
   background: #fff;
   border-radius: 4px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
   margin-top: 16px;
-  max-width: 100%;
+  max-width: 960px;
+  width: 100%;
 }
 
 .story-card-header {
@@ -138,19 +141,18 @@
 .story-card-body {
   display: flex;
   flex-direction: column;
-  min-height: 390px;
-  padding: 0 28px 28px;
+  min-height: 484px;
+  padding: 0 24px 24px;
 }
 
-.story-lesson-card-wrapper {
-  margin-top: auto;
-  width: 100%;
-}
-
+.story-lesson-card-wrapper,
 .story-practice-card-wrapper {
   margin-top: auto;
   width: 100%;
+  max-width: 912px;
+  align-self: center;
 }
+
 @media (max-width: 768px) {
   .story-callout-row {
     align-items: flex-start;
