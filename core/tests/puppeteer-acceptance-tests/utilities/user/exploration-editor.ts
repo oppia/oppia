@@ -7826,17 +7826,7 @@ export class ExplorationEditor extends BaseUser {
       RTE_BUTTON_TITLES.MATH_FORMULA.EN
     );
     await this.waitForNetworkIdle();
-    const textareaElement = await this.page.$(
-      'textarea[placeholder*="Enter a math expression using LaTeX"]'
-    );
-    if (!textareaElement) {
-      throw new Error('Math formula textarea not found.');
-    }
-    await textareaElement.type(latex);
-    // Press Tab to blur the textarea. This triggers Angular's ngModel change
-    // detection, which validates the LaTeX input and enables the "Done" button.
-    await this.page.keyboard.press('Tab');
-    await this.waitForNetworkIdle();
+    await rteEditor.typeMathExpression(latex);
 
     if (expectedText) {
       await this.expectMathJaxToRenderArabicTextInSvgTextNode(expectedText);
@@ -7870,9 +7860,10 @@ export class ExplorationEditor extends BaseUser {
       const textNodes = document.querySelectorAll('.MathJax_SVG text');
       return {
         arabicTextContent:
-          textNodes.length > 0
-            ? textNodes[0].textContent?.trim() || null
-            : null,
+          Array.from(textNodes)
+            .map(node => node.textContent?.trim() || '')
+            .filter(text => text !== '')
+            .join(' | ') || null,
         rawSvgHtml: svgElement ? svgElement.textContent : 'No SVG found',
       };
     });
