@@ -115,6 +115,11 @@ def install_playwright_dependencies() -> None:
     playwright_dir = os.path.join(
         common.CURR_DIR, 'core', 'tests', 'playwright-acceptance-tests'
     )
+    playwright_node_modules = os.path.join(playwright_dir, 'node_modules')
+
+    if os.path.exists(playwright_node_modules):
+        return
+
     install_env = {
         **os.environ,
         'PATH': os.pathsep.join(
