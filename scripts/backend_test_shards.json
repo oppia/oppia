@@ -42,6 +42,7 @@
         "extensions.objects.models.objects_test",
         "core.controllers.email_dashboard_test",
         "core.controllers.features_test",
+        "core.controllers.general_feedback_test",
         "extensions.issues.base_test",
         "core.feature_flag_list_test",
         "core.controllers.skill_mastery_test",
