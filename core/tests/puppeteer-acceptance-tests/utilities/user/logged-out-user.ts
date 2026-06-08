@@ -3769,8 +3769,12 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Filters lessons by multiple languages and deselect the already selected English language.
    * @param {string[]} languageNames - The names of the languages to filter by.
+   * @param {string} languageToDeselect - The name of the language to deselect.
    */
-  async filterLessonsByLanguage(languageNames: string[]): Promise<void> {
+  async filterLessonsByLanguage(
+    languageNames: string[],
+    languageToDeselect: string = 'English'
+  ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.waitForPageToFullyLoad();
     }
@@ -3788,8 +3792,8 @@ export class LoggedOutUser extends BaseUser {
         el => el.textContent.trim(),
         element
       );
-      // Deselecting english language.
-      if (elementText === 'English') {
+      // Deselecting the selected language before choosing new filters.
+      if (elementText === languageToDeselect) {
         await element.click();
       }
     }
@@ -3799,14 +3803,23 @@ export class LoggedOutUser extends BaseUser {
       unselectedFilterOptionsSelector
     );
     let foundMatch = false;
+    let englishMatchCount = 0;
 
     for (const language of deselectedLanguages) {
       const languageText = await this.page.evaluate(
         el => el.textContent,
         language
       );
+      const trimmedLanguageText = languageText.trim();
 
-      if (languageNames.includes(languageText.trim())) {
+      if (trimmedLanguageText === 'English') {
+        englishMatchCount += 1;
+        if (englishMatchCount < 2) {
+          continue;
+        }
+      }
+
+      if (languageNames.includes(trimmedLanguageText)) {
         foundMatch = true;
         await this.waitForElementToBeClickable(language);
         await language.click();
