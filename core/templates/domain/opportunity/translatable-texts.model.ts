@@ -41,6 +41,21 @@ export interface TranslatableTextsBackendDict {
   version: string;
 }
 
+export interface TranslatableContentBackendDictV2 {
+  content_id: string;
+  content_type: string;
+  content_format: string;
+  content_value: string | string[];
+  state_name?: string;
+  interaction_id?: string | null;
+  rule_type?: string | null;
+}
+
+export interface TranslatableTextsBackendDictV2 {
+  translatable_contents: TranslatableContentBackendDictV2[];
+  version: string;
+}
+
 export class TranslatableTexts {
   constructor(
     private readonly stateNamesToContentIdMapping: StateNamesToContentIdMapping,
@@ -61,6 +76,30 @@ export class TranslatableTexts {
         );
       }
       stateNamesToContentIdMapping[stateName] = contentIdMapping;
+    }
+    return new TranslatableTexts(
+      stateNamesToContentIdMapping,
+      backendDict.version
+    );
+  }
+
+  static createFromBackendDictV2(
+    backendDict: TranslatableTextsBackendDictV2
+  ): TranslatableTexts {
+    const stateNamesToContentIdMapping: StateNamesToContentIdMapping = {};
+    for (const content of backendDict.translatable_contents) {
+      const stateName = content.state_name || 'Content';
+      if (!stateNamesToContentIdMapping[stateName]) {
+        stateNamesToContentIdMapping[stateName] = {};
+      }
+      stateNamesToContentIdMapping[stateName][content.content_id] =
+        new TranslatableItem(
+          content.content_value,
+          content.content_format,
+          content.content_type,
+          content.interaction_id || null,
+          content.rule_type || null
+        );
     }
     return new TranslatableTexts(
       stateNamesToContentIdMapping,

@@ -69,4 +69,60 @@ describe('Translatable Texts model', () => {
   it('should get version number', () => {
     expect(sampleTranslatableTexts.explorationVersion).toBe('1');
   });
+
+  it('should create from V2 backend dict', () => {
+    const sampleBackendDictV2 = {
+      translatable_contents: [
+        {
+          content_id: '1',
+          content_type: 'content',
+          content_format: 'html',
+          content_value: 'text1',
+          state_name: 'state1',
+        },
+        {
+          content_id: '2',
+          content_type: 'content',
+          content_format: 'html',
+          content_value: 'text2',
+          state_name: 'state1',
+        },
+        {
+          content_id: '1',
+          content_type: 'content',
+          content_format: 'html',
+          content_value: 'text3',
+          state_name: 'state2',
+        },
+        {
+          content_id: '3',
+          content_type: 'content',
+          content_format: 'html',
+          content_value: 'text4',
+        },
+      ],
+      version: '2',
+    };
+
+    const translatableTexts =
+      TranslatableTexts.createFromBackendDictV2(sampleBackendDictV2);
+
+    const expectedStatewiseContents = {
+      state1: {
+        1: new TranslatableItem('text1', 'html', 'content', null, null),
+        2: new TranslatableItem('text2', 'html', 'content', null, null),
+      },
+      state2: {
+        1: new TranslatableItem('text3', 'html', 'content', null, null),
+      },
+      Content: {
+        3: new TranslatableItem('text4', 'html', 'content', null, null),
+      },
+    };
+
+    expect(translatableTexts.stateWiseContents).toEqual(
+      expectedStatewiseContents
+    );
+    expect(translatableTexts.explorationVersion).toBe('2');
+  });
 });

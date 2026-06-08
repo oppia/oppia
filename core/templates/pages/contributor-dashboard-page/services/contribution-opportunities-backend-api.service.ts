@@ -34,6 +34,7 @@ import {
   FeaturedTranslationLanguageBackendDict,
 } from 'domain/opportunity/featured-translation-language.model';
 import {UserService} from 'services/user.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import {AppConstants} from 'app.constants';
 
@@ -98,7 +99,8 @@ export class ContributionOpportunitiesBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
-    private userService: UserService
+    private userService: UserService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   private UPDATE_PINNED_OPPORTUNITY_HANDLER_URL = '/pinned-opportunities';
@@ -165,6 +167,42 @@ export class ContributionOpportunitiesBackendApiService {
     topicName: string,
     cursor: string
   ): Promise<TranslationContributionOpportunities> {
+    if (
+      this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
+        .isEnabled
+    ) {
+      const params = {
+        language_code: languageCode,
+        topic_name:
+          topicName === AppConstants.TOPIC_SENTINEL_NAME_ALL ? '' : topicName,
+        cursor: cursor,
+        entity_type: AppConstants.ENTITY_TYPE.EXPLORATION,
+      };
+
+      return this.http
+        .get<TranslationContributionOpportunitiesBackendDict>(
+          '/opportunitieshandlerv2',
+          {params}
+        )
+        .toPromise()
+        .then(
+          data => {
+            const opportunities = data.opportunities.map(dict =>
+              ExplorationOpportunitySummary.createFromBackendDict(dict)
+            );
+
+            return {
+              opportunities: opportunities,
+              nextCursor: data.next_cursor,
+              more: data.more,
+            };
+          },
+          errorResponse => {
+            throw new Error(errorResponse.error.error);
+          }
+        );
+    }
+
     const params = {
       language_code: languageCode,
       topic_name:
@@ -205,12 +243,41 @@ export class ContributionOpportunitiesBackendApiService {
     const params: {
       topic_name?: string;
       language_code?: string;
+      entity_type?: string;
     } = {};
     if (topicName !== AppConstants.TOPIC_SENTINEL_NAME_ALL) {
       params.topic_name = topicName;
     }
     if (languageCode && languageCode !== '') {
       params.language_code = languageCode;
+    }
+
+    if (
+      this.platformFeatureService.status.EnableTranslationOppsWithNewOppModels
+        .isEnabled
+    ) {
+      params.entity_type = AppConstants.ENTITY_TYPE.EXPLORATION;
+      return this.http
+        .get<ReviewableTranslationOpportunitiesBackendDict>(
+          '/getreviewableopportunitieshandlerv2',
+          {
+            params,
+          } as Object
+        )
+        .toPromise()
+        .then(
+          data => {
+            const opportunities = data.opportunities.map(dict =>
+              ExplorationOpportunitySummary.createFromBackendDict(dict)
+            );
+            return {
+              opportunities,
+            };
+          },
+          errorResponse => {
+            throw new Error(errorResponse.error.error);
+          }
+        );
     }
 
     return this.http

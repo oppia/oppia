@@ -31,6 +31,8 @@ import {SkillOpportunity} from 'domain/opportunity/skill-opportunity.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UserInfo} from 'domain/user/user-info.model';
 import {UserService} from 'services/user.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 import {FeaturedTranslationLanguage} from 'domain/opportunity/featured-translation-language.model';
 import {
   ExplorationOpportunitySummary,
@@ -38,11 +40,22 @@ import {
   ExplorationOpportunitySummaryBackendDict,
 } from 'domain/opportunity/exploration-opportunity-summary.model';
 
+class MockPlatformFeatureService {
+  get status() {
+    return {
+      EnableTranslationOppsWithNewOppModels: {
+        isEnabled: false,
+      },
+    };
+  }
+}
+
 describe('Contribution Opportunities backend API service', function () {
   let contributionOpportunitiesBackendApiService: ContributionOpportunitiesBackendApiService;
   let httpTestingController: HttpTestingController;
   let urlInterpolationService: UrlInterpolationService;
   let userService: UserService;
+  let mockPlatformFeatureService: MockPlatformFeatureService;
   const invalidCursor = 'invalidCursor';
   const skillOpportunityResponse = {
     opportunities: [
@@ -133,8 +146,15 @@ describe('Contribution Opportunities backend API service', function () {
   };
 
   beforeEach(() => {
+    mockPlatformFeatureService = new MockPlatformFeatureService();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
+      ],
     });
     contributionOpportunitiesBackendApiService = TestBed.inject(
       ContributionOpportunitiesBackendApiService
@@ -256,6 +276,39 @@ describe('Contribution Opportunities backend API service', function () {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should successfully fetch the V2 translation opportunities data when feature flag is enabled', fakeAsync(() => {
+    spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
+      EnableTranslationOppsWithNewOppModels: {
+        isEnabled: true,
+      },
+    } as unknown as FeatureStatusChecker);
+
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchTranslationOpportunitiesAsync(
+        'hi',
+        AppConstants.TOPIC_SENTINEL_NAME_ALL,
+        ''
+      )
+      .then(successHandler, failHandler);
+    const req = httpTestingController.expectOne(
+      '/opportunitieshandlerv2?language_code=hi&topic_name=&cursor=&entity_type=exploration'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(translationOpportunityResponse);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith({
+      opportunities: sampleTranslationOpportunitiesResponse,
+      nextCursor: translationOpportunityResponse.next_cursor,
+      more: translationOpportunityResponse.more,
+    });
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it(
     'should fail to fetch the translation opportunities data ' +
       'given invalid language code ' +
@@ -360,6 +413,42 @@ describe('Contribution Opportunities backend API service', function () {
 
     expect(successHandler).toHaveBeenCalledWith({
       opportunities: sampleTranslationOpportunitiesResponse,
+    });
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should fetch V2 reviewable translation opportunities when feature flag is enabled', fakeAsync(() => {
+    spyOnProperty(mockPlatformFeatureService, 'status').and.returnValue({
+      EnableTranslationOppsWithNewOppModels: {
+        isEnabled: true,
+      },
+    } as unknown as FeatureStatusChecker);
+
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchReviewableTranslationOpportunitiesAsync(
+        AppConstants.TOPIC_SENTINEL_NAME_ALL,
+        'hi'
+      )
+      .then(successHandler, failHandler);
+    const req = httpTestingController.expectOne(
+      '/getreviewableopportunitieshandlerv2?language_code=hi&entity_type=exploration'
+    );
+    expect(req.request.method).toEqual('GET');
+
+    req.flush({
+      opportunities: translationOpportunities.filter(
+        opportunity => opportunity.language_code === 'hi'
+      ),
+    });
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith({
+      opportunities: sampleTranslationOpportunitiesResponse.filter(
+        opportunity => opportunity.languageCode === 'hi'
+      ),
     });
     expect(failHandler).not.toHaveBeenCalled();
   }));

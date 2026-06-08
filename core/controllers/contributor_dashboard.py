@@ -679,14 +679,21 @@ class TranslatableContentsHandlerV2(
         ) in (
             translatable_contents_collection.content_id_to_translatable_content.values()
         ):
-            translatable_contents.append(
-                {
-                    'content_id': content.content_id,
-                    'content_type': content.content_type.value,
-                    'content_format': content.content_format.value,
-                    'content_value': content.content_value,
-                }
-            )
+            content_dict = {
+                'content_id': content.content_id,
+                'content_type': content.content_type.value,
+                'content_format': content.content_format.value,
+                'content_value': content.content_value,
+            }
+            if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+                for state_name, state in domain_object.states.items():
+                    if (
+                        content.content_id
+                        in state.get_translatable_contents_collection().content_id_to_translatable_content
+                    ):
+                        content_dict['state_name'] = state_name
+                        break
+            translatable_contents.append(content_dict)
 
         self.values = {
             'version': domain_object.version,
