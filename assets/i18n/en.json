@@ -1584,6 +1584,8 @@
     "I18N_TOPIC_VIEWER_STORIES_HEAD": "Stories you can play",
     "I18N_TOPIC_VIEWER_STUDY": "Study",
     "I18N_TOPIC_VIEWER_STUDY_SKILLS": "Study Skills for <[topicName]>",
+    "I18N_TOPIC_VIEWER_STUDY_SKILLS_CTA": "Study Skills",
+    "I18N_TOPIC_VIEWER_STUDY_SKILLS_CTA_ARIA_LABEL": "Open Study Skills for <[storyTitle]>",
     "I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE": "Use the following Study Guides to help you study skills about <[topicName]>.",
     "I18N_TOPIC_VIEWER_VIEW_ALL": "View All",
     "I18N_TOPIC_VIEWER_VIEW_LESS": "View Less",
