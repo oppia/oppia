@@ -1292,17 +1292,35 @@ def _get_target_id_to_exploration_opportunity_dict(
                 if story_node:
                     chapter_title_val = story_node.title
 
-            opportunity_id_to_opportunity_dict[exp_id] = {
-                'id': exp_id,
-                'topic_name': topic_name_val,
-                'story_title': story_title_val,
-                'chapter_title': chapter_title_val,
-                'content_count': model.content_count,
-                'translation_counts': model.translation_counts,
-                'translation_in_review_counts': {},
-                'reviewer_only_content_count': 0,
-                'is_pinned': False,
-            }
+            supported_language_codes = set(
+                language['id']
+                for language in constants.SUPPORTED_AUDIO_LANGUAGES
+            )
+            missing_language_codes = list(
+                supported_language_codes
+                - set(model.incomplete_translation_language_codes)
+            )
+            new_incomplete_translation_language_codes = (
+                model.incomplete_translation_language_codes
+                + missing_language_codes
+            )
+
+            opportunity = opportunity_domain.ExplorationOpportunitySummary(
+                exp_id,
+                model.topic_ids[0] if model.topic_ids else '',
+                topic_name_val,
+                story_id_val if story_id_val else '',
+                story_title_val,
+                chapter_title_val,
+                model.content_count,
+                new_incomplete_translation_language_codes,
+                model.translation_counts,
+                [],
+                [],
+                {},
+                0,
+            )
+            opportunity_id_to_opportunity_dict[exp_id] = opportunity.to_dict()
     else:
         opportunity_id_to_opportunity_dict = {
             opp_id: (opp.to_dict() if opp is not None else None)
