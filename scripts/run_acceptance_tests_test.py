@@ -659,18 +659,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
-                'managed_cloud_datastore_emulator',
-                mock_managed_process,
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
                 servers,
                 'managed_acceptance_tests_server',
                 mock_managed_process,
