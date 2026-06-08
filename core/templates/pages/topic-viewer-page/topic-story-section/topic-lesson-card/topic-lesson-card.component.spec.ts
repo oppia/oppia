@@ -103,19 +103,24 @@ describe('TopicLessonCardComponent', () => {
   });
 
   it('should execute navigateTo when url is provided', () => {
-    expect(component.navigateTo).toBeDefined();
+    const previousHash = window.location.hash;
+
+    component.navigateTo('#lesson-card');
+
+    expect(window.location.hash).toBe('#lesson-card');
+    window.location.hash = previousHash;
   });
 
   it('should execute navigateTo when url is null', () => {
     expect(() => {
       component.navigateTo(null);
-    }).not.toThrow();
+    }).not.toThrowError();
   });
 
   it('should execute navigateTo when url is empty', () => {
     expect(() => {
       component.navigateTo('');
-    }).not.toThrow();
+    }).not.toThrowError();
   });
 
   it('should return thumbnail alt text with lesson title', () => {

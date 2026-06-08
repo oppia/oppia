@@ -105,19 +105,24 @@ describe('TopicPracticeCardComponent', () => {
   });
 
   it('should execute navigateTo when url is provided', () => {
-    expect(component.navigateTo).toBeDefined();
+    const previousHash = window.location.hash;
+
+    component.navigateTo('#practice-card');
+
+    expect(window.location.hash).toBe('#practice-card');
+    window.location.hash = previousHash;
   });
 
   it('should execute navigateTo when url is null', () => {
     expect(() => {
       component.navigateTo(null);
-    }).not.toThrow();
+    }).not.toThrowError();
   });
 
   it('should execute navigateTo when url is empty', () => {
     expect(() => {
       component.navigateTo('');
-    }).not.toThrow();
+    }).not.toThrowError();
   });
 
   it('should return provided practice description', () => {

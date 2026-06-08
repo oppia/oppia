@@ -48,7 +48,7 @@ export class TopicPracticeCardComponent implements OnInit {
 
   navigateTo(url: string | null): void {
     if (url) {
-      window.location.href = url;
+      window.location.assign(url);
     }
   }
 
