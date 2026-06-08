@@ -2249,6 +2249,24 @@ export class BaseUser {
   }
 
   /**
+   * Function to expect the page to have no translation ids.
+   */
+  async expectPageHasNoTranslationIds(): Promise<void> {
+    const translationIds = await this.page.$$eval('[translate]', elements =>
+      elements
+        .map(el => el.getAttribute('translate'))
+        .filter(val => val && val.startsWith('I18N'))
+    );
+
+    if (translationIds.length > 0) {
+      throw new Error(
+        `Page has untranslated strings: ${translationIds.join(', ')}`
+      );
+    }
+    showMessage('Success: Page has no translation ids.');
+  }
+
+  /**
    * Checks if the upload error message contains the expected text.
    * @param expectedErrorMessage The expected text of the upload error message.
    */

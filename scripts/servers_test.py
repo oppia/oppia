@@ -20,6 +20,7 @@ import builtins
 import collections
 import contextlib
 import io
+import json
 import logging
 import os
 import re
@@ -1249,13 +1250,24 @@ class ManagedProcessTests(test_utils.TestBase):
         test_file_path = (
             'blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles'
         )
+        mock_config = {
+            'suite': [
+                {
+                    'name': test_file_path,
+                    'framework': 'puppeteer',
+                    'module': test_file_path,
+                }
+            ]
+        }
+        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
 
-        self.exit_stack.enter_context(
-            servers.managed_acceptance_tests_server(
-                suite_name=test_file_path, stdout=subprocess.PIPE
+        with json_load_swap:
+            self.exit_stack.enter_context(
+                servers.managed_acceptance_tests_server(
+                    suite_name=test_file_path, stdout=subprocess.PIPE
+                )
             )
-        )
-        self.exit_stack.close()
+            self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
@@ -1281,13 +1293,24 @@ class ManagedProcessTests(test_utils.TestBase):
         suite_name = (
             'blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles'
         )
+        mock_config = {
+            'suite': [
+                {
+                    'name': suite_name,
+                    'framework': 'puppeteer',
+                    'module': suite_name,
+                }
+            ]
+        }
+        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
 
-        self.exit_stack.enter_context(
-            servers.managed_acceptance_tests_server(
-                suite_name=suite_name, headless=True, stdout=subprocess.PIPE
+        with json_load_swap:
+            self.exit_stack.enter_context(
+                servers.managed_acceptance_tests_server(
+                    suite_name=suite_name, headless=True, stdout=subprocess.PIPE
+                )
             )
-        )
-        self.exit_stack.close()
+            self.exit_stack.close()
 
         self.assertEqual(os.getenv('HEADLESS'), 'true')
         self.assertEqual(len(popen_calls), 1)
@@ -1303,12 +1326,23 @@ class ManagedProcessTests(test_utils.TestBase):
         suite_name = (
             'blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles'
         )
+        mock_config = {
+            'suite': [
+                {
+                    'name': suite_name,
+                    'framework': 'puppeteer',
+                    'module': suite_name,
+                }
+            ]
+        }
+        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
 
-        self.exit_stack.enter_context(
-            servers.managed_acceptance_tests_server(
-                suite_name=suite_name, mobile=True, stdout=subprocess.PIPE
+        with json_load_swap:
+            self.exit_stack.enter_context(
+                servers.managed_acceptance_tests_server(
+                    suite_name=suite_name, mobile=True, stdout=subprocess.PIPE
+                )
             )
-        )
 
         self.assertEqual(os.getenv('MOBILE'), 'true')
         self.assertEqual(len(popen_calls), 1)
@@ -1320,6 +1354,118 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(os.getenv('SPEC_NAME'), suite_name)
 
         self.exit_stack.close()
+
+    def test_managed_acceptance_test_server_playwright_suite(self) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+        mock_config = {
+            'suite': [
+                {
+                    'name': 'testSuite',
+                    'framework': 'playwright',
+                    'module': 'some/module',
+                }
+            ]
+        }
+        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
+
+        with json_load_swap:
+            self.exit_stack.enter_context(
+                servers.managed_acceptance_tests_server(
+                    suite_name='testSuite', stdout=subprocess.PIPE
+                )
+            )
+            self.exit_stack.close()
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(popen_calls[0].kwargs['shell'], False)
+        self.assertEqual(popen_calls[0].kwargs['stdout'], subprocess.PIPE)
+        program_args = popen_calls[0].program_args
+        self.assertIn('some/module', program_args)
+        self.assertIn('--headed', program_args)
+        env = popen_calls[0].kwargs['env']
+        self.assertEqual(env['MOBILE'], 'false')
+        self.assertEqual(env['PROD_ENV'], 'false')
+        self.assertEqual(env['SPEC_NAME'], 'testSuite')
+
+    def test_managed_acceptance_test_server_playwright_headless(self) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+        mock_config = {
+            'suite': [
+                {
+                    'name': 'testSuite',
+                    'framework': 'playwright',
+                    'module': 'some/module',
+                }
+            ]
+        }
+        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
+
+        with json_load_swap:
+            self.exit_stack.enter_context(
+                servers.managed_acceptance_tests_server(
+                    suite_name='testSuite',
+                    headless=True,
+                    stdout=subprocess.PIPE,
+                )
+            )
+            self.exit_stack.close()
+
+        program_args = popen_calls[0].program_args
+        self.assertNotIn('--headed', program_args)
+        env = popen_calls[0].kwargs['env']
+        self.assertEqual(env['HEADLESS'], 'true')
+        self.assertEqual(env['SPEC_NAME'], 'testSuite')
+
+    def test_managed_acceptance_test_server_playwright_mobile(self) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+        mock_config = {
+            'suite': [
+                {
+                    'name': 'testSuite',
+                    'framework': 'playwright',
+                    'module': 'some/module',
+                }
+            ]
+        }
+        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
+
+        with json_load_swap:
+            self.exit_stack.enter_context(
+                servers.managed_acceptance_tests_server(
+                    suite_name='testSuite', mobile=True, stdout=subprocess.PIPE
+                )
+            )
+            self.exit_stack.close()
+
+        env = popen_calls[0].kwargs['env']
+        self.assertEqual(env['MOBILE'], 'true')
+        self.assertEqual(env['SPEC_NAME'], 'testSuite')
+
+    def test_managed_acceptance_test_server_with_invalid_framework(
+        self,
+    ) -> None:
+        mock_config = {
+            'suite': [
+                {
+                    'name': 'testSuite',
+                    'framework': 'invalid_framework',
+                    'module': 'some/module',
+                }
+            ]
+        }
+        json_load_swap = self.swap(json, 'load', lambda _: mock_config)
+
+        with json_load_swap:
+            with self.assertRaisesRegex(
+                Exception,
+                'Suite "testSuite" has invalid framework: "invalid_framework". '
+                'Must be "puppeteer" or "playwright".',
+            ):
+                self.exit_stack.enter_context(
+                    servers.managed_acceptance_tests_server(
+                        suite_name='testSuite', stdout=subprocess.PIPE
+                    )
+                )
 
 
 class GetChromedriverVersionTests(test_utils.TestBase):
