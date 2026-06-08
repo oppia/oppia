@@ -574,10 +574,14 @@ for (let i = 0; i < AppConstants.STEWARDS_LANDING_PAGE.ROUTES.length; i++) {
 }
 
 // Register all routes for topic landing page.
-for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
-  for (let i = 0; i < AppConstants.AVAILABLE_LANDING_PAGES[key].length; i++) {
+const landingPages = AppConstants.AVAILABLE_LANDING_PAGES as Record<
+  string,
+  readonly string[]
+>;
+for (let key in landingPages) {
+  for (let i = 0; i < landingPages[key].length; i++) {
     routes.push({
-      path: key + '/' + AppConstants.AVAILABLE_LANDING_PAGES[key][i],
+      path: key + '/' + landingPages[key][i],
       loadChildren: () =>
         import(
           'pages/landing-pages/topic-landing-page/topic-landing-page.module'

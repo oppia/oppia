@@ -26,6 +26,9 @@
       "app.constants": [
         "core/templates/app.constants"
       ],
+      "base-components/*": [
+        "core/templates/base-components/*"
+      ],
       "components/*": [
         "core/templates/components/*"
       ],
@@ -58,6 +61,9 @@
       ],
       "pages/*": [
         "core/templates/pages/*"
+      ],
+      "rich_text_components/*": [
+        "extensions/rich_text_components/*"
       ],
       "services/*": [
         "core/templates/services/*"

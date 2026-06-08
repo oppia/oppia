@@ -420,7 +420,7 @@ describe('Search bar component', () => {
         'http://localhost/search/find'
       );
 
-      windowRef.nativeWindow.history.pushState.calls.reset();
+      (windowRef.nativeWindow.history.pushState as jasmine.Spy).calls.reset();
 
       windowRef.nativeWindow.location = new URL(
         'http://localhost/not/search/find'
@@ -475,10 +475,12 @@ describe('Search bar component', () => {
       callb(['en', 'es']);
       return null;
     });
-    spyOn(translateService.onLangChange, 'subscribe').and.callFake(callb => {
-      callb();
-      return null;
-    });
+    spyOn(translateService.onLangChange, 'subscribe').and.callFake(
+      (callb: () => void) => {
+        callb();
+        return null;
+      }
+    );
     spyOn(
       classroomBackendApiService.onInitializeTranslation,
       'subscribe'
@@ -516,7 +518,7 @@ describe('Search bar component', () => {
 
   it('should tell searching status', () => {
     spyOn(searchService, 'isSearchInProgress').and.returnValue(false);
-    expect(component.isSearchInProgress()).toBeFalse();
+    expect(component.isSearchInProgress()).toBe(false);
   });
 
   it('should open sub menu', () => {

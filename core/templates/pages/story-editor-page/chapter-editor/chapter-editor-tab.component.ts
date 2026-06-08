@@ -30,12 +30,12 @@ import {StoryNode} from 'domain/story/story-node.model';
   templateUrl: './chapter-editor-tab.component.html',
 })
 export class ChapterEditorTabComponent implements OnInit, OnDestroy {
-  story: Story;
-  storyContents: StoryContents;
-  chapterIndex: number | null;
-  chapterId: string;
-  node: StoryNode;
-  nodes: StoryNode[];
+  story!: Story;
+  storyContents!: StoryContents;
+  chapterIndex: number | null = null;
+  chapterId!: string;
+  node!: StoryNode;
+  nodes!: StoryNode[];
 
   constructor(
     private storyUpdateService: StoryUpdateService,
@@ -60,7 +60,9 @@ export class ChapterEditorTabComponent implements OnInit, OnDestroy {
           }
         });
       }
-      this.node = this.nodes[this.chapterIndex];
+      if (this.chapterIndex !== null) {
+        this.node = this.nodes[this.chapterIndex];
+      }
     }
   }
 

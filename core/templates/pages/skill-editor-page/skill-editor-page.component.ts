@@ -23,7 +23,7 @@ import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {EntityEditorBrowserTabsInfoDomainConstants} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
 import {PageContextService} from 'services/page-context.service';
 import {EntityEditorBrowserTabsInfo} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
-import {Skill} from 'domain/skill/skill.model.ts';
+import {Skill} from 'domain/skill/skill.model';
 import {QuestionsListService} from 'services/questions-list.service';
 import {Subscription} from 'rxjs';
 import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
@@ -58,7 +58,7 @@ export class SkillEditorPageComponent implements OnInit {
     private windowRef: WindowRef
   ) {}
 
-  skill: Skill;
+  skill!: Skill;
   skillIsInitialized = false;
   directiveSubscriptions = new Subscription();
   warningsAreShown = false;
@@ -151,11 +151,15 @@ export class SkillEditorPageComponent implements OnInit {
   onClosingSkillEditorBrowserTab(): void {
     const skill = this.skillEditorStateService.getSkill();
 
-    const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo =
+    const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null =
       this.localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS,
         skill.getId()
       );
+
+    if (!skillEditorBrowserTabsInfo) {
+      return;
+    }
 
     if (
       skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges() &&
@@ -174,15 +178,15 @@ export class SkillEditorPageComponent implements OnInit {
   createOrUpdateSkillEditorBrowserTabsInfo(): void {
     const skill = this.skillEditorStateService.getSkill();
 
-    let skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo =
+    let skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null =
       this.localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS,
         skill.getId()
       );
 
     if (this.skillIsInitialized) {
-      skillEditorBrowserTabsInfo.setLatestVersion(skill.getVersion());
-      skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
+      skillEditorBrowserTabsInfo?.setLatestVersion(skill.getVersion());
+      skillEditorBrowserTabsInfo?.setSomeTabHasUnsavedChanges(false);
     } else {
       if (skillEditorBrowserTabsInfo !== null) {
         skillEditorBrowserTabsInfo.setLatestVersion(skill.getVersion());
@@ -199,6 +203,9 @@ export class SkillEditorPageComponent implements OnInit {
       this.skillIsInitialized = true;
     }
 
+    if (skillEditorBrowserTabsInfo === null) {
+      return;
+    }
     this.localStorageService.updateEntityEditorBrowserTabsInfo(
       skillEditorBrowserTabsInfo,
       EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS
