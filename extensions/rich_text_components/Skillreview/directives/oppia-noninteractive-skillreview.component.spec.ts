@@ -167,6 +167,120 @@ describe('NoninteractiveSkillreview', () => {
     );
   }));
 
+  it('should not throw error when modal is dismissed with numeric value 0', fakeAsync(() => {
+    spyOn(pageContextService, 'setCustomEntityContext');
+    spyOn(pageContextService, 'getEntityId').and.returnValue('InitialEntityId');
+    spyOn(pageContextService, 'getEntityType').and.returnValue(
+      'InitialEntityType'
+    );
+    spyOn(pageContextService, 'removeCustomEntityContext');
+
+    let e = {
+      currentTarget: {
+        offsetParent: {
+          dataset: {
+            ckeWidgetId: false,
+          },
+        },
+      },
+    } as unknown as MouseEvent;
+
+    ckEditorCopyContentService.copyModeActive = false;
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.reject(0),
+      } as NgbModalRef;
+    });
+
+    expect(() => {
+      component.openConceptCard(e);
+      flush();
+    }).not.toThrowError();
+
+    expect(pageContextService.removeCustomEntityContext).toHaveBeenCalled();
+    expect(pageContextService.setCustomEntityContext).toHaveBeenCalledWith(
+      'InitialEntityType',
+      'InitialEntityId'
+    );
+  }));
+
+  it('should not throw error when modal is dismissed with numeric value 1', fakeAsync(() => {
+    spyOn(pageContextService, 'setCustomEntityContext');
+    spyOn(pageContextService, 'getEntityId').and.returnValue('InitialEntityId');
+    spyOn(pageContextService, 'getEntityType').and.returnValue(
+      'InitialEntityType'
+    );
+    spyOn(pageContextService, 'removeCustomEntityContext');
+
+    let e = {
+      currentTarget: {
+        offsetParent: {
+          dataset: {
+            ckeWidgetId: false,
+          },
+        },
+      },
+    } as unknown as MouseEvent;
+
+    ckEditorCopyContentService.copyModeActive = false;
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.reject(1),
+      } as NgbModalRef;
+    });
+
+    expect(() => {
+      component.openConceptCard(e);
+      flush();
+    }).not.toThrowError();
+
+    expect(pageContextService.removeCustomEntityContext).toHaveBeenCalled();
+    expect(pageContextService.setCustomEntityContext).toHaveBeenCalledWith(
+      'InitialEntityType',
+      'InitialEntityId'
+    );
+  }));
+
+  it('should not throw error when modal is dismissed with undefined', fakeAsync(() => {
+    spyOn(pageContextService, 'setCustomEntityContext');
+    spyOn(pageContextService, 'getEntityId').and.returnValue('InitialEntityId');
+    spyOn(pageContextService, 'getEntityType').and.returnValue(
+      'InitialEntityType'
+    );
+    spyOn(pageContextService, 'removeCustomEntityContext');
+
+    let e = {
+      currentTarget: {
+        offsetParent: {
+          dataset: {
+            ckeWidgetId: false,
+          },
+        },
+      },
+    } as unknown as MouseEvent;
+
+    ckEditorCopyContentService.copyModeActive = false;
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.reject(undefined),
+      } as NgbModalRef;
+    });
+
+    expect(() => {
+      component.openConceptCard(e);
+      flush();
+    }).not.toThrowError();
+
+    expect(pageContextService.removeCustomEntityContext).toHaveBeenCalled();
+    expect(pageContextService.setCustomEntityContext).toHaveBeenCalledWith(
+      'InitialEntityType',
+      'InitialEntityId'
+    );
+  }));
+
   it(
     'should throw error when modal is closed in a method other than' +
       "'cancel', 'escape key press' or 'backdrop click'",
