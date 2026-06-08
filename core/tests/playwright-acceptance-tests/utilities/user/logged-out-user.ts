@@ -24,6 +24,8 @@ import isElementClickable from '../../functions/is-element-clickable';
 
 const communityLibraryUrl = testConstants.URLs.CommunityLibrary;
 
+const signUpUsernameInputField = 'input.e2e-test-username-input';
+
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 
 const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
@@ -65,6 +67,13 @@ export class LoggedOutUser extends BaseUser {
         );
       }
     });
+  }
+
+  /**
+   * Clears all text from the username input field.
+   */
+  async clearUsernameInput(): Promise<void> {
+    await this.clearAllTextFrom(signUpUsernameInputField);
   }
 
   /**
@@ -351,6 +360,20 @@ export class LoggedOutUser extends BaseUser {
 
     await this.page.keyboard.press('Enter');
     await this.page.waitForNavigation({waitUntil: 'load'});
+  }
+
+  /**
+   * Types an invalid username in the username input field and blurs it.
+   * Blur is needed to trigger validation on the input field.
+   * @param {string} invalidUsername - The invalid username to type.
+   */
+  async typeInvalidUsernameInUsernameInput(
+    invalidUsername: string
+  ): Promise<void> {
+    await this.typeInInputField(signUpUsernameInputField, invalidUsername);
+    await this.page.evaluate(selector => {
+      (document.querySelector(selector) as HTMLElement)?.blur();
+    }, signUpUsernameInputField);
   }
 }
 
