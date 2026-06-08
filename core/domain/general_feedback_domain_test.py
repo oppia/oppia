@@ -35,7 +35,7 @@ class WebFeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
     # Here we use object because session-info payloads contain heterogeneous
     # nested JSON-like values (dicts, lists, strings, ints).
     SESSION_INFO: Dict[str, object] = {
-        'console_errors_json': [
+        'console_logs_json': [
             {
                 'error_message': 'TypeError: Cannot read properties of undefined',
                 'log_level': 'error',
