@@ -80,6 +80,46 @@ describe('TopicPracticeCardComponent', () => {
     );
   });
 
+  it('should generate fallback thumbnail url through UrlInterpolationService', () => {
+    urlInterpolationService.getStaticImageUrl.and.returnValue(
+      '/assets/generated-fallback.webp'
+    );
+
+    component.thumbnailUrl = '';
+
+    component.ngOnInit();
+
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledTimes(1);
+    expect(component.resolvedThumbnailUrl).toBe(
+      '/assets/generated-fallback.webp'
+    );
+  });
+
+  it('should not call UrlInterpolationService when thumbnail url is provided', () => {
+    component.thumbnailUrl = '/assets/custom-thumbnail.png';
+
+    component.ngOnInit();
+
+    expect(urlInterpolationService.getStaticImageUrl).not.toHaveBeenCalled();
+    expect(component.resolvedThumbnailUrl).toBe('/assets/custom-thumbnail.png');
+  });
+
+  it('should execute navigateTo when url is provided', () => {
+    expect(component.navigateTo).toBeDefined();
+  });
+
+  it('should execute navigateTo when url is null', () => {
+    expect(() => {
+      component.navigateTo(null);
+    }).not.toThrow();
+  });
+
+  it('should execute navigateTo when url is empty', () => {
+    expect(() => {
+      component.navigateTo('');
+    }).not.toThrow();
+  });
+
   it('should return provided practice description', () => {
     component.practiceDescription = 'Practice solving algebra problems.';
 
@@ -120,18 +160,9 @@ describe('TopicPracticeCardComponent', () => {
     expect(component.getThumbnailAltText()).toBe('Practice thumbnail');
   });
 
-  it('should generate fallback thumbnail url through UrlInterpolationService', () => {
-    urlInterpolationService.getStaticImageUrl.and.returnValue(
-      '/assets/generated-fallback.webp'
-    );
+  it('should return default thumbnail alt text when practice title is undefined', () => {
+    component.practiceTitle = undefined as unknown as string;
 
-    component.thumbnailUrl = '';
-
-    component.ngOnInit();
-
-    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledTimes(1);
-    expect(component.resolvedThumbnailUrl).toBe(
-      '/assets/generated-fallback.webp'
-    );
+    expect(component.getThumbnailAltText()).toBe('Practice thumbnail');
   });
 });

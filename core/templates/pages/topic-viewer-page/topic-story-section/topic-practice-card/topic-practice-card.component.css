@@ -109,7 +109,9 @@
 .topic-practice-card-practice-button {
   align-items: center;
   background: #c85f44;
+  border: none;
   border-radius: 4px;
+  box-shadow: none;
   color: #fff;
   display: inline-flex;
   font-family: Roboto, Arial, sans-serif;
@@ -118,6 +120,7 @@
   height: 44px;
   justify-content: center;
   min-width: 101px;
+  outline: none;
   text-decoration: none;
 }
 

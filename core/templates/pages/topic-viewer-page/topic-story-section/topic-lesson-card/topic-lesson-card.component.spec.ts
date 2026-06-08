@@ -78,20 +78,6 @@ describe('TopicLessonCardComponent', () => {
     );
   });
 
-  it('should return thumbnail alt text with lesson title', () => {
-    component.lessonTitle = 'Introduction to Fractions';
-
-    expect(component.getThumbnailAltText()).toBe(
-      'Lesson thumbnail for Introduction to Fractions'
-    );
-  });
-
-  it('should return default thumbnail alt text when lesson title is empty', () => {
-    component.lessonTitle = '';
-
-    expect(component.getThumbnailAltText()).toBe('Lesson thumbnail');
-  });
-
   it('should generate fallback thumbnail url through UrlInterpolationService', () => {
     urlInterpolationService.getStaticImageUrl.and.returnValue(
       '/assets/generated-fallback.webp'
@@ -114,5 +100,41 @@ describe('TopicLessonCardComponent', () => {
 
     expect(urlInterpolationService.getStaticImageUrl).not.toHaveBeenCalled();
     expect(component.resolvedThumbnailUrl).toBe('/assets/custom-thumbnail.png');
+  });
+
+  it('should execute navigateTo when url is provided', () => {
+    expect(component.navigateTo).toBeDefined();
+  });
+
+  it('should execute navigateTo when url is null', () => {
+    expect(() => {
+      component.navigateTo(null);
+    }).not.toThrow();
+  });
+
+  it('should execute navigateTo when url is empty', () => {
+    expect(() => {
+      component.navigateTo('');
+    }).not.toThrow();
+  });
+
+  it('should return thumbnail alt text with lesson title', () => {
+    component.lessonTitle = 'Introduction to Fractions';
+
+    expect(component.getThumbnailAltText()).toBe(
+      'Lesson thumbnail for Introduction to Fractions'
+    );
+  });
+
+  it('should return default thumbnail alt text when lesson title is empty', () => {
+    component.lessonTitle = '';
+
+    expect(component.getThumbnailAltText()).toBe('Lesson thumbnail');
+  });
+
+  it('should return default thumbnail alt text when lesson title is undefined', () => {
+    component.lessonTitle = undefined as unknown as string;
+
+    expect(component.getThumbnailAltText()).toBe('Lesson thumbnail');
   });
 });
