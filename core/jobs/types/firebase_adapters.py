@@ -96,7 +96,7 @@ class WeakRecord(StrongRecord):
         Raises:
             TypeError. Always, since Firebase records lack a valid `user_id`.
         """
-        del record  # Unused.
+        del record
         raise TypeError('Firebase records have no Oppia User ID')
 
     @classmethod
