@@ -18,8 +18,9 @@
 
 from __future__ import annotations
 
-from core import utils
 from typing import List, TypedDict
+
+from core import utils
 
 # Valid values for async_status field.
 VALID_ASYNC_STATUSES: List[str] = ['Available', 'Not_Ready', 'Blocked']

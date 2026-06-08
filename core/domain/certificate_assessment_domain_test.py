@@ -92,11 +92,29 @@ class CertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, 'title must be a non-empty'):
             offering.validate()
 
+    def test_validate_rejects_empty_certificate_id(self) -> None:
+        offering = self._get_sample_offering()
+        offering.certificate_id = ''
+
+        with self.assertRaisesRegex(
+            Exception, 'certificate_id must be a non-empty string'
+        ):
+            offering.validate()
+
     def test_validate_rejects_long_title(self) -> None:
         offering = self._get_sample_offering()
         offering.title = 'a' * 81
 
         with self.assertRaisesRegex(Exception, 'title must be at most 80'):
+            offering.validate()
+
+    def test_validate_rejects_empty_description(self) -> None:
+        offering = self._get_sample_offering()
+        offering.description = '   '
+
+        with self.assertRaisesRegex(
+            Exception, 'description must be a non-empty string'
+        ):
             offering.validate()
 
     def test_validate_rejects_long_description(self) -> None:
@@ -105,6 +123,42 @@ class CertificateAssessmentOfferingTest(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception, 'description must be at most 500'
+        ):
+            offering.validate()
+
+    def test_validate_rejects_empty_classroom_id(self) -> None:
+        offering = self._get_sample_offering()
+        offering.classroom_id = ''
+
+        with self.assertRaisesRegex(
+            Exception, 'classroom_id must be a non-empty string'
+        ):
+            offering.validate()
+
+    def test_validate_rejects_empty_topic_ids(self) -> None:
+        offering = self._get_sample_offering()
+        offering.topic_ids = []
+
+        with self.assertRaisesRegex(
+            Exception, 'topic_ids must contain at least one topic'
+        ):
+            offering.validate()
+
+    def test_validate_rejects_non_string_topic_ids(self) -> None:
+        offering = self._get_sample_offering()
+        offering.topic_ids = ['topic_place_values', '']
+
+        with self.assertRaisesRegex(
+            Exception, 'topic_ids must contain only non-empty strings'
+        ):
+            offering.validate()
+
+    def test_validate_rejects_invalid_total_questions(self) -> None:
+        offering = self._get_sample_offering()
+        offering.total_questions = 0
+
+        with self.assertRaisesRegex(
+            Exception, 'total_questions must be a positive integer'
         ):
             offering.validate()
 
@@ -117,6 +171,15 @@ class CertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         ):
             offering.validate()
 
+    def test_validate_rejects_invalid_time_limit(self) -> None:
+        offering = self._get_sample_offering()
+        offering.time_limit_in_minutes = 0
+
+        with self.assertRaisesRegex(
+            Exception, 'time_limit_in_minutes must be a positive integer'
+        ):
+            offering.validate()
+
     def test_validate_rejects_too_long_time_limit(self) -> None:
         offering = self._get_sample_offering()
         offering.time_limit_in_minutes = 61
@@ -126,12 +189,50 @@ class CertificateAssessmentOfferingTest(test_utils.GenericTestBase):
         ):
             offering.validate()
 
+    def test_validate_rejects_non_list_demonstrates(self) -> None:
+        offering = self._get_sample_offering()
+        setattr(
+            offering,
+            'demonstrates',
+            'Understanding of whole numbers',
+        )
+
+        with self.assertRaisesRegex(
+            Exception, 'demonstrates must be a list of strings'
+        ):
+            offering.validate()
+
     def test_validate_rejects_empty_demonstrates(self) -> None:
         offering = self._get_sample_offering()
         offering.demonstrates = []
 
         with self.assertRaisesRegex(
             Exception, 'demonstrates must contain at least one item'
+        ):
+            offering.validate()
+
+    def test_validate_rejects_invalid_demonstrates_item(self) -> None:
+        offering = self._get_sample_offering()
+        offering.demonstrates = ['Understanding of whole numbers', '']
+
+        with self.assertRaisesRegex(
+            Exception, 'demonstrates must contain only non-empty strings'
+        ):
+            offering.validate()
+
+    def test_validate_rejects_invalid_async_status(self) -> None:
+        offering = self._get_sample_offering()
+        offering.async_status = 'Draft'
+
+        with self.assertRaisesRegex(Exception, 'async_status must be one of'):
+            offering.validate()
+
+    def test_validate_rejects_invalid_version(self) -> None:
+        offering = self._get_sample_offering()
+        offering.version = 0
+
+        with self.assertRaisesRegex(
+            Exception, 'version must be a positive integer'
         ):
             offering.validate()
 

@@ -91,10 +91,10 @@ class CertificateAssessmentOfferingHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            "At 'http://localhost/certificate_assessment_offering_handler' "
-            "these errors are happening:\nSchema validation for "
-            "'demonstrates' failed: Validation failed: "
-            "has_length_at_least ({'min_value': 1}) for object []",
+            'At \'http://localhost/certificate_assessment_offering_handler\' '
+            'these errors are happening:\nSchema validation for '
+            '\'demonstrates\' failed: Validation failed: '
+            'has_length_at_least ({\'min_value\': 1}) for object []',
         )
 
     def test_get_returns_real_certificate_offerings(self) -> None:
