@@ -32,23 +32,21 @@ runs:
     - name: Clean up stale Oppia server process before rerun
       shell: bash
       run: |
+        for i in 1 2 3; do
+          if ! fuser 8181/tcp >/dev/null 2>&1; then
+            echo "Port 8181 is free."
+            break
+          fi
+          echo "Attempt $i: Port 8181 occupied. Killing stale process..."
+          fuser -KILL -k 8181/tcp
+          sleep 5
+        done
+
         if fuser 8181/tcp >/dev/null 2>&1; then
-          echo "Port 8181 is occupied. Stopping stale process..."
-          fuser -TERM -k 8181/tcp || true
-          sleep 2
-          if fuser 8181/tcp >/dev/null 2>&1; then
-            echo "Port 8181 is still occupied after SIGTERM. Force stopping..."
-            fuser -KILL -k 8181/tcp || true
-            sleep 1
-          fi
-          if fuser 8181/tcp >/dev/null 2>&1; then
-            echo "Port 8181 is still occupied after cleanup."
-            exit 1
-          fi
-          echo "Port 8181 successfully freed."
-        else
-          echo "Port 8181 already free."
+          echo "Port 8181 is still occupied after cleanup."
+          exit 1
         fi
+        echo "Port 8181 successfully freed."
     - name: Run ${{ inputs.viewport-type == 'mobile' && 'Mobile' || 'Desktop' }} Acceptance Test ${{ inputs.test-suite }}
       id: run-acceptance-test
       shell: bash
