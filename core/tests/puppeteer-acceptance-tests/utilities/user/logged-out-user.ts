@@ -69,6 +69,10 @@ const donatePageThanksModalURL = testConstants.URLs.DonatePageThanksModalURL;
 const aboutPageThanksModalURL = testConstants.URLs.AboutPageThanksModalURL;
 const volunteerFormUrl = testConstants.URLs.VolunteerForm;
 const volunteerUrl = testConstants.URLs.Volunteer;
+const robotsTxtUrl = testConstants.URLs.RobotsTxt;
+const sitemapXmlUrl = testConstants.URLs.SitemapXml;
+const teachersUrl = testConstants.URLs.Teachers;
+const parentsUrl = testConstants.URLs.Parents;
 const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
 const impactReport2022Url = testConstants.URLs.ImpactReport2022Url;
 const impactReport2023Url = testConstants.URLs.ImpactReport2023Url;
@@ -606,8 +610,6 @@ const conceptCardCloseButtonSelector = '.e2e-test-close-concept-card';
 const promoBarTextSelector = '.e2e-test-promo-bar-text';
 const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
 
-const sitemapXmlUrl = testConstants.URLs.SitemapXml;
-
 const sitemapXmlLocTag = '<loc>';
 
 const metaOgTitleSelector = 'meta[property="og:title"]';
@@ -931,6 +933,20 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to navigate to the Teachers page.
+   */
+  async navigateToTeachersPage(): Promise<void> {
+    await this.goto(teachersUrl);
+  }
+
+  /**
+   * Function to navigate to the Parents page.
+   */
+  async navigateToParentsPage(): Promise<void> {
+    await this.goto(parentsUrl);
+  }
+
+  /**
    * Function to navigate to the Donate page.
    */
   async navigateToDonatePage(): Promise<void> {
@@ -964,6 +980,13 @@ export class LoggedOutUser extends BaseUser {
       await this.page.reload();
     }
     await this.goto(classroomsPageUrl, verifyURL);
+  }
+
+  /**
+   * Function to navigate to the robots.txt page.
+   */
+  async navigateToRobotsTxt(): Promise<void> {
+    await this.goto(robotsTxtUrl, false);
   }
 
   /**

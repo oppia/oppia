@@ -68,6 +68,28 @@ const PARTNERSHIPS_SEO = {
   applicationName: 'Oppia.org',
 };
 
+// Expected SEO metadata values for teachers page.
+const TEACHERS_SEO = {
+  title: 'Volunteer | Oppia',
+  ogTitle: 'Personalized Online Learning from Oppia',
+  description:
+    'Learn any subject through free and interactive lessons in easy-to-follow language. Oppia provides a step-by-step learning process to master any skills you want.',
+  ogDescription:
+    'Oppia is a free, open-source learning platform. Join the community to create or try an exploration today!',
+  applicationName: 'Oppia.org',
+};
+
+// Expected SEO metadata values for parents page.
+const PARENTS_SEO = {
+  title: 'Volunteer | Oppia',
+  ogTitle: 'Personalized Online Learning from Oppia',
+  description:
+    'Learn any subject through free and interactive lessons in easy-to-follow language. Oppia provides a step-by-step learning process to master any skills you want.',
+  ogDescription:
+    'Oppia is a free, open-source learning platform. Join the community to create or try an exploration today!',
+  applicationName: 'Oppia.org',
+};
+
 describe('Search Engine Bot', function () {
   let loggedOutUser: LoggedOutUser;
 
@@ -79,6 +101,10 @@ describe('Search Engine Bot', function () {
     'should discover the site map architecture, respect crawling restrictions,' +
       ' and extract unique, high-fidelity metadata from core public pages',
     async function () {
+      // Issue an HTTP GET request to oppia.org/robots.txt.
+      await loggedOutUser.navigateToRobotsTxt();
+      await loggedOutUser.verifyCurrentPageStatus200();
+
       // Issue an HTTP GET request to oppia.org/sitemap.xml.
       await loggedOutUser.navigateToSitemapXml();
       await loggedOutUser.verifyCurrentPageStatus200();
@@ -103,6 +129,16 @@ describe('Search Engine Bot', function () {
       await loggedOutUser.navigateToPartnershipsPage();
       await loggedOutUser.verifyCurrentPageStatus200();
       await loggedOutUser.verifySEOMetadata(PARTNERSHIPS_SEO);
+
+      // Issue an HTTP GET request to oppia.org/teachers.
+      await loggedOutUser.navigateToTeachersPage();
+      await loggedOutUser.verifyCurrentPageStatus200();
+      await loggedOutUser.verifySEOMetadata(TEACHERS_SEO);
+
+      // Issue an HTTP GET request to oppia.org/parents.
+      await loggedOutUser.navigateToParentsPage();
+      await loggedOutUser.verifyCurrentPageStatus200();
+      await loggedOutUser.verifySEOMetadata(PARENTS_SEO);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
