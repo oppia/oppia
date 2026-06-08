@@ -22,7 +22,6 @@
 test.describe.configure({mode: 'serial'});
 
 import {test} from '@playwright/test';
-import {showMessage} from '../../utilities/common/show-message';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {
   ExplorationEditor,
@@ -32,21 +31,20 @@ import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 test.describe('Logged-In Learner', function () {
+  // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+  // in mobile viewport which is required for testing the feedback messages tab),
+  // remove this part of skipping the test and make the test to run in mobile viewport as well.
+  // see: https://github.com/oppia/oppia/issues/19443
+  test.skip(
+    () => process.env.MOBILE === 'true',
+    'Test skipped in mobile viewport'
+  );
+
   let loggedInLearner: LoggedInUser & LoggedOutUser;
   let explorationEditor: ExplorationEditor;
   let explorationId: string;
 
   test.beforeAll(async function ({browser}) {
-    // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
-    // in mobile viewport which is required for testing the feedback messages tab),
-    // remove this part of skipping the test and make the test to run in mobile viewport as well.
-    // see: https://github.com/oppia/oppia/issues/19443
-    if (process.env.MOBILE === 'true') {
-      showMessage('Test skipped in mobile viewport');
-
-      process.exit(0);
-    }
-
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
       'exploration_editor@example.com',
