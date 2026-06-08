@@ -29,7 +29,11 @@ from typing import TYPE_CHECKING, Any, Dict, Optional
 if TYPE_CHECKING:  # pragma: no cover
     import datetime
 
-GOOGLE_APP_ENGINE_HOST = os.environ.get('APP_ENGINE_HOST', 'localhost')
+GOOGLE_APP_ENGINE_HOST = (
+    os.environ['APP_ENGINE_HOST']
+    if 'APP_ENGINE_HOST' in os.environ
+    else 'localhost'
+)
 GOOGLE_APP_ENGINE_PORT = os.environ['PORT'] if 'PORT' in os.environ else '8181'
 
 
