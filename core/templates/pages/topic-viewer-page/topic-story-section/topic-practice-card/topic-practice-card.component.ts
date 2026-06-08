@@ -46,6 +46,12 @@ export class TopicPracticeCardComponent implements OnInit {
       this.thumbnailUrl || this.getFallbackThumbnailUrl();
   }
 
+  navigateTo(url: string | null): void {
+    if (url) {
+      window.location.href = url;
+    }
+  }
+
   getResolvedDescription(): string {
     if (this.practiceDescription) {
       return this.practiceDescription;

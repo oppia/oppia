@@ -44,6 +44,12 @@ export class TopicLessonCardComponent implements OnInit {
       this.thumbnailUrl || this.getFallbackThumbnailUrl();
   }
 
+  navigateTo(url: string | null): void {
+    if (url) {
+      window.location.href = url;
+    }
+  }
+
   getThumbnailAltText(): string {
     return this.lessonTitle
       ? 'Lesson thumbnail for ' + this.lessonTitle

@@ -10,12 +10,11 @@
       <h3 class="topic-lesson-card-title">{{ lessonTitle }}</h3>
       <p class="topic-lesson-card-description">{{ lessonDescription }}</p>
     </div>
-    <button
-  class="topic-lesson-card-start-button"
-  type="button"
-  [disabled]="!startUrl"
-  (click)="startUrl && (window.location.href = startUrl)">
-  Start
-</button>
+    <button class="topic-lesson-card-start-button"
+            type="button"
+            [disabled]="!startUrl"
+            (click)="navigateTo(startUrl)">
+      Start
+    </button>
   </div>
 </div>

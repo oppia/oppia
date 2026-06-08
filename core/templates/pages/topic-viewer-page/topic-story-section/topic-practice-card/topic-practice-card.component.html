@@ -23,10 +23,12 @@
         Study
       </a>
 
-      <a class="topic-practice-card-practice-button"
-         [attr.href]="practiceUrl || '#'">
+      <button class="topic-practice-card-practice-button"
+              type="button"
+              [disabled]="!practiceUrl"
+              (click)="navigateTo(practiceUrl)">
         Practice
-      </a>
+      </button>
     </div>
   </div>
 </div>

@@ -2,8 +2,8 @@
   box-sizing: border-box;
   margin: 0 auto;
   max-width: 960px;
-  width: 100%;
   padding: 0;
+  width: 100%;
 }
 
 .story-callout-row {
@@ -147,10 +147,10 @@
 
 .story-lesson-card-wrapper,
 .story-practice-card-wrapper {
-  margin-top: auto;
-  width: 100%;
-  max-width: 912px;
   align-self: center;
+  margin-top: auto;
+  max-width: 912px;
+  width: 100%;
 }
 
 @media (max-width: 768px) {
