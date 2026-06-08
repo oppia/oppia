@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import json
 import os
 import shutil
 import subprocess
@@ -25,7 +26,7 @@ import sys
 
 from scripts import build, common, servers
 
-from typing import Final, List, Optional, Tuple
+from typing import Final, List, Optional, Tuple, cast
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
@@ -107,6 +108,60 @@ def compile_test_ts_files() -> None:
     )
 
 
+def install_playwright_dependencies() -> None:
+    """Installs Playwright npm dependencies and browsers."""
+    # TODO(#26264): Remove the separate Node 20 PATH
+    # override once Oppia upgrades its default Node version to 20.
+    playwright_dir = os.path.join(
+        common.CURR_DIR, 'core', 'tests', 'playwright-acceptance-tests'
+    )
+    playwright_node_modules = os.path.join(playwright_dir, 'node_modules')
+
+    if os.path.exists(playwright_node_modules):
+        return
+
+    install_env = {
+        **os.environ,
+        'PATH': os.pathsep.join(
+            [
+                os.path.join(common.PLAYWRIGHT_NODE_PATH, 'bin'),
+                os.environ['PATH'],
+            ]
+        ),
+        'NODE': os.path.join(common.PLAYWRIGHT_NODE_PATH, 'bin', 'node'),
+    }
+    subprocess.check_call(
+        [common.PLAYWRIGHT_NPM_BIN_PATH, '--prefix', playwright_dir, 'ci'],
+        env=install_env,
+    )
+    playwright_bin = os.path.join(
+        playwright_dir, 'node_modules', '.bin', 'playwright'
+    )
+    subprocess.check_call(
+        [playwright_bin, 'install', 'chromium'], env=install_env
+    )
+
+
+def get_suite_framework(suite_name: str) -> str:
+    """Returns the framework for the given suite name."""
+    # TODO(#24715): Remove the framework lookup once the
+    # migration from Puppeteer to Playwright is complete.
+    with open(
+        common.ACCEPTANCE_TEST_CONFIG_FILE_PATH, 'r', encoding='utf-8'
+    ) as f:
+        # Here we use cast because we are narrowing down the type
+        # since we know the structure of the acceptance test config
+        # file and it contains suite configuration dictionaries.
+        filedata = cast(dict[str, list[dict[str, str]]], json.load(f))
+
+    for suites in filedata.values():
+        for suite in suites:
+            if suite['name'] == suite_name:
+                return suite['framework']
+
+    raise ValueError(f'Suite \'{suite_name}\' not found in config.')
+
+
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start acceptance tests."""
     if common.is_oppia_server_already_running():
@@ -117,10 +172,19 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         """
         )
 
+    suite_framework = get_suite_framework(args.suite)
+
     with contextlib.ExitStack() as stack:
         dev_mode = not args.prod_env
 
-        compile_test_ts_files()
+        # Only compile Puppeteer TypeScript for Puppeteer suites.
+        if suite_framework == 'puppeteer':
+            compile_test_ts_files()
+
+        # Install Playwright deps for Playwright suites.
+        if suite_framework == 'playwright':
+            install_playwright_dependencies()
+
         if args.skip_build:
             common.modify_constants(prod_env=args.prod_env)
         else:
