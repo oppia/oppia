@@ -25,7 +25,7 @@ topic-viewer-page .oppia-redesigned-topic-viewer-container.studyguide-view-activ
 topic-viewer-page .redesigned-topic-viewer-content topic-header {
   display: block;
   margin: 0 auto;
-  max-width: 1160px;
+  max-width: 960px;
   width: 100%;
 }
 

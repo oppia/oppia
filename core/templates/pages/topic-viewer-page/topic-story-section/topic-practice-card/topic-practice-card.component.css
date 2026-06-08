@@ -1,9 +1,10 @@
 .topic-practice-card {
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  border: 1px solid #eee;
+  border-radius: 8px;
   display: flex;
-  min-height: 120px;
+  height: 212px;
+  min-height: 212px;
   overflow: hidden;
   width: 100%;
 }
@@ -12,16 +13,16 @@
   align-items: center;
   background: #f8f1f1;
   display: flex;
-  flex: 0 0 210px;
+  flex: 0 0 225px;
+  height: 100%;
   justify-content: center;
-  min-height: 140px;
   padding: 0;
 }
 
 .topic-practice-card-image {
   height: auto;
-  max-height: 100px;
-  max-width: 150px;
+  max-height: 120px;
+  max-width: 160px;
   object-fit: contain;
   width: auto;
 }
@@ -30,9 +31,8 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  justify-content: space-between;
   min-width: 0;
-  padding: 14px 18px;
+  padding: 24px 22px 18px;
 }
 
 .topic-practice-card-copy {
@@ -46,7 +46,7 @@
   font-family: Roboto, Arial, sans-serif;
   font-size: 24px;
   font-weight: 500;
-  line-height: 24px;
+  line-height: 1.2;
   margin: 0;
 }
 
@@ -55,7 +55,7 @@
   font-family: Roboto, Arial, sans-serif;
   font-size: 20px;
   font-weight: 400;
-  line-height: 20px;
+  line-height: 1.2;
   margin: 0;
 }
 
@@ -113,43 +113,41 @@
   color: #fff;
   display: inline-flex;
   font-family: Roboto, Arial, sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
-  gap: 10px;
   height: 44px;
   justify-content: center;
-  line-height: 24px;
-  padding: 10px;
+  min-width: 101px;
   text-decoration: none;
-  width: 101px;
 }
 
 @media (max-width: 768px) {
   .topic-practice-card {
-    min-height: 100px;
+    height: 160px;
+    min-height: 160px;
   }
 
   .topic-practice-card-thumbnail {
-    flex: 0 0 130px;
-    min-height: 100px;
+    flex: 0 0 180px;
+    height: 100%;
   }
 
   .topic-practice-card-content {
-    padding: 10px 14px;
+    padding: 16px;
   }
 
   .topic-practice-card-copy {
-    gap: 4px;
+    gap: 6px;
   }
 
   .topic-practice-card-title {
-    font-size: 16px;
-    line-height: 20px;
+    font-size: 20px;
+    line-height: 24px;
   }
 
   .topic-practice-card-description {
-    font-size: 13px;
-    line-height: 16px;
+    font-size: 16px;
+    line-height: 20px;
   }
 
   .topic-practice-card-progress {
@@ -168,7 +166,7 @@
   }
 
   .topic-practice-card-actions {
-    gap: 12px;
+    gap: 16px;
   }
 
   .topic-practice-card-study-link {
@@ -176,10 +174,10 @@
   }
 
   .topic-practice-card-practice-button {
-    font-size: 12px;
-    height: 36px;
-    padding: 8px;
-    width: 80px;
+    font-size: 13px;
+    height: 40px;
+    min-width: 90px;
+    width: 90px;
   }
 }
 
@@ -188,42 +186,44 @@
     border-radius: 8px;
     display: flex;
     flex-direction: column;
+    height: auto;
+    min-height: auto;
     overflow: hidden;
   }
 
   .topic-practice-card-thumbnail {
     flex: none;
-    height: 104px;
-    min-height: 104px;
+    height: 140px;
+    min-height: 140px;
     width: 100%;
   }
 
   .topic-practice-card-image {
-    max-height: 72px;
-    max-width: 110px;
+    max-height: 80px;
+    max-width: 120px;
   }
 
   .topic-practice-card-content {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    padding: 10px;
+    gap: 8px;
+    padding: 12px;
   }
 
   .topic-practice-card-copy {
-    gap: 2px;
+    gap: 4px;
   }
 
   .topic-practice-card-title {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
     line-height: 20px;
     margin: 0;
   }
 
   .topic-practice-card-description {
-    font-size: 12px;
-    line-height: 16px;
+    font-size: 13px;
+    line-height: 18px;
     margin: 0;
   }
 
@@ -255,15 +255,12 @@
 
   .topic-practice-card-study-link {
     font-size: 14px;
-    margin-left: 12px;
   }
 
   .topic-practice-card-practice-button {
     font-size: 14px;
     height: 40px;
-    margin-left: 0;
-    margin-right: 12px;
-    padding: 8px 12px;
+    min-width: 120px;
     width: 120px;
   }
 }
