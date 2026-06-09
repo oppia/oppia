@@ -30,6 +30,12 @@ const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
 const pagesWithDialogHandler = new WeakSet<Page>();
 
+declare global {
+  interface Window {
+    __isElementClickable: typeof isElementClickable;
+  }
+}
+
 export class BaseUser {
   readonly page: Page;
   userHasAcceptedCookies: boolean = false;
@@ -306,7 +312,7 @@ export class BaseUser {
         : selector;
     await this.page.waitForFunction(
       ({element, clickable}: {element: Element; clickable: boolean}) =>
-        (window as any).__isElementClickable(element, clickable),
+        window.__isElementClickable(element, clickable),
       {element, clickable}
     );
   }

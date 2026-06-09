@@ -42,7 +42,6 @@ const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
 const explorationCategoryDropdown =
   'mat-form-field.e2e-test-exploration-category-metadata-modal';
 const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
-const submitAnswerButton = '.e2e-test-submit-answer-button';
 
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = '.e2e-test-confirm-publish';

@@ -478,7 +478,7 @@ export class LoggedOutUser extends BaseUser {
           if (!element) {
             return false;
           }
-          return (window as any).__isElementClickable(element, clickable);
+          return window.__isElementClickable(element, clickable);
         },
         {selector: lessonCardTitleSelector, index: lessonIndex, clickable: true}
       );
