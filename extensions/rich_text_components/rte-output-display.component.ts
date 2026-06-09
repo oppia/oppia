@@ -723,10 +723,11 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     }
     if (node.nodeType === 'component') {
       const key = node.selector.split('oppia-noninteractive-')[1];
-      const templateRef = tagPortals[key];
-      return new TemplatePortal(templateRef!, this._viewContainerRef, {
-        $implicit: node.attrs,
-      });
+      return new TemplatePortal(
+        tagPortals[key] as TemplateRef<unknown>,
+        this._viewContainerRef,
+        {$implicit: node.attrs}
+      );
     }
     const templateRef = tagPortals[node.selector];
     if (templateRef !== undefined) {
