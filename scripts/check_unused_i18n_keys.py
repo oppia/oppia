@@ -78,9 +78,14 @@ def check_unused_keys() -> bool:
 
     all_keys = set(en_json.keys())
 
-    with open(ALLOWLIST_PATH, 'r', encoding='utf-8') as f:
-        allowlist = json.load(f)
-    allowlist_patterns = [item['pattern'] for item in allowlist['patterns']]
+    # --- MUDANÇA AQUI: Protegendo contra a ausência do arquivo ---
+    allowlist_patterns = []
+    if os.path.exists(ALLOWLIST_PATH):
+        with open(ALLOWLIST_PATH, 'r', encoding='utf-8') as f:
+            allowlist = json.load(f)
+            allowlist_patterns = [
+                item['pattern'] for item in allowlist.get('patterns', [])
+            ]
 
     code_tokens = get_all_code_tokens()
 
