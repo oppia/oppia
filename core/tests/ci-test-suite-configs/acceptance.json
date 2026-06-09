@@ -482,8 +482,8 @@
     },
     {
       "name": "logged-in-learner/changes-site-language-to-rtl",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/changes-site-language-to-rtl.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/changes-site-language-to-rtl.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/edit-the-profile",

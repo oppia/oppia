@@ -622,6 +622,61 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   /**
+   * Create a story, execute chapter creation for
+   * the story, and then publish the story.
+   */
+  async createAndPublishStoryWithChapter(
+    storyTitle: string,
+    storyUrlFragment: string,
+    chapterTitle: string,
+    explorationId: string,
+    topicName?: string
+  ): Promise<void> {
+    if (topicName) {
+      await this.openTopicEditor(topicName);
+    }
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(mobileStoryDropdown);
+    }
+    await this.clickOnElementWithSelector(addStoryButton);
+    await this.typeInInputField(storyTitleField, storyTitle);
+    await this.page.waitForSelector(storyUrlFragmentField, {
+      state: 'visible',
+    });
+    await this.page.type(storyUrlFragmentField, storyUrlFragment);
+    await this.typeInInputField(
+      storyDescriptionField,
+      `Story creation description for ${storyTitle}.`
+    );
+
+    await this.clickOnElementWithSelector(storyPhotoBoxButton);
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOnElementWithSelector(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {state: 'hidden'});
+    await this.clickAndWaitForNavigation(createStoryButton, true);
+
+    await this.page.waitForSelector(storyMetaTagInput);
+    await this.page.focus(storyMetaTagInput);
+    await this.page.type(storyMetaTagInput, 'meta');
+    await this.page.keyboard.press('Tab');
+
+    await this.addChapter(chapterTitle, explorationId);
+
+    await this.saveStoryDraft();
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(mobileSaveStoryChangesDropdown);
+      await this.page.waitForSelector(mobilePublishStoryButton);
+      await this.clickOnElementWithSelector(mobilePublishStoryButton);
+    } else {
+      await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
+      await this.clickOnElementWithSelector(publishStoryButton);
+      await this.page.waitForSelector(unpublishStoryButton, {state: 'visible'});
+    }
+  }
+
+  /**
    * Creates and publishes a topic with a subtopic and skill.
    * @param {string} topicName - The name of the topic.
    * @param {string} subtopicName - The name of the subtopic.

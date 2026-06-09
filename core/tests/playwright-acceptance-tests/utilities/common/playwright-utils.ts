@@ -16,11 +16,13 @@
  * @fileoverview Utility File for Playwright Acceptance Tests.
  */
 
-import {ViewportSize} from '@playwright/test';
-import {Page, ElementHandle} from '@playwright/test';
+import {expect, ViewportSize, Page, ElementHandle} from '@playwright/test';
 import isElementClickable from '../../functions/is-element-clickable';
 import testConstants from './test-constants';
 import {showMessage} from './show-message';
+
+const backgroundBanner = '.oppia-background-image';
+const libraryBanner = '.e2e-test-library-banner';
 
 const toastMessageSelector = '.e2e-test-toast-message';
 
@@ -427,6 +429,60 @@ export class BaseUser {
   }
 
   /**
+   * This function checks if the page URL contains the given URL.
+   * @param {string} url - The URL to check.
+   * @param {Page} context - The page on which the URL should be checked.
+   */
+  async expectPageURLToContain(
+    url: string,
+    context: Page = this.page
+  ): Promise<void> {
+    await context.waitForFunction((url: string) => {
+      return window.location.href.includes(url);
+    }, url);
+  }
+
+  /**
+   * This function compares the current page screenshot with a reference image.
+   * @param {string} imageName - The name for the image
+   * @param {Page|undefined} newPage - The page to take screenshot from. If not
+   *     specified, uses this.page instead.
+   * @param {Parameters<Page['screenshot']>[0]} options - Additional options for the screenshot comparison.
+   */
+  async expectScreenshotToMatch(
+    imageName: string,
+    newPage: Page | undefined = undefined,
+    options: Parameters<Page['screenshot']>[0] = {}
+  ): Promise<void> {
+    const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
+    await currentPage.mouse.move(-1, -1);
+    await currentPage.waitForTimeout(5000);
+
+    let failureTrigger = 0;
+
+    if (this.isViewportAtMobileWidth()) {
+      failureTrigger += 0.048;
+      if (await currentPage.$(backgroundBanner)) {
+        failureTrigger += 0.0352;
+      } else if (await currentPage.$(libraryBanner)) {
+        failureTrigger += 0.0039;
+      }
+    } else {
+      failureTrigger += 0.04;
+      if (await currentPage.$(backgroundBanner)) {
+        failureTrigger += 0.03;
+      } else if (await currentPage.$(libraryBanner)) {
+        failureTrigger += 0.006;
+      }
+    }
+
+    await expect(currentPage).toHaveScreenshot(`${imageName}.png`, {
+      maxDiffPixelRatio: failureTrigger,
+      ...options,
+    });
+  }
+
+  /**
    * Function to find an element by its CSS selector.
    * @param {string} selector - The CSS selector of the element.
    * @param {ElementHandle<Element>} parentElement - The parent element to search in.
@@ -731,7 +787,7 @@ export class BaseUser {
     parentElement?: ElementHandle | null,
     elementPlace?: number
   ): Promise<void> {
-    await this.page.mouse.move(0, 0);
+    await this.page.mouse.move(-1, -1);
     const context = parentElement ?? this.page;
     let element = await context.waitForSelector(selector, {timeout: 60000});
 

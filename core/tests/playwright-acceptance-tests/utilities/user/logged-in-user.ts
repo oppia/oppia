@@ -48,6 +48,7 @@ const invalidEmailErrorContainer = '#mat-error-1';
 const invalidUsernameErrorContainer = '.oppia-warning-text';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
+const angularRootElementSelector = 'oppia-angular-root';
 const explorationCard = '.e2e-test-exploration-dashboard-card';
 const desktopLessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
@@ -1323,6 +1324,32 @@ export class LoggedInUser extends BaseUser {
       newError.stack = (error as Error).stack;
       throw newError;
     }
+  }
+
+  /**
+   * Verifies if the page is displayed in Right-to-Left (RTL) mode.
+   */
+  async verifyPageIsRTL(): Promise<void> {
+    await this.page.waitForSelector(angularRootElementSelector);
+    const pageDirection = await this.page.evaluate(selector => {
+      const oppiaRoot = document.querySelector(selector);
+      if (!oppiaRoot) {
+        throw new Error(`${selector} not found`);
+      }
+
+      const childDiv = oppiaRoot.querySelector('div');
+      if (!childDiv) {
+        throw new Error('Child div not found');
+      }
+
+      return childDiv.getAttribute('dir');
+    }, angularRootElementSelector);
+
+    if (pageDirection !== 'rtl') {
+      throw new Error('Page is not in RTL mode');
+    }
+
+    showMessage('Page is displayed in RTL mode.');
   }
 }
 
