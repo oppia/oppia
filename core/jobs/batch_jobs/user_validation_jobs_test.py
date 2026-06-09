@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import user_validation_jobs
-from core.jobs.types import user_validation_errors
+from core.jobs.types import base_validation_errors, user_validation_errors
 from core.platform import models
 
 from typing import Final, Type
@@ -42,9 +42,11 @@ class GetUsersWithInvalidBioJobTests(job_test_utils.JobTestBase):
     USER_ID_1: Final = 'uid_%s' % ('a' * 32)
     USER_ID_2: Final = 'uid_%s' % ('b' * 32)
     USER_ID_3: Final = 'uid_%s' % ('c' * 32)
+    USER_ID_4: Final = 'uid_%s' % ('d' * 32)
     USER_USERNAME_1: Final = 'user_1'
     USER_USERNAME_2: Final = 'user_2'
     USER_USERNAME_3: Final = 'user_3'
+    USER_USERNAME_4: Final = 'user_4'
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -83,6 +85,41 @@ class GetUsersWithInvalidBioJobTests(job_test_utils.JobTestBase):
         self.put_multi([user])
 
         self.assert_job_output_is([])
+
+    def test_non_user_settings_model_is_skipped(self) -> None:
+        other_model = self.create_model(
+            user_models.UserEmailPreferencesModel,
+            id=self.USER_ID_1,
+        )
+        other_model.update_timestamps()
+        self.put_multi([other_model])
+
+        self.assert_job_output_is([])
+
+    def test_user_with_invalid_domain_object(self) -> None:
+        user = self.create_model(
+            user_models.UserSettingsModel,
+            id=self.USER_ID_4,
+            username=self.USER_USERNAME_4,
+            email='d@d.com',
+            user_bio='Valid bio',
+            roles=[],
+        )
+        user.update_timestamps()
+        self.put_multi([user])
+
+        self.assert_job_output_is(
+            [
+                {
+                    'ModelDomainObjectValidateError': [
+                        base_validation_errors.ModelDomainObjectValidateError(
+                            user,
+                            'Expected roles to contains one default role.',
+                        ).stderr
+                    ]
+                }
+            ]
+        )
 
     def test_user_with_too_long_bio(self) -> None:
         user = self.create_model(
