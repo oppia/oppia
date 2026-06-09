@@ -193,6 +193,7 @@ const getExplorationEditorUrl = async function (browser, page) {
     await page.click(endIneractionSelector);
     await page.waitForSelector(saveInteractionButton, {visible: true});
     await page.click(saveInteractionButton);
+    await page.waitForTimeout(2000);
 
     await page.waitForSelector(saveChangesButton, {visible: true});
     await page.click(saveChangesButton);
