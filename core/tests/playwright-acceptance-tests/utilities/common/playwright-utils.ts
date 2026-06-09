@@ -44,6 +44,9 @@ export class BaseUser {
       pagesWithDialogHandler.add(page);
       this.installPageDialogHandler();
     }
+    this.page.addInitScript(
+      `window.__isElementClickable = ${isElementClickable.toString()}`
+    );
   }
 
   /**
@@ -288,6 +291,24 @@ export class BaseUser {
     await this.page.keyboard.press('A');
     await this.page.keyboard.up('Control');
     await this.page.keyboard.press('Backspace');
+  }
+
+  /**
+   * Checks if element is clickable or not.
+   */
+  async expectElementToBeClickable(
+    selector: string | ElementHandle<Element>,
+    clickable: boolean = true
+  ): Promise<void> {
+    const element =
+      typeof selector === 'string'
+        ? await this.page.waitForSelector(selector)
+        : selector;
+    await this.page.waitForFunction(
+      ({element, clickable}: {element: Element; clickable: boolean}) =>
+        (window as any).__isElementClickable(element, clickable),
+      {element, clickable}
+    );
   }
 
   /**
