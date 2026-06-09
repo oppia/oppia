@@ -99,8 +99,12 @@ const setRole = async function (page, role) {
     await page.click(addNewRoleButton);
 
     await page.click(roleSelect);
-    var selector = `mat-option[ng-reflect-value="${role}"]`;
-    await page.click(selector);
+    await page.waitForSelector('mat-option');
+    var humanReadableRole = role.toLowerCase().replace(/_/g, ' ');
+    const [option] = await page.$x(
+      `//mat-option[contains(., '${humanReadableRole}')]`
+    );
+    await option.click();
     await page.waitForTimeout(2000);
     // eslint-disable-next-line dot-notation
     await page.goto(CREATOR_DASHBOARD_URL, {waitUntil: networkIdle});

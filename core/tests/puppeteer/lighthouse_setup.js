@@ -156,8 +156,12 @@ const setRole = async function (browser, page, role) {
     await page.click(addNewRoleButton);
 
     await page.click(roleSelect);
-    var selector = `mat-option[ng-reflect-value="${role}"]`;
-    await page.click(selector);
+    await page.waitForSelector('mat-option');
+    var humanReadableRole = role.toLowerCase().replace(/_/g, ' ');
+    const [option] = await page.$x(
+      `//mat-option[contains(., '${humanReadableRole}')]`
+    );
+    await option.click();
     await page.waitForTimeout(2000);
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -521,8 +525,6 @@ const main = async function () {
   await getExplorationEditorUrl(browser, page);
 
   await setRole(browser, page, 'COLLECTION_EDITOR');
-
-  await setRole(browser, page, 'ADMIN');
   await getTopicEditorUrl(browser, page);
   await getStoryEditorUrl(browser, page);
   await getSkillEditorUrl(browser, page);
