@@ -179,6 +179,9 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_install_elasticsearch_dev_server() -> None:
             pass
 
+        def mock_install_playwright_node() -> None:
+            pass
+
         def mock_external_script_call() -> None:
             pass
 
@@ -226,6 +229,11 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'install_elasticsearch_dev_server',
             mock_install_elasticsearch_dev_server,
         )
+        swap_install_playwright_node = self.swap(
+            install_third_party_libs,
+            'install_playwright_node',
+            mock_install_playwright_node,
+        )
         swap_install_json_deps_main = self.swap(
             install_python_prod_dependencies,
             'main',
@@ -246,7 +254,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 with pre_commit_hook_main_swap, pre_push_hook_main_swap:
                     with swap_isdir, swap_mkdir, swap_copytree:
                         with swap_install_elasticsearch_dev_server:
-                            install_third_party_libs.main()
+                            with swap_install_playwright_node:
+                                install_third_party_libs.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -746,6 +755,100 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertIn('Node is installed.', print_list)
         self.assertNotIn('Installing Node.js', print_list)
         self.assertNotIn('Removing package-lock.json', print_list)
+
+    def test_install_playwright_node_with_darwin_x64(self) -> None:
+        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+
+        with self.test_py_swap, os_name_swap:
+            with self.download_swap, self.rename_swap, self.exists_false_swap:
+                with self.is_x64_architecture_true_swap:
+                    install_third_party_libs.install_playwright_node()
+
+        self.assertEqual(
+            self.urls,
+            [
+                'https://nodejs.org/dist/v%s/node-v%s-darwin-x64.tar.gz'
+                % (
+                    common.PLAYWRIGHT_NODE_VERSION,
+                    common.PLAYWRIGHT_NODE_VERSION,
+                )
+            ],
+        )
+
+    def test_install_playwright_node_with_linux_x64(self) -> None:
+        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+
+        with self.test_py_swap, os_name_swap:
+            with self.download_swap, self.rename_swap, self.exists_false_swap:
+                with self.is_x64_architecture_true_swap:
+                    install_third_party_libs.install_playwright_node()
+
+        self.assertEqual(
+            self.urls,
+            [
+                'https://nodejs.org/dist/v%s/node-v%s-linux-x64.tar.gz'
+                % (
+                    common.PLAYWRIGHT_NODE_VERSION,
+                    common.PLAYWRIGHT_NODE_VERSION,
+                )
+            ],
+        )
+
+    def test_install_playwright_node_with_unsupported_os_raises_exception(
+        self,
+    ) -> None:
+        os_name_swap = self.swap(common, 'OS_NAME', 'Solaris')
+
+        with self.exists_false_swap, self.is_x64_architecture_true_swap:
+            with os_name_swap, self.assertRaisesRegex(
+                Exception, 'Unsupported OS'
+            ):
+                install_third_party_libs.install_playwright_node()
+
+    def test_install_playwright_node_with_non_x64_architecture(
+        self,
+    ) -> None:
+        all_cmd_tokens: List[str] = []
+
+        def mock_check_call(cmd_tokens: List[str]) -> None:
+            all_cmd_tokens.extend(cmd_tokens)
+
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+
+        with self.download_swap, self.rename_swap, self.exists_false_swap:
+            with self.is_x64_architecture_false_swap, self.cd_swap:
+                with check_call_swap:
+                    install_third_party_libs.install_playwright_node()
+
+        self.assertEqual(
+            self.urls,
+            [
+                'https://nodejs.org/dist/v%s/node-v%s.tar.gz'
+                % (
+                    common.PLAYWRIGHT_NODE_VERSION,
+                    common.PLAYWRIGHT_NODE_VERSION,
+                )
+            ],
+        )
+        self.assertEqual(all_cmd_tokens, ['./configure', 'make'])
+
+    def test_install_playwright_node_skips_if_already_installed(
+        self,
+    ) -> None:
+        print_list: List[str] = []
+
+        def mock_print(arg: str) -> None:
+            print_list.append(arg)
+
+        print_swap = self.swap(builtins, 'print', mock_print)
+
+        with print_swap, self.exists_true_swap:
+            install_third_party_libs.install_playwright_node()
+
+        self.assertIn('Playwright Node is installed.', print_list)
+        self.assertNotIn(
+            'Playwright Node not found. Installing Node.js', print_list
+        )
 
 
 class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):
