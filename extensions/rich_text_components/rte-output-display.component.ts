@@ -724,10 +724,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     if (node.nodeType === 'component') {
       const key = node.selector.split('oppia-noninteractive-')[1];
       const templateRef = tagPortals[key];
-      if (templateRef === undefined) {
-        throw new Error('No portal found for component: ' + node.selector);
-      }
-      return new TemplatePortal(templateRef, this._viewContainerRef, {
+      return new TemplatePortal(templateRef!, this._viewContainerRef, {
         $implicit: node.attrs,
       });
     }
