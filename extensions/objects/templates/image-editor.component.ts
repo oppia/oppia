@@ -151,7 +151,7 @@ interface ImageUploadBackendResponse {
   styleUrls: [],
 })
 export class ImageEditorComponent implements OnInit, OnChanges {
-  @Input() modalId: string = '';
+  @Input() modalId!: symbol;
   @Input() value: string = '';
   @Output() valueChanged = new EventEmitter<string>();
   @Output() validityChange = new EventEmitter<Record<'empty', boolean>>();
