@@ -23,6 +23,8 @@ import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
+test.describe.configure({mode: 'serial'});
+
 test.describe('Logged-in Learner', function () {
   let loggedInUser: LoggedInUser;
 
