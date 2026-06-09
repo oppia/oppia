@@ -277,7 +277,7 @@ export class QuestionPlayerEngineService {
     const onSameCard = !answerIsCorrect;
 
     const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
-    let nextCard: StateCard;
+    let nextCard: StateCard | null = null;
     const nextCardIfReallyStuck = null;
     if (!isFinalQuestion) {
       let nextInteractionHtml = this.getNextInteractionHtml(_nextFocusLabel);
@@ -291,17 +291,9 @@ export class QuestionPlayerEngineService {
         this.getNextStateData().interaction,
         this.getNextStateData().content.contentId ?? ''
       );
-    } else {
-      nextCard = StateCard.createNewCard(
-        '',
-        '',
-        '',
-        oldState.interaction,
-        oldState.content.contentId ?? ''
-      );
     }
     successCallback(
-      nextCard,
+      nextCard as StateCard,
       refreshInteraction,
       feedbackHtml,
       null,

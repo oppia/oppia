@@ -692,7 +692,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
   private _getTemplatePortal(
     node: OppiaRteNode | TextNode
-  ): TemplatePortal<unknown> {
+  ): TemplatePortal<unknown> | undefined {
     const tagPortals: Record<string, TemplateRef<unknown>> = {
       p: this.pTagPortal,
       h1: this.h1TagPortal,
@@ -737,7 +737,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         $implicit: node,
       });
     }
-    throw new Error('Unrecognized node selector: ' + node.selector);
+    return undefined;
   }
 
   shouldHighlightContent(): boolean {

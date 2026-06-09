@@ -47,7 +47,7 @@ export class OppiaRteNode {
   children: (OppiaRteNode | TextNode)[] = [];
   parent: OppiaRteNode | null = null;
   nodeType: '' | 'component';
-  portal!: TemplatePortal;
+  portal: TemplatePortal | undefined;
   constructor(
     public readonly selector: string,
     public attrs: Record<string, string> = {}
