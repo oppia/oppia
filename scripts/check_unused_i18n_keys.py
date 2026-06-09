@@ -78,7 +78,6 @@ def check_unused_keys() -> bool:
 
     all_keys = set(en_json.keys())
 
-    # --- MUDANÇA AQUI: Protegendo contra a ausência do arquivo ---
     allowlist_patterns = []
     if os.path.exists(ALLOWLIST_PATH):
         with open(ALLOWLIST_PATH, 'r', encoding='utf-8') as f:

@@ -60,8 +60,22 @@ class CheckUnusedI18nKeysTests(test_utils.GenericTestBase):
             unused_directory: str,
         ) -> list[tuple[str, list[str], list[str]]]:
             return [
-                ('.', ['node_modules', 'valid_dir'], ['file1.ts']),
+                (
+                    '.',
+                    ['node_modules', '.git', 'third_party', 'valid_dir'],
+                    ['file1.ts'],
+                ),
                 ('./node_modules', [], ['file2.ts']),
+                (
+                    './.git',
+                    [],
+                    ['hidden_file.ts'],
+                ),
+                (
+                    './third_party',
+                    [],
+                    ['lib_file.ts'],
+                ),
                 ('./valid_dir', [], ['file3.html', 'file4.txt']),
             ]
 
@@ -74,6 +88,10 @@ class CheckUnusedI18nKeysTests(test_utils.GenericTestBase):
                 return MockFile('This has I18N_KEY_1 and I18N_KEY_2')
             if path == './node_modules/file2.ts':
                 return MockFile('This has I18N_NODE_KEY')
+            if path == './.git/hidden_file.ts':
+                return MockFile('This has I18N_GIT_KEY')
+            if path == './third_party/lib_file.ts':
+                return MockFile('This has I18N_THIRD_PARTY_KEY')
             if path == './valid_dir/file3.html':
                 return MockFile(
                     'This has I18N_KEY_3 and I18N_KEY_4-with&symbol'
@@ -90,8 +108,10 @@ class CheckUnusedI18nKeysTests(test_utils.GenericTestBase):
         self.assertIn('I18N_KEY_2', tokens)
         self.assertIn('I18N_KEY_3', tokens)
         self.assertIn('I18N_KEY_4-with&symbol', tokens)
-        # Verify that tokens from node_modules files are excluded.
+        # Verify that tokens from excluded directories are ignored.
         self.assertNotIn('I18N_NODE_KEY', tokens)
+        self.assertNotIn('I18N_GIT_KEY', tokens)
+        self.assertNotIn('I18N_THIRD_PARTY_KEY', tokens)
 
     def test_get_all_code_tokens_logs_error_on_read_failure(self) -> None:
         def mock_walk(
@@ -145,7 +165,7 @@ class CheckUnusedI18nKeysTests(test_utils.GenericTestBase):
         }
 
         def mock_exists(path: str) -> bool:
-            return path == self.en_json_path
+            return path in (self.en_json_path, self.allowlist_path)
 
         def mock_open(
             path: str,
