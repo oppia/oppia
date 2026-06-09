@@ -1799,7 +1799,7 @@ describe('ImageEditor', () => {
 
   it("should crop svg when user clicks the 'crop' button", () => {
     spyOn(gifshot, 'createGIF').and.callFake(
-      (obj: any, func: (response: any) => void) => {
+      (obj: object, func: (response: object) => void) => {
         func({image: obj.images});
       }
     );
@@ -1828,7 +1828,7 @@ describe('ImageEditor', () => {
 
   it("should crop png when user clicks the 'crop' button", () => {
     spyOn(gifshot, 'createGIF').and.callFake(
-      (obj: any, func: (response: any) => void) => {
+      (obj: object, func: (response: object) => void) => {
         func({image: obj.images});
       }
     );
@@ -1845,7 +1845,7 @@ describe('ImageEditor', () => {
         height: 0,
         getContext: (txt: string) => {
           return {
-            drawImage: (txt: any, x: number, y: number) => {
+            drawImage: (txt: string, x: number, y: number) => {
               return;
             },
             getImageData: (
@@ -1856,7 +1856,7 @@ describe('ImageEditor', () => {
             ) => {
               return 'data';
             },
-            putImageData: (data: any, x: number, y: number) => {
+            putImageData: (data: string, x: number, y: number) => {
               return;
             },
           };
@@ -1891,7 +1891,7 @@ describe('ImageEditor', () => {
 
   it("should crop gif when user clicks the 'crop' button", done => {
     spyOn(gifshot, 'createGIF').and.callFake(
-      (obj: any, func: (response: any) => void) => {
+      (obj: object, func: (response: object) => void) => {
         func({image: dataGif.uploadedImageData});
       }
     );
@@ -1907,7 +1907,7 @@ describe('ImageEditor', () => {
         height: 0,
         getContext: (txt: string) => {
           return {
-            drawImage: (txt: any, x: number, y: number) => {
+            drawImage: (txt: string, x: number, y: number) => {
               return;
             },
             getImageData: (
@@ -1918,7 +1918,7 @@ describe('ImageEditor', () => {
             ) => {
               return 'data';
             },
-            putImageData: (data: any, x: number, y: number) => {
+            putImageData: (data: string, x: number, y: number) => {
               return;
             },
           };
@@ -2062,7 +2062,7 @@ describe('ImageEditor', () => {
       " percentage by clicking the '-' button",
     done => {
       spyOn(gifshot, 'createGIF').and.callFake(
-        (obj: any, func: (response: any) => void) => {
+        (obj: object, func: (response: object) => void) => {
           func(obj);
         }
       );
@@ -2096,7 +2096,7 @@ describe('ImageEditor', () => {
           height: 0,
           getContext: (txt: string) => {
             return {
-              drawImage: (txt: any, x: number, y: number) => {
+              drawImage: (txt: string, x: number, y: number) => {
                 return;
               },
             };
@@ -2307,7 +2307,7 @@ describe('ImageEditor', () => {
         },
       });
       spyOn(gifshot, 'createGIF').and.callFake(
-        (obj: any, func: (response: any) => void) => {
+        (obj: object, func: (response: object) => void) => {
           func(obj);
         }
       );
@@ -2378,7 +2378,7 @@ describe('ImageEditor', () => {
       },
     });
     spyOn(gifshot, 'createGIF').and.callFake(
-      (obj: any, func: (response: any) => void) => {
+      (obj: object, func: (response: object) => void) => {
         func({
           image: btoa('data:image/gif;base64,' + Array(102410).join('a')),
           error: false,
@@ -2424,7 +2424,7 @@ describe('ImageEditor', () => {
         },
       });
       spyOn(gifshot, 'createGIF').and.callFake(
-        (obj: any, func: (response: any) => void) => {
+        (obj: object, func: (response: object) => void) => {
           func(obj);
         }
       );
@@ -2522,7 +2522,7 @@ describe('ImageEditor', () => {
           height: 0,
           getContext: (txt: string) => {
             return {
-              drawImage: (txt: any, x: number, y: number) => {
+              drawImage: (txt: string, x: number, y: number) => {
                 return;
               },
             };
@@ -2629,7 +2629,7 @@ describe('ImageEditor', () => {
           height: 0,
           getContext: (txt: string) => {
             return {
-              drawImage: (txt: any, x: number, y: number) => {
+              drawImage: (txt: string, x: number, y: number) => {
                 return;
               },
             };
@@ -2689,7 +2689,7 @@ describe('ImageEditor', () => {
           height: 0,
           getContext: (txt: string) => {
             return {
-              drawImage: (txt: any, x: number, y: number) => {
+              drawImage: (txt: string, x: number, y: number) => {
                 return;
               },
             };
@@ -2743,7 +2743,7 @@ describe('ImageEditor', () => {
           height: 0,
           getContext: (txt: string) => {
             return {
-              drawImage: (txt: any, x: number, y: number) => {
+              drawImage: (txt: string, x: number, y: number) => {
                 return;
               },
             };

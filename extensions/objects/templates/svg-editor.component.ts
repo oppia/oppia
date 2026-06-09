@@ -51,7 +51,7 @@ export class PolyPoint {
   ) {}
 }
 interface SvgColorPicker {
-  setOptions(options: object): void;
+  setOptions: (options: object) => void;
   onOpen?: () => void;
 }
 
@@ -687,10 +687,10 @@ export class SvgEditorComponent implements OnInit {
     domReady.then(() => {
       this.initializeFabricJs();
       const fabricWithSvgLoader = fabric as typeof fabric & {
-        loadSVGFromString(
+        loadSVGFromString: (
           svgString: string,
           callback: FabricSvgLoadCallback
-        ): void;
+        ) => void;
       };
       fabricWithSvgLoader.loadSVGFromString(this.savedSvgDiagram, ((
         objects,

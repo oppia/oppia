@@ -28,7 +28,6 @@ import {
 import {InteractiveMultipleChoiceInputComponent} from './oppia-interactive-multiple-choice-input.component';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {Interaction} from 'domain/exploration/interaction.model';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {TranslateModule} from '@ngx-translate/core';
 import {InteractionAnswer} from 'interactions/answer-defs';
@@ -110,7 +109,6 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
 
     let contentId: string = 'content_id';
     let interaction = {} as Interaction;
-    let recordedVoiceovers = new RecordedVoiceovers({});
     displayedCard = new StateCard(
       'test_name',
       'content',
