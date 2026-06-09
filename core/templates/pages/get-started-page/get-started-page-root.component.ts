@@ -23,6 +23,7 @@ import {Meta} from '@angular/platform-browser';
 
 import {AppConstants} from 'app.constants';
 import {PageHeadService} from 'services/page-head.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-get-started-page-root',
@@ -34,7 +35,8 @@ export class GetStartedPageRootComponent implements OnInit, OnDestroy {
   constructor(
     private pageHeadService: PageHeadService,
     private translateService: TranslateService,
-    private meta: Meta
+    private meta: Meta,
+    private windowRef: WindowRef
   ) {}
 
   setPageTitleAndMetaTags(): void {
@@ -65,7 +67,7 @@ export class GetStartedPageRootComponent implements OnInit, OnDestroy {
         });
         this.meta.updateTag({
           property: 'og:url',
-          content: 'https://www.oppia.org/get-started',
+          content: this.windowRef.nativeWindow.location.href,
         });
       });
   }
