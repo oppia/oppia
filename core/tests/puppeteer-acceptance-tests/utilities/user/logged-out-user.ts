@@ -5212,6 +5212,7 @@ export class LoggedOutUser extends BaseUser {
   async saveProgress(): Promise<void> {
     await this.page.waitForSelector(saveProgressButton, {visible: true});
 
+    // TODO(#26357): Remove this wait once the frontend race condition is fixed.
     // The saveProgressBtnTooltipSelector div is rendered directly below the
     // button in a flex column when checkpointStatusArray[0] === 'in-progress'.
     // This happens when the modal opens before Angular's async checkpoint
