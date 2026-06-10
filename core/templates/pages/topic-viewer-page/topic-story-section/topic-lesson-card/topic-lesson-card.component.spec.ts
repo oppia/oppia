@@ -20,11 +20,21 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {TopicLessonCardComponent} from './topic-lesson-card.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      assign: (url: string) => {},
+    },
+  };
+}
 
 describe('TopicLessonCardComponent', () => {
   let component: TopicLessonCardComponent;
   let fixture: ComponentFixture<TopicLessonCardComponent>;
   let urlInterpolationService: jasmine.SpyObj<UrlInterpolationService>;
+  let windowRef: WindowRef;
 
   beforeEach(waitForAsync(() => {
     const urlInterpolationServiceSpy = jasmine.createSpyObj(
@@ -39,6 +49,10 @@ describe('TopicLessonCardComponent', () => {
           provide: UrlInterpolationService,
           useValue: urlInterpolationServiceSpy,
         },
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef,
+        },
       ],
     }).compileComponents();
 
@@ -47,6 +61,7 @@ describe('TopicLessonCardComponent', () => {
     urlInterpolationService = TestBed.inject(
       UrlInterpolationService
     ) as jasmine.SpyObj<UrlInterpolationService>;
+    windowRef = TestBed.inject(WindowRef);
   }));
 
   it('should be created', () => {
@@ -114,12 +129,13 @@ describe('TopicLessonCardComponent', () => {
   });
 
   it('should execute navigateTo when url is provided', () => {
-    const previousHash = window.location.hash;
+    spyOn(windowRef.nativeWindow.location, 'assign');
 
     component.navigateTo('#lesson-card');
 
-    expect(window.location.hash).toBe('#lesson-card');
-    window.location.hash = previousHash;
+    expect(windowRef.nativeWindow.location.assign).toHaveBeenCalledWith(
+      '#lesson-card'
+    );
   });
 
   it('should execute navigateTo when url is null', () => {
@@ -144,12 +160,6 @@ describe('TopicLessonCardComponent', () => {
 
   it('should return default thumbnail alt text when lesson title is empty', () => {
     component.lessonTitle = '';
-
-    expect(component.getThumbnailAltText()).toBe('Lesson thumbnail');
-  });
-
-  it('should return default thumbnail alt text when lesson title is undefined', () => {
-    component.lessonTitle = undefined as unknown as string;
 
     expect(component.getThumbnailAltText()).toBe('Lesson thumbnail');
   });

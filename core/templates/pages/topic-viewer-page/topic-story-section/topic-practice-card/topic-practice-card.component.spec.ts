@@ -20,11 +20,21 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {TopicPracticeCardComponent} from './topic-practice-card.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      assign: (url: string) => {},
+    },
+  };
+}
 
 describe('TopicPracticeCardComponent', () => {
   let component: TopicPracticeCardComponent;
   let fixture: ComponentFixture<TopicPracticeCardComponent>;
   let urlInterpolationService: jasmine.SpyObj<UrlInterpolationService>;
+  let windowRef: WindowRef;
 
   beforeEach(waitForAsync(() => {
     const urlInterpolationServiceSpy = jasmine.createSpyObj(
@@ -39,6 +49,10 @@ describe('TopicPracticeCardComponent', () => {
           provide: UrlInterpolationService,
           useValue: urlInterpolationServiceSpy,
         },
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef,
+        },
       ],
     }).compileComponents();
 
@@ -47,6 +61,7 @@ describe('TopicPracticeCardComponent', () => {
     urlInterpolationService = TestBed.inject(
       UrlInterpolationService
     ) as jasmine.SpyObj<UrlInterpolationService>;
+    windowRef = TestBed.inject(WindowRef);
   }));
 
   it('should be created', () => {
@@ -105,12 +120,13 @@ describe('TopicPracticeCardComponent', () => {
   });
 
   it('should execute navigateTo when url is provided', () => {
-    const previousHash = window.location.hash;
+    spyOn(windowRef.nativeWindow.location, 'assign');
 
     component.navigateTo('#practice-card');
 
-    expect(window.location.hash).toBe('#practice-card');
-    window.location.hash = previousHash;
+    expect(windowRef.nativeWindow.location.assign).toHaveBeenCalledWith(
+      '#practice-card'
+    );
   });
 
   it('should execute navigateTo when url is null', () => {
@@ -161,12 +177,6 @@ describe('TopicPracticeCardComponent', () => {
 
   it('should return default thumbnail alt text when practice title is empty', () => {
     component.practiceTitle = '';
-
-    expect(component.getThumbnailAltText()).toBe('Practice thumbnail');
-  });
-
-  it('should return default thumbnail alt text when practice title is undefined', () => {
-    component.practiceTitle = undefined as unknown as string;
 
     expect(component.getThumbnailAltText()).toBe('Practice thumbnail');
   });

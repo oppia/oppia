@@ -18,6 +18,7 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 import './topic-practice-card.component.css';
 
@@ -39,7 +40,10 @@ export class TopicPracticeCardComponent implements OnInit {
   private readonly fallbackThumbnailImagePath: string =
     '/splash/student_desk1x.webp';
 
-  constructor(private urlInterpolationService: UrlInterpolationService) {}
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef
+  ) {}
 
   ngOnInit(): void {
     this.resolvedThumbnailUrl =
@@ -48,7 +52,7 @@ export class TopicPracticeCardComponent implements OnInit {
 
   navigateTo(url: string | null): void {
     if (url) {
-      window.location.assign(url);
+      this.windowRef.nativeWindow.location.assign(url);
     }
   }
 
