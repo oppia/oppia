@@ -85,11 +85,12 @@
           {{ 'I18N_BLOG_HOME_PAGE_NO_RESULTS_FOUND' | translate }}
         </p>
       </div>
-      <div *ngIf="showBlogPostCardsLoadingScreen" class="col-8 my-auto">
+      <div *ngIf="showBlogPostCardsLoadingScreen" class="oppia-blog-post-card-container"
+           [ngClass]="{'col-8': !isSmallScreenViewActive()}">
         <div class="ps-3 posts-display-heading">
-          {{ 'I18N_BLOG_HOME_PAGE_POSTS_HEADING' | translate }}
+          {{ 'I18N_BLOG_HOME_SEARCH_PAGE_POSTS_HEADING' | translate }}
         </div>
-        <mat-spinner class="mx-auto"></mat-spinner>
+        <mat-spinner class="mx-auto" diameter="24"></mat-spinner>
       </div>
       <div [ngClass]="{'col-4': !isSmallScreenViewActive()}">
         <div class="blog-home-page-search-column pt-4 mt-2 d-inline-block"
