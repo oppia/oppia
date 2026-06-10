@@ -3794,7 +3794,7 @@ export class LoggedOutUser extends BaseUser {
     await languageFilterDropdownTogglerElement?.click();
     await this.waitForStaticAssetsToLoad();
 
-    await this.page.waitForSelector(selectedFilterOptionsSelector);
+    await this.page.waitForSelector(unselectedFilterOptionsSelector);
     const selectedElements = await this.page.$$(selectedFilterOptionsSelector);
     for (const element of selectedElements) {
       const elementText = await this.page.evaluate(
