@@ -133,12 +133,12 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding: 12px; /* Match practice card */
+    padding: 12px;
   }
 
   .topic-lesson-card-copy {
     gap: 4px;
-    margin-bottom: 18px; /* Reserved space for progress bar */
+    margin-bottom: 18px;
   }
 
   .topic-lesson-card-title {
