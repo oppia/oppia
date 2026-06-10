@@ -41,7 +41,11 @@ import {SvgFileFetcherBackendApiService} from './svg-file-fetcher-backend-api.se
 import {of} from 'rxjs';
 
 var initializeMockDocument = (svgFilenameCtrl: SvgEditorComponent) => {
+  document
+    .querySelectorAll('.oppia-svg-editor-mock-doc')
+    .forEach(el => el.remove());
   var mockDocument = document.createElement('div');
+  mockDocument.className = 'oppia-svg-editor-mock-doc';
   var colors = ['stroke', 'fill', 'bg'];
   for (var i = 0; i < 3; i++) {
     var colorDiv = document.createElement('div');
@@ -805,6 +809,308 @@ describe('SvgEditor', () => {
       })
     )
   );
+
+  it('should show warning when image data conversion fails', () => {
+    component.createRect();
+    const imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(null);
+    component.saveSvgFile();
+    expect(alertSpy).toHaveBeenCalledWith('Custom Diagram could not be saved.');
+  });
+
+  it('should throw error when svg tag is missing in generated SVG', () => {
+    spyOn(component.canvas, 'toSVG').and.returnValue('<html></html>');
+    expect(() => {
+      // This throws "Property 'getSvgString' is private". We need to
+      // suppress this error because we are testing the private method.
+      // @ts-ignore
+      component.getSvgString();
+    }).toThrowError('No svg tag found in generated SVG string.');
+  });
+
+  it('should handle null parentG in createCustomToSVG', () => {
+    var mocktoSVG = () => '<path></path>';
+    var customToSVG = component.createCustomToSVG(
+      mocktoSVG,
+      'nonexistent',
+      'group1',
+      component
+    );
+    var result = customToSVG();
+    expect(result).toContain('<path');
+  });
+
+  it('should handle undefined bezier curve in onStrokeChange', () => {
+    component.createQuadraticBezier();
+    component.canvas.clear();
+    component.onStrokeChange();
+    expect(component.drawMode).toBe(component.DRAW_MODE_BEZIER);
+  });
+
+  it('should handle undefined bezier curve in onFillChange', () => {
+    component.createQuadraticBezier();
+    component.canvas.clear();
+    component.onFillChange();
+    expect(component.drawMode).toBe(component.DRAW_MODE_BEZIER);
+  });
+
+  it('should handle undefined bezier curve in onSizeChange', () => {
+    component.createQuadraticBezier();
+    component.canvas.clear();
+    component.onSizeChange();
+    expect(component.drawMode).toBe(component.DRAW_MODE_BEZIER);
+  });
+
+  it('should return early when color picker parent element is missing', () => {
+    spyOn(document, 'getElementById')
+      .withArgs('stroke-color')
+      .and.returnValue(null);
+    // This throws "Property 'createColorPicker' is private". We need to
+    // suppress this error because we are testing the private method.
+    // @ts-ignore
+    component.createColorPicker('stroke');
+  });
+
+  it('should handle uploaded SVG file with valid data URL', () => {
+    var svgContent =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">' +
+      '</svg>';
+    var b64Content = btoa(svgContent);
+    var dataUrl = 'data:image/svg+xml;base64,' + b64Content;
+    var customReader = {
+      result: null,
+      onload: null,
+      readAsDataURL: function (
+        this: {result: string | null; onload: (() => void) | null},
+        file: Blob
+      ) {
+        this.result = dataUrl;
+        if (this.onload) {
+          this.onload();
+        }
+      },
+    };
+    (window.FileReader as unknown as jasmine.Spy).and.returnValue(
+      customReader as unknown as FileReader
+    );
+    var file = new File([svgContent], 'test.svg', {type: 'image/svg'});
+    component.onFileChanged(file, 'test.svg');
+    expect(component.uploadedSvgDataUrl).not.toBeNull();
+    expect(component.uploadedSvgDataUrl?.unsafeUrl).toBe(dataUrl);
+  });
+
+  it('should handle null safeUrl in setUploadedFile', () => {
+    var svgContent =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">' +
+      '</svg>';
+    var b64Content = btoa(svgContent);
+    var dataUrl = 'data:image/svg+xml;base64,' + b64Content;
+    var customReader = {
+      result: null,
+      onload: null,
+      readAsDataURL: function (
+        this: {result: string | null; onload: (() => void) | null},
+        file: Blob
+      ) {
+        this.result = dataUrl;
+        if (this.onload) {
+          this.onload();
+        }
+      },
+    };
+    (window.FileReader as unknown as jasmine.Spy).and.returnValue(
+      customReader as unknown as FileReader
+    );
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
+      null
+    );
+    var file = new File([svgContent], 'test.svg', {type: 'image/svg'});
+    component.onFileChanged(file, 'test.svg');
+    expect(component.uploadedSvgDataUrl).toBeNull();
+  });
+
+  it('should handle undefined activePathObject in createQuadraticBezier', () => {
+    component.createQuadraticBezier();
+    component.canvas.clear();
+    component.createQuadraticBezier();
+    expect(component.drawMode).toBe(component.DRAW_MODE_BEZIER);
+  });
+
+  it('should handle non-array path in createQuadraticBezier', () => {
+    component.createQuadraticBezier();
+    component.canvas.clear();
+    component.createRect();
+    component.createRect();
+    component.createRect();
+    component.createRect();
+    component.createQuadraticBezier();
+    expect(component.drawMode).toBe(component.DRAW_MODE_NONE);
+  });
+
+  it('should handle various undefined states in bezier object:moving', () => {
+    component.createQuadraticBezier();
+    component.canvas.fire('object:moving', {
+      target: undefined,
+    });
+    component.canvas.clear();
+    component.canvas.fire('object:moving', {
+      target: {name: 'p0', left: 100, top: 100},
+    });
+    component.drawMode = component.DRAW_MODE_BEZIER;
+    component.canvas.fire('object:moving', {
+      target: {name: 'p0'},
+    });
+    component.canvas.fire('object:moving', {
+      target: {name: 'p0', left: 100},
+    });
+  });
+
+  it('should handle undefined element in continueDiagramEditing', fakeAsync(() => {
+    component.savedSvgDiagram = '<svg></svg>';
+    // This throws "Property 'loadSVGFromString' does not exist on type
+    // 'typeof import("fabric")'". We need to suppress this error because
+    // this method exists at runtime.
+    // @ts-expect-error
+    spyOn(fabric, 'loadSVGFromString').and.callFake(
+      (svgString: string, callback: Function) => {
+        callback([new fabric.Rect()], {}, []);
+      }
+    );
+    component.continueDiagramEditing();
+    tick();
+  }));
+
+  it('should handle undefined undoObj in onUndo', () => {
+    component.createRect();
+    // This throws "Property 'objectUndoStack' is private". We need to
+    // suppress this error because we are accessing it for testing.
+    // @ts-expect-error
+    component.objectUndoStack.pop = () => undefined;
+    component.onUndo();
+  });
+
+  it('should handle undefined shape in onUndo', () => {
+    component.createRect();
+    spyOn(component.canvasObjects, 'pop').and.returnValue(undefined);
+    component.onUndo();
+  });
+
+  it('should handle undefined redoObj in onRedo', () => {
+    component.createRect();
+    component.onUndo();
+    // This throws "Property 'objectRedoStack' is private". We need to
+    // suppress this error because we are accessing it for testing.
+    // @ts-expect-error
+    component.objectRedoStack.pop = () => undefined;
+    component.onRedo();
+  });
+
+  it('should handle non-numeric type values in scaling event', () => {
+    component.createText();
+    component.canvas.setActiveObject(component.canvas.getObjects()[0]);
+    var text = component.canvas.getActiveObject();
+    if (text) {
+      spyOn(text, 'get').and.callFake((prop: string) => {
+        if (prop === 'type') {
+          return 'textbox';
+        }
+        if (prop === 'scaleX' || prop === 'scaleY') {
+          return undefined;
+        }
+        if (prop === 'width') {
+          return 100;
+        }
+        if (prop === 'height') {
+          return 50;
+        }
+        // This throws "Property 'get' does not exist on type
+        // 'Object'".
+        // We need to suppress this error because we need to call the get
+        // method on the prototype.
+        // @ts-expect-error
+        return (
+          fabric.Object.prototype as unknown as Record<string, Function>
+        ).get.call(text, prop);
+      });
+    }
+    component.canvas.fire('object:scaling');
+  });
+
+  it('should handle undefined shape on selection', () => {
+    spyOn(component.canvas, 'getActiveObject').and.returnValue(undefined);
+    component.canvas.fire('selection:created');
+  });
+
+  it('should handle undefined strokeWidth on selection', () => {
+    component.createRect();
+    component.canvas.setActiveObject(component.canvas.getObjects()[0]);
+    var rect = component.canvas.getActiveObject();
+    if (rect) {
+      spyOn(rect, 'get').and.callFake((prop: string) => {
+        if (prop === 'strokeWidth') {
+          return undefined;
+        }
+        if (prop === 'type') {
+          return 'rect';
+        }
+        if (prop === 'fill') {
+          return 'rgba(0,0,0,0)';
+        }
+        if (prop === 'stroke') {
+          return 'rgba(0,0,0,1)';
+        }
+        return 1;
+      });
+    }
+    component.canvas.fire('selection:created');
+  });
+
+  it('should handle undefined fontSize on selection', () => {
+    component.createText();
+    component.canvas.setActiveObject(component.canvas.getObjects()[0]);
+    var text = component.canvas.getActiveObject();
+    if (text) {
+      spyOn(text, 'get').and.callFake((prop: string) => {
+        if (prop === 'fontSize') {
+          return undefined;
+        }
+        if (prop === 'type') {
+          return 'textbox';
+        }
+        if (prop === 'fill') {
+          return '#000';
+        }
+        if (prop === 'stroke') {
+          return '#000';
+        }
+        if (prop === 'fontFamily') {
+          return 'Arial';
+        }
+        return 1;
+      });
+    }
+    component.canvas.fire('selection:created');
+  });
+
+  it('should handle null alpha squares in createColorPicker onChange', () => {
+    // This throws "Property 'createColorPicker' is private". We need to
+    // suppress this error because we are testing the private method.
+    // @ts-ignore
+    component.createColorPicker('stroke');
+    const originalGetElementById = document.getElementById.bind(document);
+    spyOn(document, 'getElementById').and.callFake((id: string) => {
+      if (id === 'top-stroke-alpha' || id === 'bottom-stroke-alpha') {
+        return null;
+      }
+      return originalGetElementById(id);
+    });
+    component.strokePicker?.setOptions({
+      color: 'rgba(255, 0, 0, 1)',
+    });
+  });
 });
 
 describe('SvgEditor initialized with value attribute', () => {
@@ -1109,5 +1415,25 @@ describe('SvgEditor with image save destination as local storage', () => {
     ] as fabric.Textbox;
     expect(addedText.left).toBe(450 - (addedText.width || 0));
     expect(addedText.fill).toBe('#000');
+  });
+
+  it('should handle null imageUrl from getTrustedResourceUrlForSvgFileName', () => {
+    var imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
+    spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
+    spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(null);
+    component.setSavedSvgFilename('test.svg', false);
+    expect(component.data.savedSvgUrl).toBe('');
+  });
+
+  it('should handle null safeUrl in setSavedSvgFilename', () => {
+    var imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
+    spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
+    spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(dataUrl);
+    var svgSanitizerService = TestBed.inject(SvgSanitizerService);
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
+      null
+    );
+    component.setSavedSvgFilename('test.svg', true);
+    expect(component.uploadedSvgDataUrl).toBeNull();
   });
 });

@@ -40,6 +40,7 @@ import {SimpleChanges} from '@angular/core';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {GifFramesService} from 'third-party-imports/gif-frames.import';
+import {of} from 'rxjs';
 
 let gifshot = require('gifshot');
 
@@ -1984,6 +1985,347 @@ describe('ImageEditor', () => {
   });
 
   it(
+    "should handle null resampled file for SVG in 'confirm crop'" + ' image',
+    () => {
+      spyOn(
+        imageUploadHelperService,
+        'convertImageDataToImageFile'
+      ).and.returnValue(null);
+      spyOn(alertsService, 'addWarning');
+
+      component.confirmCropImage();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Could not get resampled file.'
+      );
+    }
+  );
+
+  it(
+    "should handle null resampled file for PNG in 'confirm crop'" + ' image',
+    () => {
+      spyOn(document, 'createElement').and.callFake(
+        jasmine.createSpy('createElement').and.returnValue({
+          width: 0,
+          height: 0,
+          getContext: (txt: string) => {
+            return {
+              drawImage: (txt: CanvasImageSource, x: number, y: number) => {
+                return;
+              },
+              getImageData: (
+                x: number,
+                y: number,
+                width: number,
+                height: number
+              ) => {
+                return 'data';
+              },
+              putImageData: (data: ImageData, x: number, y: number) => {
+                return;
+              },
+            };
+          },
+          toDataURL: (str: string, x: number) => {
+            return component.data.metadata.uploadedImageData;
+          },
+        })
+      );
+      // This throws "Argument of type '{ width: number; height: number;
+      // data: string; size: number; type: string; }' is missing the
+      // following properties from type 'File': arrayBuffer, slice, stream,
+      // text".
+      // We need to suppress this error because we only need the values
+      // given below.
+      // @ts-expect-error
+      component.data.metadata = dataPng;
+      spyOn(
+        imageUploadHelperService,
+        'convertImageDataToImageFile'
+      ).and.returnValue(null);
+      spyOn(alertsService, 'addWarning');
+
+      component.confirmCropImage();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Could not get resampled file.'
+      );
+    }
+  );
+
+  it('should not crop for GIF image when resample fails', fakeAsync(() => {
+    spyOn(gifshot, 'createGIF').and.callFake(
+      (obj: object, func: (response: object) => void) => {
+        func({image: dataGif.uploadedImageData});
+      }
+    );
+    spyOn(gifFrames, 'getFrames').and.resolveTo([
+      {
+        getImage: () => {
+          return {
+            toDataURL: () => {
+              return dataGif.uploadedImageData;
+            },
+            getContext: () => {
+              return {
+                drawImage: (txt: CanvasImageSource, x: number, y: number) => {
+                  return;
+                },
+              };
+            },
+            width: 100,
+            height: 100,
+          };
+        },
+        frameInfo: {
+          disposal: 1,
+        },
+      },
+    ] as never);
+    // This throws "Argument of type '{ width: number; height: number;
+    // data: string; size: number; type: string; }' is missing the
+    // following properties from type 'File': arrayBuffer, slice, stream,
+    // text".
+    // We need to suppress this error because we only need the values
+    // given below.
+    // @ts-expect-error
+    component.data.metadata = dataGif;
+    component.cropArea = {
+      x1: 0,
+      y1: 0,
+      x2: 140,
+      y2: 120,
+    };
+    spyOn(
+      imageUploadHelperService,
+      'convertImageDataToImageFile'
+    ).and.returnValue(null);
+    spyOn(alertsService, 'addWarning');
+
+    component.confirmCropImage();
+    tick();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Could not get resampled file.'
+    );
+  }));
+
+  it(
+    'should throw error when canvas context is null in' +
+      ' getCroppedImageData',
+    () => {
+      let contextCallCount = 0;
+      spyOn(document, 'createElement').and.callFake(
+        jasmine.createSpy('createElement').and.returnValue({
+          width: 0,
+          height: 0,
+          getContext: (txt: string) => {
+            contextCallCount++;
+            if (contextCallCount === 1) {
+              return null;
+            }
+            return {
+              drawImage: (txt: CanvasImageSource, x: number, y: number) => {
+                return;
+              },
+              getImageData: (
+                x: number,
+                y: number,
+                width: number,
+                height: number
+              ) => {
+                return new ImageData(1, 1);
+              },
+              putImageData: (data: ImageData, x: number, y: number) => {
+                return;
+              },
+            };
+          },
+          toDataURL: (str: string, x: number) => {
+            return 'data:image/png;base64,abc';
+          },
+        })
+      );
+      // This throws "Argument of type '{ width: number; height: number;
+      // data: string; size: number; type: string; }' is missing the
+      // following properties from type 'File': arrayBuffer, slice, stream,
+      // text".
+      // We need to suppress this error because we only need the values
+      // given below.
+      // @ts-expect-error
+      component.data.metadata = dataPng;
+
+      expect(() => component.confirmCropImage()).toThrowError(
+        'Could not get canvas context.'
+      );
+    }
+  );
+
+  it(
+    'should throw error when crop canvas context is null in' +
+      ' getCroppedImageData',
+    () => {
+      let contextCallCount = 0;
+      spyOn(document, 'createElement').and.callFake(
+        jasmine.createSpy('createElement').and.returnValue({
+          width: 0,
+          height: 0,
+          getContext: (txt: string) => {
+            contextCallCount++;
+            if (contextCallCount === 2) {
+              return null;
+            }
+            return {
+              drawImage: (txt: CanvasImageSource, x: number, y: number) => {
+                return;
+              },
+              getImageData: (
+                x: number,
+                y: number,
+                width: number,
+                height: number
+              ) => {
+                return new ImageData(1, 1);
+              },
+              putImageData: (data: ImageData, x: number, y: number) => {
+                return;
+              },
+            };
+          },
+          toDataURL: (str: string, x: number) => {
+            return 'data:image/png;base64,abc';
+          },
+        })
+      );
+      // This throws "Argument of type '{ width: number; height: number;
+      // data: string; size: number; type: string; }' is missing the
+      // following properties from type 'File': arrayBuffer, slice, stream,
+      // text".
+      // We need to suppress this error because we only need the values
+      // given below.
+      // @ts-expect-error
+      component.data.metadata = dataPng;
+
+      expect(() => component.confirmCropImage()).toThrowError(
+        'Could not get canvas context.'
+      );
+    }
+  );
+
+  it(
+    'should throw error when crop canvas context is null in' +
+      ' getCroppedImageData',
+    async () => {
+      spyOn(document, 'createElement').and.returnValue({
+        width: 0,
+        height: 0,
+        getContext: (txt: string) => {
+          return null;
+        },
+        toDataURL: (str: string, x: number) => {
+          return 'data:image/png;base64,abc';
+        },
+      });
+
+      // This throws "Property 'getCroppedGIFDataAsync' is private". We
+      // need to suppress this error because we are testing the private
+      // method.
+      // @ts-expect-error
+      let promise = component.getCroppedGIFDataAsync(
+        0,
+        0,
+        100,
+        100,
+        'data:image/png;base64,abc'
+      );
+
+      await expectAsync(promise).toBeRejectedWithError(
+        'Could not get canvas context.'
+      );
+    }
+  );
+
+  it(
+    'should reject when crop canvas context is null in' +
+      ' getCroppedGIFDataAsync',
+    async () => {
+      let callCount = 0;
+      spyOn(document, 'createElement').and.callFake((tagName: string) => {
+        callCount++;
+        if (callCount === 1) {
+          return {
+            width: 0,
+            height: 0,
+            getContext: () => ({
+              drawImage: () => {},
+              getImageData: () => ({
+                data: new Uint8ClampedArray(40000),
+                width: 100,
+                height: 100,
+              }),
+            }),
+            toDataURL: () => 'data:image/png;base64,abc',
+          } as unknown as HTMLCanvasElement;
+        }
+        return {
+          width: 0,
+          height: 0,
+          getContext: () => null,
+          toDataURL: () => 'data:image/png;base64,abc',
+        } as unknown as HTMLCanvasElement;
+      });
+
+      // This throws "Property 'getCroppedGIFDataAsync' is private". We
+      // need to suppress this error because we are testing the private
+      // method.
+      // @ts-expect-error
+      let promise = component.getCroppedGIFDataAsync(
+        0,
+        0,
+        100,
+        100,
+        'data:image/png;base64,abc'
+      );
+
+      await expectAsync(promise).toBeRejectedWithError(
+        'Could not get canvas context.'
+      );
+    }
+  );
+
+  it(
+    'should reject when image fails to load in' + ' getCroppedGIFDataAsync',
+    async () => {
+      const mockImageElement = document.createElement('img');
+      Object.defineProperty(mockImageElement, 'src', {
+        set: () => {
+          mockImageElement.dispatchEvent(new Event('error'));
+          if (mockImageElement.onerror) {
+            mockImageElement.onerror(new Event('error'));
+          }
+        },
+      });
+      windowImageSpy.and.returnValue(mockImageElement);
+
+      // This throws "Property 'getCroppedGIFDataAsync' is private". We
+      // need to suppress this error because we are testing the private
+      // method.
+      // @ts-expect-error
+      let promise = component.getCroppedGIFDataAsync(
+        0,
+        0,
+        100,
+        100,
+        'data:image/png;base64,abc'
+      );
+
+      await expectAsync(promise).toBeRejectedWithError(
+        'Image could not be loaded.'
+      );
+    }
+  );
+
+  it(
     'should show help text when image uploaded by user is too big for the' +
       ' card',
     () => {
@@ -2285,6 +2627,29 @@ describe('ImageEditor', () => {
   );
 
   it(
+    'should alert user when server returns undefined in' + ' postImageToServer',
+    fakeAsync(() => {
+      spyOn(alertsService, 'addWarning');
+      // This throws "Property 'http' is private". We need to suppress
+      // this error because we are spying on the private http service.
+      // @ts-expect-error
+      spyOn(component.http, 'post').and.returnValue(of(undefined));
+
+      let dimensions = {width: 490, height: 327};
+      let resampledFile = localConvertImageDataToImageFile(
+        component.data.metadata.uploadedImageData as string
+      );
+
+      component.postImageToServer(dimensions, resampledFile, 'gif');
+      tick();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Error communicating with server.'
+      );
+    })
+  );
+
+  it(
     'should save uploaded gif when user clicks `Use Image`' + ' button',
     fakeAsync(() => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
@@ -2396,6 +2761,64 @@ describe('ImageEditor', () => {
       done();
     }, 150);
   });
+
+  it(
+    'should handle canvas context null when processing GIF frames' +
+      ' in processGIFImage',
+    fakeAsync(() => {
+      const frameData = [
+        {
+          getImage: () => {
+            return {
+              getContext: () => {
+                return null;
+              },
+              toDataURL: () => {
+                return 'data:image/png;base64,abc';
+              },
+              width: 100,
+              height: 100,
+            };
+          },
+          frameInfo: {
+            disposal: 2,
+          },
+        },
+      ];
+
+      let errorCaught: Error | null = null;
+      spyOn(gifFrames, 'getFrames').and.returnValue({
+        then: (callback: Function) => {
+          const result = Promise.resolve(callback(frameData));
+          result.catch((err: Error) => {
+            errorCaught = err;
+          });
+          return {
+            then: () => {},
+            catch: () => {},
+          };
+        },
+      });
+
+      spyOn(gifshot, 'createGIF').and.stub();
+
+      // This throws "Argument of type '{ width: number; height: number;
+      // data: string; size: number; type: string; }' is missing the
+      // following properties from type 'File': arrayBuffer, slice, stream,
+      // text".
+      // We need to suppress this error because we only need the values
+      // given below.
+      // @ts-expect-error
+      component.data.metadata = dataGif;
+      component.saveUploadedFile();
+      tick();
+
+      expect(errorCaught).not.toBeNull();
+      expect((errorCaught as Error).message).toBe(
+        'Could not get canvas context.'
+      );
+    })
+  );
 
   it(
     'should alert user if resampled gif file is not obtained when the user' +
@@ -2795,6 +3218,57 @@ describe('ImageEditor', () => {
     }
   );
 
+  it(
+    'should handle null resampled file for SVG in' + ' saveUploadedFile',
+    () => {
+      spyOn(
+        imageUploadHelperService,
+        'convertImageDataToImageFile'
+      ).and.returnValue(null);
+      spyOn(alertsService, 'addWarning');
+
+      expect(component.data.mode).toBe(component.MODE_UPLOADED);
+
+      component.saveUploadedFile();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Could not get resampled file.'
+      );
+      expect(component.imageIsUploading).toBe(false);
+    }
+  );
+
+  it(
+    'should throw error when canvas context is null in' +
+      ' getResampledImageData',
+    () => {
+      spyOn(document, 'createElement').and.callFake(
+        jasmine.createSpy('createElement').and.returnValue({
+          width: 0,
+          height: 0,
+          getContext: (txt: string) => {
+            return null;
+          },
+          toDataURL: (str: string, x: number) => {
+            return 'data:image/png;base64,abc';
+          },
+        })
+      );
+      // This throws "Argument of type '{ width: number; height: number;
+      // data: string; size: number; type: string; }' is missing the
+      // following properties from type 'File': arrayBuffer, slice, stream,
+      // text".
+      // We need to suppress this error because we only need the values
+      // given below.
+      // @ts-expect-error
+      component.data.metadata = dataPng;
+
+      expect(() => component.saveUploadedFile()).toThrowError(
+        'Could not get canvas context.'
+      );
+    }
+  );
+
   it('should set file name when user saves image', () => {
     spyOn(alertsService, 'clearWarnings');
     spyOn(component.valueChanged, 'emit');
@@ -2819,6 +3293,25 @@ describe('ImageEditor', () => {
     expect(component.valueChanged.emit).toHaveBeenCalled();
     expect(component.validityChange.emit).toHaveBeenCalled();
   });
+
+  it(
+    'should return empty string when raw image data is null from' +
+      ' local storage in getTrustedResourceUrlForImageFileName',
+    () => {
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+      );
+      spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
+      spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(null);
+
+      component.setSavedImageFilename(
+        'img_12345_height_250_width_250.png',
+        false
+      );
+
+      expect(component.data.metadata.savedImageUrl).toBe('');
+    }
+  );
 
   it('should not update parent when the component is reset', () => {
     spyOn(alertsService, 'clearWarnings');

@@ -1050,6 +1050,7 @@ export class SvgEditorComponent implements OnInit {
       }
       const path = activePathObject.get('path' as keyof fabric.Object);
       if (!Array.isArray(path)) {
+        this.drawMode = this.DRAW_MODE_NONE;
         return;
       }
       this.canvas.remove(activePathObject);
