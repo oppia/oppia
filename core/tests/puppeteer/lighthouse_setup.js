@@ -526,6 +526,8 @@ const main = async function () {
   await getExplorationEditorUrl(browser, page);
 
   await setRole(browser, page, 'COLLECTION_EDITOR');
+
+  await setRole(browser, page, 'ADMIN');
   await getTopicEditorUrl(browser, page);
   await getStoryEditorUrl(browser, page);
   await getSkillEditorUrl(browser, page);
