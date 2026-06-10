@@ -10,24 +10,20 @@
     <div class="topic-practice-card-copy">
       <h3 class="topic-practice-card-title">{{ practiceTitle }}</h3>
       <p class="topic-practice-card-description">{{ getResolvedDescription() }}</p>
-      <div class="topic-practice-card-progress" aria-hidden="true">
-        <div class="practice-progress-step-active"></div>
-        <div class="practice-progress-line"></div>
-      </div>
     </div>
 
     <div class="topic-practice-card-actions">
       <a class="topic-practice-card-study-link"
-         [attr.href]="studyUrl || '#'"
+         [attr.href]="studyUrl"
          [attr.aria-disabled]="studyUrl ? null : 'true'">
-        Study
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_STUDY' | translate"></span>
       </a>
 
       <button class="topic-practice-card-practice-button"
               type="button"
               [disabled]="!practiceUrl"
               (click)="navigateTo(practiceUrl)">
-        Practice
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_PRACTICE' | translate"></span>
       </button>
     </div>
   </div>

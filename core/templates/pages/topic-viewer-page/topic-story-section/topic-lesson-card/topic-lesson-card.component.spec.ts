@@ -138,12 +138,6 @@ describe('TopicLessonCardComponent', () => {
     );
   });
 
-  it('should execute navigateTo when url is null', () => {
-    expect(() => {
-      component.navigateTo(null);
-    }).not.toThrowError();
-  });
-
   it('should execute navigateTo when url is empty', () => {
     expect(() => {
       component.navigateTo('');

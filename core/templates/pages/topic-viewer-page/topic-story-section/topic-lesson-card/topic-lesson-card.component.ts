@@ -31,7 +31,7 @@ export class TopicLessonCardComponent implements OnInit {
   @Input() lessonTitle: string = '';
   @Input() lessonDescription: string = '';
   @Input() thumbnailUrl: string = '';
-  @Input() startUrl: string | null = null;
+  @Input() startUrl: string = '';
 
   resolvedThumbnailUrl: string = '';
 
@@ -48,7 +48,7 @@ export class TopicLessonCardComponent implements OnInit {
       this.thumbnailUrl || this.getFallbackThumbnailUrl();
   }
 
-  navigateTo(url: string | null): void {
+  navigateTo(url: string): void {
     if (url) {
       this.windowRef.nativeWindow.location.assign(url);
     }
