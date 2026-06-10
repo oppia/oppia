@@ -53,6 +53,17 @@ describe('TopicLessonCardComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should render the card as a div element without article role', () => {
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('div.topic-lesson-card')
+    ).toBeTruthy();
+    expect(
+      fixture.nativeElement.querySelector('.topic-lesson-card[role="article"]')
+    ).toBeNull();
+  });
+
   it('should use provided thumbnail url on initialization', () => {
     component.thumbnailUrl = '/assets/lesson-thumbnail.png';
 
