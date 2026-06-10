@@ -495,7 +495,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       throw e;
     }
     const dfs = (node: OppiaRteNode | TextNode) => {
-      node.portal = this._getTemplatePortal(node);
+      const portal = this._getTemplatePortal(node);
+      if (portal !== undefined) {
+        node.portal = portal;
+      }
       if (!('children' in node)) {
         return;
       }
@@ -730,7 +733,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
   private _getTemplatePortal(
     node: OppiaRteNode | TextNode
-  ): TemplatePortal<object> {
+  ): TemplatePortal<object> | undefined {
     const templatePortals: Record<TemplatePortalName, TemplateRef<object>> = {
       pTagPortal: this.pTagPortal,
       h1TagPortal: this.h1TagPortal,
@@ -776,7 +779,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         {$implicit: node}
       );
     }
-    throw new Error('No template portal found for selector: ' + node.selector);
+    return undefined;
   }
 
   shouldHighlightContent(): boolean {

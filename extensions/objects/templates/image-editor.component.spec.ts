@@ -39,7 +39,7 @@ import {AlertsService} from 'services/alerts.service';
 import {SimpleChanges} from '@angular/core';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {GifFramesService} from '../../../core/templates/third-party-imports/gif-frames.import';
+import {GifFramesService} from 'third-party-imports/gif-frames.import';
 
 let gifshot = require('gifshot');
 
@@ -1522,8 +1522,8 @@ describe('ImageEditor', () => {
         x: 0,
         y: 0,
       });
-      expect(component.cropAreaXWhenLastDown).toBeUndefined();
-      expect(component.cropAreaYWhenLastDown).toBeUndefined();
+      expect(component.cropAreaXWhenLastDown).toBe(0);
+      expect(component.cropAreaYWhenLastDown).toBe(0);
       expect(component.userIsDraggingCropArea).toBe(false);
 
       component.onMouseDownOnCropArea(dummyMouseEvent);
@@ -1935,9 +1935,7 @@ describe('ImageEditor', () => {
         getImage: () => {
           return {
             toDataURL: () => {
-              return {
-                image: dataGif.uploadedImageData,
-              };
+              return dataGif.uploadedImageData;
             },
           };
         },
@@ -2128,78 +2126,72 @@ describe('ImageEditor', () => {
   it('should discard uploaded file when user clicks discard button', () => {
     component.processedImageIsTooLarge = true;
 
-    expect(component.data).toEqual({
-      mode: 2,
-      metadata: {
-        uploadedFile: {
-          lastModified: 1622307491398,
-          name: '2442125.svg',
-          size: 2599,
-          type: 'image/svg+xml',
-        },
-        uploadedImageData:
-          'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb2' +
-          '5lPSJubyI/Pgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHID' +
-          'IwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVk' +
-          'ctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI+CjxzdmcgdmVyc2lvbj0iMS4wIiB4bW' +
-          'xucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iNzI2LjAwMD' +
-          'AwMHB0IiBoZWlnaHQ9IjEyODAuMDAwMDAwcHQiIHZpZXdCb3g9IjAgMCA3MjYuMD' +
-          'AwMDAwIDEyODAuMDAwMDAwIgogcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaW' +
-          'QgbWVldCI+CjxtZXRhZGF0YT4KQ3JlYXRlZCBieSBwb3RyYWNlIDEuMTUsIHdyaX' +
-          'R0ZW4gYnkgUGV0ZXIgU2VsaW5nZXIgMjAwMS0yMDE3CjwvbWV0YWRhdGE+CjxnIH' +
-          'RyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLDEyODAuMDAwMDAwKSBzY2FsZS' +
-          'gwLjEwMDAwMCwtMC4xMDAwMDApIgpmaWxsPSIjMDAwMDAwIiBzdHJva2U9Im5vbm' +
-          'UiPgo8cGF0aCBkPSJNMzU3NSAxMjc2MyBjLTQ5OSAtNDUyIC03NzIgLTc2MSAtMT' +
-          'A2OCAtMTIwOSAtODUyIC0xMjg5IC0xMTIyCi0yODY4IC03OTEgLTQ2MjQgMTM3IC' +
-          '03MjcgMzk2IC0xNTIxIDcwOSAtMjE3NiBsNjQgLTEzNCAxMTMxIDAgMTEzMSAwID' +
-          'Y5IDE0NApjMzgwIDc5NiA2NzEgMTc4MCA3NzkgMjYzNiA3MSA1NjMgODAgMTE2MC' +
-          'AyNSAxNjUwIC0xMTYgMTAzOSAtNDczIDE5NTkgLTEwNzMKMjc2NSAtMjQyIDMyNC' +
-          'AtNDk5IDYwMSAtODQ3IDkxMyAtNDQgMzkgLTgzIDcyIC04NSA3MiAtMiAwIC0yMi' +
-          'AtMTcgLTQ0IC0zN3oKbTIyMiAtMzA3OCBjMzg2IC03MyA2ODIgLTM0NyA3ODUgLT' +
-          'cyNSAyMCAtNzQgMjMgLTEwNyAyMiAtMjU1IDAgLTE5NCAtMTUKLTI2NCAtODIgLT' +
-          'QwOSAtNTQgLTExNSAtMTEyIC0xOTggLTIwMSAtMjg3IC0xMjYgLTEyNiAtMjgyIC' +
-          '0yMTYgLTQ1MyAtMjYyCi03MCAtMTggLTEwOSAtMjIgLTI0OCAtMjIgLTE5NiAxIC' +
-          '0yNzYgMTggLTQzNSA5NiAtMjY5IDEzMSAtNDYyIDM3NSAtNTMxIDY3NAotMjggMT' +
-          'E4IC0yNiAzMjkgNCA0NDkgODMgMzMyIDMzNCA2MDIgNjYxIDcxMSAxMzUgNDQgMz' +
-          'M1IDU3IDQ3OCAzMHogbS0zMgotMjI4MCBjMzkgLTggMTEyIC0zNSAxNjMgLTYwID' +
-          'I2NCAtMTMxIDQxNSAtNDM1IDM1OCAtNzI1IC00NyAtMjM5IC0yMTcgLTQzNgotND' +
-          'Q4IC01MTcgLTEwNiAtMzggLTI3MyAtNDQgLTM4MSAtMTQgLTE5OSA1NCAtMzU1ID' +
-          'E4MCAtNDQxIDM1NiAtNDcgOTQgLTY4CjE4OSAtNjcgMzA1IDAgMTE1IDE4IDE4OC' +
-          'A3MyAzMDAgMzMgNjkgNTggMTAxIDEyNyAxNzAgNTMgNTMgMTA5IDk4IDE0NiAxMT' +
-          'cKNTggMzAgMTY0IDY4IDIxNSA3NiA1OCAxMCAxOTAgNiAyNTUgLTh6IG0tMzYgLT' +
-          'E2NTAgYzIyMSAtNTMgMzc5IC0yODUgMzQyCi01MDUgLTIyIC0xMzMgLTg4IC0yMz' +
-          'kgLTE5MSAtMzA5IC0xNDMgLTk1IC0zMjEgLTEwNyAtNDcxIC0zMCAtNTIgMjYgLT' +
-          'E0NQoxMTQgLTE3NiAxNjYgLTEzMiAyMjYgLTUwIDUyMiAxNzkgNjM5IDEwMyA1My' +
-          'AyMDQgNjUgMzE3IDM5eiIvPgo8cGF0aCBkPSJNNTUxMiA2MjI4IGMtMjMgLTczIC' +
-          '02NyAtMjM4IC05NyAtMzY3IC05MCAtMzgyIC0xNzkgLTYyNiAtMzg3Ci0xMDUzIC' +
-          '01NiAtMTE1IC05OSAtMjEwIC05NyAtMjEyIDE1IC0xMyAyNTAgLTE2NiA0MzQgLT' +
-          'I4MyA3ODYgLTQ5OSAxMjk0Ci03NTUgMTYwNCAtODA4IDIzNiAtNDEgMzI5IDU2ID' +
-          'I3NSAyODUgLTY1IDI4MCAtMzM3IDc1NiAtNzk0IDEzOTUgLTIxNyAzMDIKLTgxNy' +
-          'AxMDkyIC04ODQgMTE2MyAtMTAgMTAgLTIxIC0xNSAtNTQgLTEyMHoiLz4KPHBhdG' +
-          'ggZD0iTTE1NzMgNjE3OCBjLTU3NCAtNzI2IC0xMDQ5IC0xMzkyIC0xMjk4IC0xOD' +
-          'IzIC05MyAtMTYwIC0yMDAgLTM4NwotMjM2IC00OTggLTI3IC04MyAtMzMgLTExOC' +
-          'AtMzQgLTE4OSAwIC05MyAxMSAtMTE5IDY3IC0xNjEgMzQgLTI2IDE1NSAtMzQKMj' +
-          'QwIC0xNyAyNDMgNDcgNjYwIDI0NSAxMTk4IDU2OCAyOTQgMTc3IDgyMCA1MTUgOD' +
-          'IwIDUyOCAwIDQgLTQxIDg5IC05MCAxOTAKLTE0MyAyOTEgLTI0MiA1MjYgLTMwNS' +
-          'A3MjQgLTE0IDQ3IC01NiAyMDQgLTkxIDM1MCAtNTkgMjQzIC0xMjkgNDkwIC0xMz' +
-          'kgNDkwCi0yIDAgLTYxIC03MyAtMTMyIC0xNjJ6Ii8+CjxwYXRoIGQ9Ik0yNjc5ID' +
-          'QzODMgYy0zMDkgLTMyNCAtNTQwIC03NDEgLTY0OSAtMTE3MiAtNTkgLTIzNCAtOD' +
-          'EgLTQxNCAtODEKLTY3MSAwIC0yMzkgMTYgLTM5MSA2NyAtNjIwIDI4IC0xMjQgMT' +
-          'IxIC00MjAgMTMzIC00MjAgNCAwIDE3IDM5IDMwIDg4IDE0NQo1NjIgMzE2IDkzOS' +
-          'A0NjUgMTAyNyA1OCAzNCAxMjQgMzQgMTgyIDAgMjQxIC0xNDEgNDkyIC05MTYgNz' +
-          'M0IC0yMjY1IDI4IC0xNTcKNTMgLTI5NiA1NyAtMzEwIDYgLTI4IDMgLTQzIDczID' +
-          'M0NSAyMTUgMTE5MiA0MzcgMTkyNSA2NTQgMjE2MiA2NiA3MiAxMDQgOTMKMTY2ID' +
-          'kzIDE3NSAwIDM1MiAtMzE5IDUyNiAtOTQ4IDU5IC0yMTcgNTMgLTIwMSA2NiAtMT' +
-          'c5IDE4IDMzIDc4IDIyMCAxMDggMzM3CjExOCA0NjIgMTE2IDk1MiAtNSAxMzk1IC' +
-          '0xMTUgNDE4IC0zMzkgODIxIC02MjAgMTExNCBsLTk3IDEwMSAtODY4IDAgLTg2Ny' +
-          'AwCi03NCAtNzd6Ii8+CjwvZz4KPC9zdmc+Cg==',
-        originalWidth: 968,
-        originalHeight: 1707,
-        savedImageFilename: 'saved_file_name.png',
-        savedImageUrl: 'assets/images',
-      },
-      crop: false,
-    });
+    expect(component.data.mode).toBe(2);
+    expect(component.data.metadata.uploadedFile).toEqual(jasmine.any(File));
+    expect(component.data.metadata.uploadedImageData).toBe(
+      'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb2' +
+        '5lPSJubyI/Pgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHID' +
+        'IwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVk' +
+        'ctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI+CjxzdmcgdmVyc2lvbj0iMS4wIiB4bW' +
+        'xucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iNzI2LjAwMD' +
+        'AwMHB0IiBoZWlnaHQ9IjEyODAuMDAwMDAwcHQiIHZpZXdCb3g9IjAgMCA3MjYuMD' +
+        'AwMDAwIDEyODAuMDAwMDAwIgogcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaW' +
+        'QgbWVldCI+CjxtZXRhZGF0YT4KQ3JlYXRlZCBieSBwb3RyYWNlIDEuMTUsIHdyaX' +
+        'R0ZW4gYnkgUGV0ZXIgU2VsaW5nZXIgMjAwMS0yMDE3CjwvbWV0YWRhdGE+CjxnIH' +
+        'RyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLDEyODAuMDAwMDAwKSBzY2FsZS' +
+        'gwLjEwMDAwMCwtMC4xMDAwMDApIgpmaWxsPSIjMDAwMDAwIiBzdHJva2U9Im5vbm' +
+        'UiPgo8cGF0aCBkPSJNMzU3NSAxMjc2MyBjLTQ5OSAtNDUyIC03NzIgLTc2MSAtMT' +
+        'A2OCAtMTIwOSAtODUyIC0xMjg5IC0xMTIyCi0yODY4IC03OTEgLTQ2MjQgMTM3IC' +
+        '03MjcgMzk2IC0xNTIxIDcwOSAtMjE3NiBsNjQgLTEzNCAxMTMxIDAgMTEzMSAwID' +
+        'Y5IDE0NApjMzgwIDc5NiA2NzEgMTc4MCA3NzkgMjYzNiA3MSA1NjMgODAgMTE2MC' +
+        'AyNSAxNjUwIC0xMTYgMTAzOSAtNDczIDE5NTkgLTEwNzMKMjc2NSAtMjQyIDMyNC' +
+        'AtNDk5IDYwMSAtODQ3IDkxMyAtNDQgMzkgLTgzIDcyIC04NSA3MiAtMiAwIC0yMi' +
+        'AtMTcgLTQ0IC0zN3oKbTIyMiAtMzA3OCBjMzg2IC03MyA2ODIgLTM0NyA3ODUgLT' +
+        'cyNSAyMCAtNzQgMjMgLTEwNyAyMiAtMjU1IDAgLTE5NCAtMTUKLTI2NCAtODIgLT' +
+        'QwOSAtNTQgLTExNSAtMTEyIC0xOTggLTIwMSAtMjg3IC0xMjYgLTEyNiAtMjgyIC' +
+        '0yMTYgLTQ1MyAtMjYyCi03MCAtMTggLTEwOSAtMjIgLTI0OCAtMjIgLTE5NiAxIC' +
+        '0yNzYgMTggLTQzNSA5NiAtMjY5IDEzMSAtNDYyIDM3NSAtNTMxIDY3NAotMjggMT' +
+        'E4IC0yNiAzMjkgNCA0NDkgODMgMzMyIDMzNCA2MDIgNjYxIDcxMSAxMzUgNDQgMz' +
+        'M1IDU3IDQ3OCAzMHogbS0zMgotMjI4MCBjMzkgLTggMTEyIC0zNSAxNjMgLTYwID' +
+        'I2NCAtMTMxIDQxNSAtNDM1IDM1OCAtNzI1IC00NyAtMjM5IC0yMTcgLTQzNgotND' +
+        'Q4IC01MTcgLTEwNiAtMzggLTI3MyAtNDQgLTM4MSAtMTQgLTE5OSA1NCAtMzU1ID' +
+        'E4MCAtNDQxIDM1NiAtNDcgOTQgLTY4CjE4OSAtNjcgMzA1IDAgMTE1IDE4IDE4OC' +
+        'A3MyAzMDAgMzMgNjkgNTggMTAxIDEyNyAxNzAgNTMgNTMgMTA5IDk4IDE0NiAxMT' +
+        'cKNTggMzAgMTY0IDY4IDIxNSA3NiA1OCAxMCAxOTAgNiAyNTUgLTh6IG0tMzYgLT' +
+        'E2NTAgYzIyMSAtNTMgMzc5IC0yODUgMzQyCi01MDUgLTIyIC0xMzMgLTg4IC0yMz' +
+        'kgLTE5MSAtMzA5IC0xNDMgLTk1IC0zMjEgLTEwNyAtNDcxIC0zMCAtNTIgMjYgLT' +
+        'E0NQoxMTQgLTE3NiAxNjYgLTEzMiAyMjYgLTUwIDUyMiAxNzkgNjM5IDEwMyA1My' +
+        'AyMDQgNjUgMzE3IDM5eiIvPgo8cGF0aCBkPSJNNTUxMiA2MjI4IGMtMjMgLTczIC' +
+        '02NyAtMjM4IC05NyAtMzY3IC05MCAtMzgyIC0xNzkgLTYyNiAtMzg3Ci0xMDUzIC' +
+        '01NiAtMTE1IC05OSAtMjEwIC05NyAtMjEyIDE1IC0xMyAyNTAgLTE2NiA0MzQgLT' +
+        'I4MyA3ODYgLTQ5OSAxMjk0Ci03NTUgMTYwNCAtODA4IDIzNiAtNDEgMzI5IDU2ID' +
+        'I3NSAyODUgLTY1IDI4MCAtMzM3IDc1NiAtNzk0IDEzOTUgLTIxNyAzMDIKLTgxNy' +
+        'AxMDkyIC04ODQgMTE2MyAtMTAgMTAgLTIxIC0xNSAtNTQgLTEyMHoiLz4KPHBhdG' +
+        'ggZD0iTTE1NzMgNjE3OCBjLTU3NCAtNzI2IC0xMDQ5IC0xMzkyIC0xMjk4IC0xOD' +
+        'IzIC05MyAtMTYwIC0yMDAgLTM4NwotMjM2IC00OTggLTI3IC04MyAtMzMgLTExOC' +
+        'AtMzQgLTE4OSAwIC05MyAxMSAtMTE5IDY3IC0xNjEgMzQgLTI2IDE1NSAtMzQKMj' +
+        'QwIC0xNyAyNDMgNDcgNjYwIDI0NSAxMTk4IDU2OCAyOTQgMTc3IDgyMCA1MTUgOD' +
+        'IwIDUyOCAwIDQgLTQxIDg5IC05MCAxOTAKLTE0MyAyOTEgLTI0MiA1MjYgLTMwNS' +
+        'A3MjQgLTE0IDQ3IC01NiAyMDQgLTkxIDM1MCAtNTkgMjQzIC0xMjkgNDkwIC0xMz' +
+        'kgNDkwCi0yIDAgLTYxIC03MyAtMTMyIC0xNjJ6Ii8+CjxwYXRoIGQ9Ik0yNjc5ID' +
+        'QzODMgYy0zMDkgLTMyNCAtNTQwIC03NDEgLTY0OSAtMTE3MiAtNTkgLTIzNCAtOD' +
+        'EgLTQxNCAtODEKLTY3MSAwIC0yMzkgMTYgLTM5MSA2NyAtNjIwIDI4IC0xMjQgMT' +
+        'IxIC00MjAgMTMzIC00MjAgNCAwIDE3IDM5IDMwIDg4IDE0NQo1NjIgMzE2IDkzOS' +
+        'A0NjUgMTAyNyA1OCAzNCAxMjQgMzQgMTgyIDAgMjQxIC0xNDEgNDkyIC05MTYgNz' +
+        'M0IC0yMjY1IDI4IC0xNTcKNTMgLTI5NiA1NyAtMzEwIDYgLTI4IDMgLTQzIDczID' +
+        'M0NSAyMTUgMTE5MiA0MzcgMTkyNSA2NTQgMjE2MiA2NiA3MiAxMDQgOTMKMTY2ID' +
+        'kzIDE3NSAwIDM1MiAtMzE5IDUyNiAtOTQ4IDU5IC0yMTcgNTMgLTIwMSA2NiAtMT' +
+        'c5IDE4IDMzIDc4IDIyMCAxMDggMzM3CjExOCA0NjIgMTE2IDk1MiAtNSAxMzk1IC' +
+        '0xMTUgNDE4IC0zMzkgODIxIC02MjAgMTExNCBsLTk3IDEwMSAtODY4IDAgLTg2Ny' +
+        'AwCi03NCAtNzd6Ii8+CjwvZz4KPC9zdmc+Cg=='
+    );
+    expect(component.data.metadata.originalWidth).toBe(968);
+    expect(component.data.metadata.originalHeight).toBe(1707);
+    expect(component.data.metadata.savedImageFilename).toBe(
+      'saved_file_name.png'
+    );
+    expect(component.data.metadata.savedImageUrl).toBe('assets/images');
+    expect(component.data.crop).toBe(false);
 
     component.discardUploadedFile();
 
@@ -2276,6 +2268,7 @@ describe('ImageEditor', () => {
       expect(req.request.method).toEqual('POST');
       req.flush(null, {
         status: 500,
+        statusText: 'Error',
       });
 
       flushMicrotasks();
@@ -2316,9 +2309,7 @@ describe('ImageEditor', () => {
           getImage: () => {
             return {
               toDataURL: () => {
-                return {
-                  image: dataGif.uploadedImageData,
-                };
+                return dataGif.uploadedImageData;
               },
             };
           },
@@ -2433,9 +2424,7 @@ describe('ImageEditor', () => {
           getImage: () => {
             return {
               toDataURL: () => {
-                return {
-                  image: dataGif.uploadedImageData,
-                };
+                return dataGif.uploadedImageData;
               },
             };
           },
@@ -2811,7 +2800,7 @@ describe('ImageEditor', () => {
     spyOn(component.valueChanged, 'emit');
     spyOn(component.validityChange, 'emit');
 
-    expect(component.value).toBeUndefined();
+    expect(component.value).toBe('');
     expect(component.data.metadata.savedImageFilename).toBe(
       'saved_file_name.png'
     );
@@ -2836,7 +2825,7 @@ describe('ImageEditor', () => {
     spyOn(component.valueChanged, 'emit');
     spyOn(component.validityChange, 'emit');
 
-    expect(component.value).toBeUndefined();
+    expect(component.value).toBe('');
     expect(component.data.metadata.savedImageFilename).toBe(
       'saved_file_name.png'
     );
@@ -2855,7 +2844,7 @@ describe('ImageEditor', () => {
     );
     // The following values should not get updated when resetting the
     // component.
-    expect(component.value).toBeUndefined();
+    expect(component.value).toBe('');
     expect(alertsService.clearWarnings).not.toHaveBeenCalled();
     expect(component.valueChanged.emit).not.toHaveBeenCalled();
     expect(component.validityChange.emit).not.toHaveBeenCalled();

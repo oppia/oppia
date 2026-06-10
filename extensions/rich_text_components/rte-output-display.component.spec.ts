@@ -208,6 +208,7 @@ describe('RTE display component', () => {
             },
           },
         ],
+        querySelectorAll: () => [],
       },
     };
     let rteString = '<p>Hi<em>Hello</em>Hello</p>' + '<pre> Hello </pre>';

@@ -1086,6 +1086,7 @@ describe('SvgEditor with image save destination as local storage', () => {
           style: {fill: '', stroke: '', strokeWidth: ''},
         },
       ],
+      getAttribute: (attr: string) => null,
     } as unknown as Element;
     const mockObj = {
       toObject: () => ({

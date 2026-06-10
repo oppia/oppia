@@ -66,10 +66,7 @@ import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 
-// Relative path used as an work around to get the angular compiler and webpack
-// build to not complain.
-// TODO(#16309): Fix relative imports.
-import {GifFramesService} from '../../../core/templates/third-party-imports/gif-frames.import';
+import {GifFramesService} from 'third-party-imports/gif-frames.import';
 import {WindowRef} from 'services/contextual/window-ref.service';
 const gifshot = require('gifshot');
 
@@ -428,7 +425,6 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     return new Promise((resolve, reject) => {
       // Put the original image in a canvas.
       let img = new Image();
-      img.src = imageDataURI;
       img.addEventListener(
         'load',
         () => {
@@ -468,6 +464,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
         },
         false
       );
+      img.src = imageDataURI;
     });
   }
 
