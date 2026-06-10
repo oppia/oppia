@@ -72,6 +72,10 @@ const lessonInfoCardSelector = '.oppia-lesson-info-card';
 const hintButtonSelector = '.e2e-test-view-hint';
 const gotItButtonSelector = '.e2e-test-learner-got-it-button';
 
+const contributorIconInLessonInfoSelctor =
+  '.e2e-test-lesson-info-contributor-profile';
+const profileContainerSelector = '.e2e-test-profile-container';
+
 export class LoggedOutUser extends BaseUser {
   /**
    * Waits for Angular to finish any pending async operations.
@@ -98,6 +102,20 @@ export class LoggedOutUser extends BaseUser {
    */
   async clearUsernameInput(): Promise<void> {
     await this.clearAllTextFrom(signUpUsernameInputField);
+  }
+
+  /**
+   * Clicks on first contributor in Lesson Info model.
+   */
+  async clickOnProfileIconInLessonInfoModel(): Promise<void> {
+    await this.page.waitForSelector(contributorIconInLessonInfoSelctor, {
+      state: 'visible',
+    });
+    await this.waitForElementToStabilize(contributorIconInLessonInfoSelctor);
+    await this.clickOnElementWithSelector(contributorIconInLessonInfoSelctor);
+    await this.expectElementToBeVisible(profileContainerSelector);
+
+    expect(this.page.url()).toContain('/profile');
   }
 
   /**
