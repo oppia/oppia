@@ -347,8 +347,9 @@ const getSkillEditorUrl = async function (browser, page) {
     await page.waitForSelector(skillDescriptionField, {visible: true});
     await page.type(skillDescriptionField, 'Skill Description here');
     await page.click(skillOpenConceptCard);
-    await page.waitForSelector(skillReviewMaterialInput, {visible: true});
-    await page.waitForSelector(skillCkEditor, {visible: true});
+    await page.waitForSelector('.e2e-test-concept-card-text', {visible: true});
+    await page.waitForSelector(skillReviewMaterialInput);
+    await page.waitForSelector(skillCkEditor);
     await page.click(skillCkEditor);
     await page.keyboard.type('Skill Overview here');
 
