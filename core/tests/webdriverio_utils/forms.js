@@ -734,16 +734,23 @@ var CodeMirrorChecker = function (elem, codeMirrorPaneToScroll) {
       // This is used to match and scroll the text in codemirror to a point
       // scrollTo pixels from the top of the text or the bottom of the text
       // if scrollTo is too large.
-      await browser.execute(scrollTo => {
-        var el = document.querySelector('.CodeMirror-vscrollbar');
-        if (el) {
-          el.scrollTop = scrollTo;
-        }
-      }, scrollTo);
+      var paneIndex =
+        codeMirrorPaneToScroll === 'first' ? 0 : scrollBarElements.length - 1;
+      await browser.execute(
+        (scrollTo, index) => {
+          var els = document.querySelectorAll('.CodeMirror-vscrollbar');
+          var el = els[index];
+          if (el) {
+            el.scrollTop = scrollTo;
+          }
+        },
+        scrollTo,
+        paneIndex
+      );
       var lineHeight = await elem
         .$(codeMirrorLineNumberLocator)
-        .getAttribute('clientHeight');
-      var currentScrollTop = await scrollBarWebElement.scrollIntoView();
+        .getProperty('clientHeight');
+      var currentScrollTop = await scrollBarWebElement.getProperty('scrollTop');
       if (currentScrollTop === prevScrollTop) {
         break;
       } else {
