@@ -35,7 +35,6 @@ from core.domain import (
     skill_domain,
     skill_fetchers,
     state_domain,
-    story_fetchers,
     suggestion_registry,
     suggestion_services,
     topic_fetchers,
@@ -1216,9 +1215,15 @@ class UpdateQuestionSuggestionHandler(
 def _get_target_id_to_exploration_opportunity_dict(
     suggestions: Sequence[suggestion_registry.BaseSuggestion],
 ) -> Dict[
-    str, Optional[opportunity_domain.PartialExplorationOpportunitySummaryDict]
+    str,
+    Optional[
+        Union[
+            opportunity_domain.PartialExplorationOpportunitySummaryDict,
+            opportunity_domain.TranslationOpportunityCardInfoDict,
+        ]
+    ],
 ]:
-    """Returns a dict of target_id to exploration opportunity summary dict.
+    """Returns a dict of target_id to exploration opportunity dict.
 
     Args:
         suggestions: list(BaseSuggestion). A list of suggestions to retrieve
@@ -1226,101 +1231,33 @@ def _get_target_id_to_exploration_opportunity_dict(
 
     Returns:
         dict. Dict mapping target_id to corresponding exploration opportunity
-        summary dict.
+        dict, which can be in ExplorationOpportunitySummary or
+        TranslationOpportunityCardInfo representation depending on the feature flag.
     """
     target_ids = set(s.target_id for s in suggestions)
     opportunity_id_to_opportunity_dict: Dict[
         str,
-        Optional[opportunity_domain.PartialExplorationOpportunitySummaryDict],
+        Optional[
+            Union[
+                opportunity_domain.PartialExplorationOpportunitySummaryDict,
+                opportunity_domain.TranslationOpportunityCardInfoDict,
+            ]
+        ],
     ] = {}
     if feature_flag_services.is_feature_flag_enabled(
         feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
-        translation_opportunities = (
-            opportunity_services.get_translation_opportunities_by_entity_ids(
-                feconf.ENTITY_TYPE_EXPLORATION, list(target_ids)
-            )
+        card_infos = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            list(target_ids),
+            '',
         )
-        topic_summaries = topic_fetchers.get_all_topic_summaries()
-        topic_summary_map = {
-            ts.id: ts for ts in topic_summaries if ts is not None
-        }
-
-        exp_id_to_story_id = {}
-        for ts in topic_summaries:
-            if ts is not None:
-                for (
-                    story_id,
-                    exp_ids,
-                ) in ts.published_story_exploration_mapping.items():
-                    for exp_id in exp_ids:
-                        if exp_id in target_ids:
-                            exp_id_to_story_id[exp_id] = story_id
-
-        story_ids = list(set(exp_id_to_story_id.values()))
-        story_map = {}
-        if story_ids:
-            stories = story_fetchers.get_stories_by_ids(story_ids)
-            story_map = {
-                story.id: story for story in stories if story is not None
-            }
-
-        for exp_id, model in translation_opportunities.items():
-            if model is None:
-                opportunity_id_to_opportunity_dict[exp_id] = None
-                continue
-
-            topic_name_val = ''
-            if model.topic_ids:
-                for t_id in model.topic_ids:
-                    if t_id in topic_summary_map:
-                        topic_name_val = topic_summary_map[t_id].name
-                        break
-
-            story_title_val = ''
-            chapter_title_val = ''
-            story_id_val = exp_id_to_story_id.get(exp_id)
-            if story_id_val and story_id_val in story_map:
-                story_val = story_map[story_id_val]
-                story_title_val = story_val.title
-                story_node = (
-                    story_val.story_contents.get_node_with_corresponding_exp_id(
-                        exp_id
-                    )
-                )
-                if story_node:
-                    chapter_title_val = story_node.title
-
-            supported_language_codes = set(
-                language['id']
-                for language in constants.SUPPORTED_AUDIO_LANGUAGES
-            )
-            missing_language_codes = list(
-                supported_language_codes
-                - set(model.incomplete_translation_language_codes)
-            )
-            new_incomplete_translation_language_codes = (
-                model.incomplete_translation_language_codes
-                + missing_language_codes
-            )
-
-            opportunity = opportunity_domain.ExplorationOpportunitySummary(
-                exp_id,
-                model.topic_ids[0] if model.topic_ids else '',
-                topic_name_val,
-                story_id_val if story_id_val else '',
-                story_title_val,
-                chapter_title_val,
-                model.content_count,
-                new_incomplete_translation_language_codes,
-                model.translation_counts,
-                [],
-                [],
-                {},
-                0,
-            )
-            opportunity_id_to_opportunity_dict[exp_id] = opportunity.to_dict()
+        for card in card_infos:
+            opportunity_id_to_opportunity_dict[card.entity_id] = card.to_dict()
+        for tid in target_ids:
+            if tid not in opportunity_id_to_opportunity_dict:
+                opportunity_id_to_opportunity_dict[tid] = None
     else:
         opportunity_id_to_opportunity_dict = {
             opp_id: (opp.to_dict() if opp is not None else None)

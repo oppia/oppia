@@ -4450,22 +4450,19 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(response['next_offset'], 1)
-        self.assertDictEqual(
-            response['target_id_to_opportunity_dict'],
-            {
-                'exp1': {
-                    'chapter_title': 'Node1',
-                    'content_count': 1,
-                    'reviewer_only_content_count': 0,
-                    'id': 'exp1',
-                    'is_pinned': False,
-                    'story_title': 'A story',
-                    'topic_name': 'topic',
-                    'translation_counts': {},
-                    'translation_in_review_counts': {},
-                }
-            },
+        target_opp = response['target_id_to_opportunity_dict']['exp1']
+        self.assertEqual(target_opp['entity_id'], 'exp1')
+        self.assertEqual(
+            target_opp['entity_type'], feconf.ENTITY_TYPE_EXPLORATION
         )
+        self.assertEqual(target_opp['topic_name'], 'topic')
+        self.assertEqual(target_opp['entity_description'], 'Node1')
+        self.assertEqual(target_opp['content_count'], 1)
+        self.assertEqual(target_opp['is_pinned'], False)
+        self.assertEqual(target_opp['currently_available_to_learners'], True)
+        self.assertEqual(target_opp['translation_counts'], {})
+        self.assertEqual(target_opp['translation_in_review_counts'], {})
+        self.assertIn('hi', target_opp['incomplete_translation_language_codes'])
 
     def test_topic_translate_handler_returns_no_data(self) -> None:
         response = self.get_json(

@@ -1323,8 +1323,10 @@ def _get_translation_opportunity_cards_from_models(
     """
     entity_ids = [model.entity_id for model in opportunity_models_list]
 
-    topic_summaries = topic_fetchers.get_all_topic_summaries()
-    topic_summary_map = {ts.id: ts for ts in topic_summaries if ts is not None}
+    topic_summaries = [
+        ts for ts in topic_fetchers.get_all_topic_summaries() if ts is not None
+    ]
+    topic_summary_map = {ts.id: ts for ts in topic_summaries}
 
     story_map = {}
     skill_map = {}
