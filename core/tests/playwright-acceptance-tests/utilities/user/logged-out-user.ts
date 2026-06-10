@@ -127,7 +127,8 @@ export class LoggedOutUser extends BaseUser {
       el => el.textContent
     );
     await this.clickOnElement(languageDropdownElement);
-    await this.clickOnElementWithSelector(languageOption);
+    // Capture the navigation the language click triggers before reloading.
+    await this.clickAndWaitForNavigation(languageOption, true);
     // Here we need to reload the page again to confirm the language change.
     await this.page.reload();
 
