@@ -591,6 +591,9 @@ def get_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
     Returns:
         float. The time in milliseconds since the Epoch.
     """
+    if datetime_obj.tzinfo is None:
+        # Naive datetime from datastore. Treat it as UTC.
+        datetime_obj = datetime_obj.replace(tzinfo=datetime.timezone.utc)
     return datetime_obj.timestamp() * 1000.0
 
 
