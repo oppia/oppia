@@ -26,67 +26,67 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 // Expected SEO metadata values for each page.
 const SPLASH_SEO = {
-  title: 'Oppia | Free, Online and Interactive Lessons for Anyone',
+  title: 'Personalized Online Learning from Oppia',
   ogTitle: 'Personalized Online Learning from Oppia',
   description:
-    'Learn any subject through free and interactive lessons in easy-to-follow language. Oppia provides a step-by-step learning process to master any skills you want.',
+    'Empowering children globally through free, high-quality, story-based adaptive lessons.',
   ogDescription:
-    'Oppia is a free, open-source learning platform. Join the community to create or try an exploration today!',
+    'Empowering children globally through free, high-quality, story-based adaptive lessons.',
   applicationName: 'Oppia.org',
 };
 
 // Expected SEO metadata values for donate page.
 const DONATE_SEO = {
-  title: 'Donate | Make a Positive Impact | Oppia',
-  ogTitle: 'Personalized Online Learning from Oppia',
+  title: 'Donate to Oppia | Support Global Education',
+  ogTitle: 'Donate to Oppia | Support Global Education',
   description:
-    'Learn any subject through free and interactive lessons in easy-to-follow language. Oppia provides a step-by-step learning process to master any skills you want.',
+    'Your donation helps fund free, localized educational resources for children in under-resourced communities.',
   ogDescription:
-    'Donate to The Oppia Foundation to enable more students to receive the quality education they deserve.',
+    'Your donation helps fund free, localized educational resources for children in under-resourced communities.',
   applicationName: 'Oppia.org',
 };
 
 // Expected SEO metadata values for volunteer page.
 const VOLUNTEER_SEO = {
-  title: 'Volunteer | Oppia',
-  ogTitle: 'Personalized Online Learning from Oppia',
+  title: 'Volunteer with Oppia | Join Our Global Team',
+  ogTitle: 'Volunteer with Oppia | Join Our Global Team',
   description:
-    'Learn any subject through free and interactive lessons in easy-to-follow language. Oppia provides a step-by-step learning process to master any skills you want.',
+    'Contribute your translation, engineering, or content design skills to make education accessible to all.',
   ogDescription:
-    'Oppia is a free, open-source learning platform. Join the community to create or try an exploration today!',
+    'Contribute your translation, engineering, or content design skills to make education accessible to all.',
   applicationName: 'Oppia.org',
 };
 
 // Expected SEO metadata values for partnerships page.
 const PARTNERSHIPS_SEO = {
-  title: 'Partnerships | Oppia',
-  ogTitle: 'Personalized Online Learning from Oppia',
+  title: 'Partner with Oppia | NGOs and Schools',
+  ogTitle: 'Partner with Oppia | NGOs and Schools',
   description:
-    'Learn any subject through free and interactive lessons in easy-to-follow language. Oppia provides a step-by-step learning process to master any skills you want.',
+    "Discover how schools and non-profit organizations leverage Oppia's offline capability to eliminate learning deficits.",
   ogDescription:
-    'Oppia is a free, open-source learning platform. Join the community to create or try an exploration today!',
+    "Discover how schools and non-profit organizations leverage Oppia's offline capability to eliminate learning deficits.",
   applicationName: 'Oppia.org',
 };
 
 // Expected SEO metadata values for teachers page.
 const TEACHERS_SEO = {
-  title: 'Volunteer | Oppia',
-  ogTitle: 'Personalized Online Learning from Oppia',
+  title: 'Free Math Teaching Resources & Tools | Oppia',
+  ogTitle: 'Free Math Teaching Resources & Tools | Oppia',
   description:
-    'Learn any subject through free and interactive lessons in easy-to-follow language. Oppia provides a step-by-step learning process to master any skills you want.',
+    'Equip your classroom or home with adaptive math stories, downloadable lesson plan guides, and automated student tracking dashboards.',
   ogDescription:
-    'Oppia is a free, open-source learning platform. Join the community to create or try an exploration today!',
+    'Equip your classroom or home with adaptive math stories, downloadable lesson plan guides, and automated student tracking dashboards.',
   applicationName: 'Oppia.org',
 };
 
 // Expected SEO metadata values for parents page.
 const PARENTS_SEO = {
-  title: 'Volunteer | Oppia',
-  ogTitle: 'Personalized Online Learning from Oppia',
+  title: 'Free At-Home Math Learning for Kids | Oppia',
+  ogTitle: 'Free At-Home Math Learning for Kids | Oppia',
   description:
-    'Learn any subject through free and interactive lessons in easy-to-follow language. Oppia provides a step-by-step learning process to master any skills you want.',
+    'Help your child master math with fun, story-based lessons. Safe, completely free, and designed for independent learning at home.',
   ogDescription:
-    'Oppia is a free, open-source learning platform. Join the community to create or try an exploration today!',
+    'Help your child master math with fun, story-based lessons. Safe, completely free, and designed for independent learning at home.',
   applicationName: 'Oppia.org',
 };
 
