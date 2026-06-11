@@ -46,6 +46,7 @@ export class BaseContentComponent {
   COOKIE_NAME_COOKIES_ACKNOWLEDGED = 'OPPIA_COOKIES_ACKNOWLEDGED';
   ONE_YEAR_IN_MSECS = 31536000000;
   directiveSubscriptions = new Subscription();
+  isFeedbackFloaterDismissed: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
@@ -131,6 +132,11 @@ export class BaseContentComponent {
     );
   }
 
+  isWebGeneralFeedbackModalEnabled(): boolean {
+    return this.platformFeatureService.status.WebGeneralFeedbackModalEnabled
+      .isEnabled;
+  }
+
   isSidebarShown(): boolean {
     return this.sidebarStatusService.isSidebarShown();
   }
@@ -163,6 +169,15 @@ export class BaseContentComponent {
     mainContentElement.tabIndex = -1;
     mainContentElement.scrollIntoView();
     mainContentElement.focus();
+  }
+
+  dismissFeedbackFloater(): void {
+    this.isFeedbackFloaterDismissed = true;
+  }
+
+  openFeedbackModal(): void {
+    // TODO(#26195): Implement feedback modal opening logic.
+    return;
   }
 
   hasAcknowledgedCookies(): boolean {

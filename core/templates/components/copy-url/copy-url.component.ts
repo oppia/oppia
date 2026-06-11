@@ -20,9 +20,12 @@ import {Component, Input} from '@angular/core';
 import {Clipboard} from '@angular/cdk/clipboard';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
+import './copy-url.component.css';
+
 @Component({
   selector: 'oppia-copy-url',
   templateUrl: './copy-url.component.html',
+  styleUrls: ['./copy-url.component.css'],
 })
 export class ComponentOverviewComponent {
   @Input() urlToCopy!: string;

@@ -88,6 +88,12 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_BLOG_POST,
             'Image exceeds file size limit of 1024 KB',
         )
+        self._assert_image_validation_error(
+            large_image,
+            'image.svg',
+            feconf.ENTITY_TYPE_FEEDBACK_SCREENSHOT,
+            'Image exceeds file size limit of 1024 KB',
+        )
 
         invalid_svg = b'<badsvg></badsvg>'
         self._assert_image_validation_error(
