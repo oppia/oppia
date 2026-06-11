@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import sys
 
@@ -58,3 +59,13 @@ def pytest_configure(
     for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
         if os.path.exists(directory) and directory not in sys.path:
             sys.path.insert(0, directory)
+
+    # Apply colored logging for the development console when the output is a
+    # TTY. The import is deferred to this point because core.utils depends on
+    # sys.path being fully configured above.
+    from core import utils  # pylint: disable=import-outside-toplevel
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(utils.ColoredFormatter())
+    root_logger = logging.getLogger()
+    root_logger.handlers = [handler]

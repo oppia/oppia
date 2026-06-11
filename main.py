@@ -109,6 +109,19 @@ if not constants.EMULATOR_MODE:
     client = google.cloud.logging.Client()
     client.setup_logging()
 
+# In development mode, apply colored logging so that WARNING and ERROR messages
+# are visually distinct in the terminal. This only affects local runs because
+# EMULATOR_MODE is True in development and Cloud Logging replaces the root
+# handler in production (via client.setup_logging() above).
+if constants.EMULATOR_MODE:
+    from core import (
+        utils as core_utils,
+    )  # pylint: disable=wrong-import-position
+
+    _colored_handler = logging.StreamHandler()
+    _colored_handler.setFormatter(core_utils.ColoredFormatter())
+    logging.getLogger().handlers = [_colored_handler]
+
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,
 # which makes it tiresome to identify the actual error.

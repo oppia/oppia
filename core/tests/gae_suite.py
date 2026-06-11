@@ -118,6 +118,13 @@ def main(args: Optional[List[str]] = None) -> None:
     # the html.py file in coverage instead of the native html library.
     sys.path = [path for path in sys.path if 'coverage' not in path]
 
+    import logging  # pylint: disable=import-outside-toplevel
+    from core import utils  # pylint: disable=import-outside-toplevel
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(utils.ColoredFormatter())
+    logging.getLogger().handlers = [handler]
+
     suites = create_test_suites(
         test_target=parsed_args.test_target,
     )

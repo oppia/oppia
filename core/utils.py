@@ -24,6 +24,7 @@ import hashlib
 import io
 import itertools
 import json
+import logging
 import os
 import random
 import re
@@ -62,6 +63,47 @@ SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
 
 T = TypeVar('T')
+
+_ANSI_YELLOW = '\033[33m'
+_ANSI_RED = '\033[31m'
+_ANSI_RESET = '\033[0m'
+
+
+class ColoredFormatter(logging.Formatter):
+    """A logging formatter that colorizes output by severity level.
+
+    WARNING messages are printed in yellow; ERROR and CRITICAL messages are
+    printed in red. DEBUG and INFO messages are left uncolored so they do not
+    add visual noise to routine output.
+
+    The formatter is intentionally a no-op when the target stream is not a
+    TTY (e.g. CI log files), which keeps the pipeline output clean.
+    """
+
+    _LEVEL_COLORS: Dict[int, str] = {
+        logging.WARNING: _ANSI_YELLOW,
+        logging.ERROR: _ANSI_RED,
+        logging.CRITICAL: _ANSI_RED,
+    }
+
+    def __init__(self, fmt: Optional[str] = None) -> None:
+        super().__init__(fmt=fmt or '%(levelname)s:   %(message)s')
+
+    def format(self, record: logging.LogRecord) -> str:
+        """Format a log record, wrapping the message in ANSI color codes.
+
+        Args:
+            record: logging.LogRecord. The log record to format.
+
+        Returns:
+            str. The formatted log message, optionally wrapped in ANSI color
+            escape sequences when the output is a TTY.
+        """
+        formatted = super().format(record)
+        color = self._LEVEL_COLORS.get(record.levelno)
+        if color is None:
+            return formatted
+        return '%s%s%s' % (color, formatted, _ANSI_RESET)
 
 
 class SingletonMeta(type):
