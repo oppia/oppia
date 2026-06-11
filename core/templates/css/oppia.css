@@ -2583,7 +2583,6 @@ div#ng-curtain {
 }
 
 .oppia-navbar-dropdown-toggle:focus {
-  background-color: #fff;
   color: #00645c;
 }
 .oppia-navbar-profile-picture {

@@ -3794,7 +3794,7 @@ export class LoggedOutUser extends BaseUser {
     await languageFilterDropdownTogglerElement?.click();
     await this.waitForStaticAssetsToLoad();
 
-    await this.page.waitForSelector(unselectedFilterOptionsSelector);
+    await this.page.waitForSelector(selectedFilterOptionsSelector);
     const selectedElements = await this.page.$$(selectedFilterOptionsSelector);
     for (const element of selectedElements) {
       const elementText = await this.page.evaluate(
@@ -4952,17 +4952,7 @@ export class LoggedOutUser extends BaseUser {
       // Hint is shown after one minute.
       timeout: 80000,
     });
-    await this.page.waitForSelector(hintButtonSelector, {visible: true});
-    // Click the hint button directly via the DOM API to bypass
-    // Puppeteer's viewport clickability check, since the footer
-    // element's bounding rect may report as outside the viewport
-    // in the new build architecture.
-    await this.page.evaluate((selector: string) => {
-      const button = document.querySelector(selector);
-      if (button) {
-        (button as HTMLElement).click();
-      }
-    }, hintButtonSelector);
+    await this.clickOnElementWithSelector(hintButtonSelector);
 
     await this.page.waitForSelector(gotItButtonSelector, {
       visible: true,
@@ -5020,13 +5010,7 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
       timeout: timeout,
     });
-    // Click via DOM API to bypass Puppeteer's viewport check.
-    await this.page.evaluate((selector: string) => {
-      const button = document.querySelector(selector);
-      if (button) {
-        (button as HTMLElement).click();
-      }
-    }, viewSolutionButton);
+    await this.clickOnElementWithSelector(viewSolutionButton);
     await this.clickOnElementWithSelector(continueToSolutionButton);
     await this.page.waitForSelector(closeSolutionModalButton, {
       visible: true,

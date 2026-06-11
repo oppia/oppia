@@ -46,7 +46,7 @@
 }
 .home-tab .suggested-for-you .topic-summary-tile {
   display: inline-block;
-  padding-right: 20px;
+  padding-inline-end: 20px;
 }
 .home-tab .suggested-for-you .untracked-topics {
   width: fit-content;
