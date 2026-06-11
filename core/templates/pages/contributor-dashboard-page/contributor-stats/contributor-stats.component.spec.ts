@@ -37,7 +37,6 @@ import {
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap';
 import {CertificateDownloadModalComponent} from '../modal-templates/certificate-download-modal.component';
-import {ContributionAndReviewBackendApiService} from '../services/contribution-and-review-backend-api.service';
 
 describe('Contributor stats component', () => {
   let fetchAllContributionAndReviewStatsAsync: jasmine.Spy;
