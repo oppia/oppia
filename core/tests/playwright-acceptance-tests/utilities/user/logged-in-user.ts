@@ -50,6 +50,8 @@ const invalidUsernameErrorContainer = '.oppia-warning-text';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const matFormTextSelector = '.oppia-form-text';
 const audioLanguageInputSelector = '.e2e-test-audio-language-selector';
+const audioLanguageSearchInputSelector =
+  'input.mat-select-search-input:not(.mat-select-search-hidden)';
 const explorationLanguageInputSelector =
   '.e2e-test-preferred-exploration-language-input';
 const optionText = '.mat-option-text';
@@ -1596,14 +1598,27 @@ export class LoggedInUser extends BaseUser {
    * @param {string} language - The new language to set for the user.
    */
   async updatePreferredAudioLanguage(language: string): Promise<void> {
-    await this.page.waitForSelector(audioLanguageInputSelector, {
+    const select = await this.page.waitForSelector(audioLanguageInputSelector, {
       state: 'visible',
     });
-    await this.typeInInputField(audioLanguageInputSelector, language);
+    await select.click();
+
+    const searchInput = await this.page.waitForSelector(
+      audioLanguageSearchInputSelector,
+      {state: 'visible'}
+    );
+    await this.typeInInputField(searchInput, language);
+
     await this.page.keyboard.press('Enter');
 
+    const targetOption = await this.page.waitForSelector(
+      `mat-option:has-text("${language}")`,
+      {state: 'visible'}
+    );
+    await targetOption.scrollIntoViewIfNeeded();
+    await targetOption.click();
+
     // Post-check: Ensure the audio language is properly selected.
-    await this.page.waitForLoadState('networkidle');
     await this.page.waitForSelector(audioLanguageValueSelector);
     const audioLanguageValueElement = await this.page.$(
       audioLanguageValueSelector
