@@ -127,7 +127,6 @@ describe('Contributor stats component', () => {
   let component: ContributorStatsComponent;
   let fixture: ComponentFixture<ContributorStatsComponent>;
   let contributionAndReviewStatsService: ContributionAndReviewStatsService;
-  let contributionAndReviewBackendApiService: ContributionAndReviewBackendApiService;
   let languageUtilService: LanguageUtilService;
   let userService: UserService;
   let modalService: NgbModal;
@@ -157,9 +156,6 @@ describe('Contributor stats component', () => {
 
     contributionAndReviewStatsService = TestBed.inject(
       ContributionAndReviewStatsService
-    );
-    contributionAndReviewBackendApiService = TestBed.inject(
-      ContributionAndReviewBackendApiService
     );
     certificateModal = TestBed.createComponent(
       CertificateDownloadModalComponent
