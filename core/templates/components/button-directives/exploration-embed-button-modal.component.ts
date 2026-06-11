@@ -20,10 +20,12 @@ import {Component, Input, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
+import './exploration-embed-button-modal.component.css';
+
 @Component({
   selector: 'exploration-embed-button-modal',
   templateUrl: './exploration-embed-button-modal.component.html',
-  styleUrls: [],
+  styleUrls: ['./exploration-embed-button-modal.component.css'],
 })
 export class ExplorationEmbedButtonModalComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
