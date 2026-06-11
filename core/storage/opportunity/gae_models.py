@@ -205,6 +205,14 @@ class SkillOpportunityModel(base_models.BaseModel):
     question_count = datastore_services.IntegerProperty(
         required=True, indexed=True
     )
+    # Whether the topic associated with this skill is published.
+    topic_is_published = datastore_services.BooleanProperty(
+        indexed=True, default=False
+    )
+    # Whether the skill has less than the maximum required questions.
+    is_incomplete = datastore_services.BooleanProperty(
+        indexed=True, default=True
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -226,6 +234,8 @@ class SkillOpportunityModel(base_models.BaseModel):
             **{
                 'skill_description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'question_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'topic_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'is_incomplete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             },
         )
 
@@ -261,14 +271,19 @@ class SkillOpportunityModel(base_models.BaseModel):
             urlsafe_cursor=urlsafe_start_cursor
         )
 
-        created_on_query = cls.get_all().order(cls.created_on)
+        query = cls.get_all().order(
+            -cls.topic_is_published,
+            -cls.is_incomplete,
+            -cls.question_count,
+            cls.created_on,
+        )
         fetch_result: Tuple[
             Sequence[SkillOpportunityModel], datastore_services.Cursor, bool
-        ] = created_on_query.fetch_page(page_size, start_cursor=start_cursor)
+        ] = query.fetch_page(page_size, start_cursor=start_cursor)
         query_models, cursor, _ = fetch_result
         # TODO(#13462): Refactor this so that we don't do the lookup.
         # Do a forward lookup so that we can know if there are more values.
-        fetch_result = created_on_query.fetch_page(
+        fetch_result = query.fetch_page(
             page_size + 1, start_cursor=start_cursor
         )
         plus_one_query_models, _, _ = fetch_result

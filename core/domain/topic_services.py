@@ -2167,6 +2167,9 @@ def publish_topic(topic_id: str, committer_id: str) -> None:
     save_topic_rights(
         topic_rights, committer_id, 'Published the topic', commit_cmds
     )
+    opportunity_services.update_skill_opportunities_topic_published_status(
+        topic.get_all_skill_ids(), True
+    )
 
 
 def unpublish_topic(topic_id: str, committer_id: str) -> None:
@@ -2200,6 +2203,10 @@ def unpublish_topic(topic_id: str, committer_id: str) -> None:
     ]
     save_topic_rights(
         topic_rights, committer_id, 'Unpublished the topic', commit_cmds
+    )
+    topic = topic_fetchers.get_topic_by_id(topic_id)
+    opportunity_services.update_skill_opportunities_topic_published_status(
+        topic.get_all_skill_ids(), False
     )
 
 

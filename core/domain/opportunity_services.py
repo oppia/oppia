@@ -1556,6 +1556,32 @@ def _build_exp_id_to_translation_suggestion_in_review_count(
     return exp_id_to_in_review_count
 
 
+def update_skill_opportunities_topic_published_status(
+    skill_ids: List[str], topic_is_published: bool
+) -> None:
+    """Updates the topic_is_published status of SkillOpportunityModels
+    corresponding to the given skill_ids.
+
+    Args:
+        skill_ids: list(str). The IDs of the skills to update.
+        topic_is_published: bool. The new published status.
+    """
+    skill_opportunity_models = (
+        opportunity_models.SkillOpportunityModel.get_multi(skill_ids)
+    )
+    models_to_put = []
+    for model in skill_opportunity_models:
+        if model is not None and model.topic_is_published != topic_is_published:
+            model.topic_is_published = topic_is_published
+            models_to_put.append(model)
+
+    if models_to_put:
+        opportunity_models.SkillOpportunityModel.update_timestamps_multi(
+            models_to_put
+        )
+        opportunity_models.SkillOpportunityModel.put_multi(models_to_put)
+
+
 def get_exploration_opportunity_summaries_by_ids(
     ids: List[str],
 ) -> Dict[str, Optional[opportunity_domain.ExplorationOpportunitySummary]]:
@@ -1798,14 +1824,34 @@ def _save_skill_opportunities(
             domain objects.
     """
     skill_opportunity_models = []
-    for skill_opportunity in skill_opportunities:
+    skill_ids = [so.id for so in skill_opportunities]
+    existing_models = opportunity_models.SkillOpportunityModel.get_multi(
+        skill_ids
+    )
+
+    for i, skill_opportunity in enumerate(skill_opportunities):
         skill_opportunity.validate()
-        model = opportunity_models.SkillOpportunityModel(
-            id=skill_opportunity.id,
-            skill_description=skill_opportunity.skill_description,
-            question_count=skill_opportunity.question_count,
+        is_incomplete = (
+            skill_opportunity.question_count < constants.MAX_QUESTIONS_PER_SKILL
         )
-        skill_opportunity_models.append(model)
+        existing_model = existing_models[i]
+
+        if existing_model is not None:
+            existing_model.skill_description = (
+                skill_opportunity.skill_description
+            )
+            existing_model.question_count = skill_opportunity.question_count
+            existing_model.is_incomplete = is_incomplete
+            skill_opportunity_models.append(existing_model)
+        else:
+            model = opportunity_models.SkillOpportunityModel(
+                id=skill_opportunity.id,
+                skill_description=skill_opportunity.skill_description,
+                question_count=skill_opportunity.question_count,
+                topic_is_published=False,
+                is_incomplete=is_incomplete,
+            )
+            skill_opportunity_models.append(model)
     opportunity_models.SkillOpportunityModel.update_timestamps_multi(
         skill_opportunity_models
     )
