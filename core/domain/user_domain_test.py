@@ -2006,7 +2006,8 @@ class UserSettingsProfileNameTests(test_utils.GenericTestBase):
         self.user_settings.profile_name = 'Ana123'
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'profile_name can only contain letters, spaces, and hyphens',
+            'profile_name can only contain letters, spaces, hyphens, '
+            'and apostrophes.',
         ):
             self.user_settings.validate()
 
