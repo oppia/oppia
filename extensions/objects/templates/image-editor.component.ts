@@ -76,10 +76,6 @@ const gifshot = require('gifshot');
 // We attach GifFrames to the window and use it in our codebase and the
 // default Window interface doesn't contain "GifFrames" property. Hence we want
 // to extend the Window definition here.
-// The "declare global" is needed as we want to augment GifFrames to the
-// global scope Window as Window is a global object. Typescript interfaces only
-// union the interfaces with the same name when presented in the same scope.
-// TODO(#16735): Remove the usage of declare globals in "non-global" files.
 
 interface FilepathData {
   mode: number;
