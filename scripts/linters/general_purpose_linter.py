@@ -719,7 +719,7 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
         """Checks that modal components follow the standardized pattern.
 
         This ensures:
-        1. Files using NgbModalRef must also use MatBottomSheetRef to
+        1. Files using NgbActiveModal must also use MatBottomSheetRef to
            provide a mobile-friendly bottom sheet view.
         2. Calls to ngbModal.open() must include backdrop: 'static'
            to prevent closing the modal when clicking outside.
@@ -728,6 +728,13 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
         error_messages: List[str] = []
         failed = False
 
+        # Load allowlist once before the loop.
+        allowlist_path = os.path.join(
+            os.getcwd(), 'scripts', 'linters', 'modal_allowlist.json'
+        )
+        with open(allowlist_path, 'r', encoding='utf-8') as f:
+            allowlist = json.load(f)
+
         for filepath in self.all_filepaths:
             if not filepath.endswith('.ts'):
                 continue
@@ -735,22 +742,20 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
             if filepath.endswith('.spec.ts'):
                 continue
 
-            file_content = self.file_cache.read(filepath)
-
-            # Load allowlist and skip if filepath is allowlisted.
-            allowlist_path = os.path.join(
-                os.getcwd(), 'scripts', 'linters', 'modal_allowlist.json'
-            )
-            with open(allowlist_path, 'r', encoding='utf-8') as f:
-                allowlist = json.load(f)
-
             if filepath in allowlist:
                 continue
 
+            file_content = self.file_cache.read(filepath)
+
+            # Remove comments to avoid false positives.
+            file_content_without_comments = re.sub(
+                r'//.*?\n|/\*.*?\*/', '', file_content, flags=re.DOTALL
+            )
+
             # Check 1: Modal Components (inject NgbActiveModal)
             if (
-                'NgbActiveModal' in file_content
-                and 'MatBottomSheetRef' not in file_content
+                'NgbActiveModal' in file_content_without_comments
+                and 'MatBottomSheetRef' not in file_content_without_comments
             ):
                 failed = True
                 error_messages.append(
@@ -760,8 +765,8 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
                 )
 
             # Check 2: Opener Components (call ngbModal.open)
-            if 'ngbModal.open' in file_content:
-                if 'MatBottomSheet' not in file_content:
+            if 'ngbModal.open' in file_content_without_comments:
+                if 'MatBottomSheet' not in file_content_without_comments:
                     failed = True
                     error_messages.append(
                         '%s --> Components opening modals with ngbModal.open '
@@ -770,9 +775,11 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
                     )
 
                 # Check 3: Backdrop static.
-                if (
-                    'backdrop: \'static\'' not in file_content
-                    and 'backdrop: "static"' not in file_content
+                if not bool(
+                    re.search(
+                        r'backdrop\s*:\s*[\'"]static[\'"]',
+                        file_content_without_comments,
+                    )
                 ):
                     failed = True
                     error_messages.append(
