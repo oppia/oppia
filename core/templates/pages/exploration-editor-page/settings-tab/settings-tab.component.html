@@ -447,7 +447,7 @@
   <mat-card class="oppia-settings-card-container oppia-editor-card oppia-permissions-card oppia-mobile-collapsible-card">
     <div>
       <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('permissions')">
-        <h3 class="e2e-test-permission-settings-container" tabindex="0">Permissions</h3>
+        <h3 class="e2e-test-permission-settings-container e2e-test-permissions-header" tabindex="0">Permissions</h3>
         <i class="fa fa-caret-down"
            *ngIf="!permissionsCardIsShown"
            aria-hidden="true">
@@ -457,7 +457,7 @@
            aria-hidden="true">
         </i>
       </div>
-      <div class="oppia-mobile-collapsible-card-content" *ngIf="permissionsCardIsShown">
+      <div class="oppia-mobile-collapsible-card-content e2e-test-permissions-content" *ngIf="permissionsCardIsShown">
         <p *ngIf="explorationRightsService.isPrivate() && explorationRightsService.viewableIfPrivate()" tabindex="0">
           This exploration is <strong>private</strong>. Anyone with the link can access it.
         </p>
@@ -505,7 +505,7 @@
 
   <mat-card class="oppia-settings-card-container oppia-editor-card oppia-feedback-card oppia-mobile-collapsible-card" *ngIf="editabilityService.isEditable()">
     <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('feedback')">
-      <h3 class="e2e-test-feedback-settings-container" tabindex="0">Feedback/Suggestion Email Preferences</h3>
+      <h3 class="e2e-test-feedback-settings-container e2e-test-feedback-header" tabindex="0">Feedback/Suggestion Email Preferences</h3>
       <i class="fa fa-caret-down"
          *ngIf="!feedbackCardIsShown"
          aria-hidden="true">
@@ -515,7 +515,7 @@
          aria-hidden="true">
       </i>
     </div>
-    <div class="oppia-mobile-collapsible-card-content" *ngIf="feedbackCardIsShown">
+    <div class="oppia-mobile-collapsible-card-content e2e-test-feedback-content" *ngIf="feedbackCardIsShown">
       <div role="form" class="form-horizontal">
         <div class="oppia-features-header">
           <label for="FeedbackNotifications">

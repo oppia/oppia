@@ -1036,4 +1036,32 @@ describe('Voiceover card component', () => {
 
     expect(component.automaticVoiceoverGenerationStatus).toEqual('GENERATING');
   }));
+
+  it('should correctly update language accent code from translationLanguageService when active accent changes', fakeAsync(() => {
+    // 1. Simulate the bug's race condition where localStorage returns null.
+    spyOn(
+      localStorageService,
+      'getLastSelectedLanguageAccentCode'
+    ).and.returnValue(null);
+
+    // 2. Provide the single source of truth from the correct service.
+    spyOn(
+      translationLanguageService,
+      'getActiveLanguageAccentCode'
+    ).and.returnValue('en-US');
+
+    spyOn(component, 'updateLanguageAccentCode');
+
+    // 3. Initialize the component to start the subscription.
+    component.ngOnInit();
+
+    // 4. Trigger the translation event.
+    translationLanguageService.onActiveLanguageAccentChanged.emit();
+    flush();
+
+    // 5. The component should update with the service's value ('en-US'), NOT localStorage (null).
+    expect(component.updateLanguageAccentCode).toHaveBeenCalledWith('en-US');
+
+    discardPeriodicTasks();
+  }));
 });

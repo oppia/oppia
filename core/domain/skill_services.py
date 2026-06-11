@@ -682,6 +682,77 @@ def remove_skill_from_all_topics(user_id: str, skill_id: str) -> None:
             )
 
 
+def remove_prerequisite_skill_id_from_all_skills(
+    committer_id: str, skill_id: str
+) -> None:
+    """Removes the given skill ID from all skills' prerequisite lists.
+
+    Args:
+        committer_id: str. The ID of the user performing the action.
+        skill_id: str. The ID of the prerequisite skill to be removed.
+    """
+    skills_with_prereq = skill_models.SkillModel.get_by_prerequisite_skill_id(
+        skill_id
+    )
+
+    for skill in skills_with_prereq:
+        update_skill(
+            committer_id,
+            skill.id,
+            [
+                skill_domain.SkillChange(
+                    {
+                        'cmd': skill_domain.CMD_DELETE_PREREQUISITE_SKILL,
+                        'skill_id': skill_id,
+                    }
+                )
+            ],
+            'Removed prerequisite skill with id %s.' % skill_id,
+        )
+
+
+def replace_prerequisite_skill_id_from_all_skills(
+    committer_id: str, old_skill_id: str, new_skill_id: str
+) -> None:
+    """Replaces the old skill ID with the new one in all the associated skills'
+        prerequisites.
+
+    Args:
+        committer_id: str. The ID of the user performing the action.
+        new_skill_id: str. The ID of the skill that replaces the old skill.
+        old_skill_id: str. The ID of the skill to be replaced.
+    """
+    skills_with_prereq = skill_models.SkillModel.get_by_prerequisite_skill_id(
+        old_skill_id
+    )
+
+    for skill in skills_with_prereq:
+        change_list = [
+            skill_domain.SkillChange(
+                {
+                    'cmd': skill_domain.CMD_DELETE_PREREQUISITE_SKILL,
+                    'skill_id': old_skill_id,
+                }
+            )
+        ]
+        if new_skill_id not in skill.prerequisite_skill_ids:
+            change_list.append(
+                skill_domain.SkillChange(
+                    {
+                        'cmd': skill_domain.CMD_ADD_PREREQUISITE_SKILL,
+                        'skill_id': new_skill_id,
+                    }
+                )
+            )
+        update_skill(
+            committer_id,
+            skill.id,
+            change_list,
+            'Replaced prerequisite skill id %s with %s.'
+            % (old_skill_id, new_skill_id),
+        )
+
+
 @overload
 def get_skill_summary_by_id(skill_id: str) -> skill_domain.SkillSummary: ...
 
@@ -1196,6 +1267,7 @@ def delete_skill(
             still retained in the datastore. This last option is the preferred
             one.
     """
+    remove_prerequisite_skill_id_from_all_skills(committer_id, skill_id)
     skill_models.SkillModel.delete_multi(
         [skill_id], committer_id, '', force_deletion=force_deletion
     )
