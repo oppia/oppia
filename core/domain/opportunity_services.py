@@ -835,6 +835,14 @@ def _create_exploration_opportunities(
         exploration_opportunity_summary_list
     )
 
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        create_translation_opportunity(
+            {feconf.ENTITY_TYPE_EXPLORATION: exp_ids}
+        )
+
 
 def compute_opportunity_models_with_updated_exploration(
     exp_id: str, content_count: int, translation_counts: Dict[str, int]
@@ -1381,11 +1389,13 @@ def _get_translation_opportunity_cards_from_models(
             )
 
         entity_description = ''
+        story_title = ''
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             exp_id = model.entity_id
             story_id_val = exp_id_to_story_id.get(exp_id)
             if story_id_val and story_id_val in story_map:
                 story_val = story_map[story_id_val]
+                story_title = story_val.title
                 story_node = (
                     story_val.story_contents.get_node_with_corresponding_exp_id(
                         exp_id
@@ -1417,6 +1427,7 @@ def _get_translation_opportunity_cards_from_models(
             entity_description=entity_description,
             is_pinned=False,
             currently_available_to_learners=currently_available_to_learners,
+            story_title=story_title,
         )
 
         if model.entity_id in in_review_counts:
