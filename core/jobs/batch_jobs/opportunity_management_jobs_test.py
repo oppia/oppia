@@ -1036,3 +1036,98 @@ class GenerateExplorationOpportunitySummariesJobTests(
                     ),
                 ]
             )
+
+
+class PopulateSkillOpportunityModelPropertiesJobTests(
+    job_test_utils.JobTestBase
+):
+
+    JOB_CLASS: Type[
+        opportunity_management_jobs.PopulateSkillOpportunityModelPropertiesJob
+    ] = opportunity_management_jobs.PopulateSkillOpportunityModelPropertiesJob
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_job_populates_properties(self) -> None:
+        topic_rights_model = self.create_model(
+            topic_models.TopicRightsModel,
+            id='topic_id',
+            topic_is_published=True,
+        )
+        topic_rights_model.update_timestamps()
+        datastore_services.put_multi([topic_rights_model])
+
+        topic_model = self.create_model(
+            topic_models.TopicModel,
+            id='topic_id',
+            name='topic_name',
+            url_fragment='topic-frag',
+            description='description',
+            canonical_name='canonical_name',
+            next_subtopic_id=1,
+            language_code='en',
+            subtopics=[
+                {
+                    'id': 1,
+                    'title': 'subtopic',
+                    'skill_ids': ['skill_id_1'],
+                    'url_fragment': 'sub-frag',
+                }
+            ],
+            uncategorized_skill_ids=['skill_id_2'],
+            story_reference_schema_version=1,
+            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            page_title_fragment_for_web='fragm',
+        )
+        topic_model.update_timestamps()
+        datastore_services.put_multi([topic_model])
+
+        skill_opportunity_model_1 = self.create_model(
+            opportunity_models.SkillOpportunityModel,
+            id='skill_id_1',
+            skill_description='description',
+            question_count=2,
+        )
+        skill_opportunity_model_1.update_timestamps()
+        datastore_services.put_multi([skill_opportunity_model_1])
+
+        skill_opportunity_model_2 = self.create_model(
+            opportunity_models.SkillOpportunityModel,
+            id='skill_id_2',
+            skill_description='description',
+            question_count=20,
+        )
+        skill_opportunity_model_2.update_timestamps()
+        datastore_services.put_multi([skill_opportunity_model_2])
+
+        skill_opportunity_model_3 = self.create_model(
+            opportunity_models.SkillOpportunityModel,
+            id='skill_id_3',
+            skill_description='description',
+            question_count=20,
+        )
+        skill_opportunity_model_3.update_timestamps()
+        datastore_services.put_multi([skill_opportunity_model_3])
+
+        self.assert_job_output_is(
+            [job_run_result.JobRunResult(stdout='SUCCESS: 3')]
+        )
+
+        model_1 = opportunity_models.SkillOpportunityModel.get('skill_id_1')
+        self.assertIsNotNone(model_1)
+        if model_1 is not None:
+            self.assertTrue(model_1.topic_is_published)
+            self.assertTrue(model_1.is_incomplete)
+
+        model_2 = opportunity_models.SkillOpportunityModel.get('skill_id_2')
+        self.assertIsNotNone(model_2)
+        if model_2 is not None:
+            self.assertTrue(model_2.topic_is_published)
+            self.assertFalse(model_2.is_incomplete)
+
+        model_3 = opportunity_models.SkillOpportunityModel.get('skill_id_3')
+        self.assertIsNotNone(model_3)
+        if model_3 is not None:
+            self.assertFalse(model_3.topic_is_published)
+            self.assertFalse(model_3.is_incomplete)

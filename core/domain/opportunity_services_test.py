@@ -1463,6 +1463,50 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 user_id, 'lang', topic_id, None
             )
 
+    def test_update_skill_opportunities_topic_published_status(self) -> None:
+        skill_id_1 = 'skill_1'
+        skill_id_2 = 'skill_2'
+
+        opportunity_models.SkillOpportunityModel(
+            id=skill_id_1,
+            skill_description='description 1',
+            question_count=5,
+            topic_is_published=False,
+            is_incomplete=True,
+        ).put()
+
+        opportunity_models.SkillOpportunityModel(
+            id=skill_id_2,
+            skill_description='description 2',
+            question_count=10,
+            topic_is_published=False,
+            is_incomplete=False,
+        ).put()
+
+        opportunity_services.update_skill_opportunities_topic_published_status(
+            [skill_id_1, skill_id_2], True
+        )
+
+        model1 = opportunity_models.SkillOpportunityModel.get(skill_id_1)
+        self.assertIsNotNone(model1)
+        if model1 is not None:
+            self.assertTrue(model1.topic_is_published)
+
+        model2 = opportunity_models.SkillOpportunityModel.get(skill_id_2)
+        self.assertIsNotNone(model2)
+        if model2 is not None:
+            self.assertTrue(model2.topic_is_published)
+
+        # Update again to False.
+        opportunity_services.update_skill_opportunities_topic_published_status(
+            [skill_id_1], False
+        )
+
+        model1 = opportunity_models.SkillOpportunityModel.get(skill_id_1)
+        self.assertIsNotNone(model1)
+        if model1 is not None:
+            self.assertFalse(model1.topic_is_published)
+
 
 class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
     test_utils.GenericTestBase

@@ -21,6 +21,7 @@ from __future__ import annotations
 import itertools
 import logging
 
+from core.constants import constants
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -271,15 +272,15 @@ class PopulateSkillOpportunityModelPropertiesJob(base_jobs.JobBase):
     ) -> result.Result[opportunity_models.SkillOpportunityModel, Exception]:
         """Populates the new properties on the given model."""
         try:
-            # Calculate is_incomplete
+            # Calculate is_incomplete.
             model.is_incomplete = (
-                model.question_count < 10
-            )  # Default constants.MAX_QUESTIONS_PER_SKILL
+                model.question_count < constants.MAX_QUESTIONS_PER_SKILL
+            )
 
-            # Find if any topic it belongs to is published
+            # Find if any topic it belongs to is published.
             topic_is_published = False
 
-            # Map topic IDs to their published status
+            # Map topic IDs to their published status.
             topic_published_status = {
                 tr.id: tr.topic_is_published
                 for tr in topic_rights_models
