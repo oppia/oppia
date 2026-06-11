@@ -1,4 +1,4 @@
-#  Copyright 2026 The Oppia Authors. All Rights Reserved.
+# Copyright 2026 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -215,3 +215,53 @@ class WebFeedbackThread:
             'description_preview': self.description[:140],
             'created_on_msecs': self.created_on_msecs,
         }
+
+
+class GeneralFeedbackNormalizedSubmitPayloadDict(TypedDict):
+    """Dict representation of GeneralFeedbackHandler's normalized_payload
+    dictionary.
+    """
+
+    category: str
+    description: str
+    page_url: str
+    language_code: str
+    rating: int
+    target_type: str
+    target_id: Optional[str]
+    screenshot_filename: Optional[str]
+    submit_anonymously: bool
+    include_session_info: bool
+    # Here we use object because session-info diagnostics are heterogeneous
+    # JSON-like payloads (nested dict/list values) from client logs.
+    session_info: Optional[Dict[str, object]]
+    captcha_token: Optional[str]
+    screenshot_file: Optional[Dict[str, str]]
+
+
+class CreatorFeedbackListHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of CreatorFeedbackListHandler's normalized_request
+    dictionary.
+    """
+
+    cursor: Optional[str]
+    date_from_msecs: Optional[float]
+    date_to_msecs: Optional[float]
+    status_filter: Optional[str]
+
+
+class CreatorFeedbackDetailHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of CreatorFeedbackDetailHandler's normalized_payload
+    dictionary.
+    """
+
+    action: Optional[str]
+    message: Optional[str]
+    screenshot_filename: Optional[str]
+    screenshot_file: Optional[Dict[str, str]]
+
+
+class CreatorFeedbackDetailHandlerNormalizedResponseDict(WebFeedbackThreadDict):
+    """Dict representation of CreatorFeedbackDetailHandler's response."""
+
+    can_edit_exploration: bool
