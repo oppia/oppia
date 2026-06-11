@@ -1609,8 +1609,6 @@ export class LoggedInUser extends BaseUser {
     );
     await this.typeInInputField(searchInput, language);
 
-    await this.page.keyboard.press('Enter');
-
     const targetOption = await this.page.waitForSelector(
       `mat-option:has-text("${language}")`,
       {state: 'visible'}
