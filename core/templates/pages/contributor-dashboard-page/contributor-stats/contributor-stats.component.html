@@ -28,35 +28,6 @@
     Explore the impact of your contributions!
   </div>
 
-  <div class="stats-profile-name-container e2e-test-profile-name-section">
-    <div *ngIf="profileName === null">
-      <p class="stats-profile-name-warning e2e-test-profile-name-warning">
-        &#9888; This name will be used on your contribution certificates and
-        <strong>cannot be changed in the future.</strong>
-      </p>
-      <div class="stats-profile-name-input-row">
-        <input class="form-control stats-profile-name-input e2e-test-profile-name-input"
-               [(ngModel)]="profileNameInput"
-               maxlength="100"
-               placeholder="Name for certificate"
-               [disabled]="isSubmitting">
-        <button class="btn stats-profile-name-btn e2e-test-profile-name-submit"
-                (click)="submitProfileName()"
-                [disabled]="isSubmitting">
-          Save name
-        </button>
-      </div>
-      <p *ngIf="profileNameErrorMessage"
-         class="stats-profile-name-error e2e-test-profile-name-error">
-        {{ profileNameErrorMessage }}
-      </p>
-    </div>
-    <div *ngIf="profileName !== null" class="e2e-test-profile-name-display">
-      <p>
-        Certificate name: <strong>{{ profileName }}</strong>
-      </p>
-    </div>
-  </div>
   <div class="stats-contribution-type-container">
     <div #dropdown class="oppia-stats-type-selector-container e2e-test-topic-selector e2e-test-desktop-element">
       <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected e2e-test-desktop-element"

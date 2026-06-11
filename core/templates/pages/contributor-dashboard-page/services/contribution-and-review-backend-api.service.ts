@@ -85,8 +85,6 @@ export class ContributionAndReviewBackendApiService {
   private CONTRIBUTOR_CERTIFICATE_HANDLER_URL =
     '/contributorcertificate/<username>/<suggestion_type>';
 
-  private PROFILE_NAME_URL = '/profilename';
-
   private SUBMITTED_QUESTION_SUGGESTIONS = 'SUBMITTED_QUESTION_SUGGESTIONS';
 
   private REVIEWABLE_QUESTION_SUGGESTIONS = 'REVIEWABLE_QUESTION_SUGGESTIONS';
@@ -282,18 +280,6 @@ export class ContributionAndReviewBackendApiService {
       }
     );
     return this.http.post<void>(url, requestBody).toPromise();
-  }
-
-  async fetchProfileNameAsync(): Promise<{profile_name: string | null}> {
-    return this.http
-      .get<{profile_name: string | null}>(this.PROFILE_NAME_URL)
-      .toPromise();
-  }
-
-  async setProfileNameAsync(profileName: string): Promise<void> {
-    return this.http
-      .put<void>(this.PROFILE_NAME_URL, {profile_name: profileName})
-      .toPromise();
   }
 
   async downloadContributorCertificateAsync(

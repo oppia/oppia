@@ -111,11 +111,6 @@ export class ContributorStatsComponent {
   ITEMS_PER_PAGE: number = 5;
   dataLoading = false;
 
-  profileName: string | null = null;
-  profileNameInput: string = '';
-  isSubmitting: boolean = false;
-  profileNameErrorMessage: string = '';
-
   userCanReviewTranslationSuggestions: boolean = false;
   userCanReviewQuestionSuggestions: boolean = false;
   userCanSuggestQuestions: boolean = false;
@@ -239,35 +234,7 @@ export class ContributorStatsComponent {
 
     await this.fetchStats();
 
-    const profileNameResponse =
-      await this.contributionAndReviewBackendApiService.fetchProfileNameAsync();
-    this.profileName = profileNameResponse.profile_name;
-
     this.dataLoading = false;
-  }
-
-  async submitProfileName(): Promise<void> {
-    this.profileNameErrorMessage = '';
-    if (!this.profileNameInput.trim()) {
-      this.profileNameErrorMessage = 'Name cannot be empty.';
-      return;
-    }
-    if (this.profileNameInput.length > 100) {
-      this.profileNameErrorMessage =
-        'Name cannot be longer than 100 characters.';
-      return;
-    }
-    this.isSubmitting = true;
-    try {
-      await this.contributionAndReviewBackendApiService.setProfileNameAsync(
-        this.profileNameInput
-      );
-      this.profileName = this.profileNameInput;
-    } catch (e) {
-      this.profileNameErrorMessage = 'Could not save name. Please try again.';
-    } finally {
-      this.isSubmitting = false;
-    }
   }
 
   toggleDropdown(): void {

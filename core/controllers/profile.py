@@ -345,6 +345,7 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     user_email_preferences.can_receive_subscription_email
                 ),
                 'subscription_list': subscription_list,
+                'profile_name': user_settings.profile_name,
             }
         )
         self.render_json(self.values)
@@ -428,6 +429,14 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 user_services.update_profile_picture_data_url(
                     user_settings.username, data
                 )
+            elif update_type == 'profile_name':
+                self.__validate_data_type(update_type, str, data)
+                if user_settings.profile_name is not None:
+                    raise self.InvalidInputException(
+                        'Profile name has already been set and cannot be '
+                        'changed.'
+                    )
+                user_settings.profile_name = data
             else:
                 raise self.InvalidInputException(
                     'Invalid update type: %s' % update_type
@@ -890,50 +899,6 @@ class UserInfoHandler(
                 self.user_id
             )
         self.render_json({'success': True})
-
-
-class ProfileNameHandlerNormalizedPayloadDict(TypedDict):
-    """Dict representation of ProfileNameHandler's
-    normalized_payload dictionary.
-    """
-
-    profile_name: str
-
-
-class ProfileNameHandler(
-    base.BaseHandler[ProfileNameHandlerNormalizedPayloadDict, Dict[str, str]]
-):
-    """Handler for setting a contributor's profile name (write-once)."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {},
-        'PUT': {
-            'profile_name': {
-                'schema': {'type': 'basestring'},
-                'validators': [{'id': 'has_length_at_most', 'max_value': 50}],
-            }
-        },
-    }
-
-    @acl_decorators.can_manage_own_account
-    def get(self) -> None:
-        """Handles GET requests to fetch the current user's profile name."""
-        assert self.user_id is not None
-        user_settings = user_services.get_user_settings(self.user_id)
-        self.render_json({'profile_name': user_settings.profile_name})
-
-    @acl_decorators.can_manage_own_account
-    def put(self) -> None:
-        """Handles PUT requests to set the profile name."""
-        assert self.user_id is not None
-        assert self.normalized_payload is not None
-        profile_name = self.normalized_payload['profile_name']
-        try:
-            user_services.update_profile_name(self.user_id, profile_name)
-        except Exception as e:
-            raise self.InvalidInputException(e) from e
-        self.render_json({})
 
 
 class UrlHandlerNormalizedRequestDict(TypedDict):

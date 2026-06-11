@@ -81,6 +81,27 @@
               </span>
             </div>
           </div>
+
+          <div class="mb-3 row e2e-test-profile-name-section">
+            <label class="col-lg-4 col-md-4 col-sm-4 form-label">
+              Certificate Name
+            </label>
+            <div class="col-lg-8 col-md-8 col-sm-8">
+              <div *ngIf="!profileNameAlreadySet">
+                <p class="form-text d-block oppia-form-text e2e-test-profile-name-warning">
+                  &#9888; This name will be used on your contribution certificates and
+                  <strong>cannot be changed in the future.</strong>
+                </p>
+                <input class="form-control e2e-test-profile-name-input"
+                       formControlName="profileName"
+                       maxlength="100"
+                       placeholder="Name for certificate">
+              </div>
+              <div *ngIf="profileNameAlreadySet" class="e2e-test-profile-name-display">
+                <strong>{{ preferencesForm.get('profileName').value }}</strong>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="mb-3 row">

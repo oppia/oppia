@@ -769,7 +769,6 @@ URLS = [
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler
     ),
-    get_redirect_route(r'/profilename', profile.ProfileNameHandler),
     get_redirect_route(
         r'/mailinglistsubscriptionhandler',
         profile.MailingListSubscriptionHandler,

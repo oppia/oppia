@@ -64,6 +64,7 @@ const BACKEND_UPDATE_TYPE_DICT: {[key: string]: BackendPreferenceUpdateType} = {
   preferredSiteLanguageCode: 'preferred_site_language_code',
   preferredAudioLanguageCode: 'preferred_audio_language_code',
   emailPreferences: 'email_preferences',
+  profileName: 'profile_name',
 };
 
 @Component({
@@ -89,6 +90,7 @@ export class PreferencesPageComponent {
   exportingData: boolean = false;
   hasPageLoaded: boolean = false;
   showEmailSignupLink: boolean = false;
+  profileNameAlreadySet: boolean = false;
   emailSignupLink: string = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
   PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
 
@@ -261,6 +263,11 @@ export class PreferencesPageComponent {
               AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
             );
         }
+        this.profileNameAlreadySet = preferencesData.profile_name !== null;
+        const profileNameControl = new FormControl({
+          value: preferencesData.profile_name ?? '',
+          disabled: this.profileNameAlreadySet,
+        });
         this.preferencesForm = new FormGroup({
           profilePicturePngDataUrl: new FormControl(profilePicturePngDataUrl),
           profilePictureWebpDataUrl: new FormControl(profilePictureWebpDataUrl),
@@ -290,6 +297,7 @@ export class PreferencesPageComponent {
               preferencesData.can_receive_subscription_email
             ),
           }),
+          profileName: profileNameControl,
         });
 
         this.subscriptionList = preferencesData.subscription_list;
@@ -380,6 +388,13 @@ export class PreferencesPageComponent {
           this.showEmailSignupLink = true;
         } else {
           this.alertsService.addInfoMessage('Saved!', 3000);
+        }
+        if (
+          !this.profileNameAlreadySet &&
+          this.preferencesForm.controls.profileName.dirty
+        ) {
+          this.profileNameAlreadySet = true;
+          this.preferencesForm.controls.profileName.disable();
         }
         if (this.preferencesForm.controls.profilePicturePngDataUrl.dirty) {
           // TODO(#19737): Remove the following 'if' condition.

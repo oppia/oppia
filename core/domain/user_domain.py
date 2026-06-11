@@ -28,6 +28,7 @@ from typing import Dict, List, Optional, TypedDict
 
 MAX_PROFILE_NAME_LENGTH = 100
 
+
 # TODO(#15105): Refactor UserSettings to limit the number of Optional
 # fields used in UserSettingsDict.
 class UserSettingsDict(TypedDict):
@@ -335,12 +336,12 @@ class UserSettings:
                     % MAX_PROFILE_NAME_LENGTH
                 )
             if not all(
-                c.isalpha() or c.isspace() or c == '-'
+                c.isalpha() or c.isspace() or c == '-' or c == "'"
                 for c in self.profile_name
             ):
                 raise utils.ValidationError(
-                    'profile_name can only contain letters, spaces, and '
-                    'hyphens.'
+                    'profile_name can only contain letters, spaces, hyphens, '
+                    'and apostrophes.'
                 )
 
         if not isinstance(self.email, str):

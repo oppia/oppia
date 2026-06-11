@@ -41,6 +41,7 @@ interface NonEmailPreferencesBackendDict {
   user_bio: string;
   subject_interests: string;
   subscription_list: SubscriptionSummary[];
+  profile_name: string | null;
 }
 
 // The following type is an intersection of EmailPreferencesBackendDict
@@ -70,7 +71,8 @@ export type BackendPreferenceUpdateType =
   | 'preferred_language_codes'
   | 'preferred_site_language_code'
   | 'preferred_audio_language_code'
-  | 'email_preferences';
+  | 'email_preferences'
+  | 'profile_name';
 
 type DataType<UpdateType extends BackendPreferenceUpdateType> =
   UpdateType extends 'email_preferences'
