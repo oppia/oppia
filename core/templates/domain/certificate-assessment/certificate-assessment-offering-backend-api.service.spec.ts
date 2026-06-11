@@ -97,4 +97,113 @@ describe('Certificate Assessment Offering backend api service', () => {
       'Error occurred while creating offering.'
     );
   }));
+
+  it('should successfully update a certificate assessment offering', fakeAsync(() => {
+    caos
+      .updateCertificateAssessmentOfferingAsync(
+        'mock_certificate_id',
+        mockCertificateOfferingData
+      )
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER_URL.replace(
+        '<certificate_id>',
+        'mock_certificate_id'
+      )
+    );
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual({});
+    req.flush({
+      certificate_id: 'mock_certificate_id',
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith('mock_certificate_id');
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should use rejection handler if update fails', fakeAsync(() => {
+    caos
+      .updateCertificateAssessmentOfferingAsync(
+        'mock_certificate_id',
+        mockCertificateOfferingData
+      )
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER_URL.replace(
+        '<certificate_id>',
+        'mock_certificate_id'
+      )
+    );
+    expect(req.request.method).toEqual('PUT');
+    req.flush(
+      {
+        error: 'Error occurred while updating offering.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Error occurred while updating offering.'
+    );
+  }));
+
+  it('should successfully delete a certificate assessment offering', fakeAsync(() => {
+    caos
+      .deleteCertificateAssessmentOfferingAsync('mock_certificate_id')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER_URL.replace(
+        '<certificate_id>',
+        'mock_certificate_id'
+      )
+    );
+    expect(req.request.method).toEqual('DELETE');
+    req.flush({});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should use rejection handler if deletion fails', fakeAsync(() => {
+    caos
+      .deleteCertificateAssessmentOfferingAsync('mock_certificate_id')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER_URL.replace(
+        '<certificate_id>',
+        'mock_certificate_id'
+      )
+    );
+    expect(req.request.method).toEqual('DELETE');
+    req.flush(
+      {
+        error: 'Error occurred while deleting offering.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Error occurred while deleting offering.'
+    );
+  }));
 });

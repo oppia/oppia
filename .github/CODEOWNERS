@@ -691,6 +691,7 @@
 /core/storage/certificate_assessment @oppia/contributor-experience-team
 /core/templates/pages/certificate-assessment-dashboard-page/ @oppia/contributor-experience-team
 /core/templates/pages/create-certificate-offering-page/ @oppia/contributor-experience-team
+/core/templates/pages/edit-certificate-offering-page/ @oppia/contributor-experience-team
 /core/templates/components/certificate-assessment-offering-helper/ @oppia/contributor-experience-team
 /core/templates/domain/certificate-assessment/ @oppia/contributor-experience-team
 /core/controllers/certificate_assessment*.py @oppia/contributor-experience-team
