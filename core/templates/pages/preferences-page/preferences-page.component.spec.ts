@@ -93,6 +93,7 @@ describe('Preferences Page Component', () => {
           creator_impact: 0,
         },
       ],
+      profile_name: null,
     };
 
     class MockWindowRef {
@@ -645,6 +646,7 @@ describe('Preferences Page Component', () => {
           creator_impact: 0,
         },
       ],
+      profile_name: null,
     };
 
     class MockWindowRef {

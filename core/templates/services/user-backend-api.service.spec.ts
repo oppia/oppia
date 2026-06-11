@@ -185,6 +185,7 @@ describe('User Backend Api Service', () => {
       can_receive_feedback_message_email: true,
       can_receive_subscription_email: true,
       subscription_list: [],
+      profile_name: null,
     };
     userBackendApiService.getPreferencesAsync().then(preferencesData => {
       expect(preferencesData).toEqual(samplePreferencesData);
