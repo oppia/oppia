@@ -13,12 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for certificate assessment backend APIs.
+ * @fileoverview Modal for confirming certificate offering deletion.
  */
 
-export const CertificateAssessmentDomainConstants = {
-  CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL:
-    '/certificate_assessment_offering_handler',
-  CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER_URL:
-    '/certificate_assessment_offering_handler/<certificate_id>',
-} as const;
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+
+@Component({
+  selector: 'oppia-delete-certificate-offering-modal',
+  templateUrl: './delete-certificate-offering-modal.component.html',
+})
+export class DeleteCertificateOfferingModalComponent extends ConfirmOrCancelModal {
+  constructor(ngbActiveModal: NgbActiveModal) {
+    super(ngbActiveModal);
+  }
+}
