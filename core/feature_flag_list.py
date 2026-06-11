@@ -351,8 +351,11 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     ),
     FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value: (
         (
-            'Enables automatic AI-generated translation suggestions in the '
+            'Enables automatic AI-generated translation suggestions in the.'
             'Contributor Dashboard to assist translators.',
+            feature_flag_domain.ServerMode.DEV,
+        )
+    ),
     FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT.value: (
         (
             'Enables the certificate assessment feature, allowing curriculum admins to create certificate offerings and learners to take certificate assessments.',
