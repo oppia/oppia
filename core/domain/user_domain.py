@@ -336,7 +336,7 @@ class UserSettings:
                     % MAX_PROFILE_NAME_LENGTH
                 )
             if not all(
-                c.isalpha() or c.isspace() or c == '-' or c == "'"
+                c.isalpha() or c.isspace() or c in ('-', "'")
                 for c in self.profile_name
             ):
                 raise utils.ValidationError(
