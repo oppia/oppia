@@ -151,7 +151,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   lastSuggestionToReview: boolean = false;
   firstSuggestionToReview: boolean = true;
   resolvingSuggestion: boolean = false;
-  isSubmitting: boolean = false;
   reviewable: boolean = false;
   canEditTranslation: boolean = false;
   userIsCurriculumAdmin: boolean = false;
@@ -328,7 +327,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.errorFound = false;
     this.startedEditing = false;
     this.resolvingSuggestion = false;
-    this.isSubmitting = false;
     this.lastSuggestionToReview =
       Object.keys(this.allContributions).length <= 1;
     this.translationHtml = this.activeSuggestion.change_cmd.translation_html;
@@ -429,7 +427,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       return;
     }
 
-    this.isSubmitting = true;
     this.preEditTranslationHtml = this.translationHtml;
     this.translationHtml = updatedTranslation;
     this.contributionAndReviewService.updateTranslationSuggestionAsync(
@@ -438,10 +435,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       () => {
         this.translationUpdated = true;
         this.startedEditing = false;
-        this.isSubmitting = false;
         this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
       },
-      error => this.showTranslationSuggestionUpdateError(error)
+      this.showTranslationSuggestionUpdateError
     );
     this.suggestionImagesString = this.getImageInfoForSuggestion(
       this.translationHtml
@@ -592,7 +588,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           this.resolveSuggestionAndUpdateModal();
         },
         errorMessage => {
-          this.resolvingSuggestion = false;
           this.alertsService.clearWarnings();
           this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
         }
@@ -647,7 +642,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
             this.resolveSuggestionAndUpdateModal();
           },
           errorMessage => {
-            this.resolvingSuggestion = false;
             this.alertsService.clearWarnings();
             this.alertsService.addWarning(
               `Invalid Suggestion: ${errorMessage}`
@@ -725,7 +719,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   showTranslationSuggestionUpdateError(error: Error): void {
-    this.isSubmitting = false;
     this.errorMessage = 'Invalid Suggestion: ' + error.message;
     this.errorFound = true;
     this.startedEditing = true;

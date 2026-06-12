@@ -23,26 +23,13 @@ import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {SubtopicsListComponent} from './subtopics-list/subtopics-list.component';
 import {StoriesListComponent} from './deprecations/stories-list/topic-viewer-stories-list.component';
-import {TopicStorySectionComponent} from './topic-story-section/topic-story-section.component';
 import {MatCardModule} from '@angular/material/card';
 import {SharedComponentsModule} from 'components/shared-component.module';
 
 @NgModule({
   imports: [CommonModule, MatCardModule, SharedComponentsModule],
-  declarations: [
-    StoriesListComponent,
-    SubtopicsListComponent,
-    TopicStorySectionComponent,
-  ],
-  entryComponents: [
-    StoriesListComponent,
-    SubtopicsListComponent,
-    TopicStorySectionComponent,
-  ],
-  exports: [
-    StoriesListComponent,
-    SubtopicsListComponent,
-    TopicStorySectionComponent,
-  ],
+  declarations: [StoriesListComponent, SubtopicsListComponent],
+  entryComponents: [StoriesListComponent, SubtopicsListComponent],
+  exports: [StoriesListComponent, SubtopicsListComponent],
 })
 export class TopicPlayerViewerCommonModule {}

@@ -24,12 +24,9 @@ import {
   Output,
 } from '@angular/core';
 
-import './filtered-choices-field.component.css';
-
 @Component({
   selector: 'oppia-filtered-choices-field',
   templateUrl: './filtered-choices-field.component.html',
-  styleUrls: ['./filtered-choices-field.component.css'],
 })
 export class FilteredChoicesFieldComponent {
   // These properties are initialized using Angular lifecycle hooks

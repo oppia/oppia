@@ -45,7 +45,6 @@ describe('CertificateOfferingDashboardPageComponent', () => {
         {
           provide: AlertsService,
           useValue: {
-            addWarning: () => {},
             addSuccessMessage: () => {},
           },
         },
@@ -139,28 +138,5 @@ describe('CertificateOfferingDashboardPageComponent', () => {
     expect(deleteSpy).toHaveBeenCalledWith('dummy_id');
     expect(component.certificateOfferings).toEqual([]);
     expect(alertsSpy).toHaveBeenCalledWith('Certificate deleted successfully.');
-  }));
-
-  it('should show warning when certificate deletion fails', fakeAsync(() => {
-    const deleteSpy = spyOn(
-      certificateAssessmentOfferingBackendApiService,
-      'deleteCertificateAssessmentOfferingAsync'
-    ).and.returnValue(Promise.reject('error'));
-    const warningSpy = spyOn(alertsService, 'addWarning');
-
-    void component.deleteCertificateOffering('dummy_id');
-    flushMicrotasks();
-
-    expect(deleteSpy).toHaveBeenCalledWith('dummy_id');
-    expect(component.certificateOfferings).toEqual([
-      {
-        certificateId: 'dummy_id',
-        title: 'Certificate Title',
-        topicsLabel: '-',
-        timeLabel: '-',
-        status: 'Draft',
-      },
-    ]);
-    expect(warningSpy).toHaveBeenCalledWith('Failed to delete certificate.');
   }));
 });

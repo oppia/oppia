@@ -31,12 +31,14 @@ ACCEPTANCE_TEST_SUITES: List[check_tests_are_captured_in_ci.TestSuiteDict] = (
         {
             'name': 'test/acceptance_suite1',
             'module': 'acceptance/specs/test/acceptance_suite1.spec.ts',
-            'framework': 'puppeteer',
         },
         {
             'name': 'test2/acceptance_suite2',
             'module': 'acceptance/specs/test2/acceptance_suite2.spec.ts',
-            'framework': 'puppeteer',
+        },
+        {
+            'name': 'test3/acceptance_suite3',
+            'module': 'acceptance/specs-old/test3/acceptance_suite3.spec.ts',
         },
     ]
 )
@@ -83,11 +85,11 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
         self.dummy_acceptance_specs_directory = os.path.join(
             self.dummy_acceptance_directory, 'specs'
         )
-        os.mkdir(self.dummy_acceptance_specs_directory)
-        self.dummy_playwright_acceptance_specs_directory = os.path.join(
-            self.dummy_acceptance_directory, 'playwright-specs'
+        self.dummy_acceptance_old_directory = os.path.join(
+            self.dummy_acceptance_directory, 'specs-old'
         )
-        os.mkdir(self.dummy_playwright_acceptance_specs_directory)
+        os.mkdir(self.dummy_acceptance_specs_directory)
+        os.mkdir(self.dummy_acceptance_old_directory)
         for suite in ACCEPTANCE_TEST_SUITES:
             suite_file = os.path.join(self.temp_directory.name, suite['module'])
             os.makedirs(os.path.dirname(suite_file), exist_ok=True)
@@ -129,10 +131,10 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             'ACCEPTANCE_TEST_SPECS_DIRECTORY',
             self.dummy_acceptance_specs_directory,
         )
-        self.playwright_acceptance_test_specs_directory_swap = self.swap(
+        self.acceptance_test_specs_old_directory_swap = self.swap(
             check_tests_are_captured_in_ci,
-            'PLAYWRIGHT_ACCEPTANCE_TEST_SPECS_DIRECTORY',
-            self.dummy_playwright_acceptance_specs_directory,
+            'ACCEPTANCE_TEST_SPECS_DIRECTORY_OLD',
+            self.dummy_acceptance_old_directory,
         )
 
     def tearDown(self) -> None:
@@ -141,13 +143,13 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
 
     def test_compute_test_suites_difference(self) -> None:
         test_suites_one: List[check_tests_are_captured_in_ci.TestSuiteDict] = [
-            {'name': 'test1', 'module': 'test1.js', 'framework': 'puppeteer'},
-            {'name': 'test2', 'module': 'test2.js', 'framework': 'puppeteer'},
+            {'name': 'test1', 'module': 'test1.js'},
+            {'name': 'test2', 'module': 'test2.js'},
         ]
 
         test_suites_two: List[check_tests_are_captured_in_ci.TestSuiteDict] = [
-            {'name': 'test1', 'module': 'test1.js', 'framework': 'puppeteer'},
-            {'name': 'test3', 'module': 'test3.js', 'framework': 'puppeteer'},
+            {'name': 'test1', 'module': 'test1.js'},
+            {'name': 'test3', 'module': 'test3.js'},
         ]
 
         test_suites_difference = (
@@ -158,16 +160,8 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
         self.assertEqual(
             test_suites_difference,
             [
-                {
-                    'name': 'test3',
-                    'module': 'test3.js',
-                    'framework': 'puppeteer',
-                },
-                {
-                    'name': 'test2',
-                    'module': 'test2.js',
-                    'framework': 'puppeteer',
-                },
+                {'name': 'test3', 'module': 'test3.js'},
+                {'name': 'test2', 'module': 'test2.js'},
             ],
         )
 
@@ -267,7 +261,7 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
 
         with (
             self.acceptance_test_specs_directory_swap,
-            self.playwright_acceptance_test_specs_directory_swap,
+            self.acceptance_test_specs_old_directory_swap,
             os_getcwd_swap,
         ):
             acceptance_test_suites = (
@@ -290,7 +284,7 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
 
         with (
             self.acceptance_test_specs_directory_swap,
-            self.playwright_acceptance_test_specs_directory_swap,
+            self.acceptance_test_specs_old_directory_swap,
             os_getcwd_swap,
         ):
             with acceptance_test_suites_that_are_not_run_in_ci_swap:
@@ -298,46 +292,9 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
                     check_tests_are_captured_in_ci.get_acceptance_test_suites_from_acceptance_directory()
                 )
                 self.assertEqual(
-                    acceptance_test_suites, ACCEPTANCE_TEST_SUITES[:1]
+                    acceptance_test_suites,
+                    ACCEPTANCE_TEST_SUITES[:1] + ACCEPTANCE_TEST_SUITES[2:],
                 )
-
-    def test_get_acceptance_test_suites_from_playwright_directory(self) -> None:
-        playwright_suite_file = os.path.join(
-            self.dummy_playwright_acceptance_specs_directory,
-            'test4',
-            'acceptance_suite4.spec.ts',
-        )
-        os.makedirs(os.path.dirname(playwright_suite_file), exist_ok=True)
-        os.mknod(playwright_suite_file)
-
-        def mock_get_cwd() -> str:
-            return self.temp_directory.name
-
-        os_getcwd_swap = self.swap(os, 'getcwd', mock_get_cwd)
-
-        with (
-            self.acceptance_test_specs_directory_swap,
-            self.playwright_acceptance_test_specs_directory_swap,
-            os_getcwd_swap,
-        ):
-            acceptance_test_suites = (
-                check_tests_are_captured_in_ci.get_acceptance_test_suites_from_acceptance_directory()
-            )
-            playwright_suites = [
-                s
-                for s in acceptance_test_suites
-                if s['framework'] == 'playwright'
-            ]
-            self.assertEqual(
-                playwright_suites,
-                [
-                    {
-                        'name': 'test4/acceptance_suite4',
-                        'module': 'acceptance/playwright-specs/test4/acceptance_suite4.spec.ts',
-                        'framework': 'playwright',
-                    }
-                ],
-            )
 
     def test_check_tests_are_captured_in_ci_with_acceptance_error(self) -> None:
         def mock_get_acceptance_test_suites_from_ci_config_file() -> (
@@ -371,7 +328,7 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
                         'Please update the CI config file for acceptance tests '
                         'at core/tests/ci-test-suite-configs/acceptance.json '
                         'with the suites listed above.'
-                        % (json.dumps(ACCEPTANCE_TEST_SUITES[1:2]))
+                        % (json.dumps(ACCEPTANCE_TEST_SUITES[1:3]))
                     ),
                 ):
                     check_tests_are_captured_in_ci.main()

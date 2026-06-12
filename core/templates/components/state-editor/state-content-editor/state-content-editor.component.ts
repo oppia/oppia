@@ -29,7 +29,6 @@ import {PageContextService} from 'services/page-context.service';
 import {EditabilityService} from 'services/editability.service';
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import {ExternalSaveService} from 'services/external-save.service';
-import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {StateContentService} from 'components/state-editor/state-editor-properties-services/state-content.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 
@@ -68,7 +67,6 @@ export class StateContentEditorComponent implements OnInit {
     private pageContextService: PageContextService,
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
     private externalSaveService: ExternalSaveService,
-    private externalRteSaveService: ExternalRteSaveService,
     public stateContentService: StateContentService,
     private stateEditorService: StateEditorService,
     private editabilityService: EditabilityService
@@ -141,7 +139,6 @@ export class StateContentEditorComponent implements OnInit {
 
   onSaveContentButtonClicked(): void {
     this.editorFirstTimeEventsService.registerFirstSaveContentEvent();
-    this.externalRteSaveService.onExternalRteSave.emit();
     this.saveContent();
   }
 

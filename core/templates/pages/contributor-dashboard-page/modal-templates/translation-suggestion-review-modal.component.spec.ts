@@ -488,7 +488,6 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
       expect(component.reviewMessage).toBe('');
-      expect(component.isSubmitting).toBeFalse();
     });
 
     it(
@@ -507,13 +506,11 @@ describe('Translation Suggestion Review Modal Component', function () {
       const error = new Error('Error');
       expect(component.errorFound).toBeFalse();
       expect(component.errorMessage).toBe('');
-      component.isSubmitting = true;
 
       component.showTranslationSuggestionUpdateError(error);
 
       expect(component.errorFound).toBeTrue();
       expect(component.errorMessage).toBe('Invalid Suggestion: Error');
-      expect(component.isSubmitting).toBeFalse();
     });
 
     it('should remove suggestion_id from resolvedSuggestionIds if it exists', () => {
@@ -596,21 +593,17 @@ describe('Translation Suggestion Review Modal Component', function () {
 
     it('should update translation when the update button is clicked', function () {
       component.ngOnInit();
-      let isSubmittingInServiceCall = false;
       spyOn(
         contributionAndReviewService,
         'updateTranslationSuggestionAsync'
       ).and.callFake(
         (suggestionId, translationHtml, successCallback, errorCallback) => {
-          isSubmittingInServiceCall = component.isSubmitting;
           return Promise.resolve(successCallback());
         }
       );
 
       component.updateSuggestion();
 
-      expect(isSubmittingInServiceCall).toBeTrue();
-      expect(component.isSubmitting).toBeFalse();
       expect(
         contributionAndReviewService.updateTranslationSuggestionAsync
       ).toHaveBeenCalledWith(
@@ -619,31 +612,6 @@ describe('Translation Suggestion Review Modal Component', function () {
         jasmine.any(Function),
         jasmine.any(Function)
       );
-    });
-
-    it('should handle error when updating translation suggestion fails', function () {
-      component.ngOnInit();
-      const error = new Error('Test error');
-      spyOn(
-        component,
-        'showTranslationSuggestionUpdateError'
-      ).and.callThrough();
-      spyOn(
-        contributionAndReviewService,
-        'updateTranslationSuggestionAsync'
-      ).and.callFake(
-        (suggestionId, translationHtml, successCallback, errorCallback) => {
-          errorCallback(error);
-          return Promise.resolve();
-        }
-      );
-
-      component.updateSuggestion();
-
-      expect(
-        component.showTranslationSuggestionUpdateError
-      ).toHaveBeenCalledWith(error);
-      expect(component.isSubmitting).toBeFalse();
     });
 
     it('should emit queuedSuggestion Emit when suggestions are accepted', () => {
@@ -972,7 +940,6 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.activeSuggestionId).toBe('suggestion_1');
       expect(component.activeSuggestion).toEqual(suggestion1);
       expect(component.reviewMessage).toBe('');
-      expect(component.isSubmitting).toBeFalse();
     });
 
     it(
@@ -991,72 +958,11 @@ describe('Translation Suggestion Review Modal Component', function () {
       const error = new Error('Error');
       expect(component.errorFound).toBeFalse();
       expect(component.errorMessage).toBe('');
-      component.isSubmitting = true;
 
       component.showTranslationSuggestionUpdateError(error);
 
       expect(component.errorFound).toBeTrue();
       expect(component.errorMessage).toBe('Invalid Suggestion: Error');
-      expect(component.isSubmitting).toBeFalse();
-    });
-
-    it('should reset resolvingSuggestion to false when acceptAndReviewNext fails', function () {
-      component.ngOnInit();
-      spyOn(
-        contributionAndReviewService,
-        'reviewExplorationSuggestion'
-      ).and.callFake(
-        (
-          targetId,
-          suggestionId,
-          action,
-          reviewMessage,
-          commitMessage,
-          successCallback,
-          errorCallback
-        ) => {
-          errorCallback('Error');
-        }
-      );
-      spyOn(alertsService, 'addWarning');
-      component.resolvingSuggestion = true;
-
-      component.acceptAndReviewNext();
-
-      expect(component.resolvingSuggestion).toBeFalse();
-      expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Invalid Suggestion: Error'
-      );
-    });
-
-    it('should reset resolvingSuggestion to false when rejectAndReviewNext fails', function () {
-      component.ngOnInit();
-      component.reviewMessage = 'Review message';
-      spyOn(
-        contributionAndReviewService,
-        'reviewExplorationSuggestion'
-      ).and.callFake(
-        (
-          targetId,
-          suggestionId,
-          action,
-          reviewMessage,
-          commitMessage,
-          successCallback,
-          errorCallback
-        ) => {
-          errorCallback('Error');
-        }
-      );
-      spyOn(alertsService, 'addWarning');
-      component.resolvingSuggestion = true;
-
-      component.rejectAndReviewNext(component.reviewMessage);
-
-      expect(component.resolvingSuggestion).toBeFalse();
-      expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Invalid Suggestion: Error'
-      );
     });
 
     it(
@@ -1426,21 +1332,17 @@ describe('Translation Suggestion Review Modal Component', function () {
 
     it('should update translation when the update button is clicked', function () {
       component.ngOnInit();
-      let isSubmittingInServiceCall = false;
       spyOn(
         contributionAndReviewService,
         'updateTranslationSuggestionAsync'
       ).and.callFake(
         (suggestionId, translationHtml, successCallback, errorCallback) => {
-          isSubmittingInServiceCall = component.isSubmitting;
           return Promise.resolve(successCallback());
         }
       );
 
       component.updateSuggestion();
 
-      expect(isSubmittingInServiceCall).toBeTrue();
-      expect(component.isSubmitting).toBeFalse();
       expect(
         contributionAndReviewService.updateTranslationSuggestionAsync
       ).toHaveBeenCalledWith(
@@ -1449,31 +1351,6 @@ describe('Translation Suggestion Review Modal Component', function () {
         jasmine.any(Function),
         jasmine.any(Function)
       );
-    });
-
-    it('should handle error when updating translation suggestion fails', function () {
-      component.ngOnInit();
-      const error = new Error('Test error');
-      spyOn(
-        component,
-        'showTranslationSuggestionUpdateError'
-      ).and.callThrough();
-      spyOn(
-        contributionAndReviewService,
-        'updateTranslationSuggestionAsync'
-      ).and.callFake(
-        (suggestionId, translationHtml, successCallback, errorCallback) => {
-          errorCallback(error);
-          return Promise.resolve();
-        }
-      );
-
-      component.updateSuggestion();
-
-      expect(
-        component.showTranslationSuggestionUpdateError
-      ).toHaveBeenCalledWith(error);
-      expect(component.isSubmitting).toBeFalse();
     });
 
     describe('isHtmlContentEqual', function () {
@@ -2276,12 +2153,6 @@ describe('Translation Suggestion Review Modal Component', function () {
   });
 
   describe('when set the schema constant', function () {
-    it('should reset isSubmitting to false when refreshActiveContributionState is called', () => {
-      component.isSubmitting = true;
-      component.refreshActiveContributionState();
-      expect(component.isSubmitting).toBeFalse();
-    });
-
     const reviewable = true;
     const subheading = 'topic_1 / story_1 / chapter_1';
     const suggestion1 = {

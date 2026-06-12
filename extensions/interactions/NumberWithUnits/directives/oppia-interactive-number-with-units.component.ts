@@ -29,7 +29,6 @@ import {
 } from 'interactions/answer-defs';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {HelpModalNumberWithUnitsComponent} from './oppia-help-modal-number-with-units.component';
-import {NumberConversionService} from 'services/number-conversion.service';
 import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {NumberWithUnitsRulesService} from './number-with-units-rules.service';
 
@@ -59,8 +58,7 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
     private currentInteractionService: CurrentInteractionService,
     private focusManagerService: FocusManagerService,
     private numberWithUnitsRulesService: NumberWithUnitsRulesService,
-    private ngbModal: NgbModal,
-    private numberConversionService: NumberConversionService
+    private ngbModal: NgbModal
   ) {
     this.componentSubscriptions.add(
       this.answerChanged
@@ -121,12 +119,7 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
         this.currentInteractionService.updateAnswerIsValid(false);
         return;
       }
-      const decimalSeparator =
-        this.numberConversionService.currentDecimalSeparator();
-      const numberWithUnits = NumberWithUnits.fromRawInputString(
-        this.answer,
-        decimalSeparator
-      );
+      const numberWithUnits = NumberWithUnits.fromRawInputString(this.answer);
       this.currentInteractionService.onSubmit(
         numberWithUnits,
         this.numberWithUnitsRulesService as NumberWithUnitsRulesService

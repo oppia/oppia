@@ -57,7 +57,7 @@ export class EditCertificateOfferingPageComponent implements OnInit {
   }
 
   populateCertificateAssessmentOfferingFromId(): void {
-    // TODO(#24717-M1.14): Replace this with the certificate offering fetch backend call.
+    // Stub: replace this with the certificate offering fetch backend call.
     this.certificateAssessmentOffering =
       CertificateAssessmentOfferingData.createEmpty();
   }

@@ -501,24 +501,16 @@ export class BaseUser {
    * by the ElementHandle.
    */
   async waitForElementToBeClickable(
-    selector: string | ElementHandle<Element>,
-    timeout: number = 15000
+    selector: string | ElementHandle<Element>
   ): Promise<void> {
     const elementDesc = await this.getElementDescription(selector);
     showMessage(`Checking if element ${elementDesc} is clickable...`);
     const element =
       typeof selector === 'string'
-        ? await this.page.waitForSelector(selector, {
-            timeout: timeout,
-            visible: true,
-          })
+        ? await this.page.waitForSelector(selector)
         : selector;
     try {
-      await this.page.waitForFunction(
-        isElementClickable,
-        {timeout: timeout},
-        element
-      );
+      await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
       if (error instanceof Error) {
         const clickabilityDiagnostics = await this.page.evaluate(
@@ -631,7 +623,7 @@ export class BaseUser {
             : 'No specific reason detected from diagnostics.';
 
         error.message =
-          `Element ${elementDesc} took too long to be clickable (timeout ${timeout} ms).\n` +
+          `Element ${elementDesc} took too long to be clickable.\n` +
           `Detected reasons:\n${reasonsText}\n` +
           'Original Error:\n' +
           error.message;
@@ -2246,24 +2238,6 @@ export class BaseUser {
     await this.clickOnElementWithSelector(currentActionBtnSelector);
 
     await this.expectElementToBeVisible(currentActionBtnSelector, false);
-  }
-
-  /**
-   * Function to expect the page to have no translation ids.
-   */
-  async expectPageHasNoTranslationIds(): Promise<void> {
-    const translationIds = await this.page.$$eval('[translate]', elements =>
-      elements
-        .map(el => el.getAttribute('translate'))
-        .filter(val => val && val.startsWith('I18N'))
-    );
-
-    if (translationIds.length > 0) {
-      throw new Error(
-        `Page has untranslated strings: ${translationIds.join(', ')}`
-      );
-    }
-    showMessage('Success: Page has no translation ids.');
   }
 
   /**

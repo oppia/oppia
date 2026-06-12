@@ -17,14 +17,9 @@
  */
 
 import {fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
-import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {EditableStoryBackendApiService} from 'domain/story/editable-story-backend-api.service';
-import {
-  SkillBackendApiService,
-  FetchSkillResponse,
-} from 'domain/skill/skill-backend-api.service';
 import {StorySummaryBackendDict} from 'domain/story/story-summary.model';
 import {
   EditableTopicBackendApiService,
@@ -54,7 +49,6 @@ describe('Topic editor state service', () => {
   let alertsService: AlertsService;
   let undoRedoService: UndoRedoService;
   let editableStoryBackendApiService: EditableStoryBackendApiService;
-  let skillBackendApiService: SkillBackendApiService;
 
   let skillCreationIsAllowed: boolean = true;
   let skillQuestionCountDict = {};
@@ -180,11 +174,8 @@ describe('Topic editor state service', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       providers: [
         AlertsService,
-        UndoRedoService,
-        TopicEditorStateService,
         {
           provide: EditableStoryBackendApiService,
           useClass: MockEditableStoryBackendApiService,
@@ -197,20 +188,7 @@ describe('Topic editor state service', () => {
           provide: TopicRightsBackendApiService,
           useClass: MockTopicRightsBackendApiService,
         },
-        {
-          provide: 'ContributorDashboardAdminBackendApiService',
-          useValue: {
-            updateExistenceOfTopicUrlFragment: (
-              _u: string,
-              success: () => void,
-              _error: () => void
-            ) => {
-              if (success) {
-                success();
-              }
-            },
-          },
-        },
+        UndoRedoService,
       ],
     }).compileComponents();
   }));
@@ -232,7 +210,6 @@ describe('Topic editor state service', () => {
     alertsService = TestBed.inject(
       AlertsService
     ) as unknown as jasmine.SpyObj<AlertsService>;
-    skillBackendApiService = TestBed.inject(SkillBackendApiService);
 
     topicDict = {
       id: 'topic_id',
@@ -311,7 +288,7 @@ describe('Topic editor state service', () => {
       skillCreationIsAllowed
     );
     expect(topicEditorStateService.isLoadingTopic()).toEqual(false);
-    expect(topicEditorStateService.hasLoadedTopic()).toBe(true);
+    expect(topicEditorStateService.hasLoadedTopic()).toBeTrue();
     expect(topicEditorStateService.getGroupedSkillSummaries()).toBeDefined();
     expect(topicEditorStateService.getSkillQuestionCountDict()).toBeDefined();
     expect(topicEditorStateService.getTopicRights()).toBeDefined();
@@ -350,7 +327,7 @@ describe('Topic editor state service', () => {
     expect(topicEditorStateService.getSubtopicPage()).toEqual(
       SubtopicPage.createFromBackendDict(subtopicPage)
     );
-    expect(topicEditorStateService.getCachedSubtopicPages().length).toBe(1);
+    expect(topicEditorStateService.getCachedSubtopicPages()).toHaveSize(1);
     topicEditorStateService.loadSubtopicPage('1', 2);
     expect(topicEditorStateService.getSubtopicPage()).toEqual(
       SubtopicPage.createFromBackendDict(subtopicPage)
@@ -363,7 +340,7 @@ describe('Topic editor state service', () => {
     expect(topicEditorStateService.getStudyGuide()).toEqual(
       StudyGuide.createFromBackendDict(studyGuide)
     );
-    expect(topicEditorStateService.getCachedStudyGuides().length).toBe(1);
+    expect(topicEditorStateService.getCachedStudyGuides()).toHaveSize(1);
     topicEditorStateService.loadStudyGuide('1', 2);
     expect(topicEditorStateService.getStudyGuide()).toEqual(
       StudyGuide.createFromBackendDict(studyGuide)
@@ -699,7 +676,7 @@ describe('Topic editor state service', () => {
   it('should update existence of topic name', fakeAsync(() => {
     topicEditorStateService.updateExistenceOfTopicName('test_topic', () => {});
     tick();
-    expect(topicEditorStateService.getTopicWithNameExists()).toBe(true);
+    expect(topicEditorStateService.getTopicWithNameExists()).toBeTrue();
   }));
 
   it('should show error when updation of topic name', fakeAsync(() => {
@@ -724,7 +701,7 @@ describe('Topic editor state service', () => {
       () => {}
     );
     tick();
-    expect(topicEditorStateService.getTopicWithUrlFragmentExists()).toBe(true);
+    expect(topicEditorStateService.getTopicWithUrlFragmentExists()).toBeTrue();
   }));
 
   it(
@@ -804,129 +781,4 @@ describe('Topic editor state service', () => {
       );
     })
   );
-
-  it('should fetch and cache skills when prefetchSkills is called', fakeAsync(() => {
-    const mockSkill = jasmine.createSpyObj('Skill', ['getSupersedingSkillId']);
-    mockSkill.getSupersedingSkillId.and.returnValue('superseding_skill_1');
-    const mockResponse = {
-      skill: mockSkill,
-      assignedSkillTopicData: {},
-      groupedSkillSummaries: {},
-    } as FetchSkillResponse;
-    spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
-      Promise.resolve(mockResponse)
-    );
-
-    topicEditorStateService.prefetchSkills(['skill_1']);
-    tick();
-
-    expect(skillBackendApiService.fetchSkillAsync).toHaveBeenCalledWith(
-      'skill_1'
-    );
-    const issues = topicEditorStateService.getSupersedingSkillIssues([
-      'skill_1',
-    ]);
-    expect(issues).toContain(
-      'The skill with id skill_1 has superseding skill superseding_skill_1'
-    );
-  }));
-
-  it('should deduplicate concurrent prefetchSkills calls', fakeAsync(() => {
-    const mockSkill = jasmine.createSpyObj('Skill', ['getSupersedingSkillId']);
-    mockSkill.getSupersedingSkillId.and.returnValue(null);
-    const mockResponse = {
-      skill: mockSkill,
-      assignedSkillTopicData: {},
-      groupedSkillSummaries: {},
-    } as FetchSkillResponse;
-    spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
-      Promise.resolve(mockResponse)
-    );
-
-    topicEditorStateService.prefetchSkills(['skill_1']);
-    topicEditorStateService.prefetchSkills(['skill_1']);
-    tick();
-
-    expect(skillBackendApiService.fetchSkillAsync).toHaveBeenCalledTimes(1);
-  }));
-
-  it('should handle fetch errors gracefully in prefetchSkills', fakeAsync(() => {
-    spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
-      Promise.reject(new Error('Network error'))
-    );
-
-    topicEditorStateService.prefetchSkills(['skill_err']);
-    tick();
-
-    const issues = topicEditorStateService.getSupersedingSkillIssues([
-      'skill_err',
-    ]);
-    expect(issues).toEqual([]);
-  }));
-
-  it('should evict removed skills and fetch new ones in updateSkillCache', fakeAsync(() => {
-    const mockSkill = jasmine.createSpyObj('Skill', ['getSupersedingSkillId']);
-    mockSkill.getSupersedingSkillId.and.returnValue(null);
-    const mockResponse = {
-      skill: mockSkill,
-      assignedSkillTopicData: {},
-      groupedSkillSummaries: {},
-    } as FetchSkillResponse;
-    spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
-      Promise.resolve(mockResponse)
-    );
-
-    topicEditorStateService.prefetchSkills(['skill_old']);
-    tick();
-    topicEditorStateService.updateSkillCache(['skill_new']);
-    tick();
-
-    // Skill_old evicted, skill_new fetched.
-    expect(skillBackendApiService.fetchSkillAsync).toHaveBeenCalledWith(
-      'skill_new'
-    );
-    expect(
-      topicEditorStateService.getSupersedingSkillIssues(['skill_old'])
-    ).toEqual([]);
-  }));
-
-  it('should return no issues for skills absent from cache', () => {
-    const issues = topicEditorStateService.getSupersedingSkillIssues([
-      'skill_not_cached',
-    ]);
-    expect(issues).toEqual([]);
-  });
-
-  it('should return no issues when skill has no superseding skill', fakeAsync(() => {
-    const mockSkill = jasmine.createSpyObj('Skill', ['getSupersedingSkillId']);
-    mockSkill.getSupersedingSkillId.and.returnValue(null);
-    const mockResponse = {
-      skill: mockSkill,
-      assignedSkillTopicData: {},
-      groupedSkillSummaries: {},
-    } as FetchSkillResponse;
-    spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
-      Promise.resolve(mockResponse)
-    );
-
-    topicEditorStateService.prefetchSkills(['skill_1']);
-    tick();
-
-    expect(
-      topicEditorStateService.getSupersedingSkillIssues(['skill_1'])
-    ).toEqual([]);
-  }));
-
-  it('should handle fetch errors gracefully in updateSkillCache', fakeAsync(() => {
-    spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
-      Promise.reject(new Error('Network error'))
-    );
-
-    topicEditorStateService.updateSkillCache(['skill_new']);
-    tick();
-
-    expect(
-      topicEditorStateService.getSupersedingSkillIssues(['skill_new'])
-    ).toEqual([]);
-  }));
 });

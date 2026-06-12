@@ -128,9 +128,3 @@ export interface FeedbackThreadDetail {
   can_edit_exploration?: boolean;
   messages: FeedbackMessage[];
 }
-
-export interface FeedbackListResponse {
-  results: FeedbackThreadSummary[];
-  cursor: string | null;
-  more: boolean;
-}

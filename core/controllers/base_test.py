@@ -1420,8 +1420,7 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                 if 'get' in clazz.__dict__.keys():
                     message = (
                         'Please ensure that the name of this class '
-                        'ends with \'%s\' or \'%sV2\''
-                        % (allowed_class_ending, allowed_class_ending)
+                        'ends with \'%s\'' % allowed_class_ending
                     )
                     error_message = '%s --> Line %s: %s' % (
                         file_name,
@@ -1430,17 +1429,16 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                     )
                     with self.subTest(class_name):
                         self.assertTrue(
-                            class_name.endswith(allowed_class_ending)
-                            or class_name.endswith(allowed_class_ending + 'V2'),
+                            class_name.endswith(allowed_class_ending),
                             msg=error_message,
                         )
 
-                # Check that the name of the class ends with 'Handler' or
-                # 'HandlerV2' if it does not have a get function.
+                # Check that the name of the class ends with 'Handler'
+                # if it does not has a get function.
                 else:
                     message = (
                         'Please ensure that the name of this class '
-                        'ends with \'Handler\' or \'HandlerV2\''
+                        'ends with \'Handler\''
                     )
                     error_message = '%s --> Line %s: %s' % (
                         file_name,
@@ -1449,9 +1447,7 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                     )
                     with self.subTest(class_name):
                         self.assertTrue(
-                            class_name.endswith('Handler')
-                            or class_name.endswith('HandlerV2'),
-                            msg=error_message,
+                            class_name.endswith('Handler'), msg=error_message
                         )
 
         self.assertGreater(num_handlers_checked, 275)
