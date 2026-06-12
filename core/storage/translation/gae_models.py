@@ -238,6 +238,9 @@ class EntityTranslationsModel(base_models.BaseModel):
         )
 
 
+MACHINE_TRANSLATION_POLICY_ID = 'machine_translation_policy'
+
+
 class MachineTranslationModel(base_models.BaseModel):
     """Model for storing machine generated translations for the purpose of
     preventing duplicate generation. Machine translations are used for reference
