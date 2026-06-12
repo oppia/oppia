@@ -28,7 +28,7 @@ import {CamelCaseToHyphensPipe} from '../../../filters/string-utility-filters/ca
 import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import {InteractionSpecsService} from '../../../services/interaction-specs.service';
 import {Outcome} from '../../../domain/exploration/outcome.model';
-import {State} from '../../../domain/state/state.model';
+import {State, StateBackendDict} from '../../../domain/state/state.model';
 import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
 import {AlertsService} from '../../../services/alerts.service';
 
@@ -49,11 +49,13 @@ describe('Answer Classification Service', () => {
     alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     interactionSpecsService = TestBed.inject(InteractionSpecsService);
+    // This throws "Type 'TextInputRulesService' is not assignable to type 'InteractionRulesService'.". We need to suppress this error because TextInputRulesService doesn't completely match InteractionRulesService.
+    // @ts-expect-error
     textInputRulesService = TestBed.inject(TextInputRulesService);
   });
 
   describe('with string classifier disabled', () => {
-    let stateDict;
+    let stateDict: StateBackendDict;
 
     beforeEach(() => {
       spyOn(interactionSpecsService, 'isInteractionTrainable').and.returnValue(
@@ -61,11 +63,17 @@ describe('Answer Classification Service', () => {
       );
 
       stateDict = {
+        classifier_model_id: null,
+        card_is_checkpoint: false,
+        linked_skill_id: null,
+        inapplicable_skill_misconception_ids: [],
         content: {
           content_id: 'content',
           html: 'content',
         },
         interaction: {
+          confirmed_unclassified_answers: [],
+          solution: null,
           id: 'TextInput',
           customization_args: {
             placeholder: {
@@ -104,6 +112,8 @@ describe('Answer Classification Service', () => {
                   },
                 },
               ],
+              training_data: [],
+              tagged_skill_misconception_id: null,
             },
             {
               outcome: {
@@ -147,6 +157,8 @@ describe('Answer Classification Service', () => {
                   },
                 },
               ],
+              training_data: [],
+              tagged_skill_misconception_id: null,
             },
             {
               outcome: {
@@ -190,6 +202,8 @@ describe('Answer Classification Service', () => {
                   },
                 },
               ],
+              training_data: [],
+              tagged_skill_misconception_id: null,
             },
           ],
           default_outcome: {
@@ -216,10 +230,10 @@ describe('Answer Classification Service', () => {
 
       expect(() =>
         answerClassificationService.getMatchingClassificationResult(
-          state.name,
+          state.name as string,
           state.interaction,
           '0',
-          null
+          {} as InteractionRulesService
         )
       ).toThrowError(
         'No interactionRulesService was available to classify the answer.'
@@ -234,7 +248,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name,
+            state.name as string,
             state.interaction,
             '10',
             textInputRulesService
@@ -250,7 +264,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name,
+            state.name as string,
             state.interaction,
             '5',
             textInputRulesService
@@ -266,7 +280,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name,
+            state.name as string,
             state.interaction,
             '6',
             textInputRulesService
@@ -287,7 +301,7 @@ describe('Answer Classification Service', () => {
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
-          state.name,
+          state.name as string,
           state.interaction,
           '777',
           textInputRulesService
@@ -313,7 +327,7 @@ describe('Answer Classification Service', () => {
 
         expect(() =>
           answerClassificationService.getMatchingClassificationResult(
-            state.name,
+            state.name as string,
             state.interaction,
             'abc',
             textInputRulesService
@@ -357,6 +371,8 @@ describe('Answer Classification Service', () => {
                 },
               },
             ],
+            training_data: [],
+            tagged_skill_misconception_id: null,
           },
         ];
 
@@ -364,10 +380,10 @@ describe('Answer Classification Service', () => {
 
         expect(() =>
           answerClassificationService.getMatchingClassificationResult(
-            state.name,
+            state.name as string,
             state.interaction,
             '0',
-            null
+            {} as InteractionRulesService
           )
         ).toThrowError(
           'No interactionRulesService was available to classify the answer.'
@@ -401,6 +417,8 @@ describe('Answer Classification Service', () => {
               },
             },
           ],
+          training_data: [],
+          tagged_skill_misconception_id: null,
         },
         {
           outcome: {
@@ -453,6 +471,8 @@ describe('Answer Classification Service', () => {
               },
             },
           ],
+          training_data: [],
+          tagged_skill_misconception_id: null,
         },
       ];
 
@@ -496,7 +516,7 @@ describe('Answer Classification Service', () => {
   });
 
   describe('with training data classification', () => {
-    let stateDict;
+    let stateDict: StateBackendDict;
 
     beforeEach(() => {
       spyOn(interactionSpecsService, 'isInteractionTrainable').and.returnValue(
@@ -504,11 +524,17 @@ describe('Answer Classification Service', () => {
       );
 
       stateDict = {
+        classifier_model_id: null,
+        card_is_checkpoint: false,
+        linked_skill_id: null,
+        inapplicable_skill_misconception_ids: [],
         content: {
           content_id: 'content',
           html: 'content',
         },
         interaction: {
+          confirmed_unclassified_answers: [],
+          solution: null,
           id: 'TextInput',
           customization_args: {
             placeholder: {
@@ -548,6 +574,7 @@ describe('Answer Classification Service', () => {
                   },
                 },
               ],
+              tagged_skill_misconception_id: null,
             },
             {
               outcome: {
@@ -574,6 +601,7 @@ describe('Answer Classification Service', () => {
                   },
                 },
               ],
+              tagged_skill_misconception_id: null,
             },
           ],
           default_outcome: {
@@ -603,7 +631,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name,
+            state.name as string,
             state.interaction,
             'abc',
             textInputRulesService
@@ -619,7 +647,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name,
+            state.name as string,
             state.interaction,
             'xyz',
             textInputRulesService
@@ -643,7 +671,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name,
+            state.name as string,
             state.interaction,
             'input',
             textInputRulesService
@@ -671,12 +699,14 @@ describe('Answer Classification Service', () => {
         // Returns false when no answer group matches and
         // default outcome has destination equal to state name.
 
-        stateDict.interaction.default_outcome.dest = stateName;
+        if (stateDict.interaction.default_outcome) {
+          stateDict.interaction.default_outcome.dest = stateName;
+        }
         let state1 = State.createFromBackendDict(stateName, stateDict);
 
         let res1 =
           answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-            state1.name,
+            state1.name as string,
             state1,
             '777',
             textInputRulesService
@@ -686,7 +716,7 @@ describe('Answer Classification Service', () => {
         expect(
           answerClassificationService.getMatchingClassificationResult
         ).toHaveBeenCalledWith(
-          state1.name,
+          state1.name as string,
           state1.interaction,
           '777',
           textInputRulesService
@@ -694,12 +724,14 @@ describe('Answer Classification Service', () => {
 
         // Returns true if any answer group matches.
 
-        stateDict.interaction.default_outcome.dest = 'default';
+        if (stateDict.interaction.default_outcome) {
+          stateDict.interaction.default_outcome.dest = 'default';
+        }
         let state2 = State.createFromBackendDict(stateName, stateDict);
 
         let res2 =
           answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-            state2.name,
+            state2.name as string,
             state2,
             'equal',
             textInputRulesService
@@ -709,7 +741,7 @@ describe('Answer Classification Service', () => {
         expect(
           answerClassificationService.getMatchingClassificationResult
         ).toHaveBeenCalledWith(
-          state2.name,
+          state2.name as string,
           state2.interaction,
           'equal',
           textInputRulesService

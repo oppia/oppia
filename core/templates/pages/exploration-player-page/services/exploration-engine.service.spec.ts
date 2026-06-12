@@ -27,6 +27,7 @@ import {
   ExplorationBackendDict,
 } from '../../../domain/exploration/exploration.model';
 import {Outcome} from '../../../domain/exploration/outcome.model';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {
   ParamChangeBackendDict,
   ParamChange,
@@ -41,7 +42,10 @@ import {TextInputRulesService} from 'interactions/TextInput/directives/text-inpu
 import {AlertsService} from 'services/alerts.service';
 import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
-import {AnswerClassificationService} from './answer-classification.service';
+import {
+  AnswerClassificationService,
+  InteractionRulesService,
+} from './answer-classification.service';
 import {AudioPreloaderService} from './audio-preloader.service';
 import {ContentTranslationLanguageService} from './content-translation-language.service';
 import {ExplorationEngineService} from './exploration-engine.service';
@@ -65,7 +69,7 @@ class MockPlatformFeatureService {
 describe('Exploration engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
-  let answerClassificationResult: AnswerClassificationService;
+  let answerClassificationResult: AnswerClassificationResult;
   let audioPreloaderService: AudioPreloaderService;
   let contentTranslationManagerService: ContentTranslationManagerService;
   let pageContextService: PageContextService;
@@ -157,6 +161,7 @@ describe('Exploration engine service ', () => {
           param_changes: [],
           card_is_checkpoint: true,
           linked_skill_id: null,
+          inapplicable_skill_misconception_ids: [],
           content: {
             content_id: 'content',
             html: '<p>First Question</p>',
@@ -181,6 +186,7 @@ describe('Exploration engine service ', () => {
           param_changes: [],
           card_is_checkpoint: false,
           linked_skill_id: null,
+          inapplicable_skill_misconception_ids: [],
           content: {
             content_id: 'content',
             html: 'Congratulations, you have finished!',
@@ -253,6 +259,7 @@ describe('Exploration engine service ', () => {
           param_changes: [],
           card_is_checkpoint: false,
           linked_skill_id: null,
+          inapplicable_skill_misconception_ids: [],
           content: {
             content_id: 'content',
             html: '<p>Second Question</p>',
@@ -272,11 +279,11 @@ describe('Exploration engine service ', () => {
       param_changes: [],
       title: 'My Exploration Title',
       draft_change_list_id: 9,
-      is_version_of_draft_valid: null,
+      is_version_of_draft_valid: false,
       language_code: 'en',
       init_state_name: 'Start',
       next_content_id_index: 5,
-      draft_changes: null,
+      draft_changes: [],
       exploration_metadata: {
         title: 'Exploration',
         category: 'Algebra',
@@ -348,23 +355,20 @@ describe('Exploration engine service ', () => {
       most_recently_reached_checkpoint_exp_version: 1,
     };
 
-    answerClassificationResult = {
-      outcome: {
-        dest: 'Mid',
-        destIfReallyStuck: 'Mid',
-        feedback: {
-          content_id: 'feedback_1',
-          html: 'Answer is correct!',
-        },
-        labelledAsCorrect: true,
-        paramChanges: [],
-        refresherExplorationId: null,
-        missingPrerequisiteSkillId: null,
-      },
-      answerGroupIndex: 1,
-      ruleIndex: 0,
-      classificationCategorization: 'default_outcome',
-    };
+    answerClassificationResult = new AnswerClassificationResult(
+      new Outcome(
+        'Mid',
+        'Mid',
+        new SubtitledHtml('Answer is correct!', 'feedback_1'),
+        true,
+        [],
+        null,
+        null
+      ),
+      1,
+      0,
+      'default_outcome'
+    );
   });
 
   beforeEach(() => {
@@ -668,8 +672,7 @@ describe('Exploration engine service ', () => {
           'Card 1',
           'Content html',
           'Interaction text',
-          null,
-          null,
+          {} as Interaction,
           'content_id'
         );
 
@@ -697,7 +700,7 @@ describe('Exploration engine service ', () => {
 
         const isAnswerCorrect = explorationEngineService.submitAnswer(
           answer,
-          textInputService,
+          textInputService as InteractionRulesService & TextInputRulesService,
           submitAnswerSuccessCb
         );
 
@@ -724,8 +727,7 @@ describe('Exploration engine service ', () => {
           'Start',
           'Content',
           '',
-          null,
-          null,
+          {} as Interaction,
           'feedback_1'
         )
       );
@@ -747,7 +749,7 @@ describe('Exploration engine service ', () => {
 
       const result = explorationEngineService.submitAnswer(
         'answer',
-        textInputService,
+        textInputService as InteractionRulesService & TextInputRulesService,
         submitAnswerSuccessCb
       );
 
@@ -776,8 +778,7 @@ describe('Exploration engine service ', () => {
           'Start',
           'Content',
           '',
-          mockInteraction,
-          null,
+          mockInteraction as Interaction,
           'feedback_1'
         )
       );
@@ -813,7 +814,7 @@ describe('Exploration engine service ', () => {
 
       const result = explorationEngineService.submitAnswer(
         'answer',
-        textInputService,
+        textInputService as InteractionRulesService & TextInputRulesService,
         submitAnswerSuccessCb
       );
 
@@ -838,8 +839,7 @@ describe('Exploration engine service ', () => {
           'Start',
           'Content',
           '',
-          null,
-          null,
+          {} as Interaction,
           'feedback_1'
         )
       );
@@ -868,7 +868,7 @@ describe('Exploration engine service ', () => {
       ).and.returnValue(null);
       const result = explorationEngineService.submitAnswer(
         'answer',
-        textInputService,
+        textInputService as InteractionRulesService & TextInputRulesService,
         successCallback
       );
 
@@ -882,7 +882,12 @@ describe('Exploration engine service ', () => {
       const submitAnswerSuccessCb = jasmine.createSpy('submitSuccess');
 
       answerClassificationResult.answerGroupIndex = 0;
-      answerClassificationResult.outcome.feedback.content_id = null; // Triggers the branch.
+      // Triggers the content-id null branch by mocking the contentId getter.
+      spyOnProperty(
+        answerClassificationResult.outcome.feedback,
+        'contentId',
+        'get'
+      ).and.returnValue(null);
 
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
         false
@@ -895,8 +900,7 @@ describe('Exploration engine service ', () => {
           'Start',
           'Content',
           '',
-          {id: 'TextInput', customizationArgs: {}},
-          null,
+          {id: 'TextInput', customizationArgs: {}} as Interaction,
           'feedback_1'
         )
       );
@@ -934,7 +938,7 @@ describe('Exploration engine service ', () => {
 
       const result = explorationEngineService.submitAnswer(
         'answer',
-        textInputService,
+        textInputService as InteractionRulesService & TextInputRulesService,
         submitAnswerSuccessCb
       );
 
@@ -955,8 +959,7 @@ describe('Exploration engine service ', () => {
           'Card 1',
           'Content html',
           'Interaction text',
-          null,
-          null,
+          {} as Interaction,
           'content_id'
         );
 
@@ -986,7 +989,7 @@ describe('Exploration engine service ', () => {
         explorationEngineService.answerIsBeingProcessed = true;
         explorationEngineService.submitAnswer(
           answer,
-          textInputService,
+          textInputService as InteractionRulesService & TextInputRulesService,
           submitAnswerSuccessCb
         );
 
@@ -1011,7 +1014,7 @@ describe('Exploration engine service ', () => {
           'Start',
           'Content',
           '',
-          {id: 'TextInput', customizationArgs: {}},
+          {id: 'TextInput', customizationArgs: {}} as Interaction,
           'feedback_1'
         )
       );
@@ -1062,7 +1065,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         'test answer',
-        textInputService,
+        textInputService as InteractionRulesService & TextInputRulesService,
         submitAnswerSuccessCb
       );
 
@@ -1077,14 +1080,18 @@ describe('Exploration engine service ', () => {
         let initSuccessCb = jasmine.createSpy('success');
         let submitAnswerSuccessCb = jasmine.createSpy('success');
         let answer = 'answer';
-        answerClassificationResult.outcome.feedback.html = null; // Triggers the branch.
+        // Triggers the empty-feedback branch by making the html getter return ''.
+        spyOnProperty(
+          answerClassificationResult.outcome.feedback,
+          'html',
+          'get'
+        ).and.returnValue('');
 
         let lastCard = StateCard.createNewCard(
           'Card 1',
           'Content html',
           'Interaction text',
-          null,
-          null,
+          {} as Interaction,
           'content_id'
         );
 
@@ -1116,7 +1123,7 @@ describe('Exploration engine service ', () => {
 
         explorationEngineService.submitAnswer(
           answer,
-          textInputService,
+          textInputService as InteractionRulesService & TextInputRulesService,
           submitAnswerSuccessCb
         );
 
@@ -1135,8 +1142,7 @@ describe('Exploration engine service ', () => {
         'Card 1',
         'Content html',
         'Interaction text',
-        null,
-        null,
+        {} as Interaction,
         'content_id'
       );
 
@@ -1170,7 +1176,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         answer,
-        textInputService,
+        textInputService as InteractionRulesService & TextInputRulesService,
         submitAnswerSuccessCb
       );
 
@@ -1188,8 +1194,7 @@ describe('Exploration engine service ', () => {
         'Card 1',
         'Content html',
         'Interaction text',
-        null,
-        null,
+        {} as Interaction,
         'content_id'
       );
 
@@ -1222,7 +1227,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         answer,
-        textInputService,
+        textInputService as InteractionRulesService & TextInputRulesService,
         submitAnswerSuccessCb
       );
 
@@ -1306,7 +1311,6 @@ describe('Exploration engine service ', () => {
         'Content html',
         'Interaction text',
         lastCardInteraction,
-        null,
         'content_id'
       );
 
@@ -1341,7 +1345,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         answer,
-        textInputService,
+        textInputService as InteractionRulesService & TextInputRulesService,
         submitAnswerSuccessCb
       );
 
@@ -1359,7 +1363,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         answer,
-        textInputService,
+        textInputService as InteractionRulesService & TextInputRulesService,
         submitAnswerSuccessCb
       );
       expect(submitAnswerSuccessCb).toHaveBeenCalledTimes(2);
@@ -1484,8 +1488,7 @@ describe('Exploration engine service ', () => {
         'Card 1',
         'Content html',
         'Interaction text',
-        null,
-        null,
+        {} as Interaction,
         'content_id'
       );
 
@@ -1501,7 +1504,7 @@ describe('Exploration engine service ', () => {
         'getMatchingClassificationResult'
       ).and.returnValue(answerClassificationResult);
 
-      expect(explorationEngineService.currentStateName).toBe(undefined);
+      expect(explorationEngineService.currentStateName).toBeUndefined();
 
       explorationEngineService.init(
         explorationDict,
@@ -1515,7 +1518,7 @@ describe('Exploration engine service ', () => {
 
       explorationEngineService.submitAnswer(
         answer,
-        textInputService,
+        textInputService as InteractionRulesService & TextInputRulesService,
         submitAnswerSuccessCb
       );
       expect(explorationEngineService.currentStateName).toBe('Start');

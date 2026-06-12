@@ -34,9 +34,10 @@ import {
   AnswerClassificationService,
   InteractionRulesService,
 } from './answer-classification.service';
-import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service.ts';
+import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
 import {State} from '../../../domain/state/state.model';
+import {Interaction} from '../../../domain/exploration/interaction.model';
 
 describe('Question player engine service', () => {
   let alertsService: AlertsService;
@@ -87,7 +88,7 @@ describe('Question player engine service', () => {
                   inputs: {x: 0},
                 },
               ],
-              training_data: null,
+              training_data: [],
               tagged_skill_misconception_id: null,
             },
             {
@@ -109,7 +110,7 @@ describe('Question player engine service', () => {
                   inputs: {x: 0},
                 },
               ],
-              training_data: null,
+              training_data: [],
               tagged_skill_misconception_id: 'misconceptionId',
             },
           ],
@@ -160,6 +161,7 @@ describe('Question player engine service', () => {
         },
         linked_skill_id: null,
         card_is_checkpoint: true,
+        inapplicable_skill_misconception_ids: [],
       },
       question_state_data_schema_version: 45,
       next_content_id_index: 5,
@@ -229,6 +231,7 @@ describe('Question player engine service', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
+          inapplicable_skill_misconception_ids: [],
         },
         question_state_data_schema_version: 45,
         language_code: 'en',
@@ -296,6 +299,7 @@ describe('Question player engine service', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
+          inapplicable_skill_misconception_ids: [],
         },
         question_state_data_schema_version: 45,
         language_code: 'br',
@@ -363,6 +367,7 @@ describe('Question player engine service', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
+          inapplicable_skill_misconception_ids: [],
         },
         question_state_data_schema_version: 45,
         language_code: 'ab',
@@ -398,7 +403,9 @@ describe('Question player engine service', () => {
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     focusManagerService = TestBed.inject(FocusManagerService);
-    textInputService = TestBed.inject(TextInputRulesService);
+    textInputService = TestBed.inject(
+      TextInputRulesService
+    ) as InteractionRulesService & TextInputRulesService;
 
     singleQuestionObject = Question.createFromBackendDict(
       singleQuestionBackendDict
@@ -552,7 +559,7 @@ describe('Question player engine service', () => {
     );
 
     expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
-      multipleQuestionsObjects[0]._id
+      multipleQuestionsObjects[0].getId() as string
     );
   });
 
@@ -698,7 +705,7 @@ describe('Question player engine service', () => {
       let initSuccessCb = jasmine.createSpy('success');
       let initErrorCb = jasmine.createSpy('fail');
 
-      singleQuestionBackendDict.question_state_data.content.html = null;
+      singleQuestionBackendDict.question_state_data.content.html = '';
       let alertsServiceSpy = spyOn(
         alertsService,
         'addWarning'
@@ -819,7 +826,7 @@ describe('Question player engine service', () => {
         let initErrorCb = jasmine.createSpy('fail');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createNew('default', null, null, []),
+          Outcome.createNew('default', '', '', []),
           1,
           0,
           'default_outcome'
@@ -838,8 +845,13 @@ describe('Question player engine service', () => {
           (html, envs) => html
         );
 
-        singleQuestionBackendDict.question_state_data.interaction.default_outcome.feedback.html =
-          null;
+        if (
+          singleQuestionBackendDict.question_state_data.interaction
+            .default_outcome
+        ) {
+          singleQuestionBackendDict.question_state_data.interaction.default_outcome.feedback.html =
+            '';
+        }
         questionPlayerEngineService.init(
           [Question.createFromBackendDict(singleQuestionBackendDict)],
           initSuccessCb,
@@ -871,7 +883,7 @@ describe('Question player engine service', () => {
       );
       answerClassificationResult.outcome.labelledAsCorrect = true;
 
-      singleQuestionBackendDict.question_state_data.content.html = null;
+      singleQuestionBackendDict.question_state_data.content.html = '';
       let sampleQuestion = Question.createFromBackendDict(
         singleQuestionBackendDict
       );
@@ -926,8 +938,7 @@ describe('Question player engine service', () => {
           'Card 1',
           'Content html',
           'Interaction text',
-          null,
-          null,
+          {} as Interaction,
           'content_id'
         );
 
@@ -966,7 +977,7 @@ describe('Question player engine service', () => {
         );
 
         expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
-          multipleQuestionsObjects[0]._id
+          multipleQuestionsObjects[0].getId() as string
         );
         expect(createNewCardSpy).toHaveBeenCalledTimes(1);
 
@@ -979,7 +990,7 @@ describe('Question player engine service', () => {
         );
 
         expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
-          multipleQuestionsObjects[1]._id
+          multipleQuestionsObjects[1].getId() as string
         );
         expect(createNewCardSpy).toHaveBeenCalledTimes(2);
 
@@ -992,7 +1003,7 @@ describe('Question player engine service', () => {
         );
 
         expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
-          multipleQuestionsObjects[2]._id
+          multipleQuestionsObjects[2].getId() as string
         );
         // Please note that after submitting answer to the final question,
         // a new card was not created, hence createNewCardSpy was not called.

@@ -25,6 +25,7 @@ import {
   ExplorationBackendDict,
 } from 'domain/exploration/exploration.model';
 import {ParamChange} from 'domain/exploration/param-change.model';
+import {ParamSpec} from 'domain/exploration/param-spec.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {StateObjectsBackendDict} from 'domain/exploration/states.model';
@@ -197,7 +198,7 @@ export class ExplorationEngineService {
     oldStateCard: StateCard,
     outcome: Outcome,
     envs: Record<string, string>[]
-  ): string {
+  ): string | null {
     const oldInteractionId = oldStateCard.getInteractionId();
     const oldInteractionArgs =
       oldStateCard.getInteractionCustomizationArgs() as TextInputCustomizationArgs;
@@ -221,6 +222,9 @@ export class ExplorationEngineService {
       }
     }
 
+    if (!outcome.feedback.html) {
+      return null;
+    }
     return this.expressionInterpolationService.processHtml(
       outcome.feedback.html,
       envs
@@ -379,10 +383,13 @@ export class ExplorationEngineService {
     let interaction = this.exploration.getInteraction(
       this.exploration.initStateName
     );
+    if (!interaction) {
+      throw new Error('Interaction for the initial state is not defined.');
+    }
     let nextFocusLabel: string = this.focusManagerService.generateFocusLabel();
 
     let interactionId = interaction.id;
-    let interactionHtml = null;
+    let interactionHtml = '';
     let interactionCustomizationArgs =
       this.exploration.getInteractionCustomizationArgs(this.currentStateName);
     if (interactionCustomizationArgs === null) {
@@ -419,13 +426,13 @@ export class ExplorationEngineService {
       questionHtml,
       interactionHtml,
       interaction,
-      initialState.content.contentId
+      initialState.content.contentId as string
     );
     successCallback(initialCard, nextFocusLabel);
   }
 
   getInitialStateName(): string {
-    return this.exploration.getInitialState().name;
+    return this.exploration.getInitialState().name as string;
   }
 
   /**
@@ -439,10 +446,14 @@ export class ExplorationEngineService {
    *   (used in preview mode).
    */
   private _initParams(manualParamChanges: ParamChange[]): void {
-    let baseParams = {};
-    this.exploration.paramSpecs.forEach((paramName, paramSpec) => {
-      baseParams[paramName] = paramSpec.getType().createDefaultValue();
-    });
+    let baseParams: ExplorationParams = {};
+    this.exploration.paramSpecs.forEach(
+      (paramName: string, paramSpec: ParamSpec) => {
+        baseParams[paramName] = paramSpec
+          .getType()
+          .createDefaultValue() as string;
+      }
+    );
 
     let startingParams = this.makeParams(
       baseParams,
@@ -466,7 +477,7 @@ export class ExplorationEngineService {
    * @returns {string} The formatted HTML for the state's interaction.
    * @throws {Error} If the interaction ID or customization arguments are null.
    */
-  private _getInteractionHtmlByStateName(
+  _getInteractionHtmlByStateName(
     labelForFocusTarget: string,
     stateName: string
   ): string {
@@ -783,7 +794,7 @@ export class ExplorationEngineService {
     // Compute the data for the next state.
     let oldParams: ExplorationParams = this.learnerParamsService.getAllParams();
     oldParams.answer = answer;
-    let feedbackHtml: string = this._getFeedback(
+    let feedbackHtml: string | null = this._getFeedback(
       answer,
       oldStateCard,
       classificationResult.outcome,
@@ -878,9 +889,13 @@ export class ExplorationEngineService {
       refreshInteraction,
       feedbackHtml,
       refresherExplorationId,
-      missingPrerequisiteSkillId,
+      missingPrerequisiteSkillId as string,
       onSameCard,
-      null,
+      // We use 'as unknown as string' here because the external callback
+      // defined in conversation-flow.service.ts expects a strict 'string',
+      // but our internal data models supply 'null'. This bypasses the TS
+      // compiler mismatch without altering the expected external signature.
+      null as unknown as string,
       oldStateName === this.exploration.initStateName,
       isFirstHit,
       false,
@@ -954,6 +969,9 @@ export class ExplorationEngineService {
 
     let contentId = this.exploration.getState(this.nextStateIfStuckName).content
       .contentId;
+    if (contentId === null) {
+      return null;
+    }
 
     return StateCard.createNewCard(
       this.nextStateIfStuckName,
@@ -1051,7 +1069,7 @@ export class ExplorationEngineService {
     let shortestPathToStateInReverse: string[] = [];
     let pathsQueue: string[] = [];
     let visitedNodes: Record<string, boolean> = {};
-    let nodeToParentMap: Record<string, string> | null = {};
+    let nodeToParentMap: Record<string, string | null> = {};
     visitedNodes[this.exploration.initStateName] = true;
     pathsQueue.push(this.exploration.initStateName);
     // 1st state does not have a parent
@@ -1082,10 +1100,10 @@ export class ExplorationEngineService {
     }
 
     // Reconstruct the shortest path from node to parent map.
-    let currStateName = destStateName;
+    let currStateName: string | null = destStateName;
     while (currStateName !== null) {
       shortestPathToStateInReverse.push(currStateName);
-      currStateName = nodeToParentMap[currStateName];
+      currStateName = nodeToParentMap[currStateName] ?? null;
     }
     // Actual shortest path in order is reverse of the path retrieved
     // from parent map, hence we return the reversed path that goes
