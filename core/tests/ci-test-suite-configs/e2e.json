@@ -21,10 +21,6 @@
       "module": "core/tests/webdriverio_desktop/navigation.js"
     },
     {
-      "name": "publication",
-      "module": "core/tests/webdriverio_desktop/publicationAndLibrary.js"
-    },
-    {
       "name": "skillEditor",
       "module": "core/tests/webdriverio_desktop/skillEditor.js"
     },
