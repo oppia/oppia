@@ -635,11 +635,6 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
             'is_pinned': True,
             'currently_available_to_learners': True,
             'translation_in_review_counts': {},
-            'id': 'exploration_1',
-            'chapter_title': 'Introduction to Fractions',
-            'story_title': '',
-            'language_code': 'en',
-            'reviewer_only_content_count': 0,
         }
 
         self.assertEqual(card_info.to_dict(), expected_dict)

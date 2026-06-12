@@ -23,6 +23,7 @@ import {Injectable} from '@angular/core';
 import {
   ExplorationOpportunitySummary,
   ExplorationOpportunitySummaryBackendDict,
+  TranslationOpportunityCardInfoBackendDict,
 } from 'domain/opportunity/exploration-opportunity-summary.model';
 import {
   SkillOpportunity,
@@ -50,8 +51,18 @@ interface TranslationContributionOpportunitiesBackendDict {
   more: boolean;
 }
 
+interface TranslationContributionOpportunitiesBackendDictV2 {
+  opportunities: TranslationOpportunityCardInfoBackendDict[];
+  next_cursor: string;
+  more: boolean;
+}
+
 interface ReviewableTranslationOpportunitiesBackendDict {
   opportunities: ExplorationOpportunitySummaryBackendDict[];
+}
+
+interface ReviewableTranslationOpportunitiesBackendDictV2 {
+  opportunities: TranslationOpportunityCardInfoBackendDict[];
 }
 
 interface SkillContributionOpportunities {
@@ -180,7 +191,7 @@ export class ContributionOpportunitiesBackendApiService {
       };
 
       return this.http
-        .get<TranslationContributionOpportunitiesBackendDict>(
+        .get<TranslationContributionOpportunitiesBackendDictV2>(
           '/opportunitieshandlerv2',
           {params}
         )
@@ -188,7 +199,7 @@ export class ContributionOpportunitiesBackendApiService {
         .then(
           data => {
             const opportunities = data.opportunities.map(dict =>
-              ExplorationOpportunitySummary.createFromBackendDict(dict)
+              ExplorationOpportunitySummary.createFromBackendDictV2(dict)
             );
 
             return {
@@ -258,7 +269,7 @@ export class ContributionOpportunitiesBackendApiService {
     ) {
       params.entity_type = AppConstants.ENTITY_TYPE.EXPLORATION;
       return this.http
-        .get<ReviewableTranslationOpportunitiesBackendDict>(
+        .get<ReviewableTranslationOpportunitiesBackendDictV2>(
           '/getreviewableopportunitieshandlerv2',
           {
             params,
@@ -268,7 +279,7 @@ export class ContributionOpportunitiesBackendApiService {
         .then(
           data => {
             const opportunities = data.opportunities.map(dict =>
-              ExplorationOpportunitySummary.createFromBackendDict(dict)
+              ExplorationOpportunitySummary.createFromBackendDictV2(dict)
             );
             return {
               opportunities,

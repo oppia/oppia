@@ -33,6 +33,20 @@ export interface ExplorationOpportunitySummaryBackendDict {
   reviewer_only_content_count: number;
 }
 
+export interface TranslationOpportunityCardInfoBackendDict {
+  topic_ids: string[];
+  entity_id: string;
+  content_count: number;
+  incomplete_translation_language_codes: string[];
+  translation_counts: TranslationCountsDict;
+  entity_type: string;
+  topic_name: string;
+  entity_description: string;
+  is_pinned: boolean;
+  currently_available_to_learners: boolean;
+  translation_in_review_counts: TranslationCountsDict;
+}
+
 export class ExplorationOpportunitySummary {
   id: string;
   topicName: string;
@@ -86,6 +100,23 @@ export class ExplorationOpportunitySummary {
     );
   }
 
+  static createFromBackendDictV2(
+    backendDict: TranslationOpportunityCardInfoBackendDict
+  ): ExplorationOpportunitySummary {
+    return new ExplorationOpportunitySummary(
+      backendDict.entity_id,
+      backendDict.topic_name,
+      '',
+      backendDict.entity_description,
+      backendDict.content_count,
+      backendDict.translation_counts,
+      backendDict.translation_in_review_counts,
+      'en',
+      backendDict.is_pinned,
+      0
+    );
+  }
+
   getExplorationId(): string {
     return this.id;
   }
@@ -95,7 +126,9 @@ export class ExplorationOpportunitySummary {
   }
 
   getOpportunitySubheading(): string {
-    return this.topicName + ' - ' + this.storyTitle;
+    return this.storyTitle
+      ? this.topicName + ' - ' + this.storyTitle
+      : this.topicName;
   }
 
   getContentCount(): number {
