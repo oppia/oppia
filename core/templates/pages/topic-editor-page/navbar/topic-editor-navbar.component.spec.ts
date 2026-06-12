@@ -26,6 +26,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {Change} from 'domain/editor/undo_redo/change.model';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
@@ -119,6 +120,15 @@ describe('Topic Editor Navbar', () => {
     alertsService = TestBed.inject(AlertsService);
     topicRightsBackendApiService = TestBed.inject(TopicRightsBackendApiService);
     questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
+    spyOn(topicEditorStateService, 'getSupersedingSkillIssues').and.returnValue(
+      []
+    );
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: false,
+      can_publish_topic: false,
+      can_edit_topic: false,
+      can_edit_question: false,
+    });
 
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     subtopic.setUrlFragment('dummy-url');
@@ -178,7 +188,7 @@ describe('Topic Editor Navbar', () => {
     );
   });
 
-  it('should validate topic when topic is initialised', () => {
+  it('should validate topic when topic is initialised', fakeAsync(() => {
     spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
     spyOnProperty(
@@ -192,12 +202,17 @@ describe('Topic Editor Navbar', () => {
       topicEditorStateService,
       'getTopicWithUrlFragmentExists'
     ).and.returnValue(false);
+    spyOn(topicEditorStateService, 'prefetchSkills').and.returnValue(
+      Promise.resolve()
+    );
+    spyOn(topicEditorStateService, 'hasLoadedTopic').and.returnValue(false);
     componentInstance.ngOnInit();
 
     expect(componentInstance.validationIssues).toEqual([]);
     expect(componentInstance.prepublishValidationIssues).toEqual([]);
 
     topicInitializedEventEmitter.emit();
+    tick();
 
     expect(componentInstance.validationIssues).toEqual([
       'Topic url fragment is not valid.',
@@ -209,9 +224,9 @@ describe('Topic Editor Navbar', () => {
       'Topic should have meta tag content.',
       'Subtopic subtopic1 should have a thumbnail.',
     ]);
-  });
+  }));
 
-  it('should validate topic when topic is reinitialised', () => {
+  it('should validate topic when topic is reinitialised', fakeAsync(() => {
     spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
     spyOnProperty(
@@ -225,12 +240,17 @@ describe('Topic Editor Navbar', () => {
       topicEditorStateService,
       'getTopicWithUrlFragmentExists'
     ).and.returnValue(true);
+    spyOn(topicEditorStateService, 'prefetchSkills').and.returnValue(
+      Promise.resolve()
+    );
+    spyOn(topicEditorStateService, 'hasLoadedTopic').and.returnValue(false);
     componentInstance.ngOnInit();
 
     expect(componentInstance.validationIssues).toEqual([]);
     expect(componentInstance.prepublishValidationIssues).toEqual([]);
 
     topicReinitializedEventEmitter.emit();
+    tick();
 
     expect(componentInstance.validationIssues).toEqual([
       'Topic url fragment is not valid.',
@@ -244,7 +264,7 @@ describe('Topic Editor Navbar', () => {
       'Topic should have meta tag content.',
       'Subtopic subtopic1 should have a thumbnail.',
     ]);
-  });
+  }));
 
   it('should load content properly', () => {
     spyOn(componentInstance, 'getChangeListLength').and.returnValue(1);
@@ -682,6 +702,12 @@ describe('Topic Editor Navbar', () => {
 
   it('should validate topic when called', () => {
     componentInstance.topic = topic;
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: false,
+      can_publish_topic: false,
+      can_edit_topic: false,
+      can_edit_question: false,
+    });
 
     componentInstance._validateTopic();
 
@@ -699,6 +725,13 @@ describe('Topic Editor Navbar', () => {
 
   it('should return the total number of warnings when called', () => {
     componentInstance.topic = topic;
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: false,
+      can_publish_topic: false,
+      can_edit_topic: false,
+      can_edit_question: false,
+    });
+
     componentInstance._validateTopic();
     expect(componentInstance.validationIssues).toEqual([
       'Topic url fragment is not valid.',
@@ -973,6 +1006,13 @@ describe('Topic Editor Navbar', () => {
 
   it('should return all the warnings when called', () => {
     componentInstance.topic = topic;
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: false,
+      can_publish_topic: false,
+      can_edit_topic: false,
+      can_edit_question: false,
+    });
+
     componentInstance._validateTopic();
     expect(componentInstance.getAllTopicWarnings()).toEqual(
       [
@@ -988,6 +1028,13 @@ describe('Topic Editor Navbar', () => {
 
   it('should return true or false when called', () => {
     componentInstance.topic = topic;
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: false,
+      can_publish_topic: false,
+      can_edit_topic: false,
+      can_edit_question: false,
+    });
+
     componentInstance._validateTopic();
     expect(componentInstance.isWarningTooltipDisabled()).toBe(false);
   });
@@ -1045,5 +1092,143 @@ describe('Topic Editor Navbar', () => {
     let routingSpy = spyOn(topicEditorRoutingService, 'getActiveTabName');
     routingSpy.and.returnValue('unknown_tab');
     expect(componentInstance.getMobileNavigatorText()).toEqual('Editor');
+  });
+
+  it('should validate topic and check superseding skills', () => {
+    componentInstance.topic = topic;
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: false,
+      can_publish_topic: false,
+      can_edit_topic: false,
+      can_edit_question: false,
+    });
+
+    spyOn(topic, 'getSkillIds').and.returnValue(['skill_1', 'skill_2']);
+    (
+      topicEditorStateService.getSupersedingSkillIssues as jasmine.Spy
+    ).and.returnValue([
+      'The skill with id skill_1 has superseding skill superseding_skill_1',
+    ]);
+
+    componentInstance._validateTopic();
+
+    expect(componentInstance.validationIssues).toContain(
+      'Topic url fragment is not valid.'
+    );
+    expect(componentInstance.validationIssues).toContain(
+      'The skill with id skill_1 has superseding skill superseding_skill_1'
+    );
+    expect(componentInstance.validationIssues.length).toBe(2);
+  });
+
+  it('should handle errors when fetching skills during validation', () => {
+    componentInstance.topic = topic;
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: false,
+      can_publish_topic: false,
+      can_edit_topic: false,
+      can_edit_question: false,
+    });
+
+    spyOn(topic, 'getSkillIds').and.returnValue(['skill_1']);
+    // Skills that failed to load are absent from the cache, so
+    // getSupersedingSkillIssues returns no issues for them.
+    (
+      topicEditorStateService.getSupersedingSkillIssues as jasmine.Spy
+    ).and.returnValue([]);
+
+    componentInstance._validateTopic();
+
+    expect(componentInstance.validationIssues).toContain(
+      'Topic url fragment is not valid.'
+    );
+    expect(componentInstance.validationIssues.length).toBe(1);
+  });
+
+  it('should prefetch skills and validate when topic is already loaded on init', fakeAsync(() => {
+    spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOn(topicEditorStateService, 'hasLoadedTopic').and.returnValue(true);
+    spyOn(topicEditorStateService, 'prefetchSkills').and.returnValue(
+      Promise.resolve()
+    );
+    spyOn(topicEditorStateService, 'getTopicWithNameExists').and.returnValue(
+      false
+    );
+    spyOn(
+      topicEditorStateService,
+      'getTopicWithUrlFragmentExists'
+    ).and.returnValue(false);
+
+    componentInstance.ngOnInit();
+    tick();
+
+    expect(topicEditorStateService.prefetchSkills).toHaveBeenCalled();
+    expect(componentInstance.validationIssues).toEqual([
+      'Topic url fragment is not valid.',
+    ]);
+  }));
+
+  it('should update skill cache and validate when undo/redo changes a skill', fakeAsync(() => {
+    spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOn(undoRedoService, 'getUndoRedoChangeEventEmitter').and.returnValue(
+      undoRedoChangeAppliedEventEmitter
+    );
+    spyOn(topicEditorStateService, 'getTopicWithNameExists').and.returnValue(
+      false
+    );
+    spyOn(
+      topicEditorStateService,
+      'getTopicWithUrlFragmentExists'
+    ).and.returnValue(false);
+    const mockChange = {
+      getBackendChangeObject: () => ({cmd: 'add_uncategorized_skill_id'}),
+    };
+    spyOn(undoRedoService, 'getChangeList').and.returnValue([
+      mockChange,
+    ] as unknown as Change[]);
+    spyOn(topicEditorStateService, 'updateSkillCache').and.returnValue(
+      Promise.resolve()
+    );
+
+    componentInstance.ngOnInit();
+    undoRedoChangeAppliedEventEmitter.emit();
+    tick();
+
+    expect(topicEditorStateService.updateSkillCache).toHaveBeenCalled();
+    expect(componentInstance.validationIssues).toEqual([
+      'Topic url fragment is not valid.',
+    ]);
+  }));
+
+  it('should validate topic directly when undo/redo changes a non-skill property', () => {
+    spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOn(undoRedoService, 'getUndoRedoChangeEventEmitter').and.returnValue(
+      undoRedoChangeAppliedEventEmitter
+    );
+    spyOn(topicEditorStateService, 'getTopicWithNameExists').and.returnValue(
+      false
+    );
+    spyOn(
+      topicEditorStateService,
+      'getTopicWithUrlFragmentExists'
+    ).and.returnValue(false);
+    const mockChange = {
+      getBackendChangeObject: () => ({cmd: 'update_topic_property'}),
+    };
+    spyOn(undoRedoService, 'getChangeList').and.returnValue([
+      mockChange,
+    ] as unknown as Change[]);
+    spyOn(topicEditorStateService, 'updateSkillCache');
+
+    componentInstance.ngOnInit();
+    undoRedoChangeAppliedEventEmitter.emit();
+
+    expect(topicEditorStateService.updateSkillCache).not.toHaveBeenCalled();
+    expect(componentInstance.validationIssues).toEqual([
+      'Topic url fragment is not valid.',
+    ]);
   });
 });
