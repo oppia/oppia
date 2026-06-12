@@ -301,12 +301,11 @@ class AuditBackfillTranslationOpportunityModelJob(
             computed = list(grouped_data['computed'])
 
             if not computed:
-                if existing:
-                    yield ('orphaned', 1)
-                    exist_model = existing[0]
-                    yield ('exist_content_count', exist_model.content_count)
-                    for lang, count in exist_model.translation_counts.items():
-                        yield (f'exist_translation_count_{lang}', count)
+                yield ('orphaned', 1)
+                exist_model = existing[0]
+                yield ('exist_content_count', exist_model.content_count)
+                for lang, count in exist_model.translation_counts.items():
+                    yield (f'exist_translation_count_{lang}', count)
                 return
 
             comp_model = computed[0]

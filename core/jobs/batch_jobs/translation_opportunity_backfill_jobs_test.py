@@ -222,6 +222,16 @@ class BackfillTranslationOpportunityModelJobTests(
         self.assertEqual(model.content_count, 0)
         self.assertEqual(model.translation_counts, {'hi': 1})
 
+    def test_run_with_datastore_updates_disabled(self) -> None:
+        with self.swap(self.JOB_CLASS, 'DATASTORE_UPDATES_ALLOWED', False):
+            self.assert_job_output_is(
+                [
+                    job_run_result.JobRunResult(
+                        stdout='TRANSLATION OPPORTUNITY MODEL CREATION SUCCESS: 1'
+                    ),
+                ]
+            )
+
     @test_utils.enable_feature_flags(
         [
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
@@ -805,9 +815,9 @@ class AuditBackfillTranslationOpportunityModelJobTests(
             entity_type=feconf.TranslatableEntityType.EXPLORATION.value,
             entity_id=self.exp_id,
             topic_ids=['topic_id'],
-            content_count=0,
+            content_count=1,
             incomplete_translation_language_codes=[],
-            translation_counts={},
+            translation_counts={'hi': 1},
         )
         orphaned_model.update_timestamps()
         orphaned_model.put()
@@ -821,9 +831,9 @@ class AuditBackfillTranslationOpportunityModelJobTests(
                         '- Missing in Datastore: 0\n'
                         '- Discrepancies: 0\n'
                         '- Orphaned in Datastore: 1\n'
-                        '- Total Content Count (Existing): 0\n'
+                        '- Total Content Count (Existing): 1\n'
                         '- Total Content Count (Computed): 0\n'
-                        '- Total Translation Counts (Existing): None\n'
+                        '- Total Translation Counts (Existing): hi: 1\n'
                         '- Total Translation Counts (Computed): None'
                     )
                 ),
