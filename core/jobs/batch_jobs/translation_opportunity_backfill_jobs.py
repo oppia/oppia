@@ -303,14 +303,26 @@ class AuditBackfillTranslationOpportunityModelJob(
             if not computed:
                 if existing:
                     yield ('orphaned', 1)
+                    exist_model = existing[0]
+                    yield ('exist_content_count', exist_model.content_count)
+                    for lang, count in exist_model.translation_counts.items():
+                        yield (f'exist_translation_count_{lang}', count)
                 return
 
             comp_model = computed[0]
+            yield ('comp_content_count', comp_model.content_count)
+            for lang, count in comp_model.translation_counts.items():
+                yield (f'comp_translation_count_{lang}', count)
+
             if not existing:
                 yield ('missing', 1)
                 return
 
             exist_model = existing[0]
+            yield ('exist_content_count', exist_model.content_count)
+            for lang, count in exist_model.translation_counts.items():
+                yield (f'exist_translation_count_{lang}', count)
+
             if (
                 exist_model.content_count != comp_model.content_count
                 or exist_model.translation_counts
@@ -339,12 +351,41 @@ class AuditBackfillTranslationOpportunityModelJob(
                 else:
                     totals[key] = totals.get(key, 0) + count
 
+            exist_translation_totals = {}
+            comp_translation_totals = {}
+            for key, count in totals.items():
+                if key.startswith('exist_translation_count_'):
+                    lang = key.split('exist_translation_count_')[1]
+                    exist_translation_totals[lang] = count
+                elif key.startswith('comp_translation_count_'):
+                    lang = key.split('comp_translation_count_')[1]
+                    comp_translation_totals[lang] = count
+
+            exist_translation_totals_str = (
+                ', '.join(
+                    f'{lang}: {count}'
+                    for lang, count in sorted(exist_translation_totals.items())
+                )
+                or 'None'
+            )
+            comp_translation_totals_str = (
+                ', '.join(
+                    f'{lang}: {count}'
+                    for lang, count in sorted(comp_translation_totals.items())
+                )
+                or 'None'
+            )
+
             yield job_run_result.JobRunResult.as_stdout(
                 f'Audit Summary:\n'
                 f'- Matches: {totals.get("match", 0)}\n'
                 f'- Missing in Datastore: {totals.get("missing", 0)}\n'
                 f'- Discrepancies: {totals.get("discrepancy", 0)}\n'
-                f'- Orphaned in Datastore: {totals.get("orphaned", 0)}'
+                f'- Orphaned in Datastore: {totals.get("orphaned", 0)}\n'
+                f'- Total Content Count (Existing): {totals.get("exist_content_count", 0)}\n'
+                f'- Total Content Count (Computed): {totals.get("comp_content_count", 0)}\n'
+                f'- Total Translation Counts (Existing): {exist_translation_totals_str}\n'
+                f'- Total Translation Counts (Computed): {comp_translation_totals_str}'
             )
 
             for detail in error_details:

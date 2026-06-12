@@ -644,7 +644,11 @@ class AuditBackfillTranslationOpportunityModelJobTests(
                         '- Matches: 0\n'
                         '- Missing in Datastore: 0\n'
                         '- Discrepancies: 0\n'
-                        '- Orphaned in Datastore: 0'
+                        '- Orphaned in Datastore: 0\n'
+                        '- Total Content Count (Existing): 0\n'
+                        '- Total Content Count (Computed): 0\n'
+                        '- Total Translation Counts (Existing): None\n'
+                        '- Total Translation Counts (Computed): None'
                     )
                 ),
             ]
@@ -686,7 +690,11 @@ class AuditBackfillTranslationOpportunityModelJobTests(
                         '- Matches: 1\n'
                         '- Missing in Datastore: 0\n'
                         '- Discrepancies: 0\n'
-                        '- Orphaned in Datastore: 0'
+                        '- Orphaned in Datastore: 0\n'
+                        '- Total Content Count (Existing): 1\n'
+                        '- Total Content Count (Computed): 1\n'
+                        '- Total Translation Counts (Existing): hi: 1\n'
+                        '- Total Translation Counts (Computed): hi: 1'
                     )
                 ),
                 job_run_result.JobRunResult(
@@ -704,7 +712,11 @@ class AuditBackfillTranslationOpportunityModelJobTests(
                         '- Matches: 0\n'
                         '- Missing in Datastore: 1\n'
                         '- Discrepancies: 0\n'
-                        '- Orphaned in Datastore: 0'
+                        '- Orphaned in Datastore: 0\n'
+                        '- Total Content Count (Existing): 0\n'
+                        '- Total Content Count (Computed): 0\n'
+                        '- Total Translation Counts (Existing): None\n'
+                        '- Total Translation Counts (Computed): hi: 1'
                     )
                 ),
                 job_run_result.JobRunResult(
@@ -734,7 +746,11 @@ class AuditBackfillTranslationOpportunityModelJobTests(
                         '- Matches: 0\n'
                         '- Missing in Datastore: 0\n'
                         '- Discrepancies: 1\n'
-                        '- Orphaned in Datastore: 0'
+                        '- Orphaned in Datastore: 0\n'
+                        '- Total Content Count (Existing): 10\n'
+                        '- Total Content Count (Computed): 0\n'
+                        '- Total Translation Counts (Existing): None\n'
+                        '- Total Translation Counts (Computed): hi: 1'
                     )
                 ),
                 job_run_result.JobRunResult(
@@ -804,7 +820,11 @@ class AuditBackfillTranslationOpportunityModelJobTests(
                         '- Matches: 0\n'
                         '- Missing in Datastore: 0\n'
                         '- Discrepancies: 0\n'
-                        '- Orphaned in Datastore: 1'
+                        '- Orphaned in Datastore: 1\n'
+                        '- Total Content Count (Existing): 0\n'
+                        '- Total Content Count (Computed): 0\n'
+                        '- Total Translation Counts (Existing): None\n'
+                        '- Total Translation Counts (Computed): None'
                     )
                 ),
             ]
