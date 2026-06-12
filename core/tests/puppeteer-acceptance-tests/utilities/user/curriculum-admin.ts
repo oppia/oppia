@@ -914,27 +914,9 @@ export class CurriculumAdmin extends TopicManager {
         `${closeSaveModalButton}:not([disabled])`
       );
       await this.clickOnElementWithSelector(closeSaveModalButton);
-      await this.page.waitForFunction(
-        (selector: string) => {
-          const el = document.querySelector(selector) as HTMLElement | null;
-          if (!el) {
-            return true;
-          }
-          const style = window.getComputedStyle(el);
-          if (
-            style &&
-            (style.display === 'none' || style.visibility === 'hidden')
-          ) {
-            return true;
-          }
-          if ((el as HTMLElement).offsetParent === null) {
-            return true;
-          }
-          return false;
-        },
-        {},
-        'oppia-topic-editor-save-modal'
-      );
+      await this.page.waitForSelector('oppia-topic-editor-save-modal', {
+        hidden: true,
+      });
       if (topicName) {
         await this.openTopicEditor(topicName);
       }
