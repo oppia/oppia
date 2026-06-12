@@ -18,16 +18,25 @@
 import {Component} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
-import {DeleteCertificateOfferingModalComponent} from 'components/certificate-assessment-offering-helper/delete-certificate-offering-modal.component';
 import {CertificateAssessmentOfferingBackendApiService} from 'domain/certificate-assessment/certificate-assessment-offering-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
+
+import {DeleteCertificateOfferingModalComponent} from 'components/certificate-assessment-offering-helper/delete-certificate-offering-modal.component';
+
+interface CertificateOfferingSummary {
+  certificateId: string;
+  title: string;
+  topicsLabel: string;
+  timeLabel: string;
+  status: string;
+}
 
 @Component({
   selector: 'oppia-certificate-offering-dashboard-page',
   templateUrl: './certificate-offering-dashboard-page.component.html',
 })
 export class CertificateOfferingDashboardPageComponent {
-  certificateOfferings = [
+  certificateOfferings: CertificateOfferingSummary[] = [
     {
       certificateId: 'dummy_id',
       title: 'Certificate Title',
@@ -64,18 +73,25 @@ export class CertificateOfferingDashboardPageComponent {
         backdrop: 'static',
       })
       .result.then(
-        () => this.deleteCertificateOffering(certificateId),
+        () => {
+          void this.deleteCertificateOffering(certificateId);
+        },
         () => {}
       );
   }
 
   async deleteCertificateOffering(certificateId: string): Promise<void> {
-    await this.certificateAssessmentOfferingBackendApiService.deleteCertificateAssessmentOfferingAsync(
-      certificateId
-    );
-    this.certificateOfferings = this.certificateOfferings.filter(
-      certificateOffering => certificateOffering.certificateId !== certificateId
-    );
-    this.alertsService.addSuccessMessage('Certificate deleted successfully.');
+    try {
+      await this.certificateAssessmentOfferingBackendApiService.deleteCertificateAssessmentOfferingAsync(
+        certificateId
+      );
+      this.certificateOfferings = this.certificateOfferings.filter(
+        certificateOffering =>
+          certificateOffering.certificateId !== certificateId
+      );
+      this.alertsService.addSuccessMessage('Certificate deleted successfully.');
+    } catch {
+      this.alertsService.addWarning('Failed to delete certificate.');
+    }
   }
 }
