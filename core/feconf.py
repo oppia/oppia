@@ -1135,6 +1135,9 @@ REGENERATE_VOICEOVERS_FOR_EXPLORATION_URL = (
 CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
     '/certificate_assessment_offering_handler'
 )
+CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER = (
+    '/certificate_assessment_offering_handler/<certificate_id>'
+)
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
