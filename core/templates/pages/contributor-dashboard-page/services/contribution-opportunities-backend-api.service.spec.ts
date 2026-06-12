@@ -38,6 +38,7 @@ import {
   ExplorationOpportunitySummary,
   TranslationCountsDict,
   ExplorationOpportunitySummaryBackendDict,
+  TranslationOpportunityCardInfoBackendDict,
 } from 'domain/opportunity/exploration-opportunity-summary.model';
 
 class MockPlatformFeatureService {
@@ -105,6 +106,48 @@ describe('Contribution Opportunities backend API service', function () {
   ];
   const translationOpportunityResponse = {
     opportunities: translationOpportunities,
+    next_cursor: '6',
+    more: true,
+  };
+  const translationOpportunitiesV2: TranslationOpportunityCardInfoBackendDict[] =
+    [
+      {
+        topic_ids: ['topic_id_1'],
+        entity_id: 'exp_id_1',
+        content_count: 100,
+        incomplete_translation_language_codes: ['hi'],
+        translation_counts: {
+          hi: 15,
+        } as TranslationCountsDict,
+        entity_type: 'exploration',
+        topic_name: 'Topic 1',
+        entity_description: 'Introduction',
+        is_pinned: true,
+        currently_available_to_learners: true,
+        translation_in_review_counts: {
+          hi: 15,
+        } as TranslationCountsDict,
+      },
+      {
+        topic_ids: ['topic_id_2'],
+        entity_id: 'exp_id_2',
+        content_count: 50,
+        incomplete_translation_language_codes: ['da'],
+        translation_counts: {
+          da: 8,
+        } as TranslationCountsDict,
+        entity_type: 'exploration',
+        topic_name: 'Topic 2',
+        entity_description: 'Another chapter',
+        is_pinned: false,
+        currently_available_to_learners: true,
+        translation_in_review_counts: {
+          da: 2,
+        } as TranslationCountsDict,
+      },
+    ];
+  const translationOpportunityResponseV2 = {
+    opportunities: translationOpportunitiesV2,
     next_cursor: '6',
     more: true,
   };
@@ -297,14 +340,23 @@ describe('Contribution Opportunities backend API service', function () {
       '/opportunitieshandlerv2?language_code=hi&topic_name=&cursor=&entity_type=exploration'
     );
     expect(req.request.method).toEqual('GET');
-    req.flush(translationOpportunityResponse);
+    req.flush(translationOpportunityResponseV2);
 
     flushMicrotasks();
 
+    const expectedOpportunities = translationOpportunitiesV2.map(
+      opportunity => {
+        const summary =
+          ExplorationOpportunitySummary.createFromBackendDictV2(opportunity);
+        summary.languageCode = 'hi';
+        return summary;
+      }
+    );
+
     expect(successHandler).toHaveBeenCalledWith({
-      opportunities: sampleTranslationOpportunitiesResponse,
-      nextCursor: translationOpportunityResponse.next_cursor,
-      more: translationOpportunityResponse.more,
+      opportunities: expectedOpportunities,
+      nextCursor: translationOpportunityResponseV2.next_cursor,
+      more: translationOpportunityResponseV2.more,
     });
     expect(failHandler).not.toHaveBeenCalled();
   }));
@@ -482,16 +534,18 @@ describe('Contribution Opportunities backend API service', function () {
     expect(req.request.method).toEqual('GET');
 
     req.flush({
-      opportunities: translationOpportunities.filter(
-        opportunity => opportunity.language_code === 'hi'
-      ),
+      opportunities: [translationOpportunitiesV2[0]],
     });
     flushMicrotasks();
 
+    const expectedOpportunity =
+      ExplorationOpportunitySummary.createFromBackendDictV2(
+        translationOpportunitiesV2[0]
+      );
+    expectedOpportunity.languageCode = 'hi';
+
     expect(successHandler).toHaveBeenCalledWith({
-      opportunities: sampleTranslationOpportunitiesResponse.filter(
-        opportunity => opportunity.languageCode === 'hi'
-      ),
+      opportunities: [expectedOpportunity],
     });
     expect(failHandler).not.toHaveBeenCalled();
   }));
@@ -503,7 +557,7 @@ describe('Contribution Opportunities backend API service', function () {
       },
     } as unknown as FeatureStatusChecker);
 
-    const topicName = translationOpportunities[1].topic_name;
+    const topicName = translationOpportunitiesV2[1].topic_name;
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
@@ -516,20 +570,18 @@ describe('Contribution Opportunities backend API service', function () {
     expect(req.request.method).toEqual('GET');
 
     req.flush({
-      opportunities: translationOpportunities.filter(
-        opportunity =>
-          opportunity.topic_name === topicName &&
-          opportunity.language_code === 'hi'
-      ),
+      opportunities: [translationOpportunitiesV2[1]],
     });
     flushMicrotasks();
 
+    const expectedOpportunity =
+      ExplorationOpportunitySummary.createFromBackendDictV2(
+        translationOpportunitiesV2[1]
+      );
+    expectedOpportunity.languageCode = 'hi';
+
     expect(successHandler).toHaveBeenCalledWith({
-      opportunities: sampleTranslationOpportunitiesResponse.filter(
-        opportunity =>
-          opportunity.topicName === topicName &&
-          opportunity.languageCode === 'hi'
-      ),
+      opportunities: [expectedOpportunity],
     });
     expect(failHandler).not.toHaveBeenCalled();
   }));

@@ -198,9 +198,12 @@ export class ContributionOpportunitiesBackendApiService {
         .toPromise()
         .then(
           data => {
-            const opportunities = data.opportunities.map(dict =>
-              ExplorationOpportunitySummary.createFromBackendDictV2(dict)
-            );
+            const opportunities = data.opportunities.map(dict => {
+              const summary =
+                ExplorationOpportunitySummary.createFromBackendDictV2(dict);
+              summary.languageCode = languageCode;
+              return summary;
+            });
 
             return {
               opportunities: opportunities,
@@ -278,9 +281,14 @@ export class ContributionOpportunitiesBackendApiService {
         .toPromise()
         .then(
           data => {
-            const opportunities = data.opportunities.map(dict =>
-              ExplorationOpportunitySummary.createFromBackendDictV2(dict)
-            );
+            const opportunities = data.opportunities.map(dict => {
+              const summary =
+                ExplorationOpportunitySummary.createFromBackendDictV2(dict);
+              if (languageCode) {
+                summary.languageCode = languageCode;
+              }
+              return summary;
+            });
             return {
               opportunities,
             };
