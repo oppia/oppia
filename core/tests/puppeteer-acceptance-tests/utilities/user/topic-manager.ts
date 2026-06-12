@@ -900,9 +900,7 @@ export class TopicManager extends BaseUser {
   async saveQuestionAndExpectCommitModal(commitMessage: string): Promise<void> {
     await this.clickOnElementWithSelector(saveQuestionButton);
 
-    await this.page.waitForSelector(commitMessageInputSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(commitMessageInputSelector);
     await this.typeInInputField(commitMessageInputSelector, commitMessage);
     await this.clickOnElementWithSelector(closeSaveModalButtonSelector);
 
@@ -954,21 +952,27 @@ export class TopicManager extends BaseUser {
   async linkAnotherSkillToQuestion(skillName: string): Promise<void> {
     // Wait for the question editor to fully load (including async difficultyCount).
     // The difficulty header only appears when difficultyCount is set.
-    await this.page.waitForSelector(questionDifficultyHeaderSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(questionDifficultyHeaderSelector);
 
     // Now wait for and click the "Link Another Skill" button.
-    await this.page.waitForSelector(linkAnotherSkillToQuestionButton, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(linkAnotherSkillToQuestionButton);
     await this.clickOnElementWithSelector(linkAnotherSkillToQuestionButton);
     await this.fillSkillNameInSkillSelectionModal(skillName);
     await this.selectSkillAndClickOnDoneInSkillSelectionModal(skillName);
     // Wait for the success toast to appear as linkage changes are auto-saved.
     await this.expectElementToBeVisible(successToastSelector);
-    // Wait for modal to close and button to be visible again.
-    await this.page.waitForTimeout(500);
+    // Wait for the skill to be added to the linked skills list.
+    await this.page.waitForFunction(
+      (selector: string, expectedText: string) => {
+        const elements = document.querySelectorAll(selector);
+        return Array.from(elements).some(
+          el => el.textContent?.trim() === expectedText
+        );
+      },
+      {},
+      skillLinkageDescriptionSelector,
+      skillName
+    );
   }
 
   /**
@@ -1001,7 +1005,18 @@ export class TopicManager extends BaseUser {
           // Unlinking a non-last skill triggers an auto-save API call.
           // Wait for the success toast to confirm the save completed.
           await this.expectElementToBeVisible(successToastSelector);
-          await this.page.waitForTimeout(500);
+          // Wait for the skill to be removed from the linked skills list.
+          await this.page.waitForFunction(
+            (selector: string, text: string) => {
+              const elements = document.querySelectorAll(selector);
+              return Array.from(elements).every(
+                el => el.textContent?.trim() !== text
+              );
+            },
+            {},
+            skillLinkageDescriptionSelector,
+            skillDescription
+          );
           return;
         }
       }
@@ -2800,13 +2815,9 @@ export class TopicManager extends BaseUser {
       await this.clickOnElementWithSelector(saveOrPublishSkillSelector);
     }
 
-    await this.page.waitForSelector(commitMessageInputSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(commitMessageInputSelector);
     await this.typeInInputField(commitMessageInputSelector, updateMessage);
-    await this.page.waitForSelector(closeSaveModalButtonSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(closeSaveModalButtonSelector);
     await this.clickOnElementWithSelector(closeSaveModalButtonSelector);
     await this.expectToastMessageToBe('Changes Saved.');
     showMessage('Skill updated successful');
@@ -4038,9 +4049,7 @@ export class TopicManager extends BaseUser {
     await this.waitForElementToStabilize(questionElement);
     await questionElement.click();
     await this.expectElementToBeVisible(addQuestionButtonSelector, false);
-    await this.page.waitForSelector(questionDifficultyHeaderSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(questionDifficultyHeaderSelector);
   }
 
   /**
