@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf, utils
 from core.constants import constants
 
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, List, TypedDict
 
 
 class PartialExplorationOpportunitySummaryDict(TypedDict):
@@ -617,9 +617,7 @@ class TranslationOpportunityCardInfoDict(TypedDict):
     entity_type: str
     topic_name: str
     entity_description: str
-    is_pinned: bool
     currently_available_to_learners: bool
-    translation_in_review_counts: Dict[str, int]
 
 
 class TranslationOpportunityCardInfo(TranslationOpportunity):
@@ -635,9 +633,7 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
         entity_type: str,
         topic_name: str,
         entity_description: str,
-        is_pinned: bool,
         currently_available_to_learners: bool,
-        translation_in_review_counts: Optional[Dict[str, int]] = None,
     ) -> None:
         """Constructs a TranslationOpportunityCardInfo domain object."""
         super().__init__(
@@ -658,11 +654,7 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
         self.entity_type = entity_type
         self.topic_name = topic_name
         self.entity_description = entity_description
-        self.is_pinned = is_pinned
         self.currently_available_to_learners = currently_available_to_learners
-        self.translation_in_review_counts: Dict[str, int] = (
-            translation_in_review_counts if translation_in_review_counts else {}
-        )
 
     def to_dict(self) -> TranslationOpportunityCardInfoDict:
         """Returns a dict representation of the card info."""
@@ -677,9 +669,7 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
             'entity_type': self.entity_type,
             'topic_name': self.topic_name,
             'entity_description': self.entity_description,
-            'is_pinned': self.is_pinned,
             'currently_available_to_learners': (
                 self.currently_available_to_learners
             ),
-            'translation_in_review_counts': self.translation_in_review_counts,
         }

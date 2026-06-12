@@ -2854,6 +2854,28 @@ class ContributionOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
     )
     def test_handler_returns_opportunities(self) -> None:
         self.save_new_valid_exploration('exp_1', self.admin_id)
+        exp = exp_fetchers.get_exploration_by_id('exp_1')
+        self.signup('suggester@example.com', 'suggester')
+        suggester_id = self.get_user_id_from_email('suggester@example.com')
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp_1',
+            exp.version,
+            suggester_id,
+            {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Introduction',
+                'content_id': 'content_0',
+                'language_code': 'hi',
+                'content_html': exp.get_content_html(
+                    'Introduction', 'content_0'
+                ),
+                'translation_html': '<p>Translation</p>',
+                'data_format': 'html',
+            },
+            'Translation suggestion',
+        )
         opportunity_models.TranslationOpportunityModel.create_new(
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id='exp_1',
@@ -2869,6 +2891,11 @@ class ContributionOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
         )
         self.assertEqual(len(response['opportunities']), 1)
         self.assertEqual(response['opportunities'][0]['entity_id'], 'exp_1')
+        self.assertEqual(
+            response['opportunities'][0]['translation_in_review_counts'],
+            {'hi': 1},
+        )
+        self.assertFalse(response['opportunities'][0]['is_pinned'])
 
     @test_utils.enable_feature_flags(
         [
@@ -2976,6 +3003,7 @@ class ReviewableOpportunitiesHandlerV2Test(test_utils.GenericTestBase):
             response['opportunities'][0]['translation_in_review_counts'],
             {'hi': 1},
         )
+        self.assertFalse(response['opportunities'][0]['is_pinned'])
 
     @test_utils.enable_feature_flags(
         [

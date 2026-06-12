@@ -84,6 +84,79 @@ class ClientSideExplorationOpportunitySummaryDict(
     is_pinned: bool
 
 
+class ClientSideTranslationOpportunityCardInfoDict(
+    opportunity_domain.TranslationOpportunityCardInfoDict
+):
+    """A dictionary representation of client side translation card data."""
+
+    translation_in_review_counts: Dict[str, int]
+    is_pinned: bool
+
+
+def _build_exp_id_to_translation_suggestion_in_review_count(
+    exp_ids: List[str], language_code: str
+) -> Dict[str, int]:
+    """Returns a dict mapping exploration IDs to in-review counts."""
+    if not exp_ids:
+        return {}
+
+    exp_id_to_in_review_count: Dict[str, int] = collections.defaultdict(int)
+    suggestions_in_review = (
+        suggestion_services.get_translation_suggestions_in_review_by_exp_ids(
+            exp_ids, language_code
+        )
+    )
+    for suggestion in suggestions_in_review:
+        if suggestion is not None:
+            exp_id_to_in_review_count[suggestion.target_id] += 1
+    return exp_id_to_in_review_count
+
+
+def _get_client_side_translation_opportunity_card_dicts(
+    opportunities: List[opportunity_domain.TranslationOpportunityCardInfo],
+    language_code: str,
+) -> List[ClientSideTranslationOpportunityCardInfoDict]:
+    """Returns translation opportunity card dicts with client-only metadata."""
+    exp_ids = [
+        opportunity.entity_id
+        for opportunity in opportunities
+        if opportunity.entity_type == feconf.ENTITY_TYPE_EXPLORATION
+    ]
+    exp_id_to_in_review_count = (
+        _build_exp_id_to_translation_suggestion_in_review_count(
+            exp_ids, language_code
+        )
+    )
+
+    opportunity_dicts: List[ClientSideTranslationOpportunityCardInfoDict] = []
+    for opportunity in opportunities:
+        base_opportunity_dict = opportunity.to_dict()
+        translation_in_review_counts = {}
+        if opportunity.entity_id in exp_id_to_in_review_count:
+            translation_in_review_counts = {
+                language_code: exp_id_to_in_review_count[opportunity.entity_id]
+            }
+        opportunity_dict: ClientSideTranslationOpportunityCardInfoDict = {
+            'topic_ids': base_opportunity_dict['topic_ids'],
+            'entity_id': base_opportunity_dict['entity_id'],
+            'content_count': base_opportunity_dict['content_count'],
+            'incomplete_translation_language_codes': base_opportunity_dict[
+                'incomplete_translation_language_codes'
+            ],
+            'translation_counts': base_opportunity_dict['translation_counts'],
+            'entity_type': base_opportunity_dict['entity_type'],
+            'topic_name': base_opportunity_dict['topic_name'],
+            'entity_description': base_opportunity_dict['entity_description'],
+            'currently_available_to_learners': base_opportunity_dict[
+                'currently_available_to_learners'
+            ],
+            'translation_in_review_counts': translation_in_review_counts,
+            'is_pinned': False,
+        }
+        opportunity_dicts.append(opportunity_dict)
+    return opportunity_dicts
+
+
 class ContributionOpportunitiesHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of ContributionOpportunitiesHandler's
     normalized_request dictionary.
@@ -311,7 +384,7 @@ class ContributionOpportunitiesHandler(
             exp_ids.append(opportunity_dict['id'])
             opportunity_dicts.append(opportunity_dict)
         exp_id_to_in_review_count = (
-            self._build_exp_id_to_translation_suggestion_in_review_count(
+            _build_exp_id_to_translation_suggestion_in_review_count(
                 exp_ids, language_code
             )
         )
@@ -322,28 +395,6 @@ class ContributionOpportunitiesHandler(
                     language_code: exp_id_to_in_review_count[exp_id]
                 }
         return opportunity_dicts, next_cursor, more
-
-    def _build_exp_id_to_translation_suggestion_in_review_count(
-        self, exp_ids: List[str], language_code: str
-    ) -> Dict[str, int]:
-        """Returns a dict mapping exploration IDs to in-review counts.
-
-        Args:
-            exp_ids: list(str). List of exploration IDs.
-            language_code: str. The translation language code.
-
-        Returns:
-            dict(str, int). Mapping from exploration IDs to the number of
-            translation suggestions in review.
-        """
-        exp_id_to_in_review_count: Dict[str, int] = collections.defaultdict(int)
-        suggestions_in_review = suggestion_services.get_translation_suggestions_in_review_by_exp_ids(
-            exp_ids, language_code
-        )
-        for suggestion in suggestions_in_review:
-            if suggestion is not None:
-                exp_id_to_in_review_count[suggestion.target_id] += 1
-        return exp_id_to_in_review_count
 
 
 class ContributionOpportunitiesHandlerV2NormalizedRequestDict(TypedDict):
@@ -408,7 +459,9 @@ class ContributionOpportunitiesHandlerV2(
                 entity_type, language_code, topic_name, cursor
             )
         )
-        opportunity_dicts = [opp.to_dict() for opp in opportunities]
+        opportunity_dicts = _get_client_side_translation_opportunity_card_dicts(
+            opportunities, language_code
+        )
 
         self.values = {
             'opportunities': opportunity_dicts,
@@ -639,12 +692,18 @@ class ReviewableOpportunitiesHandlerV2(
         language = self.normalized_request.get('language_code')
         entity_type = self.normalized_request['entity_type']
 
-        opportunity_dicts = []
+        opportunity_dicts: List[
+            ClientSideTranslationOpportunityCardInfoDict
+        ] = []
         if self.user_id:
-            for opp in self._get_reviewable_translation_opportunities(
+            opportunities = self._get_reviewable_translation_opportunities(
                 self.user_id, entity_type, topic_name, language
-            ):
-                opportunity_dicts.append(opp.to_dict())
+            )
+            opportunity_dicts = (
+                _get_client_side_translation_opportunity_card_dicts(
+                    opportunities, language if language is not None else ''
+                )
+            )
         self.values = {
             'opportunities': opportunity_dicts,
         }
@@ -688,7 +747,7 @@ class ReviewableOpportunitiesHandlerV2(
             language = ''
 
         opportunities = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
-            entity_type, in_review_suggestion_target_ids, language
+            entity_type, in_review_suggestion_target_ids
         )
 
         filtered_opportunities = []

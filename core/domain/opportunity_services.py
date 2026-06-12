@@ -1261,7 +1261,7 @@ def get_translation_opportunities_with_new_models(
         return [], cursor, more
 
     card_infos = _get_translation_opportunity_cards_from_models(
-        opportunity_models_list, entity_type, language_code
+        opportunity_models_list, entity_type
     )
 
     return card_infos, cursor, more
@@ -1272,7 +1272,6 @@ def _get_translation_opportunity_cards_from_models(
         opportunity_models.TranslationOpportunityModel
     ],
     entity_type: str,
-    language_code: str,
 ) -> List[opportunity_domain.TranslationOpportunityCardInfo]:
     """Returns a list of translation opportunity card info objects for the given
     list of models.
@@ -1280,7 +1279,6 @@ def _get_translation_opportunity_cards_from_models(
     Args:
         opportunity_models_list: list(TranslationOpportunityModel). The list of models.
         entity_type: str. The entity type.
-        language_code: str. The language code.
 
     Returns:
         list(TranslationOpportunityCardInfo). A list of TranslationOpportunityCardInfo.
@@ -1323,14 +1321,6 @@ def _get_translation_opportunity_cards_from_models(
     else:
         topics = topic_fetchers.get_topics_by_ids(entity_ids, strict=False)
         topic_map = {topic.id: topic for topic in topics if topic is not None}
-
-    in_review_counts = {}
-    if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-        in_review_counts = (
-            _build_exp_id_to_translation_suggestion_in_review_count(
-                entity_ids, language_code
-            )
-        )
 
     published_topic_ids = set()
     if entity_type == feconf.ENTITY_TYPE_TOPIC:
@@ -1410,14 +1400,8 @@ def _get_translation_opportunity_cards_from_models(
             entity_type=model.entity_type,
             topic_name=topic_name_val,
             entity_description=entity_description,
-            is_pinned=False,
             currently_available_to_learners=currently_available_to_learners,
         )
-
-        if model.entity_id in in_review_counts:
-            card_info.translation_in_review_counts = {
-                language_code: in_review_counts[model.entity_id]
-            }
 
         card_infos.append(card_info)
 
@@ -1427,7 +1411,6 @@ def _get_translation_opportunity_cards_from_models(
 def get_translation_opportunity_cards_by_entity_ids_with_new_models(
     entity_type: str,
     entity_ids: List[str],
-    language_code: str,
 ) -> List[opportunity_domain.TranslationOpportunityCardInfo]:
     """Returns a list of translation opportunity card info objects for the given
     entity IDs and type.
@@ -1435,7 +1418,6 @@ def get_translation_opportunity_cards_by_entity_ids_with_new_models(
     Args:
         entity_type: str. The entity type.
         entity_ids: list(str). The entity IDs.
-        language_code: str. The language code to filter by.
 
     Returns:
         list(TranslationOpportunityCardInfo). A list of TranslationOpportunityCardInfo domain objects.
@@ -1456,7 +1438,7 @@ def get_translation_opportunity_cards_by_entity_ids_with_new_models(
         return []
 
     return _get_translation_opportunity_cards_from_models(
-        opportunity_models_list, entity_type, language_code
+        opportunity_models_list, entity_type
     )
 
 

@@ -2115,48 +2115,6 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
-    def test_get_translation_opportunities_with_translations_in_review(
-        self,
-    ) -> None:
-        entity_types_and_ids = {
-            feconf.ENTITY_TYPE_EXPLORATION: ['exp_1'],
-        }
-        opportunity_services.create_translation_opportunity(
-            entity_types_and_ids
-        )
-
-        self.signup('suggester@example.com', 'suggester')
-        suggester_id = self.get_user_id_from_email('suggester@example.com')
-        change_dict = {
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'state_name': 'Introduction',
-            'content_id': 'content_0',
-            'language_code': 'hi',
-            'content_html': '<p>Content</p>',
-            'translation_html': '<p>Translation</p>',
-            'data_format': 'html',
-        }
-
-        exp = exp_fetchers.get_exploration_by_id('exp_1')
-
-        suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            'exp_1',
-            exp.version,
-            suggester_id,
-            change_dict,
-            'Translation suggestion',
-        )
-
-        cards, _, _ = (
-            opportunity_services.get_translation_opportunities_with_new_models(
-                feconf.ENTITY_TYPE_EXPLORATION, 'hi'
-            )
-        )
-        self.assertEqual(len(cards), 1)
-        self.assertIn('hi', cards[0].translation_in_review_counts)
-
     @test_utils.enable_feature_flags(
         [
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
@@ -2166,7 +2124,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
         self,
     ) -> None:
         cards = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
-            feconf.ENTITY_TYPE_EXPLORATION, [], 'hi'
+            feconf.ENTITY_TYPE_EXPLORATION, []
         )
         self.assertEqual(cards, [])
 
@@ -2179,7 +2137,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
         self,
     ) -> None:
         cards = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
-            feconf.ENTITY_TYPE_EXPLORATION, ['nonexistent'], 'hi'
+            feconf.ENTITY_TYPE_EXPLORATION, ['nonexistent']
         )
         self.assertEqual(cards, [])
 
@@ -2203,7 +2161,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
         # 1. Test Exploration entity type.
         cards = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
-            feconf.ENTITY_TYPE_EXPLORATION, ['exp_1'], 'hi'
+            feconf.ENTITY_TYPE_EXPLORATION, ['exp_1']
         )
         self.assertEqual(len(cards), 1)
         self.assertEqual(cards[0].entity_id, 'exp_1')
@@ -2212,7 +2170,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
         # 2. Test Story entity type.
         cards = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
-            feconf.ENTITY_TYPE_STORY, ['story_id_1'], 'hi'
+            feconf.ENTITY_TYPE_STORY, ['story_id_1']
         )
         self.assertEqual(len(cards), 1)
         self.assertEqual(cards[0].entity_id, 'story_id_1')
@@ -2221,7 +2179,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
         # 3. Test Skill entity type.
         cards = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
-            feconf.ENTITY_TYPE_SKILL, ['skill_id_1'], 'hi'
+            feconf.ENTITY_TYPE_SKILL, ['skill_id_1']
         )
         self.assertEqual(len(cards), 1)
         self.assertEqual(cards[0].entity_id, 'skill_id_1')
@@ -2230,7 +2188,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
         # 4. Test Topic entity type.
         cards = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
-            feconf.ENTITY_TYPE_TOPIC, ['topic_id_1'], 'hi'
+            feconf.ENTITY_TYPE_TOPIC, ['topic_id_1']
         )
         self.assertEqual(len(cards), 1)
         self.assertEqual(cards[0].entity_id, 'topic_id_1')
@@ -2290,7 +2248,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
         # Call with explorations including unmatched ones.
         # This will also hit exp_id not in entity_ids inside the mapping loop.
         cards = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
-            feconf.ENTITY_TYPE_EXPLORATION, ['exp_no_topic'], 'hi'
+            feconf.ENTITY_TYPE_EXPLORATION, ['exp_no_topic']
         )
         self.assertEqual(len(cards), 1)
         self.assertEqual(cards[0].entity_id, 'exp_no_topic')
@@ -2299,7 +2257,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
         # Call for unmatched story.
         cards = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
-            feconf.ENTITY_TYPE_STORY, ['story_no_topic'], 'hi'
+            feconf.ENTITY_TYPE_STORY, ['story_no_topic']
         )
         self.assertEqual(len(cards), 1)
         self.assertEqual(cards[0].entity_id, 'story_no_topic')
@@ -2308,7 +2266,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
         # Call for unmatched skill.
         cards = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
-            feconf.ENTITY_TYPE_SKILL, ['skill_no_topic'], 'hi'
+            feconf.ENTITY_TYPE_SKILL, ['skill_no_topic']
         )
         self.assertEqual(len(cards), 1)
         self.assertEqual(cards[0].entity_id, 'skill_no_topic')
@@ -2317,7 +2275,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
 
         # Call for unmatched topic.
         cards = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
-            feconf.ENTITY_TYPE_TOPIC, ['topic_no_topic'], 'hi'
+            feconf.ENTITY_TYPE_TOPIC, ['topic_no_topic']
         )
         self.assertEqual(len(cards), 1)
         self.assertEqual(cards[0].entity_id, 'topic_no_topic')
@@ -2345,7 +2303,7 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             lambda self, exp_id: None,
         ):
             cards = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
-                feconf.ENTITY_TYPE_EXPLORATION, ['exp_1'], 'hi'
+                feconf.ENTITY_TYPE_EXPLORATION, ['exp_1']
             )
         self.assertEqual(len(cards), 1)
         self.assertEqual(cards[0].entity_id, 'exp_1')
