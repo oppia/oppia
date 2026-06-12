@@ -52,6 +52,8 @@
     "src/environments/environment.prod.ts",
     "src/environments/environment.ts",
     "extensions/extensions.module.ts",
+    "core/templates/domain/feedback/feedback-backend-api.service.ts",
+    "core/templates/domain/feedback/feedback-screenshot-staging.service.ts",
     "core/templates/domain/state/state-version-history.model.ts",
     "core/templates/domain/utilities/classifier-file.model.ts",
     "extensions/visualizations/visualizationsRequires.ts",

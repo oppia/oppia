@@ -25,9 +25,16 @@ import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
   templateUrl: './edit-certificate-offering-page-root.component.html',
 })
 export class EditCertificateOfferingPageRootComponent extends BaseRootComponent {
+  certificateOfferingDashboardRoute =
+    '/' +
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CERTIFICATE_OFFERING_DASHBOARD
+      .ROUTE;
+
   title: string =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EDIT_CERTIFICATE_OFFERING.TITLE;
 
+  // TODO(#26274): Make the root-page meta tag contract readonly across BaseRootComponent
+  // and all subclasses, then remove this cast and align AppConstants META values.
   meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
     .EDIT_CERTIFICATE_OFFERING.META as unknown as Readonly<MetaTagData>[];
 }

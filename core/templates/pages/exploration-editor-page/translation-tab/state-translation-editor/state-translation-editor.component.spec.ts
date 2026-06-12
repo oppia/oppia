@@ -24,6 +24,7 @@ import {State} from 'domain/state/state.model';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {EditabilityService} from 'services/editability.service';
 import {ExternalSaveService} from 'services/external-save.service';
+import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {TranslationLanguageService} from '../services/translation-language.service';
 import {TranslationTabActiveContentIdService} from '../services/translation-tab-active-content-id.service';
 import {StateTranslationEditorComponent} from './state-translation-editor.component';
@@ -60,6 +61,7 @@ describe('State Translation Editor Component', () => {
   let explorationStatesService: ExplorationStatesService;
   let translationLanguageService: TranslationLanguageService;
   let externalSaveService: ExternalSaveService;
+  let externalRteSaveService: ExternalRteSaveService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationStatusService: TranslationStatusService;
   let state: State;
@@ -95,6 +97,7 @@ describe('State Translation Editor Component', () => {
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     externalSaveService = TestBed.inject(ExternalSaveService);
+    externalRteSaveService = TestBed.inject(ExternalRteSaveService);
     translationTabActiveContentIdService = TestBed.inject(
       TranslationTabActiveContentIdService
     );
@@ -288,6 +291,12 @@ describe('State Translation Editor Component', () => {
       spyOn(translationStatusService, 'refresh');
       component.onSaveTranslationButtonClicked();
       expect(translationStatusService.refresh).toHaveBeenCalled();
+    });
+
+    it('should emit onExternalRteSave before saving translation', () => {
+      spyOn(externalRteSaveService.onExternalRteSave, 'emit');
+      component.onSaveTranslationButtonClicked();
+      expect(externalRteSaveService.onExternalRteSave.emit).toHaveBeenCalled();
     });
   });
 

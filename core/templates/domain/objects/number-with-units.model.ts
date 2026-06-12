@@ -166,7 +166,10 @@ export class NumberWithUnits {
     } catch (parsingError) {}
   }
 
-  static fromRawInputString(rawInput: string): NumberWithUnits {
+  static fromRawInputString(
+    rawInput: string,
+    decimalSeparator: string = '.'
+  ): NumberWithUnits {
     rawInput = rawInput.trim();
     let type = '';
     let real = 0.0;
@@ -276,6 +279,11 @@ export class NumberWithUnits {
         fractionObj = Fraction.fromRawInputString(value);
       } else {
         type = 'real';
+        // Normalize locale-specific decimal separator to English decimal
+        // before parsing (e.g. Portuguese '1,2' becomes '1.2').
+        if (decimalSeparator !== '.') {
+          value = value.replace(decimalSeparator, '.');
+        }
         real = parseFloat(value);
       }
       if (units !== '') {
