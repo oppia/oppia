@@ -859,11 +859,15 @@ solicit_answer_details: false
             response.headers['Content-Disposition'],
             'attachment; filename=%s' % filename,
         )
-        zf_saved = zipfile.ZipFile(io.BytesIO(response.body))
-        self.assertEqual(
-            zf_saved.namelist(),
-            ['The title for ZIP download handler test.yaml'],
-        )
+        with zipfile.ZipFile(io.BytesIO(response.body)) as zf_saved:
+            self.assertEqual(
+                zf_saved.namelist(),
+                ['The title for ZIP download handler test.yaml'],
+            )
+            with zf_saved.open(
+                'The title for ZIP download handler test.yaml'
+            ) as f1:
+                saved_content = f1.read()
 
         # Load golden zip file.
         golden_zip_filepath = os.path.join(
@@ -872,16 +876,13 @@ solicit_answer_details: false
         )
         with open(golden_zip_filepath, 'rb', encoding=None) as f:
             golden_zipfile = f.read()
-        zf_gold = zipfile.ZipFile(io.BytesIO(golden_zipfile))
-        # Compare saved with golden file.
-        self.assertEqual(
-            zf_saved.open(
-                'The title for ZIP download handler test.yaml'
-            ).read(),
-            zf_gold.open(
+        with zipfile.ZipFile(io.BytesIO(golden_zipfile)) as zf_gold:
+            with zf_gold.open(
                 'The title for ZIP download handler test!.yaml'
-            ).read(),
-        )
+            ) as f2:
+                golden_content = f2.read()
+        # Compare saved with golden file.
+        self.assertEqual(saved_content, golden_content)
 
         # Check download to JSON.
         exp_services.update_exploration(
@@ -945,9 +946,8 @@ solicit_answer_details: false
             'attachment; filename=%s' % filename,
         )
 
-        zf_saved = zipfile.ZipFile(io.BytesIO(response.body))
-        self.assertEqual(zf_saved.namelist(), ['Hola.yaml'])
-
+        with zipfile.ZipFile(io.BytesIO(response.body)) as zf_saved:
+            self.assertEqual(zf_saved.namelist(), ['Hola.yaml'])
         self.logout()
 
     def test_exploration_download_handler_with_no_title(self) -> None:
@@ -976,8 +976,10 @@ solicit_answer_details: false
             'attachment; filename=%s' % filename,
         )
 
-        zf_saved = zipfile.ZipFile(io.BytesIO(response.body))
-        self.assertEqual(zf_saved.namelist(), ['Unpublished_exploration.yaml'])
+        with zipfile.ZipFile(io.BytesIO(response.body)) as zf_saved:
+            self.assertEqual(
+                zf_saved.namelist(), ['Unpublished_exploration.yaml']
+            )
 
         self.logout()
 

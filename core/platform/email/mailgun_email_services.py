@@ -178,21 +178,16 @@ def send_email_to_recipients(
         )
 
         # Adding attachments to the email.
-        files = (
-            [
-                (
-                    'attachment',
-                    (
-                        attachment['filename'],
-                        open(attachment['path'], 'rb', encoding=None),
-                    ),
-                )
-                for attachment in attachments
-            ]
-            if attachments
-            else []
-        )
-
+        files = []
+        if attachments:
+            for attachment in attachments:
+                with open(attachment['path'], 'rb', encoding=None) as file_obj:
+                    files.append(
+                        (
+                            'attachment',
+                            (attachment['filename'], file_obj.read()),
+                        )
+                    )
         response = requests.post(
             server,
             auth=('api', mailgun_api_key),
@@ -200,9 +195,6 @@ def send_email_to_recipients(
             files=(files or None),
             timeout=TIMEOUT_SECS,
         )
-
-        for _, (_, file_obj) in files:
-            file_obj.close()
 
         if response.status_code != 200:
             if 400 <= response.status_code < 500:
