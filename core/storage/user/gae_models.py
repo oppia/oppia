@@ -226,6 +226,7 @@ class UserSettingsModel(base_models.BaseModel):
                 'creator_dashboard_display_pref': base_models.EXPORT_POLICY.EXPORTED,
                 'first_contribution_msec': base_models.EXPORT_POLICY.EXPORTED,
                 'has_viewed_lesson_info_modal_once': base_models.EXPORT_POLICY.EXPORTED,
+                'profile_name': base_models.EXPORT_POLICY.EXPORTED,
                 # Pin is not exported since this is an auth mechanism.
                 'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 # The role is a deprecated field and doesn't contain any correct
@@ -325,6 +326,7 @@ class UserSettingsModel(base_models.BaseModel):
             'has_viewed_lesson_info_modal_once': (
                 user.has_viewed_lesson_info_modal_once
             ),
+            'profile_name': user.profile_name,
         }
 
     @classmethod

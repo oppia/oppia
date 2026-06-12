@@ -168,6 +168,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
                 'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'role': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'has_viewed_lesson_info_modal_once': base_models.EXPORT_POLICY.EXPORTED,
+                'profile_name': base_models.EXPORT_POLICY.EXPORTED,
             },
         )
 
@@ -316,6 +317,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'preferred_translation_language_code': None,
             'display_alias': None,
             'has_viewed_lesson_info_modal_once': False,
+            'profile_name': None,
         }
         self.assertEqual(expected_user_data, user_data)
 
@@ -349,6 +351,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             ),
             'display_alias': self.GENERIC_DISPLAY_ALIAS,
             'has_viewed_lesson_info_modal_once': False,
+            'profile_name': None,
         }
         self.assertEqual(expected_user_data, user_data)
 

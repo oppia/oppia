@@ -1664,25 +1664,6 @@ def update_profile_picture_data_url(
     fs.commit(filename_webp, webp_binary, mimetype='image/webp')
 
 
-def update_profile_name(user_id: str, profile_name: str) -> None:
-    """Sets the profile_name for the given user. Can only be set once.
-
-    Args:
-        user_id: str. The ID of the user.
-        profile_name: str. The real name to use in contributor certificates.
-
-    Raises:
-        Exception. The profile name has already been set.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    if user_settings.profile_name is not None:
-        raise Exception(
-            'Profile name has already been set and cannot be changed.'
-        )
-    user_settings.profile_name = profile_name
-    save_user_settings(user_settings)
-
-
 def add_user_role(user_id: str, role: str) -> None:
     """Updates the roles of the user with given user_id.
 
