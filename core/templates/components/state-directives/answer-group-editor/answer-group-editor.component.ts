@@ -78,7 +78,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   // specific interaction and rule.
   originalContentIdToContent!: Record<string, unknown>;
   activeRuleIndex!: number;
-  answerChoices: AnswerChoice[] | null = null;
+  answerChoices!: AnswerChoice[] | null;
   // The 'unknown' type is used here because 'editAnswerGroupForm' is a
   // generic container for form state, where keys are form control names
   // and values can be any type corresponding to the interaction's inputs.
