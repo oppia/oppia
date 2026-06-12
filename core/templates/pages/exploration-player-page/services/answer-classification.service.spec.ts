@@ -233,7 +233,7 @@ describe('Answer Classification Service', () => {
           state.name as string,
           state.interaction,
           '0',
-          {} as InteractionRulesService
+          null as unknown as InteractionRulesService
         )
       ).toThrowError(
         'No interactionRulesService was available to classify the answer.'
@@ -383,7 +383,7 @@ describe('Answer Classification Service', () => {
             state.name as string,
             state.interaction,
             '0',
-            {} as InteractionRulesService
+            null as unknown as InteractionRulesService
           )
         ).toThrowError(
           'No interactionRulesService was available to classify the answer.'
