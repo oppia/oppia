@@ -38,3 +38,53 @@ class CertificateAssessmentOfferingHandlerTest(test_utils.GenericTestBase):
         )
 
         self.assertEqual(response, {'certificate_id': 'dummy_id'})
+
+
+class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
+    """Tests class for CertificateAssessmentOfferingByIdHandler."""
+
+    def test_get_returns_stubbed_certificate_offering(self) -> None:
+        response = self.get_json(
+            feconf.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER.replace(
+                '<certificate_id>', 'dummy_id'
+            )
+        )
+
+        self.assertEqual(
+            response,
+            {
+                'certificate_offering': {
+                    'certificate_id': 'dummy_id',
+                    'title': 'Certificate Title',
+                    'description': '',
+                    'classroom_id': '',
+                    'topic_data': {},
+                    'total_questions': 0,
+                    'time_limit_in_minutes': 0,
+                    'async_status': 'Draft',
+                    'version': 1,
+                }
+            },
+        )
+
+    def test_put_returns_certificate_id(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            feconf.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER.replace(
+                '<certificate_id>', 'dummy_id'
+            ),
+            {},
+            csrf_token=csrf_token,
+        )
+
+        self.assertEqual(response, {'certificate_id': 'dummy_id'})
+
+    def test_delete_returns_empty_response(self) -> None:
+        response = self.delete_json(
+            feconf.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER.replace(
+                '<certificate_id>', 'dummy_id'
+            )
+        )
+
+        self.assertEqual(response, {})
