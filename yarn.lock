@@ -10099,9 +10099,9 @@ gtoken@^5.0.4:
     google-p12-pem "^3.1.3"
     jws "^4.0.0"
 
-"guppy-dev@git+https://github.com/oppia/guppy#2de64":
+"guppy-dev@git+https://github.com/oppia/guppy#2e8f7":
   version "2.0.0-rc.1"
-  resolved "git+https://github.com/oppia/guppy#2de6408a8dabbc137c192760ae44848c34a4b135"
+  resolved "git+https://github.com/oppia/guppy#2e8f7ab70d0d0b7778ac5b55cb59b2fcc46f7595"
 
 hammerjs@^2.0.8:
   version "2.0.8"

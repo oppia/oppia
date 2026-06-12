@@ -99,6 +99,11 @@ class FeatureNames(enum.Enum):
     ENABLE_FINANCIAL_LITERACY_CAMPAIGN_BANNER_TEST_MODE = (
         'enable_financial_literacy_campaign_banner_test_mode'
     )
+    ENABLE_CERTIFICATE_ASSESSMENT = 'enable_certificate_assessment'
+    WEB_GENERAL_FEEDBACK_MODAL_ENABLED = 'web_general_feedback_modal_enabled'
+    EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB = (
+        'exploration_editor_new_creator_feedback_tab'
+    )
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -126,6 +131,9 @@ DEV_FEATURES_LIST = [
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
     FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
+    FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT,
+    FeatureNames.WEB_GENERAL_FEEDBACK_MODAL_ENABLED,
+    FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -135,7 +143,6 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
-    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
@@ -172,6 +179,7 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
     FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST,
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
+    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
     FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
 ]
 
@@ -261,13 +269,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.PROD,
         )
     ),
-    FeatureNames.ENABLE_MULTIPLE_CLASSROOMS.value: (
-        (
-            'The flag enables flow for multiple classrooms '
-            'and makes the classrooms page available to learners.',
-            feature_flag_domain.ServerMode.TEST,
-        )
-    ),
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE.value: (
         (
             'This flag activates the redesigned topic viewer page'
@@ -342,6 +343,25 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag enables the financial literacy campaign banner for the fundraising campaign in test mode.',
             feature_flag_domain.ServerMode.TEST,
+        )
+    ),
+    FeatureNames.ENABLE_CERTIFICATE_ASSESSMENT.value: (
+        (
+            'Enables the certificate assessment feature, allowing curriculum admins to create certificate offerings and learners to take certificate assessments.',
+            feature_flag_domain.ServerMode.DEV,
+        )
+    ),
+    FeatureNames.WEB_GENERAL_FEEDBACK_MODAL_ENABLED.value: (
+        (
+            'This flag enables the global feedback entry button and feedback modal across web pages. ',
+            feature_flag_domain.ServerMode.DEV,
+        )
+    ),
+    FeatureNames.EXPLORATION_EDITOR_NEW_CREATOR_FEEDBACK_TAB.value: (
+        (
+            'This flag enables the new creator feedback tab experience in '
+            'the exploration editor along with the updated feedback updates page UI.',
+            feature_flag_domain.ServerMode.DEV,
         )
     ),
 }

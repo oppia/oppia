@@ -18,7 +18,11 @@
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
-import {EditableStoryBackendApiService} from 'domain/story/editable-story-backend-api.service';
+import {
+  EditableStoryBackendApiService,
+  STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
+  STORY_PUBLICATION_ACTION_PUBLISH,
+} from 'domain/story/editable-story-backend-api.service';
 import {StoryValidationService} from 'domain/story/story-validation.service';
 import {Story} from 'domain/story/story.model';
 import {StoryNode} from 'domain/story/story-node.model';
@@ -260,25 +264,30 @@ export class StoryEditorNavbarComponent implements OnInit {
   }
 
   publishStory(): void {
-    this.storyEditorStateService.changeStoryPublicationStatus(true, () => {
-      this.storyIsPublished = this.storyEditorStateService.isStoryPublished();
-    });
+    this.storyEditorStateService.changeStoryPublicationStatus(
+      STORY_PUBLICATION_ACTION_PUBLISH,
+      () => {
+        this.storyIsPublished = this.storyEditorStateService.isStoryPublished();
+      }
+    );
   }
 
   unpublishStory(): void {
     this.ngbModal
       .open(StoryEditorUnpublishModalComponent, {backdrop: 'static'})
       .result.then(
-        () => {
-          this.storyEditorStateService.changeStoryPublicationStatus(
-            false,
-            () => {
-              this.storyIsPublished =
-                this.storyEditorStateService.isStoryPublished();
-              this.forceValidateExplorations = true;
-              this._validateStory();
-            }
-          );
+        result => {
+          if (result?.mode) {
+            this.storyEditorStateService.changeStoryPublicationStatus(
+              result.mode,
+              () => {
+                this.storyIsPublished =
+                  this.storyEditorStateService.isStoryPublished();
+                this.forceValidateExplorations = true;
+                this._validateStory();
+              }
+            );
+          }
         },
         () => {
           // Note to developers:
@@ -318,7 +327,8 @@ export class StoryEditorNavbarComponent implements OnInit {
         }
         modalRef.componentInstance.unpublishedChapters = unpublishedChapters;
         modalRef.result.then(
-          unpublishingReason => {
+          result => {
+            const unpublishingReason = result?.reason;
             for (
               let i = Number(selectedChapterIndexInPublishUptoDropdown) + 1;
               i <= lastPublishedChapterIndex;
@@ -344,7 +354,7 @@ export class StoryEditorNavbarComponent implements OnInit {
             }
             if (Number(selectedChapterIndexInPublishUptoDropdown) === -1) {
               this.storyEditorStateService.changeStoryPublicationStatus(
-                false,
+                STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
                 () => {
                   this.storyIsPublished =
                     this.storyEditorStateService.isStoryPublished();

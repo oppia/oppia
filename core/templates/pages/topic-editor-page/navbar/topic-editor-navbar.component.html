@@ -1,17 +1,18 @@
 <ul class="oppia-navbar-desktop nav navbar-nav oppina-navbar-nav float-end"
     *ngIf="topic && topicRights.canEditTopic()">
   <li class="oppia-navbar-dropdown-menu d-inline-flex align-items-center">
-    <div class="d-inline-block position-relative">
-      <span [matTooltip]="getAllTopicWarnings()"
-            matTooltipClass="oppia-mat-tooltip-list"
-            [matTooltipDisabled]="isWarningTooltipDisabled()"
-            aria-label="List that shows issues preventing to save changes to the topic"
+    <div class="d-inline-block position-relative"
+      [matTooltip]="getAllTopicWarnings()"
+      matTooltipClass="oppia-mat-tooltip-list"
+      [matTooltipDisabled]="isWarningTooltipDisabled()">
+      <span aria-label="List that shows issues preventing to save changes to the topic"
             class="w-100">
         <button type="button"
                 class="btn btn-light oppia-save-changes-button e2e-test-save-topic-button float-start"
                 [ngClass]="{'btn-success': topicIsSaveable}"
                 (click)="saveChanges()"
-                [disabled]="!topicIsSaveable">
+                [disabled]="!topicIsSaveable"
+                [style.pointer-events]="!topicIsSaveable ? 'none' : 'auto'">
           <span *ngIf="!isSaveInProgress()">
             <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon oppia-topic-editor-save-icon"
                alt="Save Topic">
@@ -55,8 +56,8 @@
             *ngIf="!topicRights.isPublished()"
             class="btn btn-light oppia-editor-publish-button e2e-test-publish-topic-button"
             (click)="publishTopic()"
-            [ngClass]="{'btn-success': !isTopicSaveable() && getWarningsCount() === 0 && prepublishValidationIssues.length === 0}"
-            [disabled]="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
+            [ngClass]="{'btn-success': !topicIsSaveable && getWarningsCount() === 0 && prepublishValidationIssues.length === 0}"
+            [disabled]="topicIsSaveable || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
       <i class="fas fa-cloud-upload-alt md-18 md-dark oppia-save-publish-button-icon"
          alt="Publish to Oppia Library">
       </i>
@@ -68,7 +69,7 @@
             (click)="unpublishTopic()"
             *ngIf="topicRights.isPublished() && topicRights.canPublishTopic()"
             class="btn btn-light e2e-test-unpublish-topic-button"
-            [disabled]="isTopicSaveable()">
+            [disabled]="topicIsSaveable">
       Unpublish Topic
     </button>
   </li>
@@ -134,14 +135,14 @@
           <div *ngIf="!topicRights.isPublished()"
                class="e2e-test-mobile-publish-topic-button"
                (click)="publishTopic()"
-               [attr.disabled]="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
+               [attr.disabled]="topicIsSaveable || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
             <i class="fas fa-pen"></i>
             <span>Publish Topic</span>
           </div>
           <div (click)="unpublishTopic()"
                *ngIf="topicRights.isPublished() && topicRights.canPublishTopic()"
                class="e2e-test-mobile-unpublish-topic-button"
-               [attr.disabled]="isTopicSaveable()">
+               [attr.disabled]="topicIsSaveable">
             <i class="fas fa-pen"></i>
             <span>Unpublish Topic</span>
           </div>
