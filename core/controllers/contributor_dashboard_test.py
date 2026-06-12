@@ -239,6 +239,27 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(response['more'])
         self.assertIsInstance(response['next_cursor'], str)
 
+    def test_get_translation_opportunities_adds_in_review_counts(
+        self,
+    ) -> None:
+        suggestion = unittest.mock.Mock(target_id='0')
+        with unittest.mock.patch.object(
+            suggestion_services,
+            'get_translation_suggestions_in_review_by_exp_ids',
+            return_value=[None, suggestion],
+        ):
+            response = self.get_json(
+                '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+                params={'language_code': 'hi', 'topic_name': 'topic'},
+            )
+
+        expected_opportunity_dict_1 = self.expected_opportunity_dict_1.copy()
+        expected_opportunity_dict_1['translation_in_review_counts'] = {'hi': 1}
+        self.assertEqual(
+            response['opportunities'],
+            [expected_opportunity_dict_1, self.expected_opportunity_dict_2],
+        )
+
     def test_get_skill_opportunity_data_pagination(self) -> None:
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
