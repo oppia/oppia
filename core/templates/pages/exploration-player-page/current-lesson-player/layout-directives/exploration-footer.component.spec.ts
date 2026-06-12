@@ -53,7 +53,6 @@ import {EditableExplorationBackendApiService} from '../../../../domain/explorati
 import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {StateCard} from '../../../../domain/state_card/state-card.model';
-import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
 import {UserInfo} from '../../../../domain/user/user-info.model';
 import {QuestionPlayerEngineService} from '../../services/question-player-engine.service';
 import {UserService} from '../../../../services/user.service';
@@ -349,7 +348,6 @@ describe('ExplorationFooterComponent', () => {
             },
           },
         }),
-        RecordedVoiceovers.createEmpty(),
         'content'
       );
 
@@ -474,12 +472,10 @@ describe('ExplorationFooterComponent', () => {
     const stateCard = new StateCard(
       'End',
       '<p>Testing</p>',
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
+      '',
+      new Interaction([], [], {}, null, [], 'EndExploration', null),
       [],
-      null,
-      'content',
-      null
+      'content'
     );
 
     const endState = {
@@ -505,6 +501,7 @@ describe('ExplorationFooterComponent', () => {
         content_id: 'content',
         html: 'Congratulations, you have finished!',
       },
+      inapplicable_skill_misconception_ids: null,
     };
 
     component.expInfo = sampleExpInfo;
@@ -560,12 +557,10 @@ describe('ExplorationFooterComponent', () => {
     const stateCard = new StateCard(
       'End',
       '<p>Testing</p>',
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
+      '',
+      new Interaction([], [], {}, null, [], 'EndExploration', null),
       [],
-      null,
-      'content',
-      null
+      'content'
     );
 
     const endState = {
@@ -591,6 +586,7 @@ describe('ExplorationFooterComponent', () => {
         content_id: 'content',
         html: 'Congratulations, you have finished!',
       },
+      inapplicable_skill_misconception_ids: null,
     };
 
     component.expInfo = sampleExpInfo;
@@ -682,7 +678,7 @@ describe('ExplorationFooterComponent', () => {
       exploration: {
         init_state_name: 'Introduction',
         param_changes: [],
-        param_specs: null,
+        param_specs: {},
         title: 'Exploration',
         next_content_id_index: 5,
         language_code: 'en',
@@ -690,6 +686,7 @@ describe('ExplorationFooterComponent', () => {
         states: {
           Start: {
             classifier_model_id: null,
+            inapplicable_skill_misconception_ids: null,
             solicit_answer_details: false,
             interaction: {
               solution: null,
@@ -762,6 +759,7 @@ describe('ExplorationFooterComponent', () => {
           },
           End: {
             classifier_model_id: null,
+            inapplicable_skill_misconception_ids: null,
             solicit_answer_details: false,
             interaction: {
               solution: null,
@@ -786,6 +784,7 @@ describe('ExplorationFooterComponent', () => {
           },
           Mid: {
             classifier_model_id: null,
+            inapplicable_skill_misconception_ids: null,
             solicit_answer_details: false,
             interaction: {
               solution: null,
@@ -906,12 +905,10 @@ describe('ExplorationFooterComponent', () => {
     let stateCard = new StateCard(
       'End',
       '<p>Testing</p>',
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
+      '',
+      new Interaction([], [], {}, null, [], 'EndExploration', null),
       [],
-      null,
-      'content',
-      null
+      'content'
     );
 
     spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
@@ -970,6 +967,7 @@ describe('ExplorationFooterComponent', () => {
         content_id: 'content',
         html: 'Congratulations, you have finished!',
       },
+      inapplicable_skill_misconception_ids: null,
     };
     spyOn(explorationEngineService, 'getState').and.returnValue(
       State.createFromBackendDict('End', endState)
@@ -1027,8 +1025,7 @@ describe('ExplorationFooterComponent', () => {
       'State A',
       '<p>Content</p>',
       '<interaction></interaction>',
-      null,
-      RecordedVoiceovers.createEmpty(),
+      new Interaction([], [], {}, null, [], 'FractionInput', null),
       'content'
     );
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
@@ -1073,6 +1070,7 @@ describe('ExplorationFooterComponent', () => {
         param_changes: [],
         solicit_answer_details: false,
         card_is_checkpoint: true,
+        inapplicable_skill_misconception_ids: null,
       })
     );
 
@@ -1113,7 +1111,7 @@ describe('ExplorationFooterComponent', () => {
         init_state_name: 'Introduction',
         next_content_id_index: 5,
         param_changes: [],
-        param_specs: null,
+        param_specs: {},
         title: 'Exploration',
         language_code: 'en',
         objective: 'To learn',
@@ -1128,6 +1126,7 @@ describe('ExplorationFooterComponent', () => {
               html: '',
               content_id: 'content',
             },
+            inapplicable_skill_misconception_ids: null,
             interaction: {
               customization_args: {},
               answer_groups: [],
@@ -1204,7 +1203,7 @@ describe('ExplorationFooterComponent', () => {
       exploration: {
         init_state_name: 'Introduction',
         param_changes: [],
-        param_specs: null,
+        param_specs: {},
         title: 'Exploration',
         next_content_id_index: 5,
         language_code: 'en',
@@ -1220,6 +1219,7 @@ describe('ExplorationFooterComponent', () => {
               html: '',
               content_id: 'content',
             },
+            inapplicable_skill_misconception_ids: null,
             interaction: {
               customization_args: {},
               answer_groups: [],

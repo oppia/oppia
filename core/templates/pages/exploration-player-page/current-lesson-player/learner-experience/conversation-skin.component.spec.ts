@@ -89,6 +89,8 @@ import {ChapterProgressService} from '../../services/chapter-progress.service';
 import {CardAnimationService} from '../../services/card-animation.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {AuthService} from 'services/auth.service';
+import {CollectionPlaythrough} from '../../../../domain/collection/collection-playthrough.model';
+import {QuestionPlayerConfig} from './ratings-and-recommendations.component';
 class MockWindowRef {
   nativeWindow = {
     location: {
@@ -96,10 +98,13 @@ class MockWindowRef {
       reload: () => {},
     },
     onresize: () => {},
-    addEventListener(event: string, callback) {
+    addEventListener(
+      event: string,
+      callback: (event: {returnValue: null; preventDefault: () => void}) => void
+    ) {
       callback({returnValue: null, preventDefault: () => {}});
     },
-    scrollTo: (x, y) => {},
+    scrollTo: (x: number, y: number) => {},
   };
 }
 
@@ -156,13 +161,12 @@ describe('Conversation skin component', () => {
   let preventPageUnloadEventService: PreventPageUnloadEventService;
 
   let displayedCard = new StateCard(
-    null,
-    null,
-    null,
-    new Interaction([], [], null, null, [], '', null),
-    [],
     '',
-    null
+    '',
+    '',
+    new Interaction([], [], {}, null, [], '', null),
+    [],
+    ''
   );
 
   let explorationDict = {
@@ -170,6 +174,7 @@ describe('Conversation skin component', () => {
       Start: {
         classifier_model_id: null,
         solicit_answer_details: false,
+        inapplicable_skill_misconception_ids: [],
         interaction: {
           solution: null,
           confirmed_unclassified_answers: [],
@@ -242,6 +247,7 @@ describe('Conversation skin component', () => {
       End: {
         classifier_model_id: null,
         solicit_answer_details: false,
+        inapplicable_skill_misconception_ids: [],
         interaction: {
           solution: null,
           confirmed_unclassified_answers: [],
@@ -266,6 +272,7 @@ describe('Conversation skin component', () => {
       Mid: {
         classifier_model_id: null,
         solicit_answer_details: false,
+        inapplicable_skill_misconception_ids: [],
         interaction: {
           solution: null,
           confirmed_unclassified_answers: [],
@@ -345,7 +352,7 @@ describe('Conversation skin component', () => {
     init_state_name: 'Start',
     param_changes: [],
     next_content_id_index: 4,
-    param_specs: null,
+    param_specs: {},
     draft_changes: null,
   };
 
@@ -357,7 +364,7 @@ describe('Conversation skin component', () => {
     exploration: {
       init_state_name: 'Start',
       param_changes: [],
-      param_specs: null,
+      param_specs: {},
       title: 'Exploration',
       language_code: 'en',
       objective: 'To learn',
@@ -401,7 +408,7 @@ describe('Conversation skin component', () => {
     exploration: {
       init_state_name: 'Start',
       param_changes: [],
-      param_specs: null,
+      param_specs: {},
       title: 'Exploration',
       language_code: 'en',
       objective: 'To learn',
@@ -433,6 +440,9 @@ describe('Conversation skin component', () => {
     has_viewed_lesson_info_modal_once: false,
     furthest_reached_checkpoint_exp_version: 1,
     furthest_reached_checkpoint_state_name: 'End',
+    // This throws "Type 'null' is not assignable to type 'string'.". We need
+    // to suppress this error because the property can be null.
+    // @ts-expect-error
     most_recently_reached_checkpoint_state_name: null,
     most_recently_reached_checkpoint_exp_version: 2,
   };
@@ -565,7 +575,20 @@ describe('Conversation skin component', () => {
       readOnlyCollectionBackendApiService,
       'loadCollectionAsync'
     ).and.returnValue(
-      Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
+      Promise.resolve(
+        new Collection(
+          '',
+          '',
+          '',
+          '',
+          [],
+          CollectionPlaythrough.create(null, []),
+          '',
+          6,
+          8,
+          []
+        )
+      )
     );
     spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
     spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
@@ -659,13 +682,12 @@ describe('Conversation skin component', () => {
     ).and.returnValue(mockOnPlayerStateChange);
 
     const nextCard = new StateCard(
-      null,
-      null,
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
-      [],
       '',
-      null
+      '',
+      '',
+      new Interaction([], [], {}, null, [], 'EndExploration', null),
+      [],
+      ''
     );
     conversationFlowService.setNextStateCard(nextCard);
     componentInstance.isLoggedIn = false;
@@ -675,7 +697,9 @@ describe('Conversation skin component', () => {
 
     componentInstance.ngOnInit();
     tick();
-    windowRef.nativeWindow.onresize(null);
+    if (windowRef.nativeWindow.onresize) {
+      windowRef.nativeWindow.onresize(new UIEvent('resize'));
+    }
 
     mockOnNewCardOpened.emit(conversationFlowService.getNextStateCard());
     mockOnHintsExhausted.emit();
@@ -693,7 +717,9 @@ describe('Conversation skin component', () => {
     spyOn(alertsService, 'addWarning');
     componentInstance.ngOnInit();
 
-    windowRef.nativeWindow.onresize(null);
+    if (windowRef.nativeWindow.onresize) {
+      windowRef.nativeWindow.onresize(new UIEvent('resize'));
+    }
     tick(1000);
   }));
 
@@ -726,7 +752,20 @@ describe('Conversation skin component', () => {
       readOnlyCollectionBackendApiService,
       'loadCollectionAsync'
     ).and.returnValue(
-      Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
+      Promise.resolve(
+        new Collection(
+          '',
+          '',
+          '',
+          '',
+          [],
+          CollectionPlaythrough.create(null, []),
+          '',
+          6,
+          8,
+          []
+        )
+      )
     );
     spyOn(
       chapterProgressService,
@@ -812,13 +851,12 @@ describe('Conversation skin component', () => {
     ).and.returnValue(mockOnPlayerStateChange);
 
     const nextCard = new StateCard(
-      null,
-      null,
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
-      [],
       '',
-      null
+      '',
+      '',
+      new Interaction([], [], {}, null, [], 'EndExploration', null),
+      [],
+      ''
     );
     conversationFlowService.setNextStateCard(nextCard);
     componentInstance.isLoggedIn = true;
@@ -827,7 +865,9 @@ describe('Conversation skin component', () => {
     conversationFlowService.setDisplayedCard(displayedCard);
 
     componentInstance.ngOnInit();
-    windowRef.nativeWindow.onresize(null);
+    if (windowRef.nativeWindow.onresize) {
+      windowRef.nativeWindow.onresize(new UIEvent('resize'));
+    }
 
     // Tick has been used here because
     // the windowRef.nativeWindow.onresize function
@@ -867,7 +907,20 @@ describe('Conversation skin component', () => {
       readOnlyCollectionBackendApiService,
       'loadCollectionAsync'
     ).and.returnValue(
-      Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
+      Promise.resolve(
+        new Collection(
+          '',
+          '',
+          '',
+          '',
+          [],
+          CollectionPlaythrough.create(null, []),
+          '',
+          6,
+          8,
+          []
+        )
+      )
     );
     spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
@@ -948,13 +1001,12 @@ describe('Conversation skin component', () => {
     ).and.returnValue(mockOnPlayerStateChange);
 
     const nextCard = new StateCard(
-      null,
-      null,
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
-      [],
       '',
-      null
+      '',
+      '',
+      new Interaction([], [], {}, null, [], 'EndExploration', null),
+      [],
+      ''
     );
     conversationFlowService.setNextStateCard(nextCard);
     componentInstance.isLoggedIn = false;
@@ -963,7 +1015,9 @@ describe('Conversation skin component', () => {
     conversationFlowService.setDisplayedCard(displayedCard);
 
     componentInstance.ngOnInit();
-    windowRef.nativeWindow.onresize(null);
+    if (windowRef.nativeWindow.onresize) {
+      windowRef.nativeWindow.onresize(new UIEvent('resize'));
+    }
 
     // Tick has been used here because
     // the windowRef.nativeWindow.onresize function
@@ -1004,7 +1058,20 @@ describe('Conversation skin component', () => {
         readOnlyCollectionBackendApiService,
         'loadCollectionAsync'
       ).and.returnValue(
-        Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
+        Promise.resolve(
+          new Collection(
+            '',
+            '',
+            '',
+            '',
+            [],
+            CollectionPlaythrough.create(null, []),
+            '',
+            6,
+            8,
+            []
+          )
+        )
       );
       spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
       spyOn(urlService, 'isIframed').and.returnValue(isIframed);
@@ -1087,13 +1154,12 @@ describe('Conversation skin component', () => {
       spyOn(localStorageService, 'removeUniqueProgressIdOfLoggedOutLearner');
 
       const nextCard = new StateCard(
-        null,
-        null,
-        null,
-        new Interaction([], [], null, null, [], 'EndExploration', null),
-        [],
         '',
-        null
+        '',
+        '',
+        new Interaction([], [], {}, null, [], 'EndExploration', null),
+        [],
+        ''
       );
       conversationFlowService.setNextStateCard(nextCard);
       componentInstance.isLoggedIn = true;
@@ -1217,13 +1283,12 @@ describe('Conversation skin component', () => {
         false
       );
       const nextCardIfStuck = new StateCard(
-        null,
-        null,
-        null,
-        new Interaction([], [], null, null, [], 'EndExploration', null),
-        [],
         '',
-        null
+        '',
+        '',
+        new Interaction([], [], {}, null, [], 'EndExploration', null),
+        [],
+        ''
       );
 
       conversationFlowService.setNextCardIfStuck(nextCardIfStuck);
@@ -1284,13 +1349,12 @@ describe('Conversation skin component', () => {
         false
       );
       const nextCardIfStuck = new StateCard(
-        null,
-        null,
-        null,
-        new Interaction([], [], null, null, [], 'EndExploration', null),
-        [],
         '',
-        null
+        '',
+        '',
+        new Interaction([], [], {}, null, [], 'EndExploration', null),
+        [],
+        ''
       );
       conversationFlowService.setNextCardIfStuck(nextCardIfStuck);
       conversationFlowService.triggerIfLearnerStuckAction(false, () => {
@@ -1309,13 +1373,12 @@ describe('Conversation skin component', () => {
   it('should redirect the learner to stuck state', fakeAsync(() => {
     spyOn(conversationFlowService, 'showPendingCard');
     const nextCardIfStuck = new StateCard(
-      null,
-      null,
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
-      [],
       '',
-      null
+      '',
+      '',
+      new Interaction([], [], {}, null, [], 'EndExploration', null),
+      [],
+      ''
     );
 
     conversationFlowService.setNextCardIfStuck(nextCardIfStuck);
@@ -1340,11 +1403,10 @@ describe('Conversation skin component', () => {
           new StateCard(
             stateName,
             '<p>Testing</p>',
-            null,
-            new Interaction([], [], null, null, [], 'Continue', null),
+            '',
+            new Interaction([], [], {}, null, [], 'Continue', null),
             [],
-            'content',
-            null
+            'content'
           )
         );
       }
@@ -1361,7 +1423,7 @@ describe('Conversation skin component', () => {
       spyOn(playerPositionService, 'init').and.callFake(callb => {
         callb();
       });
-      componentInstance.questionPlayerConfig = {};
+      componentInstance.questionPlayerConfig = {} as QuestionPlayerConfig;
       spyOn(conversationFlowService.onPlayerStateChange, 'emit');
       spyOn(playerPositionService.onLoadedMostRecentCheckpoint, 'next');
       spyOn(focusManagerService, 'setFocusIfOnDesktop');
@@ -1549,6 +1611,24 @@ describe('Conversation skin component', () => {
       node_id: 'nodeId',
     });
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('story');
+    const mockExplorationSummary = new LearnerExplorationSummary(
+      'Math',
+      false,
+      'exp123',
+      'en',
+      100,
+      'Learn addition',
+      'public',
+      ['addition'],
+      '#F8BF74',
+      '/subjects/Math.svg',
+      'Addition Basics',
+      'exploration',
+      Date.now(),
+      Date.now() - 100000,
+      {5: 10, 4: 2, 3: 0, 2: 0, 1: 0},
+      {alice: {num_commits: 3}}
+    );
     let readOnlyStoryNode = new ReadOnlyStoryNode(
       'nodeId',
       '',
@@ -1559,8 +1639,9 @@ describe('Conversation skin component', () => {
       '',
       false,
       '',
-      null,
+      mockExplorationSummary,
       false,
+      '',
       '',
       ''
     );
@@ -1604,13 +1685,12 @@ describe('Conversation skin component', () => {
 
     conversationFlowService.setDisplayedCard(
       new StateCard(
-        null,
-        null,
-        null,
-        new Interaction([], [], null, null, [], 'EndExploration', null),
-        [],
         '',
-        null
+        '',
+        '',
+        new Interaction([], [], {}, null, [], 'EndExploration', null),
+        [],
+        ''
       )
     );
     spyOn(
@@ -1694,13 +1774,12 @@ describe('Conversation skin component', () => {
   it('should tell if display card is terminal', () => {
     conversationFlowService.setDisplayedCard(
       new StateCard(
-        null,
-        null,
-        null,
-        new Interaction([], [], null, null, [], 'EndExploration', null),
-        [],
         '',
-        null
+        '',
+        '',
+        new Interaction([], [], {}, null, [], 'EndExploration', null),
+        [],
+        ''
       )
     );
 
@@ -1771,7 +1850,7 @@ describe('Conversation skin component', () => {
         new UserInfo([], false, false, false, false, false, '', '', '', true)
       )
     );
-    componentInstance.questionPlayerConfig = {};
+    componentInstance.questionPlayerConfig = {} as QuestionPlayerConfig;
     spyOn(conversationFlowService.onPlayerStateChange, 'emit');
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
     spyOn(loaderService, 'hideLoadingScreen');
@@ -1853,17 +1932,19 @@ describe('Conversation skin component', () => {
   });
 
   it('should tell if supplemental nav is shown', () => {
-    conversationFlowService.setDisplayedCard(
-      new StateCard(
-        null,
-        null,
-        null,
-        new Interaction([], [], null, null, [], 'NumberWithUnits', null),
-        [],
-        '',
-        null
-      )
+    const card = new StateCard(
+      '',
+      '',
+      '',
+      new Interaction([], [], {}, null, [], 'NumberWithUnits', null),
+      [],
+      ''
     );
+    // This throws "Type 'null' is not assignable to type 'string'.". We need
+    // to suppress this error because the test requires a null state name.
+    // @ts-expect-error
+    card._stateName = null;
+    conversationFlowService.setDisplayedCard(card);
     spyOn(explorationModeService, 'isInQuestionMode').and.returnValues(
       false,
       true
@@ -1938,7 +2019,26 @@ describe('Conversation skin component', () => {
   });
 
   it('should get recommendation exploration summaries', () => {
-    const summaries = [{id: 1}];
+    const summaries = [
+      new LearnerExplorationSummary(
+        'Math',
+        false,
+        'exp123',
+        'en',
+        100,
+        'Learn addition',
+        'public',
+        ['addition'],
+        '#F8BF74',
+        '/subjects/Math.svg',
+        'Addition Basics',
+        'exploration',
+        Date.now(),
+        Date.now() - 100000,
+        {5: 10, 4: 2, 3: 0, 2: 0, 1: 0},
+        {alice: {num_commits: 3}}
+      ),
+    ];
     spyOn(
       conversationFlowService,
       'getRecommendedExplorationSummaries'
@@ -2111,13 +2211,12 @@ describe('Conversation skin component', () => {
       .and.returnValue(alertMessageElement);
 
     conversationFlowService.displayedCard = new StateCard(
-      null,
-      null,
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
-      [],
       '',
-      null
+      '',
+      '',
+      new Interaction([], [], {}, null, [], 'EndExploration', null),
+      [],
+      ''
     );
 
     conversationFlowService.showPendingCard();
