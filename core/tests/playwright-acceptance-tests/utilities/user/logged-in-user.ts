@@ -23,6 +23,7 @@ import {showMessage} from '../common/show-message';
 
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 
+const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
 const explorationCard = '.e2e-test-exploration-dashboard-card';
 const desktopLessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
@@ -67,7 +68,7 @@ export class LoggedInUser extends BaseUser {
         ? mobileLessonCardTitleSelector
         : desktopLessonCardTitleSelector;
 
-      await this.page.waitForSelector(lessonCardTitleSelector);
+      await this.expectElementToBeVisible(lessonCardTitleSelector);
       const lessonTitles = await this.page.$$eval(
         lessonCardTitleSelector,
         elements => elements.map(el => el.textContent?.trim())
@@ -80,9 +81,9 @@ export class LoggedInUser extends BaseUser {
       }
 
       if (isMobileViewport) {
-        await this.page.waitForSelector(learnerDashboardIconsSelector, {
-          state: 'attached',
-        });
+        await this.expectElementToBeAttachedInDOM(
+          learnerDashboardIconsSelector
+        );
         const iconContainers = await this.page.$$(
           learnerDashboardIconsSelector
         );
@@ -100,9 +101,7 @@ export class LoggedInUser extends BaseUser {
 
         await mobileAddToPlayLaterButtonElement?.click();
       } else {
-        await this.page.waitForSelector(desktopAddToPlayLaterButton, {
-          state: 'attached',
-        });
+        await this.expectElementToBeAttachedInDOM(desktopAddToPlayLaterButton);
         const addToPlayLaterButtons = await this.page.$$(
           desktopAddToPlayLaterButton
         );
@@ -131,10 +130,8 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToLearnerDashboard(): Promise<void> {
     await this.goto(learnerDashboardUrl);
-    await this.page.waitForFunction(
-      () => !document.body.innerText.includes('Loading...'),
-      {timeout: 30000}
-    );
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(homeTabSectionInLearnerDashboard);
   }
 
   /**
@@ -151,9 +148,7 @@ export class LoggedInUser extends BaseUser {
       return;
     }
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(explorationCard, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(explorationCard);
 
     const lessonCards = await this.page.$$(explorationCard);
     const lessonTitles = await Promise.all(
@@ -178,9 +173,7 @@ export class LoggedInUser extends BaseUser {
 
     await playLaterButton?.hover({force: true});
 
-    await this.page.waitForSelector('.tooltip', {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible('.tooltip');
 
     // Check the tooltip content.
     const tooltipText = await this.page.$eval('.tooltip', el => el.textContent);
@@ -193,13 +186,11 @@ export class LoggedInUser extends BaseUser {
   async navigateToCommunityLessonsSection(): Promise<void> {
     await this.waitForPageToFullyLoad();
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(progressSectionSelector);
+      await this.expectElementToBeVisible(progressSectionSelector);
       await this.clickOnElementWithSelector(progressSectionSelector);
 
       try {
-        await this.page.waitForSelector(mobileCommunityLessonSectionButton, {
-          timeout: 5000,
-        });
+        await this.expectElementToBeVisible(mobileCommunityLessonSectionButton);
       } catch (error) {
         if (error instanceof Error && error.message.includes('Timeout')) {
           // Try clicking again if does not opens the expected page.
@@ -210,15 +201,13 @@ export class LoggedInUser extends BaseUser {
       }
       await this.clickOnElementWithSelector(mobileCommunityLessonSectionButton);
     } else {
-      await this.page.waitForSelector(progressSectionSelector, {
-        state: 'visible',
-      });
-      await this.page.click(communityLessonsSectionButton);
+      await this.expectElementToBeVisible(progressSectionSelector);
+      await this.clickOnElementWithSelector(communityLessonsSectionButton);
     }
 
-    await this.page.waitForSelector(communityLessonsSectionInLearnerDashboard, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(
+      communityLessonsSectionInLearnerDashboard
+    );
   }
 
   /**
@@ -227,7 +216,7 @@ export class LoggedInUser extends BaseUser {
    */
   async playLessonFromDashboard(lessonName: string): Promise<void> {
     try {
-      await this.page.waitForSelector(lessonCardTitleSelector);
+      await this.expectElementToBeVisible(lessonCardTitleSelector);
       const searchResultsElements = await this.page.$$(lessonCardTitleSelector);
       const searchResults = await Promise.all(
         searchResultsElements.map(result =>
@@ -245,9 +234,7 @@ export class LoggedInUser extends BaseUser {
       );
       await searchResultsElements[lessonIndex].click();
 
-      await this.page.waitForSelector(lessonCardTitleSelector, {
-        state: 'hidden',
-      });
+      await this.expectElementToBeVisible(lessonCardTitleSelector, false);
     } catch (error) {
       const newError = new Error(
         `Failed to play lesson from dashboard: ${error}`
@@ -263,7 +250,7 @@ export class LoggedInUser extends BaseUser {
    */
   async removeLessonFromPlayLater(lessonName: string): Promise<void> {
     try {
-      await this.page.waitForSelector(lessonCardTitleInPlayLaterSelector);
+      await this.expectElementToBeVisible(lessonCardTitleInPlayLaterSelector);
       const lessonCards = await this.page.$$(
         lessonCardTitleInPlayLaterSelector
       );
@@ -287,7 +274,7 @@ export class LoggedInUser extends BaseUser {
       );
       await this.page.hover(lessonCardTitleInPlayLaterSelector);
 
-      await this.page.waitForSelector(removeFromPlayLaterButtonSelector);
+      await this.expectElementToBeVisible(removeFromPlayLaterButtonSelector);
       const removeFromPlayLaterButton = await this.page.$(
         removeFromPlayLaterButtonSelector
       );
@@ -296,9 +283,10 @@ export class LoggedInUser extends BaseUser {
       // Confirm removal.
       await this.clickOnElementWithSelector(confirmRemovalFromPlayLaterButton);
 
-      await this.page.waitForSelector(confirmRemovalFromPlayLaterButton, {
-        state: 'hidden',
-      });
+      await this.expectElementToBeVisible(
+        confirmRemovalFromPlayLaterButton,
+        false
+      );
 
       showMessage(`Lesson "${lessonName}" removed from 'Play Later' list.`);
     } catch (error) {
@@ -340,16 +328,12 @@ export class LoggedInUser extends BaseUser {
 
     await playLaterButton.click({force: true});
 
-    await this.page.waitForSelector(learnerPlaylistModalSelector, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(learnerPlaylistModalSelector);
 
     await this.isTextPresentOnPage("Remove from 'Play Later' list?");
 
     await this.clickOnElementWithSelector(confirmRemovalFromPlayLaterButton);
-    await this.page.waitForSelector(learnerPlaylistModalSelector, {
-      state: 'hidden',
-    });
+    await this.expectElementToBeVisible(learnerPlaylistModalSelector, false);
   }
 
   /**
@@ -363,7 +347,7 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     try {
       await this.waitForStaticAssetsToLoad();
-      await this.page.waitForSelector(playLaterSectionSelector);
+      await this.expectElementToBeVisible(playLaterSectionSelector);
       const lessonCards = await this.page.$$(
         lessonCardTitleInPlayLaterSelector
       );
