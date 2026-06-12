@@ -30,8 +30,6 @@ interface CertificateOfferingSummary {
   timeLabel: string;
   status: string;
 }
-
-import {DeleteCertificateOfferingModalComponent} from 'components/certificate-assessment-offering-helper/delete-certificate-offering-modal.component';
 @Component({
   selector: 'oppia-certificate-offering-dashboard-page',
   templateUrl: './certificate-offering-dashboard-page.component.html',
