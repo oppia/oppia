@@ -139,9 +139,44 @@ const goalCheckboxInRedesignedLearnerDashboard =
   '.oppia-learner-dash-goals-checkbox';
 
 // Learner Dashboard > Home Tab Selectors.
+const sidebarSelector = '.e2e-test-learner-dashboard-sidebar';
+const sidebarSelectorPic = '.e2e-test-learner-dash-sidebar-pic';
 const continueFromWhereLeftOffSectionInRedesignedDashboardSelector =
   '.e2e-test-continue-where-you-left-off';
+const classroomButtonOnRedesignedLearnerDashboard =
+  '.e2e-test-learner-dash-classroom-button';
 const learnSomethingNewSectionSelector = '.e2e-test-learner-dash-section';
+const learnerDashSelectors: Record<string, Record<string, string>> = {
+  tabSection: {
+    content: '.e2e-test-learner-dash-section',
+    heading: '.e2e-test-learner-dash-section-heading',
+  },
+  cardDisplay: {
+    content: '.e2e-test-card-display',
+    heading: '.e2e-test-card-display-heading',
+  },
+  topicCard: {
+    content: '.e2e-test-learner-topic-summary-tile',
+    heading: '.e2e-test-learner-topic-summary-tile-title',
+  },
+  lessonCard: {
+    content: '.e2e-test-redesigned-lesson-card-container',
+    heading: '.e2e-test-lesson-card-title',
+    button: '.e2e-test-resume-lesson-btn',
+    progress: '.e2e-test-progress-lesson',
+  },
+  skillCard: {
+    content: '.e2e-test-skill-card',
+    heading: '.e2e-test-skill-card-title',
+    button: '.e2e-test-skill-button',
+    progress: '.e2e-test-progress-skill',
+  },
+};
+const tabSelectorMap: Record<string, string> = {
+  Home: '.e2e-test-home-section',
+  Goals: '.e2e-test-goals-section',
+  Progress: '.e2e-test-progress-section',
+};
 
 const learnerGreetingsSelector = '.e2e-test-learner-greetings';
 
@@ -470,6 +505,158 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Function to verify the Or Explore All Lessons in Classroom section in the redesigned learner dashboard is present or not.
+   * @param {boolean} visible - Whether the section should be visible or not.
+   */
+  async expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      classroomButtonOnRedesignedLearnerDashboard,
+      visible
+    );
+  }
+
+  /**
+   * Verifies elements' existence on Redesigned Learner Dashboard(learnerDashSelectors).
+   * @param {string[]} expectedTexts - Text content expected in elements.
+   * @param {string} selector - Selector type.
+   * @param {ParentNode} root - Page or element type we're verifying.
+   */
+  async expectElementsToBePresentInRLD(
+    expectedTexts: string[],
+    selector: string,
+    root: Page | ElementHandle | undefined = this.page
+  ): Promise<void> {
+    await this.page.waitForSelector(learnerDashSelectors[selector].heading);
+
+    const allElements =
+      (await root?.$$(learnerDashSelectors[selector].heading)) ?? [];
+
+    const sectionHeadingTexts: string[] = [];
+    for (const el of allElements) {
+      const isHidden = await el.evaluate(node => {
+        const style = window.getComputedStyle(node as HTMLElement);
+        return style.display === 'none' || style.visibility === 'hidden';
+      });
+      if (isHidden) {
+        continue;
+      }
+
+      const text = await el.evaluate(e => (e.textContent || '').trim());
+      if (text) {
+        sectionHeadingTexts.push(text);
+      }
+    }
+
+    const allExpectedElementsFound = expectedTexts.every(expectedText =>
+      sectionHeadingTexts.includes(expectedText)
+    );
+    if (!allExpectedElementsFound) {
+      throw new Error(
+        `Expected elements not found: ${expectedTexts.join(
+          ', '
+        )} sectionHeadingTexts: ${sectionHeadingTexts.join(', ')}`
+      );
+    }
+    showMessage(`Expected elements found: ${expectedTexts.join(', ')}`);
+  }
+
+  /**
+   * Verifies that elements with the given texts DO NOT exist (or are not visible)
+   * for the given selector group of Learner Dashboard (learnerDashSelectors).
+   *
+   * @param expectedTexts - Texts that must NOT appear in the matched elements.
+   * @param selector - Selector type..
+   * @param root - Page or element type we're verifying.
+   */
+  async expectElementsNotToBePresentInRLD(
+    expectedTexts: string[],
+    selectorKey: string,
+    root: Page | ElementHandle | undefined = this.page
+  ): Promise<void> {
+    const selectors = learnerDashSelectors[selectorKey];
+    const headingSelector = selectors.heading;
+    const allElements = (await root?.$$(headingSelector)) ?? [];
+
+    const sectionHeadingTexts: string[] = [];
+    for (const el of allElements) {
+      const isHidden = await el.evaluate(node => {
+        const style = window.getComputedStyle(node as HTMLElement);
+        return style.display === 'none' || style.visibility === 'hidden';
+      });
+      if (isHidden) {
+        continue;
+      }
+
+      const text = await el.evaluate(e => (e.textContent || '').trim());
+      if (text) {
+        sectionHeadingTexts.push(text);
+      }
+    }
+
+    const foundUnexpected = expectedTexts.filter(text =>
+      sectionHeadingTexts.includes(text)
+    );
+
+    if (foundUnexpected.length > 0) {
+      throw new Error(
+        `Unexpected elements found: ${foundUnexpected.join(
+          ', '
+        )} sectionHeadingTexts: ${sectionHeadingTexts.join(', ')}`
+      );
+    }
+
+    showMessage(`Confirmed elements not present: ${expectedTexts.join(', ')}`);
+  }
+
+  /**
+   * Verifies lesson card titles and their progress inside a subsection.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string[]} expectedTitles - Lesson card titles expected.
+   *  @param {number} progress - Expected numeric progress (e.g. 20 for 20%).
+   * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
+   */
+  async expectLessonCardProgressToBe(
+    criteria: string,
+    expectedTitles: string[],
+    progress: number,
+    section: string = 'N/A'
+  ): Promise<void> {
+    const subsectionElement = await this.findSubsectionElementBasedOnTitle(
+      criteria,
+      section
+    );
+
+    await this.expectElementsToBePresentInRLD(
+      expectedTitles,
+      'lessonCard',
+      subsectionElement
+    );
+
+    for (const title of expectedTitles) {
+      const lessonCardElement = await this.findChildElementInParent(
+        subsectionElement,
+        learnerDashSelectors.lessonCard,
+        title
+      );
+      if (!lessonCardElement) {
+        throw new Error(`Lesson card with title "${title}" was not found.`);
+      }
+
+      const progressText = await lessonCardElement.$eval(
+        learnerDashSelectors.lessonCard.progress,
+        el => el.textContent?.trim() || ''
+      );
+
+      const match = progressText.match(/\d+/);
+      const numericProgress = match ? parseInt(match[0], 10) : NaN;
+
+      expect(numericProgress).toBe(progress);
+    }
+  }
+
+  /**
    * Checks if the profile dropdown contains the given element.
    * @param item The element to check for.
    * @param visible - Whether the element should be visible or not.
@@ -514,6 +701,35 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Verifies that the desktop sidebar is visible and the given tab is active.
+   * @param {('Home' | 'Goals' | 'Progress')} activeTab - The tab that should be active.
+   */
+  async expectSidebarTabToBeActiveAndContainButtonsInOrder(
+    activeTab: 'Home' | 'Goals' | 'Progress'
+  ): Promise<void> {
+    await this.page.waitForSelector(sidebarSelector, {state: 'visible'});
+
+    await this.isElementVisible(sidebarSelectorPic, true);
+    const buttonTexts = await this.page.$$eval(
+      `${sidebarSelector} .oppia-learner-dash-sidebar_btn`,
+      els => els.map(el => el.textContent?.trim() || '')
+    );
+
+    expect(buttonTexts).toHaveLength(3);
+    expect(buttonTexts[0]).toBe('Home');
+    expect(buttonTexts[1]).toBe('Goals');
+    expect(buttonTexts[2]).toBe('Progress');
+
+    const activeSelector = `${sidebarSelector} ${tabSelectorMap[activeTab]}`;
+
+    const isActive = await this.page.$eval(activeSelector, el =>
+      el.classList.contains('oppia-learner-dash-sidebar_btn--active')
+    );
+
+    expect(isActive).toBe(true);
+  }
+
+  /**
    * Expects the user's subject interests to match a certain list.
    * @param {string[]} expectedInterests - The expected list of interests.
    */
@@ -538,6 +754,21 @@ export class LoggedInUser extends BaseUser {
       newError.stack = (error as Error).stack;
       throw newError;
     }
+  }
+
+  /**
+   * Verifies user is on correct lesson page.
+   * @param {string} lessonTitle - Lesson card title expected.
+   * @param {string} lessonId - Lesson card id expected.
+   */
+  async expectToBeOnLessonPage(
+    lessonTitle: string,
+    lessonId: string
+  ): Promise<void> {
+    expect(`/explore/${lessonId}`.toLowerCase()).toBe(
+      new URL(this.page.url()).pathname.toLowerCase()
+    );
+    showMessage(`Navigated to ${lessonTitle}`);
   }
 
   /**
@@ -598,6 +829,73 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Gets subsection element based on title. We need to differentiate parent elements
+   * in progress tab because the subsections are titled the same.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string} section - Overarching section.
+   */
+  async findSubsectionElementBasedOnTitle(
+    criteria: string,
+    section: string = 'N/A'
+  ): Promise<ElementHandle | undefined> {
+    let sectionElement: Page | ElementHandle | undefined = this.page;
+    if (section === 'In Progress' || section === 'Completed') {
+      try {
+        sectionElement = await this.findChildElementInParent(
+          this.page,
+          learnerDashSelectors.tabSection,
+          section
+        );
+      } catch (e) {
+        showMessage(
+          `Section "${section}" not found with tabSection; falling back to page.`
+        );
+        sectionElement = this.page;
+      }
+    }
+
+    const subsectionElement = await this.findChildElementInParent(
+      sectionElement,
+      learnerDashSelectors.cardDisplay,
+      criteria
+    );
+
+    return subsectionElement;
+  }
+
+  /**
+   * Navigate to any classroom using button in topics available in classroom section.
+   * Currently there is only math.
+   * @param {string} classroom - Classroom.
+   */
+  async navigateToClassroomFromLearnerDashboard(
+    classroom: string
+  ): Promise<void> {
+    await this.isElementVisible(
+      classroomButtonOnRedesignedLearnerDashboard,
+      true
+    );
+    let targetHref = '';
+    const allClassroomButtonElements = await this.page.$$(
+      classroomButtonOnRedesignedLearnerDashboard
+    );
+    for (const buttonElement of allClassroomButtonElements) {
+      const buttonHref = await buttonElement.evaluate(ele =>
+        ele.getAttribute('href')
+      );
+      if (buttonHref?.includes(classroom)) {
+        targetHref = buttonHref;
+        await buttonElement.click();
+        await this.page.waitForNavigation({waitUntil: 'networkidle'});
+        break;
+      }
+    }
+    if (!targetHref) {
+      throw new Error(`${classroom} is not a valid classroom`);
+    }
+  }
+
+  /**
    * Navigates to the learner dashboard.
    */
   async navigateToLearnerDashboard(): Promise<void> {
@@ -627,6 +925,43 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
       state: 'attached',
     });
+  }
+
+  /**
+   * Navigates to lesson using lesson card.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string} lessonTitle - Lesson card title expected.
+   * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
+   */
+  async navigateToLessonByCard(
+    criteria: string,
+    lessonTitle: string,
+    section: string = 'N/A'
+  ): Promise<void> {
+    const subsectionElement = await this.findSubsectionElementBasedOnTitle(
+      criteria,
+      section
+    );
+
+    const lessonCardElement = await this.findChildElementInParent(
+      subsectionElement,
+      learnerDashSelectors.lessonCard,
+      lessonTitle
+    );
+
+    if (lessonCardElement) {
+      const lessonCardButtonElement = await lessonCardElement.$(
+        learnerDashSelectors.lessonCard.button
+      );
+      if (lessonCardButtonElement) {
+        await lessonCardButtonElement.click();
+        await this.page.waitForNavigation({waitUntil: 'networkidle'});
+      }
+    } else {
+      throw new Error(
+        `${lessonTitle} is not a valid lesson in ${criteria} of ${section} section`
+      );
+    }
   }
 
   /**
@@ -733,6 +1068,38 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToTopicsAndSkillsDashboardPage(): Promise<void> {
     await this.goto(topicsAndSkillsDashboardUrl);
+  }
+
+  /**
+   * Navigate directly to topic in math classroom using topic card.
+   * @param {string} topic - Classroom topic.
+   */
+  async navigateToTopicPageByCard(topic: string): Promise<void> {
+    await this.page.waitForFunction((c: string) => {
+      return Array.from(document.querySelectorAll(c))
+        .map(h => h.textContent?.trim())
+        .includes("Topics available in Oppia's Classroom");
+    }, learnerDashSelectors.cardDisplay.heading);
+
+    const topicsAvailableInClassroomElement =
+      await this.findChildElementInParent(
+        this.page,
+        learnerDashSelectors.cardDisplay,
+        "Topics available in Oppia's Classroom"
+      );
+
+    const topicCardElement = await this.findChildElementInParent(
+      topicsAvailableInClassroomElement,
+      learnerDashSelectors.topicCard,
+      topic
+    );
+
+    if (topicCardElement) {
+      await topicCardElement.click();
+      await this.page.waitForNavigation({waitUntil: 'networkidle'});
+    } else {
+      throw new Error(`${topic} is not a valid topic`);
+    }
   }
 
   /**
