@@ -314,7 +314,7 @@ describe('Editor state service', () => {
     ]);
     expect(
       ecs.getAnswerChoices(
-        'TextInput',
+        'DragAndDropSortInput',
         customizationArgsForItemSelectionAndDragAndDropInput
       )
     ).toEqual(null);
