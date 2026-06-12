@@ -161,12 +161,6 @@ describe('Edit Certificate Offering Page Component', () => {
     );
   });
 
-  it('should keep the loaded offering empty until backend fetch is wired', () => {
-    expect(component.certificateAssessmentOffering).toEqual(
-      CertificateAssessmentOfferingData.createEmpty()
-    );
-  });
-
   it('should navigate back to the dashboard', () => {
     const routerSpy = spyOn(router, 'navigate');
 

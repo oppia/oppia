@@ -20,6 +20,7 @@ handler arguments.
 
 from __future__ import annotations
 
+import re
 import urllib.parse
 
 from core import feconf, utils
@@ -30,6 +31,7 @@ from core.domain import (
     blog_services,
     change_domain,
     exp_domain,
+    general_feedback_domain,
     image_validation_services,
     improvements_domain,
     platform_parameter_domain,
@@ -704,16 +706,13 @@ def validate_general_feedback_session_info_log_entries(
 # Here we use object because session-info diagnostics are heterogeneous
 # JSON-like payloads (nested dict/list values) from client logs.
 def validate_general_feedback_submit_payload_coupling(
-    payload: Dict[str, object],
-) -> Dict[str, object]:
+    payload: general_feedback_domain.GeneralFeedbackNormalizedSubmitPayloadDict,
+) -> None:
     """Validates the coupling between different fields of the payload for
     feedback submission.
 
     Args:
         payload: dict. The payload to be validated.
-
-    Returns:
-        dict. The validated payload.
     """
     include_session_info = bool(payload.get('include_session_info'))
     session_info = payload.get('session_info')
@@ -721,4 +720,94 @@ def validate_general_feedback_submit_payload_coupling(
         raise base.BaseHandler.InvalidInputException(
             'Session info must be provided if include_session_info is True.'
         )
-    return payload
+
+    if not include_session_info and session_info is not None:
+        raise base.BaseHandler.InvalidInputException(
+            'Session info should not be provided when '
+            'include_session_info is False.'
+        )
+
+    description = payload.get('description')
+    if not isinstance(description, str) or not description.strip():
+        raise base.BaseHandler.InvalidInputException('Description is required.')
+
+    category = payload.get('category')
+    target_type = payload.get('target_type')
+    target_id = payload.get('target_id')
+
+    if category == 'lesson':
+        if target_type != 'exploration':
+            raise base.BaseHandler.InvalidInputException(
+                'Lesson feedback requires target_type=exploration.'
+            )
+
+        if not target_id:
+            raise base.BaseHandler.InvalidInputException(
+                'Lesson feedback requires target_id.'
+            )
+
+    elif category == 'platform':
+        if target_type != 'general':
+            raise base.BaseHandler.InvalidInputException(
+                'Platform feedback requires target_type=general.'
+            )
+
+        if target_id is not None:
+            raise base.BaseHandler.InvalidInputException(
+                'Platform feedback should not specify target_id.'
+            )
+
+    screenshot_filename = payload.get('screenshot_filename')
+    screenshot_file = payload.get('screenshot_file')
+
+    if screenshot_filename is None and screenshot_file:
+        raise base.BaseHandler.InvalidInputException(
+            'Screenshot file requires a screenshot filename.'
+        )
+
+    if screenshot_filename is not None and screenshot_file is None:
+        raise base.BaseHandler.InvalidInputException(
+            'Screenshot filename requires screenshot file data.'
+        )
+
+    if (
+        screenshot_filename is not None
+        and isinstance(screenshot_filename, str)
+        and re.fullmatch(
+            utils.get_image_filename_regex_pattern(),
+            screenshot_filename,
+        )
+        is None
+    ):
+        raise base.BaseHandler.InvalidInputException(
+            'Screenshot filename is invalid.'
+        )
+
+
+def validate_general_feedback_screenshot_file(
+    screenshot_file: Optional[Dict[str, str]],
+) -> Optional[Dict[str, str]]:
+    """Validates the screenshot file.
+
+    Args:
+        screenshot_file: dict. The screenshot file to be validated.
+
+    Returns:
+        dict. The validated screenshot file.
+    """
+    if screenshot_file is None:
+        return None
+
+    files = screenshot_file
+
+    if len(files) > 1:
+        raise utils.ValidationError('Only one screenshot file is allowed.')
+
+    for filename, encoded_data in files.items():
+        if not isinstance(filename, str):
+            raise utils.ValidationError('Filename should be a string.')
+
+        if not isinstance(encoded_data, str):
+            raise utils.ValidationError('Screenshot data should be a string.')
+
+    return files
