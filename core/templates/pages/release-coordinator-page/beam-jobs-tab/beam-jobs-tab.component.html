@@ -90,14 +90,11 @@
             <a *ngIf="jobRun.isFailed()"
                mat-raised-button
                color="primary"
-               [href]="jobRun.getDataflowUrl()"
+               [disabled]="!jobRun.dataflowJobId"
+               [attr.href]="jobRun.dataflowJobId ? jobRun.getDataflowUrl() : null"
                target="_blank"
-               rel="noopener">
-              <i *ngIf="!jobRun.dataflowJobId"
-                 class="material-icons oppia-dataflow-warning-icon"
-                 matTooltip="A specific link could not be provided because the job ID could not be found in the logs.">
-                &#xE002;
-              </i>
+               rel="noopener"
+               [matTooltip]="!jobRun.dataflowJobId ? 'Dataflow view not available for synchronous jobs.' : ''">
               View on Dataflow
             </a>
           </div>

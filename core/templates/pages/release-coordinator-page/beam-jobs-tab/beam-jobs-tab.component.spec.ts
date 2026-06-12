@@ -297,11 +297,10 @@ describe('Beam Jobs Tab Component', () => {
     const cancellingFooJob = new BeamJobRun(
       '123',
       'FooJob',
-      'CANCELLING',
+      'CANCELLED',
       0,
       0,
-      false,
-      null
+      false
     );
     const cancelBeamJobRunSpy = spyOn(
       backendApiService,
@@ -369,6 +368,52 @@ describe('Beam Jobs Tab Component', () => {
     expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
 
     component.ngOnDestroy();
+  });
+
+  it('should display View on Dataflow button for jobs with dataflowJobId', async () => {
+    const autocomplete = await loader.getHarness(MatAutocompleteHarness);
+    const input = await loader.getHarness(MatInputHarness);
+
+    const failedAsyncJob = new BeamJobRun(
+      '123',
+      'FooJob',
+      'FAILED',
+      0,
+      0,
+      false,
+      'xyz-123'
+    );
+    component.beamJobRuns.next([failedAsyncJob]);
+
+    await input.setValue('FooJob');
+    await autocomplete.selectOption({text: 'FooJob'});
+    fixture.detectChanges();
+
+    const dataflowLink =
+      fixture.nativeElement.querySelector('a[target="_blank"]');
+    expect(dataflowLink).toBeTruthy();
+    expect(dataflowLink.getAttribute('disabled')).toBeNull();
+    expect(dataflowLink.getAttribute('href')).toContain(
+      failedAsyncJob.getDataflowUrl()
+    );
+  });
+
+  it('should have disabled Dataflow button for jobs without dataflowJobId', async () => {
+    const autocomplete = await loader.getHarness(MatAutocompleteHarness);
+    const input = await loader.getHarness(MatInputHarness);
+
+    const failedSyncJob = new BeamJobRun('123', 'FooJob', 'FAILED', 0, 0, true);
+    component.beamJobRuns.next([failedSyncJob]);
+
+    await input.setValue('FooJob');
+    await autocomplete.selectOption({text: 'FooJob'});
+    fixture.detectChanges();
+
+    const dataflowLink =
+      fixture.nativeElement.querySelector('a[target="_blank"]');
+    expect(dataflowLink).toBeTruthy();
+    expect(dataflowLink.getAttribute('disabled')).toEqual('true');
+    expect(dataflowLink.getAttribute('href')).toBeNull();
   });
 
   it('should refresh the beam job runs every 15 seconds', fakeAsync(() => {

@@ -150,6 +150,17 @@ class BeamJobRun:
             'dataflow_job_id': self.dataflow_job_id,
         }
 
+    def validate(self) -> None:
+        """Validates the BeamJobRun object."""
+        if self.job_is_synchronous and self.dataflow_job_id is not None:
+            raise utils.ValidationError(
+                'Synchronous jobs cannot have a dataflow job ID.'
+            )
+        if not self.job_is_synchronous and self.dataflow_job_id is None:
+            raise utils.ValidationError(
+                'Asynchronous jobs must have a dataflow job ID.'
+            )
+
 
 class AggregateBeamJobRunResult:
     """Encapsulates the complete result of an Apache Beam job run.
