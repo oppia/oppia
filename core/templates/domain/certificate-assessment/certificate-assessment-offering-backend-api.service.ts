@@ -69,6 +69,7 @@ export class CertificateAssessmentOfferingBackendApiService {
     certificateAssessmentOffering: CertificateAssessmentOfferingData
   ): Promise<string> {
     return new Promise((resolve, reject) => {
+      // TODO(#26217-M1.12): Pass the certificate assessment offering payload once the backend update handler supports it.
       this.http
         .put<UpdateCertificateOfferingBackendResponse>(
           this.getCertificateOfferingByIdHandlerUrl(certificateId),
