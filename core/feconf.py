@@ -937,6 +937,7 @@ CONTRIBUTOR_OPPORTUNITIES_DATA_V2_URL = '/opportunitieshandlerv2'
 PINNED_OPPORTUNITIES_URL = '/pinned-opportunities'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator-dashboard'
+CREATOR_FEEDBACK_HANDLER_URL = '/creator_feedback_handler'
 CSRF_HANDLER_URL = '/csrfhandler'
 CUSTOM_NONPROFITS_LANDING_PAGE_URL = '/nonprofits'
 CUSTOM_PARENTS_LANDING_PAGE_URL = '/parents'
@@ -1133,6 +1134,9 @@ REGENERATE_VOICEOVERS_FOR_EXPLORATION_URL = (
 
 CERTIFICATE_ASSESSMENT_OFFERING_HANDLER = (
     '/certificate_assessment_offering_handler'
+)
+CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER = (
+    '/certificate_assessment_offering_handler/<certificate_id>'
 )
 
 # Event types.

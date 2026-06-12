@@ -98,7 +98,7 @@ runs:
       shell: bash
       run: |
         ls /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance/** \
-        || ls core/tests/playwright-acceptance-tests/test-results/ \
+        || ls /home/runner/work/oppia/oppia_full_stack_test_playwright_results/ \
         || echo "No video recordings and test results found."
 
     - name: Upload test recordings
@@ -118,5 +118,5 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: playwright-results_${{ inputs.modified-suite-name-for-uploads }}
-        path: core/tests/playwright-acceptance-tests/test-results/
+        path: /home/runner/work/oppia/oppia_full_stack_test_playwright_results/
         if-no-files-found: warn
