@@ -12,10 +12,7 @@
         <strong>Your certificate link:</strong>
         <a [href]="certificateUrl" target="_blank" rel="noopener">{{ certificateUrl }}</a>
         &nbsp;
-        <button
-          type="button"
-          class="oppia-copy-link-button"
-          (click)="copyCertificateUrl()"
+        <button type="button" class="oppia-copy-link-button" (click)="copyCertificateUrl()"
           aria-label="Copy link"
         >
           <i class="far fa-copy" aria-hidden="true"></i>
