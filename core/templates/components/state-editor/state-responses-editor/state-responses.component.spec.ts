@@ -536,23 +536,6 @@ describe('State Responses Component', () => {
     component.ngOnDestroy();
   });
 
-  it('should throw error when answer choices are null', () => {
-    let onUpdateAnswerChoicesEmitter = new EventEmitter();
-    spyOnProperty(stateEditorService, 'onUpdateAnswerChoices').and.returnValue(
-      onUpdateAnswerChoicesEmitter
-    );
-    let subscribeSpy = spyOn(onUpdateAnswerChoicesEmitter, 'subscribe');
-
-    component.ngOnInit();
-
-    let callback = subscribeSpy.calls.mostRecent().args[0];
-    expect(() => {
-      callback(null);
-    }).toThrowError('Expected new answer choices to be non-null.');
-
-    component.ngOnDestroy();
-  });
-
   it('should update custom arguments', () => {
     let onHandleCustomArgsUpdateEmitter = new EventEmitter();
     spyOnProperty(
@@ -575,24 +558,6 @@ describe('State Responses Component', () => {
     onHandleCustomArgsUpdateEmitter.emit();
 
     expect(component.onSaveInteractionAnswerGroups.emit).toHaveBeenCalled();
-
-    component.ngOnDestroy();
-  });
-
-  it('should throw error when custom arguments update new answer choices is null', () => {
-    let onHandleCustomArgsUpdateEmitter = new EventEmitter();
-    spyOnProperty(
-      stateEditorService,
-      'onHandleCustomArgsUpdate'
-    ).and.returnValue(onHandleCustomArgsUpdateEmitter);
-    let subscribeSpy = spyOn(onHandleCustomArgsUpdateEmitter, 'subscribe');
-
-    component.ngOnInit();
-
-    let callback = subscribeSpy.calls.mostRecent().args[0];
-    expect(() => {
-      callback(null);
-    }).toThrowError('Expected new answer choices to be non-null.');
 
     component.ngOnDestroy();
   });

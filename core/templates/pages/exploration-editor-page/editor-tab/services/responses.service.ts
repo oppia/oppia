@@ -104,7 +104,7 @@ export class ResponsesService {
   // If the interaction is terminal, then the default outcome is null.
   private _defaultOutcome!: Outcome | null;
   private _confirmedUnclassifiedAnswers!: readonly InteractionAnswer[];
-  private _answerChoices!: AnswerChoice[];
+  private _answerChoices!: AnswerChoice[] | null;
   private _activeRuleIndex: number = -1;
   private _answerGroupsChangedEventEmitter = new EventEmitter();
   private _initializeAnswerGroupsEventEmitter = new EventEmitter();
@@ -281,7 +281,7 @@ export class ResponsesService {
     }
   };
 
-  private _updateAnswerChoices = (newAnswerChoices: AnswerChoice[]) => {
+  private _updateAnswerChoices = (newAnswerChoices: AnswerChoice[] | null) => {
     const oldAnswerChoices = cloneDeep(this._answerChoices);
     this._answerChoices = newAnswerChoices;
     return oldAnswerChoices;
@@ -326,7 +326,7 @@ export class ResponsesService {
     return cloneDeep(this._confirmedUnclassifiedAnswers);
   }
 
-  getAnswerChoices(): AnswerChoice[] {
+  getAnswerChoices(): AnswerChoice[] | null {
     return cloneDeep(this._answerChoices);
   }
 
@@ -424,7 +424,11 @@ export class ResponsesService {
     let handledAnswersArray: InteractionRuleInputs[] = [];
 
     if (interactionId === 'MultipleChoiceInput') {
-      let numChoices = this.getAnswerChoices().length;
+      let choices = this.getAnswerChoices();
+      if (choices === null) {
+        return false;
+      }
+      let numChoices = choices.length;
       let choiceIndices = [];
       // Collect all answers which have been handled by at least one
       // answer group.
@@ -446,14 +450,18 @@ export class ResponsesService {
         customizationArgs as ItemSelectionInputCustomizationArgs
       ).maxAllowableSelectionCount.value;
       if (maxSelectionCount === 1) {
-        let numChoices = this.getAnswerChoices().length;
+        let choices = this.getAnswerChoices();
+        if (choices === null) {
+          return false;
+        }
+        let numChoices = choices.length;
         // This array contains a list of booleans, one for each answer
         // choice. Each boolean is true if the corresponding answer has
         // been covered by at least one rule, and false otherwise.
         handledAnswersArray = [];
         for (let i = 0; i < numChoices; i++) {
           handledAnswersArray.push(false);
-          answerChoices.push(this.getAnswerChoices()[i].val);
+          answerChoices.push(choices[i].val);
         }
 
         let answerChoiceToIndex: Record<string, number> = {};
@@ -560,17 +568,21 @@ export class ResponsesService {
   // Updates answer choices when the interaction is initialized or deleted.
   // For example, the rules for multiple choice need to refer to the
   // multiple choice interaction's customization arguments.
-  updateAnswerChoices(newAnswerChoices: AnswerChoice[]): void {
+  updateAnswerChoices(newAnswerChoices: AnswerChoice[] | null): void {
     this._updateAnswerChoices(newAnswerChoices);
   }
 
   // Handles changes to custom args by updating the answer choices
   // accordingly.
   handleCustomArgsUpdate(
-    newAnswerChoices: AnswerChoice[],
+    newAnswerChoices: AnswerChoice[] | null,
     callback: (value: AnswerGroup[]) => void
   ): void {
     const oldAnswerChoices = this._updateAnswerChoices(newAnswerChoices);
+
+    if (newAnswerChoices === null) {
+      return;
+    }
     // If the interaction is ItemSelectionInput, update the answer groups
     // to refer to the new answer options.
     if (

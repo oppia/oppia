@@ -211,7 +211,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     if (interactionId === null) {
       return false;
     }
-    let array: string[] = [
+    let array: InteractionSpecsKey[] = [
       ...AppConstants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS,
     ];
     return array.indexOf(interactionId) !== -1;
@@ -482,7 +482,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     );
   }
 
-  getAnswerChoices(): AnswerChoice[] {
+  getAnswerChoices(): AnswerChoice[] | null {
     return this.responsesService.getAnswerChoices();
   }
 
@@ -781,9 +781,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.stateEditorService.onUpdateAnswerChoices.subscribe(
         newAnswerChoices => {
-          if (newAnswerChoices === null) {
-            throw new Error('Expected new answer choices to be non-null.');
-          }
           this.responsesService.updateAnswerChoices(newAnswerChoices);
         }
       )
@@ -792,9 +789,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.stateEditorService.onHandleCustomArgsUpdate.subscribe(
         newAnswerChoices => {
-          if (newAnswerChoices === null) {
-            throw new Error('Expected new answer choices to be non-null.');
-          }
           this.responsesService.handleCustomArgsUpdate(
             newAnswerChoices,
             newAnswerGroups => {

@@ -36,6 +36,7 @@ import {StateSolutionService} from 'components/state-editor/state-editor-propert
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {Solution} from 'domain/exploration/solution.model';
+import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 
 describe('Responses Service', () => {
   let alertsService: AlertsService;
@@ -48,6 +49,7 @@ describe('Responses Service', () => {
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
   let stateSolutionService: StateSolutionService;
+  let stateCustomizationArgsService: StateCustomizationArgsService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -62,6 +64,9 @@ describe('Responses Service', () => {
     stateEditorService = TestBed.inject(StateEditorService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     stateSolutionService = TestBed.inject(StateSolutionService);
+    stateCustomizationArgsService = TestBed.inject(
+      StateCustomizationArgsService
+    );
 
     savedMemento = new Solution(
       true,
@@ -1026,4 +1031,45 @@ describe('Responses Service', () => {
     responsesService.updateDefaultOutcome(updatedDefaultOutcome, callbackSpy);
     expect(callbackSpy).not.toHaveBeenCalled();
   }));
+
+  it(
+    'should return false when interaction is MultipleChoiceInput and ' +
+      'answer choices are null',
+    () => {
+      responsesService.init(interactionData);
+      stateInteractionIdService.init('stateName', 'MultipleChoiceInput');
+      responsesService.updateAnswerChoices(null);
+
+      expect(responsesService.shouldHideDefaultAnswerGroup()).toBe(false);
+    }
+  );
+
+  it(
+    'should return false when interaction is ItemSelectionInput with ' +
+      'maxAllowableSelectionCount 1 and answer choices are null',
+    () => {
+      responsesService.init(interactionData);
+      stateInteractionIdService.init('stateName', 'ItemSelectionInput');
+      stateCustomizationArgsService.savedMemento = {
+        maxAllowableSelectionCount: {
+          value: 1,
+        },
+      };
+      responsesService.updateAnswerChoices(null);
+
+      expect(responsesService.shouldHideDefaultAnswerGroup()).toBe(false);
+    }
+  );
+
+  it('should do nothing when new answer choices are null', () => {
+    responsesService.init(interactionData);
+    stateInteractionIdService.init('stateName', 'ItemSelectionInput');
+    responsesService.updateAnswerChoices([{val: 'a', label: ''}]);
+
+    const callbackSpy = jasmine.createSpy('callback');
+    responsesService.handleCustomArgsUpdate(null, callbackSpy);
+
+    expect(callbackSpy).not.toHaveBeenCalled();
+    expect(responsesService.getAnswerChoices()).toBeNull();
+  });
 });
