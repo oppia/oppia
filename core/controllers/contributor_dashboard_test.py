@@ -3283,7 +3283,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
         self.assertEqual(content['content_format'], 'html')
         self.assertEqual(content['content_value'], '<p>Content HTML</p>')
 
-        # Ensure exploration-specific/unwanted fields are NOT returned
+        # Ensure exploration-specific/unwanted fields are NOT returned.
         self.assertNotIn('state_name', content)
         self.assertNotIn('interaction_id', content)
         self.assertNotIn('rule_type', content)
