@@ -3278,7 +3278,7 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
         self.assertEqual(len(response['translatable_contents']), 1)
 
         content = response['translatable_contents'][0]
-        self.assertEqual(content['content_id'], 'content')
+        self.assertEqual(content['content_id'], 'content_0')
         self.assertEqual(content['content_type'], 'content')
         self.assertEqual(content['content_format'], 'html')
         self.assertEqual(content['content_value'], '<p>Content HTML</p>')
