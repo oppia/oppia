@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for CertificateOfferingProgressComponent.
  */
 
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
 import {CertificateOfferingProgressComponent} from './certificate-offering-progress.component';
@@ -93,6 +93,31 @@ describe('Certificate Offering Progress Component', () => {
     component.activeSection = CERTIFICATE_OFFERING_SECTION_IDS.ADD_TOPIC_ITEMS;
     component.ngOnInit();
 
+    expect(component.progressTabAriaLabels).toEqual([
+      'Step 1: Add Certificate Details, completed',
+      'Step 2: Add Certificate Topics, current',
+      'Step 3: Review & Availability, incomplete',
+    ]);
+  });
+
+  it('should update progress statuses when activeSection changes', () => {
+    component.activeSection = CERTIFICATE_OFFERING_SECTION_IDS.DETAILS;
+    component.ngOnInit();
+
+    component.activeSection = CERTIFICATE_OFFERING_SECTION_IDS.ADD_TOPIC_ITEMS;
+    component.ngOnChanges({
+      activeSection: new SimpleChange(
+        CERTIFICATE_OFFERING_SECTION_IDS.DETAILS,
+        CERTIFICATE_OFFERING_SECTION_IDS.ADD_TOPIC_ITEMS,
+        false
+      ),
+    });
+
+    expect(component.progressStatuses).toEqual([
+      'completed',
+      'active',
+      'incomplete',
+    ]);
     expect(component.progressTabAriaLabels).toEqual([
       'Step 1: Add Certificate Details, completed',
       'Step 2: Add Certificate Topics, current',

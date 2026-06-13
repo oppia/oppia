@@ -35,6 +35,11 @@ import './certificate-offering-progress.component.css';
   templateUrl: './certificate-offering-progress.component.html',
 })
 export class CertificateOfferingProgressComponent implements OnChanges, OnInit {
+  private readonly SECTION_TITLES = [
+    'Add Certificate Details',
+    'Add Certificate Topics',
+    'Review & Availability',
+  ];
   @Input() pageTitle: string = '';
   @Input() activeSection: CertificateOfferingSectionId =
     CERTIFICATE_OFFERING_SECTION_IDS.DETAILS;
@@ -52,11 +57,6 @@ export class CertificateOfferingProgressComponent implements OnChanges, OnInit {
   }
 
   private updateProgressStatuses(): void {
-    const sectionTitles = [
-      'Add Certificate Details',
-      'Add Certificate Topics',
-      'Review & Availability',
-    ];
     this.progressStatuses = [
       this.getProgressTabStatusClass(1),
       this.getProgressTabStatusClass(2),
@@ -64,7 +64,7 @@ export class CertificateOfferingProgressComponent implements OnChanges, OnInit {
     ];
     this.progressTabAriaLabels = this.progressStatuses.map((status, index) => {
       const stateLabel = status === 'active' ? 'current' : status;
-      return `Step ${index + 1}: ${sectionTitles[index]}, ${stateLabel}`;
+      return `Step ${index + 1}: ${this.SECTION_TITLES[index]}, ${stateLabel}`;
     });
   }
 
