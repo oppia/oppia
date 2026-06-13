@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 
 from core import feconf, utils
@@ -26,7 +27,6 @@ from core.domain import (
 )
 from core.domain import translation_domain
 from core.tests import test_utils
-import json
 
 from typing import Optional
 

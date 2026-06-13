@@ -393,6 +393,8 @@ def is_automatic_translation_enabled() -> bool:
     )
     if model is None:
         return False
+    # Here we use cast because BooleanProperty returns Any type at the
+    # type-checking level, but we know the stored value is always bool.
     return cast(bool, model.automatic_translation_is_enabled)
 
 
@@ -408,6 +410,9 @@ def get_machine_translation_provider_mapping() -> Dict[str, str]:
     )
     if model is None:
         return {}
+    # Here we use cast because JsonProperty returns Any type at the
+    # type-checking level, but we know the stored value is always
+    # Dict[str, str].
     return cast(Dict[str, str], model.language_to_provider_mapping)
 
 
