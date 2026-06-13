@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import enum
-
 import json
 
 from core import feconf, utils
@@ -608,13 +607,11 @@ class EntityTranslation:
         )
 
     def validate(self) -> None:
-        """Validates the language-to-provider mapping.
+        """Validates the EntityTranslation object.
 
         Raises:
-            utils.ValidationError. If the mapping is not a dict.
-            utils.ValidationError. If any language code is invalid.
-            utils.ValidationError. If any provider is not supported for
-                the given language.
+            utils.ValidationError. One or more attributes of the
+                EntityTranslation are invalid.
         """
         if not isinstance(self.entity_type, str):
             raise utils.ValidationError(
@@ -1124,11 +1121,12 @@ class MachineTranslationProviderMapping:
 
     def validate(self) -> None:
         """Validates the language-to-provider mapping.
+
         Raises:
-        ValidationError. If the mapping is not a dict.
-        ValidationError. If any language code is invalid.
-        ValidationError. If any provider is not supported for the
-            given language.
+            utils.ValidationError. If the mapping is not a dictionary.
+            utils.ValidationError. If any language code is invalid.
+            utils.ValidationError. If any provider does not support the
+                given language.
         """
 
         if not isinstance(self.language_to_provider_mapping, dict):
