@@ -88,7 +88,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             ),
         ]
 
-        def mock_context_manager() -> MockCompilerContextManager:
+        def mock_context_manager(
+            **unused_kwargs: bool,
+        ) -> MockCompilerContextManager:
             return MockCompilerContextManager()
 
         env = os.environ.copy()

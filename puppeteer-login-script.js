@@ -35,6 +35,13 @@ var roleEditorContainer = '.e2e-test-roles-editor-card-container';
 var addNewRoleButton = '.e2e-test-add-new-role-button';
 var roleSelect = '.e2e-test-new-role-selector';
 
+var roleOptionLabels = {
+  ADMIN: 'curriculum admin',
+  BLOG_ADMIN: 'blog admin',
+  COLLECTION_EDITOR: 'collection editor',
+  MODERATOR: 'moderator',
+};
+
 module.exports = async (browser, context) => {
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout(0);
@@ -51,7 +58,12 @@ module.exports = async (browser, context) => {
   } else if (context.url.includes('blog-dashboard')) {
     await setRole(page, 'BLOG_ADMIN');
   }
-  await page.close();
+  const pages = await browser.pages();
+  if (pages.length > 1) {
+    await page.close();
+  } else {
+    await page.goto('about:blank');
+  }
 };
 
 // Needed to relogin after lighthouse_setup.js.
@@ -70,6 +82,14 @@ const login = async function (context, page) {
     try {
       await page.waitForSelector(usernameInput, {visible: true});
       await page.type(usernameInput, 'username1');
+      await Promise.all([
+        page.waitForResponse(response =>
+          response.url().includes('/usernamehandler/data')
+        ),
+        page.evaluate(selector => {
+          document.querySelector(selector).blur();
+        }, usernameInput),
+      ]);
       await page.click(agreeToTermsCheckBox);
       await page.waitForSelector(registerUser);
       await page.click(registerUser);
@@ -100,11 +120,37 @@ const setRole = async function (page, role) {
 
     await page.click(roleSelect);
     await page.waitForSelector('mat-option');
-    var humanReadableRole = role.toLowerCase().replace(/_/g, ' ');
-    const [option] = await page.$x(
-      `//mat-option[contains(., '${humanReadableRole}')]`
-    );
-    await option.click();
+    await Promise.all([
+      page.waitForResponse(response =>
+        response.url().includes('/adminrolehandler')
+      ),
+      page.evaluate(
+        (role, roleOptionLabels) => {
+          const roleOptionLabel = roleOptionLabels[role];
+          if (!roleOptionLabel) {
+            throw new Error(`No role option label configured for ${role}.`);
+          }
+
+          const normalizedRoleOptionLabel = roleOptionLabel.toLowerCase();
+          const options = Array.from(
+            document.querySelectorAll('mat-option .mat-option-text')
+          );
+
+          const match = options.find(
+            el =>
+              el.textContent.trim().toLowerCase() === normalizedRoleOptionLabel
+          );
+
+          if (!match) {
+            throw new Error(`Could not find role option for ${role}.`);
+          }
+
+          match.closest('mat-option').click();
+        },
+        role,
+        roleOptionLabels
+      ),
+    ]);
     await page.waitForTimeout(2000);
     // eslint-disable-next-line dot-notation
     await page.goto(CREATOR_DASHBOARD_URL, {waitUntil: networkIdle});

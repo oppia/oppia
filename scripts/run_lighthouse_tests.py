@@ -311,7 +311,9 @@ def main(args: Optional[List[str]] = None) -> None:
 
         if constants.EMULATOR_MODE:
             stack.enter_context(servers.managed_firebase_auth_emulator())
-            stack.enter_context(servers.managed_cloud_datastore_emulator())
+            stack.enter_context(
+                servers.managed_cloud_datastore_emulator(clear_datastore=True)
+            )
 
         env = os.environ.copy()
         env['PIP_NO_DEPS'] = 'True'

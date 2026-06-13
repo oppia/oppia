@@ -108,6 +108,11 @@ var topicCommitMessageInput = '.e2e-test-commit-message-input';
 var publishChangesButton = '.e2e-test-close-save-modal-button';
 var cookieBannerAcceptButton = '.e2e-test-oppia-cookie-banner-accept-button';
 
+var roleOptionLabels = {
+  ADMIN: 'curriculum admin',
+  COLLECTION_EDITOR: 'collection editor',
+};
+
 const login = async function (browser, page) {
   try {
     // eslint-disable-next-line dot-notation
@@ -138,6 +143,14 @@ const login = async function (browser, page) {
     }
 
     await usernameInputElement.type('username1');
+    await Promise.all([
+      page.waitForResponse(response =>
+        response.url().includes('/usernamehandler/data')
+      ),
+      page.evaluate(selector => {
+        document.querySelector(selector).blur();
+      }, usernameInput),
+    ]);
     await page.click(agreeToTermsCheckBox);
     await page.waitForSelector(registerUser);
     await page.click(registerUser);
@@ -167,17 +180,37 @@ const setRole = async function (browser, page, role) {
     await page.click(addNewRoleButton);
 
     await page.click(roleSelect);
-    await page.evaluate(role => {
-      const options = Array.from(
-        document.querySelectorAll('mat-option .mat-option-text')
-      );
+    await Promise.all([
+      page.waitForResponse(response =>
+        response.url().includes('/adminrolehandler')
+      ),
+      page.evaluate(
+        (role, roleOptionLabels) => {
+          const roleOptionLabel = roleOptionLabels[role];
+          if (!roleOptionLabel) {
+            throw new Error(`No role option label configured for ${role}.`);
+          }
 
-      const match = options.find(el => el.textContent.trim() === role);
+          const normalizedRoleOptionLabel = roleOptionLabel.toLowerCase();
+          const options = Array.from(
+            document.querySelectorAll('mat-option .mat-option-text')
+          );
 
-      if (match) {
-        match.closest('mat-option').click();
-      }
-    }, role);
+          const match = options.find(
+            el =>
+              el.textContent.trim().toLowerCase() === normalizedRoleOptionLabel
+          );
+
+          if (!match) {
+            throw new Error(`Could not find role option for ${role}.`);
+          }
+
+          match.closest('mat-option').click();
+        },
+        role,
+        roleOptionLabels
+      ),
+    ]);
     await page.waitForTimeout(2000);
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -209,6 +242,7 @@ const getExplorationEditorUrl = async function (browser, page) {
     await page.click(endIneractionSelector);
     await page.waitForSelector(saveInteractionButton, {visible: true});
     await page.click(saveInteractionButton);
+    await page.waitForTimeout(2000);
 
     await page.waitForSelector(saveChangesButton, {visible: true});
     await page.click(saveChangesButton);
