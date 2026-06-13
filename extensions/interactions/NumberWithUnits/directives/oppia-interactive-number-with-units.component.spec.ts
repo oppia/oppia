@@ -26,6 +26,8 @@ import {
 } from '@angular/core/testing';
 import {InteractiveNumberWithUnitsComponent} from './oppia-interactive-number-with-units.component';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {NumberConversionService} from 'services/number-conversion.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateModule} from '@ngx-translate/core';
@@ -75,6 +77,8 @@ describe('Number with units interaction component', () => {
           provide: CurrentInteractionService,
           useValue: mockCurrentInteractionService,
         },
+        NumberConversionService,
+        I18nLanguageCodeService,
         NgbModal,
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -253,5 +257,18 @@ describe('Number with units interaction component', () => {
 
     expect(component.componentSubscriptions.unsubscribe).toHaveBeenCalled();
     expect(component.componentSubscriptions.closed).toBeTrue();
+  });
+
+  it('should correctly parse number with comma as decimal separator', () => {
+    const i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    i18nLanguageCodeService.setI18nLanguageCode('pt-br');
+
+    component.answer = '1,2 hr';
+    spyOn(currentInteractionService, 'onSubmit');
+
+    component.submitAnswer();
+
+    expect(component.errorMessageI18nKey).toBe('');
+    expect(currentInteractionService.onSubmit).toHaveBeenCalled();
   });
 });
