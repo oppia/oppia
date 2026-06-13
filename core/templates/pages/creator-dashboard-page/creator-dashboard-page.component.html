@@ -493,6 +493,17 @@
     padding-right: 10px;
     word-wrap: break-word;
   }
+  :host-context([dir="rtl"]) .oppia-dashboard-aggregated-stats .stats-card {
+    border-left: 2px solid #bbb;
+    border-right: none;
+    padding-right: 35px;
+  }
+  :host-context([dir="rtl"]) .oppia-creator-dashboard-main-content .stats-card .stat-description {
+    padding-right: 0px;
+  }
+  :host-context([dir="rtl"]) .oppia-dashboard-aggregated-stats .stats-card:last-child {
+    border: none;
+  }
   .oppia-creator-dashboard-main-content .stats-card .stat-value-with-rating {
     margin-top: 0;
     position: absolute;
