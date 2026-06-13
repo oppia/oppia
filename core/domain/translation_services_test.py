@@ -20,10 +20,7 @@ from __future__ import annotations
 
 import json
 
-from core import (
-    feconf,
-    utils,
-)
+from core import feconf, utils
 from core.domain import (
     exp_domain,
     exp_fetchers,
