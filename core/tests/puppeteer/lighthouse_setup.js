@@ -115,22 +115,33 @@ const login = async function (browser, page) {
     await page.waitForSelector(emailInput, {visible: true});
     await page.type(emailInput, 'testadmin@example.com');
     await page.click(signInButton);
-    // Checks if the user's account was already made.
-    try {
-      let cookies = await page.cookies();
-      if (!cookies.find(item => item.name === 'OPPIA_COOKIES_ACKNOWLEDGED')) {
-        await page.waitForSelector(cookieBannerAcceptButton, {visible: true});
-        await page.click(cookieBannerAcceptButton);
-      }
-      await page.waitForSelector(usernameInput, {visible: true});
-      await page.type(usernameInput, 'username1');
-      await page.click(agreeToTermsCheckBox);
-      await page.waitForSelector(registerUser);
-      await page.click(registerUser);
-      await page.waitForSelector(navbarToggle);
-    } catch (error) {
-      // Already Signed in.
+
+    let cookies = await page.cookies();
+    if (!cookies.find(item => item.name === 'OPPIA_COOKIES_ACKNOWLEDGED')) {
+      await page.waitForSelector(cookieBannerAcceptButton, {visible: true});
+      await page.click(cookieBannerAcceptButton);
     }
+
+    let usernameInputElement = null;
+    try {
+      usernameInputElement = await page.waitForSelector(usernameInput, {
+        visible: true,
+        timeout: 5000,
+      });
+    } catch (error) {
+      // Already signed in.
+    }
+
+    if (usernameInputElement === null) {
+      await page.waitForSelector(navbarToggle);
+      return;
+    }
+
+    await usernameInputElement.type('username1');
+    await page.click(agreeToTermsCheckBox);
+    await page.waitForSelector(registerUser);
+    await page.click(registerUser);
+    await page.waitForSelector(navbarToggle);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('Login Failed');
@@ -156,8 +167,17 @@ const setRole = async function (browser, page, role) {
     await page.click(addNewRoleButton);
 
     await page.click(roleSelect);
-    var selector = `mat-option[ng-reflect-value="${role}"]`;
-    await page.click(selector);
+    await page.evaluate(role => {
+      const options = Array.from(
+        document.querySelectorAll('mat-option .mat-option-text')
+      );
+
+      const match = options.find(el => el.textContent.trim() === role);
+
+      if (match) {
+        match.closest('mat-option').click();
+      }
+    }, role);
     await page.waitForTimeout(2000);
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -224,11 +244,20 @@ const getExplorationEditorUrl = async function (browser, page) {
     await page.waitForTimeout(3000);
     await page.waitForSelector(expCategoryDropdownElement, {visible: true});
     await page.click(expCategoryDropdownElement);
+    await page.waitForSelector('mat-option .mat-option-text', {
+      visible: true,
+    });
+    await page.evaluate(() => {
+      const options = Array.from(
+        document.querySelectorAll('mat-option .mat-option-text')
+      );
 
-    await page.waitForTimeout(3000);
-    await page.waitForSelector('mat-option');
-    await page.waitForTimeout(3000);
-    await page.click('mat-option[ng-reflect-value="Algebra"]');
+      const match = options.find(el => el.textContent.trim() === 'Algebra');
+
+      if (match) {
+        match.closest('mat-option').click();
+      }
+    });
 
     await page.waitForTimeout(3000);
     await page.waitForSelector(expConfirmPublishButton, {visible: true});
