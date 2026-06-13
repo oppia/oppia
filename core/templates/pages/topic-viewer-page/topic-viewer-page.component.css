@@ -22,6 +22,10 @@ topic-viewer-page .oppia-redesigned-topic-viewer-container.studyguide-view-activ
   background-size: 1024px auto;
 }
 
+topic-viewer-page .oppia-redesigned-topic-viewer-container.studyguide-view-active .redesigned-topic-viewer-content topic-header {
+  max-width: 1160px;
+}
+
 topic-viewer-page .redesigned-topic-viewer-content topic-header {
   display: block;
   margin: 0 auto;

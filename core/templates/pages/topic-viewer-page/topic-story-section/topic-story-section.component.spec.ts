@@ -99,6 +99,8 @@ describe('TopicStorySectionComponent', () => {
 
     i18nLanguageCodeService.isCurrentLanguageRTL.and.returnValue(false);
 
+    component.storySummary = createStorySummarySpy([], []);
+
     fixture.detectChanges();
   });
 
