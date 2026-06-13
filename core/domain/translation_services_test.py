@@ -18,11 +18,12 @@
 
 from __future__ import annotations
 
+import json
+
 from core import (
     feconf,
     utils,
 )
-from core import utils
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -851,6 +852,12 @@ class MachineTranslationPolicyServicesTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.POLICY_ID = translation_models.MACHINE_TRANSLATION_POLICY_ID
+        self.mock_providers_json = json.dumps(
+            {'hi': ['azure', 'gcp'], 'es': ['azure', 'gcp']}
+        )
+        self.swap_get_file_contents = self.swap(
+            utils, 'get_file_contents', lambda x: self.mock_providers_json
+        )
 
     def test_is_automatic_translation_enabled_returns_false_by_default(
         self,
@@ -925,9 +932,10 @@ class MachineTranslationPolicyServicesTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         new_mapping = {'es': 'gcp'}
-        translation_services.save_machine_translation_provider_mapping(
-            new_mapping
-        )
+        with self.swap_get_file_contents:
+            translation_services.save_machine_translation_provider_mapping(
+                new_mapping
+            )
 
         model = translation_models.MachineTranslationPolicyModel.get(
             self.POLICY_ID
@@ -945,9 +953,10 @@ class MachineTranslationPolicyServicesTests(test_utils.GenericTestBase):
         ).put()
 
         new_mapping = {'hi': 'azure', 'es': 'gcp'}
-        translation_services.save_machine_translation_provider_mapping(
-            new_mapping
-        )
+        with self.swap_get_file_contents:
+            translation_services.save_machine_translation_provider_mapping(
+                new_mapping
+            )
 
         model = translation_models.MachineTranslationPolicyModel.get(
             self.POLICY_ID
@@ -959,8 +968,8 @@ class MachineTranslationPolicyServicesTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         invalid_mapping = {'invalid_lang': 'invalid_provider'}
-
-        with self.assertRaisesRegex(utils.ValidationError, 'Invalid'):
-            translation_services.save_machine_translation_provider_mapping(
-                invalid_mapping
-            )
+        with self.swap_get_file_contents:
+            with self.assertRaisesRegex(utils.ValidationError, 'Invalid'):
+                translation_services.save_machine_translation_provider_mapping(
+                    invalid_mapping
+                )

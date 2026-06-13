@@ -1114,7 +1114,6 @@ class MachineTranslationProviderMappingTests(test_utils.GenericTestBase):
                 mapping_obj.validate()
 
     def test_validate_with_unsupported_provider_raises_error(self) -> None:
-        # 'aws' is not in our mocked JSON whitelist for 'hi'
         mapping_dict = {'hi': 'aws'}
         mapping_obj = translation_domain.MachineTranslationProviderMapping(
             mapping_dict
