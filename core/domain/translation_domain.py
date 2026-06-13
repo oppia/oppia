@@ -20,13 +20,14 @@ from __future__ import annotations
 
 import enum
 
+import json
+
 from core import feconf, utils
 from core.constants import constants
 from core.domain import (  # pylint: disable=invalid-import-from
     translatable_object_registry,
 )
 
-import json
 from typing import Dict, Final, List, Optional, TypedDict, Union
 
 
@@ -587,7 +588,14 @@ class EntityTranslation:
         )
 
     def validate(self) -> None:
-        """Validates the EntityTranslation object."""
+        """Validates the language-to-provider mapping.
+
+        Raises:
+            utils.ValidationError. If the mapping is not a dict.
+            utils.ValidationError. If any language code is invalid.
+            utils.ValidationError. If any provider is not supported for
+                the given language.
+        """
         if not isinstance(self.entity_type, str):
             raise utils.ValidationError(
                 'entity_type must be a string, recieved %r' % self.entity_type

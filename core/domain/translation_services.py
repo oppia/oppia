@@ -393,7 +393,7 @@ def is_automatic_translation_enabled() -> bool:
     )
     if model is None:
         return False
-    return model.automatic_translation_is_enabled
+    return cast(bool, model.automatic_translation_is_enabled)
 
 
 def get_machine_translation_provider_mapping() -> Dict[str, str]:
@@ -408,7 +408,7 @@ def get_machine_translation_provider_mapping() -> Dict[str, str]:
     )
     if model is None:
         return {}
-    return model.language_to_provider_mapping
+    return cast(Dict[str, str], model.language_to_provider_mapping)
 
 
 def update_automatic_translation_status(
