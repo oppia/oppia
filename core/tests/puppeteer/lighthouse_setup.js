@@ -91,8 +91,7 @@ var createSkillButtonSelector = '.puppeteer-test-add-skill-button';
 var skillDescriptionField = '.e2e-test-new-skill-description-field';
 var skillOpenConceptCard = '.e2e-test-open-concept-card';
 var confirmSkillCreationButton = '.e2e-test-confirm-skill-creation-button';
-var skillReviewMaterialInput = '.oppia-rte';
-var skillCkEditor = '.e2e-test-ck-editor';
+var skillReviewMaterialInput = '.e2e-test-concept-card-text div.e2e-test-rte';
 
 var usernameInputFieldForRolesEditing = '.e2e-test-username-for-role-editor';
 var editUserRoleButton = '.e2e-test-role-edit-button';
@@ -403,11 +402,10 @@ const getSkillEditorUrl = async function (browser, page) {
     await page.type(skillDescriptionField, 'Skill Description here');
     await page.click(skillOpenConceptCard);
     await page.waitForSelector(skillReviewMaterialInput, {visible: true});
-    await page.waitForSelector(skillCkEditor, {visible: true});
-    await page.click(skillCkEditor);
-    await page.keyboard.type('Skill Overview here');
+    await page.click(skillReviewMaterialInput);
+    await page.type(skillReviewMaterialInput, 'Skill Overview here');
 
-    await page.waitForSelector(confirmSkillCreationButton, {visible: true});
+    await page.waitForSelector(`${confirmSkillCreationButton}:not([disabled])`);
     await page.waitForTimeout(5000);
     await page.click(confirmSkillCreationButton);
     // Doing waitForTimeout(15000) to handle new tab being opened.

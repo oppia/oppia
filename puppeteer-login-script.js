@@ -58,11 +58,21 @@ module.exports = async (browser, context) => {
   } else if (context.url.includes('blog-dashboard')) {
     await setRole(page, 'BLOG_ADMIN');
   }
-  const pages = await browser.pages();
-  if (pages.length > 1) {
-    await page.close();
-  } else {
-    await page.goto('about:blank');
+  await seedBlankPagesForLighthouseRuns(browser, page, context);
+};
+
+const seedBlankPagesForLighthouseRuns = async function (
+  browser,
+  page,
+  context
+) {
+  const numberOfRuns = Number(context.options.numberOfRuns) || 1;
+  await page.goto('about:blank');
+
+  let pages = await browser.pages();
+  for (let i = pages.length; i < numberOfRuns; i++) {
+    const blankPage = await browser.newPage();
+    await blankPage.goto('about:blank');
   }
 };
 
