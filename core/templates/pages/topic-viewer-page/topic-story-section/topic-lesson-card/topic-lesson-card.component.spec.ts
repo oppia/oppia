@@ -21,6 +21,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {TopicLessonCardComponent} from './topic-lesson-card.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 class MockWindowRef {
   nativeWindow = {
@@ -43,7 +44,7 @@ describe('TopicLessonCardComponent', () => {
     );
 
     TestBed.configureTestingModule({
-      declarations: [TopicLessonCardComponent],
+      declarations: [TopicLessonCardComponent, MockTranslatePipe],
       providers: [
         {
           provide: UrlInterpolationService,
