@@ -397,8 +397,8 @@
     },
     {
       "name": "logged-in-learner/manage-in-progress-and-completed-lessons-and-skill",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/manage-in-progress-and-completed-lessons-and-skill.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/manage-in-progress-and-completed-lessons-and-skill.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/manage-in-progress-and-completed-community-lessons-and-skill",
