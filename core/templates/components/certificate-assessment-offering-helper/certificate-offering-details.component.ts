@@ -79,6 +79,7 @@ export class CertificateOfferingDetailsComponent implements OnInit {
       this.classroomLoadErrorMessage = '';
     } catch (error: unknown) {
       console.error('Failed to load classrooms summary.', error);
+      this.classroomOptions = [];
       this.classroomLoadErrorMessage =
         'Unable to load classrooms. Please try again.';
     }
