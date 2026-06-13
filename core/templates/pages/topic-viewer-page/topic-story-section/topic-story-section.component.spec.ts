@@ -104,7 +104,7 @@ describe('TopicStorySectionComponent', () => {
 
   const createStorySummarySpy = (
     nodeTitles: string[],
-    nodes: StoryNode[]
+    nodes: jasmine.SpyObj<StoryNode>[]
   ): jasmine.SpyObj<StorySummary> => {
     const storySummarySpy = jasmine.createSpyObj('StorySummary', [
       'getTitle',
@@ -164,7 +164,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.storySummary = createStorySummarySpy(
       ['Node title 1'],
-      [storyNodeSpy as unknown as StoryNode]
+      [storyNodeSpy]
     );
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'topic';
@@ -176,7 +176,7 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards[0].thumbnailUrl).toBe(
       '/thumbnail/story/story_id/thumb.png'
     );
-    expect(component.practiceCard).toBeNull();
+    expect(component.isPracticeCardVisible).toBeFalse();
   });
 
   it('should create practice card only when there are zero lessons', () => {
@@ -190,13 +190,13 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.lessonCards.length).toBe(0);
-    expect(component.practiceCard).not.toBeNull();
-    expect(component.practiceCard?.studyUrl).toBe(
+    expect(component.isPracticeCardVisible).toBeTrue();
+    expect(component.practiceCard.studyUrl).toBe(
       '/learn/math/place-values/studyguide'
     );
   });
 
-  it('should not provide practice session url when fragments are missing', () => {
+  it('should use fallback practice session url when fragments are missing', () => {
     component.storySummary = createStorySummarySpy([], []);
     component.lessonCount = 0;
     component.practiceCount = 1;
@@ -209,11 +209,11 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.lessonCards.length).toBe(0);
-    expect(component.practiceCard).not.toBeNull();
-    expect(component.practiceCard?.practiceUrl).toBeNull();
+    expect(component.isPracticeCardVisible).toBeTrue();
+    expect(component.practiceCard.practiceUrl).toBe('#');
   });
 
-  it('should not provide practice session url when no subtopic id present', () => {
+  it('should use fallback practice session url when no subtopic id present', () => {
     component.storySummary = createStorySummarySpy([], []);
     component.lessonCount = 0;
     component.practiceCount = 1;
@@ -224,8 +224,8 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.lessonCards.length).toBe(0);
-    expect(component.practiceCard).not.toBeNull();
-    expect(component.practiceCard?.practiceUrl).toBeNull();
+    expect(component.isPracticeCardVisible).toBeTrue();
+    expect(component.practiceCard.practiceUrl).toBe('#');
   });
 
   it('should build lesson start url with all fields when exploration id present', () => {
@@ -244,7 +244,7 @@ describe('TopicStorySectionComponent', () => {
 
     const storySummary = createStorySummarySpy(
       ['Node title 1'],
-      [storyNodeSpy as unknown as StoryNode]
+      [storyNodeSpy]
     );
     component.storySummary = storySummary;
     component.classroomUrlFragment = 'math';
@@ -276,9 +276,9 @@ describe('TopicStorySectionComponent', () => {
 
     const storySummary = createStorySummarySpy(
       ['Node title 1'],
-      [storyNodeSpy as unknown as StoryNode]
+      [storyNodeSpy]
     );
-    storySummary.getId.and.returnValue(null as unknown as string);
+    storySummary.getId.and.returnValue(null);
 
     component.storySummary = storySummary;
     component.classroomUrlFragment = 'math';
@@ -330,8 +330,8 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.practiceCard).not.toBeNull();
-    expect(component.practiceCard?.practiceUrl).toContain('practice/session');
+    expect(component.isPracticeCardVisible).toBeTrue();
+    expect(component.practiceCard.practiceUrl).toContain('practice/session');
   });
 
   it('should not create practice card when practice count is zero', () => {
@@ -345,12 +345,12 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.lessonCards.length).toBe(0);
-    expect(component.practiceCard).toBeNull();
+    expect(component.isPracticeCardVisible).toBeFalse();
   });
 
   it('should use empty string when story description is missing', () => {
     const storySummary = createStorySummarySpy([], []);
-    storySummary.getDescription.and.returnValue(null as unknown as string);
+    storySummary.getDescription.and.returnValue(null);
 
     component.storySummary = storySummary;
     component.lessonCount = 0;

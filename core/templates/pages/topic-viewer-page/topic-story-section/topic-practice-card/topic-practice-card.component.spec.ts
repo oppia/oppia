@@ -123,16 +123,16 @@ describe('TopicPracticeCardComponent', () => {
   it('should execute navigateTo when url is provided', () => {
     spyOn(windowRef.nativeWindow.location, 'assign');
 
-    component.navigateTo('#practice-card');
+    component.navigateTo('/practice/session');
 
     expect(windowRef.nativeWindow.location.assign).toHaveBeenCalledWith(
-      '#practice-card'
+      '/practice/session'
     );
   });
 
-  it('should execute navigateTo when url is null', () => {
+  it('should not throw when navigating to the fallback url', () => {
     expect(() => {
-      component.navigateTo(null);
+      component.navigateTo('#');
     }).not.toThrowError();
   });
 

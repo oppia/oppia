@@ -22,6 +22,8 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 
 import './topic-practice-card.component.css';
 
+const FALLBACK_THUMBNAIL_IMAGE_PATH = '/splash/student_desk1x.webp';
+
 @Component({
   selector: 'topic-practice-card',
   templateUrl: './topic-practice-card.component.html',
@@ -32,13 +34,10 @@ export class TopicPracticeCardComponent implements OnInit {
   @Input() practiceDescription: string = '';
   @Input() relatedLessonNumber: number | null = null;
   @Input() thumbnailUrl: string = '';
-  @Input() studyUrl: string | null = null;
-  @Input() practiceUrl: string | null = null;
+  @Input() studyUrl: string = '';
+  @Input() practiceUrl: string = '#';
 
   resolvedThumbnailUrl: string = '';
-
-  private readonly fallbackThumbnailImagePath: string =
-    '/splash/student_desk1x.webp';
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -50,7 +49,7 @@ export class TopicPracticeCardComponent implements OnInit {
       this.thumbnailUrl || this.getFallbackThumbnailUrl();
   }
 
-  navigateTo(url: string | null): void {
+  navigateTo(url: string): void {
     if (url) {
       this.windowRef.nativeWindow.location.assign(url);
     }
@@ -74,7 +73,7 @@ export class TopicPracticeCardComponent implements OnInit {
 
   private getFallbackThumbnailUrl(): string {
     return this.urlInterpolationService.getStaticImageUrl(
-      this.fallbackThumbnailImagePath
+      FALLBACK_THUMBNAIL_IMAGE_PATH
     );
   }
 }

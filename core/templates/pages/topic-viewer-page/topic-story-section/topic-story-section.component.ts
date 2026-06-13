@@ -52,8 +52,8 @@ interface PracticeCardData {
   practiceDescription: string;
   relatedLessonNumber: number | null;
   thumbnailUrl: string;
-  studyUrl: string | null;
-  practiceUrl: string | null;
+  studyUrl: string;
+  practiceUrl: string;
 }
 
 @Component({
@@ -62,7 +62,7 @@ interface PracticeCardData {
   styleUrls: ['./topic-story-section.component.css'],
 })
 export class TopicStorySectionComponent implements OnInit, OnChanges {
-  @Input() storySummary: StorySummary | null = null;
+  @Input() storySummary!: StorySummary;
   @Input() storyTitle!: string;
   @Input() storyDescription!: string;
   @Input() classroomUrlFragment: string = '';
@@ -75,7 +75,8 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
   oppiaAvatarImageUrl: string = '';
   studyGuideUrl: string = '#';
   lessonCards: LessonCardData[] = [];
-  practiceCard: PracticeCardData | null = null;
+  practiceCard!: PracticeCardData;
+  isPracticeCardVisible: boolean = false;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -85,7 +86,7 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit(): void {
-    this.syncFromInputs();
+    this.populateFromInputs();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -98,7 +99,7 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
       changes.lessonCount ||
       changes.practiceCount
     ) {
-      this.syncFromInputs();
+      this.populateFromInputs();
     }
   }
 
@@ -137,7 +138,7 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
-  private syncFromInputs(): void {
+  private populateFromInputs(): void {
     if (!this.classroomUrlFragment) {
       this.classroomUrlFragment =
         this.urlService.getClassroomUrlFragmentFromLearnerUrl();
@@ -149,12 +150,6 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
 
     this.oppiaAvatarImageUrl = this.getPrimaryAvatarImageUrl();
     this.studyGuideUrl = this.getStudyGuideUrl();
-
-    if (!this.storySummary) {
-      this.lessonCards = [];
-      this.practiceCard = null;
-      return;
-    }
 
     this.storyTitle = this.storySummary.getTitle();
     this.storyDescription = this.storySummary.getDescription() || '';
@@ -171,14 +166,12 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
         };
       });
 
+    this.isPracticeCardVisible =
+      this.lessonCards.length === 0 && this.practiceCount >= 1;
     this.practiceCard = this.getPracticeCardData();
   }
 
-  private getPracticeCardData(): PracticeCardData | null {
-    if (this.lessonCards.length > 0 || this.practiceCount < 1) {
-      return null;
-    }
-
+  private getPracticeCardData(): PracticeCardData {
     return {
       practiceTitle: 'Practice 1: ' + this.storyTitle,
       practiceDescription: '',
@@ -190,14 +183,14 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
     };
   }
 
-  private getPracticeSessionUrl(): string | null {
+  private getPracticeSessionUrl(): string {
     if (!this.classroomUrlFragment || !this.topicUrlFragment) {
-      return null;
+      return '#';
     }
 
     const practiceSubtopicId = this.practiceSubtopicIds[0];
     if (practiceSubtopicId === undefined) {
-      return null;
+      return '#';
     }
 
     return this.urlInterpolationService.interpolateUrl(
@@ -212,7 +205,7 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
 
   private getLessonThumbnailUrl(node: StoryNode): string {
     const thumbnailFilename = node.getThumbnailFilename();
-    const storyId = this.storySummary?.getId();
+    const storyId = this.storySummary.getId();
     if (thumbnailFilename) {
       if (!storyId) {
         return this.getFallbackLessonThumbnailUrl();
@@ -231,8 +224,7 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
     if (
       !explorationId ||
       !this.classroomUrlFragment ||
-      !this.topicUrlFragment ||
-      !this.storySummary
+      !this.topicUrlFragment
     ) {
       return '#';
     }

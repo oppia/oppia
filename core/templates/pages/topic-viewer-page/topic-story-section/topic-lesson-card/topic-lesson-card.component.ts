@@ -22,6 +22,8 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 
 import './topic-lesson-card.component.css';
 
+const FALLBACK_THUMBNAIL_IMAGE_PATH = '/splash/student_desk1x.webp';
+
 @Component({
   selector: 'topic-lesson-card',
   templateUrl: './topic-lesson-card.component.html',
@@ -34,9 +36,6 @@ export class TopicLessonCardComponent implements OnInit {
   @Input() startUrl: string = '';
 
   resolvedThumbnailUrl: string = '';
-
-  private readonly fallbackThumbnailImagePath: string =
-    '/splash/student_desk1x.webp';
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -62,7 +61,7 @@ export class TopicLessonCardComponent implements OnInit {
 
   private getFallbackThumbnailUrl(): string {
     return this.urlInterpolationService.getStaticImageUrl(
-      this.fallbackThumbnailImagePath
+      FALLBACK_THUMBNAIL_IMAGE_PATH
     );
   }
 }
