@@ -4687,7 +4687,7 @@ export class LoggedOutUser extends BaseUser {
       attributionHtmlCodeSelector
     );
     const attributionHtmlCode = await this.page.evaluate(
-      el => el.textContent,
+      el => el.textContent?.trim(),
       attributionHtmlCodeElement
     );
 
@@ -4711,7 +4711,7 @@ export class LoggedOutUser extends BaseUser {
       attributionPrintTextSelector
     );
     const attributionPrintText = await this.page.evaluate(
-      el => el.textContent,
+      el => el.textContent?.trim(),
       attributionPrintTextElement
     );
 

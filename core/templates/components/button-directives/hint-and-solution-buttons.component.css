@@ -4,7 +4,7 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 oppia-hint-and-solution-buttons .list-inline {
-  right: 0;
+  inset-inline-end: 0;
 }
 
 oppia-hint-and-solution-buttons .btn-close {
@@ -115,7 +115,6 @@ oppia-hint-and-solution-buttons .hint-box::before {
   oppia-hint-and-solution-buttons .hint-box-add-ons .btn-close {
     bottom: 10px;
     font-size: 22px;
-    left: 310px;
     margin: 0 10px;
     position: fixed;
   }
@@ -135,12 +134,10 @@ oppia-hint-and-solution-buttons .hint-box::before {
   }
 
   oppia-hint-and-solution-buttons .hint-container {
-    right: 16px;
     width: 100%;
   }
 
   .oppia-hint-and-solution-buttons ul {
-    bottom: -17px;
     padding: 0 10px;
     position: fixed;
   }
@@ -201,7 +198,6 @@ oppia-hint-and-solution-buttons .hint-box::before {
 
 @media screen and (max-width: 546px) {
   oppia-hint-and-solution-buttons .hint-box {
-    bottom: 110px;
     font-size: 15px;
     left: 5px;
   }
