@@ -134,7 +134,6 @@ describe('TranslateTextBackendApiService', () => {
               content_type: 'content',
               content_format: 'html',
               content_value: 'text1',
-              state_name: 'stateName1',
             },
           ],
           version: '2',

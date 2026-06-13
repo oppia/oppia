@@ -3267,6 +3267,32 @@ class TranslatableContentsHandlerV2Test(test_utils.GenericTestBase):
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
+    def test_handler_returns_correct_fields_for_translatable_contents(
+        self,
+    ) -> None:
+        response = self.get_json(
+            '%s?language_code=hi&entity_type=exploration&entity_id=%s'
+            % (feconf.TRANSLATABLE_CONTENTS_V2_URL, self.exp_id)
+        )
+        self.assertEqual(response['version'], 1)
+        self.assertEqual(len(response['translatable_contents']), 1)
+
+        content = response['translatable_contents'][0]
+        self.assertEqual(content['content_id'], 'content')
+        self.assertEqual(content['content_type'], 'content')
+        self.assertEqual(content['content_format'], 'html')
+        self.assertEqual(content['content_value'], '<p>Content HTML</p>')
+
+        # Ensure exploration-specific/unwanted fields are NOT returned
+        self.assertNotIn('state_name', content)
+        self.assertNotIn('interaction_id', content)
+        self.assertNotIn('rule_type', content)
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
     def test_handler_returns_400_for_skill(self) -> None:
         response = self.get_json(
             '%s?language_code=hi&entity_type=skill&entity_id=%s'

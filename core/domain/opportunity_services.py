@@ -1325,6 +1325,24 @@ def _get_translation_opportunity_cards_from_models(
                 story.id: story for story in stories if story is not None
             }
 
+        exp_opportunity_summary_map = {}
+        exp_summary_map = {}
+        exp_opportunity_summary_models = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get_multi(
+                entity_ids
+            )
+        )
+        for exp_model in exp_opportunity_summary_models:
+            if exp_model is not None:
+                exp_opportunity_summary_map[exp_model.id] = exp_model
+
+        exp_summaries = exp_fetchers.get_exploration_summaries_matching_ids(
+            entity_ids
+        )
+        for exp_summary in exp_summaries:
+            if exp_summary is not None:
+                exp_summary_map[exp_summary.id] = exp_summary
+
     elif entity_type == feconf.ENTITY_TYPE_STORY:
         stories = story_fetchers.get_stories_by_ids(entity_ids)
         story_map = {story.id: story for story in stories if story is not None}
@@ -1414,6 +1432,22 @@ def _get_translation_opportunity_cards_from_models(
             if topic_val_obj:
                 entity_description = topic_val_obj.name
 
+        story_title_val = None
+        reviewer_only_content_count_val = None
+        language_code_val = None
+
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            exp_id = model.entity_id
+            if exp_id in exp_opportunity_summary_map:
+                story_title_val = exp_opportunity_summary_map[
+                    exp_id
+                ].story_title
+                reviewer_only_content_count_val = exp_opportunity_summary_map[
+                    exp_id
+                ].reviewer_only_content_count
+            if exp_id in exp_summary_map:
+                language_code_val = exp_summary_map[exp_id].language_code
+
         card_info = opportunity_domain.TranslationOpportunityCardInfo(
             topic_ids=model.topic_ids,
             entity_id=model.entity_id,
@@ -1425,6 +1459,9 @@ def _get_translation_opportunity_cards_from_models(
             entity_description=entity_description,
             is_pinned=False,
             currently_available_to_learners=currently_available_to_learners,
+            story_title=story_title_val,
+            language_code=language_code_val,
+            reviewer_only_content_count=reviewer_only_content_count_val,
         )
 
         if model.entity_id in in_review_counts:

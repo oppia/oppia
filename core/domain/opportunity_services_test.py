@@ -2209,6 +2209,9 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(cards[0].entity_id, 'exp_1')
         self.assertEqual(cards[0].entity_description, 'Node 1Title')
         self.assertTrue(cards[0].currently_available_to_learners)
+        self.assertEqual(cards[0].story_title, 'Story 1')
+        self.assertEqual(cards[0].language_code, 'en')
+        self.assertEqual(cards[0].reviewer_only_content_count, 0)
 
         # 2. Test Story entity type.
         cards = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(

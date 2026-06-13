@@ -637,6 +637,9 @@ class TranslationOpportunityCardInfoDict(TypedDict):
     is_pinned: bool
     currently_available_to_learners: bool
     translation_in_review_counts: Dict[str, int]
+    story_title: Optional[str]
+    language_code: Optional[str]
+    reviewer_only_content_count: Optional[int]
 
 
 class TranslationOpportunityCardInfo(TranslationOpportunity):
@@ -655,6 +658,9 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
         is_pinned: bool,
         currently_available_to_learners: bool,
         translation_in_review_counts: Optional[Dict[str, int]] = None,
+        story_title: Optional[str] = None,
+        language_code: Optional[str] = None,
+        reviewer_only_content_count: Optional[int] = None,
     ) -> None:
         """Constructs a TranslationOpportunityCardInfo domain object."""
         super().__init__(
@@ -680,6 +686,9 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
         self.translation_in_review_counts: Dict[str, int] = (
             translation_in_review_counts if translation_in_review_counts else {}
         )
+        self.story_title = story_title
+        self.language_code = language_code
+        self.reviewer_only_content_count = reviewer_only_content_count
 
     def to_dict(self) -> TranslationOpportunityCardInfoDict:
         """Returns a dict representation of the card info."""
@@ -699,4 +708,7 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
                 self.currently_available_to_learners
             ),
             'translation_in_review_counts': self.translation_in_review_counts,
+            'story_title': self.story_title,
+            'language_code': self.language_code,
+            'reviewer_only_content_count': self.reviewer_only_content_count,
         }

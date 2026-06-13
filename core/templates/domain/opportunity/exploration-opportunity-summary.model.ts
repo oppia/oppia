@@ -45,6 +45,9 @@ export interface TranslationOpportunityCardInfoBackendDict {
   is_pinned: boolean;
   currently_available_to_learners: boolean;
   translation_in_review_counts: TranslationCountsDict;
+  story_title?: string | null;
+  language_code?: string | null;
+  reviewer_only_content_count?: number | null;
 }
 
 export class ExplorationOpportunitySummary {
@@ -106,14 +109,14 @@ export class ExplorationOpportunitySummary {
     return new ExplorationOpportunitySummary(
       backendDict.entity_id,
       backendDict.topic_name,
-      '',
+      backendDict.story_title || '',
       backendDict.entity_description,
       backendDict.content_count,
       backendDict.translation_counts,
       backendDict.translation_in_review_counts,
-      'en',
+      backendDict.language_code || 'en',
       backendDict.is_pinned,
-      0
+      backendDict.reviewer_only_content_count || 0
     );
   }
 

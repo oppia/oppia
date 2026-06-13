@@ -258,9 +258,23 @@ def create_suggestion(
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(change_cmd['state_name'], str)
         assert isinstance(change_cmd['content_id'], str)
-        content_html = exploration.get_content_html(
-            change_cmd['state_name'], change_cmd['content_id']
-        )
+
+        state_name = change_cmd['state_name']
+        content_id = change_cmd['content_id']
+
+        if state_name == 'Content' or state_name not in exploration.states:
+            for s_name, state in exploration.states.items():
+                if (
+                    content_id
+                    in state.get_translatable_contents_collection().content_id_to_translatable_content
+                ):
+                    state_name = s_name
+                    new_change_cmd = dict(change_cmd)
+                    new_change_cmd['state_name'] = state_name
+                    change_cmd = new_change_cmd
+                    break
+
+        content_html = exploration.get_content_html(state_name, content_id)
         if content_html != change_cmd['content_html']:
 
             raise Exception(

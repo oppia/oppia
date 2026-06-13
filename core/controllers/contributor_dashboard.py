@@ -707,31 +707,19 @@ class TranslatableContentsHandlerV2(
             ):
                 continue
 
+            if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+                if any(
+                    s.change_cmd.content_id == content.content_id
+                    for s in suggestions
+                ):
+                    continue
+
             content_dict = {
                 'content_id': content.content_id,
                 'content_type': content.content_type.value,
                 'content_format': content.content_format.value,
                 'content_value': content.content_value,
             }
-
-            state_name = None
-            if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-                for s_name, state in domain_object.states.items():
-                    if (
-                        content.content_id
-                        in state.get_translatable_contents_collection().content_id_to_translatable_content
-                    ):
-                        state_name = s_name
-                        break
-
-            if state_name is not None:
-                if any(
-                    s.change_cmd.state_name == state_name
-                    and s.change_cmd.content_id == content.content_id
-                    for s in suggestions
-                ):
-                    continue
-                content_dict['state_name'] = state_name
 
             translatable_contents.append(content_dict)
 
