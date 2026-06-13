@@ -37,12 +37,19 @@
   word-break: break-all;
 }
 
-.oppia-certificate-link-row .fa-copy {
+.oppia-copy-link-button {
+  background: transparent;
+  border: 0;
   color: #555;
   cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+.oppia-copy-link-button .fa-copy {
   font-size: 15px;
 }
 
-.oppia-certificate-link-row .fa-copy:hover {
+.oppia-copy-link-button:hover {
   color: #000;
 }

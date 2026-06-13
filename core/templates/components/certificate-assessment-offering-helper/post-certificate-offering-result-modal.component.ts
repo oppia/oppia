@@ -32,7 +32,7 @@ type CertificateOfferingResultAction = 'created' | 'updated';
 export class PostCertificateOfferingResultModalComponent {
   @Input() action: CertificateOfferingResultAction = 'created';
 
-  // TODO(#24717 - M1.11): Replace with dynamic values once backend is wired up.
+  // TODO(#24717 - M1.14): Replace with dynamic values once backend is wired up.
   @Input() certificateName: string = 'Everyday Arithmetic & Number Confidence';
   @Input() certificateUrl: string =
     'https://www.oppia.org/certificate-offering/math/tYHbzfYwyzOP';

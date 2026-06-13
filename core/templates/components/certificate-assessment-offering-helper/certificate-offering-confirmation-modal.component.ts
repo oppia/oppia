@@ -20,7 +20,7 @@
 import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-type CertificateOfferingAction = 'create' | 'update';
+type CertificateOfferingAction = 'create' | 'updated';
 
 @Component({
   selector: 'oppia-certificate-offering-confirmation-modal',

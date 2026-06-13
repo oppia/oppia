@@ -132,7 +132,7 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
         }
       );
       postModalRef.componentInstance.action = 'created';
-      await postModalRef.result.catch(() => undefined);
+      await postModalRef.result.catch(() => null);
       this.navigateToCertificateOfferingDashboard();
     } catch (error: unknown) {
       this.alertsService.addWarning(

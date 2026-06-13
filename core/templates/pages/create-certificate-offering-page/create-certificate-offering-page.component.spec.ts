@@ -191,6 +191,43 @@ describe('Create Certificate Offering Page Component', () => {
     expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
   }));
 
+  it('should create certificate offering and show post-result modal', fakeAsync(() => {
+    const firstModalRef = {
+      componentInstance: {
+        isCertificateValid: false,
+        action: undefined as string | undefined,
+      },
+      result: Promise.resolve('create'),
+    } as NgbModalRef;
+    const secondModalRef = {
+      componentInstance: {
+        action: undefined as string | undefined,
+      },
+      result: Promise.reject('dismissed'),
+    } as NgbModalRef;
+    const apiSpy = spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'createCertificateAssessmentOfferingAsync'
+    ).and.returnValue(Promise.resolve('certificate_id_123'));
+    const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
+    const routerSpy = spyOn(router, 'navigate');
+    const modalSpy = spyOn(ngbModal, 'open').and.returnValues(
+      firstModalRef,
+      secondModalRef
+    );
+
+    component.saveCertificateOffering();
+    flushMicrotasks();
+
+    expect(modalSpy).toHaveBeenCalledTimes(2);
+    expect(apiSpy).toHaveBeenCalledWith(
+      component.certificateAssessmentOffering
+    );
+    expect(alertsSpy).toHaveBeenCalledWith('Certificate created.');
+    expect(secondModalRef.componentInstance.action).toBe('created');
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+  }));
+
   it('should not navigate or show alert if certificate creation returns falsy value', fakeAsync(() => {
     spyOn(
       certificateAssessmentOfferingBackendApiService,

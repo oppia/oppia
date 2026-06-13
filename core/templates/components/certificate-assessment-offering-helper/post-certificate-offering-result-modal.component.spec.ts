@@ -18,30 +18,56 @@
 
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {PostCertificateOfferingResultModalComponent} from './post-certificate-offering-result-modal.component';
+import {Clipboard} from '@angular/cdk/clipboard';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 describe('Post certificate offering result modal component', () => {
   let component: PostCertificateOfferingResultModalComponent;
   let ngbActiveModal: jasmine.SpyObj<NgbActiveModal>;
+  let clipboard: jasmine.SpyObj<Clipboard>;
+  let urlInterpolationService: jasmine.SpyObj<UrlInterpolationService>;
 
   beforeEach(() => {
     ngbActiveModal = jasmine.createSpyObj('NgbActiveModal', ['dismiss']);
-    component = new PostCertificateOfferingResultModalComponent(ngbActiveModal);
+    clipboard = jasmine.createSpyObj('Clipboard', ['copy']);
+    urlInterpolationService = jasmine.createSpyObj('UrlInterpolationService', [
+      'getStaticImageUrl',
+    ]);
+    urlInterpolationService.getStaticImageUrl.and.returnValue(
+      '/avatar/oppia_avatar_large_100px.svg'
+    );
+    component = new PostCertificateOfferingResultModalComponent(
+      ngbActiveModal,
+      clipboard,
+      urlInterpolationService
+    );
   });
 
-  it('should expose created copy by default', () => {
-    expect(component.modalTitle).toBe('Certificate Created');
-    expect(component.bodyText).toContain('created successfully');
+  it('should expose created state by default', () => {
+    expect(component.action).toBe('created');
+    expect(component.certificateName).toBe(
+      'Everyday Arithmetic & Number Confidence'
+    );
+    expect(component.certificateUrl).toContain('/certificate-offering/');
+    expect(component.getOppiaLargeAvatarUrl()).toBe(
+      '/avatar/oppia_avatar_large_100px.svg'
+    );
   });
 
-  it('should expose updated copy when configured', () => {
+  it('should expose updated state when configured', () => {
     component.action = 'updated';
 
-    expect(component.modalTitle).toBe('Certificate Updated');
-    expect(component.bodyText).toContain('updated successfully');
+    expect(component.action).toBe('updated');
   });
 
-  it('should dismiss on cancel', () => {
-    component.cancel();
+  it('should copy the certificate url', () => {
+    component.copyCertificateUrl();
+
+    expect(clipboard.copy).toHaveBeenCalledWith(component.certificateUrl);
+  });
+
+  it('should dismiss the modal', () => {
+    component.dismiss();
 
     expect(ngbActiveModal.dismiss).toHaveBeenCalled();
   });

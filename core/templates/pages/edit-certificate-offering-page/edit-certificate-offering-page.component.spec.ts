@@ -59,6 +59,7 @@ describe('Edit Certificate Offering Page Component', () => {
           provide: AlertsService,
           useValue: {
             addSuccessMessage: () => {},
+            addWarning: () => {},
           },
         },
         {
@@ -76,7 +77,7 @@ describe('Edit Certificate Offering Page Component', () => {
                 componentInstance: {
                   isCertificateValid: true,
                 },
-                result: Promise.resolve('update'),
+                result: Promise.resolve('updated'),
               }) as NgbModalRef,
           },
         },
@@ -190,7 +191,7 @@ describe('Edit Certificate Offering Page Component', () => {
         isCertificateValid: true,
         action: undefined as string | undefined,
       },
-      result: Promise.resolve('update'),
+      result: Promise.resolve('updated'),
     } as NgbModalRef;
     const apiSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
@@ -204,12 +205,50 @@ describe('Edit Certificate Offering Page Component', () => {
     flushMicrotasks();
 
     expect(modalSpy).toHaveBeenCalled();
-    expect(modalRef.componentInstance.action).toBe('update');
+    expect(modalRef.componentInstance.action).toBe('updated');
     expect(apiSpy).toHaveBeenCalledWith(
       'certificate_offering_id',
       component.certificateAssessmentOffering
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate updated.');
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+  }));
+
+  it('should open the post-result modal for updated certificates and navigate after dismissal', fakeAsync(() => {
+    const firstModalRef = {
+      componentInstance: {
+        isCertificateValid: true,
+        action: undefined as string | undefined,
+      },
+      result: Promise.resolve('updated'),
+    } as NgbModalRef;
+    const secondModalRef = {
+      componentInstance: {
+        action: undefined as string | undefined,
+      },
+      result: Promise.reject('dismissed'),
+    } as NgbModalRef;
+    const apiSpy = spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'updateCertificateAssessmentOfferingAsync'
+    ).and.returnValue(Promise.resolve('certificate_offering_id'));
+    const alertsSpy = spyOn(alertsService, 'addSuccessMessage');
+    const routerSpy = spyOn(router, 'navigate');
+    const modalSpy = spyOn(ngbModal, 'open').and.returnValues(
+      firstModalRef,
+      secondModalRef
+    );
+
+    component.updateCertificateOffering();
+    flushMicrotasks();
+
+    expect(modalSpy).toHaveBeenCalledTimes(2);
+    expect(apiSpy).toHaveBeenCalledWith(
+      'certificate_offering_id',
+      component.certificateAssessmentOffering
+    );
+    expect(alertsSpy).toHaveBeenCalledWith('Certificate updated.');
+    expect(secondModalRef.componentInstance.action).toBe('updated');
     expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
   }));
 
@@ -249,7 +288,7 @@ describe('Edit Certificate Offering Page Component', () => {
       componentInstance: {
         isCertificateValid: true,
       },
-      result: Promise.resolve('update'),
+      result: Promise.resolve('updated'),
     } as NgbModalRef);
 
     component.updateCertificateOffering();
@@ -278,6 +317,50 @@ describe('Edit Certificate Offering Page Component', () => {
 
     expect(apiSpy).not.toHaveBeenCalled();
     expect(alertsSpy).not.toHaveBeenCalled();
+    expect(routerSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should show the backend error message when update fails with Error', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        isCertificateValid: true,
+      },
+      result: Promise.resolve('updated'),
+    } as NgbModalRef);
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'updateCertificateAssessmentOfferingAsync'
+    ).and.returnValue(
+      Promise.reject(new Error('Failed to update certificate.'))
+    );
+    const alertsSpy = spyOn(alertsService, 'addWarning');
+    const routerSpy = spyOn(router, 'navigate');
+
+    component.updateCertificateOffering();
+    flushMicrotasks();
+
+    expect(alertsSpy).toHaveBeenCalledWith('Failed to update certificate.');
+    expect(routerSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should fall back to a generic warning when update fails with a non-Error', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        isCertificateValid: true,
+      },
+      result: Promise.resolve('updated'),
+    } as NgbModalRef);
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'updateCertificateAssessmentOfferingAsync'
+    ).and.returnValue(Promise.reject('Failed to update certificate.'));
+    const alertsSpy = spyOn(alertsService, 'addWarning');
+    const routerSpy = spyOn(router, 'navigate');
+
+    component.updateCertificateOffering();
+    flushMicrotasks();
+
+    expect(alertsSpy).toHaveBeenCalledWith('Failed to update certificate.');
     expect(routerSpy).not.toHaveBeenCalled();
   }));
 });

@@ -112,11 +112,11 @@ export class EditCertificateOfferingPageComponent implements OnInit {
         CertificateOfferingConfirmationModalComponent,
         {backdrop: 'static'}
       );
-      modalRef.componentInstance.action = 'update';
+      modalRef.componentInstance.action = 'updated';
       modalRef.componentInstance.isCertificateValid = this.isCertificateValid;
 
       const action = await modalRef.result.catch(() => null);
-      if (action !== 'not_ready' && action !== 'update') {
+      if (action !== 'not_ready' && action !== 'updated') {
         return;
       }
 
@@ -145,7 +145,7 @@ export class EditCertificateOfferingPageComponent implements OnInit {
         }
       );
       postModalRef.componentInstance.action = 'updated';
-      await postModalRef.result.catch(() => undefined);
+      await postModalRef.result.catch(() => null);
       this.navigateToCertificateOfferingDashboard();
     } catch (error: unknown) {
       this.alertsService.addWarning(

@@ -43,7 +43,7 @@ describe('Certificate offering confirmation modal component', () => {
   });
 
   it('should expose update copy and action for update flow', () => {
-    component.action = 'update';
+    component.action = 'updated';
 
     expect(component.modalTitle).toBe('Update Certificate');
     expect(component.confirmButtonText).toBe('Update Certificate');
@@ -64,10 +64,10 @@ describe('Certificate offering confirmation modal component', () => {
   });
 
   it('should close with the configured action', () => {
-    component.action = 'update';
+    component.action = 'updated';
 
     component.confirm();
 
-    expect(ngbActiveModal.close).toHaveBeenCalledWith('update');
+    expect(ngbActiveModal.close).toHaveBeenCalledWith('updated');
   });
 });
