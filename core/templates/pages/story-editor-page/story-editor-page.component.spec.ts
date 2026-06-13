@@ -17,7 +17,11 @@
  */
 
 import {EventEmitter} from '@angular/core';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbModal,
+  NgbModalOptions,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {EntityEditorBrowserTabsInfo} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
@@ -44,7 +48,7 @@ import {StoryEditorNavigationService} from './services/story-editor-navigation.s
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 class MockNgbModalRef {
-  componentInstance: {
+  componentInstance!: {
     body: 'xyz';
   };
 }
@@ -153,7 +157,7 @@ describe('Story Editor Page Component', () => {
   class MockWindowRef {
     nativeWindow = {
       open: (url: string) => {},
-      addEventListener: (value1, value2) => {},
+      addEventListener: (value1: string, value2: () => void) => {},
     };
   }
 
@@ -227,6 +231,11 @@ describe('Story Editor Page Component', () => {
             description: 'Description',
             thumbnail_filename: 'img.png',
             thumbnail_bg_color: '#a33f40',
+            status: 'Draft',
+            planned_publication_date_msecs: null,
+            last_modified_msecs: null,
+            first_publication_date_msecs: null,
+            unpublishing_reason: null,
           },
           {
             id: 'node_3',
@@ -240,6 +249,11 @@ describe('Story Editor Page Component', () => {
             description: 'Description',
             thumbnail_filename: 'img.png',
             thumbnail_bg_color: '#a33f40',
+            status: 'Draft',
+            planned_publication_date_msecs: null,
+            last_modified_msecs: null,
+            first_publication_date_msecs: null,
+            unpublishing_reason: null,
           },
         ],
         next_node_id: 'node_4',
@@ -247,10 +261,11 @@ describe('Story Editor Page Component', () => {
       language_code: 'en',
       version: 1,
       corresponding_topic_id: '2',
-      thumbnail_bg_color: null,
-      thumbnail_filename: null,
+      thumbnail_bg_color: '',
+      thumbnail_filename: '',
       url_fragment: 'story-url-fragment',
-    } as StoryBackendDict);
+      meta_tag_content: 'meta',
+    });
 
     spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
     localStorageService.removeOpenedEntityEditorBrowserTabsInfo(
@@ -299,7 +314,7 @@ describe('Story Editor Page Component', () => {
       spyOn(pageTitleService, 'setDocumentTitle');
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(10);
       spyOn(preventPageUnloadEventService, 'addListener').and.callFake(
-        callback => callback()
+        (callback: () => boolean) => callback()
       );
 
       component.ngOnInit();
@@ -312,12 +327,14 @@ describe('Story Editor Page Component', () => {
 
   it('should return to topic editor page when closing confirmation modal', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve(),
-      } as NgbModalRef;
-    });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+      (dlg: unknown, opt: NgbModalOptions) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      }
+    );
 
     component.returnToTopicEditorPage();
 
@@ -326,12 +343,14 @@ describe('Story Editor Page Component', () => {
 
   it('should return to topic editor page when dismissing confirmation modal', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: MockNgbModalRef,
-        result: Promise.reject(),
-      } as NgbModalRef;
-    });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
+      (dlg: unknown, opt: NgbModalOptions) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.reject(),
+        } as NgbModalRef;
+      }
+    );
 
     component.returnToTopicEditorPage();
 
@@ -478,6 +497,10 @@ describe('Story Editor Page Component', () => {
     storyEditorNavigationService.activeTab = 'story_editor';
     tick();
     expect(component.getNavbarText()).toEqual('Story Editor');
+
+    storyEditorNavigationService.activeTab = 'unknown_tab';
+    tick();
+    expect(component.getNavbarText()).toEqual('');
   }));
 
   it('should init page on undo redo change applied', () => {
@@ -502,7 +525,7 @@ describe('Story Editor Page Component', () => {
       spyOn(pageTitleService, 'setDocumentTitle');
       component.ngOnInit();
 
-      let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo =
+      let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null =
         localStorageService.getEntityEditorBrowserTabsInfo(
           EntityEditorBrowserTabsInfoDomainConstants.OPENED_STORY_EDITOR_BROWSER_TABS,
           story.getId()
@@ -519,7 +542,11 @@ describe('Story Editor Page Component', () => {
         );
 
       expect(storyEditorBrowserTabsInfo).toBeDefined();
-      expect(storyEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
+      expect(
+        (
+          storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+        ).getNumberOfOpenedTabs()
+      ).toEqual(1);
 
       // Opening the second tab.
       storyEditorStateService.onStoryInitialized.emit();
@@ -529,7 +556,11 @@ describe('Story Editor Page Component', () => {
           story.getId()
         );
 
-      expect(storyEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
+      expect(
+        (
+          storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+        ).getNumberOfOpenedTabs()
+      ).toEqual(2);
     }
   );
 
@@ -541,7 +572,7 @@ describe('Story Editor Page Component', () => {
       spyOn(pageTitleService, 'setDocumentTitle');
       component.ngOnInit();
 
-      let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo =
+      let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null =
         localStorageService.getEntityEditorBrowserTabsInfo(
           EntityEditorBrowserTabsInfoDomainConstants.OPENED_STORY_EDITOR_BROWSER_TABS,
           story.getId()
@@ -557,7 +588,11 @@ describe('Story Editor Page Component', () => {
           story.getId()
         );
 
-      expect(storyEditorBrowserTabsInfo.getLatestVersion()).toEqual(1);
+      expect(
+        (
+          storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+        ).getLatestVersion()
+      ).toEqual(1);
 
       // Save some changes on the story and increasing its version.
       story._version = 2;
@@ -568,7 +603,11 @@ describe('Story Editor Page Component', () => {
           story.getId()
         );
 
-      expect(storyEditorBrowserTabsInfo.getLatestVersion()).toEqual(2);
+      expect(
+        (
+          storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+        ).getLatestVersion()
+      ).toEqual(2);
     }
   );
 
@@ -586,23 +625,31 @@ describe('Story Editor Page Component', () => {
       // Opening of the second tab.
       storyEditorStateService.onStoryInitialized.emit();
 
-      let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo =
+      let storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null =
         localStorageService.getEntityEditorBrowserTabsInfo(
           EntityEditorBrowserTabsInfoDomainConstants.OPENED_STORY_EDITOR_BROWSER_TABS,
           story.getId()
         );
 
       // Making some unsaved changes on the editor page.
-      storyEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
+      (
+        storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+      ).setSomeTabHasUnsavedChanges(true);
       localStorageService.updateEntityEditorBrowserTabsInfo(
-        storyEditorBrowserTabsInfo,
+        storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo,
         EntityEditorBrowserTabsInfoDomainConstants.OPENED_STORY_EDITOR_BROWSER_TABS
       );
 
       expect(
-        storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
-      ).toBeTrue();
-      expect(storyEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
+        (
+          storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+        ).doesSomeTabHaveUnsavedChanges()
+      ).toBe(true);
+      expect(
+        (
+          storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+        ).getNumberOfOpenedTabs()
+      ).toEqual(2);
 
       component.onClosingStoryEditorBrowserTab();
       storyEditorBrowserTabsInfo =
@@ -611,13 +658,19 @@ describe('Story Editor Page Component', () => {
           story.getId()
         );
 
-      expect(storyEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
+      expect(
+        (
+          storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+        ).getNumberOfOpenedTabs()
+      ).toEqual(1);
 
       // Since the tab containing unsaved changes is closed, the value of
       // unsaved changes status will become false.
       expect(
-        storyEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
-      ).toBeFalse();
+        (
+          storyEditorBrowserTabsInfo as EntityEditorBrowserTabsInfo
+        ).doesSomeTabHaveUnsavedChanges()
+      ).toBe(false);
     }
   );
 
