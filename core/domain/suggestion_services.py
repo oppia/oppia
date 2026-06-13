@@ -288,9 +288,7 @@ def create_suggestion(
             target_id, language_code
         )
         for existing_suggestion in existing_suggestions:
-            if existing_suggestion.change_cmd['content_id'] == (
-                change_cmd['content_id']
-            ):
+            if existing_suggestion.change_cmd['content_id'] == (content_id):
                 raise Exception(
                     'A translation suggestion for this content already exists '
                     'and is currently in review.'
@@ -304,14 +302,12 @@ def create_suggestion(
             exploration.version,
             language_code,
         )
-        if change_cmd['content_id'] in entity_translation.translations:
-            if not entity_translation.translations[
-                change_cmd['content_id']
-            ].needs_update:
+        if content_id in entity_translation.translations:
+            if not entity_translation.translations[content_id].needs_update:
                 raise Exception(
                     'The content with content_id %s has already been '
                     'translated to %s and is up-to-date.'
-                    % (change_cmd['content_id'], language_code)
+                    % (content_id, language_code)
                 )
 
         suggestion = suggestion_registry.SuggestionTranslateContent(
