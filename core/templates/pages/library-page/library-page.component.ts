@@ -16,7 +16,12 @@
  * @fileoverview Data and component for the Oppia contributors' library page.
  */
 
-import {Component, Renderer2, ElementRef} from '@angular/core';
+import {
+  Component,
+  Renderer2,
+  ElementRef,
+  ViewEncapsulation,
+} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -52,6 +57,7 @@ interface MobileLibraryGroupProperties {
   selector: 'oppia-library-page',
   templateUrl: './library-page.component.html',
   styleUrls: ['./library-page.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class LibraryPageComponent {
   possibleBannerFilenames: string[] = [

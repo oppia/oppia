@@ -7811,7 +7811,7 @@ export default {
     }
   },
 
-  "DEV_MODE": true,
+  "DEV_MODE": false,
   "EMULATOR_MODE": true,
   "ASSET_TYPE_AUDIO": "audio",
   "ASSET_TYPE_IMAGE": "image",
@@ -7830,8 +7830,8 @@ export default {
   ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
-  "BRANCH_NAME": "",
-  "SHORT_COMMIT_HASH": "",
+  "BRANCH_NAME": "remove-webpack-build-architecture",
+  "SHORT_COMMIT_HASH": "a86b67ff5c",
   // Please consult the translation team before adding any entries here.
   // These words improve the quality of automatic voiceovers.
   "LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS": {

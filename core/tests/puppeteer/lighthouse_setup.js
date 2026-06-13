@@ -156,12 +156,8 @@ const setRole = async function (browser, page, role) {
     await page.click(addNewRoleButton);
 
     await page.click(roleSelect);
-    await page.waitForSelector('mat-option');
-    var humanReadableRole = role.toLowerCase().replace(/_/g, ' ');
-    const [option] = await page.$x(
-      `//mat-option[contains(., '${humanReadableRole}')]`
-    );
-    await option.click();
+    var selector = `mat-option[ng-reflect-value="${role}"]`;
+    await page.click(selector);
     await page.waitForTimeout(2000);
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -193,7 +189,6 @@ const getExplorationEditorUrl = async function (browser, page) {
     await page.click(endIneractionSelector);
     await page.waitForSelector(saveInteractionButton, {visible: true});
     await page.click(saveInteractionButton);
-    await page.waitForTimeout(2000);
 
     await page.waitForSelector(saveChangesButton, {visible: true});
     await page.click(saveChangesButton);
@@ -233,10 +228,7 @@ const getExplorationEditorUrl = async function (browser, page) {
     await page.waitForTimeout(3000);
     await page.waitForSelector('mat-option');
     await page.waitForTimeout(3000);
-    const [algebraOption] = await page.$x(
-      "//mat-option[contains(., 'Algebra')]"
-    );
-    await algebraOption.click();
+    await page.click('mat-option[ng-reflect-value="Algebra"]');
 
     await page.waitForTimeout(3000);
     await page.waitForSelector(expConfirmPublishButton, {visible: true});
@@ -347,9 +339,8 @@ const getSkillEditorUrl = async function (browser, page) {
     await page.waitForSelector(skillDescriptionField, {visible: true});
     await page.type(skillDescriptionField, 'Skill Description here');
     await page.click(skillOpenConceptCard);
-    await page.waitForSelector('.e2e-test-concept-card-text', {visible: true});
-    await page.waitForSelector(skillReviewMaterialInput);
-    await page.waitForSelector(skillCkEditor);
+    await page.waitForSelector(skillReviewMaterialInput, {visible: true});
+    await page.waitForSelector(skillCkEditor, {visible: true});
     await page.click(skillCkEditor);
     await page.keyboard.type('Skill Overview here');
 

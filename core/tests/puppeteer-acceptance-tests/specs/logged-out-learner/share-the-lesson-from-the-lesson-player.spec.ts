@@ -116,7 +116,6 @@ describe('Logged-Out Learner', function () {
   it('should be able to share the lesson using copy link', async function () {
     await loggedOutUser.playExploration(explorationId);
     await loggedOutUser.continueToNextCard();
-    await loggedOutUser.closeLessonInfoModal();
 
     await loggedOutUser.generateAttribution();
     await loggedOutUser.expectAttributionInHtmlSectionToBe(
