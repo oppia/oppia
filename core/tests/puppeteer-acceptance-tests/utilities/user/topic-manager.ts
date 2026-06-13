@@ -909,9 +909,7 @@ export class TopicManager extends BaseUser {
 
     // Wait for the editor to close and the question list to appear.
     // After saving, the question list is refreshed asynchronously.
-    await this.page.waitForSelector(questionContainerSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(questionContainerSelector);
   }
 
   /**
@@ -999,8 +997,7 @@ export class TopicManager extends BaseUser {
       if (text === skillDescription) {
         const removeButton = await item.$(skillLinkageRemoveButtonSelector);
         if (removeButton) {
-          await this.waitForElementToBeClickable(removeButton);
-          await removeButton.click();
+          await this.clickOnElement(removeButton);
 
           // Unlinking a non-last skill triggers an auto-save API call.
           // Wait for the success toast to confirm the save completed.
