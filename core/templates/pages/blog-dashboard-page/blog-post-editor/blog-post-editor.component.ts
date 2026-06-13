@@ -219,8 +219,9 @@ export class BlogPostEditorComponent implements OnInit {
     }
     const [, month, day, year, hours, minutes, seconds, millis] =
       dateTimeComponents;
-    const isoString = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${millis}Z`;
-    const millisSinceEpoch = new Date(isoString).getTime();
+    const millisSinceEpoch = new Date(
+      `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${millis}Z`
+    ).getTime();
     return this.dateTimeFormatService.getDateTimeInWords(millisSinceEpoch);
   }
 
