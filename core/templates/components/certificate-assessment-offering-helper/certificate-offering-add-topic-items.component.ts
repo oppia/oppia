@@ -104,6 +104,7 @@ export class CertificateOfferingAddTopicItemsComponent
 
   searchQuery: string = '';
   selectedTopics: TopicOption[] = [];
+  selectedTopicIds: Set<string> = new Set();
 
   // TODO(#24717 - M1.11): Replace this stub with the classroom-backed fetch once the flow
   // passes classroomId from the first step.
@@ -122,14 +123,15 @@ export class CertificateOfferingAddTopicItemsComponent
   // TODO(#24717 - M1.11): When the real classroomId is available, fetch the classroom data
   // here and map classroomData.getTopicSummaries() into TopicOption values.
   private syncSelectedFromOffering(): void {
-    const selectedIds = Object.keys(
-      this.certificateAssessmentOffering.topicData ?? {}
-    );
-    if (selectedIds.length > 0) {
-      this.selectedTopics = this.availableTopics.filter(topic =>
-        selectedIds.includes(topic.id)
-      );
-    }
+    const topicData = this.certificateAssessmentOffering.topicData ?? {};
+    const selectedIds = Object.entries(topicData)
+      .sort((left, right) => left[1] - right[1])
+      .map(([topicId]) => topicId);
+
+    this.selectedTopicIds = new Set(selectedIds);
+    this.selectedTopics = selectedIds
+      .map(topicId => this.availableTopics.find(topic => topic.id === topicId))
+      .filter((topic): topic is TopicOption => topic !== undefined);
   }
 
   get filteredTopics(): TopicOption[] {
@@ -144,7 +146,7 @@ export class CertificateOfferingAddTopicItemsComponent
   }
 
   isAdded(topicId: string): boolean {
-    return this.selectedTopics.some(topic => topic.id === topicId);
+    return this.selectedTopicIds.has(topicId);
   }
 
   toggleTopic(topic: TopicOption): void {
@@ -152,8 +154,10 @@ export class CertificateOfferingAddTopicItemsComponent
       this.selectedTopics = this.selectedTopics.filter(
         selected => selected.id !== topic.id
       );
+      this.selectedTopicIds.delete(topic.id);
     } else {
       this.selectedTopics = [...this.selectedTopics, topic];
+      this.selectedTopicIds.add(topic.id);
     }
     this.syncTopicData();
   }
@@ -162,6 +166,7 @@ export class CertificateOfferingAddTopicItemsComponent
     this.selectedTopics = this.selectedTopics.filter(
       topic => topic.id !== topicId
     );
+    this.selectedTopicIds.delete(topicId);
     this.syncTopicData();
   }
 

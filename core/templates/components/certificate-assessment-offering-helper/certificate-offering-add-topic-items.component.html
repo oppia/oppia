@@ -53,9 +53,9 @@
               </div>
             </div>
             <button type="button" class="oppia-certificate-offering-topic-toggle"
-                    [class.oppia-certificate-offering-topic-toggle--added]="isAdded(topic.id)"
+                    [class.oppia-certificate-offering-topic-toggle--added]="selectedTopicIds.has(topic.id)"
                     (click)="toggleTopic(topic)">
-              {{ isAdded(topic.id) ? 'Added' : 'Add' }}
+              {{ selectedTopicIds.has(topic.id) ? 'Added' : 'Add' }}
             </button>
           </div>
         </ng-container>

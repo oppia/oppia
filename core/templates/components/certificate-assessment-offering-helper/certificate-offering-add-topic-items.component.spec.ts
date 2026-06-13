@@ -103,6 +103,48 @@ describe('Certificate Offering Add Topic Items Component', () => {
     ]);
   });
 
+  it('should clear stale selected topics when offering data is empty', () => {
+    component.selectedTopics = [component.availableTopics[0]];
+    component.selectedTopicIds = new Set([component.availableTopics[0].id]);
+    component.certificateAssessmentOffering.topicData = {};
+
+    component.ngOnChanges({
+      certificateAssessmentOffering: {
+        currentValue: component.certificateAssessmentOffering,
+        previousValue: {
+          ...CertificateAssessmentOfferingData.createEmpty(),
+          topicData: {topic_1: 1},
+        },
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+
+    expect(component.selectedTopics).toEqual([]);
+    expect(component.selectedTopicIds.size).toEqual(0);
+  });
+
+  it('should preserve topic order from topic data positions', () => {
+    component.certificateAssessmentOffering.topicData = {
+      topic_3: 2,
+      topic_1: 1,
+    };
+
+    component.ngOnChanges({
+      certificateAssessmentOffering: {
+        currentValue: component.certificateAssessmentOffering,
+        previousValue: CertificateAssessmentOfferingData.createEmpty(),
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+
+    expect(component.selectedTopics.map(topic => topic.id)).toEqual([
+      'topic_1',
+      'topic_3',
+    ]);
+  });
+
   it('should add and remove topics while syncing topic data', () => {
     const topic = component.availableTopics[0];
 
@@ -111,6 +153,7 @@ describe('Certificate Offering Add Topic Items Component', () => {
     expect(component.selectedTopics.map(selected => selected.id)).toEqual([
       topic.id,
     ]);
+    expect(component.selectedTopicIds.has(topic.id)).toBeTrue();
     expect(component.certificateAssessmentOffering.topicData).toEqual({
       [topic.id]: 1,
     });
@@ -118,6 +161,7 @@ describe('Certificate Offering Add Topic Items Component', () => {
     component.toggleTopic(topic);
 
     expect(component.selectedTopics).toEqual([]);
+    expect(component.selectedTopicIds.has(topic.id)).toBeFalse();
     expect(component.certificateAssessmentOffering.topicData).toEqual({});
   });
 
