@@ -16,7 +16,13 @@
  * @fileoverview Shared progress bar for certificate offering pages.
  */
 
-import {Component, Input} from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 
 import {
   CertificateOfferingSectionId,
@@ -28,10 +34,39 @@ import './certificate-offering-progress.component.css';
   selector: 'oppia-certificate-offering-progress',
   templateUrl: './certificate-offering-progress.component.html',
 })
-export class CertificateOfferingProgressComponent {
+export class CertificateOfferingProgressComponent implements OnChanges, OnInit {
   @Input() pageTitle: string = '';
   @Input() activeSection: CertificateOfferingSectionId =
     CERTIFICATE_OFFERING_SECTION_IDS.DETAILS;
+  progressStatuses: string[] = [];
+  progressTabAriaLabels: string[] = [];
+
+  ngOnInit(): void {
+    this.updateProgressStatuses();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('activeSection' in changes) {
+      this.updateProgressStatuses();
+    }
+  }
+
+  private updateProgressStatuses(): void {
+    const sectionTitles = [
+      'Add Certificate Details',
+      'Add Certificate Topics',
+      'Review & Availability',
+    ];
+    this.progressStatuses = [
+      this.getProgressTabStatusClass(1),
+      this.getProgressTabStatusClass(2),
+      this.getProgressTabStatusClass(3),
+    ];
+    this.progressTabAriaLabels = this.progressStatuses.map((status, index) => {
+      const stateLabel = status === 'active' ? 'current' : status;
+      return `Step ${index + 1}: ${sectionTitles[index]}, ${stateLabel}`;
+    });
+  }
 
   getFurthestReachedSectionNumber(): number {
     if (this.activeSection === CERTIFICATE_OFFERING_SECTION_IDS.DETAILS) {

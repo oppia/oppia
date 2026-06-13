@@ -254,6 +254,22 @@ describe('Certificate Offering Details Component', () => {
     expect(component.getSelectedClassroomName()).toEqual('Science');
   });
 
+  it('should set a safe fallback when classrooms fail to load', async () => {
+    spyOn(console, 'error');
+    spyOn(
+      TestBed.inject(ClassroomBackendApiService),
+      'getAllClassroomsSummaryAsync'
+    ).and.returnValue(Promise.reject('load failed'));
+
+    await component.loadClassrooms();
+
+    expect(component.classroomOptions).toEqual([]);
+    expect(component.classroomLoadErrorMessage).toEqual(
+      'Unable to load classrooms. Please try again.'
+    );
+    expect(console.error).toHaveBeenCalled();
+  });
+
   it('should return normalized form data', async () => {
     await component.loadClassrooms();
     component.title = '  Certificate title  ';

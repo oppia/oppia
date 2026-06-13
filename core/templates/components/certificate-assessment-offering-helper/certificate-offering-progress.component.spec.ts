@@ -68,4 +68,35 @@ describe('Certificate Offering Progress Component', () => {
     expect(component.getProgressTabStatusClass(2)).toEqual('completed');
     expect(component.getProgressTabStatusClass(3)).toEqual('active');
   });
+
+  it('should cache progress statuses for template bindings', () => {
+    component.activeSection = CERTIFICATE_OFFERING_SECTION_IDS.ADD_TOPIC_ITEMS;
+    component.ngOnInit();
+
+    expect(component.progressStatuses).toEqual([
+      'completed',
+      'active',
+      'incomplete',
+    ]);
+  });
+
+  it('should cache accessible labels for each step state', () => {
+    component.activeSection = CERTIFICATE_OFFERING_SECTION_IDS.DETAILS;
+    component.ngOnInit();
+
+    expect(component.progressTabAriaLabels).toEqual([
+      'Step 1: Add Certificate Details, current',
+      'Step 2: Add Certificate Topics, incomplete',
+      'Step 3: Review & Availability, incomplete',
+    ]);
+
+    component.activeSection = CERTIFICATE_OFFERING_SECTION_IDS.ADD_TOPIC_ITEMS;
+    component.ngOnInit();
+
+    expect(component.progressTabAriaLabels).toEqual([
+      'Step 1: Add Certificate Details, completed',
+      'Step 2: Add Certificate Topics, current',
+      'Step 3: Review & Availability, incomplete',
+    ]);
+  });
 });

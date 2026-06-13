@@ -16,7 +16,7 @@
  * @fileoverview Details step for creating or editing a certificate offering.
  */
 
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
 import {
   ClassroomBackendApiService,
@@ -39,7 +39,7 @@ interface CertificateOfferingDetailsFormData {
   selector: 'oppia-certificate-offering-details',
   templateUrl: './certificate-offering-details.component.html',
 })
-export class CertificateOfferingDetailsComponent {
+export class CertificateOfferingDetailsComponent implements OnInit {
   readonly TITLE_MAX_LENGTH = 80;
   readonly DESCRIPTION_MAX_LENGTH = 500;
   readonly TIME_LIMIT_MAX_VALUE = 60;
@@ -60,6 +60,7 @@ export class CertificateOfferingDetailsComponent {
   description: string = '';
   classroomId: string = '';
   classroomOptions: ClassroomSummaryDict[] = [];
+  classroomLoadErrorMessage: string = '';
   timeLimitInMinutes: number | null = null;
   totalQuestions: number | null = null;
   demonstratesList: string[] = [''];
@@ -72,8 +73,15 @@ export class CertificateOfferingDetailsComponent {
   }
 
   async loadClassrooms(): Promise<void> {
-    this.classroomOptions =
-      await this.classroomBackendApiService.getAllClassroomsSummaryAsync();
+    try {
+      this.classroomOptions =
+        await this.classroomBackendApiService.getAllClassroomsSummaryAsync();
+      this.classroomLoadErrorMessage = '';
+    } catch (error: unknown) {
+      console.error('Failed to load classrooms summary.', error);
+      this.classroomLoadErrorMessage =
+        'Unable to load classrooms. Please try again.';
+    }
   }
 
   setFormValues(): void {
