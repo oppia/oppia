@@ -274,9 +274,6 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
       [nodesToMove[0]]
     );
 
-    // Move the first node from the source arc via the service so the
-    // removal is tracked for backend validation (otherwise the node
-    // ends up in both arcs).
     this.storyUpdateService.moveNodeToArc(this.story, nodesToMove[0], arcId);
 
     nodesToMove.slice(1).forEach(nodeIdToMove => {
@@ -326,11 +323,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
         }
         this._initEditor();
       },
-      () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      }
+      () => {}
     );
   }
 
