@@ -27,10 +27,10 @@
       </a>.
     </div>
     <button
-      *ngIf="generateAttibutionIsAllowed"
-      type="button"
-      class="oppia-attribution-link oppia-attribution-guide-text e2e-test-generate-attribution"
-      (click)="showAttributionModal()">
+            *ngIf="generateAttibutionIsAllowed"
+            type="button"
+            class="oppia-attribution-link oppia-attribution-guide-text e2e-test-generate-attribution"
+            (click)="showAttributionModal()">
       <span [innerHTML]="'I18N_GENERATE_ATTRIBUTION' | translate"></span>
     </button>
   </div>

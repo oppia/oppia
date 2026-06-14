@@ -353,8 +353,8 @@ class BaseHandler(
                         'status_code': 401,
                     }
                 )
-                return
-            self.redirect('/logout?redirect_url=%s' % request_split.path)
+            else:
+                self.redirect('/logout?redirect_url=%s' % request_split.path)
             return
 
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:

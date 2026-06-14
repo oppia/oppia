@@ -457,7 +457,7 @@ class BuildTests(test_utils.GenericTestBase):
             content,
         )
         self.assertIn(
-            ('static_dir: ' 'build/third_party/ckeditor-bootstrapck\n'),
+            'static_dir: build/third_party/ckeditor-bootstrapck\n',
             content,
         )
         self.assertNotIn(

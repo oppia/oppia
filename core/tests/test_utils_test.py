@@ -1009,8 +1009,19 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
             {'id': 'duplicate_id_1', 'data': 'first_doc'},
             {'id': 'duplicate_id_1', 'data': 'second_doc'},
         ]
+        # Here we use object because the ElasticSearch query values can be
+        # of any type.
+        ElasticQueryValue = object
         ElasticQuery = Dict[
-            str, Union[str, int, float, bool, Dict[str, object], List[object]]
+            str,
+            Union[
+                str,
+                int,
+                float,
+                bool,
+                Dict[str, ElasticQueryValue],
+                List[ElasticQueryValue],
+            ],
         ]
         body: Dict[str, Dict[str, Dict[str, List[ElasticQuery]]]] = {
             'query': {'bool': {'filter': [], 'must': []}}
