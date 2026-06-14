@@ -200,7 +200,7 @@
                 </div>
                 <div class="story-nodes-container" cdkDropList (cdkDropListDropped)="drop($event)">
                   <ng-container *ngFor="let node of linearNodesList;index as idx">
-                    <div *ngIf="idx === 0" class="legacy-arc-boundary-row">
+                    <div *ngIf="idx === 0 && isStoryEditorArcsFeatureFlagEnabled()" class="legacy-arc-boundary-row">
                       <div class="arc-boundary-divider"></div>
                       <div class="arc-boundary-header">
                         <div class="arc-boundary-info">
@@ -229,7 +229,7 @@
                       </div>
                       <div class="arc-boundary-divider"></div>
                     </div>
-                    <div *ngIf="idx > 0 && !isSameArc(idx)" class="legacy-arc-boundary-row">
+                    <div *ngIf="idx > 0 && !isSameArc(idx) && isStoryEditorArcsFeatureFlagEnabled()" class="legacy-arc-boundary-row">
                       <div class="arc-boundary-divider"></div>
                       <div class="arc-boundary-header">
                         <div class="arc-boundary-info">
@@ -258,7 +258,7 @@
                       </div>
                       <div class="arc-boundary-divider"></div>
                     </div>
-                    <div *ngIf="idx > 0 && isSameArc(idx)"
+                    <div *ngIf="idx > 0 && isSameArc(idx) && isStoryEditorArcsFeatureFlagEnabled()"
                          class="legacy-split-line-row">
                       <div class="split-line-container">
                         <div class="split-line"></div>
@@ -359,7 +359,7 @@
                       <th>Planned Publication Date</th>
                     </tr>
                      <ng-container *ngFor="let node of linearNodesList;index as idx">
-                       <tr *ngIf="idx === 0" class="arc-boundary-row">
+                       <tr *ngIf="idx === 0 && isStoryEditorArcsFeatureFlagEnabled()" class="arc-boundary-row">
                          <td colspan="7">
                            <div class="arc-boundary-divider"></div>
                            <div class="arc-boundary-header">
@@ -390,8 +390,8 @@
                            <div class="arc-boundary-divider"></div>
                          </td>
                        </tr>
-                       <tr *ngIf="idx > 0 && !isSameArc(idx)"
-                           class="arc-boundary-row">
+                       <tr *ngIf="idx > 0 && !isSameArc(idx) && isStoryEditorArcsFeatureFlagEnabled()"
+                            class="arc-boundary-row">
                          <td colspan="7">
                            <div class="arc-boundary-divider"></div>
                            <div class="arc-boundary-header">
@@ -422,8 +422,8 @@
                            <div class="arc-boundary-divider"></div>
                          </td>
                        </tr>
-                       <tr *ngIf="idx > 0 && isSameArc(idx)"
-                           class="split-line-row">
+                       <tr *ngIf="idx > 0 && isSameArc(idx) && isStoryEditorArcsFeatureFlagEnabled()"
+                            class="split-line-row">
                          <td colspan="7">
                            <div class="split-line-container">
                              <div class="split-line"></div>
