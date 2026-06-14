@@ -817,6 +817,7 @@ var CodeMirrorChecker = function (elem, codeMirrorPaneToScroll) {
         scrollTo,
         paneIndex
       );
+      // eslint-disable-next-line oppia/e2e-practices
       await browser.pause(100);
       var lineHeight = await elem
         .$(codeMirrorLineNumberLocator)
@@ -888,6 +889,7 @@ var CodeMirrorChecker = function (elem, codeMirrorPaneToScroll) {
       if (await _codeMirrorApiContainsExpectedLines(compareDict)) {
         return;
       }
+      // eslint-disable-next-line oppia/e2e-practices
       await browser.pause(CODEMIRROR_UPDATE_POLL_MSECS);
     }
   };

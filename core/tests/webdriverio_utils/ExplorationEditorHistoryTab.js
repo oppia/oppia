@@ -26,19 +26,26 @@ var ExplorationEditorHistoryTab = function () {
    * Interactive elements
    */
   var historyGraph = $('.e2e-test-history-graph');
-  var leftCodeMirrorElementSelector = function () {
-    return $$('.CodeMirror-merge-editor .CodeMirror-code');
+  var codeMirrorMergePaneElementSelector = function () {
+    return $$('.CodeMirror-merge .CodeMirror-merge-pane .CodeMirror-code');
   };
-  var rightCodeMirrorElementSelector = function () {
-    return $$('.CodeMirror-merge-right .CodeMirror-code');
-  };
-  var lastVisibleElement = async function (elements) {
-    for (var i = elements.length - 1; i >= 0; i--) {
-      if (await elements[i].isDisplayed()) {
-        return elements[i];
+  var getCodeMirrorMergePaneElement = async function (paneIndex) {
+    await browser.waitUntil(
+      async function () {
+        var elements = await codeMirrorMergePaneElementSelector();
+        return elements.length >= 2;
+      },
+      {
+        timeout: 10000,
+        timeoutMsg: 'CodeMirror merge panes took too long to appear.',
       }
+    );
+    var elements = await codeMirrorMergePaneElementSelector();
+    var firstPaneIndex = elements.length - 2;
+    if (paneIndex === 'left') {
+      return elements[firstPaneIndex];
     }
-    throw new Error('No visible CodeMirror element found.');
+    return elements[firstPaneIndex + 1];
   };
   var toastSuccessElement = $('.toast-success');
   var firstVersionDropdown = $('.e2e-test-history-version-dropdown-first');
@@ -275,12 +282,9 @@ var ExplorationEditorHistoryTab = function () {
        *                     - highlighted: true or false
        */
       expectTextToMatch: async function (v1StateContents, v2StateContents) {
-        var leftCodeMirrorElement = await lastVisibleElement(
-          await leftCodeMirrorElementSelector()
-        );
-        var rightCodeMirrorElement = await lastVisibleElement(
-          await rightCodeMirrorElementSelector()
-        );
+        var leftCodeMirrorElement = await getCodeMirrorMergePaneElement('left');
+        var rightCodeMirrorElement =
+          await getCodeMirrorMergePaneElement('right');
         await forms
           .CodeMirrorChecker(leftCodeMirrorElement, 'first')
           .expectTextToBe(v1StateContents);
@@ -303,12 +307,9 @@ var ExplorationEditorHistoryTab = function () {
         v1StateContents,
         v2StateContents
       ) {
-        var leftCodeMirrorElement = await lastVisibleElement(
-          await leftCodeMirrorElementSelector()
-        );
-        var rightCodeMirrorElement = await lastVisibleElement(
-          await rightCodeMirrorElementSelector()
-        );
+        var leftCodeMirrorElement = await getCodeMirrorMergePaneElement('left');
+        var rightCodeMirrorElement =
+          await getCodeMirrorMergePaneElement('right');
         await forms
           .CodeMirrorChecker(leftCodeMirrorElement, 'first')
           .expectTextWithHighlightingToBe(v1StateContents);
