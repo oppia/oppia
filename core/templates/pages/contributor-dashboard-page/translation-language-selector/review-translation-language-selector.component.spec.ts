@@ -277,6 +277,50 @@ describe('Review Translation language selector', () => {
       })
     );
 
+    it(
+      'should default to the first available review language when the' +
+        ' preferred language is not in the reviewable language list',
+      fakeAsync(() => {
+        // Use a preferred language code not in the reviewer's language list,
+        // so the fallback to the first available option is triggered.
+        preferredLanguageCode = 'zh';
+        component.activeLanguageCode = null;
+        component.languageSelection = 'Language';
+
+        spyOn(component.setActiveLanguageCode, 'emit').and.callFake(
+          (languageCode: string) => {
+            component.activeLanguageCode = languageCode;
+          }
+        );
+
+        component.ngOnInit();
+        tick();
+        fixture.detectChanges();
+        // Should fall back to the first available review language ('en').
+        expect(component.languageSelection).toBe('English');
+        expect(component.activeLanguageCode).toBe('en');
+      })
+    );
+
+    it(
+      'should not enter the fallback block when activeLanguageCode is' +
+        ' already resolved to a valid language description',
+      fakeAsync(() => {
+        // When activeLanguageCode resolves to a valid description, the
+        // languageSelection should be set from it and the fallback block
+        // (which would call populateLanguageSelection again) should be skipped.
+        component.activeLanguageCode = 'fr';
+        component.languageSelection = 'Language';
+
+        component.ngOnInit();
+        tick();
+        fixture.detectChanges();
+        // activeLanguageCode 'fr' is in the reviewable list, so
+        // languageSelection should reflect 'fr', not fall back to 'en'.
+        expect(component.languageSelection).toBe('français (French)');
+      })
+    );
+
     it('should show the correct language when the language is changed', () => {
       expect(component.languageSelection).toBe('English');
       component.ngOnInit();
