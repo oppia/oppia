@@ -440,6 +440,8 @@ describe('Review Translation language selector', () => {
       fakeAsync(() => {
         const selectedLanguage = 'fr';
         spyOn(component.setActiveLanguageCode, 'emit');
+        // This is a private property, so we must access it using bracket notation.
+        // eslint-disable-next-line dot-notation
         spyOn(
           component['contributionOpportunitiesBackendApiService'],
           'savePreferredTranslationLanguageAsync'
@@ -452,6 +454,8 @@ describe('Review Translation language selector', () => {
         expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith(
           selectedLanguage
         );
+        // This is a private property, so we must access it using bracket notation.
+        // eslint-disable-next-line dot-notation
         expect(
           component['contributionOpportunitiesBackendApiService']
             .savePreferredTranslationLanguageAsync
