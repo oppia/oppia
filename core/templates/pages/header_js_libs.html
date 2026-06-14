@@ -7,8 +7,12 @@
     downloaded files are different because we use different IDs in the
     query parameters to download them.
   -->
+<% if (GA_ANALYTICS_ID) { %>
 <script async src="https://www.googletagmanager.com/gtag/js?id=<%= GA_ANALYTICS_ID %>"></script>
+<% } %>
 
   <!-- Google Tag Manager -->
+<% if (GTM_ANALYTICS_ID) { %>
 <script async src="https://www.googletagmanager.com/gtm.js?id=<%= GTM_ANALYTICS_ID %>"></script>
+<% } %>
 <% } %>
