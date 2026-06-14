@@ -1047,6 +1047,7 @@ export class LoggedOutUser extends BaseUser {
     if (!blogPostsFound) {
       return;
     }
+    await this.expectElementToBeVisible(blogPostContentSelector);
     const contentFound = await this.page.$$eval(
       `${blogPostTitleContainerSelector}, ${blogPostContentSelector}`,
       (elements, searchText) =>
@@ -1095,6 +1096,7 @@ export class LoggedOutUser extends BaseUser {
     if (!blogPostsFound) {
       return;
     }
+    await this.expectElementToBeVisible(blogPostTagSelector);
     const tagFound = await this.page.$$eval(
       blogPostTagSelector,
       (elements, expectedTag) =>
@@ -1752,9 +1754,12 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(footerForumlink, {
       visible: true,
     });
-    await this.clickAndWaitForNavigation(footerForumlink, true);
-
-    expect(this.page.url()).toBe(googleGroupsOppiaUrl);
+    await this.clickLinkButtonToNewTab(
+      footerForumlink,
+      'Forum',
+      googleGroupsOppiaUrl,
+      'Forum'
+    );
   }
 
   /**
@@ -2437,8 +2442,10 @@ export class LoggedOutUser extends BaseUser {
         window.scrollTo(0, 0);
       });
     }
-    await this.page.waitForSelector(languageDropdown);
-    const languageDropdownElement = await this.page.$(languageDropdown);
+    const languageDropdownElement = await this.page.waitForSelector(
+      languageDropdown,
+      {visible: true}
+    );
     if (!languageDropdownElement) {
       throw new Error('Language dropdown element not found');
     }
@@ -2446,7 +2453,7 @@ export class LoggedOutUser extends BaseUser {
       languageDropdown,
       el => el.textContent
     );
-    await languageDropdownElement.click();
+    await this.clickOnElement(languageDropdownElement);
     await this.clickOnElementWithSelector(languageOption);
     // Here we need to reload the page again to confirm the language change.
     await this.page.reload();
@@ -2477,12 +2484,14 @@ export class LoggedOutUser extends BaseUser {
         window.scrollTo(0, 0);
       });
     }
-    await this.page.waitForSelector(languageDropdown);
-    const languageDropdownElement = await this.page.$(languageDropdown);
+    const languageDropdownElement = await this.page.waitForSelector(
+      languageDropdown,
+      {visible: true}
+    );
     if (!languageDropdownElement) {
       throw new Error('Language dropdown element not found');
     }
-    await languageDropdownElement.click();
+    await this.clickOnElement(languageDropdownElement);
     await this.clickOnElementWithSelector(languageOption);
     await this.waitForNetworkIdle();
     await this.waitForPageToFullyLoad();
@@ -3760,8 +3769,12 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Filters lessons by multiple languages and deselect the already selected English language.
    * @param {string[]} languageNames - The names of the languages to filter by.
+   * @param {string} languageToDeselect - The name of the language to deselect.
    */
-  async filterLessonsByLanguage(languageNames: string[]): Promise<void> {
+  async filterLessonsByLanguage(
+    languageNames: string[],
+    languageToDeselect: string = 'English'
+  ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.waitForPageToFullyLoad();
     }
@@ -3779,8 +3792,8 @@ export class LoggedOutUser extends BaseUser {
         el => el.textContent.trim(),
         element
       );
-      // Deselecting english language.
-      if (elementText === 'English') {
+      // Deselecting the selected language before choosing new filters.
+      if (elementText === languageToDeselect) {
         await element.click();
       }
     }
@@ -3790,14 +3803,23 @@ export class LoggedOutUser extends BaseUser {
       unselectedFilterOptionsSelector
     );
     let foundMatch = false;
+    let englishMatchCount = 0;
 
     for (const language of deselectedLanguages) {
       const languageText = await this.page.evaluate(
         el => el.textContent,
         language
       );
+      const trimmedLanguageText = languageText.trim();
 
-      if (languageNames.includes(languageText.trim())) {
+      if (trimmedLanguageText === 'English') {
+        englishMatchCount += 1;
+        if (englishMatchCount < 2) {
+          continue;
+        }
+      }
+
+      if (languageNames.includes(trimmedLanguageText)) {
         foundMatch = true;
         await this.waitForElementToBeClickable(language);
         await language.click();

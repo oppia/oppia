@@ -166,7 +166,10 @@ export class NumberWithUnits {
     } catch (parsingError) {}
   }
 
-  static fromRawInputString(rawInput: string): NumberWithUnits {
+  static fromRawInputString(
+    rawInput: string,
+    decimalSeparator: string = '.'
+  ): NumberWithUnits {
     rawInput = rawInput.trim();
     let type = '';
     let real = 0.0;
@@ -208,31 +211,34 @@ export class NumberWithUnits {
           }
         }
       } else {
-        let startsWithCorrectCurrencyUnit = false;
         const keys = Object.keys(
           ObjectsDomainConstants.CURRENCY_UNITS
         ) as CurrencyUnitsKeys;
+        const normalizedRawInput = rawInput.trim().toLowerCase();
+        let matchingCurrencyFrontUnit: string | null = null;
         for (let i = 0; i < keys.length; i++) {
-          let unitLength =
-            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length;
-          for (let j = 0; j < unitLength; j++) {
-            if (
-              rawInput.startsWith(
-                ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units[j]
-              )
-            ) {
-              startsWithCorrectCurrencyUnit = true;
+          const frontUnits =
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units;
+          for (let j = 0; j < frontUnits.length; j++) {
+            const normalizedFrontUnit = frontUnits[j].toLowerCase();
+            if (normalizedRawInput.startsWith(normalizedFrontUnit)) {
+              matchingCurrencyFrontUnit = frontUnits[j];
               break;
             }
           }
+          if (matchingCurrencyFrontUnit !== null) {
+            break;
+          }
         }
-        if (startsWithCorrectCurrencyUnit === false) {
+
+        if (matchingCurrencyFrontUnit === null) {
           throw new Error(
             // eslint-disable-next-line max-len
-            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_CURRENCY
+            ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_VALUE
           );
         }
-        const ind = rawInput.indexOf(String(rawInput.match(/[0-9]/)));
+        const digitMatch = rawInput.match(/[0-9]/);
+        const ind = digitMatch?.index ?? -1;
         if (ind === -1) {
           throw new Error(
             // eslint-disable-next-line max-len
@@ -241,23 +247,7 @@ export class NumberWithUnits {
         }
         units = rawInput.substr(0, ind).trim();
 
-        startsWithCorrectCurrencyUnit = false;
-        for (let i = 0; i < keys.length; i++) {
-          let unitLength =
-            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length;
-          for (let j = 0; j < unitLength; j++) {
-            if (
-              units ===
-              ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units[
-                j
-              ].trim()
-            ) {
-              startsWithCorrectCurrencyUnit = true;
-              break;
-            }
-          }
-        }
-        if (startsWithCorrectCurrencyUnit === false) {
+        if (units !== matchingCurrencyFrontUnit.trim()) {
           throw new Error(
             // eslint-disable-next-line max-len
             ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_CURRENCY
@@ -289,6 +279,11 @@ export class NumberWithUnits {
         fractionObj = Fraction.fromRawInputString(value);
       } else {
         type = 'real';
+        // Normalize locale-specific decimal separator to English decimal
+        // before parsing (e.g. Portuguese '1,2' becomes '1.2').
+        if (decimalSeparator !== '.') {
+          value = value.replace(decimalSeparator, '.');
+        }
         real = parseFloat(value);
       }
       if (units !== '') {

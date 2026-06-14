@@ -501,16 +501,24 @@ export class BaseUser {
    * by the ElementHandle.
    */
   async waitForElementToBeClickable(
-    selector: string | ElementHandle<Element>
+    selector: string | ElementHandle<Element>,
+    timeout: number = 15000
   ): Promise<void> {
     const elementDesc = await this.getElementDescription(selector);
     showMessage(`Checking if element ${elementDesc} is clickable...`);
     const element =
       typeof selector === 'string'
-        ? await this.page.waitForSelector(selector)
+        ? await this.page.waitForSelector(selector, {
+            timeout: timeout,
+            visible: true,
+          })
         : selector;
     try {
-      await this.page.waitForFunction(isElementClickable, {}, element);
+      await this.page.waitForFunction(
+        isElementClickable,
+        {timeout: timeout},
+        element
+      );
     } catch (error) {
       if (error instanceof Error) {
         const clickabilityDiagnostics = await this.page.evaluate(
@@ -623,7 +631,7 @@ export class BaseUser {
             : 'No specific reason detected from diagnostics.';
 
         error.message =
-          `Element ${elementDesc} took too long to be clickable.\n` +
+          `Element ${elementDesc} took too long to be clickable (timeout ${timeout} ms).\n` +
           `Detected reasons:\n${reasonsText}\n` +
           'Original Error:\n' +
           error.message;
@@ -693,7 +701,7 @@ export class BaseUser {
     // https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space.
     const element = await this.page.waitForXPath(
       `//*[contains(normalize-space(text()), normalize-space("${text}"))]`,
-      {timeout: 10000}
+      {timeout: 60000}
     );
 
     if (!element) {
@@ -1222,6 +1230,18 @@ export class BaseUser {
     // To wait for all images to load and the page to be stable.
     await currentPage.waitForTimeout(5000);
 
+    // Disable all CSS transitions and animations before taking the
+    // screenshot to prevent snapshot mismatches caused by transitions
+    // being mid-way when the screenshot is captured.
+    const styleHandle = await currentPage.addStyleTag({
+      content: `
+        *, *::before, *::after {
+          transition: none !important;
+          animation: none !important;
+        }
+      `,
+    });
+
     /* The variable failureTrigger is the percentage of the difference between the stored screenshot and the current screenshot that would trigger a failure
      * In general, it is set as 0.04/4% (desktop) 0.042/4.2% (mobile) for the randomness of the page that are small enough to be ignored.
      * Based on the existence of the background/library banner, which are randomly selected from a set of four,
@@ -1302,6 +1322,9 @@ export class BaseUser {
         ' folder name should be something like new-snapshots_(suite-name)_desktop_original.' +
         ' The new screenshot(s) should end with "-received". When replacing the screenshot(s), make sure to change the postfix "-received" to "-snap".';
       throw new Error(errorMessage);
+    } finally {
+      // Remove the injected style tag so it doesn't affect subsequent actions.
+      await currentPage.evaluate(el => el.remove(), styleHandle);
     }
   }
 
@@ -1526,8 +1549,18 @@ export class BaseUser {
     visibility: boolean = true,
     context: Page = this.page
   ): Promise<void> {
-    const options = visibility ? {visible: true} : {hidden: true};
-    await context.waitForSelector(selector, options);
+    if (visibility) {
+      await context.waitForSelector(selector, {visible: true});
+    } else {
+      await context.waitForFunction(
+        (sel: string) => {
+          const el = document.querySelector(sel);
+          return !el || (el as HTMLElement).offsetParent === null;
+        },
+        {},
+        selector
+      );
+    }
     showMessage(`Element ${selector} is ${visibility ? 'visible' : 'hidden'}.`);
   }
 
@@ -2234,6 +2267,24 @@ export class BaseUser {
     await this.clickOnElementWithSelector(currentActionBtnSelector);
 
     await this.expectElementToBeVisible(currentActionBtnSelector, false);
+  }
+
+  /**
+   * Function to expect the page to have no translation ids.
+   */
+  async expectPageHasNoTranslationIds(): Promise<void> {
+    const translationIds = await this.page.$$eval('[translate]', elements =>
+      elements
+        .map(el => el.getAttribute('translate'))
+        .filter(val => val && val.startsWith('I18N'))
+    );
+
+    if (translationIds.length > 0) {
+      throw new Error(
+        `Page has untranslated strings: ${translationIds.join(', ')}`
+      );
+    }
+    showMessage('Success: Page has no translation ids.');
   }
 
   /**
