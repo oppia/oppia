@@ -25,6 +25,7 @@ import {
   ExplorationBackendDict,
 } from 'domain/exploration/exploration.model';
 import {ParamChange} from 'domain/exploration/param-change.model';
+import {ParamSpec} from 'domain/exploration/param-spec.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {StateObjectsBackendDict} from 'domain/exploration/states.model';
@@ -381,7 +382,7 @@ export class ExplorationEngineService {
     );
     let nextFocusLabel: string = this.focusManagerService.generateFocusLabel();
 
-    let interactionId = interaction.id;
+    let interactionId = interaction?.id ?? '';
     let interactionHtml = null;
     let interactionCustomizationArgs =
       this.exploration.getInteractionCustomizationArgs(this.currentStateName);
@@ -417,7 +418,7 @@ export class ExplorationEngineService {
     let initialCard = StateCard.createNewCard(
       this.currentStateName,
       questionHtml,
-      interactionHtml,
+      interactionHtml ?? '',
       interaction,
       initialState.content.contentId
     );
@@ -425,7 +426,7 @@ export class ExplorationEngineService {
   }
 
   getInitialStateName(): string {
-    return this.exploration.getInitialState().name;
+    return this.exploration.getInitialState().name ?? '';
   }
 
   /**
@@ -439,10 +440,14 @@ export class ExplorationEngineService {
    *   (used in preview mode).
    */
   private _initParams(manualParamChanges: ParamChange[]): void {
-    let baseParams = {};
-    this.exploration.paramSpecs.forEach((paramName, paramSpec) => {
-      baseParams[paramName] = paramSpec.getType().createDefaultValue();
-    });
+    let baseParams: Record<string, string> = {};
+    this.exploration.paramSpecs.forEach(
+      (paramName: string, paramSpec: ParamSpec) => {
+        baseParams[paramName] = String(
+          paramSpec.getType().createDefaultValue()
+        );
+      }
+    );
 
     let startingParams = this.makeParams(
       baseParams,
@@ -772,7 +777,7 @@ export class ExplorationEngineService {
     }
 
     let refresherExplorationId = outcome.refresherExplorationId;
-    let missingPrerequisiteSkillId = outcome.missingPrerequisiteSkillId;
+    let missingPrerequisiteSkillId = outcome.missingPrerequisiteSkillId ?? '';
     let newState = this.exploration.getState(newStateName);
     let isFirstHit = Boolean(
       this.visitedStateNames.indexOf(newStateName) === -1
@@ -952,8 +957,9 @@ export class ExplorationEngineService {
     nextInteractionIfStuckHtml =
       nextInteractionIfStuckHtml + this.getRandomSuffix();
 
-    let contentId = this.exploration.getState(this.nextStateIfStuckName).content
-      .contentId;
+    let contentId =
+      this.exploration.getState(this.nextStateIfStuckName).content.contentId ??
+      '';
 
     return StateCard.createNewCard(
       this.nextStateIfStuckName,
@@ -1051,11 +1057,10 @@ export class ExplorationEngineService {
     let shortestPathToStateInReverse: string[] = [];
     let pathsQueue: string[] = [];
     let visitedNodes: Record<string, boolean> = {};
-    let nodeToParentMap: Record<string, string> | null = {};
+    let nodeToParentMap: Record<string, string | null> = {};
     visitedNodes[this.exploration.initStateName] = true;
     pathsQueue.push(this.exploration.initStateName);
     // 1st state does not have a parent
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     nodeToParentMap[this.exploration.initStateName] = null;
     while (pathsQueue.length > 0) {
       // '.shift()' here can return an undefined value, but we're already

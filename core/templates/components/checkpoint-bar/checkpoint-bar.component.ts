@@ -51,10 +51,10 @@ export class CheckpointBarComponent implements OnInit {
   maxStateDepth: number = 0;
 
   constructor(
-    private explorationEngineService?: ExplorationEngineService,
-    private playerPositionService?: PlayerPositionService,
-    private pageContextService?: PageContextService,
-    private checkpointProgressService?: CheckpointProgressService
+    private explorationEngineService: ExplorationEngineService,
+    private playerPositionService: PlayerPositionService,
+    private pageContextService: PageContextService,
+    private checkpointProgressService: CheckpointProgressService
   ) {}
 
   ngOnInit(): void {
