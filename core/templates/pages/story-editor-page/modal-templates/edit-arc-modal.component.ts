@@ -22,6 +22,7 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'oppia-edit-arc-modal',
   templateUrl: './edit-arc-modal.component.html',
+  styleUrls: ['./edit-arc-modal.component.css'],
 })
 export class EditArcModalComponent {
   @Input() set arcTitle(value: string) {

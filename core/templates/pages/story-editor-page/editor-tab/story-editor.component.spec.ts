@@ -881,4 +881,35 @@ describe('Story Editor Component having three story nodes', () => {
     expect(component.storyContents.getArcs().length).toBe(2);
     expect(component.getArcIdForNode('node_3')).not.toBe('arc_1');
   });
+
+  it('should return null for arc helpers when story contents are missing', () => {
+    component.storyContents = null as unknown as typeof component.storyContents;
+
+    expect(component.getArcForNode('node_1')).toBeNull();
+    expect(component.getArcSequenceNumber('node_1')).toBeNull();
+  });
+
+  it('should return null for arc helpers when node has no arc', () => {
+    expect(component.getArcForNode('node_1')).toBeNull();
+    expect(component.getArcSequenceNumber('node_1')).toBeNull();
+  });
+
+  it('should not update arc when edit arc modal is dismissed', fakeAsync(() => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', 'Old description', ['node_2'])
+    );
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        arcTitle: '',
+        arcDescription: '',
+      },
+      result: Promise.reject(),
+    } as NgbModalRef);
+    const updateArcPropertySpy = spyOn(storyUpdateService, 'updateArcProperty');
+
+    component.editArc('arc_1');
+    tick();
+
+    expect(updateArcPropertySpy).not.toHaveBeenCalled();
+  }));
 });

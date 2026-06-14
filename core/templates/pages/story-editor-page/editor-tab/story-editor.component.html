@@ -358,141 +358,142 @@
                       <th>Last Modified or Published</th>
                       <th>Planned Publication Date</th>
                     </tr>
-                     <ng-container *ngFor="let node of linearNodesList;index as idx">
-                       <tr *ngIf="idx === 0 && isStoryEditorArcsFeatureFlagEnabled()" class="arc-boundary-row">
-                         <td colspan="7">
-                           <div class="arc-boundary-divider"></div>
-                           <div class="arc-boundary-header">
-                             <div class="arc-boundary-info">
-                               <span class="arc-boundary-title">
-                                 {{ getArcForNode(node.getId())?.getTitle() }}
-                               </span>
-                               <span class="arc-boundary-description" *ngIf="getArcForNode(node.getId())?.getDescription()">
-                                 {{ getArcForNode(node.getId())?.getDescription() }}
-                               </span>
-                               <span class="arc-boundary-chapter-count">
-                                 {{ getArcForNode(node.getId())?.getNodeIds()?.length }} chapters
-                               </span>
-                             </div>
-                             <div class="arc-boundary-actions">
-                               <button class="btn btn-sm arc-edit-button"
-                                       (click)="editArc(getArcIdForNode(node.getId()));$event.stopPropagation()">
-                                 <i class="fa fa-pencil"></i>
-                                 Edit Arc
-                               </button>
-                               <button class="btn btn-sm arc-remove-button"
-                                       (click)="removeArcBoundary(getArcIdForNode(node.getId()));$event.stopPropagation()">
-                                 <i class="fa fa-trash"></i>
-                                 Remove Arc Boundary
-                               </button>
-                             </div>
-                           </div>
-                           <div class="arc-boundary-divider"></div>
-                         </td>
-                       </tr>
-                       <tr *ngIf="idx > 0 && !isSameArc(idx) && isStoryEditorArcsFeatureFlagEnabled()"
-                            class="arc-boundary-row">
-                         <td colspan="7">
-                           <div class="arc-boundary-divider"></div>
-                           <div class="arc-boundary-header">
-                             <div class="arc-boundary-info">
-                               <span class="arc-boundary-title">
-                                 {{ getArcForNode(node.getId())?.getTitle() }}
-                               </span>
-                               <span class="arc-boundary-description" *ngIf="getArcForNode(node.getId())?.getDescription()">
-                                 {{ getArcForNode(node.getId())?.getDescription() }}
-                               </span>
-                               <span class="arc-boundary-chapter-count">
-                                 {{ getArcForNode(node.getId())?.getNodeIds()?.length }} chapters
-                               </span>
-                             </div>
-                             <div class="arc-boundary-actions">
-                               <button class="btn btn-sm arc-edit-button"
-                                       (click)="editArc(getArcIdForNode(node.getId()));$event.stopPropagation()">
-                                 <i class="fa fa-pencil"></i>
-                                 Edit Arc
-                               </button>
-                               <button class="btn btn-sm arc-remove-button"
-                                       (click)="removeArcBoundary(getArcIdForNode(node.getId()));$event.stopPropagation()">
-                                 <i class="fa fa-trash"></i>
-                                 Remove Arc Boundary
-                               </button>
-                             </div>
-                           </div>
-                           <div class="arc-boundary-divider"></div>
-                         </td>
-                       </tr>
-                       <tr *ngIf="idx > 0 && isSameArc(idx) && isStoryEditorArcsFeatureFlagEnabled()"
-                            class="split-line-row">
-                         <td colspan="7">
-                           <div class="split-line-container">
-                             <div class="split-line"></div>
-                             <button class="btn btn-sm split-into-arc-button"
-                                     (click)="splitIntoArc(idx);$event.stopPropagation()">
-                               <i class="fas fa-cut"></i>
-                               Split Into Arc
-                             </button>
-                             <div class="split-line"></div>
-                           </div>
-                         </td>
-                       </tr>
-                       <tr class="story-node"
-                         [ngClass]="{'published-node': (node.getStatus() === 'Published'),
-                                    'ready-to-publish-node': (node.getStatus() === 'Ready To Publish'),
-                                    'draft-node': (node.getStatus() === 'Draft')}"
-                         (click)="navigateToChapterWithId(node.getId(), idx)"
-                         cdkDrag
-                         [cdkDragDisabled]="isDragAndDropDisabled(node)"
-                         [cdkDragData]="node">
-                      <td class="drag-handler" (click)="$event.stopPropagation()">
-                        <span class="fas fa-grip-vertical draggable-icon-indicator"
-                              *ngIf="node.getStatus()!=='Published'">
-                        </span>
-                      </td>
-                      <td class="chapter-index"> {{ idx+1 }} </td>
-                      <td class="e2e-test-chapter-title chapter-title">{{ node.getTitle() }}</td>
-                      <td class="chapter-status e2e-test-chapter-status">
-                        {{ node.getStatus() }}
-                      </td>
-                      <td class="chapter-last-modified">
-                          {{ dateTimeFormatService.getLocaleDateTimeHourString(node.getLastModifiedMsecs()) }}
-                        <div *ngIf="node.getStatus()=='Published'">(published)</div>
-                        <div *ngIf="node.getStatus()=='Ready To Publish'">(draft modified)</div>
-                        <div *ngIf="node.getStatus()=='Draft'">(draft added)</div>
-                      </td>
-                      <td class="chapter-planned-publication-date">{{ node.getPlannedPublicationDateMsecs() != null ?
-                        getMediumStyleLocaleDateString(node.getPlannedPublicationDateMsecs()): '-' }}
-                      </td>
-                      <td class="edit-options-container">
-                        <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options"
-                           (click)="toggleChapterEditOptions(idx);$event.stopPropagation()"
-                           aria-label="Chapter edit">
-                        </i>
-                        <div class="chapter-option-box"
-                             *ngIf="selectedChapterIndex === idx"
-                             (mouseleave)="toggleChapterEditOptions(-1)"
-                             (click)="toggleChapterEditOptions(-1);$event.stopPropagation()">
-                          <div class="chapter-edit-option e2e-test-move-chapter-up-button"
-                               *ngIf="idx!=0 && linearNodesList[idx-1].getStatus()!='Published' && linearNodesList[idx].getStatus()!='Published'"
-                               (click)="moveNodeUpInStory(idx);$event.stopPropagation()">
-                            <span>Move Up</span>
+                    <ng-container *ngFor="let node of linearNodesList;index as idx">
+                      <tr *ngIf="idx === 0 && isStoryEditorArcsFeatureFlagEnabled()" class="arc-boundary-row">
+                        <td colspan="7">
+                          <div class="arc-boundary-divider"></div>
+                          <div class="arc-boundary-header">
+                            <div class="arc-boundary-info">
+                              <span class="arc-boundary-title">
+                                {{ getArcForNode(node.getId())?.getTitle() }}
+                              </span>
+                              <span class="arc-boundary-description" *ngIf="getArcForNode(node.getId())?.getDescription()">
+                                {{ getArcForNode(node.getId())?.getDescription() }}
+                              </span>
+                              <span class="arc-boundary-chapter-count">
+                                {{ getArcForNode(node.getId())?.getNodeIds()?.length }} chapters
+                              </span>
+                            </div>
+                            <div class="arc-boundary-actions">
+                              <button class="btn btn-sm arc-edit-button"
+                                      (click)="editArc(getArcIdForNode(node.getId()));$event.stopPropagation()">
+                                <i class="fa fa-pencil"></i>
+                                Edit Arc
+                              </button>
+                              <button class="btn btn-sm arc-remove-button"
+                                      (click)="removeArcBoundary(getArcIdForNode(node.getId()));$event.stopPropagation()">
+                                <i class="fa fa-trash"></i>
+                                Remove Arc Boundary
+                              </button>
+                            </div>
                           </div>
-                          <div class="chapter-edit-option e2e-test-move-chapter-down-button"
-                               *ngIf="idx!=linearNodesList.length-1 && node.getStatus()!='Published'"
-                               (click)="moveNodeDownInStory(idx);$event.stopPropagation()">
-                            <span>Move Down</span>
+                          <div class="arc-boundary-divider"></div>
+                        </td>
+                      </tr>
+                      <tr *ngIf="idx > 0 && !isSameArc(idx) && isStoryEditorArcsFeatureFlagEnabled()"
+                          class="arc-boundary-row">
+                        <td colspan="7">
+                          <div class="arc-boundary-divider"></div>
+                          <div class="arc-boundary-header">
+                            <div class="arc-boundary-info">
+                              <span class="arc-boundary-title">
+                                {{ getArcForNode(node.getId())?.getTitle() }}
+                              </span>
+                              <span class="arc-boundary-description" *ngIf="getArcForNode(node.getId())?.getDescription()">
+                                {{ getArcForNode(node.getId())?.getDescription() }}
+                              </span>
+                              <span class="arc-boundary-chapter-count">
+                                {{ getArcForNode(node.getId())?.getNodeIds()?.length }} chapters
+                              </span>
+                            </div>
+                            <div class="arc-boundary-actions">
+                              <button class="btn btn-sm arc-edit-button"
+                                      (click)="editArc(getArcIdForNode(node.getId()));$event.stopPropagation()">
+                                <i class="fa fa-pencil"></i>
+                                Edit Arc
+                              </button>
+                              <button class="btn btn-sm arc-remove-button"
+                                      (click)="removeArcBoundary(getArcIdForNode(node.getId()));$event.stopPropagation()">
+                                <i class="fa fa-trash"></i>
+                                Remove Arc Boundary
+                              </button>
+                            </div>
                           </div>
-                          <div class="chapter-edit-option e2e-test-edit-chapter-button"
-                               (click)="navigateToChapterWithId(node.getId(), idx)">
-                            <span>Edit</span>
+                          <div class="arc-boundary-divider"></div>
+                        </td>
+                      </tr>
+                      <tr *ngIf="idx > 0 && isSameArc(idx) && isStoryEditorArcsFeatureFlagEnabled()"
+                          class="split-line-row">
+                        <td colspan="7">
+                          <div class="split-line-container">
+                            <div class="split-line"></div>
+                            <button class="btn btn-sm split-into-arc-button"
+                                    (click)="splitIntoArc(idx);$event.stopPropagation()">
+                              <i class="fas fa-cut"></i>
+                              Split Into Arc
+                            </button>
+                            <div class="split-line"></div>
                           </div>
-                          <div class="chapter-edit-option e2e-test-delete-chapter-button"
-                               (click)="deleteNode(node.getId());$event.stopPropagation()">
-                            <span>Delete</span>
+                        </td>
+                      </tr>
+                      <tr class="story-node"
+                          [ngClass]="{'published-node': (node.getStatus() === 'Published'),
+                                     'ready-to-publish-node': (node.getStatus() === 'Ready To Publish'),
+                                     'draft-node': (node.getStatus() === 'Draft')}"
+                          (click)="navigateToChapterWithId(node.getId(), idx)"
+                          cdkDrag
+                          [cdkDragDisabled]="isDragAndDropDisabled(node)"
+                          [cdkDragData]="node">
+                        <td class="drag-handler" (click)="$event.stopPropagation()">
+                          <span class="fas fa-grip-vertical draggable-icon-indicator"
+                                *ngIf="node.getStatus()!=='Published'">
+                          </span>
+                        </td>
+                        <td class="chapter-index"> {{ idx+1 }} </td>
+                        <td class="e2e-test-chapter-title chapter-title">{{ node.getTitle() }}</td>
+                        <td class="chapter-status e2e-test-chapter-status">
+                          {{ node.getStatus() }}
+                        </td>
+                        <td class="chapter-last-modified">
+                            {{ dateTimeFormatService.getLocaleDateTimeHourString(node.getLastModifiedMsecs()) }}
+                          <div *ngIf="node.getStatus()=='Published'">(published)</div>
+                          <div *ngIf="node.getStatus()=='Ready To Publish'">(draft modified)</div>
+                          <div *ngIf="node.getStatus()=='Draft'">(draft added)</div>
+                        </td>
+                        <td class="chapter-planned-publication-date">{{ node.getPlannedPublicationDateMsecs() != null ?
+                          getMediumStyleLocaleDateString(node.getPlannedPublicationDateMsecs()): '-' }}
+                        </td>
+                        <td class="edit-options-container">
+                          <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options"
+                             (click)="toggleChapterEditOptions(idx);$event.stopPropagation()"
+                             aria-label="Chapter edit">
+                          </i>
+                          <div class="chapter-option-box"
+                               *ngIf="selectedChapterIndex === idx"
+                               (mouseleave)="toggleChapterEditOptions(-1)"
+                               (click)="toggleChapterEditOptions(-1);$event.stopPropagation()">
+                            <div class="chapter-edit-option e2e-test-move-chapter-up-button"
+                                 *ngIf="idx!=0 && linearNodesList[idx-1].getStatus()!='Published' && linearNodesList[idx].getStatus()!='Published'"
+                                 (click)="moveNodeUpInStory(idx);$event.stopPropagation()">
+                              <span>Move Up</span>
+                            </div>
+                            <div class="chapter-edit-option e2e-test-move-chapter-down-button"
+                                 *ngIf="idx!=linearNodesList.length-1 && node.getStatus()!='Published'"
+                                 (click)="moveNodeDownInStory(idx);$event.stopPropagation()">
+                              <span>Move Down</span>
+                            </div>
+                            <div class="chapter-edit-option e2e-test-edit-chapter-button"
+                                 (click)="navigateToChapterWithId(node.getId(), idx)">
+                              <span>Edit</span>
+                            </div>
+                            <div class="chapter-edit-option e2e-test-delete-chapter-button"
+                                 (click)="deleteNode(node.getId());$event.stopPropagation()">
+                              <span>Delete</span>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                    </tr>
+                        </td>
+                      </tr>
+                    </ng-container>
                     </ng-container>
                   </table>
                 </div>
@@ -987,19 +988,19 @@
       }
     }
     .arc-boundary-row td {
-      padding: 0 !important;
       border: none !important;
+      padding: 0 !important;
     }
 
     .arc-boundary-header {
-      display: flex;
       align-items: flex-start;
-      justify-content: space-between;
       background-color: #eaf6f8;
       border: 1px solid #c7dde4;
       border-radius: 8px;
-      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
       margin: 6px 0;
+      padding: 12px 14px;
     }
 
     .arc-boundary-info {
@@ -1015,9 +1016,9 @@
     }
 
     .arc-boundary-title {
-      font-weight: 600;
-      font-size: 18px;
       color: #1f2d3d;
+      font-size: 18px;
+      font-weight: 600;
     }
 
     .arc-boundary-description {
@@ -1068,20 +1069,20 @@
     }
 
     .split-line-row td {
-      padding: 0 !important;
       border: none !important;
+      padding: 0 !important;
     }
 
     .split-line-container {
-      display: flex;
       align-items: center;
+      display: flex;
       padding: 12px 0;
     }
 
     .split-line {
+      border-top: 2px dashed #c7cbd1;
       flex: 1;
       height: 0;
-      border-top: 2px dashed #c7cbd1;
     }
 
     .split-into-arc-button {
@@ -1110,8 +1111,8 @@
     }
 
     .legacy-arc-boundary-row .arc-boundary-header {
-      display: flex;
       align-items: flex-start;
+      display: flex;
       justify-content: space-between;
     }
   </style>

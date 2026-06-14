@@ -525,6 +525,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 'nodes': [],
                 'initial_node_id': None,
                 'next_node_id': self.NODE_ID_1,
+                'arcs': [],
             },
             'story_contents_schema_version': (
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION

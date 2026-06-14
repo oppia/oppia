@@ -31,7 +31,7 @@ export interface StoryContentsBackendDict {
   initial_node_id: string;
   next_node_id: string;
   nodes: StoryNodeBackendDict[];
-  arcs: ArcBackendDict[];
+  arcs?: ArcBackendDict[];
 }
 
 interface NodeTitles {

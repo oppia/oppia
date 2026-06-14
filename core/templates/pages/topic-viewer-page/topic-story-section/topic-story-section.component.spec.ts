@@ -453,4 +453,51 @@ describe('TopicStorySectionComponent', () => {
 
     expect(component.studyGuideUrl).toBe('unchanged-value');
   });
+
+  it('should toggle arc expansion state', () => {
+    expect(component.isArcExpanded(0)).toBeFalse();
+
+    component.toggleArc(0);
+    expect(component.isArcExpanded(0)).toBeTrue();
+
+    component.toggleArc(0);
+    expect(component.isArcExpanded(0)).toBeFalse();
+  });
+
+  it('should ignore arc node ids not present in all nodes', () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue('exp_1');
+    storyNodeSpy.getId.and.returnValue('node_1');
+
+    const arcs = [
+      {
+        id: 'arc_1',
+        title: 'Arc 1',
+        description: 'First arc',
+        node_ids: ['missing_node_id'],
+      },
+    ];
+
+    component.storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy],
+      arcs
+    );
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+
+    expect(component.arcGroups.length).toBe(1);
+    expect(component.arcGroups[0].lessonCards).toEqual([]);
+  });
 });

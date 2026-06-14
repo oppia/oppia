@@ -32,6 +32,7 @@ from core.domain import (  # pylint: disable=invalid-import-from
 )
 
 from typing import Final, List, Literal, Optional, TypedDict, overload
+from typing_extensions import NotRequired
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -1213,12 +1214,21 @@ class Arc:
         description: str,
         node_ids: List[str],
     ) -> None:
+        """Initializes the Arc object.
+
+        Args:
+            arc_id: str. The unique ID of the arc.
+            title: str. The title of the arc.
+            description: str. The description of the arc.
+            node_ids: list(str). The list of node IDs in this arc.
+        """
         self.id = arc_id
         self.title = title
         self.description = description
         self.node_ids = node_ids
 
     def validate(self) -> None:
+        """Validates the arc object."""
         if not isinstance(self.id, str):
             raise utils.ValidationError(
                 'Expected arc id to be a string, received %s' % self.id
@@ -1249,6 +1259,11 @@ class Arc:
                 )
 
     def to_dict(self) -> ArcDict:
+        """Returns a dict representation of the Arc.
+
+        Returns:
+            ArcDict. A dict representation of the Arc instance.
+        """
         return {
             'id': self.id,
             'title': self.title,
@@ -1258,6 +1273,14 @@ class Arc:
 
     @classmethod
     def from_dict(cls, arc_dict: ArcDict) -> Arc:
+        """Creates an Arc from a dict.
+
+        Args:
+            arc_dict: ArcDict. The dict representation of the Arc.
+
+        Returns:
+            Arc. The corresponding Arc instance.
+        """
         return cls(
             arc_id=arc_dict['id'],
             title=arc_dict['title'],
@@ -1272,7 +1295,7 @@ class StoryContentsDict(TypedDict):
     nodes: List[StoryNodeDict]
     initial_node_id: Optional[str]
     next_node_id: str
-    arcs: List[ArcDict]
+    arcs: NotRequired[List[ArcDict]]
 
 
 class StoryContents:
@@ -1486,6 +1509,17 @@ class StoryContents:
         return ordered_nodes_list
 
     def get_arc_index(self, arc_id: str) -> int:
+        """Returns the index of the arc with the given ID.
+
+        Args:
+            arc_id: str. The ID of the arc.
+
+        Returns:
+            int. The index of the arc.
+
+        Raises:
+            ValueError. If the arc is not found.
+        """
         for ind, arc in enumerate(self.arcs):
             if arc.id == arc_id:
                 return ind
@@ -1494,16 +1528,42 @@ class StoryContents:
         )
 
     def get_arc(self, arc_id: str) -> Arc:
+        """Returns the arc with the given ID.
+
+        Args:
+            arc_id: str. The ID of the arc.
+
+        Returns:
+            Arc. The arc with the given ID.
+        """
         return self.arcs[self.get_arc_index(arc_id)]
 
     def add_arc(self, arc: Arc) -> None:
+        """Adds a new arc to the story.
+
+        Args:
+            arc: Arc. The arc to add.
+        """
         self.arcs.append(arc)
 
     def delete_arc(self, arc_id: str) -> None:
+        """Deletes the arc with the given ID.
+
+        Args:
+            arc_id: str. The ID of the arc to delete.
+        """
         index = self.get_arc_index(arc_id)
         del self.arcs[index]
 
     def rearrange_arcs(self, arc_ids_order: List[str]) -> None:
+        """Rearranges the arcs according to the given order of IDs.
+
+        Args:
+            arc_ids_order: list(str). The ordered list of arc IDs.
+
+        Raises:
+            ValueError. If an arc ID is not found.
+        """
         old_arcs = {arc.id: arc for arc in self.arcs}
         new_arcs = []
         for arc_id in arc_ids_order:
@@ -1515,6 +1575,12 @@ class StoryContents:
         self.arcs = new_arcs
 
     def move_node_to_arc(self, node_id: str, to_arc_id: str) -> None:
+        """Moves a node from its current arc to the specified arc.
+
+        Args:
+            node_id: str. The ID of the node to move.
+            to_arc_id: str. The ID of the destination arc.
+        """
         for arc in self.arcs:
             if node_id in arc.node_ids:
                 arc.node_ids.remove(node_id)

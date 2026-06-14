@@ -27,7 +27,6 @@ from core.domain import (
     platform_parameter_list,
     platform_parameter_services,
     skill_services,
-    story_domain,
     story_fetchers,
     topic_fetchers,
     topic_services,
