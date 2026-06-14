@@ -43,3 +43,61 @@ class CertificateAssessmentOfferingHandler(
     def post(self) -> None:
         """Returns a dummy certificate_id (stub)."""
         self.render_json({'certificate_id': 'dummy_id'})
+
+
+class CertificateAssessmentOfferingByIdHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler for retrieving, updating and deleting an offering by ID."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'certificate_id': {'schema': {'type': 'basestring'}}
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {},
+        'DELETE': {},
+    }
+
+    @acl_decorators.can_access_certificate_dashboard
+    def get(self, certificate_id: str) -> None:
+        """Returns a stubbed certificate offering.
+
+        Args:
+            certificate_id: str. The ID of the certificate offering.
+        """
+        self.render_json(
+            {
+                'certificate_offering': {
+                    'certificate_id': certificate_id,
+                    'title': 'Certificate Title',
+                    'description': '',
+                    'classroom_id': '',
+                    'topic_data': {},
+                    'total_questions': 0,
+                    'time_limit_in_minutes': 0,
+                    'async_status': 'Draft',
+                    'version': 1,
+                }
+            }
+        )
+
+    @acl_decorators.can_access_certificate_dashboard
+    def put(self, certificate_id: str) -> None:
+        """Returns the updated certificate ID (stub).
+
+        Args:
+            certificate_id: str. The ID of the certificate offering.
+        """
+        self.render_json({'certificate_id': certificate_id})
+
+    @acl_decorators.can_access_certificate_dashboard
+    def delete(self, certificate_id: str) -> None:
+        """Deletes the certificate offering (stub).
+
+        Args:
+            certificate_id: str. The ID of the certificate offering.
+        """
+        del certificate_id
+        self.render_json({})
