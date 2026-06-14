@@ -347,6 +347,80 @@ describe('Review Translation language selector', () => {
       })
     );
 
+    it(
+      'should default to the first available review language when the' +
+        ' active language code is invalid',
+      fakeAsync(() => {
+        // Use an active language code not in the reviewer's language list.
+        component.activeLanguageCode = 'de';
+        preferredLanguageCode = '';
+        component.languageSelection = 'Language';
+
+        spyOn(component.setActiveLanguageCode, 'emit').and.callFake(
+          (languageCode: string) => {
+            component.activeLanguageCode = languageCode;
+          }
+        );
+
+        component.ngOnInit();
+        tick();
+        fixture.detectChanges();
+        // Should fall back to the first available review language ('en').
+        expect(component.languageSelection).toBe('English');
+        expect(component.activeLanguageCode).toBe('en');
+      })
+    );
+
+    it(
+      'should not default to any language when the user has no' +
+        ' reviewable translation languages',
+      fakeAsync(() => {
+        // Reset the spy to return empty reviewable languages.
+        userService.getUserContributionRightsDataAsync = jasmine
+          .createSpy()
+          .and.resolveTo({
+            can_suggest_questions: false,
+            can_review_translation_for_language_codes: [],
+            can_review_voiceover_for_language_codes: [],
+            can_review_questions: false,
+          });
+
+        component.activeLanguageCode = null;
+        preferredLanguageCode = '';
+        component.languageSelection = 'Language';
+
+        spyOn(component.setActiveLanguageCode, 'emit');
+
+        component.ngOnInit();
+        tick();
+        fixture.detectChanges();
+
+        expect(component.languageSelection).toBe('Language');
+        expect(component.setActiveLanguageCode.emit).not.toHaveBeenCalled();
+      })
+    );
+
+    it(
+      'should not hide the dropdown when the user clicks inside' +
+        ' the dropdown',
+      () => {
+        component.dropdownShown = true;
+        const fakeClickInsideEvent = new MouseEvent('click');
+        // We set the target to a div that is inside the dropdown element.
+        const dropdownEl = component.dropdownRef.nativeElement;
+        const insideEl = document.createElement('div');
+        dropdownEl.appendChild(insideEl);
+        Object.defineProperty(fakeClickInsideEvent, 'target', {
+          value: insideEl,
+        });
+
+        component.onDocumentClick(fakeClickInsideEvent);
+        fixture.detectChanges();
+
+        expect(component.dropdownShown).toBe(true);
+      }
+    );
+
     it('should show the correct language when the language is changed', () => {
       expect(component.languageSelection).toBe('English');
       component.ngOnInit();
@@ -363,26 +437,25 @@ describe('Review Translation language selector', () => {
     it(
       'should indicate selection and save the language' +
         ' on selecting a new language',
-      () => {
+      fakeAsync(() => {
         const selectedLanguage = 'fr';
         spyOn(component.setActiveLanguageCode, 'emit');
         spyOn(
           contributionOpportunitiesBackendApiServiceStub,
           'savePreferredTranslationLanguageAsync' as never
-        );
+        ).and.resolveTo();
 
         component.selectOption(selectedLanguage);
+        tick();
+        fixture.detectChanges();
 
-        fixture.whenStable().then(() => {
-          fixture.detectChanges();
-          expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith(
-            selectedLanguage
-          );
-          expect(
-            contributionOpportunitiesBackendApiServiceStub.savePreferredTranslationLanguageAsync
-          ).toHaveBeenCalledWith(selectedLanguage);
-        });
-      }
+        expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith(
+          selectedLanguage
+        );
+        expect(
+          contributionOpportunitiesBackendApiServiceStub.savePreferredTranslationLanguageAsync
+        ).toHaveBeenCalledWith(selectedLanguage);
+      })
     );
 
     it('should toggle dropdown', fakeAsync(() => {
