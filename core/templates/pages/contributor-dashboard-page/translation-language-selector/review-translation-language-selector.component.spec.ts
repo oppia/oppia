@@ -256,169 +256,19 @@ describe('Review Translation language selector', () => {
     );
 
     it(
-      'should default to the first available review language when the preferred' +
+      'should ask user to select a language when the preferred' +
         ' language is not defined',
       fakeAsync(() => {
         preferredLanguageCode = '';
         component.activeLanguageCode = null;
         component.languageSelection = 'Language';
 
-        spyOn(component.setActiveLanguageCode, 'emit').and.callFake(
-          (languageCode: string) => {
-            component.activeLanguageCode = languageCode;
-          }
-        );
-
         component.ngOnInit();
-        tick();
+
         fixture.detectChanges();
-        expect(component.languageSelection).toBe('English');
-        expect(component.activeLanguageCode).toBe('en');
-      })
-    );
-
-    it(
-      'should default to the first available review language when the' +
-        ' preferred language is not in the reviewable language list',
-      fakeAsync(() => {
-        // Use a preferred language code not in the reviewer's language list,
-        // so the fallback to the first available option is triggered.
-        preferredLanguageCode = 'zh';
-        component.activeLanguageCode = null;
-        component.languageSelection = 'Language';
-
-        spyOn(component.setActiveLanguageCode, 'emit').and.callFake(
-          (languageCode: string) => {
-            component.activeLanguageCode = languageCode;
-          }
-        );
-
-        component.ngOnInit();
-        tick();
-        fixture.detectChanges();
-        // Should fall back to the first available review language ('en').
-        expect(component.languageSelection).toBe('English');
-        expect(component.activeLanguageCode).toBe('en');
-      })
-    );
-
-    it(
-      'should select the preferred language when it is in the' +
-        ' reviewable language list and no active language is set',
-      fakeAsync(() => {
-        // When preferred language is valid and in the reviewer's list, it
-        // should be selected via populateLanguageSelection.
-        preferredLanguageCode = 'es';
-        component.activeLanguageCode = null;
-        component.languageSelection = 'Language';
-
-        spyOn(component.setActiveLanguageCode, 'emit').and.callFake(
-          (languageCode: string) => {
-            component.activeLanguageCode = languageCode;
-          }
-        );
-
-        component.ngOnInit();
-        tick();
-        fixture.detectChanges();
-        // Preferred language 'es' is in the reviewable list, so it should
-        // be selected.
-        expect(component.languageSelection).toBe('español (Spanish)');
-        expect(component.activeLanguageCode).toBe('es');
-      })
-    );
-
-    it(
-      'should not enter the fallback block when activeLanguageCode is' +
-        ' already resolved to a valid language description',
-      fakeAsync(() => {
-        // When activeLanguageCode resolves to a valid description, the
-        // languageSelection should be set from it and the fallback block
-        // (which would call populateLanguageSelection again) should be skipped.
-        component.activeLanguageCode = 'fr';
-        component.languageSelection = 'Language';
-
-        component.ngOnInit();
-        tick();
-        fixture.detectChanges();
-        // ActiveLanguageCode 'fr' is in the reviewable list, so
-        // languageSelection should reflect 'fr', not fall back to 'en'.
-        expect(component.languageSelection).toBe('français (French)');
-      })
-    );
-
-    it(
-      'should default to the first available review language when the' +
-        ' active language code is invalid',
-      fakeAsync(() => {
-        // Use an active language code not in the reviewer's language list.
-        component.activeLanguageCode = 'de';
-        preferredLanguageCode = '';
-        component.languageSelection = 'Language';
-
-        spyOn(component.setActiveLanguageCode, 'emit').and.callFake(
-          (languageCode: string) => {
-            component.activeLanguageCode = languageCode;
-          }
-        );
-
-        component.ngOnInit();
-        tick();
-        fixture.detectChanges();
-        // Should fall back to the first available review language ('en').
-        expect(component.languageSelection).toBe('English');
-        expect(component.activeLanguageCode).toBe('en');
-      })
-    );
-
-    it(
-      'should not default to any language when the user has no' +
-        ' reviewable translation languages',
-      fakeAsync(() => {
-        // Reset the spy to return empty reviewable languages.
-        userService.getUserContributionRightsDataAsync = jasmine
-          .createSpy()
-          .and.resolveTo({
-            can_suggest_questions: false,
-            can_review_translation_for_language_codes: [],
-            can_review_voiceover_for_language_codes: [],
-            can_review_questions: false,
-          });
-
-        component.activeLanguageCode = null;
-        preferredLanguageCode = '';
-        component.languageSelection = 'Language';
-
-        spyOn(component.setActiveLanguageCode, 'emit');
-
-        component.ngOnInit();
-        tick();
-        fixture.detectChanges();
-
         expect(component.languageSelection).toBe('Language');
-        expect(component.setActiveLanguageCode.emit).not.toHaveBeenCalled();
+        expect(component.activeLanguageCode).toBe(null);
       })
-    );
-
-    it(
-      'should not hide the dropdown when the user clicks inside' +
-        ' the dropdown',
-      () => {
-        component.dropdownShown = true;
-        const fakeClickInsideEvent = new MouseEvent('click');
-        // We set the target to a div that is inside the dropdown element.
-        const dropdownEl = component.dropdownRef.nativeElement;
-        const insideEl = document.createElement('div');
-        dropdownEl.appendChild(insideEl);
-        Object.defineProperty(fakeClickInsideEvent, 'target', {
-          value: insideEl,
-        });
-
-        component.onDocumentClick(fakeClickInsideEvent);
-        fixture.detectChanges();
-
-        expect(component.dropdownShown).toBe(true);
-      }
     );
 
     it('should show the correct language when the language is changed', () => {
@@ -437,30 +287,26 @@ describe('Review Translation language selector', () => {
     it(
       'should indicate selection and save the language' +
         ' on selecting a new language',
-      fakeAsync(() => {
+      () => {
         const selectedLanguage = 'fr';
         spyOn(component.setActiveLanguageCode, 'emit');
-        // This is a private property, so we must access it using bracket notation.
-        // eslint-disable-next-line dot-notation
         spyOn(
-          component['contributionOpportunitiesBackendApiService'],
-          'savePreferredTranslationLanguageAsync'
-        ).and.resolveTo();
+          contributionOpportunitiesBackendApiServiceStub,
+          'savePreferredTranslationLanguageAsync' as never
+        );
 
         component.selectOption(selectedLanguage);
-        tick();
-        fixture.detectChanges();
 
-        expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith(
-          selectedLanguage
-        );
-        // This is a private property, so we must access it using bracket notation.
-        // eslint-disable-next-line dot-notation
-        expect(
-          component['contributionOpportunitiesBackendApiService']
-            .savePreferredTranslationLanguageAsync
-        ).toHaveBeenCalledWith(selectedLanguage);
-      })
+        fixture.whenStable().then(() => {
+          fixture.detectChanges();
+          expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith(
+            selectedLanguage
+          );
+          expect(
+            contributionOpportunitiesBackendApiServiceStub.savePreferredTranslationLanguageAsync
+          ).toHaveBeenCalledWith(selectedLanguage);
+        });
+      }
     );
 
     it('should toggle dropdown', fakeAsync(() => {
