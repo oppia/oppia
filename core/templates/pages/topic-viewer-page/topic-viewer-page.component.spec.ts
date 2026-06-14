@@ -33,6 +33,7 @@ import {PageTitleService} from 'services/page-title.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {StorySummary} from 'domain/story/story-summary.model';
 
 class MockPlatformFeatureService {
   status = {
@@ -223,15 +224,19 @@ describe('Topic viewer page', () => {
     expect(topicViewerPageComponent.skillDescriptions).toEqual({});
     expect(topicViewerPageComponent.topicIsLoading).toBe(false);
     expect(topicViewerPageComponent.practiceTabIsDisplayed).toBe(true);
-    expect(topicViewerPageComponent.canonicalStorySectionData).toEqual([
-      {
+    expect(topicViewerPageComponent.canonicalStorySectionData.length).toBe(1);
+    expect(topicViewerPageComponent.canonicalStorySectionData[0]).toEqual(
+      jasmine.objectContaining({
         storyId: '2',
         storyTitle: 'Story Title',
         storyDescription: 'Story Description',
         lessonCount: 2,
         practiceCount: 0,
-      },
-    ]);
+        practiceSubtopicIds: [],
+        classroomUrlFragment: 'math',
+        topicUrlFragment,
+      })
+    );
   }));
 
   it(
@@ -255,15 +260,19 @@ describe('Topic viewer page', () => {
       req.flush(topicDictWithPractice);
       flushMicrotasks();
 
-      expect(topicViewerPageComponent.canonicalStorySectionData).toEqual([
-        {
+      expect(topicViewerPageComponent.canonicalStorySectionData.length).toBe(1);
+      expect(topicViewerPageComponent.canonicalStorySectionData[0]).toEqual(
+        jasmine.objectContaining({
           storyId: '2',
           storyTitle: 'Story Title',
           storyDescription: '',
           lessonCount: 2,
           practiceCount: 1,
-        },
-      ]);
+          practiceSubtopicIds: [1],
+          classroomUrlFragment: 'math',
+          topicUrlFragment,
+        })
+      );
     })
   );
 
@@ -436,6 +445,16 @@ describe('Topic viewer page', () => {
   }));
 
   it('should track story data by story id', () => {
+    const storySummarySpy = jasmine.createSpyObj<StorySummary>('StorySummary', [
+      'getId',
+      'getTitle',
+      'getDescription',
+      'getNodeTitles',
+      'getAllNodes',
+      'getUrlFragment',
+    ]);
+    storySummarySpy.getId.and.returnValue('story_1');
+
     expect(
       topicViewerPageComponent.trackStoryDataById(0, {
         storyId: 'story_1',
@@ -443,6 +462,10 @@ describe('Topic viewer page', () => {
         storyDescription: 'Description',
         lessonCount: 3,
         practiceCount: 2,
+        storySummary: storySummarySpy,
+        practiceSubtopicIds: [],
+        classroomUrlFragment: '',
+        topicUrlFragment: '',
       })
     ).toBe('story_1');
   });
