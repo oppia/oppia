@@ -34,7 +34,7 @@ from core.constants import constants
 from core.domain import fs_services  # pylint: disable=invalid-import-from
 from core.domain import change_domain, study_guide_domain, subtopic_page_domain
 
-from typing import Dict, List, Literal, Optional, TypedDict
+from typing import Dict, Final, List, Literal, Optional, TypedDict
 
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
 CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
@@ -75,6 +75,10 @@ CMD_ADD_ADDITIONAL_STORY = 'add_additional_story'
 CMD_DELETE_ADDITIONAL_STORY = 'delete_additional_story'
 CMD_PUBLISH_STORY = 'publish_story'
 CMD_UNPUBLISH_STORY = 'unpublish_story'
+
+STORY_PUBLICATION_ACTION_PUBLISH: Final = 'publish'
+STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH: Final = 'permanent_unpublish'
+STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH: Final = 'temporary_unpublish'
 CMD_ADD_UNCATEGORIZED_SKILL_ID = 'add_uncategorized_skill_id'
 CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill_id'
 CMD_MOVE_SKILL_ID_TO_SUBTOPIC = 'move_skill_id_to_subtopic'
@@ -743,20 +747,29 @@ class StoryReferenceDict(TypedDict):
 
     story_id: str
     story_is_published: bool
+    story_unpublish_type: Optional[str]
 
 
 class StoryReference:
     """Domain object for a Story reference."""
 
-    def __init__(self, story_id: str, story_is_published: bool) -> None:
+    def __init__(
+        self,
+        story_id: str,
+        story_is_published: bool,
+        story_unpublish_type: Optional[str] = None,
+    ) -> None:
         """Constructs a StoryReference domain object.
 
         Args:
             story_id: str. The ID of the story.
             story_is_published: bool. Whether the story is published or not.
+            story_unpublish_type: str|None. How the story was unpublished
+                ('permanent_unpublish' or 'temporary_unpublish'), or None if currently published.
         """
         self.story_id = story_id
         self.story_is_published = story_is_published
+        self.story_unpublish_type = story_unpublish_type
 
     def to_dict(self) -> StoryReferenceDict:
         """Returns a dict representing this StoryReference domain object.
@@ -767,6 +780,7 @@ class StoryReference:
         return {
             'story_id': self.story_id,
             'story_is_published': self.story_is_published,
+            'story_unpublish_type': self.story_unpublish_type,
         }
 
     @classmethod
@@ -785,6 +799,7 @@ class StoryReference:
         story_reference = cls(
             story_reference_dict['story_id'],
             story_reference_dict['story_is_published'],
+            story_reference_dict.get('story_unpublish_type'),
         )
         return story_reference
 
@@ -1395,16 +1410,27 @@ class Topic:
         for story_reference in self.canonical_story_references:
             if story_reference.story_id == story_id:
                 story_reference.story_is_published = True
+                story_reference.story_unpublish_type = None
                 return
 
         for story_reference in self.additional_story_references:
             if story_reference.story_id == story_id:
                 story_reference.story_is_published = True
+                story_reference.story_unpublish_type = None
                 return
         raise Exception('Story with given id doesn\'t exist in the topic')
 
-    def unpublish_story(self, story_id: str) -> None:
+    def unpublish_story(
+        self,
+        story_id: str,
+        unpublish_type: str = STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH,
+    ) -> None:
         """Marks story with the given id as unpublished.
+
+        Args:
+            story_id: str. The ID of the story to unpublish.
+            unpublish_type: str. Either STORY_PUBLICATION_ACTION_PERMANENT_UNPUBLISH
+                or STORY_PUBLICATION_ACTION_TEMPORARY_UNPUBLISH.
 
         Raises:
             Exception. Story with given id doesn't exist in the topic.
@@ -1412,11 +1438,13 @@ class Topic:
         for story_reference in self.canonical_story_references:
             if story_reference.story_id == story_id:
                 story_reference.story_is_published = False
+                story_reference.story_unpublish_type = unpublish_type
                 return
 
         for story_reference in self.additional_story_references:
             if story_reference.story_id == story_id:
                 story_reference.story_is_published = False
+                story_reference.story_unpublish_type = unpublish_type
                 return
         raise Exception('Story with given id doesn\'t exist in the topic')
 
