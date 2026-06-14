@@ -28,7 +28,7 @@ import sys
 from core.constants import constants
 from scripts import build, common, servers
 
-from typing import Final, List, Optional
+from typing import Final, Iterator, List, Optional
 
 LIGHTHOUSE_MODE_PERFORMANCE: Final = 'performance'
 LIGHTHOUSE_MODE_ACCESSIBILITY: Final = 'accessibility'
@@ -277,6 +277,55 @@ def get_lighthouse_urls_to_run(
     return lighthouse_urls_to_run
 
 
+def set_lighthouse_url_environment_variables(
+    pages: Optional[str], entities: dict[str, str]
+) -> None:
+    """Sets the Lighthouse URL environment variables.
+
+    Args:
+        pages: str|None. Comma-separated page names to run, or None to run all
+            configured pages.
+        entities: dict(str, str). The available entities to inject into the
+            URLs.
+    """
+    pages_config: dict[str, str] = get_lighthouse_pages_config()
+    os.environ['ALL_LIGHTHOUSE_URLS'] = ','.join(
+        get_lighthouse_urls_to_run(
+            list(pages_config.keys()), entities, pages_config
+        )
+    )
+    if pages:
+        os.environ['LIGHTHOUSE_URLS_TO_RUN'] = ','.join(
+            get_lighthouse_urls_to_run(
+                [page.strip() for page in pages.split(',')],
+                entities,
+                pages_config,
+            )
+        )
+
+
+@contextlib.contextmanager
+def managed_lighthouse_appserver(server_mode: str) -> Iterator[None]:
+    """Starts the appserver for Lighthouse setup or checks.
+
+    Args:
+        server_mode: str. The appserver mode to start.
+
+    Yields:
+        None. Yields control while the appserver is running.
+    """
+    env = os.environ.copy()
+    env['PIP_NO_DEPS'] = 'True'
+    with servers.managed_dev_appserver(
+        APP_YAML_FILENAMES[server_mode],
+        port=GOOGLE_APP_ENGINE_PORT,
+        log_level='critical',
+        skip_sdk_update_check=True,
+        env=env,
+    ):
+        yield
+
+
 def main(args: Optional[List[str]] = None) -> None:
     """Runs lighthouse checks and deletes reports."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -290,20 +339,6 @@ def main(args: Optional[List[str]] = None) -> None:
     else:
         lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE
         server_mode = SERVER_MODE_PROD
-    if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
-        if not parsed_args.skip_build:
-            # Builds ng.
-            print('Building files in production mode.')
-            build.main(args=['--prod_env'])
-        else:
-            # Skip ng build if skip_build flag is passed.
-            print('Building files in production mode skipping ng build.')
-            build.main(args=[])
-            servers.run_ng_compilation()
-    else:
-        # Accessibility mode skip ng build.
-        build.main(args=[])
-        servers.run_ng_compilation()
 
     with contextlib.ExitStack() as stack:
         stack.enter_context(servers.managed_redis_server())
@@ -315,35 +350,50 @@ def main(args: Optional[List[str]] = None) -> None:
                 servers.managed_cloud_datastore_emulator(clear_datastore=True)
             )
 
-        env = os.environ.copy()
-        env['PIP_NO_DEPS'] = 'True'
-        stack.enter_context(
-            servers.managed_dev_appserver(
-                APP_YAML_FILENAMES[server_mode],
-                port=GOOGLE_APP_ENGINE_PORT,
-                log_level='critical',
-                skip_sdk_update_check=True,
-                env=env,
-            )
-        )
-
-        entities = run_lighthouse_puppeteer_script(parsed_args.record_screen)
-        pages_config: dict[str, str] = get_lighthouse_pages_config()
-        os.environ['ALL_LIGHTHOUSE_URLS'] = ','.join(
-            get_lighthouse_urls_to_run(
-                list(pages_config.keys()), entities, pages_config
-            )
-        )
-        if parsed_args.pages:
-            os.environ['LIGHTHOUSE_URLS_TO_RUN'] = ','.join(
-                get_lighthouse_urls_to_run(
-                    [page.strip() for page in parsed_args.pages.split(',')],
-                    entities,
-                    pages_config,
+        if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
+            if parsed_args.skip_build:
+                print(
+                    'Building files in development mode for setup skipping '
+                    'clean build.'
                 )
-            )
+                common.modify_constants(prod_env=False, emulator_mode=True)
+                common.write_hashes_json_file({})
+                servers.run_ng_compilation()
+            else:
+                print('Building files in development mode for setup.')
+                build.main(args=[])
+                servers.run_ng_compilation()
 
-        run_lighthouse_checks(lighthouse_mode)
+            with managed_lighthouse_appserver(SERVER_MODE_DEV):
+                entities = run_lighthouse_puppeteer_script(
+                    parsed_args.record_screen
+                )
+
+            if parsed_args.skip_build:
+                print('Restoring production constants for Lighthouse checks.')
+                common.modify_constants(prod_env=True, emulator_mode=True)
+            else:
+                # Builds ng.
+                print('Building files in production mode.')
+                build.main(args=['--prod_env'])
+        else:
+            # Accessibility mode skip ng build.
+            build.main(args=[])
+            servers.run_ng_compilation()
+
+            with managed_lighthouse_appserver(server_mode):
+                entities = run_lighthouse_puppeteer_script(
+                    parsed_args.record_screen
+                )
+                set_lighthouse_url_environment_variables(
+                    parsed_args.pages, entities
+                )
+                run_lighthouse_checks(lighthouse_mode)
+            return
+
+        set_lighthouse_url_environment_variables(parsed_args.pages, entities)
+        with managed_lighthouse_appserver(server_mode):
+            run_lighthouse_checks(lighthouse_mode)
 
 
 if __name__ == '__main__':  # pragma: no cover

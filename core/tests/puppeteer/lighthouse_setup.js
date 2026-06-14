@@ -91,7 +91,7 @@ var createSkillButtonSelector = '.puppeteer-test-add-skill-button';
 var skillDescriptionField = '.e2e-test-new-skill-description-field';
 var skillOpenConceptCard = '.e2e-test-open-concept-card';
 var confirmSkillCreationButton = '.e2e-test-confirm-skill-creation-button';
-var skillReviewMaterialInput = '.e2e-test-concept-card-text div.e2e-test-rte';
+var skillReviewMaterialInput = '.e2e-test-concept-card-text .e2e-test-rte';
 
 var usernameInputFieldForRolesEditing = '.e2e-test-username-for-role-editor';
 var editUserRoleButton = '.e2e-test-role-edit-button';
@@ -179,37 +179,65 @@ const setRole = async function (browser, page, role) {
     await page.click(addNewRoleButton);
 
     await page.click(roleSelect);
-    await Promise.all([
-      page.waitForResponse(response =>
+    await page.waitForSelector('mat-option');
+    const roleOptionWasSelected = await page.evaluate(
+      (role, roleOptionLabels) => {
+        const roleOptionLabel = roleOptionLabels[role];
+        if (!roleOptionLabel) {
+          throw new Error(`No role option label configured for ${role}.`);
+        }
+
+        const normalizedRoleOptionLabel = roleOptionLabel.toLowerCase();
+        const normalizedRole = role.toLowerCase();
+        const options = Array.from(document.querySelectorAll('mat-option'));
+        const match = options.find(option => {
+          const optionValue = (
+            option.getAttribute('ng-reflect-value') ||
+            option.getAttribute('value') ||
+            option.id ||
+            ''
+          ).toLowerCase();
+          const optionLabel = option.textContent.trim().toLowerCase();
+
+          return (
+            optionValue === normalizedRole ||
+            optionLabel === normalizedRoleOptionLabel ||
+            optionLabel === normalizedRole
+          );
+        });
+
+        if (!match) {
+          return false;
+        }
+
+        match.click();
+        return true;
+      },
+      role,
+      roleOptionLabels
+    );
+
+    if (roleOptionWasSelected) {
+      await page.waitForResponse(response =>
         response.url().includes('/adminrolehandler')
-      ),
-      page.evaluate(
-        (role, roleOptionLabels) => {
+      );
+    } else {
+      const roleIsAlreadyAssigned = await page.evaluate(
+        (role, roleOptionLabels, roleEditorContainer) => {
           const roleOptionLabel = roleOptionLabels[role];
-          if (!roleOptionLabel) {
-            throw new Error(`No role option label configured for ${role}.`);
-          }
-
-          const normalizedRoleOptionLabel = roleOptionLabel.toLowerCase();
-          const options = Array.from(
-            document.querySelectorAll('mat-option .mat-option-text')
-          );
-
-          const match = options.find(
-            el =>
-              el.textContent.trim().toLowerCase() === normalizedRoleOptionLabel
-          );
-
-          if (!match) {
-            throw new Error(`Could not find role option for ${role}.`);
-          }
-
-          match.closest('mat-option').click();
+          const roleEditorText = document
+            .querySelector(roleEditorContainer)
+            .textContent.toLowerCase();
+          return roleEditorText.includes(roleOptionLabel.toLowerCase());
         },
         role,
-        roleOptionLabels
-      ),
-    ]);
+        roleOptionLabels,
+        roleEditorContainer
+      );
+      if (!roleIsAlreadyAssigned) {
+        throw new Error(`Could not find role option for ${role}.`);
+      }
+    }
     await page.waitForTimeout(2000);
   } catch (e) {
     // eslint-disable-next-line no-console

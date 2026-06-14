@@ -130,37 +130,64 @@ const setRole = async function (page, role) {
 
     await page.click(roleSelect);
     await page.waitForSelector('mat-option');
-    await Promise.all([
-      page.waitForResponse(response =>
+    const roleOptionWasSelected = await page.evaluate(
+      (role, roleOptionLabels) => {
+        const roleOptionLabel = roleOptionLabels[role];
+        if (!roleOptionLabel) {
+          throw new Error(`No role option label configured for ${role}.`);
+        }
+
+        const normalizedRoleOptionLabel = roleOptionLabel.toLowerCase();
+        const normalizedRole = role.toLowerCase();
+        const options = Array.from(document.querySelectorAll('mat-option'));
+        const match = options.find(option => {
+          const optionValue = (
+            option.getAttribute('ng-reflect-value') ||
+            option.getAttribute('value') ||
+            option.id ||
+            ''
+          ).toLowerCase();
+          const optionLabel = option.textContent.trim().toLowerCase();
+
+          return (
+            optionValue === normalizedRole ||
+            optionLabel === normalizedRoleOptionLabel ||
+            optionLabel === normalizedRole
+          );
+        });
+
+        if (!match) {
+          return false;
+        }
+
+        match.click();
+        return true;
+      },
+      role,
+      roleOptionLabels
+    );
+
+    if (roleOptionWasSelected) {
+      await page.waitForResponse(response =>
         response.url().includes('/adminrolehandler')
-      ),
-      page.evaluate(
-        (role, roleOptionLabels) => {
+      );
+    } else {
+      const roleIsAlreadyAssigned = await page.evaluate(
+        (role, roleOptionLabels, roleEditorContainer) => {
           const roleOptionLabel = roleOptionLabels[role];
-          if (!roleOptionLabel) {
-            throw new Error(`No role option label configured for ${role}.`);
-          }
-
-          const normalizedRoleOptionLabel = roleOptionLabel.toLowerCase();
-          const options = Array.from(
-            document.querySelectorAll('mat-option .mat-option-text')
-          );
-
-          const match = options.find(
-            el =>
-              el.textContent.trim().toLowerCase() === normalizedRoleOptionLabel
-          );
-
-          if (!match) {
-            throw new Error(`Could not find role option for ${role}.`);
-          }
-
-          match.closest('mat-option').click();
+          const roleEditorText = document
+            .querySelector(roleEditorContainer)
+            .textContent.toLowerCase();
+          return roleEditorText.includes(roleOptionLabel.toLowerCase());
         },
         role,
-        roleOptionLabels
-      ),
-    ]);
+        roleOptionLabels,
+        roleEditorContainer
+      );
+      if (!roleIsAlreadyAssigned) {
+        throw new Error(`Could not find role option for ${role}.`);
+      }
+    }
     await page.waitForTimeout(2000);
     // eslint-disable-next-line dot-notation
     await page.goto(CREATOR_DASHBOARD_URL, {waitUntil: networkIdle});
