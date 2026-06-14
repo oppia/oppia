@@ -36,6 +36,8 @@ export interface StoryNodeBackendDict {
   last_modified_msecs: number | null;
   first_publication_date_msecs: number | null;
   unpublishing_reason: string | null;
+  available_text_language_codes?: string[];
+  available_voiceover_language_codes?: string[];
 }
 
 export class StoryNode {
@@ -55,6 +57,8 @@ export class StoryNode {
   _lastModifiedMsecs: number | null;
   _firstPublicationDateMsecs: number | null;
   _unpublishingReason: string | null;
+  _availableTextLanguageCodes: string[];
+  _availableVoiceoverLanguageCodes: string[];
 
   constructor(
     id: string,
@@ -72,7 +76,9 @@ export class StoryNode {
     plannedPublicationDateMsecs: number | null,
     lastModifiedMsecs: number | null,
     firstPublicationDateMsecs: number | null,
-    unpublishingReason: string | null
+    unpublishingReason: string | null,
+    availableTextLanguageCodes: string[] = [],
+    availableVoiceoverLanguageCodes: string[] = []
   ) {
     this._id = id;
     this._title = title;
@@ -90,6 +96,8 @@ export class StoryNode {
     this._lastModifiedMsecs = lastModifiedMsecs;
     this._firstPublicationDateMsecs = firstPublicationDateMsecs;
     this._unpublishingReason = unpublishingReason;
+    this._availableTextLanguageCodes = availableTextLanguageCodes;
+    this._availableVoiceoverLanguageCodes = availableVoiceoverLanguageCodes;
   }
 
   _checkValidNodeId(nodeId: string): boolean {
@@ -152,6 +160,14 @@ export class StoryNode {
 
   getUnpublishingReason(): string | null {
     return this._unpublishingReason;
+  }
+
+  getAvailableTextLanguageCodes(): string[] {
+    return this._availableTextLanguageCodes.slice();
+  }
+
+  getAvailableVoiceoverLanguageCodes(): string[] {
+    return this._availableVoiceoverLanguageCodes.slice();
   }
 
   setStatus(status: string): void {
@@ -394,7 +410,9 @@ export class StoryNode {
       storyNodeBackendObject.planned_publication_date_msecs,
       storyNodeBackendObject.last_modified_msecs,
       storyNodeBackendObject.first_publication_date_msecs,
-      storyNodeBackendObject.unpublishing_reason
+      storyNodeBackendObject.unpublishing_reason,
+      storyNodeBackendObject.available_text_language_codes || [],
+      storyNodeBackendObject.available_voiceover_language_codes || []
     );
   }
 

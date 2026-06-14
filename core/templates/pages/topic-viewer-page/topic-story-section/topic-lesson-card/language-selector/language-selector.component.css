@@ -1,0 +1,30 @@
+.topic-lesson-language-selector {
+  display: grid;
+  gap: 8px;
+}
+
+.topic-lesson-language-selector-row {
+  display: grid;
+  gap: 4px;
+}
+
+.topic-lesson-language-selector-label {
+  color: #3b3b3b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.topic-lesson-language-selector-select {
+  border: 1px solid #8ea3a0;
+  border-radius: 4px;
+  color: #3b3b3b;
+  font-size: 12px;
+  height: 28px;
+  padding: 2px 6px;
+}
+
+.topic-lesson-language-selector-error {
+  color: #c62828;
+  font-size: 11px;
+  margin: 0;
+}

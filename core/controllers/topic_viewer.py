@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import logging
+from typing import Dict, List
 
 from core import feconf, utils
 from core.constants import constants
@@ -24,15 +25,16 @@ from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
     email_manager,
+    exp_fetchers,
     platform_parameter_list,
     platform_parameter_services,
     skill_services,
     story_fetchers,
     topic_fetchers,
     topic_services,
+    translation_services,
+    voiceover_services,
 )
-
-from typing import Dict
 
 
 class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -73,6 +75,13 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         ]
 
         canonical_story_dicts = []
+        exploration_ids = set()
+
+        def _collect_exploration_ids_from_nodes(nodes: List[object]) -> None:
+            for node in nodes:
+                if node.exploration_id:
+                    exploration_ids.add(node.exploration_id)
+
         for story_summary in canonical_story_summaries:
             all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id
@@ -82,6 +91,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 for node in all_nodes
                 if node.status != constants.STORY_NODE_STATUS_DRAFT
             ]
+            _collect_exploration_ids_from_nodes(filtered_nodes)
             pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id
             )['pending_nodes']
@@ -100,7 +110,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'url_fragment': story_summary_dict['url_fragment'],
                 'story_is_published': True,
                 'completed_node_titles': completed_node_titles,
-                'all_node_dicts': [node.to_dict() for node in filtered_nodes],
+                '_all_nodes': filtered_nodes,
             }
             canonical_story_dicts.append(canonical_story_dict)
 
@@ -109,6 +119,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id
             )['all_nodes']
+            _collect_exploration_ids_from_nodes(all_nodes)
             pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id
             )['pending_nodes']
@@ -127,9 +138,96 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'url_fragment': story_summary_dict['url_fragment'],
                 'story_is_published': True,
                 'completed_node_titles': completed_node_titles,
-                'all_node_dicts': [node.to_dict() for node in all_nodes],
+                '_all_nodes': all_nodes,
             }
             additional_story_dicts.append(additional_story_dict)
+
+        exploration_id_to_available_text_languages: Dict[str, List[str]] = {}
+        exploration_id_to_available_voiceover_languages: Dict[
+            str, List[str]
+        ] = {}
+
+        if exploration_ids:
+            explorations_by_id = exp_fetchers.get_multiple_explorations_by_id(
+                list(exploration_ids), strict=False
+            )
+
+            for exploration_id, exploration in explorations_by_id.items():
+                displayable_language_codes = (
+                    translation_services.get_displayable_translation_languages(
+                        feconf.TranslatableEntityType.EXPLORATION,
+                        exploration,
+                    )
+                )
+
+                if (
+                    exploration.language_code
+                    and exploration.language_code
+                    not in displayable_language_codes
+                ):
+                    displayable_language_codes.insert(
+                        0, exploration.language_code
+                    )
+
+                unique_displayable_language_codes = list(
+                    dict.fromkeys(displayable_language_codes)
+                )
+
+                exploration_id_to_available_text_languages[exploration_id] = (
+                    unique_displayable_language_codes
+                )
+
+                voiceover_language_codes = []
+                for language_code in unique_displayable_language_codes:
+                    entity_voiceovers_list = voiceover_services.fetch_entity_voiceovers_by_language_code(
+                        exploration_id,
+                        feconf.TranslatableEntityType.EXPLORATION.value,
+                        exploration.version,
+                        language_code,
+                    )
+                    if entity_voiceovers_list:
+                        voiceover_language_codes.append(language_code)
+
+                exploration_id_to_available_voiceover_languages[
+                    exploration_id
+                ] = voiceover_language_codes
+
+        def _create_node_dict(node: object) -> Dict[str, object]:
+            available_text_language_codes: List[str] = []
+            available_voiceover_language_codes: List[str] = []
+
+            if node.exploration_id:
+                available_text_language_codes = (
+                    exploration_id_to_available_text_languages.get(
+                        node.exploration_id, []
+                    )
+                )
+                available_voiceover_language_codes = (
+                    exploration_id_to_available_voiceover_languages.get(
+                        node.exploration_id, []
+                    )
+                )
+
+            node_dict = node.to_dict()
+            node_dict['available_text_language_codes'] = (
+                available_text_language_codes
+            )
+            node_dict['available_voiceover_language_codes'] = (
+                available_voiceover_language_codes
+            )
+            return node_dict
+
+        for canonical_story_dict in canonical_story_dicts:
+            canonical_story_dict['all_node_dicts'] = [
+                _create_node_dict(node)
+                for node in canonical_story_dict.pop('_all_nodes')
+            ]
+
+        for additional_story_dict in additional_story_dicts:
+            additional_story_dict['all_node_dicts'] = [
+                _create_node_dict(node)
+                for node in additional_story_dict.pop('_all_nodes')
+            ]
 
         uncategorized_skill_ids = topic.get_all_uncategorized_skill_ids()
         subtopics = topic.get_all_subtopics()

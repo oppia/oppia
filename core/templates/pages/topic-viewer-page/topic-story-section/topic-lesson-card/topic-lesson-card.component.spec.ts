@@ -17,9 +17,13 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {TopicLessonCardComponent} from './topic-lesson-card.component';
+import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {TopicSessionFallbackLanguageService} from 'pages/topic-viewer-page/services/topic-session-fallback-language.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
@@ -35,12 +39,28 @@ describe('TopicLessonCardComponent', () => {
   let component: TopicLessonCardComponent;
   let fixture: ComponentFixture<TopicLessonCardComponent>;
   let urlInterpolationService: jasmine.SpyObj<UrlInterpolationService>;
+  let i18nLanguageCodeService: jasmine.SpyObj<I18nLanguageCodeService>;
+  let languageUtilService: jasmine.SpyObj<LanguageUtilService>;
+  let topicSessionFallbackLanguageService: jasmine.SpyObj<TopicSessionFallbackLanguageService>;
   let windowRef: WindowRef;
 
   beforeEach(waitForAsync(() => {
     const urlInterpolationServiceSpy = jasmine.createSpyObj(
       'UrlInterpolationService',
       ['getStaticImageUrl']
+    );
+    const i18nLanguageCodeServiceSpy = jasmine.createSpyObj(
+      'I18nLanguageCodeService',
+      ['getCurrentI18nLanguageCode']
+    );
+    const languageUtilServiceSpy = jasmine.createSpyObj('LanguageUtilService', [
+      'getContentLanguageDescription',
+      'getAudioLanguageDescription',
+    ]);
+    const ngbModalSpy = jasmine.createSpyObj('NgbModal', ['open']);
+    const topicSessionFallbackLanguageServiceSpy = jasmine.createSpyObj(
+      'TopicSessionFallbackLanguageService',
+      ['getFallbackSelection', 'saveFallbackSelection']
     );
 
     TestBed.configureTestingModule({
@@ -49,6 +69,22 @@ describe('TopicLessonCardComponent', () => {
         {
           provide: UrlInterpolationService,
           useValue: urlInterpolationServiceSpy,
+        },
+        {
+          provide: I18nLanguageCodeService,
+          useValue: i18nLanguageCodeServiceSpy,
+        },
+        {
+          provide: LanguageUtilService,
+          useValue: languageUtilServiceSpy,
+        },
+        {
+          provide: NgbModal,
+          useValue: ngbModalSpy,
+        },
+        {
+          provide: TopicSessionFallbackLanguageService,
+          useValue: topicSessionFallbackLanguageServiceSpy,
         },
         {
           provide: WindowRef,
@@ -62,7 +98,27 @@ describe('TopicLessonCardComponent', () => {
     urlInterpolationService = TestBed.inject(
       UrlInterpolationService
     ) as jasmine.SpyObj<UrlInterpolationService>;
+    i18nLanguageCodeService = TestBed.inject(
+      I18nLanguageCodeService
+    ) as jasmine.SpyObj<I18nLanguageCodeService>;
+    languageUtilService = TestBed.inject(
+      LanguageUtilService
+    ) as jasmine.SpyObj<LanguageUtilService>;
+    topicSessionFallbackLanguageService = TestBed.inject(
+      TopicSessionFallbackLanguageService
+    ) as jasmine.SpyObj<TopicSessionFallbackLanguageService>;
     windowRef = TestBed.inject(WindowRef);
+
+    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('pt');
+    languageUtilService.getContentLanguageDescription.and.callFake(
+      (languageCode: string) => languageCode
+    );
+    languageUtilService.getAudioLanguageDescription.and.callFake(
+      (languageCode: string) => languageCode
+    );
+    topicSessionFallbackLanguageService.getFallbackSelection.and.returnValue(
+      null
+    );
   }));
 
   it('should be created', () => {
@@ -132,6 +188,28 @@ describe('TopicLessonCardComponent', () => {
     expect(() => {
       component.navigateTo('');
     }).not.toThrowError();
+  });
+
+  it('should determine unavailability based on preferred language', () => {
+    component.availableTextLanguageCodes = ['en', 'fr'];
+
+    expect(component.isLessonUnavailableInPreferredLanguage()).toBeTrue();
+  });
+
+  it('should include initial content language code in lesson url', () => {
+    component.startUrl = '/explore/exp_id?topic_url_fragment=fractions';
+    component.availableTextLanguageCodes = ['en'];
+    component.ngOnInit();
+    component.selectedTextLanguageCode = 'en';
+
+    spyOn(windowRef.nativeWindow.location, 'assign');
+    component.onStartButtonClick();
+
+    expect(windowRef.nativeWindow.location.assign).toHaveBeenCalled();
+    expect(
+      (windowRef.nativeWindow.location.assign as jasmine.Spy).calls.mostRecent()
+        .args[0]
+    ).toContain('initialContentLanguageCode=en');
   });
 
   it('should return thumbnail alt text with lesson title', () => {

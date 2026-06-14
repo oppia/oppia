@@ -21,22 +21,27 @@ import 'zone.js';
 
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 import {SubtopicsListComponent} from './subtopics-list/subtopics-list.component';
 import {StoriesListComponent} from './deprecations/stories-list/topic-viewer-stories-list.component';
 import {TopicStorySectionComponent} from './topic-story-section/topic-story-section.component';
 import {TopicLessonCardComponent} from './topic-story-section/topic-lesson-card/topic-lesson-card.component';
+import {LanguageSelectorComponent} from './topic-story-section/topic-lesson-card/language-selector/language-selector.component';
 import {TopicPracticeCardComponent} from './topic-story-section/topic-practice-card/topic-practice-card.component';
+import {LanguageSelectorModalComponent} from './modals/language-selector-modal.component';
 import {MatCardModule} from '@angular/material/card';
 import {SharedComponentsModule} from 'components/shared-component.module';
 
 @NgModule({
-  imports: [CommonModule, MatCardModule, SharedComponentsModule],
+  imports: [CommonModule, FormsModule, MatCardModule, SharedComponentsModule],
   declarations: [
     StoriesListComponent,
     SubtopicsListComponent,
     TopicStorySectionComponent,
     TopicLessonCardComponent,
+    LanguageSelectorComponent,
     TopicPracticeCardComponent,
+    LanguageSelectorModalComponent,
   ],
   entryComponents: [
     StoriesListComponent,
@@ -44,13 +49,17 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     TopicStorySectionComponent,
     TopicLessonCardComponent,
     TopicPracticeCardComponent,
+    LanguageSelectorComponent,
+    LanguageSelectorModalComponent,
   ],
   exports: [
     StoriesListComponent,
     SubtopicsListComponent,
     TopicStorySectionComponent,
     TopicLessonCardComponent,
+    LanguageSelectorComponent,
     TopicPracticeCardComponent,
+    LanguageSelectorModalComponent,
   ],
 })
 export class TopicPlayerViewerCommonModule {}

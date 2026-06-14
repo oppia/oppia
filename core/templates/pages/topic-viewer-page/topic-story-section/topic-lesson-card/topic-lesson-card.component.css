@@ -75,6 +75,18 @@
   text-decoration: none;
 }
 
+.topic-lesson-card-actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.topic-lesson-card-info-icon {
+  color: #00645c;
+  font-size: 16px;
+}
+
 @media (max-width: 768px) {
   .topic-lesson-card {
     height: 160px;
@@ -109,6 +121,10 @@
     height: 40px;
     min-width: 90px;
     width: 90px;
+  }
+
+  .topic-lesson-card-actions {
+    gap: 6px;
   }
 }
 
@@ -160,5 +176,9 @@
     height: 40px;
     min-width: 120px;
     width: 100%;
+  }
+
+  .topic-lesson-card-actions {
+    justify-content: stretch;
   }
 }

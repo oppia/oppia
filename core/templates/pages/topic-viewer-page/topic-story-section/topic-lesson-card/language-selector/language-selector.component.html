@@ -1,0 +1,44 @@
+<div class="topic-lesson-language-selector">
+  <div class="topic-lesson-language-selector-row">
+    <label class="topic-lesson-language-selector-label" for="topic-lesson-text-language">
+      Lesson Language
+    </label>
+    <select
+      id="topic-lesson-text-language"
+      class="topic-lesson-language-selector-select e2e-test-topic-lesson-text-language-selector"
+      [ngModel]="selectedTextLanguageCode"
+      (ngModelChange)="onTextLanguageChange($event)"
+      aria-label="Text language selector"
+      required>
+      <option *ngFor="let textLanguageCode of availableTextLanguageCodes" [value]="textLanguageCode">
+        {{ getLanguageDescription(textLanguageCode) }}
+      </option>
+    </select>
+    <p
+      class="topic-lesson-language-selector-error"
+      *ngIf="shouldShowTextLanguageValidationError()"
+      id="topic-lesson-text-language-error"
+      aria-live="assertive">
+      Choose a text language to continue.
+    </p>
+  </div>
+
+  <div class="topic-lesson-language-selector-row" *ngIf="hasVoiceoverLanguageOptions()">
+    <label class="topic-lesson-language-selector-label" for="topic-lesson-voiceover-language">
+      Audio Language (optional)
+    </label>
+    <select
+      id="topic-lesson-voiceover-language"
+      class="topic-lesson-language-selector-select e2e-test-topic-lesson-voiceover-language-selector"
+      [ngModel]="selectedVoiceoverLanguageCode"
+      (ngModelChange)="onVoiceoverLanguageChange($event)"
+      aria-label="Voiceover language selector">
+      <option [ngValue]="null">Auto</option>
+      <option
+        *ngFor="let voiceoverLanguageCode of availableVoiceoverLanguageCodes"
+        [value]="voiceoverLanguageCode">
+        {{ getLanguageDescription(voiceoverLanguageCode) }}
+      </option>
+    </select>
+  </div>
+</div>

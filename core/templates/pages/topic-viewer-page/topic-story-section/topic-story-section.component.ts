@@ -20,15 +20,18 @@ import {
   Component,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   SimpleChanges,
 } from '@angular/core';
+import {Subscription} from 'rxjs';
 
 import {AppConstants} from 'app.constants';
 import {StoryNode} from 'domain/story/story-node.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
+import {TopicSessionFallbackLanguageService} from 'pages/topic-viewer-page/services/topic-session-fallback-language.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlService} from 'services/contextual/url.service';
@@ -45,6 +48,8 @@ interface LessonCardData {
   lessonDescription: string;
   thumbnailUrl: string;
   startUrl: string;
+  availableTextLanguageCodes: string[];
+  availableVoiceoverLanguageCodes: string[];
 }
 
 interface PracticeCardData {
@@ -61,7 +66,9 @@ interface PracticeCardData {
   templateUrl: './topic-story-section.component.html',
   styleUrls: ['./topic-story-section.component.css'],
 })
-export class TopicStorySectionComponent implements OnInit, OnChanges {
+export class TopicStorySectionComponent
+  implements OnInit, OnChanges, OnDestroy
+{
   @Input() storySummary!: StorySummary;
   @Input() storyTitle!: string;
   @Input() storyDescription!: string;
@@ -77,16 +84,26 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
   lessonCards: LessonCardData[] = [];
   practiceCard!: PracticeCardData;
   isPracticeCardVisible: boolean = false;
+  private languageCodeChangeSubscription: Subscription | null = null;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private i18nLanguageCodeService: I18nLanguageCodeService
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService
   ) {}
 
   ngOnInit(): void {
     this.populateFromInputs();
+    this.languageCodeChangeSubscription =
+      this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
+        this.topicSessionFallbackLanguageService.clearSelection();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.languageCodeChangeSubscription?.unsubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -163,6 +180,9 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
           lessonDescription: node.getDescription(),
           thumbnailUrl: this.getLessonThumbnailUrl(node),
           startUrl: this.getLessonStartUrl(node),
+          availableTextLanguageCodes: node.getAvailableTextLanguageCodes(),
+          availableVoiceoverLanguageCodes:
+            node.getAvailableVoiceoverLanguageCodes(),
         };
       });
 
