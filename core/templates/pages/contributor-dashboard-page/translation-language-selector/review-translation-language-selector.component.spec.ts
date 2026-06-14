@@ -441,8 +441,8 @@ describe('Review Translation language selector', () => {
         const selectedLanguage = 'fr';
         spyOn(component.setActiveLanguageCode, 'emit');
         spyOn(
-          contributionOpportunitiesBackendApiServiceStub,
-          'savePreferredTranslationLanguageAsync' as never
+          component['contributionOpportunitiesBackendApiService'],
+          'savePreferredTranslationLanguageAsync'
         ).and.resolveTo();
 
         component.selectOption(selectedLanguage);
@@ -453,7 +453,8 @@ describe('Review Translation language selector', () => {
           selectedLanguage
         );
         expect(
-          contributionOpportunitiesBackendApiServiceStub.savePreferredTranslationLanguageAsync
+          component['contributionOpportunitiesBackendApiService']
+            .savePreferredTranslationLanguageAsync
         ).toHaveBeenCalledWith(selectedLanguage);
       })
     );
