@@ -154,10 +154,6 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
   private getLessonProgressStatus(
     node: StoryNode
   ): 'not_started' | 'in_progress' | 'completed' | 'coming_soon' {
-    if (!this.storySummary) {
-      return 'coming_soon';
-    }
-
     const nodeTitle = node.getTitle();
     if (this.storySummary.isNodeCompleted(nodeTitle)) {
       return 'completed';
@@ -175,10 +171,6 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
   }
 
   private async loadChapterProgress(): Promise<void> {
-    if (!this.storySummary) {
-      return;
-    }
-
     const explorationIds = this.storySummary
       .getAllNodes()
       .map(node => node.getExplorationId())

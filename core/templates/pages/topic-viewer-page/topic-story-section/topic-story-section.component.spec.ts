@@ -602,4 +602,33 @@ describe('TopicStorySectionComponent', () => {
     expect(component.lessonCards.length).toBe(1);
     expect(component.lessonCards[0].lessonTitle).toBe('Lesson 1: Node title 1');
   });
+
+  it('should handle loadChapterProgress with no exploration IDs gracefully', async () => {
+    const storyNodeSpy = jasmine.createSpyObj('StoryNode', [
+      'getTitle',
+      'getDescription',
+      'getThumbnailFilename',
+      'getExplorationId',
+      'getId',
+    ]);
+    storyNodeSpy.getTitle.and.returnValue('Node title 1');
+    storyNodeSpy.getDescription.and.returnValue('Node description 1');
+    storyNodeSpy.getThumbnailFilename.and.returnValue(null);
+    storyNodeSpy.getExplorationId.and.returnValue(null);
+    storyNodeSpy.getId.and.returnValue('node_1');
+
+    const storySummary = createStorySummarySpy(
+      ['Node title 1'],
+      [storyNodeSpy]
+    );
+    component.storySummary = storySummary;
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'topic';
+
+    component.ngOnInit();
+    await fixture.whenStable();
+
+    expect(component.lessonCards.length).toBe(1);
+    expect(component.lessonCards[0].totalCheckpointsCount).toBe(0);
+  });
 });
