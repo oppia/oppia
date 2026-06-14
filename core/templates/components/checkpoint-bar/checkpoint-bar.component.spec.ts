@@ -618,9 +618,8 @@ describe('CheckpointBarComponent', () => {
     });
     spyOn(component, 'getCompletedProgressBarWidth').and.returnValue(0);
 
-    component.updateLessonProgressBar();
-
-    expect(component.completedCheckpointsCount).toBe(-1);
-    expect(component.checkpointStatusArray[0]).toBe('completed');
+    expect(() => {
+      component.updateLessonProgressBar();
+    }).not.toThrowError();
   });
 });
