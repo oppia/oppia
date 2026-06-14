@@ -1255,6 +1255,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'preferred_translation_language_code': None,
             'display_alias': None,
             'has_viewed_lesson_info_modal_once': False,
+            'profile_name': None,
         }
         user_group: Dict[str, str] = {}
         skill_data: Dict[str, str] = {}

@@ -320,6 +320,34 @@ describe('Preferences Page Component', () => {
       expect(componentInstance.getStaticImageUrl('')).toEqual(staticImageUrl);
     });
 
+    it('should mark profileNameAlreadySet and disable control when profile name is pre-loaded', fakeAsync(() => {
+      preferencesData.profile_name = 'Existing Name';
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(
+          new UserInfo(
+            ['USER_ROLE'],
+            false,
+            false,
+            false,
+            false,
+            false,
+            'en',
+            'test',
+            'test_email@example.com',
+            true
+          )
+        )
+      );
+      componentInstance.ngOnInit();
+      tick();
+      tick();
+      expect(componentInstance.profileNameAlreadySet).toBeTrue();
+      expect(
+        componentInstance.preferencesForm.controls.profileName.disabled
+      ).toBeTrue();
+      preferencesData.profile_name = null;
+    }));
+
     describe('preferences data', () => {
       beforeEach(fakeAsync(() => {
         spyOn(preventPageUnloadEventService, 'addListener');
@@ -474,6 +502,18 @@ describe('Preferences Page Component', () => {
           componentInstance.preferencesForm.controls.emailPreferences.value
             .canReceiveEmailUpdates
         ).toBeFalse();
+      }));
+
+      it('should lock profile name control after saving for the first time', fakeAsync(() => {
+        const profileNameCtrl =
+          componentInstance.preferencesForm.controls.profileName;
+        profileNameCtrl.setValue('Ana Maria');
+        profileNameCtrl.markAsDirty();
+        componentInstance.preferencesForm.updateValueAndValidity();
+        componentInstance.savePreferences();
+        tick();
+        expect(componentInstance.profileNameAlreadySet).toBeTrue();
+        expect(profileNameCtrl.disabled).toBeTrue();
       }));
     });
 
