@@ -256,18 +256,24 @@ describe('Review Translation language selector', () => {
     );
 
     it(
-      'should ask user to select a language when the preferred' +
+      'should default to the first available review language when the preferred' +
         ' language is not defined',
       fakeAsync(() => {
         preferredLanguageCode = '';
         component.activeLanguageCode = null;
         component.languageSelection = 'Language';
 
-        component.ngOnInit();
+        spyOn(component.setActiveLanguageCode, 'emit').and.callFake(
+          (languageCode: string) => {
+            component.activeLanguageCode = languageCode;
+          }
+        );
 
+        component.ngOnInit();
+        tick();
         fixture.detectChanges();
-        expect(component.languageSelection).toBe('Language');
-        expect(component.activeLanguageCode).toBe(null);
+        expect(component.languageSelection).toBe('English');
+        expect(component.activeLanguageCode).toBe('en');
       })
     );
 

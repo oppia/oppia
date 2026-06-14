@@ -76,38 +76,42 @@ export class ReviewTranslationLanguageSelectorComponent implements OnInit {
         ];
     });
 
-    this.userService
-      .getUserContributionRightsDataAsync()
-      .then(userContributionRights => {
-        if (!userContributionRights) {
-          throw new Error('User contribution rights not found.');
-        }
+    Promise.all([
+      this.userService.getUserContributionRightsDataAsync(),
+      this.contributionOpportunitiesBackendApiService.getPreferredTranslationLanguageAsync(),
+    ]).then(([userContributionRights, preferredLanguageCode]) => {
+      if (!userContributionRights) {
+        throw new Error('User contribution rights not found.');
+      }
 
-        this.filteredOptions = this.options =
-          userContributionRights.can_review_translation_for_language_codes.map(
-            languageCode => {
-              const description =
-                this.languageUtilService.getAudioLanguageDescription(
-                  languageCode
-                );
-              this.languageIdToDescription[languageCode] = description;
-              return {id: languageCode, description};
-            }
-          );
+      this.filteredOptions = this.options =
+        userContributionRights.can_review_translation_for_language_codes.map(
+          languageCode => {
+            const description =
+              this.languageUtilService.getAudioLanguageDescription(
+                languageCode
+              );
+            this.languageIdToDescription[languageCode] = description;
+            return {id: languageCode, description};
+          }
+        );
 
-        if (this.activeLanguageCode) {
-          this.languageSelection =
-            this.languageIdToDescription[this.activeLanguageCode];
-        }
-      });
+      if (this.activeLanguageCode) {
+        this.languageSelection =
+          this.languageIdToDescription[this.activeLanguageCode];
+      }
 
-    this.contributionOpportunitiesBackendApiService
-      .getPreferredTranslationLanguageAsync()
-      .then((preferredLanguageCode: string | null) => {
-        if (preferredLanguageCode && this.languageSelection === 'Language') {
+      if (this.languageSelection === 'Language' || !this.languageSelection) {
+        if (
+          preferredLanguageCode &&
+          this.languageIdToDescription[preferredLanguageCode]
+        ) {
           this.populateLanguageSelection(preferredLanguageCode);
+        } else if (this.options && this.options.length > 0) {
+          this.populateLanguageSelection(this.options[0].id);
         }
-      });
+      }
+    });
   }
 
   toggleDropdown(): void {
