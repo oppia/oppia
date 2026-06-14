@@ -62,7 +62,7 @@ export class ChapterProgressSummary {
     chapterProgressSummaryBackendDict: ChapterProgressSummaryBackendDict
   ): ChapterProgressSummary {
     return new ChapterProgressSummary(
-      chapterProgressSummaryBackendDict.exploration_id,
+      chapterProgressSummaryBackendDict.exploration_id ?? '',
       chapterProgressSummaryBackendDict.total_checkpoints_count,
       chapterProgressSummaryBackendDict.visited_checkpoints_count,
       chapterProgressSummaryBackendDict.is_chapter_complete

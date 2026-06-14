@@ -224,7 +224,7 @@ describe('TopicStorySectionComponent', () => {
 
     const storySummary = createStorySummarySpy(
       ['Node title 1'],
-      [storyNodeSpy as unknown as StoryNode]
+      [storyNodeSpy]
     );
     storySummary.isNodeCompleted.and.callFake(
       (title: string) => title === 'Node title 1'
@@ -257,7 +257,7 @@ describe('TopicStorySectionComponent', () => {
 
     const storySummary = createStorySummarySpy(
       ['Node title 1'],
-      [storyNodeSpy as unknown as StoryNode]
+      [storyNodeSpy]
     );
     storySummary.getVisitedChapterTitles.and.returnValue(['Node title 1']);
 
@@ -292,7 +292,7 @@ describe('TopicStorySectionComponent', () => {
 
     const storySummary = createStorySummarySpy(
       ['Node title 1'],
-      [storyNodeSpy as unknown as StoryNode]
+      [storyNodeSpy]
     );
 
     component.storySummary = storySummary;
@@ -324,7 +324,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.storySummary = createStorySummarySpy(
       ['Node title 1'],
-      [storyNodeSpy as unknown as StoryNode]
+      [storyNodeSpy]
     );
     component.lessonCount = 1;
     component.practiceCount = 1;
@@ -335,7 +335,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.lessonCards.length).toBe(1);
-    expect(component.isPracticeCardVisible).toBeFalse();
+    expect(component.isPracticeCardVisible).toBe(false);
   });
 
   it('should create practice card only when there are zero lessons', () => {
@@ -349,7 +349,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.lessonCards.length).toBe(0);
-    expect(component.isPracticeCardVisible).toBeTrue();
+    expect(component.isPracticeCardVisible).toBe(true);
     expect(component.practiceCard.studyUrl).toBe(
       '/learn/math/place-values/studyguide'
     );
@@ -368,7 +368,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.lessonCards.length).toBe(0);
-    expect(component.isPracticeCardVisible).toBeTrue();
+    expect(component.isPracticeCardVisible).toBe(true);
     expect(component.practiceCard.practiceUrl).toBe('#');
   });
 
@@ -383,7 +383,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.lessonCards.length).toBe(0);
-    expect(component.isPracticeCardVisible).toBeTrue();
+    expect(component.isPracticeCardVisible).toBe(true);
     expect(component.practiceCard.practiceUrl).toBe('#');
   });
 
@@ -462,7 +462,7 @@ describe('TopicStorySectionComponent', () => {
 
   it('should respect RTL language flag', () => {
     i18nLanguageCodeService.isCurrentLanguageRTL.and.returnValue(true);
-    expect(component.isLanguageRTL()).toBeTrue();
+    expect(component.isLanguageRTL()).toBe(true);
   });
 
   it('should correctly singularize lesson and practice counts', () => {
@@ -489,7 +489,7 @@ describe('TopicStorySectionComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isPracticeCardVisible).toBeTrue();
+    expect(component.isPracticeCardVisible).toBe(true);
     expect(component.practiceCard.practiceUrl).toContain('practice/session');
   });
 
@@ -504,7 +504,7 @@ describe('TopicStorySectionComponent', () => {
     component.ngOnInit();
 
     expect(component.lessonCards.length).toBe(0);
-    expect(component.isPracticeCardVisible).toBeFalse();
+    expect(component.isPracticeCardVisible).toBe(false);
   });
 
   it('should use empty string when story description is missing', () => {

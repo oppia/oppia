@@ -17,6 +17,7 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 
 import {TopicLessonCardComponent} from './topic-lesson-card.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -45,6 +46,7 @@ describe('TopicLessonCardComponent', () => {
 
     TestBed.configureTestingModule({
       declarations: [TopicLessonCardComponent, MockTranslatePipe],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {
           provide: UrlInterpolationService,
