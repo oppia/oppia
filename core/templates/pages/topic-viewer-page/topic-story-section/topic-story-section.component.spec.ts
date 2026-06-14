@@ -205,7 +205,7 @@ describe('TopicStorySectionComponent', () => {
       '/thumbnail/story/story_id/thumb.png'
     );
     expect(component.lessonCards[0].lessonProgressStatus).toBe('not_started');
-    expect(component.practiceCard).toBeNull();
+    expect(component.isPracticeCardVisible).toBe(false);
   });
 
   it('should mark lesson as completed when node is completed', () => {
