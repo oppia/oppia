@@ -40,6 +40,8 @@ import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {StoryNode} from 'domain/story/story-node.model';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
+import {ArcModel} from 'domain/story/story-contents-object.model';
+import {EditArcModalComponent} from '../modal-templates/edit-arc-modal.component';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -84,6 +86,7 @@ describe('Story Editor Component having three story nodes', () => {
         StoryEditorComponent,
         NewChapterTitleModalComponent,
         DeleteChapterModalComponent,
+        EditArcModalComponent,
         UrlFragmentEditorComponent,
       ],
       providers: [
@@ -790,5 +793,92 @@ describe('Story Editor Component having three story nodes', () => {
     expect(component.updateStoryUrlFragment).toHaveBeenCalledWith(
       newUrlFragment
     );
+  });
+
+  it('should open edit arc modal and update title and description', fakeAsync(() => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', 'Old description', [
+        'node_2',
+        'node_3',
+      ])
+    );
+    const modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        arcTitle: '',
+        arcDescription: '',
+      },
+      result: Promise.resolve({
+        title: 'Arc 1 updated',
+        description: 'New description',
+      }),
+    } as NgbModalRef);
+    const updateArcPropertySpy = spyOn(storyUpdateService, 'updateArcProperty');
+
+    component.editArc('arc_1');
+    tick();
+
+    expect(modalSpy).toHaveBeenCalledWith(EditArcModalComponent, {
+      backdrop: 'static',
+    });
+    expect(updateArcPropertySpy).toHaveBeenCalledTimes(2);
+  }));
+
+  it('should return without opening modal if arc id is null', () => {
+    const modalSpy = spyOn(ngbModal, 'open');
+
+    component.editArc(null);
+
+    expect(modalSpy).not.toHaveBeenCalled();
+  });
+
+  it('should merge current arc into previous arc on removeArcBoundary', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_1', 'node_2'])
+    );
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_2', 'Arc 2', '', ['node_3'])
+    );
+    const moveNodeToArcSpy = spyOn(storyUpdateService, 'moveNodeToArc');
+    const deleteArcSpy = spyOn(storyUpdateService, 'deleteArc');
+
+    component.removeArcBoundary('arc_2');
+
+    expect(moveNodeToArcSpy).toHaveBeenCalledWith(
+      component.story,
+      'node_3',
+      'arc_1'
+    );
+    expect(deleteArcSpy).toHaveBeenCalledWith(component.story, 'arc_2');
+  });
+
+  it('should merge second arc into first when removing boundary from first arc', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_1', 'node_2'])
+    );
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_2', 'Arc 2', '', ['node_3'])
+    );
+    const moveNodeToArcSpy = spyOn(storyUpdateService, 'moveNodeToArc');
+    const deleteArcSpy = spyOn(storyUpdateService, 'deleteArc');
+
+    component.removeArcBoundary('arc_1');
+
+    expect(moveNodeToArcSpy).toHaveBeenCalledWith(
+      component.story,
+      'node_3',
+      'arc_1'
+    );
+    expect(deleteArcSpy).toHaveBeenCalledWith(component.story, 'arc_2');
+  });
+
+  it('should place split chapter in new arc only', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_1', 'node_2', 'node_3'])
+    );
+
+    component.splitIntoArc(2);
+
+    expect(component.storyContents.getArcs().length).toBe(2);
+    expect(component.getArcIdForNode('node_3')).not.toBe('arc_1');
   });
 });

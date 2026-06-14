@@ -37,11 +37,13 @@ import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {NewChapterTitleModalComponent} from '../modal-templates/new-chapter-title-modal.component';
 import {DeleteChapterModalComponent} from '../modal-templates/delete-chapter-modal.component';
+import {EditArcModalComponent} from '../modal-templates/edit-arc-modal.component';
 import {Story} from 'domain/story/story.model';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import constants from 'assets/constants';
+import {StoryDomainConstants} from 'domain/story/story-domain.constants';
 
 @Component({
   selector: 'oppia-story-editor',
@@ -201,6 +203,30 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     return null;
   }
 
+  getArcForNode(nodeId: string): ArcModel | null {
+    if (!this.storyContents) {
+      return null;
+    }
+    const arcId = this.getArcIdForNode(nodeId);
+    if (!arcId) {
+      return null;
+    }
+    const arcIndex = this.storyContents.getArcIndex(arcId);
+    return arcIndex === -1 ? null : this.storyContents.getArcs()[arcIndex];
+  }
+
+  getArcSequenceNumber(nodeId: string): number | null {
+    if (!this.storyContents) {
+      return null;
+    }
+    const arcId = this.getArcIdForNode(nodeId);
+    if (!arcId) {
+      return null;
+    }
+    const arcIndex = this.storyContents.getArcIndex(arcId);
+    return arcIndex === -1 ? null : arcIndex + 1;
+  }
+
   isSameArc(nodeIndex: number): boolean {
     if (!this.storyContents || nodeIndex <= 0) {
       return true;
@@ -217,49 +243,131 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
       return;
     }
     const nodeId = this.linearNodesList[nodeIndex].getId();
-    const prevNodeId = this.linearNodesList[nodeIndex - 1].getId();
-    const prevArcId = this.getArcIdForNode(prevNodeId);
-    const currNodeIds = this.linearNodesList
-      .slice(nodeIndex)
-      .map(n => n.getId());
+    const sourceArcId = this.getArcIdForNode(nodeId);
+    if (!sourceArcId) {
+      return;
+    }
+    const sourceArcIndex = this.storyContents.getArcIndex(sourceArcId);
+    if (sourceArcIndex === -1) {
+      return;
+    }
+    const sourceArc = this.storyContents.getArcs()[sourceArcIndex];
+    const sourceArcNodeIds = [...sourceArc.getNodeIds()];
+    const splitIdx = sourceArcNodeIds.indexOf(nodeId);
+    if (splitIdx <= 0) {
+      return;
+    }
+    const nodesToMove = sourceArcNodeIds.slice(splitIdx);
+    if (nodesToMove.length === 0) {
+      return;
+    }
+
+    const previousArcIdsOrder = this.storyContents
+      .getArcs()
+      .map(arc => arc.getId());
     const arcId = 'arc_' + Date.now().toString();
-    const arc = ArcModel.createNew(
-      arcId,
-      'Arc ' + (this.storyContents.getArcs().length + 1),
-      '',
-      currNodeIds
-    );
     this.storyUpdateService.createArc(
       this.story,
       arcId,
       'Arc ' + (this.storyContents.getArcs().length + 1),
       '',
-      currNodeIds
+      [nodesToMove[0]]
     );
-    if (prevArcId) {
-      const prevArc = this.storyContents
-        .getArcs()
-        .find(a => a.getId() === prevArcId);
-      if (prevArc) {
-        const splitIdx = prevArc.getNodeIds().indexOf(nodeId);
-        if (splitIdx !== -1) {
-          const remainingIds = prevArc.getNodeIds().slice(0, splitIdx);
-          prevArc.setNodeIds(remainingIds);
-        }
-      }
-    }
+
+    nodesToMove.slice(1).forEach(nodeIdToMove => {
+      this.storyUpdateService.moveNodeToArc(this.story, nodeIdToMove, arcId);
+    });
+
+    // The first moved node is used to initialize the new arc, so we must
+    // explicitly remove it from the source arc to avoid dual arc membership.
+    sourceArc.setNodeIds(sourceArcNodeIds.slice(0, splitIdx));
+
+    const newArcOrder = [...previousArcIdsOrder];
+    newArcOrder.splice(sourceArcIndex + 1, 0, arcId);
+    this.storyUpdateService.rearrangeArcs(this.story, newArcOrder);
+
     this._initEditor();
   }
 
-  removeArcBoundary(arcId: string): void {
-    if (!this.storyContents) {
+  editArc(arcId: string | null): void {
+    if (!this.storyContents || !arcId) {
       return;
     }
     const arcIndex = this.storyContents.getArcIndex(arcId);
     if (arcIndex === -1) {
       return;
     }
-    this.storyUpdateService.deleteArc(this.story, arcId);
+    const arc = this.storyContents.getArcs()[arcIndex];
+    const modalRef = this.ngbModal.open(EditArcModalComponent, {
+      backdrop: 'static',
+    });
+    modalRef.componentInstance.arcTitle = arc.getTitle();
+    modalRef.componentInstance.arcDescription = arc.getDescription();
+    modalRef.result.then(
+      (result: {title: string; description: string}) => {
+        if (result.title !== arc.getTitle()) {
+          this.storyUpdateService.updateArcProperty(
+            this.story,
+            arcId,
+            StoryDomainConstants.ARC_PROPERTY_TITLE,
+            arc.getTitle(),
+            result.title
+          );
+        }
+        if (result.description !== arc.getDescription()) {
+          this.storyUpdateService.updateArcProperty(
+            this.story,
+            arcId,
+            StoryDomainConstants.ARC_PROPERTY_DESCRIPTION,
+            arc.getDescription(),
+            result.description
+          );
+        }
+        this._initEditor();
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }
+    );
+  }
+
+  removeArcBoundary(arcId: string | null): void {
+    if (!this.storyContents || !arcId) {
+      return;
+    }
+    const arcIndex = this.storyContents.getArcIndex(arcId);
+    if (arcIndex === -1) {
+      return;
+    }
+
+    let sourceArcIndex = arcIndex;
+    let destinationArcId: string;
+    if (arcIndex === 0) {
+      if (this.storyContents.getArcs().length < 2) {
+        return;
+      }
+      sourceArcIndex = 1;
+      destinationArcId = arcId;
+    } else {
+      destinationArcId = this.storyContents.getArcs()[arcIndex - 1].getId();
+    }
+
+    if (sourceArcIndex <= 0) {
+      return;
+    }
+    const currentArc = this.storyContents.getArcs()[sourceArcIndex];
+    const nodeIdsToMove = [...currentArc.getNodeIds()];
+
+    nodeIdsToMove.forEach(nodeId => {
+      this.storyUpdateService.moveNodeToArc(
+        this.story,
+        nodeId,
+        destinationArcId
+      );
+    });
+    this.storyUpdateService.deleteArc(this.story, currentArc.getId());
     this._initEditor();
   }
 

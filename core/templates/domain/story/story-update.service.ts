@@ -59,6 +59,14 @@ interface Params {
   new_value?: string | string[] | boolean | number | null;
   property_name?: string;
   cmd?: string;
+  // Arc-related parameters.
+  arc_id?: string;
+  description?: string;
+  node_ids?: string[];
+  new_title?: string;
+  arc_ids_order?: string[];
+  to_arc_id?: string;
+  old_position_index?: number;
 }
 
 type Command = BackendChangeObject['cmd'];
@@ -1213,6 +1221,53 @@ export class StoryUpdateService {
       (changeDict, story) => {
         // ---- Undo ----
         story.getStoryContents().getArcs()[arcIndex].setTitle(oldTitle);
+      }
+    );
+  }
+
+  updateArcProperty(
+    story: Story,
+    arcId: string,
+    propertyName: string,
+    oldValue: string,
+    newValue: string
+  ): void {
+    const arcIndex = story.getStoryContents().getArcIndex(arcId);
+    if (arcIndex === -1) {
+      throw new Error("The given arc doesn't exist");
+    }
+    this._applyChange(
+      story,
+      StoryDomainConstants.CMD_UPDATE_ARC_PROPERTY,
+      {
+        arc_id: arcId,
+        property_name: propertyName,
+        old_value: oldValue,
+        new_value: newValue,
+      },
+      (changeDict, story) => {
+        // ---- Apply ----
+        const arc = story.getStoryContents().getArcs()[arcIndex];
+        if (propertyName === StoryDomainConstants.ARC_PROPERTY_TITLE) {
+          arc.setTitle(newValue);
+        } else if (
+          propertyName === StoryDomainConstants.ARC_PROPERTY_DESCRIPTION
+        ) {
+          arc.setDescription(newValue);
+        } else {
+          throw new Error('Invalid arc property');
+        }
+      },
+      (changeDict, story) => {
+        // ---- Undo ----
+        const arc = story.getStoryContents().getArcs()[arcIndex];
+        if (propertyName === StoryDomainConstants.ARC_PROPERTY_TITLE) {
+          arc.setTitle(oldValue);
+        } else if (
+          propertyName === StoryDomainConstants.ARC_PROPERTY_DESCRIPTION
+        ) {
+          arc.setDescription(oldValue);
+        }
       }
     );
   }

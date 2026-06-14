@@ -34,15 +34,37 @@
     </div>
 
     <div class="story-card-body">
-      <div class="story-lesson-card-wrapper"
-           *ngFor="let lessonCard of lessonCards">
-        <topic-lesson-card
-          [lessonTitle]="lessonCard.lessonTitle"
-          [lessonDescription]="lessonCard.lessonDescription"
-          [thumbnailUrl]="lessonCard.thumbnailUrl"
-          [startUrl]="lessonCard.startUrl">
-        </topic-lesson-card>
-      </div>
+      <ng-container *ngIf="arcGroups.length > 0; else flatLessonList">
+        <div class="arc-group" *ngFor="let arcGroup of arcGroups">
+          <div class="arc-header">
+            <h4 class="arc-title">{{ arcGroup.arcTitle }}</h4>
+            <p *ngIf="arcGroup.arcDescription" class="arc-description">
+              {{ arcGroup.arcDescription }}
+            </p>
+          </div>
+          <div class="story-lesson-card-wrapper"
+               *ngFor="let lessonCard of arcGroup.lessonCards">
+            <topic-lesson-card
+              [lessonTitle]="lessonCard.lessonTitle"
+              [lessonDescription]="lessonCard.lessonDescription"
+              [thumbnailUrl]="lessonCard.thumbnailUrl"
+              [startUrl]="lessonCard.startUrl">
+            </topic-lesson-card>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #flatLessonList>
+        <div class="story-lesson-card-wrapper"
+             *ngFor="let lessonCard of lessonCards">
+          <topic-lesson-card
+            [lessonTitle]="lessonCard.lessonTitle"
+            [lessonDescription]="lessonCard.lessonDescription"
+            [thumbnailUrl]="lessonCard.thumbnailUrl"
+            [startUrl]="lessonCard.startUrl">
+          </topic-lesson-card>
+        </div>
+      </ng-template>
 
       <div class="story-practice-card-wrapper"
         *ngIf="isPracticeCardVisible">

@@ -45,6 +45,13 @@ interface LessonCardData {
   lessonDescription: string;
   thumbnailUrl: string;
   startUrl: string;
+  nodeId: string;
+}
+
+interface ArcGroupData {
+  arcTitle: string;
+  arcDescription: string;
+  lessonCards: LessonCardData[];
 }
 
 interface PracticeCardData {
@@ -75,6 +82,7 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
   oppiaAvatarImageUrl: string = '';
   studyGuideUrl: string = '#';
   lessonCards: LessonCardData[] = [];
+  arcGroups: ArcGroupData[] = [];
   practiceCard!: PracticeCardData;
   isPracticeCardVisible: boolean = false;
 
@@ -138,6 +146,33 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
+  private buildArcGroups(allNodes: StoryNode[]): ArcGroupData[] {
+    const arcs = this.storySummary.getArcs();
+    if (!arcs || arcs.length === 0) {
+      return [];
+    }
+
+    const nodeIndexMap = new Map<string, number>();
+    allNodes.forEach((node, index) => {
+      nodeIndexMap.set(node.getId(), index);
+    });
+
+    return arcs.map(arc => {
+      const arcLessonCards: LessonCardData[] = [];
+      arc.node_ids.forEach(nodeId => {
+        const nodeIndex = nodeIndexMap.get(nodeId);
+        if (nodeIndex !== undefined && this.lessonCards[nodeIndex]) {
+          arcLessonCards.push(this.lessonCards[nodeIndex]);
+        }
+      });
+      return {
+        arcTitle: arc.title,
+        arcDescription: arc.description,
+        lessonCards: arcLessonCards,
+      };
+    });
+  }
+
   private populateFromInputs(): void {
     if (!this.classroomUrlFragment) {
       this.classroomUrlFragment =
@@ -154,17 +189,19 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
     this.storyTitle = this.storySummary.getTitle();
     this.storyDescription = this.storySummary.getDescription() || '';
     this.lessonCount = this.storySummary.getNodeTitles().length;
-    this.lessonCards = this.storySummary
-      .getAllNodes()
-      .map((node: StoryNode, index: number) => {
-        return {
-          lessonNumber: index + 1,
-          lessonTitle: 'Lesson ' + (index + 1) + ': ' + node.getTitle(),
-          lessonDescription: node.getDescription(),
-          thumbnailUrl: this.getLessonThumbnailUrl(node),
-          startUrl: this.getLessonStartUrl(node),
-        };
-      });
+    const allNodes = this.storySummary.getAllNodes();
+    this.lessonCards = allNodes.map((node: StoryNode, index: number) => {
+      return {
+        lessonNumber: index + 1,
+        lessonTitle: 'Lesson ' + (index + 1) + ': ' + node.getTitle(),
+        lessonDescription: node.getDescription(),
+        thumbnailUrl: this.getLessonThumbnailUrl(node),
+        startUrl: this.getLessonStartUrl(node),
+        nodeId: node.getId(),
+      };
+    });
+
+    this.arcGroups = this.buildArcGroups(allNodes);
 
     this.isPracticeCardVisible =
       this.lessonCards.length === 0 && this.practiceCount >= 1;

@@ -145,12 +145,40 @@
   padding: 0 24px 24px;
 }
 
+.arc-group {
+  margin-top: 24px;
+}
+
+.arc-header {
+  margin-bottom: 12px;
+}
+
+.arc-title {
+  color: #00645c;
+  font-family: Capriola, Roboto, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.arc-description {
+  color: #555;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
 .story-lesson-card-wrapper,
 .story-practice-card-wrapper {
   align-self: center;
   margin-top: auto;
   max-width: 912px;
   width: 100%;
+}
+
+.arc-group .story-lesson-card-wrapper {
+  margin-top: 12px;
 }
 
 @media (max-width: 768px) {
