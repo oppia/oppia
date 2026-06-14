@@ -577,4 +577,50 @@ describe('CheckpointBarComponent', () => {
 
     expect(component.checkpointStatusArray).toBeDefined();
   });
+
+  it('should return 0 progress width when playerPositionService is undefined', () => {
+    (component as any).playerPositionService = undefined;
+
+    expect(component.getCompletedProgressBarWidth()).toBe(0);
+  });
+
+  it('should return 0 progress width when explorationEngineService is undefined', () => {
+    (component as any).explorationEngineService = undefined;
+
+    expect(component.getCompletedProgressBarWidth()).toBe(0);
+  });
+
+  it('should not navigate when playerPositionService is undefined', () => {
+    component.checkpointIndexes = [0, 10, 20, 30];
+    component.checkpointStatusArray = [
+      'completed',
+      'completed',
+      'in-progress',
+      'incomplete',
+    ];
+    (component as any).playerPositionService = undefined;
+
+    component.returnToCheckpointIfCompleted(1);
+
+    expect(component.checkpointStatusArray).toBeDefined();
+  });
+
+  it('should handle getMostRecentlyReachedCheckpointIndex returning 0', () => {
+    component.checkpointCount = 3;
+    component.expEnded = false;
+    mockCheckpointProgressService.getMostRecentlyReachedCheckpointIndex.and.returnValue(
+      0
+    );
+    mockPlayerPositionService.getDisplayedCardIndex.and.returnValue(0);
+    mockExplorationEngineService.getState.and.returnValue({name: 'testState'});
+    mockExplorationEngineService.getStateCardByName.and.returnValue({
+      isTerminal: jasmine.createSpy('isTerminal').and.returnValue(false),
+    });
+    spyOn(component, 'getCompletedProgressBarWidth').and.returnValue(0);
+
+    component.updateLessonProgressBar();
+
+    expect(component.completedCheckpointsCount).toBe(-1);
+    expect(component.checkpointStatusArray[0]).toBe('completed');
+  });
 });
