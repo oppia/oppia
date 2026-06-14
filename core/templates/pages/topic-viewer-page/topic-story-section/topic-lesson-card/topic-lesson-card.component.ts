@@ -23,6 +23,9 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import './topic-lesson-card.component.css';
 
 const FALLBACK_THUMBNAIL_IMAGE_PATH = '/splash/student_desk1x.webp';
+const CHECKPOINT_STATUS_COMPLETED = 'completed';
+const CHECKPOINT_STATUS_IN_PROGRESS = 'in-progress';
+const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
 
 @Component({
   selector: 'topic-lesson-card',
@@ -34,6 +37,13 @@ export class TopicLessonCardComponent implements OnInit {
   @Input() lessonDescription: string = '';
   @Input() thumbnailUrl: string = '';
   @Input() startUrl: string = '';
+  @Input() lessonProgressStatus:
+    | 'not_started'
+    | 'in_progress'
+    | 'completed'
+    | 'coming_soon' = 'not_started';
+  @Input() totalCheckpointsCount: number = 0;
+  @Input() visitedCheckpointsCount: number = 0;
 
   resolvedThumbnailUrl: string = '';
 
@@ -45,6 +55,78 @@ export class TopicLessonCardComponent implements OnInit {
   ngOnInit(): void {
     this.resolvedThumbnailUrl =
       this.thumbnailUrl || this.getFallbackThumbnailUrl();
+  }
+
+  get checkpointStatuses(): string[] {
+    if (
+      this.lessonProgressStatus === 'coming_soon' ||
+      this.totalCheckpointsCount === 0
+    ) {
+      return [];
+    }
+
+    const totalNodes = this.totalCheckpointsCount + 1;
+    const statuses: string[] = [];
+    const visitedCheckpointCount = Math.min(
+      Math.max(this.visitedCheckpointsCount, 0),
+      this.totalCheckpointsCount
+    );
+
+    const reachedCheckpointCount = Math.max(visitedCheckpointCount - 1, 0);
+
+    if (
+      this.lessonProgressStatus === 'completed' ||
+      visitedCheckpointCount >= this.totalCheckpointsCount
+    ) {
+      for (let i = 0; i < totalNodes; i++) {
+        statuses.push(CHECKPOINT_STATUS_COMPLETED);
+      }
+      return statuses;
+    }
+
+    const currentNodeIndex = reachedCheckpointCount;
+
+    for (let i = 0; i < totalNodes; i++) {
+      if (i < currentNodeIndex) {
+        statuses.push(CHECKPOINT_STATUS_COMPLETED);
+      } else if (i === currentNodeIndex) {
+        statuses.push(CHECKPOINT_STATUS_IN_PROGRESS);
+      } else {
+        statuses.push(CHECKPOINT_STATUS_INCOMPLETE);
+      }
+    }
+
+    return statuses;
+  }
+
+  get progressPercent(): number {
+    if (
+      this.totalCheckpointsCount === 0 ||
+      this.lessonProgressStatus === 'coming_soon'
+    ) {
+      return 0;
+    }
+    const visitedCheckpointCount = Math.min(
+      Math.max(this.visitedCheckpointsCount, 0),
+      this.totalCheckpointsCount
+    );
+    if (
+      this.lessonProgressStatus === 'completed' ||
+      visitedCheckpointCount >= this.totalCheckpointsCount
+    ) {
+      return 100;
+    }
+    const reachedCheckpointCount = Math.max(visitedCheckpointCount - 1, 0);
+    return Math.floor(
+      (reachedCheckpointCount / this.totalCheckpointsCount) * 100
+    );
+  }
+
+  get showCheckpointBar(): boolean {
+    return (
+      this.lessonProgressStatus !== 'coming_soon' &&
+      this.totalCheckpointsCount > 0
+    );
   }
 
   navigateTo(url: string): void {
