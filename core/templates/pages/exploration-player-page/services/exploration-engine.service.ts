@@ -1060,7 +1060,7 @@ export class ExplorationEngineService {
     let nodeToParentMap: Record<string, string | null> = {};
     visitedNodes[this.exploration.initStateName] = true;
     pathsQueue.push(this.exploration.initStateName);
-    // 1st state does not have a parent
+    // 1st state does not have a parent.
     nodeToParentMap[this.exploration.initStateName] = null;
     while (pathsQueue.length > 0) {
       // '.shift()' here can return an undefined value, but we're already
