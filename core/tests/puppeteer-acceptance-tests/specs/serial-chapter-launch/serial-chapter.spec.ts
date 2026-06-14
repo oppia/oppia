@@ -317,6 +317,11 @@ describe('Logged-In Learner', function () {
         'Rounding Numbers part 2',
       ]);
 
+      await loggedInLearner2.expectScreenshotToMatch(
+        'Chap6JayAtTheMarketNotVisible',
+        __dirname
+      );
+
       await loggedInLearner2.expectLessonCardToHaveNewLabel(
         'Comparing Numbers'
       );
@@ -330,8 +335,11 @@ describe('Logged-In Learner', function () {
         'Chap2InProgressSectionChap3InRecommendedSection',
         __dirname
       );
-      await loggedInLearner1.expectChapterToBePresentInRecommendedSection(
-        'Comparing Numbers'
+      await loggedInLearner1.expectInProgressLessonCardToHaveNewLabel(
+        'Chapter 2: Find the Value of a Number'
+      );
+      await loggedInLearner1.expectRecommendedLessonCardToHaveNewLabel(
+        'Chapter 3: Comparing Numbers'
       );
       await loggedInLearner1.resumeLessonFromLearnerDashboard(
         ' Chapter 2: Find the Value of a Number '

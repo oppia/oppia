@@ -4640,6 +4640,69 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Verifies that the specified lesson card in a learner dashboard card
+   * display section displays the "New" label.
+   * @param {string} sectionName - The section title to inspect.
+   * @param {string} chapterName - The name of the lesson to check.
+   */
+  async expectLessonCardInSectionToHaveNewLabel(
+    sectionName: string,
+    chapterName: string
+  ): Promise<void> {
+    const subsectionElement =
+      await this.findSubsectionElementBasedOnTitle(sectionName);
+    const lessonCardElement = await this.findChildElementInParent(
+      subsectionElement,
+      learnerDashSelectors.lessonCard,
+      chapterName
+    );
+
+    if (!lessonCardElement) {
+      throw new Error(`Lesson "${chapterName}" not found`);
+    }
+
+    const newLabelHandle = await lessonCardElement.$('.classroom-new-chapter');
+
+    if (!newLabelHandle) {
+      throw new Error(
+        `Lesson "${chapterName}" found but does NOT have a new label`
+      );
+    }
+
+    showMessage(
+      `Lesson "${chapterName}" has a new label in "${sectionName}" section`
+    );
+  }
+
+  /**
+   * Verifies that the specified lesson card in the learner dashboard's
+   * "Lessons in progress" section displays the "New" label.
+   * @param {string} chapterName - The name of the lesson to check.
+   */
+  async expectInProgressLessonCardToHaveNewLabel(
+    chapterName: string
+  ): Promise<void> {
+    await this.expectLessonCardInSectionToHaveNewLabel(
+      'Lessons in progress',
+      chapterName
+    );
+  }
+
+  /**
+   * Verifies that the specified lesson card in the learner dashboard's
+   * "Recommended for you" section displays the "New" label.
+   * @param {string} chapterName - The name of the lesson to check.
+   */
+  async expectRecommendedLessonCardToHaveNewLabel(
+    chapterName: string
+  ): Promise<void> {
+    await this.expectLessonCardInSectionToHaveNewLabel(
+      'Recommended for you',
+      chapterName
+    );
+  }
+
+  /**
    * Check if the available chapter list has all the specified chapters
    * @param chapterNames - The array of chapter names
    */

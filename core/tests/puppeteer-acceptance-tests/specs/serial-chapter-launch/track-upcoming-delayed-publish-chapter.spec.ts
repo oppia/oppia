@@ -238,26 +238,12 @@ describe('Logged-In Learner', function () {
       await curriculumAdmin.clickReadyToPublishButton();
 
       if (!curriculumAdmin.isViewportAtMobileWidth()) {
-        await curriculumAdmin.publishChapter(
-          "Jamie's Adventures in the Arcade",
-          'Place Values',
-          '0'
-        );
-
-        await curriculumAdmin.dragChapterByName(
+        await curriculumAdmin.expectPublishedChapterReorderToBeBlocked(
           "Jamie's Adventures in the Arcade",
           'Place Values',
           'Find the Value of a Number',
-          'What are the Place Values'
-        );
-
-        await curriculumAdmin.page.waitForSelector(
-          '.e2e-test-published-chapters-drop-error'
-        );
-
-        await curriculumAdmin.expectElementContentToBe(
-          '.e2e-test-published-chapters-drop-error',
-          'The positions of published chapters cannot be changed.'
+          'What are the Place Values',
+          '0'
         );
       }
 

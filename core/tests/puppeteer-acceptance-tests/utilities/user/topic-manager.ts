@@ -116,6 +116,8 @@ const newChapterPhotoBoxButton =
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 const newChapterErrorMessageSelector =
   '.acceptance-restricted-interaction-error';
+const publishedChaptersDropErrorSelector =
+  '.e2e-test-published-chapters-drop-error';
 
 const topicStatusDropdownSelector = '.e2e-test-select-topic-status-dropdown';
 const classroomDropdownSelector = '.e2e-test-select-classroom-dropdown';
@@ -4624,6 +4626,37 @@ export class TopicManager extends BaseUser {
 
     showMessage(
       `Dragged chapter "${fromChapterName}" to chapter "${toChapterName}"`
+    );
+  }
+
+  /**
+   * Verifies that published chapters cannot be reordered.
+   * @param {string} storyName - The name of the story.
+   * @param {string} topicName - The name of the topic under which the story exists.
+   * @param {string} publishedChapterName - The name of the published chapter to drag.
+   * @param {string} targetChapterName - The chapter used as the drag target.
+   * @param {string} dropdownValue - The published chapter dropdown value to publish up to.
+   */
+  async expectPublishedChapterReorderToBeBlocked(
+    storyName: string,
+    topicName: string,
+    publishedChapterName: string,
+    targetChapterName: string,
+    dropdownValue: string
+  ): Promise<void> {
+    await this.publishChapter(storyName, topicName, dropdownValue);
+
+    await this.dragChapterByName(
+      storyName,
+      topicName,
+      publishedChapterName,
+      targetChapterName
+    );
+
+    await this.page.waitForSelector(publishedChaptersDropErrorSelector);
+    await this.expectElementContentToBe(
+      publishedChaptersDropErrorSelector,
+      'The positions of published chapters cannot be changed.'
     );
   }
 }
