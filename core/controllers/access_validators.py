@@ -318,7 +318,7 @@ class PracticeSessionAccessValidationPage(
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'selected_subtopic_ids': {
+            'skill_ids': {
                 'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
             }
         }
@@ -329,20 +329,19 @@ class PracticeSessionAccessValidationPage(
         """Handles GET requests."""
 
         assert self.normalized_request is not None
-        subtopics = self.normalized_request.get('selected_subtopic_ids')
+        skill_ids = self.normalized_request.get('skill_ids')
 
-        if not isinstance(subtopics, list) or not all(
-            isinstance(s, int) for s in subtopics
+        if not isinstance(skill_ids, list) or not all(
+            isinstance(s, str) for s in skill_ids
         ):
-            raise self.InvalidInputException('Invalid subtopic IDs')
+            raise self.InvalidInputException('Invalid skill IDs')
 
         topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
         topic = topic_fetchers.get_topic_by_url_fragment(topic_url_fragment)
 
-        subtopics_ids = {subtopic.id for subtopic in topic.subtopics}
-
-        for subtopic_id in subtopics:
-            if subtopic_id not in subtopics_ids:
+        all_skill_ids = topic.get_all_skill_ids()
+        for skill_id in skill_ids:
+            if skill_id not in all_skill_ids:
                 raise self.NotFoundException
 
 

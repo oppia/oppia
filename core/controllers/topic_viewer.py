@@ -27,6 +27,7 @@ from core.domain import (
     platform_parameter_list,
     platform_parameter_services,
     skill_services,
+    story_domain,
     story_fetchers,
     topic_fetchers,
     topic_services,
@@ -90,6 +91,8 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 story_summary.node_titles, pending_node_titles
             )
             story_summary_dict = story_summary.to_human_readable_dict()
+            story = story_fetchers.get_story_by_id(story_summary.id)
+            arcs = [arc.to_dict() for arc in story.story_contents.arcs]
             canonical_story_dict = {
                 'id': story_summary_dict['id'],
                 'title': story_summary_dict['title'],
@@ -101,6 +104,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'story_is_published': True,
                 'completed_node_titles': completed_node_titles,
                 'all_node_dicts': [node.to_dict() for node in filtered_nodes],
+                'arcs': arcs,
             }
             canonical_story_dicts.append(canonical_story_dict)
 
@@ -117,6 +121,8 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 story_summary.node_titles, pending_node_titles
             )
             story_summary_dict = story_summary.to_human_readable_dict()
+            story = story_fetchers.get_story_by_id(story_summary.id)
+            arcs = [arc.to_dict() for arc in story.story_contents.arcs]
             additional_story_dict = {
                 'id': story_summary_dict['id'],
                 'title': story_summary_dict['title'],
@@ -128,6 +134,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'story_is_published': True,
                 'completed_node_titles': completed_node_titles,
                 'all_node_dicts': [node.to_dict() for node in all_nodes],
+                'arcs': arcs,
             }
             additional_story_dicts.append(additional_story_dict)
 

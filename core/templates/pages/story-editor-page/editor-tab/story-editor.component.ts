@@ -28,13 +28,16 @@ import {AlertsService} from 'services/alerts.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {StoryNode} from 'domain/story/story-node.model';
+import {
+  ArcModel,
+  StoryContents,
+} from 'domain/story/story-contents-object.model';
 import {StoryEditorNavigationService} from '../services/story-editor-navigation.service';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {NewChapterTitleModalComponent} from '../modal-templates/new-chapter-title-modal.component';
 import {DeleteChapterModalComponent} from '../modal-templates/delete-chapter-modal.component';
 import {Story} from 'domain/story/story.model';
-import {StoryContents} from 'domain/story/story-contents-object.model';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
@@ -184,6 +187,80 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   isSerialChapterFeatureFlagEnabled(): boolean {
     return this.platformFeatureService.status
       .SerialChapterLaunchCurriculumAdminView.isEnabled;
+  }
+
+  getArcIdForNode(nodeId: string): string | null {
+    if (!this.storyContents) {
+      return null;
+    }
+    for (const arc of this.storyContents.getArcs()) {
+      if (arc.getNodeIds().indexOf(nodeId) !== -1) {
+        return arc.getId();
+      }
+    }
+    return null;
+  }
+
+  isSameArc(nodeIndex: number): boolean {
+    if (!this.storyContents || nodeIndex <= 0) {
+      return true;
+    }
+    const prevNodeId = this.linearNodesList[nodeIndex - 1].getId();
+    const currNodeId = this.linearNodesList[nodeIndex].getId();
+    return (
+      this.getArcIdForNode(prevNodeId) === this.getArcIdForNode(currNodeId)
+    );
+  }
+
+  splitIntoArc(nodeIndex: number): void {
+    if (!this.storyContents) {
+      return;
+    }
+    const nodeId = this.linearNodesList[nodeIndex].getId();
+    const prevNodeId = this.linearNodesList[nodeIndex - 1].getId();
+    const prevArcId = this.getArcIdForNode(prevNodeId);
+    const currNodeIds = this.linearNodesList
+      .slice(nodeIndex)
+      .map(n => n.getId());
+    const arcId = 'arc_' + Date.now().toString();
+    const arc = ArcModel.createNew(
+      arcId,
+      'Arc ' + (this.storyContents.getArcs().length + 1),
+      '',
+      currNodeIds
+    );
+    this.storyUpdateService.createArc(
+      this.story,
+      arcId,
+      'Arc ' + (this.storyContents.getArcs().length + 1),
+      '',
+      currNodeIds
+    );
+    if (prevArcId) {
+      const prevArc = this.storyContents
+        .getArcs()
+        .find(a => a.getId() === prevArcId);
+      if (prevArc) {
+        const splitIdx = prevArc.getNodeIds().indexOf(nodeId);
+        if (splitIdx !== -1) {
+          const remainingIds = prevArc.getNodeIds().slice(0, splitIdx);
+          prevArc.setNodeIds(remainingIds);
+        }
+      }
+    }
+    this._initEditor();
+  }
+
+  removeArcBoundary(arcId: string): void {
+    if (!this.storyContents) {
+      return;
+    }
+    const arcIndex = this.storyContents.getArcIndex(arcId);
+    if (arcIndex === -1) {
+      return;
+    }
+    this.storyUpdateService.deleteArc(this.story, arcId);
+    this._initEditor();
   }
 
   _initEditor(): void {

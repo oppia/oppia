@@ -284,15 +284,60 @@
                       <th>Last Modified or Published</th>
                       <th>Planned Publication Date</th>
                     </tr>
-                    <tr *ngFor="let node of linearNodesList;index as idx"
-                        class="story-node"
-                        [ngClass]="{'published-node': (node.getStatus() === 'Published'),
-                                   'ready-to-publish-node': (node.getStatus() === 'Ready To Publish'),
-                                   'draft-node': (node.getStatus() === 'Draft')}"
-                        (click)="navigateToChapterWithId(node.getId(), idx)"
-                        cdkDrag
-                        [cdkDragDisabled]="isDragAndDropDisabled(node)"
-                        [cdkDragData]="node">
+                     <ng-container *ngFor="let node of linearNodesList;index as idx">
+                       <tr *ngIf="idx > 0 && !isSameArc(idx)"
+                           class="arc-boundary-row">
+                         <td colspan="7">
+                           <div class="arc-boundary-header">
+                             <div class="arc-boundary-info">
+                               <span class="arc-boundary-title">
+                                 {{ storyContents.getArcs()[storyContents.getArcIndex(getArcIdForNode(node.getId()))]?.getTitle() }}
+                               </span>
+                               <span class="arc-boundary-description">
+                                 {{ storyContents.getArcs()[storyContents.getArcIndex(getArcIdForNode(node.getId()))]?.getDescription() }}
+                               </span>
+                             </div>
+                             <div class="arc-boundary-actions">
+                               <button class="btn btn-sm btn-outline-secondary arc-edit-button"
+                                       (click)="$event.stopPropagation()">
+                                 Edit Arc
+                               </button>
+                               <button class="btn btn-sm btn-outline-danger arc-remove-button"
+                                       (click)="removeArcBoundary(getArcIdForNode(node.getId()));$event.stopPropagation()">
+                                 Remove Arc Boundary
+                               </button>
+                             </div>
+                           </div>
+                         </td>
+                       </tr>
+                       <tr *ngIf="idx > 0 && isSameArc(idx) && linearNodesList[idx-1].getStatus() !== 'Published'"
+                           class="split-line-row">
+                         <td colspan="7">
+                           <div class="split-line-container">
+                             <div class="split-line"></div>
+                             <button class="btn btn-sm btn-outline-primary split-into-arc-button"
+                                     (click)="splitIntoArc(idx);$event.stopPropagation()">
+                               Split Into Arc
+                             </button>
+                           </div>
+                         </td>
+                       </tr>
+                       <tr *ngIf="idx > 0 && isSameArc(idx) && linearNodesList[idx-1].getStatus() === 'Published'"
+                           class="split-line-row">
+                         <td colspan="7">
+                           <div class="split-line-container">
+                             <div class="split-line"></div>
+                           </div>
+                         </td>
+                       </tr>
+                       <tr class="story-node"
+                         [ngClass]="{'published-node': (node.getStatus() === 'Published'),
+                                    'ready-to-publish-node': (node.getStatus() === 'Ready To Publish'),
+                                    'draft-node': (node.getStatus() === 'Draft')}"
+                         (click)="navigateToChapterWithId(node.getId(), idx)"
+                         cdkDrag
+                         [cdkDragDisabled]="isDragAndDropDisabled(node)"
+                         [cdkDragData]="node">
                       <td class="drag-handler" (click)="$event.stopPropagation()">
                         <span class="fas fa-grip-vertical draggable-icon-indicator"
                               *ngIf="node.getStatus()!=='Published'">
@@ -342,6 +387,7 @@
                         </div>
                       </td>
                     </tr>
+                    </ng-container>
                   </table>
                 </div>
               </div>
@@ -821,6 +867,73 @@
       .chapter-edit-option span {
         font-size: 12px;
       }
+    }
+    .arc-boundary-row td {
+      padding: 0 !important;
+      border: none !important;
+    }
+
+    .arc-boundary-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #e0f2f1;
+      border-left: 4px solid #009688;
+      border-right: 1px solid #b2dfdb;
+      border-top: 1px solid #b2dfdb;
+      border-bottom: 1px solid #b2dfdb;
+      padding: 8px 12px;
+      margin: 4px 0;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .arc-boundary-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .arc-boundary-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: #00695c;
+    }
+
+    .arc-boundary-description {
+      font-size: 12px;
+      color: #4db6ac;
+    }
+
+    .arc-boundary-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .arc-edit-button,
+    .arc-remove-button {
+      font-size: 12px;
+    }
+
+    .split-line-row td {
+      padding: 0 !important;
+      border: none !important;
+    }
+
+    .split-line-container {
+      display: flex;
+      align-items: center;
+      padding: 4px 0;
+    }
+
+    .split-line {
+      flex: 1;
+      height: 0;
+      border-top: 2px dashed #ccc;
+    }
+
+    .split-into-arc-button {
+      margin-left: 8px;
+      font-size: 12px;
+      white-space: nowrap;
     }
   </style>
 </div>

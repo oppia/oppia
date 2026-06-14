@@ -33,7 +33,10 @@ import {StoryChange} from 'domain/editor/undo_redo/change.model';
 import {StoryDomainConstants} from 'domain/story/story-domain.constants';
 import {StoryEditorStateService} from 'pages/story-editor-page/services/story-editor-state.service';
 import {Story} from 'domain/story/story.model';
-import {StoryContents} from 'domain/story/story-contents-object.model';
+import {
+  ArcModel,
+  StoryContents,
+} from 'domain/story/story-contents-object.model';
 import {StoryNode} from './story-node.model';
 import {EntityEditorBrowserTabsInfo} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import {LocalStorageService} from 'services/local-storage.service';
@@ -1143,6 +1146,124 @@ export class StoryUpdateService {
         // ---- Undo ----
         story.getStoryContents().addAcquiredSkillIdToNode(nodeId, skillId);
         this._storyChapterUpdateEventEmitter.emit();
+      }
+    );
+  }
+
+  createArc(
+    story: Story,
+    arcId: string,
+    title: string,
+    description: string,
+    nodeIds: string[]
+  ): void {
+    this._applyChange(
+      story,
+      StoryDomainConstants.CMD_CREATE_ARC,
+      {
+        arc_id: arcId,
+        title: title,
+        description: description,
+        node_ids: nodeIds,
+      },
+      (changeDict, story) => {
+        // ---- Apply ----
+        const arc = ArcModel.createNew(arcId, title, description, nodeIds);
+        story.getStoryContents().addArc(arc);
+      },
+      (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().deleteArc(arcId);
+      }
+    );
+  }
+
+  deleteArc(story: Story, arcId: string): void {
+    this._applyChange(
+      story,
+      StoryDomainConstants.CMD_DELETE_ARC,
+      {
+        arc_id: arcId,
+      },
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().deleteArc(arcId);
+      },
+      (changeDict, story) => {
+        // ---- Undo ----
+        throw new Error('A deleted arc cannot be restored.');
+      }
+    );
+  }
+
+  renameArc(story: Story, arcId: string, newTitle: string): void {
+    const arcIndex = story.getStoryContents().getArcIndex(arcId);
+    const oldTitle = story.getStoryContents().getArcs()[arcIndex].getTitle();
+    this._applyChange(
+      story,
+      StoryDomainConstants.CMD_RENAME_ARC,
+      {
+        arc_id: arcId,
+        new_title: newTitle,
+      },
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().getArcs()[arcIndex].setTitle(newTitle);
+      },
+      (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().getArcs()[arcIndex].setTitle(oldTitle);
+      }
+    );
+  }
+
+  rearrangeArcs(story: Story, arcIdsOrder: string[]): void {
+    const oldArcIds = story
+      .getStoryContents()
+      .getArcs()
+      .map(arc => arc.getId());
+    this._applyChange(
+      story,
+      StoryDomainConstants.CMD_REARRANGE_ARCS,
+      {
+        arc_ids_order: arcIdsOrder,
+      },
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().rearrangeArcs(arcIdsOrder);
+      },
+      (changeDict, story) => {
+        // ---- Undo ----
+        story.getStoryContents().rearrangeArcs(oldArcIds);
+      }
+    );
+  }
+
+  moveNodeToArc(story: Story, nodeId: string, toArcId: string): void {
+    let oldArcId = '';
+    for (const arc of story.getStoryContents().getArcs()) {
+      if (arc.getNodeIds().indexOf(nodeId) !== -1) {
+        oldArcId = arc.getId();
+        break;
+      }
+    }
+    this._applyChange(
+      story,
+      StoryDomainConstants.CMD_MOVE_NODE_TO_ARC,
+      {
+        node_id: nodeId,
+        to_arc_id: toArcId,
+        old_position_index: 0,
+      },
+      (changeDict, story) => {
+        // ---- Apply ----
+        story.getStoryContents().moveNodeToArc(nodeId, toArcId);
+      },
+      (changeDict, story) => {
+        // ---- Undo ----
+        if (oldArcId) {
+          story.getStoryContents().moveNodeToArc(nodeId, oldArcId);
+        }
       }
     );
   }

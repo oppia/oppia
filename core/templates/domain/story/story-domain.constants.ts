@@ -44,6 +44,16 @@ export const StoryDomainConstants = {
   STORY_PROPERTY_URL_FRAGMENT: 'url_fragment',
   STORY_PROPERTY_META_TAG_CONTENT: 'meta_tag_content',
 
+  CMD_CREATE_ARC: 'create_arc',
+  CMD_DELETE_ARC: 'delete_arc',
+  CMD_RENAME_ARC: 'rename_arc',
+  CMD_REARRANGE_ARCS: 'rearrange_arcs',
+  CMD_MOVE_NODE_TO_ARC: 'move_node_to_arc',
+  CMD_UPDATE_ARC_PROPERTY: 'update_arc_property',
+
+  ARC_PROPERTY_TITLE: 'title',
+  ARC_PROPERTY_DESCRIPTION: 'description',
+
   INITIAL_NODE_ID: 'initial_node_id',
   NODE: 'node',
 
