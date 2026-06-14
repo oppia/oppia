@@ -26,8 +26,19 @@ var ExplorationEditorHistoryTab = function () {
    * Interactive elements
    */
   var historyGraph = $('.e2e-test-history-graph');
-  var codeMirrorElementSelector = function () {
-    return $$('.CodeMirror-code');
+  var leftCodeMirrorElementSelector = function () {
+    return $$('.CodeMirror-merge-editor .CodeMirror-code');
+  };
+  var rightCodeMirrorElementSelector = function () {
+    return $$('.CodeMirror-merge-right .CodeMirror-code');
+  };
+  var lastVisibleElement = async function (elements) {
+    for (var i = elements.length - 1; i >= 0; i--) {
+      if (await elements[i].isDisplayed()) {
+        return elements[i];
+      }
+    }
+    throw new Error('No visible CodeMirror element found.');
   };
   var toastSuccessElement = $('.toast-success');
   var firstVersionDropdown = $('.e2e-test-history-version-dropdown-first');
@@ -264,13 +275,17 @@ var ExplorationEditorHistoryTab = function () {
        *                     - highlighted: true or false
        */
       expectTextToMatch: async function (v1StateContents, v2StateContents) {
-        var codeMirrorElement = await codeMirrorElementSelector();
-        var lastElement = codeMirrorElement.length - 1;
+        var leftCodeMirrorElement = await lastVisibleElement(
+          await leftCodeMirrorElementSelector()
+        );
+        var rightCodeMirrorElement = await lastVisibleElement(
+          await rightCodeMirrorElementSelector()
+        );
         await forms
-          .CodeMirrorChecker(codeMirrorElement[0], 'first')
+          .CodeMirrorChecker(leftCodeMirrorElement, 'first')
           .expectTextToBe(v1StateContents);
         await forms
-          .CodeMirrorChecker(codeMirrorElement[lastElement], 'last')
+          .CodeMirrorChecker(rightCodeMirrorElement, 'last')
           .expectTextToBe(v2StateContents);
       },
       /*
@@ -288,13 +303,17 @@ var ExplorationEditorHistoryTab = function () {
         v1StateContents,
         v2StateContents
       ) {
-        var codeMirrorElement = await codeMirrorElementSelector();
-        var lastElement = codeMirrorElement.length - 1;
+        var leftCodeMirrorElement = await lastVisibleElement(
+          await leftCodeMirrorElementSelector()
+        );
+        var rightCodeMirrorElement = await lastVisibleElement(
+          await rightCodeMirrorElementSelector()
+        );
         await forms
-          .CodeMirrorChecker(codeMirrorElement[0], 'first')
+          .CodeMirrorChecker(leftCodeMirrorElement, 'first')
           .expectTextWithHighlightingToBe(v1StateContents);
         await forms
-          .CodeMirrorChecker(codeMirrorElement[lastElement], 'last')
+          .CodeMirrorChecker(rightCodeMirrorElement, 'last')
           .expectTextWithHighlightingToBe(v2StateContents);
       },
     };
