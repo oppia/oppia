@@ -17,8 +17,12 @@
     <div class="redesigned-stories-list">
       <topic-story-section
         *ngFor="let storyData of canonicalStorySectionData; trackBy: trackStoryDataById"
+        [storySummary]="storyData.storySummary"
         [storyTitle]="storyData.storyTitle"
         [storyDescription]="storyData.storyDescription"
+        [practiceSubtopicIds]="storyData.practiceSubtopicIds"
+        [classroomUrlFragment]="storyData.classroomUrlFragment"
+        [topicUrlFragment]="storyData.topicUrlFragment"
         [lessonCount]="storyData.lessonCount"
         [practiceCount]="storyData.practiceCount">
       </topic-story-section>
