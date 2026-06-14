@@ -274,13 +274,14 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
       [nodesToMove[0]]
     );
 
+    // Move the first node from the source arc via the service so the
+    // removal is tracked for backend validation (otherwise the node
+    // ends up in both arcs).
+    this.storyUpdateService.moveNodeToArc(this.story, nodesToMove[0], arcId);
+
     nodesToMove.slice(1).forEach(nodeIdToMove => {
       this.storyUpdateService.moveNodeToArc(this.story, nodeIdToMove, arcId);
     });
-
-    // The first moved node is used to initialize the new arc, so we must
-    // explicitly remove it from the source arc to avoid dual arc membership.
-    sourceArc.setNodeIds(sourceArcNodeIds.slice(0, splitIdx));
 
     const newArcOrder = [...previousArcIdsOrder];
     newArcOrder.splice(sourceArcIndex + 1, 0, arcId);
