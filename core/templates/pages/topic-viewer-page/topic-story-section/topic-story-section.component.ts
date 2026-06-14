@@ -85,6 +85,19 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
   arcGroups: ArcGroupData[] = [];
   practiceCard!: PracticeCardData;
   isPracticeCardVisible: boolean = false;
+  _expandedArcIndices: Set<number> = new Set();
+
+  isArcExpanded(index: number): boolean {
+    return this._expandedArcIndices.has(index);
+  }
+
+  toggleArc(index: number): void {
+    if (this._expandedArcIndices.has(index)) {
+      this._expandedArcIndices.delete(index);
+    } else {
+      this._expandedArcIndices.add(index);
+    }
+  }
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,

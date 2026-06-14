@@ -35,21 +35,30 @@
 
     <div class="story-card-body">
       <ng-container *ngIf="arcGroups.length > 0; else flatLessonList">
-        <div class="arc-group" *ngFor="let arcGroup of arcGroups">
-          <div class="arc-header">
-            <h4 class="arc-title">{{ arcGroup.arcTitle }}</h4>
-            <p *ngIf="arcGroup.arcDescription" class="arc-description">
-              {{ arcGroup.arcDescription }}
-            </p>
+        <div class="arc-group" *ngFor="let arcGroup of arcGroups; index as arcIdx">
+          <div class="arc-header" (click)="toggleArc(arcIdx)" role="button" tabindex="0"
+               [attr.aria-expanded]="isArcExpanded(arcIdx)"
+               (keydown.enter)="toggleArc(arcIdx)"
+               (keydown.space)="toggleArc(arcIdx); $event.preventDefault()">
+            <div class="arc-header-left">
+              <span class="arc-chevron" [class.expanded]="isArcExpanded(arcIdx)">&#9654;</span>
+              <h4 class="arc-title">{{ arcGroup.arcTitle }}</h4>
+            </div>
+            <span class="arc-lesson-count">{{ arcGroup.lessonCards.length }} lesson{{ arcGroup.lessonCards.length !== 1 ? 's' : '' }}</span>
           </div>
-          <div class="story-lesson-card-wrapper"
-               *ngFor="let lessonCard of arcGroup.lessonCards">
-            <topic-lesson-card
-              [lessonTitle]="lessonCard.lessonTitle"
-              [lessonDescription]="lessonCard.lessonDescription"
-              [thumbnailUrl]="lessonCard.thumbnailUrl"
-              [startUrl]="lessonCard.startUrl">
-            </topic-lesson-card>
+          <p *ngIf="arcGroup.arcDescription && isArcExpanded(arcIdx)" class="arc-description">
+            {{ arcGroup.arcDescription }}
+          </p>
+          <div *ngIf="isArcExpanded(arcIdx)" class="arc-lessons">
+            <div class="story-lesson-card-wrapper"
+                 *ngFor="let lessonCard of arcGroup.lessonCards">
+              <topic-lesson-card
+                [lessonTitle]="lessonCard.lessonTitle"
+                [lessonDescription]="lessonCard.lessonDescription"
+                [thumbnailUrl]="lessonCard.thumbnailUrl"
+                [startUrl]="lessonCard.startUrl">
+              </topic-lesson-card>
+            </div>
           </div>
         </div>
       </ng-container>
