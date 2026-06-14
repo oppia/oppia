@@ -487,6 +487,98 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'test description',
             )
 
+    def test_create_suggestion_with_generic_state_name_succeeds(self) -> None:
+        """Test that creating a translation suggestion with state_name='Content'
+        successfully resolves the correct state name from the content_id.
+        """
+        # Create an exploration with the content.
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.target_id, title='Title', category='Category'
+        )
+        exp.states['Introduction'].update_content(
+            state_domain.SubtitledHtml('content_0', '<p>The content html</p>')
+        )
+        exp_services.save_new_exploration(self.author_id, exp)
+        caching_services.flush_memory_caches()
+
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            # Generic state name.
+            'state_name': 'Content',
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': exp.states['Introduction'].content.html,
+            'translation_html': '<p>New translation.</p>',
+            'data_format': 'html',
+        }
+
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id,
+            exp.version,
+            self.author_id,
+            change_dict,
+            'test description',
+        )
+
+        # Verify that the suggestion was created successfully, and the
+        # change_cmd's state_name has been resolved to 'Introduction'.
+        self.assertEqual(suggestion.change_cmd.state_name, 'Introduction')
+
+    def test_create_suggestion_succeeds_if_translation_needs_update(
+        self,
+    ) -> None:
+        """Test that creating a translation suggestion succeeds if the content
+        has already been translated but the translation needs update (is stale).
+        """
+        # Create an exploration with the content.
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.target_id, title='Title', category='Category'
+        )
+        exp.states['Introduction'].update_content(
+            state_domain.SubtitledHtml('content_0', '<p>The content html</p>')
+        )
+        exp_services.save_new_exploration(self.author_id, exp)
+        caching_services.flush_memory_caches()
+
+        # Add a stale translation for the content (needs_update=True).
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.target_id,
+            exp.version,
+            'hi',
+            'content_0',
+            translation_domain.TranslatedContent(
+                '<p>Existing translation</p>',
+                translation_domain.TranslatableContentFormat.HTML,
+                # The translation needs update.
+                True,
+            ),
+        )
+
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': exp.states['Introduction'].content.html,
+            'translation_html': '<p>New translation.</p>',
+            'data_format': 'html',
+        }
+
+        # Creating the suggestion should succeed because the translation is stale.
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id,
+            exp.version,
+            self.author_id,
+            change_dict,
+            'test description',
+        )
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_IN_REVIEW)
+
     def test_accept_suggestion_succeeds_if_translation_needs_update(
         self,
     ) -> None:
