@@ -17,7 +17,7 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
 
 import {TopicLessonCardComponent} from './topic-lesson-card.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -151,10 +151,23 @@ describe('TopicLessonCardComponent', () => {
   });
 
   describe('checkpoint progress', () => {
+    function setInputs(
+      status: 'not_started' | 'in_progress' | 'completed' | 'coming_soon',
+      total: number,
+      visited: number
+    ): void {
+      component.lessonProgressStatus = status;
+      component.totalCheckpointsCount = total;
+      component.visitedCheckpointsCount = visited;
+      component.ngOnChanges({
+        lessonProgressStatus: new SimpleChange(undefined, status, false),
+        totalCheckpointsCount: new SimpleChange(undefined, total, false),
+        visitedCheckpointsCount: new SimpleChange(undefined, visited, false),
+      });
+    }
+
     it('should show correct statuses for not_started lesson', () => {
-      component.lessonProgressStatus = 'not_started';
-      component.totalCheckpointsCount = 5;
-      component.visitedCheckpointsCount = 0;
+      setInputs('not_started', 5, 0);
 
       const statuses = component.checkpointStatuses;
       expect(statuses.length).toBe(6);
@@ -163,9 +176,7 @@ describe('TopicLessonCardComponent', () => {
     });
 
     it('should show correct statuses for in_progress lesson', () => {
-      component.lessonProgressStatus = 'in_progress';
-      component.totalCheckpointsCount = 5;
-      component.visitedCheckpointsCount = 2;
+      setInputs('in_progress', 5, 2);
 
       const statuses = component.checkpointStatuses;
       expect(statuses.length).toBe(6);
@@ -178,9 +189,7 @@ describe('TopicLessonCardComponent', () => {
     });
 
     it('should show all completed for completed lesson', () => {
-      component.lessonProgressStatus = 'completed';
-      component.totalCheckpointsCount = 5;
-      component.visitedCheckpointsCount = 5;
+      setInputs('completed', 5, 5);
 
       const statuses = component.checkpointStatuses;
       expect(statuses.length).toBe(6);
@@ -188,9 +197,7 @@ describe('TopicLessonCardComponent', () => {
     });
 
     it('should show all completed if completed status is set even if checkpoint count is stale', () => {
-      component.lessonProgressStatus = 'completed';
-      component.totalCheckpointsCount = 5;
-      component.visitedCheckpointsCount = 0;
+      setInputs('completed', 5, 0);
 
       const statuses = component.checkpointStatuses;
       expect(statuses.length).toBe(6);
@@ -198,16 +205,14 @@ describe('TopicLessonCardComponent', () => {
     });
 
     it('should return empty for coming_soon lesson', () => {
-      component.lessonProgressStatus = 'coming_soon';
-      component.totalCheckpointsCount = 5;
+      setInputs('coming_soon', 5, 0);
 
       const statuses = component.checkpointStatuses;
       expect(statuses.length).toBe(0);
     });
 
     it('should return empty when totalCheckpointsCount is 0', () => {
-      component.lessonProgressStatus = 'not_started';
-      component.totalCheckpointsCount = 0;
+      setInputs('not_started', 0, 0);
 
       const statuses = component.checkpointStatuses;
       expect(statuses.length).toBe(0);
@@ -251,9 +256,7 @@ describe('TopicLessonCardComponent', () => {
     });
 
     it('should mark all nodes complete when visited checkpoint count reaches total checkpoints', () => {
-      component.lessonProgressStatus = 'in_progress';
-      component.totalCheckpointsCount = 5;
-      component.visitedCheckpointsCount = 5;
+      setInputs('in_progress', 5, 5);
 
       const statuses = component.checkpointStatuses;
       expect(statuses.length).toBe(6);
