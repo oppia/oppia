@@ -23,7 +23,7 @@ import copy
 from core import utils
 from core.domain import value_generators_domain
 
-from typing import Dict, List, Optional
+from typing import List, cast
 
 
 class Copier(value_generators_domain.BaseValueGenerator[str]):
@@ -31,26 +31,18 @@ class Copier(value_generators_domain.BaseValueGenerator[str]):
 
     default_value: str = ''
 
-    def generate_value(
-        self,
-        unused_context_params: Optional[Dict[str, str]],
-        value: str,
-        parse_with_jinja: bool = False,  # pylint: disable=unused-argument
-    ) -> str:
+    def generate_value(self, *args: object, **kwargs: object) -> str:
         """Returns a copy of the input value.
 
         Args:
-            unused_context_params: dict. Context params parsed with input
-                value which is treated as a template. Not used.
-            value: str. Value whose copy should be returned.
-            parse_with_jinja: bool. It is a part of ParamChange object.
-                The parsing of input value against context_params
-                based on parse_with_jinja is done in the FE. Not used.
+            *args: object. Positional args; first arg is the value to copy.
+            **kwargs: object. Unused keyword args.
 
         Returns:
             str. Copy of the input value.
         """
-        return copy.deepcopy(value)
+        value = args[1] if len(args) > 1 else kwargs.get('value', '')
+        return copy.deepcopy(str(value))
 
 
 class RandomSelector(value_generators_domain.BaseValueGenerator[str]):
@@ -58,7 +50,9 @@ class RandomSelector(value_generators_domain.BaseValueGenerator[str]):
 
     default_value: str = ''
 
-    def generate_value(
-        self, unused_context_params: Dict[str, str], list_of_values: List[str]
-    ) -> str:
+    def generate_value(self, *args: object, **kwargs: object) -> str:
+        list_of_values: List[str] = cast(
+            List[str],
+            args[1] if len(args) > 1 else kwargs.get('list_of_values', []),
+        )
         return copy.deepcopy(utils.get_random_choice(list_of_values))

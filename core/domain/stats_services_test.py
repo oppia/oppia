@@ -27,6 +27,7 @@ from core.domain import (
     exp_fetchers,
     exp_services,
     question_services,
+    state_domain,
     stats_domain,
     stats_services,
     translation_domain,
@@ -34,7 +35,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Optional, Tuple, Union
+from typing import Dict, Final, List, Optional, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -2148,7 +2149,7 @@ class AnswerEventTests(test_utils.GenericTestBase):
 
     SESSION_ID: Final = 'SESSION_ID'
     TIME_SPENT: Final = 5.0
-    PARAMS: Dict[str, str] = {}
+    PARAMS: Dict[str, Union[str, int]] = {}
 
     def test_record_answer(self) -> None:
         self.save_new_default_exploration('eid', 'fake@user.com')
@@ -2328,9 +2329,10 @@ class AnswerEventTests(test_utils.GenericTestBase):
             'sid1',
             self.TIME_SPENT,
             self.PARAMS,
-            {'x': 1.0, 'y': 5.0},
+            cast(
+                state_domain.AcceptableCorrectAnswerTypes, {'x': 1.0, 'y': 5.0}
+            ),
         )
-        # Answer is a number.
         event_services.AnswerSubmissionEventHandler.record(
             'eid',
             exp_version,
@@ -2356,9 +2358,11 @@ class AnswerEventTests(test_utils.GenericTestBase):
             'sid1',
             self.TIME_SPENT,
             self.PARAMS,
-            [{'a': 'some', 'b': 'text'}, {'a': 1.0, 'c': 2.0}],
+            cast(
+                state_domain.AcceptableCorrectAnswerTypes,
+                [{'a': 'some', 'b': 'text'}, {'a': 1.0, 'c': 2.0}],
+            ),
         )
-        # Answer is a list.
         event_services.AnswerSubmissionEventHandler.record(
             'eid',
             exp_version,
@@ -2370,9 +2374,8 @@ class AnswerEventTests(test_utils.GenericTestBase):
             'sid3',
             self.TIME_SPENT,
             self.PARAMS,
-            [2, 4, 8],
+            cast(state_domain.AcceptableCorrectAnswerTypes, [2, 4, 8]),
         )
-        # Answer is a unicode string.
         event_services.AnswerSubmissionEventHandler.record(
             'eid',
             exp_version,

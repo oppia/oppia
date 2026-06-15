@@ -51,7 +51,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Mapping, Union
+from typing import Any, Dict, Final, List, Mapping, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -227,7 +227,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         pass
 
     def edit_before_pre_accept_validate(
-        self, suggestion: suggestion_registry.BaseSuggestion
+        self, suggestion: suggestion_registry.BaseSuggestion[Any]
     ) -> None:
         """Edits suggestion immediately before pre-accept validation."""
         suggestion.score_category = 'invalid_score_category'
@@ -6819,7 +6819,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         )
 
     def _create_reviewable_suggestion_email_infos_from_suggestions(
-        self, suggestions: List[suggestion_registry.BaseSuggestion]
+        self, suggestions: List[suggestion_registry.BaseSuggestion[Any]]
     ) -> List[suggestion_registry.ReviewableSuggestionEmailInfo]:
         """Creates a list of ReviewableSuggestionEmailInfo objects from
         the given suggestions.
@@ -8289,7 +8289,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         )
 
     def _create_reviewable_suggestion_email_infos_from_suggestions(
-        self, suggestions: List[suggestion_registry.BaseSuggestion]
+        self, suggestions: List[suggestion_registry.BaseSuggestion[Any]]
     ) -> List[suggestion_registry.ReviewableSuggestionEmailInfo]:
         """Creates a list of ReviewableSuggestionEmailInfo objects from
         the given suggestions.

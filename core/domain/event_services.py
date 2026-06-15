@@ -25,6 +25,7 @@ from core.domain import (
     exp_domain,
     exp_fetchers,
     feedback_services,
+    state_domain,
     stats_domain,
     stats_services,
     taskqueue_services,
@@ -134,7 +135,7 @@ class AnswerSubmissionEventHandler(
             str,
             float,
             Dict[str, Union[str, int]],
-            str,
+            state_domain.AcceptableCorrectAnswerTypes,
         ]
     ]
 ):
@@ -155,7 +156,7 @@ class AnswerSubmissionEventHandler(
         session_id: str,
         time_spent_in_secs: float,
         params: Dict[str, Union[str, int]],
-        normalized_answer: str,
+        normalized_answer: state_domain.AcceptableCorrectAnswerTypes,
     ) -> None:
         """Records an event when an answer triggers a rule. The answer recorded
         here is a Python-representation of the actual answer submitted by the
@@ -326,14 +327,16 @@ class CompleteExplorationEventHandler(
         )
 
 
-class RateExplorationEventHandler(BaseEventHandler[[str, str, int, int]]):
+class RateExplorationEventHandler(
+    BaseEventHandler[[str, str, int, Optional[int]]]
+):
     """Event handler for recording exploration rating events."""
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_RATE_EXPLORATION
 
     @classmethod
     def _handle_event(
-        cls, exp_id: str, user_id: str, rating: int, old_rating: int
+        cls, exp_id: str, user_id: str, rating: int, old_rating: Optional[int]
     ) -> None:
         """Perform in-request processing of recording exploration rating
         events.

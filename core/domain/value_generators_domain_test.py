@@ -54,7 +54,9 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(all_generator_classes), 2)
 
     def test_generate_value_of_base_value_generator_raises_error(self) -> None:
-        base_generator = value_generators_domain.BaseValueGenerator()
+        base_generator: value_generators_domain.BaseValueGenerator[object] = (
+            value_generators_domain.BaseValueGenerator()
+        )
         with self.assertRaisesRegex(
             NotImplementedError,
             re.escape('generate_value() method has not yet been implemented'),

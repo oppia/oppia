@@ -43,7 +43,7 @@ from core.platform import models
 from core.tests import test_utils
 
 import requests_mock
-from typing import Dict, Final, List
+from typing import Dict, Final, List, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -3479,12 +3479,15 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         event_services.StatsEventsHandler.record(
             self.EXP_ID,
             1,
-            {
-                'num_starts': 1,
-                'num_actual_starts': 0,
-                'num_completions': 0,
-                'state_stats_mapping': {},
-            },
+            cast(
+                Dict[str, Dict[str, Union[int, str]]],
+                {
+                    'num_starts': 1,
+                    'num_actual_starts': 0,
+                    'num_completions': 0,
+                    'state_stats_mapping': {},
+                },
+            ),
         )
         self.assertEqual(
             user_services.get_dashboard_stats(self.owner_id),
@@ -3547,12 +3550,15 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         event_services.StatsEventsHandler.record(
             self.EXP_ID,
             1,
-            {
-                'num_starts': 1,
-                'num_actual_starts': 0,
-                'num_completions': 0,
-                'state_stats_mapping': {},
-            },
+            cast(
+                Dict[str, Dict[str, Union[int, str]]],
+                {
+                    'num_starts': 1,
+                    'num_actual_starts': 0,
+                    'num_completions': 0,
+                    'state_stats_mapping': {},
+                },
+            ),
         )
 
         self.assertEqual(
@@ -3652,12 +3658,15 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             event_services.StatsEventsHandler.record(
                 self.EXP_ID,
                 1,
-                {
-                    'num_starts': 1,
-                    'num_actual_starts': 0,
-                    'num_completions': 0,
-                    'state_stats_mapping': {},
-                },
+                cast(
+                    Dict[str, Dict[str, Union[int, str]]],
+                    {
+                        'num_starts': 1,
+                        'num_actual_starts': 0,
+                        'num_completions': 0,
+                        'state_stats_mapping': {},
+                    },
+                ),
             )
 
             model = user_models.UserStatsModel.get_or_create(self.owner_id)

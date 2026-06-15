@@ -50,7 +50,7 @@ from core.platform import models
 from core.tests import test_utils
 
 import webtest
-from typing import Dict, Final, List, Set, Union
+from typing import Any, Dict, Final, List, Set, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -293,7 +293,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
 
     def _create_translation_suggestion(
         self,
-    ) -> suggestion_registry.BaseSuggestion:
+    ) -> suggestion_registry.BaseSuggestion[Any]:
         """Creates a translation suggestion."""
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -544,7 +544,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
 
     def _create_translation_suggestion_for_en_language(
         self,
-    ) -> suggestion_registry.BaseSuggestion:
+    ) -> suggestion_registry.BaseSuggestion[Any]:
         """Creates a translation suggestion."""
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -568,7 +568,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
 
     def _create_translation_suggestion_for_hi_language(
         self,
-    ) -> suggestion_registry.BaseSuggestion:
+    ) -> suggestion_registry.BaseSuggestion[Any]:
         """Creates a translation suggestion."""
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -806,7 +806,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     def _create_translation_suggestion_with_language_code(
         self, language_code: str
-    ) -> suggestion_registry.BaseSuggestion:
+    ) -> suggestion_registry.BaseSuggestion[Any]:
         """Creates a translation suggestion in the given language_code."""
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -828,7 +828,9 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             'test description',
         )
 
-    def _create_question_suggestion(self) -> suggestion_registry.BaseSuggestion:
+    def _create_question_suggestion(
+        self,
+    ) -> suggestion_registry.BaseSuggestion[Any]:
         """Creates a question suggestion."""
         content_id_generator = translation_domain.ContentIdGenerator()
         add_question_change_dict: Dict[

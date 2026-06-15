@@ -53,7 +53,7 @@ from core.domain import (
     user_services,
 )
 
-from typing import Dict, List, Optional, TypedDict, Union
+from typing import Dict, List, Optional, TypedDict, Union, cast
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
@@ -580,7 +580,9 @@ class StatsEventsHandler(
         aggregated_stats = self.normalized_payload['aggregated_stats']
         exp_version = self.normalized_payload['exp_version']
         event_services.StatsEventsHandler.record(
-            exploration_id, exp_version, aggregated_stats
+            exploration_id,
+            exp_version,
+            cast(Dict[str, Dict[str, Union[str, int]]], aggregated_stats),
         )
         self.render_json({})
 
@@ -746,13 +748,13 @@ class AnswerSubmittedEventHandler(
             exploration_id,
             version,
             old_state_name,
-            exploration.states[old_state_name].interaction.id,
+            cast(str, exploration.states[old_state_name].interaction.id),
             answer_group_index,
             rule_spec_index,
             classification_categorization,
             session_id,
             client_time_spent_in_secs,
-            params,
+            cast(Dict[str, Union[str, int]], params),
             normalized_answer,
         )
         self.render_json({})
@@ -854,9 +856,9 @@ class StateHitEventHandler(
         event_services.StateHitEventHandler.record(
             exploration_id,
             exploration_version,
-            new_state_name,
+            cast(str, new_state_name),
             session_id,
-            old_params,
+            cast(Dict[str, str], old_params),
             feconf.PLAY_TYPE_NORMAL,
         )
         self.render_json({})
@@ -1184,7 +1186,7 @@ class ExplorationStartEventHandler(
             self.normalized_payload['version'],
             self.normalized_payload['state_name'],
             self.normalized_payload['session_id'],
-            self.normalized_payload['params'],
+            cast(Dict[str, str], self.normalized_payload['params']),
             feconf.PLAY_TYPE_NORMAL,
         )
         self.render_json({})
@@ -1412,7 +1414,7 @@ class ExplorationCompleteEventHandler(
             self.normalized_payload['state_name'],
             self.normalized_payload['session_id'],
             self.normalized_payload['client_time_spent_in_secs'],
-            self.normalized_payload['params'],
+            cast(Dict[str, str], self.normalized_payload['params']),
             feconf.PLAY_TYPE_NORMAL,
         )
 
@@ -1573,7 +1575,7 @@ class ExplorationMaybeLeaveHandler(
             state_name,
             self.normalized_payload['session_id'],
             self.normalized_payload['client_time_spent_in_secs'],
-            self.normalized_payload['params'],
+            cast(Dict[str, str], self.normalized_payload['params']),
             feconf.PLAY_TYPE_NORMAL,
         )
         self.render_json(self.values)

@@ -38,6 +38,7 @@ from core.domain import (
 )
 
 from typing import (
+    Any,
     Dict,
     List,
     Optional,
@@ -867,7 +868,7 @@ class TranslatableTextHandler(
         state_names_to_content_id_mapping: Dict[
             str, Dict[str, translation_domain.TranslatableContent]
         ],
-        suggestions: List[suggestion_registry.BaseSuggestion],
+        suggestions: List[suggestion_registry.BaseSuggestion[Any]],
     ) -> Dict[str, Dict[str, translation_domain.TranslatableContentDict]]:
         """Returns a copy of the supplied state_names_to_content_id_mapping
         minus any contents found in suggestions.
@@ -910,7 +911,7 @@ class TranslatableTextHandler(
         self,
         state_name: str,
         content_id: str,
-        suggestions: List[suggestion_registry.BaseSuggestion],
+        suggestions: List[suggestion_registry.BaseSuggestion[Any]],
     ) -> bool:
         """Returns whether a suggestion exists in suggestions with a
         change_cmd dict matching the supplied state_name and content_id.

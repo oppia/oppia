@@ -45,7 +45,7 @@ from core.platform import models
 from core.tests import test_utils
 from extensions import domain
 
-from typing import Dict, Final, List, Optional, TypedDict, Union, cast
+from typing import Any, Dict, Final, List, Optional, TypedDict, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -60,7 +60,7 @@ ChangeType = Dict[
 ]
 
 
-class MockInvalidSuggestion(suggestion_registry.BaseSuggestion):
+class MockInvalidSuggestion(suggestion_registry.BaseSuggestion[Any]):
 
     def __init__(self) -> None:  # pylint: disable=super-init-not-called
         pass
@@ -1167,7 +1167,12 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'The new change_cmd cmd must be equal to %s'
             % (exp_domain.CMD_ADD_WRITTEN_TRANSLATION),
         ):
-            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+            suggestion.pre_update_validate(
+                cast(
+                    exp_domain.AddWrittenTranslationCmd,
+                    exp_domain.ExplorationChange(change),
+                )
+            )
 
     def test_pre_update_validate_change_state_name(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
@@ -1198,7 +1203,12 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'The new change_cmd state_name must be equal to Introduction',
         ):
-            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+            suggestion.pre_update_validate(
+                cast(
+                    exp_domain.AddWrittenTranslationCmd,
+                    exp_domain.ExplorationChange(change),
+                )
+            )
 
     def test_pre_update_validate_change_language_code(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
@@ -1228,7 +1238,12 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError, 'The language code must be equal to hi'
         ):
-            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+            suggestion.pre_update_validate(
+                cast(
+                    exp_domain.AddWrittenTranslationCmd,
+                    exp_domain.ExplorationChange(change),
+                )
+            )
 
     def test_pre_update_validate_change_content_html(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
@@ -1260,7 +1275,12 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'The new change_cmd content_html must be equal to <p>This is a '
             'content.</p>',
         ):
-            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+            suggestion.pre_update_validate(
+                cast(
+                    exp_domain.AddWrittenTranslationCmd,
+                    exp_domain.ExplorationChange(change),
+                )
+            )
 
     def test_create_suggestion_add_translation(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
@@ -2767,7 +2787,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'The new change_cmd skill_id must be equal to skill_1',
         ):
             suggestion.pre_update_validate(
-                question_domain.CreateNewFullySpecifiedQuestionCmd(change)
+                cast(
+                    question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd,
+                    question_domain.CreateNewFullySpecifiedQuestionCmd(change),
+                )
             )
 
     def test_pre_update_validate_complains_if_nothing_changed(self) -> None:

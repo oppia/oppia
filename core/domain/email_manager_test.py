@@ -46,6 +46,7 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import (
+    Any,
     Callable,
     DefaultDict,
     Dict,
@@ -3176,7 +3177,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         language_code: str,
         translation_html: str,
         submission_datetime: datetime.datetime,
-    ) -> suggestion_registry.BaseSuggestion:
+    ) -> suggestion_registry.BaseSuggestion[Any]:
         """Creates a translation suggestion in the given language_code with the
         given translation html and submission datetime.
         """
@@ -3205,7 +3206,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
     def _create_question_suggestion_with_question_html_and_datetime(
         self, question_html: str, submission_datetime: datetime.datetime
-    ) -> suggestion_registry.BaseSuggestion:
+    ) -> suggestion_registry.BaseSuggestion[Any]:
         """Creates a question suggestion with the given question html and
         submission datetime.
         """
@@ -3251,7 +3252,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         return question_suggestion
 
     def _create_reviewable_suggestion_email_infos_from_suggestions(
-        self, suggestions: List[suggestion_registry.BaseSuggestion]
+        self, suggestions: List[suggestion_registry.BaseSuggestion[Any]]
     ) -> List[suggestion_registry.ReviewableSuggestionEmailInfo]:
         """Creates a list of ReviewableSuggestionEmailInfo objects from
         the given suggestions.
@@ -5316,7 +5317,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         language_code: str,
         translation_html: str,
         submission_datetime: datetime.datetime,
-    ) -> suggestion_registry.BaseSuggestion:
+    ) -> suggestion_registry.BaseSuggestion[Any]:
         """Creates a translation suggestion in the given language_code with the
         given translation html and submission datetime.
         """
@@ -5345,7 +5346,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
     def _create_question_suggestion_with_question_html_and_datetime(
         self, question_html: str, submission_datetime: datetime.datetime
-    ) -> suggestion_registry.BaseSuggestion:
+    ) -> suggestion_registry.BaseSuggestion[Any]:
         """Creates a question suggestion with the given question html and
         submission datetime.
         """
@@ -5391,7 +5392,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         return question_suggestion
 
     def _create_reviewable_suggestion_email_infos_from_suggestions(
-        self, suggestions: List[suggestion_registry.BaseSuggestion]
+        self, suggestions: List[suggestion_registry.BaseSuggestion[Any]]
     ) -> List[suggestion_registry.ReviewableSuggestionEmailInfo]:
         """Creates a list of ReviewableSuggestionEmailInfo objects from
         the given suggestions.
@@ -6413,7 +6414,7 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
         )
 
     def _create_reviewable_suggestion_email_infos_from_suggestions(
-        self, suggestions: List[suggestion_registry.BaseSuggestion]
+        self, suggestions: List[suggestion_registry.BaseSuggestion[Any]]
     ) -> List[suggestion_registry.ReviewableSuggestionEmailInfo]:
         """Creates a list of ReviewableSuggestionEmailInfo objects from
         the given suggestions.
@@ -6473,7 +6474,7 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
         language_code: str,
         translation_html: str,
         submission_datetime: datetime.datetime,
-    ) -> suggestion_registry.BaseSuggestion:
+    ) -> suggestion_registry.BaseSuggestion[Any]:
         """Creates a translation suggestion in the given language_code with the
         given translation html and submission datetime.
         """
@@ -6661,7 +6662,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
     def _create_translation_suggestion_with_language_code(
         self, language_code: str
-    ) -> suggestion_registry.BaseSuggestion:
+    ) -> suggestion_registry.BaseSuggestion[Any]:
         """Creates a translation suggestion in the given language_code."""
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -6683,7 +6684,9 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'test description',
         )
 
-    def _create_question_suggestion(self) -> suggestion_registry.BaseSuggestion:
+    def _create_question_suggestion(
+        self,
+    ) -> suggestion_registry.BaseSuggestion[Any]:
         """Creates a question suggestion."""
         content_id_generator = translation_domain.ContentIdGenerator()
         add_question_change_dict: Dict[

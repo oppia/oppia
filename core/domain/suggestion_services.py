@@ -49,6 +49,7 @@ from core.platform import models
 
 import bs4
 from typing import (
+    Any,
     Callable,
     Dict,
     Final,
@@ -172,7 +173,7 @@ def create_suggestion(
     author_id: str,
     change_cmd: Mapping[str, change_domain.AcceptableChangeDictTypes],
     description: Optional[str],
-) -> suggestion_registry.BaseSuggestion: ...
+) -> suggestion_registry.BaseSuggestion[Any]: ...
 
 
 def create_suggestion(
@@ -183,7 +184,7 @@ def create_suggestion(
     author_id: str,
     change_cmd: Mapping[str, change_domain.AcceptableChangeDictTypes],
     description: Optional[str],
-) -> suggestion_registry.BaseSuggestion:
+) -> suggestion_registry.BaseSuggestion[Any]:
     """Creates a new SuggestionModel and the corresponding FeedbackThread.
 
     Args:
@@ -375,7 +376,7 @@ def create_suggestion(
 
 def get_suggestion_from_model(
     suggestion_model: suggestion_models.GeneralSuggestionModel,
-) -> suggestion_registry.BaseSuggestion:
+) -> suggestion_registry.BaseSuggestion[Any]:
     """Converts the given SuggestionModel to a Suggestion domain object
 
     Args:
@@ -409,24 +410,24 @@ def get_suggestion_from_model(
 @overload
 def get_suggestion_by_id(
     suggestion_id: str,
-) -> suggestion_registry.BaseSuggestion: ...
+) -> suggestion_registry.BaseSuggestion[Any]: ...
 
 
 @overload
 def get_suggestion_by_id(
     suggestion_id: str, *, strict: Literal[True]
-) -> suggestion_registry.BaseSuggestion: ...
+) -> suggestion_registry.BaseSuggestion[Any]: ...
 
 
 @overload
 def get_suggestion_by_id(
     suggestion_id: str, *, strict: Literal[False]
-) -> Optional[suggestion_registry.BaseSuggestion]: ...
+) -> Optional[suggestion_registry.BaseSuggestion[Any]]: ...
 
 
 def get_suggestion_by_id(
     suggestion_id: str, strict: bool = True
-) -> Optional[suggestion_registry.BaseSuggestion]:
+) -> Optional[suggestion_registry.BaseSuggestion[Any]]:
     """Finds a suggestion by the suggestion ID.
 
     Args:
@@ -660,7 +661,7 @@ def get_question_review_stats_models(
 
 def get_suggestions_by_ids(
     suggestion_ids: List[str],
-) -> List[Optional[suggestion_registry.BaseSuggestion]]:
+) -> List[Optional[suggestion_registry.BaseSuggestion[Any]]]:
     """Finds suggestions using the given suggestion IDs.
 
     Args:
@@ -687,7 +688,7 @@ def get_suggestions_by_ids(
 
 def query_suggestions(
     query_fields_and_values: List[Tuple[str, str]],
-) -> List[suggestion_registry.BaseSuggestion]:
+) -> List[suggestion_registry.BaseSuggestion[Any]]:
     """Queries for suggestions.
 
     Args:
@@ -745,7 +746,7 @@ def get_all_stale_suggestion_ids() -> List[str]:
 
 
 def _update_suggestion(
-    suggestion: suggestion_registry.BaseSuggestion,
+    suggestion: suggestion_registry.BaseSuggestion[Any],
     validate_suggestion: bool = True,
 ) -> None:
     """Updates the given suggestion.
@@ -759,7 +760,7 @@ def _update_suggestion(
 
 
 def _update_suggestions(
-    suggestions: List[suggestion_registry.BaseSuggestion],
+    suggestions: List[suggestion_registry.BaseSuggestion[Any]],
     update_last_updated_time: bool = True,
     validate_suggestion: bool = True,
 ) -> None:
@@ -1179,7 +1180,7 @@ def resubmit_rejected_suggestion(
 
 def get_all_suggestions_that_can_be_reviewed_by_user(
     user_id: str,
-) -> List[suggestion_registry.BaseSuggestion]:
+) -> List[suggestion_registry.BaseSuggestion[Any]]:
     """Returns a list of suggestions which need to be reviewed, in categories
     where the user has crossed the minimum score to review.
 
@@ -1480,7 +1481,7 @@ def get_translation_suggestions_waiting_longest_for_review(
 
 def get_translation_suggestions_in_review(
     exp_id: str,
-) -> List[suggestion_registry.BaseSuggestion]:
+) -> List[suggestion_registry.BaseSuggestion[Any]]:
     """Returns translation suggestions in-review by exploration ID.
 
     Args:
@@ -1501,7 +1502,7 @@ def get_translation_suggestions_in_review(
 
 def get_translation_suggestions_in_review_by_exploration(
     exp_id: str, language_code: str
-) -> List[suggestion_registry.BaseSuggestion]:
+) -> List[suggestion_registry.BaseSuggestion[Any]]:
     """Returns translation suggestions in review by exploration ID.
 
     Args:
@@ -1523,7 +1524,7 @@ def get_translation_suggestions_in_review_by_exploration(
 
 def get_translation_suggestions_in_review_by_exp_ids(
     exp_ids: List[str], language_code: str
-) -> List[Optional[suggestion_registry.BaseSuggestion]]:
+) -> List[Optional[suggestion_registry.BaseSuggestion[Any]]]:
     """Returns translation suggestions in review by exploration ID and language
     code.
 
@@ -1648,7 +1649,7 @@ def _get_plain_text_from_html_content_string(html_content_string: str) -> str:
 
 
 def create_reviewable_suggestion_email_info_from_suggestion(
-    suggestion: suggestion_registry.BaseSuggestion,
+    suggestion: suggestion_registry.BaseSuggestion[Any],
 ) -> suggestion_registry.ReviewableSuggestionEmailInfo:
     """Creates an object with the key information needed to notify reviewers or
     admins that the given suggestion needs review.
@@ -1733,7 +1734,7 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(
         # longest for review (earliest review submission date) are automatically
         # efficiently sorted.
         suggestions_waiting_longest_heap: List[
-            Tuple[datetime.datetime, suggestion_registry.BaseSuggestion]
+            Tuple[datetime.datetime, suggestion_registry.BaseSuggestion[Any]]
         ] = []
         if user_contribution_rights.can_review_questions:
             for question_suggestion in question_suggestions:
@@ -1823,7 +1824,7 @@ def get_suggestions_waiting_for_review_info_to_notify_reviewers(
 
 def get_submitted_suggestions(
     user_id: str, suggestion_type: str
-) -> List[suggestion_registry.BaseSuggestion]:
+) -> List[suggestion_registry.BaseSuggestion[Any]]:
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.
 
@@ -1872,7 +1873,7 @@ def get_submitted_suggestions_by_offset(
     limit: int,
     offset: int,
     sort_key: Optional[str],
-) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]: ...
+) -> Tuple[Sequence[suggestion_registry.BaseSuggestion[Any]], int]: ...
 
 
 def get_submitted_suggestions_by_offset(
@@ -1881,7 +1882,7 @@ def get_submitted_suggestions_by_offset(
     limit: int,
     offset: int,
     sort_key: Optional[str],
-) -> Tuple[Sequence[suggestion_registry.BaseSuggestion], int]:
+) -> Tuple[Sequence[suggestion_registry.BaseSuggestion[Any]], int]:
     """Returns a list of suggestions of given suggestion_type which the user
     has submitted.
 
@@ -2273,7 +2274,7 @@ def get_suggestion_types_that_need_reviewers() -> Dict[str, Set[str]]:
 
 @transaction_services.run_in_transaction_wrapper
 def _update_suggestion_counts_in_community_contribution_stats_transactional(
-    suggestions: List[suggestion_registry.BaseSuggestion], amount: int
+    suggestions: List[suggestion_registry.BaseSuggestion[Any]], amount: int
 ) -> None:
     """Updates the community contribution stats counts associated with the given
     suggestions by the given amount. Note that this method should only ever be
@@ -2331,7 +2332,7 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
 
 
 def _update_suggestion_counts_in_community_contribution_stats(
-    suggestions: Sequence[suggestion_registry.BaseSuggestion], amount: int
+    suggestions: Sequence[suggestion_registry.BaseSuggestion[Any]], amount: int
 ) -> None:
     """Updates the community contribution stats counts associated with the given
     suggestions by the given amount. The GET and PUT is done in a single
@@ -2530,7 +2531,7 @@ def update_question_suggestion(
     question_state_data: state_domain.StateDict,
     next_content_id_index: int,
     inapplicable_skill_misconception_ids: Optional[List[str]] = None,
-) -> Optional[suggestion_registry.BaseSuggestion]:
+) -> Optional[suggestion_registry.BaseSuggestion[Any]]:
     """Updates skill_difficulty and question_state_data of a suggestion with
     the given suggestion_id.
 
@@ -3201,7 +3202,7 @@ def _update_question_reviewer_total_stats_models(
 
 
 def update_translation_contribution_stats_at_submission(
-    suggestion: suggestion_registry.BaseSuggestion,
+    suggestion: suggestion_registry.BaseSuggestion[Any],
 ) -> None:
     """Creates/updates TranslationContributionStatsModel and
     TranslationSubmitterTotalContributionStatsModel model for
@@ -3377,7 +3378,7 @@ def create_stats_for_new_translation_models(
 
 
 def update_translation_contribution_stats_at_review(
-    suggestion: suggestion_registry.BaseSuggestion,
+    suggestion: suggestion_registry.BaseSuggestion[Any],
 ) -> None:
     """Creates/updates TranslationContributionStatsModel and
     TranslationSubmitterTotalContributionStatsModel model for
@@ -3530,7 +3531,7 @@ def update_translation_contribution_stats_at_review(
 
 
 def update_translation_review_stats(
-    suggestion: suggestion_registry.BaseSuggestion,
+    suggestion: suggestion_registry.BaseSuggestion[Any],
 ) -> None:
     """Creates/updates TranslationReviewStatsModel
     TranslationReviewerTotalContributionStatsModel model for given translation
@@ -3685,7 +3686,7 @@ def update_translation_review_stats(
 
 
 def update_question_contribution_stats_at_submission(
-    suggestion: suggestion_registry.BaseSuggestion,
+    suggestion: suggestion_registry.BaseSuggestion[Any],
 ) -> None:
     """Creates/updates QuestionContributionStatsModel and
     QuestionSubmitterTotalContributionStatsModel models for given question
@@ -3772,7 +3773,7 @@ def update_question_contribution_stats_at_submission(
 
 
 def update_question_contribution_stats_at_review(
-    suggestion: suggestion_registry.BaseSuggestion,
+    suggestion: suggestion_registry.BaseSuggestion[Any],
 ) -> None:
     """Creates/updates QuestionContributionStatsModel
     QuestionSubmitterTotalContributionStatsModel models for given question
@@ -3883,7 +3884,7 @@ def update_question_contribution_stats_at_review(
 
 
 def update_question_review_stats(
-    suggestion: suggestion_registry.BaseSuggestion,
+    suggestion: suggestion_registry.BaseSuggestion[Any],
 ) -> None:
     """Creates/updates QuestionReviewStatsModel and
     QuestionReviewerTotalContributionStatsModel model for given question

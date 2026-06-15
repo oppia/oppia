@@ -42,6 +42,7 @@ from core.domain import (
 )
 
 from typing import (
+    Any,
     Dict,
     List,
     Mapping,
@@ -716,7 +717,7 @@ class SuggestionsProviderHandler(
     def _render_suggestions(
         self,
         target_type: str,
-        suggestions: Sequence[suggestion_registry.BaseSuggestion],
+        suggestions: Sequence[suggestion_registry.BaseSuggestion[Any]],
         next_offset: int,
     ) -> None:
         """Renders retrieved suggestions.
@@ -866,7 +867,7 @@ class ReviewableSuggestionsHandler(
         language_code_to_filter_by = (
             user_settings.preferred_translation_language_code
         )
-        suggestions: Sequence[suggestion_registry.BaseSuggestion] = []
+        suggestions: Sequence[suggestion_registry.BaseSuggestion[Any]] = []
         next_offset = 0
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
             reviewable_suggestions: List[
@@ -1212,7 +1213,7 @@ class UpdateQuestionSuggestionHandler(
 
 
 def _get_target_id_to_exploration_opportunity_dict(
-    suggestions: Sequence[suggestion_registry.BaseSuggestion],
+    suggestions: Sequence[suggestion_registry.BaseSuggestion[Any]],
 ) -> Dict[
     str, Optional[opportunity_domain.PartialExplorationOpportunitySummaryDict]
 ]:
@@ -1239,7 +1240,7 @@ def _get_target_id_to_exploration_opportunity_dict(
 
 
 def _get_target_id_to_skill_opportunity_dict(
-    suggestions: Sequence[suggestion_registry.BaseSuggestion],
+    suggestions: Sequence[suggestion_registry.BaseSuggestion[Any]],
 ) -> Dict[str, Optional[FrontendSkillOpportunityDict]]:
     """Returns a dict of target_id to skill opportunity summary dict.
 
@@ -1285,7 +1286,7 @@ def _get_target_id_to_skill_opportunity_dict(
 
 
 def _construct_exploration_suggestions(
-    suggestions: Sequence[suggestion_registry.BaseSuggestion],
+    suggestions: Sequence[suggestion_registry.BaseSuggestion[Any]],
 ) -> List[FrontendBaseSuggestionDict]:
     """Returns exploration suggestions with current exploration content. If the
     exploration content is no longer available, e.g. the exploration state or

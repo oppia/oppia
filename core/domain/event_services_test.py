@@ -36,6 +36,10 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Any, Dict, Union, cast, ParamSpec
+
+_TestP = ParamSpec('_TestP')
+
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
@@ -379,7 +383,7 @@ class FeedbackThreadStatusChangedEventHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(thread.num_open_threads, 0)
 
 
-class TestEventHandler(event_services.BaseEventHandler):
+class TestEventHandler(event_services.BaseEventHandler[Any]):
     """Mock event class for processing events of type 'test_event'."""
 
     EVENT_TYPE = 'test_event'
@@ -421,12 +425,15 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
             event_services.StatsEventsHandler.record(
                 'eid1',
                 1,
-                {
-                    'num_starts': 1,
-                    'num_actual_starts': 0,
-                    'num_completions': 0,
-                    'state_stats_mapping': {'undefined': {}},
-                },
+                cast(
+                    Dict[str, Dict[str, Union[int, str]]],
+                    {
+                        'num_starts': 1,
+                        'num_actual_starts': 0,
+                        'num_completions': 0,
+                        'state_stats_mapping': {'undefined': {}},
+                    },
+                ),
             )
         self.process_and_flush_pending_tasks()
 
@@ -450,10 +457,11 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
         event_services.StatsEventsHandler.record(
             exp_id,
             exploration.version,
-            {'state_stats_mapping': {'Introduction': {}}},
+            cast(
+                Dict[str, Dict[str, Union[int, str]]],
+                {'state_stats_mapping': {'Introduction': {}}},
+            ),
         )
-
-        all_models = stats_models.ExplorationStatsModel.get_all()
         self.assertEqual(all_models.count(), 1)
         model = all_models.get()
         # Ruling out the possibility of None for mypy type checking.
@@ -478,7 +486,10 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
             event_services.StatsEventsHandler.record(
                 exp_id,
                 exploration.version - 1,
-                {'state_stats_mapping': {'Introduction': {}}},
+                cast(
+                    Dict[str, Dict[str, Union[int, str]]],
+                    {'state_stats_mapping': {'Introduction': {}}},
+                ),
             )
 
         self.assertEqual(defer_calls, [])
@@ -499,15 +510,15 @@ class AnswerSubmissionEventHandlerTests(test_utils.GenericTestBase):
         event_services.AnswerSubmissionEventHandler.record(
             exp_id,
             exploration.version,
-            state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            interaction_id='TextInput',
-            answer_group_index=1,
-            rule_spec_index=1,
-            classification_categorization=category,
-            session_id=session_id,
-            time_spent_in_secs=2,
-            params={},
-            normalized_answer='answer_submitted',
+            feconf.DEFAULT_INIT_STATE_NAME,
+            'TextInput',
+            1,
+            1,
+            category,
+            session_id,
+            2,
+            {},
+            'answer_submitted',
         )
 
         state_answers = stats_services.get_state_answers(
