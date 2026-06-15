@@ -428,7 +428,9 @@ def compute_translation_opportunity_models_with_updated_entity(
     )
     if model is None:
         # If the model does not exist, we create a new one.
-        create_translation_opportunity({entity_type: [entity_id]})
+        create_translation_opportunity(
+            {entity_type: [entity_id]}, topic_ids=topic_ids
+        )
         model = opportunity_models.TranslationOpportunityModel.get(model_id)
 
     translation_opportunity = get_translation_opportunity_summary_from_model(
@@ -549,16 +551,26 @@ def _build_opportunity_for_non_exploration_entity(
 
 def create_translation_opportunity(
     entity_types_and_ids: Dict[str, List[str]],
+    topic_ids: Optional[List[str]] = None,
 ) -> None:
     """Creates and stores translation opportunities for the given entities.
 
     Args:
         entity_types_and_ids: dict(str, list(str)). A mapping of entity types
             (e.g., 'exploration') to lists of entity IDs to process.
+        topic_ids: list(str)|None. Specific topic IDs to associate with the
+            opportunities. If None, the topic IDs are computed dynamically.
     """
-    entity_to_topics = _compute_topic_ids_of_translation_opportunities(
-        entity_types_and_ids
-    )
+    if topic_ids is not None:
+        entity_to_topics = {
+            entity_id: topic_ids
+            for entity_ids_list in entity_types_and_ids.values()
+            for entity_id in entity_ids_list
+        }
+    else:
+        entity_to_topics = _compute_topic_ids_of_translation_opportunities(
+            entity_types_and_ids
+        )
 
     opportunities_list = []
 
@@ -840,7 +852,7 @@ def _create_exploration_opportunities(
         None,
     ):
         create_translation_opportunity(
-            {feconf.ENTITY_TYPE_EXPLORATION: exp_ids}
+            {feconf.ENTITY_TYPE_EXPLORATION: exp_ids}, topic_ids=[topic.id]
         )
 
 
@@ -2019,6 +2031,19 @@ def regenerate_opportunities_related_to_topic(
             list(exp_opportunity_models)
         )
 
+        if feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+            None,
+        ):
+            translation_opportunity_models = (
+                opportunity_models.TranslationOpportunityModel.get_by_topic(
+                    topic_id
+                )
+            )
+            opportunity_models.TranslationOpportunityModel.delete_multi(
+                list(translation_opportunity_models)
+            )
+
     topic = topic_fetchers.get_topic_by_id(topic_id)
     story_ids = topic.get_canonical_story_ids()
     stories = story_fetchers.get_stories_by_ids(story_ids)
@@ -2058,6 +2083,15 @@ def regenerate_opportunities_related_to_topic(
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list
     )
+
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        create_translation_opportunity(
+            {feconf.ENTITY_TYPE_EXPLORATION: exp_ids}, topic_ids=[topic_id]
+        )
+
     return len(exploration_opportunity_summary_list)
 
 

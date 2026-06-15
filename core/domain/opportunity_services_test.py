@@ -1810,6 +1810,46 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
         ]
     )
+    def test_create_translation_opportunity_with_topic_ids(self) -> None:
+        entity_types_and_ids = {
+            feconf.ENTITY_TYPE_EXPLORATION: ['exp_1'],
+        }
+
+        # Create with direct topic_ids mapping, bypassing datastore lookup.
+        opportunity_services.create_translation_opportunity(
+            entity_types_and_ids, topic_ids=['topic_id_other']
+        )
+
+        model_id = 'exploration.exp_1'
+        model = opportunity_models.TranslationOpportunityModel.get(model_id)
+        assert model is not None
+        self.assertEqual(model.topic_ids, ['topic_id_other'])
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_regenerate_opportunities_related_to_topic_with_new_models(
+        self,
+    ) -> None:
+        # Regenerate opportunities.
+        opportunity_services.regenerate_opportunities_related_to_topic(
+            'topic_id_1', delete_existing_opportunities=True
+        )
+
+        model_id = 'exploration.exp_1'
+        model = opportunity_models.TranslationOpportunityModel.get(
+            model_id, strict=False
+        )
+        assert model is not None
+        self.assertEqual(model.topic_ids, ['topic_id_1'])
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
     def test_get_translation_opportunities_with_nonexistent_topic_name_returns_empty(
         self,
     ) -> None:
