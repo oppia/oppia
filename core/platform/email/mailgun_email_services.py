@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import logging
+from contextlib import ExitStack
 
 from core.domain import (
     email_services,
@@ -178,23 +179,25 @@ def send_email_to_recipients(
         )
 
         # Adding attachments to the email.
-        files = []
-        if attachments:
-            for attachment in attachments:
-                with open(attachment['path'], 'rb', encoding=None) as file_obj:
-                    files.append(
-                        (
-                            'attachment',
-                            (attachment['filename'], file_obj.read()),
-                        )
-                    )
-        response = requests.post(
-            server,
-            auth=('api', mailgun_api_key),
-            data=data,
-            files=(files or None),
-            timeout=TIMEOUT_SECS,
-        )
+        with ExitStack() as stack:
+            files = [
+                (
+                    'attachment',
+                    (
+                        att['filename'],
+                        stack.enter_context(open(att['path'], 'rb')),
+                    ),
+                )
+                for att in (attachments or [])
+            ]
+
+            response = requests.post(
+                server,
+                auth=('api', mailgun_api_key),
+                data=data,
+                files=(files or None),
+                timeout=TIMEOUT_SECS,
+            )
 
         if response.status_code != 200:
             if 400 <= response.status_code < 500:
