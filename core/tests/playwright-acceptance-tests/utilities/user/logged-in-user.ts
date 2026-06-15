@@ -154,13 +154,15 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForFunction(
       ({headerSelector, starSelector, expectedCount}) => {
         const header = document.querySelector(headerSelector);
-        if (!header) return false;
+        if (!header) {
+          return false;
+        }
         return document.querySelectorAll(starSelector).length === expectedCount;
       },
       {
         headerSelector: ratingsHeaderSelector,
         starSelector: ratingStarSelector,
-        expectedCount: 5
+        expectedCount: 5,
       }
     );
   }
