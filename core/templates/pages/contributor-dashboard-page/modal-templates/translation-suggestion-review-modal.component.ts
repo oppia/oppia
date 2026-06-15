@@ -51,7 +51,7 @@ import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface HTMLSchema {
-  type: string;
+  type: 'html';
   ui_config: object;
 }
 
@@ -411,6 +411,20 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         this.errorFound = false;
       }
     }
+  }
+
+  get contentHtmlAsString(): string {
+    return typeof this.contentHtml === 'string'
+      ? this.contentHtml
+      : this.contentHtml[0] || '';
+  }
+
+  get explorationContentHtmlAsString(): string {
+    return typeof this.explorationContentHtml === 'string'
+      ? this.explorationContentHtml
+      : this.explorationContentHtml !== null
+        ? this.explorationContentHtml[0] || ''
+        : '';
   }
 
   get updateIsDisabled(): boolean {

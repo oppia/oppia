@@ -1,4 +1,4 @@
-<i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options" (click)="toggleMobileNavOptions()" [ngClass]="{'mobile-navbar-toggled': mobileNavOptionsAreShown}" aria-label="Mobile navbar options" role="button"></i>
+<i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options" (click)="toggleMobileNavOptions()" [class.mobile-navbar-toggled]="mobileNavOptionsAreShown" aria-label="Mobile navbar options" role="button"></i>
 <div class="navbar-mobile-container">
   <div class="navbar-mobile-options e2e-test-mobile-navigation-bar-container" *ngIf="mobileNavOptionsAreShown">
     <div  placement="top-start" class="exp-nav-dropdown-container">
@@ -9,54 +9,54 @@
         </a>
         <div ngbDropdownToggle class="exp-nav-dropdown-icon e2e-test-mobile-options-dropdown"></div>
         <ul ngbDropdownMenu class="dropdown-menu oppia-exploration-editor-tabs-dropdown" aria-labelledby="dropdownMenuButton">
-          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'dropdown': countWarnings()}">
-            <a href="#" ngbTooltip="Editor" placement="{{countWarnings() ? 'left' : 'bottom'}}" (click)="selectMainTab()"
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [class.dropdown]="countWarnings()">
+            <a href="#" ngbTooltip="Editor" [placement]="countWarnings() ? 'left' : 'bottom'" (click)="selectMainTab()"
                class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-main-tab">
               <i class="fa fa-pen oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Editor</span>
             </a>
-            <div [hidden]="!countWarnings()" class="oppia-editor-warnings-indicator" (click)="selectMainTab()" [ngClass]="{'oppia-editor-warnings-critical-color': hasCriticalWarnings(), 'oppia-editor-warnings-error-color': !hasCriticalWarnings()}">
+            <div [hidden]="!countWarnings()" class="oppia-editor-warnings-indicator" (click)="selectMainTab()" [class.oppia-editor-warnings-critical-color]="hasCriticalWarnings()" [class.oppia-editor-warnings-error-color]="!hasCriticalWarnings()">
               <span class="oppia-editor-warnings-count">
                 {{ countWarnings() }}
               </span>
             </div>
           </li>
-          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-translation-tab" *ngIf="isUserLoggedIn()" [ngClass]="{'active': getActiveTabName() === 'translation'}">
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-translation-tab" *ngIf="isUserLoggedIn()" [class.active]="getActiveTabName() === 'translation'">
             <a href="#" ngbTooltip="Tmaterial-iconsmaterial-iconsranslations and Voiceovers" placement="bottom" (click)="selectTranslationTab()"
                class="oppia-exploration-editor-tabs-dropdown-element">
               <i class="fa fa-microphone oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Translations</span>
             </a>
           </li>
-          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" *ngIf="isUserLoggedIn()" [ngClass]="{'active': getActiveTabName() === 'preview'}">
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" *ngIf="isUserLoggedIn()" [class.active]="getActiveTabName() === 'preview'">
             <a href="#" ngbTooltip="Preview" placement="bottom" (click)="selectPreviewTab()"
                class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-preview-button">
               <i class="fa fa-play oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Preview</span>
             </a>
           </li>
-          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-settings-button" [ngClass]="{'active': getActiveTabName() === 'settings'}">
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-settings-button" [class.active]="getActiveTabName() === 'settings'">
             <a href="#" ngbTooltip="Settings" placement="bottom" (click)="selectSettingsTab()"
                class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-settings-button">
               <i class="fa fa-cog oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Settings</span>
             </a>
           </li>
-          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-stats-button" [ngClass]="{'active': getActiveTabName() === 'stats'}">
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-stats-button" [class.active]="getActiveTabName() === 'stats'">
             <a href="#" ngbTooltip="Statistics" placement="bottom" (click)="selectStatsTab()"
                class="oppia-exploration-editor-tabs-dropdown-element">
               <i class="fa fa-poll oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Statistics</span>
             </a>
           </li>
-          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'improvements'}" *ngIf="isImprovementsTabEnabled()">
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [class.active]="getActiveTabName() === 'improvements'" *ngIf="isImprovementsTabEnabled()">
             <a href="#" ngbTooltip="Improvements" placement="bottom" (click)="selectImprovementsTab()"
                class="oppia-exploration-editor-tabs-dropdown-element">
               <i class="fa fa-arrow-trend-up oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Improvements</span>
             </a>
           </li>
-          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'history'}">
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [class.active]="getActiveTabName() === 'history'">
             <a href="#" ngbTooltip="History" placement="bottom" (click)="selectHistoryTab()"
                disabled="ExplorationRightsService.isCloned()"
                class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-history-button">
@@ -64,7 +64,7 @@
               <span class="oppia-exploration-editor-tabs-dropdown-inner">History</span>
             </a>
           </li>
-          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-feedback-button" [ngClass]="{'active': getActiveTabName() === 'feedback'}">
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-feedback-button" [class.active]="getActiveTabName() === 'feedback'">
             <a href="#" ngbTooltip="Feedback" placement="bottom" (click)="selectFeedbackTab()"
                class="oppia-exploration-editor-tabs-dropdown-element">
               <i class="fa fa-comment-alt oppia-mobile-exploration-editor-tabs-icon"></i>
@@ -83,9 +83,9 @@
       <div ngbDropdown class="exp-nav-dropdown-content right-container">
 
         <div *ngIf="isEditableOutsideTutorialMode()">
-          <div [ngClass]="{'disable-save-button': !connectedToInternet || !isExplorationSaveable()}">
+          <div [class.disable-save-button]="!connectedToInternet || !isExplorationSaveable()">
             <button class="btn publish-button e2e-test-save-changes-for-small-screens"
-                    [ngClass]="{'btn-success': connectedToInternet && isExplorationSaveable()}"
+                    [class.btn-success]="connectedToInternet && isExplorationSaveable()"
                     (click)="saveChanges()"
                     [disabled]="!connectedToInternet || !isExplorationSaveable()">
               <span *ngIf="!saveIsInProcess">
@@ -119,9 +119,9 @@
             <i class="fa fa-pen oppia-mobile-exploration-editor-tabs-icon"></i>
             Discard
           </button>
-          <div ngbDropdownItem *ngIf="showPublishButton()" [ngClass]="{'disable-publish-button': !connectedToInternet || isExplorationLockedForEditing() || countWarnings()}">
+          <div ngbDropdownItem *ngIf="showPublishButton()" [class.disable-publish-button]="!connectedToInternet || isExplorationLockedForEditing() || countWarnings()">
             <button type="button" class="btn btn-light e2e-test-mobile-publish-button"
-                    [ngClass]="{'btn-success': connectedToInternet && !isExplorationLockedForEditing() && !countWarnings()}"
+                    [class.btn-success]="connectedToInternet && !isExplorationLockedForEditing() && !countWarnings()"
                     (click)="showPublishExplorationModal()"
                     [disabled]="!connectedToInternet || isExplorationLockedForEditing() || countWarnings()">
               <span *ngIf="!publishIsInProcess">

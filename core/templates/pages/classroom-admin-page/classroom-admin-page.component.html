@@ -19,7 +19,7 @@
            class="e2e-test-classroom-tile-container">
         <div class="oppia-classroom-tile e2e-test-classroom-tile"
              (click)="getClassroomData(classroom.classroom_id)">
-          <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.getClassroomId())" class="e2e-test-classroom-tile-name">
+          <span *ngIf="!(classroomEditorMode && classroom.classroom_id === tempClassroomData.getClassroomId())" class="e2e-test-classroom-tile-name">
             {{ classroom.classroom_name }}
           </span>
           <span *ngIf="classroomEditorMode && classroom.classroom_id === tempClassroomData.getClassroomId() && tempClassroomData.getClassroomName().length > 0" class="classroom-tile-name">

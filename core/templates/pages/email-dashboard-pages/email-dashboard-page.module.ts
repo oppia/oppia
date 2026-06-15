@@ -25,11 +25,15 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
 import {EmailDashboardAuthGuard} from './email-dashboard-auth.guard';
 import {EmailDashboardPageRootComponent} from './email-dashboard-page-root.component';
 import {CommonModule} from '@angular/common';
+import {MatCardModule} from '@angular/material/card';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
 
 @NgModule({
   imports: [
     SharedComponentsModule,
     CommonModule,
+    MatCardModule,
+    SharedFormsModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([
       {

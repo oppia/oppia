@@ -17,6 +17,7 @@
  */
 
 import cloneDeep from 'lodash/cloneDeep';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {Component, OnInit} from '@angular/core';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {AlertsService} from 'services/alerts.service';
@@ -63,12 +64,14 @@ export class ClassroomAdminPageComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
-    private classroomAdminDataService: ClassroomAdminDataService,
+    public classroomAdminDataService: ClassroomAdminDataService,
     private ngbModal: NgbModal,
     private alertsService: AlertsService,
     private pageContextService: PageContextService,
     private editableTopicBackendApiService: EditableTopicBackendApiService
   ) {}
+
+  readonly separatorKeysCodes: number[] = [ENTER, COMMA];
 
   classroomData!: ExistingClassroomData;
   tempClassroomData!: ExistingClassroomData;

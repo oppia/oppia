@@ -5,7 +5,7 @@
         <mat-card class="oppia-page-card oppia-long-text">
           <form class="form-horizontal" (submit)="submitQueryAsync()" name="form.schemaForm">
             <legend>Email Dashboard</legend>
-            <div *ngFor="let customizationArgSpec of customizationArgSpecs">
+            <div *ngFor="let customizationArgSpec of customizationArgSpecs; index as idx">
               <div class="d-xl-inline-flex mb-3">
                 <label class="col-3 col-form-label" for="label-target-role-method">
                   {{ customizationArgSpec.description }}:

@@ -263,14 +263,14 @@
                  alt=""
                  [src]="getCompleteThumbnailIconUrl(exploration.thumbnailIconUrl)">
             <h2 class="activity-title e2e-test-exp-summary-tile-title">
-              <span>{{ (exploration.title || DEFAULT_EMPTY_TITLE) | truncate:40 }}</span>
+              <span>{{ truncate(exploration.title || DEFAULT_EMPTY_TITLE, 40) }}</span>
             </h2>
           </div>
           <div class="mask-wrap e2e-test-title-mask">
             <div class="title-section-mask"></div>
           </div>
         </a>
-        <div [attr.section]="right-section">
+        <div [attr.section]="'right-section'">
           <a [ngClass]="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
              aria-label="Dashboard Statistics"
              [href]="getExplorationUrl(exploration.id)">
@@ -400,7 +400,7 @@
           <div class="oppia-subscription-name-container">
             <strong class="e2e-test-subscription-name"
                     ngbPopover="showUsernamePopover(subscriber.username)">
-              {{ subscriber.username| truncate:10 }}
+              {{ truncate(subscriber.username, 10) }}
             </strong>
           </div>
           <div class="oppia-impact-text">

@@ -23,6 +23,7 @@ import {EmailDashboardQuery} from 'domain/email-dashboard/email-dashboard-query.
 import {LoaderService} from 'services/loader.service';
 import {UserService} from 'services/user.service';
 import {EmailDashboardDataService} from './email-dashboard-data.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 @Component({
   selector: 'oppia-email-dashboard-page',
@@ -60,9 +61,9 @@ export class EmailDashboardPageComponent {
     });
   }
 
-  updateQueryData(newValue: boolean | number, field: string): void {
+  updateQueryData(newValue: SchemaDefaultValue, field: string): void {
     if (this.data[field] !== newValue) {
-      this.data[field] = newValue;
+      this.data[field] = newValue as boolean | number | null;
       this.changeDetectorRef.detectChanges();
     }
   }
