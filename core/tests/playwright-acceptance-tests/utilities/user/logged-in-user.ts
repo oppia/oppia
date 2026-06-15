@@ -21,14 +21,9 @@ import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
-const baseUrl = testConstants.URLs.BaseURL;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 
-const anonymousCheckboxSelector = '.e2e-test-stay-anonymous-checkbox';
-const feedbackTextareaSelector = '.e2e-test-exploration-feedback-textarea';
-const submitButtonSelector = '.e2e-test-exploration-feedback-submit-btn';
-const submittedMessageSelector = '.e2e-test-rating-submitted-message';
-
+const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
 const explorationCard = '.e2e-test-exploration-dashboard-card';
 const desktopLessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
@@ -45,10 +40,6 @@ const lessonCardTitleInPlayLaterSelector = `${playLaterSectionSelector} .e2e-tes
 const mobileLessonCardOptionsDropdownButton =
   '.e2e-test-mobile-lesson-card-dropdown';
 const progressSectionSelector = '.e2e-test-progress-section';
-
-const ratingsHeaderSelector = '.conversation-skin-final-ratings-header';
-const ratingStarSelector = '.e2e-test-rating-star';
-const filledRatingStarSelector = '.fas.fa-star';
 
 // Learner dashboard selectors.
 const communityLessonsSectionInLearnerDashboard =
@@ -77,7 +68,7 @@ export class LoggedInUser extends BaseUser {
         ? mobileLessonCardTitleSelector
         : desktopLessonCardTitleSelector;
 
-      await this.page.waitForSelector(lessonCardTitleSelector);
+      await this.expectElementToBeVisible(lessonCardTitleSelector);
       const lessonTitles = await this.page.$$eval(
         lessonCardTitleSelector,
         elements => elements.map(el => el.textContent?.trim())
@@ -90,9 +81,9 @@ export class LoggedInUser extends BaseUser {
       }
 
       if (isMobileViewport) {
-        await this.page.waitForSelector(learnerDashboardIconsSelector, {
-          state: 'attached',
-        });
+        await this.expectElementToBeAttachedInDOM(
+          learnerDashboardIconsSelector
+        );
         const iconContainers = await this.page.$$(
           learnerDashboardIconsSelector
         );
@@ -110,9 +101,7 @@ export class LoggedInUser extends BaseUser {
 
         await mobileAddToPlayLaterButtonElement?.click();
       } else {
-        await this.page.waitForSelector(desktopAddToPlayLaterButton, {
-          state: 'attached',
-        });
+        await this.expectElementToBeAttachedInDOM(desktopAddToPlayLaterButton);
         const addToPlayLaterButtons = await this.page.$$(
           desktopAddToPlayLaterButton
         );
@@ -141,30 +130,8 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToLearnerDashboard(): Promise<void> {
     await this.goto(learnerDashboardUrl);
-    await this.page.waitForFunction(
-      () => !document.body.innerText.includes('Loading...'),
-      {timeout: 30000}
-    );
-  }
-
-  /**
-   * Check if rating stars are displayed.
-   */
-  async expectRatingStarsToBeVisible(): Promise<void> {
-    await this.page.waitForFunction(
-      ({headerSelector, starSelector, expectedCount}) => {
-        const header = document.querySelector(headerSelector);
-        if (!header) {
-          return false;
-        }
-        return document.querySelectorAll(starSelector).length === expectedCount;
-      },
-      {
-        headerSelector: ratingsHeaderSelector,
-        starSelector: ratingStarSelector,
-        expectedCount: 5,
-      }
-    );
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(homeTabSectionInLearnerDashboard);
   }
 
   /**
@@ -181,9 +148,7 @@ export class LoggedInUser extends BaseUser {
       return;
     }
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(explorationCard, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(explorationCard);
 
     const lessonCards = await this.page.$$(explorationCard);
     const lessonTitles = await Promise.all(
@@ -208,27 +173,11 @@ export class LoggedInUser extends BaseUser {
 
     await playLaterButton?.hover({force: true});
 
-    await this.page.waitForSelector('.tooltip', {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible('.tooltip');
 
     // Check the tooltip content.
     const tooltipText = await this.page.$eval('.tooltip', el => el.textContent);
     expect(tooltipText).toBe(expectedTooltip);
-  }
-
-  /**
-   * Waits for the given number of filled stars to be present on the page.
-   * @param rating The number of filled stars to wait for.
-   */
-  async expectStarRatingToBe(rating: number): Promise<void> {
-    await this.page.waitForFunction(
-      ({selector, rating}: {selector: string; rating: number}) => {
-        const filledStars = document.querySelectorAll(selector);
-        return filledStars.length === rating;
-      },
-      {selector: filledRatingStarSelector, rating}
-    );
   }
 
   /**
@@ -237,13 +186,11 @@ export class LoggedInUser extends BaseUser {
   async navigateToCommunityLessonsSection(): Promise<void> {
     await this.waitForPageToFullyLoad();
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(progressSectionSelector);
+      await this.expectElementToBeVisible(progressSectionSelector);
       await this.clickOnElementWithSelector(progressSectionSelector);
 
       try {
-        await this.page.waitForSelector(mobileCommunityLessonSectionButton, {
-          timeout: 5000,
-        });
+        await this.expectElementToBeVisible(mobileCommunityLessonSectionButton);
       } catch (error) {
         if (error instanceof Error && error.message.includes('Timeout')) {
           // Try clicking again if does not opens the expected page.
@@ -254,23 +201,13 @@ export class LoggedInUser extends BaseUser {
       }
       await this.clickOnElementWithSelector(mobileCommunityLessonSectionButton);
     } else {
-      await this.page.waitForSelector(progressSectionSelector, {
-        state: 'visible',
-      });
-      await this.page.click(communityLessonsSectionButton);
+      await this.expectElementToBeVisible(progressSectionSelector);
+      await this.clickOnElementWithSelector(communityLessonsSectionButton);
     }
 
-    await this.page.waitForSelector(communityLessonsSectionInLearnerDashboard, {
-      state: 'visible',
-    });
-  }
-
-  /**
-   * Navigates to the exploration page and starts playing the exploration.
-   * @param {string} explorationId - The ID of the exploration to play.
-   */
-  async playExploration(explorationId: string | null): Promise<void> {
-    await this.goto(`${baseUrl}/explore/${explorationId as string}`);
+    await this.expectElementToBeVisible(
+      communityLessonsSectionInLearnerDashboard
+    );
   }
 
   /**
@@ -279,7 +216,7 @@ export class LoggedInUser extends BaseUser {
    */
   async playLessonFromDashboard(lessonName: string): Promise<void> {
     try {
-      await this.page.waitForSelector(lessonCardTitleSelector);
+      await this.expectElementToBeVisible(lessonCardTitleSelector);
       const searchResultsElements = await this.page.$$(lessonCardTitleSelector);
       const searchResults = await Promise.all(
         searchResultsElements.map(result =>
@@ -297,66 +234,11 @@ export class LoggedInUser extends BaseUser {
       );
       await searchResultsElements[lessonIndex].click();
 
-      await this.page.waitForSelector(lessonCardTitleSelector, {
-        state: 'hidden',
-      });
+      await this.expectElementToBeVisible(lessonCardTitleSelector, false);
     } catch (error) {
       const newError = new Error(
         `Failed to play lesson from dashboard: ${error}`
       );
-      newError.stack = (error as Error).stack;
-      throw newError;
-    }
-  }
-
-  /**
-   * Rates an exploration by clicking on the rating stars, providing feedback, and optionally staying anonymous.
-   *
-   * @param {number} rating - The rating to give to the exploration.
-   * @param {string} feedback - The feedback to provide for the exploration.
-   * @param {boolean} stayAnonymous - Whether to stay anonymous or not.
-   */
-  async rateExploration(
-    rating: number,
-    feedback: string,
-    stayAnonymous: boolean
-  ): Promise<void> {
-    try {
-      await this.page.waitForSelector(ratingsHeaderSelector);
-      const ratingStars = await this.page.$$(ratingStarSelector);
-      await this.waitForElementToBeClickable(ratingStars[rating - 1]);
-      await ratingStars[rating - 1].click();
-
-      await this.typeInInputField(feedbackTextareaSelector, feedback);
-      if (stayAnonymous) {
-        await this.clickOnElementWithSelector(anonymousCheckboxSelector);
-      }
-
-      await this.clickOnElementWithSelector(submitButtonSelector);
-
-      // Fix for flaky test (#23488). This uses a single, atomic page.$eval()
-      // call to prevent a race condition where the element could be removed
-      // from the DOM before its text was read. Using textContent is also
-      // more reliable than innerText for automated tests.
-      // Explicitly wait for the submitted message to be visible on the page.
-      await this.page.waitForSelector(submittedMessageSelector, {
-        state: 'visible',
-      });
-      // Now that we know it's visible, we can safely get its text content.
-      const submittedMessageText = await this.page.$eval(
-        submittedMessageSelector,
-        (el: Element) => el.textContent
-      );
-      if (
-        !submittedMessageText ||
-        submittedMessageText.trim() !== 'Thank you for the feedback!'
-      ) {
-        throw new Error(
-          `Unexpected submitted message text: ${submittedMessageText}`
-        );
-      }
-    } catch (error) {
-      const newError = new Error(`Failed to rate exploration: ${error}`);
       newError.stack = (error as Error).stack;
       throw newError;
     }
@@ -368,7 +250,7 @@ export class LoggedInUser extends BaseUser {
    */
   async removeLessonFromPlayLater(lessonName: string): Promise<void> {
     try {
-      await this.page.waitForSelector(lessonCardTitleInPlayLaterSelector);
+      await this.expectElementToBeVisible(lessonCardTitleInPlayLaterSelector);
       const lessonCards = await this.page.$$(
         lessonCardTitleInPlayLaterSelector
       );
@@ -392,7 +274,7 @@ export class LoggedInUser extends BaseUser {
       );
       await this.page.hover(lessonCardTitleInPlayLaterSelector);
 
-      await this.page.waitForSelector(removeFromPlayLaterButtonSelector);
+      await this.expectElementToBeVisible(removeFromPlayLaterButtonSelector);
       const removeFromPlayLaterButton = await this.page.$(
         removeFromPlayLaterButtonSelector
       );
@@ -401,9 +283,10 @@ export class LoggedInUser extends BaseUser {
       // Confirm removal.
       await this.clickOnElementWithSelector(confirmRemovalFromPlayLaterButton);
 
-      await this.page.waitForSelector(confirmRemovalFromPlayLaterButton, {
-        state: 'hidden',
-      });
+      await this.expectElementToBeVisible(
+        confirmRemovalFromPlayLaterButton,
+        false
+      );
 
       showMessage(`Lesson "${lessonName}" removed from 'Play Later' list.`);
     } catch (error) {
@@ -445,16 +328,12 @@ export class LoggedInUser extends BaseUser {
 
     await playLaterButton.click({force: true});
 
-    await this.page.waitForSelector(learnerPlaylistModalSelector, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(learnerPlaylistModalSelector);
 
     await this.isTextPresentOnPage("Remove from 'Play Later' list?");
 
     await this.clickOnElementWithSelector(confirmRemovalFromPlayLaterButton);
-    await this.page.waitForSelector(learnerPlaylistModalSelector, {
-      state: 'hidden',
-    });
+    await this.expectElementToBeVisible(learnerPlaylistModalSelector, false);
   }
 
   /**
@@ -468,7 +347,7 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     try {
       await this.waitForStaticAssetsToLoad();
-      await this.page.waitForSelector(playLaterSectionSelector);
+      await this.expectElementToBeVisible(playLaterSectionSelector);
       const lessonCards = await this.page.$$(
         lessonCardTitleInPlayLaterSelector
       );

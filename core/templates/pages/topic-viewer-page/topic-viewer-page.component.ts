@@ -41,6 +41,10 @@ interface TopicViewerStorySectionData {
   storyId: string;
   storyTitle: string;
   storyDescription: string;
+  storySummary: StorySummary;
+  practiceSubtopicIds: number[];
+  classroomUrlFragment: string;
+  topicUrlFragment: string;
   lessonCount: number;
   practiceCount: number;
 }
@@ -95,7 +99,6 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
       this.activeView = this.VIEW_NAMES.STUDYGUIDE;
     } else if (pathname.endsWith(this.VIEW_NAMES.PRACTICE)) {
       if (this.isRedesignedTopicViewerPageFeatureEnabled()) {
-        // In the redesigned UI, practice is part of the story view.
         this.activeView = this.VIEW_NAMES.STORY;
       } else {
         this.activeView = this.VIEW_NAMES.PRACTICE;
@@ -169,14 +172,24 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
   private getCanonicalStorySectionData(
     readOnlyTopic: ReadOnlyTopic
   ): readonly TopicViewerStorySectionData[] {
-    const practiceCount = readOnlyTopic.getSubtopics().filter(subtopic => {
-      return subtopic.getSkillSummaries().length > 0;
-    }).length;
+    const practiceSubtopicIds = readOnlyTopic
+      .getSubtopics()
+      .filter(subtopic => {
+        return subtopic.getSkillSummaries().length > 0;
+      })
+      .map(subtopic => subtopic.getId());
+
+    const practiceCount = practiceSubtopicIds.length;
+
     return readOnlyTopic.getCanonicalStorySummaries().map(storySummary => {
       return {
         storyId: storySummary.getId(),
         storyTitle: storySummary.getTitle(),
         storyDescription: storySummary.getDescription() || '',
+        storySummary,
+        practiceSubtopicIds,
+        classroomUrlFragment: this.classroomUrlFragment,
+        topicUrlFragment: this.topicUrlFragment,
         lessonCount: storySummary.getNodeTitles().length,
         practiceCount,
       };
