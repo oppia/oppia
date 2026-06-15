@@ -1,0 +1,30 @@
+<div class="topic-practice-card" [attr.aria-label]="practiceTitle || 'Practice card'">
+  <div class="topic-practice-card-thumbnail">
+    <img class="topic-practice-card-image"
+         [src]="resolvedThumbnailUrl"
+         alt="{{ getThumbnailAltText() }}"
+         title="{{ getThumbnailAltText() }}">
+  </div>
+
+  <div class="topic-practice-card-content">
+    <div class="topic-practice-card-copy">
+      <h3 class="topic-practice-card-title">{{ practiceTitle }}</h3>
+      <p class="topic-practice-card-description">{{ getResolvedDescription() }}</p>
+    </div>
+
+    <div class="topic-practice-card-actions">
+      <a class="topic-practice-card-study-link"
+         [attr.href]="studyUrl"
+         [attr.aria-disabled]="studyUrl ? null : 'true'">
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_STUDY' | translate"></span>
+      </a>
+
+      <button class="topic-practice-card-practice-button"
+              type="button"
+              [disabled]="!practiceUrl"
+              (click)="navigateTo(practiceUrl)">
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_PRACTICE' | translate"></span>
+      </button>
+    </div>
+  </div>
+</div>
