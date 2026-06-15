@@ -1180,16 +1180,16 @@ describe('Story Editor Component having three story nodes', () => {
     fetchSpy.and.returnValue(null);
 
     expect(() => {
-      component['_init']();
-    }).not.toThrow();
+      (component as any)._init();
+    }).not.toThrowError();
   });
 
   it('should handle _initEditor when story is null', () => {
     fetchSpy.and.returnValue(null);
 
     expect(() => {
-      component['_initEditor']();
-    }).not.toThrow();
+      (component as any)._initEditor();
+    }).not.toThrowError();
   });
 
   it('should call setInitialNodeId when rearranging from index 0', () => {
