@@ -1154,4 +1154,58 @@ describe('Story Editor Component having three story nodes', () => {
 
     expect(updateArcPropertySpy).toHaveBeenCalledTimes(1);
   }));
+
+  it('should set the node to edit with the given id', () => {
+    component.setNodeToEdit('node_1');
+
+    expect(component.idOfNodeToEdit).toBe('node_1');
+  });
+
+  it('should return the arc id for a node', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_2'])
+    );
+
+    expect(component.getArcIdForNode('node_2')).toBe('arc_1');
+    expect(component.getArcIdForNode('node_1')).toBeNull();
+  });
+
+  it('should return null from getArcIdForNode when story contents is null', () => {
+    component.storyContents = null;
+
+    expect(component.getArcIdForNode('node_1')).toBeNull();
+  });
+
+  it('should handle _init when story is null', () => {
+    fetchSpy.and.returnValue(null);
+
+    expect(() => {
+      component['_init']();
+    }).not.toThrow();
+  });
+
+  it('should handle _initEditor when story is null', () => {
+    fetchSpy.and.returnValue(null);
+
+    expect(() => {
+      component['_initEditor']();
+    }).not.toThrow();
+  });
+
+  it('should call setInitialNodeId when rearranging from index 0', () => {
+    const setInitialNodeIdSpy = spyOn(
+      storyUpdateService,
+      'setInitialNodeId'
+    ).and.stub();
+    const rearrangeNodeSpy = spyOn(
+      storyUpdateService,
+      'rearrangeNodeInStory'
+    ).and.stub();
+    component.linearNodesList = story.getStoryContents().getNodes();
+
+    component.rearrangeNodeInList(0, 1);
+
+    expect(setInitialNodeIdSpy).toHaveBeenCalled();
+    expect(rearrangeNodeSpy).toHaveBeenCalledWith(component.story, 0, 1);
+  });
 });

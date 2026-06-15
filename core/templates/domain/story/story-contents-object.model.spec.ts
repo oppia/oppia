@@ -1007,4 +1007,58 @@ describe('Story contents object factory', () => {
     expect(storyContents.getArcs()[0].getId()).toBe('arc_new');
     expect(storyContents.getArcs()[1].getId()).toBe('arc_default');
   });
+
+  it('should return the initial node id', () => {
+    expect(_sampleStoryContents.getInitialNodeId()).toBe('node_1');
+  });
+
+  it('should return the nodes array from getNodes', () => {
+    const nodes = _sampleStoryContents.getNodes();
+    expect(nodes.length).toBe(2);
+    expect(nodes[0].getId()).toBe('node_1');
+    expect(nodes[1].getId()).toBe('node_2');
+  });
+
+  it('should add node without changing initial node when it is already set', () => {
+    _sampleStoryContents.addNode('Title 3');
+
+    expect(_sampleStoryContents.getInitialNodeId()).toBe('node_1');
+    expect(_sampleStoryContents.getNodes().length).toBe(3);
+    expect(_sampleStoryContents.getNodes()[2].getTitle()).toBe('Title 3');
+  });
+
+  it('should remove destination reference when a node that is a destination is deleted', () => {
+    expect(
+      _sampleStoryContents.getNodes()[0].getDestinationNodeIds()
+    ).toContain('node_2');
+
+    _sampleStoryContents.deleteNode('node_2');
+
+    expect(
+      _sampleStoryContents.getNodes()[0].getDestinationNodeIds()
+    ).not.toContain('node_2');
+  });
+
+  it('should throw error when rearranging arcs with wrong length', () => {
+    _sampleStoryContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', 'Desc 1', [])
+    );
+
+    expect(() => {
+      _sampleStoryContents.rearrangeArcs(['arc_1', 'extra_arc']);
+    }).toThrowError('Arc order must include each arc exactly once');
+  });
+
+  it('should throw error when rearranging arcs with duplicate id', () => {
+    _sampleStoryContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', 'Desc 1', [])
+    );
+    _sampleStoryContents.addArc(
+      ArcModel.createNew('arc_2', 'Arc 2', 'Desc 2', [])
+    );
+
+    expect(() => {
+      _sampleStoryContents.rearrangeArcs(['arc_1', 'arc_1']);
+    }).toThrowError('Duplicate arc id in arc order: arc_1');
+  });
 });
