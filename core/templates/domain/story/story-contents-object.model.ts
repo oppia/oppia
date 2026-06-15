@@ -210,7 +210,7 @@ export class StoryContents {
     const targetArcIndex = this.getArcIndex(toArcId);
     const targetArc = this._arcs[targetArcIndex];
     if (targetArc) {
-      targetArc.setNodeIds([...targetArc.getNodeIds(), nodeId]);
+      targetArc.setNodeIds([nodeId, ...targetArc.getNodeIds()]);
     }
   }
 

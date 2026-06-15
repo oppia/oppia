@@ -2563,6 +2563,7 @@ class GenericTestBase(AppEngineTestBase):
         ],
         'initial_node_id': 'node_1',
         'next_node_id': 'node_2',
+        'arcs': [],
     }
 
     VERSION_1_SUBTOPIC_DICT: Final = {

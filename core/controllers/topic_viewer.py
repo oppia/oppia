@@ -72,6 +72,8 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             for additional_story_id in additional_story_ids
         ]
 
+        # Here we use type Any because the dict values are of mixed types
+        # (str, bool, list).
         canonical_story_dicts: List[Dict[str, Any]] = []
         for story_summary in canonical_story_summaries:
             all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
@@ -92,6 +94,8 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             story_summary_dict = story_summary.to_human_readable_dict()
             story = story_fetchers.get_story_by_id(story_summary.id)
             arcs = [arc.to_dict() for arc in story.story_contents.arcs]
+            # Here we use type Any because the dict values are of mixed types
+            # (str, bool, list).
             canonical_story_dict: Dict[str, Any] = {
                 'id': story_summary_dict['id'],
                 'title': story_summary_dict['title'],
@@ -108,6 +112,8 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 canonical_story_dict['arcs'] = arcs
             canonical_story_dicts.append(canonical_story_dict)
 
+        # Here we use type Any because the dict values are of mixed types
+        # (str, bool, list).
         additional_story_dicts: List[Dict[str, Any]] = []
         for story_summary in additional_story_summaries:
             all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
@@ -123,6 +129,8 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             story_summary_dict = story_summary.to_human_readable_dict()
             story = story_fetchers.get_story_by_id(story_summary.id)
             arcs = [arc.to_dict() for arc in story.story_contents.arcs]
+            # Here we use type Any because the dict values are of mixed types
+            # (str, bool, list).
             additional_story_dict: Dict[str, Any] = {
                 'id': story_summary_dict['id'],
                 'title': story_summary_dict['title'],
