@@ -105,15 +105,13 @@ export class SuperAdmin extends LoggedInUser {
 
   /**
    * The function expects the user to have the given role.
-   * @param {string} username - The username of the user to check the role for.
-   * @param {string} role - The role to check.
    */
   async expectUserToHaveRole(username: string, role: string): Promise<void> {
     const currentPageUrl = this.page.url();
     await this.goto(adminPageRolesTab);
     await this.typeInInputField(roleEditorInputField, username);
     await this.clickOnElementWithSelector(roleEditorButtonSelector);
-    await this.expectElementToBeVisible(justifyContentDiv);
+    await this.page.waitForSelector(justifyContentDiv);
     const userRoleElements = await this.page.$$(userRoleDescriptionSelector);
     for (let i = 0; i < userRoleElements.length; i++) {
       const roleText = await this.page.evaluate(
@@ -137,13 +135,13 @@ export class SuperAdmin extends LoggedInUser {
   private async selectTopicForTopicManagerRole(
     topicName: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(selectTopicForAssignmentSelector);
+    await this.page.waitForSelector(selectTopicForAssignmentSelector);
     const selectElement = await this.page.$(selectTopicForAssignmentSelector);
     if (!selectElement) {
       throw new Error('Select element not found');
     }
 
-    await this.expectElementToBeVisible('.e2e-test-select-topic option');
+    await this.page.waitForSelector('.e2e-test-select-topic option');
     const optionElements = await selectElement.$$('option');
     if (!optionElements.length) {
       throw new Error('No options found in the select element');
@@ -168,7 +166,7 @@ export class SuperAdmin extends LoggedInUser {
         }
 
         await this.select(selectTopicForAssignmentSelector, optionValue);
-        await this.expectElementToBeVisible(addTopicButton);
+        await this.page.waitForSelector(addTopicButton);
         const button = await this.page.$(addTopicButton);
         if (!button) {
           throw new Error('Button not found');
@@ -195,14 +193,6 @@ export class SuperAdmin extends LoggedInUser {
     throw new Error(`Topic "${topicName}" not found in the options`);
   }
 
-  /**
-   * Selects a language for the translation coordinator role.
-   * Waits for the language selector to be ready before selecting to avoid
-   * a race condition where the page resets the select value to the first
-   * option after selection. After clicking 'Add Language', waits for the
-   * selected languages list to reflect the newly added language.
-   * @param {string} language - The language to select for the translation coordinator role.
-   */
   private async selectLanguageForTranslationCoordinatorRole(
     language: string
   ): Promise<void> {

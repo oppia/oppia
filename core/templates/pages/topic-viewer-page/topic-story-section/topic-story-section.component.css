@@ -1,7 +1,6 @@
 .topic-story-section {
   box-sizing: border-box;
-  margin: 0 auto;
-  max-width: 960px;
+  margin: 0;
   padding: 0;
   width: 100%;
 }
@@ -56,14 +55,12 @@
   transform: scaleY(-1);
   transform-origin: center;
 }
-
 .story-card {
   background: #fff;
   border-radius: 4px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
   margin-top: 16px;
-  max-width: 960px;
-  width: 100%;
+  max-width: 100%;
 }
 
 .story-card-header {
@@ -139,18 +136,8 @@
 }
 
 .story-card-body {
-  display: flex;
-  flex-direction: column;
-  min-height: 484px;
-  padding: 0 24px 24px;
-}
-
-.story-lesson-card-wrapper,
-.story-practice-card-wrapper {
-  align-self: center;
-  margin-top: auto;
-  max-width: 912px;
-  width: 100%;
+  min-height: 390px;
+  padding: 0;
 }
 
 @media (max-width: 768px) {
@@ -217,8 +204,7 @@
   }
 
   .story-card-body {
-    min-height: 300px;
-    padding: 0 12px 12px;
+    min-height: 260px;
   }
 }
 
@@ -302,17 +288,12 @@
     width: 100%;
   }
 
+  .study-skills-icon {
+    height: 22px;
+    width: 22px;
+  }
+
   .story-card-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 462px;
-  }
-
-  .story-lesson-card-wrapper {
-    margin-top: auto;
-  }
-
-  .story-practice-card-wrapper {
-    margin-top: auto;
+    min-height: 500px;
   }
 }

@@ -490,6 +490,8 @@ export class ProgressTabComponent {
 
   isLearnerStateEmpty(): boolean {
     return (
+      this.totalIncompleteLessonsList.length === 0 &&
+      this.totalCompletedLessonsList.length === 0 &&
       this.partiallyLearntTopicsList.length === 0 &&
       this.learntTopicsList.length === 0
     );
