@@ -117,8 +117,11 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     if (this.story) {
       this.storyContents = this.story.getStoryContents();
     }
-    if (this.storyContents && this.storyContents.getInitialNodeId()) {
-      this.setNodeToEdit(this.storyContents.getInitialNodeId() as string);
+    if (this.storyContents) {
+      const initialNodeId = this.storyContents.getInitialNodeId();
+      if (initialNodeId) {
+        this.setNodeToEdit(initialNodeId);
+      }
     }
     this._initEditor();
   }
@@ -196,7 +199,10 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
       this.nodes = [];
       if (this.storyContents && this.storyContents.getNodes().length > 0) {
         this.nodes = this.storyContents.getNodes();
-        this.initialNodeId = this.storyContents.getInitialNodeId() as string;
+        const initialNodeId = this.storyContents.getInitialNodeId();
+        if (initialNodeId !== null) {
+          this.initialNodeId = initialNodeId;
+        }
         this.linearNodesList = this.storyContents.getLinearNodesList();
         this.chapterIsPublishable = [];
         this.linearNodesList.forEach((node, index) => {
@@ -292,9 +298,12 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
         this._initEditor();
         // If the first node is added, open it just after creation.
         if (this.story.getStoryContents().getNodes().length === 1) {
-          this.setNodeToEdit(
-            this.story.getStoryContents().getInitialNodeId() as string
-          );
+          const initialNodeId = this.story
+            .getStoryContents()
+            .getInitialNodeId();
+          if (initialNodeId !== null) {
+            this.setNodeToEdit(initialNodeId);
+          }
         } else {
           let nodesArray = this.story.getStoryContents().getNodes();
           let nodesLength = nodesArray.length;

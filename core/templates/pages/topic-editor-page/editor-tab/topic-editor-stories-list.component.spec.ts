@@ -132,12 +132,75 @@ describe('topicEditorStoriesList', () => {
   it('should change list order properly', () => {
     spyOn(topicUpdateService, 'rearrangeCanonicalStory').and.stub();
 
-    component.storySummaries = [null, null, null] as unknown as StorySummary[];
-    component.topic = null as unknown as Topic;
-    component.drop({
+    component.storySummaries = [
+      StorySummary.createFromBackendDict({
+        id: 'id1',
+        title: '',
+        node_titles: [],
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+        description: '',
+        story_is_published: false,
+        completed_node_titles: [],
+        url_fragment: '',
+        all_node_dicts: [],
+      }),
+      StorySummary.createFromBackendDict({
+        id: 'id2',
+        title: '',
+        node_titles: [],
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+        description: '',
+        story_is_published: false,
+        completed_node_titles: [],
+        url_fragment: '',
+        all_node_dicts: [],
+      }),
+      StorySummary.createFromBackendDict({
+        id: 'id3',
+        title: '',
+        node_titles: [],
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+        description: '',
+        story_is_published: false,
+        completed_node_titles: [],
+        url_fragment: '',
+        all_node_dicts: [],
+      }),
+    ];
+    component.topic = new Topic(
+      '',
+      '',
+      '',
+      '',
+      '',
+      'en',
+      [],
+      [],
+      [],
+      1,
+      1,
+      [],
+      '',
+      '',
+      {},
+      false,
+      '',
+      '',
+      []
+    );
+    const dropEvent: CdkDragDrop<StorySummary[]> = {
       previousIndex: 1,
       currentIndex: 2,
-    } as CdkDragDrop<StorySummary[]>);
+      item: null!,
+      container: null!,
+      previousContainer: null!,
+      isPointerOverContainer: false,
+      distance: {x: 0, y: 0},
+    };
+    component.drop(dropEvent);
 
     expect(topicUpdateService.rearrangeCanonicalStory).toHaveBeenCalled();
   });

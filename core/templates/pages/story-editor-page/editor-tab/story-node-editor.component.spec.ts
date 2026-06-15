@@ -988,26 +988,61 @@ describe('Story node editor component', () => {
     component.nodeId = 'node1';
     component.storyNodeIds = ['node1', 'node_2', 'working', 'duty'];
     component.destinationNodeIds = ['node_2'];
-    component.story = {
-      getStoryContents: () => {
-        return {
-          getLinearNodesList: () => {
-            return [
-              {
-                getId: () => {
-                  return 'NodeID_1';
-                },
-              },
-              {
-                getId: () => {
-                  return 'NodeID_2';
-                },
-              },
-            ];
+    component.story = Story.createFromBackendDict({
+      id: 'story_id',
+      title: '',
+      description: '',
+      notes: '',
+      version: 1,
+      corresponding_topic_id: 'topic_id',
+      thumbnail_filename: '',
+      thumbnail_bg_color: '',
+      url_fragment: 'url',
+      meta_tag_content: 'meta',
+      story_contents: {
+        initial_node_id: '',
+        next_node_id: '',
+        nodes: [
+          {
+            id: 'NodeID_1',
+            title: '',
+            description: '',
+            prerequisite_skill_ids: [],
+            acquired_skill_ids: [],
+            destination_node_ids: [],
+            outline: '',
+            outline_is_finalized: false,
+            exploration_id: null,
+            thumbnail_bg_color: null,
+            thumbnail_filename: null,
+            status: 'Draft',
+            planned_publication_date_msecs: null,
+            last_modified_msecs: null,
+            first_publication_date_msecs: null,
+            unpublishing_reason: null,
           },
-        };
+          {
+            id: 'NodeID_2',
+            title: '',
+            description: '',
+            prerequisite_skill_ids: [],
+            acquired_skill_ids: [],
+            destination_node_ids: [],
+            outline: '',
+            outline_is_finalized: false,
+            exploration_id: null,
+            thumbnail_bg_color: null,
+            thumbnail_filename: null,
+            status: 'Draft',
+            planned_publication_date_msecs: null,
+            last_modified_msecs: null,
+            first_publication_date_msecs: null,
+            unpublishing_reason: null,
+          },
+        ],
       },
-    } as Story;
+      language_code: 'en',
+    });
 
     mockEventEmitterLast.emit();
     tick();
