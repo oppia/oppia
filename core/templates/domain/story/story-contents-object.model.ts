@@ -197,15 +197,20 @@ export class StoryContents {
   }
 
   moveNodeToArc(nodeId: string, toArcId: string): void {
+    // Remove the node from any arc that contains it, using setNodeIds to
+    // avoid mutating copies returned by getters and ensure a single source
+    // of truth for arc node lists.
     for (const arc of this._arcs) {
-      const idx = arc.getNodeIds().indexOf(nodeId);
-      if (idx !== -1) {
-        arc.getNodeIds().splice(idx, 1);
+      const nodeIds = arc.getNodeIds();
+      if (nodeIds.indexOf(nodeId) !== -1) {
+        arc.setNodeIds(nodeIds.filter(id => id !== nodeId));
       }
     }
-    const targetArc = this._arcs[this.getArcIndex(toArcId)];
+
+    const targetArcIndex = this.getArcIndex(toArcId);
+    const targetArc = this._arcs[targetArcIndex];
     if (targetArc) {
-      targetArc.getNodeIds().push(nodeId);
+      targetArc.setNodeIds([...targetArc.getNodeIds(), nodeId]);
     }
   }
 
