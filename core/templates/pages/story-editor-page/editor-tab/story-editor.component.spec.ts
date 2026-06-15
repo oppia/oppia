@@ -1180,7 +1180,7 @@ describe('Story Editor Component having three story nodes', () => {
     fetchSpy.and.returnValue(null);
 
     expect(() => {
-      (component as any)._init();
+      component._init();
     }).not.toThrowError();
   });
 
@@ -1188,7 +1188,7 @@ describe('Story Editor Component having three story nodes', () => {
     fetchSpy.and.returnValue(null);
 
     expect(() => {
-      (component as any)._initEditor();
+      component._initEditor();
     }).not.toThrowError();
   });
 
@@ -1273,6 +1273,7 @@ describe('Story Editor Component having three story nodes', () => {
       storyUpdateService,
       'deleteStoryNode'
     ).and.stub();
+    // eslint-disable-next-line dot-notation
     const infoMessageSpy = spyOn(component['alertsService'], 'addInfoMessage');
 
     component.deleteNode('node_1');
@@ -1333,7 +1334,7 @@ describe('Story Editor Component having three story nodes', () => {
     spyOn(storyEditorStateService, 'setChaptersAreBeingPublished');
     spyOn(storyEditorStateService, 'setNewChapterPublicationIsDisabled');
     component.story.getStoryContents().getNodes()[0].setStatus('Draft');
-    component['_initEditor']();
+    component._initEditor();
 
     component.updatePublishUptoChapterSelection(-1);
 
@@ -1364,8 +1365,8 @@ describe('Story Editor Component having three story nodes', () => {
     fetchSpy.and.returnValue(storyWithNoNodes);
 
     expect(() => {
-      component['_initEditor']();
-    }).not.toThrow();
+      component._initEditor();
+    }).not.toThrowError();
   });
 
   it('should handle _initEditor when first node is Ready To Publish', () => {
@@ -1376,7 +1377,7 @@ describe('Story Editor Component having three story nodes', () => {
     component.story.getStoryContents().getNodes()[1].setStatus('Draft');
     component.story.getStoryContents().getNodes()[2].setStatus('Draft');
 
-    component['_initEditor']();
+    component._initEditor();
 
     expect(component.chapterIsPublishable[0]).toBeTrue();
     expect(component.chapterIsPublishable[1]).toBeFalse();
@@ -1385,7 +1386,7 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should disable new chapter publication when first chapter is not publishable', () => {
     component.story.getStoryContents().getNodes()[0].setStatus('Draft');
-    component['_initEditor']();
+    component._initEditor();
     spyOn(storyEditorStateService, 'setNewChapterPublicationIsDisabled');
 
     component.updatePublishUptoChapterSelection(0);

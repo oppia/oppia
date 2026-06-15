@@ -38,7 +38,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Final, List, Optional
+from typing import Final, List, Optional, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1067,7 +1067,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     'arc_id': 'arc_3',
                     'title': 'Arc 3',
                     'description': '',
-                    'node_ids': [],
+                    'node_ids': cast(List[str], []),
                 }
             ),
             story_domain.StoryChange(
@@ -2251,7 +2251,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(story.language_code, 'bn')
 
-    def test_update_story_url_fragment(self) -> None:
+    def test_update_story_url_fragment_with_existing_story(self) -> None:
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.url_fragment, 'title')
 

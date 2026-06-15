@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf, feature_flag_list
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     classroom_config_services,
