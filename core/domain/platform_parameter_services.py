@@ -128,34 +128,31 @@ def _create_evaluation_context_for_server() -> (
 
     with open(PACKAGE_JSON_FILE_PATH, 'r', encoding='utf-8') as f:
         current_app_version = json.load(f)['version']
-        # We want to make sure that the branch is the release branch.
-        if (
-            not constants.BRANCH_NAME == ''
-            and 'release' in constants.BRANCH_NAME
-        ):
-            # We only need current app version so we can drop the 'release' part.
-            current_app_version = constants.BRANCH_NAME.split('release-')[1]
-            # We want to replace the '-' with the '.' for the version name.
-            # If the branch is the hotfix branch then we would require to further
-            # split it up and do the replacement for the version name. In the end,
-            # '3-3-1-hotfix-5' will be '3.3.1-hotfix-5' and '3-3-1' will be '3.3.1'.
-            if 'hotfix' in current_app_version:
-                split_via_hotfix = current_app_version.split('-hotfix')
-                current_app_version = (
-                    split_via_hotfix[0].replace('-', '.')
-                    + '-hotfix'
-                    + split_via_hotfix[1]
-                )
-            else:
-                current_app_version = current_app_version.replace('-', '.')
+    # We want to make sure that the branch is the release branch.
+    if not constants.BRANCH_NAME == '' and 'release' in constants.BRANCH_NAME:
+        # We only need current app version so we can drop the 'release' part.
+        current_app_version = constants.BRANCH_NAME.split('release-')[1]
+        # We want to replace the '-' with the '.' for the version name.
+        # If the branch is the hotfix branch then we would require to further
+        # split it up and do the replacement for the version name. In the end,
+        # '3-3-1-hotfix-5' will be '3.3.1-hotfix-5' and '3-3-1' will be '3.3.1'.
+        if 'hotfix' in current_app_version:
+            split_via_hotfix = current_app_version.split('-hotfix')
+            current_app_version = (
+                split_via_hotfix[0].replace('-', '.')
+                + '-hotfix'
+                + split_via_hotfix[1]
+            )
+        else:
+            current_app_version = current_app_version.replace('-', '.')
 
-        return platform_parameter_domain.EvaluationContext.from_dict(
-            {
-                'platform_type': 'Web',
-                'app_version': current_app_version,
-            },
-            {'server_mode': get_server_mode()},
-        )
+    return platform_parameter_domain.EvaluationContext.from_dict(
+        {
+            'platform_type': 'Web',
+            'app_version': current_app_version,
+        },
+        {'server_mode': get_server_mode()},
+    )
 
 
 def get_platform_parameter_value(
