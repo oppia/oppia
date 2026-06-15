@@ -925,7 +925,7 @@ describe('Story contents object factory', () => {
     expect(_sampleStoryContents._nodes[0]._explorationId).toBeNull();
   });
 
-  it('should remove node from existing arc when target arc is missing', () => {
+  it('should throw an error when target arc is missing in moveNodeToArc', () => {
     const backendDictWithArcs: StoryContentsBackendDict = {
       initial_node_id: 'node_1',
       nodes: [
@@ -961,8 +961,8 @@ describe('Story contents object factory', () => {
     const storyContents =
       StoryContents.createFromBackendDict(backendDictWithArcs);
 
-    storyContents.moveNodeToArc('node_1', 'missing_arc');
-
-    expect(storyContents.getArcs()[0].getNodeIds()).toEqual([]);
+    expect(() => {
+      storyContents.moveNodeToArc('node_1', 'missing_arc');
+    }).toThrowError('Arc with id missing_arc does not exist');
   });
 });

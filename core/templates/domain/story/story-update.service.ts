@@ -1189,18 +1189,15 @@ export class StoryUpdateService {
   deleteArc(story: Story, arcId: string): void {
     const arcIndex = story.getStoryContents().getArcIndex(arcId);
     const arc = story.getStoryContents().getArcs()[arcIndex];
+    const oldId = arc.getId();
+    const oldTitle = arc.getTitle();
+    const oldDescription = arc.getDescription();
+    const oldNodeIds = arc.getNodeIds().slice();
     this._applyChange(
       story,
       StoryDomainConstants.CMD_DELETE_ARC,
       {
         arc_id: arcId,
-        old_arc_data: {
-          id: arc.getId(),
-          title: arc.getTitle(),
-          description: arc.getDescription(),
-          node_ids: arc.getNodeIds().slice(),
-        },
-        old_arc_index: arcIndex,
       },
       (changeDict, story) => {
         // ---- Apply ----
@@ -1208,22 +1205,13 @@ export class StoryUpdateService {
       },
       (changeDict, story) => {
         // ---- Undo ----
-        const cd = changeDict as {
-          old_arc_data: {
-            id: string;
-            title: string;
-            description: string;
-            node_ids: string[];
-          };
-          old_arc_index: number;
-        };
         const restoredArc = ArcModel.createNew(
-          cd.old_arc_data.id,
-          cd.old_arc_data.title,
-          cd.old_arc_data.description,
-          cd.old_arc_data.node_ids
+          oldId,
+          oldTitle,
+          oldDescription,
+          oldNodeIds
         );
-        story.getStoryContents().insertArcAt(cd.old_arc_index, restoredArc);
+        story.getStoryContents().insertArcAt(arcIndex, restoredArc);
       }
     );
   }

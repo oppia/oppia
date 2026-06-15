@@ -1285,22 +1285,28 @@ describe('Story update service', () => {
     ]);
   });
 
-  it('should throw error when undoing a deleted arc', () => {
+  it('should restore a deleted arc on undo', () => {
     storyUpdateService.createArc(
       _sampleStory,
       'arc_1',
       'Arc 1',
       'Description 1',
-      []
+      ['node_1']
     );
     expect(_sampleStory.getStoryContents().getArcs().length).toBe(1);
 
     storyUpdateService.deleteArc(_sampleStory, 'arc_1');
     expect(_sampleStory.getStoryContents().getArcs().length).toBe(0);
 
-    expect(() => {
-      undoRedoService.undoChange(_sampleStory);
-    }).toThrowError('A deleted arc cannot be restored.');
+    undoRedoService.undoChange(_sampleStory);
+    expect(_sampleStory.getStoryContents().getArcs().length).toBe(1);
+    expect(_sampleStory.getStoryContents().getArcs()[0].getId()).toBe('arc_1');
+    expect(_sampleStory.getStoryContents().getArcs()[0].getTitle()).toBe(
+      'Arc 1'
+    );
+    expect(_sampleStory.getStoryContents().getArcs()[0].getDescription()).toBe(
+      'Description 1'
+    );
   });
 
   it('should create a proper backend change dict for deleting an arc', () => {

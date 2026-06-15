@@ -18,13 +18,12 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf, utils
+from core import feconf, feature_flag_list, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
     email_manager,
-    feature_flag_list,
     feature_flag_services,
     platform_parameter_list,
     platform_parameter_services,

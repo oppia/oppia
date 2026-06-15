@@ -62,6 +62,9 @@ class MockPlatformFeatureService {
     SerialChapterLaunchCurriculumAdminView: {
       isEnabled: false,
     },
+    StoryEditorArcs: {
+      isEnabled: false,
+    },
   };
 }
 

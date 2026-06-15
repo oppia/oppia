@@ -279,6 +279,7 @@ class StoryChange(change_domain.BaseChange):
         {
             'name': CMD_MOVE_NODE_TO_ARC,
             'required_attribute_names': ['node_id', 'to_arc_id'],
+            'optional_attribute_names': [],
             'user_id_attribute_names': [],
             'allowed_values': {},
             'deprecated_values': {},
