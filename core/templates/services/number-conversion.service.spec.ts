@@ -94,4 +94,19 @@ describe('NumberConversionService', () => {
       '-198,234'
     );
   });
+
+  it('should handle non-current locale decimal separators', () => {
+    // Test: English locale with European comma input
+    i18nLanguageCodeService.setI18nLanguageCode('en');
+    expect(numberConversionService.convertToEnglishDecimal('1,5')).toEqual(1.5);
+    expect(numberConversionService.convertToEnglishDecimal('3,14159')).toEqual(3.14159);
+    
+    // Test: French locale with English dot input
+    i18nLanguageCodeService.setI18nLanguageCode('fr');
+    expect(numberConversionService.convertToEnglishDecimal('1.5')).toEqual(1.5);
+    
+    // Test: Multiple separators (edge case)
+    i18nLanguageCodeService.setI18nLanguageCode('en');
+    expect(numberConversionService.convertToEnglishDecimal('1,234.56')).toEqual(1.23456);
+  });
 });

@@ -42,9 +42,29 @@ export class NumberConversionService {
   }
 
   convertToEnglishDecimal(number: string): null | number {
-    const decimalSeparator = this.currentDecimalSeparator();
+    const supportedLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES;
 
-    let numString = number.replace(`${decimalSeparator}`, '.');
+    // Get all unique decimal separators from supported languages
+    const allDecimalSeparators: string[] = [];
+    for (let language of supportedLanguages) {
+      if (language.decimal_separator && allDecimalSeparators.indexOf(language.decimal_separator) === -1) {
+        allDecimalSeparators.push(language.decimal_separator);
+      }
+    }
+
+    let numString = number;
+
+    // Replace all known non-English decimal separators with '.'
+    for (let separator of allDecimalSeparators) {
+      if (separator !== '.') {
+        // Use regex with global flag to replace all occurrences
+        numString = numString.replace(
+          new RegExp(separator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+          '.'
+        );
+      }
+    }
+
     let engNum = parseFloat(numString);
 
     // If the input cannot be parsed, output null.
