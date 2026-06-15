@@ -103,8 +103,9 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'story_is_published': True,
                 'completed_node_titles': completed_node_titles,
                 'all_node_dicts': [node.to_dict() for node in filtered_nodes],
-                'arcs': arcs,
             }
+            if arcs:
+                canonical_story_dict['arcs'] = arcs
             canonical_story_dicts.append(canonical_story_dict)
 
         additional_story_dicts = []
@@ -133,8 +134,9 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'story_is_published': True,
                 'completed_node_titles': completed_node_titles,
                 'all_node_dicts': [node.to_dict() for node in all_nodes],
-                'arcs': arcs,
             }
+            if arcs:
+                additional_story_dict['arcs'] = arcs
             additional_story_dicts.append(additional_story_dict)
 
         uncategorized_skill_ids = topic.get_all_uncategorized_skill_ids()

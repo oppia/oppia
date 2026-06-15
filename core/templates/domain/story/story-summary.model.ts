@@ -78,7 +78,16 @@ export class StorySummary {
   ) {}
 
   getArcs(): ArcBackendDict[] {
-    return this._arcs ? this._arcs.slice() : [];
+    if (!this._arcs) {
+      return [];
+    }
+    // Return deep copies of arc objects so callers cannot mutate internal state.
+    return this._arcs.map(a => ({
+      id: a.id,
+      title: a.title,
+      description: a.description,
+      node_ids: a.node_ids ? a.node_ids.slice() : [],
+    }));
   }
 
   getId(): string {
@@ -110,7 +119,7 @@ export class StorySummary {
   }
 
   getCompletedNodeTitles(): string[] {
-    return this._completedNodeTitles;
+    return this._completedNodeTitles.slice();
   }
 
   getTopicName(): string | undefined {

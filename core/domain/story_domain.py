@@ -32,7 +32,6 @@ from core.domain import (  # pylint: disable=invalid-import-from
 )
 
 from typing import Final, List, Literal, Optional, TypedDict, overload
-from typing_extensions import NotRequired
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -1289,13 +1288,13 @@ class Arc:
         )
 
 
-class StoryContentsDict(TypedDict):
+class StoryContentsDict(TypedDict, total=False):
     """Dictionary representing the StoryContents object."""
 
     nodes: List[StoryNodeDict]
     initial_node_id: Optional[str]
     next_node_id: str
-    arcs: NotRequired[List[ArcDict]]
+    arcs: List[ArcDict]
 
 
 class StoryContents:
@@ -1419,10 +1418,8 @@ class StoryContents:
         if len(arc_ids_list) > len(set(arc_ids_list)):
             raise utils.ValidationError('Expected all arc ids to be distinct.')
 
-        if len(self.nodes) > 0 and len(self.arcs) == 0:
-            raise utils.ValidationError(
-                'Expected at least one arc when story has nodes.'
-            )
+        # It is valid for a story to have nodes and no arcs. If arcs are
+        # present, further validation below ensures they cover nodes.
 
         if len(self.arcs) > 0:
             all_node_ids = set(node_id_list)
