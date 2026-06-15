@@ -82,7 +82,11 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
   versionNumbersToDisplay: number = 0;
   VERSIONS_PER_PAGE: number = 10;
   startingIndex: number = 1;
+  // Calculated as startingIndex + VERSIONS_PER_PAGE - 1 = 1 + 10 - 1 = 10,
+  // i.e. the last version displayed on the first page.
   endIndex: number = 10;
+  // Page-size options (from VERSIONS_PER_PAGE default of 10, plus 15 and 20)
+  // offered to users in the Material paginator's pageSizeOptions input.
   versionChoices: number[] = [10, 15, 20];
   explorationId: string = '';
   explorationAllSnapshotsUrl: string = '';
