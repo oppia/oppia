@@ -1,12 +1,12 @@
-.review-material {
+oppia-review-material-editor .review-material {
   padding-bottom: 36px;
   padding-top: 0.5em;
 }
 
-.editor-buttons {
+oppia-review-material-editor .editor-buttons {
   margin-top: 2px;
 }
 
-.oppia-editor-edit-icon {
+oppia-review-material-editor .oppia-editor-edit-icon {
   position: inherit;
 }

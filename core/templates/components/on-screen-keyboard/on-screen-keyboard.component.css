@@ -1,4 +1,4 @@
-.oppia-osk-container {
+oppia-on-screen-keyboard .oppia-osk-container {
   background: #fff;
   bottom: 0;
   left: 0;
@@ -8,29 +8,29 @@
   z-index: 10000;
 }
 
-.oppia-osk-container button {
+oppia-on-screen-keyboard .oppia-osk-container button {
   outline: none;
   padding: 11.2px 0;
 }
 
-.oppia-osk-container i {
+oppia-on-screen-keyboard .oppia-osk-container i {
   opacity: 60%;
 }
 
-.oppia-osk-navbar {
+oppia-on-screen-keyboard .oppia-osk-navbar {
   background-color: #fff;
   border-bottom: #d3d3d3 4px solid;
   border-top: #808080 3px solid;
   min-height: 56px;
 }
 
-.oppia-osk-main-tab {
+oppia-on-screen-keyboard .oppia-osk-main-tab {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(4, 5em);
 }
 
-.oppia-osk-custom-letters-div {
+oppia-on-screen-keyboard .oppia-osk-custom-letters-div {
   align-items: center;
   background-color: #ebffe4;
   border-bottom: #d3d3d3 4px solid;
@@ -38,36 +38,36 @@
   overflow-x: auto;
 }
 
-.oppia-osk-custom-letters-div button {
+oppia-on-screen-keyboard .oppia-osk-custom-letters-div button {
   flex: 0 0 auto;
 }
 
-.oppia-osk-letters-tab {
+oppia-on-screen-keyboard .oppia-osk-letters-tab {
   padding: 10px 0;
   text-align: center;
 }
 
-.oppia-osk-functions-tab {
+oppia-on-screen-keyboard .oppia-osk-functions-tab {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(4, 5em);
 }
 
-.oppia-osk-main-tab img,
-.oppia-osk-functions-tab img {
+oppia-on-screen-keyboard .oppia-osk-main-tab img,
+oppia-on-screen-keyboard .oppia-osk-functions-tab img {
   min-height: 64px;
   width: -webkit-fill-available;
 }
 
-.oppia-osk-custom-letters-div button:active,
-.oppia-osk-main-tab button:active,
-.oppia-osk-functions-tab button:active,
-.oppia-osk-container img:active {
+oppia-on-screen-keyboard .oppia-osk-custom-letters-div button:active,
+oppia-on-screen-keyboard .oppia-osk-main-tab button:active,
+oppia-on-screen-keyboard .oppia-osk-functions-tab button:active,
+oppia-on-screen-keyboard .oppia-osk-container img:active {
   background-color: #019b8b;
   border: none;
 }
 
-.oppia-osk-btn-tab-active {
+oppia-on-screen-keyboard .oppia-osk-btn-tab-active {
   background-color: transparent;
   border: none;
   border-bottom: 3px #015c53 solid;
@@ -77,7 +77,7 @@
   margin: 0 10px;
 }
 
-.oppia-osk-btn-tab-inactive {
+oppia-on-screen-keyboard .oppia-osk-btn-tab-inactive {
   background-color: transparent;
   border: none;
   color: #000;
@@ -86,7 +86,7 @@
   margin: 0 10px;
 }
 
-.oppia-osk-btn-hide {
+oppia-on-screen-keyboard .oppia-osk-btn-hide {
   background-color: transparent;
   border: none;
   color: #015c53;
@@ -97,11 +97,11 @@
   vertical-align: middle;
 }
 
-.oppia-osk-btn-hide i {
+oppia-on-screen-keyboard .oppia-osk-btn-hide i {
   margin: 3.2px;
 }
 
-.oppia-osk-btn-number {
+oppia-on-screen-keyboard .oppia-osk-btn-number {
   background-color: #fff;
   border: 1px #d3d3d3 solid;
   color: #000;
@@ -109,7 +109,7 @@
   font-size: 25px;
 }
 
-.oppia-osk-btn-operator {
+oppia-on-screen-keyboard .oppia-osk-btn-operator {
   align-items: center;
   background-color: #ffffcb;
   border: 1px #d3d3d3 solid;
@@ -118,7 +118,7 @@
   font-size: 25px;
 }
 
-.oppia-osk-btn-function {
+oppia-on-screen-keyboard .oppia-osk-btn-function {
   background-color: #fff;
   border: 1px #d3d3d3 solid;
   color: #000;
@@ -126,7 +126,7 @@
   font-size: 15px;
 }
 
-.oppia-osk-btn-shortcut {
+oppia-on-screen-keyboard .oppia-osk-btn-shortcut {
   background-color: #e4ffcb;
   border: 1px #d3d3d3 solid;
   color: #000;
@@ -134,7 +134,7 @@
   font-size: 25px;
 }
 
-.oppia-osk-btn-letter {
+oppia-on-screen-keyboard .oppia-osk-btn-letter {
   background-color: inherit;
   border: none;
   color: #000;
@@ -143,18 +143,18 @@
   width: 10%;
 }
 
-.number-9,
-.number-6,
-.number-3 {
+oppia-on-screen-keyboard .number-9,
+oppia-on-screen-keyboard .number-6,
+oppia-on-screen-keyboard .number-3 {
   border-right: 3px #808080 solid;
 }
 
-.number-3,
-.number-1 {
+oppia-on-screen-keyboard .number-3,
+oppia-on-screen-keyboard .number-1 {
   border-bottom: 3px #808080 solid;
 }
 
-.number-0 {
+oppia-on-screen-keyboard .number-0 {
   border-bottom: 3px #808080 solid;
   border-left: 3px #808080 solid;
   border-right: 3px #808080 solid;

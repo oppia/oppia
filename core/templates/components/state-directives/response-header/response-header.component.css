@@ -1,4 +1,4 @@
-.oppia-delete-response-button {
+oppia-response-header .oppia-delete-response-button {
   cursor: pointer;
   opacity: 0.5;
   position: absolute;
@@ -7,22 +7,22 @@
   width: 20px;
 }
 
-.oppia-delete-response-button:hover {
+oppia-response-header .oppia-delete-response-button:hover {
   opacity: 1;
 }
 
-.oppia-response-header-block {
+oppia-response-header .oppia-response-header-block {
   margin-left: 39px;
 }
 
 @media screen and (min-width: 769px) {
-  .oppia-response-header-block {
+  oppia-response-header .oppia-response-header-block {
     align-items: flex-end;
     display: flex;
   }
 }
 
-.oppia-nested-link {
+oppia-response-header .oppia-nested-link {
   color: #0844aa;
   cursor: pointer;
   display: inline-block;
@@ -32,55 +32,55 @@
   vertical-align: top;
   word-wrap: break-word;
 }
-.oppia-nested-link:hover {
+oppia-response-header .oppia-nested-link:hover {
   color: #3f2c76;
   text-decoration: underline;
 }
-.oppia-response-header {
+oppia-response-header .oppia-response-header {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 78%;
 }
-.oppia-response-tick-cross {
+oppia-response-header .oppia-response-tick-cross {
   margin-bottom: 7px;
 }
-.oppia-response-cross {
+oppia-response-header .oppia-response-cross {
   color: #c55f45;
 }
-.oppia-response-tick {
+oppia-response-header .oppia-response-tick {
   color: #00645c;
   font-size: 14px;
 }
-.oppia-response-summary {
+oppia-response-header .oppia-response-summary {
   display: flex;
   flex-flow: row;
 }
-.oppia-response-short-summary {
+oppia-response-header .oppia-response-short-summary {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.oppia-outcome-arrow {
+oppia-response-header .oppia-outcome-arrow {
   margin-right: 5px;
 }
-.badge {
+oppia-response-header .badge {
   vertical-align: bottom;
 }
 /* This is to break the line only when screen is too narrow to have both divs
    in same line.*/
 @media screen and (min-width: 370px) {
-  .break-in-mobile {
+  oppia-response-header .break-in-mobile {
     display: none;
   }
 }
-.oppia-responses-mobile {
+oppia-response-header .oppia-responses-mobile {
   display: none;
 }
 @media screen and (max-width: 768px) {
-  .oppia-responses-mobile {
+  oppia-response-header .oppia-responses-mobile {
     display: block;
   }
-  .oppia-response-mobile-item {
+  oppia-response-header .oppia-response-mobile-item {
     border-radius: 10px 0 0 0;
     bottom: 0;
     color: #fff;
@@ -90,13 +90,13 @@
     position: absolute;
     right: 0;
   }
-  .oppia-response-mobile-item-incorrect {
+  oppia-response-header .oppia-response-mobile-item-incorrect {
     background-color: #ffa500;
   }
-  .oppia-response-mobile-item-correct {
+  oppia-response-header .oppia-response-mobile-item-correct {
     background-color: #449d44;
   }
-  .oppia-response-container-desktop {
+  oppia-response-header .oppia-response-container-desktop {
     display: none;
   }
 }

@@ -1,4 +1,4 @@
-.classroom-new-chapter {
+lesson-card .classroom-new-chapter {
   align-items: center;
   background: #00609c;
   border-radius: 4px;
@@ -12,7 +12,7 @@
   top: 8px;
   width: 42px;
 }
-.classroom-new-chapter .classroom-status {
+lesson-card .classroom-new-chapter .classroom-status {
   color: #fff;
   font-family: 'Roboto', Arial, sans-serif;
   font-size: 13px;
@@ -20,7 +20,7 @@
   font-weight: 700;
   line-height: 100%;
 }
-.lesson-card-button {
+lesson-card .lesson-card-button {
   background-color: #fff;
   border: 1px solid #00645c;
   border-radius: 4px;
@@ -33,24 +33,24 @@
   width: 122px;
 }
 
-.lesson-card-button:hover {
+lesson-card .lesson-card-button:hover {
   background-color: #cadbda;
 }
 
-.lesson-card-button:focus {
+lesson-card .lesson-card-button:focus {
   background-color: #429488;
   border-color: #429488;
   color: #fff;
 }
 
-.lesson-card-button.upcoming {
+lesson-card .lesson-card-button.upcoming {
   background-color: #f5f5f5;
   border: 1px dashed #aaa;
   color: #888;
   pointer-events: auto;
 }
 
-.lesson-card-container {
+lesson-card .lesson-card-container {
   border-radius: 4px;
   box-shadow: 0 2px 2px 0 #00000040;
   height: 286px;
@@ -58,25 +58,25 @@
   width: 216px;
 }
 
-.lesson-card-info {
+lesson-card .lesson-card-info {
   border-radius: 0 0 0.25em 0.25em;
   height: 150px;
   padding: 8px;
 }
 
-.lesson-card-img {
+lesson-card .lesson-card-img {
   height: 136px;
   position: relative;
 }
 
-.lesson-card-tags {
+lesson-card .lesson-card-tags {
   left: 0;
   padding: 8px;
   position: absolute;
   top: 0;
 }
 
-.lesson-card-tags-container {
+lesson-card .lesson-card-tags-container {
   align-items: center;
   background-color: #fff9;
   border-radius: 4px;
@@ -86,18 +86,18 @@
   width: fit-content;
 }
 
-.lesson-card-tags-icon {
+lesson-card .lesson-card-tags-icon {
   color: #00645c;
   font-size: 16px;
 }
 
-.lesson-card-tags-text {
+lesson-card .lesson-card-tags-text {
   font-family: 'Roboto', Arial, sans-serif;
   font-size: 12px;
   font-weight: 500;
 }
 
-.lesson-card-title {
+lesson-card .lesson-card-title {
   color: #00645c;
   font-family: Capriola, Roboto, Arial, sans-serif;
   font-size: 15px;
@@ -105,16 +105,16 @@
   line-height: 20px;
 }
 
-.lesson-card-title-container {
+lesson-card .lesson-card-title-container {
   height: 50px;
 }
 
-.lesson-card-topic {
+lesson-card .lesson-card-topic {
   font-size: 12px;
   font-weight: 600;
 }
 
-.lesson-card-desc {
+lesson-card .lesson-card-desc {
   -webkit-box-orient: vertical;
   display: -webkit-box;
   font-size: 11px;

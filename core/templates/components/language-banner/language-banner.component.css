@@ -1,4 +1,4 @@
-.language-banner {
+language-banner .language-banner {
   align-items: center;
   background: #fdfbf1;
   border: 1px solid #000;
@@ -15,7 +15,7 @@
   z-index: 1000;
 }
 
-.banner-content-outer {
+language-banner .banner-content-outer {
   align-items: center;
   align-self: stretch;
   display: flex;
@@ -27,7 +27,7 @@
   width: 100%;
 }
 
-.banner-content-inner {
+language-banner .banner-content-inner {
   align-items: center;
   align-self: stretch;
   display: flex;
@@ -41,7 +41,7 @@
   width: 100%;
 }
 
-.banner-text {
+language-banner .banner-text {
   align-content: flex-start;
   align-items: center;
   display: flex;
@@ -52,13 +52,13 @@
   width: fit-content;
 }
 
-.icon {
+language-banner .icon {
   flex: none;
   height: 24px;
   width: 24px;
 }
 
-.banner-info {
+language-banner .banner-info {
   color: #000;
   flex: none;
   flex-wrap: wrap;
@@ -73,7 +73,7 @@
   word-wrap: break-word;
 }
 
-.banner-button {
+language-banner .banner-button {
   align-items: center;
   background: #00645c;
   border-radius: 4px;
@@ -85,7 +85,7 @@
   padding: 10px;
 }
 
-.button-text {
+language-banner .button-text {
   color: #fff;
   flex: none;
   font-family: 'Roboto', sans-serif;

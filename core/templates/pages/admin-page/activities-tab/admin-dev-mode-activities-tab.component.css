@@ -1,23 +1,23 @@
-.admin-dev-mode-activities-tab .oppia-admin-page-card .row {
+oppia-admin-dev-mode-activities-tab .admin-dev-mode-activities-tab .oppia-admin-page-card .row {
   margin-left: 0;
 }
-.admin-dev-mode-activities-tab .oppia-reload-collection-row,
-.oppia-reload-exploration-row {
+oppia-admin-dev-mode-activities-tab .admin-dev-mode-activities-tab .oppia-reload-collection-row,
+oppia-admin-dev-mode-activities-tab .oppia-reload-exploration-row {
   margin-bottom: 5px;
 }
-.admin-dev-mode-activities-tab .oppia-long-text-card {
+oppia-admin-dev-mode-activities-tab .admin-dev-mode-activities-tab .oppia-long-text-card {
   max-width: 700px;
 }
-.admin-dev-mode-activities-tab .oppia-form-inline {
+oppia-admin-dev-mode-activities-tab .admin-dev-mode-activities-tab .oppia-form-inline {
   margin-bottom: 5px;
 }
-.admin-dev-mode-activities-tab .oppia-publish-exploration-text {
+oppia-admin-dev-mode-activities-tab .admin-dev-mode-activities-tab .oppia-publish-exploration-text {
   font-size: smaller;
 }
-.admin-dev-mode-activities-tab .oppia-generate-exploration-text {
+oppia-admin-dev-mode-activities-tab .admin-dev-mode-activities-tab .oppia-generate-exploration-text {
   margin-top: 20px;
 }
-.admin-dev-mode-activities-tab .instruction {
+oppia-admin-dev-mode-activities-tab .admin-dev-mode-activities-tab .instruction {
   color: #555;
   font-size: smaller;
   font-style: italic;

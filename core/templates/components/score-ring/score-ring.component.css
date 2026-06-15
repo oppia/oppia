@@ -1,4 +1,4 @@
-.score-ring {
+oppia-score-ring .score-ring {
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 48px;
   font-style: normal;
@@ -8,13 +8,13 @@
   text-align: center;
 }
 
-.score-ring-circle {
+oppia-score-ring .score-ring-circle {
   transform: rotate(-90deg);
   transform-origin: 50% 50%;
   transition-property: stroke-dashoffset;
 }
 @media (max-width: 425px) {
-  .score-ring {
+  oppia-score-ring .score-ring {
     bottom: 20px;
     position: relative;
   }

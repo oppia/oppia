@@ -1,4 +1,4 @@
-.oppia-image-uploader-modal-container .oppia-image-uploader-modal-crop-area {
+oppia-image-uploader-modal .oppia-image-uploader-modal-container .oppia-image-uploader-modal-crop-area {
   background: #e4e4e4;
   height: 350px;
   margin-top: 20px;
@@ -7,21 +7,21 @@
   width: 500px;
 }
 
-.oppia-image-uploader-modal-container .oppia-image-uploader-modal-reset-button {
+oppia-image-uploader-modal .oppia-image-uploader-modal-container .oppia-image-uploader-modal-reset-button {
   position: absolute;
   right: -36px;
   top: 0;
 }
 
-.oppia-image-uploader-modal-container .oppia-image-uploader-container {
+oppia-image-uploader-modal .oppia-image-uploader-modal-container .oppia-image-uploader-container {
   min-height: 300px;
 }
 
-.oppia-image-uploader-modal-container .oppia-form-error-text {
+oppia-image-uploader-modal .oppia-image-uploader-modal-container .oppia-form-error-text {
   margin-top: 15px;
 }
 
-.oppia-unsupported-svg-tag-attribute-error {
+oppia-image-uploader-modal .oppia-unsupported-svg-tag-attribute-error {
   background-color: #fcf8e3;
   border-color: #faebcc;
   color: #8a6d3b;
@@ -29,7 +29,7 @@
   padding: 10px;
 }
 
-.oppia-thumbnail-container {
+oppia-image-uploader-modal .oppia-thumbnail-container {
   border-radius: 4px 4px 4px 4px;
   box-shadow: 0 4.5px 10px rgba(0, 0, 0, 0.25);
   height: 260px;
@@ -38,23 +38,23 @@
   position: relative;
 }
 
-.oppia-thumbnail-container img {
+oppia-image-uploader-modal .oppia-thumbnail-container img {
   border-radius: 4px 4px 0 0;
 }
 
-.oppia-thumbnail-reset-button {
+oppia-image-uploader-modal .oppia-thumbnail-reset-button {
   position: absolute;
   right: -50px;
   top: 0;
 }
 
-.oppia-thumbnail-confirm-button {
+oppia-image-uploader-modal .oppia-thumbnail-confirm-button {
   position: absolute;
   right: -50px;
   top: 40px;
 }
 
-.oppia-thumbnail-colour-select {
+oppia-image-uploader-modal .oppia-thumbnail-colour-select {
   display: grid;
   grid-gap: 5px;
   grid-template-columns: 25px 25px 25px 25px;
@@ -62,32 +62,32 @@
   margin-bottom: 7px;
 }
 
-.oppia-thumbnail-colour-select > * {
+oppia-image-uploader-modal .oppia-thumbnail-colour-select > * {
   border: 1px solid;
   border-radius: 10%;
 }
 
-.bg-color-text {
+oppia-image-uploader-modal .bg-color-text {
   align-items: center;
   display: flex;
   flex-direction: row;
   gap: 5px;
 }
 
-.oppia-thumbnail-colour-select > *:hover,
-.oppia-thumbnail-colour-select > *:focus {
+oppia-image-uploader-modal .oppia-thumbnail-colour-select > *:hover,
+oppia-image-uploader-modal .oppia-thumbnail-colour-select > *:focus {
   border: 2px solid;
   cursor: pointer;
 }
 
-.oppia-bg-color-container {
+oppia-image-uploader-modal .oppia-bg-color-container {
   border: 1px solid black;
   border-radius: 10%;
   height: 20px;
   width: 25px;
 }
 
-.oppia-thumbnail-preview-description {
+oppia-image-uploader-modal .oppia-thumbnail-preview-description {
   font-size: 16px;
   line-height: 1.2;
   overflow: hidden;
@@ -96,7 +96,7 @@
   white-space: nowrap;
 }
 
-.oppia-thumbnail-preview-footer {
+oppia-image-uploader-modal .oppia-thumbnail-preview-footer {
   bottom: 10px;
   font-size: 16px;
   font-style: italic;
@@ -105,7 +105,7 @@
   position: absolute;
 }
 
-.oppia-thumbnail-preview-title {
+oppia-image-uploader-modal .oppia-thumbnail-preview-title {
   font-size: 18px;
   font-weight: bold;
   overflow: hidden;
@@ -115,6 +115,6 @@
   white-space: nowrap;
 }
 
-.oppia-thumbnail-uploader-container {
+oppia-image-uploader-modal .oppia-thumbnail-uploader-container {
   min-height: 300px;
 }

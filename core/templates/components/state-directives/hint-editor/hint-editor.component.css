@@ -1,8 +1,8 @@
-.oppia-rule-preview {
+oppia-hint-editor .oppia-rule-preview {
   position: relative;
 }
 
-.oppia-click-to-start-editing {
+oppia-hint-editor .oppia-click-to-start-editing {
   position: absolute;
   right: 30px;
 }

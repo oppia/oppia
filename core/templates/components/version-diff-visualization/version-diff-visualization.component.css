@@ -1,4 +1,4 @@
-.version-diff-graph {
+oppia-version-diff-visualization .version-diff-graph {
   height: 100%;
   margin-bottom: 0;
   padding-bottom: 0;
@@ -6,22 +6,22 @@
   width: 100%;
 }
 
-.legend-graph .node rect {
+oppia-version-diff-visualization .legend-graph .node rect {
   pointer-events: none;
 }
 
-.legend-graph {
+oppia-version-diff-visualization .legend-graph {
   position: initial;
   right: -100px;
   top: 10px;
 }
 
-.exploration-graph-legend-heading {
+oppia-version-diff-visualization .exploration-graph-legend-heading {
   font-weight: normal;
   margin-top: 10px;
 }
 
-.diff-graph,
-.legend-graph {
+oppia-version-diff-visualization .diff-graph,
+oppia-version-diff-visualization .legend-graph {
   border: 1px solid #707070;
 }

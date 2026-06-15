@@ -1,11 +1,11 @@
-mat-card.oppia-autofocus:focus {
+oppia-questions-list mat-card.oppia-autofocus:focus {
   outline: #000;
   outline-width: 4px;
 }
-.oppia-editor-publish-button {
+oppia-questions-list .oppia-editor-publish-button {
   margin-top: 2%;
 }
-.question-data-container {
+oppia-questions-list .question-data-container {
   margin: 0;
   max-height: 68vh;
   min-height: 68vh;
@@ -13,84 +13,84 @@ mat-card.oppia-autofocus:focus {
   padding: 0;
   width: 60%;
 }
-.question-editor-container {
+oppia-questions-list .question-editor-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   margin: 60px auto 0;
   width: 70%;
 }
-.question-edit-cancel-button {
+oppia-questions-list .question-edit-cancel-button {
   margin-left: 8%;
 }
-.question-edit-save-button {
+oppia-questions-list .question-edit-save-button {
   margin-right: 8%;
   text-align: center;
   width: 90px;
 }
-.question-list-container,
-.save-question-container {
+oppia-questions-list .question-list-container,
+oppia-questions-list .save-question-container {
   padding: 0 20px 20px;
 }
-.create-question-container {
+oppia-questions-list .create-question-container {
   width: 35%;
 }
-.list-header {
+oppia-questions-list .list-header {
   border-bottom: 2px solid #000;
   display: flex;
   justify-content: space-between;
   margin: 25px 0;
 }
-.question-list-item {
+oppia-questions-list .question-list-item {
   border-bottom: 1px solid #e3e3e3;
   padding: 10px 12px;
 }
-.question-data {
+oppia-questions-list .question-data {
   cursor: pointer;
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
   justify-content: space-between;
 }
-.create-question-header {
+oppia-questions-list .create-question-header {
   border-bottom: none;
   margin: 0;
 }
-.question-text {
+oppia-questions-list .question-text {
   flex: 1;
   max-width: 90%;
 }
-.page-navigation-arrows {
+oppia-questions-list .page-navigation-arrows {
   float: right;
   margin-top: 5px;
 }
-.page-navigation-arrows > i {
+oppia-questions-list .page-navigation-arrows > i {
   cursor: pointer;
 }
-.add-question-btn {
+oppia-questions-list .add-question-btn {
   background-color: #008098;
   color: #fff;
   font-weight: bold;
   text-align: center;
 }
-.add-question-btn .btn.disabled,
-.btn:disabled {
+oppia-questions-list .add-question-btn .btn.disabled,
+oppia-questions-list .btn:disabled {
   cursor: not-allowed;
 }
-.question-editor-parent {
+oppia-questions-list .question-editor-parent {
   width: 60%;
 }
-.question-editor-open-container {
+oppia-questions-list .question-editor-open-container {
   margin-right: -29px;
   padding-bottom: 10px;
   position: sticky;
   top: 27%;
   width: 38%;
 }
-.checklist-item {
+oppia-questions-list .checklist-item {
   display: flex;
 }
-.checklist-item-number {
+oppia-questions-list .checklist-item-number {
   align-items: center;
   background-color: #fff;
   border: 1.5px solid #419889;
@@ -103,92 +103,92 @@ mat-card.oppia-autofocus:focus {
   text-align: center;
   width: 22px;
 }
-.checklist-item-number-active {
+oppia-questions-list .checklist-item-number-active {
   background-color: #419889;
   color: #fff;
 }
-.checklist-item-separator {
+oppia-questions-list .checklist-item-separator {
   background-color: #419889;
   height: 20px;
   margin: 2px 10px;
   width: 2px;
 }
-.difficulty-selection-container {
+oppia-questions-list .difficulty-selection-container {
   display: flex;
   flex-direction: column;
 }
-.new-question-header {
+oppia-questions-list .new-question-header {
   border-bottom: 2px solid #000;
   display: flex;
   justify-content: space-between;
   margin: 25px 0;
 }
-.question-skill-id {
+oppia-questions-list .question-skill-id {
   background-color: #efefef;
   margin-left: 0;
 }
-.question-skill-id:hover {
+oppia-questions-list .question-skill-id:hover {
   background-color: #e0e0e0;
 }
-.skill-description-card {
+oppia-questions-list .skill-description-card {
   padding-left: 10px;
   padding-top: 10px;
 }
-.checklist-item-text {
+oppia-questions-list .checklist-item-text {
   margin-left: 5px;
 }
-.btn-success[disabled] {
+oppia-questions-list .btn-success[disabled] {
   background-color: #008098;
 }
-.btn-success {
+oppia-questions-list .btn-success {
   color: #000;
 }
-.save-question-button-container {
+oppia-questions-list .save-question-button-container {
   border-top: 1px solid #000;
   display: flex;
   justify-content: space-between;
   margin-top: 15px;
   padding-top: 20px;
 }
-.oppia-cross-icon {
+oppia-questions-list .oppia-cross-icon {
   color: #f00;
 }
-.linked-skills-container {
+oppia-questions-list .linked-skills-container {
   margin-top: 40px;
 }
-.difficulty-card-header {
+oppia-questions-list .difficulty-card-header {
   display: flex;
   justify-content: space-between;
 }
-.difficulty-card-header i {
+oppia-questions-list .difficulty-card-header i {
   display: none;
 }
-.question-interaction-id {
+oppia-questions-list .question-interaction-id {
   color: #707070;
 }
-.list-group {
+oppia-questions-list .list-group {
   gap: 10px;
 }
-.oppia-question-editor-page-card {
+oppia-questions-list .oppia-question-editor-page-card {
   margin-bottom: 0;
   margin-top: 0;
 }
-.info-icon {
+oppia-questions-list .info-icon {
   cursor: help;
   height: 1em;
   width: 1em;
 }
-.single-option {
+oppia-questions-list .single-option {
   display: block;
   flex-direction: column;
 }
 
 @media screen and (max-width: 768px) {
-  .question-editor-container {
+  oppia-questions-list .question-editor-container {
     margin-top: 30px;
     width: 100%;
   }
-  .question-data-container {
+  oppia-questions-list .question-data-container {
     margin-left: 0;
     margin-right: 0;
     margin-top: 30px;
@@ -198,32 +198,32 @@ mat-card.oppia-autofocus:focus {
     padding-bottom: 90px;
     width: 100%;
   }
-  .create-question-container {
+  oppia-questions-list .create-question-container {
     width: 100%;
   }
-  .question-editor-parent {
+  oppia-questions-list .question-editor-parent {
     width: 100%;
   }
 
-  .create-question-header h3 {
+  oppia-questions-list .create-question-header h3 {
     margin: 0;
   }
-  .create-question-container mat-card {
+  oppia-questions-list .create-question-container mat-card {
     padding: 25px;
   }
-  .create-question-header {
+  oppia-questions-list .create-question-header {
     padding-bottom: 25px;
   }
-  .questions {
+  oppia-questions-list .questions {
     margin-bottom: 70px;
   }
-  .difficulty-card-header i {
+  oppia-questions-list .difficulty-card-header i {
     display: block;
   }
-  .difficulty-card-header h3 {
+  oppia-questions-list .difficulty-card-header h3 {
     margin: 0;
   }
-  .question-editor-open-container {
+  oppia-questions-list .question-editor-open-container {
     position: inherit;
   }
 }

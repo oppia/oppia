@@ -1,4 +1,4 @@
-.oppia-thumbnail-container {
+edit-thumbnail-modal .oppia-thumbnail-container {
   border-radius: 4px 4px 4px 4px;
   box-shadow: 0 4.5px 10px rgba(0, 0, 0, 0.25);
   height: 260px;
@@ -6,23 +6,23 @@
   max-width: 100%;
   position: relative;
 }
-.oppia-thumbnail-container img {
+edit-thumbnail-modal .oppia-thumbnail-container img {
   border-radius: 4px 4px 0 0;
 }
-.oppia-thumbnail-reset-button {
+edit-thumbnail-modal .oppia-thumbnail-reset-button {
   position: absolute;
   right: -50px;
   top: 0;
 }
-.oppia-thumbnail-uploader {
+edit-thumbnail-modal .oppia-thumbnail-uploader {
   word-break: break-word;
 }
-.oppia-thumbnail-confirm-button {
+edit-thumbnail-modal .oppia-thumbnail-confirm-button {
   position: absolute;
   right: -50px;
   top: 40px;
 }
-.oppia-thumbnail-colour-select {
+edit-thumbnail-modal .oppia-thumbnail-colour-select {
   display: grid;
   grid-gap: 5px;
   grid-template-columns: 25px 25px 25px 25px;
@@ -30,17 +30,17 @@
   margin-bottom: 7px;
 }
 
-.oppia-thumbnail-colour-select > * {
+edit-thumbnail-modal .oppia-thumbnail-colour-select > * {
   border: 1px solid;
   border-radius: 10%
 }
 
-.oppia-thumbnail-colour-select > *:hover,
-.oppia-thumbnail-colour-select > *:focus {
+edit-thumbnail-modal .oppia-thumbnail-colour-select > *:hover,
+edit-thumbnail-modal .oppia-thumbnail-colour-select > *:focus {
   border: 2px solid;
   cursor: pointer;
 }
-.oppia-thumbnail-preview-description {
+edit-thumbnail-modal .oppia-thumbnail-preview-description {
   font-size: 16px;
   line-height: 1.2;
   overflow: hidden;
@@ -48,7 +48,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.oppia-thumbnail-preview-footer {
+edit-thumbnail-modal .oppia-thumbnail-preview-footer {
   bottom: 10px;
   font-size: 16px;
   font-style: italic;
@@ -56,7 +56,7 @@
   padding: 0 16px 0 16px;
   position: absolute;
 }
-.oppia-thumbnail-preview-title {
+edit-thumbnail-modal .oppia-thumbnail-preview-title {
   font-size: 18px;
   font-weight: bold;
   overflow: hidden;
@@ -65,14 +65,14 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.oppia-thumbnail-uploader-container {
+edit-thumbnail-modal .oppia-thumbnail-uploader-container {
   min-height: 300px;
 }
-.oppia-form-error {
+edit-thumbnail-modal .oppia-form-error {
   margin-top: 15px;
   word-break: break-word;
 }
-.oppia-unsupported-svg-tag-attribute-error {
+edit-thumbnail-modal .oppia-unsupported-svg-tag-attribute-error {
   background-color: #fcf8e3;
   border-color: #faebcc;
   color: #8a6d3b;
