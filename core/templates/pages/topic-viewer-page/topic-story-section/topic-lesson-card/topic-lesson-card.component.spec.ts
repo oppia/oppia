@@ -151,11 +151,11 @@ describe('TopicLessonCardComponent', () => {
   });
 
   describe('checkpoint progress', () => {
-    function setInputs(
+    const setInputs = (
       status: 'not_started' | 'in_progress' | 'completed' | 'coming_soon',
       total: number,
       visited: number
-    ): void {
+    ): void => {
       component.lessonProgressStatus = status;
       component.totalCheckpointsCount = total;
       component.visitedCheckpointsCount = visited;
@@ -164,7 +164,7 @@ describe('TopicLessonCardComponent', () => {
         totalCheckpointsCount: new SimpleChange(undefined, total, false),
         visitedCheckpointsCount: new SimpleChange(undefined, visited, false),
       });
-    }
+    };
 
     it('should show correct statuses for not_started lesson', () => {
       setInputs('not_started', 5, 0);
