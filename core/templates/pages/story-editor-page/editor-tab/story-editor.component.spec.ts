@@ -1208,4 +1208,190 @@ describe('Story Editor Component having three story nodes', () => {
     expect(setInitialNodeIdSpy).toHaveBeenCalled();
     expect(rearrangeNodeSpy).toHaveBeenCalledWith(component.story, 0, 1);
   });
+
+  it('should not update initial node when rearranging from non-zero index', () => {
+    const setInitialNodeIdSpy = spyOn(
+      storyUpdateService,
+      'setInitialNodeId'
+    ).and.stub();
+    component.linearNodesList = story.getStoryContents().getNodes();
+
+    component.rearrangeNodeInList(1, 2);
+
+    expect(setInitialNodeIdSpy).not.toHaveBeenCalled();
+  });
+
+  it('should get sequence number for a node in an arc', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_2'])
+    );
+
+    expect(component.getArcSequenceNumber('node_2')).toBe(1);
+  });
+
+  it('should update arc description but not title in edit arc modal', fakeAsync(() => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc title', 'Original description', [
+        'node_2',
+      ])
+    );
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        arcTitle: '',
+        arcDescription: '',
+      },
+      result: Promise.resolve({
+        title: 'Arc title',
+        description: 'Updated description',
+      }),
+    } as NgbModalRef);
+    const updateArcPropertySpy = spyOn(storyUpdateService, 'updateArcProperty');
+
+    component.editArc('arc_1');
+    tick();
+
+    expect(updateArcPropertySpy).toHaveBeenCalledTimes(1);
+  }));
+
+  it('should return early from splitIntoArc when split index is first node in arc', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_1', 'node_2', 'node_3'])
+    );
+    component.linearNodesList = story.getStoryContents().getNodes();
+    const createArcSpy = spyOn(storyUpdateService, 'createArc');
+
+    component.splitIntoArc(0);
+
+    expect(createArcSpy).not.toHaveBeenCalled();
+  });
+
+  it('should handle modal dismiss when deleting a non-initial node', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.reject(),
+    } as NgbModalRef);
+    const storyUpdateSpy = spyOn(
+      storyUpdateService,
+      'deleteStoryNode'
+    ).and.stub();
+    const infoMessageSpy = spyOn(component['alertsService'], 'addInfoMessage');
+
+    component.deleteNode('node_1');
+    tick();
+
+    expect(storyUpdateSpy).not.toHaveBeenCalled();
+    expect(infoMessageSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should handle modal dismiss when creating a chapter', fakeAsync(() => {
+    class MockComponentInstance {
+      compoenentInstance!: {
+        nodeTitles: null;
+      };
+    }
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: MockComponentInstance,
+      result: Promise.reject(),
+    } as NgbModalRef);
+
+    component.createNode();
+    tick();
+  }));
+
+  it('should set chapters list shown when window is not narrow on init', () => {
+    (windowDimensionsService.isWindowNarrow as jasmine.Spy).and.returnValue(
+      false
+    );
+
+    component.ngOnInit();
+
+    expect(component.chaptersListIsShown).toBeTrue();
+  });
+
+  it('should not toggle chapters list when window is not narrow', () => {
+    (windowDimensionsService.isWindowNarrow as jasmine.Spy).and.returnValue(
+      false
+    );
+    component.chaptersListIsShown = true;
+
+    component.toggleChapterLists();
+
+    expect(component.chaptersListIsShown).toBeTrue();
+  });
+
+  it('should not toggle story editor card when window is not narrow', () => {
+    (windowDimensionsService.isWindowNarrow as jasmine.Spy).and.returnValue(
+      false
+    );
+    component.mainStoryCardIsShown = true;
+
+    component.toggleStoryEditorCard();
+
+    expect(component.mainStoryCardIsShown).toBeTrue();
+  });
+
+  it('should handle updatePublishUptoChapterSelection with first node not published', () => {
+    spyOn(storyEditorStateService, 'setChaptersAreBeingPublished');
+    spyOn(storyEditorStateService, 'setNewChapterPublicationIsDisabled');
+    component.story.getStoryContents().getNodes()[0].setStatus('Draft');
+    component['_initEditor']();
+
+    component.updatePublishUptoChapterSelection(-1);
+
+    expect(
+      storyEditorStateService.setChaptersAreBeingPublished
+    ).toHaveBeenCalledWith(true);
+    expect(
+      storyEditorStateService.setNewChapterPublicationIsDisabled
+    ).toHaveBeenCalledWith(true);
+  });
+
+  it('should handle _initEditor when storyContents has no nodes', () => {
+    const storyWithNoNodes = Story.createFromBackendDict({
+      id: 'sample_story_id',
+      title: 'Story title',
+      description: '',
+      notes: '',
+      version: 1,
+      corresponding_topic_id: 'topic_id',
+      url_fragment: 'story_title',
+      story_contents: {
+        initial_node_id: 'node_1',
+        nodes: [],
+        next_node_id: 'node_1',
+      },
+      language_code: 'en',
+    });
+    fetchSpy.and.returnValue(storyWithNoNodes);
+
+    expect(() => {
+      component['_initEditor']();
+    }).not.toThrow();
+  });
+
+  it('should handle _initEditor when first node is Ready To Publish', () => {
+    component.story
+      .getStoryContents()
+      .getNodes()[0]
+      .setStatus('Ready To Publish');
+    component.story.getStoryContents().getNodes()[1].setStatus('Draft');
+    component.story.getStoryContents().getNodes()[2].setStatus('Draft');
+
+    component['_initEditor']();
+
+    expect(component.chapterIsPublishable[0]).toBeTrue();
+    expect(component.chapterIsPublishable[1]).toBeFalse();
+    expect(component.chapterIsPublishable[2]).toBeFalse();
+  });
+
+  it('should disable new chapter publication when first chapter is not publishable', () => {
+    component.story.getStoryContents().getNodes()[0].setStatus('Draft');
+    component['_initEditor']();
+    spyOn(storyEditorStateService, 'setNewChapterPublicationIsDisabled');
+
+    component.updatePublishUptoChapterSelection(0);
+
+    expect(
+      storyEditorStateService.setNewChapterPublicationIsDisabled
+    ).toHaveBeenCalledWith(true);
+  });
 });
