@@ -40,7 +40,10 @@ import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {StoryNode} from 'domain/story/story-node.model';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
-import {ArcModel} from 'domain/story/story-contents-object.model';
+import {
+  ArcModel,
+  StoryContents,
+} from 'domain/story/story-contents-object.model';
 import {EditArcModalComponent} from '../modal-templates/edit-arc-modal.component';
 
 class MockNgbModalRef {
@@ -834,6 +837,18 @@ describe('Story Editor Component having three story nodes', () => {
     expect(modalSpy).not.toHaveBeenCalled();
   });
 
+  it('should return early from editArc when story contents are missing or arc index is invalid', () => {
+    const modalSpy = spyOn(ngbModal, 'open');
+
+    component.storyContents = null;
+    component.editArc('arc_1');
+    expect(modalSpy).not.toHaveBeenCalled();
+
+    component.storyContents = story.getStoryContents();
+    component.editArc('non_existent_arc');
+    expect(modalSpy).not.toHaveBeenCalled();
+  });
+
   it('should merge current arc into previous arc on removeArcBoundary', () => {
     component.storyContents.addArc(
       ArcModel.createNew('arc_1', 'Arc 1', '', ['node_1', 'node_2'])
@@ -1048,6 +1063,15 @@ describe('Story Editor Component having three story nodes', () => {
     component.linearNodesList = story.getStoryContents().getNodes();
     component.splitIntoArc(0);
     expect(createArcSpy).not.toHaveBeenCalled();
+
+    spyOn(component, 'getArcIdForNode').and.returnValue(null);
+    component.splitIntoArc(1);
+    expect(createArcSpy).not.toHaveBeenCalled();
+
+    (component.getArcIdForNode as jasmine.Spy).and.returnValue('arc_default');
+    spyOn(component.storyContents, 'getArcIndex').and.returnValue(-1);
+    component.splitIntoArc(1);
+    expect(createArcSpy).not.toHaveBeenCalled();
   });
 
   it('should return early from removeArcBoundary when conditions are not met', () => {
@@ -1058,6 +1082,52 @@ describe('Story Editor Component having three story nodes', () => {
 
     component.storyContents = null;
     component.removeArcBoundary('arc_1');
+    expect(deleteArcSpy).not.toHaveBeenCalled();
+
+    component.storyContents = story.getStoryContents();
+    spyOn(component.storyContents, 'getArcIndex').and.returnValue(-1);
+    component.removeArcBoundary('arc_1');
+    expect(deleteArcSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early when removing boundary from the only arc', () => {
+    component.storyContents = StoryContents.createFromBackendDict({
+      initial_node_id: 'node_1',
+      nodes: [
+        {
+          id: 'node_1',
+          title: 'Title 1',
+          description: 'Description 1',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename',
+          status: 'Published',
+          planned_publication_date_msecs: 10,
+          last_modified_msecs: 10,
+          first_publication_date_msecs: 20,
+          unpublishing_reason: null,
+        },
+      ],
+      next_node_id: 'node_2',
+      arcs: [
+        {
+          id: 'arc_only',
+          title: 'Only Arc',
+          description: '',
+          node_ids: ['node_1'],
+        },
+      ],
+    });
+    component.linearNodesList = component.storyContents.getLinearNodesList();
+    const deleteArcSpy = spyOn(storyUpdateService, 'deleteArc');
+
+    component.removeArcBoundary('arc_only');
+
     expect(deleteArcSpy).not.toHaveBeenCalled();
   });
 

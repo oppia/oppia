@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf, feature_flag_list, utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (

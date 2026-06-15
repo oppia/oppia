@@ -965,4 +965,46 @@ describe('Story contents object factory', () => {
       storyContents.moveNodeToArc('node_1', 'missing_arc');
     }).toThrowError('Arc with id missing_arc does not exist');
   });
+
+  it('should insert arc at the specified index', () => {
+    const backendDict: StoryContentsBackendDict = {
+      initial_node_id: 'node_1',
+      nodes: [
+        {
+          id: 'node_1',
+          title: 'Title 1',
+          description: 'Description 1',
+          prerequisite_skill_ids: [],
+          acquired_skill_ids: [],
+          destination_node_ids: [],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename',
+          status: 'Published',
+          planned_publication_date_msecs: 10,
+          last_modified_msecs: 10,
+          first_publication_date_msecs: 20,
+          unpublishing_reason: null,
+        },
+      ],
+      next_node_id: 'node_2',
+      arcs: [
+        {
+          id: 'arc_default',
+          title: 'Default Arc',
+          description: '',
+          node_ids: ['node_1'],
+        },
+      ],
+    };
+    const storyContents = StoryContents.createFromBackendDict(backendDict);
+    const newArc = ArcModel.createNew('arc_new', 'New Arc', '', []);
+    storyContents.insertArcAt(0, newArc);
+
+    expect(storyContents.getArcs().length).toBe(2);
+    expect(storyContents.getArcs()[0].getId()).toBe('arc_new');
+    expect(storyContents.getArcs()[1].getId()).toBe('arc_default');
+  });
 });
