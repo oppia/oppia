@@ -235,6 +235,12 @@ describe('Schema validators', () => {
         {controlValue: '0.', expectedResult: true},
         {controlValue: '', expectedResult: true},
         {controlValue: null, expectedResult: true},
+        // '1,5' is accepted as 1 due to incomplete conversion in NumberConversionService.
+        // The service only converts the active locale's separator, so ',' is left unchanged
+        // and parseFloat silently truncates to 1 instead of converting to 1.5.
+        // TODO(#26405): Handle non-locale separators in NumberConversionService.
+        {controlValue: '1,5', expectedResult: true},
+        {controlValue: '2,5', expectedResult: true},
         {controlValue: '3%%', expectedResult: false},
         {controlValue: '-', expectedResult: false},
         {controlValue: '.', expectedResult: false},
@@ -271,10 +277,11 @@ describe('Schema validators', () => {
         {controlValue: ',3', expectedResult: true},
         {controlValue: '-1,5', expectedResult: true},
         {controlValue: '2,5%', expectedResult: true},
-        // '1.5' is valid in French locale because convertToEnglishDecimal only
-        // replaces the locale separator (','), leaving '1.5' unchanged.
-        // parseFloat('1.5') then succeeds natively, this is not special casing,
-        // it's standard JS number parsing behaviour.
+        // '1.5' passes in French locale because convertToEnglishDecimal only replaces ','
+        // leaving '1.5' unchanged, and parseFloat natively understands '.'.
+        // This is the mirror of the English locale gap above but accidentally produces
+        // the correct result.
+        // TODO(#26405): Handle non-locale separators in NumberConversionService.
         {controlValue: '1.5', expectedResult: true},
         {controlValue: '1,5,5', expectedResult: false},
         {controlValue: 'abc', expectedResult: false},
