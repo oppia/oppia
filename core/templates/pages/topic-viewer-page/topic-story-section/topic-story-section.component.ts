@@ -111,8 +111,8 @@ export class TopicStorySectionComponent implements OnInit, OnChanges {
     ) {
       this.populateFromInputs();
     }
-    if (changes.storySummary) {
-      this.loadChapterProgress();
+    if (changes.storySummary && !changes.storySummary.firstChange) {
+      void this.loadChapterProgress();
     }
   }
 

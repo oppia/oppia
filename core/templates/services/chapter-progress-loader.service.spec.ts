@@ -108,6 +108,28 @@ describe('ChapterProgressLoaderService', () => {
       );
     });
 
+    it('should fallback to positional exploration id when backend id is missing', async () => {
+      userService.getUserInfoAsync.and.returnValue(
+        Promise.resolve({getUsername: () => 'test_user'})
+      );
+
+      const summaryWithoutExplorationId =
+        ChapterProgressSummary.createFromBackendDict({
+          total_checkpoints_count: 4,
+          visited_checkpoints_count: 1,
+          is_chapter_complete: false,
+        });
+
+      storyViewerBackendApiService.fetchProgressInStoriesChapters.and.returnValue(
+        Promise.resolve([summaryWithoutExplorationId])
+      );
+
+      await service.loadChapterProgressForStory('story1', ['exp1']);
+      expect(service.getChapterProgressSummary('exp1')).toEqual(
+        summaryWithoutExplorationId
+      );
+    });
+
     it('should handle missing username', async () => {
       userService.getUserInfoAsync.and.returnValue(
         Promise.resolve({getUsername: () => null})

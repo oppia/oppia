@@ -957,9 +957,14 @@ export class ExplorationEngineService {
     nextInteractionIfStuckHtml =
       nextInteractionIfStuckHtml + this.getRandomSuffix();
 
-    let contentId =
-      this.exploration.getState(this.nextStateIfStuckName).content.contentId ??
-      '';
+    let contentId = this.exploration.getState(this.nextStateIfStuckName).content
+      .contentId;
+    if (contentId === null) {
+      this.alertsService.addWarning(
+        'Content id for the next state if stuck is not defined.'
+      );
+      return null;
+    }
 
     return StateCard.createNewCard(
       this.nextStateIfStuckName,
@@ -1060,7 +1065,7 @@ export class ExplorationEngineService {
     let nodeToParentMap: Record<string, string | null> = {};
     visitedNodes[this.exploration.initStateName] = true;
     pathsQueue.push(this.exploration.initStateName);
-    // 1st state does not have a parent.
+    // First state does not have a parent.
     nodeToParentMap[this.exploration.initStateName] = null;
     while (pathsQueue.length > 0) {
       // '.shift()' here can return an undefined value, but we're already

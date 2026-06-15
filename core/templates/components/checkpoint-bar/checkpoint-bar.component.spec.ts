@@ -509,6 +509,16 @@ describe('CheckpointBarComponent', () => {
     expect(component.checkpointCount).toBe(1);
   });
 
+  it('should default progress width to 0 when input progressPercent is null', () => {
+    component.checkpointStatuses = ['completed', 'in-progress'];
+    component.progressPercent = null;
+
+    component.ngOnInit();
+
+    expect(component.progressBarWidth).toBe(0);
+    expect(component.checkpointCount).toBe(2);
+  });
+
   it('should handle case when displayed card index is negative', () => {
     component.checkpointIndexes = [0, 10, 20, 30];
     component.checkpointCount = 4;

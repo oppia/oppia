@@ -16,7 +16,13 @@
  * @fileoverview Lesson card component used in the redesigned topic viewer story section.
  */
 
-import {Component, Input, OnInit} from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
@@ -32,7 +38,7 @@ const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
   templateUrl: './topic-lesson-card.component.html',
   styleUrls: ['./topic-lesson-card.component.css'],
 })
-export class TopicLessonCardComponent implements OnInit {
+export class TopicLessonCardComponent implements OnInit, OnChanges {
   @Input() lessonTitle: string = '';
   @Input() lessonDescription: string = '';
   @Input() thumbnailUrl: string = '';
@@ -46,6 +52,7 @@ export class TopicLessonCardComponent implements OnInit {
   @Input() visitedCheckpointsCount: number = 0;
 
   resolvedThumbnailUrl: string = '';
+  _checkpointStatuses: string[] = [];
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -57,7 +64,21 @@ export class TopicLessonCardComponent implements OnInit {
       this.thumbnailUrl || this.getFallbackThumbnailUrl();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.lessonProgressStatus ||
+      changes.totalCheckpointsCount ||
+      changes.visitedCheckpointsCount
+    ) {
+      this._checkpointStatuses = this._computeCheckpointStatuses();
+    }
+  }
+
   get checkpointStatuses(): string[] {
+    return this._checkpointStatuses;
+  }
+
+  private _computeCheckpointStatuses(): string[] {
     if (
       this.lessonProgressStatus === 'coming_soon' ||
       this.totalCheckpointsCount === 0
