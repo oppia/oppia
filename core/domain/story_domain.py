@@ -279,7 +279,6 @@ class StoryChange(change_domain.BaseChange):
         {
             'name': CMD_MOVE_NODE_TO_ARC,
             'required_attribute_names': ['node_id', 'to_arc_id'],
-            'optional_attribute_names': ['old_position_index'],
             'user_id_attribute_names': [],
             'allowed_values': {},
             'deprecated_values': {},
@@ -411,7 +410,6 @@ class MoveNodeToArcCmd(StoryChange):
 
     node_id: str
     to_arc_id: str
-    old_position_index: int
 
 
 class UpdateArcPropertyCmd(StoryChange):
@@ -1559,9 +1557,19 @@ class StoryContents:
             arc_ids_order: list(str). The ordered list of arc IDs.
 
         Raises:
-            ValueError. If an arc ID is not found.
+            ValueError. If an arc ID is not found or the list is not a full
+                permutation of existing arc IDs.
         """
         old_arcs = {arc.id: arc for arc in self.arcs}
+        if (
+            len(arc_ids_order) != len(self.arcs)
+            or len(set(arc_ids_order)) != len(self.arcs)
+            or set(arc_ids_order) != set(old_arcs.keys())
+        ):
+            raise ValueError(
+                'Expected arc_ids_order to contain each existing arc '
+                'exactly once.'
+            )
         new_arcs = []
         for arc_id in arc_ids_order:
             if arc_id not in old_arcs:

@@ -173,6 +173,10 @@ export class StoryContents {
     this._arcs.push(arc);
   }
 
+  insertArcAt(index: number, arc: ArcModel): void {
+    this._arcs.splice(index, 0, arc);
+  }
+
   deleteArc(arcId: string): void {
     const index = this.getArcIndex(arcId);
     if (index === -1) {
@@ -182,21 +186,33 @@ export class StoryContents {
   }
 
   rearrangeArcs(arcIdsOrder: string[]): void {
+    if (arcIdsOrder.length !== this._arcs.length) {
+      throw new Error('Arc order must include each arc exactly once');
+    }
     const oldArcs: {[id: string]: ArcModel} = {};
     for (const arc of this._arcs) {
       oldArcs[arc.getId()] = arc;
     }
+    const seenArcIds = new Set<string>();
     const newArcs: ArcModel[] = [];
     for (const arcId of arcIdsOrder) {
-      if (!oldArcs.hasOwnProperty(arcId)) {
+      if (seenArcIds.has(arcId)) {
+        throw new Error('Duplicate arc id in arc order: ' + arcId);
+      }
+      if (!Object.prototype.hasOwnProperty.call(oldArcs, arcId)) {
         throw new Error('Arc with id ' + arcId + ' is not part of this story');
       }
+      seenArcIds.add(arcId);
       newArcs.push(oldArcs[arcId]);
     }
     this._arcs = newArcs;
   }
 
   moveNodeToArc(nodeId: string, toArcId: string): void {
+    const targetArcIndex = this.getArcIndex(toArcId);
+    if (targetArcIndex === -1) {
+      throw new Error('Arc with id ' + toArcId + ' does not exist');
+    }
     // Remove the node from any arc that contains it, using setNodeIds to
     // avoid mutating copies returned by getters and ensure a single source
     // of truth for arc node lists.
@@ -207,11 +223,10 @@ export class StoryContents {
       }
     }
 
-    const targetArcIndex = this.getArcIndex(toArcId);
-    const targetArc = this._arcs[targetArcIndex];
-    if (targetArc) {
-      targetArc.setNodeIds([nodeId, ...targetArc.getNodeIds()]);
-    }
+    this._arcs[targetArcIndex].setNodeIds([
+      nodeId,
+      ...this._arcs[targetArcIndex].getNodeIds(),
+    ]);
   }
 
   rearrangeNodeInStory(fromIndex: number, toIndex: number): void {

@@ -22,7 +22,7 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {EditArcModalComponent} from './edit-arc-modal.component';
 
 class MockActiveModal {
-  close(value?: unknown): void {
+  close(value?: {title: string; description: string}): void {
     return;
   }
 

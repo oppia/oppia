@@ -1490,6 +1490,7 @@ class AdminHandler(
                         arc_change_list,
                         'create default arc',
                     )
+                    story = story_fetchers.get_story_by_id(story_id)
                 target_arc_id = story.story_contents.arcs[0].id
             else:
                 target_arc_id = 'default_arc'

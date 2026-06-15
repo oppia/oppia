@@ -883,7 +883,7 @@ describe('Story Editor Component having three story nodes', () => {
   });
 
   it('should return null for arc helpers when story contents are missing', () => {
-    component.storyContents = null as unknown as typeof component.storyContents;
+    component.storyContents = null;
 
     expect(component.getArcForNode('node_1')).toBeNull();
     expect(component.getArcSequenceNumber('node_1')).toBeNull();
@@ -911,5 +911,174 @@ describe('Story Editor Component having three story nodes', () => {
     tick();
 
     expect(updateArcPropertySpy).not.toHaveBeenCalled();
+  }));
+
+  it('should check if story editor arcs feature flag is enabled', () => {
+    expect(component.isStoryEditorArcsFeatureFlagEnabled()).toBeFalse();
+
+    mockPlatformFeatureService.status.StoryEditorArcs = {
+      isEnabled: true,
+    };
+    expect(component.isStoryEditorArcsFeatureFlagEnabled()).toBeTrue();
+  });
+
+  it('should return true when story contents are missing or node index is zero for isSameArc', () => {
+    component.storyContents = null;
+
+    expect(component.isSameArc(0)).toBeTrue();
+
+    component.storyContents = story.getStoryContents();
+
+    expect(component.isSameArc(0)).toBeTrue();
+  });
+
+  it('should return true when previous and current nodes are in the same arc', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_1', 'node_2'])
+    );
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_2', 'Arc 2', '', ['node_3'])
+    );
+    component.linearNodesList = story.getStoryContents().getNodes();
+
+    expect(component.isSameArc(1)).toBeTrue();
+  });
+
+  it('should return false when previous and current nodes are in different arcs', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_1'])
+    );
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_2', 'Arc 2', '', ['node_2', 'node_3'])
+    );
+    component.linearNodesList = story.getStoryContents().getNodes();
+
+    expect(component.isSameArc(1)).toBeFalse();
+  });
+
+  it('should call StoryUpdate to update story description when changed', () => {
+    let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryDescription');
+
+    component.updateStoryDescription('New story description');
+
+    expect(storyUpdateSpy).toHaveBeenCalled();
+  });
+
+  it('should not call StoryUpdate when story description is unchanged', () => {
+    let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryDescription');
+
+    component.updateStoryDescription(component.story.getDescription());
+
+    expect(storyUpdateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not call setStoryTitle when the title is unchanged', () => {
+    let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryTitle');
+
+    component.updateStoryTitle(component.story.getTitle());
+
+    expect(storyUpdateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not call setThumbnailFilename when filename is unchanged', () => {
+    let storyUpdateSpy = spyOn(storyUpdateService, 'setThumbnailFilename');
+
+    component.updateStoryThumbnailFilename(
+      component.story.getThumbnailFilename()
+    );
+
+    expect(storyUpdateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not call setThumbnailBgColor when color is unchanged', () => {
+    let storyUpdateSpy = spyOn(storyUpdateService, 'setThumbnailBgColor');
+
+    component.updateStoryThumbnailBgColor(
+      component.story.getThumbnailBgColor()
+    );
+
+    expect(storyUpdateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not call setStoryMetaTagContent when content is unchanged', () => {
+    let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryMetaTagContent');
+
+    component.updateStoryMetaTagContent(component.story.getMetaTagContent());
+
+    expect(storyUpdateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not call setStoryNotes when notes are unchanged', () => {
+    let storyUpdateSpy = spyOn(storyUpdateService, 'setStoryNotes');
+
+    component.updateNotes(component.story.getNotes());
+
+    expect(storyUpdateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return null from getArcForNode when arc index is invalid', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_2'])
+    );
+    spyOn(component.storyContents, 'getArcIndex').and.returnValue(-1);
+
+    expect(component.getArcForNode('node_2')).toBeNull();
+  });
+
+  it('should return null from getArcSequenceNumber when arc index is invalid', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_2'])
+    );
+    spyOn(component.storyContents, 'getArcIndex').and.returnValue(-1);
+
+    expect(component.getArcSequenceNumber('node_2')).toBeNull();
+  });
+
+  it('should return early from splitIntoArc when conditions are not met', () => {
+    const createArcSpy = spyOn(storyUpdateService, 'createArc');
+
+    component.storyContents = null;
+    component.splitIntoArc(0);
+    expect(createArcSpy).not.toHaveBeenCalled();
+
+    component.storyContents = story.getStoryContents();
+    component.linearNodesList = story.getStoryContents().getNodes();
+    component.splitIntoArc(0);
+    expect(createArcSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from removeArcBoundary when conditions are not met', () => {
+    const deleteArcSpy = spyOn(storyUpdateService, 'deleteArc');
+
+    component.removeArcBoundary(null);
+    expect(deleteArcSpy).not.toHaveBeenCalled();
+
+    component.storyContents = null;
+    component.removeArcBoundary('arc_1');
+    expect(deleteArcSpy).not.toHaveBeenCalled();
+  });
+
+  it('should edit arc with only title change', fakeAsync(() => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Original Title', 'Original description', [
+        'node_2',
+      ])
+    );
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        arcTitle: '',
+        arcDescription: '',
+      },
+      result: Promise.resolve({
+        title: 'Updated Title',
+        description: 'Original description',
+      }),
+    } as NgbModalRef);
+    const updateArcPropertySpy = spyOn(storyUpdateService, 'updateArcProperty');
+
+    component.editArc('arc_1');
+    tick();
+
+    expect(updateArcPropertySpy).toHaveBeenCalledTimes(1);
   }));
 });

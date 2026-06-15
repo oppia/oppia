@@ -51,7 +51,7 @@ import {StoryDomainConstants} from 'domain/story/story-domain.constants';
 })
 export class StoryEditorComponent implements OnInit, OnDestroy {
   story: Story;
-  storyContents: StoryContents;
+  storyContents: StoryContents | null;
   disconnectedNodes: string[];
   linearNodesList: StoryNode[];
   nodes: StoryNode[];

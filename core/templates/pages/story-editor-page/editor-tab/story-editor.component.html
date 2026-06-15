@@ -215,12 +215,12 @@
                           </span>
                         </div>
                         <div class="arc-boundary-actions">
-                          <button class="btn btn-sm arc-edit-button"
+                          <button type="button" class="btn btn-sm arc-edit-button"
                                   (click)="editArc(getArcIdForNode(node.getId()));$event.stopPropagation()">
                             <i class="fa fa-pencil"></i>
                             Edit Arc
                           </button>
-                          <button class="btn btn-sm arc-remove-button"
+                          <button type="button" class="btn btn-sm arc-remove-button"
                                   (click)="removeArcBoundary(getArcIdForNode(node.getId()));$event.stopPropagation()">
                             <i class="fa fa-trash"></i>
                             Remove Arc Boundary
@@ -244,12 +244,12 @@
                           </span>
                         </div>
                         <div class="arc-boundary-actions">
-                          <button class="btn btn-sm arc-edit-button"
+                          <button type="button" class="btn btn-sm arc-edit-button"
                                   (click)="editArc(getArcIdForNode(node.getId()));$event.stopPropagation()">
                             <i class="fa fa-pencil"></i>
                             Edit Arc
                           </button>
-                          <button class="btn btn-sm arc-remove-button"
+                          <button type="button" class="btn btn-sm arc-remove-button"
                                   (click)="removeArcBoundary(getArcIdForNode(node.getId()));$event.stopPropagation()">
                             <i class="fa fa-trash"></i>
                             Remove Arc Boundary
@@ -262,7 +262,7 @@
                          class="legacy-split-line-row">
                       <div class="split-line-container">
                         <div class="split-line"></div>
-                        <button class="btn btn-sm split-into-arc-button"
+                        <button type="button" class="btn btn-sm split-into-arc-button"
                                 (click)="splitIntoArc(idx);$event.stopPropagation()">
                           <i class="fas fa-cut"></i>
                           Split Into Arc

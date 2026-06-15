@@ -24,6 +24,8 @@ from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
     email_manager,
+    feature_flag_list,
+    feature_flag_services,
     platform_parameter_list,
     platform_parameter_services,
     skill_services,
@@ -74,6 +76,10 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         # Here we use type Any because the dict values are of mixed types
         # (str, bool, list).
+        are_story_arcs_enabled = feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.STORY_EDITOR_ARCS.value,
+            None,
+        )
         canonical_story_dicts: List[Dict[str, Any]] = []
         for story_summary in canonical_story_summaries:
             all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
@@ -93,7 +99,6 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             )
             story_summary_dict = story_summary.to_human_readable_dict()
             story = story_fetchers.get_story_by_id(story_summary.id)
-            arcs = [arc.to_dict() for arc in story.story_contents.arcs]
             # Here we use type Any because the dict values are of mixed types
             # (str, bool, list).
             canonical_story_dict: Dict[str, Any] = {
@@ -108,8 +113,10 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'completed_node_titles': completed_node_titles,
                 'all_node_dicts': [node.to_dict() for node in filtered_nodes],
             }
-            if arcs:
-                canonical_story_dict['arcs'] = arcs
+            if are_story_arcs_enabled:
+                canonical_story_dict['arcs'] = [
+                    arc.to_dict() for arc in story.story_contents.arcs
+                ]
             canonical_story_dicts.append(canonical_story_dict)
 
         # Here we use type Any because the dict values are of mixed types
@@ -128,7 +135,6 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             )
             story_summary_dict = story_summary.to_human_readable_dict()
             story = story_fetchers.get_story_by_id(story_summary.id)
-            arcs = [arc.to_dict() for arc in story.story_contents.arcs]
             # Here we use type Any because the dict values are of mixed types
             # (str, bool, list).
             additional_story_dict: Dict[str, Any] = {
@@ -143,8 +149,10 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'completed_node_titles': completed_node_titles,
                 'all_node_dicts': [node.to_dict() for node in all_nodes],
             }
-            if arcs:
-                additional_story_dict['arcs'] = arcs
+            if are_story_arcs_enabled:
+                additional_story_dict['arcs'] = [
+                    arc.to_dict() for arc in story.story_contents.arcs
+                ]
             additional_story_dicts.append(additional_story_dict)
 
         uncategorized_skill_ids = topic.get_all_uncategorized_skill_ids()
