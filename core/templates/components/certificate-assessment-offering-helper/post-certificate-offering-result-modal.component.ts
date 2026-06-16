@@ -26,8 +26,6 @@ import './post-certificate-offering-result-modal.component.css';
 type CertificateOfferingResultAction = 'created' | 'updated';
 const CERTIFICATE_OFFERING_CREATED_ACTION: CertificateOfferingResultAction =
   'created';
-const CERTIFICATE_OFFERING_UPDATED_ACTION: CertificateOfferingResultAction =
-  'updated';
 
 @Component({
   selector: 'oppia-post-certificate-offering-result-modal',
