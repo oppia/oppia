@@ -53,10 +53,6 @@ core/templates/pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbn
 core/templates/pages/blog-dashboard-page/navbar/navbar-breadcrumb/blog-dashboard-navbar-breadcrumb.component.ts
 core/templates/pages/blog-dashboard-page/navbar/navbar-pre-logo-action/blog-post-editor-pre-logo-action.component.ts
 core/templates/pages/blog-home-page/blog-home-page.component.ts
-core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.ts
-core/templates/pages/exploration-editor-page/editor-tab/graph-directives/exploration-graph.component.ts
-core/templates/pages/exploration-editor-page/editor-tab/state-name-editor/state-name-editor.component.ts
-core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component.ts
 core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component.ts
 core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component.ts
 core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component.ts

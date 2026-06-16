@@ -202,7 +202,7 @@
             </th>
           </tr>
           <hr>
-          <tr *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction(exploration?.ratings)"
+          <tr *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction()"
               class="exploration-list-item">
             <td>
               <a [href]="getExplorationUrl(exploration.id)"
@@ -253,7 +253,7 @@
 
     <div *ngIf="myExplorationsView === 'card' && explorationsList?.length > 0"
          class="oppia-card-view-wrap">
-      <mat-card *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction(exploration?.ratings)"
+      <mat-card *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction()"
                 class="oppia-activity-summary-tile oppia-dashboard-card-view-item e2e-test-exploration-dashboard-card"
                 is-private="exploration.status === 'private'">
         <a [href]="'/create/' + exploration.id">
@@ -349,7 +349,7 @@
                              layoutAlignType="space-around center"
                              twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
                              shareType="exploration"
-                             smallFont="true"
+                              [smallFont]="true"
                              [explorationId]="exploration.id">
               </sharing-links>
             </div>
@@ -423,7 +423,7 @@
         <oppia-collection-summary-tile [getCollectionId]="collection.id"
                                        [getCollectionTitle]="collection.title"
                                        [getLastUpdatedMsec]="collection.lastUpdatedMsec"
-                                       [getNodeCount]="collection.nodeCount"
+                                       [getNodeCount]="collection.nodeCount.toString()"
                                        [getObjective]="collection.objective"
                                        [getThumbnailIconUrl]="collection.thumbnailIconUrl"
                                        [getThumbnailBgColor]="collection.thumbnailBgColor"

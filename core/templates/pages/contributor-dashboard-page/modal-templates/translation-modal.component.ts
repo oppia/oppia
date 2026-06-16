@@ -197,6 +197,9 @@ export class TranslationModalComponent {
   }
 
   wrapTextWithEllipsis(input: string, characterCount: number): string {
+    if (!input) {
+      return '';
+    }
     if (input.length <= characterCount || characterCount < 3) {
       return input;
     }

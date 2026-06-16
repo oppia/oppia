@@ -49,8 +49,8 @@ export class StateNameEditorComponent implements OnInit, OnDestroy {
     private focusManagerService: FocusManagerService,
     private normalizeWhitespacePipe: NormalizeWhitespacePipe,
     private routerService: RouterService,
-    private stateEditorService: StateEditorService,
-    private stateNameService: StateNameService
+    public stateEditorService: StateEditorService,
+    public stateNameService: StateNameService
   ) {}
 
   openStateNameEditor(): void {

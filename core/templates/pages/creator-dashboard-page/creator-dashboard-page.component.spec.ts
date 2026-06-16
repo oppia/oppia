@@ -464,6 +464,14 @@ describe('Creator Dashboard Page Component', () => {
       expect(component.returnZero()).toBe(0);
     });
 
+    it('should truncate text that exceeds the given length', () => {
+      expect(component.truncate('Hello World', 5)).toBe('Hello...');
+    });
+
+    it('should not truncate text that is within the given length', () => {
+      expect(component.truncate('Hello World', 20)).toBe('Hello World');
+    });
+
     it(
       'should not sort exploration list by options that is not last update' +
         ' when trying to sort by number of views',

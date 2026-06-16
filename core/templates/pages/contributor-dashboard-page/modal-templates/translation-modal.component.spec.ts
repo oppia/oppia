@@ -224,6 +224,10 @@ describe('Translation Modal Component', () => {
     );
   });
 
+  it('should wrap text with ellipsis when text is too long', () => {
+    expect(component.wrapTextWithEllipsis('Hello World', 6)).toBe('Hel...');
+  });
+
   it('should invoke change detection when html is updated', () => {
     component.activeWrittenTranslation = 'old';
     spyOn(changeDetectorRef, 'detectChanges').and.callThrough();
@@ -567,6 +571,21 @@ describe('Translation Modal Component', () => {
           type: 'unicode',
         },
       });
+    });
+
+    it('should return activeWrittenTranslation as string when it is a string', () => {
+      component.activeWrittenTranslation = 'test string';
+      expect(component.activeWrittenTranslationAsString).toBe('test string');
+    });
+
+    it('should return first element when activeWrittenTranslation is an array', () => {
+      component.activeWrittenTranslation = ['first', 'second'];
+      expect(component.activeWrittenTranslationAsString).toBe('first');
+    });
+
+    it('should return empty string when activeWrittenTranslation is an empty array', () => {
+      component.activeWrittenTranslation = [];
+      expect(component.activeWrittenTranslationAsString).toBe('');
     });
 
     it('should utilize the modify translations opportunity when available', () => {

@@ -25,6 +25,7 @@ import {TranslateModule} from '@ngx-translate/core';
 
 import {BackgroundBannerModule} from '../../components/common-layout-directives/common-elements/background-banner.module';
 import {BaseModule} from '../../base-components/base.module';
+import {SharedComponentsModule} from '../../components/shared-component.module';
 import {StringUtilityPipesModule} from '../../filters/string-utility-filters/string-utility-pipes.module';
 import {MaterialModule} from '../../modules/material.module';
 import {NgBootstrapModule} from '../../modules/ng-boostrap.module';
@@ -39,6 +40,7 @@ import {CreatorDashboardPageRootComponent} from './creator-dashboard-page-root.c
     FormsModule,
     BaseModule,
     BackgroundBannerModule,
+    SharedComponentsModule,
     StringUtilityPipesModule,
     MaterialModule,
     NgBootstrapModule,
