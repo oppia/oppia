@@ -2,45 +2,45 @@
   <div>
     <background-banner></background-banner>
   </div>
-  <div class="topic-preview-container">
-    <div class="topic-preview-nav">
-      <div class="topic-preview-navbar-tabs">
-        <div class="topic-preview-navbar-tab e2e-test-preview-subtab"
-             [ngClass]="{'topic-preview-nav-active e2e-test-active-tab': activeTab === 'story'}"
-             (click)="changePreviewTab('story')">
-          <div class="topic-preview-icon">
-            <img alt="" class="tab-icon"
-                 [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
-          </div>
-          <div class="topic-preview-text">
-            Learn
-          </div>
+  <div class="topic-preview-nav">
+    <div class="topic-preview-navbar-tabs">
+      <div class="topic-preview-navbar-tab e2e-test-preview-subtab"
+           [ngClass]="{'topic-preview-nav-active e2e-test-active-tab': activeTab === 'story'}"
+           (click)="changePreviewTab('story')">
+        <div class="topic-preview-icon">
+          <img alt="" class="tab-icon"
+               [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
         </div>
-        <div class="topic-preview-navbar-tab e2e-test-preview-subtab"
-             [ngClass]="{'topic-preview-nav-active e2e-test-active-tab': activeTab === 'practice'}"
-             (click)="changePreviewTab('practice')">
-          <div class="topic-preview-icon">
-            <img alt="" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
-          </div>
-          <div class="topic-preview-text">
-            Practice
-          </div>
+        <div class="topic-preview-text">
+          Learn
         </div>
-        <div class="topic-preview-navbar-tab e2e-test-preview-subtab"
-             [ngClass]="{'topic-preview-nav-active e2e-test-active-tab': activeTab === 'subtopic'}"
-             (click)="changePreviewTab('subtopic')">
-          <div class="topic-preview-icon">
-            <img alt="" class="tab-icon"
-                 [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
-          </div>
-          <div class="topic-preview-text">
-            Study
-          </div>
+      </div>
+      <div class="topic-preview-navbar-tab e2e-test-preview-subtab"
+           [ngClass]="{'topic-preview-nav-active e2e-test-active-tab': activeTab === 'practice'}"
+           (click)="changePreviewTab('practice')">
+        <div class="topic-preview-icon">
+          <img alt="" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
+        </div>
+        <div class="topic-preview-text">
+          Practice
+        </div>
+      </div>
+      <div class="topic-preview-navbar-tab e2e-test-preview-subtab"
+           [ngClass]="{'topic-preview-nav-active e2e-test-active-tab': activeTab === 'subtopic'}"
+           (click)="changePreviewTab('subtopic')">
+        <div class="topic-preview-icon">
+          <img alt="" class="tab-icon"
+               [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
+        </div>
+        <div class="topic-preview-text">
+          Study
         </div>
       </div>
     </div>
-    <div *ngIf="activeTab === 'story'">
-      <stories-list
+  </div>
+  <div class="topic-preview-container">
+    <div *ngIf="activeTab === 'story'" class="topic-preview-tab-content">
+      <stories-list class="topic-preview-mode"
                     [topicName]="topic.getName()"
                     [topicId]="topic.getId()"
                     [topicDescription]="topic.getDescription()"
@@ -50,16 +50,19 @@
                     [topicUrlFragment]="topicUrlFragment">
       </stories-list>
     </div>
-    <div *ngIf="activeTab === 'subtopic'">
-      <subtopics-list [classroomUrlFragment]="''"
+    <div *ngIf="activeTab === 'subtopic'" class="topic-preview-tab-content">
+      <subtopics-list class="topic-preview-mode"
+                      [classroomUrlFragment]="''"
                       [subtopicsList]="subtopics"
                       [topicId]="topic.getId()"
                       [topicName]="topicName"
                       [topicUrlFragment]="''">
       </subtopics-list>
     </div>
-    <div  *ngIf="activeTab === 'practice'">
-      <practice-tab *ngIf="isPracticeTabEnabled()" [subtopicsList]="subtopics"
+    <div *ngIf="activeTab === 'practice'" class="topic-preview-tab-content">
+      <practice-tab class="topic-preview-mode"
+                    *ngIf="isPracticeTabEnabled()"
+                    [subtopicsList]="subtopics"
                     [topicName]="topicName"
                     [topicUrlFragment]="topicUrlFragment"
                     [classroomUrlFragment]="classroomUrlFragment">
@@ -87,7 +90,11 @@
   .topic-preview-nav {
     background-color: #00645c;
     box-shadow: 0 2px 8px #000000cf;
-    margin-bottom: 12px;
+    margin: 0 auto;
+    position: relative;
+    top: 50px;
+    width: 50%;
+    z-index: 2;
   }
   .topic-preview-navbar-tabs {
     display: flex;
@@ -122,10 +129,22 @@
   .topic-preview-parent .topic-preview-container mat-card {
     box-shadow: none;
   }
+  .topic-preview-tab-content {
+    margin: 0;
+    padding: 0;
+  }
+  .topic-preview-tab-content > mat-card.oppia-page-card {
+    margin-bottom: 0;
+    margin-top: 0;
+    width: 100%;
+  }
   @media screen and (max-width: 1000px) {
     .topic-preview-container {
       width: 70%;
    }
+   .topic-preview-nav {
+      width: 70%;
+    }
   }
   @media screen and (max-width: 800px) {
     .topic-preview-container {
@@ -134,10 +153,16 @@
     .topic-preview-parent .background-banner-position {
       top: 30px;
     }
+    .topic-preview-nav {
+      width: 80%;
+    }
   }
   @media screen and (max-width: 650px) {
     .topic-preview-container {
       margin-top: 80px;
+      width: 100%;
+    }
+    .topic-preview-nav {
       width: 100%;
     }
   }

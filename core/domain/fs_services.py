@@ -45,6 +45,7 @@ ALLOWED_ENTITY_NAMES: List[str] = [
     feconf.ENTITY_TYPE_QUESTION,
     feconf.ENTITY_TYPE_USER,
     feconf.ENTITY_TYPE_CLASSROOM,
+    feconf.ENTITY_TYPE_FEEDBACK_SCREENSHOT,
 ]
 ALLOWED_SUGGESTION_IMAGE_CONTEXTS: List[str] = [
     feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
@@ -114,8 +115,25 @@ class GcsFileSystem(GeneralFileSystem):
     This implementation ignores versioning.
     """
 
-    def __init__(self, entity_name: str, entity_id: str) -> None:
-        self._bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+    def __init__(
+        self,
+        entity_name: str,
+        entity_id: str,
+        oppia_project_id: Optional[str] = None,
+    ) -> None:
+        """Constructs a GcsFileSystem object.
+
+        Args:
+            entity_name: str. The name of the entity
+                (eg: exploration, topic etc).
+            entity_id: str. The ID of the corresponding entity.
+            oppia_project_id: Optional[str]. The Google Cloud Project ID. Explicitly
+                required when running on Beam Dataflow, as workers cannot
+                retrieve the ID from environment variables.
+        """
+        self._bucket_name = app_identity_services.get_gcs_resource_bucket_name(
+            oppia_project_id
+        )
         super().__init__(entity_name, entity_id)
 
     def _get_gcs_file_url(self, filepath: str) -> str:

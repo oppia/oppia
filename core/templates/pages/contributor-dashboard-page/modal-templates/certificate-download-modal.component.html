@@ -4,16 +4,13 @@
       <div class="oppia-certificate-download-heading">
         Select the time range
       </div>
-      <button type="button"
-              class="btn-close oppia-close-button-position"
-              (click)="close()"
-              attr.aria-label="Close">
+      <button type="button" class="btn-close oppia-close-button-position" (click)="close()" attr.aria-label="Close">
       </button>
     </div>
   </div>
 </div>
 <div class="modal-body">
-  <div *ngIf="!certificateDownloading">
+  <div *ngIf="!isDownloading && !isPrinting">
     <div class="datepicker-container">
       <div class="date-label">From:</div>
       <input class="datepicker" type="date" [max]="maxSelectableDate" [(ngModel)]="fromDate" (change)="validateDate()">
@@ -26,54 +23,73 @@
       <span class="date-range-error">{{errorMessage}}</span>
     </div>
   </div>
-  <div *ngIf="certificateDownloading" class="loader"></div>
-  <div *ngIf="certificateDownloading" class="certficate-generation-await">
+  <div *ngIf="isDownloading || isPrinting" class="loader"></div>
+  <div *ngIf="isDownloading || isPrinting" class="certficate-generation-await">
     Generating certificate for time range {{fromDate}} to {{toDate}}. Please wait.
   </div>
 </div>
+
 <div class="oppia-certificate-download-modal-footer modal-footer">
   <button class="btn btn-secondary" (click)="close()">
     Cancel
   </button>
-  <button [disabled]="certificateDownloading || disableDownloadButton() || errorsFound"
-          class="btn btn-success"
-          (click)="downloadCertificate()">
-    <i [hidden]="!certificateDownloading" class="fa fa-spinner"></i>
+
+  <button class="btn btn-success oppia-print-button-margin" [disabled]="isDownloadDisabled"
+          (click)="printCertificate()">
+    <i [hidden]="!isPrinting" class="fa fa-spinner fa-spin"></i>
+    <span>Print</span>
+  </button>
+
+  <button class="btn btn-success" [disabled]="isDownloadDisabled" (click)="downloadCertificate()">
+    <i [hidden]="!isDownloading" class="fa fa-spinner"></i>
     <span>
       Download
     </span>
   </button>
 </div>
+
 <style>
   .certficate-generation-await {
     font-size: 20px;
     text-align: center;
   }
+
   .date-range-error {
     color: red;
   }
+
   .datepicker-container {
     margin: auto;
     margin-bottom: 10px;
     margin-top: 10px;
     width: 60%
   }
+
   .date-label {
     float: left;
     width: 25%;
   }
+
   .datepicker {
     width: 75%;
   }
+
   .oppia-certificate-download-modal-footer {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
   }
+
+  .oppia-print-button-margin {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
   .oppia-certificate-download-text-header-container .oppia-certificate-download-heading {
     display: block;
     font-size: 20px;
   }
+
   .oppia-certificate-download-text-header-container {
     border-bottom: 1px solid #e5e5e5;
     display: block;
@@ -82,22 +98,26 @@
     padding-left: 15px;
     width: 100%;
   }
+
   .oppia-certificate-download-text-header-container .oppia-certificate-download-details {
     display: flex;
     flex-direction: column;
     margin: 1.8% 0;
     width: 95%;
   }
+
   .oppia-certificate-download-text-header {
     display: flex;
     justify-content: space-between;
   }
+
   .oppia-close-button-position {
     font-size: 2.5rem;
     position: absolute;
     right: 20px;
     top: 12px;
   }
+
   .loader {
     animation: spinner 4s linear infinite;
     border: 10px solid #e0e0e0;
@@ -109,8 +129,13 @@
   }
 
   @keyframes spinner {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
   }
 
   @media screen and (max-width: 700px) {
@@ -131,6 +156,7 @@
       align-items: flex-end;
       flex-direction: column;
     }
+
     .oppia-certificate-download-modal-footer button {
       margin: 5px;
     }

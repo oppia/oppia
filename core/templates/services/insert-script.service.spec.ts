@@ -39,7 +39,6 @@ class MockRendererFactory {
 
 describe('InsertScriptService', () => {
   let insertScriptService: InsertScriptService;
-  let rendererFactory: RendererFactory2;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -48,10 +47,24 @@ describe('InsertScriptService', () => {
       ],
     });
     insertScriptService = TestBed.inject(InsertScriptService);
-    rendererFactory = TestBed.inject(RendererFactory2);
   });
 
-  it('should not reload script if already loaded', (done: jasmine.DoneFn) => {
+  it('should not reload script if already loaded', (done: DoneFn) => {
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    spyOn(document.body, 'appendChild').and.callFake(
+      (script: HTMLScriptElement) => {
+        setTimeout(() => {
+          script.onload?.(new Event('load'));
+        }, 10);
+      }
+    );
+
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
       const result = insertScriptService.loadScript(
         KNOWN_SCRIPTS.DONORBOX,
@@ -63,24 +76,36 @@ describe('InsertScriptService', () => {
     });
   });
 
-  it('should not create new script element if script is still loading', (done: jasmine.DoneFn) => {
-    spyOn(
-      rendererFactory.createRenderer(null, null),
-      'createElement'
-    ).and.callThrough();
+  it('should not create new script element if script is still loading', (done: DoneFn) => {
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    const appendChildSpy = spyOn(document.body, 'appendChild').and.callFake(
+      (script: HTMLScriptElement) => {
+        setTimeout(() => {
+          script.onload?.(new Event('load'));
+        }, 10);
+      }
+    );
 
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {
       expect(insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX)).toBe(
         false
       );
+      expect(appendChildSpy).toHaveBeenCalledTimes(1);
       done();
     });
 
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
     expect(result).toBe(true);
+    expect(appendChildSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('should handle script load error correctly', (done: jasmine.DoneFn) => {
+  it('should handle script load error correctly', (done: DoneFn) => {
     const mockScriptElement: Partial<HTMLScriptElement> = {
       onload: null,
       onerror: null,
@@ -93,7 +118,7 @@ describe('InsertScriptService', () => {
     spyOn(document.body, 'appendChild').and.callFake(
       (script: HTMLScriptElement) => {
         setTimeout(() => {
-          script.onerror(new ErrorEvent('error'));
+          script.onerror?.(new ErrorEvent('error'));
         }, 10);
       }
     );
@@ -119,11 +144,19 @@ describe('InsertScriptService', () => {
   });
 
   it('should return false for unknown scripts', () => {
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    spyOn(document.body, 'appendChild').and.callFake(() => {});
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.UNKNOWN);
     expect(result).toBe(false);
   });
 
-  it('should load MATHJAX script correctly', (done: jasmine.DoneFn) => {
+  it('should load MATHJAX script correctly', (done: DoneFn) => {
     const mockScriptElement: Partial<HTMLScriptElement> = {
       onload: null,
       onerror: null,
@@ -135,7 +168,7 @@ describe('InsertScriptService', () => {
     spyOn(document.body, 'appendChild').and.callFake(
       (script: HTMLScriptElement) => {
         setTimeout(() => {
-          script.onload();
+          script.onload?.(new Event('load'));
         }, 10);
       }
     );
@@ -150,7 +183,21 @@ describe('InsertScriptService', () => {
     expect(result).toBe(true);
   });
 
-  it('should insert script into html', (done: jasmine.DoneFn) => {
+  it('should insert script into html', (done: DoneFn) => {
+    const mockScriptElement: Partial<HTMLScriptElement> = {
+      onload: null,
+      onerror: null,
+      src: '',
+      setAttribute: () => {},
+    };
+    spyOn(document, 'createElement').and.returnValue(mockScriptElement);
+    spyOn(document.body, 'appendChild').and.callFake(
+      (script: HTMLScriptElement) => {
+        setTimeout(() => {
+          script.onload?.(new Event('load'));
+        }, 10);
+      }
+    );
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
     expect(result).toBe(true);
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {

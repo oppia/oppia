@@ -37,6 +37,7 @@ import {
   PlatformFeatureService,
 } from 'services/platform-feature.service';
 import {RequestInterceptor} from 'services/request-interceptor.service';
+import {SessionInfoHttpInterceptorService} from 'services/session-info-http-interceptor.service';
 import {CookieModule} from 'ngx-cookie';
 import {ToastrModule} from 'ngx-toastr';
 import {
@@ -84,8 +85,6 @@ export class MyHammerConfig extends HammerGestureConfig {
   };
 }
 
-import {SharedComponentsModule} from 'components/shared-component.module';
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -97,7 +96,6 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     AppRoutingModule,
     I18nModule,
     ToastrModule.forRoot(toastrConfig),
-    SharedComponentsModule,
   ],
   declarations: [OppiaRootComponent],
   entryComponents: [OppiaRootComponent],
@@ -106,6 +104,11 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: SessionInfoHttpInterceptorService,
       multi: true,
     },
     {

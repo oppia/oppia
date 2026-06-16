@@ -47,12 +47,14 @@ if MYPY:  # pragma: no cover
         auth_models,
         base_models,
         blog_models,
+        certificate_assessment_offering_models,
         collection_models,
         config_models,
     )
     from mypy_imports import exp_models as exploration_models
     from mypy_imports import (
         feedback_models,
+        general_feedback_models,
         improvements_models,
         learner_group_models,
         question_models,
@@ -69,10 +71,12 @@ if MYPY:  # pragma: no cover
     auth_models,
     base_models,
     blog_models,
+    certificate_assessment_offering_models,
     collection_models,
     config_models,
     exploration_models,
     feedback_models,
+    general_feedback_models,
     improvements_models,
     learner_group_models,
     question_models,
@@ -88,10 +92,12 @@ if MYPY:  # pragma: no cover
         models.Names.AUTH,
         models.Names.BASE_MODEL,
         models.Names.BLOG,
+        models.Names.CERTIFICATE_ASSESSMENT_OFFERING,
         models.Names.COLLECTION,
         models.Names.CONFIG,
         models.Names.EXPLORATION,
         models.Names.FEEDBACK,
+        models.Names.GENERAL_FEEDBACK,
         models.Names.IMPROVEMENTS,
         models.Names.LEARNER_GROUP,
         models.Names.QUESTION,
@@ -406,6 +412,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     ANDROID_DEVICE_MODEL: Final = 'Pixel 4a'
     ANDROID_SDK_VERSION: Final = 28
     ENTRY_POINT_NAVIGATION_DRAWER: Final = 'navigation_drawer'
+    WEB_FEEDBACK_CATEGORY: Final = 'platform'
+    WEB_FEEDBACK_PAGE_URL: Final = '/learn'
+    WEB_FEEDBACK_LANGUAGE_CODE: Final = 'en'
+    WEB_FEEDBACK_RATING: Final = 5
+    WEB_FEEDBACK_TARGET_TYPE: Final = 'general'
+    WEB_FEEDBACK_TARGET_ID: Final = 'learn_page'
+    WEB_FEEDBACK_STATUS: Final = 'open'
+    WEB_FEEDBACK_TEXT: Final = 'Web feedback export test.'
     TEXT_LANGUAGE_CODE_ENGLISH: Final = 'en'
     AUDIO_LANGUAGE_CODE_ENGLISH: Final = 'en'
     ANDROID_REPORT_INFO: Dict[
@@ -907,6 +921,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             topic_id=self.TOPIC_ID_1,
             language_code=self.SUGGESTION_LANGUAGE_CODE,
             opportunity_id=self.EXPLORATION_IDS[0],
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
         )
 
         suggestion_models.QuestionReviewerTotalContributionStatsModel.create(
@@ -1039,6 +1054,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         ).put()
 
         config_models.PlatformParameterSnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID,
+            committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE,
+            commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS,
+        ).put()
+        certificate_assessment_offering_models.CertificateAssessmentOfferingSnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID,
             committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE,
@@ -1314,6 +1336,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_platform_parameter_sm: Dict[str, Dict[str, Dict[str, str]]] = (
             {}
         )
+        expected_certificate_assessment_offering_sm: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
         expected_user_auth_details: Dict[str, str] = {}
         expected_user_email_preferences: Dict[str, str] = {}
         expected_blog_post_data: Dict[str, Union[str, float, List[str]]] = {}
@@ -1323,6 +1348,16 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_blog_author_details: Dict[str, Dict[str, str]] = {}
         expected_learner_group_model_data: Dict[str, str] = {}
         expected_learner_grp_user_model_data: Dict[str, str] = {}
+        # Here we use type Any because this dictionary contains other
+        # different types of dictionaries whose values can vary from int
+        # to complex Union types. So, to make this Dict generalized for
+        # every other Dict. We used Any here.
+        expected_web_feedback_thread_data: Dict[
+            str, Dict[str, Union[str, bool, int, float, None]]
+        ] = {}
+        expected_web_feedback_message_data: Dict[
+            str, Dict[str, Union[str, int, float, None]]
+        ] = {}
 
         # Here we use type Any because this dictionary contains other
         # different types of dictionaries whose values can vary from int
@@ -1381,8 +1416,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'exploration_rights_snapshot_metadata': expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
             'platform_parameter_snapshot_metadata': expected_platform_parameter_sm,
+            'certificate_assessment_offering_snapshot_metadata': (
+                expected_certificate_assessment_offering_sm
+            ),
             'user_auth_details': expected_user_auth_details,
             'user_email_preferences': expected_user_email_preferences,
+            'web_feedback_message': expected_web_feedback_message_data,
+            'web_feedback_thread': expected_web_feedback_thread_data,
         }
 
         # Perform export and compare.
@@ -1961,6 +2001,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'commit_message': self.COMMIT_MESSAGE,
             }
         }
+        expected_certificate_assessment_offering_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+            }
+        }
         expected_user_email_preferences: Dict[str, str] = {}
         expected_user_auth_details: Dict[str, str] = {}
         expected_app_feedback_report = {
@@ -2235,6 +2281,87 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'opportunity_id': self.EXPLORATION_IDS[0],
             }
         }
+        web_feedback_thread_id = (
+            general_feedback_models.WebFeedbackThreadModel.create(
+                category=self.WEB_FEEDBACK_CATEGORY,
+                page_url=self.WEB_FEEDBACK_PAGE_URL,
+                language_code=self.WEB_FEEDBACK_LANGUAGE_CODE,
+                rating=self.WEB_FEEDBACK_RATING,
+                target_type=self.WEB_FEEDBACK_TARGET_TYPE,
+                target_id=self.WEB_FEEDBACK_TARGET_ID,
+                has_screenshot=False,
+                has_session_info=False,
+                original_author_id=self.USER_ID_1,
+            )
+        )
+        general_feedback_models.WebFeedbackMessageModel.create(
+            thread_id=web_feedback_thread_id,
+            message_index=0,
+            author_status=general_feedback_models.AUTHOR_ROLE_LEARNER,
+            author_id=self.USER_ID_1,
+            text=self.WEB_FEEDBACK_TEXT,
+            screenshot_filename=None,
+            screenshot_entity_id=None,
+            updated_status=self.WEB_FEEDBACK_STATUS,
+        )
+        web_feedback_thread_model = (
+            general_feedback_models.WebFeedbackThreadModel.get_by_id(
+                web_feedback_thread_id
+            )
+        )
+        web_feedback_message_model = (
+            general_feedback_models.WebFeedbackMessageModel.get_by_id(
+                '%s.%d' % (web_feedback_thread_id, 0)
+            )
+        )
+        self.assertIsNotNone(web_feedback_thread_model)
+        self.assertIsNotNone(web_feedback_message_model)
+        if (
+            web_feedback_thread_model is None
+            or web_feedback_message_model is None
+        ):
+            raise AssertionError('Web feedback test models were not created.')
+        expected_web_feedback_thread_data: Dict[
+            str, Dict[str, Union[str, bool, int, float, None]]
+        ] = {
+            web_feedback_thread_model.id: {
+                'category': self.WEB_FEEDBACK_CATEGORY,
+                'target_type': self.WEB_FEEDBACK_TARGET_TYPE,
+                'page_url': self.WEB_FEEDBACK_PAGE_URL,
+                'language_code': self.WEB_FEEDBACK_LANGUAGE_CODE,
+                'rating': self.WEB_FEEDBACK_RATING,
+                'has_screenshot': False,
+                'has_session_info': False,
+                'session_info': None,
+                'status': self.WEB_FEEDBACK_STATUS,
+                'message_count': 0,
+                'created_on_msec': utils.get_time_in_millisecs(
+                    web_feedback_thread_model.created_on
+                ),
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    web_feedback_thread_model.last_updated
+                ),
+            }
+        }
+        expected_web_feedback_message_data: Dict[
+            str, Dict[str, Union[str, int, float, None]]
+        ] = {
+            web_feedback_message_model.id: {
+                'thread_id': web_feedback_thread_model.id,
+                'message_index': 0,
+                'author_status': general_feedback_models.AUTHOR_ROLE_LEARNER,
+                'text': self.WEB_FEEDBACK_TEXT,
+                'updated_status': self.WEB_FEEDBACK_STATUS,
+                'screenshot_filename': None,
+                'screenshot_entity_id': None,
+                'created_on_msec': utils.get_time_in_millisecs(
+                    web_feedback_message_model.created_on
+                ),
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    web_feedback_message_model.last_updated
+                ),
+            }
+        }
         expected_translation_coordinator_stats_data = {
             'coordinated_language_ids': ['es', 'hi']
         }
@@ -2287,12 +2414,17 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'exploration_rights_snapshot_metadata': expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
             'platform_parameter_snapshot_metadata': expected_platform_parameter_sm,
+            'certificate_assessment_offering_snapshot_metadata': (
+                expected_certificate_assessment_offering_sm
+            ),
             'user_email_preferences': expected_user_email_preferences,
             'user_auth_details': expected_user_auth_details,
             'app_feedback_report': expected_app_feedback_report,
             'blog_post': expected_blog_post_data,
             'blog_post_rights': expected_blog_post_rights,
             'blog_author_details': expected_blog_author_details,
+            'web_feedback_message': expected_web_feedback_message_data,
+            'web_feedback_thread': expected_web_feedback_thread_data,
         }
 
         with open(

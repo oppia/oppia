@@ -74,7 +74,6 @@
   "I18N_BLOG_HOME_PAGE_TITLE": "Blogu ya Oppia | Opia",
   "I18N_BLOG_HOME_PAGE_WELCOME_HEADING": "Karibu kwenye blogu ya Oppia",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_HEADING": "Inaonyesha matokeo ya utafutaji",
-  "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY": "Inaonyesha <[startingNumber]> - <[endingNumber]> ya jumla ya matokeo ya utafutaji.",
   "I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY": "Inaonyesha <[startingNumber]> - <[endingNumber]> ya <[totalNumber]> machapisho.",
   "I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT": "Ongeza picha ndogo ya Picha",
   "I18N_BLOG_POST_EDITOR_BODY_HEADING": "Mwili",

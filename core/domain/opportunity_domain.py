@@ -21,15 +21,12 @@ from __future__ import annotations
 from core import feconf, utils
 from core.constants import constants
 
-from typing import Dict, List, TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 
 class PartialExplorationOpportunitySummaryDict(TypedDict):
-    """A dictionary representing partial fields of
-    ExplorationOpportunitySummary object.
-
-    This dict has only required fields to represent
-    an opportunity to a contributor.
+    """A dictionary representing a PartialExplorationOpportunitySummary
+    object.
     """
 
     id: str
@@ -39,6 +36,7 @@ class PartialExplorationOpportunitySummaryDict(TypedDict):
     content_count: int
     translation_counts: Dict[str, int]
     translation_in_review_counts: Dict[str, int]
+    reviewer_only_content_count: int
     is_pinned: bool
 
 
@@ -64,6 +62,7 @@ class PinnedOpportunityDict(TypedDict):
     language_code: str
     topic_id: str
     opportunity_id: str
+    entity_type: str
 
 
 class SkillOpportunityDict(TypedDict):
@@ -93,6 +92,7 @@ class ExplorationOpportunitySummary:
         language_codes_needing_voice_artists: List[str],
         language_codes_with_assigned_voice_artists: List[str],
         translation_in_review_counts: Dict[str, int],
+        reviewer_only_content_count: int = 0,
         is_pinned: bool = False,
     ) -> None:
         """Constructs a ExplorationOpportunitySummary domain object.
@@ -118,6 +118,9 @@ class ExplorationOpportunitySummary:
             translation_in_review_counts: dict. A dict with language code as a
                 key and number of translation in review in that language as the
                 value.
+            reviewer_only_content_count: int. The number of content items that are
+                only translatable by reviewers (e.g. content with
+                'set_of_strings' data format).
             is_pinned: bool. Denotes whether the opportunity is pinned or not in
                 contributor dashboard.
         """
@@ -139,6 +142,7 @@ class ExplorationOpportunitySummary:
             language_codes_with_assigned_voice_artists
         )
         self.translation_in_review_counts = translation_in_review_counts
+        self.reviewer_only_content_count = reviewer_only_content_count
         self.is_pinned = is_pinned
         self.validate()
 
@@ -178,6 +182,9 @@ class ExplorationOpportunitySummary:
             exploration_opportunity_summary_dict[
                 'translation_in_review_counts'
             ],
+            exploration_opportunity_summary_dict.get(
+                'reviewer_only_content_count', 0
+            ),
         )
 
     def to_dict(self) -> PartialExplorationOpportunitySummaryDict:
@@ -200,6 +207,7 @@ class ExplorationOpportunitySummary:
             'content_count': self.content_count,
             'translation_counts': self.translation_counts,
             'translation_in_review_counts': self.translation_in_review_counts,
+            'reviewer_only_content_count': self.reviewer_only_content_count,
             'is_pinned': self.is_pinned,
         }
 
@@ -358,7 +366,11 @@ class PinnedOpportunity:
     """
 
     def __init__(
-        self, language_code: str, topic_id: str, opportunity_id: str
+        self,
+        language_code: str,
+        topic_id: str,
+        opportunity_id: str,
+        entity_type: str,
     ) -> None:
         """Constructs a PinnedOpportunity domain object.
 
@@ -368,10 +380,24 @@ class PinnedOpportunity:
             topic_id: str. The ID of the topic for which the
                 opportunity is pinned.
             opportunity_id: str. The ID of the pinned opportunity.
+            entity_type: str. The type of the entity.
         """
         self.language_code = language_code
         self.topic_id = topic_id
         self.opportunity_id = opportunity_id
+        self.entity_type = entity_type
+        self.validate()
+
+    def validate(self) -> None:
+        """Validates the properties of the PinnedOpportunity domain object.
+
+        Raises:
+            ValidationError. One or more attributes are invalid.
+        """
+        if self.entity_type not in feconf.TRANSLATABLE_ENTITY_TYPES:
+            raise utils.ValidationError(
+                'Invalid entity_type: %s' % self.entity_type
+            )
 
     @classmethod
     def from_dict(
@@ -392,6 +418,9 @@ class PinnedOpportunity:
             pinned_opportunity_dict['language_code'],
             pinned_opportunity_dict['topic_id'],
             pinned_opportunity_dict['opportunity_id'],
+            pinned_opportunity_dict.get(
+                'entity_type', feconf.ENTITY_TYPE_EXPLORATION
+            ),
         )
 
     def to_dict(self) -> PinnedOpportunityDict:
@@ -405,6 +434,7 @@ class PinnedOpportunity:
             'language_code': self.language_code,
             'topic_id': self.topic_id,
             'opportunity_id': self.opportunity_id,
+            'entity_type': self.entity_type,
         }
 
 
@@ -502,6 +532,54 @@ class TranslationOpportunity:
                     % (language_code, self.content_count, count)
                 )
 
+    def _update_language_completeness(self, language_code: str) -> None:
+        """Updates the completeness state of the given language code.
+
+        Args:
+            language_code: str. The language code to update.
+        """
+        count = self.translation_counts.get(language_code, 0)
+        if count < self.content_count:
+            if language_code not in self.incomplete_translation_language_codes:
+                self.incomplete_translation_language_codes.append(language_code)
+        else:
+            if language_code in self.incomplete_translation_language_codes:
+                self.incomplete_translation_language_codes.remove(language_code)
+
+    def update_translation_count(self, language_code: str, count: int) -> None:
+        """Updates the translation count of the given language.
+
+        Args:
+            language_code: str. The language code of the translation.
+            count: int. The new number of translations.
+        """
+        self.translation_counts[language_code] = count
+        self._update_language_completeness(language_code)
+        self.validate()
+
+    def update_content_count(self, content_count: int) -> None:
+        """Updates the content count of the opportunity.
+
+        Args:
+            content_count: int. The new content count.
+        """
+        self.content_count = content_count
+
+        # Re-check all languages to see if any are now incomplete or complete.
+        for lang_code in self.translation_counts:
+            self._update_language_completeness(lang_code)
+
+        self.validate()
+
+    def update_topic_ids(self, topic_ids: List[str]) -> None:
+        """Updates the topic IDs of the opportunity.
+
+        Args:
+            topic_ids: list(str). The new topic IDs.
+        """
+        self.topic_ids = topic_ids
+        self.validate()
+
     @classmethod
     def from_dict(
         cls, translation_opportunity_dict: TranslationOpportunityDict
@@ -558,6 +636,7 @@ class TranslationOpportunityCardInfoDict(TypedDict):
     entity_description: str
     is_pinned: bool
     currently_available_to_learners: bool
+    translation_in_review_counts: Dict[str, int]
 
 
 class TranslationOpportunityCardInfo(TranslationOpportunity):
@@ -575,6 +654,7 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
         entity_description: str,
         is_pinned: bool,
         currently_available_to_learners: bool,
+        translation_in_review_counts: Optional[Dict[str, int]] = None,
     ) -> None:
         """Constructs a TranslationOpportunityCardInfo domain object."""
         super().__init__(
@@ -597,6 +677,9 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
         self.entity_description = entity_description
         self.is_pinned = is_pinned
         self.currently_available_to_learners = currently_available_to_learners
+        self.translation_in_review_counts: Dict[str, int] = (
+            translation_in_review_counts if translation_in_review_counts else {}
+        )
 
     def to_dict(self) -> TranslationOpportunityCardInfoDict:
         """Returns a dict representation of the card info."""
@@ -615,4 +698,5 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
             'currently_available_to_learners': (
                 self.currently_available_to_learners
             ),
+            'translation_in_review_counts': self.translation_in_review_counts,
         }

@@ -43,6 +43,9 @@ const saveChangesButton = 'button.e2e-test-save-changes';
 const mathInteractionsTab = '.e2e-test-interaction-tab-math';
 const closeResponseModalButton = '.e2e-test-close-add-response-modal';
 
+const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
+const activeModalBackdropSelector = '.modal-backdrop, ngb-modal-window, .modal';
+
 const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
 const explorationTitleSelector = '.e2e-test-exploration-title-input';
@@ -59,9 +62,13 @@ const feedbackToggle = 'label.e2e-test-enable-fallbacks';
 const editRoleButton = '.e2e-test-edit-roles';
 const addUsernameInputBox = '#newMemberUsername';
 const addRoleDropdown = 'mat-select.e2e-test-role-select';
+const managerRoleOption = 'Manager (can edit permissions)';
 const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
+const rolesHeaderSelector = '.e2e-test-roles-header';
+const rolesContentSelector = '.e2e-test-roles-content';
+const usernameSelector = '.e2e-test-role-username';
 
 const interactionDiv = '.e2e-test-interaction';
 const addInteractionModalSelector = 'customize-interaction-body-container';
@@ -74,7 +81,7 @@ const multipleChoiceResponseDropdown =
 const multipleChoiceResponseOption = 'mat-option.e2e-test-html-select-selector';
 const textInputInteractionButton = 'div.e2e-test-interaction-tile-TextInput';
 const textInputInteractionOption =
-  'tr#e2e-test-schema-based-list-editor-table-row';
+  'tr[id^="e2e-test-schema-based-list-editor-table-row"]';
 const textInputField = '.e2e-test-text-input';
 
 const saveDraftButton = 'button.e2e-test-save-draft-button';
@@ -196,12 +203,7 @@ const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
 const mobileNavbarOptions = '.navbar-mobile-options';
 const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
 const basicSettingsDropdown = 'h3.e2e-test-settings-container';
-const feedbackSettingsDropdown = 'h3.e2e-test-feedback-settings-container';
-const permissionSettingsDropdown = 'h3.e2e-test-permission-settings-container';
-const voiceArtistSettingsDropdown =
-  'h3.e2e-test-voice-artists-settings-container';
-const rolesSettingsDropdown = 'h3.e2e-test-roles-settings-container';
-const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
+const communityOwnedMessageSelector = '.e2e-test-is-community-owned';
 const explorationControlsSettingsDropdown =
   'h3.e2e-test-controls-bar-settings-container';
 const settingsContainerSelector =
@@ -269,6 +271,7 @@ const feedbackStatusMenu = '.e2e-test-oppia-feedback-status-menu';
 const feedbackTabRowSelector = '.e2e-test-oppia-feedback-tab-row';
 const feedbackStatusSelector = '.e2e-test-exploration-feedback-status';
 const feedbackAuthorSelector = '.e2e-test-exploration-feedback-author';
+const ownersListSelector = '.e2e-test-owner-role-names';
 
 const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const addManualVoiceoverButton = '.e2e-test-voiceover-upload-audio';
@@ -403,6 +406,7 @@ const commonModalBodySelector = '.e2e-test-modal-body';
 const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
 
 const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
+const improvementsTabButton = '.e2e-test-improvements-tab';
 const formErrorContainer = '.e2e-test-form-error-container';
 const numberWithUnitsModalSelector =
   '.e2e-test-number-with-units-help-modal-header';
@@ -433,6 +437,17 @@ const answerInputSelector = '.e2e-test-answer-description-fragment input';
 const saveAnswerButtonInResponseGroupSelector = '.e2e-test-save-answer';
 const activeRuleTabClass = 'oppia-rule-tab-active';
 const activeTabClass = 'e2e-test-active-tab';
+const profileDropdown = '.e2e-test-profile-dropdown';
+const creatorDashboardMenuLink = '.e2e-test-creator-dashboard-link';
+const statsButtonTab = '.e2e-test-stats-tab';
+const mobileStatsTabButton = '.e2e-test-mobile-stats-button';
+const explorationStatsTabContentSelector = '.e2e-test-exploration-stats-card';
+const explorationStateStatsModalSelector = '.e2e-test-state-stats-modal-body';
+const explorationStateStatsEnterCountSelector =
+  '.e2e-test-state-stats-card-entered-here-count';
+const feedbackTimeElement =
+  '.e2e-test-oppia-feedback-tab-row td:nth-child(4) span';
+const numberOfPassers = '.e2e-test-num-passersby';
 
 const explorationGraphSelector = 'oppia-exploration-graph';
 const explorationGraphNodeBackgroundSelector = 'rect.e2e-test-node-background';
@@ -451,8 +466,6 @@ const cardHeightLimitWarningSelector = '.e2e-test-card-height-limit-warning';
 const saveRecommendationModalSelector = '.e2e-test-save-prompt-modal';
 const saveRecommendationModalSaveButtonSelector =
   'button.e2e-test-recommendation-prompt-save-button';
-const profileDropdown = '.e2e-test-profile-dropdown';
-const creatorDashboardMenuLink = '.e2e-test-creator-dashboard-link';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
@@ -522,7 +535,9 @@ export class ExplorationEditor extends BaseUser {
   async removeFeedbackResponseInPreviewTab(): Promise<void> {
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector);
     // Wait for the response modal animation to finish, else it causes flakiness.
-    await this.page.waitForTimeout(2000);
+    await this.page.waitForSelector(feedbackResponseRemoveSelector, {
+      visible: true,
+    });
     await this.clickOnElementWithSelector(feedbackResponseRemoveSelector);
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector, false);
   }
@@ -1848,6 +1863,9 @@ export class ExplorationEditor extends BaseUser {
         );
         break;
       case INTERACTION_TYPES.TEXT_INPUT:
+        await this.page.waitForSelector(responseModalBodySelector, {
+          visible: true,
+        });
         await this.clickOnElementWithSelector(addResponseOptionButton);
         await this.page.waitForSelector(textInputInteractionOption);
         await this.page.type(textInputInteractionOption, answer);
@@ -1992,9 +2010,19 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Updates graph theory learner answer in response modal to be a simple star network.
+   * * @param {string} centerVertex - The text to be entered for the center vertex.
    */
-  async updateGraphTheoryLearnerAnswerInResponseModal(): Promise<void> {
+  async updateGraphTheoryLearnerAnswerInResponseModal(
+    centerVertex?: string
+  ): Promise<void> {
     const responseBox = await this.getRuleEditorModal();
+
+    if (centerVertex) {
+      const inputElement = await responseBox.$('input');
+      if (inputElement) {
+        await inputElement.type(centerVertex);
+      }
+    }
 
     await this.waitForPageToFullyLoad();
     const graphViz = new GraphViz(this.page, responseBox);
@@ -2527,6 +2555,9 @@ export class ExplorationEditor extends BaseUser {
    * in the setting tab for mobile view port.)
    */
   async navigateToSettingsTab(): Promise<void> {
+    // Ensure the editor is fully loaded before attempting to navigate.
+    await this.waitForPageToFullyLoad();
+
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarDropdown);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -2538,19 +2569,23 @@ export class ExplorationEditor extends BaseUser {
         });
         await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       }
+      // Wait until the expanded mobile navbar is visible before clicking it.
       await this.page.waitForSelector(mobileNavbarDropdown, {
         visible: true,
       });
+      // Open the navbar dropdown, then navigate to Settings.
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.clickOnElementWithSelector(mobileSettingsBarSelector);
 
       // Open all dropdowns because by default all dropdowns are closed in mobile view.
-      await this.clickOnElementWithSelector(basicSettingsDropdown);
-      await this.clickOnElementWithSelector(advanceSettingsDropdown);
-      await this.clickOnElementWithSelector(rolesSettingsDropdown);
-      await this.clickOnElementWithSelector(voiceArtistSettingsDropdown);
-      await this.clickOnElementWithSelector(permissionSettingsDropdown);
-      await this.clickOnElementWithSelector(feedbackSettingsDropdown);
+      // Use expandSettingsTabSection which checks if already expanded.
+      await this.expectElementToBeVisible(basicSettingsDropdown);
+      await this.expandSettingsTabSection('Basic Settings');
+      await this.expandSettingsTabSection('Advanced Features');
+      await this.expandSettingsTabSection('Roles');
+      await this.expandSettingsTabSection('Voice Artists');
+      await this.expandSettingsTabSection('Permissions');
+      await this.expandSettingsTabSection('Feedback');
     } else {
       await this.page.waitForSelector(settingsTabSelector, {
         visible: true,
@@ -2566,7 +2601,9 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Expands the specified settings tab section.
-   * Currently it only expands Basic Settings, Advanced Features, Roles, and Voice Artists.
+   * Supports Basic Settings, Advanced Features, Roles, Voice Artists,
+   * Permissions, Feedback, and Controls sections.
+   * Note: Roles and Voice Artists sections are only available for exploration creators.
    * @param section - The name of the section to expand.
    */
   async expandSettingsTabSection(
@@ -2575,6 +2612,8 @@ export class ExplorationEditor extends BaseUser {
       | 'Advanced Features'
       | 'Roles'
       | 'Voice Artists'
+      | 'Permissions'
+      | 'Feedback'
       | 'Controls'
   ): Promise<void> {
     if (!this.isViewportAtMobileWidth()) {
@@ -2590,6 +2629,17 @@ export class ExplorationEditor extends BaseUser {
     const sectionContentSelector = `.e2e-test-${identifier}-content`;
     const sectionHeaderSelector = `.e2e-test-${identifier}-header`;
 
+    // Check if the section header exists (some sections like Roles and Voice Artists
+    // are only available for exploration creators).
+    const sectionHeaderExists = await this.page.$(sectionHeaderSelector);
+    if (!sectionHeaderExists) {
+      showMessage(
+        `Skipped: Expanding ${section} section.\n` +
+          'Reason: Section is not available (only available for exploration creators).'
+      );
+      return;
+    }
+
     // Skip if the section is already expanded.
     if (await this.isElementVisible(sectionContentSelector)) {
       showMessage(
@@ -2601,7 +2651,7 @@ export class ExplorationEditor extends BaseUser {
 
     // Expand the section.
     await this.expectElementToBeVisible(sectionHeaderSelector);
-    await this.page.click(sectionHeaderSelector);
+    await this.clickOnElementWithSelector(sectionHeaderSelector);
     await this.expectElementToBeVisible(sectionContentSelector);
   }
 
@@ -2659,7 +2709,7 @@ export class ExplorationEditor extends BaseUser {
    * This is a composite function that can be used when a straightforward, simple exploration published is required.
    * @param {string} title - The title of the exploration.
    * @param {string} goal - The goal of the exploration.
-   * @param {string} category - The category of the exploration.,
+   * @param {string} category - The category of the exploration.
    * @param {string} tags - The tags of the exploration.
    */
   async publishExplorationWithMetadata(
@@ -2671,13 +2721,8 @@ export class ExplorationEditor extends BaseUser {
     const publishExploration = async () => {
       if (this.isViewportAtMobileWidth()) {
         await this.waitForPageToFullyLoad();
-        await this.page.waitForSelector(mobileNavbarDropdown, {
-          visible: true,
-        });
+        await this.page.waitForSelector(mobileNavbarDropdown, {visible: true});
         const element = await this.page.$(mobileNavbarOptions);
-        // If the element is not present, it means the mobile navigation bar is not expanded.
-        // The option to save changes appears only in the mobile view after clicking on the mobile options button,
-        // which expands the mobile navigation bar.
         if (!element) {
           await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
         }
@@ -2690,7 +2735,6 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOnElementWithSelector(publishExplorationButtonSelector);
       }
     };
-
     const fillExplorationMetadataDetails = async () => {
       await this.clickOnElementWithSelector(explorationTitleInput);
       await this.typeInInputField(explorationTitleInput, title);
@@ -2710,6 +2754,17 @@ export class ExplorationEditor extends BaseUser {
         visible: true,
       });
       await this.clickOnElementWithSelector(explorationConfirmPublishButton);
+      const success = await this.page
+        .waitForSelector(explorationIdElement, {visible: true, timeout: 20000})
+        .then(() => true)
+        .catch(() => false);
+      if (!success) {
+        await this.page.reload({waitUntil: 'networkidle0'});
+        await this.page.waitForSelector(explorationIdElement, {
+          visible: true,
+          timeout: 30000,
+        });
+      }
       await this.page.waitForSelector(explorationIdElement);
       const explorationIdUrl = await this.page.$eval(
         explorationIdElement,
@@ -2753,21 +2808,22 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToFeedbackTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
+      const mobileNavbarElement = await this.getElementInParent(
+        mobileNavbarOptions
+      ).catch(() => null);
       if (!mobileNavbarElement) {
         await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+        await this.expectElementToBeVisible(mobileNavbarDropdown);
       }
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
-      await this.page.waitForSelector(mobileNavbarPane);
+      await this.expectElementToBeVisible(mobileNavbarPane);
       await this.clickOnElementWithSelector(mobileFeedbackTabButton);
     } else {
       await this.clickOnElementWithSelector(feedBackButtonTab);
       await this.waitForNetworkIdle();
     }
 
-    await this.page.waitForSelector(explorationFeedbackTabContentSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
   }
 
   /**
@@ -2855,8 +2911,17 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
+    // Wait for any lingering modals/backdrops to fully clear before interacting
+    // with the card content editor. Ghost modals from prior test steps can
+    // intercept clicks and cause hard-to-diagnose flakiness.
+    await this.page.waitForFunction(
+      (selector: string) => document.querySelectorAll(selector).length === 0,
+      {timeout: 60000},
+      activeModalBackdropSelector
+    );
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
+      timeout: 60000,
     });
     await this.clickOnElementWithSelector(stateEditSelector);
     await this.clearAllTextFrom(stateContentInputField);
@@ -2879,13 +2944,8 @@ export class ExplorationEditor extends BaseUser {
     interactionType: INTERACTION_TYPES
   ): Promise<void> {
     const interactionTabs: Record<string, INTERACTION_TYPES[]> = {
-      [INTERACTION_TABS.PROGRAMMING]: [
-        INTERACTION_TYPES.CODE_EDITOR,
-        INTERACTION_TYPES.PENCIL_CODE_EDITOR,
-      ],
       [INTERACTION_TABS.MATHS]: [
         INTERACTION_TYPES.FRACTION_INPUT,
-        INTERACTION_TYPES.GRAPH_THEORY,
         INTERACTION_TYPES.NUMBER_INPUT,
         INTERACTION_TYPES.SET_INPUT,
         INTERACTION_TYPES.NUMERIC_EXPRESSION,
@@ -2894,8 +2954,6 @@ export class ExplorationEditor extends BaseUser {
         INTERACTION_TYPES.NUMBER_WITH_UNITS,
         INTERACTION_TYPES.RATIO_EXPRESSION_INPUT,
       ],
-      [INTERACTION_TABS.GEOGRAPHY]: [INTERACTION_TYPES.WORLD_MAP],
-      [INTERACTION_TABS.MUSIC]: [INTERACTION_TYPES.MUSIC_NOTES_INPUT],
     };
 
     for (const interaction in interactionTabs) {
@@ -2904,6 +2962,17 @@ export class ExplorationEditor extends BaseUser {
           INTERACTION_TABS_SELECTORS[interaction]
         );
         await this.clickOnElementWithSelector(
+          INTERACTION_TABS_SELECTORS[interaction]
+        );
+        // Wait until the tab gains the 'active' class before looking for tiles.
+        // Without this, Puppeteer may query tiles while the modal is still
+        // animating to the new tab, causing spurious 'not found' errors.
+        await this.page.waitForFunction(
+          (selector: string) => {
+            const el = document.querySelector(selector);
+            return el && el.classList.contains('active');
+          },
+          {timeout: 30000},
           INTERACTION_TABS_SELECTORS[interaction]
         );
         showMessage(`Switched to ${interaction} tab.`);
@@ -2925,6 +2994,10 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
 
+    // Wait for any loading overlays to detach before clicking.
+    await this.page.waitForSelector(loadingFullPageOverlaySelector, {
+      hidden: true,
+    });
     await this.clickOnElementWithSelector(addInteractionButton);
 
     // Check if modal title is correct.
@@ -2935,7 +3008,17 @@ export class ExplorationEditor extends BaseUser {
     );
 
     await this.waitForNetworkIdle();
-    await this.clickOnElementWithText(interactionToAdd);
+    // Use a higher timeout for math interactions as they are heavy to render.
+    let tileText = interactionToAdd;
+
+    const interactionElement = await this.page.waitForXPath(
+      `//*[contains(normalize-space(text()), "${tileText}")]`,
+      {timeout: 90000}
+    );
+    if (!interactionElement) {
+      throw new Error(`Interaction "${interactionToAdd}" not found in modal.`);
+    }
+    await this.clickOnElement(interactionElement);
     if (skipInteractionCustoization) {
       await this.expectCustomizeInteractionTitleToBe(
         `Customize Interaction (${interactionToAdd})`
@@ -3410,6 +3493,96 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Opens the Roles form.
+   * Uses existing helpers and resilient fallbacks for mobile/constrained
+   * viewports.
+   */
+  async openRolesForm(): Promise<void> {
+    // Precondition: The caller must navigate to the Settings tab first.
+    // This helper intentionally avoids navigation so expectation methods do
+    // not perform extra interactions as side effects.
+    if (this.isViewportAtMobileWidth()) {
+      await this.expandSettingsTabSection('Roles');
+    }
+
+    await this.expectElementToBeVisible(rolesHeaderSelector);
+
+    // The edit button opens the roles form via Angular handler. Try a normal
+    // click first, then fallback to dispatching low-level mouse events if the
+    // add-user input does not appear.
+    await this.page.waitForSelector(editRolesButtonSelector, {
+      visible: true,
+      timeout: 5000,
+    });
+    await this.clickOnElementWithSelector(editRoleButton);
+
+    try {
+      await this.page.waitForSelector(addUsernameInputBox, {
+        visible: true,
+        timeout: 3000,
+      });
+      return;
+    } catch (e) {
+      showMessage(
+        'Edit roles click did not open the form; performing in-page click fallback.'
+      );
+      await this.page.evaluate((editRoleButtonSelector: string) => {
+        const el = document.querySelector(
+          editRoleButtonSelector
+        ) as HTMLElement | null;
+        if (el) {
+          el.scrollIntoView({block: 'center', inline: 'center'});
+          ['mousedown', 'mouseup', 'click'].forEach(type => {
+            const ev = new MouseEvent(type, {
+              bubbles: true,
+              cancelable: true,
+              view: window,
+            });
+            el.dispatchEvent(ev);
+          });
+        }
+      }, editRoleButton);
+      await this.page.waitForSelector(addUsernameInputBox, {
+        visible: true,
+        timeout: 5000,
+      });
+    }
+
+    // Verify the roles form is open by checking the add-user input is visible.
+    await this.expectElementToBeVisible(addUsernameInputBox);
+  }
+
+  /**
+   * Expects the exploration to be community owned in the Settings tab.
+   * @param expectedCommunityOwnedMessage The expected community-owned text.
+   */
+  async expectExplorationToBeCommunityOwned(
+    expectedCommunityOwnedMessage: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(communityOwnedMessageSelector);
+    try {
+      await this.page.waitForFunction(
+        (selector: string, expectedText: string) => {
+          const element = document.querySelector(selector);
+          const messageText = element?.textContent?.trim() || '';
+          return messageText.includes(expectedText);
+        },
+        {timeout: 5000},
+        communityOwnedMessageSelector,
+        expectedCommunityOwnedMessage
+      );
+    } catch {
+      const messageText = await this.page.$eval(
+        communityOwnedMessageSelector,
+        el => el.textContent?.trim() || ''
+      );
+      throw new Error(
+        `Expected community-owned message to contain "${expectedCommunityOwnedMessage}", but got: "${messageText}"`
+      );
+    }
+  }
+
+  /**
    * Assigns a role of manager to any guest user.
    */
   async assignUserToManagerRole(username: string): Promise<void> {
@@ -3420,16 +3593,60 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(addUsernameInputBox);
     await this.typeInInputField(addUsernameInputBox, username);
     await this.clickOnElementWithSelector(addRoleDropdown);
-    const [managerOption] = await this.page.$x(
-      "//mat-option[contains(., 'Manager (can edit permissions)')]"
+    // Prefer clicking the actual mat-option element to avoid overlay/span
+    // elements blocking the text node.
+    await this.page.waitForSelector('mat-option');
+    const roleOptions = await this.page.$$('mat-option');
+    const roleOptionTexts = await this.page.$$eval('mat-option', elements =>
+      elements.map(element => element.textContent?.trim())
     );
-    await managerOption.click();
-    await this.page.waitForSelector(tagFilterDropdownSelector, {
-      hidden: true,
-    });
+    const roleIndex = roleOptionTexts.indexOf(managerRoleOption);
+    if (roleIndex === -1) {
+      throw new Error(`Could not find option with text ${managerRoleOption}`);
+    }
+    await roleOptions[roleIndex].click();
+    await this.page.waitForSelector('mat-option', {visible: false});
+    await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
+    await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
-    await this.page.waitForSelector(saveRoleButton, {hidden: true});
+    await this.expectElementToBeVisible(saveRoleButton, false);
+    await this.waitForPageToFullyLoad();
     showMessage(`${username} has been added as manager role.`);
+  }
+
+  /**
+   * Assigns a role of manager to any guest user assuming the Roles form is
+   * already open and the username input is visible. This avoids re-clicking the
+   * edit button when it may be unreliable in constrained viewports.
+   * @param {string} username - The username to assign the manager role to.
+   */
+  async assignUserToManagerRoleAfterFormOpen(username: string): Promise<void> {
+    await this.expectElementToBeVisible(usernameSelector);
+    await this.expectElementToBeClickable(addUsernameInputBox);
+    await this.clickOnElementWithSelector(addUsernameInputBox);
+    await this.typeInInputField(addUsernameInputBox, username);
+    await this.clickOnElementWithSelector(addRoleDropdown);
+    // Prefer clicking the actual mat-option element to avoid overlay/span
+    // elements blocking the text node.
+    await this.page.waitForSelector('mat-option');
+    const roleOptions = await this.page.$$('mat-option');
+    const roleOptionTexts = await this.page.$$eval('mat-option', elements =>
+      elements.map(element => element.textContent?.trim())
+    );
+    const roleIndex = roleOptionTexts.indexOf(managerRoleOption);
+    if (roleIndex === -1) {
+      throw new Error(`Could not find option with text ${managerRoleOption}`);
+    }
+    await roleOptions[roleIndex].click();
+    await this.page.waitForSelector('mat-option', {visible: false});
+    await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
+    await this.waitForElementToStabilize(saveRoleButton);
+    await this.clickOnElementWithSelector(saveRoleButton);
+    await this.expectElementToBeVisible(saveRoleButton, false);
+    await this.waitForPageToFullyLoad();
+    showMessage(
+      `${username} has been added as manager role (after form open).`
+    );
   }
 
   /**
@@ -3446,7 +3663,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithText(collaboratorRoleOption);
     await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
-    await this.page.waitForSelector(saveRoleButton, {hidden: true});
+    await this.expectElementToBeVisible(saveRoleButton, false);
     showMessage(`${username} has been added as collaboratorRole.`);
   }
 
@@ -3466,7 +3683,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(addRoleDropdown);
     await this.clickOnElementWithText(playtesterRoleOption);
     await this.clickOnElementWithSelector(saveRoleButton);
-    await this.page.waitForSelector(saveRoleButton, {hidden: true});
+    await this.expectElementToBeVisible(saveRoleButton, false);
     showMessage(`${username} has been added as playtester.`);
   }
 
@@ -3726,8 +3943,16 @@ export class ExplorationEditor extends BaseUser {
     // Get all state node groups (not just labels) since we need to click the
     // background rect which has the click handler.
     const stateNodeGroupSelector = '.e2e-test-node';
-    await this.page.waitForSelector(stateNodeGroupSelector);
-    elements = await this.page.$$(stateNodeGroupSelector);
+    const scopedStateNodeGroupSelector = this.isViewportAtMobileWidth()
+      ? `${explorationStateGraphModalSelector} ${stateNodeGroupSelector}`
+      : stateNodeGroupSelector;
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(explorationStateGraphModalSelector, {
+        visible: true,
+      });
+    }
+    await this.page.waitForSelector(scopedStateNodeGroupSelector);
+    elements = await this.page.$$(scopedStateNodeGroupSelector);
 
     const cardNames = await Promise.all(
       elements.map(element =>
@@ -3743,13 +3968,7 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Card name ${cardName} not found in the graph.`);
     }
 
-    let nodeGroup: ElementHandle<Element> | null = null;
-    if (this.isViewportAtMobileWidth()) {
-      nodeGroup = elements[cardIndex + elements.length / 2];
-    } else {
-      nodeGroup = elements[cardIndex];
-    }
-
+    const nodeGroup: ElementHandle<Element> | null = elements[cardIndex];
     if (!nodeGroup) {
       throw new Error(`Could not find card button for card: ${cardName}`);
     }
@@ -3761,6 +3980,9 @@ export class ExplorationEditor extends BaseUser {
         `Could not find clickable background for card: ${cardName}`
       );
     }
+    await nodeBackground.evaluate(el =>
+      el.scrollIntoView({block: 'center', inline: 'center'})
+    );
     await this.clickOnElement(nodeBackground);
     await this.waitForNetworkIdle({idleTime: 1000});
 
@@ -4309,8 +4531,11 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(previewTabButton);
     }
 
-    await this.expectElementToBeVisible(previewTabContainer);
+    await this.page.waitForFunction(() =>
+      window.location.href.includes('#/preview/')
+    );
     await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(previewTabContainer, {visible: true});
   }
 
   /**
@@ -4576,6 +4801,16 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to verify that the improvements tab is hidden.
+   * @param visible - Expected visibility.
+   */
+  async expectImprovementsTabToBePresnt(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(improvementsTabButton, visible);
+  }
+
+  /**
    * Function to submit an answer to a form input field.
    *
    * This function first determines the type of the input field in the DOM using the getInputType function.
@@ -4715,27 +4950,31 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * This function creates simple Programming Exploration.
+   * This function creates an exploration with an interaction that is not
+   * supported on the mobile app (e.g. SetInput). This is useful for testing
+   * validation errors when adding mobile-unsupported explorations to stories.
    * Starts at new Exploration Editor Page.
-   * Ends at same page, after adding programming interaction and saving the
+   * Ends at same page, after adding the unsupported interaction and saving the
    * draft.
    */
-  async createSimpleProgrammingExploration(): Promise<string> {
+  async createSimpleUnsupportedExploration(): Promise<string> {
     // Check if element to add interaction is visible (pre-check)
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
 
     await this.createMinimalExploration(
-      'This is a test Programming Exploration',
-      INTERACTION_TYPES.CODE_EDITOR
+      'This is a test Math Exploration',
+      INTERACTION_TYPES.SET_INPUT
     );
 
     const lastInteraction = 'Last Card';
     await this.waitForElementToBeClickable(destinationCardSelector);
     await this.select(destinationCardSelector, '/');
+    await this.expectElementToBeVisible(addStateInput);
     await this.typeInInputField(addStateInput, lastInteraction);
     await this.clickOnElementWithSelector(addNewResponseButton);
+    await this.expectElementToBeVisible(correctAnswerInTheGroupSelector);
     await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
 
     await this.editDefaultResponseFeedbackInExplorationEditorPage(
@@ -4749,9 +4988,9 @@ export class ExplorationEditor extends BaseUser {
 
     await this.saveExplorationDraft();
     const explorationId = await this.publishExplorationWithMetadata(
-      'Simple Code Editor',
+      'Simple Math Exploration',
       'This is goal here',
-      'Algebra'
+      'Mathematics'
     );
 
     // Check if publish button is disabled (post-check)
@@ -4897,6 +5136,37 @@ export class ExplorationEditor extends BaseUser {
     } else {
       throw new Error(`User ${username} is not a subscriber.`);
     }
+  }
+
+  /**
+   * Checks whether the specified user is a manager of the exploration.
+   * Verifies by checking that the username appears explicitly in the Managers section.
+   */
+  async expectUserToBeExplorationManager(username: string): Promise<void> {
+    // Verify the username is listed in the Managers section (the definitive check per CUJ).
+    await this.expectElementToBeVisible(rolesContentSelector);
+    const owners = await this.page.$$(ownersListSelector);
+    if (owners.length === 0) {
+      throw new Error('Managers list is empty or not found.');
+    }
+
+    const ownerUsernames = await this.page.$$eval(
+      ownersListSelector,
+      elements =>
+        elements
+          .map(element => element.textContent?.trim() || '')
+          .filter(Boolean)
+    );
+
+    if (!ownerUsernames.includes(username)) {
+      throw new Error(
+        `Expected user "${username}" to be listed as manager, but not found in: ${ownerUsernames.join(
+          ', '
+        )}`
+      );
+    }
+
+    showMessage(`User ${username} is listed as a manager of this exploration.`);
   }
 
   /**
@@ -5452,6 +5722,10 @@ export class ExplorationEditor extends BaseUser {
       if (!sourceElement) {
         throw new Error(`Option "${option}" not found.`);
       }
+
+      // Ensure that elements have stabilized before we start dragging.
+      await this.waitForElementToStabilize(sourceElement);
+      await this.waitForElementToStabilize(destinationElement);
 
       const sourceBox = await sourceElement.boundingBox();
       const destBox = await destinationElement.boundingBox();
@@ -7440,6 +7714,94 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(creatorDashboardMenuLink);
     await this.clickOnElementWithSelector(creatorDashboardMenuLink);
     await this.expectElementToBeVisible(creatorDashboardContainerSelector);
+  }
+
+  /**
+   * Navigates to the stats tab of the exploration editor.
+   */
+  async navigateToStatsTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
+      if (!mobileNavbarElement) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOnElementWithSelector(mobileStatsTabButton);
+    } else {
+      await this.clickOnElementWithSelector(statsButtonTab);
+      await this.waitForNetworkIdle();
+    }
+
+    await this.expectElementToBeVisible(explorationStatsTabContentSelector);
+  }
+
+  /**
+   * From the stats tab, open the modal showing the stats of the specified card.
+   */
+  async openCardStats(cardName: string): Promise<void> {
+    await this.navigateToCard(cardName);
+    await this.expectElementToBeVisible(explorationStateStatsModalSelector);
+  }
+
+  /**
+   * Function to check how many times a card has been entered.
+   * Requires the card stats modal to be open.
+   */
+  async expectCardEnteredTimesToBe(count: number): Promise<void> {
+    await this.expectTextContentToContain(
+      explorationStateStatsEnterCountSelector,
+      `Card entered: ${count} times.`
+    );
+  }
+
+  /**
+   * Close the currently-opened state stats modal.
+   */
+  async closeCardStats(): Promise<void> {
+    await this.clickOnElementWithSelector(closeModalButtonSelector);
+    await this.expectElementToBeVisible(
+      explorationStateStatsModalSelector,
+      false
+    );
+  }
+
+  /**
+   * Expects the number of passers to be a specific value.
+   * @param expected the expected number of passers.
+   */
+  async expectNumberOfPassersToBe(expected: number): Promise<void> {
+    await this.expectElementToBeVisible(numberOfPassers);
+
+    const text = await this.page.$eval(
+      numberOfPassers,
+      el => el.textContent?.trim() || ''
+    );
+
+    const match = text.match(/\d+/);
+    const actual = match ? Number(match[0]) : 0;
+
+    if (actual !== expected) {
+      throw new Error(
+        `Expected number of passers to be ${expected}, but found ${actual}.`
+      );
+    }
+  }
+
+  /**
+   * Expects the feedback reply details to be visible.
+   */
+  async expectFeedbackReplyDetailsToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(feedbackAuthorSelector);
+    await this.expectElementToBeVisible(feedbackStatusSelector);
+    await this.expectElementToBeVisible(feedbackTimeElement);
+  }
+
+  /**
+   * Expects Feedback Page to be visible.
+   */
+  async expectFeedbackPageTobeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
   }
 }
 

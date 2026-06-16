@@ -82,6 +82,7 @@ const FILE_EXCLUSIONS_FOR_SEARCH = [
   'core/templates/utility/hashes.ts',
   'webpack.*.ts',
   'angular-template-style-url-replacer.webpack-loader.js',
+  'core/tests/playwright-acceptance-tests',
 ];
 
 const FILE_EXTENSIONS_FOR_SEARCH = [
@@ -109,9 +110,6 @@ const MANUALLY_MAPPED_DEPENDENCIES: Record<string, string[]> = {
   ],
   'core/templates/pages/oppia-root/index.ts': [
     'core/templates/pages/oppia-root/oppia-root.mainpage.html',
-  ],
-  'core/templates/pages/lightweight-oppia-root/index.ts': [
-    'core/templates/pages/lightweight-oppia-root/lightweight-oppia-root.mainpage.html',
   ],
 };
 

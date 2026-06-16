@@ -26,6 +26,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {Change} from 'domain/editor/undo_redo/change.model';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
@@ -119,6 +120,15 @@ describe('Topic Editor Navbar', () => {
     alertsService = TestBed.inject(AlertsService);
     topicRightsBackendApiService = TestBed.inject(TopicRightsBackendApiService);
     questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
+    spyOn(topicEditorStateService, 'getSupersedingSkillIssues').and.returnValue(
+      []
+    );
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: false,
+      can_publish_topic: false,
+      can_edit_topic: false,
+      can_edit_question: false,
+    });
 
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     subtopic.setUrlFragment('dummy-url');
@@ -167,18 +177,18 @@ describe('Topic Editor Navbar', () => {
       'Preview',
     ]);
     expect(componentInstance.activeTab).toEqual('Editor');
-    expect(componentInstance.showNavigationOptions).toBeFalse();
-    expect(componentInstance.warningsAreShown).toBeFalse();
-    expect(componentInstance.showTopicEditOptions).toBeFalse();
+    expect(componentInstance.showNavigationOptions).toBe(false);
+    expect(componentInstance.warningsAreShown).toBe(false);
+    expect(componentInstance.showTopicEditOptions).toBe(false);
     expect(componentInstance.topic).toEqual(topic);
-    expect(componentInstance.discardChangesButtonIsShown).toBeFalse();
+    expect(componentInstance.discardChangesButtonIsShown).toBe(false);
     expect(componentInstance.validationIssues).toEqual([]);
     expect(componentInstance.topicRights).toEqual(
-      new TopicRights(false, false, false)
+      new TopicRights(false, false, false, false)
     );
   });
 
-  it('should validate topic when topic is initialised', () => {
+  it('should validate topic when topic is initialised', fakeAsync(() => {
     spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
     spyOnProperty(
@@ -192,12 +202,17 @@ describe('Topic Editor Navbar', () => {
       topicEditorStateService,
       'getTopicWithUrlFragmentExists'
     ).and.returnValue(false);
+    spyOn(topicEditorStateService, 'prefetchSkills').and.returnValue(
+      Promise.resolve()
+    );
+    spyOn(topicEditorStateService, 'hasLoadedTopic').and.returnValue(false);
     componentInstance.ngOnInit();
 
     expect(componentInstance.validationIssues).toEqual([]);
     expect(componentInstance.prepublishValidationIssues).toEqual([]);
 
     topicInitializedEventEmitter.emit();
+    tick();
 
     expect(componentInstance.validationIssues).toEqual([
       'Topic url fragment is not valid.',
@@ -209,9 +224,9 @@ describe('Topic Editor Navbar', () => {
       'Topic should have meta tag content.',
       'Subtopic subtopic1 should have a thumbnail.',
     ]);
-  });
+  }));
 
-  it('should validate topic when topic is reinitialised', () => {
+  it('should validate topic when topic is reinitialised', fakeAsync(() => {
     spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
     spyOnProperty(
@@ -225,12 +240,17 @@ describe('Topic Editor Navbar', () => {
       topicEditorStateService,
       'getTopicWithUrlFragmentExists'
     ).and.returnValue(true);
+    spyOn(topicEditorStateService, 'prefetchSkills').and.returnValue(
+      Promise.resolve()
+    );
+    spyOn(topicEditorStateService, 'hasLoadedTopic').and.returnValue(false);
     componentInstance.ngOnInit();
 
     expect(componentInstance.validationIssues).toEqual([]);
     expect(componentInstance.prepublishValidationIssues).toEqual([]);
 
     topicReinitializedEventEmitter.emit();
+    tick();
 
     expect(componentInstance.validationIssues).toEqual([
       'Topic url fragment is not valid.',
@@ -244,7 +264,7 @@ describe('Topic Editor Navbar', () => {
       'Topic should have meta tag content.',
       'Subtopic subtopic1 should have a thumbnail.',
     ]);
-  });
+  }));
 
   it('should load content properly', () => {
     spyOn(componentInstance, 'getChangeListLength').and.returnValue(1);
@@ -293,13 +313,13 @@ describe('Topic Editor Navbar', () => {
   it('should return true when topic saving is in progress', () => {
     spyOn(topicEditorStateService, 'isSavingTopic').and.returnValue(true);
 
-    expect(componentInstance.isSaveInProgress()).toBeTrue();
+    expect(componentInstance.isSaveInProgress()).toBe(true);
   });
 
   it('should return false when topic saving is not in progress', () => {
     spyOn(topicEditorStateService, 'isSavingTopic').and.returnValue(false);
 
-    expect(componentInstance.isSaveInProgress()).toBeFalse();
+    expect(componentInstance.isSaveInProgress()).toBe(false);
   });
 
   it('should return active tab name when called', () => {
@@ -460,6 +480,7 @@ describe('Topic Editor Navbar', () => {
         published: false,
         can_publish_topic: false,
         can_edit_topic: true,
+        can_edit_question: true,
       });
 
       componentInstance.publishTopic();
@@ -497,11 +518,12 @@ describe('Topic Editor Navbar', () => {
       published: false,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.validationIssues = [];
     componentInstance.prepublishValidationIssues = [];
 
-    expect(componentInstance.isTopicSaveable()).toBeTrue();
+    expect(componentInstance.isTopicSaveable()).toBe(true);
   });
 
   it('should return false when there are no changes', () => {
@@ -510,11 +532,12 @@ describe('Topic Editor Navbar', () => {
       published: false,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.validationIssues = [];
     componentInstance.prepublishValidationIssues = [];
 
-    expect(componentInstance.isTopicSaveable()).toBeFalse();
+    expect(componentInstance.isTopicSaveable()).toBe(false);
   });
 
   it('should return false when topic has wranings', () => {
@@ -523,11 +546,12 @@ describe('Topic Editor Navbar', () => {
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.validationIssues = ['warn1'];
     componentInstance.prepublishValidationIssues = [];
 
-    expect(componentInstance.isTopicSaveable()).toBeFalse();
+    expect(componentInstance.isTopicSaveable()).toBe(false);
   });
 
   it('should return false when topic has pre publish validation issues', () => {
@@ -536,11 +560,12 @@ describe('Topic Editor Navbar', () => {
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.validationIssues = [];
     componentInstance.prepublishValidationIssues = ['warn1'];
 
-    expect(componentInstance.isTopicSaveable()).toBeFalse();
+    expect(componentInstance.isTopicSaveable()).toBe(false);
   });
 
   it('should show discard button when changes are present', () => {
@@ -549,8 +574,8 @@ describe('Topic Editor Navbar', () => {
 
     componentInstance.toggleDiscardChangeButton();
 
-    expect(componentInstance.showTopicEditOptions).toBeFalse();
-    expect(componentInstance.discardChangesButtonIsShown).toBeTrue();
+    expect(componentInstance.showTopicEditOptions).toBe(false);
+    expect(componentInstance.discardChangesButtonIsShown).toBe(true);
   });
 
   it('should disable discard button when changes are present', () => {
@@ -559,24 +584,27 @@ describe('Topic Editor Navbar', () => {
 
     componentInstance.toggleDiscardChangeButton();
 
-    expect(componentInstance.showTopicEditOptions).toBeFalse();
-    expect(componentInstance.discardChangesButtonIsShown).toBeFalse();
+    expect(componentInstance.showTopicEditOptions).toBe(false);
+    expect(componentInstance.discardChangesButtonIsShown).toBe(false);
   });
 
   it('should save topic when user saves topic changes', fakeAsync(() => {
-    const modalspy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: {
-          topicIsPublished: true,
-        },
-        result: Promise.resolve('commitMessage'),
-      } as NgbModalRef;
-    });
+    const modalspy = spyOn(ngbModal, 'open').and.callFake(
+      (dlg: boolean, opt: boolean) => {
+        return {
+          componentInstance: {
+            topicIsPublished: true,
+          },
+          result: Promise.resolve('commitMessage'),
+        } as NgbModalRef;
+      }
+    );
     topicEditorStateService.setTopic(topic);
     componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     spyOn(alertsService, 'addSuccessMessage');
     spyOn(topicEditorStateService, 'saveTopic').and.callFake(
@@ -600,19 +628,22 @@ describe('Topic Editor Navbar', () => {
   }));
 
   it('should close save topic modal when user clicks cancel', fakeAsync(() => {
-    const modalspy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: {
-          topicIsPublished: true,
-        },
-        result: Promise.reject(),
-      } as NgbModalRef;
-    });
+    const modalspy = spyOn(ngbModal, 'open').and.callFake(
+      (dlg: boolean, opt: boolean) => {
+        return {
+          componentInstance: {
+            topicIsPublished: true,
+          },
+          result: Promise.reject(),
+        } as NgbModalRef;
+      }
+    );
     topicEditorStateService.setTopic(topic);
     componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     spyOn(alertsService, 'addSuccessMessage');
     componentInstance.saveChanges();
@@ -630,11 +661,11 @@ describe('Topic Editor Navbar', () => {
 
       componentInstance.toggleNavigationOptions();
 
-      expect(componentInstance.showNavigationOptions).toBeFalse();
+      expect(componentInstance.showNavigationOptions).toBe(false);
 
       componentInstance.toggleNavigationOptions();
 
-      expect(componentInstance.showNavigationOptions).toBeTrue();
+      expect(componentInstance.showNavigationOptions).toBe(true);
     }
   );
 
@@ -646,11 +677,11 @@ describe('Topic Editor Navbar', () => {
 
       componentInstance.toggleTopicEditOptions();
 
-      expect(componentInstance.showTopicEditOptions).toBeFalse();
+      expect(componentInstance.showTopicEditOptions).toBe(false);
 
       componentInstance.toggleTopicEditOptions();
 
-      expect(componentInstance.showTopicEditOptions).toBeTrue();
+      expect(componentInstance.showTopicEditOptions).toBe(true);
     }
   );
 
@@ -661,16 +692,22 @@ describe('Topic Editor Navbar', () => {
 
       componentInstance.toggleWarningText();
 
-      expect(componentInstance.warningsAreShown).toBeFalse();
+      expect(componentInstance.warningsAreShown).toBe(false);
 
       componentInstance.toggleWarningText();
 
-      expect(componentInstance.warningsAreShown).toBeTrue();
+      expect(componentInstance.warningsAreShown).toBe(true);
     }
   );
 
   it('should validate topic when called', () => {
     componentInstance.topic = topic;
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: false,
+      can_publish_topic: false,
+      can_edit_topic: false,
+      can_edit_question: false,
+    });
 
     componentInstance._validateTopic();
 
@@ -688,6 +725,13 @@ describe('Topic Editor Navbar', () => {
 
   it('should return the total number of warnings when called', () => {
     componentInstance.topic = topic;
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: false,
+      can_publish_topic: false,
+      can_edit_topic: false,
+      can_edit_question: false,
+    });
+
     componentInstance._validateTopic();
     expect(componentInstance.validationIssues).toEqual([
       'Topic url fragment is not valid.',
@@ -709,6 +753,7 @@ describe('Topic Editor Navbar', () => {
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.showTopicEditOptions = true;
     spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and.returnValue(
@@ -723,13 +768,14 @@ describe('Topic Editor Navbar', () => {
     componentInstance.unpublishTopic();
     tick();
 
-    expect(componentInstance.showTopicEditOptions).toBeFalse();
+    expect(componentInstance.showTopicEditOptions).toBe(false);
     expect(componentInstance.topicRights.isPublished()).toBe(false);
     expect(topicEditorStateService.setTopicRights).toHaveBeenCalledWith(
       TopicRights.createFromBackendDict({
         published: false,
         can_publish_topic: true,
         can_edit_topic: true,
+        can_edit_question: true,
       })
     );
   }));
@@ -740,6 +786,7 @@ describe('Topic Editor Navbar', () => {
       published: false,
       can_publish_topic: false,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and.returnValue(
       Promise.resolve({
@@ -761,6 +808,7 @@ describe('Topic Editor Navbar', () => {
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.showTopicEditOptions = true;
 
@@ -781,7 +829,7 @@ describe('Topic Editor Navbar', () => {
         'Contact the curriculum admins to remove it from the classroom first.'
     );
 
-    expect(componentInstance.showTopicEditOptions).toBeTrue();
+    expect(componentInstance.showTopicEditOptions).toBe(true);
     expect(result).toBe(false);
     expect(
       topicRightsBackendApiService.unpublishTopicAsync
@@ -804,6 +852,7 @@ describe('Topic Editor Navbar', () => {
       published: false,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
 
     componentInstance.publishTopic();
@@ -813,7 +862,7 @@ describe('Topic Editor Navbar', () => {
       'Topic published.',
       1000
     );
-    expect(componentInstance.topicRights.isPublished()).toBeTrue();
+    expect(componentInstance.topicRights.isPublished()).toBe(true);
     expect(windowRef.nativeWindow.location.href).toBe(
       '/topics-and-skills-dashboard'
     );
@@ -828,7 +877,7 @@ describe('Topic Editor Navbar', () => {
       spyOn(topicRightsBackendApiService, 'sendMailAsync').and.returnValue(
         Promise.resolve()
       );
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      spyOn(ngbModal, 'open').and.callFake((dlg: boolean, opt: boolean) => {
         return {
           result: Promise.resolve('success'),
         } as NgbModalRef;
@@ -838,6 +887,7 @@ describe('Topic Editor Navbar', () => {
         published: false,
         can_publish_topic: false,
         can_edit_topic: true,
+        can_edit_question: true,
       });
 
       componentInstance.publishTopic();
@@ -956,6 +1006,13 @@ describe('Topic Editor Navbar', () => {
 
   it('should return all the warnings when called', () => {
     componentInstance.topic = topic;
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: false,
+      can_publish_topic: false,
+      can_edit_topic: false,
+      can_edit_question: false,
+    });
+
     componentInstance._validateTopic();
     expect(componentInstance.getAllTopicWarnings()).toEqual(
       [
@@ -971,8 +1028,15 @@ describe('Topic Editor Navbar', () => {
 
   it('should return true or false when called', () => {
     componentInstance.topic = topic;
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: false,
+      can_publish_topic: false,
+      can_edit_topic: false,
+      can_edit_question: false,
+    });
+
     componentInstance._validateTopic();
-    expect(componentInstance.isWarningTooltipDisabled()).toBeFalse();
+    expect(componentInstance.isWarningTooltipDisabled()).toBe(false);
   });
 
   it('should return early from _navigateToPreview when classroomUrlFragment is null', () => {
@@ -1007,6 +1071,7 @@ describe('Topic Editor Navbar', () => {
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
 
     componentInstance.publishTopic();
@@ -1016,7 +1081,7 @@ describe('Topic Editor Navbar', () => {
       'Topic published.',
       1000
     );
-    expect(componentInstance.topicRights.isPublished()).toBeTrue();
+    expect(componentInstance.topicRights.isPublished()).toBe(true);
     // Should not redirect to dashboard since topic was already published.
     expect(windowRef.nativeWindow.location.href).not.toBe(
       '/topics-and-skills-dashboard'
@@ -1027,5 +1092,143 @@ describe('Topic Editor Navbar', () => {
     let routingSpy = spyOn(topicEditorRoutingService, 'getActiveTabName');
     routingSpy.and.returnValue('unknown_tab');
     expect(componentInstance.getMobileNavigatorText()).toEqual('Editor');
+  });
+
+  it('should validate topic and check superseding skills', () => {
+    componentInstance.topic = topic;
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: false,
+      can_publish_topic: false,
+      can_edit_topic: false,
+      can_edit_question: false,
+    });
+
+    spyOn(topic, 'getSkillIds').and.returnValue(['skill_1', 'skill_2']);
+    (
+      topicEditorStateService.getSupersedingSkillIssues as jasmine.Spy
+    ).and.returnValue([
+      'The skill with id skill_1 has superseding skill superseding_skill_1',
+    ]);
+
+    componentInstance._validateTopic();
+
+    expect(componentInstance.validationIssues).toContain(
+      'Topic url fragment is not valid.'
+    );
+    expect(componentInstance.validationIssues).toContain(
+      'The skill with id skill_1 has superseding skill superseding_skill_1'
+    );
+    expect(componentInstance.validationIssues.length).toBe(2);
+  });
+
+  it('should handle errors when fetching skills during validation', () => {
+    componentInstance.topic = topic;
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: false,
+      can_publish_topic: false,
+      can_edit_topic: false,
+      can_edit_question: false,
+    });
+
+    spyOn(topic, 'getSkillIds').and.returnValue(['skill_1']);
+    // Skills that failed to load are absent from the cache, so
+    // getSupersedingSkillIssues returns no issues for them.
+    (
+      topicEditorStateService.getSupersedingSkillIssues as jasmine.Spy
+    ).and.returnValue([]);
+
+    componentInstance._validateTopic();
+
+    expect(componentInstance.validationIssues).toContain(
+      'Topic url fragment is not valid.'
+    );
+    expect(componentInstance.validationIssues.length).toBe(1);
+  });
+
+  it('should prefetch skills and validate when topic is already loaded on init', fakeAsync(() => {
+    spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOn(topicEditorStateService, 'hasLoadedTopic').and.returnValue(true);
+    spyOn(topicEditorStateService, 'prefetchSkills').and.returnValue(
+      Promise.resolve()
+    );
+    spyOn(topicEditorStateService, 'getTopicWithNameExists').and.returnValue(
+      false
+    );
+    spyOn(
+      topicEditorStateService,
+      'getTopicWithUrlFragmentExists'
+    ).and.returnValue(false);
+
+    componentInstance.ngOnInit();
+    tick();
+
+    expect(topicEditorStateService.prefetchSkills).toHaveBeenCalled();
+    expect(componentInstance.validationIssues).toEqual([
+      'Topic url fragment is not valid.',
+    ]);
+  }));
+
+  it('should update skill cache and validate when undo/redo changes a skill', fakeAsync(() => {
+    spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOn(undoRedoService, 'getUndoRedoChangeEventEmitter').and.returnValue(
+      undoRedoChangeAppliedEventEmitter
+    );
+    spyOn(topicEditorStateService, 'getTopicWithNameExists').and.returnValue(
+      false
+    );
+    spyOn(
+      topicEditorStateService,
+      'getTopicWithUrlFragmentExists'
+    ).and.returnValue(false);
+    const mockChange = {
+      getBackendChangeObject: () => ({cmd: 'add_uncategorized_skill_id'}),
+    };
+    spyOn(undoRedoService, 'getChangeList').and.returnValue([
+      mockChange,
+    ] as unknown as Change[]);
+    spyOn(topicEditorStateService, 'updateSkillCache').and.returnValue(
+      Promise.resolve()
+    );
+
+    componentInstance.ngOnInit();
+    undoRedoChangeAppliedEventEmitter.emit();
+    tick();
+
+    expect(topicEditorStateService.updateSkillCache).toHaveBeenCalled();
+    expect(componentInstance.validationIssues).toEqual([
+      'Topic url fragment is not valid.',
+    ]);
+  }));
+
+  it('should validate topic directly when undo/redo changes a non-skill property', () => {
+    spyOn(urlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
+    spyOn(undoRedoService, 'getUndoRedoChangeEventEmitter').and.returnValue(
+      undoRedoChangeAppliedEventEmitter
+    );
+    spyOn(topicEditorStateService, 'getTopicWithNameExists').and.returnValue(
+      false
+    );
+    spyOn(
+      topicEditorStateService,
+      'getTopicWithUrlFragmentExists'
+    ).and.returnValue(false);
+    const mockChange = {
+      getBackendChangeObject: () => ({cmd: 'update_topic_property'}),
+    };
+    spyOn(undoRedoService, 'getChangeList').and.returnValue([
+      mockChange,
+    ] as unknown as Change[]);
+    spyOn(topicEditorStateService, 'updateSkillCache');
+
+    componentInstance.ngOnInit();
+    undoRedoChangeAppliedEventEmitter.emit();
+
+    expect(topicEditorStateService.updateSkillCache).not.toHaveBeenCalled();
+    expect(componentInstance.validationIssues).toEqual([
+      'Topic url fragment is not valid.',
+    ]);
   });
 });

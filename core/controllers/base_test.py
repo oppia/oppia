@@ -27,6 +27,8 @@ import logging
 import os
 import re
 import types
+from unittest import mock
+from xml.sax import handler
 
 import main
 from core import feconf, handler_schema_constants, utils
@@ -45,7 +47,7 @@ from core.tests import test_utils
 
 import webapp2
 import webtest
-from typing import Dict, Final, FrozenSet, List, Optional, TypedDict, cast
+from typing import Any, Dict, Final, FrozenSet, List, Optional, TypedDict, cast
 from webapp2_extras import routes
 
 MYPY = False
@@ -141,6 +143,15 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         def get(self) -> None:
             """Handles GET requests."""
+            pass
+
+    class MockPostHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {'custom_key': {'schema': {'type': 'unicode'}}}
+        }
+
+        def post(self, *args: Any) -> None:
             pass
 
     def setUp(self) -> None:
@@ -565,7 +576,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             )
             response = self.get_html_response('/', expected_status_int=200)
             self.assertIn(
-                b'<lightweight-oppia-root></lightweight-oppia-root>',
+                b'<oppia-root></oppia-root>',
                 response.body,
             )
 
@@ -596,6 +607,27 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.assert_matches_regexps(
             logs, ['No email address was found for the user.']
         )
+
+    def test_validate_and_normalize_args_with_empty_payload_string(
+        self,
+    ) -> None:
+        """Test argument normalization when payload is naturally None."""
+        mock_request = mock.Mock()
+        mock_request.environ = {'REQUEST_METHOD': 'POST'}
+        mock_request.route_kwargs = {}
+        mock_request.arguments.return_value = ['payload', 'custom_key']
+
+        def mock_get_side_effect(arg_name: str) -> Optional[str]:
+            if arg_name == 'payload':
+                return ''
+            if arg_name == 'custom_key':
+                return 'some_value'
+            return None
+
+        mock_request.get.side_effect = mock_get_side_effect
+        handler = self.MockPostHandler(mock_request, mock.Mock())
+
+        handler.validate_and_normalize_args()
 
     def test_logs_request_with_invalid_payload(self) -> None:
         with contextlib.ExitStack() as exit_stack:
@@ -1388,7 +1420,8 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                 if 'get' in clazz.__dict__.keys():
                     message = (
                         'Please ensure that the name of this class '
-                        'ends with \'%s\'' % allowed_class_ending
+                        'ends with \'%s\' or \'%sV2\''
+                        % (allowed_class_ending, allowed_class_ending)
                     )
                     error_message = '%s --> Line %s: %s' % (
                         file_name,
@@ -1397,16 +1430,17 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                     )
                     with self.subTest(class_name):
                         self.assertTrue(
-                            class_name.endswith(allowed_class_ending),
+                            class_name.endswith(allowed_class_ending)
+                            or class_name.endswith(allowed_class_ending + 'V2'),
                             msg=error_message,
                         )
 
-                # Check that the name of the class ends with 'Handler'
-                # if it does not has a get function.
+                # Check that the name of the class ends with 'Handler' or
+                # 'HandlerV2' if it does not have a get function.
                 else:
                     message = (
                         'Please ensure that the name of this class '
-                        'ends with \'Handler\''
+                        'ends with \'Handler\' or \'HandlerV2\''
                     )
                     error_message = '%s --> Line %s: %s' % (
                         file_name,
@@ -1415,7 +1449,9 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                     )
                     with self.subTest(class_name):
                         self.assertTrue(
-                            class_name.endswith('Handler'), msg=error_message
+                            class_name.endswith('Handler')
+                            or class_name.endswith('HandlerV2'),
+                            msg=error_message,
                         )
 
         self.assertGreater(num_handlers_checked, 275)

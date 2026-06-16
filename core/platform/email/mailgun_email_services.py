@@ -205,6 +205,16 @@ def send_email_to_recipients(
             file_obj.close()
 
         if response.status_code != 200:
+            if 400 <= response.status_code < 500:
+                logging.error(
+                    'Failed to send email (Permanent Error): %s - %s.'
+                    % (response.status_code, response.text)
+                )
+                raise email_services.PermanentEmailSendingError(
+                    'Mailgun returned a permanent error %s: %s'
+                    % (response.status_code, response.text)
+                )
+
             logging.error(
                 'Failed to send email: %s - %s.'
                 % (response.status_code, response.text)

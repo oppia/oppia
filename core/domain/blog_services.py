@@ -412,6 +412,26 @@ def get_blog_post_rights(
     return get_blog_post_rights_from_model(model)
 
 
+def get_total_number_of_matching_blog_posts(
+    query_string: str, tags: List[str]
+) -> int:
+    """Returns the total number of blog posts matching the search query and tags."""
+    valid_blog_post_ids: List[str] = []
+    search_offset: Optional[int] = None
+
+    for _ in range(MAX_ITERATIONS):
+        remaining_to_fetch = 1000
+
+        batch_ids, search_offset = get_blog_post_ids_matching_query(
+            query_string, tags, size=remaining_to_fetch, offset=search_offset
+        )
+        valid_blog_post_ids.extend(batch_ids)
+
+        if search_offset is None:
+            break
+    return len(valid_blog_post_ids)
+
+
 def get_published_blog_post_summaries_by_user_id(
     user_id: str, max_limit: int, offset: int = 0
 ) -> List[blog_domain.BlogPostSummary]:

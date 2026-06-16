@@ -26,7 +26,10 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {LoginRequiredModalContent} from '../modal-templates/login-required-modal.component';
 import {SkillOpportunity} from 'domain/opportunity/skill-opportunity.model';
-import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
+import {
+  ExplorationOpportunitySummary,
+  ExplorationOpportunitySummaryBackendDict,
+} from 'domain/opportunity/exploration-opportunity-summary.model';
 class MockNgbModalRef {
   componentInstance!: {};
 }
@@ -65,7 +68,8 @@ describe('Contribution Opportunities Service', () => {
         },
         language_code: 'hi',
         is_pinned: false,
-      },
+        reviewer_only_content_count: 0,
+      } as ExplorationOpportunitySummaryBackendDict,
     ],
     next_cursor: '6',
     more: true,

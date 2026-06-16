@@ -463,6 +463,8 @@ const topicPageRevisionTabContentSelector =
 const learnerViewCardSelector = '.oppia-learner-view-card-content';
 const signInBoxInSaveProressModalSelector = '.sign-in-box';
 const loginButtonSelector = '.e2e-mobile-test-login';
+const progressBarSelector = '.oppia-progress-bar';
+const suggestionSection = '.suggested-for-you-section';
 
 const youtubePlayerSelector = '.e2e-test-youtube-player';
 const collapsibleRTEHeaderSelector = '.e2e-test-collapsible-heading';
@@ -1045,6 +1047,7 @@ export class LoggedOutUser extends BaseUser {
     if (!blogPostsFound) {
       return;
     }
+    await this.expectElementToBeVisible(blogPostContentSelector);
     const contentFound = await this.page.$$eval(
       `${blogPostTitleContainerSelector}, ${blogPostContentSelector}`,
       (elements, searchText) =>
@@ -1093,6 +1096,7 @@ export class LoggedOutUser extends BaseUser {
     if (!blogPostsFound) {
       return;
     }
+    await this.expectElementToBeVisible(blogPostTagSelector);
     const tagFound = await this.page.$$eval(
       blogPostTagSelector,
       (elements, expectedTag) =>
@@ -1750,9 +1754,12 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(footerForumlink, {
       visible: true,
     });
-    await this.clickAndWaitForNavigation(footerForumlink, true);
-
-    expect(this.page.url()).toBe(googleGroupsOppiaUrl);
+    await this.clickLinkButtonToNewTab(
+      footerForumlink,
+      'Forum',
+      googleGroupsOppiaUrl,
+      'Forum'
+    );
   }
 
   /**
@@ -2435,8 +2442,10 @@ export class LoggedOutUser extends BaseUser {
         window.scrollTo(0, 0);
       });
     }
-    await this.page.waitForSelector(languageDropdown);
-    const languageDropdownElement = await this.page.$(languageDropdown);
+    const languageDropdownElement = await this.page.waitForSelector(
+      languageDropdown,
+      {visible: true}
+    );
     if (!languageDropdownElement) {
       throw new Error('Language dropdown element not found');
     }
@@ -2444,7 +2453,7 @@ export class LoggedOutUser extends BaseUser {
       languageDropdown,
       el => el.textContent
     );
-    await languageDropdownElement.click();
+    await this.clickOnElement(languageDropdownElement);
     await this.clickOnElementWithSelector(languageOption);
     // Here we need to reload the page again to confirm the language change.
     await this.page.reload();
@@ -2458,6 +2467,34 @@ export class LoggedOutUser extends BaseUser {
       languageOption,
       initialLanguage
     );
+  }
+
+  /**
+   * Changes the site language for an embedded exploration without reloading
+   * the page, since reloading resets the language in the embedded player.
+   * @param langCode - The language code to change to. Example: 'es', 'pt-br'
+   */
+  async changeSiteLanguageForEmbeddedExploration(
+    langCode: string
+  ): Promise<void> {
+    const languageOption = `.e2e-test-i18n-language-${langCode} a`;
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.evaluate(() => {
+        window.scrollTo(0, 0);
+      });
+    }
+    const languageDropdownElement = await this.page.waitForSelector(
+      languageDropdown,
+      {visible: true}
+    );
+    if (!languageDropdownElement) {
+      throw new Error('Language dropdown element not found');
+    }
+    await this.clickOnElement(languageDropdownElement);
+    await this.clickOnElementWithSelector(languageOption);
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -2676,11 +2713,50 @@ export class LoggedOutUser extends BaseUser {
    */
   async isDonorBoxVisbleOnDonatePage(): Promise<void> {
     const donorBox = await this.page.waitForSelector(donorBoxIframe);
+    if (!this.isViewportAtMobileWidth()) {
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          if (!element) {
+            return false;
+          }
+          const rect = element.getBoundingClientRect();
+          return rect.width > 0 && rect.height > 0;
+        },
+        {},
+        donorBoxIframe
+      );
+      await this.waitForDonorBoxFrameToLoad();
+    }
     if (!donorBox) {
       throw new Error('The donor box is not visible on the donate page.');
     } else {
       showMessage('The donor box is visible on the donate page.');
     }
+  }
+
+  /**
+   * Waits for the DonorBox iframe to load its frame URL.
+   * This avoids taking screenshots before the external content renders.
+   */
+  private async waitForDonorBoxFrameToLoad(): Promise<void> {
+    const maxWaitMsecs = 20000;
+    const pollIntervalMsecs = 500;
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < maxWaitMsecs) {
+      const donorBoxFrame = this.page
+        .frames()
+        .find(frame => frame.url().includes('donorbox.org'));
+      if (donorBoxFrame) {
+        return;
+      }
+      await this.page.waitForTimeout(pollIntervalMsecs);
+    }
+
+    throw new Error(
+      'The DonorBox iframe did not finish loading within the expected time.'
+    );
   }
 
   /**
@@ -3419,7 +3495,8 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForFunction(
       (selector: string, value: string) => {
         const element = document.querySelector(selector);
-        return element?.textContent !== value;
+        const text = element?.textContent?.trim();
+        return !!text && text !== value?.trim();
       },
       {},
       currentCardContentSelector,
@@ -3692,8 +3769,12 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Filters lessons by multiple languages and deselect the already selected English language.
    * @param {string[]} languageNames - The names of the languages to filter by.
+   * @param {string} languageToDeselect - The name of the language to deselect.
    */
-  async filterLessonsByLanguage(languageNames: string[]): Promise<void> {
+  async filterLessonsByLanguage(
+    languageNames: string[],
+    languageToDeselect: string = 'English'
+  ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.waitForPageToFullyLoad();
     }
@@ -3711,8 +3792,8 @@ export class LoggedOutUser extends BaseUser {
         el => el.textContent.trim(),
         element
       );
-      // Deselecting english language.
-      if (elementText === 'English') {
+      // Deselecting the selected language before choosing new filters.
+      if (elementText === languageToDeselect) {
         await element.click();
       }
     }
@@ -3722,14 +3803,23 @@ export class LoggedOutUser extends BaseUser {
       unselectedFilterOptionsSelector
     );
     let foundMatch = false;
+    let englishMatchCount = 0;
 
     for (const language of deselectedLanguages) {
       const languageText = await this.page.evaluate(
         el => el.textContent,
         language
       );
+      const trimmedLanguageText = languageText.trim();
 
-      if (languageNames.includes(languageText.trim())) {
+      if (trimmedLanguageText === 'English') {
+        englishMatchCount += 1;
+        if (englishMatchCount < 2) {
+          continue;
+        }
+      }
+
+      if (languageNames.includes(trimmedLanguageText)) {
         foundMatch = true;
         await this.waitForElementToBeClickable(language);
         await language.click();
@@ -3977,6 +4067,24 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the practice tab in the topic page.
    */
   async navigateToPracticeTabInTopic(): Promise<void> {
+    const practiceTabLink = '.e2e-test-practice-tab-link';
+    const practiceContainer = '.e2e-test-practice-tab-container';
+    const practiceTabExists = await this.page.$(practiceTabLink);
+    if (!practiceTabExists) {
+      await this.page.reload({waitUntil: 'networkidle0'});
+      await this.page.waitForSelector(practiceTabLink, {
+        visible: true,
+        timeout: 30000,
+      });
+    }
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.evaluate(() => window.scrollTo(0, 0));
+    }
+    await this.clickOnElementWithSelector(practiceTabLink);
+    await this.page.waitForSelector(practiceContainer, {
+      visible: true,
+      timeout: 60000,
+    });
     await this.expectElementToBeVisible(practiceTabButtonSelector);
     await this.clickOnElementWithSelector(practiceTabButtonSelector);
 
@@ -6118,6 +6226,45 @@ export class LoggedOutUser extends BaseUser {
         }, but it was ${isVisible ? 'visible' : 'hidden'}`
       );
     }
+  }
+
+  /**
+   * Checks if suggestion section is visible or not.
+   * @param visible - Expected visibility.
+   */
+  async expectSuggestionSectionToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(suggestionSection, visible);
+  }
+
+  /**
+   * Checks if progress bar is visible or not.
+   * @param visible - Expected visibility.
+   */
+  async expectProgressBarToBePresent(visible: boolean = true): Promise<void> {
+    await this.expectElementToBeVisible(progressBarSelector, visible);
+  }
+
+  /**
+   * Check if the number input placeholder matches the expected text.
+   * @param expectedPlaceholder - Expected placeholder text of the input field.
+   */
+  async expectNumberInputPlaceholderToMatch(
+    expectedPlaceholder: string
+  ): Promise<void> {
+    // Wait until the placeholder attribute updates to the expected value.
+    await this.page.waitForFunction(
+      (selector: string, expected: string) => {
+        const el = document.querySelector(selector);
+        return el && el.getAttribute('placeholder') === expected;
+      },
+      {timeout: 30000},
+      floatFormInput,
+      expectedPlaceholder
+    );
+
+    showMessage(`Input placeholder is "${expectedPlaceholder}" as expected.`);
   }
 
   /**
