@@ -204,20 +204,20 @@ describe('Beam Jobs Tab Component', () => {
     await input.setValue('Fo');
     fixture.detectChanges();
 
-    expect(await autocomplete.getOptions()).toHaveSize(1);
-    expect(await table.getRows()).toHaveSize(1);
+    expect((await autocomplete.getOptions()).length).toEqual(1);
+    expect((await table.getRows()).length).toEqual(1);
 
     await input.setValue('Fob');
     fixture.detectChanges();
 
-    expect(await autocomplete.getOptions()).toHaveSize(0);
-    expect(await table.getRows()).toHaveSize(0);
+    expect((await autocomplete.getOptions()).length).toEqual(0);
+    expect((await table.getRows()).length).toEqual(0);
 
     await input.setValue('Ba');
     fixture.detectChanges();
 
-    expect(await autocomplete.getOptions()).toHaveSize(2);
-    expect(await table.getRows()).toHaveSize(2);
+    expect((await autocomplete.getOptions()).length).toEqual(2);
+    expect((await table.getRows()).length).toEqual(2);
 
     component.ngOnDestroy();
   });
@@ -273,7 +273,7 @@ describe('Beam Jobs Tab Component', () => {
     );
     await startNewButton.click();
 
-    expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(1);
+    expect((await loader.getAllHarnesses(MatDialogHarness)).length).toEqual(1);
 
     const confirmButton = await loader.getHarness(
       MatButtonHarness.with({
@@ -284,7 +284,7 @@ describe('Beam Jobs Tab Component', () => {
     await fixture.whenStable();
 
     expect(startNewJobSpy).toHaveBeenCalledWith(fooJob);
-    expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
+    expect((await loader.getAllHarnesses(MatDialogHarness)).length).toEqual(0);
     expect(component.beamJobRuns.value).toContain(newPendingFooJob);
 
     component.ngOnDestroy();
@@ -321,7 +321,7 @@ describe('Beam Jobs Tab Component', () => {
     );
     await cancelButton.click();
 
-    expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(1);
+    expect((await loader.getAllHarnesses(MatDialogHarness)).length).toEqual(1);
 
     const confirmButton = await loader.getHarness(
       MatButtonHarness.with({
@@ -332,7 +332,7 @@ describe('Beam Jobs Tab Component', () => {
     await fixture.whenStable();
 
     expect(cancelBeamJobRunSpy).toHaveBeenCalledWith(runningFooJob);
-    expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
+    expect((await loader.getAllHarnesses(MatDialogHarness)).length).toEqual(0);
     expect(component.beamJobRuns.value).not.toContain(runningFooJob);
     expect(component.beamJobRuns.value).toContain(cancellingFooJob);
 
@@ -365,7 +365,7 @@ describe('Beam Jobs Tab Component', () => {
     await dialog.close();
 
     expect(getBeamJobRunOutputSpy).toHaveBeenCalledWith(doneBarJob);
-    expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
+    expect((await loader.getAllHarnesses(MatDialogHarness)).length).toEqual(0);
 
     component.ngOnDestroy();
   });
@@ -391,7 +391,9 @@ describe('Beam Jobs Tab Component', () => {
 
     const dataflowLink = Array.from(
       fixture.nativeElement.querySelectorAll('a')
-    ).find(el => el.textContent?.includes('View on Dataflow')) as HTMLElement;
+    ).find((el: HTMLAnchorElement) =>
+      el.textContent?.includes('View on Dataflow')
+    ) as HTMLAnchorElement;
     expect(dataflowLink).toBeTruthy();
     expect(dataflowLink.getAttribute('disabled')).toBeNull();
     expect(dataflowLink.getAttribute('href')).toContain(
@@ -412,7 +414,9 @@ describe('Beam Jobs Tab Component', () => {
 
     const dataflowLink = Array.from(
       fixture.nativeElement.querySelectorAll('a')
-    ).find(el => el.textContent?.includes('View on Dataflow')) as HTMLElement;
+    ).find((el: HTMLAnchorElement) =>
+      el.textContent?.includes('View on Dataflow')
+    ) as HTMLAnchorElement;
     expect(dataflowLink).toBeTruthy();
     expect(dataflowLink.getAttribute('disabled')).toEqual('true');
     expect(dataflowLink.getAttribute('href')).toBeNull();

@@ -103,26 +103,24 @@ class BeamJobRunTests(test_utils.TestBase):
         run_async.validate()
 
     def test_validate_fails_for_synchronous_job_with_dataflow_id(self) -> None:
-        run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', 'RUNNING', self.NOW, self.NOW, True, 'xyz'
-        )
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Synchronous jobs cannot have a dataflow job ID.',
         ):
-            run.validate()
+            beam_job_domain.BeamJobRun(
+                '123', 'FooJob', 'RUNNING', self.NOW, self.NOW, True, 'xyz'
+            )
 
     def test_validate_fails_for_asynchronous_job_without_dataflow_id(
         self,
     ) -> None:
-        run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', 'RUNNING', self.NOW, self.NOW, False
-        )
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Asynchronous jobs must have a dataflow job ID.',
         ):
-            run.validate()
+            beam_job_domain.BeamJobRun(
+                '123', 'FooJob', 'RUNNING', self.NOW, self.NOW, False
+            )
 
 
 class AggregateBeamJobRunResultTests(test_utils.TestBase):
