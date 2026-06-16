@@ -668,7 +668,7 @@ describe('Exploration editor page component', () => {
 
       expect(focusSpy).toHaveBeenCalledWith('tmpMessageText');
 
-      component.activeThread = null as unknown as string;
+      component.activeThread = null;
       component.setFocusOnActiveTab('feedback');
 
       expect(focusSpy).toHaveBeenCalledWith('newThreadButton');

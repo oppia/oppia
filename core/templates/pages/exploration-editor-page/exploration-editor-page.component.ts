@@ -130,7 +130,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   autosaveIsInProgress: boolean = false;
   connectedToInternet: boolean = true;
   explorationEditorPageHasInitialized: boolean = false;
-  activeThread: string;
+  activeThread: string | null = null;
   warningsAreShown: boolean;
   currentUserIsCurriculumAdmin: boolean;
   currentUserIsModerator: boolean;
@@ -826,9 +826,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       windowClass: 'oppia-confirm-or-cancel-modal',
     });
 
-    if (modalRef.componentInstance) {
-      modalRef.componentInstance.openThreadsCount = openThreadsCount;
-    }
+    modalRef.componentInstance.openThreadsCount = openThreadsCount;
 
     modalRef.result.then(
       () => {

@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,12 +18,10 @@
 import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import './feedback-prompt-modal.component.css';
 
 @Component({
   selector: 'oppia-feedback-prompt-modal',
   templateUrl: './feedback-prompt-modal.component.html',
-  styleUrls: ['./feedback-prompt-modal.component.css'],
 })
 export class FeedbackPromptModalComponent extends ConfirmOrCancelModal {
   @Input() openThreadsCount!: number;

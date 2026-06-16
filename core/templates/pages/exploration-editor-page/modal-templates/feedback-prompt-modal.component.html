@@ -1,3 +1,21 @@
+<style>
+  .oppia-feedback-prompt-title {
+    margin-bottom: 4px;
+  }
+
+  .oppia-feedback-prompt-message {
+    margin-top: 0;
+  }
+
+  .oppia-feedback-prompt-modal .modal-header {
+    padding: 8px 15px;
+  }
+
+  .oppia-feedback-prompt-modal .modal-body {
+    padding-top: 8px;
+  }
+</style>
+
 <div class="oppia-feedback-prompt-modal">
   <div class="modal-header">
     <h3 class="modal-title oppia-feedback-prompt-title">
@@ -21,8 +39,8 @@
 
   <div class="modal-footer">
     <button type="button"
-            class="btn oppia-white-button e2e-test-stay-in-editor-button"
-            (click)="cancel()">
+        class="btn btn-secondary e2e-test-stay-in-editor-button"
+        (click)="cancel()">
       Stay in editor
     </button>
 
