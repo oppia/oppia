@@ -89,5 +89,8 @@
     "core",
     "extensions",
     "typings"
+  ],
+  "exclude": [
+    "core/tests/playwright-acceptance-tests"
   ]
 }
