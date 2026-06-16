@@ -179,7 +179,7 @@ class BlogHomepageDataHandler(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'offset': {
-                'schema': {'type': 'basestring'},
+                'schema': {'type': 'int'},
             }
         }
     }
