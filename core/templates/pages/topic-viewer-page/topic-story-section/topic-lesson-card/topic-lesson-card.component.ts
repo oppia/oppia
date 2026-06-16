@@ -16,121 +16,144 @@
  * @fileoverview Lesson card component used in the redesigned topic viewer story section.
  */
 
-import {Component, Input, OnInit} from '@angular/core';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {LanguageUtilService} from 'domain/utilities/language-util.service';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {LanguageSelectorModalComponent} from 'pages/topic-viewer-page/modals/language-selector-modal.component';
-import {TopicSessionFallbackLanguageService} from 'pages/topic-viewer-page/services/topic-session-fallback-language.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 import './topic-lesson-card.component.css';
 
 const FALLBACK_THUMBNAIL_IMAGE_PATH = '/splash/student_desk1x.webp';
+const CHECKPOINT_STATUS_COMPLETED = 'completed';
+const CHECKPOINT_STATUS_IN_PROGRESS = 'in-progress';
+const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
 
 @Component({
   selector: 'topic-lesson-card',
   templateUrl: './topic-lesson-card.component.html',
   styleUrls: ['./topic-lesson-card.component.css'],
 })
-export class TopicLessonCardComponent implements OnInit {
+export class TopicLessonCardComponent implements OnInit, OnChanges {
   @Input() lessonTitle: string = '';
   @Input() lessonDescription: string = '';
   @Input() thumbnailUrl: string = '';
   @Input() startUrl: string = '';
-  @Input() availableTextLanguageCodes: string[] = [];
-  @Input() availableVoiceoverLanguageCodes: string[] = [];
+  @Input() lessonProgressStatus:
+    | 'not_started'
+    | 'in_progress'
+    | 'completed'
+    | 'coming_soon' = 'not_started';
+  @Input() totalCheckpointsCount: number = 0;
+  @Input() visitedCheckpointsCount: number = 0;
 
   resolvedThumbnailUrl: string = '';
-  selectedTextLanguageCode: string | null = null;
-  selectedVoiceoverLanguageCode: string | null = null;
-
-  private readonly INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM =
-    'initialContentLanguageCode';
-  private readonly INITIAL_VOICEOVER_LANGUAGE_CODE_URL_PARAM =
-    'initialVoiceoverLanguageCode';
+  _checkpointStatuses: string[] = [];
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
-    private languageUtilService: LanguageUtilService,
-    private ngbModal: NgbModal,
-    private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService,
     private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
     this.resolvedThumbnailUrl =
       this.thumbnailUrl || this.getFallbackThumbnailUrl();
-    this.initializeFallbackLanguageSelection();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.lessonProgressStatus ||
+      changes.totalCheckpointsCount ||
+      changes.visitedCheckpointsCount
+    ) {
+      this._checkpointStatuses = this._computeCheckpointStatuses();
+    }
+  }
+
+  get checkpointStatuses(): string[] {
+    return this._checkpointStatuses;
+  }
+
+  private _computeCheckpointStatuses(): string[] {
+    if (
+      this.lessonProgressStatus === 'coming_soon' ||
+      this.totalCheckpointsCount === 0
+    ) {
+      return [];
+    }
+
+    const totalNodes = this.totalCheckpointsCount + 1;
+    const statuses: string[] = [];
+    const visitedCheckpointCount = Math.min(
+      Math.max(this.visitedCheckpointsCount, 0),
+      this.totalCheckpointsCount
+    );
+
+    const reachedCheckpointCount = Math.max(visitedCheckpointCount - 1, 0);
+
+    if (
+      this.lessonProgressStatus === 'completed' ||
+      visitedCheckpointCount >= this.totalCheckpointsCount
+    ) {
+      for (let i = 0; i < totalNodes; i++) {
+        statuses.push(CHECKPOINT_STATUS_COMPLETED);
+      }
+      return statuses;
+    }
+
+    const currentNodeIndex = reachedCheckpointCount;
+
+    for (let i = 0; i < totalNodes; i++) {
+      if (i < currentNodeIndex) {
+        statuses.push(CHECKPOINT_STATUS_COMPLETED);
+      } else if (i === currentNodeIndex) {
+        statuses.push(CHECKPOINT_STATUS_IN_PROGRESS);
+      } else {
+        statuses.push(CHECKPOINT_STATUS_INCOMPLETE);
+      }
+    }
+
+    return statuses;
+  }
+
+  get progressPercent(): number {
+    if (
+      this.totalCheckpointsCount === 0 ||
+      this.lessonProgressStatus === 'coming_soon'
+    ) {
+      return 0;
+    }
+    const visitedCheckpointCount = Math.min(
+      Math.max(this.visitedCheckpointsCount, 0),
+      this.totalCheckpointsCount
+    );
+    if (
+      this.lessonProgressStatus === 'completed' ||
+      visitedCheckpointCount >= this.totalCheckpointsCount
+    ) {
+      return 100;
+    }
+    const reachedCheckpointCount = Math.max(visitedCheckpointCount - 1, 0);
+    return Math.floor(
+      (reachedCheckpointCount / this.totalCheckpointsCount) * 100
+    );
+  }
+
+  get showCheckpointBar(): boolean {
+    return (
+      this.lessonProgressStatus !== 'coming_soon' &&
+      this.totalCheckpointsCount > 0
+    );
   }
 
   navigateTo(url: string): void {
     if (url) {
       this.windowRef.nativeWindow.location.assign(url);
     }
-  }
-
-  onStartButtonClick(): void {
-    if (!this.startUrl) {
-      return;
-    }
-
-    if (!this.isLessonUnavailableInPreferredLanguage()) {
-      this.navigateTo(this.startUrl);
-      return;
-    }
-
-    if (this.selectedTextLanguageCode) {
-      this.saveSessionFallbackLanguageSelection();
-      this.navigateTo(
-        this.getLessonStartUrlWithLanguageSelection(
-          this.selectedTextLanguageCode,
-          this.selectedVoiceoverLanguageCode
-        )
-      );
-      return;
-    }
-
-    this.openLanguageSelectionModal();
-  }
-
-  isLessonUnavailableInPreferredLanguage(): boolean {
-    if (!this.availableTextLanguageCodes.length) {
-      return false;
-    }
-    const preferredLanguageCode = this.getPreferredLanguageCode();
-    return !this.availableTextLanguageCodes.includes(preferredLanguageCode);
-  }
-
-  getFallbackInfoTooltipText(): string {
-    const preferredLanguageDescription = this.getLanguageDescription(
-      this.getPreferredLanguageCode()
-    );
-    return (
-      'This lesson is not available in ' +
-      preferredLanguageDescription +
-      '. Choose another language to continue.'
-    );
-  }
-
-  onSelectedTextLanguageCodeChange(newLanguageCode: string | null): void {
-    this.selectedTextLanguageCode = newLanguageCode;
-    this.saveSessionFallbackLanguageSelection();
-  }
-
-  onSelectedVoiceoverLanguageCodeChange(newLanguageCode: string | null): void {
-    this.selectedVoiceoverLanguageCode = newLanguageCode;
-    this.saveSessionFallbackLanguageSelection();
-  }
-
-  getLanguageDescription(languageCode: string): string {
-    return (
-      this.languageUtilService.getContentLanguageDescription(languageCode) ||
-      this.languageUtilService.getAudioLanguageDescription(languageCode) ||
-      languageCode
-    );
   }
 
   getThumbnailAltText(): string {
@@ -142,154 +165,6 @@ export class TopicLessonCardComponent implements OnInit {
   private getFallbackThumbnailUrl(): string {
     return this.urlInterpolationService.getStaticImageUrl(
       FALLBACK_THUMBNAIL_IMAGE_PATH
-    );
-  }
-
-  private getPreferredLanguageCode(): string {
-    return this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
-  }
-
-  private initializeFallbackLanguageSelection(): void {
-    if (!this.isLessonUnavailableInPreferredLanguage()) {
-      this.selectedTextLanguageCode = null;
-      this.selectedVoiceoverLanguageCode = null;
-      return;
-    }
-
-    const preferredLanguageCode = this.getPreferredLanguageCode();
-    const sessionFallbackSelection =
-      this.topicSessionFallbackLanguageService.getFallbackSelection(
-        preferredLanguageCode
-      );
-
-    this.selectedTextLanguageCode = this.getInitialTextLanguageCode(
-      sessionFallbackSelection?.textLanguageCode || null
-    );
-    this.selectedVoiceoverLanguageCode = this.getInitialVoiceoverLanguageCode(
-      sessionFallbackSelection?.voiceoverLanguageCode || null
-    );
-
-    this.saveSessionFallbackLanguageSelection();
-  }
-
-  private getInitialTextLanguageCode(
-    sessionFallbackTextLanguageCode: string | null
-  ): string | null {
-    if (!this.availableTextLanguageCodes.length) {
-      return null;
-    }
-
-    if (
-      sessionFallbackTextLanguageCode &&
-      this.availableTextLanguageCodes.includes(sessionFallbackTextLanguageCode)
-    ) {
-      return sessionFallbackTextLanguageCode;
-    }
-
-    if (this.availableTextLanguageCodes.includes('en')) {
-      return 'en';
-    }
-
-    return this.availableTextLanguageCodes[0];
-  }
-
-  private getInitialVoiceoverLanguageCode(
-    sessionFallbackVoiceoverLanguageCode: string | null
-  ): string | null {
-    if (!this.availableVoiceoverLanguageCodes.length) {
-      return null;
-    }
-
-    if (
-      sessionFallbackVoiceoverLanguageCode &&
-      this.availableVoiceoverLanguageCodes.includes(
-        sessionFallbackVoiceoverLanguageCode
-      )
-    ) {
-      return sessionFallbackVoiceoverLanguageCode;
-    }
-
-    if (this.availableVoiceoverLanguageCodes.includes('en')) {
-      return 'en';
-    }
-
-    return this.availableVoiceoverLanguageCodes[0];
-  }
-
-  private saveSessionFallbackLanguageSelection(): void {
-    if (!this.isLessonUnavailableInPreferredLanguage()) {
-      return;
-    }
-
-    if (!this.selectedTextLanguageCode) {
-      return;
-    }
-
-    this.topicSessionFallbackLanguageService.saveFallbackSelection(
-      this.getPreferredLanguageCode(),
-      this.selectedTextLanguageCode,
-      this.selectedVoiceoverLanguageCode
-    );
-  }
-
-  private getLessonStartUrlWithLanguageSelection(
-    textLanguageCode: string,
-    voiceoverLanguageCode: string | null
-  ): string {
-    const lessonStartUrl = new URL(
-      this.startUrl,
-      this.windowRef.nativeWindow.location.origin
-    );
-
-    lessonStartUrl.searchParams.set(
-      this.INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM,
-      textLanguageCode
-    );
-
-    if (voiceoverLanguageCode) {
-      lessonStartUrl.searchParams.set(
-        this.INITIAL_VOICEOVER_LANGUAGE_CODE_URL_PARAM,
-        voiceoverLanguageCode
-      );
-    }
-
-    return lessonStartUrl.toString();
-  }
-
-  private openLanguageSelectionModal(): void {
-    const modalRef = this.ngbModal.open(LanguageSelectorModalComponent, {
-      backdrop: 'static',
-      centered: true,
-    });
-
-    modalRef.componentInstance.preferredLanguageCode =
-      this.getPreferredLanguageCode();
-    modalRef.componentInstance.availableTextLanguageCodes =
-      this.availableTextLanguageCodes;
-    modalRef.componentInstance.availableVoiceoverLanguageCodes =
-      this.availableVoiceoverLanguageCodes;
-    modalRef.componentInstance.selectedTextLanguageCode =
-      this.selectedTextLanguageCode;
-    modalRef.componentInstance.selectedVoiceoverLanguageCode =
-      this.selectedVoiceoverLanguageCode;
-
-    modalRef.result.then(
-      (result: {
-        selectedTextLanguageCode: string;
-        selectedVoiceoverLanguageCode: string | null;
-      }) => {
-        this.selectedTextLanguageCode = result.selectedTextLanguageCode;
-        this.selectedVoiceoverLanguageCode =
-          result.selectedVoiceoverLanguageCode;
-        this.saveSessionFallbackLanguageSelection();
-        this.navigateTo(
-          this.getLessonStartUrlWithLanguageSelection(
-            this.selectedTextLanguageCode,
-            this.selectedVoiceoverLanguageCode
-          )
-        );
-      },
-      () => {}
     );
   }
 }

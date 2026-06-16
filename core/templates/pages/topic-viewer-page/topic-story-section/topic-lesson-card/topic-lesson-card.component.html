@@ -9,16 +9,6 @@
     <div class="topic-lesson-card-copy">
       <h3 class="topic-lesson-card-title">{{ lessonTitle }}</h3>
       <p class="topic-lesson-card-description">{{ lessonDescription }}</p>
-
-      <topic-lesson-language-selector
-        *ngIf="isLessonUnavailableInPreferredLanguage()"
-        [availableTextLanguageCodes]="availableTextLanguageCodes"
-        [availableVoiceoverLanguageCodes]="availableVoiceoverLanguageCodes"
-        [selectedTextLanguageCode]="selectedTextLanguageCode"
-        [selectedVoiceoverLanguageCode]="selectedVoiceoverLanguageCode"
-        (selectedTextLanguageCodeChange)="onSelectedTextLanguageCodeChange($event)"
-        (selectedVoiceoverLanguageCodeChange)="onSelectedVoiceoverLanguageCodeChange($event)">
-      </topic-lesson-language-selector>
     </div>
 
     <div class="topic-lesson-card-actions">
@@ -31,6 +21,16 @@
         aria-label="Lesson language information"
         tabindex="0">
       </span>
+
+      <topic-lesson-language-selector
+        *ngIf="isLessonUnavailableInPreferredLanguage()"
+        [availableTextLanguageCodes]="availableTextLanguageCodes"
+        [availableVoiceoverLanguageCodes]="availableVoiceoverLanguageCodes"
+        [selectedTextLanguageCode]="selectedTextLanguageCode"
+        [selectedVoiceoverLanguageCode]="selectedVoiceoverLanguageCode"
+        (selectedTextLanguageCodeChange)="onSelectedTextLanguageCodeChange($event)"
+        (selectedVoiceoverLanguageCodeChange)="onSelectedVoiceoverLanguageCodeChange($event)">
+      </topic-lesson-language-selector>
 
       <button class="topic-lesson-card-start-button"
               type="button"

@@ -83,8 +83,15 @@
 }
 
 .topic-lesson-card-info-icon {
+  align-items: center;
+  border: 1px solid #00645c;
+  border-radius: 50%;
   color: #00645c;
-  font-size: 16px;
+  display: inline-flex;
+  font-size: 12px;
+  height: 22px;
+  justify-content: center;
+  width: 22px;
 }
 
 @media (max-width: 768px) {
@@ -124,6 +131,7 @@
   }
 
   .topic-lesson-card-actions {
+    flex-wrap: wrap;
     gap: 6px;
   }
 }
@@ -179,6 +187,8 @@
   }
 
   .topic-lesson-card-actions {
+    align-items: stretch;
+    flex-direction: column;
     justify-content: stretch;
   }
 }
