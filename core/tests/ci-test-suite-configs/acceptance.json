@@ -401,11 +401,6 @@
       "framework": "puppeteer"
     },
     {
-      "name": "logged-in-learner/manage-in-progress-and-completed-community-lessons-and-skill",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/manage-in-progress-and-completed-community-lessons-and-skill.spec.ts",
-      "framework": "puppeteer"
-    },
-    {
       "name": "logged-out-learner/play-a-complete-community-lesson",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/play-a-complete-community-lesson.spec.ts",
       "framework": "puppeteer"
