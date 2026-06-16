@@ -1,0 +1,20 @@
+<div class="topic-lesson-card" [attr.aria-label]="lessonTitle || 'Lesson card'">
+  <div class="topic-lesson-card-thumbnail">
+    <img class="topic-lesson-card-image"
+         [src]="resolvedThumbnailUrl"
+         alt="{{ getThumbnailAltText() }}"
+         title="{{ getThumbnailAltText() }}">
+  </div>
+  <div class="topic-lesson-card-content">
+    <div class="topic-lesson-card-copy">
+      <h3 class="topic-lesson-card-title">{{ lessonTitle }}</h3>
+      <p class="topic-lesson-card-description">{{ lessonDescription }}</p>
+    </div>
+    <button class="topic-lesson-card-start-button"
+            type="button"
+            [disabled]="!startUrl"
+            (click)="navigateTo(startUrl)">
+      {{ 'I18N_TOPIC_VIEWER_START' | translate }}
+    </button>
+  </div>
+</div>
