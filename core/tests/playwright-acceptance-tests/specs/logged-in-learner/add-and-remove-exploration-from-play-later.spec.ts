@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,22 +19,23 @@
  * LI.PL. Learner selects an exploration to “play later” from the community library
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+test.describe.configure({mode: 'serial'});
 
-describe('Logged-in User', function () {
+test.describe('Logged-in User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedInUser: LoggedInUser & LoggedOutUser;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
@@ -53,15 +54,16 @@ describe('Logged-in User', function () {
 
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser',
-      'logged_in_user@example.com'
+      'logged_in_user@example.com',
+      browser
     );
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 
-  it('should be able to navigate to community library', async function () {
+  test('should be able to navigate to community library', async function () {
     await loggedInUser.navigateToCommunityLibraryOnNavbar();
   });
 
-  it('should be able to save an exploration to play later', async function () {
+  test('should be able to save an exploration to play later', async function () {
     // Add a lesson to 'play later'.
     await loggedInUser.addLessonToPlayLater('Negative Numbers', true);
     await loggedInUser.expectToastMessage(
@@ -73,7 +75,7 @@ describe('Logged-in User', function () {
     await loggedInUser.addLessonToPlayLater('Whole Numbers');
   });
 
-  it('should be able to remove an exploration from play later in community library', async function () {
+  test('should be able to remove an exploration from play later in community library', async function () {
     await loggedInUser.expectPlayLaterIconToolTipToBe(
       'Whole Numbers',
       'Already added to playlist'
@@ -86,7 +88,7 @@ describe('Logged-in User', function () {
     );
   });
 
-  it('should be able to check play later in learner dashboard', async function () {
+  test('should be able to check play later in learner dashboard', async function () {
     // Navigate to the learner dashboard and play the lesson.
     await loggedInUser.navigateToLearnerDashboard();
     await loggedInUser.navigateToCommunityLessonsSection();
@@ -103,7 +105,7 @@ describe('Logged-in User', function () {
     await loggedInUser.verifyLessonPresenceInPlayLater('Whole Numbers', false);
   });
 
-  it('should be able to remove exploration from play later in learner dashboard', async function () {
+  test('should be able to remove exploration from play later in learner dashboard', async function () {
     // Removing a lesson from play later list.
     await loggedInUser.removeLessonFromPlayLater('Negative Numbers');
     await loggedInUser.verifyLessonPresenceInPlayLater(
@@ -112,7 +114,7 @@ describe('Logged-in User', function () {
     );
   });
 
-  it('should be able to play exploration from play later', async function () {
+  test('should be able to play exploration from play later', async function () {
     await loggedInUser.playLessonFromDashboard('Positive Numbers');
 
     // The exploration has a single state.
@@ -131,7 +133,7 @@ describe('Logged-in User', function () {
     );
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
