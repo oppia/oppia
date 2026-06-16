@@ -1065,7 +1065,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     'arc_id': 'arc_3',
                     'title': 'Arc 3',
                     'description': '',
-                    # Here use cast because the literal empty list is inferred as
+                    # Here we use cast because the literal empty list is inferred as
                     # List[Any], but the change dict expects List[str].
                     'node_ids': cast(List[str], []),
                 }

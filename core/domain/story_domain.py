@@ -1571,13 +1571,7 @@ class StoryContents:
                 'Expected arc_ids_order to contain each existing arc '
                 'exactly once.'
             )
-        new_arcs = []
-        for arc_id in arc_ids_order:
-            if arc_id not in old_arcs:
-                raise ValueError(
-                    'Arc with id %s is not part of this story.' % arc_id
-                )
-            new_arcs.append(old_arcs[arc_id])
+        new_arcs = [old_arcs[arc_id] for arc_id in arc_ids_order]
         self.arcs = new_arcs
 
     def move_node_to_arc(self, node_id: str, to_arc_id: str) -> None:

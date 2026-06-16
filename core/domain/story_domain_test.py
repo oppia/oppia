@@ -2844,6 +2844,19 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'node_3', self.story.story_contents.nodes[0].destination_node_ids
         )
 
+    def test_delete_node_with_duplicate_destination_ids_merge(self) -> None:
+        self.story.add_node('node_3', 'Title 3')
+        self.story.story_contents.nodes[0].destination_node_ids = [
+            'node_2',
+            'node_3',
+        ]
+        self.story.story_contents.nodes[1].destination_node_ids = ['node_3']
+        self.story.story_contents.nodes[2].destination_node_ids = []
+        self.story.delete_node('node_2')
+        self.assertIn(
+            'node_3', self.story.story_contents.nodes[0].destination_node_ids
+        )
+
     def test_story_summary_creation(self) -> None:
         curr_time = datetime.datetime.utcnow()
         story_summary = story_domain.StorySummary(
