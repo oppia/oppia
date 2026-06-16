@@ -24,13 +24,18 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import './post-certificate-offering-result-modal.component.css';
 
 type CertificateOfferingResultAction = 'created' | 'updated';
+const CERTIFICATE_OFFERING_CREATED_ACTION: CertificateOfferingResultAction =
+  'created';
+const CERTIFICATE_OFFERING_UPDATED_ACTION: CertificateOfferingResultAction =
+  'updated';
 
 @Component({
   selector: 'oppia-post-certificate-offering-result-modal',
   templateUrl: './post-certificate-offering-result-modal.component.html',
 })
 export class PostCertificateOfferingResultModalComponent {
-  @Input() action: CertificateOfferingResultAction = 'created';
+  @Input() action: CertificateOfferingResultAction =
+    CERTIFICATE_OFFERING_CREATED_ACTION;
 
   // TODO(#24717 - M1.14): Replace with dynamic values once backend is wired up.
   @Input() certificateName: string = 'Everyday Arithmetic & Number Confidence';

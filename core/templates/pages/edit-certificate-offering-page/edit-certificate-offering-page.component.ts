@@ -33,6 +33,9 @@ import {AlertsService} from 'services/alerts.service';
 import {CertificateOfferingConfirmationModalComponent} from 'components/certificate-assessment-offering-helper/certificate-offering-confirmation-modal.component';
 import {PostCertificateOfferingResultModalComponent} from 'components/certificate-assessment-offering-helper/post-certificate-offering-result-modal.component';
 
+const CERTIFICATE_OFFERING_UPDATED_ACTION = 'updated';
+const CERTIFICATE_OFFERING_NOT_READY_ACTION = 'not_ready';
+
 @Component({
   selector: 'oppia-edit-certificate-offering-page',
   templateUrl: './edit-certificate-offering-page.component.html',
@@ -112,11 +115,14 @@ export class EditCertificateOfferingPageComponent implements OnInit {
         CertificateOfferingConfirmationModalComponent,
         {backdrop: 'static'}
       );
-      modalRef.componentInstance.action = 'updated';
+      modalRef.componentInstance.action = CERTIFICATE_OFFERING_UPDATED_ACTION;
       modalRef.componentInstance.isCertificateValid = this.isCertificateValid;
 
       const action = await modalRef.result.catch(() => null);
-      if (action !== 'not_ready' && action !== 'updated') {
+      if (
+        action !== CERTIFICATE_OFFERING_NOT_READY_ACTION &&
+        action !== CERTIFICATE_OFFERING_UPDATED_ACTION
+      ) {
         return;
       }
 
@@ -130,7 +136,7 @@ export class EditCertificateOfferingPageComponent implements OnInit {
         return;
       }
 
-      if (action === 'not_ready') {
+      if (action === CERTIFICATE_OFFERING_NOT_READY_ACTION) {
         this.alertsService.addSuccessMessage('Certificate saved as not ready.');
         this.navigateToCertificateOfferingDashboard();
         return;
@@ -144,7 +150,8 @@ export class EditCertificateOfferingPageComponent implements OnInit {
           windowClass: 'oppia-certificate-result-modal',
         }
       );
-      postModalRef.componentInstance.action = 'updated';
+      postModalRef.componentInstance.action =
+        CERTIFICATE_OFFERING_UPDATED_ACTION;
       await postModalRef.result.catch(() => null);
       this.navigateToCertificateOfferingDashboard();
     } catch (error: unknown) {

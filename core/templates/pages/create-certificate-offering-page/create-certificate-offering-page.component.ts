@@ -33,6 +33,10 @@ import {CertificateOfferingConfirmationModalComponent} from 'components/certific
 import {PostCertificateOfferingResultModalComponent} from 'components/certificate-assessment-offering-helper/post-certificate-offering-result-modal.component';
 import {AlertsService} from 'services/alerts.service';
 
+const CERTIFICATE_OFFERING_CREATE_ACTION = 'create';
+const CERTIFICATE_OFFERING_CREATED_ACTION = 'created';
+const CERTIFICATE_OFFERING_NOT_READY_ACTION = 'not_ready';
+
 @Component({
   selector: 'oppia-create-certificate-offering-page',
   templateUrl: './create-certificate-offering-page.component.html',
@@ -100,11 +104,14 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
         CertificateOfferingConfirmationModalComponent,
         {backdrop: 'static'}
       );
-      modalRef.componentInstance.action = 'create';
+      modalRef.componentInstance.action = CERTIFICATE_OFFERING_CREATE_ACTION;
       modalRef.componentInstance.isCertificateValid = this.isCertificateValid;
 
       const action = await modalRef.result.catch(() => null);
-      if (action !== 'not_ready' && action !== 'create') {
+      if (
+        action !== CERTIFICATE_OFFERING_NOT_READY_ACTION &&
+        action !== CERTIFICATE_OFFERING_CREATE_ACTION
+      ) {
         return;
       }
 
@@ -117,7 +124,7 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
         return;
       }
 
-      if (action === 'not_ready') {
+      if (action === CERTIFICATE_OFFERING_NOT_READY_ACTION) {
         this.alertsService.addSuccessMessage('Certificate saved as not ready.');
         this.navigateToCertificateOfferingDashboard();
         return;
@@ -131,7 +138,8 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
           windowClass: 'oppia-certificate-result-modal',
         }
       );
-      postModalRef.componentInstance.action = 'created';
+      postModalRef.componentInstance.action =
+        CERTIFICATE_OFFERING_CREATED_ACTION;
       await postModalRef.result.catch(() => null);
       this.navigateToCertificateOfferingDashboard();
     } catch (error: unknown) {

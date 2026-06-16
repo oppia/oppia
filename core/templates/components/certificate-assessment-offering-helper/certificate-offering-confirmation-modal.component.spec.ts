@@ -19,6 +19,10 @@
 import {CertificateOfferingConfirmationModalComponent} from './certificate-offering-confirmation-modal.component';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
+const CERTIFICATE_OFFERING_CREATE_ACTION = 'create';
+const CERTIFICATE_OFFERING_UPDATED_ACTION = 'updated';
+const CERTIFICATE_OFFERING_NOT_READY_ACTION = 'not_ready';
+
 describe('Certificate offering confirmation modal component', () => {
   let component: CertificateOfferingConfirmationModalComponent;
   let ngbActiveModal: jasmine.SpyObj<NgbActiveModal>;
@@ -34,7 +38,7 @@ describe('Certificate offering confirmation modal component', () => {
   });
 
   it('should expose create copy and action for create flow', () => {
-    component.action = 'create';
+    component.action = CERTIFICATE_OFFERING_CREATE_ACTION;
 
     expect(component.modalTitle).toBe('Save Certificate');
     expect(component.confirmButtonText).toBe('Create Certificate');
@@ -43,7 +47,7 @@ describe('Certificate offering confirmation modal component', () => {
   });
 
   it('should expose update copy and action for update flow', () => {
-    component.action = 'updated';
+    component.action = CERTIFICATE_OFFERING_UPDATED_ACTION;
 
     expect(component.modalTitle).toBe('Update Certificate');
     expect(component.confirmButtonText).toBe('Update Certificate');
@@ -60,14 +64,18 @@ describe('Certificate offering confirmation modal component', () => {
   it('should close as not ready when requested', () => {
     component.saveAsNotReady();
 
-    expect(ngbActiveModal.close).toHaveBeenCalledWith('not_ready');
+    expect(ngbActiveModal.close).toHaveBeenCalledWith(
+      CERTIFICATE_OFFERING_NOT_READY_ACTION
+    );
   });
 
   it('should close with the configured action', () => {
-    component.action = 'updated';
+    component.action = CERTIFICATE_OFFERING_UPDATED_ACTION;
 
     component.confirm();
 
-    expect(ngbActiveModal.close).toHaveBeenCalledWith('updated');
+    expect(ngbActiveModal.close).toHaveBeenCalledWith(
+      CERTIFICATE_OFFERING_UPDATED_ACTION
+    );
   });
 });

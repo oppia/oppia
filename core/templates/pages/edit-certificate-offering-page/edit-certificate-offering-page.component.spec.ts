@@ -33,6 +33,9 @@ import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/c
 import {CERTIFICATE_OFFERING_SECTION_IDS} from 'components/certificate-assessment-offering-helper/certificate-offering-section.model';
 import {AlertsService} from 'services/alerts.service';
 
+const CERTIFICATE_OFFERING_UPDATED_ACTION = 'updated';
+const CERTIFICATE_OFFERING_NOT_READY_ACTION = 'not_ready';
+
 describe('Edit Certificate Offering Page Component', () => {
   let component: EditCertificateOfferingPageComponent;
   let fixture: ComponentFixture<EditCertificateOfferingPageComponent>;
@@ -77,7 +80,7 @@ describe('Edit Certificate Offering Page Component', () => {
                 componentInstance: {
                   isCertificateValid: true,
                 },
-                result: Promise.resolve('updated'),
+                result: Promise.resolve(CERTIFICATE_OFFERING_UPDATED_ACTION),
               }) as NgbModalRef,
           },
         },
@@ -191,7 +194,7 @@ describe('Edit Certificate Offering Page Component', () => {
         isCertificateValid: true,
         action: undefined as string | undefined,
       },
-      result: Promise.resolve('updated'),
+      result: Promise.resolve(CERTIFICATE_OFFERING_UPDATED_ACTION),
     } as NgbModalRef;
     const apiSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
@@ -205,7 +208,9 @@ describe('Edit Certificate Offering Page Component', () => {
     flushMicrotasks();
 
     expect(modalSpy).toHaveBeenCalled();
-    expect(modalRef.componentInstance.action).toBe('updated');
+    expect(modalRef.componentInstance.action).toBe(
+      CERTIFICATE_OFFERING_UPDATED_ACTION
+    );
     expect(apiSpy).toHaveBeenCalledWith(
       'certificate_offering_id',
       component.certificateAssessmentOffering
@@ -220,7 +225,7 @@ describe('Edit Certificate Offering Page Component', () => {
         isCertificateValid: true,
         action: undefined as string | undefined,
       },
-      result: Promise.resolve('updated'),
+      result: Promise.resolve(CERTIFICATE_OFFERING_UPDATED_ACTION),
     } as NgbModalRef;
     const secondModalRef = {
       componentInstance: {
@@ -248,7 +253,9 @@ describe('Edit Certificate Offering Page Component', () => {
       component.certificateAssessmentOffering
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate updated.');
-    expect(secondModalRef.componentInstance.action).toBe('updated');
+    expect(secondModalRef.componentInstance.action).toBe(
+      CERTIFICATE_OFFERING_UPDATED_ACTION
+    );
     expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
   }));
 
@@ -263,7 +270,7 @@ describe('Edit Certificate Offering Page Component', () => {
       componentInstance: {
         isCertificateValid: true,
       },
-      result: Promise.resolve('not_ready'),
+      result: Promise.resolve(CERTIFICATE_OFFERING_NOT_READY_ACTION),
     } as NgbModalRef);
 
     component.updateCertificateOffering();
@@ -288,7 +295,7 @@ describe('Edit Certificate Offering Page Component', () => {
       componentInstance: {
         isCertificateValid: true,
       },
-      result: Promise.resolve('updated'),
+      result: Promise.resolve(CERTIFICATE_OFFERING_UPDATED_ACTION),
     } as NgbModalRef);
 
     component.updateCertificateOffering();
@@ -325,7 +332,7 @@ describe('Edit Certificate Offering Page Component', () => {
       componentInstance: {
         isCertificateValid: true,
       },
-      result: Promise.resolve('updated'),
+      result: Promise.resolve(CERTIFICATE_OFFERING_UPDATED_ACTION),
     } as NgbModalRef);
     spyOn(
       certificateAssessmentOfferingBackendApiService,
@@ -348,7 +355,7 @@ describe('Edit Certificate Offering Page Component', () => {
       componentInstance: {
         isCertificateValid: true,
       },
-      result: Promise.resolve('updated'),
+      result: Promise.resolve(CERTIFICATE_OFFERING_UPDATED_ACTION),
     } as NgbModalRef);
     spyOn(
       certificateAssessmentOfferingBackendApiService,

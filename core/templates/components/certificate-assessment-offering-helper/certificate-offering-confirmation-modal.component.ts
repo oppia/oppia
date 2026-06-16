@@ -21,13 +21,16 @@ import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 type CertificateOfferingAction = 'create' | 'updated';
+const CERTIFICATE_OFFERING_CREATE_ACTION: CertificateOfferingAction = 'create';
+const CERTIFICATE_OFFERING_NOT_READY_ACTION = 'not_ready';
 
 @Component({
   selector: 'oppia-certificate-offering-confirmation-modal',
   templateUrl: './certificate-offering-confirmation-modal.component.html',
 })
 export class CertificateOfferingConfirmationModalComponent {
-  @Input() action: CertificateOfferingAction = 'create';
+  @Input() action: CertificateOfferingAction =
+    CERTIFICATE_OFFERING_CREATE_ACTION;
   @Input() isCertificateValid: boolean = false;
 
   constructor(private ngbActiveModal: NgbActiveModal) {}
@@ -37,7 +40,7 @@ export class CertificateOfferingConfirmationModalComponent {
   }
 
   saveAsNotReady(): void {
-    this.ngbActiveModal.close('not_ready');
+    this.ngbActiveModal.close(CERTIFICATE_OFFERING_NOT_READY_ACTION);
   }
 
   confirm(): void {
@@ -45,23 +48,25 @@ export class CertificateOfferingConfirmationModalComponent {
   }
 
   get modalTitle(): string {
-    return this.action === 'create' ? 'Save Certificate' : 'Update Certificate';
+    return this.action === CERTIFICATE_OFFERING_CREATE_ACTION
+      ? 'Save Certificate'
+      : 'Update Certificate';
   }
 
   get confirmButtonText(): string {
-    return this.action === 'create'
+    return this.action === CERTIFICATE_OFFERING_CREATE_ACTION
       ? 'Create Certificate'
       : 'Update Certificate';
   }
 
   get confirmationText(): string {
-    return this.action === 'create'
+    return this.action === CERTIFICATE_OFFERING_CREATE_ACTION
       ? 'Choose whether to save this certificate as not ready or create it now.'
       : 'Choose whether to save this certificate as not ready or update it now.';
   }
 
   get disabledText(): string {
-    return this.action === 'create'
+    return this.action === CERTIFICATE_OFFERING_CREATE_ACTION
       ? 'Create Certificate is disabled until validation passes.'
       : 'Update Certificate is disabled until validation passes.';
   }

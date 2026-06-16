@@ -33,6 +33,10 @@ import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/c
 import {CERTIFICATE_OFFERING_SECTION_IDS} from 'components/certificate-assessment-offering-helper/certificate-offering-section.model';
 import {AlertsService} from 'services/alerts.service';
 
+const CERTIFICATE_OFFERING_CREATE_ACTION = 'create';
+const CERTIFICATE_OFFERING_CREATED_ACTION = 'created';
+const CERTIFICATE_OFFERING_NOT_READY_ACTION = 'not_ready';
+
 describe('Create Certificate Offering Page Component', () => {
   let component: CreateCertificateOfferingPageComponent;
   let fixture: ComponentFixture<CreateCertificateOfferingPageComponent>;
@@ -67,7 +71,7 @@ describe('Create Certificate Offering Page Component', () => {
                 componentInstance: {
                   isCertificateValid: false,
                 },
-                result: Promise.resolve('not_ready'),
+                result: Promise.resolve(CERTIFICATE_OFFERING_NOT_READY_ACTION),
               }) as NgbModalRef,
           },
         },
@@ -169,7 +173,7 @@ describe('Create Certificate Offering Page Component', () => {
         isCertificateValid: false,
         action: undefined as string | undefined,
       },
-      result: Promise.resolve('not_ready'),
+      result: Promise.resolve(CERTIFICATE_OFFERING_NOT_READY_ACTION),
     } as NgbModalRef;
     const apiSpy = spyOn(
       certificateAssessmentOfferingBackendApiService,
@@ -183,7 +187,9 @@ describe('Create Certificate Offering Page Component', () => {
     flushMicrotasks();
 
     expect(modalSpy).toHaveBeenCalled();
-    expect(modalRef.componentInstance.action).toBe('create');
+    expect(modalRef.componentInstance.action).toBe(
+      CERTIFICATE_OFFERING_CREATE_ACTION
+    );
     expect(apiSpy).toHaveBeenCalledWith(
       component.certificateAssessmentOffering
     );
@@ -197,7 +203,7 @@ describe('Create Certificate Offering Page Component', () => {
         isCertificateValid: false,
         action: undefined as string | undefined,
       },
-      result: Promise.resolve('create'),
+      result: Promise.resolve(CERTIFICATE_OFFERING_CREATE_ACTION),
     } as NgbModalRef;
     const secondModalRef = {
       componentInstance: {
@@ -224,7 +230,9 @@ describe('Create Certificate Offering Page Component', () => {
       component.certificateAssessmentOffering
     );
     expect(alertsSpy).toHaveBeenCalledWith('Certificate created.');
-    expect(secondModalRef.componentInstance.action).toBe('created');
+    expect(secondModalRef.componentInstance.action).toBe(
+      CERTIFICATE_OFFERING_CREATED_ACTION
+    );
     expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
   }));
 
@@ -239,7 +247,7 @@ describe('Create Certificate Offering Page Component', () => {
       componentInstance: {
         isCertificateValid: false,
       },
-      result: Promise.resolve('not_ready'),
+      result: Promise.resolve(CERTIFICATE_OFFERING_NOT_READY_ACTION),
     } as NgbModalRef);
 
     component.saveCertificateOffering();
@@ -276,7 +284,7 @@ describe('Create Certificate Offering Page Component', () => {
       componentInstance: {
         isCertificateValid: false,
       },
-      result: Promise.resolve('not_ready'),
+      result: Promise.resolve(CERTIFICATE_OFFERING_NOT_READY_ACTION),
     } as NgbModalRef);
     spyOn(
       certificateAssessmentOfferingBackendApiService,
@@ -299,7 +307,7 @@ describe('Create Certificate Offering Page Component', () => {
       componentInstance: {
         isCertificateValid: false,
       },
-      result: Promise.resolve('not_ready'),
+      result: Promise.resolve(CERTIFICATE_OFFERING_NOT_READY_ACTION),
     } as NgbModalRef);
     spyOn(
       certificateAssessmentOfferingBackendApiService,
