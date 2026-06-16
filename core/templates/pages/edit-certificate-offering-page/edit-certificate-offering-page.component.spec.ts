@@ -56,12 +56,15 @@ describe('Edit Certificate Offering Page Component', () => {
         {
           provide: AlertsService,
           useValue: {
+            addWarning: () => {},
             addSuccessMessage: () => {},
           },
         },
         {
           provide: CertificateAssessmentOfferingBackendApiService,
           useValue: {
+            getCertificateAssessmentOfferingAsync: async () =>
+              Promise.resolve(CertificateAssessmentOfferingData.createEmpty()),
             updateCertificateAssessmentOfferingAsync: async () =>
               Promise.resolve('certificate_offering_id'),
           },
@@ -97,13 +100,62 @@ describe('Edit Certificate Offering Page Component', () => {
     expect(component.certificateOfferingId).toEqual('certificate_offering_id');
   });
 
-  it('should populate the certificate assessment offering with an empty model', () => {
-    component.populateCertificateAssessmentOfferingFromId();
+  it('should populate the certificate assessment offering with an empty model', fakeAsync(() => {
+    const apiSpy = spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'getCertificateAssessmentOfferingAsync'
+    ).and.returnValue(
+      Promise.resolve(CertificateAssessmentOfferingData.createEmpty())
+    );
 
+    component.populateCertificateAssessmentOfferingFromId();
+    flushMicrotasks();
+
+    expect(apiSpy).toHaveBeenCalledWith('certificate_offering_id');
     expect(component.certificateAssessmentOffering).toEqual(
       CertificateAssessmentOfferingData.createEmpty()
     );
-  });
+  }));
+
+  it('should populate the certificate assessment offering from backend data', fakeAsync(() => {
+    const fetchedOffering = new CertificateAssessmentOfferingData(
+      'certificate_offering_id',
+      'Loaded Title',
+      'Loaded Description',
+      'loaded_classroom',
+      {topic_1: 1},
+      3,
+      15,
+      'Available',
+      1
+    );
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'getCertificateAssessmentOfferingAsync'
+    ).and.returnValue(Promise.resolve(fetchedOffering));
+
+    component.populateCertificateAssessmentOfferingFromId();
+    flushMicrotasks();
+
+    expect(component.certificateAssessmentOffering).toEqual(fetchedOffering);
+  }));
+
+  it('should warn and navigate away if loading the certificate offering fails', fakeAsync(() => {
+    const alertsSpy = spyOn(alertsService, 'addWarning');
+    const routerSpy = spyOn(router, 'navigate');
+    spyOn(
+      certificateAssessmentOfferingBackendApiService,
+      'getCertificateAssessmentOfferingAsync'
+    ).and.returnValue(Promise.reject(new Error('Backend error')));
+
+    component.populateCertificateAssessmentOfferingFromId();
+    flushMicrotasks();
+
+    expect(alertsSpy).toHaveBeenCalledWith(
+      'The certificate offering could not be loaded.'
+    );
+    expect(routerSpy).toHaveBeenCalledWith(['/certificate-offering-dashboard']);
+  }));
 
   it('should correctly evaluate active sections', () => {
     component.activeSection = CERTIFICATE_OFFERING_SECTION_IDS.DETAILS;

@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from core import feconf
+from core import utils
 from core.domain import certificate_assessment_domain
 from core.storage.certificate_assessment import gae_models
 
@@ -104,6 +106,101 @@ def create_certificate_assessment_offering(
         certificate_assessment_offering_model
     )
     return certificate_assessment_offering
+
+
+def get_certificate_assessment_offering(
+    certificate_id: str,
+) -> certificate_assessment_domain.CertificateAssessmentOffering:
+    """Returns a single certificate assessment offering from datastore."""
+    certificate_assessment_offering_model = (
+        gae_models.CertificateAssessmentOfferingModel.get_by_id(certificate_id)
+    )
+    if certificate_assessment_offering_model is None:
+        raise utils.ValidationError(
+            'Certificate assessment offering %s does not exist.'
+            % certificate_id
+        )
+
+    return _model_to_domain(certificate_assessment_offering_model)
+
+
+def update_certificate_assessment_offering(
+    certificate_id: str,
+    title: str,
+    description: str,
+    classroom_id: str,
+    topic_ids: list[str],
+    total_questions: int,
+    time_limit_in_minutes: int,
+    demonstrates: list[str],
+    async_status: str,
+) -> certificate_assessment_domain.CertificateAssessmentOffering:
+    """Updates an existing certificate assessment offering."""
+    certificate_assessment_offering_model = (
+        gae_models.CertificateAssessmentOfferingModel.get_by_id(certificate_id)
+    )
+    if certificate_assessment_offering_model is None:
+        raise utils.ValidationError(
+            'Certificate assessment offering %s does not exist.'
+            % certificate_id
+        )
+
+    certificate_assessment_offering_model.title = title
+    certificate_assessment_offering_model.description = description
+    certificate_assessment_offering_model.classroom_id = classroom_id
+    certificate_assessment_offering_model.topic_ids = topic_ids
+    certificate_assessment_offering_model.total_questions = total_questions
+    certificate_assessment_offering_model.time_limit_in_minutes = (
+        time_limit_in_minutes
+    )
+    certificate_assessment_offering_model.demonstrates = demonstrates
+    certificate_assessment_offering_model.async_status = async_status
+
+    certificate_assessment_offering = _model_to_domain(
+        certificate_assessment_offering_model
+    )
+    certificate_assessment_offering.validate()
+
+    certificate_assessment_offering_model.commit(
+        feconf.SYSTEM_COMMITTER_ID,
+        'Certificate assessment offering updated.',
+        [
+            {'cmd': 'update_title', 'new_title': title},
+            {'cmd': 'update_description', 'new_description': description},
+            {'cmd': 'update_classroom_id', 'new_classroom_id': classroom_id},
+            {'cmd': 'update_topic_ids', 'new_topic_ids': topic_ids},
+            {
+                'cmd': 'update_total_questions',
+                'new_total_questions': total_questions,
+            },
+            {
+                'cmd': 'update_time_limit_in_minutes',
+                'new_time_limit_in_minutes': time_limit_in_minutes,
+            },
+            {'cmd': 'update_demonstrates', 'new_demonstrates': demonstrates},
+            {'cmd': 'update_async_status', 'new_async_status': async_status},
+        ],
+    )
+
+    return _model_to_domain(certificate_assessment_offering_model)
+
+
+def delete_certificate_assessment_offering(certificate_id: str) -> None:
+    """Deletes a certificate assessment offering from datastore."""
+    certificate_assessment_offering_model = (
+        gae_models.CertificateAssessmentOfferingModel.get_by_id(certificate_id)
+    )
+    if certificate_assessment_offering_model is None:
+        raise utils.ValidationError(
+            'Certificate assessment offering %s does not exist.'
+            % certificate_id
+        )
+
+    certificate_assessment_offering_model.delete(
+        feconf.SYSTEM_COMMITTER_ID,
+        'Certificate assessment offering deleted.',
+        force_deletion=True,
+    )
 
 
 def get_certificate_assessment_offerings() -> (
