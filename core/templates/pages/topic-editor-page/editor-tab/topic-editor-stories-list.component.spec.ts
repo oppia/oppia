@@ -194,8 +194,11 @@ describe('topicEditorStoriesList', () => {
     const dropEvent: CdkDragDrop<StorySummary[]> = {
       previousIndex: 1,
       currentIndex: 2,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       item: null!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       container: null!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       previousContainer: null!,
       isPointerOverContainer: false,
       distance: {x: 0, y: 0},
