@@ -46,6 +46,10 @@ import {
   TopicDeleteAdditionalStoryChange,
 } from 'domain/editor/undo_redo/change.model';
 import {LoaderService} from 'services/loader.service';
+import {
+  SkillBackendApiService,
+  FetchSkillResponse,
+} from 'domain/skill/skill-backend-api.service';
 import {SubtopicPageContents} from 'domain/topic/subtopic-page-contents.model';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {
@@ -95,6 +99,13 @@ export class TopicEditorStateService {
     others: [],
   };
 
+  // Cache of skill data fetched from the backend, keyed by skill ID.
+  // Used to avoid repeated backend calls during topic validation.
+  private _cachedSkillsMap: Map<string, FetchSkillResponse> = new Map();
+  // Tracks the in-progress prefetch promise so concurrent calls share
+  // the same fetch rather than firing duplicate network requests.
+  private _prefetchPromise: Promise<void> | null = null;
+
   private _skillCreationIsAllowed: boolean = false;
   private _classroomUrlFragment: string | null = null;
   private _curriculumAdminUsernames: string[] = [];
@@ -125,9 +136,10 @@ export class TopicEditorStateService {
     private editableTopicBackendApiService: EditableTopicBackendApiService,
     private topicRightsBackendApiService: TopicRightsBackendApiService,
     private loaderService: LoaderService,
+    private skillBackendApiService: SkillBackendApiService,
     private undoRedoService: UndoRedoService
   ) {
-    this._topicRights = new TopicRights(false, false, false);
+    this._topicRights = new TopicRights(false, false, false, false);
     this._subtopicPage = new SubtopicPage(
       'id',
       'topic_id',
@@ -913,6 +925,78 @@ export class TopicEditorStateService {
           }
         }
       );
+  }
+
+  /**
+   * Fetches all skills for the given skill IDs from the backend and
+   * populates the cache. Should be called once when the topic is first
+   * loaded. Validation can then be performed synchronously from the cache.
+   */
+  async prefetchSkills(skillIds: string[]): Promise<void> {
+    if (this._prefetchPromise) {
+      return this._prefetchPromise.then(() => this.prefetchSkills(skillIds));
+    }
+    this._prefetchPromise = (async () => {
+      const toFetch = skillIds.filter(id => !this._cachedSkillsMap.has(id));
+      const results = await Promise.all(
+        toFetch.map(id =>
+          this.skillBackendApiService.fetchSkillAsync(id).catch(() => null)
+        )
+      );
+      toFetch.forEach((id, i) => {
+        const result = results[i];
+        if (result) {
+          this._cachedSkillsMap.set(id, result);
+        }
+      });
+      this._prefetchPromise = null;
+    })();
+    return this._prefetchPromise;
+  }
+
+  /**
+   * Updates the skill cache incrementally when skills are added or removed
+   * from the topic. Evicts skills no longer in the topic and fetches only
+   * newly added skills. Should be called when an undo/redo change affects
+   * the topic's skill list.
+   */
+  async updateSkillCache(skillIds: string[]): Promise<void> {
+    for (const id of this._cachedSkillsMap.keys()) {
+      if (!skillIds.includes(id)) {
+        this._cachedSkillsMap.delete(id);
+      }
+    }
+    const toFetch = skillIds.filter(id => !this._cachedSkillsMap.has(id));
+    await Promise.all(
+      toFetch.map(id =>
+        this.skillBackendApiService
+          .fetchSkillAsync(id)
+          .then(data => this._cachedSkillsMap.set(id, data))
+          .catch(() => null)
+      )
+    );
+  }
+
+  /**
+   * Returns a list of validation issue strings for any skills in the topic
+   * that have been superseded by another skill. Reads synchronously from
+   * the cache populated by prefetchSkills() or updateSkillCache().
+   */
+  getSupersedingSkillIssues(skillIds: string[]): string[] {
+    const issues: string[] = [];
+    for (const skillId of skillIds) {
+      const skillData = this._cachedSkillsMap.get(skillId);
+      if (!skillData) {
+        continue;
+      }
+      const supersedingSkillId = skillData.skill.getSupersedingSkillId();
+      if (supersedingSkillId !== null) {
+        issues.push(
+          `The skill with id ${skillId} has superseding skill ${supersedingSkillId}`
+        );
+      }
+    }
+    return issues;
   }
 
   get onStorySummariesInitialized(): EventEmitter<void> {

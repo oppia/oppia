@@ -117,26 +117,26 @@ interface ExplorationData extends ExplorationBackendDict {
 export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  explorationIsLinkedToStory: boolean;
-  screenIsLarge: boolean;
-  explorationId: string;
-  explorationUrl: string;
-  revertExplorationUrl: string;
-  checkRevertExplorationValidUrl: string;
-  explorationDownloadUrl: string;
-  improvementsTabIsEnabled: boolean;
+  explorationIsLinkedToStory: boolean = false;
+  screenIsLarge: boolean = false;
+  explorationId: string = '';
+  explorationUrl: string = '';
+  revertExplorationUrl: string = '';
+  checkRevertExplorationValidUrl: string = '';
+  explorationDownloadUrl: string = '';
+  improvementsTabIsEnabled: boolean = false;
   reconnectedMessageTimeoutMilliseconds: number = 4000;
   disconnectedMessageTimeoutMilliseconds: number = 5000;
   autosaveIsInProgress: boolean = false;
   connectedToInternet: boolean = true;
   explorationEditorPageHasInitialized: boolean = false;
   activeThread: string | null = null;
-  warningsAreShown: boolean;
-  currentUserIsCurriculumAdmin: boolean;
-  currentUserIsModerator: boolean;
-  currentUser: string;
-  currentVersion: number;
-  areExplorationWarningsVisible: boolean;
+  warningsAreShown: boolean = false;
+  currentUserIsCurriculumAdmin: boolean = false;
+  currentUserIsModerator: boolean = false;
+  currentUser: string = '';
+  currentVersion: number = 0;
+  areExplorationWarningsVisible: boolean = false;
   isModalOpenable: boolean = true;
   modifyTranslationsFeatureFlagIsEnabled: boolean = false;
 
@@ -247,27 +247,32 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
 
         this.explorationFeaturesService.init(explorationData, featuresData);
 
-        this.explorationStatesService.init(
-          explorationData.states,
-          (explorationData as ExplorationData).exploration_is_linked_to_story
-        );
-        this.entityTranslationsService.init(
-          this.explorationId,
-          'exploration',
-          explorationData.version
-        );
-        this.pageContextService.setExplorationVersion(explorationData.version);
+      this.explorationStatesService.init(
+        explorationData.states,
+        (explorationData as ExplorationData).exploration_is_linked_to_story
+      );
+      const version = explorationData.version;
 
-        const languageCode =
-          this.entityVoiceoversService.languageCode ||
-          explorationData.language_code;
-        this.entityVoiceoversService.init(
-          this.explorationId,
-          'exploration',
-          explorationData.version,
-          languageCode
-        );
-        this.entityVoiceoversService.fetchEntityVoiceovers();
+      if (version === undefined || version === null) {
+        throw new Error('Exploration version cannot be null.');
+      }
+      this.entityTranslationsService.init(
+        this.explorationId,
+        'exploration',
+        version
+      );
+      this.pageContextService.setExplorationVersion(version);
+
+      const languageCode =
+        this.entityVoiceoversService.languageCode ||
+        explorationData.language_code;
+      this.entityVoiceoversService.init(
+        this.explorationId,
+        'exploration',
+        version,
+        languageCode
+      );
+      this.entityVoiceoversService.fetchEntityVoiceovers();
 
         this.explorationTitleService.init(explorationData.title);
         this.explorationCategoryService.init(
@@ -301,27 +306,27 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           this.editabilityService.lockExploration(false);
         }
 
-        this.currentUserIsCurriculumAdmin = userInfo.isCurriculumAdmin();
-        this.currentUserIsModerator = userInfo.isModerator();
-        this.currentUser = (explorationData as ExplorationData).user;
-        this.currentVersion = explorationData.version;
+      this.currentUserIsCurriculumAdmin = userInfo.isCurriculumAdmin();
+      this.currentUserIsModerator = userInfo.isModerator();
+      this.currentUser = (explorationData as ExplorationData).user;
+      this.currentVersion = version;
 
-        this.explorationRightsService.init(
-          (explorationData as ExplorationData).rights.owner_names,
-          (explorationData as ExplorationData).rights.editor_names,
-          (explorationData as ExplorationData).rights.voice_artist_names,
-          (explorationData as ExplorationData).rights.viewer_names,
-          (explorationData as ExplorationData).rights.status,
-          (explorationData as ExplorationData).rights.cloned_from,
-          (explorationData as ExplorationData).rights.community_owned,
-          (explorationData as ExplorationData).rights.viewable_if_private
-        );
-        this.userEmailPreferencesService.init(
-          (explorationData as ExplorationData).email_preferences
-            .mute_feedback_notifications,
-          (explorationData as ExplorationData).email_preferences
-            .mute_suggestion_notifications
-        );
+      this.explorationRightsService.init(
+        (explorationData as ExplorationData).rights.owner_names,
+        (explorationData as ExplorationData).rights.editor_names,
+        (explorationData as ExplorationData).rights.voice_artist_names,
+        (explorationData as ExplorationData).rights.viewer_names,
+        (explorationData as ExplorationData).rights.status,
+        (explorationData as ExplorationData).rights.cloned_from,
+        (explorationData as ExplorationData).rights.community_owned,
+        (explorationData as ExplorationData).rights.viewable_if_private
+      );
+      this.userEmailPreferencesService.init(
+        (explorationData as ExplorationData).email_preferences
+          .mute_feedback_notifications,
+        (explorationData as ExplorationData).email_preferences
+          .mute_suggestion_notifications
+      );
 
         this.userExplorationPermissionsService
           .getPermissionsAsync()
@@ -334,67 +339,31 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
             }
           });
 
-        this.versionHistoryService.init(explorationData.version);
+      this.versionHistoryService.init(version);
 
         this.graphDataService.recompute();
 
-        if (
-          !this.stateEditorService.getActiveStateName() ||
-          !this.explorationStatesService.getState(
-            this.stateEditorService.getActiveStateName()
-          )
-        ) {
-          this.stateEditorService.setActiveStateName(
-            this.explorationInitStateNameService.displayed as string
-          );
-        }
+      const activeStateName = this.stateEditorService.getActiveStateName();
 
-        if (this.modifyTranslationsFeatureFlagIsEnabled) {
-          this.entityBulkTranslationsBackendApiService
-            .fetchEntityBulkTranslationsAsync(
-              this.explorationId,
-              'exploration',
-              this.currentVersion
-            )
-            .then(response => {
-              for (let language in response) {
-                // Initialize the entity translation objects with the last published translations
-                // in order to compare translation changes made.
-                let languageTranslations =
-                  response[language].translationMappingToBackendDict();
-                this.entityTranslationsService.languageCodeToLastPublishedEntityTranslations[
-                  language
-                ] = EntityTranslation.createFromBackendDict({
-                  entity_id: this.explorationId,
-                  entity_type: 'exploration',
-                  entity_version: response[language].entityVersion,
-                  language_code: language,
-                  translations: languageTranslations,
-                });
+      if (
+        !activeStateName ||
+        !this.explorationStatesService.getState(activeStateName)
+      ) {
+        this.stateEditorService.setActiveStateName(
+          this.explorationInitStateNameService.displayed as string
+        );
+      }
 
-                this.entityTranslationsService.languageCodeToLatestEntityTranslations[
-                  language
-                ] = EntityTranslation.createFromBackendDict({
-                  entity_id: this.explorationId,
-                  entity_type: 'exploration',
-                  entity_version: response[language].entityVersion,
-                  language_code: language,
-                  translations: languageTranslations,
-                });
-              }
-              // Populate the entity translations with draft changes
-              // if they exist.
-              this.populateEntityTranslationsWithDraftChanges(
-                explorationData.draft_changes,
-                explorationData.version
-              );
-            });
-        } else {
-          // Simply populate draft changes for the translation tab in case the feature flag is not enabled.
-          this.populateEntityTranslationsWithDraftChanges(
-            explorationData.draft_changes,
-            explorationData.version
-          );
+      const currentStateName =
+        this.routerService.getCurrentStateFromLocationPath();
+
+      if (
+        !this.routerService.isLocationSetToNonStateEditorTab() &&
+        (!currentStateName ||
+          !explorationData.states.hasOwnProperty(currentStateName))
+      ) {
+        if (this.threadDataBackendApiService.getOpenThreadsCount() > 0) {
+          this.routerService.navigateToFeedbackTab();
         }
 
         // Initialize changeList by draft changes if they exist.
@@ -425,9 +394,46 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           this.explorationStatesService.getState(
             this.stateEditorService.getActiveStateName()
           )
-        ) {
-          this.stateEditorRefreshService.onRefreshStateEditor.emit();
-        }
+          .then(response => {
+            for (let language in response) {
+              // Initialize the entity translation objects with the last published translations
+              // in order to compare translation changes made.
+              let languageTranslations =
+                response[language].translationMappingToBackendDict();
+              this.entityTranslationsService.languageCodeToLastPublishedEntityTranslations[
+                language
+              ] = EntityTranslation.createFromBackendDict({
+                entity_id: this.explorationId,
+                entity_type: 'exploration',
+                entity_version: response[language].entityVersion,
+                language_code: language,
+                translations: languageTranslations,
+              });
+
+              this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+                language
+              ] = EntityTranslation.createFromBackendDict({
+                entity_id: this.explorationId,
+                entity_type: 'exploration',
+                entity_version: response[language].entityVersion,
+                language_code: language,
+                translations: languageTranslations,
+              });
+            }
+            // Populate the entity translations with draft changes
+            // if they exist.
+            this.populateEntityTranslationsWithDraftChanges(
+              explorationData.draft_changes,
+              version
+            );
+          });
+      } else {
+        // Simply populate draft changes for the translation tab in case the feature flag is not enabled.
+        this.populateEntityTranslationsWithDraftChanges(
+          explorationData.draft_changes,
+          version
+        );
+      }
 
         this.stateTutorialFirstTimeService.initEditor(
           (explorationData as ExplorationData)
@@ -448,9 +454,13 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         await this.explorationImprovementsService.flushUpdatedTasksToBackend();
 
         this.explorationWarningsService.updateWarnings();
+      if (
+        activeStateName &&
+        this.explorationStatesService.getState(activeStateName)
+      ) {
         this.stateEditorRefreshService.onRefreshStateEditor.emit();
-        this.explorationEditorPageHasInitialized = true;
       }
+      this.explorationEditorPageHasInitialized = true;
     );
   }
 
@@ -543,9 +553,11 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       '.exploration-editor-content'
     );
 
-    mainContentElement.tabIndex = -1;
-    mainContentElement.scrollIntoView();
-    mainContentElement.focus();
+    if (mainContentElement) {
+      mainContentElement.tabIndex = -1;
+      mainContentElement.scrollIntoView();
+      mainContentElement.focus();
+    }
   }
 
   startEditorTutorial(): void {

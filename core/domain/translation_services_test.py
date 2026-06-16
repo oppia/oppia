@@ -367,19 +367,44 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
                 False,
             ),
         )
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.EXP_ID,
+            5,
+            'ar',
+            'content_5',
+            translation_domain.TranslatedContent(
+                'Translations in Arabic!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False,
+            ),
+        )
 
         entity_translation_models: Sequence[
             translation_models.EntityTranslationsModel
         ] = translation_models.EntityTranslationsModel.get_all().fetch()
-        self.assertEqual(len(entity_translation_models), 1)
-        entity_translation_model = entity_translation_models[0]
-        self.assertEqual(entity_translation_model.entity_version, 5)
+        self.assertEqual(len(entity_translation_models), 2)
+        entity_translation_model_hi = next(
+            et for et in entity_translation_models if et.language_code == 'hi'
+        )
+        self.assertEqual(entity_translation_model_hi.entity_version, 5)
         self.assertEqual(
             [
                 translation['needs_update']
-                for translation in entity_translation_model.translations.values()
+                for translation in entity_translation_model_hi.translations.values()
             ],
             [False, False],
+        )
+        entity_translation_model_ar = next(
+            et for et in entity_translation_models if et.language_code == 'ar'
+        )
+        self.assertEqual(entity_translation_model_ar.entity_version, 5)
+        self.assertEqual(
+            [
+                translation['needs_update']
+                for translation in entity_translation_model_ar.translations.values()
+            ],
+            [False],
         )
 
         self.exp.version = 6
@@ -399,14 +424,30 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             )
         )
 
-        self.assertEqual(len(entity_translation_models), 1)
-        entity_translation = entity_translation_models[0]
+        self.assertEqual(len(entity_translation_models), 2)
+
+        # Hindi translation should be marked as needs update.
+        entity_translation_hi = next(
+            et for et in entity_translation_models if et.language_code == 'hi'
+        )
         self.assertItemsEqual(
             [
                 translation['needs_update']
-                for translation in entity_translation.translations.values()
+                for translation in entity_translation_hi.translations.values()
             ],
             [False, True],
+        )
+
+        # Arabic translation should NOT be marked as needs update.
+        entity_translation_ar = next(
+            et for et in entity_translation_models if et.language_code == 'ar'
+        )
+        self.assertItemsEqual(
+            [
+                translation['needs_update']
+                for translation in entity_translation_ar.translations.values()
+            ],
+            [False],
         )
 
     def test_compute_translation_related_change_edits_existing_translation(

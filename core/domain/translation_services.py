@@ -24,10 +24,11 @@ from core import feconf
 from core.domain import exp_domain, translation_domain, translation_fetchers
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple, cast
+from typing import Dict, List, Optional, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
+    from core.domain import skill_domain, story_domain, topic_domain
     from mypy_imports import translate_services, translation_models
 
 
@@ -329,11 +330,17 @@ def get_displayable_translation_languages(
 
 
 def get_translation_counts(
-    entity_type: feconf.TranslatableEntityType, entity: exp_domain.Exploration
+    entity_type: feconf.TranslatableEntityType,
+    entity: Union[
+        exp_domain.Exploration,
+        story_domain.Story,
+        skill_domain.Skill,
+        topic_domain.Topic,
+    ],
 ) -> Dict[str, int]:
     """Returns a dict representing the number of translations available in a
     language for which there exists at least one translation in the
-    exploration.
+    entity.
 
     Returns:
         dict(str, int). A dict with language code as a key and number of
@@ -345,8 +352,10 @@ def get_translation_counts(
         )
     )
     return {
-        entity_translation.language_code: entity.get_translation_count(
-            entity_translation
+        entity_translation.language_code: (
+            entity.get_translation_count(entity_translation)
+            if isinstance(entity, translation_domain.BaseTranslatableObject)
+            else len(entity_translation.translations)
         )
         for entity_translation in entity_translations
     }

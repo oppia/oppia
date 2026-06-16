@@ -24,6 +24,7 @@ import {State} from 'domain/state/state.model';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {EditabilityService} from 'services/editability.service';
 import {ExternalSaveService} from 'services/external-save.service';
+import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {TranslationLanguageService} from '../services/translation-language.service';
 import {TranslationTabActiveContentIdService} from '../services/translation-tab-active-content-id.service';
 import {StateTranslationEditorComponent} from './state-translation-editor.component';
@@ -60,6 +61,7 @@ describe('State Translation Editor Component', () => {
   let explorationStatesService: ExplorationStatesService;
   let translationLanguageService: TranslationLanguageService;
   let externalSaveService: ExternalSaveService;
+  let externalRteSaveService: ExternalRteSaveService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationStatusService: TranslationStatusService;
   let state: State;
@@ -95,6 +97,7 @@ describe('State Translation Editor Component', () => {
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     externalSaveService = TestBed.inject(ExternalSaveService);
+    externalRteSaveService = TestBed.inject(ExternalRteSaveService);
     translationTabActiveContentIdService = TestBed.inject(
       TranslationTabActiveContentIdService
     );
@@ -177,10 +180,11 @@ describe('State Translation Editor Component', () => {
           content_0: {
             manual: manualVoiceover1,
           },
-        }
+        },
+        {}
       );
 
-      entityVoiceoversService.init('exp_id', 'exploration', 5);
+      entityVoiceoversService.init('exp_id', 'exploration', 5, 'hi');
       entityVoiceoversService.setLanguageCode('hi');
       entityVoiceoversService.setActiveLanguageAccentCode('hi-IN');
       entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
@@ -198,7 +202,9 @@ describe('State Translation Editor Component', () => {
     });
 
     it('should not open the modal if voiceover already needs update', () => {
-      state.recordedVoiceovers = RecordedVoiceovers.createFromBackendDict({
+      (
+        state as unknown as {recordedVoiceovers: RecordedVoiceovers}
+      ).recordedVoiceovers = RecordedVoiceovers.createFromBackendDict({
         voiceovers_mapping: {
           content1: {
             hi: {
@@ -229,10 +235,11 @@ describe('State Translation Editor Component', () => {
           content_0: {
             manual: manualVoiceover1,
           },
-        }
+        },
+        {}
       );
 
-      entityVoiceoversService.init('exp_id', 'exploration', 5);
+      entityVoiceoversService.init('exp_id', 'exploration', 5, 'hi');
       entityVoiceoversService.setLanguageCode('hi');
       entityVoiceoversService.setActiveLanguageAccentCode('hi-IN');
       entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
@@ -266,7 +273,7 @@ describe('State Translation Editor Component', () => {
         entityTranslationsService.languageCodeToLatestEntityTranslations.hi.translationMapping.hasOwnProperty(
           'content1'
         )
-      ).toBeTrue();
+      ).toBeTruthy();
 
       component.activeWrittenTranslation = TranslatedContent.createNew('html');
       component.activeWrittenTranslation.translation = '';
@@ -277,13 +284,19 @@ describe('State Translation Editor Component', () => {
         entityTranslationsService.languageCodeToLatestEntityTranslations.hi.translationMapping.hasOwnProperty(
           'content1'
         )
-      ).toBeFalse();
+      ).toBeFalsy();
     });
 
     it('should refresh the translation status', () => {
       spyOn(translationStatusService, 'refresh');
       component.onSaveTranslationButtonClicked();
       expect(translationStatusService.refresh).toHaveBeenCalled();
+    });
+
+    it('should emit onExternalRteSave before saving translation', () => {
+      spyOn(externalRteSaveService.onExternalRteSave, 'emit');
+      component.onSaveTranslationButtonClicked();
+      expect(externalRteSaveService.onExternalRteSave.emit).toHaveBeenCalled();
     });
   });
 

@@ -50,7 +50,7 @@ import {
 class MockPlatformFeatureService {
   get status(): object {
     return {
-      AutomaticVoiceoverRegenerationFromExp: {
+      HighlightSentencesDuringAutomaticVoiceoverPlayback: {
         isEnabled: true,
       },
     };
@@ -265,26 +265,22 @@ describe('RTE display component', () => {
 
   it('should disable voiceover regeneration feature flag', fakeAsync(() => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      AutomaticVoiceoverRegenerationFromExp: {
+      HighlightSentencesDuringAutomaticVoiceoverPlayback: {
         isEnabled: false,
       },
     } as FeatureStatusChecker);
 
-    expect(
-      component.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
-    ).toBeFalse();
+    expect(component.isHighlightSentencesFeatureEnabled()).toBeFalse();
   }));
 
   it('should enable voiceover regeneration feature flag', fakeAsync(() => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      AutomaticVoiceoverRegenerationFromExp: {
+      HighlightSentencesDuringAutomaticVoiceoverPlayback: {
         isEnabled: true,
       },
     } as FeatureStatusChecker);
 
-    expect(
-      component.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
-    ).toBeTrue();
+    expect(component.isHighlightSentencesFeatureEnabled()).toBeTrue();
   }));
 
   it('should correctly wrap html content inside span tag for highlighting', fakeAsync(() => {
@@ -301,13 +297,126 @@ describe('RTE display component', () => {
     expect(outputWrappedString).toBe(expectedOutputWrappedString);
   }));
 
+  it('should correctly wrap html content inside span tag for highlighting', fakeAsync(() => {
+    let rteString = '<li><p>Hello world!</p></li>';
+    let expectedOutputWrappedString =
+      '<li><p><span class="highlightBlock1">Hello world!</span></p></li>';
+
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+    let outputWrappedString =
+      component.wrapSentencesInSpansForHighlighting(rteString);
+    expect(outputWrappedString).toBe(expectedOutputWrappedString);
+  }));
+
+  it('should correctly wrap custom oppia tags inside span tag for highlighting', fakeAsync(() => {
+    let rteString =
+      '<p><oppia-noninteractive-link url-with-value="&quot;https://oppia.org&quot;" text-with-value="&quot;Oppia&quot;"></oppia-noninteractive-link></p>' +
+      '<p>Hello world. This is the second sentence.</p>';
+
+    let expectedOutputWrappedString =
+      '<p><span class="highlightBlock1"><oppia-noninteractive-link url-with-value="&quot;https://oppia.org&quot;" text-with-value="&quot;Oppia&quot;"></oppia-noninteractive-link></span></p>' +
+      '<p><span class="highlightBlock2">Hello world.</span> <span class="highlightBlock3">This is the second sentence.</span></p>';
+
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+    let outputWrappedString =
+      component.wrapSentencesInSpansForHighlighting(rteString);
+
+    expect(outputWrappedString).toBe(expectedOutputWrappedString);
+  }));
+
   it('should correctly wrap html multiple sentences inside span tag for highlighting', fakeAsync(() => {
     let rteString = '<p>Hi world! I am a content creator.</p>';
     let expectedOutputWrappedString =
       '<p><span class="highlightBlock1">Hi world!</span>' +
-      '<span> </span>' +
-      '<span class="highlightBlock2">I am a content creator.</span></p>';
+      ' <span class="highlightBlock2">I am a content creator.</span></p>';
 
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+    let outputWrappedString =
+      component.wrapSentencesInSpansForHighlighting(rteString);
+    expect(outputWrappedString).toBe(expectedOutputWrappedString);
+  }));
+
+  it('should return BR node directly while traversing', () => {
+    const brElement = document.createElement('br');
+    const result = component.traverseNodeAndWrapSpanTags(brElement, /\s+/g) as
+      | Node[]
+      | Node;
+
+    expect(Array.isArray(result)).toBeTrue();
+    expect((result as Node[]).length).toBe(1);
+    expect((result as Node[])[0]).toBe(brElement);
+  });
+
+  it('should skip empty sentence fragments for empty text nodes', () => {
+    const textNode = document.createTextNode('');
+    const result = component.traverseNodeAndWrapSpanTags(
+      textNode,
+      /(?<=[.!?])\s+/g
+    ) as Text[];
+
+    expect(result.length).toBe(0);
+  });
+
+  it('should append pending whitespace nodes after traversal loop', fakeAsync(() => {
+    let rteString = '<p>Hello world.<br></p>';
+    let expectedOutputWrappedString =
+      '<p><span class="highlightBlock1">Hello world.</span><br></p>';
+
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+    let outputWrappedString =
+      component.wrapSentencesInSpansForHighlighting(rteString);
+
+    expect(outputWrappedString).toBe(expectedOutputWrappedString);
+  }));
+
+  it('should preserve unmatched trailing nodes when sentence match is incomplete', () => {
+    const paragraph = document.createElement('p');
+    paragraph.appendChild(document.createTextNode('abc'));
+
+    // This regex creates empty split fragments so sentence matching is not
+    // completed, exercising the fallback path that appends leftover nodes.
+    const traversedNode = component.traverseNodeAndWrapSpanTags(
+      paragraph,
+      /abc/g
+    ) as HTMLElement;
+
+    expect(traversedNode.nodeName).toBe('P');
+    expect(traversedNode.textContent).toBe('abc');
+    expect(traversedNode.querySelector('span')).toBeNull();
+  });
+
+  it('should preserve multiple spaces between sentences while wrapping', fakeAsync(() => {
+    let rteString = '<p>My Name is Nikhil.     Thanks!</p>';
+    let expectedOutputWrappedString =
+      '<p><span class="highlightBlock1">My Name is Nikhil.</span>' +
+      '     <span class="highlightBlock2">Thanks!</span></p>';
+
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+    let outputWrappedString =
+      component.wrapSentencesInSpansForHighlighting(rteString);
+    expect(outputWrappedString).toBe(expectedOutputWrappedString);
+  }));
+
+  it('should preserve space after punctuation around custom tags', fakeAsync(() => {
+    let rteString =
+      '<p><oppia-noninteractive-link url-with-value="&quot;https://oppia.org&quot;" text-with-value="&quot;Oppia&quot;"></oppia-noninteractive-link>. My name is Nikhil.</p>';
+    let expectedOutputWrappedString =
+      '<p><span class="highlightBlock1"><oppia-noninteractive-link url-with-value="&quot;https://oppia.org&quot;" text-with-value="&quot;Oppia&quot;"></oppia-noninteractive-link>. My name is Nikhil.</span></p>';
     spyOn(
       localStorageService,
       'getLastSelectedTranslationLanguageCode'
@@ -324,7 +433,7 @@ describe('RTE display component', () => {
     ).and.returnValue(false);
     let regenerateVoiceoverFeatureSpy = spyOn(
       component,
-      'isAutomaticVoiceoverRegenerationFromExpFeatureEnabled'
+      'isHighlightSentencesFeatureEnabled'
     );
     spyOn(
       automaticVoiceoverHighlightService,
@@ -383,7 +492,7 @@ describe('RTE display component', () => {
     let rteString = '<p>Hi<em>Hello</em>Hello</p>';
     let regenerateVoiceoverFeatureSpy = spyOn(
       component,
-      'isAutomaticVoiceoverRegenerationFromExpFeatureEnabled'
+      'isHighlightSentencesFeatureEnabled'
     );
     spyOn(automaticVoiceoverHighlightService, 'setHighlightIdToSentenceMap');
     spyOn(automaticVoiceoverHighlightService, 'setActiveContentId');
@@ -510,6 +619,23 @@ describe('RTE display component', () => {
     expect(readableText).toBe(expectedString);
   });
 
+  it('should be able to get empty text from div node', () => {
+    let node = document.createElement('div');
+    // eslint-disable-next-line oppia/no-inner-html
+    node.innerHTML =
+      '<oppia-noninteractive-image ' +
+      'alt-with-value="Oppia Arabic Blogpost Graphic" ' +
+      'caption-with-value="&amp;quot;&amp;quot;" ' +
+      'filepath-with-value="&amp;quot;' +
+      'blog_post_image_height_326_width_490.svg&amp;quot;">' +
+      '</oppia-noninteractive-image>';
+    let expectedString = '';
+    let readableText = component.decodeHtmlEntities(
+      component.getReadableTextFromNode(node.childNodes[0])
+    );
+    expect(readableText).toBe(expectedString);
+  });
+
   it('should be able to get readable text from non-interactive math node', () => {
     let node = document.createElement('p');
     // eslint-disable-next-line oppia/no-inner-html
@@ -571,6 +697,63 @@ describe('RTE display component', () => {
     );
   }));
 
+  it('should remove previous highlight element if current element is not found', fakeAsync(() => {
+    spyOn(
+      component,
+      'isManualVoiceoverAvailableForActiveContent'
+    ).and.returnValue(false);
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
+    let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
+    audioPlayingSpy.and.returnValue(true);
+
+    component.highlightIdToSentenceText = {
+      highlightBlock2: 'New element',
+    };
+
+    let document = TestBed.inject(DOCUMENT);
+
+    let previousElement = document.createElement('span');
+    // eslint-disable-next-line oppia/no-inner-html
+    previousElement.innerHTML = 'Hello world';
+    previousElement.style.backgroundColor =
+      component.backgroundColorOfHighlightedSentence;
+
+    component.previousHighlightedElementId = 'highlightBlock1';
+
+    spyOn(
+      automaticVoiceoverHighlightService,
+      'getCurrentSentenceIdToHighlight'
+    ).and.returnValue('highlightBlock2');
+
+    spyOn(
+      automaticVoiceoverHighlightService,
+      'getUnmodifiedSentenceByHighlightId'
+    ).and.callFake((className: string) => {
+      if (className === 'highlightBlock1') {
+        return 'Hello world';
+      } else if (className === 'highlightBlock2') {
+        return 'New element';
+      }
+      return null;
+    });
+
+    spyOn(document, 'getElementsByClassName').and.callFake(
+      (className: string) => {
+        if (className === 'highlightBlock1') {
+          return [previousElement];
+        }
+        return [];
+      }
+    );
+
+    component.highlightSentenceDuringVoiceoverPlay();
+
+    expect(
+      (document.getElementsByClassName('highlightBlock1')[0] as HTMLElement)
+        .style.backgroundColor
+    ).toBe('');
+  }));
+
   it(
     'should highlight the current element and remove highlighting from ' +
       'previous element during voiceover playback',
@@ -589,13 +772,13 @@ describe('RTE display component', () => {
 
       let document = TestBed.inject(DOCUMENT);
 
-      let previousElement = document.createElement('p');
+      let previousElement = document.createElement('span');
       // eslint-disable-next-line oppia/no-inner-html
       previousElement.innerHTML = 'Hello world';
       previousElement.style.backgroundColor =
         component.backgroundColorOfHighlightedSentence;
 
-      let currentElement = document.createElement('p');
+      let currentElement = document.createElement('span');
       // eslint-disable-next-line oppia/no-inner-html
       currentElement.innerHTML = 'New element';
       currentElement.style.backgroundColor = '';

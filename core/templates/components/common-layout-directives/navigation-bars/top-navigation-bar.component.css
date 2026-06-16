@@ -66,19 +66,19 @@
   padding: 0;
 }
 .oppia-top-navigation-bar .get-involved-dropdown .language {
-  color: #f2994a;
+  color: #c76a14;
   font-size: 18px;
 }
 .oppia-top-navigation-bar .get-involved-dropdown .volunteer {
-  color: #2d9cdb;
+  color: #0070b8;
   font-size: 18px;
 }
 .oppia-top-navigation-bar .get-involved-dropdown .contact {
-  color: #b4bbc3;
+  color: #757575;
   font-size: 18px;
 }
 .oppia-top-navigation-bar .get-involved-dropdown .fav {
-  color: #eb5757;
+  color: #d32f2f;
   font-size: 18px;
 }
 .oppia-top-navigation-bar .get-involved-dropdown .des {
@@ -229,7 +229,7 @@
 }
 .oppia-top-navigation-bar .about-dropdown-menu .about-link:hover,
 .oppia-top-navigation-bar .about-dropdown-menu .about-link:focus {
-  color: #009688 !important;
+  color: #00645c !important;
 }
 .oppia-top-navigation-bar .nav-item-left-head {
   color: #333;
@@ -239,7 +239,7 @@
   line-height: 18.75px;
 }
 .oppia-top-navigation-bar .learn-dropdown-menu .nav-content {
-  color: #767676;
+  color: #555;
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
   font-weight: 400;
@@ -383,7 +383,7 @@
   margin-top: -5px;
 }
 .oppia-top-navigation-bar .oppia-launch-icon {
-  color: #009688;
+  color: #00645c;
   font-size: 22px;
 }
 .oppia-top-navigation-bar .oppia-user-avatar-icon {
@@ -416,10 +416,10 @@
 }
 
 .oppia-top-navigation-bar .oppia-navbar-dropdown .nav-link {
-  color: #009688;
+  color: #00645c;
 }
 .oppia-top-navigation-bar .oppia-navbar-dropdown .nav-link:hover {
-  color: #888;
+  color: #333;
 }
 
 .oppia-top-navigation-bar .oppia-signin-text {
@@ -477,10 +477,9 @@
   padding-right: 6px;
 }
 .oppia-top-navigation-bar .oppia-navbar-tab-content-desc {
-  color: #767676;
+  color: #555;
   line-height: 20px;
   margin-left: 28px;
-  opacity: 0.9;
 }
 .oppia-top-navigation-bar .oppia-navbar-dropdown-right {
   left: 0;
@@ -617,5 +616,103 @@
     .oppia-top-navigation-bar .oppia-logo {
       left: 0;
     }
+  }
+}
+.dropdn {
+  position: absolute;
+  z-index: 500;
+}
+/*
+  Added this because Bootstrap was behaving unexpectedly by
+  adding CSS which was breaking the dropdown position while
+  in the embedded player.
+*/
+.oppia-embedded-navbar-dropdown {
+  left: auto !important;
+  position: absolute;
+  top: auto !important;
+  transform: translate(0, 0) !important;
+  will-change: auto !important;
+}
+@media only screen and (max-width: 335px) {
+  :lang(ar) .sinin {
+    font-size: 0.5rem;
+    padding: 0;
+    position: relative;
+    top: 2rem;
+  }
+}
+
+@media only screen and (max-width: 355px) {
+  .langbtn {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 4px;
+    padding: 0;
+  }
+  .langi {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 4px;
+    padding-left: 2px;
+  }
+  .langcd {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 4px;
+    padding: 0;
+  }
+  .langbtnContainer {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 4px;
+  }
+  .sinin {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 3px;
+    padding: 3px;
+  }
+  :lang(ar) .langbtn {
+    height: 28px;
+    margin-top: 6px;
+    padding: 0;
+    position: relative;
+    top: 6.2rem;
+    width: 80px;
+  }
+  :lang(ar) .langi {
+    font-size: 1.2rem;
+    margin-left: 1rem;
+    margin-right: 0;
+    margin-top: 4px;
+    padding-left: 0;
+  }
+  :lang(ar) .langbtnContainer {
+    margin-left: 1rem;
+    margin-right: 0;
+    margin-top: 4px;
+  }
+  :lang(ar) .sinin {
+    font-size: 1.2rem;
+    padding: 0;
+    position: relative;
+    top: 3.4rem;
+  }
+  :lang(ar) .pfl {
+    position: relative;
+    top: 6rem;
+  }
+  .oppia-language-dropdown-button-embedded {
+    margin-top: 8px;
+    padding: 0 1px 2px 2px;
+  }
+}
+
+@media only screen and (max-width: 308px) {
+  :lang(ar) .langbtn {
+    margin-top: 6px;
+    padding: 0;
+    position: relative;
   }
 }

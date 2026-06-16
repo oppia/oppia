@@ -241,6 +241,7 @@ export class TranslationModalComponent {
       this.activeDataFormat =
         this.modifyTranslationOpportunity.currentContentTranslation.dataFormat;
       this.loadingData = false;
+      this.updateTranslationErrors();
     }
 
     this.userService
@@ -385,6 +386,7 @@ export class TranslationModalComponent {
       ruleType,
       interactionId
     );
+    this.updateTranslationErrors();
   }
 
   toggleExpansionState(tab: ExpansionTabType): void {
@@ -423,10 +425,11 @@ export class TranslationModalComponent {
     return this.ckEditorCopyContentService.copyModeActive;
   }
 
-  updateHtml($event: string): void {
+  updateHtml($event: string | string[]): void {
     if ($event !== this.activeWrittenTranslation) {
       this.activeWrittenTranslation = $event;
       this.changeDetectorRef.detectChanges();
+      this.updateTranslationErrors();
     }
   }
 
@@ -506,21 +509,10 @@ export class TranslationModalComponent {
 
   canTranslatedTextBeSubmitted(): boolean {
     if (!this.isSetOfStringDataFormat()) {
-      const translationError =
-        this.translationValidationService.validateTranslationFromHtmlStrings(
-          this.textToTranslate as string,
-          this.activeWrittenTranslation as string
-        );
-
-      this.hasImgTextError =
-        translationError.hasDuplicateAltTexts ||
-        translationError.hasDuplicateDescriptions;
-      this.hasIncompleteTranslationError =
-        translationError.hasUntranslatedElements;
+      this.updateTranslationErrors();
 
       if (
-        this.hasImgTextError ||
-        this.hasIncompleteTranslationError ||
+        this.hasSubmitValidationErrors() ||
         this.uploadingTranslation ||
         this.loadingData
       ) {
@@ -532,6 +524,10 @@ export class TranslationModalComponent {
       }
     }
     return true;
+  }
+
+  hasSubmitValidationErrors(): boolean {
+    return this.hasImgTextError || this.hasIncompleteTranslationError;
   }
 
   suggestTranslatedText(): void {
@@ -582,6 +578,32 @@ export class TranslationModalComponent {
 
   private clearTranslation(): void {
     this.activeWrittenTranslation = '';
+    this.updateTranslationErrors();
+  }
+
+  private updateTranslationErrors(): void {
+    if (
+      this.isSetOfStringDataFormat() ||
+      typeof this.textToTranslate !== 'string' ||
+      typeof this.activeWrittenTranslation !== 'string' ||
+      this.activeWrittenTranslation.length === 0
+    ) {
+      this.hasImgTextError = false;
+      this.hasIncompleteTranslationError = false;
+      return;
+    }
+
+    const translationError =
+      this.translationValidationService.validateTranslationFromHtmlStrings(
+        this.textToTranslate,
+        this.activeWrittenTranslation
+      );
+
+    this.hasImgTextError =
+      translationError.hasDuplicateAltTexts ||
+      translationError.hasDuplicateDescriptions;
+    this.hasIncompleteTranslationError =
+      translationError.hasUntranslatedElements;
   }
 
   private closeWithoutUnsavedCheck(): void {

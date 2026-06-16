@@ -77,6 +77,11 @@ class TopicsAndSkillsDashboardPageDataHandler(
                 topic_summary['can_edit_topic'] = (
                     topic_services.check_can_edit_topic(self.user, topic_rights)
                 )
+                topic_summary['can_edit_question'] = (
+                    topic_services.check_can_edit_question(
+                        self.user, topic_rights
+                    )
+                )
 
         classrooms = classroom_config_services.get_all_classrooms()
         all_classroom_names = [classroom.name for classroom in classrooms]
@@ -604,9 +609,6 @@ class NewSkillHandler(
         for topic in topics:
             if topic is None:
                 raise self.InvalidInputException
-            topic_services.add_uncategorized_skill(
-                self.user_id, topic.id, new_skill_id
-            )
 
         if skill_services.does_skill_with_description_exist(description):
             raise self.InvalidInputException(
@@ -622,6 +624,12 @@ class NewSkillHandler(
         image_filenames = skill_services.get_image_filenames_from_skill(skill)
 
         skill_services.save_new_skill(self.user_id, skill)
+        if linked_topic_ids is not None:
+            for topic in topics:
+                assert topic is not None
+                topic_services.add_uncategorized_skill(
+                    self.user_id, topic.id, new_skill_id
+                )
 
         for filename in image_filenames:
             base64_image = files[filename]
@@ -702,6 +710,9 @@ class MergeSkillHandler(
         old_skill = skill_fetchers.get_skill_by_id(old_skill_id, strict=True)
 
         skill_services.replace_skill_id_in_all_topics(
+            self.user_id, old_skill_id, new_skill_id
+        )
+        skill_services.replace_prerequisite_skill_id_from_all_skills(
             self.user_id, old_skill_id, new_skill_id
         )
         question_services.replace_skill_id_for_all_questions(

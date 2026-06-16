@@ -4,37 +4,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
 
-<link rel="preload" href="/third_party/generated/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/third_party/generated/webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
-
 <link rel="preload"
       media="screen"
       href="https://fonts.googleapis.com/css2?family=Capriola&family=Roboto:wght@400;500;700&family=Noto+Serif:ital@0;1&display=swap"
       as="style"
       onload="this.onload=null;this.rel='stylesheet'">
-<% if (!htmlWebpackPlugin.options.lightweight) { %>
-  <link rel="preload"
-        media="screen"
-        href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap"
-        as="style"
-        onload="this.onload=null;this.rel='stylesheet'">
-<% } %>
-<% if (webpackConfig.mode == 'production') { %>
-  <link rel="preload"
-        href="/third_party/generated/css/third_party.min.css"
-        as="style"
-        onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload"
+      media="screen"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'">
+
+<!-- Angular CLI global styles (Bootstrap, Font Awesome, oppia.css, oppia-material.css, toastr). -->
+<!-- Production placeholders are rewritten to hashed styles/vendor-styles filenames in scripts/build.py. -->
+<% if (webpackConfig.mode === 'production') { %>
+  <link rel="stylesheet" type="text/css" href="/dist/oppia-angular-prod/vendor-styles.css">
+  <link rel="stylesheet" type="text/css" href="/dist/oppia-angular-prod/styles.css">
 <% } else { %>
-  <link rel="preload"
-        href="/third_party/generated/css/third_party.css"
-        as="style"
-        onload="this.onload=null;this.rel='stylesheet'">
-<% } %>
-
-<link rel="stylesheet" type="text/css" media="screen"
-      href="/templates/css/oppia.css">
-
-<% if (!htmlWebpackPlugin.options.lightweight) { %>
-  <link rel="stylesheet" type="text/css" media="screen"
-        href="/templates/css/oppia-material.css">
+  <link rel="stylesheet" type="text/css" href="/dist/oppia-angular/vendor-styles.css">
+  <link rel="stylesheet" type="text/css" href="/dist/oppia-angular/styles.css">
 <% } %>
