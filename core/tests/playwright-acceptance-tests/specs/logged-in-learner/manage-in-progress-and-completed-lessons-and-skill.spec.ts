@@ -157,7 +157,7 @@ test.describe('Logged-in Learner', function () {
       'tabSection'
     );
     await loggedInLearner.expectElementsToBePresentInRLD(
-      ['Classroom Lessons', 'Skills'],
+      ['Classroom Lessons'],
       'cardDisplay'
     );
 
@@ -166,11 +166,6 @@ test.describe('Logged-in Learner', function () {
       ['Chapter 1: What are the Place Values'],
       0,
       'In Progress'
-    );
-    await loggedInLearner.expectSkillCardProgressToBe(
-      'Skills',
-      ['Place Values'],
-      0
     );
     await loggedInLearner.navigateToLessonByCard(
       'Classroom Lessons',
@@ -187,7 +182,6 @@ test.describe('Logged-in Learner', function () {
     await loggedInLearner.expectScreenshotToMatch(
       'ProgressSectionInProgressWithOnlyChapter02'
     );
-    await loggedInLearner.navigateToSkillByCard('Skills', 'Place Values');
   });
 
   test("should complete all the lessons of Place Value's Story and see Chapter 1 in the Completed Lessons section", async function () {
@@ -199,11 +193,6 @@ test.describe('Logged-in Learner', function () {
       ['Chapter 2: Find the Value of a Number'],
       0,
       'In Progress'
-    );
-    await loggedInLearner.expectSkillCardProgressToBe(
-      'Skills',
-      ['Place Values'],
-      0
     );
 
     await loggedInLearner.navigateToLessonByCard(
@@ -223,11 +212,6 @@ test.describe('Logged-in Learner', function () {
       ['Chapter 3: Comparing Numbers'],
       0,
       'In Progress'
-    );
-    await loggedInLearner.expectSkillCardProgressToBe(
-      'Skills',
-      ['Place Values'],
-      0
     );
 
     await loggedInLearner.navigateToLessonByCard(
@@ -251,7 +235,7 @@ test.describe('Logged-in Learner', function () {
       'tabSection'
     );
     await loggedInLearner.expectElementsToBePresentInRLD(
-      ['Classroom Lessons', 'Skills'],
+      ['Classroom Lessons'],
       'cardDisplay'
     );
 
@@ -260,11 +244,6 @@ test.describe('Logged-in Learner', function () {
       ['Chapter 1: What are the Place Values'],
       100,
       'Completed'
-    );
-    await loggedInLearner.expectSkillCardProgressToBe(
-      'Skills',
-      ['Place Values'],
-      0
     );
   });
 
