@@ -900,6 +900,27 @@ describe('Story Editor Component having three story nodes', () => {
     expect(component.getArcIdForNode('node_3')).not.toBe('arc_1');
   });
 
+  it('should move multiple nodes to a new arc when splitting at a middle index', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_1', 'node_2', 'node_3'])
+    );
+    component.linearNodesList = story.getStoryContents().getNodes();
+    const moveNodeToArcSpy = spyOn(storyUpdateService, 'moveNodeToArc');
+
+    component.splitIntoArc(1);
+
+    expect(moveNodeToArcSpy).toHaveBeenCalledWith(
+      component.story,
+      'node_2',
+      jasmine.any(String)
+    );
+    expect(moveNodeToArcSpy).toHaveBeenCalledWith(
+      component.story,
+      'node_3',
+      jasmine.any(String)
+    );
+  });
+
   it('should return null for arc helpers when story contents are missing', () => {
     component.storyContents = null;
 

@@ -100,6 +100,9 @@ def _create_story(
     model.commit(committer_id, commit_message, commit_cmd_dicts)
     story.version += 1
     create_story_summary(story.id)
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_STORY, None, [story.id]
+    )
 
 
 def save_new_story(committer_id: str, story: story_domain.Story) -> None:
@@ -1034,7 +1037,11 @@ def delete_story_summary(story_id: str) -> None:
             be deleted.
     """
 
-    story_models.StorySummaryModel.get(story_id).delete()
+    story_summary_model = story_models.StorySummaryModel.get(
+        story_id, strict=False
+    )
+    if story_summary_model is not None:
+        story_summary_model.delete()
 
 
 def compute_summary_of_story(

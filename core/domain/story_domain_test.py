@@ -2585,6 +2585,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.add_arc(
             story_domain.Arc('arc_1', 'Title', 'Desc', ['node_1'])
         )
+        # Here we use MyPy ignore because we are intentionally assigning an
+        # invalid type to test validation.
         self.story.story_contents.arcs[0].id = 123  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected arc id to be a string, received 123'
@@ -2598,6 +2600,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_arc_validate_invalid_title(self) -> None:
         self.story.story_contents.add_arc(
+            # Here we use MyPy ignore because we are intentionally passing an
+            # invalid title type to test validation.
             story_domain.Arc('arc_1', 123, 'Desc', ['node_1'])  # type: ignore[arg-type]
         )
         self._assert_validation_error(
@@ -2612,6 +2616,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_arc_validate_invalid_description(self) -> None:
         self.story.story_contents.add_arc(
+            # Here we use MyPy ignore because we are intentionally passing an
+            # invalid description type to test validation.
             story_domain.Arc('arc_1', 'Title', 456, ['node_1'])  # type: ignore[arg-type]
         )
         self._assert_validation_error(
@@ -2620,6 +2626,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_arc_validate_invalid_node_ids(self) -> None:
         self.story.story_contents.add_arc(
+            # Here we use MyPy ignore because we are intentionally passing a
+            # non-list value for node_ids to test validation.
             story_domain.Arc('arc_1', 'Title', 'Desc', 'not_a_list')  # type: ignore[arg-type]
         )
         self._assert_validation_error(
@@ -2628,6 +2636,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_arc_validate_non_string_node_id(self) -> None:
         self.story.story_contents.add_arc(
+            # Here we use MyPy ignore because we are intentionally passing a
+            # list with non-string items to test validation.
             story_domain.Arc('arc_1', 'Title', 'Desc', [123])  # type: ignore[list-item]
         )
         self._assert_validation_error(
@@ -2635,12 +2645,16 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         )
 
     def test_non_list_arcs_field(self) -> None:
+        # Here we use MyPy ignore because we are intentionally assigning an
+        # invalid type to arcs to test validation.
         self.story.story_contents.arcs = 'invalid'  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected arcs field to be a list, received invalid'
         )
 
     def test_arc_not_arc_object(self) -> None:
+        # Here we use MyPy ignore because we are intentionally assigning a
+        # list with non-Arc items to test validation.
         self.story.story_contents.arcs = ['not_an_arc']  # type: ignore[list-item]
         self._assert_validation_error(
             'Expected each arc to be an Arc object, received not_an_arc'
@@ -2812,6 +2826,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'next_node_id': 'node_4',
         }
         result = story_domain.Story._convert_story_contents_v5_dict_to_v6_dict(  # pylint: disable=protected-access
+            # Here we use MyPy ignore because the v5_dict doesn't match the
+            # v6 dict type, which is exactly what we're converting from.
             v5_dict  # type: ignore[arg-type]
         )
         self.assertEqual(result['nodes'][0]['destination_node_ids'], ['node_2'])

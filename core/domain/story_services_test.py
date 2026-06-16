@@ -275,7 +275,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(updated_story.title, 'New Title')
 
     def test_update_story_url_fragment(self) -> None:
-        self.save_new_story(self.STORY_ID, self.USER_ID, self.TOPIC_ID)
         changelist = [
             story_domain.StoryChange(
                 {
@@ -293,7 +292,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.url_fragment, 'new-url-fragment')
 
     def test_update_story_meta_tag_content(self) -> None:
-        self.save_new_story(self.STORY_ID, self.USER_ID, self.TOPIC_ID)
         changelist = [
             story_domain.StoryChange(
                 {
@@ -1067,6 +1065,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     'arc_id': 'arc_3',
                     'title': 'Arc 3',
                     'description': '',
+                    # Here use cast because the literal empty list is inferred as
+                    # List[Any], but the change dict expects List[str].
                     'node_ids': cast(List[str], []),
                 }
             ),

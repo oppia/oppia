@@ -2564,6 +2564,9 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
         topic.add_canonical_story(story_id)
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
+        topic.add_subtopic(1, 'Title', 'dummy-subtopic')
+        topic.subtopics[0].skill_ids.append(skill_id)
+        topic.update_skill_ids_for_diagnostic_test([skill_id])
         topic_services.save_new_topic(admin_id, topic)
         topic_services.publish_topic(topic_id, admin_id)
 

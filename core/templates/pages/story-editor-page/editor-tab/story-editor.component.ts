@@ -262,9 +262,6 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
       return;
     }
     const nodesToMove = sourceArcNodeIds.slice(splitIdx);
-    if (nodesToMove.length === 0) {
-      return;
-    }
 
     const previousArcIdsOrder = this.storyContents
       .getArcs()
@@ -352,9 +349,6 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
       destinationArcId = this.storyContents.getArcs()[arcIndex - 1].getId();
     }
 
-    if (sourceArcIndex <= 0) {
-      return;
-    }
     const currentArc = this.storyContents.getArcs()[sourceArcIndex];
     const nodeIdsToMove = [...currentArc.getNodeIds()];
 
