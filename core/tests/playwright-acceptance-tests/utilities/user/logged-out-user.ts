@@ -16,7 +16,7 @@
  * @fileoverview Logged-out users utility file.
  */
 
-import {expect, Page} from '@playwright/test';
+import {Page} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
@@ -30,12 +30,7 @@ const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
 const mobileSidebarOpenSelector = '.e2e-test-sidebar-menu-open';
 
-const nextCardButton = '.e2e-test-next-card-button';
-const nextCardArrowButton = '.e2e-test-next-button';
-
 const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
-
-const stateConversationContent = '.e2e-test-conversation-content';
 
 const searchInputSelector = '.e2e-test-search-input';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
@@ -173,8 +168,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-export class LoggedOutUser extends BaseUser {
-  /**
    * Clicks an element using JavaScript's native click() method.
    * This ensures Angular properly handles the event in its change detection
    * cycle, which is more reliable than Puppeteer's simulated clicks for
@@ -211,7 +204,10 @@ export class LoggedOutUser extends BaseUser {
 
     showMessage('Exploration has completed successfully');
 
-    await this.expectElementToBeVisible(explorationCompletionToastMessage, false);
+    await this.expectElementToBeVisible(
+      explorationCompletionToastMessage,
+      false
+    );
   }
 
   /**

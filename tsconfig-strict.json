@@ -82,9 +82,6 @@
       "./node_modules/@types"
     ]
   },
-  "exclude": [
-    "core/tests/playwright-acceptance-tests"
-  ],
   "include": [
     "core",
     "extensions",
