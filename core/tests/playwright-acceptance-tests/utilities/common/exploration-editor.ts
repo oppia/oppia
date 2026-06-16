@@ -30,17 +30,15 @@ export class ExplorationEditorModal {
 
   /**
    * Function to dismiss exploration editor welcome modal.
-   * @param failIfMissing - Whether to fail if the welcome modal is not found.
+   * @param {boolean} failIfMissing - Whether to fail if the welcome modal is not found.
    */
   async dismissWelcomeModal(failIfMissing: boolean = true): Promise<void> {
     try {
-      await this.userInstance.page.waitForSelector(
+      await this.userInstance.expectElementToBeVisible(
         dismissWelcomeModalSelector,
-        {
-          state: 'visible',
-          // If we know the modal should appear, we can wait longer.
-          timeout: failIfMissing ? 20000 : 5000,
-        }
+        true,
+        this.userInstance.page,
+        failIfMissing ? 20000 : 5000
       );
       await this.userInstance.clickOnElementWithSelector(
         dismissWelcomeModalSelector
