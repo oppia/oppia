@@ -27,6 +27,10 @@ import {
 import {
   CertificateOfferingSectionId,
   CERTIFICATE_OFFERING_SECTION_IDS,
+  CERTIFICATE_OFFERING_SECTION_NUMBERS,
+  CERTIFICATE_OFFERING_PROGRESS_TAB_STATE_LABELS,
+  CERTIFICATE_OFFERING_PROGRESS_TAB_STATUSES,
+  CERTIFICATE_OFFERING_SECTION_TITLES,
 } from './certificate-offering-section.model';
 import './certificate-offering-progress.component.css';
 
@@ -35,11 +39,6 @@ import './certificate-offering-progress.component.css';
   templateUrl: './certificate-offering-progress.component.html',
 })
 export class CertificateOfferingProgressComponent implements OnChanges, OnInit {
-  private readonly SECTION_TITLES = [
-    'Add Certificate Details',
-    'Add Certificate Topics',
-    'Review & Availability',
-  ];
   @Input() pageTitle: string = '';
   @Input() activeSection: CertificateOfferingSectionId =
     CERTIFICATE_OFFERING_SECTION_IDS.DETAILS;
@@ -58,36 +57,47 @@ export class CertificateOfferingProgressComponent implements OnChanges, OnInit {
 
   private updateProgressStatuses(): void {
     this.progressStatuses = [
-      this.getProgressTabStatusClass(1),
-      this.getProgressTabStatusClass(2),
-      this.getProgressTabStatusClass(3),
+      this.getProgressTabStatusClass(
+        CERTIFICATE_OFFERING_SECTION_NUMBERS.DETAILS
+      ),
+      this.getProgressTabStatusClass(
+        CERTIFICATE_OFFERING_SECTION_NUMBERS.ADD_TOPIC_ITEMS
+      ),
+      this.getProgressTabStatusClass(
+        CERTIFICATE_OFFERING_SECTION_NUMBERS.REVIEW_AND_AVAILABILITY
+      ),
     ];
     this.progressTabAriaLabels = this.progressStatuses.map((status, index) => {
-      const stateLabel = status === 'active' ? 'current' : status;
-      return `Step ${index + 1}: ${this.SECTION_TITLES[index]}, ${stateLabel}`;
+      const stateLabel =
+        status === CERTIFICATE_OFFERING_PROGRESS_TAB_STATUSES.ACTIVE
+          ? CERTIFICATE_OFFERING_PROGRESS_TAB_STATE_LABELS.CURRENT
+          : status;
+      return `Step ${index + 1}: ${
+        CERTIFICATE_OFFERING_SECTION_TITLES[index]
+      }, ${stateLabel}`;
     });
   }
 
   getFurthestReachedSectionNumber(): number {
     if (this.activeSection === CERTIFICATE_OFFERING_SECTION_IDS.DETAILS) {
-      return 1;
+      return CERTIFICATE_OFFERING_SECTION_NUMBERS.DETAILS;
     }
     if (
       this.activeSection === CERTIFICATE_OFFERING_SECTION_IDS.ADD_TOPIC_ITEMS
     ) {
-      return 2;
+      return CERTIFICATE_OFFERING_SECTION_NUMBERS.ADD_TOPIC_ITEMS;
     }
-    return 3;
+    return CERTIFICATE_OFFERING_SECTION_NUMBERS.REVIEW_AND_AVAILABILITY;
   }
 
   getProgressTabStatusClass(sectionNumber: number): string {
     const furthestReachedSectionNumber = this.getFurthestReachedSectionNumber();
     if (sectionNumber < furthestReachedSectionNumber) {
-      return 'completed';
+      return CERTIFICATE_OFFERING_PROGRESS_TAB_STATUSES.COMPLETED;
     }
     if (sectionNumber === furthestReachedSectionNumber) {
-      return 'active';
+      return CERTIFICATE_OFFERING_PROGRESS_TAB_STATUSES.ACTIVE;
     }
-    return 'incomplete';
+    return CERTIFICATE_OFFERING_PROGRESS_TAB_STATUSES.INCOMPLETE;
   }
 }
