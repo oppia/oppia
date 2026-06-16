@@ -14,231 +14,315 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for HTML translation pre/post-processing services."""
+"""Services for HTML pre-processing and post-processing for machine
+translation.
+"""
 
 from __future__ import annotations
 
+import html as html_module
 import json
+import re
 
-from core.domain import html_translation_services
-from core.tests import test_utils
+import bs4
 
+from core.domain import html_cleaner
 
-class ProtectHtmlForTranslationTests(test_utils.GenericTestBase):
-    """Tests for protect_html_for_translation."""
-
-    def test_returns_empty_string_unchanged(self) -> None:
-        self.assertEqual(
-            html_translation_services.protect_html_for_translation(''), ''
-        )
-
-    def test_plain_text_is_unchanged(self) -> None:
-        source = '<p>Hello world</p>'
-        self.assertEqual(
-            html_translation_services.protect_html_for_translation(source),
-            source,
-        )
-
-    def test_math_component_gets_translate_no(self) -> None:
-        source = (
-            '<p>Find the area: '
-            '<oppia-noninteractive-math math_content-with-value="x²">'
-            '</oppia-noninteractive-math></p>'
-        )
-        result = html_translation_services.protect_html_for_translation(source)
-        self.assertIn('translate="no"', result)
-        self.assertIn('math_content-with-value', result)
-
-    def test_video_component_gets_translate_no(self) -> None:
-        source = (
-            '<oppia-noninteractive-video video_id-with-value="abc123">'
-            '</oppia-noninteractive-video>'
-        )
-        result = html_translation_services.protect_html_for_translation(source)
-        self.assertIn('translate="no"', result)
-
-    def test_skillreview_component_gets_translate_no(self) -> None:
-        source = (
-            '<oppia-noninteractive-skillreview skill_id-with-value="abc"'
-            ' text-with-value="Fractions">'
-            '</oppia-noninteractive-skillreview>'
-        )
-        result = html_translation_services.protect_html_for_translation(source)
-        self.assertIn('translate="no"', result)
-        # text-with-value should NOT be extracted for skillreview.
-        self.assertNotIn('data-oi-attr', result)
-
-    def test_link_text_extracted_url_preserved(self) -> None:
-        source = (
-            '<oppia-noninteractive-link url-with-value="https://oppia.org"'
-            ' text-with-value="Learn more">'
-            '</oppia-noninteractive-link>'
-        )
-        result = html_translation_services.protect_html_for_translation(source)
-        # text-with-value extracted into a span.
-        self.assertIn('data-oi-attr="text-with-value"', result)
-        self.assertIn('Learn more', result)
-        # url-with-value preserved on the component.
-        self.assertIn('url-with-value="https://oppia.org"', result)
-        # text-with-value removed from component.
-        self.assertNotIn('oppia-noninteractive-link text-with-value', result)
-
-    def test_image_alt_and_caption_extracted(self) -> None:
-        source = (
-            '<oppia-noninteractive-image filepath-with-value="img.png"'
-            ' alt-with-value="A red car"'
-            ' caption-with-value="Figure 1">'
-            '</oppia-noninteractive-image>'
-        )
-        result = html_translation_services.protect_html_for_translation(source)
-        self.assertIn('data-oi-attr="alt-with-value"', result)
-        self.assertIn('data-oi-attr="caption-with-value"', result)
-        self.assertIn('A red car', result)
-        self.assertIn('Figure 1', result)
-        # filepath must be preserved on the component.
-        self.assertIn('filepath-with-value="img.png"', result)
-
-    def test_collapsible_heading_extracted_content_protected(self) -> None:
-        source = (
-            '<oppia-noninteractive-collapsible'
-            ' heading-with-value="Show solution"'
-            ' content-with-value="&lt;p&gt;Step 1&lt;/p&gt;">'
-            '</oppia-noninteractive-collapsible>'
-        )
-        result = html_translation_services.protect_html_for_translation(source)
-        self.assertIn('data-oi-attr="heading-with-value"', result)
-        self.assertIn('Show solution', result)
-        self.assertIn('data-oi-attr="content-with-value"', result)
-        self.assertIn('Step 1', result)
-
-    def test_workedexample_question_extracted_answer_protected(self) -> None:
-        source = (
-            '<oppia-noninteractive-workedexample'
-            ' question-with-value="Solve for x"'
-            ' answer-with-value="&lt;p&gt;x=5&lt;/p&gt;">'
-            '</oppia-noninteractive-workedexample>'
-        )
-        result = html_translation_services.protect_html_for_translation(source)
-        self.assertIn('data-oi-attr="question-with-value"', result)
-        self.assertIn('Solve for x', result)
-        self.assertIn('data-oi-attr="answer-with-value"', result)
-        self.assertIn('x=5', result)
-
-    def test_tabs_json_unpacked_into_temp_elements(self) -> None:
-        tabs = json.dumps(
-            [{'title': 'Hint', 'content': '&lt;p&gt;Try again&lt;/p&gt;'}]
-        )
-        source = (
-            '<oppia-noninteractive-tabs tab_contents-with-value=\'%s\'>'
-            '</oppia-noninteractive-tabs>' % tabs
-        )
-        result = html_translation_services.protect_html_for_translation(source)
-        self.assertIn('data-oi-attr="tab-title-0"', result)
-        self.assertIn('Hint', result)
-        self.assertIn('data-oi-attr="tab-content-0"', result)
-        self.assertIn('Try again', result)
-
-    def test_anchor_tag_is_not_protected(self) -> None:
-        source = '<a href="https://example.com">Click here</a>'
-        result = html_translation_services.protect_html_for_translation(source)
-        self.assertNotIn('translate="no"', result)
-        self.assertIn('href="https://example.com"', result)
-
-    def test_function_is_idempotent(self) -> None:
-        source = (
-            '<oppia-noninteractive-math math_content-with-value="x²">'
-            '</oppia-noninteractive-math>'
-        )
-        once = html_translation_services.protect_html_for_translation(source)
-        twice = html_translation_services.protect_html_for_translation(once)
-        self.assertEqual(once.count('translate="no"'), 1)
-        self.assertEqual(twice.count('translate="no"'), 1)
+from typing import Dict, cast
 
 
-class PostprocessTranslatedHtmlTests(test_utils.GenericTestBase):
-    """Tests for postprocess_translated_html."""
+# Components whose content must never be translated. Their attributes are
+# either technical identifiers, LaTeX expressions, or backend-mapped values.
+_SKIP_COMPONENTS = frozenset(
+    [
+        'oppia-noninteractive-math',
+        'oppia-noninteractive-video',
+        # TODO(#24933): oppia-noninteractive-skillreview is excluded because
+        # its displayed value is tied to backend mappings. Rohan is working on
+        # a project to translate Exploration metadata that will eventually
+        # cover these keywords. Once that project is complete, this component
+        # can be updated to support translation.
+        # See: https://github.com/oppia/oppia/issues/24933
+        'oppia-noninteractive-skillreview',
+    ]
+)
 
-    def test_empty_string_returns_empty_string(self) -> None:
-        self.assertEqual(
-            html_translation_services.postprocess_translated_html(''), ''
-        )
+# Maps each component to the attribute names that hold plain learner-visible
+# text. These values are extracted before translation and restored after.
+_TRANSLATABLE_TEXT_ATTRS = {
+    'oppia-noninteractive-link': ['text-with-value'],
+    'oppia-noninteractive-image': ['alt-with-value', 'caption-with-value'],
+    'oppia-noninteractive-collapsible': ['heading-with-value'],
+    'oppia-noninteractive-workedexample': ['question-with-value'],
+}
 
-    def test_strips_translate_no(self) -> None:
-        source = (
-            '<oppia-noninteractive-math translate="no"'
-            ' math_content-with-value="x²">'
-            '</oppia-noninteractive-math>'
-        )
-        result = html_translation_services.postprocess_translated_html(source)
-        self.assertNotIn('translate="no"', result)
+# Maps each component to the attribute names that hold HTML-encoded strings.
+# These must be decoded, recursively pre-processed, then re-encoded on
+# the way back.
+_ENCODED_HTML_ATTRS = {
+    'oppia-noninteractive-collapsible': ['content-with-value'],
+    'oppia-noninteractive-workedexample': ['answer-with-value'],
+}
 
-    def test_link_text_restored_url_preserved(self) -> None:
-        source = (
-            '<oppia-noninteractive-link url-with-value="https://oppia.org"'
-            ' text-with-value="Learn more">'
-            '</oppia-noninteractive-link>'
-        )
-        protected = html_translation_services.protect_html_for_translation(
-            source
-        )
-        # Simulate Azure translating the span text.
-        translated = protected.replace('Learn more', 'यहाँ और जानें')
-        result = html_translation_services.postprocess_translated_html(
-            translated
-        )
-        self.assertIn('text-with-value="यहाँ और जानें"', result)
-        self.assertIn('url-with-value="https://oppia.org"', result)
-        self.assertNotIn('data-oi-id', result)
-        self.assertNotIn('translate="no"', result)
+# Data attribute names used to link extraction elements back to their
+# parent component during post-processing.
+_DATA_COMP_ID = 'data-oi-id'
+_DATA_ATTR_NAME = 'data-oi-attr'
+_DATA_IS_ENCODED = 'data-oi-encoded'
+_DATA_TAB_COUNT = 'data-oi-tab-count'
 
-    def test_image_alt_and_caption_restored(self) -> None:
-        source = (
-            '<oppia-noninteractive-image filepath-with-value="img.png"'
-            ' alt-with-value="A red car"'
-            ' caption-with-value="Figure 1">'
-            '</oppia-noninteractive-image>'
-        )
-        protected = html_translation_services.protect_html_for_translation(
-            source
-        )
-        translated = protected.replace('A red car', 'एक लाल कार').replace(
-            'Figure 1', 'चित्र 1'
-        )
-        result = html_translation_services.postprocess_translated_html(
-            translated
-        )
-        self.assertIn('alt-with-value="एक लाल कार"', result)
-        self.assertIn('caption-with-value="चित्र 1"', result)
-        self.assertIn('filepath-with-value="img.png"', result)
+# Regexes to strip all helper attributes injected during pre-processing.
+_CLEANUP_PATTERNS = [
+    re.compile(r'\s*translate=["\']no["\']', re.IGNORECASE),
+    re.compile(r'\s*data-oi-id=["\'][^"\']*["\']', re.IGNORECASE),
+    re.compile(r'\s*data-oi-attr=["\'][^"\']*["\']', re.IGNORECASE),
+    re.compile(r'\s*data-oi-encoded=["\'][^"\']*["\']', re.IGNORECASE),
+    re.compile(r'\s*data-oi-tab-count=["\'][^"\']*["\']', re.IGNORECASE),
+]
 
-    def test_math_component_preserved_unchanged(self) -> None:
-        source = (
-            '<oppia-noninteractive-math math_content-with-value="πr²">'
-            '</oppia-noninteractive-math>'
-        )
-        protected = html_translation_services.protect_html_for_translation(
-            source
-        )
-        result = html_translation_services.postprocess_translated_html(
-            protected
-        )
-        self.assertIn('math_content-with-value="πr²"', result)
-        self.assertNotIn('translate="no"', result)
 
-    def test_full_roundtrip_with_plain_text(self) -> None:
-        source = (
-            '<p>Find the area</p>'
-            '<oppia-noninteractive-math math_content-with-value="πr²">'
-            '</oppia-noninteractive-math>'
+def protect_html_for_translation(source_html: str) -> str:
+    """Pre-processes HTML to protect Oppia components from the translation
+    engine while exposing translatable attribute values as inline elements.
+
+    Strategy per component type:
+    - Skip components (math, video, skillreview): marked with translate="no",
+      their entire subtree is skipped by the API.
+    - Components with translatable text attributes (link, image, collapsible,
+      workedexample): each translatable attribute value is extracted into a
+      temporary <span> inserted before the component, and the attribute is
+      removed from the component tag itself. The component receives
+      translate="no" so only its structural attributes are preserved.
+    - Components with encoded HTML attributes (collapsible content,
+      workedexample answer): decoded, recursively pre-processed, and
+      placed in a temporary <div> before the component. Re-encoded on
+      the way back in post-processing.
+    - Tabs: the JSON tab_contents array is unpacked into individual temporary
+      <span> (titles) and <div> (content) elements, one per tab.
+
+    Note: <a> tags are intentionally left untouched. The Azure API natively
+    translates anchor text while preserving the href attribute byte-for-byte
+    when using textType="html".
+
+    Args:
+        source_html: str. The raw HTML string to pre-process.
+
+    Returns:
+        str. The modified HTML string ready to be sent to the translation API.
+    """
+    if not source_html or not source_html.strip():
+        return source_html
+
+    soup = bs4.BeautifulSoup(source_html, 'html.parser')
+    counter = [0]
+
+    def _next_id() -> str:
+        """Returns the next unique component ID."""
+        comp_id = str(counter[0])
+        counter[0] += 1
+        return comp_id
+
+    for tag in soup.find_all(re.compile(r'^oppia-noninteractive-')):
+        tag_name = tag.name
+
+        if tag_name in _SKIP_COMPONENTS:
+            if tag.get('translate') != 'no':
+                tag['translate'] = 'no'
+            continue
+
+        comp_id = _next_id()
+
+        # Extract simple text attributes into temp spans.
+        if tag_name in _TRANSLATABLE_TEXT_ATTRS:
+            for attr_name in _TRANSLATABLE_TEXT_ATTRS[tag_name]:
+                attr_val = tag.get(attr_name)
+                if attr_val is not None:
+                    temp_span = soup.new_tag('span')
+                    temp_span[_DATA_COMP_ID] = comp_id
+                    temp_span[_DATA_ATTR_NAME] = attr_name
+                    temp_span.string = attr_val
+                    tag.insert_before(temp_span)
+                    del tag[attr_name]
+
+        # Extract encoded HTML attributes into temp divs.
+        if tag_name in _ENCODED_HTML_ATTRS:
+            for attr_name in _ENCODED_HTML_ATTRS[tag_name]:
+                attr_val = tag.get(attr_name)
+                if attr_val is not None:
+                    decoded = html_module.unescape(attr_val)
+                    protected_inner = protect_html_for_translation(decoded)
+                    temp_div = soup.new_tag('div')
+                    temp_div[_DATA_COMP_ID] = comp_id
+                    temp_div[_DATA_ATTR_NAME] = attr_name
+                    temp_div[_DATA_IS_ENCODED] = 'true'
+                    inner_soup = bs4.BeautifulSoup(
+                        protected_inner, 'html.parser'
+                    )
+                    for child in list(inner_soup.contents):
+                        temp_div.append(child)
+                    tag.insert_before(temp_div)
+                    del tag[attr_name]
+
+        # Unpack tabs JSON into individual temp elements.
+        if tag_name == 'oppia-noninteractive-tabs':
+            tabs_raw = tag.get('tab_contents-with-value')
+            if tabs_raw is not None:
+                try:
+                    tabs = json.loads(tabs_raw)
+                    for i, tab in enumerate(tabs):
+                        if 'title' in tab:
+                            temp_span = soup.new_tag('span')
+                            temp_span[_DATA_COMP_ID] = comp_id
+                            temp_span[_DATA_ATTR_NAME] = 'tab-title-%d' % i
+                            temp_span.string = tab['title']
+                            tag.insert_before(temp_span)
+                        if 'content' in tab:
+                            decoded = html_module.unescape(tab['content'])
+                            protected_inner = protect_html_for_translation(
+                                decoded
+                            )
+                            temp_div = soup.new_tag('div')
+                            temp_div[_DATA_COMP_ID] = comp_id
+                            temp_div[_DATA_ATTR_NAME] = 'tab-content-%d' % i
+                            temp_div[_DATA_IS_ENCODED] = 'true'
+                            inner_soup = bs4.BeautifulSoup(
+                                protected_inner, 'html.parser'
+                            )
+                            for child in list(inner_soup.contents):
+                                temp_div.append(child)
+                            tag.insert_before(temp_div)
+                    tag[_DATA_TAB_COUNT] = str(len(tabs))
+                    del tag['tab_contents-with-value']
+                except (json.JSONDecodeError, TypeError):
+                    # If JSON parsing fails, protect the whole component.
+                    if tag.get('translate') != 'no':
+                        tag['translate'] = 'no'
+                    continue
+
+        tag[_DATA_COMP_ID] = comp_id
+        if tag.get('translate') != 'no':
+            tag['translate'] = 'no'
+
+    return soup.decode_contents()
+
+
+def postprocess_translated_html(translated_html: str) -> str:
+    """Reverses protect_html_for_translation after the API call completes.
+
+    Steps:
+    1. Finds every temporary <span>/<div> by its data-oi-id and data-oi-attr.
+    2. Restores plain text values directly to the component attribute.
+    3. Re-encodes inner HTML and restores it to the component attribute.
+    4. Reconstructs the tabs JSON from individual temp elements.
+    5. Removes all temporary elements and helper data attributes.
+    6. Strips any remaining translate="no" via regex.
+    7. Runs the result through html_cleaner.clean() for final sanitization.
+
+    Args:
+        translated_html: str. The raw HTML returned by the translation API.
+
+    Returns:
+        str. The cleaned and restored HTML string safe for datastore storage.
+    """
+    if not translated_html:
+        return translated_html
+
+    soup = bs4.BeautifulSoup(translated_html, 'html.parser')
+
+    # Build a map from component ID to its tag for fast restoration lookup.
+    comp_id_to_tag = {}
+    for tag in soup.find_all(attrs={_DATA_COMP_ID: True}):
+        if tag.name and tag.name.startswith('oppia-noninteractive-'):
+            comp_id_to_tag[tag.get(_DATA_COMP_ID)] = tag
+
+    # Collect tabs data separately since reconstruction requires all tabs.
+    tabs_data: Dict[str, Dict[str, str]] = {}
+
+    for temp_tag in list(soup.find_all(attrs={_DATA_ATTR_NAME: True})):
+        comp_id = temp_tag.get(_DATA_COMP_ID)
+        attr_name = temp_tag.get(_DATA_ATTR_NAME)
+        is_encoded = temp_tag.get(_DATA_IS_ENCODED) == 'true'
+        component_tag = comp_id_to_tag.get(comp_id)
+
+        if component_tag is None:
+            temp_tag.decompose()
+            continue
+
+        # Collect tabs data for later JSON reconstruction.
+        if attr_name and (
+            attr_name.startswith('tab-title-')
+            or attr_name.startswith('tab-content-')
+        ):
+            if comp_id not in tabs_data:
+                tabs_data[comp_id] = {}
+            if is_encoded:
+                tabs_data[comp_id][attr_name] = postprocess_translated_html(
+                    temp_tag.decode_contents()
+                )
+            else:
+                tabs_data[comp_id][attr_name] = temp_tag.get_text()
+            temp_tag.decompose()
+            continue
+
+        # Restore encoded HTML attributes.
+        if is_encoded:
+            inner_html = postprocess_translated_html(temp_tag.decode_contents())
+            component_tag[attr_name] = _encode_attr_html(inner_html)
+        else:
+            # Restore plain text attributes.
+            component_tag[attr_name] = temp_tag.get_text()
+
+        temp_tag.decompose()
+
+    # Reconstruct tabs JSON from collected data.
+    for comp_id, tab_attr_data in tabs_data.items():
+        component_tag = comp_id_to_tag.get(comp_id)
+        if component_tag is None:
+            continue
+        tab_count = int(component_tag.get(_DATA_TAB_COUNT, 0))
+        tabs = []
+        for i in range(tab_count):
+            tab = {}
+            title_val = tab_attr_data.get('tab-title-%d' % i)
+            content_val = tab_attr_data.get('tab-content-%d' % i)
+            if title_val is not None:
+                tab['title'] = title_val
+            if content_val is not None:
+                tab['content'] = _encode_attr_html(content_val)
+            tabs.append(tab)
+        component_tag['tab_contents-with-value'] = json.dumps(
+            tabs, ensure_ascii=False
         )
-        protected = html_translation_services.protect_html_for_translation(
-            source
-        )
-        translated = protected.replace('Find the area', 'Finde die Fläche')
-        result = html_translation_services.postprocess_translated_html(
-            translated
-        )
-        self.assertIn('Finde die Fläche', result)
-        self.assertIn('math_content-with-value="πr²"', result)
-        self.assertNotIn('translate="no"', result)
-        self.assertNotIn('data-oi-id', result)
+        if _DATA_TAB_COUNT in component_tag.attrs:
+            del component_tag[_DATA_TAB_COUNT]
+
+    # Remove the data-oi-id marker from all component tags.
+    for tag in soup.find_all(attrs={_DATA_COMP_ID: True}):
+        if _DATA_COMP_ID in tag.attrs:
+            del tag[_DATA_COMP_ID]
+
+    result = soup.decode_contents()
+
+    # Strip all temporary helper attributes using regex.
+    for pattern in _CLEANUP_PATTERNS:
+        result = pattern.sub('', result)
+        # Here we use cast because html_cleaner.clean() returns Any at the
+        #  type-checking level, but we know the returned value is always str.
+        return cast(str, html_cleaner.clean(result))
+
+
+def _encode_attr_html(html_fragment: str) -> str:
+    """HTML-encodes a string for safe storage inside an attribute value.
+
+    Args:
+        html_fragment: str. A raw HTML string.
+
+    Returns:
+        str. The HTML-entity-encoded string.
+    """
+    return (
+        html_fragment.replace('&', '&amp;')
+        .replace('<', '&lt;')
+        .replace('>', '&gt;')
+        .replace('"', '&quot;')
+    )
