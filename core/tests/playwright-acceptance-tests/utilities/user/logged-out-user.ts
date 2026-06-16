@@ -78,26 +78,6 @@ const profileContainerSelector = '.e2e-test-profile-container';
 
 export class LoggedOutUser extends BaseUser {
   /**
-   * Waits for Angular to finish any pending async operations.
-   * This ensures the UI is stable before interacting with elements.
-   */
-  private async waitForAngularStability(): Promise<void> {
-    await this.page.evaluate(async () => {
-      const win = window as unknown as {
-        getAllAngularTestabilities?: () => {
-          whenStable: (cb: () => void) => void;
-        }[];
-      };
-      const testabilities = win.getAllAngularTestabilities?.();
-      if (testabilities?.[0]) {
-        await new Promise<void>(resolve =>
-          testabilities[0].whenStable(() => resolve())
-        );
-      }
-    });
-  }
-
-  /**
    * Clears all text from the username input field.
    */
   async clearUsernameInput(): Promise<void> {
@@ -319,6 +299,7 @@ export class LoggedOutUser extends BaseUser {
    * This ensures Angular properly handles the event in its change detection
    * cycle, which is more reliable than Puppeteer's simulated clicks for
    * Angular components like the sidebar.
+   * @param {string} selector - The CSS selector of the element to click.
    */
   private async clickWithJavaScript(selector: string): Promise<void> {
     await this.waitForElementToStabilize(selector);
@@ -397,7 +378,7 @@ export class LoggedOutUser extends BaseUser {
   async expectExplorationCompletionToastMessage(
     message: string
   ): Promise<void> {
-    await this.page.waitForSelector(explorationCompletionToastMessage);
+    await this.expectElementToBeVisible(explorationCompletionToastMessage);
 
     const toastMessage = await this.page.$eval(
       explorationCompletionToastMessage,
@@ -410,9 +391,7 @@ export class LoggedOutUser extends BaseUser {
 
     showMessage('Exploration has completed successfully');
 
-    await this.page.waitForSelector(explorationCompletionToastMessage, {
-      state: 'hidden',
-    });
+    await this.expectElementToBeVisible(explorationCompletionToastMessage, false);
   }
 
   /**
@@ -530,9 +509,7 @@ export class LoggedOutUser extends BaseUser {
       );
     }
 
-    await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(mobileNavbarOpenSidebarButton);
 
     // Check if navbar is hidden (e.g., scrolled up via Headroom).
     const buttonRect = await this.page.$eval(
@@ -566,9 +543,7 @@ export class LoggedOutUser extends BaseUser {
     // Use JavaScript click to ensure Angular handles the event properly.
     await this.clickWithJavaScript(mobileNavbarOpenSidebarButton);
 
-    await this.page.waitForSelector(mobileSidebarOpenSelector, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(mobileSidebarOpenSelector);
 
     // Wait for the sidebar slide animation to complete by checking element
     // position stability.
@@ -583,13 +558,9 @@ export class LoggedOutUser extends BaseUser {
       showMessage('Skipped: Open Navigation Menu (mobile).');
       return;
     }
-    await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(mobileNavbarOpenSidebarButton);
     await this.openMobileSidebar();
-    await this.page.waitForSelector(communityLibraryLinkInNavMenuSelector, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(communityLibraryLinkInNavMenuSelector);
     showMessage('Opened Navigation Menu (mobile).');
   }
 

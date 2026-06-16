@@ -16,7 +16,8 @@
  * @fileoverview Utility File for Playwright Acceptance Tests.
  */
 
-import {expect, ViewportSize, Page, ElementHandle} from '@playwright/test';
+import {ViewportSize} from '@playwright/test';
+import {expect, Page, ElementHandle} from '@playwright/test';
 import isElementClickable from '../../functions/is-element-clickable';
 import testConstants from './test-constants';
 import {showMessage} from './show-message';
@@ -28,8 +29,6 @@ const toastMessageSelector = '.e2e-test-toast-message';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 
-const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
-
 const pagesWithDialogHandler = new WeakSet<Page>();
 
 declare global {
@@ -37,6 +36,11 @@ declare global {
     __isElementClickable: typeof isElementClickable;
   }
 }
+
+const usernameInputSelector = 'input.e2e-test-username-input';
+const agreeToTermsCheckboxSelector = 'input.e2e-test-agree-to-terms-checkbox';
+const registerButtonSelector = 'button.e2e-test-register-user:not([disabled])';
+const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
 export class BaseUser {
   readonly page: Page;
@@ -59,8 +63,8 @@ export class BaseUser {
 
   /**
    * This function navigates to the given URL.
-   * @param url The URL to navigate to.
-   * @param verifyURL Whether to verify that the final URL includes the given URL after navigation. Defaults to true.
+   * @param {string} url - The URL to navigate to.
+   * @param {boolean} verifyURL - Whether to verify that the final URL includes the given URL after navigation. Defaults to true.
    */
   async goto(url: string, verifyURL: boolean = true): Promise<void> {
     const currentUrl = this.page.url();
@@ -112,9 +116,29 @@ export class BaseUser {
   }
 
   /**
-   * This function types the text in the input field using its CSS selector.
-   * @param selector The CSS selector of the input field.
-   * @param text The text to type.
+   * Waits for Angular to finish any pending async operations.
+   * This ensures the UI is stable before interacting with elements.
+   */
+  async waitForAngularStability(): Promise<void> {
+    await this.page.evaluate(async () => {
+      const win = window as unknown as {
+        getAllAngularTestabilities?: () => {
+          whenStable: (cb: () => void) => void;
+        }[];
+      };
+      const testabilities = win.getAllAngularTestabilities?.();
+      if (testabilities?.[0]) {
+        await new Promise<void>(resolve =>
+          testabilities[0].whenStable(() => resolve())
+        );
+      }
+    });
+  }
+
+  /**
+   * * This function types the text in the input field using its CSS selector or ElementHandle.
+   * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the input field.
+   * @param {string} text - The text to type.
    */
   async typeInInputField(
     selector: string | ElementHandle<Element>,
@@ -143,6 +167,7 @@ export class BaseUser {
 
   /**
    * Function to sign in the user with the given email to the Oppia website.
+   * @param {string} email - The email to sign in with.
    */
   async signInWithEmail(email: string): Promise<void> {
     await this.goto(testConstants.URLs.Home);
@@ -157,16 +182,14 @@ export class BaseUser {
 
   /**
    * This function signs up a new user with the given username and email.
+   * @param {string} username - The username for the new user.
+   * @param {string} email - The email for the new user.
    */
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
-    await this.typeInInputField('input.e2e-test-username-input', username);
-    await this.clickOnElementWithSelector(
-      'input.e2e-test-agree-to-terms-checkbox'
-    );
-    await this.page.waitForSelector(
-      'button.e2e-test-register-user:not([disabled])'
-    );
+    await this.typeInInputField(usernameInputSelector, username);
+    await this.clickOnElementWithSelector(agreeToTermsCheckboxSelector);
+    await this.expectElementToBeVisible(registerButtonSelector);
     await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
     this.username = username;
     this.email = email;
@@ -174,7 +197,7 @@ export class BaseUser {
 
   /**
    * Clicks on the element with the given text.
-   * @param text The text of the element to click on.
+   * @param {string} text - The text of the element to click on.
    */
   async clickOnElementWithText(text: string): Promise<void> {
     // Normalize-space is used to remove the extra spaces in the text.
@@ -201,9 +224,11 @@ export class BaseUser {
 
   /**
    * This selects a value in a dropdown.
+   * @param {string} selector - The CSS selector of the dropdown element.
+   * @param {string} option - The value of the option to select.
    */
   async select(selector: string, option: string): Promise<void> {
-    await this.page.waitForSelector(selector);
+    await this.expectElementToBeVisible(selector);
     await this.waitForElementToBeClickable(selector);
     await this.page.selectOption(selector, option);
   }
@@ -211,8 +236,8 @@ export class BaseUser {
   /**
    * Waits and checks for the element to be visible.
    * @param {string} selector - The selector of the element to wait for.
-   * @param {boolean} hidden - Whether the element should be hidden or not. Default is false.
-   * @param {number} timeout - The maximum amount of time to wait, in milliseconds. Default is 30000.
+   * @param {boolean} visible - Whether the element should be visible or not. Default is true.
+   * @param {number} timeout - The maximum amount of time to wait, in milliseconds. Default is 10000.
    */
   async isElementVisible(
     selector: string,
@@ -252,19 +277,43 @@ export class BaseUser {
   }
 
   /**
-   * Verify that element is visilbe or not.
-   * @param {string} selector - The selector of the element to get text from.
+   * Waits for the given element to be attached in the DOM.
+   * @param {string} selector - The selector of the element to wait for.
+   * @param {Page} context - The page on which the selector should be verified.
+   * @param {number} timeout - The maximum time to wait in milliseconds.
+   * If not provided, Playwright's default timeout is used (30 seconds).
+   */
+  async expectElementToBeAttachedInDOM(
+    selector: string,
+    context: Page = this.page,
+    timeout?: number
+  ): Promise<void> {
+    const options: {state: 'attached'; timeout?: number} = {
+      state: 'attached',
+      ...(timeout !== undefined && {timeout}),
+    };
+    await context.waitForSelector(selector, options);
+    showMessage(`Element ${selector} is attached in DOM.`);
+  }
+
+  /**
+   * Verify that element is visible or not.
+   * @param {string} selector - The selector of the element to verify.
    * @param {boolean} visibility - Whether the element should be visible or not.
    * @param {Page} context - The page on which the selector should be verified.
+   * @param {number} timeout - The maximum time to wait in milliseconds.
+   * If not provided, Playwright's default timeout is used (30 seconds).
    */
   async expectElementToBeVisible(
     selector: string,
     visibility: boolean = true,
-    context: Page = this.page
+    context: Page = this.page,
+    timeout?: number
   ): Promise<void> {
-    const options = visibility
-      ? {state: 'visible' as const}
-      : {state: 'hidden' as const};
+    const options: {state: 'visible' | 'hidden'; timeout?: number} = {
+      state: visibility ? 'visible' : 'hidden',
+      ...(timeout !== undefined && {timeout}),
+    };
     await context.waitForSelector(selector, options);
     showMessage(`Element ${selector} is ${visibility ? 'visible' : 'hidden'}.`);
   }
@@ -289,6 +338,7 @@ export class BaseUser {
 
   /**
    * The function selects all text content and delete it.
+   * @param {string} selector - The CSS selector of the element to clear text from.
    */
   async clearAllTextFrom(selector: string): Promise<void> {
     // Clicking three times on a line of text selects all the text.
@@ -369,8 +419,8 @@ export class BaseUser {
 
   /**
    * Verify text content inside an element, waiting until it matches expected text.
-   * @param selector - The selector of the element to get text from.
-   * @param expectedText - The expected text content.
+   * @param {string} selector - The selector of the element to get text from.
+   * @param {string} text - The expected text content.
    */
   async expectTextContentToContain(
     selector: string,
@@ -513,6 +563,12 @@ export class BaseUser {
     }
   }
 
+  /**
+   * The function clicks an element and waits until the new page is fully loaded.
+   * @param {string} selector - The selector of button to click.
+   * @param {boolean} useSelector - Whether to use the selector or the text.
+   * @param {number} timeout - The maximum time to wait for navigation in milliseconds. Defaults to 60000.
+   */
   async clickAndWaitForNavigation(
     selector: string,
     useSelector: boolean = false,
@@ -563,6 +619,7 @@ export class BaseUser {
   /**
    * This function waits for an element to be clickable either by its CSS selector or
    * by the ElementHandle.
+   * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the element to wait for.
    */
   async waitForElementToBeClickable(
     selector: string | ElementHandle<Element>
@@ -750,6 +807,7 @@ export class BaseUser {
    * Gets a human-readable description of an element for logging purposes.
    * If a string selector is provided, returns it directly.
    * If an ElementHandle is provided, extracts tag name and key attributes.
+   * @param {string | ElementHandle<Element>} selector - The CSS selector or ElementHandle of the element to describe.
    */
   private async getElementDescription(
     selector: string | ElementHandle<Element>
@@ -777,10 +835,10 @@ export class BaseUser {
   }
 
   /**
-   * The function clicks the element using the text on the button.
-   * @param selector - The text of the button to click on.
-   * @param parentElement - The parent element to search within.
-   * @param elementPlace - 1-based index to select nth element with the given selector.
+   * The function clicks the element matching the given CSS selector
+   * @param {string} selector - The CSS selector of the element to click on.
+   * @param {ElementHandle<Element>} parentElement - The parent element to search within.
+   * @param {number} elementPlace - 1-based index to select nth element with the given selector.
    */
   async clickOnElementWithSelector(
     selector: string,
@@ -816,8 +874,8 @@ export class BaseUser {
    * Clicks on the given element after checking if it's clickable and not in
    * tansition animation.
    * Note: This function doesn't have post-check.
-   * @param element - The Puppeteer element to click on.
-   * @param options - Click options.
+   * @param {ElementHandle<Element>} element - The element to click on.
+   * @param {Parameters<ElementHandle['click']>[0]} options - Click options.
    */
   async clickOnElement(
     element: ElementHandle<Element>,
