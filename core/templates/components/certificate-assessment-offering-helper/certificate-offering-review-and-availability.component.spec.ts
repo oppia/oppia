@@ -40,10 +40,12 @@ describe('Certificate Offering Review And Availability Component', () => {
     component = fixture.componentInstance;
     component.certificateAssessmentOffering =
       CertificateAssessmentOfferingData.createEmpty();
-    fixture.detectChanges();
   });
 
-  it('should populate stub data on init when validation errors are empty', () => {
+  it('should populate stub data on init when stub mode is enabled', () => {
+    component.useStubData = true;
+    fixture.detectChanges();
+
     expect(component.validationErrors).toEqual({
       topic_adding_numbers: {
         easy: {required: 5, available: 5},
@@ -61,7 +63,7 @@ describe('Certificate Offering Review And Availability Component', () => {
         hard: {required: 3, available: 2},
       },
     });
-    expect(component.isValid).toBeTrue();
+    expect(component.isValid).toBeFalse();
     expect(component.topicNameMap).toEqual({
       topic_adding_numbers: 'Adding Numbers',
       topic_fractions: 'Fractions',
@@ -137,6 +139,46 @@ describe('Certificate Offering Review And Availability Component', () => {
     ]);
   });
 
+  it('should preserve real inputs when stub mode is disabled', () => {
+    component.validationErrors = {
+      topic_fractions: {
+        easy: {required: 5, available: 5},
+        medium: {required: 10, available: 3},
+        hard: {required: 3, available: 0},
+      },
+    };
+    component.topicNameMap = {
+      topic_fractions: 'Fractions',
+    };
+
+    fixture.detectChanges();
+
+    expect(component.validationErrors).toEqual({
+      topic_fractions: {
+        easy: {required: 5, available: 5},
+        medium: {required: 10, available: 3},
+        hard: {required: 3, available: 0},
+      },
+    });
+    expect(component.topicNameMap).toEqual({
+      topic_fractions: 'Fractions',
+    });
+    expect(component.topicReadinessRows).toEqual([
+      {
+        topicId: 'topic_fractions',
+        topicName: 'Fractions',
+        easy: 5,
+        medium: 3,
+        hard: 0,
+        totalQuestions: 8,
+        isReady: false,
+        easySufficient: true,
+        mediumSufficient: false,
+        hardSufficient: false,
+      },
+    ]);
+  });
+
   it('should format error text for zero and non-zero availability', () => {
     expect(
       component.getErrorText({
@@ -206,6 +248,78 @@ describe('Certificate Offering Review And Availability Component', () => {
         available: 0,
         required: 3,
         isZero: true,
+      },
+    ]);
+  });
+
+  it('should rebuild derived data when validation inputs change', () => {
+    component.validationErrors = {
+      topic_fractions: {
+        easy: {required: 5, available: 5},
+        medium: {required: 10, available: 3},
+        hard: {required: 3, available: 0},
+      },
+    };
+    component.topicNameMap = {
+      topic_fractions: 'Fractions',
+    };
+
+    fixture.detectChanges();
+
+    component.validationErrors = {
+      topic_percentages: {
+        easy: {required: 5, available: 4},
+        medium: {required: 5, available: 5},
+        hard: {required: 3, available: 2},
+      },
+    };
+    component.topicNameMap = {
+      topic_percentages: 'Percentages',
+    };
+
+    component.ngOnChanges({
+      validationErrors: {
+        currentValue: component.validationErrors,
+        previousValue: {},
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+      topicNameMap: {
+        currentValue: component.topicNameMap,
+        previousValue: {},
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    });
+
+    expect(component.topicReadinessRows).toEqual([
+      {
+        topicId: 'topic_percentages',
+        topicName: 'Percentages',
+        easy: 4,
+        medium: 5,
+        hard: 2,
+        totalQuestions: 11,
+        isReady: false,
+        easySufficient: false,
+        mediumSufficient: true,
+        hardSufficient: false,
+      },
+    ]);
+    expect(component.errorMessages).toEqual([
+      {
+        topicName: 'Percentages',
+        difficulty: 'Easy',
+        available: 4,
+        required: 5,
+        isZero: false,
+      },
+      {
+        topicName: 'Percentages',
+        difficulty: 'Hard',
+        available: 2,
+        required: 3,
+        isZero: false,
       },
     ]);
   });

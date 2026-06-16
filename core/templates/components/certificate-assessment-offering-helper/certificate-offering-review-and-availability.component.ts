@@ -18,7 +18,15 @@
  * and edit flows.
  */
 
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 
 import {CertificateAssessmentOfferingData} from 'domain/certificate-assessment/certificate-assessment-offering.model';
 
@@ -72,14 +80,14 @@ export interface ReadinessErrorMessage {
 @Component({
   selector: 'oppia-certificate-offering-review-and-availability',
   templateUrl: './certificate-offering-review-and-availability.component.html',
-  styleUrls: ['./certificate-offering-review-and-availability.component.css'],
 })
 export class CertificateOfferingReviewAndAvailabilityComponent
-  implements OnInit
+  implements OnInit, OnChanges
 {
   @Input() certificateAssessmentOffering: CertificateAssessmentOfferingData =
     CertificateAssessmentOfferingData.createEmpty();
   @Input() isEditMode: boolean = false;
+  @Input() useStubData: boolean = false;
 
   // These two inputs will be wired from the real validation API response.
   // TODO(##24717 - M1.13): Replace the stub path below with the backend contract once the
@@ -109,7 +117,7 @@ export class CertificateOfferingReviewAndAvailabilityComponent
     topic_percentages: 'Percentages',
   };
 
-  private readonly STUB_IS_VALID: boolean = true;
+  private readonly STUB_IS_VALID: boolean = false;
 
   private readonly STUB_VALIDATION_ERRORS: ValidationErrors = {
     topic_adding_numbers: {
@@ -130,12 +138,18 @@ export class CertificateOfferingReviewAndAvailabilityComponent
   };
 
   ngOnInit(): void {
-    if (Object.keys(this.validationErrors).length === 0) {
+    if (this.useStubData) {
       this.validationErrors = this.STUB_VALIDATION_ERRORS;
       this.isValid = this.STUB_IS_VALID;
       this.topicNameMap = this.STUB_TOPIC_NAME_MAP;
     }
     this._buildDisplayData();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.validationErrors || changes.topicNameMap) {
+      this._buildDisplayData();
+    }
   }
 
   private _buildDisplayData(): void {
