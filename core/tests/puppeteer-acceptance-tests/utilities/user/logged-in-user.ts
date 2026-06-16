@@ -4775,6 +4775,12 @@ export class LoggedInUser extends BaseUser {
     await this.clickOnElementWithSelector(contributorProfileLink);
 
     await this.waitForPageToFullyLoad();
+    const expectedProfilePath: string = '/profile/';
+    await this.page.waitForFunction(
+      (path: string) => window.location.href.includes(path),
+      {},
+      expectedProfilePath
+    );
   }
 }
 

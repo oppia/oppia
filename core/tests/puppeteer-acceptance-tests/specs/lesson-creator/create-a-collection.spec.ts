@@ -98,7 +98,7 @@ describe('LC.12 Visit Creator Dashboard', function () {
 
     await learner.subscribeToCreator('lessonCreator');
 
-    await lessonCreator.page.reload();
+    await lessonCreator.reloadPage();
 
     await lessonCreator.waitForPageToFullyLoad();
 
@@ -114,7 +114,7 @@ describe('LC.12 Visit Creator Dashboard', function () {
   it(
     'should view explorations in grid view',
     async function () {
-      await lessonCreator.page.reload();
+      await lessonCreator.reloadPage();
 
       await lessonCreator.waitForPageToFullyLoad();
 

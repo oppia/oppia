@@ -5789,29 +5789,24 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     await this.expectElementToBeVisible(averageRatingsCardSelector, true);
 
-    const ratingText = await this.page.$eval(
-      averageRatingsCardSelector,
-      card => {
-        const cardElement = card as HTMLElement;
-        const visibleValue = Array.from(
-          cardElement.querySelectorAll(
-            '.stat-value-with-rating, .stat-value-without-rating'
-          )
-        ).find(element => {
-          const htmlElement = element as HTMLElement;
-          const style = window.getComputedStyle(htmlElement);
-          const rect = htmlElement.getBoundingClientRect();
-          return (
-            style.display !== 'none' &&
-            style.visibility !== 'hidden' &&
-            rect.width > 0 &&
-            rect.height > 0
-          );
-        }) as HTMLElement | undefined;
-
-        return visibleValue?.innerText.trim() || '';
-      }
+    const ratingElements = await this.page.$$(
+      `${averageRatingsCardSelector} .stat-value-with-rating, ` +
+        `${averageRatingsCardSelector} .stat-value-without-rating`
     );
+    let ratingText = '';
+
+    for (const element of ratingElements) {
+      const rect = await element.boundingBox();
+      if (!rect || rect.width === 0 || rect.height === 0) {
+        continue;
+      }
+
+      ratingText = await this.page.evaluate(
+        el => (el as HTMLElement).innerText.trim() || '',
+        element
+      );
+      break;
+    }
 
     // Handle "N/A" case.
     if (expectedRating === 'N/A') {
@@ -5889,28 +5884,25 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectTotalPlaysToBe(number: number): Promise<void> {
     await this.expectElementToBeVisible(totalPlaysCardSelector, true);
-    const numberOfTotalPlays = await this.page.$eval(
-      totalPlaysCardSelector,
-      card => {
-        const statValue = Array.from(
-          (card as HTMLElement).querySelectorAll(
-            '.stat-value-with-rating, .stat-value-without-rating'
-          )
-        ).find(element => {
-          const htmlElement = element as HTMLElement;
-          const style = window.getComputedStyle(htmlElement);
-          const rect = htmlElement.getBoundingClientRect();
-          return (
-            style.display !== 'none' &&
-            style.visibility !== 'hidden' &&
-            rect.width > 0 &&
-            rect.height > 0
-          );
-        }) as HTMLElement | undefined;
-
-        return parseInt(statValue?.innerText.trim() || '0', 10);
-      }
+    const totalPlaysElements = await this.page.$$(
+      `${totalPlaysCardSelector} .stat-value-with-rating, ` +
+        `${totalPlaysCardSelector} .stat-value-without-rating`
     );
+    let numberOfTotalPlays = 0;
+
+    for (const el of totalPlaysElements) {
+      const rect = await el.boundingBox();
+      if (!rect || rect.width === 0 || rect.height === 0) {
+        continue;
+      }
+
+      const text = await this.page.evaluate(
+        element => (element as HTMLElement).innerText.trim() || '0',
+        el
+      );
+      numberOfTotalPlays = parseInt(text, 10) || 0;
+      break;
+    }
     if (numberOfTotalPlays !== number) {
       throw new Error(
         `Expected total plays count to be ${number}, but found ${numberOfTotalPlays}.`
@@ -8187,9 +8179,50 @@ export class ExplorationEditor extends BaseUser {
   async switchToListView(): Promise<void> {
     await this.expectElementToBeVisible(listViewButtonSelector, true);
 
+    // If list is already visible and grid is hidden, we can pass.
+    const listVisibleInitially = await this.isElementVisible(
+      explorationListSelector,
+      true,
+      500
+    );
+    const gridVisibleInitially = await this.isElementVisible(
+      explorationGridSelector,
+      true,
+      500
+    );
+
+    if (listVisibleInitially && !gridVisibleInitially) {
+      await this.waitForCreatorDashboardToLoad();
+      return;
+    }
+
     await this.clickOnElementWithSelector(listViewButtonSelector);
 
-    await this.expectElementToBeVisible(explorationListSelector, true);
+    // Wait until the list container is visible and the grid container is hidden.
+    await this.page.waitForFunction(
+      (listSel: string, gridSel: string) => {
+        const list = document.querySelector(listSel);
+        const grid = document.querySelector(gridSel);
+
+        const isVisible = (el: Element | null) => {
+          if (!el) return false;
+          const style = window.getComputedStyle(el as Element);
+          const rect = (el as HTMLElement).getBoundingClientRect();
+          return (
+            style.display !== 'none' &&
+            style.visibility !== 'hidden' &&
+            rect.width > 0 &&
+            rect.height > 0
+          );
+        };
+
+        return isVisible(list) && !isVisible(grid);
+      },
+      {},
+      explorationListSelector,
+      explorationGridSelector
+    );
+
     await this.waitForCreatorDashboardToLoad();
   }
 
