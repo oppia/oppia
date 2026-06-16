@@ -3393,7 +3393,7 @@ oppia-noninteractive-link {
 
   .oppia-dashboard-aggregated-stats .stats-card {
     font-size: 12px;
-    padding-left: 10px;
+    padding-inline-start: 10px;
   }
 }
 
