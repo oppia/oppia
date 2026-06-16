@@ -61,6 +61,7 @@ export class ExplorationOpportunitySummary {
   languageCode: string;
   isPinned: boolean;
   reviewerOnlyContentCount: number;
+  entityType?: string;
 
   constructor(
     expId: string,
@@ -72,7 +73,8 @@ export class ExplorationOpportunitySummary {
     translationInReviewCount: TranslationCountsDict,
     languageCode: string,
     isPinned: boolean,
-    reviewerOnlyContentCount: number
+    reviewerOnlyContentCount: number,
+    entityType?: string
   ) {
     this.id = expId;
     this.topicName = topicName;
@@ -84,6 +86,7 @@ export class ExplorationOpportunitySummary {
     this.languageCode = languageCode;
     this.isPinned = isPinned;
     this.reviewerOnlyContentCount = reviewerOnlyContentCount;
+    this.entityType = entityType;
   }
 
   static createFromBackendDict(
@@ -116,7 +119,8 @@ export class ExplorationOpportunitySummary {
       backendDict.translation_in_review_counts,
       backendDict.language_code || 'en',
       backendDict.is_pinned,
-      backendDict.reviewer_only_content_count || 0
+      backendDict.reviewer_only_content_count || 0,
+      backendDict.entity_type
     );
   }
 
@@ -129,6 +133,11 @@ export class ExplorationOpportunitySummary {
   }
 
   getOpportunitySubheading(): string {
+    if (this.entityType) {
+      const formattedEntityType =
+        this.entityType.charAt(0).toUpperCase() + this.entityType.slice(1);
+      return formattedEntityType + ' - ' + this.topicName;
+    }
     return this.storyTitle
       ? this.topicName + ' - ' + this.storyTitle
       : this.topicName;

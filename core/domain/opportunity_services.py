@@ -1337,17 +1337,10 @@ def _get_translation_opportunity_cards_from_models(
                 story.id: story for story in stories if story is not None
             }
 
-        exp_opportunity_summary_map = {}
-        exp_summary_map = {}
-        exp_opportunity_summary_models = (
-            opportunity_models.ExplorationOpportunitySummaryModel.get_multi(
-                entity_ids
-            )
+        explorations_map = exp_fetchers.get_multiple_explorations_by_id(
+            entity_ids, strict=False
         )
-        for exp_model in exp_opportunity_summary_models:
-            if exp_model is not None:
-                exp_opportunity_summary_map[exp_model.id] = exp_model
-
+        exp_summary_map = {}
         exp_summaries = exp_fetchers.get_exploration_summaries_matching_ids(
             entity_ids
         )
@@ -1450,13 +1443,13 @@ def _get_translation_opportunity_cards_from_models(
 
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             exp_id = model.entity_id
-            if exp_id in exp_opportunity_summary_map:
-                story_title_val = exp_opportunity_summary_map[
+            story_id_val = exp_id_to_story_id.get(exp_id)
+            if story_id_val and story_id_val in story_map:
+                story_title_val = story_map[story_id_val].title
+            if exp_id in explorations_map:
+                reviewer_only_content_count_val = explorations_map[
                     exp_id
-                ].story_title
-                reviewer_only_content_count_val = exp_opportunity_summary_map[
-                    exp_id
-                ].reviewer_only_content_count
+                ].get_reviewer_only_content_count()
             if exp_id in exp_summary_map:
                 language_code_val = exp_summary_map[exp_id].language_code
 

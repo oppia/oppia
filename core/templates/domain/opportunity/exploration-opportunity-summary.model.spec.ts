@@ -162,7 +162,7 @@ describe('Exploration opportunity summary model', () => {
         ExplorationOpportunitySummary.createFromBackendDictV2(backendDictV2);
       expect(summary.getExplorationId()).toEqual('exp_id');
       expect(summary.getOpportunityHeading()).toEqual('Introduction');
-      expect(summary.getOpportunitySubheading()).toEqual('Topic');
+      expect(summary.getOpportunitySubheading()).toEqual('Exploration - Topic');
       expect(summary.storyTitle).toEqual('');
       expect(summary.languageCode).toEqual('en');
       expect(summary.getReviewerOnlyContentCount()).toEqual(0);
@@ -196,7 +196,7 @@ describe('Exploration opportunity summary model', () => {
 
       const summary =
         ExplorationOpportunitySummary.createFromBackendDictV2(backendDictV2);
-      expect(summary.getOpportunitySubheading()).toEqual('Topic - Story');
+      expect(summary.getOpportunitySubheading()).toEqual('Exploration - Topic');
       expect(summary.storyTitle).toEqual('Story');
       expect(summary.languageCode).toEqual('hi');
       expect(summary.getReviewerOnlyContentCount()).toEqual(5);

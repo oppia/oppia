@@ -701,12 +701,17 @@ class TranslatableContentsHandlerV2(
 
         translatable_contents = []
         for content in contents_which_need_translation.values():
+            # Skip list-format content if the user does not have reviewer
+            # rights for the selected language. Translating list contents
+            # (such as answer choices) requires reviewer privileges.
             if (
                 language_code not in reviewable_language_codes
                 and content.is_data_format_list()
             ):
                 continue
 
+            # Skip content that already has a suggestion in review to
+            # prevent duplicate translation submissions.
             if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
                 if any(
                     s.change_cmd.content_id == content.content_id

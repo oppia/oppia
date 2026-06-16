@@ -20,12 +20,13 @@ from __future__ import annotations
 
 import base64
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.controllers import acl_decorators, base, domain_objects_validator
 from core.domain import (
     change_domain,
     exp_fetchers,
+    feature_flag_services,
     fs_services,
     html_cleaner,
     image_validation_services,
@@ -1214,7 +1215,13 @@ class UpdateQuestionSuggestionHandler(
 def _get_target_id_to_exploration_opportunity_dict(
     suggestions: Sequence[suggestion_registry.BaseSuggestion],
 ) -> Dict[
-    str, Optional[opportunity_domain.PartialExplorationOpportunitySummaryDict]
+    str,
+    Optional[
+        Union[
+            opportunity_domain.PartialExplorationOpportunitySummaryDict,
+            opportunity_domain.TranslationOpportunityCardInfoDict,
+        ]
+    ],
 ]:
     """Returns a dict of target_id to exploration opportunity summary dict.
 
@@ -1226,12 +1233,33 @@ def _get_target_id_to_exploration_opportunity_dict(
         dict. Dict mapping target_id to corresponding exploration opportunity
         summary dict.
     """
-    target_ids = set(s.target_id for s in suggestions)
+    target_ids = list(set(s.target_id for s in suggestions))
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None,
+    ):
+        language_code = suggestions[0].language_code if suggestions else 'en'
+        cards = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
+            feconf.ENTITY_TYPE_EXPLORATION, target_ids, language_code
+        )
+        opportunity_id_to_opportunity_dict: Dict[
+            str,
+            Optional[
+                Union[
+                    opportunity_domain.PartialExplorationOpportunitySummaryDict,
+                    opportunity_domain.TranslationOpportunityCardInfoDict,
+                ]
+            ],
+        ] = {target_id: None for target_id in target_ids}
+        for card in cards:
+            opportunity_id_to_opportunity_dict[card.entity_id] = card.to_dict()
+        return opportunity_id_to_opportunity_dict
+
     opportunity_id_to_opportunity_dict = {
         opp_id: (opp.to_dict() if opp is not None else None)
         for opp_id, opp in (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                list(target_ids)
+                target_ids
             ).items()
         )
     }
