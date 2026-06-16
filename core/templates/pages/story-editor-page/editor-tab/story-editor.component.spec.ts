@@ -321,18 +321,42 @@ describe('Story Editor Component having three story nodes', () => {
       }),
     ];
 
-    const event1 = {
+    const event1: CdkDragDrop<string[]> = {
       previousIndex: 1,
       currentIndex: 0,
-    } as CdkDragDrop<string[]>;
-    const event2 = {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      item: null!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      container: null!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      previousContainer: null!,
+      isPointerOverContainer: false,
+      distance: {x: 0, y: 0},
+    };
+    const event2: CdkDragDrop<string[]> = {
       previousIndex: 1,
       currentIndex: 2,
-    } as CdkDragDrop<string[]>;
-    const event3 = {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      item: null!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      container: null!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      previousContainer: null!,
+      isPointerOverContainer: false,
+      distance: {x: 0, y: 0},
+    };
+    const event3: CdkDragDrop<string[]> = {
       previousIndex: 0,
       currentIndex: 1,
-    } as CdkDragDrop<string[]>;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      item: null!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      container: null!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      previousContainer: null!,
+      isPointerOverContainer: false,
+      distance: {x: 0, y: 0},
+    };
 
     expect(component.publishedChaptersDropErrorIsShown).toEqual(false);
     component.drop(event1);
@@ -499,11 +523,14 @@ describe('Story Editor Component having three story nodes', () => {
       };
     }
 
+    const modalRef = jasmine.createSpyObj('NgbModalRef', [
+      'componentInstance',
+      'result',
+    ]);
+    modalRef.componentInstance = MockComponentInstance;
+    modalRef.result = Promise.resolve();
     let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
-      return {
-        componentInstance: MockComponentInstance,
-        result: Promise.resolve(),
-      } as NgbModalRef;
+      return modalRef;
     });
 
     component.createNode();
@@ -556,11 +583,14 @@ describe('Story Editor Component having three story nodes', () => {
     };
     spyOn(component, '_initEditor').and.stub();
     component.story = Story.createFromBackendDict(sampleStoryBackendObject);
+    const modalRef = jasmine.createSpyObj('NgbModalRef', [
+      'componentInstance',
+      'result',
+    ]);
+    modalRef.componentInstance = MockComponentInstance;
+    modalRef.result = Promise.resolve();
     let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
-      return {
-        componentInstance: MockComponentInstance,
-        result: Promise.resolve(),
-      } as NgbModalRef;
+      return modalRef;
     });
 
     component.createNode();
@@ -683,12 +713,15 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should show modal if there are unsaved changes on leaving', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(10);
+    const modalRef = jasmine.createSpyObj('NgbModalRef', [
+      'componentInstance',
+      'result',
+    ]);
+    modalRef.componentInstance = MockNgbModalRef;
+    modalRef.result = Promise.resolve();
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(
       (dlg: unknown, opt: NgbModalOptions) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve(),
-        } as NgbModalRef;
+        return modalRef;
       }
     );
 
@@ -699,12 +732,15 @@ describe('Story Editor Component having three story nodes', () => {
 
   it('should show modal if there are unsaved changes and click reject', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(10);
+    const modalRef = jasmine.createSpyObj('NgbModalRef', [
+      'componentInstance',
+      'result',
+    ]);
+    modalRef.componentInstance = MockNgbModalRef;
+    modalRef.result = Promise.reject();
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(
       (dlg: unknown, opt: NgbModalOptions) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.reject(),
-        } as NgbModalRef;
+        return modalRef;
       }
     );
 

@@ -24,11 +24,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {
-  NgbModal,
-  NgbModalOptions,
-  NgbModalRef,
-} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalOptions} from '@ng-bootstrap/ng-bootstrap';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ConceptCard} from 'domain/skill/concept-card.model';
@@ -638,12 +634,15 @@ describe('Story node editor component', () => {
   });
 
   it('should open add skill modal for adding prerequisite skill', () => {
+    const modalRef = jasmine.createSpyObj('NgbModalRef', [
+      'componentInstance',
+      'result',
+    ]);
+    modalRef.componentInstance = MockNgbModalRef;
+    modalRef.result = Promise.resolve('success');
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(
       (dlg: unknown, opt: NgbModalOptions) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve('success'),
-        } as NgbModalRef;
+        return modalRef;
       }
     );
 
@@ -664,17 +663,20 @@ describe('Story node editor component', () => {
       let alertsSpy = spyOn(alertsService, 'addInfoMessage').and.returnValue(
         null
       );
+      const modalRef = jasmine.createSpyObj('NgbModalRef', [
+        'componentInstance',
+        'result',
+      ]);
+      modalRef.componentInstance = MockNgbModalRef;
+      modalRef.result = Promise.resolve({
+        summary: {
+          id: 'id',
+          description: 'description',
+        },
+      });
       spyOn(ngbModal, 'open').and.callFake(
         (dlg: unknown, opt: NgbModalOptions) => {
-          return {
-            componentInstance: MockNgbModalRef,
-            result: Promise.resolve({
-              summary: {
-                id: 'id',
-                description: 'description',
-              },
-            }),
-          } as NgbModalRef;
+          return modalRef;
         }
       );
 
@@ -692,12 +694,15 @@ describe('Story node editor component', () => {
     spyOn(storyUpdateService, 'addAcquiredSkillIdToNode').and.callFake(
       () => {}
     );
+    const modalRef = jasmine.createSpyObj('NgbModalRef', [
+      'componentInstance',
+      'result',
+    ]);
+    modalRef.componentInstance = MockNgbModalRef;
+    modalRef.result = Promise.resolve('success');
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(
       (dlg: unknown, opt: NgbModalOptions) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve('success'),
-        } as NgbModalRef;
+        return modalRef;
       }
     );
 
@@ -717,12 +722,15 @@ describe('Story node editor component', () => {
       let alertsSpy = spyOn(alertsService, 'addInfoMessage').and.returnValue(
         null
       );
+      const modalRef = jasmine.createSpyObj('NgbModalRef', [
+        'componentInstance',
+        'result',
+      ]);
+      modalRef.componentInstance = MockNgbModalRef;
+      modalRef.result = Promise.resolve('success');
       spyOn(ngbModal, 'open').and.callFake(
         (dlg: unknown, opt: NgbModalOptions) => {
-          return {
-            componentInstance: MockNgbModalRef,
-            result: Promise.resolve('success'),
-          } as NgbModalRef;
+          return modalRef;
         }
       );
 
