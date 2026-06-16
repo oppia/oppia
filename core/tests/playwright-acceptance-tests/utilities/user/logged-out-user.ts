@@ -116,7 +116,10 @@ export class LoggedOutUser extends BaseUser {
 
     showMessage('Exploration has completed successfully');
 
-    await this.expectElementToBeVisible(explorationCompletionToastMessage, false);
+    await this.expectElementToBeVisible(
+      explorationCompletionToastMessage,
+      false
+    );
   }
 
   async expectToBeOnCommunityLibraryPage(): Promise<void> {
