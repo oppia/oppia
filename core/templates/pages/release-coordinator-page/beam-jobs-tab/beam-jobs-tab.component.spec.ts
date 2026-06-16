@@ -389,8 +389,9 @@ describe('Beam Jobs Tab Component', () => {
     await autocomplete.selectOption({text: 'FooJob'});
     fixture.detectChanges();
 
-    const dataflowLink =
-      fixture.nativeElement.querySelector('a[target="_blank"]');
+    const dataflowLink = Array.from(
+      fixture.nativeElement.querySelectorAll('a')
+    ).find(el => el.textContent?.includes('View on Dataflow')) as HTMLElement;
     expect(dataflowLink).toBeTruthy();
     expect(dataflowLink.getAttribute('disabled')).toBeNull();
     expect(dataflowLink.getAttribute('href')).toContain(
@@ -409,8 +410,9 @@ describe('Beam Jobs Tab Component', () => {
     await autocomplete.selectOption({text: 'FooJob'});
     fixture.detectChanges();
 
-    const dataflowLink =
-      fixture.nativeElement.querySelector('a[target="_blank"]');
+    const dataflowLink = Array.from(
+      fixture.nativeElement.querySelectorAll('a')
+    ).find(el => el.textContent?.includes('View on Dataflow')) as HTMLElement;
     expect(dataflowLink).toBeTruthy();
     expect(dataflowLink.getAttribute('disabled')).toEqual('true');
     expect(dataflowLink.getAttribute('href')).toBeNull();

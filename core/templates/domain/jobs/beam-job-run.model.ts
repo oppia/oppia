@@ -188,7 +188,7 @@ export class BeamJobRun {
     }
   }
 
-  getDataflowUrl(): string {
+  getDataflowUrl(): string | null {
     if (this.dataflowJobId) {
       return (
         'https://console.cloud.google.com/dataflow/jobs/us-central1/' +
@@ -196,7 +196,7 @@ export class BeamJobRun {
         ';graphView=0'
       );
     }
-    return 'https://console.cloud.google.com/dataflow/jobs';
+    return null;
   }
 
   static createFromBackendDict(backendDict: BeamJobRunBackendDict): BeamJobRun {

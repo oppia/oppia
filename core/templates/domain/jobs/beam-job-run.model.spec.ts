@@ -425,11 +425,9 @@ describe('Beam Job Run', () => {
   });
 
   describe('getDataflowUrl', () => {
-    it('should return the base Dataflow URL if dataflowJobId is not provided', () => {
+    it('should return null if dataflowJobId is not provided', () => {
       const beamJobRun = new BeamJobRun('123', 'FooJob', 'FAILED', 0, 0, false);
-      expect(beamJobRun.getDataflowUrl()).toEqual(
-        'https://console.cloud.google.com/dataflow/jobs'
-      );
+      expect(beamJobRun.getDataflowUrl()).toBeNull();
     });
 
     it('should return the correct Dataflow URL if dataflowJobId is provided', () => {

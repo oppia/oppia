@@ -116,6 +116,7 @@ class BeamJobRun:
         self.job_updated_on = job_updated_on
         self.job_is_synchronous = job_is_synchronous
         self.dataflow_job_id = dataflow_job_id
+        self.validate()
 
     def to_dict(self) -> Dict[str, Union[bool, float, str, None, List[str]]]:
         """Returns a dict representation of the BeamJobRun.
