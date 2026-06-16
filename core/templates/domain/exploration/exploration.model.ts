@@ -58,7 +58,7 @@ export interface ExplorationBackendDict {
   title: string;
   language_code: string;
   draft_change_list_id: number;
-  version?: number;
+  version: number;
   next_content_id_index: number;
   edits_allowed?: boolean;
   exploration_metadata: ExplorationMetadataBackendDict;
@@ -233,6 +233,7 @@ export class Exploration extends BaseTranslatableObject {
       exploration_metadata: explorationBackendResponse.exploration_metadata,
       is_version_of_draft_valid: false,
       draft_change_list_id: explorationBackendResponse.draft_change_list_id,
+      version: explorationBackendResponse.version,
     };
     return Exploration.createFromBackendDict(
       explorationBackendDict,

@@ -89,6 +89,12 @@ describe('datetimeformatter', () => {
     );
   });
 
+  it('should provide date time in words format', () => {
+    expect(df.getDateTimeInWords(NOW_MILLIS)).toBe(
+      dayjs(new Date(NOW_MILLIS)).format('dddd, MMMM D, YYYY [at] h:mm A')
+    );
+  });
+
   it('should provide correct date format MM/DD/YYY string', () => {
     // Note to developers: This test is not ideal, because it tests the
     // implementation rather than the interface. However, we have not found
