@@ -54,7 +54,6 @@ const filledRatingStarSelector = '.fas.fa-star';
 // Learner dashboard selectors.
 const communityLessonsSectionInLearnerDashboard =
   '.e2e-test-community-lessons-section';
-const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
 const profileDropdown = '.e2e-test-profile-dropdown';
 const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
 
@@ -534,7 +533,7 @@ export class LoggedInUser extends BaseUser {
    * @param {string} explorationId - The ID of the exploration to play.
    */
   async playExploration(explorationId: string | null): Promise<void> {
-    await this.goto(`${baseUrl}/explore/${explorationId as string}`);    
+    await this.goto(`${baseUrl}/explore/${explorationId as string}`);
   }
 
   /**
