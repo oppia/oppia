@@ -40,11 +40,10 @@ class BaseTranslationServiceTests(test_utils.GenericTestBase):
     """Tests for the BaseTranslationService abstract base class."""
 
     def test_cannot_instantiate_abstract_class_directly(self) -> None:
-        try:
-            base_translate_services.BaseTranslationService()  # type: ignore[abstract]
-            raise AssertionError('Expected TypeError was not raised.')
-        except TypeError:
-            pass
+        with self.assertRaisesRegex(
+            TypeError, 'Can\'t instantiate abstract class'
+        ):
+            base_translate_services.BaseTranslationService()  # pylint: disable=abstract-class-instantiated
 
     def test_concrete_subclass_can_be_instantiated(self) -> None:
         service = ConcreteTranslationService()
@@ -68,10 +67,11 @@ class BaseTranslationServiceTests(test_utils.GenericTestBase):
         class IncompleteTranslationService(
             base_translate_services.BaseTranslationService
         ):
+            """Incomplete subclass missing generate_translation for testing."""
+
             pass
 
-        try:
-            IncompleteTranslationService()  # type: ignore[abstract]
-            raise AssertionError('Expected TypeError was not raised.')
-        except TypeError:
-            pass
+        with self.assertRaisesRegex(
+            TypeError, 'Can\'t instantiate abstract class'
+        ):
+            IncompleteTranslationService()  # pylint: disable=abstract-class-instantiated

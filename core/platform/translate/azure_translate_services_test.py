@@ -91,9 +91,7 @@ class AzureTranslationServiceTests(test_utils.GenericTestBase):
         # Here we use type Any because the mock function must match the
         # requests.post signature which accepts arbitrary args and kwargs
         # that vary depending on how the function is called internally.
-        def mock_post(
-            **kwargs: Any,
-        ) -> MockResponse:  # pylint: disable=unused-argument
+        def mock_post(**unused_kwargs: Any) -> MockResponse:
             return mock_response
 
         post_swap = self.swap(requests, 'post', mock_post)
@@ -108,9 +106,7 @@ class AzureTranslationServiceTests(test_utils.GenericTestBase):
         # Here we use type Any because the mock function must match the
         # requests.post signature which accepts arbitrary args and kwargs
         # that vary depending on how the function is called internally.
-        def mock_post(
-            **kwargs: Any,
-        ) -> MockResponse:  # pylint: disable=unused-argument
+        def mock_post(**unused_kwargs: Any) -> MockResponse:
             return mock_response
 
         post_swap = self.swap(requests, 'post', mock_post)
@@ -127,9 +123,7 @@ class AzureTranslationServiceTests(test_utils.GenericTestBase):
         # Here we use type Any because the mock function must match the
         # requests.post signature which accepts arbitrary args and kwargs
         # that vary depending on how the function is called internally.
-        def mock_post(
-            **kwargs: Any,
-        ) -> MockResponse:  # pylint: disable=unused-argument
+        def mock_post(**unused_kwargs: Any) -> MockResponse:
             return mock_response
 
         post_swap = self.swap(requests, 'post', mock_post)
@@ -145,9 +139,7 @@ class AzureTranslationServiceTests(test_utils.GenericTestBase):
         # Here we use type Any because the mock function must match the
         # requests.post signature which accepts arbitrary args and kwargs
         # that vary depending on how the function is called internally.
-        def mock_post_timeout(
-            **kwargs: Any,
-        ) -> MockResponse:  # pylint: disable=unused-argument
+        def mock_post_timeout(**unused_kwargs: Any) -> MockResponse:
             raise requests.exceptions.Timeout('Connection timed out.')
 
         post_swap = self.swap(requests, 'post', mock_post_timeout)
