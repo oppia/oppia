@@ -38,6 +38,15 @@ class PartialExplorationOpportunitySummaryDict(TypedDict):
     reviewer_only_content_count: int
 
 
+class ClientSideExplorationOpportunitySummaryDict(
+    PartialExplorationOpportunitySummaryDict
+):
+    """A dictionary representing client-side opportunity summary data."""
+
+    translation_in_review_counts: Dict[str, int]
+    is_pinned: bool
+
+
 class ExplorationOpportunitySummaryDict(
     PartialExplorationOpportunitySummaryDict
 ):
@@ -193,6 +202,37 @@ class ExplorationOpportunitySummary:
             'content_count': self.content_count,
             'translation_counts': self.translation_counts,
             'reviewer_only_content_count': self.reviewer_only_content_count,
+        }
+
+    def to_client_side_dict(
+        self,
+        translation_in_review_counts: Dict[str, int],
+        is_pinned: bool,
+    ) -> ClientSideExplorationOpportunitySummaryDict:
+        """Returns a dict containing client-only opportunity metadata.
+
+        Args:
+            translation_in_review_counts: dict. A dict mapping language code to
+                the number of translation suggestions currently in review.
+            is_pinned: bool. Whether this opportunity is pinned by the user.
+
+        Returns:
+            dict. A dict representation of an ExplorationOpportunitySummary with
+            client-only fields added for the contributor dashboard response.
+        """
+        opportunity_dict = self.to_dict()
+        return {
+            'id': opportunity_dict['id'],
+            'topic_name': opportunity_dict['topic_name'],
+            'story_title': opportunity_dict['story_title'],
+            'chapter_title': opportunity_dict['chapter_title'],
+            'content_count': opportunity_dict['content_count'],
+            'translation_counts': opportunity_dict['translation_counts'],
+            'reviewer_only_content_count': opportunity_dict[
+                'reviewer_only_content_count'
+            ],
+            'translation_in_review_counts': translation_in_review_counts,
+            'is_pinned': is_pinned,
         }
 
     def validate(self) -> None:
@@ -620,6 +660,15 @@ class TranslationOpportunityCardInfoDict(TypedDict):
     currently_available_to_learners: bool
 
 
+class ClientSideTranslationOpportunityCardInfoDict(
+    TranslationOpportunityCardInfoDict
+):
+    """A dictionary representing client-side translation card data."""
+
+    translation_in_review_counts: Dict[str, int]
+    is_pinned: bool
+
+
 class TranslationOpportunityCardInfo(TranslationOpportunity):
     """The domain object for rendering translation opportunity cards."""
 
@@ -672,4 +721,39 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
             'currently_available_to_learners': (
                 self.currently_available_to_learners
             ),
+        }
+
+    def to_client_side_dict(
+        self,
+        translation_in_review_counts: Dict[str, int],
+        is_pinned: bool,
+    ) -> ClientSideTranslationOpportunityCardInfoDict:
+        """Returns a dict containing client-only translation card metadata.
+
+        Args:
+            translation_in_review_counts: dict. A dict mapping language code to
+                the number of translation suggestions currently in review.
+            is_pinned: bool. Whether this opportunity is pinned by the user.
+
+        Returns:
+            dict. A dict representation of TranslationOpportunityCardInfo with
+            client-only fields added for the contributor dashboard response.
+        """
+        opportunity_dict = self.to_dict()
+        return {
+            'topic_ids': opportunity_dict['topic_ids'],
+            'entity_id': opportunity_dict['entity_id'],
+            'content_count': opportunity_dict['content_count'],
+            'incomplete_translation_language_codes': opportunity_dict[
+                'incomplete_translation_language_codes'
+            ],
+            'translation_counts': opportunity_dict['translation_counts'],
+            'entity_type': opportunity_dict['entity_type'],
+            'topic_name': opportunity_dict['topic_name'],
+            'entity_description': opportunity_dict['entity_description'],
+            'currently_available_to_learners': opportunity_dict[
+                'currently_available_to_learners'
+            ],
+            'translation_in_review_counts': translation_in_review_counts,
+            'is_pinned': is_pinned,
         }

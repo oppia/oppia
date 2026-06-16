@@ -106,6 +106,24 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             },
         )
 
+    def test_to_client_side_dict_returns_expected_dict(self) -> None:
+        expected_dict = {
+            'id': 'exp_1',
+            'topic_name': 'A topic',
+            'story_title': 'A new story',
+            'chapter_title': 'A new chapter',
+            'content_count': 5,
+            'translation_counts': {},
+            'reviewer_only_content_count': 0,
+            'translation_in_review_counts': {'hi': 2},
+            'is_pinned': True,
+        }
+
+        self.assertEqual(
+            self.valid_exp_opp_summary.to_client_side_dict({'hi': 2}, True),
+            expected_dict,
+        )
+
     def test_negative_content_count_fails_validation_check(self) -> None:
         self.assertTrue(
             isinstance(self.valid_exp_opp_summary.content_count, int)
@@ -628,3 +646,23 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
         }
 
         self.assertEqual(card_info.to_dict(), expected_dict)
+
+    def test_to_client_side_dict_returns_expected_dict(self) -> None:
+        expected_dict = {
+            'topic_ids': ['topic_1'],
+            'entity_id': 'exploration_1',
+            'content_count': 5,
+            'incomplete_translation_language_codes': ['en'],
+            'translation_counts': {'en': 3},
+            'entity_type': 'exploration',
+            'topic_name': 'Fractions',
+            'entity_description': 'Introduction to Fractions',
+            'currently_available_to_learners': True,
+            'translation_in_review_counts': {'en': 1},
+            'is_pinned': False,
+        }
+
+        self.assertEqual(
+            self.valid_card_info.to_client_side_dict({'en': 1}, False),
+            expected_dict,
+        )
