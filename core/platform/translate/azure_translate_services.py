@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Azure Cognitive Services Text Translation API platform service."""
+
 from __future__ import annotations
 
 import logging
@@ -23,6 +25,7 @@ from core import feconf
 from core.platform.translate import base_translate_services
 
 import requests
+import requests.exceptions
 
 
 class AzureTranslationService(base_translate_services.BaseTranslationService):
@@ -66,7 +69,7 @@ class AzureTranslationService(base_translate_services.BaseTranslationService):
         retries = 0
         backoff_delay = self.INITIAL_BACKOFF_SEC
 
-        while retries <= self.MAX_RETRIES:
+        while retries < self.MAX_RETRIES:
             try:
                 response = requests.post(
                     endpoint,
@@ -78,7 +81,7 @@ class AzureTranslationService(base_translate_services.BaseTranslationService):
 
                 if response.status_code == 200:
                     response_json = response.json()
-                    return response_json[0]['translations'][0]['text']
+                    return str(response_json[0]['translations'][0]['text'])
 
                 # Transient failure processing (Rate Limits / Server Outage).
                 if response.status_code in [429, 503]:
@@ -95,7 +98,7 @@ class AzureTranslationService(base_translate_services.BaseTranslationService):
                 # Immediate hard failures (401 Bad Credentials, 400 Oversized Text).
                 response.raise_for_status()
 
-            except requests.Timeout:
+            except requests.exceptions.Timeout:
                 logging.warning(
                     'Azure API timed out. Retrying in %s seconds...',
                     backoff_delay,
@@ -103,8 +106,10 @@ class AzureTranslationService(base_translate_services.BaseTranslationService):
                 time.sleep(backoff_delay)
                 retries += 1
                 backoff_delay *= 2
-            except requests.RequestException as e:
-                raise Exception('Failed to communicate with Azure API: %s' % e)
+            except requests.exceptions.RequestException as e:
+                raise Exception(
+                    'Failed to communicate with Azure API: %s' % e
+                ) from e
 
         raise Exception(
             'Azure Translator API request failed after %s retry attempts.'

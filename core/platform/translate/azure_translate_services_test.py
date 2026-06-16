@@ -18,24 +18,39 @@
 
 from __future__ import annotations
 
-import requests
-
 from core import feconf
 from core.platform.translate import azure_translate_services
 from core.tests import test_utils
+
+import requests
+import requests.exceptions
+from typing import Any, Dict, List, Union
 
 
 class MockResponse:
     """Mock for the requests.models.Response object."""
 
-    def __init__(self, json_data: dict, status_code: int) -> None:
+    # Here we use type Any because the json_data can be either a list of dicts
+    # or a dict, and the exact structure depends on the API response format
+    # which varies across different test cases.
+    def __init__(
+        self,
+        json_data: Union[List[Dict[str, Any]], Dict[str, Any]],
+        status_code: int,
+    ) -> None:
+        """Initializes the MockResponse object."""
         self.json_data = json_data
         self.status_code = status_code
 
-    def json(self) -> dict:
+    # Here we use type Any because the JSON response values from the Azure API
+    # can be of arbitrary types and cannot be statically typed without
+    # introducing unnecessary complexity.
+    def json(self) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
+        """Returns the json data."""
         return self.json_data
 
     def raise_for_status(self) -> None:
+        """Raises an HTTPError if status code is >= 400."""
         if self.status_code >= 400:
             raise requests.exceptions.HTTPError(
                 'HTTP Error: %s' % self.status_code
@@ -51,6 +66,9 @@ class AzureTranslationServiceTests(test_utils.GenericTestBase):
         self.api_key_swap = self.swap(
             feconf, 'AZURE_TRANSLATOR_API_KEY', 'fake_api_key'
         )
+        self.region_swap = self.swap(
+            feconf, 'AZURE_TRANSLATOR_REGION', 'fake_region'
+        )
 
         import time
 
@@ -60,7 +78,8 @@ class AzureTranslationServiceTests(test_utils.GenericTestBase):
         missing_key_swap = self.swap(feconf, 'AZURE_TRANSLATOR_API_KEY', None)
         with missing_key_swap:
             with self.assertRaisesRegex(
-                Exception, 'Azure Translation API key.*'
+                Exception,
+                'Either Azure Translation API key configuration or region is missing.',
             ):
                 self.service.generate_translation('en', 'es', 'hello')
 
@@ -68,17 +87,35 @@ class AzureTranslationServiceTests(test_utils.GenericTestBase):
         mock_response = MockResponse(
             [{'translations': [{'text': 'hola'}]}], 200
         )
-        post_swap = self.swap_with_mock(requests, 'post', mock_response)
 
-        with self.api_key_swap, post_swap:
+        # Here we use type Any because the mock function must match the
+        # requests.post signature which accepts arbitrary args and kwargs
+        # that vary depending on how the function is called internally.
+        def mock_post(
+            **kwargs: Any,
+        ) -> MockResponse:  # pylint: disable=unused-argument
+            return mock_response
+
+        post_swap = self.swap(requests, 'post', mock_post)
+
+        with self.api_key_swap, self.region_swap, post_swap:
             result = self.service.generate_translation('en', 'es', 'hello')
             self.assertEqual(result, 'hola')
 
     def test_rate_limit_triggers_exponential_backoff_and_fails(self) -> None:
         mock_response = MockResponse({}, 429)
-        post_swap = self.swap_with_mock(requests, 'post', mock_response)
 
-        with self.api_key_swap, post_swap, self.sleep_swap:
+        # Here we use type Any because the mock function must match the
+        # requests.post signature which accepts arbitrary args and kwargs
+        # that vary depending on how the function is called internally.
+        def mock_post(
+            **kwargs: Any,
+        ) -> MockResponse:  # pylint: disable=unused-argument
+            return mock_response
+
+        post_swap = self.swap(requests, 'post', mock_post)
+
+        with self.api_key_swap, self.region_swap, post_swap, self.sleep_swap:
             with self.assertRaisesRegex(
                 Exception, 'Azure Translator API request failed'
             ):
@@ -86,21 +123,36 @@ class AzureTranslationServiceTests(test_utils.GenericTestBase):
 
     def test_hard_error_fails_immediately_without_retrying(self) -> None:
         mock_response = MockResponse({}, 400)
-        post_swap = self.swap_with_mock(requests, 'post', mock_response)
 
-        with self.api_key_swap, post_swap:
+        # Here we use type Any because the mock function must match the
+        # requests.post signature which accepts arbitrary args and kwargs
+        # that vary depending on how the function is called internally.
+        def mock_post(
+            **kwargs: Any,
+        ) -> MockResponse:  # pylint: disable=unused-argument
+            return mock_response
+
+        post_swap = self.swap(requests, 'post', mock_post)
+
+        with self.api_key_swap, self.region_swap, post_swap:
             with self.assertRaisesRegex(
                 requests.exceptions.HTTPError, 'HTTP Error: 400'
             ):
                 self.service.generate_translation('en', 'es', 'hello')
 
     def test_timeout_triggers_exponential_backoff_and_fails(self) -> None:
-        def mock_post_timeout(*args, **kwargs) -> None:
-            raise requests.Timeout('Connection timed out.')
+
+        # Here we use type Any because the mock function must match the
+        # requests.post signature which accepts arbitrary args and kwargs
+        # that vary depending on how the function is called internally.
+        def mock_post_timeout(
+            **kwargs: Any,
+        ) -> MockResponse:  # pylint: disable=unused-argument
+            raise requests.exceptions.Timeout('Connection timed out.')
 
         post_swap = self.swap(requests, 'post', mock_post_timeout)
 
-        with self.api_key_swap, post_swap, self.sleep_swap:
+        with self.api_key_swap, self.region_swap, post_swap, self.sleep_swap:
             with self.assertRaisesRegex(
                 Exception, 'Azure Translator API request failed'
             ):

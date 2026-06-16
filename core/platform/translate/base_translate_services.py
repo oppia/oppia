@@ -40,9 +40,6 @@ class BaseTranslationService(metaclass=abc.ABCMeta):
             target_language_code: str. ISO 639-1 language code for translation.
             source_text: str. The HTML fragment or string to translate.
 
-        Returns:
-            str. The machine-translated output string.
-
         Raises:
             Exception. If the translation provider fails to process the request.
         """
