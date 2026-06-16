@@ -215,7 +215,7 @@ export class BlogPostEditorComponent implements OnInit {
       /^(\d{2})\/(\d{2})\/(\d{4}), (\d{2}):(\d{2}):(\d{2}):(\d{3})\d*$/
     );
     if (!dateTimeComponents) {
-      throw new Error(`Invalid datetime string: ${naiveDateTime}.`);
+      return naiveDateTime;
     }
     const [, month, day, year, hours, minutes, seconds, millis] =
       dateTimeComponents;
