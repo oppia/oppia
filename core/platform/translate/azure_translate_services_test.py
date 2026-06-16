@@ -18,12 +18,13 @@
 
 from __future__ import annotations
 
+import requests
+import requests.exceptions
+
 from core import feconf
 from core.platform.translate import azure_translate_services
 from core.tests import test_utils
 
-import requests
-import requests.exceptions
 from typing import Any, Dict, List, Union
 
 
@@ -91,7 +92,7 @@ class AzureTranslationServiceTests(test_utils.GenericTestBase):
         # Here we use type Any because the mock function must match the
         # requests.post signature which accepts arbitrary args and kwargs
         # that vary depending on how the function is called internally.
-        def mock_post(**unused_kwargs: Any) -> MockResponse:
+        def mock_post(*unused_args: Any, **unused_kwargs: Any) -> MockResponse:
             return mock_response
 
         post_swap = self.swap(requests, 'post', mock_post)
@@ -103,10 +104,7 @@ class AzureTranslationServiceTests(test_utils.GenericTestBase):
     def test_rate_limit_triggers_exponential_backoff_and_fails(self) -> None:
         mock_response = MockResponse({}, 429)
 
-        # Here we use type Any because the mock function must match the
-        # requests.post signature which accepts arbitrary args and kwargs
-        # that vary depending on how the function is called internally.
-        def mock_post(**unused_kwargs: Any) -> MockResponse:
+        def mock_post(*unused_args: Any, **unused_kwargs: Any) -> MockResponse:
             return mock_response
 
         post_swap = self.swap(requests, 'post', mock_post)
@@ -120,10 +118,7 @@ class AzureTranslationServiceTests(test_utils.GenericTestBase):
     def test_hard_error_fails_immediately_without_retrying(self) -> None:
         mock_response = MockResponse({}, 400)
 
-        # Here we use type Any because the mock function must match the
-        # requests.post signature which accepts arbitrary args and kwargs
-        # that vary depending on how the function is called internally.
-        def mock_post(**unused_kwargs: Any) -> MockResponse:
+        def mock_post(*unused_args: Any, **unused_kwargs: Any) -> MockResponse:
             return mock_response
 
         post_swap = self.swap(requests, 'post', mock_post)
@@ -136,10 +131,9 @@ class AzureTranslationServiceTests(test_utils.GenericTestBase):
 
     def test_timeout_triggers_exponential_backoff_and_fails(self) -> None:
 
-        # Here we use type Any because the mock function must match the
-        # requests.post signature which accepts arbitrary args and kwargs
-        # that vary depending on how the function is called internally.
-        def mock_post_timeout(**unused_kwargs: Any) -> MockResponse:
+        def mock_post_timeout(
+            *unused_args: Any, **unused_kwargs: Any
+        ) -> MockResponse:
             raise requests.exceptions.Timeout('Connection timed out.')
 
         post_swap = self.swap(requests, 'post', mock_post_timeout)

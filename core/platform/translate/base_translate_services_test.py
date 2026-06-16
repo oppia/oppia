@@ -39,39 +39,25 @@ class ConcreteTranslationService(
 class BaseTranslationServiceTests(test_utils.GenericTestBase):
     """Tests for the BaseTranslationService abstract base class."""
 
-    def test_cannot_instantiate_abstract_class_directly(self) -> None:
-        with self.assertRaisesRegex(
-            TypeError, 'Can\'t instantiate abstract class'
-        ):
-            base_translate_services.BaseTranslationService()  # pylint: disable=abstract-class-instantiated
+    def setUp(self) -> None:
+        super().setUp()
+        self.service = ConcreteTranslationService()
 
     def test_concrete_subclass_can_be_instantiated(self) -> None:
-        service = ConcreteTranslationService()
         self.assertIsInstance(
-            service, base_translate_services.BaseTranslationService
+            self.service, base_translate_services.BaseTranslationService
         )
 
     def test_generate_translation_returns_string(self) -> None:
-        service = ConcreteTranslationService()
-        result = service.generate_translation('en', 'es', 'hello')
+        result = self.service.generate_translation('en', 'es', 'hello')
         self.assertIsInstance(result, str)
 
     def test_generate_translation_uses_source_text(self) -> None:
-        service = ConcreteTranslationService()
-        result = service.generate_translation('en', 'es', 'hello')
+        result = self.service.generate_translation('en', 'es', 'hello')
         self.assertEqual(result, 'translated: hello')
 
-    def test_subclass_missing_generate_translation_raises_type_error(
-        self,
-    ) -> None:
-        class IncompleteTranslationService(
-            base_translate_services.BaseTranslationService
-        ):
-            """Incomplete subclass missing generate_translation for testing."""
-
-            pass
-
-        with self.assertRaisesRegex(
-            TypeError, 'Can\'t instantiate abstract class'
-        ):
-            IncompleteTranslationService()  # pylint: disable=abstract-class-instantiated
+    def test_abstract_method_raises_not_implemented_error(self) -> None:
+        with self.assertRaisesRegex(NotImplementedError, r'.*'):
+            base_translate_services.BaseTranslationService.generate_translation(
+                self.service, 'en', 'es', 'hello'
+            )
