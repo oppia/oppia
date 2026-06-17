@@ -48,7 +48,6 @@ const invalidEmailErrorContainer = '#mat-error-1';
 const invalidUsernameErrorContainer = '.oppia-warning-text';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 
-const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
 const explorationCard = '.e2e-test-exploration-dashboard-card';
 const desktopLessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
