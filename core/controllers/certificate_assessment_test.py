@@ -164,6 +164,14 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
             },
         )
 
+    def test_get_returns_404_for_missing_certificate_offering(self) -> None:
+        self.get_json(
+            feconf.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER.replace(
+                '<certificate_id>', 'missing_certificate_id'
+            ),
+            expected_status_int=404,
+        )
+
     def test_put_updates_certificate_offering(self) -> None:
         csrf_token = self.get_new_csrf_token()
         created_offering = certificate_assessment_services.create_certificate_assessment_offering(
@@ -223,6 +231,31 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(updated_offering.async_status, 'Blocked')
         self.assertEqual(updated_offering.version, 2)
 
+    def test_put_returns_404_for_missing_certificate_offering(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+
+        self.put_json(
+            feconf.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER.replace(
+                '<certificate_id>', 'missing_certificate_id'
+            ),
+            {
+                'title': 'Chemistry Mastery',
+                'description': 'Updated chemistry coverage.',
+                'classroom_id': 'science_classroom_02',
+                'topics': [
+                    {
+                        'topic_id': 'topic_atoms',
+                    },
+                ],
+                'total_questions': 9,
+                'time_limit_in_minutes': 40,
+                'demonstrates': ['Scientific reasoning'],
+                'async_status': 'Blocked',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=404,
+        )
+
     def test_delete_removes_certificate_offering(self) -> None:
         created_offering = certificate_assessment_services.create_certificate_assessment_offering(
             title='Chemistry Basics',
@@ -249,3 +282,11 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
             certificate_assessment_services.get_certificate_assessment_offering(
                 created_offering.certificate_id
             )
+
+    def test_delete_returns_404_for_missing_certificate_offering(self) -> None:
+        self.delete_json(
+            feconf.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER.replace(
+                '<certificate_id>', 'missing_certificate_id'
+            ),
+            expected_status_int=404,
+        )

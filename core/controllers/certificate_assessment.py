@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf
+from core import feconf, utils
 from core.controllers import acl_decorators, base
 from core.domain import certificate_assessment_services
 
@@ -88,18 +88,22 @@ class CertificateAssessmentOfferingHandler(
     def post(self) -> None:
         """Creates a certificate assessment offering."""
         assert self.normalized_payload is not None
+        topic_ids = [
+            topic['topic_id'] for topic in self.normalized_payload['topics']
+        ]
+        total_questions = int(self.normalized_payload['total_questions'])
+        time_limit_in_minutes = int(
+            self.normalized_payload['time_limit_in_minutes']
+        )
+        demonstrates = list(self.normalized_payload['demonstrates'])
         certificate_offering = certificate_assessment_services.create_certificate_assessment_offering(
             title=self.normalized_payload['title'],
             description=self.normalized_payload['description'],
             classroom_id=self.normalized_payload['classroom_id'],
-            topic_ids=[
-                topic['topic_id'] for topic in self.normalized_payload['topics']
-            ],
-            total_questions=self.normalized_payload['total_questions'],
-            time_limit_in_minutes=self.normalized_payload[
-                'time_limit_in_minutes'
-            ],
-            demonstrates=self.normalized_payload['demonstrates'],
+            topic_ids=topic_ids,
+            total_questions=total_questions,
+            time_limit_in_minutes=time_limit_in_minutes,
+            demonstrates=demonstrates,
             async_status=self.normalized_payload['async_status'],
         )
         self.render_json(
@@ -108,7 +112,7 @@ class CertificateAssessmentOfferingHandler(
 
 
 class CertificateAssessmentOfferingByIdHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
+    base.BaseHandler[Dict[str, Any], Dict[str, Any]]
 ):
     """Handler for retrieving, updating and deleting an offering by ID."""
 
@@ -163,11 +167,12 @@ class CertificateAssessmentOfferingByIdHandler(
         Args:
             certificate_id: str. The ID of the certificate offering.
         """
-        certificate_offering = (
-            certificate_assessment_services.get_certificate_assessment_offering(
+        try:
+            certificate_offering = certificate_assessment_services.get_certificate_assessment_offering(
                 certificate_id
             )
-        )
+        except utils.ValidationError as e:
+            raise self.NotFoundException(str(e)) from e
         self.render_json(
             {
                 'certificate_offering': {
@@ -188,21 +193,28 @@ class CertificateAssessmentOfferingByIdHandler(
             certificate_id: str. The ID of the certificate offering.
         """
         assert self.normalized_payload is not None
-        certificate_offering = certificate_assessment_services.update_certificate_assessment_offering(
-            certificate_id=certificate_id,
-            title=self.normalized_payload['title'],
-            description=self.normalized_payload['description'],
-            classroom_id=self.normalized_payload['classroom_id'],
-            topic_ids=[
-                topic['topic_id'] for topic in self.normalized_payload['topics']
-            ],
-            total_questions=self.normalized_payload['total_questions'],
-            time_limit_in_minutes=self.normalized_payload[
-                'time_limit_in_minutes'
-            ],
-            demonstrates=self.normalized_payload['demonstrates'],
-            async_status=self.normalized_payload['async_status'],
+        topic_ids = [
+            topic['topic_id'] for topic in self.normalized_payload['topics']
+        ]
+        total_questions = int(self.normalized_payload['total_questions'])
+        time_limit_in_minutes = int(
+            self.normalized_payload['time_limit_in_minutes']
         )
+        demonstrates = list(self.normalized_payload['demonstrates'])
+        try:
+            certificate_offering = certificate_assessment_services.update_certificate_assessment_offering(
+                certificate_id=certificate_id,
+                title=self.normalized_payload['title'],
+                description=self.normalized_payload['description'],
+                classroom_id=self.normalized_payload['classroom_id'],
+                topic_ids=topic_ids,
+                total_questions=total_questions,
+                time_limit_in_minutes=time_limit_in_minutes,
+                demonstrates=demonstrates,
+                async_status=self.normalized_payload['async_status'],
+            )
+        except utils.ValidationError as e:
+            raise self.NotFoundException(str(e)) from e
         self.render_json(
             {'certificate_id': certificate_offering.certificate_id}
         )
@@ -214,7 +226,10 @@ class CertificateAssessmentOfferingByIdHandler(
         Args:
             certificate_id: str. The ID of the certificate offering.
         """
-        certificate_assessment_services.delete_certificate_assessment_offering(
-            certificate_id
-        )
+        try:
+            certificate_assessment_services.delete_certificate_assessment_offering(
+                certificate_id
+            )
+        except utils.ValidationError as e:
+            raise self.NotFoundException(str(e)) from e
         self.render_json({})
