@@ -7090,7 +7090,7 @@ export default {
     },
     "DONATE": {
       "ROUTE": "donate",
-      "TITLE": "Donate to Oppia | Support Global Education",
+      "TITLE": "I18N_DONATE_PAGE_BROWSER_TAB_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "name",
@@ -7194,7 +7194,7 @@ export default {
     },
     "PARTNERSHIPS": {
       "ROUTE": "partnerships",
-      "TITLE": "Partner with Oppia | NGOs and Schools",
+      "TITLE": "I18N_PARTNERSHIPS_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "name",
@@ -7536,7 +7536,7 @@ export default {
     },
     "VOLUNTEER": {
       "ROUTE": "volunteer",
-      "TITLE": "Volunteer with Oppia | Join Our Global Team",
+      "TITLE": "I18N_VOLUNTEER_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "name",
