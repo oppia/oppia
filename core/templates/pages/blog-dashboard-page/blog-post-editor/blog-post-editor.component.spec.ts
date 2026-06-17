@@ -603,6 +603,10 @@ describe('Blog Post Editor Component', () => {
     );
   });
 
+  it('should return original string for invalid datetime format', () => {
+    expect(component.getDateStringInWords('invalid-date')).toBe('invalid-date');
+  });
+
   it('should cancel delete blog post model', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject(),
