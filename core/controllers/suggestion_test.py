@@ -34,6 +34,7 @@ from core.domain import (
     question_services,
     rights_domain,
     rights_manager,
+    skill_domain,
     skill_fetchers,
     skill_services,
     state_domain,
@@ -49,7 +50,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, Union, cast
+from typing import Dict, Final, List, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -3952,7 +3953,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         class MockSkill:
             def __init__(self, skill_id: str):
                 self.id = skill_id
-                self.rubrics: list = []
+                self.rubrics: List[skill_domain.Rubric] = []
 
         mock_skill = MockSkill(self.SKILL_ID)
 
