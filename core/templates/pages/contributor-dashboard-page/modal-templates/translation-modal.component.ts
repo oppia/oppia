@@ -203,7 +203,7 @@ export class TranslationModalComponent {
     if (input.length <= characterCount || characterCount < 3) {
       return input;
     }
-    return input.substr(0, characterCount - 3).trim() + '...';
+    return input.substring(0, characterCount - 3).trim() + '...';
   }
 
   ngOnInit(): void {
@@ -454,7 +454,15 @@ export class TranslationModalComponent {
 
   updateHtml($event: SchemaDefaultValue): void {
     if ($event !== this.activeWrittenTranslation) {
-      this.activeWrittenTranslation = $event as string | string[];
+      if (typeof $event === 'string') {
+        this.activeWrittenTranslation = $event;
+      } else if (Array.isArray($event)) {
+        this.activeWrittenTranslation = $event.filter(
+          (item): item is string => typeof item === 'string'
+        );
+      } else {
+        return;
+      }
       this.changeDetectorRef.detectChanges();
       this.updateTranslationErrors();
     }

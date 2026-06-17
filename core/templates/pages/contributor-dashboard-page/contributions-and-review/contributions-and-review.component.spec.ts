@@ -71,6 +71,13 @@ class MockNgbModal {
   }
 }
 
+class MockNgbModalRef {
+  componentInstance: Record<string, unknown> = {};
+  result: Promise<unknown> = Promise.resolve();
+  close(): void {}
+  dismiss(): void {}
+}
+
 class MockWindowRef {
   nativeWindow = {
     scrollTo: (x, y) => {},
@@ -1184,22 +1191,22 @@ describe('Contributions and review component', () => {
     }));
 
     it('should handle dismiss when question suggestion modal is closed', fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: {
-          authorName: null,
-          contentHtml: null,
-          reviewable: null,
-          question: null,
-          questionHeader: null,
-          suggestion: null,
-          skillRubrics: null,
-          suggestionId: null,
-          skillDifficulty: null,
-          misconceptionsBySkill: null,
-          editSuggestionEmitter: new EventEmitter(),
-        },
-        result: Promise.reject(),
-      } as NgbModalRef);
+      const mockModalRef = new MockNgbModalRef();
+      mockModalRef.componentInstance = {
+        authorName: null,
+        contentHtml: null,
+        reviewable: null,
+        question: null,
+        questionHeader: null,
+        suggestion: null,
+        skillRubrics: null,
+        suggestionId: null,
+        skillDifficulty: null,
+        misconceptionsBySkill: null,
+        editSuggestionEmitter: new EventEmitter(),
+      };
+      mockModalRef.result = Promise.reject();
+      spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
       let question = Question.createFromBackendDict({
         question_state_data_schema_version: null,
@@ -1300,7 +1307,51 @@ describe('Contributions and review component', () => {
       });
 
       component._showQuestionSuggestionModal(
-        {} as Suggestion,
+        {
+          change_cmd: {
+            skill_id: '',
+            content_html: '',
+            translation_html: '',
+            question_dict: {
+              id: null,
+              question_state_data: {
+                classifier_model_id: null,
+                param_changes: [],
+                solicit_answer_details: false,
+                content: {content_id: '', html: ''},
+                interaction: {
+                  answer_groups: [],
+                  default_outcome: {
+                    dest: '',
+                    dest_if_really_stuck: null,
+                    feedback: {content_id: '', html: ''},
+                    param_changes: [],
+                    refresher_exploration_id: null,
+                    missing_prerequisite_skill_id: null,
+                    labelled_as_correct: false,
+                  },
+                  id: '',
+                  customization_args: {},
+                },
+                linked_skill_id: null,
+                next_content_id_index: 0,
+              },
+              question_state_data_schema_version: 0,
+              language_code: '',
+              version: 0,
+              linked_skill_ids: [],
+              inapplicable_skill_misconception_ids: [],
+              next_content_id_index: 0,
+            },
+            skill_difficulty: [],
+          },
+          status: '',
+          suggestion_type: '',
+          target_id: '',
+          suggestion_id: '',
+          author_name: '',
+          exploration_content_html: null,
+        },
         {},
         false,
         question,
@@ -2770,16 +2821,16 @@ describe('Contributions and review component', () => {
     }));
 
     it('should handle dismiss when translation suggestion modal is closed', fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: {
-          suggestionIdToContribution: {},
-          initialSuggestionId: 'suggestion_1',
-          subheading: 'Sub heading',
-          queuedSuggestionSummaryEmit: new EventEmitter(),
-          queuedSuggestionEmit: new EventEmitter(),
-        },
-        result: Promise.reject(),
-      } as NgbModalRef);
+      const mockModalRef = new MockNgbModalRef();
+      mockModalRef.componentInstance = {
+        suggestionIdToContribution: {},
+        initialSuggestionId: 'suggestion_1',
+        subheading: 'Sub heading',
+        queuedSuggestionSummaryEmit: new EventEmitter(),
+        queuedSuggestionEmit: new EventEmitter(),
+      };
+      mockModalRef.result = Promise.reject();
+      spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
       component.contributions = {
         suggestion_1: {

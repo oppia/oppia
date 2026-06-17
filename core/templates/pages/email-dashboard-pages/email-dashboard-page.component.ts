@@ -61,9 +61,17 @@ export class EmailDashboardPageComponent {
     });
   }
 
+  private isValidQueryValue(
+    value: SchemaDefaultValue
+  ): value is boolean | number | null {
+    return (
+      typeof value === 'boolean' || typeof value === 'number' || value === null
+    );
+  }
+
   updateQueryData(newValue: SchemaDefaultValue, field: string): void {
-    if (this.data[field] !== newValue) {
-      this.data[field] = newValue as boolean | number | null;
+    if (this.data[field] !== newValue && this.isValidQueryValue(newValue)) {
+      this.data[field] = newValue;
       this.changeDetectorRef.detectChanges();
     }
   }
