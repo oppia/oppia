@@ -42,7 +42,8 @@ oppia-state-interaction-editor .oppia-add-interaction-button-container {
   padding: 20px 30px;
 }
 
-oppia-state-interaction-editor .oppia-exp-interaction-container {
+oppia-state-interaction-editor .oppia-exp-interaction-container,
+:host .oppia-exp-interaction-container {
   border: 1.5px solid #d3d1d1;
   border-radius: 4px;
   margin: 15px auto 30px;
@@ -53,7 +54,8 @@ oppia-state-interaction-editor .oppia-state-interaction-content {
   margin-top: 0;
 }
 
-oppia-state-interaction-editor .oppia-interaction-preview-container {
+oppia-state-interaction-editor .oppia-interaction-preview-container,
+:host .oppia-interaction-preview-container {
   padding: 5px;
   pointer-events: none;
 }
