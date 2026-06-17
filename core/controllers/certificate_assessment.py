@@ -20,11 +20,39 @@ from core import feconf, utils
 from core.controllers import acl_decorators, base
 from core.domain import certificate_assessment_services
 
-from typing import Any, Dict
+from typing import Dict, List, TypedDict
+
+
+class CertificateAssessmentOfferingTopicDict(TypedDict):
+    """Dict representation of a certificate assessment topic."""
+
+    topic_id: str
+
+
+class CertificateAssessmentOfferingHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of CertificateAssessmentOfferingHandler payload."""
+
+    title: str
+    description: str
+    classroom_id: str
+    topics: List[CertificateAssessmentOfferingTopicDict]
+    total_questions: int
+    time_limit_in_minutes: int
+    demonstrates: List[str]
+    async_status: str
+
+
+class CertificateAssessmentOfferingByIdHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of certificate_id path args."""
+
+    certificate_id: str
 
 
 class CertificateAssessmentOfferingHandler(
-    base.BaseHandler[Dict[str, Any], Dict[str, Any]]
+    base.BaseHandler[
+        CertificateAssessmentOfferingHandlerNormalizedPayloadDict,
+        Dict[str, str],
+    ]
 ):
     """Handler for creating and listing certificate assessment offerings."""
 
@@ -112,7 +140,10 @@ class CertificateAssessmentOfferingHandler(
 
 
 class CertificateAssessmentOfferingByIdHandler(
-    base.BaseHandler[Dict[str, Any], Dict[str, Any]]
+    base.BaseHandler[
+        CertificateAssessmentOfferingHandlerNormalizedPayloadDict,
+        CertificateAssessmentOfferingByIdHandlerNormalizedRequestDict,
+    ]
 ):
     """Handler for retrieving, updating and deleting an offering by ID."""
 
