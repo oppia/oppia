@@ -21,7 +21,7 @@ from __future__ import annotations
 import base64
 import os
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     exp_domain,
@@ -34,6 +34,7 @@ from core.domain import (
     question_services,
     rights_domain,
     rights_manager,
+    skill_fetchers,
     skill_services,
     state_domain,
     story_domain,
@@ -52,10 +53,16 @@ from typing import Dict, Final, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services, suggestion_models
+    from mypy_imports import (
+        datastore_services,
+        opportunity_models,
+        suggestion_models,
+    )
 
 datastore_services = models.Registry.import_datastore_services()
-(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
+opportunity_models, suggestion_models = models.Registry.import_models(
+    [models.Names.OPPORTUNITY, models.Names.SUGGESTION]
+)
 
 
 class SuggestionUnitTests(test_utils.GenericTestBase):
@@ -2699,7 +2706,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion_post_accept['status'], suggestion_models.STATUS_ACCEPTED
         )
-        (questions, merged_question_skill_links) = (
+        questions, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
                 1, [self.SKILL_ID], 0
             )
@@ -3341,6 +3348,52 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
         self.logout()
 
+    def test_reject_suggestion_to_skill_with_different_suggestion_type(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        suggestion_to_accept = self.get_json(
+            '%s?author_id=%s'
+            % (feconf.SUGGESTION_LIST_URL_PREFIX, self.author_id)
+        )['suggestions'][0]
+
+        suggestion_id = suggestion_to_accept['suggestion_id']
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+
+        # Create a mock suggestion with a different suggestion_type.
+        class MockSuggestion:
+            def __init__(
+                self, original_suggestion: suggestion_registry.BaseSuggestion
+            ):
+                self.suggestion_type = feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                self.target_id = original_suggestion.target_id
+                self.target_type = original_suggestion.target_type
+
+        mock_suggestion = MockSuggestion(suggestion)
+
+        # Swap suggestion_services.get_suggestion_by_id to return our mock suggestion.
+        swap_get_suggestion = self.swap(
+            suggestion_services,
+            'get_suggestion_by_id',
+            lambda _: mock_suggestion,
+        )
+
+        csrf_token = self.get_new_csrf_token()
+        with swap_get_suggestion:
+            self.put_json(
+                '%s/skill/%s/%s'
+                % (
+                    feconf.SUGGESTION_ACTION_URL_PREFIX,
+                    suggestion_to_accept['target_id'],
+                    suggestion_id,
+                ),
+                {'action': 'reject', 'review_message': 'Rejected!'},
+                csrf_token=csrf_token,
+            )
+
+        self.logout()
+
 
 class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
     """Unit test for the UserSubmittedSuggestionsHandler."""
@@ -3855,6 +3908,80 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
             },
             expected_status_int=400,
+        )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+        ]
+    )
+    def test_exploration_handler_returns_data_with_v2_feature_flag_enabled(
+        self,
+    ) -> None:
+        self.login(self.AUTHOR_EMAIL)
+
+        # Save a new V2 translation opportunity model.
+        opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.EXP_ID,
+            topic_ids=['topic_id_1'],
+            content_count=2,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={},
+        ).put()
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content',
+            {
+                'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                'offset': 0,
+                'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+            },
+        )
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+        self.assertEqual(response['next_offset'], 1)
+        self.assertEqual(
+            response['target_id_to_opportunity_dict'][self.EXP_ID]['entity_id'],
+            self.EXP_ID,
+        )
+
+    def test_skill_opportunity_dict_with_none_opportunity(self) -> None:
+        self.login(self.AUTHOR_EMAIL)
+
+        class MockSkill:
+            def __init__(self, skill_id: str):
+                self.id = skill_id
+                self.rubrics: list = []
+
+        mock_skill = MockSkill(self.SKILL_ID)
+
+        # Swap skill_fetchers.get_multi_skills to return our mock skill.
+        swap_get_multi_skills = self.swap(
+            skill_fetchers,
+            'get_multi_skills',
+            lambda skill_ids, strict=True: [mock_skill],
+        )
+
+        # Swap opportunity_services.get_skill_opportunities_by_ids to return None for our skill.
+        swap_get_skill_opps = self.swap(
+            opportunity_services,
+            'get_skill_opportunities_by_ids',
+            lambda skill_ids: {self.SKILL_ID: None},
+        )
+
+        with swap_get_multi_skills, swap_get_skill_opps:
+            response = self.get_json(
+                '/getsubmittedsuggestions/skill/add_question',
+                {
+                    'limit': constants.OPPORTUNITIES_PAGE_SIZE,
+                    'offset': 0,
+                    'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
+                },
+            )
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(
+            response['target_id_to_opportunity_dict'][self.SKILL_ID], None
         )
 
 
