@@ -8205,7 +8205,9 @@ export class ExplorationEditor extends BaseUser {
         const grid = document.querySelector(gridSel);
 
         const isVisible = (el: Element | null) => {
-          if (!el) return false;
+          if (!el) {
+            return false;
+          }
           const style = window.getComputedStyle(el as Element);
           const rect = (el as HTMLElement).getBoundingClientRect();
           return (
