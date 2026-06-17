@@ -21,11 +21,11 @@ import {Clipboard} from '@angular/cdk/clipboard';
 import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {
+  CERTIFICATE_OFFERING_RESULT_ACTIONS,
+  CertificateOfferingResultAction,
+} from './certificate-offering-action.model';
 import './post-certificate-offering-result-modal.component.css';
-
-type CertificateOfferingResultAction = 'created' | 'updated';
-const CERTIFICATE_OFFERING_CREATED_ACTION: CertificateOfferingResultAction =
-  'created';
 
 @Component({
   selector: 'oppia-post-certificate-offering-result-modal',
@@ -33,7 +33,7 @@ const CERTIFICATE_OFFERING_CREATED_ACTION: CertificateOfferingResultAction =
 })
 export class PostCertificateOfferingResultModalComponent {
   @Input() action: CertificateOfferingResultAction =
-    CERTIFICATE_OFFERING_CREATED_ACTION;
+    CERTIFICATE_OFFERING_RESULT_ACTIONS.CREATED;
 
   // TODO(#24717 - M1.14): Replace with dynamic values once backend is wired up.
   @Input() certificateName: string = 'Everyday Arithmetic & Number Confidence';
@@ -54,6 +54,12 @@ export class PostCertificateOfferingResultModalComponent {
 
   copyCertificateUrl(): void {
     this.clipboard.copy(this.certificateUrl);
+  }
+
+  get certificateActionMessage(): string {
+    return this.action === CERTIFICATE_OFFERING_RESULT_ACTIONS.CREATED
+      ? 'has been created.'
+      : 'has been updated.';
   }
 
   dismiss(): void {

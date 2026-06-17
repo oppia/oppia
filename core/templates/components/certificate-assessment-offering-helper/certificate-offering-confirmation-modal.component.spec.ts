@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for CertificateOfferingConfirmationModalComponent.
  */
 
-import {CertificateOfferingConfirmationModalComponent} from './certificate-offering-confirmation-modal.component';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-
-const CERTIFICATE_OFFERING_CREATE_ACTION = 'create';
-const CERTIFICATE_OFFERING_UPDATED_ACTION = 'updated';
-const CERTIFICATE_OFFERING_NOT_READY_ACTION = 'not_ready';
+import {
+  CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
+  CERTIFICATE_OFFERING_SAVE_STATUSES,
+} from './certificate-offering-action.model';
+import {CertificateOfferingConfirmationModalComponent} from './certificate-offering-confirmation-modal.component';
 
 describe('Certificate offering confirmation modal component', () => {
   let component: CertificateOfferingConfirmationModalComponent;
@@ -38,7 +38,7 @@ describe('Certificate offering confirmation modal component', () => {
   });
 
   it('should expose create copy and action for create flow', () => {
-    component.action = CERTIFICATE_OFFERING_CREATE_ACTION;
+    component.action = CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE;
 
     expect(component.modalTitle).toBe('Save Certificate');
     expect(component.confirmButtonText).toBe('Create Certificate');
@@ -47,7 +47,7 @@ describe('Certificate offering confirmation modal component', () => {
   });
 
   it('should expose update copy and action for update flow', () => {
-    component.action = CERTIFICATE_OFFERING_UPDATED_ACTION;
+    component.action = CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.UPDATE;
 
     expect(component.modalTitle).toBe('Update Certificate');
     expect(component.confirmButtonText).toBe('Update Certificate');
@@ -65,17 +65,17 @@ describe('Certificate offering confirmation modal component', () => {
     component.saveAsNotReady();
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith(
-      CERTIFICATE_OFFERING_NOT_READY_ACTION
+      CERTIFICATE_OFFERING_SAVE_STATUSES.NOT_READY
     );
   });
 
   it('should close with the configured action', () => {
-    component.action = CERTIFICATE_OFFERING_UPDATED_ACTION;
+    component.action = CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.UPDATE;
 
     component.confirm();
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith(
-      CERTIFICATE_OFFERING_UPDATED_ACTION
+      CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.UPDATE
     );
   });
 });

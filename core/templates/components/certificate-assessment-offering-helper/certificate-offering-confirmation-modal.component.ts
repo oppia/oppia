@@ -19,18 +19,19 @@
 
 import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-
-type CertificateOfferingAction = 'create' | 'updated';
-const CERTIFICATE_OFFERING_CREATE_ACTION: CertificateOfferingAction = 'create';
-const CERTIFICATE_OFFERING_NOT_READY_ACTION = 'not_ready';
+import {
+  CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
+  CertificateOfferingConfirmationAction,
+  CERTIFICATE_OFFERING_SAVE_STATUSES,
+} from './certificate-offering-action.model';
 
 @Component({
   selector: 'oppia-certificate-offering-confirmation-modal',
   templateUrl: './certificate-offering-confirmation-modal.component.html',
 })
 export class CertificateOfferingConfirmationModalComponent {
-  @Input() action: CertificateOfferingAction =
-    CERTIFICATE_OFFERING_CREATE_ACTION;
+  @Input() action: CertificateOfferingConfirmationAction =
+    CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE;
   @Input() isCertificateValid: boolean = false;
 
   constructor(private ngbActiveModal: NgbActiveModal) {}
@@ -40,7 +41,7 @@ export class CertificateOfferingConfirmationModalComponent {
   }
 
   saveAsNotReady(): void {
-    this.ngbActiveModal.close(CERTIFICATE_OFFERING_NOT_READY_ACTION);
+    this.ngbActiveModal.close(CERTIFICATE_OFFERING_SAVE_STATUSES.NOT_READY);
   }
 
   confirm(): void {
@@ -48,25 +49,25 @@ export class CertificateOfferingConfirmationModalComponent {
   }
 
   get modalTitle(): string {
-    return this.action === CERTIFICATE_OFFERING_CREATE_ACTION
+    return this.action === CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE
       ? 'Save Certificate'
       : 'Update Certificate';
   }
 
   get confirmButtonText(): string {
-    return this.action === CERTIFICATE_OFFERING_CREATE_ACTION
+    return this.action === CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE
       ? 'Create Certificate'
       : 'Update Certificate';
   }
 
   get confirmationText(): string {
-    return this.action === CERTIFICATE_OFFERING_CREATE_ACTION
+    return this.action === CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE
       ? 'Choose whether to save this certificate as not ready or create it now.'
       : 'Choose whether to save this certificate as not ready or update it now.';
   }
 
   get disabledText(): string {
-    return this.action === CERTIFICATE_OFFERING_CREATE_ACTION
+    return this.action === CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE
       ? 'Create Certificate is disabled until validation passes.'
       : 'Update Certificate is disabled until validation passes.';
   }

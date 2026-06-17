@@ -29,13 +29,14 @@ import {
   CertificateOfferingSectionId,
   CERTIFICATE_OFFERING_SECTION_IDS,
 } from 'components/certificate-assessment-offering-helper/certificate-offering-section.model';
+import {
+  CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
+  CERTIFICATE_OFFERING_RESULT_ACTIONS,
+  CERTIFICATE_OFFERING_SAVE_STATUSES,
+} from 'components/certificate-assessment-offering-helper/certificate-offering-action.model';
 import {CertificateOfferingConfirmationModalComponent} from 'components/certificate-assessment-offering-helper/certificate-offering-confirmation-modal.component';
 import {PostCertificateOfferingResultModalComponent} from 'components/certificate-assessment-offering-helper/post-certificate-offering-result-modal.component';
 import {AlertsService} from 'services/alerts.service';
-
-const CERTIFICATE_OFFERING_CREATE_ACTION = 'create';
-const CERTIFICATE_OFFERING_CREATED_ACTION = 'created';
-const CERTIFICATE_OFFERING_NOT_READY_ACTION = 'not_ready';
 
 @Component({
   selector: 'oppia-create-certificate-offering-page',
@@ -104,13 +105,14 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
         CertificateOfferingConfirmationModalComponent,
         {backdrop: 'static'}
       );
-      modalRef.componentInstance.action = CERTIFICATE_OFFERING_CREATE_ACTION;
+      modalRef.componentInstance.action =
+        CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE;
       modalRef.componentInstance.isCertificateValid = this.isCertificateValid;
 
       const action = await modalRef.result.catch(() => null);
       if (
-        action !== CERTIFICATE_OFFERING_NOT_READY_ACTION &&
-        action !== CERTIFICATE_OFFERING_CREATE_ACTION
+        action !== CERTIFICATE_OFFERING_SAVE_STATUSES.NOT_READY &&
+        action !== CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS.CREATE
       ) {
         return;
       }
@@ -124,7 +126,7 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
         return;
       }
 
-      if (action === CERTIFICATE_OFFERING_NOT_READY_ACTION) {
+      if (action === CERTIFICATE_OFFERING_SAVE_STATUSES.NOT_READY) {
         this.alertsService.addSuccessMessage('Certificate saved as not ready.');
         this.navigateToCertificateOfferingDashboard();
         return;
@@ -139,7 +141,7 @@ export class CreateCertificateOfferingPageComponent implements OnInit {
         }
       );
       postModalRef.componentInstance.action =
-        CERTIFICATE_OFFERING_CREATED_ACTION;
+        CERTIFICATE_OFFERING_RESULT_ACTIONS.CREATED;
       await postModalRef.result.catch(() => null);
       this.navigateToCertificateOfferingDashboard();
     } catch (error: unknown) {

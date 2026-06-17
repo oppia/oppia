@@ -17,12 +17,10 @@
  */
 
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {CERTIFICATE_OFFERING_RESULT_ACTIONS} from './certificate-offering-action.model';
 import {PostCertificateOfferingResultModalComponent} from './post-certificate-offering-result-modal.component';
 import {Clipboard} from '@angular/cdk/clipboard';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-
-const CERTIFICATE_OFFERING_CREATED_ACTION = 'created';
-const CERTIFICATE_OFFERING_UPDATED_ACTION = 'updated';
 
 describe('Post certificate offering result modal component', () => {
   let component: PostCertificateOfferingResultModalComponent;
@@ -47,7 +45,7 @@ describe('Post certificate offering result modal component', () => {
   });
 
   it('should expose created state by default', () => {
-    expect(component.action).toBe(CERTIFICATE_OFFERING_CREATED_ACTION);
+    expect(component.action).toBe(CERTIFICATE_OFFERING_RESULT_ACTIONS.CREATED);
     expect(component.certificateName).toBe(
       'Everyday Arithmetic & Number Confidence'
     );
@@ -58,9 +56,9 @@ describe('Post certificate offering result modal component', () => {
   });
 
   it('should expose updated state when configured', () => {
-    component.action = CERTIFICATE_OFFERING_UPDATED_ACTION;
+    component.action = CERTIFICATE_OFFERING_RESULT_ACTIONS.UPDATED;
 
-    expect(component.action).toBe(CERTIFICATE_OFFERING_UPDATED_ACTION);
+    expect(component.action).toBe(CERTIFICATE_OFFERING_RESULT_ACTIONS.UPDATED);
   });
 
   it('should copy the certificate url', () => {
