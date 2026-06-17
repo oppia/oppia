@@ -24,25 +24,24 @@ import html as html_module
 import json
 import re
 
-import bs4
-
 from core.domain import html_cleaner
 
+import bs4
 from typing import Dict, cast
 
-
+# TODO(#24933): Oppia-noninteractive-skillreview is excluded because
+# its displayed value is tied to backend mappings. Rohan is working on
+# a project to translate Exploration metadata that will eventually
+# cover these keywords. Once that project is complete, this component
+# can be updated to support translation.
+# See: https://github.com/oppia/oppia/issues/24933
+#
 # Components whose content must never be translated. Their attributes are
 # either technical identifiers, LaTeX expressions, or backend-mapped values.
 _SKIP_COMPONENTS = frozenset(
     [
         'oppia-noninteractive-math',
         'oppia-noninteractive-video',
-        # TODO(#24933): oppia-noninteractive-skillreview is excluded because
-        # its displayed value is tied to backend mappings. Rohan is working on
-        # a project to translate Exploration metadata that will eventually
-        # cover these keywords. Once that project is complete, this component
-        # can be updated to support translation.
-        # See: https://github.com/oppia/oppia/issues/24933
         'oppia-noninteractive-skillreview',
     ]
 )
@@ -203,7 +202,9 @@ def protect_html_for_translation(source_html: str) -> str:
         if tag.get('translate') != 'no':
             tag['translate'] = 'no'
 
-    return soup.decode_contents()
+    # Here we use cast because BeautifulSoup's decode_contents() is typed as
+    # returning Any in the bs4 stubs, but it always returns a str in practice.
+    return cast(str, soup.decode_contents())
 
 
 def postprocess_translated_html(translated_html: str) -> str:
@@ -301,14 +302,14 @@ def postprocess_translated_html(translated_html: str) -> str:
         if _DATA_COMP_ID in tag.attrs:
             del tag[_DATA_COMP_ID]
 
-    result = soup.decode_contents()
+    # Here we use cast because BeautifulSoup's decode_contents() returns Any
+    # at the type-checking level, but we know it is always a string here.
+    result = cast(str, soup.decode_contents())
 
     # Strip all temporary helper attributes using regex.
     for pattern in _CLEANUP_PATTERNS:
         result = pattern.sub('', result)
-        # Here we use cast because html_cleaner.clean() returns Any at the
-        #  type-checking level, but we know the returned value is always str.
-        return cast(str, html_cleaner.clean(result))
+    return html_cleaner.clean(result)
 
 
 def _encode_attr_html(html_fragment: str) -> str:

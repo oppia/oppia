@@ -65,7 +65,7 @@ class ProtectHtmlForTranslationTests(test_utils.GenericTestBase):
         )
         result = html_translation_services.protect_html_for_translation(source)
         self.assertIn('translate="no"', result)
-        # text-with-value should NOT be extracted for skillreview.
+        # Text-with-value should NOT be extracted for skillreview.
         self.assertNotIn('data-oi-attr', result)
 
     def test_link_text_extracted_url_preserved(self) -> None:
@@ -75,12 +75,12 @@ class ProtectHtmlForTranslationTests(test_utils.GenericTestBase):
             '</oppia-noninteractive-link>'
         )
         result = html_translation_services.protect_html_for_translation(source)
-        # text-with-value extracted into a span.
+        # Text-with-value extracted into a span.
         self.assertIn('data-oi-attr="text-with-value"', result)
         self.assertIn('Learn more', result)
-        # url-with-value preserved on the component.
+        # Url-with-value preserved on the component.
         self.assertIn('url-with-value="https://oppia.org"', result)
-        # text-with-value removed from component.
+        # Text-with-value removed from component.
         self.assertNotIn('oppia-noninteractive-link text-with-value', result)
 
     def test_image_alt_and_caption_extracted(self) -> None:
@@ -95,7 +95,7 @@ class ProtectHtmlForTranslationTests(test_utils.GenericTestBase):
         self.assertIn('data-oi-attr="caption-with-value"', result)
         self.assertIn('A red car', result)
         self.assertIn('Figure 1', result)
-        # filepath must be preserved on the component.
+        # Filepath must be preserved on the component.
         self.assertIn('filepath-with-value="img.png"', result)
 
     def test_collapsible_heading_extracted_content_protected(self) -> None:

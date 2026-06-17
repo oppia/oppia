@@ -238,6 +238,7 @@
         "scripts.run_mypy_checks_test",
         "scripts.linters.pylint_extensions_test",
         "core.domain.html_cleaner_test",
+        "core.domain.html_translation_services_test",
         "core.platform.taskqueue.dev_mode_taskqueue_services_test",
         "core.storage.suggestion.gae_models_test",
         "core.storage.auth.gae_models_test",
