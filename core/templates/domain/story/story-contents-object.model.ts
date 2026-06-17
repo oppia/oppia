@@ -224,8 +224,8 @@ export class StoryContents {
     }
 
     this._arcs[targetArcIndex].setNodeIds([
-      nodeId,
       ...this._arcs[targetArcIndex].getNodeIds(),
+      nodeId,
     ]);
   }
 

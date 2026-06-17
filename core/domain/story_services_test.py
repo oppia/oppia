@@ -922,7 +922,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 {
                     'cmd': story_domain.CMD_CREATE_ARC,
                     'arc_id': 'arc_1',
-                    'title': 'Main Arc',
+                    'title': 'Arc 1',
                     'description': '',
                     'node_ids': [self.NODE_ID_1, self.NODE_ID_2],
                 }
@@ -934,7 +934,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(len(story.story_contents.arcs), 1)
         self.assertEqual(story.story_contents.arcs[0].id, 'arc_1')
-        self.assertEqual(story.story_contents.arcs[0].title, 'Main Arc')
+        self.assertEqual(story.story_contents.arcs[0].title, 'Arc 1')
 
     def test_update_story_with_delete_arc_command(self) -> None:
         changelist = [
