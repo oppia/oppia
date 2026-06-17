@@ -601,7 +601,7 @@ export class LoggedInUser extends BaseUser {
   async navigateToLearnerDashboard(): Promise<void> {
     await this.goto(learnerDashboardUrl);
     await this.waitForPageToFullyLoad();
-    await this.expectElementToBeVisible(homeTabSectionInLearnerDashboard);
+    await this.expectElementToBeAttachedInDOM(homeTabSectionInLearnerDashboard);
   }
 
   /**
