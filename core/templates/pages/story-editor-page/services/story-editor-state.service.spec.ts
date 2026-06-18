@@ -341,7 +341,7 @@ describe('Story editor state service', () => {
     var story = Story.createFromBackendDict(secondBackendStoryObject);
     expect(() => {
       storyEditorStateService.setStory(story);
-    }).not.toThrow();
+    }).not.toThrowError();
   });
 
   it('should fail to save the story without first loading one', () => {
