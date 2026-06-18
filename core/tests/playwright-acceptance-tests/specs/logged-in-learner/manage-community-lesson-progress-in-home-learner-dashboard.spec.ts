@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
  * CL.6. Resume Community library lessons from Redesigned Learner Dashboard Tabs
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
@@ -31,23 +32,27 @@ import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {showMessage} from '../../utilities/common/show-message';
 
 const ROLES = testConstants.Roles;
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-In Learner', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-In Learner', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(6000000); // Setup is taking longer than default timeout.
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculumAdmin@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseAdm',
       'releaseAdm@example.com',
+      browser,
       [ROLES.RELEASE_COORDINATOR]
     );
 
@@ -67,37 +72,33 @@ describe('Logged-In Learner', function () {
 
     loggedInLearner = await UserFactory.createNewUser(
       'loggedInLearner1',
-      'logged_in_learner1@example.com'
+      'logged_in_learner1@example.com',
+      browser
     );
     await UserFactory.closeSuperAdminBrowser();
-  }, 6000000);
+  });
 
-  it(
-    'should be able to see community lessons in In Progress section if not completed fully',
-    async function () {
-      await loggedInLearner.navigateToLearnerDashboard();
-      await loggedInLearner.navigateToCommunityLibraryOnNavbar();
-      await loggedInLearner.expectToBeOnCommunityLibraryPage();
+  test('should be able to see community lessons in In Progress section if not completed fully', async function () {
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToCommunityLibraryOnNavbar();
+    await loggedInLearner.expectToBeOnCommunityLibraryPage();
 
-      await loggedInLearner.searchForLessonInSearchBar('Explore Title 1');
-      await loggedInLearner.playLessonFromSearchResults('Explore Title 1');
+    await loggedInLearner.searchForLessonInSearchBar('Explore Title 1');
+    await loggedInLearner.playLessonFromSearchResults('Explore Title 1');
 
-      await loggedInLearner.continueToNextCard();
-      await loggedInLearner.navigateToLearnerDashboard();
-      await loggedInLearner.expectScreenshotToMatch(
-        'learnerDashboardHomeTabWithLessonsInProgressExploreTitle1',
-        __dirname
-      );
-      await loggedInLearner.expectLessonCardProgressToBe(
-        'Lessons in progress',
-        ['Explore Title 1'],
-        0
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.expectScreenshotToMatch(
+      'learnerDashboardHomeTabWithLessonsInProgressExploreTitle1'
+    );
+    await loggedInLearner.expectLessonCardProgressToBe(
+      'Lessons in progress',
+      ['Explore Title 1'],
+      0
+    );
+  });
 
-  it('should be able to add community lessons to Add to Play Later list and can be seen in the Learn something New section inside a subsection "Lessons you saved for later"', async function () {
+  test('should be able to add community lessons to Add to Play Later list and can be seen in the Learn something New section inside a subsection "Lessons you saved for later"', async function () {
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.navigateToCommunityLibraryOnNavbar();
     await loggedInLearner.expectToBeOnCommunityLibraryPage();
@@ -110,8 +111,7 @@ describe('Logged-In Learner', function () {
 
     await loggedInLearner.navigateToLearnerDashboard();
     await loggedInLearner.expectScreenshotToMatch(
-      'learnerDashboardHomeTabWithLessonsInProgressExploreTitle1AndExploreTitle2InLearnPlatLaterSection',
-      __dirname
+      'learnerDashboardHomeTabWithLessonsInProgressExploreTitle1AndExploreTitle2InLearnPlatLaterSection'
     );
     await loggedInLearner.expectElementsToBePresentInRLD(
       ['Continue where you left off', 'Learn Something New'],
@@ -134,7 +134,7 @@ describe('Logged-In Learner', function () {
     showMessage('Completed final test');
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
