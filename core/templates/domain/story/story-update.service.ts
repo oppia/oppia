@@ -1308,9 +1308,12 @@ export class StoryUpdateService {
 
   moveNodeToArc(story: Story, nodeId: string, toArcId: string): void {
     let oldArcId = '';
+    let oldPositionIndex = -1;
     for (const arc of story.getStoryContents().getArcs()) {
-      if (arc.getNodeIds().indexOf(nodeId) !== -1) {
+      const nodeIndex = arc.getNodeIds().indexOf(nodeId);
+      if (nodeIndex !== -1) {
         oldArcId = arc.getId();
+        oldPositionIndex = nodeIndex;
         break;
       }
     }
@@ -1328,7 +1331,9 @@ export class StoryUpdateService {
       (changeDict, story) => {
         // ---- Undo ----
         if (oldArcId) {
-          story.getStoryContents().moveNodeToArc(nodeId, oldArcId);
+          story
+            .getStoryContents()
+            .moveNodeToArc(nodeId, oldArcId, oldPositionIndex);
         }
       }
     );

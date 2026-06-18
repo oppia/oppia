@@ -1610,8 +1610,8 @@ describe('Story update service', () => {
 
     undoRedoService.undoChange(_sampleStory);
     expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
-      'node_2',
       'node_1',
+      'node_2',
     ]);
     expect(_sampleStory.getStoryContents().getArcs()[1].getNodeIds()).toEqual(
       []

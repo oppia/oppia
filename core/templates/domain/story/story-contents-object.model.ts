@@ -208,7 +208,7 @@ export class StoryContents {
     this._arcs = newArcs;
   }
 
-  moveNodeToArc(nodeId: string, toArcId: string): void {
+  moveNodeToArc(nodeId: string, toArcId: string, positionIndex?: number): void {
     const targetArcIndex = this.getArcIndex(toArcId);
     if (targetArcIndex === -1) {
       throw new Error('Arc with id ' + toArcId + ' does not exist');
@@ -223,10 +223,13 @@ export class StoryContents {
       }
     }
 
-    this._arcs[targetArcIndex].setNodeIds([
-      ...this._arcs[targetArcIndex].getNodeIds(),
-      nodeId,
-    ]);
+    const currentNodeIds = this._arcs[targetArcIndex].getNodeIds();
+    if (positionIndex !== undefined && positionIndex <= currentNodeIds.length) {
+      currentNodeIds.splice(positionIndex, 0, nodeId);
+      this._arcs[targetArcIndex].setNodeIds(currentNodeIds);
+    } else {
+      this._arcs[targetArcIndex].setNodeIds([...currentNodeIds, nodeId]);
+    }
   }
 
   rearrangeNodeInStory(fromIndex: number, toIndex: number): void {

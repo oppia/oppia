@@ -265,6 +265,85 @@ describe('Story editor state service', () => {
     expect(actualStory).not.toBe(expectedStory);
   }));
 
+  it('should migrate legacy "Main Arc" title to "Arc 1" when setting a story', () => {
+    const storyBackendDictWithLegacyArc: StoryBackendDict = {
+      id: 'storyId_2',
+      title: 'Story with legacy arc',
+      description: 'Story Description',
+      notes: '<p>Notes</p>',
+      story_contents: {
+        initial_node_id: 'node_1',
+        next_node_id: 'node_2',
+        nodes: [],
+        arcs: [
+          {
+            id: 'arc_1',
+            title: 'Main Arc',
+            description: 'Legacy arc description',
+            node_ids: [],
+          },
+        ],
+      },
+      language_code: 'en',
+      version: 1,
+      corresponding_topic_id: 'topic_id',
+      thumbnail_filename: 'img.svg',
+      thumbnail_bg_color: '',
+      url_fragment: 'url_fragment',
+      meta_tag_content: 'meta_content',
+    };
+
+    var story = Story.createFromBackendDict(storyBackendDictWithLegacyArc);
+    expect(story.getStoryContents().getArcs()[0].getTitle()).toBe('Main Arc');
+
+    storyEditorStateService.setStory(story);
+
+    expect(story.getStoryContents().getArcs()[0].getTitle()).toBe('Arc 1');
+  });
+
+  it('should not modify arc titles that are not "Main Arc"', () => {
+    const storyBackendDictWithCustomArc: StoryBackendDict = {
+      id: 'storyId_3',
+      title: 'Story with custom arc',
+      description: 'Story Description',
+      notes: '<p>Notes</p>',
+      story_contents: {
+        initial_node_id: 'node_1',
+        next_node_id: 'node_2',
+        nodes: [],
+        arcs: [
+          {
+            id: 'arc_1',
+            title: 'Custom Arc Title',
+            description: 'Custom arc description',
+            node_ids: [],
+          },
+        ],
+      },
+      language_code: 'en',
+      version: 1,
+      corresponding_topic_id: 'topic_id',
+      thumbnail_filename: 'img.svg',
+      thumbnail_bg_color: '',
+      url_fragment: 'url_fragment',
+      meta_tag_content: 'meta_content',
+    };
+
+    var story = Story.createFromBackendDict(storyBackendDictWithCustomArc);
+    storyEditorStateService.setStory(story);
+
+    expect(story.getStoryContents().getArcs()[0].getTitle()).toBe(
+      'Custom Arc Title'
+    );
+  });
+
+  it('should not throw if story has no arcs', () => {
+    var story = Story.createFromBackendDict(secondBackendStoryObject);
+    expect(() => {
+      storyEditorStateService.setStory(story);
+    }).not.toThrow();
+  });
+
   it('should fail to save the story without first loading one', () => {
     expect(() => {
       const successCallback = jasmine.createSpy('successCallback');
