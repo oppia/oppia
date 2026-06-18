@@ -42,5 +42,6 @@ class BaseTranslationService(metaclass=abc.ABCMeta):
 
         Raises:
             Exception. If the translation provider fails to process the request.
+            NotImplementedError. The method is not implemented in the base class.
         """
-        pass
+        raise NotImplementedError()  # pragma: no cover
