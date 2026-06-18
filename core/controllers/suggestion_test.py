@@ -3939,7 +3939,24 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'sort_key': constants.SUGGESTIONS_SORT_KEY_DATE,
             },
         )
+        # The suggestions list contains 1 suggestion which was created in the setUp method.
         self.assertEqual(len(response['suggestions']), 1)
+        suggestion_dict = response['suggestions'][0]
+        self.assertEqual(
+            suggestion_dict['suggestion_type'],
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+        )
+        self.assertEqual(
+            suggestion_dict['target_type'],
+            feconf.ENTITY_TYPE_EXPLORATION,
+        )
+        self.assertEqual(suggestion_dict['target_id'], self.EXP_ID)
+        self.assertEqual(suggestion_dict['change_cmd']['language_code'], 'hi')
+        self.assertEqual(
+            suggestion_dict['change_cmd']['translation_html'],
+            '<p>new content html in Hindi</p>',
+        )
+
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
         self.assertEqual(response['next_offset'], 1)
         self.assertEqual(

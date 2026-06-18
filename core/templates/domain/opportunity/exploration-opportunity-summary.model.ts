@@ -16,6 +16,8 @@
  * @fileoverview Frontend model for exploration opportunity summary.
  */
 
+import {AppConstants} from 'app.constants';
+
 export interface TranslationCountsDict {
   [languageCode: string]: number;
 }
@@ -117,7 +119,7 @@ export class ExplorationOpportunitySummary {
       backendDict.content_count,
       backendDict.translation_counts,
       backendDict.translation_in_review_counts,
-      backendDict.language_code || 'en',
+      backendDict.language_code || AppConstants.DEFAULT_LANGUAGE_CODE,
       backendDict.is_pinned,
       backendDict.reviewer_only_content_count || 0,
       backendDict.entity_type
