@@ -18,243 +18,268 @@
 
 from __future__ import annotations
 
+import dataclasses
+import operator
 import unittest
 from unittest import mock
 
-from core.constants import constants
 from core.jobs import job_test_utils
-from core.jobs.transforms import firebase_transforms, job_result_transforms
-from core.jobs.types import job_run_result
+from core.jobs.transforms import firebase_transforms
+from core.jobs.types import firebase_domain, job_run_result
+from core.platform.auth import firebase_auth_services
 
 import apache_beam as beam
-import firebase_admin
 import firebase_admin.auth as firebase_auth
-from typing import Callable, Sequence
+from typing import Callable
+
+TAG_OK, TAG_ADD, TAG_DEL, TAG_EMAIL, TAG_AUTH_ID = operator.attrgetter(
+    'TAG_OK',
+    'TAG_ADD',
+    'TAG_DEL',
+    'TAG_EMAIL_CONFLICT',
+    'TAG_AUTH_ID_CONFLICT',
+)(firebase_transforms.DiffFirebaseRecords)
 
 
-class FakeBatchError(firebase_auth.ErrorInfo):
-    """Test stub for ErrorInfo."""
+class DiffFirebaseRecordsTests(job_test_utils.PipelinedTestBase):
+    """Pipeline tests for DiffFirebaseRecords."""
 
-    def __init__(self, index: int, reason: str) -> None:
-        super().__init__({'index': index, 'message': reason})
+    def test_diff_with_no_records_produces_no_output(self) -> None:
+        self.assert_pcoll_empty(self.run_diff([], []))
 
-
-class FakeBatchResult(
-    firebase_auth.DeleteUsersResult,
-    firebase_auth.UserImportResult,
-):
-    """Test stubs for DeleteUsersResult & UserImportResult."""
-
-    def __init__(self, errors: Sequence[FakeBatchError] = ()) -> None:
-        super().__init__(mock.Mock(errors=list(errors)), 0)
-
-
-class FakeBatchOperation(
-    firebase_transforms.FirebaseBatchOperation[str, FakeBatchResult]
-):
-    """Concrete subclass that delegates handle_batched_items to a callable."""
-
-    def __init__(self, op: Callable[[list[str]], FakeBatchResult]) -> None:
-        super().__init__()
-        self.op = op
-
-    def setup(self) -> None:
-        pass
-
-    def handle_batched_items(self, batch: list[str]) -> FakeBatchResult:
-        return self.op(batch)
-
-
-class DeleteRecordsPipelineTests(job_test_utils.PipelinedTestBase):
-    """Pipeline tests for DeleteRecords."""
-
-    def test_with_uids_reports_success_count(self) -> None:
-        with (
-            self.swap_to_always_return(firebase_admin, 'initialize_app'),
-            self.swap_to_always_return(
-                firebase_auth, 'delete_users', FakeBatchResult()
+    def test_diff_with_identical_records_reports_ok_count(self) -> None:
+        records = [
+            firebase_domain.FirebaseRecord(
+                auth_id='a', email='a@a.com', disabled=False
             ),
-        ):
-            self.assert_pcoll_equal(
-                (
-                    self.pipeline
-                    | beam.Create([['uid1', 'uid2']])
-                    | beam.ParDo(
-                        do_fn := firebase_transforms.DeleteRecords()
-                    ).with_outputs(
-                        do_fn.PASS_TAG,
-                        do_fn.FAIL_TAG,
-                    )
-                    | job_result_transforms.FromTaggedOutputs(
-                        do_fn.PASS_TAG,
-                        do_fn.FAIL_TAG,
-                    )
-                ),
-                [job_run_result.JobRunResult(stdout='SUCCESS: 2')],
-            )
-
-
-class CreateRecordsPipelineTests(job_test_utils.PipelinedTestBase):
-    """Pipeline tests for CreateRecords."""
-
-    def test_with_records_reports_success_count(self) -> None:
-        records = [
-            firebase_auth.ImportUserRecord(uid='uid1'),
-            firebase_auth.ImportUserRecord(uid='uid2'),
-        ]
-
-        with (
-            self.swap(constants, 'EMULATOR_MODE', False),
-            self.swap_to_always_return(firebase_admin, 'initialize_app'),
-            mock.patch.object(
-                firebase_auth, 'import_users', return_value=FakeBatchResult()
-            ) as import_users,
-            mock.patch.object(firebase_auth, 'create_user') as create_users,
-        ):
-            self.assert_pcoll_equal(
-                (
-                    self.pipeline
-                    | beam.Create([records])
-                    | beam.ParDo(
-                        do_fn := firebase_transforms.CreateRecords()
-                    ).with_outputs(
-                        do_fn.PASS_TAG,
-                        do_fn.FAIL_TAG,
-                    )
-                    | job_result_transforms.FromTaggedOutputs(
-                        do_fn.PASS_TAG,
-                        do_fn.FAIL_TAG,
-                    )
-                ),
-                [job_run_result.JobRunResult(stdout='SUCCESS: 2')],
-            )
-
-        import_users.assert_called()
-        create_users.assert_not_called()
-
-    def test_with_emulator_calls_create_user_instead(self) -> None:
-        records = [
-            firebase_auth.ImportUserRecord(uid='a', email='a@a.com'),
-            firebase_auth.ImportUserRecord(uid='b'),
-        ]
-
-        with (
-            self.swap(constants, 'EMULATOR_MODE', True),
-            self.swap_to_always_return(firebase_admin, 'initialize_app'),
-            mock.patch.object(
-                firebase_auth, 'import_users', return_value=FakeBatchResult()
-            ) as import_users,
-            mock.patch.object(firebase_auth, 'create_user') as create_users,
-        ):
-            self.assert_pcoll_equal(
-                (
-                    self.pipeline
-                    | beam.Create([records])
-                    | beam.ParDo(
-                        do_fn := firebase_transforms.CreateRecords()
-                    ).with_outputs(do_fn.PASS_TAG, do_fn.FAIL_TAG)
-                    | job_result_transforms.FromTaggedOutputs(
-                        do_fn.PASS_TAG,
-                        do_fn.FAIL_TAG,
-                        prefix='CREATED',
-                    )
-                ),
-                [job_run_result.JobRunResult(stdout='CREATED SUCCESS: 2')],
-            )
-
-        import_users.assert_not_called()
-        create_users.assert_called()
-
-    def test_with_network_error_reports_create_user_error(self) -> None:
-        records = [
-            firebase_auth.ImportUserRecord(uid='a', email='a@a.com'),
-            firebase_auth.ImportUserRecord(uid='b'),
-        ]
-
-        with (
-            self.swap(constants, 'EMULATOR_MODE', True),
-            self.swap_to_always_return(firebase_admin, 'initialize_app'),
-            self.swap_to_always_raise(
-                firebase_auth, 'create_user', ValueError('network error')
+            firebase_domain.FirebaseRecord(
+                auth_id='b', email='b@b.com', disabled=False
             ),
-        ):
-            self.assert_pcoll_equal(
-                (
-                    self.pipeline
-                    | beam.Create([records])
-                    | beam.ParDo(
-                        do_fn := firebase_transforms.CreateRecords()
-                    ).with_outputs(do_fn.PASS_TAG, do_fn.FAIL_TAG)
-                    | job_result_transforms.FromTaggedOutputs(
-                        do_fn.PASS_TAG,
-                        do_fn.FAIL_TAG,
-                        prefix='CREATED',
-                    )
-                ),
+        ]
+
+        self.assert_pcoll_equal(
+            self.run_diff(records, records),
+            [
+                (firebase_transforms.DiffFirebaseRecords.TAG_OK, 1),
+                (firebase_transforms.DiffFirebaseRecords.TAG_OK, 1),
+            ],
+        )
+
+    def test_diff_with_extra_actual_record_reports_add(self) -> None:
+        self.assert_pcoll_equal(
+            self.run_diff(
                 [
-                    job_run_result.JobRunResult(
-                        stderr='CREATED FAILURE: at index=[0]: network error'
-                    ),
-                    job_run_result.JobRunResult(
-                        stderr='CREATED FAILURE: at index=[1]: network error'
-                    ),
+                    firebase_domain.FirebaseRecord(
+                        auth_id='a', email='a@a.com', disabled=False
+                    )
                 ],
-            )
+                [],
+            ),
+            [(firebase_transforms.DiffFirebaseRecords.TAG_ADD, 'a')],
+        )
+
+    def test_diff_with_missing_actual_record_reports_del(self) -> None:
+        self.assert_pcoll_equal(
+            self.run_diff(
+                [],
+                [
+                    firebase_domain.FirebaseRecord(
+                        auth_id='b', email='b@b.com', disabled=False
+                    )
+                ],
+            ),
+            [(firebase_transforms.DiffFirebaseRecords.TAG_DEL, 'b')],
+        )
+
+    def test_diff_with_changed_record_reports_add_and_del(self) -> None:
+        self.assert_pcoll_equal(
+            self.run_diff(
+                [
+                    firebase_domain.FirebaseRecord(
+                        auth_id='a', email='a@a.com', disabled=True
+                    )
+                ],
+                [
+                    firebase_domain.FirebaseRecord(
+                        auth_id='a', email='a@a.com', disabled=False
+                    )
+                ],
+            ),
+            [
+                (firebase_transforms.DiffFirebaseRecords.TAG_ADD, 'a'),
+                (firebase_transforms.DiffFirebaseRecords.TAG_DEL, 'a'),
+            ],
+        )
+
+    def test_diff_with_duplicate_actual_records_reports_corrupt(self) -> None:
+        email = 'dup@dup.com'
+        dup_a = firebase_domain.FirebaseRecord(
+            auth_id='a1', email=email, disabled=False
+        )
+        dup_b = firebase_domain.FirebaseRecord(
+            auth_id='a2', email=email, disabled=False
+        )
+
+        self.assert_pcoll_equal(
+            self.run_diff(
+                [dup_a, dup_b],
+                [],
+                keyed_user_ids_by_auth_id={'a1': ['uid_a1'], 'a2': ['uid_a2']},
+            ),
+            [
+                (
+                    firebase_transforms.DiffFirebaseRecords.TAG_EMAIL_CONFLICT,
+                    'Oppia users (user_ids=[\'uid_a1\', \'uid_a2\']) are '
+                    'sharing the same email',
+                ),
+                (firebase_transforms.DiffFirebaseRecords.TAG_ADD, 'a1'),
+                (firebase_transforms.DiffFirebaseRecords.TAG_ADD, 'a2'),
+            ],
+        )
+
+    def test_diff_with_duplicate_expected_records_reports_corrupt(self) -> None:
+        email = 'dup@dup.com'
+        dup_a = firebase_domain.FirebaseRecord(
+            auth_id='a1', email=email, disabled=False
+        )
+        dup_b = firebase_domain.FirebaseRecord(
+            auth_id='a2', email=email, disabled=False
+        )
+
+        self.assert_pcoll_equal(
+            self.run_diff([], [dup_a, dup_b]),
+            [
+                (
+                    firebase_transforms.DiffFirebaseRecords.TAG_EMAIL_CONFLICT,
+                    'Firebase accounts (auth_ids=[\'a1\', \'a2\']) are sharing '
+                    'the same email',
+                ),
+                (firebase_transforms.DiffFirebaseRecords.TAG_DEL, 'a1'),
+                (firebase_transforms.DiffFirebaseRecords.TAG_DEL, 'a2'),
+            ],
+        )
+
+    def test_diff_with_shared_auth_id_reports_auth_id_conflict(self) -> None:
+        self.assert_pcoll_equal(
+            self.run_diff(
+                [],
+                [],
+                keyed_user_ids_by_auth_id={
+                    'a1': ['uid_x', 'uid_y'],
+                    'a2': ['uid_z'],
+                },
+            ),
+            [
+                (
+                    firebase_transforms.DiffFirebaseRecords.TAG_AUTH_ID_CONFLICT,
+                    'Oppia users (user_ids=[\'uid_x\', \'uid_y\']) are sharing '
+                    'the same Firebase account (auth_id=\'a1\')',
+                ),
+            ],
+        )
+
+    def run_diff(
+        self,
+        actual: list[firebase_domain.FirebaseRecord],
+        expected: list[firebase_domain.FirebaseRecord],
+        keyed_user_ids_by_auth_id: dict[str, list[str]] | None = None,
+    ) -> beam.PCollection[tuple[str, str | int]]:
+        """Runs the diff and flattens the tagged outputs into one PCollection.
+
+        Each emitted element is a (tag, payload) pair, where the payload is the
+        OK count for TAG_OK, the record's auth_id for TAG_ADD / TAG_DEL, and the
+        corruption message for TAG_EMAIL_CONFLICT / TAG_AUTH_ID_CONFLICT.
+
+        Args:
+            actual: list(FirebaseRecord). The "actual" (Oppia) records.
+            expected: list(FirebaseRecord). The "expected" (Firebase) records.
+            keyed_user_ids_by_auth_id: dict(str, list(str)). Maps each
+                firebase_auth_id to the Oppia user ID(s) that claim it, used to
+                build the side input. Defaults to an empty mapping when None.
+
+        Returns:
+            PCollection. The flattened (tag, payload) pairs.
+        """
+        keyed_user_ids_by_auth_id = keyed_user_ids_by_auth_id or {}
+        auth_pairs = self.pipeline | 'CreatePairs' >> beam.Create(
+            [
+                (auth_id, user_id)
+                for auth_id, user_ids in keyed_user_ids_by_auth_id.items()
+                for user_id in user_ids
+            ]
+        )
+        diffs = (
+            self.pipeline | 'CreateActual' >> beam.Create(actual),
+            self.pipeline | 'CreateExpected' >> beam.Create(expected),
+        ) | 'Compute diffs' >> firebase_transforms.DiffFirebaseRecords(
+            auth_pairs=auth_pairs
+        )
+
+        return (
+            diffs[TAG_OK] | beam.Map(lambda num: (TAG_OK, num)),
+            diffs[TAG_ADD] | beam.Map(lambda rec: (TAG_ADD, rec.auth_id)),
+            diffs[TAG_DEL] | beam.Map(lambda rec: (TAG_DEL, rec.auth_id)),
+            diffs[TAG_EMAIL] | beam.Map(lambda err: (TAG_EMAIL, err)),
+            diffs[TAG_AUTH_ID] | beam.Map(lambda err: (TAG_AUTH_ID, err)),
+        ) | beam.Flatten()
 
 
-class FirebaseBatchOperationPipelineTests(job_test_utils.PipelinedTestBase):
+class FirebaseBatchOperationTests(job_test_utils.PipelinedTestBase):
     """Pipeline tests for FirebaseBatchOperation using a "fake" subclass."""
 
     def test_expand_with_no_inputs_produces_no_output(self) -> None:
-        self.assert_pcoll_empty(self._run_batch_operation([]))
+        self.assert_pcoll_empty(self.run_batch_operation([]))
 
     def test_expand_with_successful_inputs_reports_ok_count(self) -> None:
         self.assert_pcoll_equal(
-            self._run_batch_operation(['a', 'b', 'c']),
-            [job_run_result.JobRunResult(stdout='TEST OPERATION SUCCESS: 3')],
+            self.run_batch_operation(['a', 'b', 'c']),
+            [job_run_result.JobRunResult(stdout='OK: 3')],
         )
 
     def test_expand_with_batch_value_error_reports_error(self) -> None:
-        def raise_value_error(_: list[str]) -> FakeBatchResult:
+        def raise_value_error(_: list[str]) -> TestBatchResult:
             raise ValueError('bad input')
 
         self.assert_pcoll_equal(
-            self._run_batch_operation(['a'], raise_value_error),
+            self.run_batch_operation(['a'], raise_value_error),
             [
                 job_run_result.JobRunResult(
-                    stderr='TEST OPERATION FAILURE: at slice=[0:1]: bad input'
+                    stderr='ERROR: at slice=[0:1]: bad input'
                 ),
             ],
         )
 
     def test_expand_with_batch_firebase_error_reports_error(self) -> None:
-        def raise_firebase_error(_: list[str]) -> FakeBatchResult:
+        def raise_firebase_error(_: list[str]) -> TestBatchResult:
             raise firebase_auth.UserNotFoundError('missing')
 
         self.assert_pcoll_equal(
-            self._run_batch_operation(['a', 'b'], raise_firebase_error),
+            self.run_batch_operation(['a', 'b'], raise_firebase_error),
             [
                 job_run_result.JobRunResult(
-                    stderr='TEST OPERATION FAILURE: at slice=[0:2]: missing'
+                    stderr='ERROR: at slice=[0:2]: missing'
                 ),
             ],
         )
 
     def test_expand_with_individual_failures_reports_each_error(self) -> None:
-        errors = [FakeBatchError(0, 'fail-a'), FakeBatchError(2, 'fail-c')]
+        errors = [
+            mock.Mock(index=0, error='fail-a'),
+            mock.Mock(index=2, error='fail-c'),
+        ]
 
         self.assert_pcoll_equal(
-            self._run_batch_operation(
+            self.run_batch_operation(
                 ['a', 'b', 'c'],
-                lambda _: FakeBatchResult(errors=errors),
+                lambda _: mock.Mock(errors=errors),
             ),
             [
-                job_run_result.JobRunResult(stdout='TEST OPERATION SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='OK: 1'),
                 job_run_result.JobRunResult(
-                    stderr='TEST OPERATION FAILURE: at index=[0]: fail-a'
+                    stderr='ERROR: at index=[0]: fail-a'
                 ),
                 job_run_result.JobRunResult(
-                    stderr='TEST OPERATION FAILURE: at index=[2]: fail-c'
+                    stderr='ERROR: at index=[2]: fail-c'
                 ),
             ],
         )
@@ -262,17 +287,17 @@ class FirebaseBatchOperationPipelineTests(job_test_utils.PipelinedTestBase):
     def test_expand_with_mixed_success_and_individual_failures_reports_both(
         self,
     ) -> None:
-        errors = [FakeBatchError(1, 'fail-b')]
+        errors = [mock.Mock(index=1, error='fail-b')]
 
         self.assert_pcoll_equal(
-            self._run_batch_operation(
+            self.run_batch_operation(
                 ['a', 'b'],
-                lambda _: FakeBatchResult(errors=errors),
+                lambda _: mock.Mock(errors=errors),
             ),
             [
-                job_run_result.JobRunResult(stdout='TEST OPERATION SUCCESS: 1'),
+                job_run_result.JobRunResult(stdout='OK: 1'),
                 job_run_result.JobRunResult(
-                    stderr='TEST OPERATION FAILURE: at index=[1]: fail-b'
+                    stderr='ERROR: at index=[1]: fail-b'
                 ),
             ],
         )
@@ -280,19 +305,22 @@ class FirebaseBatchOperationPipelineTests(job_test_utils.PipelinedTestBase):
     def test_expand_with_all_inputs_failed_produces_no_ok_count(
         self,
     ) -> None:
-        errors = [FakeBatchError(0, 'fail-a'), FakeBatchError(1, 'fail-b')]
+        errors = [
+            mock.Mock(index=0, error='fail-a'),
+            mock.Mock(index=1, error='fail-b'),
+        ]
 
         self.assert_pcoll_equal(
-            self._run_batch_operation(
+            self.run_batch_operation(
                 ['a', 'b'],
-                lambda _: FakeBatchResult(errors=errors),
+                lambda _: mock.Mock(errors=errors),
             ),
             [
                 job_run_result.JobRunResult(
-                    stderr='TEST OPERATION FAILURE: at index=[0]: fail-a'
+                    stderr='ERROR: at index=[0]: fail-a'
                 ),
                 job_run_result.JobRunResult(
-                    stderr='TEST OPERATION FAILURE: at index=[1]: fail-b'
+                    stderr='ERROR: at index=[1]: fail-b'
                 ),
             ],
         )
@@ -302,11 +330,11 @@ class FirebaseBatchOperationPipelineTests(job_test_utils.PipelinedTestBase):
     ) -> None:
         call_count = 0
 
-        def per_batch_handler(_: list[str]) -> FakeBatchResult:
+        def per_batch_handler(_: list[str]) -> TestBatchResult:
             nonlocal call_count
             call_count += 1
             if call_count == 1:
-                return FakeBatchResult()
+                return mock.Mock()
             else:
                 raise ValueError('uh-oh')
 
@@ -314,52 +342,127 @@ class FirebaseBatchOperationPipelineTests(job_test_utils.PipelinedTestBase):
             firebase_transforms.FirebaseBatchOperation, 'BATCH_LIMIT', 2
         ):
             self.assert_pcoll_equal(
-                self._run_batch_operation(['a', 'b', 'c'], per_batch_handler),
+                self.run_batch_operation(['a', 'b', 'c'], per_batch_handler),
                 [
+                    job_run_result.JobRunResult(stdout='OK: 2'),
                     job_run_result.JobRunResult(
-                        stdout='TEST OPERATION SUCCESS: 2'
-                    ),
-                    job_run_result.JobRunResult(
-                        stderr='TEST OPERATION FAILURE: at slice=[2:3]: uh-oh'
+                        stderr='ERROR: at slice=[2:3]: uh-oh'
                     ),
                 ],
             )
 
-    def _run_batch_operation(
+    def run_batch_operation(
         self,
-        inputs: list[str],
-        op: Callable[[list[str]], FakeBatchResult] | None = None,
+        prefixes: list[str],
+        op: Callable[[list[str]], TestBatchResult] = mock.Mock,
     ) -> beam.PCollection[job_run_result.JobRunResult]:
         """Test-only helper for producing the output type used in production."""
 
-        do_fn = FakeBatchOperation(op or (lambda _: FakeBatchResult()))
-        return (
-            self.pipeline
-            | beam.Create([inputs])
-            | beam.ParDo(do_fn).with_outputs(do_fn.PASS_TAG, do_fn.FAIL_TAG)
-            | job_result_transforms.FromTaggedOutputs(
-                do_fn.PASS_TAG,
-                do_fn.FAIL_TAG,
-                prefix='TEST OPERATION',
+        records = [
+            firebase_domain.FirebaseRecord(
+                auth_id=prefix, email=f'{prefix}@test.com', disabled=False
             )
-        )
+            for prefix in prefixes
+        ]
+        return self.pipeline | beam.Create(records) | TestBatchOperation(op)
 
 
-class FirebaseBatchOperationTests(unittest.TestCase):
+class FirebaseBatchOperationInheritanceTests(unittest.TestCase):
     """Tests for FirebaseBatchOperation that don't require a pipeline."""
 
-    def test_handle_input_batch_without_subclass_override_raises_not_implemented(
+    def test_incomplete_subclass_raises_type_error_on_instantiation(
         self,
     ) -> None:
         class IncompleteBatchOperation(
-            firebase_transforms.FirebaseBatchOperation[str, FakeBatchResult]
+            firebase_transforms.FirebaseBatchOperation[str, TestBatchResult]
         ):
-            """Dummy subclass for testing."""
+            """Dummy subclass for testing incomplete inheritance."""
 
             pass
 
-        op = IncompleteBatchOperation()
-        with self.assertRaisesRegex(
-            NotImplementedError, 'Subclasses must override this function'
+        with self.assertRaises(TypeError):
+            IncompleteBatchOperation()  # pylint: disable=abstract-class-instantiated
+
+    def test_base_abstract_methods_raise_not_implemented_error(self) -> None:
+        class DelegatesToSuper(
+            firebase_transforms.FirebaseBatchOperation[str, TestBatchResult]
         ):
-            op.handle_batched_items([])
+            """Concrete subclass that calls the super method."""
+
+            def get_batch_input(
+                self, record: firebase_domain.FirebaseRecord
+            ) -> str:
+                return super().get_batch_input(record)
+
+            def run_batch_operation(self, batch: list[str]) -> TestBatchResult:
+                return super().run_batch_operation(batch)
+
+        operation = DelegatesToSuper()
+
+        with self.assertRaisesRegex(NotImplementedError, 'get_batch_input'):
+            operation.get_batch_input(
+                firebase_domain.FirebaseRecord(
+                    auth_id='a', email='a@a.com', disabled=False
+                )
+            )
+        with self.assertRaisesRegex(NotImplementedError, 'run_batch_operation'):
+            operation.run_batch_operation(['a'])
+
+    @mock.patch.object(firebase_auth_services, 'establish_firebase_connection')
+    def test_setup_calls_establish_firebase_connection(
+        self, establish_firebase_connection: mock.Mock
+    ) -> None:
+        class ConcreteBatchOperation(
+            firebase_transforms.FirebaseBatchOperation[str, TestBatchResult]
+        ):
+            """Concrete subclass that keeps the base setup() behavior."""
+
+            def get_batch_input(
+                self, record: firebase_domain.FirebaseRecord
+            ) -> str:
+                return record.auth_id
+
+            def run_batch_operation(self, batch: list[str]) -> TestBatchResult:
+                del batch
+                return mock.Mock()
+
+        ConcreteBatchOperation().setup()
+
+        establish_firebase_connection.assert_called_once_with()
+
+
+@dataclasses.dataclass
+class TestBatchError(firebase_auth.ErrorInfo):
+    """Test stub for ErrorInfo."""
+
+    index: int
+    reason: str
+
+
+@dataclasses.dataclass
+class TestBatchResult(
+    firebase_auth.DeleteUsersResult,
+    firebase_auth.UserImportResult,
+):
+    """Test stubs for DeleteUsersResult & UserImportResult."""
+
+    errors: list[TestBatchError]
+
+
+class TestBatchOperation(
+    firebase_transforms.FirebaseBatchOperation[str, TestBatchResult]
+):
+    """Concrete subclass that delegates run_batch_operation to a callable."""
+
+    def __init__(self, op: Callable[[list[str]], TestBatchResult]) -> None:
+        super().__init__()
+        self.op = op
+
+    def setup(self) -> None:
+        pass
+
+    def get_batch_input(self, record: firebase_domain.FirebaseRecord) -> str:
+        return record.auth_id
+
+    def run_batch_operation(self, batch: list[str]) -> TestBatchResult:
+        return self.op(batch)

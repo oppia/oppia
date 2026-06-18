@@ -30,7 +30,7 @@ from typing import Any, Optional
 class FromTaggedOutputs(beam.PTransform):  # type: ignore[misc]
     """Builds JobRunResults from PCollections organized into tagged outputs.
 
-    Examples:
+    Example:
         FromTaggedOutputs('PASS', 'FAIL'):
             stdout='PASS: 30'
             stderr='FAIL: 1st error message'
@@ -45,14 +45,14 @@ class FromTaggedOutputs(beam.PTransform):  # type: ignore[misc]
                    'MyJob WARN: 2nd warning message'
 
     Attributes:
-        pass_tag: str | None. Tag mapped to a PCollection[int]. Default: 'main'.
-        fail_tags: tuple[str, ...]. Tags each mapped to a PCollection[str].
-        prefix: str. String prepended to every message.
+        pass_tag: str. Tag mapped to some PCollection[int]. Defaults to 'main'.
+        fail_tags: tuple[str, ...]. Tags mapped to some PCollection[str].
+        prefix: str. Prepended to every message.
     """
 
     def __init__(
         self,
-        pass_tag: str | None,
+        pass_tag: str,
         *fail_tags: str,
         prefix: str = '',
         label: str | None = None,

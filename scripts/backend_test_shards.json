@@ -65,9 +65,8 @@
         "core.jobs.batch_jobs.voiceover_synthesis_jobs_test",
         "core.jobs.batch_jobs.synthesize_voiceover_by_language_accent_jobs_test",
         "core.jobs.io.firebase_io_test",
-        "core.jobs.types.firebase_adapters_test",
-        "core.jobs.batch_jobs.firebase_sync_jobs_test",
-        "core.jobs.batch_jobs.firebase_validation_jobs_test",
+        "core.jobs.types.firebase_domain_test",
+        "core.jobs.batch_jobs.firebase_server_sync_jobs_test",
         "core.jobs.transforms.firebase_transforms_test"
     ],
     "2": [

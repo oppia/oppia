@@ -18,11 +18,19 @@
 
 from __future__ import annotations
 
+from unittest import mock
+
+from core.constants import constants
 from core.jobs import job_test_utils
 from core.jobs.io import firebase_io
-from core.jobs.types import firebase_adapters
+from core.jobs.types import firebase_domain, job_run_result
 from core.platform import models
-from core.platform.auth import firebase_auth_services_test
+from core.platform.auth import (
+    firebase_auth_services,
+    firebase_auth_services_test,
+)
+
+import apache_beam as beam
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -33,19 +41,22 @@ auth_models, user_models = models.Registry.import_models(
 )
 
 
-class AuthIoTestBase(
+class GetRecordsDirectlyFromFirebaseTests(
     job_test_utils.JobTestBase,
     firebase_auth_services_test.FirebaseAuthServicesTestBase,
 ):
-    """Base class for firebase_io tests."""
+    @mock.patch.object(firebase_auth_services, 'establish_firebase_connection')
+    def test_setup_calls_establish_firebase_connection(
+        self, establish_firebase_connection: mock.Mock
+    ) -> None:
+        firebase_io.GetRecordsDirectlyFromFirebase().setup()
 
-    pass
-
-
-class GetStrongRecordsTests(AuthIoTestBase):
+        establish_firebase_connection.assert_called_once_with()
 
     def test_get_with_no_firebase_users_returns_empty(self) -> None:
-        self.assert_pcoll_empty(self.pipeline | firebase_io.GetStrongRecords())
+        self.assert_pcoll_empty(
+            self.pipeline | firebase_io.GetRecordsDirectlyFromFirebase()
+        )
 
     def test_get_with_multiple_firebase_users_returns_all(self) -> None:
         self.firebase_sdk_stub.create_user(
@@ -59,19 +70,46 @@ class GetStrongRecordsTests(AuthIoTestBase):
         )
 
         self.assert_pcoll_equal(
-            self.pipeline | firebase_io.GetStrongRecords(),
+            self.pipeline | firebase_io.GetRecordsDirectlyFromFirebase(),
             [
-                firebase_adapters.StrongRecord('uid_a', 'a@a.com', False),
-                firebase_adapters.StrongRecord('uid_b', 'b@b.com', False),
-                firebase_adapters.StrongRecord('uid_c', 'c@c.com', True),
+                firebase_domain.FirebaseRecord(
+                    auth_id='uid_a', email='a@a.com', disabled=False
+                ),
+                firebase_domain.FirebaseRecord(
+                    auth_id='uid_b', email='b@b.com', disabled=False
+                ),
+                firebase_domain.FirebaseRecord(
+                    auth_id='uid_c', email='c@c.com', disabled=True
+                ),
             ],
         )
 
 
-class GetWeakRecordsTests(AuthIoTestBase):
+class RecreateRecordsFromOppiaModelsTests(job_test_utils.JobTestBase):
+    def get_tagged_outputs(
+        self,
+    ) -> tuple[
+        beam.PCollection[firebase_domain.FirebaseRecord],
+        beam.PCollection[tuple[str, str]],
+    ]:
+        """Applies the transform and returns just the recreated records."""
 
-    def test_get_with_no_oppia_models_returns_empty(self) -> None:
-        self.assert_pcoll_empty(self.pipeline | firebase_io.GetWeakRecords())
+        output = (
+            self.pipeline
+            | 'Recreate records' >> firebase_io.RecreateRecordsFromOppiaModels()
+        )
+        return (
+            output[firebase_io.RecreateRecordsFromOppiaModels.TAG_RECORDS],
+            output[firebase_io.RecreateRecordsFromOppiaModels.TAG_AUTH_PAIRS],
+        )
+
+    def test_run_without_oppia_models_returns_empty_records(self) -> None:
+        records, _ = self.get_tagged_outputs()
+        self.assert_pcoll_empty(records)
+
+    def test_run_without_oppia_models_returns_empty_auth_pairs(self) -> None:
+        _, auth_pairs = self.get_tagged_outputs()
+        self.assert_pcoll_empty(auth_pairs)
 
     def test_get_with_single_model_pair_returns_record(self) -> None:
         self.put_multi(
@@ -89,9 +127,16 @@ class GetWeakRecordsTests(AuthIoTestBase):
             ]
         )
 
+        records, _ = self.get_tagged_outputs()
         self.assert_pcoll_equal(
-            self.pipeline | firebase_io.GetWeakRecords(),
-            [firebase_adapters.WeakRecord('fb_a', 'a@a.com', False, 'uid_a')],
+            records,
+            [
+                firebase_domain.FirebaseRecord(
+                    auth_id='fb_a',
+                    email='a@a.com',
+                    disabled=False,
+                )
+            ],
         )
 
     def test_get_with_deleted_model_returns_disabled_record(self) -> None:
@@ -112,9 +157,16 @@ class GetWeakRecordsTests(AuthIoTestBase):
             ]
         )
 
+        records, _ = self.get_tagged_outputs()
         self.assert_pcoll_equal(
-            self.pipeline | firebase_io.GetWeakRecords(),
-            [firebase_adapters.WeakRecord('fb_a', 'a@a.com', True, 'uid_a')],
+            records,
+            [
+                firebase_domain.FirebaseRecord(
+                    auth_id='fb_a',
+                    email='a@a.com',
+                    disabled=True,
+                )
+            ],
         )
 
     def test_get_with_multiple_model_pairs_returns_all(self) -> None:
@@ -143,11 +195,20 @@ class GetWeakRecordsTests(AuthIoTestBase):
             ]
         )
 
+        records, _ = self.get_tagged_outputs()
         self.assert_pcoll_equal(
-            self.pipeline | firebase_io.GetWeakRecords(),
+            records,
             [
-                firebase_adapters.WeakRecord('fb_a', 'a@a.com', False, 'uid_a'),
-                firebase_adapters.WeakRecord('fb_b', 'b@b.com', False, 'uid_b'),
+                firebase_domain.FirebaseRecord(
+                    auth_id='fb_a',
+                    email='a@a.com',
+                    disabled=False,
+                ),
+                firebase_domain.FirebaseRecord(
+                    auth_id='fb_b',
+                    email='b@b.com',
+                    disabled=False,
+                ),
             ],
         )
 
@@ -179,10 +240,47 @@ class GetWeakRecordsTests(AuthIoTestBase):
             ]
         )
 
+        records, _ = self.get_tagged_outputs()
         self.assert_pcoll_equal(
-            self.pipeline | firebase_io.GetWeakRecords(),
-            [firebase_adapters.WeakRecord('fb_a', 'a@a.com', False, 'uid_a')],
+            records,
+            [
+                firebase_domain.FirebaseRecord(
+                    auth_id='fb_a',
+                    email='a@a.com',
+                    disabled=False,
+                )
+            ],
         )
+
+    def test_auth_pairs_emits_only_firebase_linked_users(self) -> None:
+        self.put_multi(
+            [
+                self.create_model(
+                    auth_models.UserAuthDetailsModel,
+                    id='uid_a',
+                    firebase_auth_id='fb_a',
+                ),
+                self.create_model(
+                    user_models.UserSettingsModel,
+                    id='uid_a',
+                    email='a@a.com',
+                ),
+                self.create_model(
+                    auth_models.UserAuthDetailsModel,
+                    id='uid_b',
+                    firebase_auth_id=None,
+                    parent_user_id='uid_a',
+                ),
+                self.create_model(
+                    user_models.UserSettingsModel,
+                    id='uid_b',
+                    email='b@b.com',
+                ),
+            ]
+        )
+
+        _, auth_pairs = self.get_tagged_outputs()
+        self.assert_pcoll_equal(auth_pairs, [('fb_a', 'uid_a')])
 
     def test_get_with_missing_auth_details_raises_value_error(self) -> None:
         self.put_multi(
@@ -195,12 +293,9 @@ class GetWeakRecordsTests(AuthIoTestBase):
             ]
         )
 
-        with self.assertRaisesRegex(
-            ValueError, 'need EXACTLY ONE of each model'
-        ):
-            self.assert_pcoll_equal(
-                self.pipeline | firebase_io.GetWeakRecords(), []
-            )
+        with self.assertRaisesRegex(ValueError, 'needs exactly one'):
+            records, _ = self.get_tagged_outputs()
+            self.assert_pcoll_equal(records, [])
 
     def test_get_with_missing_settings_raises_value_error(self) -> None:
         self.put_multi(
@@ -213,9 +308,145 @@ class GetWeakRecordsTests(AuthIoTestBase):
             ]
         )
 
-        with self.assertRaisesRegex(
-            ValueError, 'need EXACTLY ONE of each model'
-        ):
+        with self.assertRaisesRegex(ValueError, 'needs exactly one'):
+            records, _ = self.get_tagged_outputs()
+            self.assert_pcoll_equal(records, [])
+
+    def test_get_with_inconsistent_deleted_status_raises_value_error(
+        self,
+    ) -> None:
+        self.put_multi(
+            [
+                self.create_model(
+                    auth_models.UserAuthDetailsModel,
+                    id='uid_a',
+                    firebase_auth_id='fb_a',
+                    deleted=True,
+                ),
+                self.create_model(
+                    user_models.UserSettingsModel,
+                    id='uid_a',
+                    email='a@a.com',
+                    deleted=False,
+                ),
+            ]
+        )
+
+        with self.assertRaisesRegex(ValueError, 'Failed to rebuild record'):
+            records, _ = self.get_tagged_outputs()
+            self.assert_pcoll_equal(records, [])
+
+
+class CreateFirebaseRecordsTests(
+    job_test_utils.JobTestBase,
+    firebase_auth_services_test.FirebaseAuthServicesTestBase,
+):
+    def test_create_outside_emulator_uses_import_users(self) -> None:
+        with self.swap(constants, 'EMULATOR_MODE', False):
             self.assert_pcoll_equal(
-                self.pipeline | firebase_io.GetWeakRecords(), []
+                (
+                    self.pipeline
+                    | beam.Create(
+                        [
+                            firebase_domain.FirebaseRecord(
+                                auth_id='uid_a',
+                                email='uid_a@a.com',
+                                disabled=False,
+                            ),
+                            firebase_domain.FirebaseRecord(
+                                auth_id='uid_b',
+                                email='uid_b@a.com',
+                                disabled=False,
+                            ),
+                        ]
+                    )
+                    | firebase_io.CreateFirebaseRecords()
+                ),
+                [job_run_result.JobRunResult(stdout='CREATE OK: 2')],
             )
+
+    def test_create_within_emulator_uses_create_user(self) -> None:
+        with self.swap(constants, 'EMULATOR_MODE', True):
+            self.assert_pcoll_equal(
+                (
+                    self.pipeline
+                    | beam.Create(
+                        [
+                            firebase_domain.FirebaseRecord(
+                                auth_id='uid_a',
+                                email='uid_a@a.com',
+                                disabled=False,
+                            ),
+                            firebase_domain.FirebaseRecord(
+                                auth_id='uid_b',
+                                email='uid_b@a.com',
+                                disabled=False,
+                            ),
+                        ]
+                    )
+                    | firebase_io.CreateFirebaseRecords()
+                ),
+                [job_run_result.JobRunResult(stdout='CREATE OK: 2')],
+            )
+
+    def test_create_within_emulator_reports_per_record_failure(self) -> None:
+        self.firebase_sdk_stub.create_user(uid='uid_a', email='uid_a@a.com')
+
+        with self.swap(constants, 'EMULATOR_MODE', True):
+            self.assert_pcoll_equal(
+                (
+                    self.pipeline
+                    | beam.Create(
+                        [
+                            firebase_domain.FirebaseRecord(
+                                auth_id='uid_a',
+                                email='uid_a@a.com',
+                                disabled=False,
+                            ),
+                        ]
+                    )
+                    | firebase_io.CreateFirebaseRecords()
+                ),
+                [
+                    job_run_result.JobRunResult(
+                        stderr=(
+                            'CREATE ERROR: at index=[0]: uid=\'uid_a\' '
+                            'already exists'
+                        )
+                    ),
+                ],
+            )
+
+
+class DeleteFirebaseRecordsTests(
+    job_test_utils.JobTestBase,
+    firebase_auth_services_test.FirebaseAuthServicesTestBase,
+):
+    def test_delete_with_no_records_produces_no_output(self) -> None:
+        self.assert_pcoll_empty(
+            self.pipeline
+            | beam.Create([])
+            | firebase_io.DeleteFirebaseRecords()
+        )
+
+    def test_delete_reports_success_count(self) -> None:
+        self.firebase_sdk_stub.create_user(uid='uid_a', email='a@a.com')
+        self.firebase_sdk_stub.create_user(uid='uid_b', email='b@b.com')
+
+        self.assert_pcoll_equal(
+            (
+                self.pipeline
+                | beam.Create(
+                    [
+                        firebase_domain.FirebaseRecord(
+                            auth_id='uid_a', email='uid_a@a.com', disabled=False
+                        ),
+                        firebase_domain.FirebaseRecord(
+                            auth_id='uid_b', email='uid_b@a.com', disabled=False
+                        ),
+                    ]
+                )
+                | firebase_io.DeleteFirebaseRecords()
+            ),
+            [job_run_result.JobRunResult(stdout='DELETE OK: 2')],
+        )

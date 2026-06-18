@@ -18,147 +18,285 @@
 
 from __future__ import annotations
 
-import hashlib
+import abc as abstract_base_classes
 import itertools
+from collections import abc
 
-from core.constants import constants
+from core.jobs.transforms import job_result_transforms
+from core.jobs.types import firebase_domain, job_run_result
 from core.platform.auth import firebase_auth_services
 
 import apache_beam as beam
 import firebase_admin.auth as firebase_auth
 import firebase_admin.exceptions as firebase_exceptions
 from apache_beam import pvalue
-from typing import Generic, Iterator, TypeVar
+from typing import Generic, TypeVar
 
-InputType = TypeVar(
-    'InputType',
-    bound=(str | firebase_auth.ImportUserRecord),
-)
-
-OutputType = TypeVar(
-    'OutputType',
-    bound=(firebase_auth.DeleteUsersResult | firebase_auth.UserImportResult),
+InputT = TypeVar('InputT', bound=str | firebase_auth.ImportUserRecord)
+OutputT = TypeVar(
+    'OutputT',
+    bound=firebase_auth.DeleteUsersResult | firebase_auth.UserImportResult,
 )
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
-class FirebaseBatchOperation(beam.DoFn, Generic[InputType, OutputType]):  # type: ignore[misc]
+class DiffFirebaseRecords(beam.PTransform):  # type: ignore[misc]
+    """Returns the diff between two PCollections of FirebaseRecord objects.
+
+    This transform expects a tuple of PCollection[FirebaseRecord] with exactly 2
+    elements. The first PCollection is considered the "expected records" (i.e.
+    the ones built from Oppia's user models), and the second PCollection is
+    considered to be the "actual records" (i.e. the ones exported directly from
+    Firebase).
+
+    Attributes:
+        TAG_OK: str. Tag to PCollection[int] that can be summed to find the
+            number of records present in both PCollections.
+        TAG_ADD: str. Tag to PCollection[FirebaseRecord] with the records that
+            are present in the expected records but absent from the actual ones.
+        TAG_DEL: str. Tag to PCollection[FirebaseRecord] with the records that
+            are absent from the expected records but present in the actual ones.
+        TAG_EMAIL_CONFLICT: str. Tag to PCollection[str] describing the Oppia
+            users that are sharing an email address; this violates the
+            assumption that each email should map to exactly one user.
+        TAG_AUTH_ID_CONFLICT: str. Tag to PCollection[str] describing the Oppia
+            users that are sharing a Firebase account ID; this violates the
+            assumption that each Firebase account maps to exactly one user.
+    """
+
+    TAG_OK = 'OK'
+    TAG_ADD = 'ADD'
+    TAG_DEL = 'DEL'
+    TAG_EMAIL_CONFLICT = 'EMAIL_CONFLICT'
+    TAG_AUTH_ID_CONFLICT = 'AUTH_ID_CONFLICT'
+
+    def __init__(
+        self,
+        auth_pairs: beam.PCollection[tuple[str, str]],
+        label: str | None = None,
+    ) -> None:
+        """Initializes the DiffFirebaseRecords PTransform.
+
+        This transform expects a tuple of PCollection[FirebaseRecord] with
+        exactly 2 elements. The first PCollection is considered the "expected
+        records" (i.e. the ones built from Oppia's user models), and the second
+        PCollection is considered to be the "actual records" (i.e. the ones
+        exported directly from Firebase).
+
+        Args:
+            auth_pairs: PCollection. Collection of (firebase id, oppia user id)
+                pairs for every Firebase-linked Oppia user. Used to detect auth
+                ID conflicts and to annotate email conflicts.
+            label: str|None. The label of the PTransform.
+        """
+        super().__init__(label=label)
+        self._auth_pairs = auth_pairs
+
+    def expand(
+        self,
+        records: tuple[
+            beam.PCollection[firebase_domain.FirebaseRecord],
+            beam.PCollection[firebase_domain.FirebaseRecord],
+        ],
+    ) -> dict[str, beam.PCollection]:
+        """Computes the diff between the input pair of Firebase records.
+
+        Args:
+            records: tuple. The pair of FirebaseRecord collections to be diffed.
+                The first PCollection is considered the "expected records" (i.e.
+                the ones built from Oppia's user models), and the second
+                PCollection is considered the "actual records" (i.e. the ones
+                exported directly from Firebase).
+
+        Returns:
+            dict. A dict mapping each tag (TAG_OK, TAG_ADD, TAG_DEL,
+            TAG_EMAIL_CONFLICT, TAG_AUTH_ID_CONFLICT) to its PCollection. The
+            tags encode the actions needed to bring the actual records in-sync
+            with the expected records, and all data-integrity conflicts found
+            which aren't actionable (by this job).
+        """
+
+        expected_records, actual_records = records
+
+        keyed_expected_records = (
+            expected_records
+            | 'Get expected records with email keys'
+            >> beam.Map(lambda r: (r.email, r))
+        )
+
+        keyed_actual_records = (
+            actual_records
+            | 'Get actual records with email keys'
+            >> beam.Map(lambda r: (r.email, r))
+        )
+
+        diff_outputs = (
+            (keyed_expected_records, keyed_actual_records)
+            | 'Group records by email' >> beam.CoGroupByKey()
+            | 'Drop email keys' >> beam.MapTuple(lambda _, grouped: grouped)
+            | 'Compute diff'
+            >> beam.FlatMapTuple(
+                self._yield_diffs,
+                beam.pvalue.AsMultiMap(self._auth_pairs),
+            ).with_outputs(
+                self.TAG_OK,
+                self.TAG_ADD,
+                self.TAG_DEL,
+                self.TAG_EMAIL_CONFLICT,
+            )
+        )
+
+        auth_id_conflicts = (
+            self._auth_pairs
+            | 'Group Oppia user ids by Firebase account id' >> beam.GroupByKey()
+            | 'Only keep Firebase account ids associated with more than 1 user'
+            >> beam.Filter(lambda keyed_user_id: len(set(keyed_user_id[1])) > 1)
+            | 'Format Firebase account id conflicts'
+            >> beam.MapTuple(self._format_auth_id_conflict)
+        )
+
+        return {
+            self.TAG_OK: diff_outputs[self.TAG_OK],
+            self.TAG_ADD: diff_outputs[self.TAG_ADD],
+            self.TAG_DEL: diff_outputs[self.TAG_DEL],
+            self.TAG_EMAIL_CONFLICT: diff_outputs[self.TAG_EMAIL_CONFLICT],
+            self.TAG_AUTH_ID_CONFLICT: auth_id_conflicts,
+        }
+
+    @classmethod
+    def _yield_diffs(
+        cls,
+        expected_iter: abc.Iterable[firebase_domain.FirebaseRecord],
+        actual_iter: abc.Iterable[firebase_domain.FirebaseRecord],
+        user_ids_by_auth_id: abc.Mapping[str, abc.Iterable[str]] | None = None,
+    ) -> abc.Iterator[beam.TaggedOutput]:
+        """Yields diffs between the given records using tagged outputs."""
+        user_ids_by_auth_id = user_ids_by_auth_id or {}
+
+        if len(expected_set := set(expected_iter)) > 1:
+            user_ids = sorted(
+                {
+                    user_id
+                    for record in expected_set
+                    for user_id in user_ids_by_auth_id[record.auth_id]
+                }
+            )
+            yield beam.TaggedOutput(
+                cls.TAG_EMAIL_CONFLICT,
+                f'Oppia users ({user_ids=!r}) are sharing the same email',
+            )
+
+        if len(actual_set := set(actual_iter)) > 1:
+            auth_ids = sorted(record.auth_id for record in actual_set)
+            yield beam.TaggedOutput(
+                cls.TAG_EMAIL_CONFLICT,
+                f'Firebase accounts ({auth_ids=!r}) are sharing the same email',
+            )
+
+        if ok_records := expected_set & actual_set:
+            yield beam.TaggedOutput(cls.TAG_OK, len(ok_records))
+
+        for record_to_add in expected_set - actual_set:
+            yield beam.TaggedOutput(cls.TAG_ADD, record_to_add)
+
+        for record_to_del in actual_set - expected_set:
+            yield beam.TaggedOutput(cls.TAG_DEL, record_to_del)
+
+    @classmethod
+    def _format_auth_id_conflict(
+        cls, auth_id: str, user_id_iter: abc.Iterable[str]
+    ) -> str:
+        """Formats the conflict message for an auth ID with multiple users."""
+
+        user_ids = sorted(set(user_id_iter))
+        return (
+            f'Oppia users ({user_ids=!r}) are sharing the same Firebase '
+            f'account ({auth_id=!r})'
+        )
+
+
+class FirebaseBatchOperation(
+    # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks types.
+    beam.PTransform,  # type: ignore[misc]
+    Generic[InputT, OutputT],
+    abstract_base_classes.ABC,
+):
     """Executes a batch operation against Firebase and returns the results."""
 
     BATCH_LIMIT = 1000
-
-    PASS_TAG = 'SUCCESS'
-    FAIL_TAG = 'FAILURE'
-
-    def handle_batched_items(self, _: list[InputType]) -> OutputType:
-        """Virtual function to call a specific Firebase Admin SDK operation."""
-
-        raise NotImplementedError('Subclasses must override this function')
+    OK_TAG = 'OK'
+    ERR_TAG = 'ERROR'
 
     def setup(self) -> None:
-        """Establishes a Firebase connection just before running `process`."""
-
+        """Establishes a Firebase connection just before running expand()."""
         firebase_auth_services.establish_firebase_connection()
 
-    def process(
-        self,
-        inputs: list[InputType],
-    ) -> Iterator[pvalue.TaggedOutput]:
+    def expand(
+        self, records: beam.PCollection[firebase_domain.FirebaseRecord]
+    ) -> beam.PCollection[job_run_result.JobRunResult]:
+
+        return (
+            records
+            | beam.Map(self.get_batch_input)
+            | beam.combiners.ToList()
+            | beam.ParDo(self._yield_run_batch_operation_output).with_outputs(
+                self.OK_TAG,
+                self.ERR_TAG,
+            )
+            | job_result_transforms.FromTaggedOutputs(
+                self.OK_TAG,
+                self.ERR_TAG,
+            )
+        )
+
+    @abstract_base_classes.abstractmethod
+    def get_batch_input(self, record: firebase_domain.FirebaseRecord) -> InputT:
+        """Virtual function to extract the relevant FirebaseRecord fields."""
+
+        del record
+        raise NotImplementedError('Subclasses must implement get_batch_input()')
+
+    @abstract_base_classes.abstractmethod
+    def run_batch_operation(self, input_batch: list[InputT]) -> OutputT:
+        """Virtual function to call a specific Firebase Admin SDK operation."""
+
+        del input_batch
+        raise NotImplementedError(
+            'Subclasses must implement run_batch_operation()'
+        )
+
+    def _yield_run_batch_operation_output(
+        self, inputs: list[InputT]
+    ) -> abc.Iterator[pvalue.TaggedOutput]:
         """Common batch processing logic for Firebase Admin SDK operations."""
 
         input_iter = iter(inputs)
-        used_count = 0
-        fail_count = 0
-        error_messages = []
+        input_offset = 0
+        failure_count = 0
 
         while batch := list(itertools.islice(input_iter, self.BATCH_LIMIT)):
             try:
-                output: OutputType = self.handle_batched_items(batch)
+                output = self.run_batch_operation(batch)
+
             except (ValueError, firebase_exceptions.FirebaseError) as e:
-                fail_count += len(batch)
-                error_messages.append(
-                    f'at slice=[{used_count}:{used_count + len(batch)}]: {e}'
+                failure_count += len(batch)
+                yield beam.TaggedOutput(
+                    self.ERR_TAG,
+                    f'at slice=[{input_offset}:{input_offset + len(batch)}]: {e}',
                 )
+
             else:
-                fail_count += output.failure_count
-                error_messages.extend(
-                    f'at index=[{used_count + e.index}]: {e.reason}'
+                failure_count += output.failure_count
+                yield from (
+                    beam.TaggedOutput(
+                        self.ERR_TAG,
+                        f'at index=[{input_offset + e.index}]: {e.reason}',
+                    )
                     for e in output.errors
                 )
+
             finally:
-                used_count += len(batch)
+                input_offset += len(batch)
 
-        if success_count := max(used_count - fail_count, 0):
-            yield beam.TaggedOutput(self.PASS_TAG, success_count)
-
-        for error_message in error_messages:
-            yield beam.TaggedOutput(self.FAIL_TAG, error_message)
-
-
-class DeleteRecords(
-    FirebaseBatchOperation[str, firebase_auth.DeleteUsersResult]
-):
-    """Deletes users from Firebase by their UIDs in batches."""
-
-    def handle_batched_items(
-        self, uids: list[str]
-    ) -> firebase_auth.DeleteUsersResult:
-        return firebase_auth.delete_users(uids)
-
-
-class CreateRecords(
-    FirebaseBatchOperation[
-        firebase_auth.ImportUserRecord, firebase_auth.UserImportResult
-    ]
-):
-    """Imports users into Firebase in batches."""
-
-    def handle_batched_items(
-        self, users: list[firebase_auth.ImportUserRecord]
-    ) -> firebase_auth.UserImportResult:
-        if constants.EMULATOR_MODE:
-            return self._handle_batched_items_within_emulator(users)
-        return firebase_auth.import_users(users)
-
-    def _handle_batched_items_within_emulator(
-        self, records: list[firebase_auth.ImportUserRecord]
-    ) -> firebase_auth.UserImportResult:
-        """Creating users needs to be handled differently within EMULATOR_MODE.
-
-        When we migrated to Firebase Authentication we decided that, while Oppia
-        is running locally against the Firebase Authentication Emulator, users
-        should be created using email & password for authentication. This is
-        intentionally inconsistent with production, where we use Single Sign-On
-        (i.e. Google Sign-In) instead. This was done so that developers wouldn't
-        need to keep sensitive auth credentials on their local file system.
-
-        NOTE: Since the `import_users` API doesn't accept a raw password field,
-        we need to call the `create_user` API, which DOES accept one, instead.
-
-        Args:
-            records: list[ImportUserRecord]. The batch of records to create.
-
-        Returns:
-            UserImportResult. The result of the create operation.
-
-        Raises:
-            AssertionError. Email is required within EMULATOR_MODE.
-        """
-
-        errors = []
-        for i, record in enumerate(records):
-            user_email = record.email or ''
-            # HINT: `md5(email)` used for consistency with the frontend.
-            # See: core/templates/services/auth.service.ts.
-            user_password = hashlib.md5(user_email.encode()).hexdigest()
-            try:
-                firebase_auth.create_user(
-                    uid=record.uid,
-                    disabled=record.disabled,
-                    email=user_email,
-                    password=user_password,
-                )
-            except (ValueError, firebase_exceptions.FirebaseError) as e:
-                errors.append({'index': i, 'message': str(e)})
-
-        return firebase_auth.UserImportResult({'error': errors}, len(records))
+        if input_offset > failure_count:
+            yield beam.TaggedOutput(self.OK_TAG, input_offset - failure_count)

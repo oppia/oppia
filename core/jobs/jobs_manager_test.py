@@ -25,7 +25,7 @@ from unittest import mock
 from core import feconf
 from core.domain import beam_job_services
 from core.jobs import base_jobs, job_options, jobs_manager
-from core.jobs.batch_jobs import firebase_sync_jobs, firebase_validation_jobs
+from core.jobs.batch_jobs import firebase_server_sync_jobs
 from core.jobs.types import job_run_result
 from core.storage.beam_job import gae_models as beam_job_models
 from core.tests import test_utils
@@ -317,12 +317,12 @@ class ServiceAccountEmailOptionTests(test_utils.GenericTestBase):
 
     TEST_CASES = (
         (
-            firebase_validation_jobs.FirebaseAuditRecordsJob,
-            feconf.FIREBASE_AUTHENTICATION_READ_ONLY_SERVICE_ACCOUNT_ID,
+            firebase_server_sync_jobs.AuditFirebaseServerSyncJob,
+            feconf.SENSITIVE_FIREBASE_AUTH_READ_ONLY_SERVICE_ACCOUNT_ID,
         ),
         (
-            firebase_sync_jobs.FirebaseSyncRecordsJob,
-            feconf.FIREBASE_AUTHENTICATION_READ_AND_WRITE_SERVICE_ACCOUNT_ID,
+            firebase_server_sync_jobs.FirebaseServerSyncJob,
+            feconf.SENSITIVE_FIREBASE_AUTH_READ_WRITE_SERVICE_ACCOUNT_ID,
         ),
         (
             WorkingJob,

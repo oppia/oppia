@@ -26,7 +26,7 @@ import traceback
 from core import feconf
 from core.domain import beam_job_services, caching_services
 from core.jobs import base_jobs, job_options
-from core.jobs.batch_jobs import firebase_sync_jobs, firebase_validation_jobs
+from core.jobs.batch_jobs import firebase_server_sync_jobs
 from core.jobs.io import cache_io, job_io
 from core.platform import models
 from core.storage.beam_job import gae_models as beam_job_models
@@ -364,11 +364,9 @@ def choose_service_account_id_for_job(
         job, or None if no custom service account is required.
     """
     match job_class:
-        case firebase_sync_jobs.FirebaseSyncRecordsJob:
-            return (
-                feconf.FIREBASE_AUTHENTICATION_READ_AND_WRITE_SERVICE_ACCOUNT_ID
-            )
-        case firebase_validation_jobs.FirebaseAuditRecordsJob:
-            return feconf.FIREBASE_AUTHENTICATION_READ_ONLY_SERVICE_ACCOUNT_ID
+        case firebase_server_sync_jobs.FirebaseServerSyncJob:
+            return feconf.SENSITIVE_FIREBASE_AUTH_READ_WRITE_SERVICE_ACCOUNT_ID
+        case firebase_server_sync_jobs.AuditFirebaseServerSyncJob:
+            return feconf.SENSITIVE_FIREBASE_AUTH_READ_ONLY_SERVICE_ACCOUNT_ID
         case _:
             return None
