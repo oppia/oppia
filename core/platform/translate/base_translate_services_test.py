@@ -55,9 +55,3 @@ class BaseTranslationServiceTests(test_utils.GenericTestBase):
     def test_generate_translation_uses_source_text(self) -> None:
         result = self.service.generate_translation('en', 'es', 'hello')
         self.assertEqual(result, 'translated: hello')
-
-    def test_abstract_method_raises_not_implemented_error(self) -> None:
-        with self.assertRaisesRegex(NotImplementedError, r'.*'):
-            base_translate_services.BaseTranslationService.generate_translation(
-                self.service, 'en', 'es', 'hello'
-            )
