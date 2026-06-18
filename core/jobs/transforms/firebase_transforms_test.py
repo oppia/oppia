@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import dataclasses
-import operator
 import unittest
 from unittest import mock
 
@@ -32,13 +30,11 @@ import apache_beam as beam
 import firebase_admin.auth as firebase_auth
 from typing import Callable
 
-TAG_OK, TAG_ADD, TAG_DEL, TAG_EMAIL, TAG_AUTH_ID = operator.attrgetter(
-    'TAG_OK',
-    'TAG_ADD',
-    'TAG_DEL',
-    'TAG_EMAIL_CONFLICT',
-    'TAG_AUTH_ID_CONFLICT',
-)(firebase_transforms.DiffFirebaseRecords)
+TAG_OK = firebase_transforms.DiffFirebaseRecords.TAG_OK
+TAG_ADD = firebase_transforms.DiffFirebaseRecords.TAG_ADD
+TAG_DEL = firebase_transforms.DiffFirebaseRecords.TAG_DEL
+TAG_EMAIL = firebase_transforms.DiffFirebaseRecords.TAG_EMAIL_CONFLICT
+TAG_AUTH_ID = firebase_transforms.DiffFirebaseRecords.TAG_AUTH_ID_CONFLICT
 
 
 class DiffFirebaseRecordsTests(job_test_utils.PipelinedTestBase):
@@ -264,14 +260,14 @@ class FirebaseBatchOperationTests(job_test_utils.PipelinedTestBase):
 
     def test_expand_with_individual_failures_reports_each_error(self) -> None:
         errors = [
-            mock.Mock(index=0, error='fail-a'),
-            mock.Mock(index=2, error='fail-c'),
+            mock.Mock(index=0, reason='fail-a'),
+            mock.Mock(index=2, reason='fail-c'),
         ]
 
         self.assert_pcoll_equal(
             self.run_batch_operation(
                 ['a', 'b', 'c'],
-                lambda _: mock.Mock(errors=errors),
+                lambda _: mock.Mock(failure_count=2, errors=errors),
             ),
             [
                 job_run_result.JobRunResult(stdout='OK: 1'),
@@ -287,12 +283,12 @@ class FirebaseBatchOperationTests(job_test_utils.PipelinedTestBase):
     def test_expand_with_mixed_success_and_individual_failures_reports_both(
         self,
     ) -> None:
-        errors = [mock.Mock(index=1, error='fail-b')]
+        errors = [mock.Mock(index=1, reason='fail-b')]
 
         self.assert_pcoll_equal(
             self.run_batch_operation(
                 ['a', 'b'],
-                lambda _: mock.Mock(errors=errors),
+                lambda _: mock.Mock(failure_count=1, errors=errors),
             ),
             [
                 job_run_result.JobRunResult(stdout='OK: 1'),
@@ -306,14 +302,14 @@ class FirebaseBatchOperationTests(job_test_utils.PipelinedTestBase):
         self,
     ) -> None:
         errors = [
-            mock.Mock(index=0, error='fail-a'),
-            mock.Mock(index=1, error='fail-b'),
+            mock.Mock(index=0, reason='fail-a'),
+            mock.Mock(index=1, reason='fail-b'),
         ]
 
         self.assert_pcoll_equal(
             self.run_batch_operation(
                 ['a', 'b'],
-                lambda _: mock.Mock(errors=errors),
+                lambda _: mock.Mock(failure_count=2, errors=errors),
             ),
             [
                 job_run_result.JobRunResult(
@@ -334,7 +330,7 @@ class FirebaseBatchOperationTests(job_test_utils.PipelinedTestBase):
             nonlocal call_count
             call_count += 1
             if call_count == 1:
-                return mock.Mock()
+                return mock.Mock(failure_count=0, errors=[])
             else:
                 raise ValueError('uh-oh')
 
@@ -354,7 +350,9 @@ class FirebaseBatchOperationTests(job_test_utils.PipelinedTestBase):
     def run_batch_operation(
         self,
         prefixes: list[str],
-        op: Callable[[list[str]], TestBatchResult] = mock.Mock,
+        op: Callable[[list[str]], TestBatchResult] = (
+            lambda _: mock.Mock(failure_count=0, errors=[])
+        ),
     ) -> beam.PCollection[job_run_result.JobRunResult]:
         """Test-only helper for producing the output type used in production."""
 
@@ -412,41 +410,16 @@ class FirebaseBatchOperationInheritanceTests(unittest.TestCase):
     def test_setup_calls_establish_firebase_connection(
         self, establish_firebase_connection: mock.Mock
     ) -> None:
-        class ConcreteBatchOperation(
-            firebase_transforms.FirebaseBatchOperation[str, TestBatchResult]
-        ):
-            """Concrete subclass that keeps the base setup() behavior."""
-
-            def get_batch_input(
-                self, record: firebase_domain.FirebaseRecord
-            ) -> str:
-                return record.auth_id
-
-            def run_batch_operation(self, batch: list[str]) -> TestBatchResult:
-                del batch
-                return mock.Mock()
-
-        ConcreteBatchOperation().setup()
+        TestBatchOperation(
+            lambda _: mock.Mock(failure_count=0, errors=[])
+        ).setup()
 
         establish_firebase_connection.assert_called_once_with()
 
 
-@dataclasses.dataclass
-class TestBatchError(firebase_auth.ErrorInfo):
-    """Test stub for ErrorInfo."""
-
-    index: int
-    reason: str
-
-
-@dataclasses.dataclass
-class TestBatchResult(
-    firebase_auth.DeleteUsersResult,
-    firebase_auth.UserImportResult,
-):
-    """Test stubs for DeleteUsersResult & UserImportResult."""
-
-    errors: list[TestBatchError]
+TestBatchResult = (
+    firebase_auth.DeleteUsersResult | firebase_auth.UserImportResult
+)
 
 
 class TestBatchOperation(
@@ -454,12 +427,13 @@ class TestBatchOperation(
 ):
     """Concrete subclass that delegates run_batch_operation to a callable."""
 
-    def __init__(self, op: Callable[[list[str]], TestBatchResult]) -> None:
-        super().__init__()
+    def __init__(
+        self,
+        op: Callable[[list[str]], TestBatchResult],
+        label: str | None = None,
+    ) -> None:
+        super().__init__(label=label)
         self.op = op
-
-    def setup(self) -> None:
-        pass
 
     def get_batch_input(self, record: firebase_domain.FirebaseRecord) -> str:
         return record.auth_id
