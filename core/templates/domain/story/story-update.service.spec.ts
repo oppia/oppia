@@ -1610,8 +1610,8 @@ describe('Story update service', () => {
 
     undoRedoService.undoChange(_sampleStory);
     expect(_sampleStory.getStoryContents().getArcs()[0].getNodeIds()).toEqual([
-      'node_1',
       'node_2',
+      'node_1',
     ]);
     expect(_sampleStory.getStoryContents().getArcs()[1].getNodeIds()).toEqual(
       []
@@ -1656,7 +1656,6 @@ describe('Story update service', () => {
           cmd: 'move_node_to_arc',
           node_id: 'node_1',
           to_arc_id: 'arc_2',
-          old_position_index: 0,
         },
       ]);
     }

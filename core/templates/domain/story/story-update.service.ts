@@ -1320,7 +1320,6 @@ export class StoryUpdateService {
       {
         node_id: nodeId,
         to_arc_id: toArcId,
-        old_position_index: 0,
       },
       (changeDict, story) => {
         // ---- Apply ----
