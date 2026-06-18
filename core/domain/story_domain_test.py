@@ -2834,6 +2834,31 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result['nodes'][1]['destination_node_ids'], ['node_1'])
         self.assertEqual(result['nodes'][2]['destination_node_ids'], [])
 
+    def test_convert_story_contents_v6_dict_to_v7_dict(self) -> None:
+        v6_dict = {
+            'nodes': [
+                {
+                    'id': 'node_1',
+                    'title': 'Chapter 1',
+                },
+                {
+                    'id': 'node_2',
+                    'title': 'Chapter 2',
+                },
+            ],
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_3',
+        }
+        result = story_domain.Story._convert_story_contents_v6_dict_to_v7_dict(  # pylint: disable=protected-access
+            v6_dict  # type: ignore[arg-type]
+        )
+        self.assertIn('arcs', result)
+        self.assertEqual(len(result['arcs']), 1)
+        self.assertEqual(result['arcs'][0]['id'], 'arc_default')
+        self.assertEqual(result['arcs'][0]['title'], 'All Chapters')
+        self.assertEqual(result['arcs'][0]['description'], '')
+        self.assertEqual(result['arcs'][0]['node_ids'], ['node_1', 'node_2'])
+
     def test_delete_node_with_destination_ids_merge(self) -> None:
         self.story.add_node('node_3', 'Title 3')
         self.story.story_contents.nodes[0].destination_node_ids = ['node_2']
