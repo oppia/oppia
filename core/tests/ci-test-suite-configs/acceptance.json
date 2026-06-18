@@ -492,8 +492,8 @@
     },
     {
       "name": "logged-in-learner/manage-goals-in-learner-dashboard",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/manage-goals-in-learner-dashboard.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/manage-goals-in-learner-dashboard.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-in-learner/interact-with-goals-in-learner-dashboard",

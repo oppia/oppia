@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * LI.2. Set goals on the Learner Dashboard
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
@@ -30,21 +31,26 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
-describe('Logged-In Learner - Manage Goals', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-In Learner - Manage Goals', function () {
   let loggedInUser: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(6000000); // Setup taking longer than default timeout.
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculumAdmin@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseCoordinator',
       'release_coordinator@example.com',
+      browser,
       [ROLES.RELEASE_COORDINATOR]
     );
 
@@ -114,38 +120,35 @@ describe('Logged-In Learner - Manage Goals', function () {
     await UserFactory.closeBrowserForUser(curriculumAdmin);
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser1',
-      'logged_in_user1@example.com'
+      'logged_in_user1@example.com',
+      browser
     );
     await UserFactory.closeSuperAdminBrowser();
-  }, 6000000); // Setup taking longer than default timeout.
+  });
 
-  it('should display empty Goals tab with title and Add Goals button', async function () {
+  test('should display empty Goals tab with title and Add Goals button', async function () {
     await loggedInUser.navigateToLearnerDashboard();
     await loggedInUser.navigateToGoalsSection();
 
     await loggedInUser.expectLearnerGreetingsToBe("loggedInUser1's Goals");
 
     await loggedInUser.expectScreenshotToMatch(
-      'goalsTabEmptyStateWithAddGoalsButton',
-      __dirname
+      'goalsTabEmptyStateWithAddGoalsButton'
     );
   });
 
-  it('should open add goals modal with topic checkbox and cancel', async function () {
+  test('should open add goals modal with topic checkbox and cancel', async function () {
     await loggedInUser.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
     await loggedInUser.expectAddGoalsModalToBeDisplayed();
 
     await loggedInUser.expectGoalCheckboxToBeVisible('Place Values');
 
-    await loggedInUser.expectScreenshotToMatch(
-      'addGoalsModalInitial',
-      __dirname
-    );
+    await loggedInUser.expectScreenshotToMatch('addGoalsModalInitial');
 
     await loggedInUser.cancelGoalModalInRedesignedLearnerDashboard();
   });
 
-  it('should add Place Values goal and display In Progress card (0%)', async function () {
+  test('should add Place Values goal and display In Progress card (0%)', async function () {
     await loggedInUser.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
 
     await loggedInUser.clickOnGoalCheckboxInRedesignedLearnerDashboard(
@@ -165,12 +168,11 @@ describe('Logged-In Learner - Manage Goals', function () {
     await loggedInUser.expectGoalCardToBeVisible('Place Values');
 
     await loggedInUser.expectScreenshotToMatch(
-      'goalsTabInProgressCardZeroPercent',
-      __dirname
+      'goalsTabInProgressCardZeroPercent'
     );
   });
 
-  it('should prompt for goal removal when unchecked in modal', async function () {
+  test('should prompt for goal removal when unchecked in modal', async function () {
     await loggedInUser.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
 
     await loggedInUser.clickOnGoalCheckboxInRedesignedLearnerDashboard(
@@ -184,16 +186,13 @@ describe('Logged-In Learner - Manage Goals', function () {
       "Are you sure you want to remove 'Place Values' from your 'Current Goals' list?"
     );
 
-    await loggedInUser.expectScreenshotToMatch(
-      'removeGoalConfirmationModal',
-      __dirname
-    );
+    await loggedInUser.expectScreenshotToMatch('removeGoalConfirmationModal');
 
     await loggedInUser.clickButtonInRemoveActivityModal('Remove');
     await loggedInUser.expectGoalCardToBeVisible('Place Values', false);
   });
 
-  it('should return to empty state after removal', async function () {
+  test('should return to empty state after removal', async function () {
     await loggedInUser.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
 
     await loggedInUser.expectGoalCheckboxToBeVisible('Place Values');
@@ -207,7 +206,7 @@ describe('Logged-In Learner - Manage Goals', function () {
     await loggedInUser.expectAddGoalsButtonToBeVisible();
   });
 
-  it('should not save checkbox selection when closing modal', async function () {
+  test('should not save checkbox selection when closing modal', async function () {
     await loggedInUser.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
     await loggedInUser.clickOnGoalCheckboxInRedesignedLearnerDashboard(
       'Place Values',
@@ -222,7 +221,7 @@ describe('Logged-In Learner - Manage Goals', function () {
     );
   });
 
-  it('should show goal card with 0% and Start button after adding goal', async function () {
+  test('should show goal card with 0% and Start button after adding goal', async function () {
     await loggedInUser.navigateToLearnerDashboard();
     await loggedInUser.navigateToGoalsSection();
 
@@ -233,7 +232,7 @@ describe('Logged-In Learner - Manage Goals', function () {
     await loggedInUser.expectGoalCardButtonLabel('Place Values', 'Start');
   });
 
-  it('should expand Place Values and show all lessons with Start buttons', async function () {
+  test('should expand Place Values and show all lessons with Start buttons', async function () {
     await loggedInUser.clickOnGoalCard('Place Values');
 
     await loggedInUser.expectGoalDetailPageToBeDisplayed('Place Values');
@@ -249,27 +248,20 @@ describe('Logged-In Learner - Manage Goals', function () {
       'Start'
     );
 
-    await loggedInUser.expectScreenshotToMatch(
-      'goalDetailExpandedLessonList',
-      __dirname
-    );
+    await loggedInUser.expectScreenshotToMatch('goalDetailExpandedLessonList');
   });
 
-  it('should highlight Goals tab in sidebar', async function () {
+  test('should highlight Goals tab in sidebar', async function () {
     await loggedInUser.navigateToLearnerDashboard();
 
     await loggedInUser.expectGoalsTabButtonToBeVisible();
     await loggedInUser.navigateToGoalsSection();
     await loggedInUser.expectGoalsTabButtonToBeActive();
 
-    await loggedInUser.expectScreenshotToMatch(
-      'goalsTabSidebarHighlighted',
-      __dirname
-    );
+    await loggedInUser.expectScreenshotToMatch('goalsTabSidebarHighlighted');
   });
 
-  afterAll(async function () {
-    await UserFactory.closeBrowserForUser(loggedInUser);
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
