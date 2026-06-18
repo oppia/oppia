@@ -391,8 +391,8 @@ describe('Beam Jobs Tab Component', () => {
 
     const dataflowLink = Array.from(
       fixture.nativeElement.querySelectorAll('a')
-    ).find((el: HTMLAnchorElement) =>
-      el.textContent?.includes('View on Dataflow')
+    ).find(el =>
+      (el as HTMLAnchorElement).textContent?.includes('View on Dataflow')
     ) as HTMLAnchorElement;
     expect(dataflowLink).toBeTruthy();
     expect(dataflowLink.getAttribute('disabled')).toBeNull();
@@ -414,8 +414,8 @@ describe('Beam Jobs Tab Component', () => {
 
     const dataflowLink = Array.from(
       fixture.nativeElement.querySelectorAll('a')
-    ).find((el: HTMLAnchorElement) =>
-      el.textContent?.includes('View on Dataflow')
+    ).find(el =>
+      (el as HTMLAnchorElement).textContent?.includes('View on Dataflow')
     ) as HTMLAnchorElement;
     expect(dataflowLink).toBeTruthy();
     expect(dataflowLink.getAttribute('disabled')).toEqual('true');
