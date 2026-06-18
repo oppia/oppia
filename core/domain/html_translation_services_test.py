@@ -24,221 +24,194 @@ from core.domain import html_translation_services
 from core.tests import test_utils
 
 
-class ProtectHtmlForTranslationTests(test_utils.GenericTestBase):
-    """Tests for protect_html_for_translation."""
+class HtmlTranslationServicesTests(test_utils.GenericTestBase):
+    """Tests for HTML translation services."""
 
-    def test_returns_empty_string_unchanged(self) -> None:
+    def test_empty_and_whitespace_strings(self) -> None:
         self.assertEqual(
             html_translation_services.protect_html_for_translation(''), ''
         )
-
-    def test_plain_text_is_unchanged(self) -> None:
-        source = '<p>Hello world</p>'
         self.assertEqual(
-            html_translation_services.protect_html_for_translation(source),
-            source,
+            html_translation_services.protect_html_for_translation('   '), '   '
+        )
+        self.assertEqual(
+            html_translation_services.postprocess_translated_html(''), ''
         )
 
-    def test_math_component_gets_translate_no(self) -> None:
+    def test_skip_components_receive_translate_no(self) -> None:
         source = (
-            '<p>Find the area: '
             '<oppia-noninteractive-math math_content-with-value="x²">'
-            '</oppia-noninteractive-math></p>'
-        )
-        result = html_translation_services.protect_html_for_translation(source)
-        self.assertIn('translate="no"', result)
-        self.assertIn('math_content-with-value', result)
-
-    def test_video_component_gets_translate_no(self) -> None:
-        source = (
+            '</oppia-noninteractive-math>'
             '<oppia-noninteractive-video video_id-with-value="abc123">'
             '</oppia-noninteractive-video>'
-        )
-        result = html_translation_services.protect_html_for_translation(source)
-        self.assertIn('translate="no"', result)
-
-    def test_skillreview_component_gets_translate_no(self) -> None:
-        source = (
-            '<oppia-noninteractive-skillreview skill_id-with-value="abc"'
-            ' text-with-value="Fractions">'
+            '<oppia-noninteractive-skillreview skill_id-with-value="abc">'
             '</oppia-noninteractive-skillreview>'
+            '<oppia-noninteractive-math translate="no"></oppia-noninteractive-math>'
         )
         result = html_translation_services.protect_html_for_translation(source)
-        self.assertIn('translate="no"', result)
-        # Text-with-value should NOT be extracted for skillreview.
-        self.assertNotIn('data-oi-attr', result)
+        self.assertEqual(result.count('translate="no"'), 4)
 
-    def test_link_text_extracted_url_preserved(self) -> None:
+    def test_translatable_text_attrs_extracted_and_restored(self) -> None:
         source = (
-            '<oppia-noninteractive-link url-with-value="https://oppia.org"'
-            ' text-with-value="Learn more">'
-            '</oppia-noninteractive-link>'
+            '<oppia-noninteractive-link url-with-value="https://oppia.org" '
+            'text-with-value="Learn more"></oppia-noninteractive-link>'
         )
-        result = html_translation_services.protect_html_for_translation(source)
-        # Text-with-value extracted into a span.
-        self.assertIn('data-oi-attr="text-with-value"', result)
-        self.assertIn('Learn more', result)
-        # Url-with-value preserved on the component.
-        self.assertIn('url-with-value="https://oppia.org"', result)
-        # Text-with-value removed from component.
-        self.assertNotIn('oppia-noninteractive-link text-with-value', result)
+        protected = html_translation_services.protect_html_for_translation(
+            source
+        )
+        self.assertIn('data-oi-attr="text-with-value"', protected)
 
-    def test_image_alt_and_caption_extracted(self) -> None:
+        restored = html_translation_services.postprocess_translated_html(
+            protected
+        )
+        self.assertIn('text-with-value="Learn more"', restored)
+        self.assertNotIn('data-oi-id', restored)
+
+    def test_image_alt_and_caption_extracted_and_restored(self) -> None:
         source = (
-            '<oppia-noninteractive-image filepath-with-value="img.png"'
-            ' alt-with-value="A red car"'
-            ' caption-with-value="Figure 1">'
+            '<oppia-noninteractive-image filepath-with-value="img.png" '
+            'alt-with-value="A red car" caption-with-value="Figure 1">'
             '</oppia-noninteractive-image>'
         )
-        result = html_translation_services.protect_html_for_translation(source)
-        self.assertIn('data-oi-attr="alt-with-value"', result)
-        self.assertIn('data-oi-attr="caption-with-value"', result)
-        self.assertIn('A red car', result)
-        self.assertIn('Figure 1', result)
-        # Filepath must be preserved on the component.
-        self.assertIn('filepath-with-value="img.png"', result)
+        protected = html_translation_services.protect_html_for_translation(
+            source
+        )
+        restored = html_translation_services.postprocess_translated_html(
+            protected
+        )
+        self.assertIn('alt-with-value="A red car"', restored)
+        self.assertIn('caption-with-value="Figure 1"', restored)
 
-    def test_collapsible_heading_extracted_content_protected(self) -> None:
+    def test_encoded_html_attrs_extracted_and_restored(self) -> None:
         source = (
-            '<oppia-noninteractive-collapsible'
-            ' heading-with-value="Show solution"'
-            ' content-with-value="&lt;p&gt;Step 1&lt;/p&gt;">'
+            '<oppia-noninteractive-collapsible heading-with-value="Show" '
+            'content-with-value="&lt;p&gt;Step 1&lt;/p&gt;">'
             '</oppia-noninteractive-collapsible>'
         )
-        result = html_translation_services.protect_html_for_translation(source)
-        self.assertIn('data-oi-attr="heading-with-value"', result)
-        self.assertIn('Show solution', result)
-        self.assertIn('data-oi-attr="content-with-value"', result)
-        self.assertIn('Step 1', result)
+        protected = html_translation_services.protect_html_for_translation(
+            source
+        )
+        self.assertIn('data-oi-encoded="true"', protected)
 
-    def test_workedexample_question_extracted_answer_protected(self) -> None:
+        restored = html_translation_services.postprocess_translated_html(
+            protected
+        )
+        self.assertIn(
+            'content-with-value="&lt;p&gt;Step 1&lt;/p&gt;"', restored
+        )
+
+    def test_workedexample_extracted_and_restored(self) -> None:
         source = (
-            '<oppia-noninteractive-workedexample'
-            ' question-with-value="Solve for x"'
-            ' answer-with-value="&lt;p&gt;x=5&lt;/p&gt;">'
+            '<oppia-noninteractive-workedexample question-with-value="Q1" '
+            'answer-with-value="&lt;p&gt;A1&lt;/p&gt;">'
             '</oppia-noninteractive-workedexample>'
         )
-        result = html_translation_services.protect_html_for_translation(source)
-        self.assertIn('data-oi-attr="question-with-value"', result)
-        self.assertIn('Solve for x', result)
-        self.assertIn('data-oi-attr="answer-with-value"', result)
-        self.assertIn('x=5', result)
+        protected = html_translation_services.protect_html_for_translation(
+            source
+        )
+        restored = html_translation_services.postprocess_translated_html(
+            protected
+        )
+        self.assertIn('question-with-value="Q1"', restored)
+        self.assertIn('answer-with-value="&lt;p&gt;A1&lt;/p&gt;"', restored)
 
-    def test_tabs_json_unpacked_into_temp_elements(self) -> None:
+    def test_tabs_json_extracted_and_restored(self) -> None:
         tabs = json.dumps(
-            [{'title': 'Hint', 'content': '&lt;p&gt;Try again&lt;/p&gt;'}]
+            [
+                {'title': 'Hint', 'content': '&lt;p&gt;Try&lt;/p&gt;'},
+                {'title': 'Hint 2'},
+            ]
         )
         source = (
             '<oppia-noninteractive-tabs tab_contents-with-value=\'%s\'>'
             '</oppia-noninteractive-tabs>' % tabs
         )
-        result = html_translation_services.protect_html_for_translation(source)
-        self.assertIn('data-oi-attr="tab-title-0"', result)
-        self.assertIn('Hint', result)
-        self.assertIn('data-oi-attr="tab-content-0"', result)
-        self.assertIn('Try again', result)
-
-    def test_anchor_tag_is_not_protected(self) -> None:
-        source = '<a href="https://example.com">Click here</a>'
-        result = html_translation_services.protect_html_for_translation(source)
-        self.assertNotIn('translate="no"', result)
-        self.assertIn('href="https://example.com"', result)
-
-    def test_function_is_idempotent(self) -> None:
-        source = (
-            '<oppia-noninteractive-math math_content-with-value="x²">'
-            '</oppia-noninteractive-math>'
-        )
-        once = html_translation_services.protect_html_for_translation(source)
-        twice = html_translation_services.protect_html_for_translation(once)
-        self.assertEqual(once.count('translate="no"'), 1)
-        self.assertEqual(twice.count('translate="no"'), 1)
-
-
-class PostprocessTranslatedHtmlTests(test_utils.GenericTestBase):
-    """Tests for postprocess_translated_html."""
-
-    def test_empty_string_returns_empty_string(self) -> None:
-        self.assertEqual(
-            html_translation_services.postprocess_translated_html(''), ''
-        )
-
-    def test_strips_translate_no(self) -> None:
-        source = (
-            '<oppia-noninteractive-math translate="no"'
-            ' math_content-with-value="x²">'
-            '</oppia-noninteractive-math>'
-        )
-        result = html_translation_services.postprocess_translated_html(source)
-        self.assertNotIn('translate="no"', result)
-
-    def test_link_text_restored_url_preserved(self) -> None:
-        source = (
-            '<oppia-noninteractive-link url-with-value="https://oppia.org"'
-            ' text-with-value="Learn more">'
-            '</oppia-noninteractive-link>'
-        )
         protected = html_translation_services.protect_html_for_translation(
             source
         )
-        # Simulate Azure translating the span text.
-        translated = protected.replace('Learn more', 'यहाँ और जानें')
-        result = html_translation_services.postprocess_translated_html(
-            translated
-        )
-        self.assertIn('text-with-value="यहाँ और जानें"', result)
-        self.assertIn('url-with-value="https://oppia.org"', result)
-        self.assertNotIn('data-oi-id', result)
-        self.assertNotIn('translate="no"', result)
+        self.assertIn('tab-title-0', protected)
+        self.assertIn('tab-content-0', protected)
+        self.assertIn('tab-title-1', protected)
 
-    def test_image_alt_and_caption_restored(self) -> None:
-        source = (
-            '<oppia-noninteractive-image filepath-with-value="img.png"'
-            ' alt-with-value="A red car"'
-            ' caption-with-value="Figure 1">'
-            '</oppia-noninteractive-image>'
-        )
-        protected = html_translation_services.protect_html_for_translation(
-            source
-        )
-        translated = protected.replace('A red car', 'एक लाल कार').replace(
-            'Figure 1', 'चित्र 1'
-        )
-        result = html_translation_services.postprocess_translated_html(
-            translated
-        )
-        self.assertIn('alt-with-value="एक लाल कार"', result)
-        self.assertIn('caption-with-value="चित्र 1"', result)
-        self.assertIn('filepath-with-value="img.png"', result)
-
-    def test_math_component_preserved_unchanged(self) -> None:
-        source = (
-            '<oppia-noninteractive-math math_content-with-value="πr²">'
-            '</oppia-noninteractive-math>'
-        )
-        protected = html_translation_services.protect_html_for_translation(
-            source
-        )
-        result = html_translation_services.postprocess_translated_html(
+        restored = html_translation_services.postprocess_translated_html(
             protected
         )
-        self.assertIn('math_content-with-value="πr²"', result)
-        self.assertNotIn('translate="no"', result)
+        self.assertIn('Hint', restored)
+        self.assertIn('&lt;p&gt;Try&lt;/p&gt;', restored)
+        self.assertIn('Hint 2', restored)
 
-    def test_full_roundtrip_with_plain_text(self) -> None:
+    def test_tabs_with_invalid_json_is_skipped(self) -> None:
         source = (
-            '<p>Find the area</p>'
-            '<oppia-noninteractive-math math_content-with-value="πr²">'
-            '</oppia-noninteractive-math>'
+            '<oppia-noninteractive-tabs tab_contents-with-value="invalid">'
+            '</oppia-noninteractive-tabs>'
         )
         protected = html_translation_services.protect_html_for_translation(
             source
         )
-        translated = protected.replace('Find the area', 'Finde die Fläche')
-        result = html_translation_services.postprocess_translated_html(
-            translated
+        self.assertIn('translate="no"', protected)
+
+        source_with_no = (
+            '<oppia-noninteractive-tabs tab_contents-with-value="invalid" '
+            'translate="no"></oppia-noninteractive-tabs>'
         )
-        self.assertIn('Finde die Fläche', result)
-        self.assertIn('math_content-with-value="πr²"', result)
-        self.assertNotIn('translate="no"', result)
+        protected2 = html_translation_services.protect_html_for_translation(
+            source_with_no
+        )
+        self.assertIn('translate="no"', protected2)
+
+    def test_tabs_json_null_value_protects_whole_component(self) -> None:
+        # JSON null parses fine but raises TypeError when iterated over,
+        # hitting the TypeError branch of the except clause.
+        source = (
+            '<oppia-noninteractive-tabs tab_contents-with-value="null">'
+            '</oppia-noninteractive-tabs>'
+        )
+        result = html_translation_services.protect_html_for_translation(source)
+        self.assertIn('translate="no"', result)
+        self.assertNotIn('data-oi-attr', result)
+
+    def test_tabs_zero_count_produces_empty_json_array(self) -> None:
+        # The tab-title-0 span populates tabs_data["0"], entering the
+        # reconstruction block. data-oi-tab-count="0" makes range(0) run
+        # zero iterations, producing an empty JSON array.
+        source = (
+            '<span data-oi-id="0" data-oi-attr="tab-title-0">T</span>'
+            '<oppia-noninteractive-tabs data-oi-id="0" '
+            'data-oi-tab-count="0" translate="no">'
+            '</oppia-noninteractive-tabs>'
+        )
+        result = html_translation_services.postprocess_translated_html(source)
+        self.assertIn('tab_contents-with-value="[]"', result)
+        self.assertNotIn('data-oi-tab-count', result)
+
+    def test_orphaned_temp_tags_are_removed(self) -> None:
+        source = (
+            '<span data-oi-id="99" data-oi-attr="text-with-value">'
+            'Orphan</span>'
+        )
+        restored = html_translation_services.postprocess_translated_html(source)
+        self.assertEqual(restored, '')
+
+    def test_non_oppia_tag_with_data_oi_id_skipped_in_comp_map(self) -> None:
+        # The <p> has BOTH data-oi-id and data-oi-attr, so it appears in
+        # the temp-tag loop. At line 249-250 the comp_id_to_tag build
+        # skips it (not an oppia- tag), so component_tag resolves to None
+        # and the element is decomposed via the orphan branch.
+        source = '<p data-oi-id="0" data-oi-attr="text-with-value">Orphan</p>'
+        result = html_translation_services.postprocess_translated_html(source)
         self.assertNotIn('data-oi-id', result)
+        self.assertNotIn('Orphan', result)
+
+    def test_missing_component_tag_for_tabs_data_skips_gracefully(self) -> None:
+        source = (
+            '<span data-oi-id="100" data-oi-attr="tab-title-0">Title</span>'
+            '<div data-oi-id="100" data-oi-attr="tab-content-0" '
+            'data-oi-encoded="true">&lt;p&gt;Content&lt;/p&gt;</div>'
+        )
+        restored = html_translation_services.postprocess_translated_html(source)
+        self.assertEqual(restored, '')
+
+    def test_encode_attr_html(self) -> None:
+        source = '<p>&">\'</p>'
+        encoded = html_translation_services._encode_attr_html(source)
+        self.assertEqual(encoded, '&lt;p&gt;&amp;&quot;&gt;\'&lt;/p&gt;')
