@@ -1,25 +1,32 @@
-<div class="oppia-edit-certificate-offering-container">
-  <oppia-certificate-offering-details
-    *ngIf="isDetailsSection()"
-    [certificateAssessmentOffering]="certificateAssessmentOffering"
-    (certificateAssessmentOfferingChange)="updateCertificateAssessmentOffering($event)"
-    (navigateToAddTopicsSection)="navigateToAddTopicsSection()"
-    (cancelClicked)="navigateBackToDashboard()">
-  </oppia-certificate-offering-details>
+<div class="oppia-edit-certificate-offering">
+  <oppia-certificate-offering-progress
+    [pageTitle]="'Edit Certificate Offering'"
+    [activeSection]="activeSection">
+  </oppia-certificate-offering-progress>
 
-  <oppia-certificate-offering-add-topic-items
-    *ngIf="isAddTopicsSection()"
-    [certificateAssessmentOffering]="certificateAssessmentOffering"
-    (topicDataChange)="updateTopicData($event)"
-    (navigateToReviewAndAvailabilitySection)="navigateToReviewAndAvailabilitySection()"
-    (navigateToDetailsSection)="navigateToDetailsSection()">
-  </oppia-certificate-offering-add-topic-items>
+  <div class="oppia-certificate-offering-tab-container">
+    <oppia-certificate-offering-details
+      *ngIf="isDetailsSection()"
+      [certificateAssessmentOffering]="certificateAssessmentOffering"
+      (certificateAssessmentOfferingChange)="updateCertificateAssessmentOffering($event)"
+      (navigateToAddTopicsSection)="navigateToAddTopicsSection()"
+      (cancelClicked)="navigateBackToDashboard()">
+    </oppia-certificate-offering-details>
 
-  <oppia-certificate-offering-review-and-availability
-    *ngIf="isReviewAndAvailabilitySection()"
-    [certificateAssessmentOffering]="certificateAssessmentOffering"
-    [isEditMode]="true"
-    (saveCertificateOffering)="updateCertificateOffering()"
-    (navigateToAddTopicsSection)="navigateToAddTopicsSection()">
-  </oppia-certificate-offering-review-and-availability>
+    <oppia-certificate-offering-add-topic-items
+      *ngIf="isAddTopicsSection()"
+      [certificateAssessmentOffering]="certificateAssessmentOffering"
+      (topicDataChange)="updateTopicData($event)"
+      (navigateToReviewAndAvailabilitySection)="navigateToReviewAndAvailabilitySection()"
+      (navigateToDetailsSection)="navigateToDetailsSection()">
+    </oppia-certificate-offering-add-topic-items>
+
+    <oppia-certificate-offering-review-and-availability
+      *ngIf="isReviewAndAvailabilitySection()"
+      [certificateAssessmentOffering]="certificateAssessmentOffering"
+      [isEditMode]="true"
+      (saveCertificateOffering)="updateCertificateOffering()"
+      (navigateToAddTopicsSection)="navigateToAddTopicsSection()">
+    </oppia-certificate-offering-review-and-availability>
+  </div>
 </div>
