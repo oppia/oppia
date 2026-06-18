@@ -35,8 +35,6 @@ const CHECKPOINT_STATUS_IN_PROGRESS = 'in-progress';
   styleUrls: ['./checkpoint-bar.component.css'],
 })
 export class CheckpointBarComponent implements OnInit {
-  @Input() checkpointStatuses: string[] | null = null;
-  @Input() progressPercent: number | null = null;
   @Input() isReadOnly: boolean = false;
   @Input() totalCheckpointsCount: number = 0;
   @Input() visitedCheckpointsCount: number = 0;
@@ -60,13 +58,6 @@ export class CheckpointBarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    if (this.checkpointStatuses !== null) {
-      this.checkpointStatusArray = this.checkpointStatuses;
-      this.progressBarWidth = this.progressPercent ?? 0;
-      this.checkpointCount = this.checkpointStatuses.length;
-      return;
-    }
-
     if (this.totalCheckpointsCount > 0) {
       this.checkpointCount = this.totalCheckpointsCount;
       this.updateStatusesFromCounts();
@@ -102,7 +93,7 @@ export class CheckpointBarComponent implements OnInit {
     const segmentWidth = 100 / this.checkpointCount;
 
     if (displayedCardIndex === checkpointIndexes[0]) {
-      return 0;
+      return 0; // No progress needed; it's the first checkpoint.
     }
 
     let state = this.explorationEngineService.getState();
@@ -113,10 +104,11 @@ export class CheckpointBarComponent implements OnInit {
       return 100;
     }
 
+    // Find the current segment between checkpoints.
     let currentSegmentIndex = 0;
 
     if (displayedCardIndex >= checkpointIndexes[checkpointIndexes.length - 1]) {
-      currentSegmentIndex = checkpointIndexes.length - 1;
+      currentSegmentIndex = checkpointIndexes.length - 1; // If at or beyond the last checkpoint, full progress.
     } else {
       for (let i = 0; i < checkpointIndexes.length - 1; i++) {
         if (

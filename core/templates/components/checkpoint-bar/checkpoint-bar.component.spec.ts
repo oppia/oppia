@@ -485,40 +485,6 @@ describe('CheckpointBarComponent', () => {
     ).not.toHaveBeenCalled();
   });
 
-  it('should use provided input data when checkpointStatuses is set', () => {
-    const testStatuses = ['completed', 'completed', 'in-progress'];
-    component.checkpointStatuses = testStatuses;
-    component.progressPercent = 66;
-    component.isReadOnly = true;
-
-    component.ngOnInit();
-
-    expect(component.checkpointStatusArray).toEqual(testStatuses);
-    expect(component.progressBarWidth).toBe(66);
-    expect(component.checkpointCount).toBe(3);
-  });
-
-  it('should handle input mode with single checkpoint', () => {
-    const testStatuses = ['completed'];
-    component.checkpointStatuses = testStatuses;
-    component.progressPercent = 100;
-
-    component.ngOnInit();
-
-    expect(component.checkpointStatusArray).toEqual(testStatuses);
-    expect(component.checkpointCount).toBe(1);
-  });
-
-  it('should default progress width to 0 when input progressPercent is null', () => {
-    component.checkpointStatuses = ['completed', 'in-progress'];
-    component.progressPercent = null;
-
-    component.ngOnInit();
-
-    expect(component.progressBarWidth).toBe(0);
-    expect(component.checkpointCount).toBe(2);
-  });
-
   it('should handle case when displayed card index is negative', () => {
     component.checkpointIndexes = [0, 10, 20, 30];
     component.checkpointCount = 4;
@@ -641,23 +607,6 @@ describe('CheckpointBarComponent', () => {
         component.checkpointStatusArray.slice(1).every(s => s === 'incomplete')
       ).toBeTrue();
       expect(component.progressBarWidth).toBe(0);
-    });
-
-    it('should prefer checkpointStatuses input over count-based inputs', () => {
-      component.checkpointStatuses = ['completed', 'completed', 'completed'];
-      component.progressPercent = 100;
-      component.totalCheckpointsCount = 5;
-      component.visitedCheckpointsCount = 2;
-
-      component.ngOnInit();
-
-      expect(component.checkpointCount).toBe(3);
-      expect(component.checkpointStatusArray).toEqual([
-        'completed',
-        'completed',
-        'completed',
-      ]);
-      expect(component.progressBarWidth).toBe(100);
     });
   });
 
