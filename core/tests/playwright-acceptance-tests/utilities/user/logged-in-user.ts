@@ -129,6 +129,7 @@ const emptyProgressSectionContainerSelector =
 const emptyProgressSectionMessage = '.e2e-test-empty-progress-message';
 
 const addNewGoalButtonSelector = '.e2e-test-add-new-goal-button';
+const completedGoalsContainerSelector = '.e2e-test-completed-goals-section';
 const goalsHeadingInRedesignedDashbaordSelector = '.e2e-test-goals-heading';
 const goalsSectionSelector = '.e2e-test-goals-section';
 const currentGoalsSectionSelector = '.e2e-test-current-goals-section';
@@ -351,6 +352,85 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(removeModalContainerSelector, {
       state: 'hidden',
     });
+  }
+
+  /**
+   * Clicks on a lesson card button to start or resume the lesson.
+   * @param lessonTitle - The title of the lesson.
+   */
+  async clickLessonCardButton(lessonTitle: string): Promise<void> {
+    await this.page.waitForSelector(lessonCardContainer, {state: 'visible'});
+    const lessonCards = await this.page.$$(lessonCardContainer);
+
+    for (const card of lessonCards) {
+      const titles = await card.$$eval(lessonTitleSelector, els =>
+        els.map(el => el.textContent?.trim())
+      );
+
+      if (titles.some(text => text && text.includes(lessonTitle))) {
+        const button = await card.$('a.oppia-learner-dash-button--goals-list');
+
+        if (!button) {
+          throw new Error(`Button not found for lesson "${lessonTitle}".`);
+        }
+
+        await button.evaluate(el => {
+          if (el instanceof HTMLElement) {
+            el.scrollIntoView({behavior: 'auto', block: 'center'});
+          }
+        });
+
+        const href = await button.evaluate(el =>
+          el instanceof HTMLAnchorElement ? el.href : null
+        );
+
+        const waitForExplorationPlayer = async (): Promise<void> => {
+          // Wait for navigation to land on an exploration and for the player to render.
+          await this.page.waitForFunction(
+            () =>
+              window.location.pathname.includes('/explore/') ||
+              document.querySelector(
+                '.e2e-test-conversation-skin-cards-container'
+              ),
+            {
+              timeout: 60000,
+            }
+          );
+
+          await this.page.waitForSelector(
+            '.e2e-test-conversation-skin-cards-container',
+            {
+              state: 'visible',
+              timeout: 60000,
+            }
+          );
+        };
+
+        if (!href) {
+          await Promise.all([
+            this.page.waitForNavigation({
+              waitUntil: 'networkidle',
+              timeout: 60000,
+            }),
+            button.click(),
+          ]);
+          await waitForExplorationPlayer();
+          return;
+        }
+
+        await Promise.all([
+          this.page.waitForNavigation({
+            waitUntil: 'networkidle',
+            timeout: 60000,
+          }),
+          this.page.goto(href),
+        ]);
+        await waitForExplorationPlayer();
+        return;
+      }
+    }
+
+    throw new Error(`Lesson card with title "${lessonTitle}" not found.`);
   }
 
   /**
@@ -579,6 +659,26 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Function to verify the goal in the completed goals section in the
+   * redesigned learner dashboard.
+   * @param {string} goal - The goal to check for.
+   */
+  async expectCompletedGoalsSectionInRedesignedDashboardToContain(
+    goal: string
+  ): Promise<void> {
+    await this.page.waitForSelector(completedGoalsContainerSelector, {
+      state: 'visible',
+    });
+    const completedGoalsSection = await this.page.$(
+      completedGoalsContainerSelector
+    );
+    if (!completedGoalsSection) {
+      throw new Error('Completed goals section not found.');
+    }
+    await this.expectGoalToBePresent(goal, completedGoalsSection);
+  }
+
+  /**
    * Verifies elements' existence on Redesigned Learner Dashboard(learnerDashSelectors).
    * @param {string[]} expectedTexts - Text content expected in elements.
    * @param {string} selector - Selector type.
@@ -715,6 +815,14 @@ export class LoggedInUser extends BaseUser {
 
       expect(numericProgress).toBe(progress);
     }
+  }
+
+  /**
+   * Expects the mobile layout to be correct.
+   */
+  async expectMobileLayoutToBeCorrect(): Promise<void> {
+    const viewportSize = this.page.viewportSize();
+    expect(viewportSize?.width).toBeLessThanOrEqual(768);
   }
 
   /**
@@ -2250,6 +2358,13 @@ export class LoggedInUser extends BaseUser {
       );
     }
     showMessage('Changes saved successfully in preferences page.');
+  }
+
+  /**
+   * Sets the viewport to mobile size.
+   */
+  async setMobileViewport(): Promise<void> {
+    await this.page.setViewportSize({width: 375, height: 667});
   }
 
   /**

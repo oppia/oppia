@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * LI.2. Set goals on the Learner Dashboard
  */
 
+import {test} from '@playwright/test';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
@@ -30,21 +31,26 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
-describe('Logged-In Learner', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-In Learner', function () {
   let loggedInUser: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
+    test.setTimeout(6000000); // Setup is taking longer than default timeout.
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculumAdmin@example.com',
+      browser,
       [ROLES.CURRICULUM_ADMIN]
     );
 
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseCoordinator',
       'release_coordinator@example.com',
+      browser,
       [ROLES.RELEASE_COORDINATOR]
     );
 
@@ -114,13 +120,14 @@ describe('Logged-In Learner', function () {
     await UserFactory.closeBrowserForUser(curriculumAdmin);
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser1',
-      'logged_in_user1@example.com'
+      'logged_in_user1@example.com',
+      browser
     );
 
     await UserFactory.closeSuperAdminBrowser();
-  }, 6000000); // Setup taking longer than default timeout.
+  });
 
-  it('should start and complete Chapter 1, then show updated progress (33%)', async function () {
+  test('should start and complete Chapter 1, then show updated progress (33%)', async function () {
     await loggedInUser.navigateToLearnerDashboard();
     await loggedInUser.navigateToGoalsSection();
 
@@ -151,12 +158,11 @@ describe('Logged-In Learner', function () {
     await loggedInUser.expectGoalProgressToBeDisplayed('Place Values', 33);
 
     await loggedInUser.expectScreenshotToMatch(
-      'chapter1CompletedWith33PercentProgress',
-      __dirname
+      'chapter1CompletedWith33PercentProgress'
     );
   });
 
-  it('should complete Chapter 2 and update progress to 66%', async function () {
+  test('should complete Chapter 2 and update progress to 66%', async function () {
     await loggedInUser.navigateToLearnerDashboard();
     await loggedInUser.navigateToGoalsSection();
     await loggedInUser.clickOnGoalCard('Place Values');
@@ -177,12 +183,11 @@ describe('Logged-In Learner', function () {
     await loggedInUser.expectGoalProgressToBeDisplayed('Place Values', 66);
 
     await loggedInUser.expectScreenshotToMatch(
-      'chapter2CompletedWith66PercentProgress',
-      __dirname
+      'chapter2CompletedWith66PercentProgress'
     );
   });
 
-  it('should complete final chapter and move goal to Completed section', async function () {
+  test('should complete final chapter and move goal to Completed section', async function () {
     await loggedInUser.navigateToLearnerDashboard();
     await loggedInUser.navigateToGoalsSection();
     await loggedInUser.clickOnGoalCard('Place Values');
@@ -208,12 +213,11 @@ describe('Logged-In Learner', function () {
     );
 
     await loggedInUser.expectScreenshotToMatch(
-      'chapter3CompletedWith100PercentProgress',
-      __dirname
+      'chapter3CompletedWith100PercentProgress'
     );
   });
 
-  it('should display correctly on mobile viewport', async function () {
+  test('should display correctly on mobile viewport', async function () {
     await loggedInUser.setMobileViewport();
 
     await loggedInUser.navigateToLearnerDashboard();
@@ -224,11 +228,10 @@ describe('Logged-In Learner', function () {
 
     await loggedInUser.expectMobileLayoutToBeCorrect();
 
-    await loggedInUser.expectScreenshotToMatch('goalsTabMobileView', __dirname);
+    await loggedInUser.expectScreenshotToMatch('goalsTabMobileView');
   });
 
-  afterAll(async function () {
-    await UserFactory.closeBrowserForUser(loggedInUser);
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
