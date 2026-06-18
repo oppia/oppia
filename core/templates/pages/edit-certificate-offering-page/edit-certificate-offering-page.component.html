@@ -10,8 +10,7 @@
       [certificateAssessmentOffering]="certificateAssessmentOffering"
       (certificateAssessmentOfferingChange)="updateCertificateAssessmentOffering($event)"
       (navigateToAddTopicsSection)="navigateToAddTopicsSection()"
-      (cancelClicked)="navigateBackToDashboard()"
-      class="oppia-certificate-offering-details-tab">
+      (cancelClicked)="navigateBackToDashboard()">
     </oppia-certificate-offering-details>
     <oppia-certificate-offering-add-topic-items
       *ngIf="isAddTopicsSection()"
