@@ -92,6 +92,7 @@ describe('Certificate Assessment Offering backend api service', () => {
       },
       3,
       15,
+      [],
       'Available',
       1
     );
