@@ -169,12 +169,6 @@
       </div>
 
       <div class="chapter-list-container">
-        <div *ngIf="chaptersListIsShown" class="add-chapter-above-sections">
-          <button (click)="createNode()" class="btn add-chapter-button e2e-test-add-chapter-button">
-            + ADD CHAPTER
-          </button>
-        </div>
-
         <div *ngIf="!isSerialChapterFeatureFlagEnabled()">
           <mat-card class="oppia-page-card oppia-long-text content-card oppia-mobile-collapsible-card">
             <div class="story-node-editor">
@@ -193,6 +187,9 @@
             </div>
             <div *ngIf="chaptersListIsShown" class="oppia-mobile-collapsible-card-content">
               <div>
+                <button (click)="createNode()" class="btn add-chapter-btn e2e-test-add-chapter-button">
+                  + ADD CHAPTER
+                </button>
                 <div *ngIf="!linearNodesList.length">
                   <p class="no-chapters-message">
                     This story has no chapters.
@@ -350,6 +347,9 @@
                   </p>
                 </div>
                 <div *ngIf="linearNodesList.length">
+                  <button (click)="createNode()" class="btn add-chapter-button e2e-test-add-chapter-button">
+                    + ADD CHAPTER
+                  </button>
                   <div class="story-nodes-container">
                     <table cdkDropList
                            [cdkDropListData]="linearNodesList"
