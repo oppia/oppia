@@ -53,12 +53,14 @@ describe('Post certificate offering result modal component', () => {
     expect(component.getOppiaLargeAvatarUrl()).toBe(
       '/avatar/oppia_avatar_large_100px.svg'
     );
+    expect(component.certificateActionMessage).toBe('has been created.');
   });
 
   it('should expose updated state when configured', () => {
     component.action = CERTIFICATE_OFFERING_RESULT_ACTIONS.UPDATED;
 
     expect(component.action).toBe(CERTIFICATE_OFFERING_RESULT_ACTIONS.UPDATED);
+    expect(component.certificateActionMessage).toBe('has been updated.');
   });
 
   it('should copy the certificate url', () => {
