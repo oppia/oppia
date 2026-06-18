@@ -12,8 +12,8 @@
     </div>
     <div class="topic-lesson-card-progress" *ngIf="showCheckpointBar">
       <oppia-checkpoint-bar
-        [checkpointStatuses]="checkpointStatuses"
-        [progressPercent]="progressPercent"
+        [totalCheckpointsCount]="totalCheckpointsCount"
+        [visitedCheckpointsCount]="visitedCheckpointsCount"
         [isReadOnly]="true">
       </oppia-checkpoint-bar>
     </div>

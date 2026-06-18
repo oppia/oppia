@@ -18,20 +18,20 @@
  */
 
 export interface ChapterProgressSummaryBackendDict {
-  exploration_id?: string;
+  exploration_id: string;
   total_checkpoints_count: number;
   visited_checkpoints_count: number;
   is_chapter_complete: boolean;
 }
 
 export class ChapterProgressSummary {
-  _explorationId: string | null;
+  _explorationId: string;
   _totalCheckpointsCount: number;
   _visitedCheckpointsCount: number;
   _isChapterComplete: boolean;
 
   constructor(
-    explorationId: string | null,
+    explorationId: string,
     totalCheckpointsCount: number,
     visitedCheckpointsCount: number,
     isChapterComplete: boolean
@@ -42,7 +42,7 @@ export class ChapterProgressSummary {
     this._isChapterComplete = isChapterComplete;
   }
 
-  get explorationId(): string | null {
+  get explorationId(): string {
     return this._explorationId;
   }
 
@@ -62,7 +62,7 @@ export class ChapterProgressSummary {
     chapterProgressSummaryBackendDict: ChapterProgressSummaryBackendDict
   ): ChapterProgressSummary {
     return new ChapterProgressSummary(
-      chapterProgressSummaryBackendDict.exploration_id ?? null,
+      chapterProgressSummaryBackendDict.exploration_id,
       chapterProgressSummaryBackendDict.total_checkpoints_count,
       chapterProgressSummaryBackendDict.visited_checkpoints_count,
       chapterProgressSummaryBackendDict.is_chapter_complete

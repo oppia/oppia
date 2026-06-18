@@ -16,29 +16,20 @@
  * @fileoverview Lesson card component used in the redesigned topic viewer story section.
  */
 
-import {
-  Component,
-  Input,
-  OnChanges,
-  OnInit,
-  SimpleChanges,
-} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 import './topic-lesson-card.component.css';
 
 const FALLBACK_THUMBNAIL_IMAGE_PATH = '/splash/student_desk1x.webp';
-const CHECKPOINT_STATUS_COMPLETED = 'completed';
-const CHECKPOINT_STATUS_IN_PROGRESS = 'in-progress';
-const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
 
 @Component({
   selector: 'topic-lesson-card',
   templateUrl: './topic-lesson-card.component.html',
   styleUrls: ['./topic-lesson-card.component.css'],
 })
-export class TopicLessonCardComponent implements OnInit, OnChanges {
+export class TopicLessonCardComponent implements OnInit {
   @Input() lessonTitle: string = '';
   @Input() lessonDescription: string = '';
   @Input() thumbnailUrl: string = '';
@@ -52,7 +43,6 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   @Input() visitedCheckpointsCount: number = 0;
 
   resolvedThumbnailUrl: string = '';
-  _checkpointStatuses: string[] = [];
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -62,85 +52,6 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     this.resolvedThumbnailUrl =
       this.thumbnailUrl || this.getFallbackThumbnailUrl();
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes.lessonProgressStatus ||
-      changes.totalCheckpointsCount ||
-      changes.visitedCheckpointsCount
-    ) {
-      this._checkpointStatuses = this._computeCheckpointStatuses();
-    }
-  }
-
-  get checkpointStatuses(): string[] {
-    return this._checkpointStatuses;
-  }
-
-  private _computeCheckpointStatuses(): string[] {
-    if (
-      this.lessonProgressStatus === 'coming_soon' ||
-      this.totalCheckpointsCount === 0
-    ) {
-      return [];
-    }
-
-    const totalNodes = this.totalCheckpointsCount + 1;
-    const statuses: string[] = [];
-    const visitedCheckpointCount = Math.min(
-      Math.max(this.visitedCheckpointsCount, 0),
-      this.totalCheckpointsCount
-    );
-
-    const reachedCheckpointCount = Math.max(visitedCheckpointCount - 1, 0);
-
-    if (
-      this.lessonProgressStatus === 'completed' ||
-      visitedCheckpointCount >= this.totalCheckpointsCount
-    ) {
-      for (let i = 0; i < totalNodes; i++) {
-        statuses.push(CHECKPOINT_STATUS_COMPLETED);
-      }
-      return statuses;
-    }
-
-    const currentNodeIndex = reachedCheckpointCount;
-
-    for (let i = 0; i < totalNodes; i++) {
-      if (i < currentNodeIndex) {
-        statuses.push(CHECKPOINT_STATUS_COMPLETED);
-      } else if (i === currentNodeIndex) {
-        statuses.push(CHECKPOINT_STATUS_IN_PROGRESS);
-      } else {
-        statuses.push(CHECKPOINT_STATUS_INCOMPLETE);
-      }
-    }
-
-    return statuses;
-  }
-
-  get progressPercent(): number {
-    if (
-      this.totalCheckpointsCount === 0 ||
-      this.lessonProgressStatus === 'coming_soon'
-    ) {
-      return 0;
-    }
-    const visitedCheckpointCount = Math.min(
-      Math.max(this.visitedCheckpointsCount, 0),
-      this.totalCheckpointsCount
-    );
-    if (
-      this.lessonProgressStatus === 'completed' ||
-      visitedCheckpointCount >= this.totalCheckpointsCount
-    ) {
-      return 100;
-    }
-    const reachedCheckpointCount = Math.max(visitedCheckpointCount - 1, 0);
-    return Math.floor(
-      (reachedCheckpointCount / this.totalCheckpointsCount) * 100
-    );
   }
 
   get showCheckpointBar(): boolean {

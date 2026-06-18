@@ -38,6 +38,8 @@ export class CheckpointBarComponent implements OnInit {
   @Input() checkpointStatuses: string[] | null = null;
   @Input() progressPercent: number | null = null;
   @Input() isReadOnly: boolean = false;
+  @Input() totalCheckpointsCount: number = 0;
+  @Input() visitedCheckpointsCount: number = 0;
 
   explorationId!: string;
   expStates!: StateObjectsBackendDict;
@@ -62,6 +64,12 @@ export class CheckpointBarComponent implements OnInit {
       this.checkpointStatusArray = this.checkpointStatuses;
       this.progressBarWidth = this.progressPercent ?? 0;
       this.checkpointCount = this.checkpointStatuses.length;
+      return;
+    }
+
+    if (this.totalCheckpointsCount > 0) {
+      this.checkpointCount = this.totalCheckpointsCount;
+      this.updateStatusesFromCounts();
       return;
     }
 
@@ -137,6 +145,36 @@ export class CheckpointBarComponent implements OnInit {
 
   getProgressPercentage(): string {
     return this.progressBarWidth.toString();
+  }
+
+  private updateStatusesFromCounts(): void {
+    const totalNodes = this.totalCheckpointsCount + 1;
+    const visitedCount = Math.min(
+      Math.max(this.visitedCheckpointsCount, 0),
+      this.totalCheckpointsCount
+    );
+
+    if (visitedCount >= this.totalCheckpointsCount) {
+      this.checkpointStatusArray = new Array(totalNodes).fill(
+        CHECKPOINT_STATUS_COMPLETED
+      );
+      this.progressBarWidth = 100;
+      return;
+    }
+
+    const completedCount = Math.max(visitedCount - 1, 0);
+    this.checkpointStatusArray = new Array(totalNodes);
+    for (let i = 0; i < completedCount; i++) {
+      this.checkpointStatusArray[i] = CHECKPOINT_STATUS_COMPLETED;
+    }
+    this.checkpointStatusArray[completedCount] = CHECKPOINT_STATUS_IN_PROGRESS;
+    for (let i = completedCount + 1; i < totalNodes; i++) {
+      this.checkpointStatusArray[i] = CHECKPOINT_STATUS_INCOMPLETE;
+    }
+
+    this.progressBarWidth = Math.floor(
+      (completedCount / this.totalCheckpointsCount) * 100
+    );
   }
 
   updateLessonProgressBar(): void {
