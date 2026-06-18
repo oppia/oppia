@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * LI. Learner starts from beginning after completing a lesson
  */
 
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {
   ExplorationEditor,
@@ -27,14 +28,17 @@ import {
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-describe('Logged-In User', function () {
+test.describe.configure({mode: 'serial'});
+
+test.describe('Logged-In User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedInUser: LoggedInUser & LoggedOutUser;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -97,18 +101,19 @@ describe('Logged-In User', function () {
 
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser',
-      'logged_in_user@example.com'
+      'logged_in_user@example.com',
+      browser
     );
   });
 
-  it('should be able to start lesson from beginning on revisit', async function () {
+  test('should be able to start lesson from beginning on revisit', async function () {
     // TODO(#20563): When a user revisits an exploration after completing it,
     // the exploration should start from the beginning, not from the previous checkpoint.
     // see: https://github.com/oppia/oppia/issues/20563.
     await loggedInUser.navigateToLearnerDashboard();
   });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });
