@@ -268,7 +268,7 @@ def postprocess_translated_html(translated_html: str) -> str:
         # Restore encoded HTML attributes.
         if is_encoded:
             inner_html = postprocess_translated_html(temp_tag.decode_contents())
-            component_tag[attr_name] = _encode_attr_html(inner_html)
+            component_tag[attr_name] = inner_html
         else:
             # Restore plain text attributes.
             component_tag[attr_name] = temp_tag.get_text()
@@ -289,7 +289,7 @@ def postprocess_translated_html(translated_html: str) -> str:
             if title_val is not None:
                 tab['title'] = title_val
             if content_val is not None:
-                tab['content'] = _encode_attr_html(content_val)
+                tab['content'] = content_val
             tabs.append(tab)
         component_tag['tab_contents-with-value'] = json.dumps(
             tabs, ensure_ascii=False
@@ -309,21 +309,12 @@ def postprocess_translated_html(translated_html: str) -> str:
     # Strip all temporary helper attributes using regex.
     for pattern in _CLEANUP_PATTERNS:
         result = pattern.sub('', result)
+
+    # html_cleaner.clean() reparses and serializes HTML, which causes
+    # entities inside the tab_contents-with-value JSON attribute to be
+    # double-escaped. Nested tab content has already been recursively
+    # postprocessed and cleaned, so return the result directly when tabs
+    # are present.
+    if 'tab_contents-with-value' in result:
+        return result
     return html_cleaner.clean(result)
-
-
-def _encode_attr_html(html_fragment: str) -> str:
-    """HTML-encodes a string for safe storage inside an attribute value.
-
-    Args:
-        html_fragment: str. A raw HTML string.
-
-    Returns:
-        str. The HTML-entity-encoded string.
-    """
-    return (
-        html_fragment.replace('&', '&amp;')
-        .replace('<', '&lt;')
-        .replace('>', '&gt;')
-        .replace('"', '&quot;')
-    )

@@ -210,10 +210,3 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         )
         restored = html_translation_services.postprocess_translated_html(source)
         self.assertEqual(restored, '')
-
-    def test_encode_attr_html(self) -> None:
-        source = '<p>&">\'</p>'
-        encoded = html_translation_services._encode_attr_html(
-            source
-        )  # pylint: disable=protected-access
-        self.assertEqual(encoded, '&lt;p&gt;&amp;&quot;&gt;\'&lt;/p&gt;')
