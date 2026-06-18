@@ -57,7 +57,7 @@ describe('Exploration save and publish buttons component', () => {
   let explorationWarningsService: ExplorationWarningsService;
   let editabilityService: EditabilityService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
-  let fetchPermissionsAsyncSpy;
+  let fetchPermissionsAsyncSpy: jasmine.Spy;
 
   let mockExternalSaveEventEmitter = new EventEmitter<void>();
   let mockConnectionServiceEmitter = new EventEmitter<boolean>();
@@ -77,13 +77,13 @@ describe('Exploration save and publish buttons component', () => {
   class MockWindowRef {
     location = {path: '/create/2234'};
     nativeWindow = {
-      scrollTo: (value1, value2) => {},
+      scrollTo: (value1: number, value2: number) => {},
       sessionStorage: {
         promoIsDismissed: null,
-        setItem: (testKey1, testKey2) => {},
-        removeItem: testKey => {},
+        setItem: (testKey1: string, testKey2: string) => {},
+        removeItem: (testKey: string) => {},
       },
-      gtag: (value1, value2, value3) => {},
+      gtag: (value1: string, value2: string, value3: object) => {},
       navigator: {
         onLine: true,
         userAgent: null,
@@ -100,7 +100,7 @@ describe('Exploration save and publish buttons component', () => {
       },
       document: {
         documentElement: {
-          setAttribute: (value1, value2) => {},
+          setAttribute: (value1: string, value2: string) => {},
           clientWidth: null,
           clientHeight: null,
         },
@@ -112,7 +112,10 @@ describe('Exploration save and publish buttons component', () => {
           },
         },
       },
-      addEventListener: (value1, value2) => {},
+      addEventListener: (
+        value1: string,
+        value2: EventListenerOrEventListenerObject
+      ) => {},
     };
   }
 
@@ -189,14 +192,14 @@ describe('Exploration save and publish buttons component', () => {
       mockConnectionServiceEmitter
     );
     spyOn(explorationSaveService, 'saveChangesAsync').and.callFake(
-      (showCallback, hideCallback) => {
+      (showCallback: () => void, hideCallback: () => void) => {
         showCallback();
         hideCallback();
         return Promise.resolve();
       }
     );
     spyOn(explorationSaveService, 'showPublishExplorationModal').and.callFake(
-      (showCallback, hideCallback) => {
+      (showCallback: () => void, hideCallback: () => void) => {
         showCallback();
         hideCallback();
         return Promise.resolve();
