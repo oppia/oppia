@@ -1,0 +1,28 @@
+<div class="oppia-certificate-offering-title">
+  {{ pageTitle }}
+</div>
+<div class="oppia-certificate-offering-progress">
+  <ul class="oppia-learner-group-progressbar">
+    <li [ngClass]="progressStatuses[0]"
+        [attr.aria-current]="progressStatuses[0] === 'active' ? 'step' : null"
+        [attr.aria-label]="progressTabAriaLabels[0]">
+      <span *ngIf="progressStatuses[0] != 'completed'" class="indicator" aria-hidden="true">1</span>
+      <span *ngIf="progressStatuses[0] == 'completed'" class="indicator checkmark" aria-hidden="true"></span>
+      <span class="title">Add Certificate Details</span>
+    </li>
+    <li [ngClass]="progressStatuses[1]"
+        [attr.aria-current]="progressStatuses[1] === 'active' ? 'step' : null"
+        [attr.aria-label]="progressTabAriaLabels[1]">
+      <span *ngIf="progressStatuses[1] != 'completed'" class="indicator" aria-hidden="true">2</span>
+      <span *ngIf="progressStatuses[1] == 'completed'" class="indicator checkmark" aria-hidden="true"></span>
+      <span class="title">Add Certificate Topics</span>
+    </li>
+    <li [ngClass]="progressStatuses[2]"
+        [attr.aria-current]="progressStatuses[2] === 'active' ? 'step' : null"
+        [attr.aria-label]="progressTabAriaLabels[2]">
+      <span *ngIf="progressStatuses[2] != 'completed'" class="indicator" aria-hidden="true">3</span>
+      <span *ngIf="progressStatuses[2] == 'completed'" class="indicator checkmark" aria-hidden="true"></span>
+      <span class="title">Review & Availability</span>
+    </li>
+  </ul>
+</div>
