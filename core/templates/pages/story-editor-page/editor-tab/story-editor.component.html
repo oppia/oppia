@@ -168,348 +168,274 @@
         </mat-card>
       </div>
 
-      <div class="chapter-list-container">
-        <div *ngIf="!isSerialChapterFeatureFlagEnabled()">
-          <mat-card class="oppia-page-card oppia-long-text content-card oppia-mobile-collapsible-card">
-            <div class="story-node-editor">
-              <div class="chapter-list-card-header oppia-mobile-collapsible-card-header e2e-test-mobile-add-chapter"
-                   (click)="toggleChapterLists()">
-                <span>Chapters</span>
-                <i class="fa fa-caret-down"
-                   *ngIf="!chaptersListIsShown"
-                   aria-hidden="true">
-                </i>
-                <i class="fa fa-caret-up"
-                   *ngIf="chaptersListIsShown"
-                   aria-hidden="true">
-                </i>
+      <div class="chapter-list-container" *ngIf="!isSerialChapterFeatureFlagEnabled()">
+        <mat-card class="oppia-page-card oppia-long-text content-card oppia-mobile-collapsible-card">
+          <div class="story-node-editor">
+            <div class="chapter-list-card-header oppia-mobile-collapsible-card-header e2e-test-mobile-add-chapter"
+                 (click)="toggleChapterLists()">
+              <span>Chapters</span>
+              <i class="fa fa-caret-down"
+                 *ngIf="!chaptersListIsShown"
+                 aria-hidden="true">
+              </i>
+              <i class="fa fa-caret-up"
+                 *ngIf="chaptersListIsShown"
+                 aria-hidden="true">
+              </i>
+            </div>
+          </div>
+          <div *ngIf="chaptersListIsShown" class="oppia-mobile-collapsible-card-content">
+            <div>
+              <button (click)="createNode()" class="btn add-chapter-btn e2e-test-add-chapter-button">
+                + ADD CHAPTER
+              </button>
+              <div *ngIf="!linearNodesList.length">
+                <p class="no-chapters-message">
+                  This story has no chapters.
+                </p>
+              </div>
+              <div *ngIf="linearNodesList.length">
+                <div class="chapter-list-card-heading">
+                  <span>Name</span>
+                </div>
+                <div class="story-nodes-container" cdkDropList (cdkDropListDropped)="drop($event)">
+                  <div *ngFor="let node of linearNodesList;index as idx"
+                       cdkDrag>
+                    <div class="story-editor-node"
+                         [ngClass]="{'selected-node': (node.getId() === idOfNodeToEdit)}"
+                         (click)="navigateToChapterWithId(node.getId(), idx)">
+                      <div class="story-editor-node-title">
+                        <span> {{ idx+1 }}. </span>
+                        <span class="e2e-test-chapter-title">{{ node.getTitle() }}</span>
+                      </div>
+                      <div class="edit-options-container">
+                        <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options"
+                           (click)="toggleChapterEditOptions(idx);$event.stopPropagation()"
+                           aria-label="Chapter edit">
+                        </i>
+                      </div>
+                      <div class="chapter-option-box"
+                           *ngIf="selectedChapterIndex === idx"
+                           (mouseleave)="toggleChapterEditOptions(-1)"
+                           (click)="toggleChapterEditOptions(-1);$event.stopPropagation()">
+                        <div class="chapter-edit-option e2e-test-delete-chapter-button"
+                             (click)="deleteNode(node.getId())">
+                          <i class="fa fa-trash"></i>
+                          <span>Delete</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <div *ngIf="chaptersListIsShown" class="oppia-mobile-collapsible-card-content">
-              <div>
-                <button (click)="createNode()" class="btn add-chapter-btn e2e-test-add-chapter-button">
-                  + ADD CHAPTER
-                </button>
-                <div *ngIf="!linearNodesList.length">
-                  <p class="no-chapters-message">
-                    This story has no chapters.
-                  </p>
+          </div>
+        </mat-card>
+      </div>
+
+      <div class="chapter-list-container" *ngIf="isSerialChapterFeatureFlagEnabled()">
+        <mat-card class="oppia-page-card oppia-long-text content-card oppia-mobile-collapsible-card chapter-control-container">
+          <div class="story-node-editor-container">
+            <div class="chapter-list-card-header oppia-mobile-collapsible-card-header e2e-test-mobile-add-chapter"
+                 (click)="toggleChapterLists()">
+              <span>Chapter Control</span>
+              <i class="fa fa-caret-down"
+                 *ngIf="!chaptersListIsShown"
+                 aria-hidden="true">
+              </i>
+              <i class="fa fa-caret-up"
+                 *ngIf="chaptersListIsShown"
+                 aria-hidden="true">
+              </i>
+            </div>
+          </div>
+          <div *ngIf="chaptersListIsShown" class="oppia-mobile-collapsible-card-content chapter-control-panel">
+            <div>
+              <div class="chapter-control-bar" *ngIf="linearNodesList.length">
+                <div class="publish-upto-chapter-menu">
+                  <span class="publish-upto-chapter-label">Publish up to Chapter ...</span>
+                  <select [(ngModel)]="selectedChapterIndexInPublishUptoDropdown"
+                          (ngModelChange)="updatePublishUptoChapterSelection(selectedChapterIndexInPublishUptoDropdown)"
+                          class="publish-upto-chapter-dropdown e2e-test-publish-up-to-chapter-dropdown">
+                    <option [value]="-1">None</option>
+                    <option *ngFor="let node of linearNodesList;index as idx"
+                            [disabled]="!chapterIsPublishable[idx]"
+                            [value]="idx">
+                            {{ idx+1 }}
+                    </option>
+                  </select>
                 </div>
-                <div *ngIf="linearNodesList.length">
-                  <div class="chapter-list-card-heading">
-                    <span>Name</span>
-                  </div>
-                  <div class="story-nodes-container" cdkDropList (cdkDropListDropped)="drop($event)">
+              </div>
+              <div *ngIf="!linearNodesList.length">
+                <p class="no-chapters-message">
+                  This story has no chapters.
+                </p>
+              </div>
+              <div *ngIf="linearNodesList.length">
+                <div  class="story-nodes-container">
+                  <table cdkDropList
+                         [cdkDropListData]="linearNodesList"
+                         (cdkDropListDropped)="drop($event)">
+                    <tr class="chapter-list-heading">
+                      <th class="drag-handler-header"></th>
+                      <th></th>
+                      <th>Chapter Name</th>
+                      <th>Status</th>
+                      <th>Last Modified or Published</th>
+                      <th>Planned Publication Date</th>
+                    </tr>
                     <ng-container *ngFor="let node of linearNodesList;index as idx">
-                      <div *ngIf="idx === 0 && isStoryEditorArcsFeatureFlagEnabled()" class="legacy-arc-boundary-row">
-                        <div class="arc-boundary-divider"></div>
-                        <div class="arc-boundary-header">
-                          <div class="arc-boundary-info">
-                            <span class="arc-boundary-title">
-                              {{ getArcForNode(node.getId())?.getTitle() }}
-                            </span>
-                            <span class="arc-boundary-description" *ngIf="getArcForNode(node.getId())?.getDescription()">
-                              {{ getArcForNode(node.getId())?.getDescription() }}
-                            </span>
-                            <span class="arc-boundary-chapter-count">
-                              {{ getArcForNode(node.getId())?.getNodeIds()?.length }} chapters
-                            </span>
+                      <tr *ngIf="isStoryEditorArcsFeatureFlagEnabled() && idx === 0"
+                          class="arc-boundary-row">
+                        <td colspan="7">
+                          <div class="arc-boundary-divider"></div>
+                          <div class="arc-boundary-header">
+                            <div class="arc-boundary-info">
+                              <span class="arc-boundary-title">
+                                {{ getArcForNode(node.getId())?.getTitle() }}
+                              </span>
+                              <span class="arc-boundary-description" *ngIf="getArcForNode(node.getId())?.getDescription()">
+                                {{ getArcForNode(node.getId())?.getDescription() }}
+                              </span>
+                              <span class="arc-boundary-chapter-count">
+                                {{ getArcForNode(node.getId())?.getNodeIds()?.length }} chapters
+                              </span>
+                            </div>
+                            <div class="arc-boundary-actions">
+                              <button type="button" class="btn btn-sm arc-edit-button"
+                                      (click)="editArc(getArcIdForNode(node.getId()));$event.stopPropagation()">
+                                <i class="fa fa-pencil"></i>
+                                Edit Arc
+                              </button>
+                              <button type="button" class="btn btn-sm arc-remove-button"
+                                      (click)="removeArcBoundary(getArcIdForNode(node.getId()));$event.stopPropagation()">
+                                <i class="fa fa-trash"></i>
+                                Remove Arc Boundary
+                              </button>
+                            </div>
                           </div>
-                          <div class="arc-boundary-actions">
-                            <button type="button" class="btn btn-sm arc-edit-button"
-                                    (click)="editArc(getArcIdForNode(node.getId()));$event.stopPropagation()">
-                              <i class="fa fa-pencil"></i>
-                              Edit Arc
+                          <div class="arc-boundary-divider"></div>
+                        </td>
+                      </tr>
+                      <tr *ngIf="isStoryEditorArcsFeatureFlagEnabled() && idx > 0 && !isSameArc(idx)"
+                          class="arc-boundary-row">
+                        <td colspan="7">
+                          <div class="arc-boundary-divider"></div>
+                          <div class="arc-boundary-header">
+                            <div class="arc-boundary-info">
+                              <span class="arc-boundary-title">
+                                {{ getArcForNode(node.getId())?.getTitle() }}
+                              </span>
+                              <span class="arc-boundary-description" *ngIf="getArcForNode(node.getId())?.getDescription()">
+                                {{ getArcForNode(node.getId())?.getDescription() }}
+                              </span>
+                              <span class="arc-boundary-chapter-count">
+                                {{ getArcForNode(node.getId())?.getNodeIds()?.length }} chapters
+                              </span>
+                            </div>
+                            <div class="arc-boundary-actions">
+                              <button type="button" class="btn btn-sm arc-edit-button"
+                                      (click)="editArc(getArcIdForNode(node.getId()));$event.stopPropagation()">
+                                <i class="fa fa-pencil"></i>
+                                Edit Arc
+                              </button>
+                              <button type="button" class="btn btn-sm arc-remove-button"
+                                      (click)="removeArcBoundary(getArcIdForNode(node.getId()));$event.stopPropagation()">
+                                <i class="fa fa-trash"></i>
+                                Remove Arc Boundary
+                              </button>
+                            </div>
+                          </div>
+                          <div class="arc-boundary-divider"></div>
+                        </td>
+                      </tr>
+                      <tr *ngIf="isStoryEditorArcsFeatureFlagEnabled() && idx > 0 && isSameArc(idx)"
+                          class="split-line-row">
+                        <td colspan="7">
+                          <div class="split-line-container">
+                            <div class="split-line"></div>
+                            <button type="button" class="btn btn-sm split-into-arc-button"
+                                    (click)="splitIntoArc(idx);$event.stopPropagation()">
+                              <i class="fas fa-cut"></i>
+                              Split Into Arc
                             </button>
-                            <button type="button" class="btn btn-sm arc-remove-button"
-                                    (click)="removeArcBoundary(getArcIdForNode(node.getId()));$event.stopPropagation()">
-                              <i class="fa fa-trash"></i>
-                              Remove Arc Boundary
-                            </button>
+                            <div class="split-line"></div>
                           </div>
-                        </div>
-                        <div class="arc-boundary-divider"></div>
-                      </div>
-                      <div *ngIf="idx > 0 && !isSameArc(idx) && isStoryEditorArcsFeatureFlagEnabled()" class="legacy-arc-boundary-row">
-                        <div class="arc-boundary-divider"></div>
-                        <div class="arc-boundary-header">
-                          <div class="arc-boundary-info">
-                            <span class="arc-boundary-title">
-                              {{ getArcForNode(node.getId())?.getTitle() }}
-                            </span>
-                            <span class="arc-boundary-description" *ngIf="getArcForNode(node.getId())?.getDescription()">
-                              {{ getArcForNode(node.getId())?.getDescription() }}
-                            </span>
-                            <span class="arc-boundary-chapter-count">
-                              {{ getArcForNode(node.getId())?.getNodeIds()?.length }} chapters
-                            </span>
-                          </div>
-                          <div class="arc-boundary-actions">
-                            <button type="button" class="btn btn-sm arc-edit-button"
-                                    (click)="editArc(getArcIdForNode(node.getId()));$event.stopPropagation()">
-                              <i class="fa fa-pencil"></i>
-                              Edit Arc
-                            </button>
-                            <button type="button" class="btn btn-sm arc-remove-button"
-                                    (click)="removeArcBoundary(getArcIdForNode(node.getId()));$event.stopPropagation()">
-                              <i class="fa fa-trash"></i>
-                              Remove Arc Boundary
-                            </button>
-                          </div>
-                        </div>
-                        <div class="arc-boundary-divider"></div>
-                      </div>
-                      <div *ngIf="idx > 0 && isSameArc(idx) && isStoryEditorArcsFeatureFlagEnabled()"
-                           class="legacy-split-line-row">
-                        <div class="split-line-container">
-                          <div class="split-line"></div>
-                          <button type="button" class="btn btn-sm split-into-arc-button"
-                                  (click)="splitIntoArc(idx);$event.stopPropagation()">
-                            <i class="fas fa-cut"></i>
-                            Split Into Arc
-                          </button>
-                          <div class="split-line"></div>
-                        </div>
-                      </div>
-                      <div cdkDrag>
-                        <div class="story-editor-node"
-                             [ngClass]="{'selected-node': (node.getId() === idOfNodeToEdit),
-                                         'no-bottom-border': (idx < linearNodesList.length - 1 && isSameArc(idx + 1))}"
-                             (click)="navigateToChapterWithId(node.getId(), idx)">
-                          <div class="story-editor-node-title">
-                            <span class="fas fa-grip-vertical legacy-draggable-icon"></span>
-                            <span> {{ idx+1 }}. </span>
-                            <span class="e2e-test-chapter-title">{{ node.getTitle() }}</span>
-                          </div>
-                          <div class="edit-options-container">
-                            <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options"
-                               (click)="toggleChapterEditOptions(idx);$event.stopPropagation()"
-                               aria-label="Chapter edit">
-                            </i>
-                          </div>
+                        </td>
+                      </tr>
+                      <tr
+                          class="story-node"
+                          [ngClass]="{'published-node': (node.getStatus() === 'Published'),
+                                     'ready-to-publish-node': (node.getStatus() === 'Ready To Publish'),
+                                     'draft-node': (node.getStatus() === 'Draft')}"
+                          (click)="navigateToChapterWithId(node.getId(), idx)"
+                          cdkDrag
+                          [cdkDragDisabled]="isDragAndDropDisabled(node)"
+                          [cdkDragData]="node">
+                        <td class="drag-handler" (click)="$event.stopPropagation()">
+                          <span class="fas fa-grip-vertical draggable-icon-indicator"
+                                *ngIf="node.getStatus()!=='Published'">
+                          </span>
+                        </td>
+                        <td class="chapter-index"> {{ idx+1 }} </td>
+                        <td class="e2e-test-chapter-title chapter-title">{{ node.getTitle() }}</td>
+                        <td class="chapter-status e2e-test-chapter-status">
+                          {{ node.getStatus() }}
+                        </td>
+                        <td class="chapter-last-modified">
+                            {{ dateTimeFormatService.getLocaleDateTimeHourString(node.getLastModifiedMsecs()) }}
+                          <div *ngIf="node.getStatus()=='Published'">(published)</div>
+                          <div *ngIf="node.getStatus()=='Ready To Publish'">(draft modified)</div>
+                          <div *ngIf="node.getStatus()=='Draft'">(draft added)</div>
+                        </td>
+                        <td class="chapter-planned-publication-date">{{ node.getPlannedPublicationDateMsecs() != null ?
+                          getMediumStyleLocaleDateString(node.getPlannedPublicationDateMsecs()): '-' }}
+                        </td>
+                        <td class="edit-options-container">
+                          <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options"
+                             (click)="toggleChapterEditOptions(idx);$event.stopPropagation()"
+                             aria-label="Chapter edit">
+                          </i>
                           <div class="chapter-option-box"
                                *ngIf="selectedChapterIndex === idx"
                                (mouseleave)="toggleChapterEditOptions(-1)"
                                (click)="toggleChapterEditOptions(-1);$event.stopPropagation()">
+                            <div class="chapter-edit-option e2e-test-move-chapter-up-button"
+                                 *ngIf="idx!=0 && linearNodesList[idx-1].getStatus()!='Published' && linearNodesList[idx].getStatus()!='Published'"
+                                 (click)="moveNodeUpInStory(idx);$event.stopPropagation()">
+                              <span>Move Up</span>
+                            </div>
+                            <div class="chapter-edit-option e2e-test-move-chapter-down-button"
+                                 *ngIf="idx!=linearNodesList.length-1 && node.getStatus()!='Published'"
+                                 (click)="moveNodeDownInStory(idx);$event.stopPropagation()">
+                              <span>Move Down</span>
+                            </div>
+                            <div class="chapter-edit-option e2e-test-edit-chapter-button"
+                                 (click)="navigateToChapterWithId(node.getId(), idx)">
+                              <span>Edit</span>
+                            </div>
                             <div class="chapter-edit-option e2e-test-delete-chapter-button"
-                                 (click)="deleteNode(node.getId())">
-                              <i class="fa fa-trash"></i>
+                                 (click)="deleteNode(node.getId());$event.stopPropagation()">
                               <span>Delete</span>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                    </ng-container>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </mat-card>
-        </div>
-
-        <div *ngIf="isSerialChapterFeatureFlagEnabled()">
-          <mat-card class="oppia-page-card oppia-long-text content-card oppia-mobile-collapsible-card chapter-control-container">
-            <div class="story-node-editor-container">
-              <div class="chapter-list-card-header oppia-mobile-collapsible-card-header e2e-test-mobile-add-chapter"
-                   (click)="toggleChapterLists()">
-                <span>Chapter Control</span>
-                <i class="fa fa-caret-down"
-                   *ngIf="!chaptersListIsShown"
-                   aria-hidden="true">
-                </i>
-                <i class="fa fa-caret-up"
-                   *ngIf="chaptersListIsShown"
-                   aria-hidden="true">
-                </i>
-              </div>
-            </div>
-            <div *ngIf="chaptersListIsShown" class="oppia-mobile-collapsible-card-content chapter-control-panel">
-              <div>
-                <div class="chapter-control-bar" *ngIf="linearNodesList.length">
-                  <div class="publish-upto-chapter-menu">
-                    <span class="publish-upto-chapter-label">Publish up to Chapter ...</span>
-                    <select [(ngModel)]="selectedChapterIndexInPublishUptoDropdown"
-                            (ngModelChange)="updatePublishUptoChapterSelection(selectedChapterIndexInPublishUptoDropdown)"
-                            title="Publish up to chapter"
-                            class="publish-upto-chapter-dropdown e2e-test-publish-up-to-chapter-dropdown">
-                      <option [value]="-1">None</option>
-                      <option *ngFor="let node of linearNodesList;index as idx"
-                              [disabled]="!chapterIsPublishable[idx]"
-                              [value]="idx">
-                              {{ idx+1 }}
-                      </option>
-                    </select>
-                  </div>
-                </div>
-                <div *ngIf="!linearNodesList.length">
-                  <p class="no-chapters-message">
-                    This story has no chapters.
-                  </p>
-                </div>
-                <div *ngIf="linearNodesList.length">
-                  <button (click)="createNode()" class="btn add-chapter-button e2e-test-add-chapter-button">
-                    + ADD CHAPTER
-                  </button>
-                  <div class="story-nodes-container">
-                    <table cdkDropList
-                           [cdkDropListData]="linearNodesList"
-                           (cdkDropListDropped)="drop($event)">
-                      <tr class="chapter-list-heading">
-                        <th class="drag-handler-header"></th>
-                        <th></th>
-                        <th>Chapter Name</th>
-                        <th>Status</th>
-                        <th>Last Modified or Published</th>
-                        <th>Planned Publication Date</th>
+                        </td>
                       </tr>
-                      <ng-container *ngFor="let node of linearNodesList;index as idx">
-                        <tr *ngIf="idx === 0 && isStoryEditorArcsFeatureFlagEnabled()" class="arc-boundary-row">
-                          <td colspan="7">
-                            <div class="arc-boundary-divider"></div>
-                            <div class="arc-boundary-header">
-                              <div class="arc-boundary-info">
-                                <span class="arc-boundary-title">
-                                  {{ getArcForNode(node.getId())?.getTitle() }}
-                                </span>
-                                <span class="arc-boundary-description" *ngIf="getArcForNode(node.getId())?.getDescription()">
-                                  {{ getArcForNode(node.getId())?.getDescription() }}
-                                </span>
-                                <span class="arc-boundary-chapter-count">
-                                  {{ getArcForNode(node.getId())?.getNodeIds()?.length }} chapters
-                                </span>
-                              </div>
-                              <div class="arc-boundary-actions">
-                                <button type="button" class="btn btn-sm arc-edit-button"
-                                        (click)="editArc(getArcIdForNode(node.getId()));$event.stopPropagation()">
-                                  <i class="fa fa-pencil"></i>
-                                  Edit Arc
-                                </button>
-                                <button type="button" class="btn btn-sm arc-remove-button"
-                                        (click)="removeArcBoundary(getArcIdForNode(node.getId()));$event.stopPropagation()">
-                                  <i class="fa fa-trash"></i>
-                                  Remove Arc Boundary
-                                </button>
-                              </div>
-                            </div>
-                            <div class="arc-boundary-divider"></div>
-                          </td>
-                        </tr>
-                        <tr *ngIf="idx > 0 && !isSameArc(idx) && isStoryEditorArcsFeatureFlagEnabled()"
-                            class="arc-boundary-row">
-                          <td colspan="7">
-                            <div class="arc-boundary-divider"></div>
-                            <div class="arc-boundary-header">
-                              <div class="arc-boundary-info">
-                                <span class="arc-boundary-title">
-                                  {{ getArcForNode(node.getId())?.getTitle() }}
-                                </span>
-                                <span class="arc-boundary-description" *ngIf="getArcForNode(node.getId())?.getDescription()">
-                                  {{ getArcForNode(node.getId())?.getDescription() }}
-                                </span>
-                                <span class="arc-boundary-chapter-count">
-                                  {{ getArcForNode(node.getId())?.getNodeIds()?.length }} chapters
-                                </span>
-                              </div>
-                              <div class="arc-boundary-actions">
-                                <button type="button" class="btn btn-sm arc-edit-button"
-                                        (click)="editArc(getArcIdForNode(node.getId()));$event.stopPropagation()">
-                                  <i class="fa fa-pencil"></i>
-                                  Edit Arc
-                                </button>
-                                <button type="button" class="btn btn-sm arc-remove-button"
-                                        (click)="removeArcBoundary(getArcIdForNode(node.getId()));$event.stopPropagation()">
-                                  <i class="fa fa-trash"></i>
-                                  Remove Arc Boundary
-                                </button>
-                              </div>
-                            </div>
-                            <div class="arc-boundary-divider"></div>
-                          </td>
-                        </tr>
-                        <tr *ngIf="idx > 0 && isSameArc(idx) && isStoryEditorArcsFeatureFlagEnabled()"
-                            class="split-line-row">
-                          <td colspan="7">
-                            <div class="split-line-container">
-                              <div class="split-line"></div>
-                              <button type="button" class="btn btn-sm split-into-arc-button"
-                                      (click)="splitIntoArc(idx);$event.stopPropagation()">
-                                <i class="fas fa-cut"></i>
-                                Split Into Arc
-                              </button>
-                              <div class="split-line"></div>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr class="story-node"
-                            [ngClass]="{'published-node': (node.getStatus() === 'Published'),
-                                       'ready-to-publish-node': (node.getStatus() === 'Ready To Publish'),
-                                       'draft-node': (node.getStatus() === 'Draft')}"
-                            (click)="navigateToChapterWithId(node.getId(), idx)"
-                            cdkDrag
-                            [cdkDragDisabled]="isDragAndDropDisabled(node)"
-                            [cdkDragData]="node">
-                          <td class="drag-handler" (click)="$event.stopPropagation()">
-                            <span class="fas fa-grip-vertical draggable-icon-indicator"
-                                  *ngIf="node.getStatus()!=='Published'">
-                            </span>
-                          </td>
-                          <td class="chapter-index"> {{ idx+1 }} </td>
-                          <td class="e2e-test-chapter-title chapter-title">{{ node.getTitle() }}</td>
-                          <td class="chapter-status e2e-test-chapter-status">
-                            {{ node.getStatus() }}
-                          </td>
-                          <td class="chapter-last-modified">
-                              {{ dateTimeFormatService.getLocaleDateTimeHourString(node.getLastModifiedMsecs()) }}
-                            <div *ngIf="node.getStatus()=='Published'">(published)</div>
-                            <div *ngIf="node.getStatus()=='Ready To Publish'">(draft modified)</div>
-                            <div *ngIf="node.getStatus()=='Draft'">(draft added)</div>
-                          </td>
-                          <td class="chapter-planned-publication-date">{{ node.getPlannedPublicationDateMsecs() != null ?
-                            getMediumStyleLocaleDateString(node.getPlannedPublicationDateMsecs()): '-' }}
-                          </td>
-                          <td class="edit-options-container">
-                            <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options"
-                               (click)="toggleChapterEditOptions(idx);$event.stopPropagation()"
-                               aria-label="Chapter edit">
-                            </i>
-                            <div class="chapter-option-box"
-                                 *ngIf="selectedChapterIndex === idx"
-                                 (mouseleave)="toggleChapterEditOptions(-1)"
-                                 (click)="toggleChapterEditOptions(-1);$event.stopPropagation()">
-                              <div class="chapter-edit-option e2e-test-move-chapter-up-button"
-                                   *ngIf="idx!=0 && linearNodesList[idx-1].getStatus()!='Published' && linearNodesList[idx].getStatus()!='Published'"
-                                   (click)="moveNodeUpInStory(idx);$event.stopPropagation()">
-                                <span>Move Up</span>
-                              </div>
-                              <div class="chapter-edit-option e2e-test-move-chapter-down-button"
-                                   *ngIf="idx!=linearNodesList.length-1 && node.getStatus()!='Published'"
-                                   (click)="moveNodeDownInStory(idx);$event.stopPropagation()">
-                                <span>Move Down</span>
-                              </div>
-                              <div class="chapter-edit-option e2e-test-edit-chapter-button"
-                                   (click)="navigateToChapterWithId(node.getId(), idx)">
-                                <span>Edit</span>
-                              </div>
-                              <div class="chapter-edit-option e2e-test-delete-chapter-button"
-                                   (click)="deleteNode(node.getId());$event.stopPropagation()">
-                                <span>Delete</span>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      </ng-container>
-                    </table>
-                  </div>
+                    </ng-container>
+                  </table>
                 </div>
               </div>
+              <button (click)="createNode()" class="btn add-chapter-button e2e-test-add-chapter-button">
+                + ADD CHAPTER
+              </button>
             </div>
-          </mat-card>
-        </div>
+          </div>
+        </mat-card>
       </div>
     </div>
   </div>
 
-      <style>
+  <style>
     .story-length-validation-error {
       align-items: center;
       background-color: #f8d7da;
@@ -603,22 +529,10 @@
       position: relative;
     }
 
-    .story-editor-node.no-bottom-border {
-      border-bottom: none;
-    }
-
     .story-editor-node-title {
-      align-items: center;
       cursor: pointer;
-      display: flex;
-      gap: 8px;
       text-align: left;
       width: 95%;
-    }
-
-    .legacy-draggable-icon {
-      color: #546e7a;
-      font-size: 16px;
     }
 
     .story-node .drag-handler {
