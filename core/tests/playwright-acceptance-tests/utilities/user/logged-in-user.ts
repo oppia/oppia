@@ -72,14 +72,9 @@ const ratingsHeaderSelector = '.conversation-skin-final-ratings-header';
 const ratingStarSelector = '.e2e-test-rating-star';
 const filledRatingStarSelector = '.fas.fa-star';
 
-const ratingsHeaderSelector = '.conversation-skin-final-ratings-header';
-const ratingStarSelector = '.e2e-test-rating-star';
-const filledRatingStarSelector = '.fas.fa-star';
-
 // Learner dashboard selectors.
 const communityLessonsSectionInLearnerDashboard =
   '.e2e-test-community-lessons-section';
-const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
 const profileDropdown = '.e2e-test-profile-dropdown';
 const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
 const learnerDashboardContainerSelector = '.e2e-test-learner-dashboard-page';
