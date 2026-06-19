@@ -699,6 +699,19 @@ class TranslatableContentsHandlerV2(
             )
         )
 
+        content_id_to_state_name = {}
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            for state_name, state in domain_object.states.items():
+                translatable_contents_collection = (
+                    state.get_translatable_contents_collection()
+                )
+                for (
+                    content_id
+                ) in (
+                    translatable_contents_collection.content_id_to_translatable_content
+                ):
+                    content_id_to_state_name[content_id] = state_name
+
         translatable_contents = []
         for content in contents_which_need_translation.values():
             # Skip list-format content if the user does not have reviewer
@@ -724,6 +737,9 @@ class TranslatableContentsHandlerV2(
                 'content_type': content.content_type.value,
                 'content_format': content.content_format.value,
                 'content_value': content.content_value,
+                'grouping_key': (
+                    content_id_to_state_name.get(content.content_id)
+                ),
             }
 
             translatable_contents.append(content_dict)

@@ -46,6 +46,7 @@ export interface TranslatableContentBackendDictV2 {
   content_type: string;
   content_format: string;
   content_value: string | string[];
+  grouping_key?: string | null;
 }
 
 export interface TranslatableTextsBackendDictV2 {
@@ -84,9 +85,11 @@ export class TranslatableTexts {
     backendDict: TranslatableTextsBackendDictV2
   ): TranslatableTexts {
     const stateNamesToContentIdMapping: StateNamesToContentIdMapping = {};
-    const stateName = 'Content';
-    stateNamesToContentIdMapping[stateName] = {};
     for (const content of backendDict.translatable_contents) {
+      const stateName = content.grouping_key || 'Content';
+      if (!stateNamesToContentIdMapping.hasOwnProperty(stateName)) {
+        stateNamesToContentIdMapping[stateName] = {};
+      }
       stateNamesToContentIdMapping[stateName][content.content_id] =
         new TranslatableItem(
           content.content_value,
