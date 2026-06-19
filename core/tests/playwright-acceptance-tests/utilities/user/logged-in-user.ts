@@ -72,10 +72,6 @@ const ratingsHeaderSelector = '.conversation-skin-final-ratings-header';
 const ratingStarSelector = '.e2e-test-rating-star';
 const filledRatingStarSelector = '.fas.fa-star';
 
-const ratingsHeaderSelector = '.conversation-skin-final-ratings-header';
-const ratingStarSelector = '.e2e-test-rating-star';
-const filledRatingStarSelector = '.fas.fa-star';
-
 // Learner dashboard selectors.
 const communityLessonsSectionInLearnerDashboard =
   '.e2e-test-community-lessons-section';
