@@ -1,0 +1,205 @@
+.oppia-certificate-review-container {
+  color: #333;
+  font-family: "Roboto", sans-serif;
+  margin: 0 auto;
+  max-width: 1080px;
+}
+
+.oppia-certificate-review-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  margin-bottom: 5px;
+  padding: 16px 20px;
+}
+
+.oppia-certificate-review-section-heading {
+  color: #333;
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+}
+
+.oppia-certificate-review-cert-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+}
+
+.oppia-certificate-review-cert-description {
+  color: #555;
+  font-size: 13px;
+  margin: 0 0 8px 0;
+}
+
+.oppia-certificate-review-cert-time {
+  font-size: 13px;
+  margin: 0;
+}
+
+.oppia-certificate-review-table {
+  border-collapse: collapse;
+  font-size: 13px;
+  width: 100%;
+}
+
+.oppia-certificate-review-table thead tr {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.oppia-certificate-review-table th {
+  color: #555;
+  font-weight: 600;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.oppia-certificate-review-table td {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 10px 12px;
+}
+
+.oppia-certificate-review-row--fail {
+  background-color: #fff5f5;
+}
+
+.oppia-certificate-review-cell--fail {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.oppia-certificate-review-badge--pass {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.oppia-certificate-review-badge--fail {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.oppia-certificate-review-overall-status {
+  align-items: center;
+  display: flex;
+  font-size: 14px;
+  gap: 6px;
+  margin: 0 0 6px 0;
+}
+
+.oppia-certificate-review-status-icon--fail {
+  color: #d32f2f;
+}
+
+.oppia-certificate-review-status-icon--pass {
+  color: #2e7d32;
+}
+
+.oppia-certificate-review-overall-status--fail strong {
+  color: #d32f2f;
+}
+
+.oppia-certificate-review-overall-status--pass strong {
+  color: #2e7d32;
+}
+
+.oppia-certificate-review-overall-desc {
+  color: #555;
+  font-size: 13px;
+  margin: 0 0 14px 0;
+}
+
+.oppia-certificate-review-fix-label {
+  font-size: 13px;
+  margin: 0 0 6px 0;
+}
+
+.oppia-certificate-review-errors-list {
+  font-size: 13px;
+  margin: 0 0 16px 0;
+  padding-left: 20px;
+}
+
+.oppia-certificate-review-error-item {
+  margin-bottom: 4px;
+}
+
+.oppia-certificate-review-info-box {
+  align-items: flex-start;
+  background: #fffde7;
+  border: 1px solid #f9a825;
+  border-radius: 6px;
+  display: flex;
+  font-size: 13px;
+  gap: 10px;
+  padding: 12px 16px;
+}
+
+.oppia-certificate-review-info-icon {
+  color: #000;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.oppia-certificate-review-info-icon .mat-icon {
+  font-size: 20px;
+  height: 20px;
+  width: 20px;
+}
+
+.oppia-certificate-review-info-title {
+  margin: 0 0 4px 0;
+}
+
+.oppia-certificate-review-info-body {
+  color: #555;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.oppia-certificate-review-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.oppia-certificate-review-btn--back {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  color: #333;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 8px 20px;
+}
+
+.oppia-certificate-review-btn--back:hover {
+  background: #f5f5f5;
+}
+
+.oppia-certificate-review-btn--save {
+  background: #00645c;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 20px;
+}
+
+.oppia-certificate-review-btn--save:hover {
+  background: #004d47;
+}
+
+.oppia-visually-hidden {
+  border: 0;
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}

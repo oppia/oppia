@@ -26,6 +26,7 @@ const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const contributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
+const loginPageUrl = testConstants.URLs.Login;
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
 const signUpEmailField = testConstants.SignInDetails.inputField;
@@ -91,10 +92,6 @@ const editProfilePictureButton = '.e2e-test-photo-clickable';
 const bioTextareaSelector = '.e2e-test-user-bio';
 const subjectInterestsInputSelector = '.e2e-test-subject-interests-input';
 
-const ratingsHeaderSelector = '.conversation-skin-final-ratings-header';
-const ratingStarSelector = '.e2e-test-rating-star';
-const filledRatingStarSelector = '.fas.fa-star';
-
 // Preferences page selectors.
 const confirmUsernameField = '.e2e-test-confirm-username-field';
 const confirmAccountDeletionButton = '.e2e-test-confirm-deletion-button';
@@ -114,6 +111,10 @@ const preferencesMenuLink = '.e2e-test-preferences-link';
 const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE =
   'Your data is currently being loaded and will be downloaded as a JSON formatted text file upon completion.';
 const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE_2 = 'Please do not leave this page.';
+
+const ratingsHeaderSelector = '.conversation-skin-final-ratings-header';
+const ratingStarSelector = '.e2e-test-rating-star';
+const filledRatingStarSelector = '.fas.fa-star';
 
 // Learner dashboard selectors.
 const communityLessonsSectionInLearnerDashboard =
@@ -533,6 +534,16 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Function to verify if the learner dashboard is opened using URL.
+   */
+  async expectToBeOnLearnerDashboard(): Promise<void> {
+    await this.page.waitForFunction(
+      (url: string) => document.URL.includes(url),
+      testConstants.URLs.LearnerDashboard
+    );
+  }
+
+  /**
    * Verifies that the current page URL includes the expected page pathname.
    */
   async expectToBeOnPage(expectedPage: string): Promise<void> {
@@ -899,11 +910,20 @@ export class LoggedInUser extends BaseUser {
    * Check if rating stars are displayed.
    */
   async expectRatingStarsToBeVisible(): Promise<void> {
-    await this.page.waitForSelector(ratingsHeaderSelector);
-    const ratingStars = await this.page.$$(ratingStarSelector);
-    if (ratingStars.length !== 5) {
-      throw new Error('Rating stars are not visible.');
-    }
+    await this.page.waitForFunction(
+      ({headerSelector, starSelector, expectedCount}) => {
+        const header = document.querySelector(headerSelector);
+        if (!header) {
+          return false;
+        }
+        return document.querySelectorAll(starSelector).length === expectedCount;
+      },
+      {
+        headerSelector: ratingsHeaderSelector,
+        starSelector: ratingStarSelector,
+        expectedCount: 5,
+      }
+    );
   }
 
   /**
@@ -1092,6 +1112,13 @@ export class LoggedInUser extends BaseUser {
     await this.expectElementToBeVisible(
       communityLessonsSectionInLearnerDashboard
     );
+  }
+
+  /**
+   * Navigates to the login page.
+   */
+  async navigateToLoginPage(): Promise<void> {
+    await this.goto(loginPageUrl, false);
   }
 
   /**

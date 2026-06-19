@@ -17,7 +17,7 @@
   <div class="story-card" [attr.aria-label]="storyTitle ? ('Story summary: ' + storyTitle) : 'Story summary'">
     <div class="story-card-header">
       <div class="story-card-header-left">
-        <h3 class="story-title"><span class="story-label">Story: </span>“{{ storyTitle }}”</h3>
+        <h3 class="story-title"><span class="story-label">Story: </span>"{{ storyTitle }}"</h3>
         <p class="story-meta" [attr.aria-label]="getStoryMetaAriaLabel()">
           {{ getStoryMetaText() }}
         </p>
@@ -40,7 +40,10 @@
           [lessonTitle]="lessonCard.lessonTitle"
           [lessonDescription]="lessonCard.lessonDescription"
           [thumbnailUrl]="lessonCard.thumbnailUrl"
-          [startUrl]="lessonCard.startUrl">
+          [startUrl]="lessonCard.startUrl"
+          [lessonProgressStatus]="lessonCard.lessonProgressStatus"
+          [totalCheckpointsCount]="lessonCard.totalCheckpointsCount"
+          [visitedCheckpointsCount]="lessonCard.visitedCheckpointsCount">
         </topic-lesson-card>
       </div>
 
