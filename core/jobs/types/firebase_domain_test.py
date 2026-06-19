@@ -87,6 +87,22 @@ class FirebaseRecordTests(test_utils.GenericTestBase):
                 mock.Mock(uid=None, email='a@a.com', disabled=False)
             )
 
+        with (
+            self.subTest('email is empty'),
+            self.assertRaisesRegex(ValueError, r'needs non-empty'),
+        ):
+            firebase_domain.FirebaseRecord.from_export(
+                mock.Mock(uid='uid', email='', disabled=False)
+            )
+
+        with (
+            self.subTest('uid is empty'),
+            self.assertRaisesRegex(ValueError, r'needs non-empty'),
+        ):
+            firebase_domain.FirebaseRecord.from_export(
+                mock.Mock(uid='', email='a@a.com', disabled=False)
+            )
+
     def test_from_oppia_models_with_matching_ids_and_deleted_returns_record(
         self,
     ) -> None:

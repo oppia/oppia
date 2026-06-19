@@ -67,34 +67,78 @@ class FirebaseServerSyncJobBase(base_jobs.JobBase):
             auth_pairs
         )
 
+        # Oppia-side collisions mean Oppia (the source of truth) is itself
+        # inconsistent, so we cannot trust the diff: any such collision aborts
+        # ALL record mutations for the run rather than risk creating or deleting
+        # the wrong Firebase accounts. Firebase-account collisions are left to
+        # flow through, since the diff resolves them with ordinary deletes.
+        oppia_collision_count = (
+            diff_results[
+                firebase_transforms.DiffFirebaseRecords.TAG_OPPIA_USER_COLLISION
+            ]
+            | 'Count Oppia user collisions' >> beam.combiners.Count.Globally()
+        )
+        no_oppia_collisions = (
+            oppia_collision_count
+            | 'No Oppia user collisions?' >> beam.Map(lambda count: count == 0)
+        )
+
+        add_records = diff_results[
+            firebase_transforms.DiffFirebaseRecords.TAG_ADD
+        ] | 'Gate adds on no Oppia collisions' >> beam.Filter(
+            lambda _, gate_open: gate_open,
+            gate_open=beam.pvalue.AsSingleton(no_oppia_collisions),
+        )
+        del_records = diff_results[
+            firebase_transforms.DiffFirebaseRecords.TAG_DEL
+        ] | 'Gate dels on no Oppia collisions' >> beam.Filter(
+            lambda _, gate_open: gate_open,
+            gate_open=beam.pvalue.AsSingleton(no_oppia_collisions),
+        )
+
         if self.DRY_RUN:
-            add_results = diff_results[
-                firebase_transforms.DiffFirebaseRecords.TAG_ADD
-            ] | job_result_transforms.CountObjectsToJobRunResult('WOULD CREATE')
-            del_results = diff_results[
-                firebase_transforms.DiffFirebaseRecords.TAG_DEL
-            ] | job_result_transforms.CountObjectsToJobRunResult('WOULD DELETE')
+            add_results = add_records | (
+                job_result_transforms.CountObjectsToJobRunResult('WOULD CREATE')
+            )
+            del_results = del_records | (
+                job_result_transforms.CountObjectsToJobRunResult('WOULD DELETE')
+            )
+            abort_prefix = 'WOULD ABORT WRITES'
         else:
-            add_results = (
-                diff_results[firebase_transforms.DiffFirebaseRecords.TAG_ADD]
-                | firebase_io.CreateFirebaseRecords()
+            add_results = add_records | firebase_io.CreateFirebaseRecords()
+            del_results = del_records | firebase_io.DeleteFirebaseRecords()
+            abort_prefix = 'WRITES ABORTED'
+
+        abort_results = (
+            oppia_collision_count
+            | 'Only abort when Oppia collisions exist'
+            >> beam.Filter(lambda count: count > 0)
+            | 'Report aborted writes'
+            >> beam.Map(
+                lambda count: job_run_result.JobRunResult.as_stderr(
+                    f'{abort_prefix}: {count} Oppia user collision(s) detected'
+                )
             )
-            del_results = (
-                diff_results[firebase_transforms.DiffFirebaseRecords.TAG_DEL]
-                | firebase_io.DeleteFirebaseRecords()
-            )
+        )
 
         remaining_results = (
             diff_results
             | 'Format remaining results'
             >> job_result_transforms.FromTaggedOutputs(
                 firebase_transforms.DiffFirebaseRecords.TAG_OK,
-                firebase_transforms.DiffFirebaseRecords.TAG_EMAIL_CONFLICT,
-                firebase_transforms.DiffFirebaseRecords.TAG_AUTH_ID_CONFLICT,
+                firebase_transforms.DiffFirebaseRecords.TAG_OPPIA_USER_COLLISION,
+                (
+                    firebase_transforms.DiffFirebaseRecords.TAG_FIREBASE_ACCOUNT_COLLISION
+                ),
             )
         )
 
-        return (add_results, del_results, remaining_results) | beam.Flatten()
+        return (
+            add_results,
+            del_results,
+            remaining_results,
+            abort_results,
+        ) | beam.Flatten()
 
 
 class AuditFirebaseServerSyncJob(FirebaseServerSyncJobBase):

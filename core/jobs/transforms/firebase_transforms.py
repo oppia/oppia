@@ -56,12 +56,14 @@ class DiffFirebaseRecords(beam.PTransform):  # type: ignore[misc]
             in the expected records but absent from the actual ones.
         TAG_DEL: PCollection[FirebaseRecord] with the records that are absent
             from the expected records but present in the actual ones.
-        TAG_EMAIL_CONFLICT: PCollection[str] describing the Oppia users that are
-            sharing an email address; this violates the assumption that each
-            email should map to exactly one user.
-        TAG_AUTH_ID_CONFLICT: PCollection[str] describing the Oppia users that
-            are sharing a Firebase account ID; this violates the assumption that
-            each Firebase account maps to exactly one user.
+        TAG_OPPIA_USER_COLLISION: PCollection[str] describing Oppia-side
+            data-integrity collisions: multiple Oppia users sharing one email
+            address, or multiple Oppia users sharing one Firebase account ID.
+            These are NOT actionable by this job because Oppia is the source of
+            truth and is itself inconsistent.
+        TAG_FIREBASE_ACCOUNT_COLLISION: PCollection[str] describing multiple
+            Firebase accounts sharing one email address. This IS actionable: the
+            diff resolves it by deleting the extra Firebase accounts.
     """
 
     class OutputDict(TypedDict):
@@ -70,15 +72,19 @@ class DiffFirebaseRecords(beam.PTransform):  # type: ignore[misc]
         OK: beam.PCollection[int]
         ADD: beam.PCollection[firebase_domain.FirebaseRecord]
         DEL: beam.PCollection[firebase_domain.FirebaseRecord]
-        EMAIL_CONFLICT: beam.PCollection[str]
-        AUTH_ID_CONFLICT: beam.PCollection[str]
+        OPPIA_USER_COLLISION: beam.PCollection[str]
+        FIREBASE_ACCOUNT_COLLISION: beam.PCollection[str]
 
     # NOTE: Tag values are taken from the runtime keys of OutputDict to keep
     # them DRY. These MUST be kept in the same order to keep the mapping correct
     # (verified with tests).
-    TAG_OK, TAG_ADD, TAG_DEL, TAG_EMAIL_CONFLICT, TAG_AUTH_ID_CONFLICT = (
-        OutputDict.__annotations__.keys()
-    )
+    (
+        TAG_OK,
+        TAG_ADD,
+        TAG_DEL,
+        TAG_OPPIA_USER_COLLISION,
+        TAG_FIREBASE_ACCOUNT_COLLISION,
+    ) = OutputDict.__annotations__.keys()
 
     def __init__(
         self,
@@ -151,25 +157,36 @@ class DiffFirebaseRecords(beam.PTransform):  # type: ignore[misc]
                 self.TAG_OK,
                 self.TAG_ADD,
                 self.TAG_DEL,
-                self.TAG_EMAIL_CONFLICT,
+                self.TAG_OPPIA_USER_COLLISION,
+                self.TAG_FIREBASE_ACCOUNT_COLLISION,
             )
         )
 
-        auth_id_conflicts = (
+        auth_id_collisions = (
             self._auth_pairs
             | 'Group Oppia user ids by Firebase account id' >> beam.GroupByKey()
             | 'Only keep Firebase account ids associated with more than 1 user'
             >> beam.Filter(lambda keyed_user_id: len(set(keyed_user_id[1])) > 1)
-            | 'Format Firebase account id conflicts'
-            >> beam.MapTuple(self._format_auth_id_conflict)
+            | 'Format Firebase account id collisions'
+            >> beam.MapTuple(self._format_auth_id_collision)
         )
+
+        # Both "multiple Oppia users share an email" (from the diff) and
+        # "multiple Oppia users share a Firebase account id" (from the auth
+        # pairs) are Oppia-side collisions, so they share one output.
+        oppia_user_collisions = (
+            diff_outputs[self.TAG_OPPIA_USER_COLLISION],
+            auth_id_collisions,
+        ) | 'Merge Oppia user collisions' >> beam.Flatten()
 
         return DiffFirebaseRecords.OutputDict(
             OK=diff_outputs[self.TAG_OK],
             ADD=diff_outputs[self.TAG_ADD],
             DEL=diff_outputs[self.TAG_DEL],
-            EMAIL_CONFLICT=diff_outputs[self.TAG_EMAIL_CONFLICT],
-            AUTH_ID_CONFLICT=auth_id_conflicts,
+            OPPIA_USER_COLLISION=oppia_user_collisions,
+            FIREBASE_ACCOUNT_COLLISION=diff_outputs[
+                self.TAG_FIREBASE_ACCOUNT_COLLISION
+            ],
         )
 
     @classmethod
@@ -191,14 +208,14 @@ class DiffFirebaseRecords(beam.PTransform):  # type: ignore[misc]
                 }
             )
             yield beam.TaggedOutput(
-                cls.TAG_EMAIL_CONFLICT,
+                cls.TAG_OPPIA_USER_COLLISION,
                 f'Oppia users ({user_ids=!r}) are sharing the same email',
             )
 
         if len(actual_set := set(actual_iter)) > 1:
             auth_ids = sorted(record.auth_id for record in actual_set)
             yield beam.TaggedOutput(
-                cls.TAG_EMAIL_CONFLICT,
+                cls.TAG_FIREBASE_ACCOUNT_COLLISION,
                 f'Firebase accounts ({auth_ids=!r}) are sharing the same email',
             )
 
@@ -212,10 +229,10 @@ class DiffFirebaseRecords(beam.PTransform):  # type: ignore[misc]
             yield beam.TaggedOutput(cls.TAG_DEL, record_to_del)
 
     @classmethod
-    def _format_auth_id_conflict(
+    def _format_auth_id_collision(
         cls, auth_id: str, user_id_iter: abc.Iterable[str]
     ) -> str:
-        """Formats the conflict message for an auth ID with multiple users."""
+        """Formats the collision message for an auth ID with multiple users."""
 
         user_ids = sorted(set(user_id_iter))
         return (

@@ -33,8 +33,10 @@ from typing import Callable
 TAG_OK = firebase_transforms.DiffFirebaseRecords.TAG_OK
 TAG_ADD = firebase_transforms.DiffFirebaseRecords.TAG_ADD
 TAG_DEL = firebase_transforms.DiffFirebaseRecords.TAG_DEL
-TAG_EMAIL = firebase_transforms.DiffFirebaseRecords.TAG_EMAIL_CONFLICT
-TAG_AUTH_ID = firebase_transforms.DiffFirebaseRecords.TAG_AUTH_ID_CONFLICT
+TAG_OPPIA = firebase_transforms.DiffFirebaseRecords.TAG_OPPIA_USER_COLLISION
+TAG_FIREBASE = (
+    firebase_transforms.DiffFirebaseRecords.TAG_FIREBASE_ACCOUNT_COLLISION
+)
 
 
 class DiffFirebaseRecordsTests(job_test_utils.PipelinedTestBase):
@@ -107,7 +109,9 @@ class DiffFirebaseRecordsTests(job_test_utils.PipelinedTestBase):
             ],
         )
 
-    def test_diff_with_duplicate_actual_records_reports_corrupt(self) -> None:
+    def test_diff_with_duplicate_oppia_records_reports_oppia_collision(
+        self,
+    ) -> None:
         email = 'dup@dup.com'
         dup_a = firebase_domain.FirebaseRecord(
             auth_id='a1', email=email, disabled=False
@@ -124,7 +128,7 @@ class DiffFirebaseRecordsTests(job_test_utils.PipelinedTestBase):
             ),
             [
                 (
-                    firebase_transforms.DiffFirebaseRecords.TAG_EMAIL_CONFLICT,
+                    TAG_OPPIA,
                     'Oppia users (user_ids=[\'uid_a1\', \'uid_a2\']) are '
                     'sharing the same email',
                 ),
@@ -133,7 +137,9 @@ class DiffFirebaseRecordsTests(job_test_utils.PipelinedTestBase):
             ],
         )
 
-    def test_diff_with_duplicate_expected_records_reports_corrupt(self) -> None:
+    def test_diff_with_duplicate_firebase_records_reports_firebase_collision(
+        self,
+    ) -> None:
         email = 'dup@dup.com'
         dup_a = firebase_domain.FirebaseRecord(
             auth_id='a1', email=email, disabled=False
@@ -146,7 +152,7 @@ class DiffFirebaseRecordsTests(job_test_utils.PipelinedTestBase):
             self.run_diff([], [dup_a, dup_b]),
             [
                 (
-                    firebase_transforms.DiffFirebaseRecords.TAG_EMAIL_CONFLICT,
+                    TAG_FIREBASE,
                     'Firebase accounts (auth_ids=[\'a1\', \'a2\']) are sharing '
                     'the same email',
                 ),
@@ -155,7 +161,7 @@ class DiffFirebaseRecordsTests(job_test_utils.PipelinedTestBase):
             ],
         )
 
-    def test_diff_with_shared_auth_id_reports_auth_id_conflict(self) -> None:
+    def test_diff_with_shared_auth_id_reports_oppia_collision(self) -> None:
         self.assert_pcoll_equal(
             self.run_diff(
                 [],
@@ -167,7 +173,7 @@ class DiffFirebaseRecordsTests(job_test_utils.PipelinedTestBase):
             ),
             [
                 (
-                    firebase_transforms.DiffFirebaseRecords.TAG_AUTH_ID_CONFLICT,
+                    TAG_OPPIA,
                     'Oppia users (user_ids=[\'uid_x\', \'uid_y\']) are sharing '
                     'the same Firebase account (auth_id=\'a1\')',
                 ),
@@ -184,11 +190,12 @@ class DiffFirebaseRecordsTests(job_test_utils.PipelinedTestBase):
 
         Each emitted element is a (tag, payload) pair, where the payload is the
         OK count for TAG_OK, the record's auth_id for TAG_ADD / TAG_DEL, and the
-        corruption message for TAG_EMAIL_CONFLICT / TAG_AUTH_ID_CONFLICT.
+        collision message for TAG_OPPIA_USER_COLLISION /
+        TAG_FIREBASE_ACCOUNT_COLLISION.
 
         Args:
-            expected: list(FirebaseRecord). The "expected" (Firebase) records.
-            actual: list(FirebaseRecord). The "actual" (Oppia) records.
+            expected: list(FirebaseRecord). The "expected" (Oppia) records.
+            actual: list(FirebaseRecord). The "actual" (Firebase) records.
             keyed_user_ids_by_auth_id: dict(str, list(str)). Maps each
                 firebase_auth_id to the Oppia user ID(s) that claim it, used to
                 build the side input. Defaults to an empty mapping when None.
@@ -215,8 +222,8 @@ class DiffFirebaseRecordsTests(job_test_utils.PipelinedTestBase):
             diffs[TAG_OK] | beam.Map(lambda num: (TAG_OK, num)),
             diffs[TAG_ADD] | beam.Map(lambda rec: (TAG_ADD, rec.auth_id)),
             diffs[TAG_DEL] | beam.Map(lambda rec: (TAG_DEL, rec.auth_id)),
-            diffs[TAG_EMAIL] | beam.Map(lambda err: (TAG_EMAIL, err)),
-            diffs[TAG_AUTH_ID] | beam.Map(lambda err: (TAG_AUTH_ID, err)),
+            diffs[TAG_OPPIA] | beam.Map(lambda err: (TAG_OPPIA, err)),
+            diffs[TAG_FIREBASE] | beam.Map(lambda err: (TAG_FIREBASE, err)),
         ) | beam.Flatten()
 
 
