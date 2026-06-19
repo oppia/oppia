@@ -266,6 +266,13 @@ export class LoggedOutUser extends BaseUser {
     );
   }
 
+  async expectToBeOnCommunityLibraryPage(): Promise<void> {
+    await this.page.waitForFunction(
+      (url: string) => window.location.href.includes(url),
+      testConstants.URLs.CommunityLibrary
+    );
+  }
+
   /**
    * Checks if the progress remainder is found or not, based on the shouldBeFound parameter. (It can be found when the an already played exploration is revisited or an ongoing exploration is reloaded, but only if the first checkpoint is reached.)
    * @param {boolean} shouldBeFound - Whether the progress remainder should be found or not.
