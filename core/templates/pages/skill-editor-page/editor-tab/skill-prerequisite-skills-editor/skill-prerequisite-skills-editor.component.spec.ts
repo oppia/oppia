@@ -478,17 +478,25 @@ describe('Skill editor main tab Component', () => {
       expect(ngbModal.open).toHaveBeenCalled();
       // Verify skill2 was filtered out due to having a superseding skill ID.
       expect(modalRef.componentInstance.skillSummaries).toEqual([
-        {id: 'skill1', description: 'test description 1'},
+        ShortSkillSummary.create('skill1', 'test description 1'),
       ]);
       // Verify categorized skills were also filtered.
       expect(
         modalRef.componentInstance.categorizedSkills['Topic 1']['Subtopic 1']
-      ).toEqual([{id: 'skill1', description: 'test description 1'}]);
+      ).toEqual([ShortSkillSummary.create('skill1', 'test description 1')]);
       // Verify skillsInSameTopicCount was updated correctly.
       expect(modalRef.componentInstance.skillsInSameTopicCount).toBe(1);
       // Verify untriaged skills were filtered correctly.
       expect(modalRef.componentInstance.untriagedSkillSummaries).toEqual([
-        {id: '4P77sLaU14DE', description: 'Dummy Skill 3'},
+        SkillSummary.createFromBackendDict({
+          id: '4P77sLaU14DE',
+          description: 'Dummy Skill 3',
+          language_code: 'en',
+          version: 1,
+          misconception_count: 0,
+          skill_model_created_on: 0,
+          skill_model_last_updated: 0,
+        }),
       ]);
     }));
 
