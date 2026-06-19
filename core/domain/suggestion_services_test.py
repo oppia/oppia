@@ -504,7 +504,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         change_dict = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             # Generic state name.
-            'state_name': 'Content',
+            'state_name': constants.DEFAULT_SUGGESTION_STATE_NAME,
             'content_id': 'content_0',
             'language_code': 'hi',
             'content_html': exp.states['Introduction'].content.html,

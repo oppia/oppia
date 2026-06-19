@@ -1223,7 +1223,8 @@ def _get_target_id_to_exploration_opportunity_dict(
         ]
     ],
 ]:
-    """Returns a dict of target_id to exploration opportunity summary dict.
+    """Returns a dict of target_id to exploration opportunity summary dict
+    or translation opportunity card info dict.
 
     Args:
         suggestions: list(BaseSuggestion). A list of suggestions to retrieve
@@ -1231,14 +1232,18 @@ def _get_target_id_to_exploration_opportunity_dict(
 
     Returns:
         dict. Dict mapping target_id to corresponding exploration opportunity
-        summary dict.
+        summary dict or translation opportunity card info dict.
     """
     target_ids = list(set(s.target_id for s in suggestions))
     if feature_flag_services.is_feature_flag_enabled(
         feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
-        language_code = suggestions[0].language_code if suggestions else 'en'
+        language_code = (
+            suggestions[0].language_code
+            if suggestions
+            else constants.DEFAULT_LANGUAGE_CODE
+        )
         cards = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
             feconf.ENTITY_TYPE_EXPLORATION, target_ids, language_code
         )

@@ -637,6 +637,11 @@ class TranslationOpportunityCardInfoDict(TypedDict):
     is_pinned: bool
     currently_available_to_learners: bool
     translation_in_review_counts: Dict[str, int]
+    # The following story_title, language_code, and reviewer_only_content_count
+    # properties are temporary backward-compatibility fields added to match the
+    # legacy ExplorationOpportunitySummary dictionary format expected by the frontend.
+    # TODO(#24933): Delete these fields in Milestone 2 when the frontend is fully
+    # refactored to use generic TranslationOpportunity objects directly.
     story_title: Optional[str]
     language_code: Optional[str]
     reviewer_only_content_count: Optional[int]
