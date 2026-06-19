@@ -209,9 +209,6 @@ class CreateFirebaseRecords(
 
         Returns:
             UserImportResult. The result of the create operation.
-
-        Raises:
-            AssertionError. Email is required within EMULATOR_MODE.
         """
 
         errors = []
