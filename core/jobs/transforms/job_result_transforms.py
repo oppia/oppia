@@ -235,8 +235,9 @@ class CountObjectsToJobRunResult(beam.PTransform):  # type: ignore[misc]
             prefix: str|None. The prefix for the result string.
             label: str|None. The label of the PTransform.
         """
-        super().__init__(label=label)
-        self.prefix = '%s ' % prefix if prefix else ''
+        prefix = f'{prefix} ' if prefix else ''
+        super().__init__(label=label or f'{prefix}Get Object Count as stdout')
+        self.prefix = prefix
 
     # Here we use type Any because this method can accept any kind of
     # Pcollection object to return the unique JobRunResult objects

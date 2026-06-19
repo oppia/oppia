@@ -56,36 +56,32 @@ class FirebaseServerSyncJobBase(base_jobs.JobBase):
         oppia_records = recreated_record_results[
             firebase_io.RecreateRecordsFromOppiaModels.TAG_RECORDS
         ]
-        auth_id_user_id_pairs = recreated_record_results[
+        auth_pairs = recreated_record_results[
             firebase_io.RecreateRecordsFromOppiaModels.TAG_AUTH_PAIRS
         ]
 
-        diff_results: firebase_transforms.DiffFirebaseRecords.OutputDict = (
+        diff_results = (
             oppia_records,
             firebase_records,
-        ) | 'Diff expected records (in Oppia) by actual records (in Firebase)' >> firebase_transforms.DiffFirebaseRecords(
-            auth_pairs=auth_id_user_id_pairs,
+        ) | 'Compute Diff' >> firebase_transforms.DiffFirebaseRecords(
+            auth_pairs
         )
 
         if self.DRY_RUN:
             add_results = diff_results[
-                'ADD'
-            ] | 'Count records that would be created' >> job_result_transforms.CountObjectsToJobRunResult(
-                'WOULD CREATE'
-            )
+                firebase_transforms.DiffFirebaseRecords.TAG_ADD
+            ] | job_result_transforms.CountObjectsToJobRunResult('WOULD CREATE')
             del_results = diff_results[
-                'DEL'
-            ] | 'Count records that would be deleted' >> job_result_transforms.CountObjectsToJobRunResult(
-                'WOULD DELETE'
-            )
+                firebase_transforms.DiffFirebaseRecords.TAG_DEL
+            ] | job_result_transforms.CountObjectsToJobRunResult('WOULD DELETE')
         else:
             add_results = (
-                diff_results['ADD']
-                | 'Create the records' >> firebase_io.CreateFirebaseRecords()
+                diff_results[firebase_transforms.DiffFirebaseRecords.TAG_ADD]
+                | firebase_io.CreateFirebaseRecords()
             )
             del_results = (
-                diff_results['DEL']
-                | 'Delete the records' >> firebase_io.DeleteFirebaseRecords()
+                diff_results[firebase_transforms.DiffFirebaseRecords.TAG_DEL]
+                | firebase_io.DeleteFirebaseRecords()
             )
 
         remaining_results = (
