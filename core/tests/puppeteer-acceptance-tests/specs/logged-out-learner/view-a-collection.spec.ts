@@ -15,7 +15,7 @@
 /**
  * @fileoverview Acceptance test for LO.13: View collection - logged-out learner.
  *
- * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ * https://docs.google.com/spreadsheets/d/1IrxN13IC5xwWdAFnGMu_4p3FU1ADL4QO-eLZIuTowIA/edit?gid=888982708#gid=888982708
  * Test LO.13 (View collection) — needs lessonCreator + logged-out learner:
  * Setup: create & publish 2 explorations + 1 collection
  * Navigate to library → find collection
