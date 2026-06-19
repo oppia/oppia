@@ -126,6 +126,7 @@ describe('Edit Certificate Offering Page Component', () => {
       {topic_1: 1},
       3,
       15,
+      [],
       'Available',
       1
     );
@@ -159,7 +160,7 @@ describe('Edit Certificate Offering Page Component', () => {
 
   it('should correctly evaluate active sections', () => {
     component.activeSection = CERTIFICATE_OFFERING_SECTION_IDS.DETAILS;
-    expect(component.isDetailsSection()).toBeTrue();
+    expect(component.isDetailsSection()).toBe(true);
     expect(component.isAddTopicsSection()).toBeFalse();
     expect(component.isReviewAndAvailabilitySection()).toBeFalse();
 
