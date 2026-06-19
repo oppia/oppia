@@ -788,7 +788,7 @@ export class BaseUser {
 
   /**
    * Clicks on the given element after checking if it's clickable and not in
-   * tansition animation.
+   * transition animation.
    * Note: This function doesn't have post-check.
    * @param {ElementHandle<Element>} element - The element to click on.
    * @param {Parameters<ElementHandle['click']>[0]} options - Click options.
