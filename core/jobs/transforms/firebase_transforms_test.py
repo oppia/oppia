@@ -232,27 +232,21 @@ class FirebaseBatchOperationTests(job_test_utils.PipelinedTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        # The batch operation connects to Firebase, so mock out the connection
-        # to avoid establishing a real one during testing.
-        establish_connection_patcher = mock.patch.object(
+        patcher = mock.patch.object(
             firebase_auth_services, 'establish_firebase_connection'
         )
-        self.establish_firebase_connection_mock = (
-            establish_connection_patcher.start()
-        )
-        self.addCleanup(establish_connection_patcher.stop)
+        self.establish_firebase_connection_mock = patcher.start()
+        self.addCleanup(patcher.stop)
 
     def test_expand_with_no_inputs_produces_no_output(self) -> None:
         self.assert_pcoll_empty(self.run_batch_operation([]))
-        # The batch operation connects to Firebase, so a connection is made.
-        self.establish_firebase_connection_mock.assert_called_once()
+        self.establish_firebase_connection_mock.assert_not_called()
 
     def test_expand_with_successful_inputs_reports_ok_count(self) -> None:
         self.assert_pcoll_equal(
             self.run_batch_operation(['a', 'b', 'c']),
             [job_run_result.JobRunResult(stdout='OK: 3')],
         )
-        # The batch operation connects to Firebase, so a connection is made.
         self.establish_firebase_connection_mock.assert_called_once()
 
     def test_expand_with_batch_value_error_reports_error(self) -> None:
@@ -267,7 +261,6 @@ class FirebaseBatchOperationTests(job_test_utils.PipelinedTestBase):
                 ),
             ],
         )
-        # The batch operation connects to Firebase, so a connection is made.
         self.establish_firebase_connection_mock.assert_called_once()
 
     def test_expand_with_batch_firebase_error_reports_error(self) -> None:
@@ -282,7 +275,6 @@ class FirebaseBatchOperationTests(job_test_utils.PipelinedTestBase):
                 ),
             ],
         )
-        # The batch operation connects to Firebase, so a connection is made.
         self.establish_firebase_connection_mock.assert_called_once()
 
     def test_expand_with_individual_failures_reports_each_error(self) -> None:
@@ -306,7 +298,6 @@ class FirebaseBatchOperationTests(job_test_utils.PipelinedTestBase):
                 ),
             ],
         )
-        # The batch operation connects to Firebase, so a connection is made.
         self.establish_firebase_connection_mock.assert_called_once()
 
     def test_expand_with_mixed_success_and_individual_failures_reports_both(
@@ -326,7 +317,6 @@ class FirebaseBatchOperationTests(job_test_utils.PipelinedTestBase):
                 ),
             ],
         )
-        # The batch operation connects to Firebase, so a connection is made.
         self.establish_firebase_connection_mock.assert_called_once()
 
     def test_expand_with_all_inputs_failed_produces_no_ok_count(
@@ -351,7 +341,6 @@ class FirebaseBatchOperationTests(job_test_utils.PipelinedTestBase):
                 ),
             ],
         )
-        # The batch operation connects to Firebase, so a connection is made.
         self.establish_firebase_connection_mock.assert_called_once()
 
     def test_expand_with_inputs_exceeding_batch_limit_processes_each_batch(
@@ -379,7 +368,6 @@ class FirebaseBatchOperationTests(job_test_utils.PipelinedTestBase):
                     ),
                 ],
             )
-        # The batch operation connects to Firebase, so a connection is made.
         self.establish_firebase_connection_mock.assert_called_once()
 
     def run_batch_operation(

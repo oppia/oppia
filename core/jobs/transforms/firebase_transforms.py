@@ -290,6 +290,9 @@ class FirebaseBatchOperation(
     ) -> abc.Iterator[pvalue.TaggedOutput]:
         """Common batch processing logic for Firebase Admin SDK operations."""
 
+        if not inputs:
+            return
+
         firebase_auth_services.establish_firebase_connection()
 
         input_iter = iter(inputs)

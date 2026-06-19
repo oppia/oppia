@@ -67,11 +67,6 @@ class FirebaseServerSyncJobBase(base_jobs.JobBase):
             auth_pairs
         )
 
-        # Oppia-side collisions mean Oppia (the source of truth) is itself
-        # inconsistent, so we cannot trust the diff: any such collision aborts
-        # ALL record mutations for the run rather than risk creating or deleting
-        # the wrong Firebase accounts. Firebase-account collisions are left to
-        # flow through, since the diff resolves them with ordinary deletes.
         oppia_collision_count = (
             diff_results[
                 firebase_transforms.DiffFirebaseRecords.TAG_OPPIA_USER_COLLISION
