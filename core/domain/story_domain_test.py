@@ -2850,6 +2850,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'next_node_id': 'node_3',
         }
         result = story_domain.Story._convert_story_contents_v6_dict_to_v7_dict(  # pylint: disable=protected-access
+            # Here we use MyPy ignore because the v6_dict doesn't match the
+            # v7 dict type, which is exactly what we're converting from.
             v6_dict  # type: ignore[arg-type]
         )
         self.assertIn('arcs', result)
