@@ -431,6 +431,7 @@
         "core.tests.firebase_admin_sdk_stub_test",
         "core.domain.certificate_assessment_domain_test",
         "core.storage.certificate_assessment.gae_models_test",
-        "core.controllers.certificate_assessment_test"
+        "core.controllers.certificate_assessment_test",
+        "core.domain.certificate_assessment_services_test"
     ]
 }

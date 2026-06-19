@@ -24,6 +24,7 @@
     <oppia-certificate-offering-review-and-availability
       *ngIf="isReviewAndAvailabilitySection()"
       [certificateAssessmentOffering]="certificateAssessmentOffering"
+      [useStubData]="true"
       (saveCertificateOffering)="saveCertificateOffering()"
       (navigateToAddTopicsSection)="navigateToAddTopicsSection()">
     </oppia-certificate-offering-review-and-availability>
