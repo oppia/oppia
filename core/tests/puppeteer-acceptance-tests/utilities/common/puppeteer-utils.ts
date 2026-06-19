@@ -32,6 +32,8 @@ expect.extend({toMatchImageSnapshot});
 const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
 
+const cookieBannerAcceptButtonSelector =
+  'button.e2e-test-oppia-cookie-banner-accept-button';
 const commonModalTitleSelector = '.e2e-test-modal-header';
 const commonModalBodySelector = '.e2e-test-modal-body';
 const commonModalConfirmBtnSelector = '.e2e-test-confirm-action-button';
@@ -379,6 +381,20 @@ export class BaseUser {
     await this.clickOnElementWithText('Sign in');
     await this.typeInInputField(testConstants.SignInDetails.inputField, email);
     await this.clickAndWaitForNavigation('Sign In');
+  }
+
+  /**
+   * This function accepts the cookie banner if it is present on the page.
+   */
+  async acceptCookieBannerIfPresent(): Promise<void> {
+    if (await this.page.$(cookieBannerAcceptButtonSelector)) {
+      await this.clickOnElementWithSelector(cookieBannerAcceptButtonSelector);
+      this.userHasAcceptedCookies = true;
+      await this.page.waitForSelector(cookieBannerAcceptButtonSelector, {
+        hidden: true,
+        timeout: 10000,
+      });
+    }
   }
 
   /**
