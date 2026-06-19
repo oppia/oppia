@@ -370,11 +370,20 @@ export class LoggedInUser extends BaseUser {
    * Check if rating stars are displayed.
    */
   async expectRatingStarsToBeVisible(): Promise<void> {
-    await this.page.waitForSelector(ratingsHeaderSelector);
-    const ratingStars = await this.page.$$(ratingStarSelector);
-    if (ratingStars.length !== 5) {
-      throw new Error('Rating stars are not visible.');
-    }
+    await this.page.waitForFunction(
+      ({headerSelector, starSelector, expectedCount}) => {
+        const header = document.querySelector(headerSelector);
+        if (!header) {
+          return false;
+        }
+        return document.querySelectorAll(starSelector).length === expectedCount;
+      },
+      {
+        headerSelector: ratingsHeaderSelector,
+        starSelector: ratingStarSelector,
+        expectedCount: 5,
+      }
+    );
   }
 
   /**

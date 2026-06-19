@@ -415,18 +415,14 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} cardName - The name of the card to which learners will be directed.
    */
   async directLearnersToNewCard(cardName: string): Promise<void> {
-    await this.page.waitForSelector(openOutcomeDestButton, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(openOutcomeDestButton);
     await this.clickOnElementWithSelector(openOutcomeDestButton);
     await this.waitForElementToBeClickable(destinationCardSelector);
     // The '/' value is used to select the 'a new card called' option in the dropdown.
     await this.select(destinationCardSelector, '/');
     await this.typeInInputField(addStateInput, cardName);
     await this.clickOnElementWithSelector(saveOutcomeDestButton);
-    await this.page.waitForSelector(saveOutcomeDestButton, {
-      state: 'hidden',
-    });
+    await this.expectElementToBeVisible(saveOutcomeDestButton, false);
   }
 
   /**
@@ -525,13 +521,9 @@ export class ExplorationEditor extends BaseUser {
         // resize button.
         const blockingModal = await this.page.$('div.modal-content');
         if (blockingModal) {
-          await this.page.waitForSelector('div.modal-content', {
-            state: 'hidden',
-          });
+          await this.expectElementToBeVisible('div.modal-content', false);
         }
-        await this.page.waitForSelector(mobileStateGraphResizeButton, {
-          state: 'visible',
-        });
+        await this.expectElementToBeVisible(mobileStateGraphResizeButton);
         await this.clickOnElementWithSelector(mobileStateGraphResizeButton);
       }
     }
@@ -543,9 +535,7 @@ export class ExplorationEditor extends BaseUser {
       ? `${explorationStateGraphModalSelector} ${stateNodeGroupSelector}`
       : stateNodeGroupSelector;
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(explorationStateGraphModalSelector, {
-        state: 'visible',
-      });
+      await this.expectElementToBeVisible(explorationStateGraphModalSelector);
     }
     await this.page.waitForSelector(scopedStateNodeGroupSelector);
     elements = await this.page.$$(scopedStateNodeGroupSelector);
@@ -883,13 +873,9 @@ export class ExplorationEditor extends BaseUser {
    * Function to display the Oppia responses section.
    */
   async viewOppiaResponses(): Promise<void> {
-    await this.page.waitForSelector(stateResponsesSelector, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(stateResponsesSelector);
     await this.clickOnElementWithSelector(stateResponsesSelector);
-    await this.page.waitForSelector(oppiaFeebackEditorContainerSelector, {
-      state: 'visible',
-    });
+    await this.expectElementToBeVisible(oppiaFeebackEditorContainerSelector);
   }
 }
 
