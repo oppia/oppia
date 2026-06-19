@@ -109,7 +109,7 @@ class FirebaseRecord:
             )
         if user_auth_details_model.parent_user_id is not None:
             return None
-        if user_auth_details_model.firebase_auth_id is None:
+        if not user_auth_details_model.firebase_auth_id:
             raise ValueError(
                 f'{user_auth_details_model.id=!r} must have non-empty'
                 ' firebase_auth_id'
