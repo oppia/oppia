@@ -296,6 +296,38 @@ describe('Certificate Assessment Offering backend api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should use backend error if fetching fails with an error response body', fakeAsync(() => {
+    caos
+      .getCertificateAssessmentOfferingAsync('mock_certificate_id')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER_URL.replace(
+        '<certificate_id>',
+        'mock_certificate_id'
+      )
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: {
+          error: 'Error occurred while fetching offering.',
+        },
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith({
+      error: 'Error occurred while fetching offering.',
+    });
+  }));
+
   it('should use rejection handler if update fails', fakeAsync(() => {
     caos
       .updateCertificateAssessmentOfferingAsync(
