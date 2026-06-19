@@ -4064,6 +4064,6 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
             story = story_fetchers.get_story_from_model(story_model)
 
         self.assertEqual(story.story_contents_schema_version, 5)
-        self.assertEqual(
-            story.story_contents.to_dict(), self.VERSION_5_STORY_CONTENTS_DICT
-        )
+        expected_dict = dict(self.VERSION_5_STORY_CONTENTS_DICT)
+        expected_dict['arcs'] = []
+        self.assertEqual(story.story_contents.to_dict(), expected_dict)
