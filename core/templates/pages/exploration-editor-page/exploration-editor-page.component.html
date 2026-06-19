@@ -1,8 +1,3 @@
-<ng-template #EditorTabTourPreviewTab>
-  <h3 class="e2e-test-joyride-title" tabindex="0">Preview</h3>
-  <p tabindex="0">At any time, you can click the <b>preview</b> button to play through your exploration.</p>
-</ng-template>
-
 <div class="navbar-helper">
   <div class="navbar-tabs">
     <div class="navbar-text">
@@ -65,7 +60,7 @@
         </a>
       </li>
 
-      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'preview', 'oppia-disabled-tab': !connectedToInternet}" id="tutorialPreviewTab" class="nav-item icon nav-list-item e2e-test-preview-tab" joyrideStep="editorTabTourPreviewTab" [stepContent]="EditorTabTourPreviewTab"
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'preview', 'oppia-disabled-tab': !connectedToInternet}" id="tutorialPreviewTab" class="nav-item icon nav-list-item e2e-test-preview-tab"
           (click)="!connectedToInternet || selectPreviewTab()" [ngbTooltip]="'Preview does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
         <a class="nav-link  navbar-tab"
            [ngbTooltip]="'Preview'"

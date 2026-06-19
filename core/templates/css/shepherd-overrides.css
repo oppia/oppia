@@ -1,0 +1,225 @@
+.shepherd-element {
+  position: absolute;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  z-index: 1016;
+  max-width: 900px;
+  box-shadow: 0 0 30px 1px #000;
+  border-radius: 0;
+}
+
+.shepherd-content {
+  box-sizing: border-box;
+  position: relative;
+  color: #000;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+  border-radius: 0;
+}
+
+.shepherd-header,
+.shepherd-has-title .shepherd-content .shepherd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-radius: 0;
+  line-height: normal;
+  background: transparent;
+}
+
+.shepherd-title {
+  font-weight: 700;
+  font-size: 20px;
+  color: #000;
+  display: block;
+  flex: none;
+  margin: 0;
+  padding: 0;
+}
+
+.shepherd-cancel-icon,
+.shepherd-has-title .shepherd-content .shepherd-cancel-icon {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 24px;
+  color: #000;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  transition: none;
+  font-weight: normal;
+}
+
+.shepherd-cancel-icon:hover,
+.shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover {
+  color: #000;
+}
+
+.shepherd-text {
+  text-align: left;
+  padding: 10px 8px;
+  font-size: 16px;
+  color: #000;
+  line-height: normal;
+}
+
+.shepherd-text p {
+  margin: 0 0 8px;
+}
+
+.shepherd-text p:last-child {
+  margin-bottom: 0;
+}
+
+.shepherd-text ul {
+  margin: 0 0 8px;
+  padding-left: 20px;
+  list-style-position: outside;
+}
+
+.shepherd-text ul:last-child {
+  margin-bottom: 0;
+}
+
+.shepherd-text li {
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+  color: #000;
+  line-height: normal;
+}
+
+.shepherd-footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 8px;
+  padding-top: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+  border-radius: 0;
+}
+
+.shepherd-button {
+  text-transform: uppercase;
+  border-radius: 0;
+  outline: 0;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background-color: #000;
+  cursor: pointer;
+  border: 2px solid #000;
+  margin-right: 0;
+  transition: none;
+  line-height: normal;
+}
+
+.shepherd-button:not(:disabled):hover {
+  color: #000;
+  border: 2px solid #000;
+  background-color: #fff;
+}
+
+.shepherd-button:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.shepherd-footer .shepherd-button:last-child {
+  margin-left: 2.5px;
+  margin-right: 0;
+}
+
+.shepherd-button.shepherd-button-secondary {
+  background: #000;
+  color: #fff;
+  border: 2px solid #000;
+}
+
+.shepherd-button.shepherd-button-secondary:not(:disabled):hover {
+  color: #000;
+  background-color: #fff;
+  border: 2px solid #000;
+}
+
+.shepherd-step-counter {
+  background: none !important;
+  border: none !important;
+  color: #000 !important;
+  cursor: default !important;
+  font-weight: 700 !important;
+  font-size: 12px;
+  padding: 0 !important;
+  margin-right: auto;
+  text-transform: none;
+  pointer-events: none;
+}
+
+.shepherd-arrow,
+.shepherd-arrow:before {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  z-index: -1;
+}
+
+.shepherd-arrow:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(45deg);
+  background: #fff;
+}
+
+.shepherd-element[data-popper-placement^="top"] > .shepherd-arrow {
+  bottom: -8px;
+}
+
+.shepherd-element[data-popper-placement^="bottom"] > .shepherd-arrow {
+  top: -8px;
+}
+
+.shepherd-element[data-popper-placement^="left"] > .shepherd-arrow {
+  right: -8px;
+}
+
+.shepherd-element[data-popper-placement^="right"] > .shepherd-arrow {
+  left: -8px;
+}
+
+.shepherd-element.shepherd-has-title[data-popper-placement^="bottom"] > .shepherd-arrow:before {
+  background: #fff;
+}
+
+.shepherd-element.shepherd-centered > .shepherd-arrow {
+  display: none;
+}
+
+.shepherd-modal-overlay-container {
+  z-index: 997;
+}
+
+.shepherd-element,
+.shepherd-content,
+.shepherd-header,
+.shepherd-footer,
+.shepherd-button,
+.shepherd-cancel-icon {
+  transition: none !important;
+}

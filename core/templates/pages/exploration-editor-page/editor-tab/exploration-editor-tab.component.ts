@@ -16,9 +16,15 @@
  * @fileoverview Component for the Editor tab in the exploration editor page.
  */
 
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {
+  ApplicationRef,
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import {Subscription} from 'rxjs';
-import {JoyrideService} from 'ngx-joyride';
+import {ShepherdService} from 'angular-shepherd';
 import cloneDeep from 'lodash/cloneDeep';
 import {StateTutorialFirstTimeService} from '../services/state-tutorial-first-time.service';
 import {EditabilityService} from 'services/editability.service';
@@ -68,15 +74,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   stateName: string | null = null;
   index: number = 0;
   validationErrorIsShown: boolean = false;
-  joyRideSteps: string[] = [
-    'editorTabTourContainer',
-    'editorTabTourContentEditorTab',
-    'editorTabTourSlideStateInteractionEditorTab',
-    'editorTabTourStateResponsesTab',
-    'editorTabTourPreviewTab',
-    'editorTabTourSaveDraft',
-    'editorTabTourTutorialComplete',
-  ];
+  private shepherdTourSteps: object[] = [];
 
   constructor(
     private editabilityService: EditabilityService,
@@ -96,12 +94,13 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     private stateEditorRefreshService: StateEditorRefreshService,
     private loaderService: LoaderService,
     private graphDataService: GraphDataService,
-    private joyride: JoyrideService,
+    private shepherdService: ShepherdService,
     private versionHistoryService: VersionHistoryService,
     private versionHistoryBackendApiService: VersionHistoryBackendApiService,
     private pageContextService: PageContextService,
     private skillBackendApiService: SkillBackendApiService,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
+    private applicationRef: ApplicationRef
   ) {}
 
   private smoothScrollTo(targetY: number, duration: number): void {
@@ -132,142 +131,223 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     requestAnimationFrame(step);
   }
 
-  startTutorial(): void {
-    this.tutorialInProgress = true;
-    this.joyride
-      .startTour({
-        steps: this.joyRideSteps,
-        stepDefaultPosition: 'top',
-        themeColor: '#212f23',
-      })
-      .subscribe(
-        value => {
-          // This code make the joyride visible over navbar
-          // by overriding the properties of joyride-step__holder class.
-          const joyrideStepHolder = document.querySelector<HTMLElement>(
-            '.joyride-step__holder'
-          );
-          if (joyrideStepHolder) {
-            joyrideStepHolder.style.zIndex = '1020';
-          }
-
-          const joyrideStepCounter = document.querySelector<HTMLElement>(
-            '.joyride-step__counter'
-          );
-          if (joyrideStepCounter) {
-            joyrideStepCounter.tabIndex = 0;
-          }
-
-          const joyrideTitle = document.querySelector<HTMLElement>(
-            '.e2e-test-joyride-title'
-          );
-          joyrideTitle?.focus();
-
-          if (value.number === 1) {
+  private buildEditorTabTourSteps(): object[] {
+    const steps = [
+      {
+        id: 'editorTabTourContainer',
+        attachTo: {element: '#editorTabTourContainer', on: 'top'},
+        title: 'Creating in Oppia',
+        text: [
+          'Explorations are learning experiences that you create using Oppia. ' +
+            'Think of explorations as a conversation between a student and a tutor.',
+        ],
+        buttons: [
+          {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+        ],
+        when: {
+          show: () => {
             this.smoothScrollTo(0, 1000);
-          }
-
-          if (value.number === 2) {
-            this.smoothScrollTo(0, 1000);
-
-            const joyrideStepCounter = document.querySelector<HTMLElement>(
-              '.joyride-step__counter'
-            );
-            if (joyrideStepCounter) {
-              joyrideStepCounter.tabIndex = 0;
-            }
-
-            const joyrideTitle = document.querySelector<HTMLElement>(
-              '.e2e-test-joyride-title'
-            );
-            joyrideTitle?.focus();
-          }
-
-          if (value.number === 4) {
-            let idToScrollTo = true
-              ? this._ID_TUTORIAL_PREVIEW_TAB
-              : this._ID_TUTORIAL_STATE_INTERACTION;
-
-            const element = document.getElementById(idToScrollTo);
-            if (element) {
-              this.smoothScrollTo(element.offsetTop - 200, 1000);
-            }
-
-            const joyrideStepCounter = document.querySelector<HTMLElement>(
-              '.joyride-step__counter'
-            );
-            if (joyrideStepCounter) {
-              joyrideStepCounter.tabIndex = 0;
-            }
-
-            const joyrideTitle = document.querySelector<HTMLElement>(
-              '.e2e-test-joyride-title'
-            );
-            joyrideTitle?.focus();
-          }
-
-          if (value.number === 5) {
-            this.smoothScrollTo(0, 1000);
-          }
-
-          if (value.number === 6) {
-            let idToScrollTo = true
-              ? this._ID_TUTORIAL_PREVIEW_TAB
-              : this._ID_TUTORIAL_STATE_INTERACTION;
-
-            const element = document.getElementById(idToScrollTo);
-            if (element) {
-              this.smoothScrollTo(element.offsetTop - 200, 1000);
-            }
-
-            const joyrideStepCounter = document.querySelector<HTMLElement>(
-              '.joyride-step__counter'
-            );
-            if (joyrideStepCounter) {
-              joyrideStepCounter.tabIndex = 0;
-            }
-
-            const joyrideTitle = document.querySelector<HTMLElement>(
-              '.e2e-test-joyride-title'
-            );
-            joyrideTitle?.focus();
-          }
+          },
         },
-        () => {},
-        () => {
-          this.siteAnalyticsService.registerFinishTutorialEvent(
-            this.explorationId
-          );
-          this.leaveTutorial();
-        }
-      );
+      },
+      {
+        id: 'editorTabTourContentEditorTab',
+        attachTo: {element: '#editorTabTourContentEditorTab', on: 'top'},
+        title: 'Content',
+        text: [
+          "An Oppia exploration is divided into several 'cards'. The first part of a " +
+            'card is the <strong>content</strong>. Use the content section to set the ' +
+            'scene. Tell the learner a story, give them some information, and then ask a ' +
+            'relevant question.',
+        ],
+        buttons: [
+          {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+          {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+        ],
+        when: {
+          show: () => {
+            this.smoothScrollTo(0, 1000);
+          },
+        },
+      },
+      {
+        id: 'editorTabTourSlideStateInteractionEditorTab',
+        attachTo: {
+          element: '#editorTabTourSlideStateInteractionEditorTab',
+          on: 'top',
+        },
+        title: 'Interaction',
+        text: [
+          "After you've written the content of your conversation, choose an " +
+            'interaction type. An interaction is how you want your learner to ' +
+            'respond to your question.',
+          'Oppia has several built-in interactions, including:',
+          '<ul><li>Multiple Choice</li><li>Text/Number input</li><li>Code snippets</li></ul>',
+          'and more.',
+        ],
+        buttons: [
+          {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+          {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+        ],
+        when: {
+          show: () => {
+            this.smoothScrollTo(0, 1000);
+          },
+        },
+      },
+      {
+        id: 'editorTabTourStateResponsesTab',
+        attachTo: {element: '#editorTabTourStateResponsesTab', on: 'top'},
+        title: 'Responses',
+        text: [
+          'After the learner uses the interaction you created, it is your turn again ' +
+            'to choose how your exploration will respond to their input. You can send a ' +
+            'learner to a new card or have them repeat the same card, depending on how ' +
+            'they answer.',
+        ],
+        buttons: [
+          {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+          {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+        ],
+        when: {
+          show: () => {
+            const idToScrollTo = this._ID_TUTORIAL_PREVIEW_TAB;
+            const element = document.getElementById(idToScrollTo);
+            if (element) {
+              this.smoothScrollTo(element.offsetTop - 200, 1000);
+            }
+          },
+        },
+      },
+      {
+        id: 'editorTabTourPreviewTab',
+        attachTo: {element: '#tutorialPreviewTab', on: 'top'},
+        title: 'Preview',
+        text: [
+          'At any time, you can click the <strong>preview</strong> button to play ' +
+            'through your exploration.',
+        ],
+        buttons: [
+          {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+          {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+        ],
+        when: {
+          show: () => {
+            this.smoothScrollTo(0, 1000);
+          },
+        },
+      },
+      {
+        id: 'editorTabTourSaveDraft',
+        attachTo: {element: '#editorTabTourSaveDraft', on: 'top'},
+        title: 'Save',
+        text: ["When you're done making changes, be sure to save your work."],
+        buttons: [
+          {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+          {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+        ],
+        when: {
+          show: () => {
+            const idToScrollTo = this._ID_TUTORIAL_PREVIEW_TAB;
+            const element = document.getElementById(idToScrollTo);
+            if (element) {
+              this.smoothScrollTo(element.offsetTop - 200, 1000);
+            }
+          },
+        },
+      },
+      {
+        id: 'editorTabTourTutorialComplete',
+        attachTo: {element: '#editorTabTourTutorialComplete', on: 'top'},
+        title: 'Tutorial Complete',
+        text: [
+          'Now for the fun part...',
+          "That's the end of the tour! To finish up, here are some things we suggest:",
+          '<ul><li>Create your first card!</li><li>Preview your exploration.</li>' +
+            '<li>Check out more resources in the <a href="https://oppia.github.io/#/" ' +
+            'target="_blank" rel="noopener">Help Center</a>.</li></ul>',
+        ],
+        buttons: [
+          {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+          {
+            text: 'Done',
+            action: () => {
+              this.shepherdService.complete();
+              this.leaveTutorial();
+            },
+            classes: 'shepherd-button-primary',
+          },
+        ],
+      },
+    ];
+    return steps;
   }
 
-  // // Remove save from tutorial if user does not has edit rights for
-  // // exploration since in that case Save Draft button will not be
-  // // visible on the create page.
-  removeTutorialSaveButtonIfNoPermissions(): void {
+  startTutorial(): void {
+    this.tutorialInProgress = true;
+    const steps = this.buildEditorTabTourSteps();
+
+    this.removeTutorialSaveButtonIfNoPermissions(steps);
+    this.addStepCounters(steps);
+
+    this.shepherdService.defaultStepOptions = {
+      scrollTo: false,
+      cancelIcon: {enabled: true},
+    };
+    this.shepherdService.modal = true;
+    this.shepherdService.addSteps(steps);
+    this.shepherdService.tourObject.on('cancel', () => {
+      if (this.tutorialInProgress) {
+        this.handleTourFinish();
+        this.applicationRef.tick();
+      }
+    });
+    this.shepherdService.start();
+  }
+
+  private handleTourFinish(): void {
+    this.editabilityService.onEndTutorial();
+    this.stateTutorialFirstTimeService.markEditorTutorialFinished();
+    this.siteAnalyticsService.registerFinishTutorialEvent(this.explorationId);
+    this.tutorialInProgress = false;
+  }
+
+  leaveTutorial(): void {
+    this.shepherdService.complete();
+    this.handleTourFinish();
+  }
+
+  private addStepCounters(steps: object[]): void {
+    const totalSteps = steps.length;
+    steps.forEach((step, index) => {
+      const s = step as {
+        buttons?: {text: string; classes?: string; action?: () => void}[];
+      };
+      if (!s.buttons) {
+        s.buttons = [];
+      }
+      s.buttons.unshift({
+        text: `${index + 1}/${totalSteps}`,
+        classes: 'shepherd-step-counter',
+        action: () => {},
+      });
+    });
+  }
+
+  private removeTutorialSaveButtonIfNoPermissions(steps: object[]): void {
     this.userExplorationPermissionsService
       .getPermissionsAsync()
       .then(permissions => {
         if (!permissions.canEdit) {
-          this.joyRideSteps = [
-            'editorTabTourContainer',
-            'editorTabTourContentEditorTab',
-            'editorTabTourSlideStateInteractionEditorTab',
-            'editorTabTourStateResponsesTab',
-            'editorTabTourPreviewTab',
-            'editorTabTourTutorialComplete',
-          ];
+          const saveStepIndex = steps.findIndex(
+            (s: {id?: string}) =>
+              (s as {id: string}).id === 'editorTabTourSaveDraft'
+          );
+          if (saveStepIndex !== -1) {
+            steps.splice(saveStepIndex, 1);
+          }
         }
       });
-  }
-
-  leaveTutorial(): void {
-    this.joyride.closeTour();
-    this.editabilityService.onEndTutorial();
-    this.stateTutorialFirstTimeService.markEditorTutorialFinished();
-    this.tutorialInProgress = false;
   }
 
   private getValidActiveStateName(): string {
@@ -584,7 +664,6 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     });
 
     this.interactionIsShown = false;
-    this.removeTutorialSaveButtonIfNoPermissions();
     this.generateContentIdService.init(
       () => {
         let indexToUse = this.explorationNextContentIdIndexService.displayed;

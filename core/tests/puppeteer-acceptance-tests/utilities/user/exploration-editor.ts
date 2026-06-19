@@ -375,13 +375,13 @@ const helpPageLinkSelector = '.e2e-test-help-page-link';
 const takeATourButtonSelector = '.e2e-test-tour-button';
 const translationTourButtonSelector = '.e2e-test-translation-tour-button';
 
-// Joyride (Exploration Editor Tour).
-const joyrideBodySelector = '.joyride-step__body';
-const joyrideTitleSelector = '.e2e-test-joyride-title';
-const nextButtonSelector = '.joyride-step__next-container .joyride-button';
-const previousButtonSelector = '.joyride-step__prev-container .joyride-button';
-const joyrideDoneButtonSelector = '.joyride-step__done-button .joyride-button';
-const joyrideStepSelector = '.joyride-step__counter';
+// Shepherd (Exploration Editor Tour).
+const shepherdBodySelector = '.shepherd-text';
+const shepherdTitleSelector = '.shepherd-title';
+const nextButtonSelector = 'button.shepherd-button-primary';
+const previousButtonSelector = 'button.shepherd-button-secondary';
+const shepherdDoneButtonSelector = 'button.shepherd-button-primary';
+const shepherdStepSelector = '.shepherd-text';
 
 // Save Exploration Modal.
 const saveExplorationModalContainerSelector =
@@ -6157,14 +6157,14 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(takeATourButtonSelector);
     await this.clickOnElementWithSelector(takeATourButtonSelector);
 
-    await this.expectElementToBeVisible(joyrideBodySelector);
+    await this.expectElementToBeVisible(shepherdBodySelector);
   }
 
   async clickOnTakeATranslationsTourButton(): Promise<void> {
     await this.expectElementToBeVisible(translationTourButtonSelector);
     await this.clickOnElementWithSelector(translationTourButtonSelector);
 
-    await this.expectElementToBeVisible(joyrideBodySelector);
+    await this.expectElementToBeVisible(shepherdBodySelector);
   }
 
   /**
@@ -6241,45 +6241,45 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Navigates to the next step in the joyride.
+   * Navigates to the next step in the shepherd tour.
    */
-  async continueToNextJoyrideStep(): Promise<void> {
+  async continueToNextShepherdStep(): Promise<void> {
     await this.waitForPageToFullyLoad();
-    await this.expectJoyrideNextButtonToBeVisible();
+    await this.expectShepherdNextButtonToBeVisible();
 
-    const currentStep = await this.getTextContent(joyrideStepSelector);
+    const currentContent = await this.getTextContent(shepherdStepSelector);
     await this.page.click(nextButtonSelector);
 
     await this.waitForPageToFullyLoad();
     await this.page.waitForTimeout(1000);
     await this.page.waitForFunction(
-      (selector: string, currentStep: string) => {
+      (selector: string, currentContent: string) => {
         const element = document.querySelector(selector);
-        return element?.textContent?.trim() !== currentStep;
+        return element?.textContent?.trim() !== currentContent;
       },
       {},
-      joyrideStepSelector,
-      currentStep
+      shepherdStepSelector,
+      currentContent
     );
   }
 
   /**
-   * Navigates to the previous step in the joyride.
+   * Navigates to the previous step in the shepherd tour.
    */
-  async continueToPreviousJoyrideStep(): Promise<void> {
-    await this.expectJoyridePreviousButtonToBeVisible();
+  async continueToPreviousShepherdStep(): Promise<void> {
+    await this.expectShepherdPreviousButtonToBeVisible();
 
-    const currentStep = await this.getTextContent(joyrideStepSelector);
+    const currentContent = await this.getTextContent(shepherdStepSelector);
     await this.page.click(previousButtonSelector);
 
     await this.page.waitForFunction(
-      (selector: string, currentStep: string) => {
+      (selector: string, currentContent: string) => {
         const element = document.querySelector(selector);
-        return element?.textContent?.trim() !== currentStep;
+        return element?.textContent?.trim() !== currentContent;
       },
       {},
-      joyrideStepSelector,
-      currentStep
+      shepherdStepSelector,
+      currentContent
     );
   }
 
@@ -6445,40 +6445,43 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Verifies that the joyride content is as expected.
+   * Verifies that the shepherd tour content is as expected.
    * @param expectedContent - The expected content.
    */
-  async expectJoyrideContentToContain(expectedContent: string): Promise<void> {
-    await this.expectTextContentToContain(joyrideBodySelector, expectedContent);
+  async expectShepherdContentToContain(expectedContent: string): Promise<void> {
+    await this.expectTextContentToContain(
+      shepherdBodySelector,
+      expectedContent
+    );
   }
 
   /**
-   * Verifies that the joyride title is as expected.
+   * Verifies that the shepherd tour title is as expected.
    * @param expectedTitle - The expected title.
    */
-  async expectJoyrideTitleToBe(expectedTitle: string): Promise<void> {
-    await this.expectTextContentToBe(joyrideTitleSelector, expectedTitle);
+  async expectShepherdTitleToBe(expectedTitle: string): Promise<void> {
+    await this.expectTextContentToBe(shepherdTitleSelector, expectedTitle);
   }
 
-  async expectJoyrideDoneButtonToBeVisible(
+  async expectShepherdDoneButtonToBeVisible(
     visible: boolean = true
   ): Promise<void> {
-    await this.expectElementToBeVisible(joyrideDoneButtonSelector, visible);
+    await this.expectElementToBeVisible(shepherdDoneButtonSelector, visible);
   }
 
   /**
-   * Verifies that the joyride next button is visible.
+   * Verifies that the shepherd next button is visible.
    */
-  async expectJoyrideNextButtonToBeVisible(
+  async expectShepherdNextButtonToBeVisible(
     visible: boolean = true
   ): Promise<void> {
     await this.expectElementToBeVisible(nextButtonSelector, visible);
   }
 
   /**
-   * Verifies that the joyride previous button is visible.
+   * Verifies that the shepherd previous button is visible.
    */
-  async expectJoyridePreviousButtonToBeVisible(
+  async expectShepherdPreviousButtonToBeVisible(
     visible: boolean = true
   ): Promise<void> {
     await this.expectElementToBeVisible(previousButtonSelector, visible);
@@ -6645,13 +6648,13 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to finish the joyride.
+   * Function to finish the shepherd.
    */
-  async finishJoyride(): Promise<void> {
-    await this.expectJoyrideDoneButtonToBeVisible();
+  async finishShepherd(): Promise<void> {
+    await this.expectShepherdDoneButtonToBeVisible();
 
-    await this.page.click(joyrideDoneButtonSelector);
-    await this.expectElementToBeVisible(joyrideDoneButtonSelector, false);
+    await this.page.click(shepherdDoneButtonSelector);
+    await this.expectElementToBeVisible(shepherdDoneButtonSelector, false);
   }
 
   /**

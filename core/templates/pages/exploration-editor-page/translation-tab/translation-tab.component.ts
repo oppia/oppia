@@ -16,16 +16,9 @@
  * @fileoverview Component for the translation tab.
  */
 
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ApplicationRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-// This throws "Object is possibly undefined." The type undefined
-// comes here from ngx joyride dependency. We need to suppress this
-// error because of strict type checking. This error is thrown because
-// the type of the variable is undefined. This is because the type of
-// the variable is undefined. This is because the type of the variable
-// is undefined. This is because the type of the variable is undefined.
-// @ts-ignore
-import {JoyrideService} from 'ngx-joyride';
+import {ShepherdService} from 'angular-shepherd';
 import {Subscription} from 'rxjs';
 import {WelcomeTranslationModalComponent} from 'pages/exploration-editor-page/translation-tab/modal-templates/welcome-translation-modal.component';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -80,12 +73,13 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
     private userExplorationPermissionsService: UserExplorationPermissionsService,
-    private joyride: JoyrideService,
+    private shepherdService: ShepherdService,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
     private voiceoverLanguageManagementService: VoiceoverLanguageManagementService,
     private entityVoiceoversService: EntityVoiceoversService,
     private voiceoverPlayerService: VoiceoverPlayerService,
-    private translationLanguageService: TranslationLanguageService
+    private translationLanguageService: TranslationLanguageService,
+    private applicationRef: ApplicationRef
   ) {}
 
   // Adding the smoothScrollTo helper function for the translation tab.
@@ -125,6 +119,11 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
   }
 
   leaveTutorial(): void {
+    this.shepherdService.complete();
+    this.handleTourFinish();
+  }
+
+  private handleTourFinish(): void {
     this.editabilityService.onEndTutorial();
     this.stateTutorialFirstTimeService.markTranslationTutorialFinished();
     this.tutorialInProgress = false;
@@ -136,49 +135,165 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     }
     if (this.permissions.canVoiceover) {
       this.tutorialInProgress = true;
-      this.joyride
-        .startTour({
-          steps: [
-            'translationTabTourContainer',
-            'translationTabOverview',
-            'translationTabStatusGraph',
-            'translationTabCardOptions',
-            'translationTabRecordingOverview',
-            'translationTabReRecordingOverview',
-            'translationTabTutorialComplete',
+
+      const steps = [
+        {
+          id: 'translationTabTourContainer',
+          attachTo: {element: '#translationTabTourContainer', on: 'bottom'},
+          title: 'Translations In Oppia',
+          text: [
+            'Hello, welcome to the Translation Tab! This tour will walk you ' +
+              'through the translation page. Hit the "Next" button to begin.',
           ],
-          stepDefaultPosition: 'bottom',
-          themeColor: '#212f23',
-        })
-        .subscribe(
-          value => {
-            let element = document.querySelector<HTMLElement>(
-              '.joyride-step__holder'
-            ) as HTMLElement;
-            // This code make the joyride visible over navbar
-            // by overriding the properties of joyride-step__holder class.
-            element.style.zIndex = '1020';
-
-            // Scroll to top for steps 1, 2, and 4.
-            if (
-              value.number === 1 ||
-              value.number === 2 ||
-              value.number === 4
-            ) {
+          buttons: [
+            {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+          ],
+          when: {
+            show: () => {
               this.smoothScrollTo(0, 1000);
-            }
-
-            // Custom "partial" scroll for step 3.
-            if (value.number === 3) {
-              this.smoothScrollTo(250, 1000);
-            }
+            },
           },
-          () => {},
-          () => {
-            this.leaveTutorial();
-          }
-        );
+        },
+        {
+          id: 'translationTabOverview',
+          attachTo: {element: '#translationTabOverview', on: 'bottom'},
+          title: 'Choose Language',
+          text: [
+            'Start your translation by choosing the language that you want to translate to.',
+          ],
+          buttons: [
+            {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+            {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+          ],
+          when: {
+            show: () => {
+              this.smoothScrollTo(0, 1000);
+            },
+          },
+        },
+        {
+          id: 'translationTabStatusGraph',
+          attachTo: {element: '#translationTabStatusGraph', on: 'bottom'},
+          title: 'Choose a Card to Translate',
+          text: [
+            'Then, choose a card from the exploration overview by clicking on the card. ' +
+              'The selected card will have a bold border. Cards with missing translations ' +
+              'are coloured yellow or red. These are good places to start.',
+          ],
+          buttons: [
+            {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+            {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+          ],
+          when: {
+            show: () => {
+              this.smoothScrollTo(250, 1000);
+            },
+          },
+        },
+        {
+          id: 'translationTabCardOptions',
+          attachTo: {element: '#translationTabCardOptions', on: 'bottom'},
+          title: 'Choose a Part of the Card to Translate',
+          text: [
+            'Next, choose a part of the lesson card to translate. This menu at the top ' +
+              'lists all the translatable parts of the card. Within each tab, multiple ' +
+              'sections may be available for translating.',
+          ],
+          buttons: [
+            {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+            {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+          ],
+          when: {
+            show: () => {
+              this.smoothScrollTo(0, 1000);
+            },
+          },
+        },
+        {
+          id: 'translationTabRecordingOverview',
+          attachTo: {element: '#translationTabRecordingOverview', on: 'bottom'},
+          title: 'Recording Audio',
+          text: [
+            'To create audio translations in Oppia, we recommend using the upload button ' +
+              'to upload audio files from your computer. You can also record via your browser.',
+          ],
+          buttons: [
+            {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+            {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+          ],
+        },
+        {
+          id: 'translationTabReRecordingOverview',
+          attachTo: {
+            element: '#translationTabReRecordingOverview',
+            on: 'bottom',
+          },
+          title: 'Re-record/Re-upload audio',
+          text: [
+            'The audio recording also has options related to updating and deleting translations.',
+          ],
+          buttons: [
+            {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+            {type: 'next', text: 'Next', classes: 'shepherd-button-primary'},
+          ],
+        },
+        {
+          id: 'translationTabTutorialComplete',
+          attachTo: {element: '#translationTabTutorialComplete', on: 'bottom'},
+          title: 'Tutorial Complete',
+          text: [
+            'Now, you are ready to begin adding translations to your explorations! ' +
+              'This marks the end of this tour. Remember to save your progress periodically ' +
+              'using the save button in the navigation bar at the top. ' +
+              'Thank you for making this lesson more accessible for non-native speakers!',
+          ],
+          buttons: [
+            {type: 'back', text: 'Prev', classes: 'shepherd-button-secondary'},
+            {
+              text: 'Done',
+              action: () => {
+                this.shepherdService.complete();
+                this.leaveTutorial();
+              },
+              classes: 'shepherd-button-primary',
+            },
+          ],
+        },
+      ];
+
+      this.addStepCounters(steps);
+
+      this.shepherdService.defaultStepOptions = {
+        scrollTo: false,
+        cancelIcon: {enabled: true},
+      };
+      this.shepherdService.modal = true;
+      this.shepherdService.addSteps(steps);
+      this.shepherdService.tourObject.on('cancel', () => {
+        if (this.tutorialInProgress) {
+          this.leaveTutorial();
+          this.applicationRef.tick();
+        }
+      });
+      this.shepherdService.start();
     }
+  }
+
+  private addStepCounters(steps: object[]): void {
+    const totalSteps = steps.length;
+    steps.forEach((step, index) => {
+      const s = step as {
+        buttons?: {text: string; classes?: string; action?: () => void}[];
+      };
+      if (!s.buttons) {
+        s.buttons = [];
+      }
+      s.buttons.unshift({
+        text: `${index + 1}/${totalSteps}`,
+        classes: 'shepherd-step-counter',
+        action: () => {},
+      });
+    });
   }
 
   showWelcomeTranslationModal(): void {
