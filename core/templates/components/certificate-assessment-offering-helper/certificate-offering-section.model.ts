@@ -22,5 +22,27 @@ export const CERTIFICATE_OFFERING_SECTION_IDS = {
   REVIEW_AND_AVAILABILITY: 'review_and_availability',
 } as const;
 
+export const CERTIFICATE_OFFERING_SECTION_TITLES = [
+  'Add Certificate Details',
+  'Add Certificate Topics',
+  'Review & Availability',
+] as const;
+
+export const CERTIFICATE_OFFERING_SECTION_NUMBERS = {
+  DETAILS: 1,
+  ADD_TOPIC_ITEMS: 2,
+  REVIEW_AND_AVAILABILITY: 3,
+} as const;
+
+export const CERTIFICATE_OFFERING_PROGRESS_TAB_STATUSES = {
+  ACTIVE: 'active',
+  COMPLETED: 'completed',
+  INCOMPLETE: 'incomplete',
+} as const;
+
+export const CERTIFICATE_OFFERING_PROGRESS_TAB_STATE_LABELS = {
+  CURRENT: 'current',
+} as const;
+
 export type CertificateOfferingSectionId =
   (typeof CERTIFICATE_OFFERING_SECTION_IDS)[keyof typeof CERTIFICATE_OFFERING_SECTION_IDS];

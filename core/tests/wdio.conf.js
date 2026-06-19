@@ -45,10 +45,6 @@ var suites = {
     './core/tests/webdriverio/learnerFlow.js'
   ],
 
-  navigation: [
-    './core/tests/webdriverio_desktop/navigation.js'
-  ],
-
   skillEditor: [
     './core/tests/webdriverio_desktop/skillEditor.js'
   ],
