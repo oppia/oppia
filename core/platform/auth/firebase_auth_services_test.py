@@ -905,7 +905,7 @@ class FirebaseAdminSdkStub:
         """
         mock_response = mock.Mock()
         mock_response.errors = [
-            firebase_auth.ErrorInfo({'index': i, 'message': error})
+            firebase_auth.ErrorInfo({'index': i, 'reason': error})
             for i, error in errors
         ]
         return firebase_auth.DeleteUsersResult(mock_response, total)
@@ -927,9 +927,7 @@ class FirebaseAdminSdkStub:
         """
         return firebase_auth.UserImportResult(
             {
-                'error': [
-                    {'index': i, 'message': error} for i, error in errors
-                ],
+                'error': [{'index': i, 'reason': error} for i, error in errors],
             },
             total,
         )
