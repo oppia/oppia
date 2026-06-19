@@ -29,6 +29,7 @@ import {
   CERTIFICATE_OFFERING_SECTION_IDS,
 } from 'components/certificate-assessment-offering-helper/certificate-offering-section.model';
 import {AlertsService} from 'services/alerts.service';
+import './edit-certificate-offering-page.component.css';
 
 @Component({
   selector: 'oppia-edit-certificate-offering-page',
