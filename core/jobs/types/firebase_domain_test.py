@@ -176,3 +176,20 @@ class FirebaseRecordTests(test_utils.GenericTestBase):
             firebase_domain.FirebaseRecord.from_oppia_models(
                 auth_details, settings
             )
+
+    def test_from_oppia_models_with_none_firebase_auth_id_returns_none(
+        self,
+    ) -> None:
+        auth_details = auth_models.UserAuthDetailsModel(
+            id='uid_a',
+            firebase_auth_id=None,
+            deleted=False,
+            parent_user_id=None,
+        )
+        settings = user_models.UserSettingsModel(
+            id='uid_a', email='a@a.com', deleted=False
+        )
+        with self.assertRaisesRegex(ValueError, r'must have non-empty'):
+            firebase_domain.FirebaseRecord.from_oppia_models(
+                auth_details, settings
+            )
