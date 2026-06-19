@@ -26,6 +26,7 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {TranslationReviewer} from '../../utilities/user/translation-reviewer';
 import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
@@ -39,6 +40,7 @@ describe('Translation Reviewer', function () {
     Contributor;
   let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
+  let releaseCoordinator: ReleaseCoordinator;
 
   beforeAll(async function () {
     translationReviewer = await UserFactory.createNewUser(
@@ -56,6 +58,16 @@ describe('Translation Reviewer', function () {
       'curriculumAdm',
       'curriculumAdm@example.com',
       [ROLES.CURRICULUM_ADMIN]
+    );
+
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'releaseCoordinator@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
+
+    await releaseCoordinator.enableFeatureFlag(
+      'enable_translation_opps_with_new_opp_models'
     );
 
     // Create translation opportunity.
@@ -114,7 +126,7 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Cutting the Pies',
-      'The Picnic Problem'
+      'Fractions'
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0 (पाई काटना)');
     await translationSubmitter.clickOnElementWithText('Save and close');
@@ -123,7 +135,7 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.selectLanguageFilter('Ákán (Akan)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Trading Slices',
-      'The Picnic Problem'
+      'Fractions'
     );
     await translationSubmitter.typeTextForRTE(
       'emu nsɛm 0 (slices a wɔde sesa wɔn ho wɔn ho)'
@@ -134,7 +146,7 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Chemical Reactions',
-      'The Ideal Gas Law'
+      'States of Matter'
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOnElementWithText('Save and close');

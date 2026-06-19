@@ -25,6 +25,7 @@ import {Contributor} from '../../utilities/user/contributor';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {TranslationReviewer} from '../../utilities/user/translation-reviewer';
 import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
@@ -35,6 +36,7 @@ describe('Translation Submitter', function () {
   let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
   let translationReviewer: TranslationReviewer & Contributor & LoggedInUser;
+  let releaseCoordinator: ReleaseCoordinator;
 
   beforeAll(async function () {
     // Create users.
@@ -54,6 +56,16 @@ describe('Translation Submitter', function () {
       'translationReviewer@example.com',
       [ROLES.TRANSLATION_REVIEWER],
       'hi'
+    );
+
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'releaseCoordinator@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
+
+    await releaseCoordinator.enableFeatureFlag(
+      'enable_translation_opps_with_new_opp_models'
     );
 
     // Create a curated exploration.
@@ -83,7 +95,7 @@ describe('Translation Submitter', function () {
 
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Cutting the Pies',
-      'Fractions - The Picnic Problem'
+      'Exploration - Fractions'
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOnElementWithText(
@@ -99,11 +111,11 @@ describe('Translation Submitter', function () {
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
       'Cutting the Pies',
-      'Fractions - The Picnic Problem'
+      'Exploration - Fractions'
     );
     await translationReviewer.startTranslationReview(
       'सामग्री 0',
-      'Fractions / The Picnic'
+      'Fractions / Cutting the Pies'
     );
     await translationReviewer.submitTranslationReview('accept');
     await translationReviewer.submitTranslationReview('accept');

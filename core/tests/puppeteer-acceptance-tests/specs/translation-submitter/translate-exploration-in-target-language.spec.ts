@@ -29,6 +29,7 @@ import {
   INTERACTION_TYPES,
 } from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
 
@@ -51,6 +52,7 @@ const FEATURED_LANGUAGES = [
 describe('Translation Submitter', function () {
   let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
+  let releaseCoordinator: ReleaseCoordinator;
 
   beforeAll(async function () {
     // Create users.
@@ -62,6 +64,15 @@ describe('Translation Submitter', function () {
       'curriculumAdm',
       'curriculumAdm@example.com',
       [ROLES.CURRICULUM_ADMIN]
+    );
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'releaseCoordinator@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
+
+    await releaseCoordinator.enableFeatureFlag(
+      'enable_translation_opps_with_new_opp_models'
     );
 
     await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
@@ -170,7 +181,7 @@ describe('Translation Submitter', function () {
 
     await translationSubmitter.expectOpportunityToBePresent(
       'Cutting the Pies',
-      'Fractions - The Picnic Problem'
+      'Exploration - Fractions'
     );
 
     // Check if pagination works properly.
@@ -188,7 +199,7 @@ describe('Translation Submitter', function () {
     await translationSubmitter.expectPaginationButtonToBeVisible('previous');
     await translationSubmitter.expectOpportunityToBePresent(
       'Cutting the Pies',
-      'Fractions - The Picnic Problem',
+      'Exploration - Fractions',
       false
     );
 
@@ -200,14 +211,14 @@ describe('Translation Submitter', function () {
     await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
     await translationSubmitter.expectOpportunityToBePresent(
       'Cutting the Pies',
-      'Fractions - The Picnic Problem'
+      'Exploration - Fractions'
     );
   });
 
   it('should be able to use RTE', async function () {
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Cutting the Pies',
-      'Fractions - The Picnic Problem'
+      'Exploration - Fractions'
     );
 
     // Bold Text.
@@ -344,7 +355,7 @@ describe('Translation Submitter', function () {
     // Check for awaiting review.
     await translationSubmitter.expectContributionStatusToBe(
       'बोल्ड टेक्स्ट इटैलिक टेक्स्...',
-      'Fractions / The Picnic',
+      'Fractions / Cutting the Pies',
       'Awaiting review'
     );
   });

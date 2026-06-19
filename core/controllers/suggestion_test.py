@@ -4606,7 +4606,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(target_opp['is_pinned'], False)
         self.assertEqual(target_opp['currently_available_to_learners'], True)
         self.assertEqual(target_opp['translation_counts'], {})
-        self.assertEqual(target_opp['translation_in_review_counts'], {})
+        self.assertEqual(target_opp['translation_in_review_counts'], {'hi': 1})
         self.assertIn('hi', target_opp['incomplete_translation_language_codes'])
 
     def test_topic_translate_handler_returns_no_data(self) -> None:
