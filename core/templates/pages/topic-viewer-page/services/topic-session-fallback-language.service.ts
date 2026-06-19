@@ -20,7 +20,6 @@ import {Injectable} from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 interface TopicSessionFallbackLanguageState {
-  preferredLanguageCode: string;
   textLanguageCode: string;
   voiceoverLanguageCode: string | null;
 }
@@ -33,24 +32,11 @@ export class TopicSessionFallbackLanguageService {
 
   constructor(private windowRef: WindowRef) {}
 
-  getFallbackSelection(
-    preferredLanguageCode: string
-  ): TopicSessionFallbackLanguageState | null {
-    const savedState = this.getSavedState();
-    if (!savedState) {
-      return null;
-    }
-
-    if (savedState.preferredLanguageCode !== preferredLanguageCode) {
-      this.clearSelection();
-      return null;
-    }
-
-    return savedState;
+  getFallbackSelection(): TopicSessionFallbackLanguageState | null {
+    return this.getSavedState();
   }
 
   saveFallbackSelection(
-    preferredLanguageCode: string,
     textLanguageCode: string,
     voiceoverLanguageCode: string | null
   ): void {
@@ -59,7 +45,6 @@ export class TopicSessionFallbackLanguageService {
     }
 
     const state: TopicSessionFallbackLanguageState = {
-      preferredLanguageCode,
       textLanguageCode,
       voiceoverLanguageCode,
     };
