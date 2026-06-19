@@ -161,19 +161,19 @@ describe('Edit Certificate Offering Page Component', () => {
   it('should correctly evaluate active sections', () => {
     component.activeSection = CERTIFICATE_OFFERING_SECTION_IDS.DETAILS;
     expect(component.isDetailsSection()).toBe(true);
-    expect(component.isAddTopicsSection()).toBeFalse();
-    expect(component.isReviewAndAvailabilitySection()).toBeFalse();
+    expect(component.isAddTopicsSection()).toBe(false);
+    expect(component.isReviewAndAvailabilitySection()).toBe(false);
 
     component.activeSection = CERTIFICATE_OFFERING_SECTION_IDS.ADD_TOPIC_ITEMS;
-    expect(component.isDetailsSection()).toBeFalse();
-    expect(component.isAddTopicsSection()).toBeTrue();
-    expect(component.isReviewAndAvailabilitySection()).toBeFalse();
+    expect(component.isDetailsSection()).toBe(false);
+    expect(component.isAddTopicsSection()).toBe(true);
+    expect(component.isReviewAndAvailabilitySection()).toBe(false);
 
     component.activeSection =
       CERTIFICATE_OFFERING_SECTION_IDS.REVIEW_AND_AVAILABILITY;
-    expect(component.isDetailsSection()).toBeFalse();
-    expect(component.isAddTopicsSection()).toBeFalse();
-    expect(component.isReviewAndAvailabilitySection()).toBeTrue();
+    expect(component.isDetailsSection()).toBe(false);
+    expect(component.isAddTopicsSection()).toBe(false);
+    expect(component.isReviewAndAvailabilitySection()).toBe(true);
   });
 
   it('should navigate to specific sections correctly', () => {
