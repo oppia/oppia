@@ -2017,7 +2017,11 @@ def regenerate_opportunities_related_to_topic(
 
 
 def update_pinned_opportunity_model(
-    user_id: str, language_code: str, topic_id: str, lesson_id: Optional[str]
+    user_id: str,
+    language_code: str,
+    topic_id: str,
+    lesson_id: Optional[str],
+    entity_type: str = feconf.ENTITY_TYPE_EXPLORATION,
 ) -> None:
     """Pins/Unpins Reviewable opportunities in Contributor Dashboard.
 
@@ -2029,6 +2033,7 @@ def update_pinned_opportunity_model(
             pinned.
         lesson_id: str or None. The opportunity_id/exp_id of opportunity
             to be pinned. None if user wants to unpin the opportunity.
+        entity_type: str. The type of the entity to be pinned.
     """
 
     pinned_opportunity = user_models.PinnedOpportunityModel.get_model(
@@ -2046,12 +2051,14 @@ def update_pinned_opportunity_model(
             language_code=language_code,
             topic_id=topic_id,
             opportunity_id=lesson_id,
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_type=entity_type,
         )
     else:
         if pinned_opportunity:
-            # Update the model's opportunity_id with the given lesson_id.
+            # Update the model's opportunity_id and entity_type.
             pinned_opportunity.opportunity_id = lesson_id
+            if lesson_id is not None:
+                pinned_opportunity.entity_type = entity_type
             pinned_opportunity.update_timestamps()
             pinned_opportunity.put()
 
