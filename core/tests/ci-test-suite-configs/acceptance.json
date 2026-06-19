@@ -377,8 +377,8 @@
     },
     {
       "name": "logged-in-learner/completes-the-exploration-and-decides-what-to-do-next",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/completes-the-exploration-and-decides-what-to-do-next.spec.ts",
-      "framework": "puppeteer"
+      "module": "core/tests/playwright-acceptance-tests/specs/logged-in-learner/completes-the-exploration-and-decides-what-to-do-next.spec.ts",
+      "framework": "playwright"
     },
     {
       "name": "logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player",

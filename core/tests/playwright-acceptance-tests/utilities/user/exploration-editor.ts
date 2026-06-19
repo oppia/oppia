@@ -16,7 +16,7 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import {Page} from '@playwright/test';
+import {Page, ElementHandle} from '@playwright/test';
 import {BaseUser} from '../common/playwright-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -47,7 +47,19 @@ const explorationConfirmPublishButton = '.e2e-test-confirm-publish';
 const explorationIdElement = 'span.oppia-unique-progress-id';
 const closePublishedPopUpButton = 'button.e2e-test-share-publish-close';
 
+const explorationStateGraphModalSelector =
+  '.e2e-test-exploration-state-graph-modal';
+const mobileStateGraphResizeButton = '.e2e-test-mobile-graph-resize-button';
+const currentCardNameContainerSelector = '.e2e-test-state-name-container';
+
 const stateEditSelector = '.e2e-test-state-edit-content';
+const stateResponsesSelector = '.e2e-test-default-response-tab';
+const oppiaFeebackEditorContainerSelector = '.e2e-test-response-body-default';
+
+const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
+const destinationCardSelector = 'select.e2e-test-destination-selector-dropdown';
+const addStateInput = '.e2e-test-add-state-input';
+const saveOutcomeDestButton = '.e2e-test-save-outcome-dest';
 // TODO(#23019): Required selector for code below.
 // const stateContentSelector = '.e2e-test-actual-state-content';
 const stateContentInputField = 'div.e2e-test-rte';
@@ -204,6 +216,49 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function for creating an exploration with two cards.
+   * @param {string} explorationTitle - The title of the exploration.
+   * @param {string} category - The category of the exploration.,
+   * @param {number} numberOfCards - The number of cards to create.
+   */
+  async createAndPublishExplorationWithCards(
+    explorationTitle: string,
+    category: string = 'Mathematics',
+    numberOfCards: number = 2,
+    expectedWelcomeModal: boolean = false
+  ): Promise<string> {
+    await this.navigateToCreatorDashboardPage();
+    await this.navigateToExplorationEditorFromCreatorDashboard();
+    await this.dismissWelcomeModal(expectedWelcomeModal);
+
+    for (let i = 0; i < numberOfCards - 1; i++) {
+      await this.updateCardContent(`Content ${i}`);
+      await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+      await this.viewOppiaResponses();
+      await this.directLearnersToNewCard(`Card ${i + 1}`);
+      await this.saveExplorationDraft();
+      await this.navigateToCard(`Card ${i + 1}`);
+    }
+
+    await this.updateCardContent(`Content ${numberOfCards - 1}`);
+    await this.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await this.saveExplorationDraft();
+
+    const explorationId = await this.publishExplorationWithMetadata(
+      explorationTitle,
+      `This is ${explorationTitle}\`s goals.`,
+      category
+    );
+
+    if (explorationId) {
+      showMessage('Exploration published successfully');
+      return explorationId;
+    } else {
+      throw new Error('Exploration not published');
+    }
+  }
+
+  /**
    * Function for creating an exploration with only EndExploration interaction with given title.
    * @param {string} title - The title of the exploration.
    * @param {string} category - The category of the exploration. Defaults to 'Algebra'.
@@ -246,6 +301,21 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to select the card that learners will be directed to from the current card.
+   * @param {string} cardName - The name of the card to which learners will be directed.
+   */
+  async directLearnersToNewCard(cardName: string): Promise<void> {
+    await this.expectElementToBeVisible(openOutcomeDestButton);
+    await this.clickOnElementWithSelector(openOutcomeDestButton);
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    // The '/' value is used to select the 'a new card called' option in the dropdown.
+    await this.select(destinationCardSelector, '/');
+    await this.typeInInputField(addStateInput, cardName);
+    await this.clickOnElementWithSelector(saveOutcomeDestButton);
+    await this.expectElementToBeVisible(saveOutcomeDestButton, false);
+  }
+
+  /**
    * Function to dismiss exploration editor welcome modal.
    * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
@@ -274,6 +344,98 @@ export class ExplorationEditor extends BaseUser {
       commonModalTitleSelector,
       expectedTitle
     );
+  }
+
+  /**
+   * Function to navigate to a specific card in the exploration.
+   * @param {string} cardName - The name of the card to navigate to.
+   */
+  async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
+    let elements;
+    if (this.isViewportAtMobileWidth()) {
+      // Check if the state graph modal is already open before clicking the
+      // resize button.
+      const stateGraphModalIsOpen = await this.page.$(
+        explorationStateGraphModalSelector
+      );
+      if (!stateGraphModalIsOpen) {
+        // Wait for any blocking modal to close first before clicking the
+        // resize button.
+        const blockingModal = await this.page.$('div.modal-content');
+        if (blockingModal) {
+          await this.expectElementToBeVisible('div.modal-content', false);
+        }
+        await this.expectElementToBeVisible(mobileStateGraphResizeButton);
+        await this.clickOnElementWithSelector(mobileStateGraphResizeButton);
+      }
+    }
+
+    // Get all state node groups (not just labels) since we need to click the
+    // background rect which has the click handler.
+    const stateNodeGroupSelector = '.e2e-test-node';
+    const scopedStateNodeGroupSelector = this.isViewportAtMobileWidth()
+      ? `${explorationStateGraphModalSelector} ${stateNodeGroupSelector}`
+      : stateNodeGroupSelector;
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(explorationStateGraphModalSelector);
+    }
+    await this.page.waitForSelector(scopedStateNodeGroupSelector);
+    elements = await this.page.$$(scopedStateNodeGroupSelector);
+
+    const cardNames = await Promise.all(
+      elements.map(element =>
+        element.$eval(
+          '.e2e-test-node-label',
+          node => node.textContent?.trim() || ''
+        )
+      )
+    );
+    const cardIndex = cardNames.indexOf(cardName);
+
+    if (cardIndex === -1) {
+      throw new Error(`Card name ${cardName} not found in the graph.`);
+    }
+
+    const nodeGroup: ElementHandle<Element> | null = elements[cardIndex];
+    if (!nodeGroup) {
+      throw new Error(`Could not find card button for card: ${cardName}`);
+    }
+
+    // Click on the node background rect which has the click handler.
+    const nodeBackground = await nodeGroup.$('.e2e-test-node-background');
+    if (!nodeBackground) {
+      throw new Error(
+        `Could not find clickable background for card: ${cardName}`
+      );
+    }
+    await nodeBackground.evaluate(el =>
+      el.scrollIntoView({block: 'center', inline: 'center'})
+    );
+    await this.clickOnElement(nodeBackground);
+    await this.page.waitForLoadState('networkidle');
+
+    const headingName = !cardName.trimEnd().endsWith('...')
+      ? cardName
+      : cardName.trimEnd().slice(0, -3);
+    try {
+      await this.page.waitForFunction(
+        ({selector, value}: {selector: string; value: string}) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.includes(value);
+        },
+        {selector: currentCardNameContainerSelector, value: headingName}
+      );
+    } catch (error) {
+      if (retry) {
+        showMessage(`Unable to navigate to the card ${cardName}. Retrying...`);
+        await this.navigateToCard(cardName, false);
+      } else {
+        const err = error instanceof Error ? error : new Error(String(error));
+        err.message =
+          `Unable to navigate to the card ${cardName}.\n` + err.message;
+        throw err;
+      }
+    }
   }
 
   /**
@@ -441,6 +603,15 @@ export class ExplorationEditor extends BaseUser {
       await publishExploration();
       return await confirmPublish();
     }
+  }
+
+  /**
+   * Function to display the Oppia responses section.
+   */
+  async viewOppiaResponses(): Promise<void> {
+    await this.expectElementToBeVisible(stateResponsesSelector);
+    await this.clickOnElementWithSelector(stateResponsesSelector);
+    await this.expectElementToBeVisible(oppiaFeebackEditorContainerSelector);
   }
 }
 
