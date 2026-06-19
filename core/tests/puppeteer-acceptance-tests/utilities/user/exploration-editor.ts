@@ -7853,20 +7853,29 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     // Math interactions require heavy MathJax rendering and take significantly
     // longer to load than other interactions.
-    await this.page.waitForSelector('.MathJax_SVG svg', {timeout: 15000});
-
-    const {arabicTextContent, rawSvgHtml} = await this.page.evaluate(() => {
-      const svgElement = document.querySelector('.MathJax_SVG svg');
-      const textNodes = document.querySelectorAll('.MathJax_SVG text');
-      return {
-        arabicTextContent:
-          Array.from(textNodes)
-            .map(node => node.textContent?.trim() || '')
-            .filter(text => text !== '')
-            .join(' | ') || null,
-        rawSvgHtml: svgElement ? svgElement.textContent : 'No SVG found',
-      };
+    await this.page.waitForSelector('.modal-dialog .MathJax_SVG svg', {
+      timeout: 15000,
     });
+
+    const {arabicTextContent, rawSvgHtml} = await this.page.evaluate(
+      modalSelector => {
+        const svgElement = document.querySelector(
+          `${modalSelector} .MathJax_SVG svg`
+        );
+        const textNodes = document.querySelectorAll(
+          `${modalSelector} .MathJax_SVG text`
+        );
+        return {
+          arabicTextContent:
+            Array.from(textNodes)
+              .map(node => node.textContent?.trim() || '')
+              .filter(text => text !== '')
+              .join(' | ') || null,
+          rawSvgHtml: svgElement ? svgElement.textContent : 'No SVG found',
+        };
+      },
+      '.modal-dialog'
+    );
 
     if (!arabicTextContent || !arabicTextContent.includes(expectedText)) {
       throw new Error(
