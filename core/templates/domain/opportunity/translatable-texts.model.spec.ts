@@ -99,7 +99,7 @@ describe('Translatable Texts model', () => {
       TranslatableTexts.createFromBackendDictV2(sampleBackendDictV2);
 
     const expectedStatewiseContents = {
-      Content: {
+      'Generic Content': {
         1: new TranslatableItem('text1', 'html', 'content', null, null),
         2: new TranslatableItem('text2', 'html', 'content', null, null),
         3: new TranslatableItem('text3', 'html', 'content', null, null),
@@ -157,7 +157,7 @@ describe('Translatable Texts model', () => {
       state2: {
         3: new TranslatableItem('text3', 'html', 'content', null, null),
       },
-      Content: {
+      'Generic Content': {
         4: new TranslatableItem('text4', 'html', 'content', null, null),
       },
     };

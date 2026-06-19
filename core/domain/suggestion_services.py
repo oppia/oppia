@@ -262,7 +262,15 @@ def create_suggestion(
         state_name = change_cmd['state_name']
         content_id = change_cmd['content_id']
 
-        if state_name == 'Content' or state_name not in exploration.states:
+        # This check and loop act as a backward-compatibility fallback layer for
+        # generic V2 suggestion payloads (which do not specify exploration-specific
+        # state names in change commands directly) or legacy translation suggestions.
+        # It resolves the generic placeholder state name to the correct exploration
+        # state name by matching content IDs.
+        if (
+            state_name == constants.DEFAULT_SUGGESTION_STATE_NAME
+            or state_name not in exploration.states
+        ):
             for s_name, state in exploration.states.items():
                 if (
                     content_id

@@ -699,7 +699,7 @@ class TranslatableContentsHandlerV2(
             )
         )
 
-        content_id_to_state_name = {}
+        content_id_to_grouping_key = {}
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             for state_name, state in domain_object.states.items():
                 translatable_contents_collection = (
@@ -710,7 +710,7 @@ class TranslatableContentsHandlerV2(
                 ) in (
                     translatable_contents_collection.content_id_to_translatable_content
                 ):
-                    content_id_to_state_name[content_id] = state_name
+                    content_id_to_grouping_key[content_id] = state_name
 
         translatable_contents = []
         for content in contents_which_need_translation.values():
@@ -738,7 +738,7 @@ class TranslatableContentsHandlerV2(
                 'content_format': content.content_format.value,
                 'content_value': content.content_value,
                 'grouping_key': (
-                    content_id_to_state_name.get(content.content_id)
+                    content_id_to_grouping_key.get(content.content_id)
                 ),
             }
 

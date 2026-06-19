@@ -20,6 +20,7 @@ import {
   TranslatableItem,
   TranslatableItemBackendDict,
 } from './translatable-content.model';
+import {AppConstants} from 'app.constants';
 
 export interface ContentIdToContentBackendDictMapping {
   [contentId: string]: TranslatableItemBackendDict;
@@ -86,7 +87,8 @@ export class TranslatableTexts {
   ): TranslatableTexts {
     const stateNamesToContentIdMapping: StateNamesToContentIdMapping = {};
     for (const content of backendDict.translatable_contents) {
-      const stateName = content.grouping_key || 'Content';
+      const stateName =
+        content.grouping_key || AppConstants.DEFAULT_SUGGESTION_STATE_NAME;
       if (!stateNamesToContentIdMapping.hasOwnProperty(stateName)) {
         stateNamesToContentIdMapping[stateName] = {};
       }
