@@ -96,7 +96,7 @@ class FromTaggedOutputs(beam.PTransform):  # type: ignore[misc]
     def _extract_input_pvalues(
         self, out: TaggedOutputs
     ) -> tuple[TaggedOutputs, dict[str, pvalue.PCollection]]:
-        """Needs to be overriden when input type doesn't inherit from PValue."""
+        """Needs to be overridden when input type isn't a subclass of PValue."""
 
         return out, {tag: out[tag] for tag in {self.pass_tag, *self.fail_tags}}
 
