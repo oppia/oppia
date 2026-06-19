@@ -58,6 +58,7 @@ export class SkillEditorPageComponent implements OnInit {
     private windowRef: WindowRef
   ) {}
 
+  // Initialized in ngOnInit via the skill editor state service subscription.
   skill!: Skill;
   skillIsInitialized = false;
   directiveSubscriptions = new Subscription();

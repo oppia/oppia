@@ -30,6 +30,8 @@ import {StoryNode} from 'domain/story/story-node.model';
   templateUrl: './chapter-editor-tab.component.html',
 })
 export class ChapterEditorTabComponent implements OnInit, OnDestroy {
+  // These properties are all set in initEditor(), which is called from the
+  // story editor state service callbacks registered in ngOnInit.
   story!: Story;
   storyContents!: StoryContents;
   chapterIndex: number | null = null;

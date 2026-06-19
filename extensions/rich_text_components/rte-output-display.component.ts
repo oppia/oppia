@@ -55,6 +55,8 @@ type PortalTree = (TemplatePortal<unknown> | PortalTree)[];
   styleUrls: [],
 })
 export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
+  // These @ViewChild properties are populated by Angular automatically before
+  // ngAfterViewInit runs and are always set by that point.
   // Native HTML elements.
   @ViewChild('p') pTagPortal!: TemplateRef<unknown>;
   @ViewChild('h1') h1TagPortal!: TemplateRef<unknown>;
@@ -385,6 +387,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // Sentences in the lesson content are separated using punctuation marks
     // specific to the language.
     // The following line retrieves the punctuation marks for the current language.
+    // languageCode is guaranteed to be a valid key here because it falls back to
+    // DEFAULT_LANGUAGE_CODE, which is always present in the map.
     const punctuationsForCurrentLanguage =
       AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS[
         languageCode as keyof typeof AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS
@@ -723,11 +727,13 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     }
     if (node.nodeType === 'component') {
       const key = node.selector.split('oppia-noninteractive-')[1];
-      return new TemplatePortal(
-        tagPortals[key] as TemplateRef<unknown>,
-        this._viewContainerRef,
-        {$implicit: node.attrs}
-      );
+      const templateRef: TemplateRef<unknown> | undefined = tagPortals[key];
+      if (templateRef === undefined) {
+        return undefined;
+      }
+      return new TemplatePortal(templateRef, this._viewContainerRef, {
+        $implicit: node.attrs,
+      });
     }
     const templateRef = tagPortals[node.selector];
     if (templateRef !== undefined) {

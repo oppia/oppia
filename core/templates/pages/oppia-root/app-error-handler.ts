@@ -64,6 +64,8 @@ export class AppErrorHandler extends ErrorHandler {
   handleError(error: Error): void {
     if (
       AppErrorHandler.EXPECTED_ERROR_CODES.includes(
+        // The firebase.auth.Error is not compatible with javascript's Error type.
+        // That's why explicit type conversion is used here.
         (error as {code?: string}).code ?? ''
       )
     ) {

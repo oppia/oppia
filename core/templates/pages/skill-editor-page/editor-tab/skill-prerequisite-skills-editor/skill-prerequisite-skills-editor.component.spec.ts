@@ -138,7 +138,7 @@ describe('Skill editor main tab Component', () => {
       version: 3,
       next_misconception_id: 3,
       prerequisite_skill_ids: ['skill_1'],
-      superseding_skill_id: null as unknown as string,
+      superseding_skill_id: null,
       all_questions_merged: true,
     });
 
@@ -441,22 +441,21 @@ describe('Skill editor main tab Component', () => {
         'Topic 1': {
           uncategorized: [],
           'Subtopic 1': [
-            {
-              id: 'skill1',
-              description: 'test description 1',
-            } as unknown as ShortSkillSummary,
-            {
-              id: 'skill2',
-              description: 'test description 2',
-            } as unknown as ShortSkillSummary,
+            ShortSkillSummary.create('skill1', 'test description 1'),
+            ShortSkillSummary.create('skill2', 'test description 2'),
           ],
         },
       };
       component.untriagedSkillSummaries = [
-        {
+        SkillSummary.createFromBackendDict({
           id: '4P77sLaU14DE',
           description: 'Dummy Skill 3',
-        } as unknown as SkillSummary,
+          language_code: 'en',
+          version: 1,
+          misconception_count: 0,
+          skill_model_created_on: 0,
+          skill_model_last_updated: 0,
+        }),
       ];
 
       const validSkillSummary = {

@@ -26,7 +26,10 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {Change} from 'domain/editor/undo_redo/change.model';
+import {
+  BackendChangeObject,
+  Change,
+} from 'domain/editor/undo_redo/change.model';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
@@ -1182,12 +1185,13 @@ describe('Topic Editor Navbar', () => {
       topicEditorStateService,
       'getTopicWithUrlFragmentExists'
     ).and.returnValue(false);
-    const mockChange = {
-      getBackendChangeObject: () => ({cmd: 'add_uncategorized_skill_id'}),
-    };
-    spyOn(undoRedoService, 'getChangeList').and.returnValue([
-      mockChange,
-    ] as unknown as Change[]);
+    const mockChange = jasmine.createSpyObj<Change>('Change', [
+      'getBackendChangeObject',
+    ]);
+    mockChange.getBackendChangeObject.and.returnValue({
+      cmd: 'add_uncategorized_skill_id',
+    } as BackendChangeObject);
+    spyOn(undoRedoService, 'getChangeList').and.returnValue([mockChange]);
     spyOn(topicEditorStateService, 'updateSkillCache').and.returnValue(
       Promise.resolve()
     );
@@ -1215,12 +1219,13 @@ describe('Topic Editor Navbar', () => {
       topicEditorStateService,
       'getTopicWithUrlFragmentExists'
     ).and.returnValue(false);
-    const mockChange = {
-      getBackendChangeObject: () => ({cmd: 'update_topic_property'}),
-    };
-    spyOn(undoRedoService, 'getChangeList').and.returnValue([
-      mockChange,
-    ] as unknown as Change[]);
+    const mockChange = jasmine.createSpyObj<Change>('Change', [
+      'getBackendChangeObject',
+    ]);
+    mockChange.getBackendChangeObject.and.returnValue({
+      cmd: 'update_topic_property',
+    } as BackendChangeObject);
+    spyOn(undoRedoService, 'getChangeList').and.returnValue([mockChange]);
     spyOn(topicEditorStateService, 'updateSkillCache');
 
     componentInstance.ngOnInit();
