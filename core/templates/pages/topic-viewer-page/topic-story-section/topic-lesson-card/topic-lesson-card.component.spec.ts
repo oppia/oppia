@@ -17,6 +17,7 @@
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 
 import {TopicLessonCardComponent} from './topic-lesson-card.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -45,6 +46,7 @@ describe('TopicLessonCardComponent', () => {
 
     TestBed.configureTestingModule({
       declarations: [TopicLessonCardComponent, MockTranslatePipe],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {
           provide: UrlInterpolationService,
@@ -146,5 +148,33 @@ describe('TopicLessonCardComponent', () => {
     component.lessonTitle = '';
 
     expect(component.getThumbnailAltText()).toBe('Lesson thumbnail');
+  });
+
+  describe('showCheckpointBar', () => {
+    it('should return true when not coming_soon and totalCheckpointsCount > 0', () => {
+      component.lessonProgressStatus = 'not_started';
+      component.totalCheckpointsCount = 5;
+      expect(component.showCheckpointBar).toBeTrue();
+
+      component.lessonProgressStatus = 'in_progress';
+      component.totalCheckpointsCount = 3;
+      expect(component.showCheckpointBar).toBeTrue();
+
+      component.lessonProgressStatus = 'completed';
+      component.totalCheckpointsCount = 1;
+      expect(component.showCheckpointBar).toBeTrue();
+    });
+
+    it('should return false when lesson is coming_soon', () => {
+      component.lessonProgressStatus = 'coming_soon';
+      component.totalCheckpointsCount = 5;
+      expect(component.showCheckpointBar).toBeFalse();
+    });
+
+    it('should return false when totalCheckpointsCount is 0', () => {
+      component.lessonProgressStatus = 'not_started';
+      component.totalCheckpointsCount = 0;
+      expect(component.showCheckpointBar).toBeFalse();
+    });
   });
 });

@@ -1,8 +1,11 @@
 .oppia-certificate-offering-details {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px #0000001a;
   color: #333;
   font-family: 'Roboto', sans-serif;
   margin: 0;
-  padding: 0;
+  padding: 32px 30px 30px 40px;
 }
 
 .oppia-certificate-section-title {

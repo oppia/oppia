@@ -12,7 +12,6 @@
       (navigateToAddTopicsSection)="navigateToAddTopicsSection()"
       (cancelClicked)="navigateBackToDashboard()">
     </oppia-certificate-offering-details>
-
     <oppia-certificate-offering-add-topic-items
       *ngIf="isAddTopicsSection()"
       [certificateAssessmentOffering]="certificateAssessmentOffering"
@@ -25,8 +24,10 @@
       *ngIf="isReviewAndAvailabilitySection()"
       [certificateAssessmentOffering]="certificateAssessmentOffering"
       [isEditMode]="true"
+      [useStubData]="true"
       (saveCertificateOffering)="updateCertificateOffering()"
       (navigateToAddTopicsSection)="navigateToAddTopicsSection()">
     </oppia-certificate-offering-review-and-availability>
   </div>
+
 </div>
