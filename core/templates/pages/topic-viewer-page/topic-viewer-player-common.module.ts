@@ -28,7 +28,6 @@ import {TopicStorySectionComponent} from './topic-story-section/topic-story-sect
 import {TopicLessonCardComponent} from './topic-story-section/topic-lesson-card/topic-lesson-card.component';
 import {LanguageSelectorComponent} from './topic-story-section/topic-lesson-card/language-selector.component';
 import {TopicPracticeCardComponent} from './topic-story-section/topic-practice-card/topic-practice-card.component';
-import {LanguageSelectorModalComponent} from './modals/language-selector-modal.component';
 import {MatCardModule} from '@angular/material/card';
 import {SharedComponentsModule} from 'components/shared-component.module';
 
@@ -41,7 +40,6 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     TopicLessonCardComponent,
     LanguageSelectorComponent,
     TopicPracticeCardComponent,
-    LanguageSelectorModalComponent,
   ],
   entryComponents: [
     StoriesListComponent,
@@ -50,7 +48,6 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     TopicLessonCardComponent,
     TopicPracticeCardComponent,
     LanguageSelectorComponent,
-    LanguageSelectorModalComponent,
   ],
   exports: [
     StoriesListComponent,
@@ -59,7 +56,6 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     TopicLessonCardComponent,
     LanguageSelectorComponent,
     TopicPracticeCardComponent,
-    LanguageSelectorModalComponent,
   ],
 })
 export class TopicPlayerViewerCommonModule {}

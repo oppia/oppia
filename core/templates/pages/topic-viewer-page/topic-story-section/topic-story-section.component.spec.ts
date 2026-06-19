@@ -490,7 +490,7 @@ describe('TopicStorySectionComponent', () => {
     (
       i18nLanguageCodeService.isCurrentLanguageRTL as jasmine.Spy
     ).and.returnValue(true);
-    expect(component.isLanguageRTL()).toBeTrue();
+    expect(component.isLanguageRTL()).toBe(true);
   });
 
   it('should clear fallback selection when language changes', () => {

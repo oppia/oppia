@@ -233,6 +233,9 @@ export class TopicStorySectionComponent
           lessonProgressStatus: this.getLessonProgressStatus(node),
           totalCheckpointsCount: totalCheckpoints,
           visitedCheckpointsCount: visitedCheckpoints,
+          availableTextLanguageCodes: node.getAvailableTextLanguageCodes(),
+          availableVoiceoverLanguageCodes:
+            node.getAvailableVoiceoverLanguageCodes(),
         };
       });
   }

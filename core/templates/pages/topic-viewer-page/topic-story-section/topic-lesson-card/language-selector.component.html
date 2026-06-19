@@ -3,12 +3,12 @@
     <div class="topic-lesson-language-selector-select-container">
       <i class="fa fa-file-text-o topic-lesson-language-selector-leading-icon" aria-hidden="true"></i>
       <select
-        id="topic-lesson-text-language"
-        class="topic-lesson-language-selector-select e2e-test-topic-lesson-text-language-selector"
-        [ngModel]="selectedTextLanguageCode"
-        (ngModelChange)="onTextLanguageChange($event)"
-        aria-label="Text language selector"
-        required>
+              id="topic-lesson-text-language"
+              class="topic-lesson-language-selector-select e2e-test-topic-lesson-text-language-selector"
+              [ngModel]="selectedTextLanguageCode"
+              (ngModelChange)="onTextLanguageChange($event)"
+              aria-label="Text language selector"
+              required>
         <option *ngFor="let textLanguageCode of availableTextLanguageCodes" [value]="textLanguageCode">
           {{ getLanguageDescription(textLanguageCode) }}
         </option>
@@ -20,15 +20,15 @@
     <div class="topic-lesson-language-selector-select-container">
       <i class="fa fa-headphones topic-lesson-language-selector-leading-icon" aria-hidden="true"></i>
       <select
-        id="topic-lesson-voiceover-language"
-        class="topic-lesson-language-selector-select e2e-test-topic-lesson-voiceover-language-selector"
-        [ngModel]="selectedVoiceoverLanguageCode"
-        (ngModelChange)="onVoiceoverLanguageChange($event)"
-        aria-label="Voiceover language selector">
+              id="topic-lesson-voiceover-language"
+              class="topic-lesson-language-selector-select e2e-test-topic-lesson-voiceover-language-selector"
+              [ngModel]="selectedVoiceoverLanguageCode"
+              (ngModelChange)="onVoiceoverLanguageChange($event)"
+              aria-label="Voiceover language selector">
         <option [ngValue]="null">Auto</option>
         <option
-          *ngFor="let voiceoverLanguageCode of availableVoiceoverLanguageCodes"
-          [value]="voiceoverLanguageCode">
+                *ngFor="let voiceoverLanguageCode of availableVoiceoverLanguageCodes"
+                [value]="voiceoverLanguageCode">
           {{ getLanguageDescription(voiceoverLanguageCode) }}
         </option>
       </select>
@@ -37,10 +37,10 @@
     </div>
 
     <p
-      class="topic-lesson-language-selector-error"
-      *ngIf="shouldShowTextLanguageValidationError()"
-      id="topic-lesson-text-language-error"
-      aria-live="assertive">
+       class="topic-lesson-language-selector-error"
+       *ngIf="shouldShowTextLanguageValidationError()"
+       id="topic-lesson-text-language-error"
+       aria-live="assertive">
       Choose a text language to continue.
     </p>
   </div>

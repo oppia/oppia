@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, List
 
 from core import feconf, utils
 from core.constants import constants
@@ -29,11 +28,19 @@ from core.domain import (
     platform_parameter_list,
     platform_parameter_services,
     skill_services,
+    story_domain,
     story_fetchers,
     topic_fetchers,
     topic_services,
     translation_services,
     voiceover_services,
+)
+
+from typing import (  # pylint: disable=wrong-import-position
+    Any,
+    Dict,
+    List,
+    Sequence,
 )
 
 
@@ -74,10 +81,14 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             for additional_story_id in additional_story_ids
         ]
 
-        canonical_story_dicts = []
-        exploration_ids = set()
+        # Here we use type Any because the dict values have mixed types (str, list, bool).
+        canonical_story_dicts: List[Dict[str, Any]] = []
+        canonical_story_nodes: List[Sequence[story_domain.StoryNode]] = []
+        exploration_ids: set[str] = set()
 
-        def _collect_exploration_ids_from_nodes(nodes: List[object]) -> None:
+        def _collect_exploration_ids_from_nodes(
+            nodes: Sequence[story_domain.StoryNode],
+        ) -> None:
             for node in nodes:
                 if node.exploration_id:
                     exploration_ids.add(node.exploration_id)
@@ -100,7 +111,8 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 story_summary.node_titles, pending_node_titles
             )
             story_summary_dict = story_summary.to_human_readable_dict()
-            canonical_story_dict = {
+            # Here we use type Any because the dict values have mixed types (str, list, bool).
+            canonical_story_dict: Dict[str, Any] = {
                 'id': story_summary_dict['id'],
                 'title': story_summary_dict['title'],
                 'description': story_summary_dict['description'],
@@ -110,11 +122,13 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'url_fragment': story_summary_dict['url_fragment'],
                 'story_is_published': True,
                 'completed_node_titles': completed_node_titles,
-                '_all_nodes': filtered_nodes,
             }
             canonical_story_dicts.append(canonical_story_dict)
+            canonical_story_nodes.append(filtered_nodes)
 
-        additional_story_dicts = []
+        # Here we use type Any because the dict values have mixed types (str, list, bool).
+        additional_story_dicts: List[Dict[str, Any]] = []
+        additional_story_nodes: List[Sequence[story_domain.StoryNode]] = []
         for story_summary in additional_story_summaries:
             all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id
@@ -127,8 +141,10 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             completed_node_titles = utils.compute_list_difference(
                 story_summary.node_titles, pending_node_titles
             )
+            additional_story_nodes.append(all_nodes)
             story_summary_dict = story_summary.to_human_readable_dict()
-            additional_story_dict = {
+            # Here we use type Any because the dict values have mixed types (str, list, bool).
+            additional_story_dict: Dict[str, Any] = {
                 'id': story_summary_dict['id'],
                 'title': story_summary_dict['title'],
                 'description': story_summary_dict['description'],
@@ -138,7 +154,6 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'url_fragment': story_summary_dict['url_fragment'],
                 'story_is_published': True,
                 'completed_node_titles': completed_node_titles,
-                '_all_nodes': all_nodes,
             }
             additional_story_dicts.append(additional_story_dict)
 
@@ -192,7 +207,8 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     exploration_id
                 ] = voiceover_language_codes
 
-        def _create_node_dict(node: object) -> Dict[str, object]:
+        # Here we use type Any because the returned dict values have mixed types (str, list).
+        def _create_node_dict(node: story_domain.StoryNode) -> Dict[str, Any]:
             available_text_language_codes: List[str] = []
             available_voiceover_language_codes: List[str] = []
 
@@ -208,7 +224,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     )
                 )
 
-            node_dict = node.to_dict()
+            node_dict = dict(node.to_dict())
             node_dict['available_text_language_codes'] = (
                 available_text_language_codes
             )
@@ -217,16 +233,18 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             )
             return node_dict
 
-        for canonical_story_dict in canonical_story_dicts:
+        for canonical_story_dict, canonical_nodes in zip(
+            canonical_story_dicts, canonical_story_nodes
+        ):
             canonical_story_dict['all_node_dicts'] = [
-                _create_node_dict(node)
-                for node in canonical_story_dict.pop('_all_nodes')
+                _create_node_dict(node) for node in canonical_nodes
             ]
 
-        for additional_story_dict in additional_story_dicts:
+        for additional_story_dict, additional_nodes in zip(
+            additional_story_dicts, additional_story_nodes
+        ):
             additional_story_dict['all_node_dicts'] = [
-                _create_node_dict(node)
-                for node in additional_story_dict.pop('_all_nodes')
+                _create_node_dict(node) for node in additional_nodes
             ]
 
         uncategorized_skill_ids = topic.get_all_uncategorized_skill_ids()

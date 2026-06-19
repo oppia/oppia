@@ -18,7 +18,7 @@
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {TopicLessonCardComponent} from './topic-lesson-card.component';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
@@ -65,6 +65,7 @@ describe('TopicLessonCardComponent', () => {
     );
 
     TestBed.configureTestingModule({
+      imports: [NgbModule],
       declarations: [TopicLessonCardComponent, MockTranslatePipe],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
@@ -89,7 +90,6 @@ describe('TopicLessonCardComponent', () => {
           useClass: MockWindowRef,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TopicLessonCardComponent);
@@ -161,7 +161,7 @@ describe('TopicLessonCardComponent', () => {
     component.ngOnInit();
 
     expect(component.selectedTextLanguageCode).toBe('en');
-    expect(component.shouldShowFallbackCta()).toBeFalse();
+    expect(component.shouldShowFallbackCta()).toBe(false);
   });
 
   it('should fall back to session language when preferred language is unavailable', () => {
@@ -177,7 +177,7 @@ describe('TopicLessonCardComponent', () => {
 
     expect(component.selectedTextLanguageCode).toBe('es');
     expect(component.selectedVoiceoverLanguageCode).toBe('es');
-    expect(component.shouldShowFallbackCta()).toBeTrue();
+    expect(component.shouldShowFallbackCta()).toBe(true);
   });
 
   it('should fall back to English when preferred and session languages are unavailable', () => {
@@ -192,7 +192,7 @@ describe('TopicLessonCardComponent', () => {
 
     expect(component.selectedTextLanguageCode).toBe('en');
     expect(component.selectedVoiceoverLanguageCode).toBe('en');
-    expect(component.shouldShowFallbackCta()).toBeTrue();
+    expect(component.shouldShowFallbackCta()).toBe(true);
   });
 
   it('should persist manual fallback selection in current session', () => {
@@ -262,11 +262,11 @@ describe('TopicLessonCardComponent', () => {
     component.availableVoiceoverLanguageCodes = ['en', 'es'];
     component.ngOnInit();
 
-    expect(component.shouldShowFallbackCta()).toBeFalse();
+    expect(component.shouldShowFallbackCta()).toBe(false);
 
     component.onSelectedTextLanguageCodeChange('es');
 
-    expect(component.shouldShowFallbackCta()).toBeTrue();
+    expect(component.shouldShowFallbackCta()).toBe(true);
     expect(component.getStartButtonLabel()).toBe('Play Lesson in es 🌐');
   });
 
@@ -359,27 +359,27 @@ describe('TopicLessonCardComponent', () => {
     it('should return true when not coming_soon and totalCheckpointsCount > 0', () => {
       component.lessonProgressStatus = 'not_started';
       component.totalCheckpointsCount = 5;
-      expect(component.showCheckpointBar).toBeTrue();
+      expect(component.showCheckpointBar).toBe(true);
 
       component.lessonProgressStatus = 'in_progress';
       component.totalCheckpointsCount = 3;
-      expect(component.showCheckpointBar).toBeTrue();
+      expect(component.showCheckpointBar).toBe(true);
 
       component.lessonProgressStatus = 'completed';
       component.totalCheckpointsCount = 1;
-      expect(component.showCheckpointBar).toBeTrue();
+      expect(component.showCheckpointBar).toBe(true);
     });
 
     it('should return false when lesson is coming_soon', () => {
       component.lessonProgressStatus = 'coming_soon';
       component.totalCheckpointsCount = 5;
-      expect(component.showCheckpointBar).toBeFalse();
+      expect(component.showCheckpointBar).toBe(false);
     });
 
     it('should return false when totalCheckpointsCount is 0', () => {
       component.lessonProgressStatus = 'not_started';
       component.totalCheckpointsCount = 0;
-      expect(component.showCheckpointBar).toBeFalse();
+      expect(component.showCheckpointBar).toBe(false);
     });
   });
 });
