@@ -173,6 +173,13 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
     );
   }
 
+  get showCheckpointBar(): boolean {
+    return (
+      this.lessonProgressStatus !== 'coming_soon' &&
+      this.totalCheckpointsCount > 0
+    );
+  }
+
   navigateTo(url: string): void {
     if (url) {
       this.windowRef.nativeWindow.location.assign(url);

@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,23 +19,24 @@
  * LI. Learner completes the exploration and decides what to do next.
  */
 
-import testConstants from '../../utilities/common/test-constants';
+import {test} from '@playwright/test';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+test.describe.configure({mode: 'serial'});
 
-describe('Logged-In Learner', function () {
+test.describe('Logged-In Learner', function () {
   let explorationEditor: ExplorationEditor;
   let loggedInUser: LoggedInUser & LoggedOutUser;
   let explorationId: string | null;
 
-  beforeAll(async function () {
+  test.beforeAll(async function ({browser}) {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      browser
     );
 
     explorationId =
@@ -45,29 +46,26 @@ describe('Logged-In Learner', function () {
 
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser',
-      'loggedInUser@example.com'
+      'loggedInUser@example.com',
+      browser
     );
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 
-  it(
-    'should be able to rate the lesson',
-    async function () {
-      await loggedInUser.playExploration(explorationId);
-      await loggedInUser.continueToNextCard();
+  test('should be able to rate the lesson', async function () {
+    await loggedInUser.playExploration(explorationId);
+    await loggedInUser.continueToNextCard();
 
-      // Rate exploration and give feedback.
-      await loggedInUser.expectRatingStarsToBeVisible();
-      await loggedInUser.rateExploration(3, 'Nice!', false);
-      await loggedInUser.expectStarRatingToBe(3);
+    // Rate exploration and give feedback.
+    await loggedInUser.expectRatingStarsToBeVisible();
+    await loggedInUser.rateExploration(3, 'Nice!', false);
+    await loggedInUser.expectStarRatingToBe(3);
 
-      // Return to learner dashboard.
-      await loggedInUser.returnToLibraryFromExplorationCompletion();
-      await loggedInUser.expectToBeOnCommunityLibraryPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    // Return to learner dashboard.
+    await loggedInUser.returnToLibraryFromExplorationCompletion();
+    await loggedInUser.expectToBeOnCommunityLibraryPage();
+  });
 
-  afterAll(async function () {
+  test.afterAll(async function () {
     await UserFactory.closeAllBrowsers();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 });

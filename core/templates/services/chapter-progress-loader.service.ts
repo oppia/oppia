@@ -68,11 +68,8 @@ export class ChapterProgressLoaderService {
           [storyId]
         );
 
-      progressSummaries.forEach((summary, index) => {
-        if (index < explorationIds.length) {
-          const explorationId = explorationIds[index];
-          this.chapterProgressByExpId.set(explorationId, summary);
-        }
+      progressSummaries.forEach(summary => {
+        this.chapterProgressByExpId.set(summary.explorationId, summary);
       });
 
       this.loadedStoryIds.add(storyId);

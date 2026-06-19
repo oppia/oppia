@@ -842,6 +842,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             topic_fetchers, 'get_topic_by_name', return_value=mock_topic
         ):
 
+            # 1. Test pinning exploration with default entity type.
             request_dict = {
                 'topic_id': topic_id,
                 'language_code': language_code,
@@ -854,6 +855,34 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 request_dict,
                 csrf_token=csrf_token,
                 expected_status_int=200,
+            )
+
+            # 2. Test pinning with a different valid entity type ('story').
+            request_dict = {
+                'topic_id': topic_id,
+                'language_code': language_code,
+                'opportunity_id': opportunity_id,
+                'entity_type': feconf.ENTITY_TYPE_STORY,
+            }
+            _ = self.put_json(
+                '%s' % feconf.PINNED_OPPORTUNITIES_URL,
+                request_dict,
+                csrf_token=csrf_token,
+                expected_status_int=200,
+            )
+
+            # 3. Test pinning with an invalid entity type returns 400.
+            request_dict = {
+                'topic_id': topic_id,
+                'language_code': language_code,
+                'opportunity_id': opportunity_id,
+                'entity_type': 'invalid_type',
+            }
+            _ = self.put_json(
+                '%s' % feconf.PINNED_OPPORTUNITIES_URL,
+                request_dict,
+                csrf_token=csrf_token,
+                expected_status_int=400,
             )
 
     def test_pin_translation_opportunity_with_language_code_set_to_none(

@@ -11,6 +11,14 @@
       <p class="topic-lesson-card-description">{{ lessonDescription }}</p>
     </div>
 
+    <div class="topic-lesson-card-progress" *ngIf="showCheckpointBar">
+      <oppia-checkpoint-bar
+        [totalCheckpointsCount]="totalCheckpointsCount"
+        [visitedCheckpointsCount]="visitedCheckpointsCount"
+        [isReadOnly]="true">
+      </oppia-checkpoint-bar>
+    </div>
+
     <div class="topic-lesson-card-actions">
       <span
         *ngIf="shouldShowFallbackCta()"

@@ -35,6 +35,7 @@ import {TopicSessionFallbackLanguageService} from 'pages/topic-viewer-page/servi
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlService} from 'services/contextual/url.service';
+import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 
 import './topic-story-section.component.css';
 
@@ -48,6 +49,13 @@ interface LessonCardData {
   lessonDescription: string;
   thumbnailUrl: string;
   startUrl: string;
+  lessonProgressStatus:
+    | 'not_started'
+    | 'in_progress'
+    | 'completed'
+    | 'coming_soon';
+  totalCheckpointsCount: number;
+  visitedCheckpointsCount: number;
   availableTextLanguageCodes: string[];
   availableVoiceoverLanguageCodes: string[];
 }
@@ -91,11 +99,13 @@ export class TopicStorySectionComponent
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
+    private chapterProgressLoaderService: ChapterProgressLoaderService,
     private topicSessionFallbackLanguageService: TopicSessionFallbackLanguageService
   ) {}
 
   ngOnInit(): void {
     this.populateFromInputs();
+    void this.loadChapterProgress();
     this.languageCodeChangeSubscription =
       this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
         this.topicSessionFallbackLanguageService.clearSelection();
@@ -117,6 +127,9 @@ export class TopicStorySectionComponent
       changes.practiceCount
     ) {
       this.populateFromInputs();
+    }
+    if (changes.storySummary && !changes.storySummary.firstChange) {
+      void this.loadChapterProgress();
     }
   }
 
@@ -155,6 +168,75 @@ export class TopicStorySectionComponent
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
+  private getLessonProgressStatus(
+    node: StoryNode
+  ): 'not_started' | 'in_progress' | 'completed' | 'coming_soon' {
+    const nodeTitle = node.getTitle();
+    if (this.storySummary.isNodeCompleted(nodeTitle)) {
+      return 'completed';
+    }
+
+    const visitedChapterTitles = this.storySummary.getVisitedChapterTitles();
+    if (
+      visitedChapterTitles &&
+      visitedChapterTitles.indexOf(nodeTitle) !== -1
+    ) {
+      return 'in_progress';
+    }
+
+    return 'not_started';
+  }
+
+  private async loadChapterProgress(): Promise<void> {
+    const explorationIds = this.storySummary
+      .getAllNodes()
+      .map(node => node.getExplorationId())
+      .filter(id => id !== null) as string[];
+
+    if (explorationIds.length === 0) {
+      return;
+    }
+
+    try {
+      await this.chapterProgressLoaderService.loadChapterProgressForStory(
+        this.storySummary.getId(),
+        explorationIds
+      );
+    } catch {
+      return;
+    }
+
+    this.lessonCards = this.storySummary
+      .getAllNodes()
+      .map((node: StoryNode, index: number) => {
+        const explorationId = node.getExplorationId();
+        let totalCheckpoints = 0;
+        let visitedCheckpoints = 0;
+
+        if (explorationId) {
+          const summary =
+            this.chapterProgressLoaderService.getChapterProgressSummary(
+              explorationId
+            );
+          if (summary) {
+            totalCheckpoints = summary.totalCheckpoints;
+            visitedCheckpoints = summary.visitedCheckpoints;
+          }
+        }
+
+        return {
+          lessonNumber: index + 1,
+          lessonTitle: 'Lesson ' + (index + 1) + ': ' + node.getTitle(),
+          lessonDescription: node.getDescription(),
+          thumbnailUrl: this.getLessonThumbnailUrl(node),
+          startUrl: this.getLessonStartUrl(node),
+          lessonProgressStatus: this.getLessonProgressStatus(node),
+          totalCheckpointsCount: totalCheckpoints,
+          visitedCheckpointsCount: visitedCheckpoints,
+        };
+      });
+  }
+
   private populateFromInputs(): void {
     if (!this.classroomUrlFragment) {
       this.classroomUrlFragment =
@@ -180,6 +262,9 @@ export class TopicStorySectionComponent
           lessonDescription: node.getDescription(),
           thumbnailUrl: this.getLessonThumbnailUrl(node),
           startUrl: this.getLessonStartUrl(node),
+          lessonProgressStatus: this.getLessonProgressStatus(node),
+          totalCheckpointsCount: 0,
+          visitedCheckpointsCount: 0,
           availableTextLanguageCodes: node.getAvailableTextLanguageCodes(),
           availableVoiceoverLanguageCodes:
             node.getAvailableVoiceoverLanguageCodes(),
