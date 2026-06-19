@@ -71,7 +71,7 @@ class FromTaggedOutputs(beam.PTransform):  # type: ignore[misc]
             raise ValueError(f'{pass_tag=!r} must not be one of {fail_tags=!r}')
         super().__init__(label=label)
         self.pass_tag = pass_tag
-        self.fail_tags = tuple(fail_tags)
+        self.fail_tags = tuple(sorted({tag for tag in fail_tags}))
         self.prefix = (prefix.removesuffix(' ') + ' ') if prefix else ''
 
     def expand(
