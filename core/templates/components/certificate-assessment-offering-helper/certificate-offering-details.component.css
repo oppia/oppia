@@ -1,0 +1,239 @@
+.oppia-certificate-offering-details {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px #0000001a;
+  color: #333;
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 32px 30px 30px 40px;
+}
+
+.oppia-certificate-section-title {
+  color: #00645c;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 20px;
+}
+
+.oppia-certificate-section-subtitle {
+  color: #555;
+  font-size: 13px;
+  margin: -14px 0 18px;
+}
+
+.oppia-certificate-section-hint {
+  color: #666;
+  font-size: 12px;
+  margin: -10px 0 14px;
+}
+
+.oppia-certificate-label {
+  color: #333;
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.oppia-certificate-required {
+  margin-left: 1px;
+}
+
+.oppia-certificate-input {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: #333;
+  font-family: inherit;
+  font-size: 13px;
+  height: 40px;
+  outline: none;
+  padding: 8px 12px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+
+.oppia-certificate-input:focus {
+  border-color: #00645c;
+  box-shadow: 0 0 0 2px rgba(0, 100, 92, 0.12);
+}
+
+.oppia-certificate-input::placeholder {
+  color: #aaa;
+}
+
+.oppia-certificate-textarea {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: #333;
+  font-family: inherit;
+  font-size: 13px;
+  min-height: 148px;
+  outline: none;
+  padding: 10px 12px 28px;
+  resize: vertical;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+
+.oppia-certificate-textarea:focus {
+  border-color: #00645c;
+  box-shadow: 0 0 0 2px rgba(0, 100, 92, 0.12);
+}
+
+.oppia-certificate-textarea::placeholder {
+  color: #aaa;
+}
+
+.has-error .oppia-certificate-input,
+.has-error .oppia-certificate-textarea {
+  border-color: #d9534f;
+}
+
+.has-error .oppia-certificate-input:focus,
+.has-error .oppia-certificate-textarea:focus {
+  border-color: #d9534f;
+  box-shadow: 0 0 0 2px rgba(217, 83, 79, 0.12);
+}
+
+.has-error .form-text {
+  color: #d9534f;
+}
+
+.oppia-certificate-two-col {
+  align-items: flex-start;
+  display: flex;
+  gap: 24px;
+}
+
+.oppia-certificate-col-left {
+  flex: 1.1;
+}
+
+.oppia-certificate-col-right {
+  flex: 1;
+}
+
+.oppia-certificate-textarea-wrap {
+  position: relative;
+}
+
+.oppia-certificate-demonstrates-box {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 16px 20px;
+}
+
+.oppia-certificate-demonstrates-prefix {
+  color: #333;
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0 0 12px;
+}
+
+.oppia-certificate-outcome-row {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.oppia-certificate-outcome-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.oppia-certificate-outcome-remove {
+  align-items: center;
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  color: #888;
+  cursor: pointer;
+  display: flex;
+  flex-shrink: 0;
+  font-size: 16px;
+  height: 28px;
+  justify-content: center;
+  line-height: 1;
+  margin-top: 0;
+  padding: 0;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  width: 28px;
+}
+
+.oppia-certificate-outcome-remove:hover {
+  background: #fff5f5;
+  border-color: #d32f2f;
+  color: #d32f2f;
+}
+
+.oppia-certificate-outcome-add {
+  align-items: center;
+  background: none;
+  border: none;
+  color: #00645c;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  gap: 4px;
+  margin-top: 2px;
+  padding: 4px 0;
+  transition: opacity 0.15s;
+}
+
+.oppia-certificate-outcome-add:hover {
+  opacity: 0.75;
+}
+
+.oppia-certificate-offering-details-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 0;
+  padding: 5px 0 0;
+}
+
+.oppia-certificate-btn-next {
+  background: #00645c;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 28px;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.oppia-certificate-btn-next:hover:not([disabled]) {
+  background: #004e47;
+}
+
+.oppia-certificate-btn-next[disabled],
+.oppia-certificate-btn-next[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+@media (max-width: 640px) {
+  .oppia-certificate-two-col {
+    flex-direction: column;
+  }
+
+  .oppia-certificate-section {
+    padding: 0 0 20px;
+  }
+
+  .oppia-certificate-offering-details-actions {
+    padding: 12px 0 0;
+  }
+}
