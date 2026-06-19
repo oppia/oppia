@@ -55,7 +55,7 @@ import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component
 import {NgBootstrapModule} from 'modules/ng-boostrap.module';
 import {FooterDonateVolunteerComponent} from './footer-donate-volunteer.component';
 import {FeedbackModalComponent} from './feedback-modal.component';
-import {CustomFormsComponentsModule} from 'components/forms/custom-forms-directives/custom-form-components.module';
+import {ImageReceiverModule} from 'components/forms/custom-forms-directives/image-receiver.module';
 import {MatIconModule} from '@angular/material/icon';
 import {PrimaryButtonComponent} from 'components/button-directives/primary-button.component';
 import {RouterModule} from '@angular/router';
@@ -73,7 +73,7 @@ import {RouterModule} from '@angular/router';
     RouterModule,
     SharedPipesModule,
     MatIconModule,
-    CustomFormsComponentsModule,
+    ImageReceiverModule,
   ],
 
   declarations: [

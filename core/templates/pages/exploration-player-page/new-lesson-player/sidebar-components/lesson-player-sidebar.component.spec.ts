@@ -258,13 +258,22 @@ describe('LessonPlayerSidebarComponent', () => {
   });
 
   it('should open report an issue modal', () => {
+    const mockModalRef = jasmine.createSpyObj('NgbModalRef', ['close']);
+    mockModalRef.componentInstance = {};
+    mockNgbModal.open.and.returnValue(mockModalRef);
+
     component.showReportAnIssueModal();
+
     expect(mockNgbModal.open).toHaveBeenCalledWith(FeedbackModalComponent, {
       backdrop: 'static',
     });
   });
 
   it('should open send a lesson feedback modal', () => {
+    const mockModalRef = jasmine.createSpyObj('NgbModalRef', ['close']);
+    mockModalRef.componentInstance = {};
+    mockNgbModal.open.and.returnValue(mockModalRef);
+
     component.showSendLessonFeedbackModal();
     expect(mockNgbModal.open).toHaveBeenCalledWith(FeedbackModalComponent, {
       backdrop: 'static',
