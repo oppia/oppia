@@ -67,11 +67,10 @@ class FromTaggedOutputs(beam.PTransform):  # type: ignore[misc]
         prefix: str = '',
         label: str | None = None,
     ) -> None:
-
-        if pass_tag in fail_tags:
+        if (pass_tag := pass_tag or 'main') in fail_tags:
             raise ValueError(f'{pass_tag=!r} must not be one of {fail_tags=!r}')
         super().__init__(label=label)
-        self.pass_tag = pass_tag or 'main'
+        self.pass_tag = pass_tag
         self.fail_tags = frozenset(fail_tags)
         self.prefix = (prefix.removesuffix(' ') + ' ') if prefix else ''
 

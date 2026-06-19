@@ -28,10 +28,13 @@ from apache_beam import pvalue
 
 
 class FromTaggedOutputsTests(job_test_utils.PipelinedTestBase):
-
     def test_init_with_pass_tag_in_fail_tags_raises(self) -> None:
         with self.assertRaisesRegex(ValueError, 'must not be one of'):
             job_result_transforms.FromTaggedOutputs('OK', 'OK')
+
+    def test_init_with_main_as_fail_tag_raises(self) -> None:
+        with self.assertRaisesRegex(ValueError, 'must not be one of'):
+            job_result_transforms.FromTaggedOutputs('', 'main')
 
     def test_results_with_nothing_produces_nothing(self) -> None:
         self.assert_pcoll_empty(self.run_from_tagged_outputs(('OK', 'ERR')))
@@ -105,7 +108,6 @@ class FromTaggedOutputsTests(job_test_utils.PipelinedTestBase):
 
 
 class ResultsToJobRunResultsTests(job_test_utils.PipelinedTestBase):
-
     def test_ok_results_without_prefix_correctly_outputs(self) -> None:
         self.assert_pcoll_equal(
             (
@@ -156,7 +158,6 @@ class ResultsToJobRunResultsTests(job_test_utils.PipelinedTestBase):
 
 
 class CountObjectsToJobRunResultTests(job_test_utils.PipelinedTestBase):
-
     def test_three_objects_without_prefix_correctly_outputs(self) -> None:
         self.assert_pcoll_equal(
             (
