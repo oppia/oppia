@@ -41,22 +41,34 @@ auth_models, user_models = models.Registry.import_models(
 )
 
 
-class GetRecordsDirectlyFromFirebaseTests(
+class FirebaseConnectionTestBase(
     job_test_utils.JobTestBase,
     firebase_auth_services_test.FirebaseAuthServicesTestBase,
 ):
-    @mock.patch.object(firebase_auth_services, 'establish_firebase_connection')
-    def test_setup_calls_establish_firebase_connection(
-        self, establish_firebase_connection: mock.Mock
-    ) -> None:
-        firebase_io.GetRecordsDirectlyFromFirebase().setup()
+    """Base class for transforms that connect to Firebase.
 
-        establish_firebase_connection.assert_called_once_with()
+    These transforms read from or write to Firebase, so the connection is
+    mocked out to avoid establishing a real one during testing.
+    """
 
+    def setUp(self) -> None:
+        super().setUp()
+        establish_connection_patcher = mock.patch.object(
+            firebase_auth_services, 'establish_firebase_connection'
+        )
+        self.establish_firebase_connection_mock = (
+            establish_connection_patcher.start()
+        )
+        self.addCleanup(establish_connection_patcher.stop)
+
+
+class GetRecordsDirectlyFromFirebaseTests(FirebaseConnectionTestBase):
     def test_get_with_no_firebase_users_returns_empty(self) -> None:
         self.assert_pcoll_empty(
             self.pipeline | firebase_io.GetRecordsDirectlyFromFirebase()
         )
+        # Getting records reads directly from Firebase, so a connection is made.
+        self.establish_firebase_connection_mock.assert_called_once()
 
     def test_get_with_multiple_firebase_users_returns_all(self) -> None:
         self.firebase_sdk_stub.create_user(
@@ -83,6 +95,8 @@ class GetRecordsDirectlyFromFirebaseTests(
                 ),
             ],
         )
+        # Getting records reads directly from Firebase, so a connection is made.
+        self.establish_firebase_connection_mock.assert_called_once()
 
 
 class RecreateRecordsFromOppiaModelsTests(job_test_utils.JobTestBase):
@@ -337,10 +351,7 @@ class RecreateRecordsFromOppiaModelsTests(job_test_utils.JobTestBase):
             self.assert_pcoll_equal(records, [])
 
 
-class CreateFirebaseRecordsTests(
-    job_test_utils.JobTestBase,
-    firebase_auth_services_test.FirebaseAuthServicesTestBase,
-):
+class CreateFirebaseRecordsTests(FirebaseConnectionTestBase):
     def test_create_outside_emulator_uses_import_users(self) -> None:
         with self.swap(constants, 'EMULATOR_MODE', False):
             self.assert_pcoll_equal(
@@ -364,6 +375,8 @@ class CreateFirebaseRecordsTests(
                 ),
                 [job_run_result.JobRunResult(stdout='CREATE OK: 2')],
             )
+        # Creating records writes to Firebase, so a connection is made.
+        self.establish_firebase_connection_mock.assert_called_once()
 
     def test_create_within_emulator_uses_create_user(self) -> None:
         with self.swap(constants, 'EMULATOR_MODE', True):
@@ -388,6 +401,8 @@ class CreateFirebaseRecordsTests(
                 ),
                 [job_run_result.JobRunResult(stdout='CREATE OK: 2')],
             )
+        # Creating records writes to Firebase, so a connection is made.
+        self.establish_firebase_connection_mock.assert_called_once()
 
     def test_create_within_emulator_reports_per_record_failure(self) -> None:
         self.firebase_sdk_stub.create_user(uid='uid_a', email='uid_a@a.com')
@@ -416,18 +431,19 @@ class CreateFirebaseRecordsTests(
                     ),
                 ],
             )
+        # Creating records writes to Firebase, so a connection is made.
+        self.establish_firebase_connection_mock.assert_called_once()
 
 
-class DeleteFirebaseRecordsTests(
-    job_test_utils.JobTestBase,
-    firebase_auth_services_test.FirebaseAuthServicesTestBase,
-):
+class DeleteFirebaseRecordsTests(FirebaseConnectionTestBase):
     def test_delete_with_no_records_produces_no_output(self) -> None:
         self.assert_pcoll_empty(
             self.pipeline
             | beam.Create([])
             | firebase_io.DeleteFirebaseRecords()
         )
+        # Deleting records writes to Firebase, so a connection is made.
+        self.establish_firebase_connection_mock.assert_called_once()
 
     def test_delete_reports_success_count(self) -> None:
         self.firebase_sdk_stub.create_user(uid='uid_a', email='a@a.com')
@@ -450,3 +466,5 @@ class DeleteFirebaseRecordsTests(
             ),
             [job_run_result.JobRunResult(stdout='DELETE OK: 2')],
         )
+        # Deleting records writes to Firebase, so a connection is made.
+        self.establish_firebase_connection_mock.assert_called_once()

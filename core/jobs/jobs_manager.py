@@ -125,6 +125,7 @@ def run_job(
         job.
 
     Raises:
+        ValueError. The parameterized_args defines service_account_email.
         RuntimeError. Failed to deploy given job to the Dataflow service.
     """
     job_name = job_class.__name__
@@ -140,6 +141,15 @@ def run_job(
             'autoscaling_algorithm': 'THROUGHPUT_BASED',
         }
 
+    if parameterized_args:
+        if 'service_account_email' in parameterized_args:
+            raise ValueError(
+                'SENSITIVE: service_account_email cannot be passed as an '
+                'option (choose_service_account_id_for_job() is responsible '
+                'for assigning the correct account)'
+            )
+        additional_options.update(parameterized_args)
+
     if service_account_id := choose_service_account_id_for_job(job_class):
         additional_options['service_account_email'] = (
             feconf.CLOUD_SERVICE_ACCOUNT_EMAIL_TEMPLATE.format(
@@ -147,9 +157,6 @@ def run_job(
                 app_id=app_identity_services.get_application_id(),
             )
         )
-
-    if parameterized_args:
-        additional_options.update(parameterized_args)
 
     if pipeline is None:
         pipeline = beam.Pipeline(

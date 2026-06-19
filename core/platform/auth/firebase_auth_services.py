@@ -68,7 +68,7 @@ import firebase_admin
 import webapp2
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
-from typing import List, Optional
+from typing import Any, List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -201,11 +201,10 @@ def mark_user_for_deletion(user_id: str) -> None:
     assoc_by_auth_id_model = (
         auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id)
         if assoc_by_user_id_model is None
-        else
         # NOTE: We use get_multi(include_deleted=True) because get() returns
         # None for models with deleted=True, but we need to make changes to
         # those models when managing deletion.
-        auth_models.UserIdByFirebaseAuthIdModel.get_multi(
+        else auth_models.UserIdByFirebaseAuthIdModel.get_multi(
             [assoc_by_user_id_model.firebase_auth_id], include_deleted=True
         )[0]
     )
@@ -617,7 +616,8 @@ def _get_auth_claims_from_session_cookie(
 
 
 def _create_auth_claims(
-    firebase_claims: dict[str, str],
+    # Here we use type Any because that's how the Firebase SDK annotates claims.
+    firebase_claims: dict[str, Any],
 ) -> auth_domain.AuthClaims:
     """Returns a new AuthClaims domain object from the Firebase-provided dict.
 

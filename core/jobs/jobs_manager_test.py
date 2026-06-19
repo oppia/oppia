@@ -61,7 +61,6 @@ class FailingJob(base_jobs.JobBase):
 
 
 class RunJobTests(test_utils.GenericTestBase):
-
     def test_working_sync_job(self) -> None:
         run = jobs_manager.run_job(WorkingJob, True, namespace=self.namespace)
 
@@ -143,7 +142,6 @@ class RunJobTests(test_utils.GenericTestBase):
 
 
 class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
 
@@ -228,7 +226,6 @@ class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
 
 
 class CancelJobTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
 
@@ -284,7 +281,6 @@ class CancelJobTests(test_utils.GenericTestBase):
 
 
 class LimitJobResourcesTests(test_utils.GenericTestBase):
-
     def test_does_job_requires_limiting_workers_true(self) -> None:
         job_name = 'VoiceoverSynthesisJob'
         self.assertTrue(
@@ -314,21 +310,19 @@ class LimitJobResourcesTests(test_utils.GenericTestBase):
 
 
 class ServiceAccountEmailOptionTests(test_utils.GenericTestBase):
-
-    TEST_CASES = (
-        (
-            firebase_server_sync_jobs.AuditFirebaseServerSyncJob,
-            feconf.SENSITIVE_FIREBASE_AUTH_READ_ONLY_SERVICE_ACCOUNT_ID,
-        ),
-        (
-            firebase_server_sync_jobs.FirebaseServerSyncJob,
-            feconf.SENSITIVE_FIREBASE_AUTH_READ_WRITE_SERVICE_ACCOUNT_ID,
-        ),
-        (
-            WorkingJob,
-            None,
-        ),
-    )
+    @mock.patch('apache_beam.Pipeline', return_value=mock.MagicMock())
+    def test_service_account_email_via_options_raises_error(
+        self, unused_pipeline: mock.Mock
+    ) -> None:
+        with self.assertRaisesRegex(
+            ValueError, 'service_account_email cannot be passed'
+        ):
+            jobs_manager.run_job(
+                WorkingJob,
+                sync=True,
+                namespace=self.namespace,
+                parameterized_args={'service_account_email': 'a@a.com'},
+            )
 
     def test_service_account_email_option(self) -> None:
         for job_class, expected_id in self.TEST_CASES:
@@ -358,3 +352,18 @@ class ServiceAccountEmailOptionTests(test_utils.GenericTestBase):
                     expected_id
                     and f'{expected_id}@dev-project-id.iam.gserviceaccount.com',
                 )
+
+    TEST_CASES = (
+        (
+            firebase_server_sync_jobs.AuditFirebaseServerSyncJob,
+            feconf.SENSITIVE_FIREBASE_AUTH_READ_ONLY_SERVICE_ACCOUNT_ID,
+        ),
+        (
+            firebase_server_sync_jobs.FirebaseServerSyncJob,
+            feconf.SENSITIVE_FIREBASE_AUTH_READ_WRITE_SERVICE_ACCOUNT_ID,
+        ),
+        (
+            WorkingJob,
+            None,
+        ),
+    )

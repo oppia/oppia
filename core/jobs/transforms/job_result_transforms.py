@@ -23,7 +23,17 @@ from core.jobs.types import job_run_result
 import apache_beam as beam
 import result
 from apache_beam import pvalue
-from typing import Any, Optional
+from typing import Any, Optional, Protocol
+
+
+class TaggedOutputs(Protocol):
+    """A read-only mapping of PCollections addressable by string tags.
+
+    This allows FromTaggedOutputs to accept any tagged-output container without
+    coupling it to a concrete type.
+    """
+
+    def __getitem__(self, tag: str) -> pvalue.PCollection: ...
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
@@ -66,7 +76,7 @@ class FromTaggedOutputs(beam.PTransform):  # type: ignore[misc]
         self.prefix = (prefix.removesuffix(' ') + ' ') if prefix else ''
 
     def expand(
-        self, out: pvalue.DoOutputsTuple
+        self, out: TaggedOutputs
     ) -> pvalue.PCollection[job_run_result.JobRunResult]:
         """Formats pass/fail tagged outputs as stdout/stderr job run results."""
 
@@ -85,8 +95,8 @@ class FromTaggedOutputs(beam.PTransform):  # type: ignore[misc]
         return (stdout, *stderr_iter) | 'Flatten outputs' >> beam.Flatten()
 
     def _extract_input_pvalues(
-        self, out: pvalue.DoOutputsTuple
-    ) -> tuple[pvalue.DoOutputsTuple, dict[str, pvalue.PCollection]]:
+        self, out: TaggedOutputs
+    ) -> tuple[TaggedOutputs, dict[str, pvalue.PCollection]]:
         """Needs to be overriden when input type doesn't inherit from PValue."""
 
         return out, {tag: out[tag] for tag in {self.pass_tag, *self.fail_tags}}

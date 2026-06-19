@@ -70,6 +70,23 @@ class FirebaseRecordTests(test_utils.GenericTestBase):
         self.assertEqual(record.email, 'a@a.com')
         self.assertTrue(record.disabled)
 
+    def test_from_export_with_missing_fields_raises_value_error(self) -> None:
+        with (
+            self.subTest('email is None'),
+            self.assertRaisesRegex(ValueError, r'needs non-empty'),
+        ):
+            firebase_domain.FirebaseRecord.from_export(
+                mock.Mock(uid='uid', email=None, disabled=False)
+            )
+
+        with (
+            self.subTest('uid is None'),
+            self.assertRaisesRegex(ValueError, r'needs non-empty'),
+        ):
+            firebase_domain.FirebaseRecord.from_export(
+                mock.Mock(uid=None, email='a@a.com', disabled=False)
+            )
+
     def test_from_oppia_models_with_matching_ids_and_deleted_returns_record(
         self,
     ) -> None:

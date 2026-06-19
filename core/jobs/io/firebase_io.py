@@ -46,11 +46,6 @@ auth_models, user_models = models.Registry.import_models(
 class GetRecordsDirectlyFromFirebase(beam.PTransform):  # type: ignore[misc]
     """Gets the collection of records directly from the Firebase server."""
 
-    def setup(self) -> None:
-        """Establishes a Firebase connection just before running `process`."""
-
-        firebase_auth_services.establish_firebase_connection()
-
     def expand(
         self, pbegin: pvalue.PBegin
     ) -> beam.PCollection[firebase_domain.FirebaseRecord]:
@@ -59,19 +54,8 @@ class GetRecordsDirectlyFromFirebase(beam.PTransform):  # type: ignore[misc]
         return (
             pbegin
             | 'Allocate exactly one worker' >> beam.Create([None])
-            | 'Get records directly from Firebase'
-            >> beam.FlatMap(self._yield_records_from_firebase_exports)
+            | 'Get Firebase records' >> beam.ParDo(_ExportFirebaseRecords())
             | 'Reshuffle records to improve parallelization' >> beam.Reshuffle()
-        )
-
-    def _yield_records_from_firebase_exports(
-        self, _: None
-    ) -> abc.Iterable[firebase_domain.FirebaseRecord]:
-        """Yields all of the records directly from Firebase."""
-
-        yield from (
-            firebase_domain.FirebaseRecord.from_export(user)
-            for user in firebase_auth.list_users().iterate_all()
         )
 
 
@@ -270,3 +254,17 @@ class DeleteFirebaseRecords(
         """Deletes the given users from Firebase by their UIDs."""
 
         return firebase_auth.delete_users(uids)
+
+
+# TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
+class _ExportFirebaseRecords(beam.DoFn):  # type: ignore[misc]
+    """Exports all Firebase records directly from the Firebase server."""
+
+    def process(self, _: None) -> abc.Iterable[firebase_domain.FirebaseRecord]:
+        """Yields all of the records directly from Firebase."""
+
+        firebase_auth_services.establish_firebase_connection()
+        yield from (
+            firebase_domain.FirebaseRecord.from_export(user)
+            for user in firebase_auth.list_users().iterate_all()
+        )

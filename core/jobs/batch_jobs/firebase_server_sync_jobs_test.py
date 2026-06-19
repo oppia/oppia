@@ -18,11 +18,16 @@
 
 from __future__ import annotations
 
+from unittest import mock
+
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import firebase_server_sync_jobs
 from core.jobs.types import firebase_domain, job_run_result
 from core.platform import models
-from core.platform.auth import firebase_auth_services_test
+from core.platform.auth import (
+    firebase_auth_services,
+    firebase_auth_services_test,
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -38,6 +43,18 @@ class FirebaseServerSyncJobTestBase(
     firebase_auth_services_test.FirebaseAuthServicesTestBase,
 ):
     """Shared setup helpers for the Firebase server sync jobs."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        # The sync jobs read from and write to Firebase, so mock out the
+        # connection to avoid establishing a real one during testing.
+        establish_connection_patcher = mock.patch.object(
+            firebase_auth_services, 'establish_firebase_connection'
+        )
+        self.establish_firebase_connection_mock = (
+            establish_connection_patcher.start()
+        )
+        self.addCleanup(establish_connection_patcher.stop)
 
     def create_oppia_user(
         self,
@@ -81,6 +98,8 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
 
     def test_empty_storage_produces_no_output(self) -> None:
         self.assert_job_output_is_empty()
+        # Syncing makes one connection each to read, create, and delete records.
+        self.assertEqual(self.establish_firebase_connection_mock.call_count, 3)
 
     def test_in_sync_user_is_left_unchanged(self) -> None:
         self.create_oppia_user(
@@ -94,6 +113,8 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
             [job_run_result.JobRunResult.as_stdout('OK: 1')]
         )
         self.firebase_sdk_stub.assert_is_user('aid_a')
+        # Syncing makes one connection each to read, create, and delete records.
+        self.assertEqual(self.establish_firebase_connection_mock.call_count, 3)
 
     def test_user_missing_from_firebase_is_created(self) -> None:
         self.create_oppia_user(
@@ -105,6 +126,8 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
             [job_run_result.JobRunResult(stdout='CREATE OK: 1')]
         )
         self.firebase_sdk_stub.assert_is_user('aid_b')
+        # Syncing makes one connection each to read, create, and delete records.
+        self.assertEqual(self.establish_firebase_connection_mock.call_count, 3)
 
     def test_user_missing_from_oppia_is_deleted(self) -> None:
         self.firebase_sdk_stub.create_user(
@@ -115,6 +138,8 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
             [job_run_result.JobRunResult(stdout='DELETE OK: 1')]
         )
         self.firebase_sdk_stub.assert_is_not_user('aid_c')
+        # Syncing makes one connection each to read, create, and delete records.
+        self.assertEqual(self.establish_firebase_connection_mock.call_count, 3)
 
     def test_deleted_oppia_user_in_sync_with_disabled_firebase_user(
         self,
@@ -134,6 +159,8 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
         )
         self.firebase_sdk_stub.assert_is_user('aid_d')
         self.firebase_sdk_stub.assert_is_disabled('aid_d')
+        # Syncing makes one connection each to read, create, and delete records.
+        self.assertEqual(self.establish_firebase_connection_mock.call_count, 3)
 
     def test_profile_users_are_ignored(self) -> None:
         self.create_oppia_user(
@@ -152,6 +179,8 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
         self.assert_job_output_is(
             [job_run_result.JobRunResult.as_stdout('OK: 1')]
         )
+        # Syncing makes one connection each to read, create, and delete records.
+        self.assertEqual(self.establish_firebase_connection_mock.call_count, 3)
 
     def test_mixed_diff_applies_every_change(self) -> None:
         self.create_oppia_user(
@@ -179,6 +208,8 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
         self.firebase_sdk_stub.assert_is_user('aid_a')
         self.firebase_sdk_stub.assert_is_user('aid_b')
         self.firebase_sdk_stub.assert_is_not_user('aid_c')
+        # Syncing makes one connection each to read, create, and delete records.
+        self.assertEqual(self.establish_firebase_connection_mock.call_count, 3)
 
 
 class AuditFirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
@@ -186,6 +217,9 @@ class AuditFirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
 
     def test_empty_storage_produces_no_output(self) -> None:
         self.assert_job_output_is_empty()
+        # The dry-run audit only reads from Firebase, so exactly one connection
+        # is made (and nothing is written).
+        self.establish_firebase_connection_mock.assert_called_once()
 
     def test_in_sync_user_is_reported(self) -> None:
         self.create_oppia_user(
@@ -199,6 +233,9 @@ class AuditFirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
             [job_run_result.JobRunResult.as_stdout('OK: 1')]
         )
         self.firebase_sdk_stub.assert_is_user('aid_a')
+        # The dry-run audit only reads from Firebase, so exactly one connection
+        # is made (and nothing is written).
+        self.establish_firebase_connection_mock.assert_called_once()
 
     def test_user_missing_from_firebase_is_reported_not_created(self) -> None:
         self.create_oppia_user(
@@ -210,6 +247,9 @@ class AuditFirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
         )
 
         self.firebase_sdk_stub.assert_is_not_user('aid_b')
+        # The dry-run audit only reads from Firebase, so exactly one connection
+        # is made (and nothing is written).
+        self.establish_firebase_connection_mock.assert_called_once()
 
     def test_user_missing_from_oppia_is_reported_not_deleted(self) -> None:
         self.firebase_sdk_stub.create_user(
@@ -221,6 +261,9 @@ class AuditFirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
         )
 
         self.firebase_sdk_stub.assert_is_user('aid_c')
+        # The dry-run audit only reads from Firebase, so exactly one connection
+        # is made (and nothing is written).
+        self.establish_firebase_connection_mock.assert_called_once()
 
     def test_mixed_diff_reports_counts_without_mutating(self) -> None:
         self.create_oppia_user(
@@ -250,6 +293,9 @@ class AuditFirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
         self.firebase_sdk_stub.assert_is_user('aid_a')
         self.firebase_sdk_stub.assert_is_not_user('aid_b')
         self.firebase_sdk_stub.assert_is_user('aid_c')
+        # The dry-run audit only reads from Firebase, so exactly one connection
+        # is made (and nothing is written).
+        self.establish_firebase_connection_mock.assert_called_once()
 
     def test_duplicate_email_is_reported_as_corrupt(self) -> None:
         duplicate_email = 'dup@dup.com'
@@ -284,6 +330,9 @@ class AuditFirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
                 ),
             ]
         )
+        # The dry-run audit only reads from Firebase, so exactly one connection
+        # is made (and nothing is written).
+        self.establish_firebase_connection_mock.assert_called_once()
 
     def test_duplicate_auth_id_is_reported_as_corrupt(self) -> None:
         shared_auth_id = 'aid_shared'
@@ -308,3 +357,6 @@ class AuditFirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
                 ),
             ]
         )
+        # The dry-run audit only reads from Firebase, so exactly one connection
+        # is made (and nothing is written).
+        self.establish_firebase_connection_mock.assert_called_once()

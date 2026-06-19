@@ -60,7 +60,7 @@ class FirebaseServerSyncJobBase(base_jobs.JobBase):
             firebase_io.RecreateRecordsFromOppiaModels.TAG_AUTH_PAIRS
         ]
 
-        diff_results = (
+        diff_results: firebase_transforms.DiffFirebaseRecords.OutputDict = (
             oppia_records,
             firebase_records,
         ) | 'Diff expected records (in Oppia) by actual records (in Firebase)' >> firebase_transforms.DiffFirebaseRecords(
@@ -69,22 +69,22 @@ class FirebaseServerSyncJobBase(base_jobs.JobBase):
 
         if self.DRY_RUN:
             add_results = diff_results[
-                firebase_transforms.DiffFirebaseRecords.TAG_ADD
+                'ADD'
             ] | 'Count records that would be created' >> job_result_transforms.CountObjectsToJobRunResult(
                 'WOULD CREATE'
             )
             del_results = diff_results[
-                firebase_transforms.DiffFirebaseRecords.TAG_DEL
+                'DEL'
             ] | 'Count records that would be deleted' >> job_result_transforms.CountObjectsToJobRunResult(
                 'WOULD DELETE'
             )
         else:
             add_results = (
-                diff_results[firebase_transforms.DiffFirebaseRecords.TAG_ADD]
+                diff_results['ADD']
                 | 'Create the records' >> firebase_io.CreateFirebaseRecords()
             )
             del_results = (
-                diff_results[firebase_transforms.DiffFirebaseRecords.TAG_DEL]
+                diff_results['DEL']
                 | 'Delete the records' >> firebase_io.DeleteFirebaseRecords()
             )
 

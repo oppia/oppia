@@ -64,7 +64,12 @@ class FirebaseRecord:
         Returns:
             firebase_domain.FirebaseRecord. Holds the same auth_id, email, and
             disabled values.
+
+        Raises:
+            ValueError. If any required fields are missing from the record.
         """
+        if not record.uid or not record.email:
+            raise ValueError('ExportedUserRecord needs non-empty uid and email')
         return FirebaseRecord(
             auth_id=record.uid, email=record.email, disabled=record.disabled
         )

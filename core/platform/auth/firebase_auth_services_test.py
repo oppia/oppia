@@ -260,7 +260,7 @@ class FirebaseAdminSdkStub:
         uids_to_delete = set(uids)
         for uid in uids_to_delete.intersection(self._users_by_uid):
             del self._users_by_uid[uid]
-        return self._create_delete_users_result_fragile([], len(uids_to_delete))
+        return self._create_delete_users_result_fragile([], len(uids))
 
     def get_user(self, uid: str) -> firebase_auth.UserRecord:
         """Returns user with given ID if found, otherwise raises an error.
