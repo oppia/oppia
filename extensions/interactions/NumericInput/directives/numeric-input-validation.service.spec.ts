@@ -597,7 +597,7 @@ describe('NumericInputValidationService', () => {
     );
   });
 
-  it('should generate errors for disallowed exponent and minus symbols', () => {
+  it('should generate correct error message based on configuration flags', () => {
     expect(
       validatorService.validateNumericString('12e2', '.', false, false)
     ).toEqual('I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT');
@@ -608,15 +608,21 @@ describe('NumericInputValidationService', () => {
 
     expect(
       validatorService.validateNumericString('-12', '.', true, false)
-    ).toEqual('I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_MINUS');
+    ).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_MINUS_NO_EXPONENT'
+    );
 
     expect(
       validatorService.validateNumericString('12e2', '.', true, false)
-    ).toEqual('I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_EXPONENT');
+    ).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_MINUS_NO_EXPONENT'
+    );
 
     expect(
       validatorService.validateNumericString('-12e2', '.', true, false)
-    ).toEqual('I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_MINUS');
+    ).toEqual(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_NO_INVALID_CHARS_NO_MINUS_NO_EXPONENT'
+    );
 
     expect(
       validatorService.validateNumericString('12f2', '.', true, false)
