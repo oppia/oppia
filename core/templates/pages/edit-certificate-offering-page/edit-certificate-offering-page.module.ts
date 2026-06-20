@@ -36,9 +36,5 @@ import {EditCertificateOfferingPageRoutingModule} from './edit-certificate-offer
     EditCertificateOfferingPageRootComponent,
     EditCertificateOfferingPageComponent,
   ],
-  entryComponents: [
-    EditCertificateOfferingPageRootComponent,
-    EditCertificateOfferingPageComponent,
-  ],
 })
 export class EditCertificateOfferingPageModule {}

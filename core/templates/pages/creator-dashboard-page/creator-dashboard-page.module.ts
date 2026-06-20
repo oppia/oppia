@@ -41,6 +41,5 @@ import {CreatorDashboardPageRootComponent} from './creator-dashboard-page-root.c
     CreatorDashboardPageComponent,
     CreatorDashboardPageRootComponent,
   ],
-  entryComponents: [CreatorDashboardPageComponent],
 })
 export class CreatorDashboardPageModule {}

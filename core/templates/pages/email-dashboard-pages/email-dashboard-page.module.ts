@@ -40,6 +40,5 @@ import {CommonModule} from '@angular/common';
     ]),
   ],
   declarations: [EmailDashboardPageRootComponent, EmailDashboardPageComponent],
-  entryComponents: [EmailDashboardPageComponent],
 })
 export class EmailDashboardPageModule {}

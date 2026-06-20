@@ -35,9 +35,5 @@ import {CreateCertificateOfferingPageRoutingModule} from './create-certificate-o
     CreateCertificateOfferingPageRootComponent,
     CreateCertificateOfferingPageComponent,
   ],
-  entryComponents: [
-    CreateCertificateOfferingPageRootComponent,
-    CreateCertificateOfferingPageComponent,
-  ],
 })
 export class CreateCertificateOfferingPageModule {}

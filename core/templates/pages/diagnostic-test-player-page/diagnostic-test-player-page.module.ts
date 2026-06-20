@@ -54,9 +54,5 @@ import {DiagnosticTestPlayerPageAuthGuard} from './diagnostic-test-player-page-a
     DiagnosticTestPlayerPageRootComponent,
     DiagnosticTestPlayerComponent,
   ],
-  entryComponents: [
-    DiagnosticTestPlayerPageRootComponent,
-    DiagnosticTestPlayerComponent,
-  ],
 })
 export class DiagnosticTestPlayerPageModule {}

@@ -37,6 +37,5 @@ import {RouterModule} from '@angular/router';
     NgbModule,
   ],
   declarations: [DonatePageComponent, DonatePageRootComponent],
-  entryComponents: [DonatePageComponent, DonatePageRootComponent],
 })
 export class DonatePageModule {}

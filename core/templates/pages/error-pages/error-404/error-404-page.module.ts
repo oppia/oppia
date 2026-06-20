@@ -25,7 +25,6 @@ import {Error404PageComponent} from './error-404-page.component';
 @NgModule({
   imports: [SharedComponentsModule, Error404PageRoutingModule],
   declarations: [Error404PageComponent, Error404PageRootComponent],
-  entryComponents: [Error404PageComponent, Error404PageRootComponent],
   exports: [Error404PageComponent, Error404PageRootComponent],
 })
 export class Error404PageModule {}
