@@ -432,8 +432,8 @@ describe('Skill editor main tab Component', () => {
       component.skill = sampleSkill;
       component.groupedSkillSummaries = {
         current: [
-          {id: 'skill1', description: 'test description 1'},
-          {id: 'skill2', description: 'test description 2'},
+          ShortSkillSummary.create('skill1', 'test description 1'),
+          ShortSkillSummary.create('skill2', 'test description 2'),
         ],
         others: [],
       };
@@ -620,7 +620,7 @@ describe('Skill editor main tab Component', () => {
 
         component.skill = sampleSkill;
         component.groupedSkillSummaries = {
-          current: [{id: 'skillId', description: 'New Skill'}],
+          current: [ShortSkillSummary.create('skillId', 'New Skill')],
           others: [],
         };
         component.categorizedSkills = {};
