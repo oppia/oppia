@@ -45,12 +45,6 @@ import {DirectivesModule} from 'directives/directives.module';
     ResponseGraphInput,
     ShortResponseGraphInput,
   ],
-  entryComponents: [
-    InteractiveGraphInput,
-    GraphVizComponent,
-    ResponseGraphInput,
-    ShortResponseGraphInput,
-  ],
   exports: [
     InteractiveGraphInput,
     GraphVizComponent,

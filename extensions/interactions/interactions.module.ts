@@ -69,7 +69,6 @@ import {PencilCodeEditorModule} from './PencilCodeEditor/pencil-code-editor-inte
     TranslateModule,
   ],
   declarations: [],
-  entryComponents: [],
   exports: [
     AlgebraicExpressionInputExtensionsModule,
     CodeReplInteractionModule,

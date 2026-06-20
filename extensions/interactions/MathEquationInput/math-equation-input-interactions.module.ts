@@ -32,11 +32,6 @@ import {ShortResponseMathEquationInput} from './directives/oppia-short-response-
     ResponseMathEquationInput,
     ShortResponseMathEquationInput,
   ],
-  entryComponents: [
-    InteractiveMathEquationInput,
-    ResponseMathEquationInput,
-    ShortResponseMathEquationInput,
-  ],
   exports: [
     InteractiveMathEquationInput,
     ResponseMathEquationInput,

@@ -33,11 +33,6 @@ import {TranslateModule} from '@ngx-translate/core';
     ResponseInteractiveMapComponent,
     ShortResponseInteractiveMapComponent,
   ],
-  entryComponents: [
-    InteractiveInteractiveMapComponent,
-    ResponseInteractiveMapComponent,
-    ShortResponseInteractiveMapComponent,
-  ],
   exports: [
     InteractiveInteractiveMapComponent,
     ResponseInteractiveMapComponent,

@@ -42,11 +42,6 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
     ResponseMusicNotesInput,
     ShortResponseMusicNotesInput,
   ],
-  entryComponents: [
-    MusicNotesInputComponent,
-    ResponseMusicNotesInput,
-    ShortResponseMusicNotesInput,
-  ],
   exports: [
     MusicNotesInputComponent,
     ResponseMusicNotesInput,
