@@ -67,6 +67,7 @@ const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
 const creationModalSelector = '.e2e-test-creation-modal';
 const createExplorationFromModalSelector = '.e2e-test-create-exploration';
+const modalWindowSelector = 'ngb-modal-window.modal.show';
 
 const interactionDiv = '.e2e-test-interaction';
 const addInteractionModalSelector = 'customize-interaction-body-container';
@@ -4584,7 +4585,7 @@ export class ExplorationEditor extends BaseUser {
   async navigateToPreviewTab(): Promise<void> {
     // A lingering modal can block the Preview tab click even after a save.
     const hasOpenModal = await this.isElementVisible(
-      'ngb-modal-window.modal.show',
+      modalWindowSelector,
       true,
       1500
     );
@@ -4595,7 +4596,7 @@ export class ExplorationEditor extends BaseUser {
       } else {
         await this.page.keyboard.press('Escape');
       }
-      await this.page.waitForSelector('ngb-modal-window.modal.show', {
+      await this.page.waitForSelector(modalWindowSelector, {
         hidden: true,
       });
     }
@@ -4821,7 +4822,7 @@ export class ExplorationEditor extends BaseUser {
   async navigateToEditorTab(): Promise<void> {
     // A lingering modal can block Main tab and Save Draft interactions.
     const hasOpenModal = await this.isElementVisible(
-      'ngb-modal-window.modal.show',
+      modalWindowSelector,
       true,
       1500
     );
@@ -4832,7 +4833,7 @@ export class ExplorationEditor extends BaseUser {
       } else {
         await this.page.keyboard.press('Escape');
       }
-      await this.page.waitForSelector('ngb-modal-window.modal.show', {
+      await this.page.waitForSelector(modalWindowSelector, {
         hidden: true,
       });
     }
