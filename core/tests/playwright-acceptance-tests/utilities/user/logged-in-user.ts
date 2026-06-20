@@ -26,6 +26,7 @@ const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const contributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
+const loginPageUrl = testConstants.URLs.Login;
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
 const signUpEmailField = testConstants.SignInDetails.inputField;
@@ -539,6 +540,16 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Function to verify if the learner dashboard is opened using URL.
+   */
+  async expectToBeOnLearnerDashboard(): Promise<void> {
+    await this.page.waitForFunction(
+      (url: string) => document.URL.includes(url),
+      testConstants.URLs.LearnerDashboard
+    );
+  }
+
+  /**
    * Verifies that the current page URL includes the expected page pathname.
    */
   async expectToBeOnPage(expectedPage: string): Promise<void> {
@@ -958,11 +969,20 @@ export class LoggedInUser extends BaseUser {
    * Check if rating stars are displayed.
    */
   async expectRatingStarsToBeVisible(): Promise<void> {
-    await this.page.waitForSelector(ratingsHeaderSelector);
-    const ratingStars = await this.page.$$(ratingStarSelector);
-    if (ratingStars.length !== 5) {
-      throw new Error('Rating stars are not visible.');
-    }
+    await this.page.waitForFunction(
+      ({headerSelector, starSelector, expectedCount}) => {
+        const header = document.querySelector(headerSelector);
+        if (!header) {
+          return false;
+        }
+        return document.querySelectorAll(starSelector).length === expectedCount;
+      },
+      {
+        headerSelector: ratingsHeaderSelector,
+        starSelector: ratingStarSelector,
+        expectedCount: 5,
+      }
+    );
   }
 
   /**
@@ -1151,6 +1171,13 @@ export class LoggedInUser extends BaseUser {
     await this.expectElementToBeVisible(
       communityLessonsSectionInLearnerDashboard
     );
+  }
+
+  /**
+   * Navigates to the login page.
+   */
+  async navigateToLoginPage(): Promise<void> {
+    await this.goto(loginPageUrl, false);
   }
 
   /**
