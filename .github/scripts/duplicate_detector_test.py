@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import unittest
 
-from . import duplicate_detector
+import duplicate_detector  # pylint: disable=import-error
 
 
 class DuplicateDetectorTests(unittest.TestCase):
