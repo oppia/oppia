@@ -23,12 +23,15 @@ the diff (dry run) or apply it (create missing records and delete stale ones).
 
 from __future__ import annotations
 
+import operator
+
 from core.jobs import base_jobs
 from core.jobs.io import firebase_io
 from core.jobs.transforms import firebase_transforms, job_result_transforms
 from core.jobs.types import job_run_result
 
 import apache_beam as beam
+from apache_beam import pvalue
 
 
 class FirebaseServerSyncJobBase(base_jobs.JobBase):
@@ -48,17 +51,14 @@ class FirebaseServerSyncJobBase(base_jobs.JobBase):
             | 'Get records directly from the Firebase server'
             >> firebase_io.GetRecordsDirectlyFromFirebase()
         )
-        recreated_record_results = (
+        oppia_records, auth_pairs = operator.itemgetter(
+            firebase_io.RecreateRecordsFromOppiaModels.TAG_RECORDS,
+            firebase_io.RecreateRecordsFromOppiaModels.TAG_AUTH_PAIRS,
+        )(
             self.pipeline
             | 'Recreate records from Oppia models'
             >> firebase_io.RecreateRecordsFromOppiaModels()
         )
-        oppia_records = recreated_record_results[
-            firebase_io.RecreateRecordsFromOppiaModels.TAG_RECORDS
-        ]
-        auth_pairs = recreated_record_results[
-            firebase_io.RecreateRecordsFromOppiaModels.TAG_AUTH_PAIRS
-        ]
 
         diff_results = (
             oppia_records,
@@ -67,28 +67,26 @@ class FirebaseServerSyncJobBase(base_jobs.JobBase):
             auth_pairs
         )
 
-        oppia_collision_count = (
+        oppia_is_ok = (
             diff_results[
                 firebase_transforms.DiffFirebaseRecords.TAG_OPPIA_USER_COLLISION
             ]
             | 'Count Oppia user collisions' >> beam.combiners.Count.Globally()
-        )
-        no_oppia_collisions = (
-            oppia_collision_count
-            | 'No Oppia user collisions?' >> beam.Map(lambda count: count == 0)
+            | 'Oppia is OK when there are zero user collisions'
+            >> beam.Map(lambda count: count == 0)
         )
 
         add_records = diff_results[
             firebase_transforms.DiffFirebaseRecords.TAG_ADD
         ] | 'Gate adds on no Oppia collisions' >> beam.Filter(
             lambda _, gate_open: gate_open,
-            gate_open=beam.pvalue.AsSingleton(no_oppia_collisions),
+            gate_open=pvalue.AsSingleton(oppia_is_ok, default_value=False),
         )
         del_records = diff_results[
             firebase_transforms.DiffFirebaseRecords.TAG_DEL
         ] | 'Gate dels on no Oppia collisions' >> beam.Filter(
             lambda _, gate_open: gate_open,
-            gate_open=beam.pvalue.AsSingleton(no_oppia_collisions),
+            gate_open=pvalue.AsSingleton(oppia_is_ok, default_value=False),
         )
 
         if self.DRY_RUN:
@@ -98,23 +96,13 @@ class FirebaseServerSyncJobBase(base_jobs.JobBase):
             del_results = del_records | (
                 job_result_transforms.CountObjectsToJobRunResult('WOULD DELETE')
             )
-            abort_prefix = 'WOULD ABORT WRITES'
         else:
-            add_results = add_records | firebase_io.CreateFirebaseRecords()
             del_results = del_records | firebase_io.DeleteFirebaseRecords()
-            abort_prefix = 'WRITES ABORTED'
-
-        abort_results = (
-            oppia_collision_count
-            | 'Only abort when Oppia collisions exist'
-            >> beam.Filter(lambda count: count > 0)
-            | 'Report aborted writes'
-            >> beam.Map(
-                lambda count: job_run_result.JobRunResult.as_stderr(
-                    f'{abort_prefix}: {count} Oppia user collision(s) detected'
-                )
+            add_results = (
+                add_records
+                | beam.WaitOn(del_results)
+                | firebase_io.CreateFirebaseRecords()
             )
-        )
 
         remaining_results = (
             diff_results
@@ -122,18 +110,11 @@ class FirebaseServerSyncJobBase(base_jobs.JobBase):
             >> job_result_transforms.FromTaggedOutputs(
                 firebase_transforms.DiffFirebaseRecords.TAG_OK,
                 firebase_transforms.DiffFirebaseRecords.TAG_OPPIA_USER_COLLISION,
-                (
-                    firebase_transforms.DiffFirebaseRecords.TAG_FIREBASE_ACCOUNT_COLLISION
-                ),
+                firebase_transforms.DiffFirebaseRecords.TAG_FIREBASE_ACCOUNT_COLLISION,
             )
         )
 
-        return (
-            add_results,
-            del_results,
-            remaining_results,
-            abort_results,
-        ) | beam.Flatten()
+        return (add_results, del_results, remaining_results) | beam.Flatten()
 
 
 class AuditFirebaseServerSyncJob(FirebaseServerSyncJobBase):

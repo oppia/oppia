@@ -225,9 +225,6 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
                         ' same email'
                     )
                 ),
-                job_run_result.JobRunResult.as_stderr(
-                    'WRITES ABORTED: 1 Oppia user collision(s) detected'
-                ),
             ]
         )
         self.firebase_sdk_stub.assert_is_not_user('aid_x')
@@ -256,9 +253,6 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
                         '(user_ids=[\'uid_x\', \'uid_y\']) are sharing the'
                         ' same email'
                     )
-                ),
-                job_run_result.JobRunResult.as_stderr(
-                    'WRITES ABORTED: 1 Oppia user collision(s) detected'
                 ),
             ]
         )
@@ -386,9 +380,6 @@ class AuditFirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
                         ' same email'
                     )
                 ),
-                job_run_result.JobRunResult.as_stderr(
-                    'WOULD ABORT WRITES: 1 Oppia user collision(s) detected'
-                ),
             ]
         )
         self.establish_firebase_connection_mock.assert_called_once()
@@ -410,9 +401,6 @@ class AuditFirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
                         '(user_ids=[\'uid_x\', \'uid_y\']) are sharing the'
                         ' same Firebase account (auth_id=\'aid_shared\')'
                     )
-                ),
-                job_run_result.JobRunResult.as_stderr(
-                    'WOULD ABORT WRITES: 1 Oppia user collision(s) detected'
                 ),
             ]
         )
