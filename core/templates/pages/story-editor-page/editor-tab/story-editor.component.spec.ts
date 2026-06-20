@@ -44,6 +44,7 @@ import {
   ArcModel,
   StoryContents,
 } from 'domain/story/story-contents-object.model';
+import {StoryDomainConstants} from 'domain/story/story-domain.constants';
 import {EditArcModalComponent} from '../modal-templates/edit-arc-modal.component';
 
 class MockNgbModalRef {
@@ -1195,6 +1196,37 @@ describe('Story Editor Component having three story nodes', () => {
     component.storyContents = null;
 
     expect(component.getArcIdForNode('node_1')).toBeNull();
+  });
+
+  it('should return null from getArcColorForNode when story contents is null', () => {
+    component.storyContents = null;
+
+    expect(component.getArcColorForNode('node_1')).toBeNull();
+  });
+
+  it('should return null from getArcColorForNode when arc id is null', () => {
+    spyOn(component, 'getArcIdForNode').and.returnValue(null);
+
+    expect(component.getArcColorForNode('node_1')).toBeNull();
+  });
+
+  it('should return null from getArcColorForNode when arc index is invalid', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_2'])
+    );
+    spyOn(component.storyContents, 'getArcIndex').and.returnValue(-1);
+
+    expect(component.getArcColorForNode('node_2')).toBeNull();
+  });
+
+  it('should return correct color from getArcColorForNode', () => {
+    component.storyContents.addArc(
+      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_2'])
+    );
+    const expectedColor = StoryDomainConstants.ARC_COLOR_PALETTE[0];
+    const result = component.getArcColorForNode('node_2');
+
+    expect(result).toEqual(expectedColor);
   });
 
   it('should handle _init when story is null', () => {
