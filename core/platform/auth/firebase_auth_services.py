@@ -68,7 +68,7 @@ import firebase_admin
 import webapp2
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
-from typing import Any, List, Optional
+from typing import List, Optional, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -612,27 +612,41 @@ def _get_auth_claims_from_session_cookie(
             'session invalid: %s' % error
         ) from error
     else:
-        return _create_auth_claims(claims)
+        firebase_claims = _FirebaseAuthClaims(
+            sub=str(claims['sub']),
+            email=str(claims['email']) if 'email' in claims else None,
+            role=str(claims['role']) if 'role' in claims else None,
+        )
+        return _create_auth_claims(firebase_claims)
 
 
-def _create_auth_claims(
-    # Here we use type Any because that's how the Firebase SDK annotates claims.
-    firebase_claims: dict[str, Any],
-) -> auth_domain.AuthClaims:
-    """Returns a new AuthClaims domain object from the Firebase-provided dict.
+class _FirebaseAuthClaims(TypedDict):
+    """Raw claims from Firebase that Oppia relies on.
 
     To learn more about what "claims" are, see the "Terminology" section of this
     module's documentation comments.
 
+    Attributes:
+        sub: str. The user's unique "Firebase Account ID". This is the
+            only claim that is GUARANTEED to exist.
+        email: str|None. The user's primary email address.
+        role: str|None. The user's administrator role. This value can
+            only be assigned to a user by Oppia's SERVER ADMINISTRATORS.
+            Users have ZERO CONTROL over what their assigned role is.
+    """
+
+    sub: str
+    email: str | None
+    role: str | None
+
+
+def _create_auth_claims(
+    firebase_claims: _FirebaseAuthClaims,
+) -> auth_domain.AuthClaims:
+    """Returns a new AuthClaims domain object from the Firebase-provided dict.
+
     Args:
-        firebase_claims: dict(str: *). The raw claims provided by Firebase.
-            Oppia relies on the following raw claims:
-                sub: str. The user's unique "Firebase Account ID". This is the
-                    only claim that is GUARANTEED to exist.
-                email: str|None. The user's primary email address.
-                role: str|None. The user's administrator role. This value can
-                    only be assigned to a user by Oppia's SERVER ADMINISTRATORS.
-                    Users have ZERO CONTROL over what their assigned role is.
+        firebase_claims: _FirebaseAuthClaims. The claims provided by Firebase.
 
     Returns:
         AuthClaims. Oppia's representation of the Firebase SDK claims.

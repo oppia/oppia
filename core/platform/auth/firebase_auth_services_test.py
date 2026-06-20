@@ -36,7 +36,7 @@ import firebase_admin
 import webapp2
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
-from typing import Any, cast
+from typing import cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -427,27 +427,27 @@ class FirebaseAdminSdkStub:
         """
         self.update_user(uid, custom_claims=custom_claims)
 
-    # Here we use type Any because `_set_user_fragile` is responsible for giving
-    # the properties strong types. This method stubs a public function in the
-    # Firebase Admin SDK, so it'd introduce even more fragility and maintenance
-    # if we try duplicate the types here.
-    def update_user(self, uid: str, **kwargs: Any) -> firebase_auth.UserRecord:
+    def update_user(
+        self,
+        uid: str,
+        email: str | None | mock._Sentinel = mock.sentinel,
+        disabled: bool | mock._Sentinel = mock.sentinel,
+        custom_claims: (
+            dict[str, str] | str | None | mock._Sentinel
+        ) = mock.sentinel,
+    ) -> firebase_auth.UserRecord:
         """Updates the user in storage if found, otherwise raises an error.
 
-        The properties supported by this stub are:
+        If any of these properties are omitted, then they will not be changed.
+
+        Args:
+            uid: str. The Firebase account ID of the user.
             email: str|None. The email address for the user, or None to erase
                 the email if it exists.
             disabled: bool. Whether the user account is to be disabled.
             custom_claims: dict[str, str] | str | None. A JSON dict with
                 string keys and values, or a string-encoded JSON dict with
                 string keys and values, or None.
-
-        If any of these properties are omitted, then they will not be changed.
-
-        Args:
-            uid: str. The Firebase account ID of the user.
-            **kwargs: Any. The properties to update. If a property is omitted,
-                then it won't be changed.
 
         Returns:
             firebase_auth.UserRecord. The final state of the account.
@@ -458,10 +458,33 @@ class FirebaseAdminSdkStub:
         if uid not in self._users_by_uid:
             raise firebase_auth.UserNotFoundError(f'{uid} not found')
         user = self._users_by_uid[uid]
-        disabled = kwargs.get('disabled', user.disabled)
-        email = kwargs.get('email', user.email)
-        custom_claims = kwargs.get('custom_claims', user.custom_claims)
-        return self._set_user_fragile(uid, email, disabled, custom_claims)
+        return self._set_user_fragile(
+            uid,
+            disabled=(
+                user.disabled
+                if isinstance(
+                    disabled,
+                    mock._Sentinel,  # pylint: disable=protected-access
+                )
+                else disabled
+            ),
+            email=(
+                user.email
+                if isinstance(
+                    email,
+                    mock._Sentinel,  # pylint: disable=protected-access
+                )
+                else email
+            ),
+            custom_claims=(
+                user.custom_claims
+                if isinstance(
+                    custom_claims,
+                    mock._Sentinel,  # pylint: disable=protected-access
+                )
+                else custom_claims
+            ),
+        )
 
     def verify_id_token(self, token: str) -> dict[str, str | bool | None]:
         """Returns claims for the corresponding user if the ID token is valid.
