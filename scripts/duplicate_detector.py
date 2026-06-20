@@ -21,12 +21,12 @@ import logging
 import os
 import re
 import urllib.request
-from typing import Any, Dict, List, Set
 
 from sentence_transformers import (  # pylint: disable=import-error
     SentenceTransformer,
     util,
 )
+from typing import Any, Dict, List, Set
 
 
 def get_template_lines(repo_path: str) -> Set[str]:
@@ -89,6 +89,7 @@ def clean_text(text: str, template_lines: Set[str]) -> str:
     return '\n'.join(clean_lines)
 
 
+# Here we use type Any because the GitHub API returns a dynamic JSON payload containing multiple unknown types.
 def get_all_open_issues(
     repo: str, headers: Dict[str, str]
 ) -> List[Dict[str, Any]]:
