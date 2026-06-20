@@ -71,17 +71,6 @@ import {ConversationFlowService} from '../services/conversation-flow.service';
     LessonFeedbackModalComponent,
     NewProgressReminderModalComponent,
   ],
-  entryComponents: [
-    NewFlagExplorationModalComponent,
-    CustomizableThankYouModalComponent,
-    NewLessonPlayerPageComponent,
-    NewLessonPlayerPageRootComponent,
-    LessonPlayerSidebarComponent,
-    NewAudioBarComponent,
-    LessonFeedbackModalComponent,
-    NewSwitchContentLanguageRefreshRequiredModalComponent,
-    NewProgressReminderModalComponent,
-  ],
   providers: [
     HintAndSolutionModalService,
     FatigueDetectionService,

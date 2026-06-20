@@ -41,9 +41,5 @@ import {FacilitatorDashboardPageAuthGuard} from './facilitator-dashboard-page-au
     FacilitatorDashboardPageRootComponent,
     FacilitatorDashboardPageComponent,
   ],
-  entryComponents: [
-    FacilitatorDashboardPageRootComponent,
-    FacilitatorDashboardPageComponent,
-  ],
 })
 export class FacilitatorDashboardPageModule {}

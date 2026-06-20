@@ -73,16 +73,6 @@ import {ExplorationPlayerPageAuthGuard} from './exploration-player-page-auth.gua
     LearnerViewInfoComponent,
     RefresherExplorationConfirmationModal,
   ],
-  entryComponents: [
-    ExplorationPlayerPageComponent,
-    ExplorationPlayerPageRootComponent,
-    ExplorationSuccessfullyFlaggedModalComponent,
-    ProgressReminderModalComponent,
-    FlagExplorationModalComponent,
-    LearnerLocalNavComponent,
-    LearnerViewInfoComponent,
-    RefresherExplorationConfirmationModal,
-  ],
   providers: [HintAndSolutionModalService, FatigueDetectionService],
   exports: [LearnerLocalNavComponent, LearnerViewInfoComponent],
 })

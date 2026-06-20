@@ -41,9 +41,5 @@ import {RouterModule} from '@angular/router';
     FeedbackUpdatesPageComponent,
     FeedbackUpdatesPageRootComponent,
   ],
-  entryComponents: [
-    FeedbackUpdatesPageComponent,
-    FeedbackUpdatesPageRootComponent,
-  ],
 })
 export class FeedbackUpdatesPageModule {}

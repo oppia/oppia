@@ -30,6 +30,5 @@ import {TopicLandingPageRoutingModule} from './topic-landing-page-routing.module
     TopicLandingPageRoutingModule,
   ],
   declarations: [TopicLandingPageComponent, TopicLandingPageRootComponent],
-  entryComponents: [TopicLandingPageComponent, TopicLandingPageRootComponent],
 })
 export class TopicLandingPageModule {}
