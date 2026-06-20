@@ -1,5 +1,7 @@
 name: Duplicate Issue and PR Detection
 
+permissions: read-all
+
 on:
   issues:
     types: [opened]
