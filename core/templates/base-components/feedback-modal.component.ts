@@ -242,19 +242,18 @@ export class FeedbackModalComponent implements OnInit {
   isFormValid(): boolean {
     if (!this.feedbackText.trim()) {
       this.formError = this.translateService.instant(
-        'I18N_FEEDBACK_MESSAGE_TOO_LONG',
-        {
-          maxLength: this.MAX_REPORT_MESSAGE_LENGTH,
-        }
+        'I18N_FEEDBACK_DESCRIPTION_REQUIRED'
       );
       return false;
     }
 
     if (this.feedbackText.length > this.MAX_REPORT_MESSAGE_LENGTH) {
-      this.formError =
-        'Please keep your feedback under ' +
-        this.MAX_REPORT_MESSAGE_LENGTH +
-        ' characters.';
+      this.formError = this.translateService.instant(
+        'I18N_FEEDBACK_MESSAGE_TOO_LONG',
+        {
+          maxLength: this.MAX_REPORT_MESSAGE_LENGTH,
+        }
+      );
       return false;
     }
 

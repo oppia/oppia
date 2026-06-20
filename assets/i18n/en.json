@@ -972,6 +972,7 @@
     "I18N_LEAVE_LEARNER_GROUP_MODAL_BUTTON": "Leave",
     "I18N_LEAVE_LEARNER_GROUP_MODAL_HEADER": "Leave Learner Group?",
     "I18N_LESSON_FEEDBACK_CONTINUE_AS_GUEST_BUTTON": "Continue as Guest",
+    "I18N_FEEDBACK_DESCRIPTION_REQUIRED": "Please add a description before submitting.",
     "I18N_LESSON_FEEDBACK_GUEST_SUBTITLE": "Create a free profile to send direct recommendations, track creator responses and save your checkpoint milestones permanently!",
     "I18N_LESSON_FEEDBACK_GUEST_TITLE": "Want to chat with our Lessons Team?",
     "I18N_FEEDBACK_MESSAGE_TOO_LONG": "Please keep your feedback under {{maxLength}} characters.",

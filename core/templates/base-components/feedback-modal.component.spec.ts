@@ -227,8 +227,18 @@ describe('FeedbackModalComponent', () => {
     userService = new MockUserService();
     translateService = jasmine.createSpyObj('TranslateService', ['instant']);
 
-    translateService.instant.and.returnValue(
-      'Please keep your feedback under 2500 characters.'
+    translateService.instant.and.callFake(
+      (key: string, params?: {maxLength: number}) => {
+        if (key === 'I18N_FEEDBACK_DESCRIPTION_REQUIRED') {
+          return 'Please add a description before submitting.';
+        }
+
+        if (key === 'I18N_FEEDBACK_MESSAGE_TOO_LONG') {
+          return `Please keep your feedback under ${params?.maxLength} characters.`;
+        }
+
+        return key;
+      }
     );
     feedbackSessionInfoService = jasmine.createSpyObj(
       'FeedbackSessionInfoService',

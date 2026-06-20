@@ -972,6 +972,7 @@
   "I18N_LEAVE_LEARNER_GROUP_MODAL_BUTTON": "Confirmation button text shown in the modal when a learner tries to leave a learner group.",
   "I18N_LEAVE_LEARNER_GROUP_MODAL_HEADER": "Header text for the modal that appears when a learner tries to leave a learner group.",
   "I18N_LESSON_FEEDBACK_CONTINUE_AS_GUEST_BUTTON": "Label for the button allowing guest users to close the feedback modal without signing in.",
+  "I18N_FEEDBACK_DESCRIPTION_REQUIRED": "Error message shown when the feedback message is empty.",
   "I18N_LESSON_FEEDBACK_GUEST_SUBTITLE": "Description encouraging guest users to create an account before sending lesson feedback.",
   "I18N_LESSON_FEEDBACK_GUEST_TITLE": "Title shown in the lesson feedback modal when the user is not logged in.",
   "I18N_FEEDBACK_MESSAGE_TOO_LONG": "Dynamic text shown when the feedback message is too long.",
