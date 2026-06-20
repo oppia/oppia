@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from unittest import mock
 
+from core.domain import feature_flag_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import firebase_server_sync_jobs
 from core.jobs.types import job_run_result
@@ -91,6 +92,18 @@ class FirebaseServerSyncJobTestBase(
 
 class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
     JOB_CLASS = firebase_server_sync_jobs.FirebaseServerSyncJob
+
+    def test_prod_mode_job_raises_permission_error(self) -> None:
+        with (
+            self.swap_to_always_return(
+                feature_flag_domain,
+                'get_server_mode',
+                feature_flag_domain.ServerMode.PROD,
+            ),
+            self.assertRaisesRegex(PermissionError, 'Refusing to mutate prod'),
+        ):
+            self.assert_job_output_is_empty()
+        self.assertEqual(self.establish_firebase_connection_mock.call_count, 0)
 
     def test_empty_storage_produces_no_output(self) -> None:
         self.assert_job_output_is_empty()
@@ -289,6 +302,15 @@ class FirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
 
 class AuditFirebaseServerSyncJobTests(FirebaseServerSyncJobTestBase):
     JOB_CLASS = firebase_server_sync_jobs.AuditFirebaseServerSyncJob
+
+    def test_prod_mode_job_is_ok(self) -> None:
+        with self.swap_to_always_return(
+            feature_flag_domain,
+            'get_server_mode',
+            feature_flag_domain.ServerMode.PROD,
+        ):
+            self.assert_job_output_is_empty()
+        self.assertEqual(self.establish_firebase_connection_mock.call_count, 1)
 
     def test_empty_storage_produces_no_output(self) -> None:
         self.assert_job_output_is_empty()
