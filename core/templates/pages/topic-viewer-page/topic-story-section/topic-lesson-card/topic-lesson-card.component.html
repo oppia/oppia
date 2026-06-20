@@ -21,23 +21,25 @@
 
     <div class="topic-lesson-card-actions">
       <span
-            *ngIf="shouldShowFallbackCta()"
-            class="topic-lesson-card-info-icon fa fa-info-circle"
-            [ngbTooltip]="getFallbackInfoTooltipText()"
-            placement="top"
-            container="body"
-            aria-label="Lesson language information"
-            tabindex="0">
+        class="topic-lesson-card-info-icon"
+        [ngbTooltip]="getFallbackInfoTooltipText()"
+        placement="top"
+        container="body"
+        aria-label="Lesson language information"
+        tabindex="0">
+        i
       </span>
 
-      <topic-lesson-language-selector
-        [availableTextLanguageCodes]="availableTextLanguageCodes"
-        [availableVoiceoverLanguageCodes]="availableVoiceoverLanguageCodes"
-        [selectedTextLanguageCode]="selectedTextLanguageCode"
-        [selectedVoiceoverLanguageCode]="selectedVoiceoverLanguageCode"
-        (selectedTextLanguageCodeChange)="onSelectedTextLanguageCodeChange($event)"
-        (selectedVoiceoverLanguageCodeChange)="onSelectedVoiceoverLanguageCodeChange($event)">
-      </topic-lesson-language-selector>
+      <div class="topic-lesson-language-selector-wrapper">
+        <topic-lesson-language-selector
+          [availableTextLanguageCodes]="availableTextLanguageCodes"
+          [availableVoiceoverLanguageCodes]="availableVoiceoverLanguageCodes"
+          [selectedTextLanguageCode]="selectedTextLanguageCode"
+          [selectedVoiceoverLanguageCode]="selectedVoiceoverLanguageCode"
+          (selectedTextLanguageCodeChange)="onSelectedTextLanguageCodeChange($event)"
+          (selectedVoiceoverLanguageCodeChange)="onSelectedVoiceoverLanguageCodeChange($event)">
+        </topic-lesson-language-selector>
+      </div>
 
       <button class="topic-lesson-card-start-button"
               type="button"

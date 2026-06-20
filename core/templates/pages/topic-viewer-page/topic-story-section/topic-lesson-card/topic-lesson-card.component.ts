@@ -241,10 +241,7 @@ export class TopicLessonCardComponent implements OnInit, OnChanges {
   }
 
   shouldShowFallbackCta(): boolean {
-    return (
-      !!this.selectedTextLanguageCode &&
-      this.selectedTextLanguageCode !== this.getPreferredLanguageCode()
-    );
+    return !!this.selectedTextLanguageCode;
   }
 
   getFallbackInfoTooltipText(): string {

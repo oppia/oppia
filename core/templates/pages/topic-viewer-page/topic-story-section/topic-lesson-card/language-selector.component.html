@@ -1,47 +1,64 @@
-<div class="topic-lesson-language-selector">
-  <div class="topic-lesson-language-selector-row topic-lesson-language-selector-row--compact">
-    <div class="topic-lesson-language-selector-select-container">
-      <i class="fa fa-file-text-o topic-lesson-language-selector-leading-icon" aria-hidden="true"></i>
-      <select
-              id="topic-lesson-text-language"
-              class="topic-lesson-language-selector-select e2e-test-topic-lesson-text-language-selector"
-              [ngModel]="selectedTextLanguageCode"
-              (ngModelChange)="onTextLanguageChange($event)"
-              aria-label="Text language selector"
-              required>
-        <option *ngFor="let textLanguageCode of availableTextLanguageCodes" [value]="textLanguageCode">
-          {{ getLanguageDescription(textLanguageCode) }}
-        </option>
-      </select>
+<div class="topic-lesson-language-selector-row topic-lesson-language-selector-row--compact">
+  <div class="topic-lesson-language-selector-select-container">
+<i class="fa-regular fa-file-lines topic-lesson-language-selector-leading-icon"
+   aria-hidden="true"></i>
+    <div class="topic-lesson-language-selector-text-block">
       <span class="topic-lesson-language-selector-chip-label">Text</span>
-      <i class="fa fa-angle-down topic-lesson-language-selector-trailing-icon" aria-hidden="true"></i>
+      <span class="topic-lesson-language-selector-selected-value">
+        {{ selectedTextLanguageCode ? getLanguageDescription(selectedTextLanguageCode) : 'Select' }}
+      </span>
     </div>
 
-    <div class="topic-lesson-language-selector-select-container">
-      <i class="fa fa-headphones topic-lesson-language-selector-leading-icon" aria-hidden="true"></i>
-      <select
-              id="topic-lesson-voiceover-language"
-              class="topic-lesson-language-selector-select e2e-test-topic-lesson-voiceover-language-selector"
-              [ngModel]="selectedVoiceoverLanguageCode"
-              (ngModelChange)="onVoiceoverLanguageChange($event)"
-              aria-label="Voiceover language selector">
-        <option [ngValue]="null">Auto</option>
-        <option
-                *ngFor="let voiceoverLanguageCode of availableVoiceoverLanguageCodes"
-                [value]="voiceoverLanguageCode">
-          {{ getLanguageDescription(voiceoverLanguageCode) }}
-        </option>
-      </select>
+    <select
+            id="topic-lesson-text-language"
+            class="topic-lesson-language-selector-select e2e-test-topic-lesson-text-language-selector"
+            [ngModel]="selectedTextLanguageCode"
+            (ngModelChange)="onTextLanguageChange($event)"
+            aria-label="Text language selector"
+            required>
+      <option *ngFor="let textLanguageCode of availableTextLanguageCodes"
+              [value]="textLanguageCode">
+        {{ getLanguageDescription(textLanguageCode) }}
+      </option>
+    </select>
+
+    <i class="fa fa-angle-down topic-lesson-language-selector-trailing-icon"
+       aria-hidden="true"></i>
+  </div>
+
+  <div class="topic-lesson-language-selector-select-container">
+    <i class="fa fa-headphones topic-lesson-language-selector-leading-icon"
+       aria-hidden="true"></i>
+    <div class="topic-lesson-language-selector-text-block">
       <span class="topic-lesson-language-selector-chip-label">Audio</span>
-      <i class="fa fa-angle-down topic-lesson-language-selector-trailing-icon" aria-hidden="true"></i>
+      <span class="topic-lesson-language-selector-selected-value">
+        {{ selectedVoiceoverLanguageCode ? getLanguageDescription(selectedVoiceoverLanguageCode) : 'Auto' }}
+      </span>
     </div>
 
-    <p
-       class="topic-lesson-language-selector-error"
-       *ngIf="shouldShowTextLanguageValidationError()"
-       id="topic-lesson-text-language-error"
-       aria-live="assertive">
-      Choose a text language to continue.
-    </p>
+    <select
+            id="topic-lesson-voiceover-language"
+            class="topic-lesson-language-selector-select e2e-test-topic-lesson-voiceover-language-selector"
+            [ngModel]="selectedVoiceoverLanguageCode"
+            (ngModelChange)="onVoiceoverLanguageChange($event)"
+            aria-label="Voiceover language selector">
+      <option [ngValue]="null">Auto</option>
+      <option
+              *ngFor="let voiceoverLanguageCode of availableVoiceoverLanguageCodes"
+              [value]="voiceoverLanguageCode">
+        {{ getLanguageDescription(voiceoverLanguageCode) }}
+      </option>
+    </select>
+
+    <i class="fa fa-angle-down topic-lesson-language-selector-trailing-icon"
+       aria-hidden="true"></i>
   </div>
 </div>
+
+<p
+   class="topic-lesson-language-selector-error"
+   *ngIf="shouldShowTextLanguageValidationError()"
+   id="topic-lesson-text-language-error"
+   aria-live="assertive">
+  Choose a text language to continue.
+</p>

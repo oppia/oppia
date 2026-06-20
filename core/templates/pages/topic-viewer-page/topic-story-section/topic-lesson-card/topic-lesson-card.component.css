@@ -89,20 +89,36 @@
 .topic-lesson-card-actions {
   align-items: center;
   display: flex;
-  gap: 8px;
-  justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 12px;
+  justify-content: flex-start;
+  width: 100%;
 }
 
 .topic-lesson-card-info-icon {
   align-items: center;
-  border: 1px solid #00645c;
+  border: 2px solid #006f67;
   border-radius: 50%;
-  color: #00645c;
+  color: #006f67;
   display: inline-flex;
+  font-family: Roboto, Arial, sans-serif;
   font-size: 12px;
-  height: 22px;
+  font-style: normal;
+  font-weight: 700;
+  height: 24px;
   justify-content: center;
-  width: 22px;
+  line-height: 1;
+  width: 24px;
+}
+
+.topic-lesson-language-selector-wrapper {
+  flex: 0 0 auto;
+  margin-right: 0;
+  min-width: auto;
+}
+
+.topic-lesson-card-start-button {
+  margin-left: auto;
 }
 
 .topic-lesson-card-fallback-helper {
@@ -156,7 +172,7 @@
   }
 
   .topic-lesson-card-actions {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 6px;
   }
 

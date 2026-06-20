@@ -161,7 +161,7 @@ describe('TopicLessonCardComponent', () => {
     component.ngOnInit();
 
     expect(component.selectedTextLanguageCode).toBe('en');
-    expect(component.shouldShowFallbackCta()).toBe(false);
+    expect(component.shouldShowFallbackCta()).toBe(true);
   });
 
   it('should fall back to session language when preferred language is unavailable', () => {
@@ -262,7 +262,7 @@ describe('TopicLessonCardComponent', () => {
     component.availableVoiceoverLanguageCodes = ['en', 'es'];
     component.ngOnInit();
 
-    expect(component.shouldShowFallbackCta()).toBe(false);
+    expect(component.shouldShowFallbackCta()).toBe(true);
 
     component.onSelectedTextLanguageCodeChange('es');
 
