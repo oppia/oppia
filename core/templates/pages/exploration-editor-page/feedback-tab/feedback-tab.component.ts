@@ -40,14 +40,18 @@ import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model
 export class FeedbackTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   STATUS_CHOICES = this.threadStatusDisplayService.STATUS_CHOICES;
-  activeThread: SuggestionThread;
-  userIsLoggedIn: boolean;
-  threadIsStale: boolean;
-  threadData: FeedbackThread[];
-  messageSendingInProgress: boolean;
+  activeThread: SuggestionThread | null = null;
+  userIsLoggedIn = false;
+  threadIsStale = false;
+  threadData: FeedbackThread[] = [];
+  messageSendingInProgress = false;
+
   feedbackMessage: {
-    status: string;
+    status: string | null;
     text: string;
+  } = {
+    status: null,
+    text: '',
   };
 
   constructor(
@@ -101,18 +105,13 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
   }
 
   _isSuggestionHandled(): boolean {
-    return (
-      this.activeThread !== null && this.activeThread.isSuggestionHandled()
-    );
+    return !!(this.activeThread && this.activeThread.isSuggestionHandled());
   }
 
   _isSuggestionValid(): boolean {
-    return (
-      this.activeThread !== null &&
-      this.explorationStatesService.hasState(
-        this.activeThread.getSuggestionStateName()
-      )
-    );
+    const stateName = this.activeThread?.getSuggestionStateName();
+
+    return !!(stateName && this.explorationStatesService.hasState(stateName));
   }
 
   _hasUnsavedChanges(): boolean {
@@ -180,7 +179,9 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
       .then(
         messages => {
           this._resetFeedbackMessageFields();
-          this.activeThread.messages = messages;
+          if (this.activeThread) {
+            this.activeThread.messages = messages;
+          }
           this.messageSendingInProgress = false;
         },
         () => {
@@ -223,7 +224,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.activeThread = null;
-    this.userIsLoggedIn = null;
+    this.userIsLoggedIn = false;
     this.threadIsStale = false;
     this.loaderService.showLoadingScreen('Loading');
 
