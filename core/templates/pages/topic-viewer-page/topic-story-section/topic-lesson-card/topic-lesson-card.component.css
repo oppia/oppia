@@ -56,6 +56,17 @@
   margin: 0;
 }
 
+.topic-lesson-card-progress {
+  height: 24px;
+  width: 296px;
+}
+
+.topic-lesson-card-progress oppia-checkpoint-bar {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
 .topic-lesson-card-start-button {
   align-items: center;
   align-self: flex-end;
@@ -104,6 +115,12 @@
     line-height: 20px;
   }
 
+  .topic-lesson-card-progress {
+    height: 24px;
+    max-width: 296px;
+    width: 100%;
+  }
+
   .topic-lesson-card-start-button {
     font-size: 13px;
     height: 40px;
@@ -138,7 +155,7 @@
 
   .topic-lesson-card-copy {
     gap: 4px;
-    margin-bottom: 18px;
+    margin-bottom: 0;
   }
 
   .topic-lesson-card-title {
@@ -152,6 +169,11 @@
     font-size: 13px;
     line-height: 18px;
     margin: 0;
+  }
+
+  .topic-lesson-card-progress {
+    height: 24px;
+    width: 100%;
   }
 
   .topic-lesson-card-start-button {
