@@ -88,9 +88,7 @@ describe('Story editor navbar component', () => {
       schemas: [NO_ERRORS_SCHEMA],
     })
       .overrideModule(BrowserDynamicTestingModule, {
-        set: {
-          entryComponents: [StoryEditorUnpublishModalComponent],
-        },
+        set: {},
       })
       .compileComponents();
   });

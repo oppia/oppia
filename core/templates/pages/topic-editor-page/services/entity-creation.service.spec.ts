@@ -61,9 +61,7 @@ describe('Entity creation service', () => {
       schemas: [NO_ERRORS_SCHEMA],
     })
       .overrideModule(BrowserDynamicTestingModule, {
-        set: {
-          entryComponents: [CreateNewSubtopicModalComponent],
-        },
+        set: {},
       })
       .compileComponents();
   }));
