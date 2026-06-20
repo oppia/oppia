@@ -22,10 +22,10 @@ import os
 import re
 import urllib.request
 
-from sentence_transformers import (
+from sentence_transformers import (  # pylint: disable=import-error
     SentenceTransformer,
     util,
-)  # pylint: disable=import-error
+)
 
 
 def get_template_lines(repo_path):
@@ -217,14 +217,14 @@ def main():
 
         if best_issue_number is None or best_score < threshold:
             logging.info(
-                'Issue #%s: No duplicate found. ' '(Highest score: %s)',
+                'Issue #%s: No duplicate found. (Highest score: %s)',
                 current_id,
                 best_score,
             )
             continue
 
         logging.info(
-            'Issue #%s: Duplicate found! ' '#%s (Score: %s)',
+            'Issue #%s: Duplicate found! #%s (Score: %s)',
             current_id,
             best_issue_number,
             best_score,
