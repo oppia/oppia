@@ -16,11 +16,15 @@
  * @fileoverview Utility File for Playwright Acceptance Tests.
  */
 
-import {ViewportSize} from '@playwright/test';
-import {Page, ElementHandle} from '@playwright/test';
+import {expect, ViewportSize} from '@playwright/test';
+import test, {Page, ElementHandle} from '@playwright/test';
 import isElementClickable from '../../functions/is-element-clickable';
 import testConstants from './test-constants';
 import {showMessage} from './show-message';
+import fs from 'fs';
+
+const backgroundBanner = '.oppia-background-image';
+const libraryBanner = '.e2e-test-library-banner';
 
 const toastMessageSelector = '.e2e-test-toast-message';
 
@@ -299,6 +303,60 @@ export class BaseUser {
     };
     await context.waitForSelector(selector, options);
     showMessage(`Element ${selector} is ${visibility ? 'visible' : 'hidden'}.`);
+  }
+
+  /**
+   * This function compares the current page screenshot with a reference image.
+   * @param {string} imageName - The name for the image
+   * @param {Page|undefined} newPage - The page to take screenshot from. If not
+   *     specified, uses this.page instead.
+   * @param {Parameters<Page['screenshot']>[0]} options - Additional options for the screenshot comparison.
+   */
+  async expectScreenshotToMatch(
+    imageName: string,
+    newPage: Page | undefined = undefined,
+    options: Parameters<Page['screenshot']>[0] = {}
+  ): Promise<void> {
+    const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
+    await currentPage.mouse.move(-1, -1);
+    await currentPage.waitForTimeout(5000);
+
+    const snapshotPath = test
+      .info()
+      .snapshotPath(`${imageName}.png`, {kind: 'screenshot'});
+
+    if (
+      !fs.existsSync(snapshotPath) &&
+      process.env.UPDATE_SNAPSHOTS !== 'true'
+    ) {
+      throw new Error(
+        `Missing baseline snapshot: ${imageName}.png at ${snapshotPath}. ` +
+          `Run with --update_snapshots to generate it.`
+      );
+    }
+
+    let failureTrigger = 0;
+
+    if (this.isViewportAtMobileWidth()) {
+      failureTrigger += 0.048;
+      if (await currentPage.$(backgroundBanner)) {
+        failureTrigger += 0.0352;
+      } else if (await currentPage.$(libraryBanner)) {
+        failureTrigger += 0.0039;
+      }
+    } else {
+      failureTrigger += 0.04;
+      if (await currentPage.$(backgroundBanner)) {
+        failureTrigger += 0.03;
+      } else if (await currentPage.$(libraryBanner)) {
+        failureTrigger += 0.006;
+      }
+    }
+
+    await expect(currentPage).toHaveScreenshot(`${imageName}.png`, {
+      maxDiffPixelRatio: 0,
+      ...options,
+    });
   }
 
   /**
