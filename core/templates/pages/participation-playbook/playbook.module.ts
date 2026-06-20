@@ -32,6 +32,5 @@ import {RouterModule} from '@angular/router';
     PlaybookPageRoutingModule,
   ],
   declarations: [PlaybookPageComponent, PlaybookPageRootComponent],
-  entryComponents: [PlaybookPageComponent, PlaybookPageRootComponent],
 })
 export class PlaybookPageModule {}

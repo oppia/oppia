@@ -33,11 +33,5 @@ import {SignupPageRoutingModule} from './signup-page-routing.module';
     RegistrationSessionExpiredModalComponent,
     LicenseExplanationModalComponent,
   ],
-  entryComponents: [
-    SignupPageComponent,
-    SignupPageRootComponent,
-    RegistrationSessionExpiredModalComponent,
-    LicenseExplanationModalComponent,
-  ],
 })
 export class SignupPageModule {}

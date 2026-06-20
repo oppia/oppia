@@ -39,9 +39,5 @@ import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.mod
     PendingAccountDeletionPageComponent,
     PendingAccountDeletionPageRootComponent,
   ],
-  entryComponents: [
-    PendingAccountDeletionPageComponent,
-    PendingAccountDeletionPageRootComponent,
-  ],
 })
 export class PendingAccountDeletionPageModule {}

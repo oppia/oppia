@@ -45,6 +45,5 @@ import {PracticeSessionPageRootComponent} from './practice-session-page-root.com
     PracticeSessionPageRootComponent,
     PracticeSessionPageComponent,
   ],
-  entryComponents: [PracticeSessionPageComponent],
 })
 export class PracticeSessionPageModule {}

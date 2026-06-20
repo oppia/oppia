@@ -34,6 +34,5 @@ import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-m
     CampaignBannerModule,
   ],
   declarations: [PartnershipsPageComponent, PartnershipsPageRootComponent],
-  entryComponents: [PartnershipsPageComponent, PartnershipsPageRootComponent],
 })
 export class PartnershipsPageModule {}
