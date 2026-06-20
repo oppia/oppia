@@ -25,7 +25,6 @@ import {InteractionDisplayComponent} from './interaction-display.component';
 @NgModule({
   imports: [CommonModule],
   declarations: [InteractionDisplayComponent],
-  entryComponents: [],
   exports: [InteractionDisplayComponent],
 })
 export class DynamicContentModule {}

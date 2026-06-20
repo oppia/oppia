@@ -94,23 +94,6 @@ import {RouterModule} from '@angular/router';
     LanguageBannerComponent,
   ],
 
-  entryComponents: [
-    AlertMessageComponent,
-    BaseContentComponent,
-    PrimaryButtonComponent,
-    CreateActivityButtonComponent,
-    LoadingMessageComponent,
-    OppiaAngularRootComponent,
-    OppiaFooterComponent,
-    PromoBarComponent,
-    SideNavigationBarComponent,
-    SocialButtonsComponent,
-    TopNavigationBarComponent,
-    ThanksForSubscribingModalComponent,
-    WarningsAndAlertsComponent,
-    ClassroomNavigationLinksComponent,
-  ],
-
   exports: [
     // Modules.
     CookieModule,

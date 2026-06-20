@@ -25,7 +25,6 @@ import {LoadingDotsComponent} from './loading-dots.component';
 @NgModule({
   imports: [CommonModule],
   declarations: [LoadingDotsComponent],
-  entryComponents: [LoadingDotsComponent],
   exports: [LoadingDotsComponent],
 })
 export class CommonElementsModule {}

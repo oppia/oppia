@@ -28,7 +28,6 @@ import {FormsModule} from '@angular/forms';
 @NgModule({
   imports: [CommonModule, CodemirrorModule, FormsModule],
   declarations: [CodemirrorMergeviewComponent, CodeMirrorComponent],
-  entryComponents: [CodemirrorMergeviewComponent, CodeMirrorComponent],
   exports: [CodemirrorMergeviewComponent, CodeMirrorComponent],
 })
 export class CodeMirrorModule {}

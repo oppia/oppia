@@ -26,7 +26,6 @@ import {CkEditorCopyToolbarComponent} from './ck-editor-copy-toolbar.component';
 @NgModule({
   imports: [CommonModule],
   declarations: [CkEditorCopyToolbarComponent],
-  entryComponents: [CkEditorCopyToolbarComponent],
   exports: [CkEditorCopyToolbarComponent],
 })
 export class OppiaCkEditorCopyToolBarModule {}

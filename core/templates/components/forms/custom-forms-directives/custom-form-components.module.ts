@@ -42,7 +42,6 @@ import {RouterModule} from '@angular/router';
     TranslateModule,
   ],
   declarations: [ImageReceiverComponent],
-  entryComponents: [ImageReceiverComponent],
   exports: [ImageReceiverComponent],
 })
 export class CustomFormsComponentsModule {}
