@@ -383,6 +383,37 @@ def get_translation_opportunity_summary_from_model(
     )
 
 
+def get_translation_opportunities_by_entity_ids(
+    entity_type: str,
+    entity_ids: List[str],
+) -> Dict[str, Optional[opportunity_domain.TranslationOpportunity]]:
+    """Returns a dict mapping entity ID to corresponding TranslationOpportunity
+    domain objects.
+
+    Args:
+        entity_type: str. The entity type.
+        entity_ids: list(str). The entity IDs.
+
+    Returns:
+        dict(str, TranslationOpportunity|None). A dict with key as the entity ID
+        and values representing the TranslationOpportunity domain objects.
+    """
+    opportunities: Dict[
+        str, Optional[opportunity_domain.TranslationOpportunity]
+    ] = {entity_id: None for entity_id in entity_ids}
+    opportunity_models_list = (
+        opportunity_models.TranslationOpportunityModel.get_by_entity_ids(
+            entity_type, entity_ids
+        )
+    )
+    for model in opportunity_models_list:
+        if model is not None:
+            opportunities[model.entity_id] = (
+                get_translation_opportunity_summary_from_model(model)
+            )
+    return opportunities
+
+
 def compute_translation_opportunity_models_with_updated_entity(
     entity_type: str,
     entity_id: str,
@@ -1292,8 +1323,10 @@ def _get_translation_opportunity_cards_from_models(
     """
     entity_ids = [model.entity_id for model in opportunity_models_list]
 
-    topic_summaries = topic_fetchers.get_all_topic_summaries()
-    topic_summary_map = {ts.id: ts for ts in topic_summaries if ts is not None}
+    topic_summaries = [
+        ts for ts in topic_fetchers.get_all_topic_summaries() if ts is not None
+    ]
+    topic_summary_map = {ts.id: ts for ts in topic_summaries}
 
     story_map = {}
     skill_map = {}
