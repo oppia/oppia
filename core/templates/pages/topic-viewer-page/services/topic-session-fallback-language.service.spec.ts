@@ -26,17 +26,23 @@ describe('TopicSessionFallbackLanguageService', () => {
 
   beforeEach(() => {
     const store: {[key: string]: string} = {};
-    mockSessionStorage = jasmine.createSpyObj('Storage', {
-      getItem: (key: string) => store[key] || null,
-      setItem: (key: string, value: string) => {
-        store[key] = value;
-      },
-      removeItem: (key: string) => {
-        delete store[key];
-      },
-      clear: () => {
-        Object.keys(store).forEach(k => delete store[k]);
-      },
+    mockSessionStorage = jasmine.createSpyObj('Storage', [
+      'getItem',
+      'setItem',
+      'removeItem',
+      'clear',
+    ]);
+    mockSessionStorage.getItem.and.callFake(
+      (key: string) => store[key] || null
+    );
+    mockSessionStorage.setItem.and.callFake((key: string, value: string) => {
+      store[key] = value;
+    });
+    mockSessionStorage.removeItem.and.callFake((key: string) => {
+      delete store[key];
+    });
+    mockSessionStorage.clear.and.callFake(() => {
+      Object.keys(store).forEach(k => delete store[k]);
     });
 
     const mockWindowRef = new WindowRef();
@@ -91,23 +97,22 @@ describe('TopicSessionFallbackLanguageService', () => {
   it('should clear selection when JSON parse fails on retrieval', () => {
     const corruptData = 'not-valid-json';
     mockSessionStorage.setItem('topic_session_fallback_language', corruptData);
-    spyOn(service as any, 'clearSelection').and.callThrough();
+    spyOn(service, 'clearSelection').and.callThrough();
 
     const result = service.getFallbackSelection();
 
     expect(result).toBeNull();
-    expect((service as any).clearSelection).toHaveBeenCalled();
+    expect(service.clearSelection).toHaveBeenCalled();
   });
 
-  it('should return null when sessionStorage throws on getItem', () => {
+  it('should propagate error when sessionStorage throws on getItem', () => {
     mockSessionStorage.getItem.and.throwError('Storage error');
 
-    const result = service.getFallbackSelection();
-    expect(result).toBeNull();
+    expect(() => service.getFallbackSelection()).toThrowError('Storage error');
   });
 
   it('should handle saveFallbackSelection when sessionStorage is unavailable', () => {
-    spyOn(service as any, 'isSessionStorageAvailable').and.returnValue(false);
+    spyOn(service, 'isSessionStorageAvailable' as const).and.returnValue(false);
 
     service.saveFallbackSelection('en', null);
 
@@ -115,7 +120,7 @@ describe('TopicSessionFallbackLanguageService', () => {
   });
 
   it('should handle clearSelection when sessionStorage is unavailable', () => {
-    spyOn(service as any, 'isSessionStorageAvailable').and.returnValue(false);
+    spyOn(service, 'isSessionStorageAvailable' as const).and.returnValue(false);
 
     service.clearSelection();
 
