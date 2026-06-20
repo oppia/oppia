@@ -33,11 +33,6 @@ import {InteractiveNumericExpressionInput} from './directives/oppia-interactive-
     ShortResponseNumericExpressionInput,
     InteractiveNumericExpressionInput,
   ],
-  entryComponents: [
-    ResponseNumericExpressionInput,
-    ShortResponseNumericExpressionInput,
-    InteractiveNumericExpressionInput,
-  ],
   exports: [
     ResponseNumericExpressionInput,
     ShortResponseNumericExpressionInput,

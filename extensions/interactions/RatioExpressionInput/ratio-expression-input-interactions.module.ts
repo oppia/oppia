@@ -31,11 +31,6 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     ResponseRatioExpressionInputComponent,
     ShortResponseRatioExpressionInputComponent,
   ],
-  entryComponents: [
-    InteractiveRatioExpressionInputComponent,
-    ResponseRatioExpressionInputComponent,
-    ShortResponseRatioExpressionInputComponent,
-  ],
   exports: [
     InteractiveRatioExpressionInputComponent,
     ResponseRatioExpressionInputComponent,

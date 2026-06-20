@@ -39,11 +39,6 @@ import {TranslateModule} from '@ngx-translate/core';
     ResponseSetInputComponent,
     ShortResponseSetInputComponent,
   ],
-  entryComponents: [
-    InteractiveSetInputComponent,
-    ResponseSetInputComponent,
-    ShortResponseSetInputComponent,
-  ],
   exports: [
     InteractiveSetInputComponent,
     ResponseSetInputComponent,
