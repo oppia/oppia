@@ -22,7 +22,6 @@ from core.jobs.types import job_run_result
 
 import apache_beam as beam
 import result
-from apache_beam import pvalue
 from typing import Any, Optional, Protocol
 
 
@@ -33,7 +32,7 @@ class TaggedOutputs(Protocol):
     coupling it to a concrete type.
     """
 
-    def __getitem__(self, tag: str) -> pvalue.PCollection: ...
+    def __getitem__(self, tag: str) -> beam.PCollection: ...
 
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
@@ -76,7 +75,7 @@ class FromTaggedOutputs(beam.PTransform):  # type: ignore[misc]
 
     def expand(
         self, out: TaggedOutputs
-    ) -> pvalue.PCollection[job_run_result.JobRunResult]:
+    ) -> beam.PCollection[job_run_result.JobRunResult]:
         """Formats pass/fail tagged outputs as stdout/stderr job run results."""
 
         stdout = (
@@ -95,7 +94,7 @@ class FromTaggedOutputs(beam.PTransform):  # type: ignore[misc]
 
     def _extract_input_pvalues(
         self, out: TaggedOutputs
-    ) -> tuple[TaggedOutputs, dict[str, pvalue.PCollection]]:
+    ) -> tuple[TaggedOutputs, dict[str, beam.PCollection]]:
         """Needs to be overridden when input type isn't a subclass of PValue."""
 
         return out, {tag: out[tag] for tag in {self.pass_tag, *self.fail_tags}}
