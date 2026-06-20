@@ -82,11 +82,6 @@ export class CollectionEditor extends BaseUser {
       .split('/collection_editor/create/')[1]
       .split('?')[0];
 
-    await this.page.waitForSelector(collectionEditorCardsSelector, {
-      visible: true,
-      timeout: 30000,
-    });
-
     for (const expId of explorationIds) {
       await this.page.waitForSelector(addExplorationInputSelector, {
         visible: true,
