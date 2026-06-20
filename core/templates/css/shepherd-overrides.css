@@ -1,4 +1,3 @@
-/* All 0,1,0 specificity selectors (single class) */
 .shepherd-element,
 .shepherd-content,
 .shepherd-header,
@@ -127,7 +126,6 @@
   padding: 0;
 }
 
-/* All 0,2,0 specificity selectors */
 .shepherd-arrow:before {
   background: #fff;
   content: "";
@@ -178,7 +176,6 @@
   padding-left: 20px;
 }
 
-/* All 0,2,1 specificity selectors */
 .shepherd-footer .shepherd-button:last-child {
   margin-left: 2.5px;
   margin-right: 0;
@@ -192,7 +189,6 @@
   margin-bottom: 0;
 }
 
-/* All 0,3,0 specificity selectors */
 .shepherd-button.shepherd-button-secondary:not(:disabled):hover {
   background-color: #fff;
   border: 2px solid #000;
@@ -227,17 +223,14 @@
   padding: 8px;
 }
 
-/* All 0,3,0 specificity (attribute selectors + classes) */
 .shepherd-element.shepherd-centered > .shepherd-arrow {
   display: none;
 }
 
-/* All 0,3,1 specificity selectors */
 .shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover {
   color: #000;
 }
 
-/* All 0,2,2 specificity (attribute + pseudo) */
 .shepherd-element[data-popper-placement^="bottom"] > .shepherd-arrow {
   top: -8px;
 }
@@ -254,7 +247,6 @@
   bottom: -8px;
 }
 
-/* All 0,4,0 specificity */
 .shepherd-element.shepherd-has-title[data-popper-placement^="bottom"] > .shepherd-arrow:before {
   background: #fff;
 }

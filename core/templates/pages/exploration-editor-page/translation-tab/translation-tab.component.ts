@@ -269,12 +269,14 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
       };
       this.shepherdService.modal = true;
       this.shepherdService.addSteps(steps);
-      this.shepherdService.tourObject.on('cancel', () => {
-        if (this.tutorialInProgress) {
-          this.leaveTutorial();
-          this.applicationRef.tick();
-        }
-      });
+      if (this.shepherdService.tourObject) {
+        this.shepherdService.tourObject.on('cancel', () => {
+          if (this.tutorialInProgress) {
+            this.leaveTutorial();
+            this.applicationRef.tick();
+          }
+        });
+      }
       this.shepherdService.start();
     }
   }
