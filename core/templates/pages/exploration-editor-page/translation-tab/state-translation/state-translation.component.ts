@@ -69,34 +69,32 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   activeAnswerGroupIndex!: number | null;
   directiveSubscriptions = new Subscription();
   INTERACTION_SPECS = INTERACTION_SPECS;
-  activatedTabId: string;
-  activeAnswerGroupIndex: number;
-  stateAnswerGroups: AnswerGroup[];
-  RULE_INPUT_TYPES_TO_DATA_FORMATS: object;
-  TAB_ID_RULE_INPUTS: string;
-  stateContent: SubtitledHtml;
-  stateSolution: Solution | SubtitledHtml;
-  interactionPreviewHtml: string;
-  stateInteractionCustomizationArgs: InteractionCustomizationArgs;
-  activeCustomizationArgContentIndex: number;
-  activeRuleContentIndex: number;
-  activeHintIndex: number;
-  stateHints: Hint[];
-  stateName: string;
-  needsUpdateTooltipMessage: string;
-  stateInteractionId: InteractionSpecsKey | null;
-  TAB_ID_CUSTOMIZATION_ARGS: string;
-  TAB_ID_SOLUTION: string;
-  TAB_ID_FEEDBACK: string;
-  TAB_ID_HINTS: string;
-  TAB_ID_CONTENT: string;
-  stateDefaultOutcome: Outcome;
-  answerChoices: AnswerChoice[];
-  activeTranslatedContent: TranslatedContent;
-  activeTab: string;
-  initActiveContentId: string | null;
-  initActiveIndex: number;
-  interactionRuleTranslatableContents: {
+  stateAnswerGroups!: AnswerGroup[];
+  RULE_INPUT_TYPES_TO_DATA_FORMATS!: Record<string, string>;
+  TAB_ID_RULE_INPUTS!: string;
+  stateContent!: SubtitledHtml;
+  stateSolution!: Solution | SubtitledHtml;
+  interactionPreviewHtml!: string;
+  stateInteractionCustomizationArgs!: InteractionCustomizationArgs;
+  activeCustomizationArgContentIndex!: number;
+  activeRuleContentIndex!: number;
+  activeHintIndex!: number;
+  stateHints!: Hint[];
+  stateName!: string;
+  needsUpdateTooltipMessage!: string;
+  stateInteractionId!: InteractionSpecsKey | null;
+  TAB_ID_CUSTOMIZATION_ARGS!: string;
+  TAB_ID_SOLUTION!: string;
+  TAB_ID_FEEDBACK!: string;
+  TAB_ID_HINTS!: string;
+  TAB_ID_CONTENT!: string;
+  stateDefaultOutcome!: Outcome;
+  answerChoices!: AnswerChoice[];
+  activeTranslatedContent!: TranslatedContent;
+  activeTab!: string;
+  initActiveContentId!: string | null;
+  initActiveIndex!: number;
+  interactionRuleTranslatableContents!: {
     rule: Rule;
     inputName: string;
     contentId: string;
@@ -773,7 +771,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       this.explorationStatesService.getInteractionCustomizationArgsMemento(
         this.stateName
       );
-    this.activeHintIndex = null;
+    this.activeHintIndex = 0;
     this.activeAnswerGroupIndex = null;
     let currentCustomizationArgs =
       this.explorationStatesService.getInteractionCustomizationArgsMemento(
