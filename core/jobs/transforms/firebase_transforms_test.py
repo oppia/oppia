@@ -51,10 +51,10 @@ class DiffFirebaseRecordsTests(job_test_utils.PipelinedTestBase):
     )
 
     def test_tag_names(self) -> None:
-        for tag_name, expected_value in TAG_TEST_CASES:
+        for tag_name, expected_value in self.TAG_TEST_CASES:
             with self.subTest(f'{tag_name} == {expected_value!r}'):
                 self.assertEqual(
-                    firebase_transforms.DiffFirebaseRecords[tag_name],
+                    getattr(firebase_transforms.DiffFirebaseRecords, tag_name),
                     expected_value,
                 )
 
