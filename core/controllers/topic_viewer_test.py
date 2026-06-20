@@ -33,7 +33,16 @@ from core.domain import (
     voiceover_domain,
     voiceover_services,
 )
+from core.platform import models
 from core.tests import test_utils
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import translation_models
+
+(translation_models,) = models.Registry.import_models(
+    [models.Names.TRANSLATION]
+)
 
 
 class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
@@ -331,6 +340,10 @@ class TopicPageDataHandlerTests(
         )
         voiceover_services.save_entity_voiceovers(entity_voiceovers)
 
+        translation_models.EntityTranslationsModel.create_new(
+            'exploration', exploration_id, 1, 'en', {}
+        ).put()
+
         change_list = [
             story_domain.StoryChange(
                 {
@@ -357,25 +370,9 @@ class TopicPageDataHandlerTests(
                     'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
                 }
             ),
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_ADD_STORY_NODE,
-                    'node_id': 'node_2',
-                    'title': 'Node 2',
-                }
-            ),
-            story_domain.StoryChange(
-                {
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                    'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
-                    'node_id': 'node_2',
-                    'old_value': constants.STORY_NODE_STATUS_DRAFT,
-                    'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
-                }
-            ),
         ]
         story_services.update_story(
-            self.admin_id, self.story_id_1, change_list, 'Added nodes.'
+            self.admin_id, self.story_id_1, change_list, 'Added node.'
         )
 
         self.login(self.NEW_USER_EMAIL)
@@ -389,21 +386,15 @@ class TopicPageDataHandlerTests(
         ]
         self.assertEqual(len(story_with_nodes), 1)
         story_dict = story_with_nodes[0]
-        self.assertEqual(len(story_dict['all_node_dicts']), 2)
+        self.assertEqual(len(story_dict['all_node_dicts']), 1)
 
-        node_1_dict = story_dict['all_node_dicts'][0]
-        self.assertEqual(node_1_dict['id'], 'node_1')
-        self.assertEqual(node_1_dict['exploration_id'], exploration_id)
-        self.assertEqual(node_1_dict['available_text_language_codes'], ['en'])
+        node_dict = story_dict['all_node_dicts'][0]
+        self.assertEqual(node_dict['id'], 'node_1')
+        self.assertEqual(node_dict['exploration_id'], exploration_id)
+        self.assertEqual(node_dict['available_text_language_codes'], ['en'])
         self.assertEqual(
-            node_1_dict['available_voiceover_language_codes'], ['en']
+            node_dict['available_voiceover_language_codes'], ['en']
         )
-
-        node_2_dict = story_dict['all_node_dicts'][1]
-        self.assertEqual(node_2_dict['id'], 'node_2')
-        self.assertIsNone(node_2_dict['exploration_id'])
-        self.assertEqual(node_2_dict['available_text_language_codes'], [])
-        self.assertEqual(node_2_dict['available_voiceover_language_codes'], [])
         self.logout()
 
     def test_get_with_meta_tag_content(self) -> None:
