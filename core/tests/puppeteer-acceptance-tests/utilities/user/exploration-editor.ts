@@ -46,6 +46,8 @@ const closeResponseModalButton = '.e2e-test-close-add-response-modal';
 
 const loadingFullPageOverlaySelector = '.oppia-loading-full-page';
 const activeModalBackdropSelector = '.modal-backdrop, ngb-modal-window, .modal';
+const activeModalMathJaxSvgSelector = '.modal-dialog .MathJax_SVG svg';
+const activeModalMathJaxTextSelector = '.modal-dialog .MathJax_SVG text';
 
 const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
@@ -7853,28 +7855,25 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     // Math interactions require heavy MathJax rendering and take significantly
     // longer to load than other interactions.
-    await this.page.waitForSelector('.modal-dialog .MathJax_SVG svg', {
+    await this.page.waitForSelector(activeModalMathJaxSvgSelector, {
       timeout: 15000,
     });
 
     const {arabicTextContent, rawSvgHtml} = await this.page.evaluate(
-      modalSelector => {
-        const svgElement = document.querySelector(
-          `${modalSelector} .MathJax_SVG svg`
-        );
-        const textNodes = document.querySelectorAll(
-          `${modalSelector} .MathJax_SVG text`
-        );
+      (svgSelector, textSelector) => {
+        const svgElement = document.querySelector(svgSelector);
+        const textNodes = document.querySelectorAll(textSelector);
         return {
           arabicTextContent:
             Array.from(textNodes)
               .map(node => node.textContent?.trim() || '')
               .filter(text => text !== '')
               .join(' | ') || null,
-          rawSvgHtml: svgElement ? svgElement.textContent : 'No SVG found',
+          rawSvgHtml: svgElement ? svgElement.textContent : null,
         };
       },
-      '.modal-dialog'
+      activeModalMathJaxSvgSelector,
+      activeModalMathJaxTextSelector
     );
 
     if (!arabicTextContent || !arabicTextContent.includes(expectedText)) {
