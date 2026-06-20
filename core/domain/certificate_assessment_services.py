@@ -58,17 +58,21 @@ def create_certificate_assessment_offering(
     """Creates and stores a certificate assessment offering.
 
     Args:
-        title: The title of the certificate assessment offering.
-        description: The description of the certificate assessment offering.
-        classroom_id: The classroom ID associated with the offering.
-        topic_ids: The topic IDs associated with the offering.
-        total_questions: The total number of questions in the offering.
-        time_limit_in_minutes: The time limit for the offering in minutes.
-        demonstrates: The list of skills demonstrated by the offering.
-        async_status: The availability status of the offering.
+        title: str. The title of the certificate assessment offering.
+        description: str. The description of the certificate assessment
+            offering.
+        classroom_id: str. The classroom ID associated with the offering.
+        topic_ids: list(str). The topic IDs associated with the offering.
+        total_questions: int. The total number of questions in the offering.
+        time_limit_in_minutes: int. The time limit for the offering in
+            minutes.
+        demonstrates: list(str). The list of skills demonstrated by the
+            offering.
+        async_status: str. The availability status of the offering.
 
     Returns:
-        The created certificate assessment offering.
+        CertificateAssessmentOffering. The created certificate assessment
+        offering.
 
     Raises:
         ValidationError. The provided offering data is invalid.
@@ -130,10 +134,11 @@ def get_certificate_assessment_offering(
     """Returns a single certificate assessment offering from datastore.
 
     Args:
-        certificate_id: The ID of the certificate assessment offering.
+        certificate_id: str. The ID of the certificate assessment offering.
 
     Returns:
-        The certificate assessment offering with the given ID.
+        CertificateAssessmentOffering. The certificate assessment offering
+        with the given ID.
 
     Raises:
         ValidationError. The certificate assessment offering does not exist.
@@ -164,22 +169,26 @@ def update_certificate_assessment_offering(
     """Updates an existing certificate assessment offering.
 
     Args:
-        certificate_id: The ID of the certificate assessment offering.
-        title: The title of the certificate assessment offering.
-        description: The description of the certificate assessment offering.
-        classroom_id: The classroom ID associated with the offering.
-        topic_ids: The topic IDs associated with the offering.
-        total_questions: The total number of questions in the offering.
-        time_limit_in_minutes: The time limit for the offering in minutes.
-        demonstrates: The list of skills demonstrated by the offering.
-        async_status: The availability status of the offering.
+        certificate_id: str. The ID of the certificate assessment offering.
+        title: str. The title of the certificate assessment offering.
+        description: str. The description of the certificate assessment
+            offering.
+        classroom_id: str. The classroom ID associated with the offering.
+        topic_ids: list(str). The topic IDs associated with the offering.
+        total_questions: int. The total number of questions in the offering.
+        time_limit_in_minutes: int. The time limit for the offering in
+            minutes.
+        demonstrates: list(str). The list of skills demonstrated by the
+            offering.
+        async_status: str. The availability status of the offering.
 
     Returns:
-        The updated certificate assessment offering.
+        CertificateAssessmentOffering. The updated certificate assessment
+        offering.
 
     Raises:
-        ValidationError. The certificate assessment offering does not exist or
-        the provided offering data is invalid.
+        ValidationError. The certificate assessment offering does not exist.
+        ValidationError. The provided offering data is invalid.
     """
     certificate_assessment_offering_model = (
         gae_models.CertificateAssessmentOfferingModel.get_by_id(certificate_id)
@@ -234,7 +243,7 @@ def delete_certificate_assessment_offering(certificate_id: str) -> None:
     """Deletes a certificate assessment offering from datastore.
 
     Args:
-        certificate_id: The ID of the certificate assessment offering.
+        certificate_id: str. The ID of the certificate assessment offering.
 
     Raises:
         ValidationError. The certificate assessment offering does not exist.
@@ -261,7 +270,8 @@ def get_certificate_assessment_offerings() -> (
     """Returns all certificate assessment offerings from datastore.
 
     Returns:
-        A list of all certificate assessment offerings.
+        list(CertificateAssessmentOffering). A list of all certificate
+        assessment offerings.
     """
     certificate_assessment_offering_models: List[
         gae_models.CertificateAssessmentOfferingModel
