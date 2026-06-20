@@ -29,7 +29,12 @@ import {
 } from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {EventEmitter} from '@angular/core';
-import {OppiaRteParserService} from 'services/oppia-rte-parser.service';
+import {
+  OppiaRteParserService,
+  OppiaRteNode,
+  TextNode,
+} from 'services/oppia-rte-parser.service';
+import {TemplatePortal} from '@angular/cdk/portal';
 import {RichTextComponentsModule} from './rich-text-components.module';
 import {RteOutputDisplayComponent} from './rte-output-display.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
@@ -1026,7 +1031,13 @@ describe('RTE display component', () => {
       parent: null,
       portal: undefined,
     };
-    const result = (component as any)._getTemplatePortal(node);
+    const result = (
+      component as unknown as {
+        _getTemplatePortal: (
+          node: OppiaRteNode | TextNode
+        ) => TemplatePortal<unknown> | undefined;
+      }
+    )._getTemplatePortal(node);
     expect(result).toBeUndefined();
   });
 
@@ -1039,7 +1050,13 @@ describe('RTE display component', () => {
       parent: null,
       portal: undefined,
     };
-    const result = (component as any)._getTemplatePortal(node);
+    const result = (
+      component as unknown as {
+        _getTemplatePortal: (
+          node: OppiaRteNode | TextNode
+        ) => TemplatePortal<unknown> | undefined;
+      }
+    )._getTemplatePortal(node);
     expect(result).toBeUndefined();
   });
 });
