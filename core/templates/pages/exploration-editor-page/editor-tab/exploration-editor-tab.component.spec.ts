@@ -94,8 +94,13 @@ describe('Exploration editor tab component', () => {
   class MockShepherdService {
     defaultStepOptions = {};
     modal = false;
-    steps = [];
-    tourObject = null;
+    steps: object[] = [];
+    tourObject: {
+      on: (eventName: string, cb: () => void) => void;
+      start: () => void;
+      complete: () => void;
+      cancel: () => void;
+    } | null = null;
 
     addSteps(steps: object[]) {
       this.steps = steps;
@@ -108,20 +113,14 @@ describe('Exploration editor tab component', () => {
     }
 
     start() {
-      if (this.tourObject) {
-        this.tourObject.start();
-      }
+      this.tourObject?.start();
     }
     complete() {
-      if (this.tourObject) {
-        this.tourObject.complete();
-      }
+      this.tourObject?.complete();
     }
     back() {}
     cancel() {
-      if (this.tourObject) {
-        this.tourObject.cancel();
-      }
+      this.tourObject?.cancel();
     }
   }
 
@@ -1137,16 +1136,24 @@ describe('Exploration editor tab component', () => {
       userExplorationPermissionsService,
       'getPermissionsAsync'
     ).and.returnValue(
-      Promise.resolve({
-        canEdit: false,
-      } as ExplorationPermissions)
+      Promise.resolve(
+        new ExplorationPermissions(
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        )
+      )
     );
     stateEditorService.setActiveStateName('First State');
     editabilityService.onStartTutorial();
 
     component.initStateEditor();
     component.leaveTutorial();
-    component.removeTutorialSaveButtonIfNoPermissions();
 
     expect(editabilityService.onEndTutorial).toHaveBeenCalled();
     expect(component.tutorialInProgress).toBe(false);
@@ -1155,10 +1162,12 @@ describe('Exploration editor tab component', () => {
   it('should smoothly scroll to target position', () => {
     let scrollToSpy = spyOn(window, 'scrollTo');
     let callbacks: FrameRequestCallback[] = [];
-    spyOn(window, 'requestAnimationFrame').and.callFake(cb => {
-      callbacks.push(cb);
-      return 1;
-    });
+    spyOn(window, 'requestAnimationFrame').and.callFake(
+      (cb: FrameRequestCallback) => {
+        callbacks.push(cb);
+        return 1;
+      }
+    );
     let mockPerformanceNow = spyOn(performance, 'now');
 
     mockPerformanceNow.and.returnValue(0);
@@ -1285,6 +1294,81 @@ describe('Exploration editor tab component', () => {
       }
     }
   });
+
+  it('should remove the save step from the tour when user lacks edit permissions', fakeAsync(() => {
+    spyOn(
+      userExplorationPermissionsService,
+      'getPermissionsAsync'
+    ).and.returnValue(
+      Promise.resolve(
+        new ExplorationPermissions(
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        )
+      )
+    );
+    const mockSteps: {id: string}[] = [
+      {id: 'step1'},
+      {id: 'editorTabTourSaveDraft'},
+      {id: 'step3'},
+    ];
+    // eslint-disable-next-line dot-notation
+    component['removeTutorialSaveButtonIfNoPermissions'](mockSteps);
+    tick();
+    expect(mockSteps.length).toBe(2);
+    expect(mockSteps.findIndex(s => s.id === 'editorTabTourSaveDraft')).toBe(
+      -1
+    );
+  }));
+
+  it('should not call handleTourFinish on cancel when tutorialInProgress is false', fakeAsync(() => {
+    spyOn(
+      userExplorationPermissionsService,
+      'getPermissionsAsync'
+    ).and.returnValue(
+      Promise.resolve(
+        new ExplorationPermissions(
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          false
+        )
+      )
+    );
+    const registeredCallbacks: Record<string, () => void> = {};
+    const shepherdService = TestBed.inject(ShepherdService);
+    spyOn(shepherdService, 'addSteps').and.callFake((_steps: object[]) => {
+      const tourObj = {
+        on: (eventName: string, cb: () => void) => {
+          registeredCallbacks[eventName] = cb;
+        },
+        start: () => {},
+        complete: () => {},
+        cancel: () => {},
+      };
+      // eslint-disable-next-line dot-notation
+      shepherdService['tourObject'] = tourObj;
+    });
+    // eslint-disable-next-line dot-notation
+    const tickSpy = spyOn(component['applicationRef'], 'tick');
+
+    component.startTutorial();
+    tick();
+
+    component.tutorialInProgress = false;
+    registeredCallbacks.cancel();
+    expect(tickSpy).not.toHaveBeenCalled();
+  }));
 
   it('should get the last edited version number in case of error', () => {
     versionHistoryService.insertStateVersionHistoryData(4, null, '');

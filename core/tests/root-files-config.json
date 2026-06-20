@@ -19,6 +19,7 @@
     "core/templates/components/common-layout-directives/navigation-bars/side-navigation-bar.component.css",
     "core/templates/components/forms/validators/README.md",
     "core/templates/css/README.md",
+    "core/templates/css/shepherd-overrides.css",
     "core/templates/domain/statistics/learner-answer-details.model.ts",
     "core/templates/domain/feedback/feedback.model.ts",
     "core/templates/pages/about-page/about-page.constants.ts",

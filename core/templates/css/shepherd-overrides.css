@@ -1,158 +1,99 @@
-.shepherd-element {
+/* All 0,1,0 specificity selectors (single class) */
+.shepherd-element,
+.shepherd-content,
+.shepherd-header,
+.shepherd-footer,
+.shepherd-button,
+.shepherd-cancel-icon {
+  transition: none !important;
+}
+
+.shepherd-button {
+  background-color: #000;
+  border: 2px solid #000;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: normal;
+  margin-right: 0;
+  outline: 0;
+  padding: 6px 12px;
+  text-transform: uppercase;
+  transition: none;
+}
+
+.shepherd-cancel-icon {
+  background: transparent;
+  border: none;
+  color: #000;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: normal;
+  height: 24px;
+  line-height: 24px;
+  margin: 0;
+  padding: 0;
   position: absolute;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  z-index: 1016;
-  max-width: 900px;
-  box-shadow: 0 0 30px 1px #000;
-  border-radius: 0;
+  right: 10px;
+  top: 10px;
+  transition: none;
+  width: 24px;
 }
 
 .shepherd-content {
-  box-sizing: border-box;
-  position: relative;
-  color: #000;
   background-color: #fff;
+  border-radius: 0;
+  box-sizing: border-box;
+  color: #000;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 10px;
-  border-radius: 0;
+  position: relative;
 }
 
-.shepherd-header,
-.shepherd-has-title .shepherd-content .shepherd-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px;
-  border-radius: 0;
-  line-height: normal;
-  background: transparent;
-}
-
-.shepherd-title {
-  font-weight: 700;
-  font-size: 20px;
-  color: #000;
-  display: block;
-  flex: none;
-  margin: 0;
-  padding: 0;
-}
-
-.shepherd-cancel-icon,
-.shepherd-has-title .shepherd-content .shepherd-cancel-icon {
+.shepherd-arrow {
+  height: 16px;
   position: absolute;
-  right: 10px;
-  top: 10px;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  font-size: 24px;
-  line-height: 24px;
-  color: #000;
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin: 0;
-  transition: none;
-  font-weight: normal;
+  width: 16px;
+  z-index: -1;
 }
 
-.shepherd-cancel-icon:hover,
-.shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover {
-  color: #000;
-}
-
-.shepherd-text {
-  text-align: left;
-  padding: 10px 8px;
+.shepherd-element {
+  border-radius: 0;
+  box-shadow: 0 0 30px 1px #000;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
-  color: #000;
-  line-height: normal;
-}
-
-.shepherd-text p {
-  margin: 0 0 8px;
-}
-
-.shepherd-text p:last-child {
-  margin-bottom: 0;
-}
-
-.shepherd-text ul {
-  margin: 0 0 8px;
-  padding-left: 20px;
-  list-style-position: outside;
-}
-
-.shepherd-text ul:last-child {
-  margin-bottom: 0;
-}
-
-.shepherd-text li {
-  margin: 0;
-  padding: 0;
-  font-size: 16px;
-  color: #000;
-  line-height: normal;
+  max-width: 900px;
+  position: absolute;
+  z-index: 1016;
 }
 
 .shepherd-footer {
+  align-items: center;
+  border-radius: 0;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
-  padding-left: 8px;
-  padding-top: 0;
-  padding-right: 0;
   padding-bottom: 0;
-  border-radius: 0;
+  padding-left: 8px;
+  padding-right: 0;
+  padding-top: 0;
 }
 
-.shepherd-button {
-  text-transform: uppercase;
+.shepherd-header {
+  align-items: center;
+  background: transparent;
   border-radius: 0;
-  outline: 0;
-  padding: 6px 12px;
-  font-size: 12px;
-  font-weight: 700;
-  color: #fff;
-  background-color: #000;
-  cursor: pointer;
-  border: 2px solid #000;
-  margin-right: 0;
-  transition: none;
+  display: flex;
+  justify-content: space-between;
   line-height: normal;
+  padding: 8px;
 }
 
-.shepherd-button:not(:disabled):hover {
-  color: #000;
-  border: 2px solid #000;
-  background-color: #fff;
-}
-
-.shepherd-button:disabled {
-  cursor: default;
-  opacity: 1;
-}
-
-.shepherd-footer .shepherd-button:last-child {
-  margin-left: 2.5px;
-  margin-right: 0;
-}
-
-.shepherd-button.shepherd-button-secondary {
-  background: #000;
-  color: #fff;
-  border: 2px solid #000;
-}
-
-.shepherd-button.shepherd-button-secondary:not(:disabled):hover {
-  color: #000;
-  background-color: #fff;
-  border: 2px solid #000;
+.shepherd-modal-overlay-container {
+  z-index: 997;
 }
 
 .shepherd-step-counter {
@@ -160,37 +101,143 @@
   border: none !important;
   color: #000 !important;
   cursor: default !important;
-  font-weight: 700 !important;
   font-size: 12px;
-  padding: 0 !important;
+  font-weight: 700 !important;
   margin-right: auto;
-  text-transform: none;
+  padding: 0 !important;
   pointer-events: none;
+  text-transform: none;
 }
 
-.shepherd-arrow,
-.shepherd-arrow:before {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  z-index: -1;
+.shepherd-text {
+  color: #000;
+  font-size: 16px;
+  line-height: normal;
+  padding: 10px 8px;
+  text-align: left;
 }
 
+.shepherd-title {
+  color: #000;
+  display: block;
+  flex: none;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  padding: 0;
+}
+
+/* All 0,2,0 specificity selectors */
 .shepherd-arrow:before {
+  background: #fff;
   content: "";
+  height: 100%;
+  left: 0;
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
   transform: rotate(45deg);
-  background: #fff;
+  width: 100%;
 }
 
-.shepherd-element[data-popper-placement^="top"] > .shepherd-arrow {
-  bottom: -8px;
+.shepherd-button:disabled {
+  cursor: default;
+  opacity: 1;
 }
 
+.shepherd-button:not(:disabled):hover {
+  background-color: #fff;
+  border: 2px solid #000;
+  color: #000;
+}
+
+.shepherd-button.shepherd-button-secondary {
+  background: #000;
+  border: 2px solid #000;
+  color: #fff;
+}
+
+.shepherd-cancel-icon:hover {
+  color: #000;
+}
+
+.shepherd-text li {
+  color: #000;
+  font-size: 16px;
+  line-height: normal;
+  margin: 0;
+  padding: 0;
+}
+
+.shepherd-text p {
+  margin: 0 0 8px;
+}
+
+.shepherd-text ul {
+  list-style-position: outside;
+  margin: 0 0 8px;
+  padding-left: 20px;
+}
+
+/* All 0,2,1 specificity selectors */
+.shepherd-footer .shepherd-button:last-child {
+  margin-left: 2.5px;
+  margin-right: 0;
+}
+
+.shepherd-text p:last-child {
+  margin-bottom: 0;
+}
+
+.shepherd-text ul:last-child {
+  margin-bottom: 0;
+}
+
+/* All 0,3,0 specificity selectors */
+.shepherd-button.shepherd-button-secondary:not(:disabled):hover {
+  background-color: #fff;
+  border: 2px solid #000;
+  color: #000;
+}
+
+.shepherd-has-title .shepherd-content .shepherd-cancel-icon {
+  background: transparent;
+  border: none;
+  color: #000;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: normal;
+  height: 24px;
+  line-height: 24px;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  transition: none;
+  width: 24px;
+}
+
+.shepherd-has-title .shepherd-content .shepherd-header {
+  align-items: center;
+  background: transparent;
+  border-radius: 0;
+  display: flex;
+  justify-content: space-between;
+  line-height: normal;
+  padding: 8px;
+}
+
+/* All 0,3,0 specificity (attribute selectors + classes) */
+.shepherd-element.shepherd-centered > .shepherd-arrow {
+  display: none;
+}
+
+/* All 0,3,1 specificity selectors */
+.shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover {
+  color: #000;
+}
+
+/* All 0,2,2 specificity (attribute + pseudo) */
 .shepherd-element[data-popper-placement^="bottom"] > .shepherd-arrow {
   top: -8px;
 }
@@ -203,23 +250,11 @@
   left: -8px;
 }
 
+.shepherd-element[data-popper-placement^="top"] > .shepherd-arrow {
+  bottom: -8px;
+}
+
+/* All 0,4,0 specificity */
 .shepherd-element.shepherd-has-title[data-popper-placement^="bottom"] > .shepherd-arrow:before {
   background: #fff;
-}
-
-.shepherd-element.shepherd-centered > .shepherd-arrow {
-  display: none;
-}
-
-.shepherd-modal-overlay-container {
-  z-index: 997;
-}
-
-.shepherd-element,
-.shepherd-content,
-.shepherd-header,
-.shepherd-footer,
-.shepherd-button,
-.shepherd-cancel-icon {
-  transition: none !important;
 }

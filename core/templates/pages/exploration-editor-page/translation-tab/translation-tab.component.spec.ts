@@ -74,8 +74,13 @@ describe('Translation tab component', () => {
   class MockShepherdService {
     defaultStepOptions = {};
     modal = false;
-    steps = [];
-    tourObject = null;
+    steps: object[] = [];
+    tourObject: {
+      on: (eventName: string, cb: () => void) => void;
+      start: () => void;
+      complete: () => void;
+      cancel: () => void;
+    } | null = null;
 
     addSteps(steps: object[]) {
       this.steps = steps;
@@ -88,20 +93,14 @@ describe('Translation tab component', () => {
     }
 
     start() {
-      if (this.tourObject) {
-        this.tourObject.start();
-      }
+      this.tourObject?.start();
     }
     complete() {
-      if (this.tourObject) {
-        this.tourObject.complete();
-      }
+      this.tourObject?.complete();
     }
     back() {}
     cancel() {
-      if (this.tourObject) {
-        this.tourObject.cancel();
-      }
+      this.tourObject?.cancel();
     }
   }
 
@@ -572,10 +571,12 @@ describe('Translation tab component', () => {
   it('should smoothly scroll to target position', () => {
     let scrollToSpy = spyOn(window, 'scrollTo');
     let callbacks: FrameRequestCallback[] = [];
-    spyOn(window, 'requestAnimationFrame').and.callFake(cb => {
-      callbacks.push(cb);
-      return 1;
-    });
+    spyOn(window, 'requestAnimationFrame').and.callFake(
+      (cb: FrameRequestCallback) => {
+        callbacks.push(cb);
+        return 1;
+      }
+    );
     let mockPerformanceNow = spyOn(performance, 'now');
 
     mockPerformanceNow.and.returnValue(0);
@@ -625,13 +626,6 @@ describe('Translation tab component', () => {
 
     component.permissions = {
       canVoiceover: true,
-      canUnpublish: false,
-      canReleaseOwnership: false,
-      canPublish: false,
-      canDelete: false,
-      canModifyRoles: false,
-      canEdit: false,
-      canManageVoiceArtist: false,
     };
 
     const smoothScrollToSpy = spyOn(
