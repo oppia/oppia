@@ -231,6 +231,24 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     return arcIndex === -1 ? null : arcIndex + 1;
   }
 
+  getArcColorForNode(
+    nodeId: string
+  ): (typeof StoryDomainConstants.ARC_COLOR_PALETTE)[number] | null {
+    if (!this.storyContents) {
+      return null;
+    }
+    const arcId = this.getArcIdForNode(nodeId);
+    if (!arcId) {
+      return null;
+    }
+    const arcIndex = this.storyContents.getArcIndex(arcId);
+    if (arcIndex === -1) {
+      return null;
+    }
+    const palette = StoryDomainConstants.ARC_COLOR_PALETTE;
+    return palette[arcIndex % palette.length];
+  }
+
   isSameArc(nodeIndex: number): boolean {
     if (!this.storyContents || nodeIndex <= 0) {
       return true;
