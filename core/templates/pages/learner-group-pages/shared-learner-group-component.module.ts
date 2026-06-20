@@ -34,13 +34,6 @@ import {LearnerGroupLearnerSpecificProgressComponent} from './edit-group/learner
     AddSyllabusItemsComponent,
     InviteLearnersComponent,
   ],
-  entryComponents: [
-    LearnerGroupDetailsComponent,
-    LearnerGroupOverviewComponent,
-    LearnerGroupLearnerSpecificProgressComponent,
-    AddSyllabusItemsComponent,
-    InviteLearnersComponent,
-  ],
   exports: [
     LearnerGroupDetailsComponent,
     LearnerGroupOverviewComponent,

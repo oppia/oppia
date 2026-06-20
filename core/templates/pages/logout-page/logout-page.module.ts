@@ -27,6 +27,5 @@ import {LogoutPageRoutingModule} from './logout-page-routing.module';
 @NgModule({
   imports: [CommonModule, SharedComponentsModule, LogoutPageRoutingModule],
   declarations: [LogoutPageComponent, LogoutPageRootComponent],
-  entryComponents: [LogoutPageComponent, LogoutPageRootComponent],
 })
 export class LogoutPageModule {}

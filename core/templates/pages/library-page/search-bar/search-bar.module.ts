@@ -34,7 +34,6 @@ import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-ut
     TranslateModule,
   ],
   declarations: [SearchBarComponent],
-  entryComponents: [SearchBarComponent],
   exports: [SearchBarComponent],
 })
 export class SearchBarModule {}

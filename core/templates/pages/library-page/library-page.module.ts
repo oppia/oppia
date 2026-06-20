@@ -49,14 +49,5 @@ import {ClassroomCardComponent} from './classroom-card/classroom-card.component'
     LibraryPageRootComponent,
     ClassroomCardComponent,
   ],
-  entryComponents: [
-    LearnerPlaylistModalComponent,
-    LibraryFooterComponent,
-    SearchResultsComponent,
-    ActivityTilesInfinityGridComponent,
-    LibraryPageComponent,
-    LibraryPageRootComponent,
-    ClassroomCardComponent,
-  ],
 })
 export class LibraryPageModule {}

@@ -43,6 +43,5 @@ import {LoginPageRoutingModule} from './login-page-routing.module';
     LoginPageRoutingModule,
   ],
   declarations: [LoginPageComponent, LoginPageRootComponent],
-  entryComponents: [LoginPageComponent, LoginPageRootComponent],
 })
 export class LoginPageModule {}

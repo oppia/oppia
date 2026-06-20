@@ -47,12 +47,5 @@ import {RouterModule} from '@angular/router';
     ExitLearnerGroupModalComponent,
     LearnerGroupPreferencesModalComponent,
   ],
-  entryComponents: [
-    ViewLearnerGroupPageComponent,
-    ViewLearnerGroupPageRootComponent,
-    LearnerGroupViewAssignedSyllabusComponent,
-    ExitLearnerGroupModalComponent,
-    LearnerGroupPreferencesModalComponent,
-  ],
 })
 export class ViewLearnerGroupPageModule {}

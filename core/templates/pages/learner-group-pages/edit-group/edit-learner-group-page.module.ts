@@ -65,16 +65,5 @@ import {SharedLearnerGroupComponentsModule} from 'pages/learner-group-pages/shar
     InviteSuccessfulModalComponent,
     DeleteLearnerGroupModalComponent,
   ],
-  entryComponents: [
-    EditLearnerGroupPageComponent,
-    LearnerGroupSyllabusComponent,
-    LearnerGroupLearnersProgressComponent,
-    LearnerGroupPreferencesComponent,
-    RemoveItemModalComponent,
-    SyllabusAdditionSuccessModalComponent,
-    InviteLearnersModalComponent,
-    InviteSuccessfulModalComponent,
-    DeleteLearnerGroupModalComponent,
-  ],
 })
 export class EditLearnerGroupPageModule {}
