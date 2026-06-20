@@ -31,9 +31,10 @@
   border: 1px solid #bdd4d0;
   border-radius: 4px;
   display: flex;
-  flex: 0 0 244px;
+  flex: 1;
   height: 38px;
-  min-width: 244px;
+  max-width: 150px;
+  min-width: 0;
   overflow: hidden;
   position: relative;
 }
@@ -130,6 +131,7 @@
   }
 
   .topic-lesson-language-selector-select-container {
+    max-width: none;
     width: 100%;
   }
 
