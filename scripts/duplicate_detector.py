@@ -135,8 +135,8 @@ def main() -> None:
         with open(event_path, 'r', encoding='utf-8') as f:
             event = json.load(f)
 
-    repo = os.environ.get('GITHUB_REPOSITORY')
-    token = os.environ.get('GITHUB_TOKEN')
+    repo = os.environ.get('GITHUB_REPOSITORY', '')
+    token = os.environ.get('GITHUB_TOKEN', '')
     workspace = os.environ.get('GITHUB_WORKSPACE', '.')
     threshold = float(os.environ.get('THRESHOLD_SCORE', '0.8'))
 
