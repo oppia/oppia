@@ -22,7 +22,10 @@ import os
 import re
 import urllib.request
 
-from sentence_transformers import SentenceTransformer, util
+from sentence_transformers import (
+    SentenceTransformer,
+    util,
+)  # pylint: disable=import-error
 
 
 def get_template_lines(repo_path):
@@ -111,7 +114,7 @@ def get_all_open_issues(repo, headers):
                 issues.extend(page_issues)
                 page += 1
         except Exception as e:
-            logging.info(f'Error fetching issues on page {page}: {e}')
+            logging.info('Error fetching issues on page %s: %s', page, e)
             break
     return issues
 
@@ -176,7 +179,7 @@ def main():
         logging.info('No issues found to triage in the given range.')
         return
 
-    logging.info(f'Generating embeddings for {len(all_issues)} open issues...')
+    logging.info('Generating embeddings for %s open issues...', len(all_issues))
     embeddings = {}
     for iss in all_issues:
         title = iss.get('title', '')
@@ -193,7 +196,7 @@ def main():
                 text, convert_to_tensor=True
             )
 
-    logging.info(f'Triaging {len(issues_to_triage)} issues...')
+    logging.info('Triaging %s issues...', len(issues_to_triage))
     for target_iss in issues_to_triage:
         current_id = target_iss['number']
         current_embedding = embeddings[current_id]
@@ -214,14 +217,17 @@ def main():
 
         if best_issue_number is None or best_score < threshold:
             logging.info(
-                f'Issue #{current_id}: No duplicate found. '
-                f'(Highest score: {best_score})'
+                'Issue #%s: No duplicate found. ' '(Highest score: %s)',
+                current_id,
+                best_score,
             )
             continue
 
         logging.info(
-            f'Issue #{current_id}: Duplicate found! '
-            f'#{best_issue_number} (Score: {best_score})'
+            'Issue #%s: Duplicate found! ' '#%s (Score: %s)',
+            current_id,
+            best_issue_number,
+            best_score,
         )
 
         label_url = (
@@ -235,9 +241,9 @@ def main():
         )
         try:
             urllib.request.urlopen(label_req)
-            logging.info(f'Issue #{current_id}: Label added.')
+            logging.info('Issue #%s: Label added.', current_id)
         except Exception as e:
-            logging.info(f'Issue #{current_id}: Failed to add label: {e}')
+            logging.info('Issue #%s: Failed to add label: %s', current_id, e)
 
         comment_url = (
             f'https://api.github.com/repos/{repo}/issues/{current_id}/comments'
@@ -256,9 +262,9 @@ def main():
         )
         try:
             urllib.request.urlopen(comment_req)
-            logging.info(f'Issue #{current_id}: Comment added.')
+            logging.info('Issue #%s: Comment added.', current_id)
         except Exception as e:
-            logging.info(f'Issue #{current_id}: Failed to add comment: {e}')
+            logging.info('Issue #%s: Failed to add comment: %s', current_id, e)
 
 
 if __name__ == '__main__':
