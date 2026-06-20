@@ -26,25 +26,96 @@ interface CreateCertificateOfferingBackendResponse {
   certificate_id: string;
 }
 
+interface UpdateCertificateOfferingBackendResponse {
+  certificate_id: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class CertificateAssessmentOfferingBackendApiService {
   constructor(private http: HttpClient) {}
 
+  private getCertificateOfferingByIdHandlerUrl(certificateId: string): string {
+    return CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER_URL.replace(
+      '<certificate_id>',
+      certificateId
+    );
+  }
+
   async createCertificateAssessmentOfferingAsync(
     certificateAssessmentOffering: CertificateAssessmentOfferingData
   ): Promise<string> {
+    const topicIds = Object.keys(certificateAssessmentOffering.topicData || {});
     return new Promise((resolve, reject) => {
+      // TODO(#24717-M1.14): Replace this temporary stub payload with the real create
+      // request once the end-to-end certificate offering wiring is in place.
       this.http
         .post<CreateCertificateOfferingBackendResponse>(
           CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL,
+          {
+            title: certificateAssessmentOffering.title || 'Stub Certificate',
+            description:
+              certificateAssessmentOffering.description || 'Stub Description',
+            classroom_id:
+              certificateAssessmentOffering.classroomId || 'math_classroom_01',
+            topics:
+              topicIds.length > 0
+                ? topicIds.map(topicId => ({topic_id: topicId}))
+                : [{topic_id: 'topic_place_values'}],
+            total_questions: certificateAssessmentOffering.totalQuestions || 1,
+            time_limit_in_minutes:
+              certificateAssessmentOffering.timeLimitInMinutes || 1,
+            demonstrates: ['Stub demonstration'],
+            async_status:
+              certificateAssessmentOffering.asyncStatus || 'Available',
+          }
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response.certificate_id);
+          },
+          errorResponse => {
+            reject(errorResponse?.error?.error || errorResponse.message);
+          }
+        );
+    });
+  }
+
+  async updateCertificateAssessmentOfferingAsync(
+    certificateId: string,
+    certificateAssessmentOffering: CertificateAssessmentOfferingData
+  ): Promise<string> {
+    return new Promise((resolve, reject) => {
+      // TODO(#26217-M1.12): Pass the certificate assessment offering payload once the backend update handler supports it.
+      this.http
+        .put<UpdateCertificateOfferingBackendResponse>(
+          this.getCertificateOfferingByIdHandlerUrl(certificateId),
           {}
         )
         .toPromise()
         .then(
           response => {
             resolve(response.certificate_id);
+          },
+          errorResponse => {
+            reject(errorResponse?.error?.error || errorResponse.message);
+          }
+        );
+    });
+  }
+
+  async deleteCertificateAssessmentOfferingAsync(
+    certificateId: string
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .delete<void>(this.getCertificateOfferingByIdHandlerUrl(certificateId))
+        .toPromise()
+        .then(
+          () => {
+            resolve();
           },
           errorResponse => {
             reject(errorResponse?.error?.error || errorResponse.message);

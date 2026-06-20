@@ -151,6 +151,7 @@ describe('LearnerGroupLearnerSpecificProgressComponent', () => {
 
   it('should initialize', fakeAsync(() => {
     const chapterProgressSummaryDict = {
+      exploration_id: 'exp_1',
       total_checkpoints_count: 6,
       visited_checkpoints_count: 4,
       is_chapter_complete: false,
@@ -186,22 +187,24 @@ describe('LearnerGroupLearnerSpecificProgressComponent', () => {
       LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS
         .PROGRESS_IN_STORIES
     );
-    expect(tabIsActive).toBeTrue();
+    expect(tabIsActive).toBe(true);
 
     tabIsActive = component.isTabActive(
       LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS
         .SKILLS_ANALYSIS
     );
-    expect(tabIsActive).toBeFalse();
+    expect(tabIsActive).toBe(false);
   });
 
   it('should get all checkpoints progress of chapter correctly', fakeAsync(() => {
     const chapterProgressSummaryDict1 = {
+      exploration_id: 'exp_1',
       total_checkpoints_count: 6,
       visited_checkpoints_count: 4,
       is_chapter_complete: false,
     };
     const chapterProgressSummaryDict2 = {
+      exploration_id: 'exp_2',
       total_checkpoints_count: 4,
       visited_checkpoints_count: 3,
       is_chapter_complete: false,
@@ -238,10 +241,10 @@ describe('LearnerGroupLearnerSpecificProgressComponent', () => {
     component.learnerProgress = sampleLearnerGroupUserProg;
 
     let chapterIsCompleted = component.isChapterCompleted(0, 0);
-    expect(chapterIsCompleted).toBeTrue();
+    expect(chapterIsCompleted).toBe(true);
 
     chapterIsCompleted = component.isChapterCompleted(1, 1);
-    expect(chapterIsCompleted).toBeFalse();
+    expect(chapterIsCompleted).toBe(false);
   });
 
   it('should get completed chapter progress bar width correctly', () => {
