@@ -100,7 +100,6 @@ import {SearchBarModule} from 'pages/library-page/search-bar/search-bar.module';
 import {SubtopicSummaryTileComponent} from './summary-tile/subtopic-summary-tile.component';
 import {FilteredChoicesFieldComponent} from './filter-fields/filtered-choices-field/filtered-choices-field.component';
 import {MultiSelectionFieldComponent} from './filter-fields/multi-selection-field/multi-selection-field.component';
-import {ConceptCardComponent} from './concept-card/concept-card.component';
 import {ScoreRingComponent} from './score-ring/score-ring.component';
 import {CompletionGraphComponent} from './statistics-directives/completion-graph.component';
 import {TutorCardComponent} from 'pages/exploration-player-page/current-lesson-player/learner-experience/tutor-card.component';
@@ -165,8 +164,6 @@ import {VisualizationSortedTilesComponent} from '../../../extensions/visualizati
 import {OppiaVisualizationClickHexbinsComponent} from '../../../extensions/visualizations/oppia-visualization-click-hexbins.directive';
 import {OppiaVisualizationFrequencyTableComponent} from '../../../extensions/visualizations/oppia-visualization-frequency-table.directive';
 import {OppiaVisualizationEnumeratedFrequencyTableComponent} from '../../../extensions/visualizations/oppia-visualization-enumerated-frequency-table.directive';
-import {RandomSelectorComponent} from '../../../extensions/value_generators/templates/random-selector.component';
-import {CopierComponent} from '../../../extensions/value_generators/templates/copier.component';
 import {UndoSnackbarComponent} from './custom-snackbar/undo-snackbar.component';
 import {TranslationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import {OppiaCkEditorCopyToolBarModule} from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
