@@ -42,6 +42,22 @@ TAG_FIREBASE = (
 class DiffFirebaseRecordsTests(job_test_utils.PipelinedTestBase):
     """Pipeline tests for DiffFirebaseRecords."""
 
+    TAG_TEST_CASES = (
+        ('TAG_OK', 'OK'),
+        ('TAG_ADD', 'ADD'),
+        ('TAG_DEL', 'DEL'),
+        ('TAG_OPPIA_USER_COLLISION', 'OPPIA_USER_COLLISION'),
+        ('TAG_FIREBASE_ACCOUNT_COLLISION', 'FIREBASE_ACCOUNT_COLLISION'),
+    )
+
+    def test_tag_names(self) -> None:
+        for tag_name, expected_value in TAG_TEST_CASES:
+            with self.subTest(f'{tag_name} == {expected_value!r}'):
+                self.assertEqual(
+                    firebase_transforms.DiffFirebaseRecords[tag_name],
+                    expected_value,
+                )
+
     def test_diff_with_no_records_produces_no_output(self) -> None:
         self.assert_pcoll_empty(self.run_diff([], []))
 
