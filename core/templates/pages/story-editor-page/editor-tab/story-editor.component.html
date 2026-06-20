@@ -308,7 +308,8 @@
                     <option [value]="-1">None</option>
                     <option *ngFor="let node of linearNodesList;index as idx"
                             [disabled]="!chapterIsPublishable[idx]"
-                            [value]="idx">{{ idx+1 }}</option>
+                            [value]="idx">{{ idx+1 }}
+                    </option>
                   </select>
                 </div>
               </div>
@@ -339,7 +340,8 @@
                           [cdkDragData]="node">
                         <td class="drag-handler" (click)="$event.stopPropagation()">
                           <span class="fas fa-grip-vertical draggable-icon-indicator"
-                                *ngIf="node.getStatus() !== 'Published'"></span>
+                                *ngIf="node.getStatus() !== 'Published'">
+                          </span>
                         </td>
                         <td class="chapter-index">{{ idx+1 }}</td>
                         <td class="e2e-test-chapter-title chapter-title">{{ node.getTitle() }}</td>
@@ -358,7 +360,8 @@
                         <td class="edit-options-container">
                           <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options"
                              (click)="toggleChapterEditOptions(idx);$event.stopPropagation()"
-                             aria-label="Chapter edit"></i>
+                             aria-label="Chapter edit">
+                          </i>
                           <div class="chapter-option-box"
                                *ngIf="selectedChapterIndex === idx"
                                (mouseleave)="toggleChapterEditOptions(-1)"
@@ -417,7 +420,8 @@
                 <option [value]="-1">None</option>
                 <option *ngFor="let node of linearNodesList;index as idx"
                         [disabled]="!chapterIsPublishable[idx]"
-                        [value]="idx">{{ idx+1 }}</option>
+                        [value]="idx">{{ idx+1 }}
+                </option>
               </select>
             </div>
 
@@ -504,7 +508,8 @@
                         [cdkDragData]="node">
                       <td class="col-drag arc-drag-handle" (click)="$event.stopPropagation()">
                         <span class="fas fa-grip-vertical draggable-icon-indicator"
-                              *ngIf="node.getStatus() !== 'Published'"></span>
+                              *ngIf="node.getStatus() !== 'Published'">
+                        </span>
                       </td>
                       <td class="col-num arc-chapter-num">{{ idx + 1 }}</td>
                       <td class="col-name arc-chapter-name e2e-test-chapter-title">{{ node.getTitle() }}</td>
@@ -525,7 +530,8 @@
                       <td class="col-actions" (click)="$event.stopPropagation()">
                         <i class="fa fa-ellipsis-v chapter-edit-toggle-button e2e-test-edit-options"
                            (click)="toggleChapterEditOptions(idx);$event.stopPropagation()"
-                           aria-label="Chapter edit"></i>
+                           aria-label="Chapter edit">
+                        </i>
                         <div class="chapter-option-box"
                              *ngIf="selectedChapterIndex === idx"
                              (mouseleave)="toggleChapterEditOptions(-1)"
@@ -1123,7 +1129,7 @@
     }
 
     .arc-table-heading th.col-drag { width: 32px; }
-    .arc-table-heading th.col-num  { width: 40px; }
+    .arc-table-heading th.col-num { width: 40px; }
     .arc-table-heading th.col-name { width: 20%; }
     .arc-table-heading th.col-status { width: 16%; }
     .arc-table-heading th.col-modified { width: 24%; }
@@ -1214,7 +1220,7 @@
       white-space: nowrap;
     }
 
-    .arc-edit-btn  { color: #198754; }
+    .arc-edit-btn { color: #198754; }
     .arc-remove-btn { color: #dc3545; }
     .arc-action-btn:hover { opacity: .75; }
 
@@ -1332,7 +1338,7 @@
       margin: 6px 0;
       padding: 12px 14px;
     }
-    .arc-boundary-header--odd  { background-color: #eef7ef; border-color: #b8dbbf; }
+    .arc-boundary-header--odd { background-color: #eef7ef; border-color: #b8dbbf; }
     .arc-boundary-header--even { background-color: #eef3fb; border-color: #bdd0ed; }
     .arc-boundary-info { display: flex; flex-direction: column; gap: 2px; }
     .arc-boundary-title-row { align-items: center; display: flex; gap: 10px; }
