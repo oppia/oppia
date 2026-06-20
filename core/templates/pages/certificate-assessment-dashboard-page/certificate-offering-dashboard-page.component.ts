@@ -30,6 +30,7 @@ interface CertificateOfferingSummary {
   timeLabel: string;
   status: string;
 }
+
 @Component({
   selector: 'oppia-certificate-offering-dashboard-page',
   templateUrl: './certificate-offering-dashboard-page.component.html',

@@ -22,21 +22,17 @@ import {SharedComponentsModule} from 'components/shared-component.module';
 
 import {CertificateOfferingAddTopicItemsComponent} from './certificate-offering-add-topic-items.component';
 import {CertificateOfferingDetailsComponent} from './certificate-offering-details.component';
-import {CertificateOfferingProgressComponent} from './certificate-offering-progress.component';
 import {CertificateOfferingReviewAndAvailabilityComponent} from './certificate-offering-review-and-availability.component';
-import {FormsModule} from '@angular/forms';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, SharedComponentsModule],
+  imports: [CommonModule, SharedComponentsModule],
   declarations: [
     CertificateOfferingDetailsComponent,
-    CertificateOfferingProgressComponent,
     CertificateOfferingAddTopicItemsComponent,
     CertificateOfferingReviewAndAvailabilityComponent,
   ],
   exports: [
     CertificateOfferingDetailsComponent,
-    CertificateOfferingProgressComponent,
     CertificateOfferingAddTopicItemsComponent,
     CertificateOfferingReviewAndAvailabilityComponent,
   ],

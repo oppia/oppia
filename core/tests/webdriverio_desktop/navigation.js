@@ -1,0 +1,134 @@
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview End-to-end tests for general site navigation.
+ */
+var action = require('../webdriverio_utils/action.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
+var GetStartedPage = require('../webdriverio_utils/GetStartedPage.js');
+var PreferencesPage = require('../webdriverio_utils/PreferencesPage.js');
+
+describe('Meta Tags', function () {
+  var EXPECTED_META_NAME = 'Personalized Online Learning from Oppia';
+  var EXPECTED_META_DESCRIPTION = 'Learn how to get started using Oppia.';
+  var getStartedPage = new GetStartedPage.GetStartedPage();
+
+  beforeEach(async function () {
+    await getStartedPage.get();
+  });
+
+  it('should set the correct itemprop meta tags', async function () {
+    expect(await getStartedPage.getMetaTagContent('name', 'itemprop')).toEqual(
+      EXPECTED_META_NAME
+    );
+    expect(
+      await getStartedPage.getMetaTagContent('description', 'itemprop')
+    ).toEqual(EXPECTED_META_DESCRIPTION);
+  });
+
+  it('should set the correct og meta tags', async function () {
+    expect(await getStartedPage.getMetaTagContent('title', 'og')).toEqual(
+      EXPECTED_META_NAME
+    );
+    expect(await getStartedPage.getMetaTagContent('description', 'og')).toEqual(
+      EXPECTED_META_DESCRIPTION
+    );
+    expect(await getStartedPage.getMetaTagContent('url', 'og')).toEqual(
+      'http://localhost:8181/get-started'
+    );
+  });
+
+  it('should set the correct application name', async function () {
+    expect(
+      await getStartedPage.getMetaTagContent('application-name', 'name')
+    ).toEqual('Oppia.org');
+  });
+});
+
+describe('Static Pages Tour', function () {
+  it('should redirect away from the Login page when visited by logged-in user', async function () {
+    var loginPage = $('.e2e-test-login-page');
+    var learnerDashboardPage = $('.e2e-test-learner-dashboard-page');
+
+    await users.createAndLoginUser('user@navigation.com', 'navigationUser');
+
+    await waitFor.clientSideRedirection(
+      async () => {
+        // Login page will redirect user away if logged in.
+        await browser.url('/login');
+
+        // Wait for first redirection (login page to splash page).
+        await browser.waitUntil(
+          async () => {
+            var url = await browser.getUrl();
+            // Wait until the URL has changed to something that is not /login.
+            return !/login/.test(url);
+          },
+          {timeout: 10000}
+        );
+      },
+      url => {
+        // Wait for second redirection (splash page to preferred dashboard
+        // page).
+        return url !== 'http://localhost:8181/';
+      },
+      async () => {
+        await waitFor.presenceOf(
+          learnerDashboardPage,
+          'Learner dashboard page did not load'
+        );
+      }
+    );
+
+    expect(await loginPage.isExisting()).toBe(false);
+
+    await users.logout();
+    await browser.url('/login');
+    await waitFor.pageToFullyLoad();
+    await waitFor.presenceOf(loginPage, 'Login page did not load');
+  });
+});
+
+describe('Error reporting', function () {
+  it('should report a client error to the backend', async () => {
+    let preferencesPage = new PreferencesPage.PreferencesPage();
+    await users.createUser('lorem@preferences.com', 'loremPreferences');
+    await users.login('lorem@preferences.com');
+    await preferencesPage.get();
+    // This delay is needed so that the page gets a chance to fully load before
+    // cookies are deleted. The page makes a backend request for feature flags
+    // and the additional pause avoids that being recorded as an error due to
+    // the user no longer being logged in.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(2000);
+    // Deleting the cookies simulates an expired session error.
+    await browser.deleteCookies();
+    // Expect the cookies are deleted.
+    let cookies = await browser.getCookies();
+    expect(cookies).toEqual([]);
+    await browser.setupInterceptor();
+    // Expect that the frontend error is sent to the backend handler.
+    await browser.expectRequest('POST', '/frontend_errors', 200);
+    let creatorDashboardRadio = $('.e2e-test-creator-dashboard-radio');
+    let saveChangesButton = $('.e2e-test-save-changes-button');
+    await action.click('Creator Dashboard radio', creatorDashboardRadio);
+    await action.click('Save Changes button', saveChangesButton);
+    // Add a 1 second delay to ensure that expected request gets triggered.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(1000);
+    await browser.assertExpectedRequestsOnly();
+  });
+});

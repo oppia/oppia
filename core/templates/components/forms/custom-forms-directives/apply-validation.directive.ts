@@ -23,7 +23,6 @@ import {
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
-import {NumberConversionService} from 'services/number-conversion.service';
 import {UnderscoresToCamelCasePipe} from 'filters/string-utility-filters/underscores-to-camel-case.pipe';
 import {Validator as OppiaValidator} from 'interactions/TextInput/directives/text-input-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
@@ -42,7 +41,6 @@ import {SchemaValidators} from '../validators/schema-validators';
 export class ApplyValidationDirective implements Validator {
   @Input() validators: OppiaValidator[];
   underscoresToCamelCasePipe = new UnderscoresToCamelCasePipe();
-  constructor(private numberConversionService: NumberConversionService) {}
   validate(control: AbstractControl): ValidationErrors | null {
     if (!this.validators || this.validators.length === 0) {
       return null;
@@ -61,10 +59,7 @@ export class ApplyValidationDirective implements Validator {
         }
       }
       if (SchemaValidators[validatorName]) {
-        const error = SchemaValidators[validatorName](
-          filterArgs,
-          this.numberConversionService
-        )(control);
+        const error = SchemaValidators[validatorName](filterArgs)(control);
         if (error !== null) {
           errorsPresent = true;
           allValidationErrors = {...allValidationErrors, ...error};

@@ -33,24 +33,14 @@ import cloneDeep from 'lodash/cloneDeep';
 import {ParamSpecs} from 'domain/exploration/param-specs.model';
 import {CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
 
-interface RandomSelectorCustomizationArgs {
-  list_of_values: (string | number | boolean)[];
-}
-
-interface CopierCustomizationArgs {
-  value: string | number | boolean;
-}
-
 @Component({
   selector: 'param-changes-editor',
   templateUrl: './param-changes-editor.component.html',
 })
 export class ParamChangesEditorComponent implements OnInit, OnDestroy {
-  @Input() paramChangesServiceName!:
-    | 'explorationParamChangesService'
-    | 'stateParamChangesService';
-  @Input() postSaveHook!: () => void;
-  @Input() currentlyInSettingsTab!: boolean;
+  @Input() paramChangesServiceName: string;
+  @Input() postSaveHook: () => void;
+  @Input() currentlyInSettingsTab: boolean;
 
   SERVICE_MAPPING = {
     explorationParamChangesService: ExplorationParamChangesService,
@@ -58,32 +48,12 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
   };
 
   directiveSubscriptions = new Subscription();
-  isParamChangesEditorOpen: boolean = false;
-  paramNameChoices: {id: string; text: string}[] = [];
-  warningText: string = '';
+  isParamChangesEditorOpen: boolean;
+  paramNameChoices: {id: string; text: string}[];
+  warningText: string;
   HUMAN_READABLE_ARGS_RENDERERS: {
-    Copier: (value: CopierCustomizationArgs) => string;
-    RandomSelector: (value: RandomSelectorCustomizationArgs) => string;
-  } = {
-    Copier: (value: CopierCustomizationArgs): string => {
-      return 'to ' + value.value;
-    },
-
-    RandomSelector: (value: RandomSelectorCustomizationArgs): string => {
-      let result = 'to one of [';
-
-      for (let i = 0; i < value.list_of_values.length; i++) {
-        if (i !== 0) {
-          result += ', ';
-        }
-
-        result += String(value.list_of_values[i]);
-      }
-
-      result += '] at random';
-
-      return result;
-    },
+    Copier: (value) => void;
+    RandomSelector: (value) => void;
   };
 
   PREAMBLE_TEXT = {
@@ -91,7 +61,7 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     RandomSelector: 'to one of',
   };
 
-  paramChangesService!:
+  paramChangesService:
     | ExplorationParamChangesService
     | StateParamChangesService;
 
@@ -132,13 +102,10 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     let newParamChange = ParamChange.createDefault(newParamName);
     // Add the new param name to this.paramNameChoices, if necessary,
     // so that it shows up in the dropdown.
-    const paramSpecs = this.explorationParamSpecsService
-      .displayed as ParamSpecs;
-
     if (
-      paramSpecs.addParamIfNew(
+      (this.explorationParamSpecsService.displayed as ParamSpecs).addParamIfNew(
         newParamChange.name,
-        paramSpecs.getParamSpec(newParamChange.name)
+        null
       )
     ) {
       this.paramNameChoices = this.generateParamNameChoices();
@@ -163,56 +130,45 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
   }
 
   areDisplayedParamChangesValid(): boolean {
-    let displayed = this.paramChangesService.displayed;
+    let paramChanges = this.paramChangesService.displayed;
 
-    if (!Array.isArray(displayed)) {
-      return false;
-    }
+    if (paramChanges && (paramChanges as ParamChange[]).length) {
+      for (let i = 0; i < (paramChanges as ParamChange[]).length; i++) {
+        let paramName = paramChanges[i].name;
+        if (paramName === '') {
+          this.warningText = 'Please pick a non-empty parameter name.';
+          return false;
+        }
 
-    let paramChanges = displayed as ParamChange[];
+        if (AppConstants.INVALID_PARAMETER_NAMES.indexOf(paramName) !== -1) {
+          this.warningText =
+            "The parameter name '" + paramName + "' is reserved.";
+          return false;
+        }
 
-    for (let i = 0; i < paramChanges.length; i++) {
-      let paramChange = paramChanges[i];
-      let paramName = paramChange.name;
+        let ALPHA_CHARS_REGEX = /^[A-Za-z]+$/;
+        if (!ALPHA_CHARS_REGEX.test(paramName)) {
+          this.warningText =
+            'Parameter names should use only alphabetic characters.';
+          return false;
+        }
 
-      if (paramName === '') {
-        this.warningText = 'Please pick a non-empty parameter name.';
-        return false;
-      }
+        let generatorId = paramChanges[i].generatorId;
+        let customizationArgs = paramChanges[i].customizationArgs;
 
-      if (
-        (AppConstants.INVALID_PARAMETER_NAMES as readonly string[]).includes(
-          paramName
-        )
-      ) {
-        this.warningText =
-          "The parameter name '" + paramName + "' is reserved.";
-        return false;
-      }
+        if (!this.PREAMBLE_TEXT.hasOwnProperty(generatorId)) {
+          this.warningText = 'Each parameter should have a generator id.';
+          return false;
+        }
 
-      let ALPHA_CHARS_REGEX = /^[A-Za-z]+$/;
-
-      if (!ALPHA_CHARS_REGEX.test(paramName)) {
-        this.warningText =
-          'Parameter names should use only alphabetic characters.';
-        return false;
-      }
-
-      let generatorId = paramChange.generatorId;
-      let customizationArgs = paramChange.customizationArgs;
-
-      if (!this.PREAMBLE_TEXT.hasOwnProperty(generatorId)) {
-        this.warningText = 'Each parameter should have a generator id.';
-        return false;
-      }
-
-      if (
-        generatorId === 'RandomSelector' &&
-        customizationArgs?.list_of_values?.length === 0
-      ) {
-        this.warningText =
-          'Each parameter should have at least one possible value.';
-        return false;
+        if (
+          generatorId === 'RandomSelector' &&
+          customizationArgs.list_of_values.length === 0
+        ) {
+          this.warningText =
+            'Each parameter should have at least one possible value.';
+          return false;
+        }
       }
     }
 
@@ -233,12 +189,9 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     this.explorationParamSpecsService.restoreFromMemento();
     (this.paramChangesService.displayed as ParamChange[]).forEach(
       paramChange => {
-        const paramSpecs = this.explorationParamSpecsService
-          .displayed as ParamSpecs;
-
-        const paramSpec = paramSpecs.getParamSpec(paramChange.name);
-
-        paramSpecs.addParamIfNew(paramChange.name, paramSpec);
+        (
+          this.explorationParamSpecsService.displayed as ParamSpecs
+        ).addParamIfNew(paramChange.name, null);
       }
     );
 
@@ -270,12 +223,9 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
 
     (this.paramChangesService.displayed as ParamChange[]).forEach(
       paramChange => {
-        const paramSpecs = this.explorationParamSpecsService
-          .displayed as ParamSpecs;
-
-        const paramSpec = paramSpecs.getParamSpec(paramChange.name);
-
-        paramSpecs.addParamIfNew(paramChange.name, paramSpec);
+        (
+          this.explorationParamSpecsService.displayed as ParamSpecs
+        ).addParamIfNew(paramChange.name, null);
       }
     );
     this.paramNameChoices = this.generateParamNameChoices();
@@ -299,7 +249,6 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
 
     this.isParamChangesEditorOpen = false;
     this.warningText = '';
-
     this.directiveSubscriptions.add(
       this.externalSaveService.onExternalSave.subscribe(() => {
         if (this.isParamChangesEditorOpen) {
@@ -309,6 +258,22 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     );
 
     this.paramNameChoices = [];
+    this.HUMAN_READABLE_ARGS_RENDERERS = {
+      Copier: customizationArgs => {
+        return 'to ' + customizationArgs.value;
+      },
+      RandomSelector: customizationArgs => {
+        let result = 'to one of [';
+        for (let i = 0; i < customizationArgs.list_of_values.length; i++) {
+          if (i !== 0) {
+            result += ', ';
+          }
+          result += String(customizationArgs.list_of_values[i]);
+        }
+        result += '] at random';
+        return result;
+      },
+    };
   }
 
   ngOnDestroy(): void {
