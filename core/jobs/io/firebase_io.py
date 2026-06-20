@@ -225,7 +225,7 @@ class CreateFirebaseRecords(
                     password=user_password,
                 )
             except (ValueError, firebase_exceptions.FirebaseError) as e:
-                errors.append({'index': i, 'reason': str(e)})
+                errors.append({'index': i, 'message': str(e)})
 
         return firebase_auth.UserImportResult({'error': errors}, len(records))
 
