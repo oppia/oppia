@@ -66,12 +66,17 @@ class CopyGuppyAssetsPlugin {
         }
 
         fs.mkdirSync(targetDirectory, {recursive: true});
-        fs.readdirSync(sourceDirectory).forEach(filename => {
+        for (const entry of fs.readdirSync(sourceDirectory, {
+          withFileTypes: true,
+        })) {
+          if (!entry.isFile()) {
+            continue;
+          }
           fs.copyFileSync(
-            path.join(sourceDirectory, filename),
-            path.join(targetDirectory, filename)
+            path.join(sourceDirectory, entry.name),
+            path.join(targetDirectory, entry.name)
           );
-        });
+        }
       });
     });
   }
