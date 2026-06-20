@@ -66,9 +66,7 @@ describe('Start new beam job dialog', () => {
     });
     // NOTE: This allows tests to compile the DOM of each dialog component.
     TestBed.overrideModule(BrowserDynamicTestingModule, {
-      set: {
-        entryComponents: [StartNewBeamJobDialogComponent],
-      },
+      set: {},
     });
     await TestBed.compileComponents();
 

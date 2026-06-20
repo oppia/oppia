@@ -76,9 +76,7 @@ describe('View beam job output dialog', () => {
     });
     // NOTE: This allows tests to compile the DOM of each dialog component.
     TestBed.overrideModule(BrowserDynamicTestingModule, {
-      set: {
-        entryComponents: [ViewBeamJobOutputDialogComponent],
-      },
+      set: {},
     });
     await TestBed.compileComponents();
 

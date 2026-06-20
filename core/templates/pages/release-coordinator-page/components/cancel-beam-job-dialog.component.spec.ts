@@ -71,9 +71,7 @@ describe('Cancel beam job dialog', () => {
     });
     // NOTE: This allows tests to compile the DOM of each dialog component.
     TestBed.overrideModule(BrowserDynamicTestingModule, {
-      set: {
-        entryComponents: [CancelBeamJobDialogComponent],
-      },
+      set: {},
     });
     await TestBed.compileComponents();
 

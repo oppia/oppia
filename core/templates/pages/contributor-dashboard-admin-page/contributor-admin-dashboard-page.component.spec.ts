@@ -144,9 +144,7 @@ describe('Contributor dashboard Admin page', () => {
       schemas: [NO_ERRORS_SCHEMA],
     })
       .overrideModule(BrowserDynamicTestingModule, {
-        set: {
-          entryComponents: [CdAdminTranslationRoleEditorModal],
-        },
+        set: {},
       })
       .compileComponents();
 

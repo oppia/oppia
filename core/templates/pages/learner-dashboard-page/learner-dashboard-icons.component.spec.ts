@@ -69,9 +69,7 @@ describe('Learner Dashboard Icons Component', () => {
       schemas: [NO_ERRORS_SCHEMA],
     })
       .overrideModule(BrowserDynamicTestingModule, {
-        set: {
-          entryComponents: [LearnerPlaylistModalComponent],
-        },
+        set: {},
       })
       .compileComponents();
   }));

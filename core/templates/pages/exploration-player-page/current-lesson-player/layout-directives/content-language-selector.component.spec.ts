@@ -133,9 +133,7 @@ describe('Content language selector component', () => {
       ],
     })
       .overrideModule(BrowserDynamicTestingModule, {
-        set: {
-          entryComponents: [SwitchContentLanguageRefreshRequiredModalComponent],
-        },
+        set: {},
       })
       .compileComponents();
     contentTranslationLanguageService = TestBed.inject(

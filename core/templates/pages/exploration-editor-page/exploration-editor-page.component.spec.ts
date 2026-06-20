@@ -326,13 +326,7 @@ describe('Exploration editor page component', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).overrideModule(BrowserDynamicTestingModule, {
-      set: {
-        entryComponents: [
-          LostChangesModalComponent,
-          WelcomeModalComponent,
-          HelpModalComponent,
-        ],
-      },
+      set: {},
     });
   });
 

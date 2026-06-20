@@ -37,9 +37,7 @@ describe('Value Generator Editor Component', function () {
       schemas: [NO_ERRORS_SCHEMA],
     })
       .overrideModule(BrowserDynamicTestingModule, {
-        set: {
-          entryComponents: [CopierComponent, RandomSelectorComponent],
-        },
+        set: {},
       })
       .compileComponents();
   }));
