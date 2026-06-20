@@ -120,7 +120,7 @@ class RecreateRecordsFromOppiaModels(beam.PTransform):  # type: ignore[misc]
             self.TAG_AUTH_PAIRS: (
                 user_auth_details_models
                 | 'Omit models without a corresponding Firebase Auth ID'
-                >> beam.Filter(lambda m: m.firebase_auth_id is not None)
+                >> beam.Filter(lambda m: bool(m.firebase_auth_id))
                 | 'Create (Firebase Auth ID, User ID) pairs'
                 >> beam.Map(lambda m: (m.firebase_auth_id, m.id))
             ),
@@ -225,7 +225,7 @@ class CreateFirebaseRecords(
                     password=user_password,
                 )
             except (ValueError, firebase_exceptions.FirebaseError) as e:
-                errors.append({'index': i, 'message': str(e)})
+                errors.append({'index': i, 'reason': str(e)})
 
         return firebase_auth.UserImportResult({'error': errors}, len(records))
 
