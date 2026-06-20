@@ -48,11 +48,11 @@
       </a>
     </div>
     <div *ngIf="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container"
-      [class.oppia-container-expanded]="isContentExpanded" [class.oppia-container-contracted]="!isContentExpanded" #contentContainer>
+         [class.oppia-container-expanded]="isContentExpanded" [class.oppia-container-contracted]="!isContentExpanded" #contentContainer>
       <!-- textToTranslate contains the html content of an exploration state -->
       <oppia-rte-output-display *ngIf="activeDataFormat === 'html' || activeDataFormat === 'unicode'"
-         [class.oppia-rte-editor-focused]="isCopyModeActive()" (click)="onContentClick($event)"
-        [rteString]="textToTranslateAsString" class="oppia-rte-editor" #contentPanel>
+                                [class.oppia-rte-editor-focused]="isCopyModeActive()" (click)="onContentClick($event)"
+                                [rteString]="textToTranslateAsString" class="oppia-rte-editor" #contentPanel>
       </oppia-rte-output-display>
       <div *ngIf="isSetOfStringDataFormat()">
         <strong>{{ activeRuleDescription }}</strong>
@@ -72,8 +72,8 @@
       <div class="e2e-test-state-translation-editor">
         <ck-editor-copy-toolbar *ngIf="activeDataFormat === 'html'"></ck-editor-copy-toolbar>
         <div class="oppia-editor-container"
-          [class.oppia-container-expanded]="isTranslationExpanded" [class.oppia-container-contracted]="!isTranslationExpanded"
-          #translationContainer>
+             [class.oppia-container-expanded]="isTranslationExpanded" [class.oppia-container-contracted]="!isTranslationExpanded"
+             #translationContainer>
           <p class="oppia-keybaord-accessibility-text" tabindex="0">Alt+0 for keyboard accessibility</p>
           <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'html'" [schema]="HTML_SCHEMA"
             [localValue]="activeWrittenTranslation" (localValueChange)="updateHtml($event)" #oppiaRTE>
