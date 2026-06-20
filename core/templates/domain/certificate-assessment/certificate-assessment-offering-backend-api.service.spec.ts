@@ -60,7 +60,55 @@ describe('Certificate Assessment Offering backend api service', () => {
       CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL
     );
     expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual({});
+    expect(req.request.body).toEqual({
+      title: 'Stub Certificate',
+      description: 'Stub Description',
+      classroom_id: 'math_classroom_01',
+      topics: [{topic_id: 'topic_place_values'}],
+      total_questions: 1,
+      time_limit_in_minutes: 1,
+      demonstrates: ['Stub demonstration'],
+      async_status: 'Available',
+    });
+    req.flush({
+      certificate_id: 'mock_certificate_id',
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith('mock_certificate_id');
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should include provided topic ids in the stub payload', fakeAsync(() => {
+    mockCertificateOfferingData = new CertificateAssessmentOfferingData(
+      '',
+      'Sample Title',
+      'Sample Description',
+      'sample_classroom',
+      {
+        topic_1: 1,
+        topic_2: 1,
+      },
+      3,
+      15,
+      [],
+      'Available',
+      1
+    );
+
+    caos
+      .createCertificateAssessmentOfferingAsync(mockCertificateOfferingData)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      CertificateAssessmentDomainConstants.CERTIFICATE_ASSESSMENT_OFFERING_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body.topics).toEqual([
+      {topic_id: 'topic_1'},
+      {topic_id: 'topic_2'},
+    ]);
     req.flush({
       certificate_id: 'mock_certificate_id',
     });
