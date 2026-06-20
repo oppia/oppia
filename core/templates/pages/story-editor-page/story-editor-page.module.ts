@@ -64,19 +64,5 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
     StoryEditorNavbarBreadcrumbComponent,
     StoryEditorNavbarComponent,
   ],
-  entryComponents: [
-    StoryEditorSaveModalComponent,
-    StoryEditorUnpublishModalComponent,
-    DraftChapterConfirmationModalComponent,
-    StoryNodeEditorComponent,
-    StoryPreviewTabComponent,
-    ChapterEditorTabComponent,
-    StoryEditorComponent,
-    NewChapterTitleModalComponent,
-    StoryEditorPageComponent,
-    DeleteChapterModalComponent,
-    StoryEditorNavbarBreadcrumbComponent,
-    StoryEditorNavbarComponent,
-  ],
 })
 export class StoryEditorPageModule {}

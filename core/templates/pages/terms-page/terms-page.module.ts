@@ -32,6 +32,5 @@ import {RouterModule} from '@angular/router';
     TermsPageRoutingModule,
   ],
   declarations: [TermsPageComponent, TermsPageRootComponent],
-  entryComponents: [TermsPageComponent, TermsPageRootComponent],
 })
 export class TermsPageModule {}

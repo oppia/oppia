@@ -27,6 +27,5 @@ import {ThanksPageRoutingModule} from './thanks-page-routing.module';
 @NgModule({
   imports: [CommonModule, SharedComponentsModule, ThanksPageRoutingModule],
   declarations: [ThanksPageComponent, ThanksPageRootComponent],
-  entryComponents: [ThanksPageComponent, ThanksPageRootComponent],
 })
 export class ThanksPageModule {}

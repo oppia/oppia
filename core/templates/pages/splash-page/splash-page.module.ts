@@ -37,6 +37,5 @@ import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-m
     CampaignBannerModule,
   ],
   declarations: [SplashPageComponent, SplashPageRootComponent],
-  entryComponents: [SplashPageComponent, SplashPageRootComponent],
 })
 export class SplashPageModule {}

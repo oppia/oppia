@@ -46,10 +46,5 @@ import {ToastrModule} from 'ngx-toastr';
     SubtopicViewerPageComponent,
     SubtopicViewerRootComponent,
   ],
-  entryComponents: [
-    SubtopicViewerNavbarBreadcrumbComponent,
-    SubtopicViewerPageComponent,
-    SubtopicViewerNavbarBreadcrumbComponent,
-  ],
 })
 export class SubtopicViewerPageModule {}
