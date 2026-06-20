@@ -5950,9 +5950,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
             following schema version v63.
         """
         exploration_dict['schema_version'] = 63
-        exploration_dict['states'] = cls._convert_states_v57_dict_to_v58_dict(
+        states_dict, _ = cls._convert_states_v57_dict_to_v58_dict(
             exploration_dict['states']
         )
+        exploration_dict['states'] = states_dict
         # states_schema_version intentionally not reassigned here — see
         # _convert_states_v57_dict_to_v58_dict, which is the single place
         # responsible for advancing it.
