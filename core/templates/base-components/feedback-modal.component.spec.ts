@@ -212,7 +212,6 @@ describe('FeedbackModalComponent', () => {
     component.feedbackModalType = modalType;
 
     windowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
-    translateService = TestBed.inject(TranslateService);
     userService = TestBed.inject(UserService) as unknown as MockUserService;
     feedbackBackendApiService = TestBed.inject(FeedbackBackendApiService);
     pageContextService = TestBed.inject(PageContextService);
@@ -229,7 +228,7 @@ describe('FeedbackModalComponent', () => {
     translateService = jasmine.createSpyObj('TranslateService', ['instant']);
 
     translateService.instant.and.returnValue(
-      'Please keep your feedback under 2000 characters.'
+      'Please keep your feedback under 2500 characters.'
     );
     feedbackSessionInfoService = jasmine.createSpyObj(
       'FeedbackSessionInfoService',
