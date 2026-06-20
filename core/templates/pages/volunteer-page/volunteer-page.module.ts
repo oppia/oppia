@@ -34,6 +34,5 @@ import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-m
     CampaignBannerModule,
   ],
   declarations: [VolunteerPageComponent, VolunteerPageRootComponent],
-  entryComponents: [VolunteerPageComponent, VolunteerPageRootComponent],
 })
 export class VolunteerPageModule {}

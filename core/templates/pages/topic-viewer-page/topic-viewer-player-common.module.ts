@@ -38,13 +38,6 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     TopicLessonCardComponent,
     TopicPracticeCardComponent,
   ],
-  entryComponents: [
-    StoriesListComponent,
-    SubtopicsListComponent,
-    TopicStorySectionComponent,
-    TopicLessonCardComponent,
-    TopicPracticeCardComponent,
-  ],
   exports: [
     StoriesListComponent,
     SubtopicsListComponent,

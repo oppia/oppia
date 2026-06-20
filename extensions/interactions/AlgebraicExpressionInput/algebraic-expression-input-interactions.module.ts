@@ -32,11 +32,6 @@ import {ShortResponseAlgebraicExpressionInputComponent} from './directives/oppia
     ResponseAlgebraicExpressionInputComponent,
     ShortResponseAlgebraicExpressionInputComponent,
   ],
-  entryComponents: [
-    AlgebraicExpressionInputInteractionComponent,
-    ResponseAlgebraicExpressionInputComponent,
-    ShortResponseAlgebraicExpressionInputComponent,
-  ],
   exports: [
     AlgebraicExpressionInputInteractionComponent,
     ResponseAlgebraicExpressionInputComponent,

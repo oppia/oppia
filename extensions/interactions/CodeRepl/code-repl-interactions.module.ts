@@ -46,11 +46,6 @@ import {ShortResponseCodeRepl} from './directives/oppia-short-response-code-repl
     ResponseCodeReplComponent,
     ShortResponseCodeRepl,
   ],
-  entryComponents: [
-    InteractiveCodeReplComponent,
-    ResponseCodeReplComponent,
-    ShortResponseCodeRepl,
-  ],
   exports: [
     InteractiveCodeReplComponent,
     ResponseCodeReplComponent,

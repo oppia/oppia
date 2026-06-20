@@ -66,6 +66,5 @@ import {TopicHeaderComponent} from './topic-header/topic-header.component';
     TopicHeaderComponent,
     PracticeSessionConfirmationModal,
   ],
-  entryComponents: [TopicViewerPageComponent, PracticeSessionConfirmationModal],
 })
 export class TopicViewerPageModule {}
