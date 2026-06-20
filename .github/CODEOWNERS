@@ -778,6 +778,7 @@
 /core/templates/services/platform-feature*.ts @oppia/core-reviewers
 
 # Acceptance Tests.
+/core/tests/playwright-acceptance-tests/ @oppia/acceptance-test-reviewers
 /core/tests/puppeteer-acceptance-tests/ @oppia/acceptance-test-reviewers
 /core/tests/puppeteer/ @oppia/acceptance-test-reviewers
 /core/tests/test-modules-mappings/acceptance/ @oppia/acceptance-test-reviewers

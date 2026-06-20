@@ -37,6 +37,7 @@ import {
 import {CertificateOfferingConfirmationModalComponent} from 'components/certificate-assessment-offering-helper/certificate-offering-confirmation-modal.component';
 import {PostCertificateOfferingResultModalComponent} from 'components/certificate-assessment-offering-helper/post-certificate-offering-result-modal.component';
 import {AlertsService} from 'services/alerts.service';
+import './create-certificate-offering-page.component.css';
 
 @Component({
   selector: 'oppia-create-certificate-offering-page',

@@ -23,13 +23,16 @@ import {SharedComponentsModule} from 'components/shared-component.module';
 import {CertificateOfferingAddTopicItemsComponent} from './certificate-offering-add-topic-items.component';
 import {CertificateOfferingConfirmationModalComponent} from './certificate-offering-confirmation-modal.component';
 import {CertificateOfferingDetailsComponent} from './certificate-offering-details.component';
+import {CertificateOfferingProgressComponent} from './certificate-offering-progress.component';
 import {CertificateOfferingReviewAndAvailabilityComponent} from './certificate-offering-review-and-availability.component';
 import {PostCertificateOfferingResultModalComponent} from './post-certificate-offering-result-modal.component';
+import {FormsModule} from '@angular/forms';
 
 @NgModule({
-  imports: [CommonModule, SharedComponentsModule],
+  imports: [CommonModule, FormsModule, SharedComponentsModule],
   declarations: [
     CertificateOfferingDetailsComponent,
+    CertificateOfferingProgressComponent,
     CertificateOfferingAddTopicItemsComponent,
     CertificateOfferingReviewAndAvailabilityComponent,
     CertificateOfferingConfirmationModalComponent,
@@ -37,6 +40,7 @@ import {PostCertificateOfferingResultModalComponent} from './post-certificate-of
   ],
   exports: [
     CertificateOfferingDetailsComponent,
+    CertificateOfferingProgressComponent,
     CertificateOfferingAddTopicItemsComponent,
     CertificateOfferingReviewAndAvailabilityComponent,
     CertificateOfferingConfirmationModalComponent,

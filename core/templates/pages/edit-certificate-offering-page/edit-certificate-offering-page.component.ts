@@ -35,6 +35,7 @@ import {PostCertificateOfferingResultModalComponent} from 'components/certificat
 
 const CERTIFICATE_OFFERING_UPDATED_ACTION = 'updated';
 const CERTIFICATE_OFFERING_NOT_READY_ACTION = 'not_ready';
+import './edit-certificate-offering-page.component.css';
 
 @Component({
   selector: 'oppia-edit-certificate-offering-page',
