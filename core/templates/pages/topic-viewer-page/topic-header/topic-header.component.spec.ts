@@ -35,6 +35,9 @@ describe('TopicHeaderComponent', () => {
   beforeEach(waitForAsync(() => {
     urlService = jasmine.createSpyObj('UrlService', [
       'getClassroomUrlFragmentFromLearnerUrl',
+      'getTopicUrlFragmentFromLearnerUrl',
+      'getLearnerClassroomUrl',
+      'getLearnerTopicStoryUrl',
     ]);
     TestBed.configureTestingModule({
       declarations: [TopicHeaderComponent, MockTranslatePipe],
@@ -50,6 +53,13 @@ describe('TopicHeaderComponent', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     urlService = TestBed.inject(UrlService) as jasmine.SpyObj<UrlService>;
     urlService.getClassroomUrlFragmentFromLearnerUrl.and.returnValue('math');
+    urlService.getTopicUrlFragmentFromLearnerUrl.and.returnValue(
+      'place-values'
+    );
+    urlService.getLearnerClassroomUrl.and.returnValue('/learn/math');
+    urlService.getLearnerTopicStoryUrl.and.returnValue(
+      '/learn/math/place-values/story'
+    );
 
     spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValues(
       'topic.title.translation.key',
@@ -94,8 +104,23 @@ describe('TopicHeaderComponent', () => {
 
   it('should return /learn/<fragment> or /learn', () => {
     expect(component.getClassroomUrl()).toBe('/learn/math');
+    expect(urlService.getLearnerClassroomUrl).toHaveBeenCalledWith();
     component.classroomUrlFragment = '';
+    urlService.getLearnerClassroomUrl.and.returnValue('/learn');
     expect(component.getClassroomUrl()).toBe('/learn');
+  });
+
+  it('should return topic story URL when fragments exist and /learn otherwise', () => {
+    expect(component.getTopicStoryUrl()).toBe('/learn/math/place-values/story');
+    expect(urlService.getLearnerTopicStoryUrl).toHaveBeenCalledWith();
+
+    component.classroomUrlFragment = '';
+    urlService.getLearnerTopicStoryUrl.and.returnValue('/learn');
+    expect(component.getTopicStoryUrl()).toBe('/learn');
+
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = '';
+    expect(component.getTopicStoryUrl()).toBe('/learn');
   });
 
   it('should delegate RTL detection to I18nLanguageCodeService', () => {

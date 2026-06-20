@@ -111,6 +111,13 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
             self.BLOG_ADMIN_USERNAME,
         )
 
+    def test_get_blog_homepage_data_with_invalid_offset(self) -> None:
+        self.login(self.user_email)
+        self.get_json(
+            '%s?offset=abc' % feconf.BLOG_HOMEPAGE_DATA_URL,
+            expected_status_int=400,
+        )
+
     def test_get_blog_homepage_data_with_author_account_deleted(self) -> None:
         blog_services.update_blog_author_details(
             self.blog_admin_id, 'new author name', 'general user bio'
