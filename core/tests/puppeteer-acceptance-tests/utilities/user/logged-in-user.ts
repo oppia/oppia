@@ -55,7 +55,7 @@ const accountDeletionButtonInDeleteAccountPage =
   '.e2e-test-delete-my-account-button';
 const signUpUsernameField = 'input.e2e-test-username-input';
 const invalidEmailErrorContainer = '#mat-error-1';
-const invalidUsernameErrorContainer = '.oppia-warning-text';
+const invalidUsernameErrorContainer = '.e2e-test-username-warning';
 const optionText = '.mat-option-text';
 const errorContainerSelector = '.e2e-test-error-container';
 const errorPageHeadingSelector = '.e2e-test-error-page-heading';
@@ -64,6 +64,7 @@ const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
 const confirmUsernameField = '.e2e-test-confirm-username-field';
 const confirmAccountDeletionButton = '.e2e-test-confirm-deletion-button';
 const agreeToTermsCheckbox = 'input.e2e-test-agree-to-terms-checkbox';
+const emailPreferencesRadioNo = 'input.e2e-test-email-preferences-radio-no';
 const registerNewUserButton = 'button.e2e-test-register-user:not([disabled])';
 const desktopLessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
@@ -921,11 +922,20 @@ export class LoggedInUser extends BaseUser {
     }, signUpUsernameField);
 
     await this.waitForPageToFullyLoad();
+    // The username availability check runs asynchronously on blur and updates
+    // the validation warning only after its network request resolves. Waiting
+    // for the network to settle ensures we read the final validation state
+    // rather than racing the in-flight availability check.
+    await this.waitForNetworkIdle();
     const invalidUsernameErrorContainerElement = await this.page.$(
       invalidUsernameErrorContainer
     );
     if (!invalidUsernameErrorContainerElement) {
       await this.clickOnElementWithSelector(agreeToTermsCheckbox);
+      // The email preferences form is always shown during signup and requires
+      // a selection for new users, so we choose "do not send" to keep the
+      // default of not subscribing to email updates.
+      await this.clickOnElementWithSelector(emailPreferencesRadioNo);
       await this.page.waitForSelector(registerNewUserButton);
       await Promise.all([
         this.page.waitForNavigation({waitUntil: 'networkidle0'}),

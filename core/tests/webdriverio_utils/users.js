@@ -132,6 +132,17 @@ var _completeSignup = async function (username) {
   var agreeToTermsCheckbox = await $('.e2e-test-agree-to-terms-checkbox');
   await action.click('Agree to terms checkbox', agreeToTermsCheckbox);
 
+  // The email preferences form is always shown during signup and requires a
+  // selection for new users, so we choose "do not send" to keep the default of
+  // not subscribing to email updates.
+  var doNotReceiveEmailUpdatesRadio = await $(
+    '.e2e-test-email-preferences-radio-no'
+  );
+  await action.click(
+    'Do not receive email updates radio',
+    doNotReceiveEmailUpdatesRadio
+  );
+
   var registerUser = $('.e2e-test-register-user');
 
   var currentUrl = decodeURIComponent(await browser.getUrl());

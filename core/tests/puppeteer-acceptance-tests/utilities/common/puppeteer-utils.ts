@@ -390,6 +390,12 @@ export class BaseUser {
     await this.clickOnElementWithSelector(
       'input.e2e-test-agree-to-terms-checkbox'
     );
+    // The email preferences form is always shown during signup and requires a
+    // selection for new users, so we choose "do not send" to keep the default
+    // of not subscribing to email updates.
+    await this.clickOnElementWithSelector(
+      'input.e2e-test-email-preferences-radio-no'
+    );
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
     );

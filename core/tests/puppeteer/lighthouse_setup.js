@@ -44,6 +44,7 @@ var emailInput = '.e2e-test-sign-in-email-input';
 var signInButton = '.e2e-test-sign-in-button';
 var usernameInput = '.e2e-test-username-input';
 var agreeToTermsCheckBox = '.e2e-test-agree-to-terms-checkbox';
+var doNotReceiveEmailUpdatesRadio = '.e2e-test-email-preferences-radio-no';
 var registerUser = '.e2e-test-register-user:not([disabled])';
 var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
@@ -125,6 +126,11 @@ const login = async function (browser, page) {
       await page.waitForSelector(usernameInput, {visible: true});
       await page.type(usernameInput, 'username1');
       await page.click(agreeToTermsCheckBox);
+      // The email preferences form is always shown during signup and requires a
+      // selection for new users, so we choose "do not send" to keep the default
+      // of not subscribing to email updates.
+      await page.waitForSelector(doNotReceiveEmailUpdatesRadio);
+      await page.click(doNotReceiveEmailUpdatesRadio);
       await page.waitForSelector(registerUser);
       await page.click(registerUser);
       await page.waitForSelector(navbarToggle);
