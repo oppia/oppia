@@ -118,7 +118,7 @@ def get_all_open_issues(
                 issues.extend(page_issues)
                 page += 1
         except Exception as e:
-            logging.info('Error fetching issues on page %s: %s', page, e)
+            logging.error('Error fetching issues on page %s: %s', page, e)
             break
     return issues
 
@@ -247,7 +247,7 @@ def main() -> None:
             urllib.request.urlopen(label_req)
             logging.info('Issue #%s: Label added.', current_id)
         except Exception as e:
-            logging.info('Issue #%s: Failed to add label: %s', current_id, e)
+            logging.error('Issue #%s: Failed to add label: %s', current_id, e)
 
         comment_url = (
             f'https://api.github.com/repos/{repo}/issues/{current_id}/comments'
@@ -268,7 +268,7 @@ def main() -> None:
             urllib.request.urlopen(comment_req)
             logging.info('Issue #%s: Comment added.', current_id)
         except Exception as e:
-            logging.info('Issue #%s: Failed to add comment: %s', current_id, e)
+            logging.error('Issue #%s: Failed to add comment: %s', current_id, e)
 
 
 if __name__ == '__main__':
