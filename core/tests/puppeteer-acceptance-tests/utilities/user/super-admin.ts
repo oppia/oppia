@@ -361,65 +361,41 @@ export class SuperAdmin extends BaseUser {
     const normalizedRole = role.toLowerCase();
 
     await this.goto(adminPageRolesTab);
+
     await this.page.waitForSelector(roleEditorInputField, {
       visible: true,
       timeout: 60000,
     });
 
-    const timeoutMs = 90000;
-    const start = Date.now();
-    let attempts = 0;
-    while (Date.now() - start < timeoutMs) {
-      attempts += 1;
+    await this.page.click(roleEditorInputField, {clickCount: 3});
+    await this.page.keyboard.press('Backspace');
+    await this.typeInInputField(roleEditorInputField, username);
 
-      // Re-run the search to avoid stale results.
-      await this.page.click(roleEditorInputField, {clickCount: 3});
-      await this.page.keyboard.press('Backspace');
-      await this.typeInInputField(roleEditorInputField, username);
-      await this.clickOnElementWithSelector(roleEditorButtonSelector);
+    await this.clickOnElementWithSelector(roleEditorButtonSelector);
 
-      await this.page.waitForSelector(justifyContentDiv, {
-        visible: true,
-        timeout: 30000,
-      });
+    await this.page.waitForSelector(justifyContentDiv, {
+      visible: true,
+      timeout: 30000,
+    });
 
-      const roleFound = await this.page
-        .$$eval(
-          userRoleDescriptionSelector,
-          (elements, expectedRole) =>
-            elements.some(
-              el =>
-                (el as HTMLElement).innerText.trim().toLowerCase() ===
-                String(expectedRole)
-            ),
-          normalizedRole
-        )
-        .catch(() => false);
+    const roleFound = await this.page.$$eval(
+      userRoleDescriptionSelector,
+      (elements, expectedRole) =>
+        elements.some(
+          el =>
+            (el as HTMLElement).innerText.trim().toLowerCase() ===
+            String(expectedRole)
+        ),
+      normalizedRole
+    );
 
-      if (roleFound) {
-        showMessage(`User ${username} has the ${role} role!`);
-        await this.goto(currentPageUrl);
-        return;
-      }
-
-      // Role assignment can take a moment to propagate; wait and retry.
-      await this.page.waitForTimeout(2000);
-
-      // Occasionally reload to bust any cached/stale role view state.
-      if (attempts % 3 === 0) {
-        await this.page.reload({waitUntil: ['load', 'networkidle2']});
-        await this.page.waitForSelector(roleEditorInputField, {
-          visible: true,
-          timeout: 60000,
-        });
-      }
+    if (!roleFound) {
+      await this.goto(currentPageUrl);
+      throw new Error(`User does not have the "${role}" role.`);
     }
 
+    showMessage(`User ${username} has the ${role} role!`);
     await this.goto(currentPageUrl);
-    throw new Error(
-      `User does not have the "${role}" role after ${attempts} checks ` +
-        `over ${timeoutMs}ms.`
-    );
   }
 
   /**
