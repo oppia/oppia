@@ -412,4 +412,68 @@ describe('Story node model', () => {
 
     expect(_sampleStoryNode.getThumbnailBgColor()).toEqual('#fff');
   });
+
+  it('should return published status correctly', () => {
+    expect(_sampleStoryNode.getPublishedStatus()).toBe(false);
+
+    _sampleStoryNode.setStatus('Published');
+
+    expect(_sampleStoryNode.getPublishedStatus()).toBe(true);
+  });
+
+  it('should be able to get and set exploration id', () => {
+    _sampleStoryNode.setExplorationId('exp_123');
+    expect(_sampleStoryNode.getExplorationId()).toEqual('exp_123');
+
+    _sampleStoryNode.setExplorationId(null);
+    expect(_sampleStoryNode.getExplorationId()).toBeNull();
+  });
+
+  it('should be able to get and set thumbnail filename', () => {
+    expect(_sampleStoryNode.getThumbnailFilename()).toEqual('image.png');
+
+    _sampleStoryNode.setThumbnailFilename('new-thumb.png');
+
+    expect(_sampleStoryNode.getThumbnailFilename()).toEqual('new-thumb.png');
+
+    _sampleStoryNode.setThumbnailFilename(null);
+
+    expect(_sampleStoryNode.getThumbnailFilename()).toBeNull();
+  });
+
+  it('should return available text language codes', () => {
+    expect(_sampleStoryNode.getAvailableTextLanguageCodes()).toEqual([]);
+  });
+
+  it('should return available voiceover language codes', () => {
+    expect(_sampleStoryNode.getAvailableVoiceoverLanguageCodes()).toEqual([]);
+  });
+
+  it('should create node from backend dict with available language codes', () => {
+    const backendDict: StoryNodeBackendDict = {
+      id: 'node_2',
+      thumbnail_filename: null,
+      title: 'Title 2',
+      description: 'Description 2',
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
+      destination_node_ids: [],
+      outline: '',
+      exploration_id: 'exp_1',
+      outline_is_finalized: false,
+      thumbnail_bg_color: null,
+      status: 'Draft',
+      planned_publication_date_msecs: null,
+      last_modified_msecs: null,
+      first_publication_date_msecs: null,
+      unpublishing_reason: null,
+      available_text_language_codes: ['en', 'es'],
+      available_voiceover_language_codes: ['en'],
+    };
+
+    const node = StoryNode.createFromBackendDict(backendDict);
+
+    expect(node.getAvailableTextLanguageCodes()).toEqual(['en', 'es']);
+    expect(node.getAvailableVoiceoverLanguageCodes()).toEqual(['en']);
+  });
 });

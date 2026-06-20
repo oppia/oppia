@@ -355,6 +355,352 @@ describe('TopicLessonCardComponent', () => {
     expect(component.getThumbnailAltText()).toBe('Lesson thumbnail');
   });
 
+  it('should handle onStartButtonClick when startUrl is empty', () => {
+    component.startUrl = '';
+    spyOn(windowRef.nativeWindow.location, 'assign');
+    component.onStartButtonClick();
+    expect(windowRef.nativeWindow.location.assign).not.toHaveBeenCalled();
+  });
+
+  it('should auto-set voiceover when selected text language matches available voiceover codes', () => {
+    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
+    component.availableTextLanguageCodes = ['en', 'es', 'fr'];
+    component.availableVoiceoverLanguageCodes = ['en', 'es', 'fr'];
+    component.selectedVoiceoverLanguageCode = null;
+    component.selectedTextLanguageCode = null;
+    component.ngOnInit();
+
+    component.selectedVoiceoverLanguageCode = null;
+    component.onSelectedTextLanguageCodeChange('fr');
+
+    expect(component.selectedVoiceoverLanguageCode).toBe('fr');
+  });
+
+  it('should return empty start button label when fallback CTA is not shown', () => {
+    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
+    component.availableTextLanguageCodes = ['en', 'es'];
+    component.availableVoiceoverLanguageCodes = ['en', 'es'];
+    component.ngOnInit();
+
+    expect(component.getStartButtonLabel()).toBe('');
+  });
+
+  it('should return Portuguese helper text when preferred language is available and site language is Portuguese', () => {
+    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('pt');
+    component.availableTextLanguageCodes = ['en', 'pt'];
+    component.availableVoiceoverLanguageCodes = ['en', 'pt'];
+    component.ngOnInit();
+
+    component.onSelectedTextLanguageCodeChange('en');
+
+    const helperText = component.getFallbackInfoTooltipText();
+    expect(helperText).toContain('A hist\u00f3ria ser\u00e1 reproduzida em');
+    expect(helperText).toContain('en');
+  });
+
+  it('should fall back to first available language when English is not available', () => {
+    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('pt');
+    component.availableTextLanguageCodes = ['fr', 'de'];
+    component.availableVoiceoverLanguageCodes = ['fr', 'de'];
+    component.ngOnInit();
+
+    expect(component.selectedTextLanguageCode).toBe('fr');
+    expect(component.selectedVoiceoverLanguageCode).toBe('fr');
+  });
+
+  it('should fall back to English voiceover when selected text code is not available as voiceover', () => {
+    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('pt');
+    component.availableTextLanguageCodes = ['fr'];
+    component.availableVoiceoverLanguageCodes = ['en'];
+    topicSessionFallbackLanguageService.getFallbackSelection.and.returnValue(
+      null
+    );
+    component.ngOnInit();
+
+    expect(component.selectedTextLanguageCode).toBe('fr');
+    expect(component.selectedVoiceoverLanguageCode).toBe('en');
+  });
+
+  it('should handle navigateTo with empty url', () => {
+    spyOn(windowRef.nativeWindow.location, 'assign');
+    component.navigateTo('');
+    expect(windowRef.nativeWindow.location.assign).not.toHaveBeenCalled();
+  });
+
+  it('should use audio language description when content description is empty', () => {
+    languageUtilService.getContentLanguageDescription.and.returnValue('');
+    languageUtilService.getAudioLanguageDescription.and.returnValue(
+      'English (Audio)'
+    );
+    component.ngOnInit();
+    component.onSelectedTextLanguageCodeChange('en');
+
+    expect(component.getStartButtonLabel()).toBe(
+      'Jogar Lição em English (Audio) 🌐'
+    );
+  });
+
+  it('should use language code when both descriptions are empty', () => {
+    i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
+    languageUtilService.getContentLanguageDescription.and.returnValue('');
+    languageUtilService.getAudioLanguageDescription.and.returnValue('');
+    component.availableTextLanguageCodes = ['en', 'es'];
+    component.availableVoiceoverLanguageCodes = ['en', 'es'];
+    component.ngOnInit();
+    component.onSelectedTextLanguageCodeChange('es');
+
+    expect(component.getStartButtonLabel()).toBe('Play Lesson in es 🌐');
+  });
+
+  it('should return false from isLessonUnavailableInPreferredLanguage when no text codes are available', () => {
+    component.availableTextLanguageCodes = [];
+    expect(component.isLessonUnavailableInPreferredLanguage()).toBeFalse();
+  });
+
+  it('should not save session fallback when selected text language code is null', () => {
+    component.selectedTextLanguageCode = null;
+    component.onSelectedTextLanguageCodeChange(null);
+    expect(
+      topicSessionFallbackLanguageService.saveFallbackSelection
+    ).not.toHaveBeenCalled();
+  });
+
+  describe('ngOnChanges', () => {
+    it('should update checkpoint statuses when lesson progress inputs change', () => {
+      component.lessonProgressStatus = 'not_started';
+      component.totalCheckpointsCount = 3;
+      component.visitedCheckpointsCount = 0;
+
+      component.ngOnChanges({
+        lessonProgressStatus: {
+          previousValue: undefined,
+          currentValue: 'not_started',
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      });
+
+      expect(component.checkpointStatuses.length).toBe(4);
+    });
+
+    it('should reinitialize language selection when language codes change', () => {
+      component.availableTextLanguageCodes = [];
+
+      component.ngOnChanges({
+        availableTextLanguageCodes: {
+          previousValue: ['en', 'es'],
+          currentValue: [],
+          firstChange: false,
+          isFirstChange: () => false,
+        },
+      });
+
+      expect(component.selectedTextLanguageCode).toBeNull();
+      expect(component.selectedVoiceoverLanguageCode).toBeNull();
+    });
+  });
+
+  describe('checkpointStatuses', () => {
+    it('should compute checkpoint statuses for a completed lesson', () => {
+      component.lessonProgressStatus = 'completed';
+      component.totalCheckpointsCount = 2;
+      component.visitedCheckpointsCount = 2;
+
+      component.ngOnChanges({
+        lessonProgressStatus: {
+          previousValue: undefined,
+          currentValue: 'completed',
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      });
+
+      expect(component.checkpointStatuses).toEqual([
+        'completed',
+        'completed',
+        'completed',
+      ]);
+    });
+
+    it('should compute checkpoint statuses when visited count meets total', () => {
+      component.lessonProgressStatus = 'in_progress';
+      component.totalCheckpointsCount = 3;
+      component.visitedCheckpointsCount = 3;
+
+      component.ngOnChanges({
+        lessonProgressStatus: {
+          previousValue: undefined,
+          currentValue: 'in_progress',
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      });
+
+      expect(component.checkpointStatuses).toEqual([
+        'completed',
+        'completed',
+        'completed',
+        'completed',
+      ]);
+    });
+
+    it('should compute checkpoint statuses for partial progress', () => {
+      component.lessonProgressStatus = 'in_progress';
+      component.totalCheckpointsCount = 3;
+      component.visitedCheckpointsCount = 1;
+
+      component.ngOnChanges({
+        lessonProgressStatus: {
+          previousValue: undefined,
+          currentValue: 'in_progress',
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      });
+
+      expect(component.checkpointStatuses).toEqual([
+        'completed',
+        'in-progress',
+        'incomplete',
+        'incomplete',
+      ]);
+    });
+
+    it('should return empty array when lesson is coming_soon', () => {
+      component.lessonProgressStatus = 'coming_soon';
+      component.totalCheckpointsCount = 3;
+
+      component.ngOnChanges({
+        lessonProgressStatus: {
+          previousValue: undefined,
+          currentValue: 'coming_soon',
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      });
+
+      expect(component.checkpointStatuses).toEqual([]);
+    });
+
+    it('should return empty array when totalCheckpointsCount is 0', () => {
+      component.lessonProgressStatus = 'not_started';
+      component.totalCheckpointsCount = 0;
+
+      component.ngOnChanges({
+        lessonProgressStatus: {
+          previousValue: undefined,
+          currentValue: 'not_started',
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      });
+
+      expect(component.checkpointStatuses).toEqual([]);
+    });
+  });
+
+  describe('progressPercent', () => {
+    it('should return 0 when totalCheckpointsCount is 0', () => {
+      component.totalCheckpointsCount = 0;
+      expect(component.progressPercent).toBe(0);
+    });
+
+    it('should return 0 when lesson is coming_soon', () => {
+      component.lessonProgressStatus = 'coming_soon';
+      component.totalCheckpointsCount = 5;
+      expect(component.progressPercent).toBe(0);
+    });
+
+    it('should return 100 when lesson is completed', () => {
+      component.lessonProgressStatus = 'completed';
+      component.totalCheckpointsCount = 3;
+      component.visitedCheckpointsCount = 2;
+      expect(component.progressPercent).toBe(100);
+    });
+
+    it('should return 100 when visited count exceeds total', () => {
+      component.lessonProgressStatus = 'in_progress';
+      component.totalCheckpointsCount = 3;
+      component.visitedCheckpointsCount = 5;
+      expect(component.progressPercent).toBe(100);
+    });
+
+    it('should compute progress percentage for partial progress', () => {
+      component.lessonProgressStatus = 'in_progress';
+      component.totalCheckpointsCount = 5;
+      component.visitedCheckpointsCount = 2;
+      expect(component.progressPercent).toBe(20);
+    });
+  });
+
+  describe('getLessonStartUrlWithLanguageSelection', () => {
+    it('should omit voiceover param when voiceover is null', () => {
+      const url = (component as any).getLessonStartUrlWithLanguageSelection(
+        'es',
+        null
+      );
+      expect(url).toContain('initialContentLanguageCode=es');
+      expect(url).not.toContain('initialVoiceoverLanguageCode');
+    });
+  });
+
+  describe('onSelectedTextLanguageCodeChange', () => {
+    it('should not auto-set voiceover when selected text lang is not in voiceover list', () => {
+      i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
+      component.availableTextLanguageCodes = ['en', 'es', 'fr'];
+      component.availableVoiceoverLanguageCodes = ['en', 'es'];
+      component.selectedVoiceoverLanguageCode = null;
+      component.selectedTextLanguageCode = null;
+      component.ngOnInit();
+
+      component.selectedVoiceoverLanguageCode = null;
+      component.onSelectedTextLanguageCodeChange('fr');
+
+      expect(component.selectedVoiceoverLanguageCode).toBeNull();
+    });
+  });
+
+  describe('initializeLanguageSelection', () => {
+    it('should set both language codes to null when no text codes are available', () => {
+      component.availableTextLanguageCodes = [];
+      component.availableVoiceoverLanguageCodes = [];
+      component.ngOnInit();
+
+      expect(component.selectedTextLanguageCode).toBeNull();
+      expect(component.selectedVoiceoverLanguageCode).toBeNull();
+    });
+  });
+
+  describe('getInitialVoiceoverLanguageCode', () => {
+    it('should return null when no voiceover codes are available', () => {
+      component.availableVoiceoverLanguageCodes = [];
+      const result = (component as any).getInitialVoiceoverLanguageCode(
+        null,
+        'en'
+      );
+      expect(result).toBeNull();
+    });
+
+    it('should fall back to first available voiceover when en is not available', () => {
+      component.availableVoiceoverLanguageCodes = ['fr', 'de'];
+      const result = (component as any).getInitialVoiceoverLanguageCode(
+        null,
+        'pt'
+      );
+      expect(result).toBe('fr');
+    });
+  });
+
+  describe('saveSessionFallbackLanguageSelection', () => {
+    it('should not save when selectedTextLanguageCode is null', () => {
+      component.selectedTextLanguageCode = null;
+      (component as any).saveSessionFallbackLanguageSelection();
+      expect(
+        topicSessionFallbackLanguageService.saveFallbackSelection
+      ).not.toHaveBeenCalled();
+    });
+  });
+
   describe('showCheckpointBar', () => {
     it('should return true when not coming_soon and totalCheckpointsCount > 0', () => {
       component.lessonProgressStatus = 'not_started';
