@@ -278,8 +278,6 @@ def postprocess_translated_html(translated_html: str) -> str:
     # Reconstruct tabs JSON from collected data.
     for comp_id, tab_attr_data in tabs_data.items():
         component_tag = comp_id_to_tag.get(comp_id)
-        if component_tag is None:
-            continue
         tab_count = int(component_tag.get(_DATA_TAB_COUNT, 0))
         tabs = []
         for i in range(tab_count):

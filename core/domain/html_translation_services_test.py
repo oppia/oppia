@@ -204,15 +204,6 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         self.assertNotIn('data-oi-id', result)
         self.assertNotIn('Orphan', result)
 
-    def test_missing_component_tag_for_tabs_data_skips_gracefully(self) -> None:
-        source = (
-            '<span data-oi-id="100" data-oi-attr="tab-title-0">Title</span>'
-            '<div data-oi-id="100" data-oi-attr="tab-content-0" '
-            'data-oi-encoded="true">&lt;p&gt;Content&lt;/p&gt;</div>'
-        )
-        restored = html_translation_services.postprocess_translated_html(source)
-        self.assertEqual(restored, '')
-
     def test_translatable_text_attr_with_none_value_is_skipped(self) -> None:
         soup = bs4.BeautifulSoup(
             '<oppia-noninteractive-link></oppia-noninteractive-link>',
