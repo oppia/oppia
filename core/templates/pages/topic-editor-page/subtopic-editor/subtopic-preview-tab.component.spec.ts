@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the subtopic preview tab directive.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {SubtopicPreviewTab} from './subtopic-preview-tab.component';
 import {Topic} from 'domain/topic/topic-object.model';
@@ -74,7 +74,7 @@ describe('SubtopicPreviewTab', () => {
   let subtopicPageLoadedEventEmitter = new EventEmitter();
   let studyGuideLoadedEventEmitter = new EventEmitter();
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [SubtopicPreviewTab],
