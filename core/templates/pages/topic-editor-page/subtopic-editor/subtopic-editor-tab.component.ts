@@ -39,6 +39,13 @@ import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DeleteStudyGuideSectionComponent} from 'pages/topic-editor-page/subtopic-editor/delete-study-guide-section-modal.component';
 import {AddStudyGuideSectionModalComponent} from 'pages/topic-editor-page/subtopic-editor/add-study-guide-section.component';
+import {
+  ImageUploaderData,
+  ImageUploaderParameters,
+} from 'components/forms/custom-forms-directives/image-uploader.component';
+import {AlertsService} from 'services/alerts.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Component({
   selector: 'oppia-subtopic-editor-tab',
@@ -59,6 +66,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   editableTitle!: string;
   editableThumbnailFilename!: string;
   editableThumbnailBgColor!: string;
+  imageUploaderParameters!: ImageUploaderParameters;
   initialSubtopicUrlFragment!: string;
   editableUrlFragment!: string;
   subtopicPage!: SubtopicPage;
@@ -90,6 +98,9 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   generatedUrlPrefix!: string;
 
   constructor(
+    private pageContextService: PageContextService,
+    private assetsBackendApiService: AssetsBackendApiService,
+    private alertsService: AlertsService,
     private questionBackendApiService: QuestionBackendApiService,
     private subtopicValidationService: SubtopicValidationService,
     private topicEditorRoutingService: TopicEditorRoutingService,
@@ -162,6 +173,23 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
         this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
       }
       this.allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic;
+      const canEdit =
+        this.topicEditorStateService.getTopicRights()?.canEditTopic() ?? false;
+      this.imageUploaderParameters = {
+        disabled: !canEdit,
+        maxImageSizeInKB: 100,
+        imageName: 'Thumbnail',
+        orientation: 'landscape',
+        bgColor:
+          this.subtopic.getThumbnailBgColor() ??
+          (this.allowedBgColors as string[])[0],
+        allowedBgColors: this.allowedBgColors as string[],
+        allowedImageFormats: ['svg'],
+        aspectRatio: '4:3',
+        filename: this.subtopic.getThumbnailFilename() ?? undefined,
+        previewTitle: this.editableTitle,
+        previewDescriptionBgColor: '#BE563C',
+      };
       if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
         var sections = this.studyGuide.getSections();
         this.sections = sections;
@@ -239,30 +267,50 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     this.editableUrlFragment = urlFragment;
   }
 
-  updateSubtopicThumbnailFilename(newThumbnailFilename: string): void {
-    var oldThumbnailFilename = this.subtopic.getThumbnailFilename();
-    if (newThumbnailFilename === oldThumbnailFilename) {
-      return;
-    }
-    this.topicUpdateService.setSubtopicThumbnailFilename(
-      this.topic,
-      this.subtopic.getId(),
-      newThumbnailFilename
-    );
-    this.editableThumbnailFilename = newThumbnailFilename;
-  }
+  onImageSave(imageData: ImageUploaderData): void {
+    const entityType = this.pageContextService.getEntityType();
+    const entityId = this.pageContextService.getEntityId();
 
-  updateSubtopicThumbnailBgColor(newThumbnailBgColor: string): void {
-    var oldThumbnailBgColor = this.subtopic.getThumbnailBgColor();
-    if (newThumbnailBgColor === oldThumbnailBgColor) {
+    if (!entityType || !entityId) {
       return;
     }
-    this.topicUpdateService.setSubtopicThumbnailBgColor(
-      this.topic,
-      this.subtopic.getId(),
-      newThumbnailBgColor
-    );
-    this.editableThumbnailBgColor = newThumbnailBgColor;
+
+    this.assetsBackendApiService
+      .postThumbnailFile(
+        imageData.image_data,
+        imageData.filename,
+        entityType,
+        entityId
+      )
+      .toPromise()
+      .then(() => {
+        if (imageData.filename !== this.subtopic.getThumbnailFilename()) {
+          this.topicUpdateService.setSubtopicThumbnailFilename(
+            this.topic,
+            this.subtopic.getId(),
+            imageData.filename
+          );
+        }
+
+        if (imageData.bg_color !== this.subtopic.getThumbnailBgColor()) {
+          this.topicUpdateService.setSubtopicThumbnailBgColor(
+            this.topic,
+            this.subtopic.getId(),
+            imageData.bg_color
+          );
+        }
+
+        this.imageUploaderParameters = {
+          ...this.imageUploaderParameters,
+          filename: imageData.filename,
+          bgColor: imageData.bg_color,
+        };
+      })
+      .catch(() => {
+        this.alertsService.addWarning(
+          'There was an error while saving the thumbnail.'
+        );
+      });
   }
 
   resetErrorMsg(): void {

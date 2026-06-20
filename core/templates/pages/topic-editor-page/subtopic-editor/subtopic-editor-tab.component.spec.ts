@@ -43,6 +43,10 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
+import {ImageUploaderData} from 'components/forms/custom-forms-directives/image-uploader.component';
+import {of} from 'rxjs';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {PageContextService} from 'services/page-context.service';
 
 class MockQuestionBackendApiService {
   async fetchTotalQuestionCountForSkillIdsAsync() {
@@ -86,6 +90,15 @@ class MockNgbModalRef {
   componentInstance = {};
 }
 
+class MockPageContextService {
+  getEntityType() {
+    return 'topic';
+  }
+  getEntityId() {
+    return 'sndsjfn42';
+  }
+}
+
 describe('Subtopic editor tab', () => {
   let component: SubtopicEditorTabComponent;
   let fixture: ComponentFixture<SubtopicEditorTabComponent>;
@@ -102,6 +115,7 @@ describe('Subtopic editor tab', () => {
   let topicReinitializedEventEmitter = new EventEmitter();
   let subtopicPageLoadedEventEmitter = new EventEmitter();
   let studyGuideLoadedEventEmitter = new EventEmitter();
+  let assetsBackendApiService: AssetsBackendApiService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -126,6 +140,10 @@ describe('Subtopic editor tab', () => {
           provide: PlatformFeatureService,
           useClass: MockPlatformFeatureService,
         },
+        {
+          provide: PageContextService,
+          useClass: MockPageContextService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -141,6 +159,7 @@ describe('Subtopic editor tab', () => {
     topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     wds = TestBed.inject(WindowDimensionsService);
+    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
 
     let topic = new Topic(
       'id',
@@ -290,47 +309,104 @@ describe('Subtopic editor tab', () => {
     expect(urlFragmentSpy).not.toHaveBeenCalled();
   });
 
-  it('should call topicUpdateService if subtopic thumbnail updates', () => {
+  it('should call topicUpdateService when onImageSave is called with new filename', fakeAsync(() => {
     let thumbnailSpy = spyOn(
       topicUpdateService,
       'setSubtopicThumbnailFilename'
     );
-    component.updateSubtopicThumbnailFilename('img.svg');
+
+    spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
+      of({filename: 'img.svg'})
+    );
+
+    component.onImageSave({
+      filename: 'img.svg',
+      bg_color: component.editableThumbnailBgColor,
+      image_data: new Blob(),
+    } as ImageUploaderData);
+
+    tick();
+
     expect(thumbnailSpy).toHaveBeenCalled();
-  });
+  }));
 
-  it('should not call topicUpdateService if subtopic thumbnail is not updated', () => {
-    component.updateSubtopicThumbnailFilename('img.svg');
+  it('should not call topicUpdateService when onImageSave is called with same filename', fakeAsync(() => {
+    spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
+      of({filename: 'img.svg'})
+    );
+
+    component.onImageSave({
+      filename: 'img.svg',
+      bg_color: component.editableThumbnailBgColor,
+      image_data: new Blob(),
+    } as ImageUploaderData);
+
+    tick();
+
     let thumbnailSpy = spyOn(
       topicUpdateService,
       'setSubtopicThumbnailFilename'
     );
-    component.updateSubtopicThumbnailFilename('img.svg');
-    expect(thumbnailSpy).not.toHaveBeenCalled();
-  });
+    component.onImageSave({
+      filename: 'img.svg',
+      bg_color: component.editableThumbnailBgColor,
+      image_data: new Blob(),
+    } as ImageUploaderData);
 
-  it('should call topicUpdateService if subtopic thumbnail bg color updates', () => {
+    tick();
+
+    expect(thumbnailSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should call topicUpdateService when onImageSave is called with new bg color', fakeAsync(() => {
     let thumbnailBgSpy = spyOn(
       topicUpdateService,
       'setSubtopicThumbnailBgColor'
     );
-    component.updateSubtopicThumbnailBgColor('#FFFFFF');
-    expect(thumbnailBgSpy).toHaveBeenCalled();
-  });
 
-  it(
-    'should not call topicUpdateService if subtopic ' +
-      'thumbnail bg color is not updated',
-    () => {
-      component.updateSubtopicThumbnailBgColor('#FFFFFF');
-      let thumbnailBgSpy = spyOn(
-        topicUpdateService,
-        'setSubtopicThumbnailBgColor'
-      );
-      component.updateSubtopicThumbnailBgColor('#FFFFFF');
-      expect(thumbnailBgSpy).not.toHaveBeenCalled();
-    }
-  );
+    spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
+      of({filename: 'img.svg'})
+    );
+
+    component.onImageSave({
+      filename: component.editableThumbnailFilename,
+      bg_color: '#FFFFFF',
+      image_data: new Blob(),
+    } as ImageUploaderData);
+
+    tick();
+
+    expect(thumbnailBgSpy).toHaveBeenCalled();
+  }));
+
+  it('should not call topicUpdateService when onImageSave is called with same bg color', fakeAsync(() => {
+    spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
+      of({filename: 'img.svg'})
+    );
+
+    component.onImageSave({
+      filename: component.editableThumbnailFilename,
+      bg_color: '#FFFFFF',
+      image_data: new Blob(),
+    } as ImageUploaderData);
+
+    tick();
+
+    let thumbnailBgSpy = spyOn(
+      topicUpdateService,
+      'setSubtopicThumbnailBgColor'
+    );
+
+    component.onImageSave({
+      filename: component.editableThumbnailFilename,
+      bg_color: '#FFFFFF',
+      image_data: new Blob(),
+    } as ImageUploaderData);
+
+    tick();
+
+    expect(thumbnailBgSpy).not.toHaveBeenCalled();
+  }));
 
   it('should return skill editor URL', () => {
     let skillId = 'asd4242a';

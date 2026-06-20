@@ -45,6 +45,13 @@ import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {Topic} from 'domain/topic/topic-object.model';
 import {TopicRights} from 'domain/topic/topic-rights.model';
 import {RearrangeSkillsInSubtopicsModalComponent} from '../modal-templates/rearrange-skills-in-subtopics-modal.component';
+import {
+  ImageUploaderData,
+  ImageUploaderParameters,
+} from 'components/forms/custom-forms-directives/image-uploader.component';
+
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
 
 @Component({
   selector: 'oppia-topic-editor-tab',
@@ -88,6 +95,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   subtopicQuestionCountDict!: Record<number, number>;
   uncategorizedSkillSummaries!: ShortSkillSummary[];
   editableThumbnailDataUrl!: string;
+  imageUploaderParameters!: ImageUploaderParameters;
   canonicalStorySummaries!: StorySummary[];
   mainTopicCardIsShown!: boolean;
   storiesListIsShown!: boolean;
@@ -108,6 +116,8 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
 
   constructor(
     private pageContextService: PageContextService,
+    private assetsBackendApiService: AssetsBackendApiService,
+    private alertsService: AlertsService,
     private entityCreationService: EntityCreationService,
     private focusManagerService: FocusManagerService,
     private imageUploadHelperService: ImageUploadHelperService,
@@ -163,6 +173,22 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     this.editableTopicUrlFragment = this.topic.getUrlFragment();
     this.editableDescription = this.topic.getDescription();
     this.allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic;
+    this.imageUploaderParameters = {
+      disabled: !this.topicRights.canEditTopic(),
+      maxImageSizeInKB: 100,
+      imageName: 'Thumbnail',
+      orientation: 'landscape',
+      bgColor:
+        this.topic.getThumbnailBgColor() ??
+        (this.allowedBgColors as string[])[0],
+      allowedBgColors: this.allowedBgColors as string[],
+      allowedImageFormats: ['svg'],
+      aspectRatio: '4:3',
+      filename: this.topic.getThumbnailFilename() ?? undefined,
+      previewTitle: this.editableName,
+      previewDescriptionBgColor: '#2F6687',
+      previewFooter: `${this.topic.getCanonicalStoryIds().length} Lessons`,
+    };
     this.topicNameExists = false;
     this.topicUrlFragmentExists = false;
     this.hostname = this.windowRef.nativeWindow.location.hostname;
@@ -410,24 +436,48 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     this.updateTopicUrlFragment(urlFragment);
   }
 
-  updateTopicThumbnailFilename(newThumbnailFilename: string): void {
-    if (newThumbnailFilename === this.topic.getThumbnailFilename()) {
-      return;
-    }
-    this.topicUpdateService.setTopicThumbnailFilename(
-      this.topic,
-      newThumbnailFilename
-    );
-  }
+  onImageSave(imageData: ImageUploaderData): void {
+    const entityType = this.pageContextService.getEntityType();
+    const entityId = this.pageContextService.getEntityId();
 
-  updateTopicThumbnailBgColor(newThumbnailBgColor: string): void {
-    if (newThumbnailBgColor === this.topic.getThumbnailBgColor()) {
+    if (!entityType || !entityId) {
       return;
     }
-    this.topicUpdateService.setTopicThumbnailBgColor(
-      this.topic,
-      newThumbnailBgColor
-    );
+
+    this.assetsBackendApiService
+      .postThumbnailFile(
+        imageData.image_data,
+        imageData.filename,
+        entityType,
+        entityId
+      )
+      .toPromise()
+      .then(() => {
+        if (imageData.filename !== this.topic.getThumbnailFilename()) {
+          this.topicUpdateService.setTopicThumbnailFilename(
+            this.topic,
+            imageData.filename
+          );
+        }
+
+        if (imageData.bg_color !== this.topic.getThumbnailBgColor()) {
+          this.topicUpdateService.setTopicThumbnailBgColor(
+            this.topic,
+            imageData.bg_color
+          );
+        }
+
+        this.imageUploaderParameters = {
+          ...this.imageUploaderParameters,
+          filename: imageData.filename,
+          bgColor: imageData.bg_color,
+        };
+      })
+      .catch(() => {
+        this.alertsService.addWarning(
+          'There was an error while saving the thumbnail.'
+        );
+      });
   }
 
   updateTopicDescription(newDescription: string): void {

@@ -52,6 +52,9 @@ import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skill
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
+import {ImageUploaderData} from 'components/forms/custom-forms-directives/image-uploader.component';
+import {of} from 'rxjs';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 
 class MockNgbModal {
   open() {
@@ -87,6 +90,7 @@ class MockImageUploadHelperService {
 
 describe('Topic editor tab directive', () => {
   let component: TopicEditorTabComponent;
+  let assetsBackendApiService: AssetsBackendApiService;
   let fixture: ComponentFixture<TopicEditorTabComponent>;
   let ngbModal: NgbModal;
   let urlInterpolationService: UrlInterpolationService;
@@ -134,6 +138,7 @@ describe('Topic editor tab directive', () => {
         EntityCreationService,
         TopicEditorRoutingService,
         QuestionBackendApiService,
+        AssetsBackendApiService,
         {
           provide: TopicsAndSkillsDashboardBackendApiService,
           useValue: MockTopicsAndSkillsDashboardBackendApiService,
@@ -172,6 +177,7 @@ describe('Topic editor tab directive', () => {
     undoRedoService = TestBed.inject(UndoRedoService);
     entityCreationService = TestBed.inject(EntityCreationService);
     topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
+    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
 
     spyOnProperty(topicEditorStateService, 'onTopicInitialized').and.callFake(
       () => {
@@ -510,24 +516,55 @@ describe('Topic editor tab directive', () => {
     ).not.toHaveBeenCalled();
   });
 
-  it('should call the TopicUpdateService if thumbnail is updated', () => {
+  it('should call the TopicUpdateService if thumbnail is updated', fakeAsync(() => {
     let topicThumbnailSpy = spyOn(
       topicUpdateService,
       'setTopicThumbnailFilename'
     );
-    component.updateTopicThumbnailFilename('img2.svg');
-    expect(topicThumbnailSpy).toHaveBeenCalled();
-  });
 
-  it('should call the TopicUpdateService if thumbnail is updated', () => {
-    component.updateTopicThumbnailFilename('img2.svg');
+    spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
+      of({filename: 'img2.svg'})
+    );
+
+    component.onImageSave({
+      filename: 'img2.svg',
+      bg_color: component.topic.getThumbnailBgColor(),
+      image_data: new Blob(),
+    } as ImageUploaderData);
+
+    tick();
+
+    expect(topicThumbnailSpy).toHaveBeenCalled();
+  }));
+
+  it('should not call the TopicUpdateService if thumbnail is same', fakeAsync(() => {
+    spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
+      of({filename: 'img2.svg'})
+    );
+
+    component.onImageSave({
+      filename: 'img2.svg',
+      bg_color: component.topic.getThumbnailBgColor(),
+      image_data: new Blob(),
+    } as ImageUploaderData);
+
+    tick();
+
     let topicThumbnailSpy = spyOn(
       topicUpdateService,
       'setTopicThumbnailFilename'
     );
-    component.updateTopicThumbnailFilename('img2.svg');
+
+    component.onImageSave({
+      filename: 'img2.svg',
+      bg_color: component.topic.getThumbnailBgColor(),
+      image_data: new Blob(),
+    } as ImageUploaderData);
+
+    tick();
+
     expect(topicThumbnailSpy).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should call the TopicUpdateService if topic description is updated', () => {
     let topicDescriptionSpy = spyOn(topicUpdateService, 'setTopicDescription');
@@ -597,14 +634,25 @@ describe('Topic editor tab directive', () => {
     expect(topicDeleteSpy).toHaveBeenCalled();
   });
 
-  it('should call the TopicUpdateService if thumbnail bg color is updated', () => {
+  it('should call the TopicUpdateService if thumbnail bg color is updated', fakeAsync(() => {
     let topicThumbnailBGSpy = spyOn(
       topicUpdateService,
       'setTopicThumbnailBgColor'
     );
-    component.updateTopicThumbnailBgColor('#FFFFFF');
+    spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
+      of({filename: 'img2.svg'})
+    );
+
+    component.onImageSave({
+      filename: component.topic.getThumbnailFilename(),
+      bg_color: '#FFFFFF',
+      image_data: new Blob(),
+    } as ImageUploaderData);
+
+    tick();
+
     expect(topicThumbnailBGSpy).toHaveBeenCalled();
-  });
+  }));
 
   it('should call TopicEditorRoutingService to navigate to skill', () => {
     let topicThumbnailBGSpy = spyOn(
@@ -622,15 +670,34 @@ describe('Topic editor tab directive', () => {
     );
   });
 
-  it('should not call the TopicUpdateService if thumbnail bg color is same', () => {
-    component.updateTopicThumbnailBgColor('#FFFFFF');
+  it('should not call the TopicUpdateService if thumbnail bg color is same', fakeAsync(() => {
+    spyOn(assetsBackendApiService, 'postThumbnailFile').and.returnValue(
+      of({filename: 'img2.svg'})
+    );
+
+    component.onImageSave({
+      filename: component.topic.getThumbnailFilename(),
+      bg_color: '#FFFFFF',
+      image_data: new Blob(),
+    } as ImageUploaderData);
+
+    tick();
+
     let topicThumbnailBGSpy = spyOn(
       topicUpdateService,
       'setTopicThumbnailBgColor'
     );
-    component.updateTopicThumbnailBgColor('#FFFFFF');
+
+    component.onImageSave({
+      filename: component.topic.getThumbnailFilename(),
+      bg_color: '#FFFFFF',
+      image_data: new Blob(),
+    } as ImageUploaderData);
+
+    tick();
+
     expect(topicThumbnailBGSpy).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should toggle topic preview', () => {
     expect(component.topicPreviewCardIsShown).toEqual(false);

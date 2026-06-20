@@ -33,6 +33,11 @@ import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
 } from 'services/html-length.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {
+  ImageUploaderData,
+  ImageUploaderParameters,
+} from 'components/forms/custom-forms-directives/image-uploader.component';
 
 @Component({
   selector: 'oppia-create-new-subtopic-modal',
@@ -68,6 +73,7 @@ export class CreateNewSubtopicModalComponent
   MAX_CHARS_IN_SUBTOPIC_TITLE!: number;
   MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING!: number;
   generatedUrlPrefix!: string;
+  imageUploaderParameters!: ImageUploaderParameters;
   studyGuideSectionCharacterLimit: number =
     AppConstants.STUDY_GUIDE_SECTION_CHARACTER_LIMIT;
 
@@ -78,6 +84,7 @@ export class CreateNewSubtopicModalComponent
     private topicEditorStateService: TopicEditorStateService,
     private platformFeatureService: PlatformFeatureService,
     private htmlLengthService: HtmlLengthService,
+    private imageLocalStorageService: ImageLocalStorageService,
     private windowRef: WindowRef
   ) {
     super(ngbActiveModal);
@@ -113,6 +120,32 @@ export class CreateNewSubtopicModalComponent
     this.errorMsg = null;
     this.subtopicUrlFragmentExists = false;
     this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment} /${this.topic.getUrlFragment()}/studyguide`;
+    this.imageUploaderParameters = {
+      disabled: false,
+      maxImageSizeInKB: 100,
+      imageName: 'Thumbnail',
+      orientation: 'landscape',
+      bgColor: (this.allowedBgColors as string[])[0],
+      allowedBgColors: this.allowedBgColors as string[],
+      allowedImageFormats: ['svg'],
+      aspectRatio: '4:3',
+      previewTitle: this.subtopicTitle,
+      previewDescriptionBgColor: '#BE563C',
+    };
+  }
+
+  onImageSave(imageData: ImageUploaderData): void {
+    this.editableThumbnailFilename = imageData.filename;
+    this.editableThumbnailBgColor = imageData.bg_color;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imageLocalStorageService.saveImage(
+        imageData.filename,
+        reader.result as string
+      );
+    };
+    reader.readAsDataURL(imageData.image_data);
+    this.imageLocalStorageService.setThumbnailBgColor(imageData.bg_color);
   }
 
   getSchema(): object {
@@ -141,14 +174,6 @@ export class CreateNewSubtopicModalComponent
       this.subtopicId,
       this.editableThumbnailBgColor
     );
-  }
-
-  updateSubtopicThumbnailFilename(newThumbnailFilename: string): void {
-    this.editableThumbnailFilename = newThumbnailFilename;
-  }
-
-  updateSubtopicThumbnailBgColor(newThumbnailBgColor: string): void {
-    this.editableThumbnailBgColor = newThumbnailBgColor;
   }
 
   resetErrorMsg(): void {

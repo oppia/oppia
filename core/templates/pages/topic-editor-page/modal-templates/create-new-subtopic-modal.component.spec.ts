@@ -38,11 +38,20 @@ import {SubtopicPage} from 'domain/topic/subtopic-page.model';
 import {StudyGuide} from 'domain/topic/study-guide.model';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {ImageUploaderData} from 'components/forms/custom-forms-directives/image-uploader.component';
 
 class MockWindowRef {
   nativeWindow = {
     location: {
       hostname: 'local',
+    },
+    sessionStorage: {
+      setItem: (key: string, value: string) => {},
+      getItem: (key: string) => null,
+      removeItem: (key: string) => {},
+      clear: () => {},
     },
   };
 }
@@ -137,6 +146,7 @@ describe('create new subtopic modal', function () {
     htmlLengthService = new MockHtmlLengthService();
 
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [
         CreateNewSubtopicModalComponent,
         UrlFragmentEditorComponent,
@@ -164,6 +174,7 @@ describe('create new subtopic modal', function () {
         },
         TopicUpdateService,
         SubtopicValidationService,
+        ImageLocalStorageService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -270,26 +281,29 @@ describe('create new subtopic modal', function () {
   );
 
   it(
-    'should update editableThumbnailFilename when ' +
-      'filename updated in "Thumbnail Image" modal',
+    'should update editableThumbnailFilename when ' + 'onImageSave is called',
     () => {
-      let newFileName = 'shivamOppiaFile';
-      component.updateSubtopicThumbnailFilename(newFileName);
+      const imageData: ImageUploaderData = {
+        filename: 'shivamOppiaFile',
+        bg_color: '#C6DCDA',
+        image_data: new Blob(),
+      };
+      component.onImageSave(imageData);
 
-      expect(component.editableThumbnailFilename).toBe(newFileName);
+      expect(component.editableThumbnailFilename).toBe('shivamOppiaFile');
     }
   );
 
-  it(
-    'should update ThumbnailBgColor when ' +
-      'user select new color in "Thumbnail Image" modal',
-    () => {
-      let newThumbnailBgColor = 'red';
-      component.updateSubtopicThumbnailBgColor(newThumbnailBgColor);
+  it('should update ThumbnailBgColor when ' + 'onImageSave is called', () => {
+    const imageData: ImageUploaderData = {
+      filename: 'test.svg',
+      bg_color: 'red',
+      image_data: new Blob(),
+    };
+    component.onImageSave(imageData);
 
-      expect(component.editableThumbnailBgColor).toBe(newThumbnailBgColor);
-    }
-  );
+    expect(component.editableThumbnailBgColor).toBe('red');
+  });
 
   it(
     'should reset errorMsg when user' + ' enter data in "Title" input area',
