@@ -20,12 +20,13 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {AngularFireAuth} from '@angular/fire/auth';
 import {CookieModule} from 'ngx-cookie';
-import {
-  OppiaAngularRootComponent,
-  registerCustomElements,
-} from './oppia-angular-root.component';
+import {OppiaAngularRootComponent} from './oppia-angular-root.component';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {Injector, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFactoryResolver,
+  Compiler,
+  NO_ERRORS_SCHEMA,
+} from '@angular/core';
 import {PageContextService} from 'services/page-context.service';
 import {RichTextComponentsModule} from '../../../extensions/rich_text_components/rich-text-components.module';
 import {CkEditorInitializerService} from './ck-editor-helpers/ck-editor-4-widgets.initializer';
@@ -52,17 +53,18 @@ class MockWindowRef {
   };
 }
 
-class WordCount extends HTMLParagraphElement {
-  constructor() {
-    super();
-  }
-}
-
 describe('OppiaAngularRootComponent', function () {
   let i18nService: I18nService;
   let emitSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
+    // Prevent the constructor from calling registerCustomElements, which uses
+    // ComponentFactoryResolver internally. Angular 11 Ivy JIT does not expose
+    // component factories for dynamically resolved components unless they are
+    // listed in entryComponents. In Angular 12+ entryComponents is a no-op, so
+    // we work around this by setting the static flag before component creation.
+    OppiaAngularRootComponent.rteElementsAreInitialized = true;
+
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
@@ -112,8 +114,8 @@ describe('OppiaAngularRootComponent', function () {
       OppiaAngularRootComponent
     ).componentInstance;
     expect(componentInstance).toBeDefined();
-    spyOn(customElements, 'get').and.callFake(() => WordCount);
-    registerCustomElements(TestBed.inject(Injector));
+    // The flag should remain true after a second component creation.
+    expect(OppiaAngularRootComponent.rteElementsAreInitialized).toBe(true);
   });
 
   it('should emit once ngAfterViewInit is called', () => {
@@ -156,5 +158,45 @@ describe('OppiaAngularRootComponent', function () {
     expect(OppiaAngularRootComponent.pageContextService).toBe(
       previousContextService
     );
+  });
+
+  it('should register custom elements and set rteHelperService in constructor', () => {
+    OppiaAngularRootComponent.rteElementsAreInitialized = false;
+
+    // Patch ComponentFactoryResolver so createCustomElement can resolve RTE
+    // components via the compiler instead of entryComponents.
+    const compiler = TestBed.inject(Compiler);
+    const resolver = TestBed.inject(ComponentFactoryResolver);
+    const originalResolve = resolver.resolveComponentFactory.bind(resolver);
+    resolver.resolveComponentFactory = function (componentType) {
+      try {
+        return originalResolve(componentType);
+      } catch {
+        // This throws "Property 'getComponentFactory' does not exist on type
+        // 'Compiler'". We need to suppress this error because the method
+        // exists at runtime on the CompilerImpl instance but is not part of
+        // the Compiler public API.
+        // @ts-expect-error
+        return compiler.getComponentFactory(componentType);
+      }
+    };
+
+    // Mock customElements to cover both the continue and define branches.
+    class MockElement {}
+    spyOn(customElements, 'get').and.callFake((name: string) => {
+      if (name === 'oppia-noninteractive-ckeditor-image') {
+        return MockElement;
+      }
+      return undefined;
+    });
+    spyOn(customElements, 'define').and.stub();
+
+    const newComponent = TestBed.createComponent(
+      OppiaAngularRootComponent
+    ).componentInstance;
+    expect(newComponent).toBeDefined();
+    expect(OppiaAngularRootComponent.rteHelperService).toBeDefined();
+    expect(OppiaAngularRootComponent.rteElementsAreInitialized).toBeTrue();
+    expect(customElements.define).toHaveBeenCalled();
   });
 });

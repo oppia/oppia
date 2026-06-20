@@ -16,12 +16,31 @@
  * @fileoverview Unit tests for valueGeneratorEditor.
  */
 
-import {NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
+import {
+  Compiler,
+  ComponentFactoryResolver,
+  NO_ERRORS_SCHEMA,
+  SimpleChange,
+} from '@angular/core';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
-import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
 import {CopierComponent} from '../../../../../extensions/value_generators/templates/copier.component';
 import {RandomSelectorComponent} from '../../../../../extensions/value_generators/templates/random-selector.component';
 import {ValueGeneratorEditorComponent} from './value-generator-editor.component';
+
+class MockComponentFactoryResolver extends ComponentFactoryResolver {
+  constructor(private compiler: Compiler) {
+    super();
+  }
+
+  resolveComponentFactory(componentType: Function) {
+    // This throws "Property 'getComponentFactory' does not exist on type
+    // 'Compiler'". We need to suppress this error because the method exists
+    // at runtime on the CompilerImpl instance but is not part of the
+    // Compiler public API.
+    // @ts-expect-error
+    return this.compiler.getComponentFactory(componentType);
+  }
+}
 
 describe('Value Generator Editor Component', function () {
   let component: ValueGeneratorEditorComponent;
@@ -35,11 +54,14 @@ describe('Value Generator Editor Component', function () {
         CopierComponent,
       ],
       schemas: [NO_ERRORS_SCHEMA],
-    })
-      .overrideModule(BrowserDynamicTestingModule, {
-        set: {},
-      })
-      .compileComponents();
+      providers: [
+        {
+          provide: ComponentFactoryResolver,
+          useClass: MockComponentFactoryResolver,
+          deps: [Compiler],
+        },
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

@@ -31,6 +31,7 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatAutocompleteHarness} from '@angular/material/autocomplete/testing';
 import {MatButtonModule} from '@angular/material/button';
 import {MatButtonHarness} from '@angular/material/button/testing';
+import {ComponentFactoryResolver, Compiler} from '@angular/core';
 import {MatCardModule} from '@angular/material/card';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatDialogHarness} from '@angular/material/dialog/testing';
@@ -42,7 +43,6 @@ import {MatTableModule} from '@angular/material/table';
 import {MatTableHarness} from '@angular/material/table/testing';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {of} from 'rxjs';
 import {marbles} from 'rxjs-marbles';
@@ -118,10 +118,6 @@ describe('Beam Jobs Tab Component', () => {
         },
       ],
     });
-    // NOTE: This allows tests to compile the DOM of each dialog component.
-    TestBed.overrideModule(BrowserDynamicTestingModule, {
-      set: {},
-    });
 
     await TestBed.compileComponents();
 
@@ -132,6 +128,24 @@ describe('Beam Jobs Tab Component', () => {
     // NOTE: This must use .documentRootLoader(), otherwise the DOM elements
     // within the dialog components won't be found.
     loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+
+    // Patch the ComponentFactoryResolver to also resolve dialog components
+    // that are declared but not in entryComponents.
+    const compiler = TestBed.inject(Compiler);
+    const resolver = TestBed.inject(ComponentFactoryResolver);
+    const originalResolve = resolver.resolveComponentFactory.bind(resolver);
+    resolver.resolveComponentFactory = function (componentType) {
+      try {
+        return originalResolve(componentType);
+      } catch {
+        // This throws "Property 'getComponentFactory' does not exist on type
+        // 'Compiler'". We need to suppress this error because the method
+        // exists at runtime on the CompilerImpl instance but is not part of
+        // the Compiler public API.
+        // @ts-expect-error
+        return compiler.getComponentFactory(componentType);
+      }
+    };
   }));
 
   it(

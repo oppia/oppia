@@ -26,7 +26,7 @@ import {
   tick,
 } from '@angular/core/testing';
 import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {
   ContentLanguageSelectorComponent,
@@ -118,6 +118,14 @@ describe('Content language selector component', () => {
         SwitchContentLanguageRefreshRequiredModalComponent,
       ],
       providers: [
+        {
+          provide: NgbModal,
+          useValue: {
+            open: () => ({
+              componentInstance: {},
+            }),
+          },
+        },
         {
           provide: WindowRef,
           useClass: MockWindowRef,
