@@ -28,6 +28,7 @@ import {PlayerPositionService} from 'pages/exploration-player-page/services/play
 import {PageContextService} from 'services/page-context.service';
 import {LearnerAnswerInfoService} from 'pages/exploration-player-page/services/learner-answer-info.service';
 import {FeedbackSessionInfoService} from 'services/feedback-session-info.service';
+import {TranslateService} from '@ngx-translate/core';
 import {
   ReportAnIssueCategory,
   IssueReportModel,
@@ -95,7 +96,8 @@ export class FeedbackModalComponent implements OnInit {
     private learnerAnswerInfoService: LearnerAnswerInfoService,
     private feedbackSessionInfoService: FeedbackSessionInfoService,
     private feedbackBackendApiService: FeedbackBackendApiService,
-    private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal,
+    private translateService: TranslateService
   ) {}
 
   get isLessonFeedbackMode(): boolean {
@@ -239,7 +241,12 @@ export class FeedbackModalComponent implements OnInit {
 
   isFormValid(): boolean {
     if (!this.feedbackText.trim()) {
-      this.formError = 'Please add a description before submitting.';
+      this.formError = this.translateService.instant(
+        'I18N_FEEDBACK_MESSAGE_TOO_LONG',
+        {
+          maxLength: this.MAX_REPORT_MESSAGE_LENGTH,
+        }
+      );
       return false;
     }
 

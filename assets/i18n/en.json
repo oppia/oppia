@@ -974,6 +974,8 @@
     "I18N_LESSON_FEEDBACK_CONTINUE_AS_GUEST_BUTTON": "Continue as Guest",
     "I18N_LESSON_FEEDBACK_GUEST_SUBTITLE": "Create a free profile to send direct recommendations, track creator responses and save your checkpoint milestones permanently!",
     "I18N_LESSON_FEEDBACK_GUEST_TITLE": "Want to chat with our Lessons Team?",
+    "I18N_FEEDBACK_MESSAGE_TOO_LONG": "Please keep your feedback under {{maxLength}} characters.",
+    "I18N_LESSON_FEEDBACK_MODAL_BUTTON": "Send Lesson Feedback",
     "I18N_LESSON_FEEDBACK_MODAL_SAFETY_NOTICE": "To protect your safety, do not type names, phone numbers, or email addresses in your note. Responses or updates from authors will appear directly in your Learner Dashboard.",
     "I18N_LESSON_FEEDBACK_MODAL_SUBTITLE": "Your message and recent lesson path will be shared with the Lessons Team to help improve this lesson.",
     "I18N_LESSON_FEEDBACK_MODAL_TEXTAREA_PLACEHOLDER": "Write a note here! What did you like? Do you have an idea to make this lesson better?",

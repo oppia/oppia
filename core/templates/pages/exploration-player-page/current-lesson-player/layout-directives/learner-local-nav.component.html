@@ -43,7 +43,7 @@
   <li *ngIf="isWebFeedbackModalFeatureFlagEnabled()"
       tabindex="0"
       class="nav-link e2e-test-report-exploration-button"
-      ngbTooltip="Send Lesson Feedback"
+      ngbTooltip="{{'I18N_LESSON_FEEDBACK_MODAL_BUTTON' | translate}}"
       (click)="showSendLessonFeedbackModal()"
       (keydown.enter)="showSendLessonFeedbackModal()"
       placement="bottom">

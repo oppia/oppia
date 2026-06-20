@@ -31,6 +31,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {RouterTestingModule} from '@angular/router/testing';
 import {FeedbackModalComponent} from './feedback-modal.component';
@@ -191,6 +192,7 @@ describe('FeedbackModalComponent', () => {
   let fixture: ComponentFixture<FeedbackModalComponent>;
   let component: FeedbackModalComponent;
   let activeModal: MockActiveModal;
+  let translateService: jasmine.SpyObj<TranslateService>;
   let feedbackScreenshotStagingService: jasmine.SpyObj<FeedbackScreenshotStagingService>;
   let windowRef: MockWindowRef;
   let userService: MockUserService;
@@ -210,6 +212,7 @@ describe('FeedbackModalComponent', () => {
     component.feedbackModalType = modalType;
 
     windowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
+    translateService = TestBed.inject(TranslateService);
     userService = TestBed.inject(UserService) as unknown as MockUserService;
     feedbackBackendApiService = TestBed.inject(FeedbackBackendApiService);
     pageContextService = TestBed.inject(PageContextService);
@@ -223,6 +226,11 @@ describe('FeedbackModalComponent', () => {
     activeModal = new MockActiveModal();
     windowRef = new MockWindowRef();
     userService = new MockUserService();
+    translateService = jasmine.createSpyObj('TranslateService', ['instant']);
+
+    translateService.instant.and.returnValue(
+      'Please keep your feedback under 2000 characters.'
+    );
     feedbackSessionInfoService = jasmine.createSpyObj(
       'FeedbackSessionInfoService',
       ['getSessionInfo']
@@ -259,6 +267,10 @@ describe('FeedbackModalComponent', () => {
         PlayerPositionService,
         LearnerAnswerInfoService,
         FeedbackBackendApiService,
+        {
+          provide: TranslateService,
+          useValue: translateService,
+        },
         {
           provide: FeedbackSessionInfoService,
           useValue: feedbackSessionInfoService,
