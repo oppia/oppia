@@ -233,12 +233,16 @@ describe('TopicStorySectionComponent', () => {
       'getThumbnailFilename',
       'getExplorationId',
       'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
     storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
     storyNodeSpy.getExplorationId.and.returnValue('exp_1');
     storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue(['en']);
 
     const storySummary = createStorySummarySpy(
       ['Node title 1'],
@@ -266,12 +270,16 @@ describe('TopicStorySectionComponent', () => {
       'getThumbnailFilename',
       'getExplorationId',
       'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
     storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
     storyNodeSpy.getExplorationId.and.returnValue('exp_1');
     storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue(['en']);
 
     const storySummary = createStorySummarySpy(
       ['Node title 1'],
@@ -296,12 +304,16 @@ describe('TopicStorySectionComponent', () => {
       'getThumbnailFilename',
       'getExplorationId',
       'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
     storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
     storyNodeSpy.getExplorationId.and.returnValue('exp_1');
     storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue(['en']);
 
     const mockSummary = new ChapterProgressSummary('exp_1', 5, 3, false);
     chapterProgressLoaderService.getChapterProgressSummary.and.returnValue(
@@ -333,12 +345,16 @@ describe('TopicStorySectionComponent', () => {
       'getThumbnailFilename',
       'getExplorationId',
       'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
     storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
     storyNodeSpy.getExplorationId.and.returnValue('exp_1');
     storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue(['en']);
 
     component.storySummary = createStorySummarySpy(
       ['Node title 1'],
@@ -588,12 +604,16 @@ describe('TopicStorySectionComponent', () => {
       'getThumbnailFilename',
       'getExplorationId',
       'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
     storyNodeSpy.getThumbnailFilename.and.returnValue(null);
     storyNodeSpy.getExplorationId.and.returnValue(null);
     storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue(['en']);
 
     const storySummary = createStorySummarySpy(
       ['Node title 1'],
@@ -615,12 +635,16 @@ describe('TopicStorySectionComponent', () => {
       'getThumbnailFilename',
       'getExplorationId',
       'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
     storyNodeSpy.getThumbnailFilename.and.returnValue('thumb.png');
     storyNodeSpy.getExplorationId.and.returnValue('exp_1');
     storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue(['en']);
 
     chapterProgressLoaderService.loadChapterProgressForStory.and.rejectWith(
       new Error('Network error')
@@ -648,12 +672,16 @@ describe('TopicStorySectionComponent', () => {
       'getThumbnailFilename',
       'getExplorationId',
       'getId',
+      'getAvailableTextLanguageCodes',
+      'getAvailableVoiceoverLanguageCodes',
     ]);
     storyNodeSpy.getTitle.and.returnValue('Node title 1');
     storyNodeSpy.getDescription.and.returnValue('Node description 1');
     storyNodeSpy.getThumbnailFilename.and.returnValue(null);
     storyNodeSpy.getExplorationId.and.returnValue(null);
     storyNodeSpy.getId.and.returnValue('node_1');
+    storyNodeSpy.getAvailableTextLanguageCodes.and.returnValue(['en']);
+    storyNodeSpy.getAvailableVoiceoverLanguageCodes.and.returnValue(['en']);
 
     const storySummary = createStorySummarySpy(
       ['Node title 1'],

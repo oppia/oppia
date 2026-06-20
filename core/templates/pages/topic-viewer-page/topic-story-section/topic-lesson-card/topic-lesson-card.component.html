@@ -21,13 +21,13 @@
 
     <div class="topic-lesson-card-actions">
       <span
-        *ngIf="shouldShowFallbackCta()"
-        class="topic-lesson-card-info-icon fa fa-info-circle"
-        [ngbTooltip]="getFallbackInfoTooltipText()"
-        placement="top"
-        container="body"
-        aria-label="Lesson language information"
-        tabindex="0">
+            *ngIf="shouldShowFallbackCta()"
+            class="topic-lesson-card-info-icon fa fa-info-circle"
+            [ngbTooltip]="getFallbackInfoTooltipText()"
+            placement="top"
+            container="body"
+            aria-label="Lesson language information"
+            tabindex="0">
       </span>
 
       <topic-lesson-language-selector

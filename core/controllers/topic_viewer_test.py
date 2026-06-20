@@ -294,6 +294,63 @@ class TopicPageDataHandlerTests(
 
         self.logout()
 
+    def test_get_with_story_node_explorations(self) -> None:
+        exploration_id = 'exp_id'
+        self.save_new_valid_exploration(
+            exploration_id, self.admin_id, end_state_name='End'
+        )
+        self.publish_exploration(self.admin_id, exploration_id)
+
+        change_list = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': 'node_1',
+                    'title': 'Node 1',
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': exploration_id,
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                    'node_id': 'node_1',
+                    'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                    'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
+                }
+            ),
+        ]
+        story_services.update_story(
+            self.admin_id, self.story_id_1, change_list, 'Added node.'
+        )
+
+        self.login(self.NEW_USER_EMAIL)
+        json_response = self.get_json(
+            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public')
+        )
+
+        canonical_stories = json_response['canonical_story_dicts']
+        story_with_nodes = [
+            s for s in canonical_stories if s['id'] == self.story_id_1
+        ]
+        self.assertEqual(len(story_with_nodes), 1)
+        story_dict = story_with_nodes[0]
+        self.assertEqual(len(story_dict['all_node_dicts']), 1)
+        node_dict = story_dict['all_node_dicts'][0]
+        self.assertEqual(node_dict['id'], 'node_1')
+        self.assertEqual(node_dict['exploration_id'], exploration_id)
+        self.assertEqual(node_dict['available_text_language_codes'], ['en'])
+        self.assertEqual(node_dict['available_voiceover_language_codes'], [])
+        self.logout()
+
     def test_get_with_meta_tag_content(self) -> None:
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id,
