@@ -23,6 +23,8 @@ import json
 from core.domain import html_translation_services
 from core.tests import test_utils
 
+import bs4
+
 
 class HtmlTranslationServicesTests(test_utils.GenericTestBase):
     """Tests for HTML translation services."""
@@ -210,3 +212,73 @@ class HtmlTranslationServicesTests(test_utils.GenericTestBase):
         )
         restored = html_translation_services.postprocess_translated_html(source)
         self.assertEqual(restored, '')
+
+    def test_translatable_text_attr_with_none_value_is_skipped(self) -> None:
+        soup = bs4.BeautifulSoup(
+            '<oppia-noninteractive-link></oppia-noninteractive-link>',
+            'html.parser',
+        )
+        tag = soup.find('oppia-noninteractive-link')
+        self.assertIsNone(tag.get('text-with-value'))
+        source = '<oppia-noninteractive-link></oppia-noninteractive-link>'
+        protected = html_translation_services.protect_html_for_translation(
+            source
+        )
+        self.assertNotIn('data-oi-attr', protected)
+
+    def test_encoded_html_attr_with_none_value_is_skipped(self) -> None:
+        source = '<oppia-noninteractive-collapsible></oppia-noninteractive-collapsible>'
+        protected = html_translation_services.protect_html_for_translation(
+            source
+        )
+        self.assertNotIn('data-oi-attr', protected)
+
+    def test_tabs_json_with_missing_title_or_content_is_handled(self) -> None:
+        tabs = json.dumps(
+            [
+                {'content': '&lt;p&gt;No Title&lt;/p&gt;'},
+                {'title': 'No Content'},
+            ]
+        )
+        source = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'%s\'>'
+            '</oppia-noninteractive-tabs>' % tabs
+        )
+        protected = html_translation_services.protect_html_for_translation(
+            source
+        )
+        self.assertIn('tab-content-0', protected)
+        self.assertNotIn('tab-title-0', protected)
+        self.assertIn('tab-title-1', protected)
+        self.assertNotIn('tab-content-1', protected)
+
+        restored = html_translation_services.postprocess_translated_html(
+            protected
+        )
+        self.assertIn('No Title', restored)
+        self.assertIn('No Content', restored)
+
+    def test_postprocess_encoded_attr_with_none_tag_skips_gracefully(
+        self,
+    ) -> None:
+        source = (
+            '<div data-oi-id="99" data-oi-attr="content-with-value" '
+            'data-oi-encoded="true">&lt;p&gt;Orphan&lt;/p&gt;</div>'
+        )
+        restored = html_translation_services.postprocess_translated_html(source)
+        self.assertEqual(restored, '')
+
+    def test_postprocess_tabs_with_none_tag_skips_gracefully(self) -> None:
+        source = '<span data-oi-id="99" data-oi-attr="tab-title-0">Title</span>'
+        restored = html_translation_services.postprocess_translated_html(source)
+        self.assertEqual(restored, '')
+
+    def test_tabs_with_json_type_error_is_skipped(self) -> None:
+        source = (
+            '<oppia-noninteractive-tabs tab_contents-with-value="123">'
+            '</oppia-noninteractive-tabs>'
+        )
+        protected = html_translation_services.protect_html_for_translation(
+            source
+        )
+        self.assertIn('translate="no"', protected)
