@@ -553,6 +553,14 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
             self.valid_translation_opportunity.incomplete_translation_language_codes,
         )
 
+        # Keep the language complete when it is already absent from the list of
+        # incomplete languages.
+        self.valid_translation_opportunity.update_translation_count('hi', 5)
+        self.assertNotIn(
+            'hi',
+            self.valid_translation_opportunity.incomplete_translation_language_codes,
+        )
+
         # Drop below content_count (should be added back to incomplete).
         self.valid_translation_opportunity.update_translation_count('hi', 4)
         self.assertIn(
