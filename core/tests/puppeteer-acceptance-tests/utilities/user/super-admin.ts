@@ -592,10 +592,6 @@ export class SuperAdmin extends BaseUser {
     try {
       await this.navigateToAdminPageActivitiesTab();
 
-      await this.page.waitForFunction(
-        () => window.location.href.includes('/admin#/activities'),
-        {timeout: 15000}
-      );
       await this.page.waitForSelector(reloadCollectionsRowsSelector, {
         visible: true,
         timeout: 30000,
