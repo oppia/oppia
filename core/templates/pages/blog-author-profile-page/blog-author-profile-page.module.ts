@@ -52,9 +52,5 @@ import {SharedBlogComponentsModule} from 'pages/blog-dashboard-page/shared-blog-
     BlogAuthorProfilePageComponent,
     BlogAuthorProfilePageRootComponent,
   ],
-  entryComponents: [
-    BlogAuthorProfilePageComponent,
-    BlogAuthorProfilePageRootComponent,
-  ],
 })
 export class BlogAuthorProfilePageModule {}

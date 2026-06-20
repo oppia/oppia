@@ -66,15 +66,5 @@ import {AdminPageComponent} from './admin-page.component';
     AdminPageRootComponent,
     TranslationCoordinatorRoleEditorModalComponent,
   ],
-  entryComponents: [
-    OppiaAdminProdModeActivitiesTabComponent,
-    AdminMiscTabComponent,
-    AdminNavbarComponent,
-    AdminPageComponent,
-    AdminRolesTabComponent,
-    AdminDevModeActivitiesTabComponent,
-    TopicManagerRoleEditorModalComponent,
-    TranslationCoordinatorRoleEditorModalComponent,
-  ],
 })
 export class AdminPageModule {}

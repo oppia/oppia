@@ -52,17 +52,6 @@ import {CommonModule} from '@angular/common';
     UploadBlogPostThumbnailComponent,
     BlogPostEditorNavbarPreLogoActionComponent,
   ],
-  entryComponents: [
-    BlogDashboardNavbarBreadcrumbComponent,
-    BlogCardComponent,
-    BlogDashboardTileComponent,
-    BlogPostEditorComponent,
-    BlogPostActionConfirmationModalComponent,
-    UploadBlogPostThumbnailModalComponent,
-    BlogCardPreviewModalComponent,
-    UploadBlogPostThumbnailComponent,
-    BlogPostEditorNavbarPreLogoActionComponent,
-  ],
   exports: [
     BlogDashboardNavbarBreadcrumbComponent,
     BlogCardComponent,

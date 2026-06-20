@@ -27,7 +27,6 @@ import {TopicSummaryTileComponent} from './topic-summary-tile.component';
 @NgModule({
   imports: [CommonModule, StringUtilityPipesModule, TranslateModule],
   declarations: [TopicSummaryTileComponent],
-  entryComponents: [TopicSummaryTileComponent],
   exports: [TopicSummaryTileComponent],
 })
 export class SummaryTilesModule {}

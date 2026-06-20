@@ -54,10 +54,5 @@ import {CampaignBannerModule} from 'components/campaign-banner/campaign-banner-m
     BlogHomePageRootComponent,
     TagFilterComponent,
   ],
-  entryComponents: [
-    BlogHomePageComponent,
-    BlogHomePageRootComponent,
-    TagFilterComponent,
-  ],
 })
 export class BlogHomePageModule {}
