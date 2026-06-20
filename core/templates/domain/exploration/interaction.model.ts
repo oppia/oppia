@@ -446,8 +446,11 @@ export class Interaction extends BaseTranslatableObject {
   static createFromNumericInputCustomizationArgsBackendDict(
     caBackendDict: NumericInputCustomizationArgsBackendDict
   ): NumericInputCustomizationArgs {
-    const {requireNonnegativeInput} = caBackendDict;
-    return {requireNonnegativeInput};
+    const {requireNonnegativeInput, allowExponentialNotation} = caBackendDict;
+    return {
+      requireNonnegativeInput,
+      allowExponentialNotation,
+    };
   }
 
   static convertFromCustomizationArgsBackendDict(

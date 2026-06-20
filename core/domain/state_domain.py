@@ -4112,22 +4112,42 @@ class State(translation_domain.BaseTranslatableObject):
         Raises:
             Exception. The customization arguments are not unique.
         """
-        # Here we use cast because for argument 'customization_args_mapping'
-        # we have used Mapping type because we want to allow
-        # 'update_interaction_customization_args' method to accept different
-        # subtypes of customization_arg dictionaries, but the problem with
-        # Mapping is that the Mapping does not allow to update(or set) values
-        # because Mapping is a read-only type. To overcome this issue, we
-        # narrowed down the type from Mapping to Dict by using cast so that
-        # while updating or setting a new value MyPy will not throw any error.
+        # We copy the Mapping to a mutable dict before backfilling missing
+        # args because Mapping itself is read-only.
         customization_args_dict = cast(
-            CustomizationArgsDictType, customization_args_mapping
+            CustomizationArgsDictType,
+            copy.deepcopy(dict(customization_args_mapping)),
         )
+        # Older change lists may not include newly-added customization args.
+        # Backfill missing args from existing values when available, otherwise
+        # use the interaction spec default.
+        if self.interaction.id is not None:
+            interaction = interaction_registry.Registry.get_interaction_by_id(
+                self.interaction.id
+            )
+            for spec in interaction.customization_arg_specs:
+                ca_name = spec.name
+                if ca_name in customization_args_dict:
+                    continue
+                existing_customization_arg = (
+                    self.interaction.customization_args.get(ca_name)
+                )
+                if existing_customization_arg is not None:
+                    customization_args_dict[ca_name] = (
+                        existing_customization_arg.to_customization_arg_dict()
+                    )
+                else:
+                    default_value = cast(
+                        UnionOfCustomizationArgsDictValues,
+                        copy.deepcopy(spec.default_value),
+                    )
+                    customization_args_dict[ca_name] = {'value': default_value}
+
         customization_args = InteractionInstance.convert_customization_args_dict_to_customization_args(
             self.interaction.id, customization_args_dict
         )
-        for ca_name in customization_args:
-            customization_args[ca_name].validate_subtitled_html()
+        for ca in customization_args.values():
+            ca.validate_subtitled_html()
 
         self.interaction.customization_args = customization_args
         new_content_id_list = list(
@@ -4732,6 +4752,11 @@ class State(translation_domain.BaseTranslatableObject):
             ]
             for spec in ca_specs_dict:
                 if spec['name'] != 'catchMisspellings':
+                    if spec['name'] not in customisation_args:
+                        # Some older states may not contain newly-added
+                        # customization args. Skip missing args during
+                        # traversal to avoid migration failures.
+                        continue
                     customisation_arg = customisation_args[spec['name']]
                     contents = (
                         InteractionCustomizationArg.traverse_by_schema_and_get(
