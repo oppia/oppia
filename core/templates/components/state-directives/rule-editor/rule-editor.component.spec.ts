@@ -188,11 +188,7 @@ describe('Rule Editor Component', () => {
   });
 
   it('should throw error when interaction id is null on initialization', () => {
-    component.rule = new Rule(
-      '',
-      {} as unknown as RuleInputs,
-      {} as unknown as RuleInputTypes
-    );
+    component.rule = new Rule('', {}, {});
 
     stateInteractionIdService.savedMemento = null;
 
