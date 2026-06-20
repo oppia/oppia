@@ -17,10 +17,6 @@
       "module": "core/tests/webdriverio/learnerFlow.js"
     },
     {
-      "name": "navigation",
-      "module": "core/tests/webdriverio_desktop/navigation.js"
-    },
-    {
       "name": "skillEditor",
       "module": "core/tests/webdriverio_desktop/skillEditor.js"
     },

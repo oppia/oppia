@@ -10,6 +10,13 @@
       <h3 class="topic-lesson-card-title">{{ lessonTitle }}</h3>
       <p class="topic-lesson-card-description">{{ lessonDescription }}</p>
     </div>
+    <div class="topic-lesson-card-progress" *ngIf="showCheckpointBar">
+      <oppia-checkpoint-bar
+        [totalCheckpointsCount]="totalCheckpointsCount"
+        [visitedCheckpointsCount]="visitedCheckpointsCount"
+        [isReadOnly]="true">
+      </oppia-checkpoint-bar>
+    </div>
     <button class="topic-lesson-card-start-button"
             type="button"
             [disabled]="!startUrl"
