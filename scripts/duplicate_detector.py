@@ -21,6 +21,7 @@ import logging
 import os
 import re
 import urllib.request
+from typing import Any, Dict, List, Set
 
 from sentence_transformers import (  # pylint: disable=import-error
     SentenceTransformer,
@@ -28,7 +29,7 @@ from sentence_transformers import (  # pylint: disable=import-error
 )
 
 
-def get_template_lines(repo_path):
+def get_template_lines(repo_path: str) -> Set[str]:
     """Extracts template boilerplate from issue and PR templates.
 
     Args:
@@ -70,7 +71,7 @@ def get_template_lines(repo_path):
     return template_lines
 
 
-def clean_text(text, template_lines):
+def clean_text(text: str, template_lines: Set[str]) -> str:
     """Cleans the issue text by removing boilerplate template lines.
 
     Args:
@@ -88,7 +89,9 @@ def clean_text(text, template_lines):
     return '\n'.join(clean_lines)
 
 
-def get_all_open_issues(repo, headers):
+def get_all_open_issues(
+    repo: str, headers: Dict[str, str]
+) -> List[Dict[str, Any]]:
     """Fetches all open issues from the GitHub API via pagination.
 
     Args:
@@ -119,7 +122,7 @@ def get_all_open_issues(repo, headers):
     return issues
 
 
-def main():
+def main() -> None:
     """Main execution function."""
     logging.getLogger().setLevel(logging.INFO)
     logging.info('Loading HuggingFace Sentence Transformers AI Model...')
@@ -164,7 +167,7 @@ def main():
         for iss in all_issues:
             if start_issue <= iss['number'] <= end_issue:
                 issues_to_triage.append(iss)
-        issues_to_triage.sort(key=lambda x: x['number'])
+        issues_to_triage.sort(key=lambda x: int(x['number']))
     else:
         logging.info('Automatic trigger detected.')
         item = event.get('issue')
