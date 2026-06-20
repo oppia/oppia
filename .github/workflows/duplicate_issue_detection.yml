@@ -1,0 +1,45 @@
+name: Duplicate Issue and PR Detection
+
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      start_issue_number:
+        description: 'Starting issue number (optional, for batch triaging)'
+        required: false
+        type: string
+      end_issue_number:
+        description: 'Ending issue number (optional)'
+        required: false
+        type: string
+      best_score:
+        description: 'Similarity threshold score'
+        required: false
+        default: '0.8'
+        type: string
+
+jobs:
+  check-duplicates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install sentence-transformers
+
+      - name: Run Duplicate Detector
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          THRESHOLD_SCORE: ${{ github.event.inputs.best_score || '0.8' }}
+          START_ISSUE_NUMBER: ${{ github.event.inputs.start_issue_number || '' }}
+          END_ISSUE_NUMBER: ${{ github.event.inputs.end_issue_number || '' }}
+        run: python .github/scripts/duplicate_detector.py
