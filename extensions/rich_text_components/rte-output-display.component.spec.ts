@@ -1016,4 +1016,30 @@ describe('RTE display component', () => {
 
     expect(component.shouldHighlightContent()).toBeFalse();
   });
+
+  it('should return undefined from _getTemplatePortal for component node with unknown selector', () => {
+    const node = {
+      nodeType: 'component' as const,
+      selector: 'oppia-noninteractive-unknown',
+      attrs: {},
+      children: [],
+      parent: null,
+      portal: undefined,
+    };
+    const result = (component as any)._getTemplatePortal(node);
+    expect(result).toBeUndefined();
+  });
+
+  it('should return undefined from _getTemplatePortal for non-component node with unknown selector', () => {
+    const node = {
+      nodeType: '' as const,
+      selector: 'unknown-element',
+      attrs: {},
+      children: [],
+      parent: null,
+      portal: undefined,
+    };
+    const result = (component as any)._getTemplatePortal(node);
+    expect(result).toBeUndefined();
+  });
 });
