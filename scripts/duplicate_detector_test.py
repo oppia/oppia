@@ -16,10 +16,16 @@
 
 from __future__ import annotations
 
+import sys
 import unittest
+from unittest import mock
 
-import duplicate_detector  # pylint: disable=import-error
 from typing import Set
+
+# Mock sentence_transformers since it is not installed in the local Oppia environment.
+sys.modules['sentence_transformers'] = mock.MagicMock()
+
+from scripts import duplicate_detector  # pylint: disable=wrong-import-position
 
 
 class DuplicateDetectorTests(unittest.TestCase):
