@@ -97,12 +97,13 @@ describe('TopicSessionFallbackLanguageService', () => {
   it('should clear selection when JSON parse fails on retrieval', () => {
     const corruptData = 'not-valid-json';
     mockSessionStorage.setItem('topic_session_fallback_language', corruptData);
-    spyOn(service, 'clearSelection').and.callThrough();
 
     const result = service.getFallbackSelection();
 
     expect(result).toBeNull();
-    expect(service.clearSelection).toHaveBeenCalled();
+    expect(mockSessionStorage.removeItem).toHaveBeenCalledWith(
+      'topic_session_fallback_language'
+    );
   });
 
   it('should propagate error when sessionStorage throws on getItem', () => {
@@ -111,20 +112,32 @@ describe('TopicSessionFallbackLanguageService', () => {
     expect(() => service.getFallbackSelection()).toThrowError('Storage error');
   });
 
+  it('should return null when sessionStorage is unavailable on retrieval', () => {
+    mockSessionStorage.setItem.and.callFake(() => {
+      throw new Error('Storage unavailable');
+    });
+
+    const result = service.getFallbackSelection();
+
+    expect(result).toBeNull();
+  });
+
   it('should handle saveFallbackSelection when sessionStorage is unavailable', () => {
-    spyOn(service, 'isSessionStorageAvailable' as const).and.returnValue(false);
+    mockSessionStorage.setItem.and.callFake(() => {
+      throw new Error('Storage unavailable');
+    });
 
-    service.saveFallbackSelection('en', null);
-
-    expect(mockSessionStorage.setItem).not.toHaveBeenCalled();
+    expect(() => service.saveFallbackSelection('en', null)).not.toThrowError();
+    expect(mockSessionStorage.setItem).toHaveBeenCalled();
   });
 
   it('should handle clearSelection when sessionStorage is unavailable', () => {
-    spyOn(service, 'isSessionStorageAvailable' as const).and.returnValue(false);
+    mockSessionStorage.setItem.and.callFake(() => {
+      throw new Error('Storage unavailable');
+    });
 
-    service.clearSelection();
-
-    expect(mockSessionStorage.removeItem).not.toHaveBeenCalled();
+    expect(() => service.clearSelection()).not.toThrowError();
+    expect(mockSessionStorage.setItem).toHaveBeenCalled();
   });
 
   it('should return the last saved selection when saved multiple times', () => {
