@@ -3874,6 +3874,7 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to select destination for default response.
+   * @param cardName - The name of the card to which learners will be directed.
    */
   async selectDestinationAndSave(cardName: string): Promise<void> {
     await this.waitForElementToBeClickable(destinationCardSelector);
@@ -3887,6 +3888,7 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to select existing destination and save.
+   * @param cardName - The name of the card to which learners will be directed.
    */
   async selectExistingDestinationAndSave(cardName: string): Promise<void> {
     await this.waitForElementToBeClickable(destinationCardSelector);
@@ -3901,9 +3903,6 @@ export class ExplorationEditor extends BaseUser {
    * Function to display the Oppia responses section.
    */
   async viewOppiaResponsesLegacyKeptForCompatibility(): Promise<void> {
-    await this.page.waitForSelector(stateResponsesSelector, {
-      visible: true,
-    });
     await this.clickOnElementWithSelector(stateResponsesSelector);
     await this.page.waitForSelector(oppiaFeebackEditorContainerSelector, {
       visible: true,
