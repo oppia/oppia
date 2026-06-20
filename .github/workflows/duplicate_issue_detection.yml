@@ -13,7 +13,7 @@ on:
         description: 'Ending issue number (optional)'
         required: false
         type: string
-      best_score:
+      threshold_score:
         description: 'Similarity threshold score'
         required: false
         default: '0.8'
