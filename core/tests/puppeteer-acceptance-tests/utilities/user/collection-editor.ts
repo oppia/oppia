@@ -35,6 +35,12 @@ const collectionSaveChangesButtonSelector =
   '.e2e-test-collection-save-changes-button';
 const collectionEditorCardsSelector =
   '.e2e-test-collection-editor-cards-container';
+const createNewExplorationButtonSelector =
+  'button.e2e-test-create-new-exploration-button';
+const creationModalSelector = '.e2e-test-creation-modal';
+const createCollectionButtonSelector = '.e2e-test-create-collection';
+const collectionCategoryMatSelectSelector = `${collectionCategoryDropdownSelector} mat-select`;
+const collectionCategoryOptionSelector = 'mat-option .mat-option-text';
 
 export const CollectionEditorFactory = (): CollectionEditor => {
   return new CollectionEditor();
@@ -56,24 +62,21 @@ export class CollectionEditor extends BaseUser {
     explorationIds: string[]
   ): Promise<string> {
     await this.goto(testConstants.URLs.CreatorDashboard);
-    await this.page.waitForSelector(
-      'button.e2e-test-create-new-exploration-button',
-      {visible: true}
-    );
-    await this.clickOnElementWithSelector(
-      'button.e2e-test-create-new-exploration-button'
-    );
 
-    await this.page.waitForSelector('.e2e-test-creation-modal', {
+    await this.clickOnElementWithSelector(createNewExplorationButtonSelector);
+
+    await this.page.waitForSelector(creationModalSelector, {
       visible: true,
       timeout: 10000,
     });
-    await this.clickAndWaitForNavigation('.e2e-test-create-collection', true);
+
+    await this.clickAndWaitForNavigation(createCollectionButtonSelector, true);
 
     await this.page.waitForFunction(
       () => window.location.href.includes('/collection_editor/create/'),
       {timeout: 30000}
     );
+
     const url = this.page.url();
     const collectionId = url
       .split('/collection_editor/create/')[1]
@@ -90,76 +93,66 @@ export class CollectionEditor extends BaseUser {
       });
       await this.page.click(addExplorationInputSelector, {clickCount: 3});
       await this.page.type(addExplorationInputSelector, expId);
-      await this.page.waitForSelector(addExplorationButtonSelector, {
-        visible: true,
-      });
+
       await this.clickOnElementWithSelector(addExplorationButtonSelector);
       await this.waitForNetworkIdle();
       showMessage(`Added exploration ${expId} to collection.`);
     }
 
-    await this.page.waitForSelector(saveDraftButtonSelector, {visible: true});
     await this.clickOnElementWithSelector(saveDraftButtonSelector);
+
     await this.page.waitForSelector(commitMessageInputSelector, {
       visible: true,
     });
+
     await this.page.type(
       commitMessageInputSelector,
       'Initial collection setup.'
     );
-    await this.page.waitForSelector(closeSaveModalButtonSelector, {
-      visible: true,
-    });
+
     await this.clickOnElementWithSelector(closeSaveModalButtonSelector);
+
     await this.waitForNetworkIdle();
 
-    await this.page.waitForSelector(publishCollectionButtonSelector, {
-      visible: true,
-    });
     await this.clickOnElementWithSelector(publishCollectionButtonSelector);
 
     await this.page.waitForSelector(collectionTitleInputSelector, {
       visible: true,
     });
+
     await this.page.click(collectionTitleInputSelector);
     await this.page.type(collectionTitleInputSelector, title);
 
     await this.page.click(collectionObjectiveInputSelector);
     await this.page.type(collectionObjectiveInputSelector, objective);
 
-    await this.page.waitForSelector(
-      `${collectionCategoryDropdownSelector} mat-select`,
-      {visible: true}
-    );
-    await this.clickOnElementWithSelector(
-      `${collectionCategoryDropdownSelector} mat-select`
-    );
+    await this.clickOnElementWithSelector(collectionCategoryMatSelectSelector);
 
     await this.page.waitForFunction(
-      (cat: string) => {
-        const options = Array.from(
-          document.querySelectorAll('mat-option .mat-option-text')
-        );
+      (cat: string, selector: string) => {
+        const options = Array.from(document.querySelectorAll(selector));
         return options.some(el => el.textContent?.trim() === cat);
       },
       {timeout: 10000},
-      category
+      category,
+      collectionCategoryOptionSelector
     );
-    await this.page.evaluate((cat: string) => {
-      const options = Array.from(
-        document.querySelectorAll('mat-option .mat-option-text')
-      );
-      const match = options.find(
-        el => el.textContent?.trim() === cat
-      ) as HTMLElement;
-      match
-        ?.closest('mat-option')
-        ?.dispatchEvent(new MouseEvent('click', {bubbles: true}));
-    }, category);
 
-    await this.page.waitForSelector(collectionSaveChangesButtonSelector, {
-      visible: true,
-    });
+    await this.page.evaluate(
+      (cat: string, selector: string) => {
+        const options = Array.from(document.querySelectorAll(selector));
+        const match = options.find(
+          el => el.textContent?.trim() === cat
+        ) as HTMLElement;
+
+        match
+          ?.closest('mat-option')
+          ?.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+      },
+      category,
+      collectionCategoryOptionSelector
+    );
+
     await this.clickOnElementWithSelector(collectionSaveChangesButtonSelector);
     await this.waitForNetworkIdle();
 
