@@ -38,7 +38,10 @@ import {NumericInputRulesService} from 'interactions/NumericInput/directives/num
 import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import {SetInputRulesService} from 'interactions/SetInput/directives/set-input-rules.service';
 import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
-import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
+import {
+  AnswerClassificationService,
+  InteractionRulesService,
+} from 'pages/exploration-player-page/services/answer-classification.service';
 import {AlertsService} from 'services/alerts.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {State} from 'domain/state/state.model';
@@ -259,11 +262,11 @@ export class TrainingDataEditorPanelComponent
       RULES_SERVICE_MAPPING[
         rulesServiceName as keyof typeof RULES_SERVICE_MAPPING
       ]
-    );
+    ) as InteractionRulesService;
 
     let newAnswerTemplate = this.explorationHtmlFormatterService.getAnswerHtml(
       newAnswer,
-      this.stateInteractionIdService.savedMemento,
+      interactionId,
       this.stateCustomizationArgsService.savedMemento
     );
 
