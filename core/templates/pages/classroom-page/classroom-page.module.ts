@@ -47,6 +47,5 @@ import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.mod
     Error404PageModule,
   ],
   declarations: [ClassroomPageComponent, ClassroomPageRootComponent],
-  entryComponents: [ClassroomPageComponent, ClassroomPageRootComponent],
 })
 export class ClassroomPageModule {}

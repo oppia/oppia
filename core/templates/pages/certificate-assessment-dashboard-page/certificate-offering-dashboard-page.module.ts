@@ -34,10 +34,5 @@ import {DeleteCertificateOfferingModalComponent} from 'components/certificate-as
     CertificateOfferingDashboardPageComponent,
     DeleteCertificateOfferingModalComponent,
   ],
-  entryComponents: [
-    CertificateOfferingDashboardPageRootComponent,
-    CertificateOfferingDashboardPageComponent,
-    DeleteCertificateOfferingModalComponent,
-  ],
 })
 export class CertificateOfferingDashboardPageModule {}

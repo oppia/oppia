@@ -51,6 +51,5 @@ import {SharedBlogComponentsModule} from 'pages/blog-dashboard-page/shared-blog-
     MatTooltipModule,
   ],
   declarations: [BlogPostPageComponent, BlogPostPageRootComponent],
-  entryComponents: [BlogPostPageComponent, BlogPostPageRootComponent],
 })
 export class BlogPostPageModule {}

@@ -50,12 +50,5 @@ import {ToastrModule} from 'ngx-toastr';
     CollectionPlayerPageComponent,
     CollectionPlayerPageRootComponent,
   ],
-  entryComponents: [
-    CollectionFooterComponent,
-    CollectionLocalNavComponent,
-    CollectionNodeListComponent,
-    CollectionNavbarComponent,
-    CollectionPlayerPageComponent,
-  ],
 })
 export class CollectionPlayerPageModule {}
