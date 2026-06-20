@@ -245,7 +245,9 @@ class CertificateAssessmentOfferingByIdHandler(
                 async_status=self.normalized_payload['async_status'],
             )
         except utils.ValidationError as e:
-            raise self.NotFoundException(str(e)) from e
+            if 'does not exist.' in str(e):
+                raise self.NotFoundException(str(e)) from e
+            raise self.InvalidInputException(e)
         self.render_json(
             {'certificate_id': certificate_offering.certificate_id}
         )

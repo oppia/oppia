@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+from unittest import mock
+
 from core import feconf, utils
 from core.domain import certificate_assessment_services
 from core.tests import test_utils
@@ -255,6 +257,35 @@ class CertificateAssessmentOfferingByIdHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=404,
         )
+
+    def test_put_returns_400_for_invalid_certificate_offering(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+        with mock.patch.object(
+            certificate_assessment_services,
+            'update_certificate_assessment_offering',
+            side_effect=utils.ValidationError('Invalid classroom id.'),
+        ):
+            self.put_json(
+                feconf.CERTIFICATE_ASSESSMENT_OFFERING_BY_ID_HANDLER.replace(
+                    '<certificate_id>', 'certificate_offering_id'
+                ),
+                {
+                    'title': 'Chemistry Mastery',
+                    'description': 'Updated chemistry coverage.',
+                    'classroom_id': 'science_classroom_02',
+                    'topics': [
+                        {
+                            'topic_id': 'topic_atoms',
+                        },
+                    ],
+                    'total_questions': 9,
+                    'time_limit_in_minutes': 40,
+                    'demonstrates': ['Scientific reasoning'],
+                    'async_status': 'Blocked',
+                },
+                csrf_token=csrf_token,
+                expected_status_int=400,
+            )
 
     def test_delete_removes_certificate_offering(self) -> None:
         created_offering = certificate_assessment_services.create_certificate_assessment_offering(

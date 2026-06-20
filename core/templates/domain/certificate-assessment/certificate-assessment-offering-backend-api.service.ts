@@ -39,6 +39,7 @@ interface GetCertificateOfferingBackendResponse {
     topic_data: {
       [topicId: string]: number;
     };
+    demonstrates: string[];
     total_questions: number;
     time_limit_in_minutes: number;
     async_status: string;
@@ -77,6 +78,7 @@ export class CertificateAssessmentOfferingBackendApiService {
                 description: response.certificate_offering.description,
                 classroom_id: response.certificate_offering.classroom_id,
                 topic_data: response.certificate_offering.topic_data,
+                demonstrates: response.certificate_offering.demonstrates,
                 total_questions: response.certificate_offering.total_questions,
                 time_limit_in_minutes:
                   response.certificate_offering.time_limit_in_minutes,
@@ -138,6 +140,8 @@ export class CertificateAssessmentOfferingBackendApiService {
   ): Promise<string> {
     const topicIds = Object.keys(certificateAssessmentOffering.topicData || {});
     return new Promise((resolve, reject) => {
+      // TODO(#24717-M1.14): Replace the temporary stub fallbacks in this
+      // request with the real edit-form values once the M1.14 wiring is done.
       this.http
         .put<UpdateCertificateOfferingBackendResponse>(
           this.getCertificateOfferingByIdHandlerUrl(certificateId),
