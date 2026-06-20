@@ -95,6 +95,7 @@ class GetAllOpenIssuesTests(unittest.TestCase):
 
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0]['number'], 1)
+        mock_request.assert_called()
 
     @mock.patch('scripts.duplicate_detector.urllib.request.urlopen')
     @mock.patch('scripts.duplicate_detector.urllib.request.Request')
@@ -109,6 +110,7 @@ class GetAllOpenIssuesTests(unittest.TestCase):
         )
 
         self.assertEqual(issues, [])
+        mock_request.assert_called()
 
 
 class GetTemplateLinesTests(unittest.TestCase):
@@ -122,3 +124,5 @@ class GetTemplateLinesTests(unittest.TestCase):
         """Test that get_template_lines returns empty set when no templates."""
         result = duplicate_detector.get_template_lines('/fake/path')
         self.assertEqual(result, set())
+        mock_isdir.assert_called()
+        mock_isfile.assert_called()
