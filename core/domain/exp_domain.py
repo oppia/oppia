@@ -3373,7 +3373,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 interaction['customization_args'],
                 state_schema_version=state_schema,
             )
-            for ca_name in customisation_args:
+            for ca in customisation_args.values():
                 content_id_list.extend(ca.get_content_ids())
 
         # Here we use MyPy ignore because the latest schema of state
@@ -5434,8 +5434,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _convert_states_v57_dict_to_v58_dict(
         cls, states_dict: Dict[str, state_domain.StateDict]
     ) -> Tuple[Dict[str, state_domain.StateDict], int]:
-        """
-        Converts from v57 to v58. Version 58 adds
+        """Converts from v57 to v58. Version 58 adds
         allowExponentialNotation customization arg to NumericInput and sets it
         to True for legacy states to preserve existing learner-facing behavior.
 
@@ -5938,8 +5937,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _convert_v62_dict_to_v63_dict(
         cls, exploration_dict: VersionedExplorationDict
     ) -> VersionedExplorationDict:
-        """
-        Converts a v62 exploration dict into a v63 exploration dict.
+        """Converts a v62 exploration dict into a v63 exploration dict.
         Version 63 adds a new customization arg to NumericInput allowing
         creators to disable exponential notation.
 

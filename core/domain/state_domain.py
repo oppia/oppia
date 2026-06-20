@@ -4114,6 +4114,10 @@ class State(translation_domain.BaseTranslatableObject):
         """
         # We copy the Mapping to a mutable dict before backfilling missing
         # args because Mapping itself is read-only.
+
+        # Here use cast because deepcopy(dict(...)) loses the precise
+        # CustomizationArgsDictType typing and is inferred as a generic dict.
+        # We explicitly cast it back since the structure matches the expected type.
         customization_args_dict = cast(
             CustomizationArgsDictType,
             copy.deepcopy(dict(customization_args_mapping)),
@@ -4137,6 +4141,9 @@ class State(translation_domain.BaseTranslatableObject):
                         existing_customization_arg.to_customization_arg_dict()
                     )
                 else:
+                    # Here use cast because spec.default_value is dynamically typed and
+                    # deepcopy does not preserve the UnionOfCustomizationArgsDictValues type.
+                    # We cast to ensure it conforms to the expected customization arg value type.
                     default_value = cast(
                         UnionOfCustomizationArgsDictValues,
                         copy.deepcopy(spec.default_value),
