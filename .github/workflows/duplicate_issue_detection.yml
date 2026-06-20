@@ -34,10 +34,11 @@ jobs:
       - name: Install dependencies
         run: pip install sentence-transformers
 
-      - name: Run Duplicate Detector
+      - name: Run Duplicate Detection Script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          THRESHOLD_SCORE: ${{ github.event.inputs.best_score || '0.8' }}
-          START_ISSUE_NUMBER: ${{ github.event.inputs.start_issue_number || '' }}
-          END_ISSUE_NUMBER: ${{ github.event.inputs.end_issue_number || '' }}
-        run: python .github/scripts/duplicate_detector.py
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+          START_ISSUE_NUMBER: ${{ github.event.inputs.start_issue_number }}
+          END_ISSUE_NUMBER: ${{ github.event.inputs.end_issue_number }}
+          THRESHOLD_SCORE: ${{ github.event.inputs.threshold_score }}
+        run: python scripts/duplicate_detector.py
