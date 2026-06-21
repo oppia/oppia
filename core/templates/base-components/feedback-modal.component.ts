@@ -249,7 +249,7 @@ export class FeedbackModalComponent implements OnInit {
 
     if (this.feedbackText.length > this.MAX_REPORT_MESSAGE_LENGTH) {
       this.formError = this.translateService.instant(
-        'I18N_FEEDBACK_MESSAGE_TOO_LONG',
+        'I18N_LESSON_FEEDBACK_MESSAGE_TOO_LONG',
         {
           maxLength: this.MAX_REPORT_MESSAGE_LENGTH,
         }

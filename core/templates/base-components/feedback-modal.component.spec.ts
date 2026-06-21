@@ -233,7 +233,7 @@ describe('FeedbackModalComponent', () => {
           return 'Please add a description before submitting.';
         }
 
-        if (key === 'I18N_FEEDBACK_MESSAGE_TOO_LONG') {
+        if (key === 'I18N_LESSON_FEEDBACK_MESSAGE_TOO_LONG') {
           return `Please keep your feedback under ${params?.maxLength} characters.`;
         }
 
