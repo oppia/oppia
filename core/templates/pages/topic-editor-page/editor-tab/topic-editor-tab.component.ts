@@ -129,7 +129,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
 
   drop(event: CdkDragDrop<Subtopic[]>): void {
     moveItemInArray(this.subtopics, event.previousIndex, event.currentIndex);
-    if (event.previousIndex == event.currentIndex) return;
+    if (event.previousIndex === event.currentIndex) return;
     this.topicUpdateService.rearrangeSubtopic(
       this.topic,
       event.previousIndex,
