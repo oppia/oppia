@@ -2208,7 +2208,7 @@ describe('State translation component', () => {
           },
         ] as Hint[];
 
-        component.activeHintIndex = 1;
+        component.activeHintIndex = null;
 
         spyOn(translationTabActiveContentIdService, 'setActiveContent');
 

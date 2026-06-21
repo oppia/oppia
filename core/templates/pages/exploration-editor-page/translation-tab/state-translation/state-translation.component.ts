@@ -78,7 +78,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   stateInteractionCustomizationArgs!: InteractionCustomizationArgs;
   activeCustomizationArgContentIndex!: number;
   activeRuleContentIndex!: number;
-  activeHintIndex!: number;
+  activeHintIndex!: number | null;
   stateHints!: Hint[];
   stateName!: string;
   needsUpdateTooltipMessage!: string;
@@ -771,7 +771,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       this.explorationStatesService.getInteractionCustomizationArgsMemento(
         this.stateName
       );
-    this.activeHintIndex = 0;
+    this.activeHintIndex = null;
     this.activeAnswerGroupIndex = null;
     let currentCustomizationArgs =
       this.explorationStatesService.getInteractionCustomizationArgsMemento(
