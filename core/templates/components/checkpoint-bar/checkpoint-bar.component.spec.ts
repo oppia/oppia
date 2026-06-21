@@ -468,6 +468,23 @@ describe('CheckpointBarComponent', () => {
     ).not.toHaveBeenCalled();
   });
 
+  it('should not navigate when isReadOnly is true', () => {
+    component.isReadOnly = true;
+    component.checkpointIndexes = [0, 10, 20, 30];
+    component.checkpointStatusArray = [
+      'completed',
+      'completed',
+      'in-progress',
+      'incomplete',
+    ];
+
+    component.returnToCheckpointIfCompleted(1);
+
+    expect(
+      mockPlayerPositionService.setDisplayedCardIndex
+    ).not.toHaveBeenCalled();
+  });
+
   it('should handle case when displayed card index is negative', () => {
     component.checkpointIndexes = [0, 10, 20, 30];
     component.checkpointCount = 4;
@@ -535,5 +552,79 @@ describe('CheckpointBarComponent', () => {
     component.updateLessonProgressBar();
 
     expect(component.checkpointStatusArray).toBeDefined();
+  });
+
+  describe('updateStatusesFromCounts', () => {
+    it('should build statuses from totalCheckpointsCount and visitedCheckpointsCount on init', () => {
+      component.totalCheckpointsCount = 5;
+      component.visitedCheckpointsCount = 2;
+
+      component.ngOnInit();
+
+      expect(component.checkpointCount).toBe(5);
+      expect(component.checkpointStatusArray.length).toBe(6);
+      expect(component.checkpointStatusArray[0]).toBe('completed');
+      expect(component.checkpointStatusArray[1]).toBe('in-progress');
+      expect(
+        component.checkpointStatusArray.slice(2).every(s => s === 'incomplete')
+      ).toBeTrue();
+      expect(component.progressBarWidth).toBe(20);
+    });
+
+    it('should mark all completed when visited exceeds total', () => {
+      component.totalCheckpointsCount = 3;
+      component.visitedCheckpointsCount = 5;
+
+      component.ngOnInit();
+
+      expect(
+        component.checkpointStatusArray.every(s => s === 'completed')
+      ).toBeTrue();
+      expect(component.progressBarWidth).toBe(100);
+    });
+
+    it('should mark all completed when visited equals total', () => {
+      component.totalCheckpointsCount = 4;
+      component.visitedCheckpointsCount = 4;
+
+      component.ngOnInit();
+
+      expect(
+        component.checkpointStatusArray.every(s => s === 'completed')
+      ).toBeTrue();
+      expect(component.progressBarWidth).toBe(100);
+    });
+
+    it('should handle zero visited count (not started)', () => {
+      component.totalCheckpointsCount = 3;
+      component.visitedCheckpointsCount = 0;
+
+      component.ngOnInit();
+
+      expect(component.checkpointStatusArray.length).toBe(4);
+      expect(component.checkpointStatusArray[0]).toBe('in-progress');
+      expect(
+        component.checkpointStatusArray.slice(1).every(s => s === 'incomplete')
+      ).toBeTrue();
+      expect(component.progressBarWidth).toBe(0);
+    });
+  });
+
+  it('should handle getMostRecentlyReachedCheckpointIndex returning 0', () => {
+    component.checkpointCount = 3;
+    component.expEnded = false;
+    mockCheckpointProgressService.getMostRecentlyReachedCheckpointIndex.and.returnValue(
+      0
+    );
+    mockPlayerPositionService.getDisplayedCardIndex.and.returnValue(0);
+    mockExplorationEngineService.getState.and.returnValue({name: 'testState'});
+    mockExplorationEngineService.getStateCardByName.and.returnValue({
+      isTerminal: jasmine.createSpy('isTerminal').and.returnValue(false),
+    });
+    spyOn(component, 'getCompletedProgressBarWidth').and.returnValue(0);
+
+    expect(() => {
+      component.updateLessonProgressBar();
+    }).not.toThrowError();
   });
 });

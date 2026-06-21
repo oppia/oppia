@@ -16,11 +16,11 @@
  * @fileoverview Component for tracking Checkpoint state.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import './checkpoint-bar.component.css';
-import {ExplorationEngineService} from '../../../services/exploration-engine.service';
+import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
 import {StateObjectsBackendDict} from 'domain/exploration/states.model';
-import {PlayerPositionService} from '../../../services/player-position.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {Subscription} from 'rxjs';
 import {PageContextService} from 'services/page-context.service';
 import {CheckpointProgressService} from 'pages/exploration-player-page/services/checkpoint-progress.service';
@@ -35,6 +35,10 @@ const CHECKPOINT_STATUS_IN_PROGRESS = 'in-progress';
   styleUrls: ['./checkpoint-bar.component.css'],
 })
 export class CheckpointBarComponent implements OnInit {
+  @Input() isReadOnly: boolean = false;
+  @Input() totalCheckpointsCount: number = 0;
+  @Input() visitedCheckpointsCount: number = 0;
+
   explorationId!: string;
   expStates!: StateObjectsBackendDict;
   checkpointCount: number = 0;
@@ -54,6 +58,12 @@ export class CheckpointBarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    if (this.totalCheckpointsCount > 0) {
+      this.checkpointCount = this.totalCheckpointsCount;
+      this.updateStatusesFromCounts();
+      return;
+    }
+
     this.explorationId = this.pageContextService.getExplorationId();
     this.checkpointIndexes =
       this.checkpointProgressService.getCheckpointStates();
@@ -129,6 +139,36 @@ export class CheckpointBarComponent implements OnInit {
     return this.progressBarWidth.toString();
   }
 
+  private updateStatusesFromCounts(): void {
+    const totalNodes = this.totalCheckpointsCount + 1;
+    const visitedCount = Math.min(
+      Math.max(this.visitedCheckpointsCount, 0),
+      this.totalCheckpointsCount
+    );
+
+    if (visitedCount >= this.totalCheckpointsCount) {
+      this.checkpointStatusArray = new Array(totalNodes).fill(
+        CHECKPOINT_STATUS_COMPLETED
+      );
+      this.progressBarWidth = 100;
+      return;
+    }
+
+    const completedCount = Math.max(visitedCount - 1, 0);
+    this.checkpointStatusArray = new Array(totalNodes);
+    for (let i = 0; i < completedCount; i++) {
+      this.checkpointStatusArray[i] = CHECKPOINT_STATUS_COMPLETED;
+    }
+    this.checkpointStatusArray[completedCount] = CHECKPOINT_STATUS_IN_PROGRESS;
+    for (let i = completedCount + 1; i < totalNodes; i++) {
+      this.checkpointStatusArray[i] = CHECKPOINT_STATUS_INCOMPLETE;
+    }
+
+    this.progressBarWidth = Math.floor(
+      (completedCount / this.totalCheckpointsCount) * 100
+    );
+  }
+
   updateLessonProgressBar(): void {
     this.progressBarWidth = this.getCompletedProgressBarWidth();
     let state = this.explorationEngineService.getState();
@@ -192,6 +232,9 @@ export class CheckpointBarComponent implements OnInit {
    * @returns {void} This function does not return a value. It changes the displayed card if the checkpoint is completed.
    */
   returnToCheckpointIfCompleted(checkpointNumber: number): void {
+    if (this.isReadOnly) {
+      return;
+    }
     const checkpointCardIndexes = this.checkpointIndexes;
     const cardIndex = checkpointCardIndexes[checkpointNumber];
 
