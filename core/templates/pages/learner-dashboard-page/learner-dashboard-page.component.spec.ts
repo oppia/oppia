@@ -20,9 +20,15 @@ import {
   Collection,
   CollectionBackendDict,
 } from 'domain/collection/collection.model';
-import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+import {
+  LearnerExplorationSummary,
+  LearnerExplorationSummaryBackendDict,
+} from 'domain/summary/learner-exploration-summary.model';
 
-import {CollectionSummary} from 'domain/collection/collection-summary.model';
+import {
+  CollectionSummary,
+  CollectionSummaryBackendDict,
+} from 'domain/collection/collection-summary.model';
 import {ProfileSummary} from 'domain/user/profile-summary.model';
 import {LearnerDashboardPageComponent} from './learner-dashboard-page.component';
 import {
@@ -122,25 +128,23 @@ class LoadingDotsComponentStub {}
 describe('Learner dashboard page', () => {
   let component: LearnerDashboardPageComponent;
   let fixture: ComponentFixture<LearnerDashboardPageComponent>;
-  let alertsService: AlertsService = null;
-  let csrfTokenService: CsrfTokenService = null;
-  let dateTimeFormatService: DateTimeFormatService = null;
+  let alertsService: AlertsService;
+  let csrfTokenService: CsrfTokenService;
+  let dateTimeFormatService: DateTimeFormatService;
   let focusManagerService: FocusManagerService;
   let loggerService: LoggerService;
   let urlInterpolationService: UrlInterpolationService;
-  let learnerDashboardBackendApiService: LearnerDashboardBackendApiService =
-    null;
-  let suggestionModalForLearnerDashboardService: SuggestionModalForLearnerDashboardService =
-    null;
+  let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
+  let suggestionModalForLearnerDashboardService: SuggestionModalForLearnerDashboardService;
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEmitter: EventEmitter<void>;
-  let userService: UserService = null;
-  let translateService: TranslateService = null;
-  let pageTitleService: PageTitleService = null;
+  let userService: UserService;
+  let translateService: TranslateService;
+  let pageTitleService: PageTitleService;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let urlService: UrlService;
   let platformFeatureService: PlatformFeatureService;
-  let learnerDashboardBackendApiServiceSpy: LearnerDashboardBackendApiService;
+  let learnerDashboardBackendApiServiceSpy: jasmine.Spy;
 
   let explorationDict: ExplorationBackendDict = {
     init_state_name: 'Introduction',
@@ -251,27 +255,27 @@ describe('Learner dashboard page', () => {
   };
 
   let learnerDashboardCollectionsData = {
-    completed_collections_list: [],
-    incomplete_collections_list: [],
+    completed_collections_list: [] as CollectionSummaryBackendDict[],
+    incomplete_collections_list: [] as CollectionSummaryBackendDict[],
     completed_to_incomplete_collections: [],
     number_of_nonexistent_collections: {
       incomplete_collections: 0,
       completed_collections: 0,
       collection_playlist: 0,
     },
-    collection_playlist: [],
+    collection_playlist: [] as CollectionSummaryBackendDict[],
   };
 
   let learnerDashboardExplorationsData = {
-    completed_explorations_list: [],
-    incomplete_explorations_list: [],
+    completed_explorations_list: [] as LearnerExplorationSummaryBackendDict[],
+    incomplete_explorations_list: [] as LearnerExplorationSummaryBackendDict[],
     subscription_list: subscriptionsList,
     number_of_nonexistent_explorations: {
       incomplete_explorations: 0,
       completed_explorations: 0,
       exploration_playlist: 0,
     },
-    exploration_playlist: [],
+    exploration_playlist: [] as LearnerExplorationSummaryBackendDict[],
   };
 
   let userInfo = {
@@ -395,64 +399,115 @@ describe('Learner dashboard page', () => {
       });
       // Generate completed explorations and exploration playlist.
       for (let i = 0; i < 10; i++) {
-        learnerDashboardExplorationsData.completed_explorations_list[i] =
-          Exploration.createFromBackendDict(
-            Object.assign(explorationDict, {
-              id: i + 1,
-              title: titleList[i],
-              category: categoryList[i],
-            }),
-            loggerService,
-            urlInterpolationService
-          );
+        learnerDashboardExplorationsData.completed_explorations_list[i] = {
+          id: Number(i + 1).toString(),
+          title: titleList[i],
+          category: categoryList[i],
+          community_owned: false,
+          activity_type: 'exploration',
+          last_updated_msec: 0,
+          ratings: {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
+          created_on_msec: 0,
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          num_views: 0,
+          objective: '',
+          status: 'public',
+          tags: [],
+          thumbnail_bg_color: '',
+          thumbnail_icon_url: '',
+        };
         learnerDashboardExplorationsData.exploration_playlist[i] = {
           id: Number(i + 1).toString(),
+          title: '',
+          category: '',
+          community_owned: false,
+          activity_type: 'exploration',
+          last_updated_msec: 0,
+          ratings: {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
+          created_on_msec: 0,
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          num_views: 0,
+          objective: '',
+          status: 'public',
+          tags: [],
+          thumbnail_bg_color: '',
+          thumbnail_icon_url: '',
         };
       }
 
       // Generate incomplete explorations and incomplete exploration playlist.
       for (let i = 0; i < 12; i++) {
-        learnerDashboardExplorationsData.incomplete_explorations_list[i] =
-          Exploration.createFromBackendDict(
-            Object.assign(explorationDict, {
-              // Create ids from 11 to 22.
-              // (1 to 10 is the complete explorations).
-              id: Number(i + 11).toString(),
-              title: titleList[i],
-              category: categoryList[i],
-            }),
-            loggerService,
-            urlInterpolationService
-          );
+        learnerDashboardExplorationsData.incomplete_explorations_list[i] = {
+          // Create ids from 11 to 22.
+          // (1 to 10 is the complete explorations).
+          id: Number(i + 11).toString(),
+          title: titleList[i],
+          category: categoryList[i],
+          community_owned: false,
+          activity_type: 'exploration',
+          last_updated_msec: 0,
+          ratings: {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
+          created_on_msec: 0,
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          num_views: 0,
+          objective: '',
+          status: 'public',
+          tags: [],
+          thumbnail_bg_color: '',
+          thumbnail_icon_url: '',
+        };
       }
 
       // Generate completed collections and collection playlist.
       for (let i = 0; i < 8; i++) {
-        learnerDashboardCollectionsData.completed_collections_list[i] =
-          // TODO(#10875): Fix type mismatch.
-          Collection.create(
-            Object.assign(collectionDict, {
-              title: titleList[i],
-              category: categoryList[i],
-            }) as CollectionBackendDict
-          );
+        learnerDashboardCollectionsData.completed_collections_list[i] = {
+          id: Number(i + 1).toString(),
+          title: titleList[i],
+          category: categoryList[i],
+          community_owned: false,
+          last_updated_msec: 0,
+          created_on: 0,
+          language_code: 'en',
+          objective: 'an objective',
+          status: 'public',
+          thumbnail_bg_color: '',
+          thumbnail_icon_url: '',
+        };
         learnerDashboardCollectionsData.collection_playlist[i] = {
           id: Number(i + 1).toString(),
+          title: '',
+          category: '',
+          community_owned: false,
+          last_updated_msec: 0,
+          created_on: 0,
+          language_code: 'en',
+          objective: '',
+          status: 'public',
+          thumbnail_bg_color: '',
+          thumbnail_icon_url: '',
         };
       }
 
       // Generate incomplete collections.
       for (let i = 0; i < 8; i++) {
-        learnerDashboardCollectionsData.incomplete_collections_list[i] =
-          // TODO(#10875): Fix type mismatch.
-          Collection.create(
-            Object.assign(collectionDict, {
-              // Create ids from 9 to 16.
-              // (1 to 8 is the complete collections).
-              id: Number(i + 9).toString(),
-              title: 'Collection Title ' + (i + 7),
-            }) as CollectionBackendDict
-          );
+        learnerDashboardCollectionsData.incomplete_collections_list[i] = {
+          // Create ids from 9 to 16.
+          // (1 to 8 is the complete collections).
+          id: Number(i + 9).toString(),
+          title: 'Collection Title ' + (i + 7),
+          category: categoryList[i],
+          community_owned: false,
+          last_updated_msec: 0,
+          created_on: 0,
+          language_code: 'en',
+          objective: 'an objective',
+          status: 'public',
+          thumbnail_bg_color: '',
+          thumbnail_icon_url: '',
+        };
       }
 
       spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
@@ -611,8 +666,10 @@ describe('Learner dashboard page', () => {
           learntToPartiallyLearntTopics: [],
           numberOfNonexistentTopicsAndStories:
             NonExistentTopicsAndStories.createFromBackendDict({
-              number_of_nonexistent_topics: 0,
-              number_of_nonexistent_stories: 0,
+              partially_learnt_topics: 0,
+              completed_stories: 0,
+              learnt_topics: 0,
+              topics_to_learn: 0,
             }),
         })
       );
@@ -623,8 +680,8 @@ describe('Learner dashboard page', () => {
 
       expect(component.curatedExplorationIds).toBeDefined();
       expect(component.curatedExplorationIds.size).toBe(2);
-      expect(component.curatedExplorationIds.has('1')).toBeTrue();
-      expect(component.curatedExplorationIds.has('2')).toBeTrue();
+      expect(component.curatedExplorationIds.has('1')).toBe(true);
+      expect(component.curatedExplorationIds.has('2')).toBe(true);
     }));
 
     it('should handle topics without canonical story summary dicts gracefully', fakeAsync(() => {
@@ -647,8 +704,10 @@ describe('Learner dashboard page', () => {
           learntToPartiallyLearntTopics: [],
           numberOfNonexistentTopicsAndStories:
             NonExistentTopicsAndStories.createFromBackendDict({
-              number_of_nonexistent_topics: 0,
-              number_of_nonexistent_stories: 0,
+              partially_learnt_topics: 0,
+              completed_stories: 0,
+              learnt_topics: 0,
+              topics_to_learn: 0,
             }),
         })
       );
@@ -688,8 +747,10 @@ describe('Learner dashboard page', () => {
           learntToPartiallyLearntTopics: [],
           numberOfNonexistentTopicsAndStories:
             NonExistentTopicsAndStories.createFromBackendDict({
-              number_of_nonexistent_topics: 0,
-              number_of_nonexistent_stories: 0,
+              partially_learnt_topics: 0,
+              completed_stories: 0,
+              learnt_topics: 0,
+              topics_to_learn: 0,
             }),
         })
       );
@@ -699,7 +760,7 @@ describe('Learner dashboard page', () => {
       fixture.detectChanges();
 
       expect(component.curatedExplorationIds.size).toBe(1);
-      expect(component.curatedExplorationIds.has('exp1')).toBeTrue();
+      expect(component.curatedExplorationIds.has('exp1')).toBe(true);
     }));
 
     it(
@@ -719,7 +780,7 @@ describe('Learner dashboard page', () => {
           'profile-image-url-webp'
         );
         expect(component.username).toBe(userInfo.getUsername());
-        expect(component.windowIsNarrow).toBeTrue();
+        expect(component.windowIsNarrow).toBe(true);
       })
     );
 
@@ -746,11 +807,11 @@ describe('Learner dashboard page', () => {
     it('should check whether window is narrow on resizing the screen', () => {
       spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
 
-      expect(component.windowIsNarrow).toBeTrue();
+      expect(component.windowIsNarrow).toBe(true);
 
       mockResizeEmitter.emit();
 
-      expect(component.windowIsNarrow).toBeFalse();
+      expect(component.windowIsNarrow).toBe(false);
     });
 
     it('should set focus without scroll on browse lesson btn', fakeAsync(() => {
