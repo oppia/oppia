@@ -17,10 +17,6 @@
  */
 
 import {
-  Collection,
-  CollectionBackendDict,
-} from 'domain/collection/collection.model';
-import {
   LearnerExplorationSummary,
   LearnerExplorationSummaryBackendDict,
 } from 'domain/summary/learner-exploration-summary.model';
@@ -46,14 +42,9 @@ import {Component, EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
 import {AlertsService} from 'services/alerts.service';
-import {LoggerService} from 'services/contextual/logger.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
-import {
-  ExplorationBackendDict,
-  Exploration,
-} from 'domain/exploration/exploration.model';
 import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import {SuggestionModalForLearnerDashboardService} from './suggestion-modal/suggestion-modal-for-learner-dashboard.service';
@@ -132,8 +123,6 @@ describe('Learner dashboard page', () => {
   let csrfTokenService: CsrfTokenService;
   let dateTimeFormatService: DateTimeFormatService;
   let focusManagerService: FocusManagerService;
-  let loggerService: LoggerService;
-  let urlInterpolationService: UrlInterpolationService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   let suggestionModalForLearnerDashboardService: SuggestionModalForLearnerDashboardService;
   let windowDimensionsService: WindowDimensionsService;
@@ -145,36 +134,6 @@ describe('Learner dashboard page', () => {
   let urlService: UrlService;
   let platformFeatureService: PlatformFeatureService;
   let learnerDashboardBackendApiServiceSpy: jasmine.Spy;
-
-  let explorationDict: ExplorationBackendDict = {
-    init_state_name: 'Introduction',
-    language_code: 'en',
-    states: {},
-    param_changes: [],
-    param_specs: {},
-    is_version_of_draft_valid: true,
-    draft_changes: [],
-    version: 1,
-    draft_change_list_id: 3,
-    title: 'Test Exploration',
-    next_content_id_index: 3,
-    auto_tts_enabled: true,
-    exploration_metadata: {
-      title: 'Exploration',
-      category: 'Algebra',
-      objective: 'To learn',
-      language_code: 'en',
-      tags: [],
-      blurb: '',
-      author_notes: '',
-      states_schema_version: 50,
-      init_state_name: 'Introduction',
-      param_specs: {},
-      param_changes: [],
-      auto_tts_enabled: false,
-      edits_allowed: true,
-    },
-  };
 
   let titleList = [
     'World War III',
@@ -220,22 +179,6 @@ describe('Learner dashboard page', () => {
       creator_username: 'Captain America',
     },
   ];
-
-  let collectionDict: CollectionBackendDict = {
-    id: 'sample_collection_id',
-    title: 'a title',
-    objective: 'an objective',
-    category: 'a category',
-    version: 0,
-    nodes: [],
-    language_code: null,
-    schema_version: null,
-    tags: null,
-    playthrough_dict: {
-      next_exploration_id: 'expId',
-      completed_exploration_ids: ['expId2'],
-    },
-  };
 
   let learnerDashboardTopicAndStoriesData = {
     completed_stories_list: [],
@@ -373,8 +316,6 @@ describe('Learner dashboard page', () => {
       dateTimeFormatService = TestBed.inject(DateTimeFormatService);
       focusManagerService = TestBed.inject(FocusManagerService);
       windowDimensionsService = TestBed.inject(WindowDimensionsService);
-      loggerService = TestBed.inject(LoggerService);
-      urlInterpolationService = TestBed.inject(UrlInterpolationService);
       learnerDashboardBackendApiService = TestBed.inject(
         LearnerDashboardBackendApiService
       );

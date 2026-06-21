@@ -460,7 +460,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       throw e;
     }
     const dfs = (node: OppiaRteNode | TextNode) => {
-      node.portal = this._getTemplatePortal(node);
+      node.portal = this._getTemplatePortal(node) as TemplatePortal<unknown>;
       if (!('children' in node)) {
         return;
       }
@@ -692,7 +692,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
   private _getTemplatePortal(
     node: OppiaRteNode | TextNode
-  ): TemplatePortal<unknown> {
+  ): TemplatePortal<unknown> | undefined {
     const tagPortals: Record<string, TemplateRef<unknown>> = {
       p: this.pTagPortal,
       h1: this.h1TagPortal,
@@ -725,7 +725,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       const key = node.selector.split('oppia-noninteractive-')[1];
       const templateRef = tagPortals[key];
       if (templateRef === undefined) {
-        throw new Error('No portal found for component: ' + node.selector);
+        return undefined;
       }
       return new TemplatePortal(templateRef, this._viewContainerRef, {
         $implicit: node.attrs,
@@ -737,7 +737,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         $implicit: node,
       });
     }
-    throw new Error('Unrecognized node selector: ' + node.selector);
+    return undefined;
   }
 
   shouldHighlightContent(): boolean {
