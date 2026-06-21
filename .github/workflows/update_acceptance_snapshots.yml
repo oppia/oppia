@@ -2,9 +2,7 @@
 # baselines (prod-desktop-screenshots / prod-mobile-screenshots) for a single
 # suite. It is manually triggered, runs the suite with --update_snapshots,
 # and uploads the entire prod-{viewport}-screenshots folder as an artifact
-# for human review -- it does not auto-commit anything. Reviewers should
-# diff the downloaded artifact against the currently committed snapshots to
-# see what actually changed.
+# for human review.
 
 name: Update acceptance test snapshots
 
@@ -111,13 +109,6 @@ jobs:
           if-no-files-found: warn
 
       - name: Upload all snapshots in the prod-${{ inputs.viewport_type }}-screenshots folder for review
-        # Note: this uploads every baseline in the folder, not just the ones
-        # that changed in this run, since that's simpler to implement and was
-        # confirmed as fine to do. Reviewers should compare against the
-        # currently committed versions to see what actually changed.
-        # The screenshots folder is keyed by spec directory (e.g.
-        # logged-in-learner), not the full suite name, so we use SPEC_DIR
-        # here rather than inputs.test_suite directly.
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
