@@ -18,8 +18,8 @@
 
 from __future__ import annotations
 
+import contextlib
 import logging
-from contextlib import ExitStack
 
 from core.domain import (
     email_services,
@@ -179,7 +179,7 @@ def send_email_to_recipients(
         )
 
         # Adding attachments to the email.
-        with ExitStack() as stack:
+        with contextlib.ExitStack() as stack:
             files = [
                 (
                     'attachment',
