@@ -331,7 +331,7 @@ export class BaseUser {
     ) {
       throw new Error(
         `Missing baseline snapshot: ${imageName}.png at ${snapshotPath}. ` +
-          `Run with --update_snapshots to generate it.`
+          'Run with --update_snapshots to generate it.'
       );
     }
 
