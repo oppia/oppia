@@ -787,9 +787,9 @@ export class TopicEditorStateService {
           }
         },
         error => {
-          const errorMessage = typeof error == 'string' ? error : error?.error;
+          const errorMessage = typeof error === 'string' ? error : error?.error;
           this.alertsService.addWarning(
-            errorMessage || 'There was an error when saving the topic.'
+            errorMessage ?? 'There was an error when saving the topic.'
           );
           this._topicIsBeingSaved = false;
         }
