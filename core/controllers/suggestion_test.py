@@ -51,6 +51,7 @@ from core.domain import (
 )
 from core.platform import models
 from core.tests import test_utils
+
 from typing import Dict, Final, List, Optional, Union, cast
 
 MYPY = False
