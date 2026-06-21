@@ -1002,7 +1002,11 @@ def update_translation_opportunity_with_accepted_suggestion(
                 entity.version,
                 language_code,
             )
-            new_count = entity.get_translation_count(entity_translation)
+            new_count = (
+                entity.get_translation_count(entity_translation)
+                if isinstance(entity, translation_domain.BaseTranslatableObject)
+                else 0
+            )
 
             exp_opportunity_summary.translation_counts[language_code] = (
                 new_count
@@ -1055,7 +1059,11 @@ def update_translation_opportunity_with_accepted_suggestion(
             language_code,
         )
 
-        new_count = entity.get_translation_count(entity_translation)
+        new_count = (
+            entity.get_translation_count(entity_translation)
+            if isinstance(entity, translation_domain.BaseTranslatableObject)
+            else 0
+        )
 
         translation_opportunity.translation_counts[language_code] = new_count
         translation_opportunity.content_count = (
