@@ -719,6 +719,9 @@ describe('Translation tab component', () => {
 
   it('should return early from startTutorial if another tour started while permissions were loading', fakeAsync(() => {
     component.tutorialInProgress = false;
+    // This throws "Type 'null' is not assignable to parameter of
+    // type '{ canVoiceover: boolean; }'." We need to suppress this
+    // error because permissions are null before fetching.
     // @ts-ignore
     component.permissions = null;
 
