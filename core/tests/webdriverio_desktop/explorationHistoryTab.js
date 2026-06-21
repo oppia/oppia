@@ -322,11 +322,11 @@ describe('Exploration history', function () {
         highlighted: true,
       },
       28: {
-        text: '  allowExponentialNotation:',
+        text: '    allowExponentialNotation:',
         highlighted: true,
       },
       29: {
-        text: '    value: true',
+        text: '      value: true',
         highlighted: true,
       },
       30: {
