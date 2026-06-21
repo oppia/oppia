@@ -975,7 +975,7 @@
   "I18N_LESSON_FEEDBACK_DESCRIPTION_REQUIRED": "Error message shown when the feedback message is empty.",
   "I18N_LESSON_FEEDBACK_GUEST_SUBTITLE": "Description encouraging guest users to create an account before sending lesson feedback.",
   "I18N_LESSON_FEEDBACK_GUEST_TITLE": "Title shown in the lesson feedback modal when the user is not logged in.",
-  "I18N_FEEDBACK_MESSAGE_TOO_LONG": "Dynamic text shown when the feedback message is too long.",
+  "I18N_LESSON_FEEDBACK_MESSAGE_TOO_LONG": "Dynamic text shown when the feedback message is too long.",
   "I18N_LESSON_FEEDBACK_MODAL_BUTTON": "Button text shown at the bottom of options sidebar of new lesson player for logged-in users.",
   "I18N_LESSON_FEEDBACK_MODAL_SAFETY_NOTICE": "Safety notice instructing users not to include personal information in lesson feedback.",
   "I18N_LESSON_FEEDBACK_MODAL_SUBTITLE": "Subtitle explaining that lesson feedback and recent lesson context will be shared with the lessons team.",
