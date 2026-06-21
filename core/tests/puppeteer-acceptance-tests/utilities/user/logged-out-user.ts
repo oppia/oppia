@@ -607,6 +607,20 @@ const conceptCardCloseButtonSelector = '.e2e-test-close-concept-card';
 const promoBarTextSelector = '.e2e-test-promo-bar-text';
 const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
 
+const shareCollectionFooterSelector = '.e2e-test-share-collection-footer';
+const desktopCollectionExplorationTileSelector =
+  '.e2e-test-collection-exploration';
+const mobileCollectionExplorationTileSelector =
+  '.e2e-mobile-test-collection-exploration';
+const backToCollectionButtonSelector = '.conversation-skin-back-to-collection';
+const collectionCardSelector = '.e2e-test-collection-card';
+const collectionSummaryTileTitleSelector =
+  '.e2e-test-collection-summary-tile-title';
+const collectionCardLinkSelector = '.e2e-test-collection-card a';
+const explorationTileHrefLinkSelector = 'a[href*="/explore/"]';
+const collectionPreviewTileLinkSelector =
+  '.oppia-exploration-summary-tile a[href*="/explore/"]';
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -7480,6 +7494,273 @@ export class LoggedOutUser extends BaseUser {
 
     if (suggestedSection) {
       await this.expectElementToBeVisible(blogSuggestedForYouHeadingSelector);
+    }
+  }
+
+  private storedCollectionPath: string | null = null;
+  /**
+   * Expects a collection with the given name to be visible in the community
+   * library.
+   */
+  async expectCollectionToBeVisibleInLibrary(
+    collectionName: string
+  ): Promise<void> {
+    await this.page.waitForSelector(collectionCardSelector, {visible: true});
+    const titles = await this.page.$$eval(
+      collectionSummaryTileTitleSelector,
+      elements => elements.map(el => el.textContent?.trim() ?? '')
+    );
+    if (!titles.includes(collectionName)) {
+      throw new Error(
+        `${collectionName} collection was not visible in Community Library.`
+      );
+    }
+  }
+
+  /**
+   * Navigates to the named collection from the community library. Internally
+   * stores the collection URL path so it can be reused later (e.g. after a
+   * language change).
+   */
+  async navigateToCollectionFromLibrary(collectionName: string): Promise<void> {
+    const cards = await this.page.$$(collectionCardSelector);
+    for (const card of cards) {
+      const text = await card.evaluate(el => el.textContent?.trim() ?? '');
+      if (!text.includes(collectionName)) {
+        continue;
+      }
+
+      const path = await card
+        .$eval(collectionCardLinkSelector, el => {
+          const href = (el as HTMLAnchorElement).getAttribute('href') ?? '';
+          return href.startsWith('http')
+            ? new URL(href).pathname + new URL(href).search
+            : href;
+        })
+        .catch(() => null);
+
+      this.storedCollectionPath = path;
+
+      if (path) {
+        await this.page.goto(`http://localhost:8181${path}`, {
+          waitUntil: 'domcontentloaded',
+          timeout: 60000,
+        });
+      } else {
+        await Promise.all([
+          this.page.waitForNavigation({
+            waitUntil: 'networkidle0',
+            timeout: 20000,
+          }),
+          card.click(),
+        ]);
+      }
+      await this.waitForPageToFullyLoad();
+      return;
+    }
+    throw new Error(`Could not open ${collectionName} collection card.`);
+  }
+
+  /**
+   * Expects the "Begin <collectionName>" button to be present on the collection
+   * page, confirming the page has fully loaded with the correct collection.
+   */
+  async expectBeginCollectionButtonToBePresent(
+    collectionName: string
+  ): Promise<void> {
+    const pageText = await this.page.$eval('body', el => el.textContent ?? '');
+    if (!pageText.includes(`Begin ${collectionName}`)) {
+      throw new Error(
+        `Expected "Begin ${collectionName}" on the collection page.`
+      );
+    }
+  }
+
+  /**
+   * Expects an exploration with the given title to be listed on the currently
+   * open collection page.
+   */
+  async expectExplorationToBeListedInCollection(
+    explorationTitle: string
+  ): Promise<void> {
+    const pageText = await this.page.$eval('body', el => el.textContent ?? '');
+    if (!pageText.includes(explorationTitle)) {
+      throw new Error(
+        `${explorationTitle} was not listed on the collection page.`
+      );
+    }
+  }
+
+  /**
+   * Navigates to an exploration from the collection page by clicking its tile.
+   * Handles desktop and mobile viewports, and falls back to the first available
+   * tile when the target title cannot be matched by text content.
+   */
+  async navigateToExplorationFromCollection(
+    explorationTitle: string
+  ): Promise<void> {
+    const isMobile = this.isViewportAtMobileWidth();
+    const tileSelector = isMobile
+      ? mobileCollectionExplorationTileSelector
+      : desktopCollectionExplorationTileSelector;
+
+    await this.page.waitForSelector(tileSelector, {visible: true});
+    const tiles = await this.page.$$(tileSelector);
+
+    for (const tile of tiles) {
+      const tileText = await tile.evaluate(el => el.textContent?.trim() ?? '');
+      if (tileText.includes(explorationTitle)) {
+        await this.openExplorationTile(tile, isMobile);
+        return;
+      }
+    }
+
+    // Fallback: open the first available tile.
+    if (tiles.length > 0) {
+      await this.openExplorationTile(tiles[0], isMobile);
+      return;
+    }
+
+    throw new Error(
+      `Could not find any exploration tiles on the collection page.`
+    );
+  }
+
+  /**
+   * Opens an exploration tile. Prefers a direct href link when available;
+   * falls back to the mobile preview-tile flow otherwise.
+   */
+  private async openExplorationTile(
+    tile: puppeteer.ElementHandle,
+    isMobile: boolean
+  ): Promise<void> {
+    const link = await tile
+      .$eval(explorationTileHrefLinkSelector, el => {
+        const href = (el as HTMLAnchorElement).getAttribute('href') ?? '';
+        return href.startsWith('http')
+          ? new URL(href).pathname + new URL(href).search
+          : href;
+      })
+      .catch(() => null);
+
+    if (link) {
+      await this.page.goto(`http://localhost:8181${link}`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 60000,
+      });
+    } else if (isMobile) {
+      await tile.click();
+      await this.page.waitForSelector(collectionPreviewTileLinkSelector, {
+        visible: true,
+        timeout: 10000,
+      });
+      const previewLink = await this.page
+        .$eval(collectionPreviewTileLinkSelector, el => {
+          const href = (el as HTMLAnchorElement).getAttribute('href') ?? '';
+          return href.startsWith('http')
+            ? new URL(href).pathname + new URL(href).search
+            : href;
+        })
+        .catch(() => null);
+      if (!previewLink) {
+        throw new Error(
+          'Could not resolve exploration link from preview tile.'
+        );
+      }
+      await this.page.goto(`http://localhost:8181${previewLink}`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 60000,
+      });
+    } else {
+      await Promise.all([
+        this.page.waitForNavigation({
+          waitUntil: 'domcontentloaded',
+          timeout: 30000,
+        }),
+        tile.click(),
+      ]);
+    }
+
+    await this.waitForPageToFullyLoad();
+    await this.expectToBeOnPage('/explore/');
+  }
+
+  /**
+   * Accepts two possible completion toast messages and passes as long as either
+   * one appears. Use this when the exact wording may vary between exploration
+   * types.
+   */
+  async expectExplorationCompletionToastMessageWithFallback(
+    primaryMessage: string,
+    fallbackMessage: string
+  ): Promise<void> {
+    try {
+      await this.expectExplorationCompletionToastMessage(primaryMessage);
+    } catch {
+      await this.expectExplorationCompletionToastMessage(fallbackMessage);
+    }
+  }
+
+  /**
+   * Clicks the "Back to Collection" button and waits until the browser is on a
+   * collection page. Re-navigates via the stored collection path (with query
+   * params) if one is available, to avoid frontend routing errors caused by
+   * key-less collection URLs.
+   */
+  async clickBackToCollectionButton(): Promise<void> {
+    await this.page.waitForSelector(backToCollectionButtonSelector, {
+      visible: true,
+      timeout: 10000,
+    });
+    await this.clickOnElementWithSelector(backToCollectionButtonSelector);
+
+    if (this.storedCollectionPath?.includes('key=')) {
+      await this.page.goto(
+        `http://localhost:8181${this.storedCollectionPath}`,
+        {waitUntil: 'domcontentloaded', timeout: 60000}
+      );
+    }
+
+    await this.page.waitForFunction(
+      () => window.location.pathname.includes('/collection/'),
+      {timeout: 15000}
+    );
+  }
+
+  /**
+   * Navigates directly to the collection page that was stored when
+   * navigateToCollectionFromLibrary was called. Useful for reloading the page
+   * after a language change.
+   */
+  async navigateToCollectionPage(): Promise<void> {
+    if (!this.storedCollectionPath) {
+      throw new Error(
+        'No collection path stored. Call navigateToCollectionFromLibrary first.'
+      );
+    }
+    await this.page.goto(`http://localhost:8181${this.storedCollectionPath}`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
+    });
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Expects the share-collection footer to display exactly the given text
+   * (compared upper-case so the caller may pass either casing).
+   */
+  async expectShareCollectionFooterText(expectedText: string): Promise<void> {
+    await this.page.waitForSelector(shareCollectionFooterSelector, {
+      timeout: 10000,
+    });
+    const actualText = await this.page.$eval(
+      shareCollectionFooterSelector,
+      el => el.textContent?.trim().toUpperCase() ?? ''
+    );
+    if (actualText !== expectedText.toUpperCase()) {
+      throw new Error(
+        `Expected share footer "${expectedText}" but found "${actualText}".`
+      );
     }
   }
 }

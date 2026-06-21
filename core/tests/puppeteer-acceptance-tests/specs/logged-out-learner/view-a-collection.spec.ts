@@ -34,29 +34,15 @@ const ROLES = testConstants.Roles;
 const COLLECTION_NAME = 'Numbers';
 const FIRST_EXPLORATION_TITLE = 'Positive Numbers';
 const SECOND_EXPLORATION_TITLE = 'Negative Numbers';
-const SHARE_COLLECTION_FOOTER_SELECTOR = '.e2e-test-share-collection-footer';
-const DESKTOP_EXPLORATION_TILE_SELECTOR = '.e2e-test-collection-exploration';
-const MOBILE_EXPLORATION_TILE_SELECTOR =
-  '.e2e-mobile-test-collection-exploration';
-const BACK_TO_COLLECTION_BUTTON_SELECTOR =
-  '.conversation-skin-back-to-collection';
-const COLLECTION_CARD_SELECTOR = '.e2e-test-collection-card';
-const COLLECTION_TITLE_SELECTOR = '.e2e-test-collection-summary-tile-title';
 const EXPLORATION_COMPLETION_TOAST_MESSAGE =
   'Congratulations! You have finished!';
 const ALTERNATE_EXPLORATION_COMPLETION_TOAST_MESSAGE =
   'Congratulations for completing this lesson!';
 const LONG_SETUP_TIMEOUT_MSECS = 12 * 60 * 1000;
 
-const COLLECTION_CARD_LINK_SELECTOR = '.e2e-test-collection-card a';
-const EXPLORATION_TILE_LINK_SELECTOR = 'a[href*="/explore/"]';
-const COLLECTION_PREVIEW_TILE_LINK_SELECTOR =
-  '.oppia-exploration-summary-tile a[href*="/explore/"]';
-
 describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
   let lessonCreator: ExplorationEditor & CollectionEditor;
-  let collectionId: string;
 
   beforeAll(async function () {
     loggedOutLearner = await UserFactory.createLoggedOutUser();
@@ -81,7 +67,7 @@ describe('Logged-Out Learner', function () {
       SECOND_EXPLORATION_TITLE
     );
 
-    collectionId = await lessonCreator.createAndPublishCollection(
+    await lessonCreator.createAndPublishCollection(
       COLLECTION_NAME,
       'Learn about numbers.',
       'Algebra',
@@ -89,292 +75,56 @@ describe('Logged-Out Learner', function () {
     );
   }, LONG_SETUP_TIMEOUT_MSECS);
 
-  it('should complete View a collection', async function () {
-    await loggedOutLearner.goto('http://localhost:8181/');
-    try {
-      await loggedOutLearner.navigateToCommunityLibraryOnNavbar();
-    } catch {
-      // Fallback to direct navigation with a less strict wait strategy.
-      await loggedOutLearner.page.goto(
-        'http://localhost:8181/community-library',
-        {
-          waitUntil: 'domcontentloaded',
-          timeout: 60000,
-        }
-      );
-      await loggedOutLearner.page.waitForSelector(
-        '.e2e-test-library-container',
-        {
-          visible: true,
-          timeout: 30000,
-        }
-      );
-    }
-
-    await loggedOutLearner.page.waitForSelector(COLLECTION_CARD_SELECTOR, {
-      visible: true,
-    });
-
-    const collectionTitles = await loggedOutLearner.page.$$eval(
-      COLLECTION_TITLE_SELECTOR,
-      elements => elements.map(element => element.textContent?.trim() ?? '')
+  it('should find the collection in the community library', async function () {
+    await loggedOutLearner.navigateToCommunityLibraryPage();
+    await loggedOutLearner.expectCollectionToBeVisibleInLibrary(
+      COLLECTION_NAME
     );
-    if (!collectionTitles.includes(COLLECTION_NAME)) {
-      throw new Error(
-        `${COLLECTION_NAME} collection was not visible in Community Library.`
-      );
-    }
+  });
 
-    const collectionCards = await loggedOutLearner.page.$$(
-      COLLECTION_CARD_SELECTOR
+  it('should display both explorations on the collection page', async function () {
+    await loggedOutLearner.navigateToCollectionFromLibrary(COLLECTION_NAME);
+
+    // Verify the collection begin button and both explorations are visible.
+    await loggedOutLearner.expectBeginCollectionButtonToBePresent(
+      COLLECTION_NAME
     );
-    let clickedCollection = false;
-    let collectionPathFromCard: string | null = null;
-    for (const card of collectionCards) {
-      const cardText = await card.evaluate(
-        element => element.textContent?.trim() ?? ''
-      );
-      if (cardText.includes(COLLECTION_NAME)) {
-        collectionPathFromCard = await card
-          .$eval(COLLECTION_CARD_LINK_SELECTOR, element => {
-            const href =
-              (element as HTMLAnchorElement).getAttribute('href') ?? '';
-            return href.startsWith('http')
-              ? new URL(href).pathname + new URL(href).search
-              : href;
-          })
-          .catch(() => null);
-
-        if (collectionPathFromCard) {
-          await loggedOutLearner.page.goto(
-            `http://localhost:8181${collectionPathFromCard}`,
-            {
-              waitUntil: 'domcontentloaded',
-              timeout: 60000,
-            }
-          );
-        } else {
-          await Promise.all([
-            loggedOutLearner.page.waitForNavigation({
-              waitUntil: 'networkidle0',
-              timeout: 20000,
-            }),
-            card.click(),
-          ]);
-        }
-        clickedCollection = true;
-        break;
-      }
-    }
-    if (!clickedCollection) {
-      throw new Error(`Could not open ${COLLECTION_NAME} collection card.`);
-    }
-
-    await loggedOutLearner.waitForPageToFullyLoad();
-
-    const collectionPageText = await loggedOutLearner.page.$eval(
-      'body',
-      element => element.textContent ?? ''
+    await loggedOutLearner.expectExplorationToBeListedInCollection(
+      FIRST_EXPLORATION_TITLE
     );
-    if (!collectionPageText.includes(`Begin ${COLLECTION_NAME}`)) {
-      throw new Error(
-        `Expected to find Begin ${COLLECTION_NAME} on the collection page.`
-      );
-    }
-    if (!collectionPageText.includes(FIRST_EXPLORATION_TITLE)) {
-      throw new Error(`${FIRST_EXPLORATION_TITLE} was not visible.`);
-    }
-    if (!collectionPageText.includes(SECOND_EXPLORATION_TITLE)) {
-      throw new Error(`${SECOND_EXPLORATION_TITLE} was not visible.`);
-    }
-
-    const isMobileViewport = loggedOutLearner.isViewportAtMobileWidth();
-    const explorationTileSelector = isMobileViewport
-      ? MOBILE_EXPLORATION_TILE_SELECTOR
-      : DESKTOP_EXPLORATION_TILE_SELECTOR;
-
-    await loggedOutLearner.page.waitForSelector(explorationTileSelector, {
-      visible: true,
-    });
-    const explorationTiles = await loggedOutLearner.page.$$(
-      explorationTileSelector
+    await loggedOutLearner.expectExplorationToBeListedInCollection(
+      SECOND_EXPLORATION_TITLE
     );
-    let clickedPositiveNumbersExploration = false;
-    let clickedFirstExplorationTile = false;
-    for (const tile of explorationTiles) {
-      const tileText = await tile.evaluate(
-        element => element.textContent?.trim() ?? ''
-      );
-      if (tileText.includes(FIRST_EXPLORATION_TITLE)) {
-        const tileLink = await tile
-          .$eval(EXPLORATION_TILE_LINK_SELECTOR, element => {
-            const href =
-              (element as HTMLAnchorElement).getAttribute('href') ?? '';
-            return href.startsWith('http')
-              ? new URL(href).pathname + new URL(href).search
-              : href;
-          })
-          .catch(() => null);
+  });
 
-        if (tileLink) {
-          await loggedOutLearner.page.goto(`http://localhost:8181${tileLink}`, {
-            waitUntil: 'domcontentloaded',
-            timeout: 60000,
-          });
-        } else if (isMobileViewport) {
-          await tile.click();
-          await loggedOutLearner.page.waitForSelector(
-            COLLECTION_PREVIEW_TILE_LINK_SELECTOR,
-            {visible: true, timeout: 10000}
-          );
-          const previewLink = await loggedOutLearner.page
-            .$eval(COLLECTION_PREVIEW_TILE_LINK_SELECTOR, element => {
-              const href =
-                (element as HTMLAnchorElement).getAttribute('href') ?? '';
-              return href.startsWith('http')
-                ? new URL(href).pathname + new URL(href).search
-                : href;
-            })
-            .catch(() => null);
-          if (!previewLink) {
-            throw new Error('Could not open exploration preview tile.');
-          }
-          await loggedOutLearner.page.goto(
-            `http://localhost:8181${previewLink}`,
-            {
-              waitUntil: 'domcontentloaded',
-              timeout: 60000,
-            }
-          );
-        } else {
-          await Promise.all([
-            loggedOutLearner.page.waitForNavigation({
-              waitUntil: 'domcontentloaded',
-              timeout: 30000,
-            }),
-            tile.click(),
-          ]);
-        }
-        clickedPositiveNumbersExploration = true;
-        break;
-      }
-    }
-    if (!clickedPositiveNumbersExploration && explorationTiles.length > 0) {
-      if (isMobileViewport) {
-        await explorationTiles[0].click();
-        await loggedOutLearner.page.waitForSelector(
-          COLLECTION_PREVIEW_TILE_LINK_SELECTOR,
-          {visible: true, timeout: 10000}
-        );
-        const previewLink = await loggedOutLearner.page
-          .$eval(COLLECTION_PREVIEW_TILE_LINK_SELECTOR, element => {
-            const href =
-              (element as HTMLAnchorElement).getAttribute('href') ?? '';
-            return href.startsWith('http')
-              ? new URL(href).pathname + new URL(href).search
-              : href;
-          })
-          .catch(() => null);
-        if (!previewLink) {
-          throw new Error('Could not open exploration preview tile.');
-        }
-        await loggedOutLearner.page.goto(
-          `http://localhost:8181${previewLink}`,
-          {
-            waitUntil: 'domcontentloaded',
-            timeout: 60000,
-          }
-        );
-      } else {
-        await Promise.all([
-          loggedOutLearner.page.waitForNavigation({
-            waitUntil: 'domcontentloaded',
-            timeout: 30000,
-          }),
-          explorationTiles[0].click(),
-        ]);
-      }
-      clickedFirstExplorationTile = true;
-    }
-    if (!clickedPositiveNumbersExploration && !clickedFirstExplorationTile) {
-      throw new Error(`Could not open ${FIRST_EXPLORATION_TITLE} exploration.`);
-    }
-
-    await loggedOutLearner.waitForPageToFullyLoad();
-    await loggedOutLearner.expectToBeOnPage('/explore/');
+  it('should complete an exploration started from the collection', async function () {
+    // Open the first exploration from the collection page.
+    await loggedOutLearner.navigateToExplorationFromCollection(
+      FIRST_EXPLORATION_TITLE
+    );
     await loggedOutLearner.expectContinueToNextCardButtonToBePresent();
     await loggedOutLearner.continueToNextCard();
-    try {
-      await loggedOutLearner.expectExplorationCompletionToastMessage(
-        EXPLORATION_COMPLETION_TOAST_MESSAGE
-      );
-    } catch {
-      await loggedOutLearner.expectExplorationCompletionToastMessage(
-        ALTERNATE_EXPLORATION_COMPLETION_TOAST_MESSAGE
-      );
-    }
 
-    await loggedOutLearner.page.waitForSelector(
-      BACK_TO_COLLECTION_BUTTON_SELECTOR,
-      {visible: true, timeout: 10000}
+    // Verify the exploration completion toast message.
+    await loggedOutLearner.expectExplorationCompletionToastMessageWithFallback(
+      EXPLORATION_COMPLETION_TOAST_MESSAGE,
+      ALTERNATE_EXPLORATION_COMPLETION_TOAST_MESSAGE
     );
-    await loggedOutLearner.clickOnElementWithSelector(
-      BACK_TO_COLLECTION_BUTTON_SELECTOR
-    );
+  });
 
-    // The back button can return a key-less collection URL that triggers
-    // frontend routing errors. Re-open the same collection path captured from
-    // the library card (with query params) before verifying completion UI.
-    if (collectionPathFromCard?.includes('key=')) {
-      await loggedOutLearner.page.goto(
-        `http://localhost:8181${collectionPathFromCard}`,
-        {
-          waitUntil: 'domcontentloaded',
-          timeout: 60000,
-        }
-      );
-    }
+  it('should return to the collection after completing the exploration', async function () {
+    await loggedOutLearner.clickBackToCollectionButton();
+    await loggedOutLearner.expectToBeOnPage('/collection/');
+  });
 
-    await loggedOutLearner.page.waitForFunction(
-      (collectionIdArg: string) =>
-        window.location.pathname.includes(`/collection/${collectionIdArg}`),
-      {timeout: 15000},
-      collectionId
-    );
-
+  it('should display "COMPARTIR ESTA COLECCIÓN" when language is changed to Spanish', async function () {
+    // Change the site language to Spanish and reload the collection page.
     await loggedOutLearner.changeSiteLanguage('es');
+    await loggedOutLearner.navigateToCollectionPage();
 
-    if (collectionPathFromCard) {
-      await loggedOutLearner.page.goto(
-        `http://localhost:8181${collectionPathFromCard}`,
-        {
-          waitUntil: 'domcontentloaded',
-          timeout: 60000,
-        }
-      );
-    } else {
-      await loggedOutLearner.page.goto(
-        `http://localhost:8181/collection/${collectionId}`,
-        {
-          waitUntil: 'domcontentloaded',
-          timeout: 60000,
-        }
-      );
-    }
-
-    await loggedOutLearner.page.waitForSelector(
-      SHARE_COLLECTION_FOOTER_SELECTOR,
-      {timeout: 10000}
+    await loggedOutLearner.expectShareCollectionFooterText(
+      'COMPARTIR ESTA COLECCIÓN'
     );
-    const shareText = await loggedOutLearner.page.$eval(
-      SHARE_COLLECTION_FOOTER_SELECTOR,
-      element => element.textContent?.trim().toUpperCase() ?? ''
-    );
-    if (shareText !== 'COMPARTIR ESTA COLECCIÓN') {
-      throw new Error(
-        `Expected COMPARTIR ESTA COLECCIÓN but found ${shareText}.`
-      );
-    }
   });
 
   afterAll(async function () {
