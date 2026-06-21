@@ -31,6 +31,8 @@ import {
   TranslateModule,
   TranslateService,
 } from '@ngx-translate/core';
+import {NumberConversionService} from 'services/number-conversion.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
 import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
@@ -62,6 +64,8 @@ describe('Schema Based Unicode Editor', () => {
         SchemaFormSubmittedService,
         StateCustomizationArgsService,
         TranslateService,
+        NumberConversionService,
+        I18nLanguageCodeService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
