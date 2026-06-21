@@ -36,7 +36,7 @@ import {RouterService} from '../services/router.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 class MockNgbModalRef {
-  componentInstance: {
+  componentInstance!: {
     version: null;
   };
 }
@@ -69,10 +69,10 @@ describe('History tab component', () => {
       commit_cmds: [],
     },
     {
-      commit_message: 'This is the commit message 2',
+      commit_messag: '',
+      version_nume: 'This is the commit message 2',
       committer_id: 'committer_3',
-      commit_type: '',
-      version_number: 2,
+      commit_typeber: 2,
       created_on_ms: 1416563100000,
       commit_cmds: [],
     },
@@ -94,10 +94,12 @@ describe('History tab component', () => {
             data: {
               version: 2,
             },
-            getDataAsync: () =>
-              Promise.resolve({
+            getDataAsync: (cb: () => void) => {
+              cb();
+              return Promise.resolve({
                 version: 2,
-              }),
+              });
+            },
           },
         },
         {
@@ -135,8 +137,18 @@ describe('History tab component', () => {
       v2Metadata: null,
     };
     component.compareVersionMetadata = {
-      earlierVersion: 2,
-      laterVersion: 3,
+      earlierVersion: {
+        versionNumber: 2,
+        committerId: 'user1',
+        createdOnMsecsStr: '11/21/2014',
+        commitMessage: 'message 1',
+      },
+      laterVersion: {
+        versionNumber: 3,
+        committerId: 'user2',
+        createdOnMsecsStr: '11/21/2014',
+        commitMessage: 'message 2',
+      },
     };
     component.selectedVersionsArray = [1, 4];
     component.ngOnInit();
@@ -159,7 +171,18 @@ describe('History tab component', () => {
     expect(component.explorationVersionMetadata).toBe(null);
     expect(component.versionCheckboxArray).toEqual([]);
     expect(component.displayedCurrentPageNumber).toBe(1);
-    expect(component.versionNumbersToDisplay).toEqual([]);
+    expect(component.versionNumbersToDisplay).toEqual(0);
+  });
+
+  it('should get version header', () => {
+    const result = component.getVersionHeader({
+      versionNumber: 1,
+      committerId: 'user1',
+      createdOnMsecsStr: '11/21/2014',
+      commitMessage: 'test commit',
+    });
+
+    expect(result).toBe('Revision #1 by user1 (11/21/2014): test commit');
   });
 
   it(
@@ -197,24 +220,24 @@ describe('History tab component', () => {
         version_number: 1,
         committer_id: 'committer_id',
         created_on_ms: 10,
-        commit_cmds: null,
-        commit_type: null,
+        commit_cmds: [],
+        commit_type: '',
         commit_message: 'message',
       },
       {
         version_number: 1,
         committer_id: 'committer_id',
         created_on_ms: 10,
-        commit_cmds: null,
-        commit_type: null,
+        commit_cmds: [],
+        commit_type: '',
         commit_message: 'message',
       },
       {
         version_number: 1,
         committer_id: 'committer_id',
         created_on_ms: 10,
-        commit_cmds: null,
-        commit_type: null,
+        commit_cmds: [],
+        commit_type: '',
         commit_message: 'message',
       },
     ];
@@ -260,8 +283,8 @@ describe('History tab component', () => {
     expect(component.hideHistoryGraph).toBe(true);
     expect(component.diffData).toEqual({v1Metadata: null, v2Metadata: null});
 
-    expect(component.earlierVersionHeader).toBe(undefined);
-    expect(component.laterVersionHeader).toBe(undefined);
+    expect(component.earlierVersionHeader).toBe('');
+    expect(component.laterVersionHeader).toBe('');
   }));
 
   it('should show exploration metadata diff modal', () => {
@@ -327,6 +350,27 @@ describe('History tab component', () => {
 
     expect(spyObj).toHaveBeenCalled();
   });
+
+  it('should dismiss exploration metadata diff modal', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        oldMetadata: null,
+        newMetadata: null,
+        headers: null,
+      },
+      result: Promise.reject(),
+    } as NgbModalRef);
+
+    component.diffData = {
+      v1Metadata: null,
+      v2Metadata: null,
+    };
+
+    component.showExplorationMetadataDiffModal();
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
 
   it('should open a new tab for download exploration with version', () => {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
@@ -411,6 +455,22 @@ describe('History tab component', () => {
     expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
   }));
 
+  it('should handle failed revert exploration request', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: new MockNgbModalRef(),
+      result: Promise.resolve(1),
+    } as NgbModalRef);
+
+    spyOn(historyTabBackendApiService, 'postData').and.returnValue(
+      Promise.reject()
+    );
+
+    component.showRevertExplorationModal(1);
+    tick();
+
+    expect(historyTabBackendApiService.postData).toHaveBeenCalled();
+  }));
+
   it('should not reload page when dismissing revert exploration modal', () => {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
@@ -435,45 +495,42 @@ describe('History tab component', () => {
   it('should filter the history by username', () => {
     let snapshots = [
       {
-        commit_message: 'This is the commit message',
+        versionNumber: 1,
         committerId: 'committer_3',
-        commit_type: '',
-        version_number: 1,
-        created_on_ms: 1416563100000,
-        commit_cmds: [],
+        createdOnMsecsStr: '11/21/2014',
+        commitMessage: 'This is the commit message',
       },
       {
-        commit_message: 'This is the commit message 2',
+        versionNumber: 2,
         committerId: 'committer_3',
-        commit_type: '',
-        version_number: 2,
-        created_on_ms: 1416563100000,
-        commit_cmds: [],
+        createdOnMsecsStr: '11/21/2014',
+        commitMessage: 'This is the commit message 2',
       },
       {
-        commit_message: 'This is the commit message 2',
+        versionNumber: 3,
         committerId: 'committer_1',
-        commit_type: '',
-        version_number: 2,
-        created_on_ms: 1416563100000,
-        commit_cmds: [],
+        createdOnMsecsStr: '11/21/2014',
+        commitMessage: 'This is the commit message 2',
       },
     ];
     component.totalExplorationVersionMetadata = snapshots;
     component.username = '';
     component.filterByUsername();
-    expect(component.explorationVersionMetadata).toEqual(snapshots);
+
+    expect(component.filteredVersionMetadata).toEqual(snapshots);
 
     component.username = 'committer_3';
     component.filterByUsername();
-    expect(component.explorationVersionMetadata).toEqual([
+
+    expect(component.filteredVersionMetadata).toEqual([
       snapshots[0],
       snapshots[1],
     ]);
 
     component.username = 'committer_1';
     component.filterByUsername();
-    expect(component.explorationVersionMetadata).toEqual([snapshots[2]]);
+
+    expect(component.filteredVersionMetadata).toEqual([snapshots[2]]);
   });
 
   it('should reset the graph', () => {
@@ -485,38 +542,35 @@ describe('History tab component', () => {
   it('should reverse the array when the date filter is applied', () => {
     let snapshots = [
       {
-        commit_message: 'This is the commit message',
+        commitMessage: 'This is the commit message',
         committerId: 'committer_3',
-        commit_type: '',
-        version_number: 1,
-        created_on_ms: 1416563100000,
-        commit_cmds: [],
+        versionNumber: 1,
+        createdOnMsecsStr: '11/21/2014',
+        tooltipText: 'tooltip',
       },
       {
-        commit_message: 'This is the commit message 2',
+        commitMessage: 'This is the commit message 2',
         committerId: 'committer_3',
-        commit_type: '',
-        version_number: 2,
-        created_on_ms: 1416563100000,
-        commit_cmds: [],
+        versionNumber: 2,
+        createdOnMsecsStr: '11/21/2014',
+        tooltipText: 'tooltip',
       },
       {
-        commit_message: 'This is the commit message 2',
+        commitMessage: 'This is the commit message 2',
         committerId: 'committer_1',
-        commit_type: '',
-        version_number: 3,
-        created_on_ms: 1416563100000,
-        commit_cmds: [],
+        versionNumber: 3,
+        createdOnMsecsStr: '11/21/2014',
+        tooltipText: 'tooltip',
       },
     ];
     component.explorationVersionMetadata = snapshots;
     component.reverseDateOrder();
-    expect(component.explorationVersionMetadata[0].version_number).toEqual(3);
-    expect(component.explorationVersionMetadata[2].version_number).toEqual(1);
+    expect(component.explorationVersionMetadata[0].versionNumber).toEqual(3);
+    expect(component.explorationVersionMetadata[2].versionNumber).toEqual(1);
 
     component.reverseDateOrder();
-    expect(component.explorationVersionMetadata[0].version_number).toEqual(1);
-    expect(component.explorationVersionMetadata[2].version_number).toEqual(3);
+    expect(component.explorationVersionMetadata[0].versionNumber).toEqual(1);
+    expect(component.explorationVersionMetadata[2].versionNumber).toEqual(3);
   });
 
   it('should find the versions to compare', fakeAsync(() => {
@@ -530,25 +584,25 @@ describe('History tab component', () => {
     component.totalExplorationVersionMetadata = [
       {
         committerId: '1',
-        createdOnMsecsStr: 10,
+        createdOnMsecsStr: '10',
         commitMessage: 'commit message 1',
         versionNumber: 1,
       },
       {
         committerId: '2',
-        createdOnMsecsStr: 10,
+        createdOnMsecsStr: '10',
         commitMessage: 'commit message 2',
         versionNumber: 2,
       },
       {
         committerId: '3',
-        createdOnMsecsStr: 10,
+        createdOnMsecsStr: '10',
         commitMessage: 'commit message 3',
         versionNumber: 3,
       },
       {
         committerId: '4',
-        createdOnMsecsStr: 10,
+        createdOnMsecsStr: '10',
         commitMessage: 'commit message 4',
         versionNumber: 4,
       },
@@ -583,5 +637,93 @@ describe('History tab component', () => {
     expect(component.compareVersionMetadata.laterVersion).toEqual(
       component.totalExplorationVersionMetadata[2]
     );
+  }));
+
+  it('should return when earlierIndex or laterIndex is null', fakeAsync(() => {
+    spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
+      Promise.resolve({v1Metadata: null, v2Metadata: null})
+    );
+
+    component.selectedVersionsArray = [10, 20];
+
+    component.totalExplorationVersionMetadata = [
+      {
+        versionNumber: 1,
+        committerId: 'user1',
+        createdOnMsecsStr: '11/21/2014',
+        commitMessage: 'msg1',
+      },
+      {
+        versionNumber: 2,
+        committerId: 'user2',
+        createdOnMsecsStr: '11/21/2014',
+        commitMessage: 'msg2',
+      },
+    ];
+
+    component.changeCompareVersion();
+
+    tick();
+
+    expect(component.diffData).toBeNull();
+    expect(component.compareVersionMetadata.earlierVersion).toBeUndefined();
+    expect(component.compareVersionMetadata.laterVersion).toBeUndefined();
+    expect(compareVersionsService.getDiffGraphData).not.toHaveBeenCalled();
+  }));
+
+  it('should return when earlier or later version is missing', fakeAsync(() => {
+    spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
+      Promise.resolve(null)
+    );
+
+    component.selectedVersionsArray = [1, 2];
+
+    component.totalExplorationVersionMetadata = [
+      {
+        committerId: '1',
+        createdOnMsecsStr: '10',
+        commitMessage: 'msg',
+        versionNumber: 1,
+      },
+    ];
+
+    component.changeCompareVersion();
+    tick();
+
+    expect(component.earlierVersionHeader).toBe('');
+    expect(component.laterVersionHeader).toBe('');
+  }));
+
+  it('should return when earlierVersion becomes undefined in promise callback', fakeAsync(() => {
+    spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
+      Promise.resolve({v1Metadata: null, v2Metadata: null})
+    );
+
+    spyOn(component, 'getVersionHeader');
+
+    component.selectedVersionsArray = [1, 2];
+
+    component.totalExplorationVersionMetadata = [
+      {
+        versionNumber: 1,
+        committerId: 'user1',
+        createdOnMsecsStr: '11/21/2014',
+        commitMessage: 'msg1',
+      },
+      {
+        versionNumber: 2,
+        committerId: 'user2',
+        createdOnMsecsStr: '11/21/2014',
+        commitMessage: 'msg2',
+      },
+    ];
+
+    component.changeCompareVersion();
+
+    component.compareVersionMetadata.earlierVersion = undefined;
+
+    tick();
+
+    expect(component.getVersionHeader).not.toHaveBeenCalled();
   }));
 });

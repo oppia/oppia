@@ -57,17 +57,23 @@ if MYPY:  # pragma: no cover
         opportunity_models,
         story_models,
         suggestion_models,
+        user_models,
     )
 
-feedback_models, opportunity_models, story_models, suggestion_models = (
-    models.Registry.import_models(
-        [
-            models.Names.FEEDBACK,
-            models.Names.OPPORTUNITY,
-            models.Names.STORY,
-            models.Names.SUGGESTION,
-        ]
-    )
+(
+    feedback_models,
+    opportunity_models,
+    story_models,
+    suggestion_models,
+    user_models,
+) = models.Registry.import_models(
+    [
+        models.Names.FEEDBACK,
+        models.Names.OPPORTUNITY,
+        models.Names.STORY,
+        models.Names.SUGGESTION,
+        models.Names.USER,
+    ]
 )
 
 
@@ -1454,10 +1460,54 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
             self.assertIsNone(pinned_opportunity)
 
-            # Test pinning an opportunity whose model exists.
+            # Test pinning an opportunity with default entity_type.
             opportunity_services.update_pinned_opportunity_model(
                 user_id, language_code, topic_id, 'lesson_2'
             )
+            pinned_model = user_models.PinnedOpportunityModel.get_model(
+                user_id, language_code, topic_id
+            )
+            self.assertIsNotNone(pinned_model)
+            assert pinned_model is not None
+            self.assertEqual(pinned_model.opportunity_id, 'lesson_2')
+            self.assertEqual(
+                pinned_model.entity_type, feconf.ENTITY_TYPE_EXPLORATION
+            )
+
+            # Test updating pinning with a different entity_type.
+            opportunity_services.update_pinned_opportunity_model(
+                user_id,
+                language_code,
+                topic_id,
+                'story_1',
+                entity_type=feconf.ENTITY_TYPE_STORY,
+            )
+            pinned_model = user_models.PinnedOpportunityModel.get_model(
+                user_id, language_code, topic_id
+            )
+            self.assertIsNotNone(pinned_model)
+            assert pinned_model is not None
+            self.assertEqual(pinned_model.opportunity_id, 'story_1')
+            self.assertEqual(pinned_model.entity_type, feconf.ENTITY_TYPE_STORY)
+
+            # Test pinning with a non-exploration entity_type when model does not exist.
+            opportunity_services.update_pinned_opportunity_model(
+                user_id, language_code, topic_id, None
+            )
+            opportunity_services.update_pinned_opportunity_model(
+                user_id,
+                language_code,
+                topic_id,
+                'skill_1',
+                entity_type=feconf.ENTITY_TYPE_SKILL,
+            )
+            pinned_model = user_models.PinnedOpportunityModel.get_model(
+                user_id, language_code, topic_id
+            )
+            self.assertIsNotNone(pinned_model)
+            assert pinned_model is not None
+            self.assertEqual(pinned_model.opportunity_id, 'skill_1')
+            self.assertEqual(pinned_model.entity_type, feconf.ENTITY_TYPE_SKILL)
 
             opportunity_services.update_pinned_opportunity_model(
                 user_id, 'lang', topic_id, None
@@ -2393,3 +2443,24 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(cards), 1)
         self.assertEqual(cards[0].entity_id, 'exp_1')
         self.assertEqual(cards[0].entity_description, '')
+
+    def test_get_translation_opportunities_by_entity_ids(self) -> None:
+        entity_types_and_ids = {
+            feconf.ENTITY_TYPE_EXPLORATION: ['exp_1'],
+        }
+        opportunity_services.create_translation_opportunity(
+            entity_types_and_ids
+        )
+
+        opportunities = (
+            opportunity_services.get_translation_opportunities_by_entity_ids(
+                feconf.ENTITY_TYPE_EXPLORATION, ['exp_1', 'exp_nonexistent']
+            )
+        )
+
+        self.assertEqual(len(opportunities), 2)
+        exp_1_opp = opportunities['exp_1']
+        self.assertIsNotNone(exp_1_opp)
+        assert exp_1_opp is not None
+        self.assertEqual(exp_1_opp.entity_id, 'exp_1')
+        self.assertIsNone(opportunities['exp_nonexistent'])

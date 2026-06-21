@@ -385,6 +385,37 @@ def get_translation_opportunity_summary_from_model(
     )
 
 
+def get_translation_opportunities_by_entity_ids(
+    entity_type: str,
+    entity_ids: List[str],
+) -> Dict[str, Optional[opportunity_domain.TranslationOpportunity]]:
+    """Returns a dict mapping entity ID to corresponding TranslationOpportunity
+    domain objects.
+
+    Args:
+        entity_type: str. The entity type.
+        entity_ids: list(str). The entity IDs.
+
+    Returns:
+        dict(str, TranslationOpportunity|None). A dict with key as the entity ID
+        and values representing the TranslationOpportunity domain objects.
+    """
+    opportunities: Dict[
+        str, Optional[opportunity_domain.TranslationOpportunity]
+    ] = {entity_id: None for entity_id in entity_ids}
+    opportunity_models_list = (
+        opportunity_models.TranslationOpportunityModel.get_by_entity_ids(
+            entity_type, entity_ids
+        )
+    )
+    for model in opportunity_models_list:
+        if model is not None:
+            opportunities[model.entity_id] = (
+                get_translation_opportunity_summary_from_model(model)
+            )
+    return opportunities
+
+
 def compute_translation_opportunity_models_with_updated_entity(
     entity_type: str,
     entity_id: str,
@@ -1366,8 +1397,10 @@ def _get_translation_opportunity_cards_from_models(
     """
     entity_ids = [model.entity_id for model in opportunity_models_list]
 
-    topic_summaries = topic_fetchers.get_all_topic_summaries()
-    topic_summary_map = {ts.id: ts for ts in topic_summaries if ts is not None}
+    topic_summaries = [
+        ts for ts in topic_fetchers.get_all_topic_summaries() if ts is not None
+    ]
+    topic_summary_map = {ts.id: ts for ts in topic_summaries}
 
     story_map = {}
     skill_map = {}
@@ -2148,7 +2181,11 @@ def regenerate_opportunities_related_to_topic(
 
 
 def update_pinned_opportunity_model(
-    user_id: str, language_code: str, topic_id: str, lesson_id: Optional[str]
+    user_id: str,
+    language_code: str,
+    topic_id: str,
+    lesson_id: Optional[str],
+    entity_type: str = feconf.ENTITY_TYPE_EXPLORATION,
 ) -> None:
     """Pins/Unpins Reviewable opportunities in Contributor Dashboard.
 
@@ -2160,6 +2197,7 @@ def update_pinned_opportunity_model(
             pinned.
         lesson_id: str or None. The opportunity_id/exp_id of opportunity
             to be pinned. None if user wants to unpin the opportunity.
+        entity_type: str. The type of the entity to be pinned.
     """
 
     pinned_opportunity = user_models.PinnedOpportunityModel.get_model(
@@ -2177,12 +2215,14 @@ def update_pinned_opportunity_model(
             language_code=language_code,
             topic_id=topic_id,
             opportunity_id=lesson_id,
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_type=entity_type,
         )
     else:
         if pinned_opportunity:
-            # Update the model's opportunity_id with the given lesson_id.
+            # Update the model's opportunity_id and entity_type.
             pinned_opportunity.opportunity_id = lesson_id
+            if lesson_id is not None:
+                pinned_opportunity.entity_type = entity_type
             pinned_opportunity.update_timestamps()
             pinned_opportunity.put()
 

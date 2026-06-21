@@ -17,6 +17,7 @@
     <button type="button"
             class="btn-close oppia-close-button-position"
             (click)="cancel()"
+            [disabled]="resolvingSuggestion || isSubmitting"
             aria-label="Close">
     </button>
     <h4 class="oppia-translation-modal-author-header">
@@ -65,7 +66,8 @@
         <strong> Translation:</strong>
         <button class="btn btn-sm btn-secondary float-end"
                 *ngIf="!startedEditing && status === 'review' && canEditTranslation"
-                (click)="editSuggestion()">
+                (click)="editSuggestion()"
+                [disabled]="resolvingSuggestion || isSubmitting">
           Edit
         </button>
       </div>
@@ -105,14 +107,16 @@
       <div class="oppia-translation-review-edit-buttons">
         <button class="btn btn-secondary me-2"
                 *ngIf="startedEditing"
+                [disabled]="isSubmitting"
                 (click)="cancelEdit()">
           Cancel
         </button>
         <button class="e2e-test-update-translation-button btn btn-success ms-2"
                 *ngIf="startedEditing"
                 (click)="updateSuggestion()"
-                [disabled]="updateIsDisabled">
-          Update
+                [disabled]="updateIsDisabled || isSubmitting">
+          <i [hidden]="!isSubmitting" class="fa fa-spinner fa-spin"></i>
+          <span [hidden]="isSubmitting">Update</span>
         </button>
       </div>
       <div class="oppia-collapse-content"
@@ -227,13 +231,13 @@
     <button type="button"
             class="oppia-pagination-button e2e-test-pagination-button-previous"
             (click)="goToPreviousItem()"
-            [disabled]="isFirstItem">
+            [disabled]="isFirstItem || isSubmitting || resolvingSuggestion">
       <span class="material-icons">navigate_before</span>Previous
     </button>
     <button type="button"
             class="oppia-pagination-button e2e-test-pagination-button-next"
             (click)="goToNextItem()"
-            [disabled]="isLastItem">
+            [disabled]="isLastItem || isSubmitting || resolvingSuggestion">
       Next<span class="material-icons">navigate_next</span>
     </button>
   </div>

@@ -29,15 +29,13 @@ from . import build, check_frontend_test_coverage
 
 MAX_ATTEMPTS = 2
 
-_PARSER = argparse.ArgumentParser(
-    description="""
+_PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
     python -m scripts.run_frontend_tests
 The root folder MUST be named 'oppia'.
 Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run
 a single test or test suite.
-"""
-)
+""")
 
 _PARSER.add_argument(
     '--verbose',
@@ -93,6 +91,8 @@ def get_file_spec(file_path: str) -> str | None:
     normalized_file_path = file_path.replace('\\', '/')
     if normalized_file_path.startswith(
         'core/tests/puppeteer-acceptance-tests/'
+    ) or normalized_file_path.startswith(
+        'core/tests/playwright-acceptance-tests/'
     ):
         return None
 
