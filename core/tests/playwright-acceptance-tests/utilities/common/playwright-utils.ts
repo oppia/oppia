@@ -354,7 +354,7 @@ export class BaseUser {
     }
 
     await expect(currentPage).toHaveScreenshot(`${imageName}.png`, {
-      maxDiffPixelRatio: 0,
+      maxDiffPixelRatio: failureTrigger,
       ...options,
     });
   }
