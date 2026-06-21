@@ -290,6 +290,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
             this.subtopic.getId(),
             imageData.filename
           );
+          this.editableThumbnailFilename = imageData.filename;
         }
 
         if (imageData.bg_color !== this.subtopic.getThumbnailBgColor()) {
@@ -298,6 +299,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
             this.subtopic.getId(),
             imageData.bg_color
           );
+          this.editableThumbnailBgColor = imageData.bg_color;
         }
 
         this.imageUploaderParameters = {
