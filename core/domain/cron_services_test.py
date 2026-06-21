@@ -18,16 +18,17 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
 from core.domain import cron_services
 from core.platform import models
 from core.tests import test_utils
 
 MYPY = False
 if MYPY:
-    from mypy_imports import user_models
+    from mypy_imports import job_models, user_models
 
-(user_models,) = models.Registry.import_models([models.Names.USER])
+job_models, user_models = models.Registry.import_models(
+    [models.Names.JOB, models.Names.USER]
+)
 
 
 class CronServicesTests(test_utils.GenericTestBase):
@@ -71,20 +72,16 @@ class CronServicesTests(test_utils.GenericTestBase):
 
     def test_mark_outdated_models_as_deleted(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-
-        user_query_model = user_models.UserQueryModel(
-            id='query_id',
-            user_ids=[],
-            submitter_id=admin_user_id,
-            query_status=feconf.USER_QUERY_STATUS_PROCESSING,
-            last_updated=datetime.datetime.utcnow() - self.NINE_WEEKS,
+        job_model = job_models.JobModel(
+            id='job_id',
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=181),
         )
-        user_query_model.update_timestamps(update_last_updated_time=False)
-        user_query_model.put()
+        job_model.update_timestamps(update_last_updated_time=False)
+        job_model.put()
 
-        self.assertFalse(user_query_model.get_by_id('query_id').deleted)
+        self.assertFalse(job_model.get_by_id('job_id').deleted)
 
         cron_services.mark_outdated_models_as_deleted()
 
-        self.assertTrue(user_query_model.get_by_id('query_id').deleted)
+        self.assertTrue(job_model.get_by_id('job_id').deleted)
