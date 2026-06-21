@@ -24,7 +24,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {NgbModal, NgbModalOptions} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ConceptCard} from 'domain/skill/concept-card.model';
@@ -42,16 +42,6 @@ import {SkillBackendApiService} from '../../../domain/skill/skill-backend-api.se
 import {TopicsAndSkillsDashboardBackendApiService} from '../../../domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
-
-class MockNgbModalRef {
-  componentInstance!: {
-    skillSummaries: null;
-    skillsInSameTopicCount: null;
-    categorizedSkills: null;
-    allowSkillsFromOtherTopics: null;
-    untriagedSkillSummaries: null;
-  };
-}
 
 class MockTopicsAndSkillsDashboardBackendApiService {
   fetchDashboardDataAsync = () => {
@@ -638,13 +628,9 @@ describe('Story node editor component', () => {
       'componentInstance',
       'result',
     ]);
-    modalRef.componentInstance = MockNgbModalRef;
+    modalRef.componentInstance = {};
     modalRef.result = Promise.resolve('success');
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: unknown, opt: NgbModalOptions) => {
-        return modalRef;
-      }
-    );
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => modalRef);
 
     component.addPrerequisiteSkillId();
 
@@ -667,18 +653,14 @@ describe('Story node editor component', () => {
         'componentInstance',
         'result',
       ]);
-      modalRef.componentInstance = MockNgbModalRef;
+      modalRef.componentInstance = {};
       modalRef.result = Promise.resolve({
         summary: {
           id: 'id',
           description: 'description',
         },
       });
-      spyOn(ngbModal, 'open').and.callFake(
-        (dlg: unknown, opt: NgbModalOptions) => {
-          return modalRef;
-        }
-      );
+      spyOn(ngbModal, 'open').and.callFake(() => modalRef);
 
       component.addPrerequisiteSkillId();
       tick();
@@ -698,13 +680,9 @@ describe('Story node editor component', () => {
       'componentInstance',
       'result',
     ]);
-    modalRef.componentInstance = MockNgbModalRef;
+    modalRef.componentInstance = {};
     modalRef.result = Promise.resolve('success');
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: unknown, opt: NgbModalOptions) => {
-        return modalRef;
-      }
-    );
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => modalRef);
 
     component.addAcquiredSkillId();
     tick();
@@ -726,13 +704,9 @@ describe('Story node editor component', () => {
         'componentInstance',
         'result',
       ]);
-      modalRef.componentInstance = MockNgbModalRef;
+      modalRef.componentInstance = {};
       modalRef.result = Promise.resolve('success');
-      spyOn(ngbModal, 'open').and.callFake(
-        (dlg: unknown, opt: NgbModalOptions) => {
-          return modalRef;
-        }
-      );
+      spyOn(ngbModal, 'open').and.callFake(() => modalRef);
 
       component.addAcquiredSkillId();
       tick();

@@ -17,11 +17,7 @@
  */
 
 import {EventEmitter} from '@angular/core';
-import {
-  NgbModal,
-  NgbModalOptions,
-  NgbModalRef,
-} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {EntityEditorBrowserTabsInfo} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
@@ -328,12 +324,11 @@ describe('Story Editor Page Component', () => {
   it('should return to topic editor page when closing confirmation modal', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: unknown, opt: NgbModalOptions) => {
-        return {
+      () =>
+        ({
           componentInstance: MockNgbModalRef,
           result: Promise.resolve(),
-        } as NgbModalRef;
-      }
+        }) as NgbModalRef
     );
 
     component.returnToTopicEditorPage();
@@ -344,12 +339,11 @@ describe('Story Editor Page Component', () => {
   it('should return to topic editor page when dismissing confirmation modal', () => {
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: unknown, opt: NgbModalOptions) => {
-        return {
+      () =>
+        ({
           componentInstance: MockNgbModalRef,
           result: Promise.reject(),
-        } as NgbModalRef;
-      }
+        }) as NgbModalRef
     );
 
     component.returnToTopicEditorPage();

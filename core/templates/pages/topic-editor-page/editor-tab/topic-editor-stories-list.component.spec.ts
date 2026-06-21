@@ -25,11 +25,7 @@ import {
   TestBed,
   tick,
 } from '@angular/core/testing';
-import {
-  NgbModal,
-  NgbModalOptions,
-  NgbModalRef,
-} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {TopicUpdateService} from 'domain/topic/topic-update.service';
@@ -270,12 +266,11 @@ describe('topicEditorStoriesList', () => {
       ' without saving changes',
     () => {
       const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-        (dlg: unknown, opt: NgbModalOptions) => {
-          return {
+        () =>
+          ({
             componentInstance: MockNgbModalRef,
             result: Promise.resolve(),
-          } as NgbModalRef;
-        }
+          }) as NgbModalRef
       );
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
@@ -289,12 +284,11 @@ describe('topicEditorStoriesList', () => {
     'should close save changes modal when closes the saves changes' + ' modal',
     () => {
       const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-        (dlg: unknown, opt: NgbModalOptions) => {
-          return {
+        () =>
+          ({
             componentInstance: MockNgbModalRef,
             result: Promise.reject(),
-          } as NgbModalRef;
-        }
+          }) as NgbModalRef
       );
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 

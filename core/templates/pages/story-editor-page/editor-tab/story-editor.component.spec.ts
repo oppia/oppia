@@ -25,11 +25,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {
-  NgbModal,
-  NgbModalOptions,
-  NgbModalRef,
-} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {StoryUpdateService} from 'domain/story/story-update.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -44,12 +40,6 @@ import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {StoryNode} from 'domain/story/story-node.model';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
-
-class MockNgbModalRef {
-  componentInstance!: {
-    body: 'xyz';
-  };
-}
 
 class MockNgbModal {
   open() {
@@ -517,17 +507,11 @@ describe('Story Editor Component having three story nodes', () => {
   }));
 
   it('should call storyUpdateService to add destination node id', () => {
-    class MockComponentInstance {
-      compoenentInstance!: {
-        nodeTitles: null;
-      };
-    }
-
     const modalRef = jasmine.createSpyObj('NgbModalRef', [
       'componentInstance',
       'result',
     ]);
-    modalRef.componentInstance = MockComponentInstance;
+    modalRef.componentInstance = {};
     modalRef.result = Promise.resolve();
     let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
       return modalRef;
@@ -539,11 +523,6 @@ describe('Story Editor Component having three story nodes', () => {
   });
 
   it('should call storyUpdateService to add destination node id', fakeAsync(() => {
-    class MockComponentInstance {
-      compoenentInstance!: {
-        nodeTitles: null;
-      };
-    }
     let sampleStoryBackendObject = {
       id: 'sample_story_id',
       title: 'Story title',
@@ -587,7 +566,7 @@ describe('Story Editor Component having three story nodes', () => {
       'componentInstance',
       'result',
     ]);
-    modalRef.componentInstance = MockComponentInstance;
+    modalRef.componentInstance = {};
     modalRef.result = Promise.resolve();
     let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
       return modalRef;
@@ -717,13 +696,9 @@ describe('Story Editor Component having three story nodes', () => {
       'componentInstance',
       'result',
     ]);
-    modalRef.componentInstance = MockNgbModalRef;
+    modalRef.componentInstance = {};
     modalRef.result = Promise.resolve();
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: unknown, opt: NgbModalOptions) => {
-        return modalRef;
-      }
-    );
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => modalRef);
 
     component.returnToTopicEditorPage();
 
@@ -736,13 +711,9 @@ describe('Story Editor Component having three story nodes', () => {
       'componentInstance',
       'result',
     ]);
-    modalRef.componentInstance = MockNgbModalRef;
+    modalRef.componentInstance = {};
     modalRef.result = Promise.reject();
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: unknown, opt: NgbModalOptions) => {
-        return modalRef;
-      }
-    );
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => modalRef);
 
     component.returnToTopicEditorPage();
     expect(modalSpy).toHaveBeenCalled();
