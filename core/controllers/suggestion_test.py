@@ -1001,7 +1001,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         with self.swap(
             opportunity_services,
             'update_translation_opportunity_with_accepted_suggestion',
-            lambda x, _: x,
+            lambda x, y, z: None,
         ):
             self.put_json(
                 '%s/exploration/%s/%s'
@@ -1296,7 +1296,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         with self.swap(
             opportunity_services,
             'update_translation_opportunity_with_accepted_suggestion',
-            lambda x, _: x,
+            lambda x, y, z: None,
         ):
             self.put_json(
                 '%s/exploration/%s/%s'
@@ -1932,7 +1932,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         with self.swap(
             opportunity_services,
             'update_translation_opportunity_with_accepted_suggestion',
-            lambda x, _: x,
+            lambda x, y, z: None,
         ):
             suggestion_services.accept_suggestion(
                 suggestion.suggestion_id, self.reviewer_id, 'Accepted', 'Done'

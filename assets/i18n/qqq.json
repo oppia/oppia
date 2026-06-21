@@ -1580,6 +1580,7 @@
   "I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_NOTICE_MODAL_TITLE": "Title shown in the practice session confirmation modal meant for seeking confirmation from users on whether they'd like to start the practice session in English if their site language is not set to English.",
   "I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_TAG": "Text enclosed in parentheses meant to indicate that a practice session is in beta",
   "I18N_TOPIC_VIEWER_SELECT_SKILLS": "Subtitle shown in the 'Practice' tab in the topic viewer, where the user can select skills to tackle questions on them.",
+  "I18N_TOPIC_VIEWER_START": "Text displayed on the start button in the lesson card within the topic viewer. Clicking this, the user can start a lesson.",
   "I18N_TOPIC_VIEWER_START_PRACTICE": "Text displayed on the start button in the 'Practice' tab in the topic viewer. Clicking this, the user can start a practice session on skills selected by the user.\n{{Identical|Start}}",
   "I18N_TOPIC_VIEWER_STORIES_HEAD": "Text displayed above all stories specifically in mobile view.",
   "I18N_TOPIC_VIEWER_STUDY": "Title shown in a tab header in the topic's viewer page. - Clicking on this shows a list of the study guides that lie within the topic",

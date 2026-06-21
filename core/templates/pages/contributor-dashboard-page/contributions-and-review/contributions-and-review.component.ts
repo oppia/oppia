@@ -352,6 +352,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit([
       suggestionId,
     ]);
+    // Reload opportunities to refresh progress bars after accepting suggestion.
+    this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
   }
 
   _showQuestionSuggestionModal(

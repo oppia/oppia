@@ -38,6 +38,7 @@ const siteAdminPageUrl = testConstants.URLs.AdminPage;
 const CreatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 const splashPageUrl = testConstants.URLs.splash;
 const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
+const loginPageUrl = testConstants.URLs.Login;
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -717,6 +718,13 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToPreferencesPage(): Promise<void> {
     await this.goto(PreferencesPageUrl);
+  }
+
+  /**
+   * Navigates to the login page.
+   */
+  async navigateToLoginPage(): Promise<void> {
+    await this.goto(loginPageUrl, false);
   }
 
   /**

@@ -870,6 +870,7 @@ def accept_suggestion(
         Exception. The suggestion is not valid.
         Exception. The commit message is empty.
     """
+
     if not commit_message or not commit_message.strip():
         raise Exception('Commit message cannot be empty.')
 
@@ -935,6 +936,14 @@ def accept_suggestion(
     suggestion.accept(commit_message)
 
     _update_suggestion(suggestion)
+
+    # Update the translation opportunity model with the new translation count.
+    if suggestion.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        opportunity_services.update_translation_opportunity_with_accepted_suggestion(
+            suggestion.target_id,
+            suggestion.change_cmd.language_code,
+            suggestion.target_type,
+        )
 
     # Update the community contribution stats so that the number of suggestions
     # of this type that are in review decreases by one, since this
