@@ -242,7 +242,7 @@ export class FeedbackModalComponent implements OnInit {
   isFormValid(): boolean {
     if (!this.feedbackText.trim()) {
       this.formError = this.translateService.instant(
-        'I18N_FEEDBACK_DESCRIPTION_REQUIRED'
+        'I18N_LESSON_FEEDBACK_DESCRIPTION_REQUIRED'
       );
       return false;
     }

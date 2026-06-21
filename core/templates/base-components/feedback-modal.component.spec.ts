@@ -229,7 +229,7 @@ describe('FeedbackModalComponent', () => {
 
     translateService.instant.and.callFake(
       (key: string, params?: {maxLength: number}) => {
-        if (key === 'I18N_FEEDBACK_DESCRIPTION_REQUIRED') {
+        if (key === 'I18N_LESSON_FEEDBACK_DESCRIPTION_REQUIRED') {
           return 'Please add a description before submitting.';
         }
 
