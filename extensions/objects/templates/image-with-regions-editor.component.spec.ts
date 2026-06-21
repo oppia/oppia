@@ -17,7 +17,7 @@
  */
 
 import {
-  waitForAsync,
+  async,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -69,7 +69,7 @@ describe('ImageWithRegionsEditorComponent', () => {
     }
   }
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [ImageWithRegionsEditorComponent],

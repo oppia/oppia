@@ -18,7 +18,7 @@
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
-  waitForAsync,
+  async,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -30,7 +30,7 @@ describe('GraphEditorComponent', () => {
   let component: GraphEditorComponent;
   let fixture: ComponentFixture<GraphEditorComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [GraphEditorComponent],
       schemas: [NO_ERRORS_SCHEMA],

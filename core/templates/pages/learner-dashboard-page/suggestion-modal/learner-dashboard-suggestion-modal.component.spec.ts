@@ -17,7 +17,7 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 
@@ -42,7 +42,7 @@ describe('Learner Dashboard Suggestion Modal Component', () => {
   let fixture: ComponentFixture<LearnerDashboardSuggestionModalComponent>;
   let ngbActiveModal: NgbActiveModal;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
         LearnerDashboardSuggestionModalComponent,

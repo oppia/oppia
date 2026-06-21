@@ -17,7 +17,7 @@
  */
 
 import {
-  waitForAsync,
+  async,
   ComponentFixture,
   fakeAsync,
   flushMicrotasks,
@@ -80,7 +80,7 @@ describe('InteractiveImageClickInput', () => {
     ) => {},
   };
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [InteractiveImageClickInput],

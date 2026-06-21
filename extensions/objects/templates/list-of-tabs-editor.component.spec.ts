@@ -17,14 +17,14 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {ListOfTabsEditorComponent} from './list-of-tabs-editor.component';
 
 describe('ListOfTabsEditorComponent', () => {
   let component: ListOfTabsEditorComponent;
   let fixture: ComponentFixture<ListOfTabsEditorComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ListOfTabsEditorComponent],
       schemas: [NO_ERRORS_SCHEMA],

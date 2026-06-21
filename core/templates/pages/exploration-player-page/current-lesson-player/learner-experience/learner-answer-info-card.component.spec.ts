@@ -17,7 +17,7 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {BackgroundMaskService} from '../../../../services/stateful/background-mask.service';
@@ -39,7 +39,7 @@ describe('LearnerAnswerInfoCard', () => {
   let playerTranscriptService: PlayerTranscriptService;
   let learnerAnswerInfoService: LearnerAnswerInfoService;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [LearnerAnswerInfoCard],

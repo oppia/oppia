@@ -17,7 +17,7 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {InteractiveItemSelectionInputComponent} from './oppia-interactive-item-selection-input.component';
 import {BrowserCheckerService} from 'domain/utilities/browser-checker.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
@@ -74,7 +74,7 @@ describe('oppiaInteractiveItemSelectionInput', function () {
     }
   }
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [InteractiveItemSelectionInputComponent, MockTranslatePipe],
       providers: [

@@ -18,7 +18,7 @@
 
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {
-  waitForAsync,
+  async,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -75,7 +75,7 @@ describe('InteractiveCodeReplComponent', () => {
     },
   };
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [InteractiveCodeReplComponent],
       providers: [

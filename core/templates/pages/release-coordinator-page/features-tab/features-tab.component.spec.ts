@@ -21,7 +21,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   ComponentFixture,
   fakeAsync,
-  waitForAsync,
+  async,
   TestBed,
   flushMicrotasks,
   tick,
@@ -73,7 +73,7 @@ describe('Release coordinator page feature tab', function () {
 
   let mockConfirmResult: (val: boolean) => void;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
         FormsModule,

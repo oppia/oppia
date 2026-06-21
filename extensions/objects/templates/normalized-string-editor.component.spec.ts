@@ -20,7 +20,7 @@ import {EventEmitter, SimpleChanges} from '@angular/core';
 import {ExternalSaveService} from 'services/external-save.service';
 import {FormsModule} from '@angular/forms';
 import {NormalizedStringEditorComponent} from './normalized-string-editor.component';
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 describe('NormalizedStringEditorComponent', () => {
   let component: NormalizedStringEditorComponent;
@@ -29,7 +29,7 @@ describe('NormalizedStringEditorComponent', () => {
 
   var externalSaveEventEmitter = new EventEmitter();
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule],
       declarations: [NormalizedStringEditorComponent],

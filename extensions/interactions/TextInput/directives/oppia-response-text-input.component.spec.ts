@@ -17,7 +17,7 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {TextInputAnswer} from 'interactions/answer-defs';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ResponseTextInputComponent} from './oppia-response-text-input.component';
@@ -32,7 +32,7 @@ describe('ResponseTextInputComponent', () => {
     },
   };
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ResponseTextInputComponent],
       providers: [

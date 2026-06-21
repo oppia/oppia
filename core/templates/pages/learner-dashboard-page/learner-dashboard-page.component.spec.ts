@@ -26,7 +26,7 @@ import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {ProfileSummary} from 'domain/user/profile-summary.model';
 import {LearnerDashboardPageComponent} from './learner-dashboard-page.component';
 import {
-  waitForAsync,
+  async,
   ComponentFixture,
   fakeAsync,
   flush,
@@ -303,7 +303,7 @@ describe('Learner dashboard page', () => {
   };
 
   describe('when successfully fetching learner dashboard data', () => {
-    beforeEach(waitForAsync(() => {
+    beforeEach(async(() => {
       mockResizeEmitter = new EventEmitter();
       TestBed.configureTestingModule({
         imports: [
@@ -1063,7 +1063,7 @@ describe('Learner dashboard page', () => {
   });
 
   describe('when fetching dashboard data fails', () => {
-    beforeEach(waitForAsync(() => {
+    beforeEach(async(() => {
       TestBed.configureTestingModule({
         imports: [
           BrowserAnimationsModule,

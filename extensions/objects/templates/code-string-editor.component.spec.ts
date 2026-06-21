@@ -17,7 +17,7 @@
  */
 
 import {
-  waitForAsync,
+  async,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -29,7 +29,7 @@ describe('CodeStringEditorComponent', () => {
   let component: CodeStringEditorComponent;
   let fixture: ComponentFixture<CodeStringEditorComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [CodeStringEditorComponent],
     }).compileComponents();

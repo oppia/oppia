@@ -17,7 +17,7 @@
  */
 
 import {
-  waitForAsync,
+  async,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -43,7 +43,7 @@ describe('Old Progress tab Component', () => {
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEmitter: EventEmitter<void> = new EventEmitter();
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [MaterialModule, FormsModule, HttpClientTestingModule],
       declarations: [MockTranslatePipe, OldProgressTabComponent],

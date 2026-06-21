@@ -17,14 +17,14 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {IntEditorComponent} from './int-editor.component';
 
 describe('IntEditorComponent', () => {
   let component: IntEditorComponent;
   let fixture: ComponentFixture<IntEditorComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [IntEditorComponent],
       schemas: [NO_ERRORS_SCHEMA],

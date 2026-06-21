@@ -18,7 +18,7 @@
 
 import {SimpleChanges} from '@angular/core';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {PageContextService} from 'services/page-context.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {NoninteractiveLink} from './oppia-noninteractive-link.component';
@@ -35,7 +35,7 @@ describe('NoninteractiveLink', () => {
     },
   };
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [NoninteractiveLink],
       providers: [

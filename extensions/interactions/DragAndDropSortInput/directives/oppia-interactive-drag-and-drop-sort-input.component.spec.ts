@@ -18,7 +18,7 @@
 
 import {NO_ERRORS_SCHEMA, ElementRef, QueryList} from '@angular/core';
 import {
-  waitForAsync,
+  async,
   ComponentFixture,
   TestBed,
   fakeAsync,
@@ -118,7 +118,7 @@ describe('Drag and drop sort input interactive component', () => {
     }
   }
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [InteractiveDragAndDropSortInputComponent],
       providers: [

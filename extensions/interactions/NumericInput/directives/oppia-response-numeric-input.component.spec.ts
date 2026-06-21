@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the NumericInput response.
  */
 
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ResponseNumericInput} from './oppia-response-numeric-input.component';
 
@@ -30,7 +30,7 @@ describe('ResponseNumericInput', () => {
     }
   }
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ResponseNumericInput],
       providers: [

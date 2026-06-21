@@ -17,7 +17,7 @@
  */
 
 import {
-  waitForAsync,
+  async,
   ComponentFixture,
   fakeAsync,
   flush,
@@ -51,7 +51,7 @@ describe('NoninteractiveSkillreview', () => {
     };
   }
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [NoninteractiveSkillreview],
       providers: [

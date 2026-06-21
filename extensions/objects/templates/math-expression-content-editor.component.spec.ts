@@ -18,7 +18,7 @@
 
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
-  waitForAsync,
+  async,
   ComponentFixture,
   fakeAsync,
   flush,
@@ -83,7 +83,7 @@ describe('MathExpressionContentEditorComponent', () => {
     },
   };
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [MathExpressionContentEditorComponent],

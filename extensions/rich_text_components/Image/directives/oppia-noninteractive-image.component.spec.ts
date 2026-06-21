@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the Image rich-text component.
  */
 import {
-  waitForAsync,
+  async,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -82,7 +82,7 @@ describe('NoninteractiveImage', () => {
     },
   };
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [NoninteractiveImage],

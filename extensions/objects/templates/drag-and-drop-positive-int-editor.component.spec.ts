@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for drag and drop positive int editor.
  */
 
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {DragAndDropPositiveIntEditorComponent} from './drag-and-drop-positive-int-editor.component';
 
 describe('DragAndDropPositiveIntEditorComponent', () => {
   let component: DragAndDropPositiveIntEditorComponent;
   let fixture: ComponentFixture<DragAndDropPositiveIntEditorComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [DragAndDropPositiveIntEditorComponent],
     }).compileComponents();

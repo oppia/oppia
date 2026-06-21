@@ -16,7 +16,7 @@
  * @fileoverview Tests for SuggestionModalForLearnerDashboardService.
  */
 
-import {waitForAsync, TestBed} from '@angular/core/testing';
+import {async, TestBed} from '@angular/core/testing';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
@@ -36,7 +36,7 @@ describe('Suggestion Modal Service For Learners Dashboard', () => {
   let csrfService: CsrfTokenService;
   let ngbModal: NgbModal;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });

@@ -17,7 +17,7 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ResponseDragAndDropSortInputComponent} from './oppia-response-drag-and-drop-sort-input.component';
 
@@ -31,7 +31,7 @@ describe('Drag and drop sort input response component', () => {
     }
   }
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ResponseDragAndDropSortInputComponent],
       providers: [

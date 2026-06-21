@@ -17,7 +17,7 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {waitForAsync, TestBed} from '@angular/core/testing';
+import {async, TestBed} from '@angular/core/testing';
 
 import {ExplorationRecommendationsBackendApiService} from '../../../domain/recommendations/exploration-recommendations-backend-api.service';
 import {LearnerExplorationSummary} from '../../../domain/summary/learner-exploration-summary.model';
@@ -64,7 +64,7 @@ describe('Exploration Recommendations Service', () => {
       {}
     );
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [ExplorationRecommendationsService],

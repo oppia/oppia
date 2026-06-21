@@ -18,7 +18,7 @@
 import Mousetrap from 'mousetrap';
 
 import {ApplicationRef} from '@angular/core';
-import {waitForAsync, TestBed} from '@angular/core/testing';
+import {async, TestBed} from '@angular/core/testing';
 import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
 import {
   KeyboardShortcutHelpModalComponent,
@@ -53,7 +53,7 @@ describe('Keyboard Shortcuts', () => {
   let keyboardShortcutService: KeyboardShortcutService;
   let ngbModal: NgbModal;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [KeyboardShortcutHelpModalComponent],
       providers: [

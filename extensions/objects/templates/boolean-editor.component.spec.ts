@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for boolean editor.
  */
 
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {BooleanEditorComponent} from './boolean-editor.component';
 
 describe('BooleanEditorComponent', () => {
   let component: BooleanEditorComponent;
   let fixture: ComponentFixture<BooleanEditorComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [BooleanEditorComponent],
     }).compileComponents();

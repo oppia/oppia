@@ -17,7 +17,7 @@
  */
 
 import {
-  waitForAsync,
+  async,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -72,7 +72,7 @@ describe('Goals tab Component', () => {
   };
   let sampleTopic: LearnerTopicSummary;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     mockResizeEmitter = new EventEmitter();
     matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     matDialogRefSpy = jasmine.createSpyObj('MatDialogRef', [

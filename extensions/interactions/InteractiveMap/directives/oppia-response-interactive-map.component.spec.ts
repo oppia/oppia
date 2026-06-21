@@ -17,7 +17,7 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {icon, LatLng, tileLayer} from 'leaflet';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ResponseInteractiveMapComponent} from './oppia-response-interactive-map.component';
@@ -32,7 +32,7 @@ describe('ResponseInteractiveMapComponent', () => {
     }
   }
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ResponseInteractiveMapComponent],
       providers: [

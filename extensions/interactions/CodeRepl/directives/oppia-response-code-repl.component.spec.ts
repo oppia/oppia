@@ -17,7 +17,7 @@
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {ResponseCodeReplComponent} from './oppia-response-code-repl.component';
@@ -33,7 +33,7 @@ describe('ResponseCodeReplComponent', () => {
     }
   }
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ResponseCodeReplComponent],
       providers: [

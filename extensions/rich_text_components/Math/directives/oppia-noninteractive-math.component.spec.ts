@@ -19,7 +19,7 @@
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {SimpleChanges} from '@angular/core';
 import {
-  waitForAsync,
+  async,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -96,7 +96,7 @@ describe('NoninteractiveMath', () => {
     }
   }
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [NoninteractiveMath],

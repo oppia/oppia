@@ -17,7 +17,7 @@
  */
 
 import {
-  waitForAsync,
+  async,
   ComponentFixture,
   fakeAsync,
   flushMicrotasks,
@@ -54,7 +54,7 @@ describe('Learner Dashboard Icons Component', () => {
   let learnerDashboardActivityBackendApiService: LearnerDashboardActivityBackendApiService;
   let learnerPlaylistSpy: jasmine.Spy;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule, NgbModule],
       declarations: [

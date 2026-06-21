@@ -18,7 +18,7 @@
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ChangeDetectorRef} from '@angular/core';
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {SubtitledUnicodeEditorComponent} from './subtitled-unicode-editor.component';
 
@@ -26,7 +26,7 @@ describe('SubtitledUnicodeEditorComponent', () => {
   let component: SubtitledUnicodeEditorComponent;
   let fixture: ComponentFixture<SubtitledUnicodeEditorComponent>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [SubtitledUnicodeEditorComponent],
       schemas: [NO_ERRORS_SCHEMA],

@@ -17,14 +17,14 @@
  * using the SpeechSynthesis API.
  */
 
-import {waitForAsync, TestBed} from '@angular/core/testing';
+import {async, TestBed} from '@angular/core/testing';
 import {AutomaticVoiceoverHighlightService} from './automatic-voiceover-highlight-service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Automatic voiceover highlight service', () => {
   let automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });

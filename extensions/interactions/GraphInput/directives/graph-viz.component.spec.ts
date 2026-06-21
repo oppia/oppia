@@ -17,7 +17,7 @@
  */
 
 import {
-  waitForAsync,
+  async,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -44,7 +44,7 @@ describe('GraphVizComponent', () => {
 
   let mockNewCardAvailableEmitter = new EventEmitter();
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [GraphVizComponent, MockTranslatePipe],
       providers: [GraphDetailService, DeviceInfoService],
