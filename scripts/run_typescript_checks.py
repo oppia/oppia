@@ -111,11 +111,13 @@ TS_STRICT_EXCLUDE_PATHS = [
 ]
 # pylint: enable=line-too-long, single-line-pragma
 
-_PARSER = argparse.ArgumentParser(description="""
-Run the script from the oppia root folder:
-    python -m scripts.run_typescript_checks
-Note that the root folder MUST be named 'oppia'.
-""")
+_PARSER = argparse.ArgumentParser(
+    description=(
+        'Run the script from the oppia root folder:\n'
+        '    python -m scripts.run_typescript_checks\n'
+        "Note that the root folder MUST be named 'oppia'.\n"
+    )
+)
 
 _PARSER.add_argument(
     '--strict_checks',
