@@ -832,6 +832,7 @@ def _compute_topic_ids_of_translation_opportunities(
             for topic_id in topic_ids_set:
                 entity_id_to_topic_ids[topic_id] = [topic_id]
 
+        else:
             raise Exception(f'Unsupported entity type: {entity_type}')
 
     return entity_id_to_topic_ids
@@ -1451,6 +1452,7 @@ def _get_translation_opportunity_cards_from_models(
         skills = skill_fetchers.get_multi_skills(entity_ids, strict=False)
         skill_map = {skill.id: skill for skill in skills if skill is not None}
 
+    elif entity_type == feconf.ENTITY_TYPE_TOPIC:
         topics = topic_fetchers.get_topics_by_ids(entity_ids, strict=False)
         topic_map = {topic.id: topic for topic in topics if topic is not None}
 
@@ -1500,6 +1502,7 @@ def _get_translation_opportunity_cards_from_models(
             if model.topic_ids:
                 currently_available_to_learners = True
 
+        elif entity_type == feconf.ENTITY_TYPE_TOPIC:
             currently_available_to_learners = (
                 model.entity_id in published_topic_ids
             )
