@@ -222,7 +222,7 @@ describe('TopicLessonCardComponent', () => {
     expect(navigatedUrl).toContain('initialVoiceoverLanguageCode=es');
   });
 
-  it('should navigate directly when preferred language is available', () => {
+  it('should navigate with language params when preferred language is selected', () => {
     i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
     component.availableTextLanguageCodes = ['en', 'es'];
     component.availableVoiceoverLanguageCodes = ['en', 'es'];
@@ -231,9 +231,15 @@ describe('TopicLessonCardComponent', () => {
     spyOn(windowRef.nativeWindow.location, 'assign');
     component.onStartButtonClick();
 
-    expect(windowRef.nativeWindow.location.assign).toHaveBeenCalledWith(
+    expect(windowRef.nativeWindow.location.assign).toHaveBeenCalled();
+    const navigatedUrl = (
+      windowRef.nativeWindow.location.assign as jasmine.Spy
+    ).calls.mostRecent().args[0] as string;
+    expect(navigatedUrl).toContain(
       '/explore/exp_1?topic_url_fragment=fractions'
     );
+    expect(navigatedUrl).toContain('initialContentLanguageCode=en');
+    expect(navigatedUrl).toContain('initialVoiceoverLanguageCode=en');
   });
 
   it('should navigate with language params when user changes language even if preferred is available', () => {
@@ -376,13 +382,13 @@ describe('TopicLessonCardComponent', () => {
     expect(component.selectedVoiceoverLanguageCode).toBe('fr');
   });
 
-  it('should return empty start button label when fallback CTA is not shown', () => {
+  it('should return fallback start button label when preferred language is selected', () => {
     i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
     component.availableTextLanguageCodes = ['en', 'es'];
     component.availableVoiceoverLanguageCodes = ['en', 'es'];
     component.ngOnInit();
 
-    expect(component.getStartButtonLabel()).toBe('');
+    expect(component.getStartButtonLabel()).toBe('Play Lesson in en 🌐');
   });
 
   it('should return Portuguese helper text when preferred language is available and site language is Portuguese', () => {

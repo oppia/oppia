@@ -313,6 +313,12 @@ class TopicPageDataHandlerTests(
         )
         self.publish_exploration(self.admin_id, exploration_id)
 
+        no_translation_exploration_id = 'exp_id_2'
+        self.save_new_valid_exploration(
+            no_translation_exploration_id, self.admin_id, end_state_name='End'
+        )
+        self.publish_exploration(self.admin_id, no_translation_exploration_id)
+
         voiceover_services.save_language_accent_support(
             language_codes_mapping={'en': {'en-US': True}}
         )
@@ -370,9 +376,34 @@ class TopicPageDataHandlerTests(
                     'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
                 }
             ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': 'node_2',
+                    'title': 'Node 2',
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
+                    'node_id': 'node_2',
+                    'old_value': None,
+                    'new_value': no_translation_exploration_id,
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                    'node_id': 'node_2',
+                    'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                    'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
+                }
+            ),
         ]
         story_services.update_story(
-            self.admin_id, self.story_id_1, change_list, 'Added node.'
+            self.admin_id, self.story_id_1, change_list, 'Added nodes.'
         )
 
         self.login(self.NEW_USER_EMAIL)
@@ -386,7 +417,7 @@ class TopicPageDataHandlerTests(
         ]
         self.assertEqual(len(story_with_nodes), 1)
         story_dict = story_with_nodes[0]
-        self.assertEqual(len(story_dict['all_node_dicts']), 1)
+        self.assertEqual(len(story_dict['all_node_dicts']), 2)
 
         node_dict = story_dict['all_node_dicts'][0]
         self.assertEqual(node_dict['id'], 'node_1')
@@ -394,6 +425,18 @@ class TopicPageDataHandlerTests(
         self.assertEqual(node_dict['available_text_language_codes'], ['en'])
         self.assertEqual(
             node_dict['available_voiceover_language_codes'], ['en']
+        )
+
+        second_node_dict = story_dict['all_node_dicts'][1]
+        self.assertEqual(second_node_dict['id'], 'node_2')
+        self.assertEqual(
+            second_node_dict['exploration_id'], no_translation_exploration_id
+        )
+        self.assertEqual(
+            second_node_dict['available_text_language_codes'], ['en']
+        )
+        self.assertEqual(
+            second_node_dict['available_voiceover_language_codes'], []
         )
         self.logout()
 

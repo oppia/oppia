@@ -81,6 +81,7 @@
   font-weight: 700;
   height: 44px;
   justify-content: center;
+  margin-left: auto;
   min-width: 106px;
   outline: none;
   text-decoration: none;
@@ -116,10 +117,6 @@
   flex: 0 0 auto;
   margin-right: 16px;
   min-width: auto;
-}
-
-.topic-lesson-card-start-button {
-  margin-left: auto;
 }
 
 .topic-lesson-card-fallback-helper {
@@ -166,10 +163,10 @@
   }
 
   .topic-lesson-card-start-button {
-    font-size: 13px;
+    font-size: 12px;
     height: 40px;
     min-width: 90px;
-    width: 90px;
+    padding: 0 12px;
   }
 
   .topic-lesson-card-actions {

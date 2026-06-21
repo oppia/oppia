@@ -126,8 +126,8 @@
 @media (max-width: 600px) {
   .topic-lesson-language-selector-row,
   .topic-lesson-language-selector-row--compact {
-    flex-direction: row;
     align-items: center;
+    flex-direction: row;
   }
 
   .topic-lesson-language-selector-select-container {
