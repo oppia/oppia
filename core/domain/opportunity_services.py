@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import collections
+import copy
 import logging
 
 from core import feature_flag_list, feconf
@@ -38,6 +39,7 @@ from core.domain import (
     topic_domain,
     topic_fetchers,
     translation_domain,
+    translation_fetchers,
     translation_services,
 )
 from core.platform import models
@@ -122,9 +124,9 @@ def get_exploration_opportunity_summary_from_model(
         model.chapter_title,
         model.content_count,
         new_incomplete_translation_language_codes,
-        model.translation_counts,
-        model.language_codes_needing_voice_artists,
-        model.language_codes_with_assigned_voice_artists,
+        copy.deepcopy(model.translation_counts),
+        list(model.language_codes_needing_voice_artists),
+        list(model.language_codes_with_assigned_voice_artists),
         {},
         (
             model.reviewer_only_content_count
@@ -374,12 +376,12 @@ def get_translation_opportunity_summary_from_model(
     return opportunity_domain.TranslationOpportunity(
         entity_type=model.entity_type,
         entity_id=model.entity_id,
-        topic_ids=model.topic_ids,
+        topic_ids=list(model.topic_ids),
         content_count=model.content_count,
-        incomplete_translation_language_codes=(
+        incomplete_translation_language_codes=list(
             model.incomplete_translation_language_codes
         ),
-        translation_counts=model.translation_counts,
+        translation_counts=copy.deepcopy(model.translation_counts),
     )
 
 
@@ -799,7 +801,6 @@ def _compute_topic_ids_of_translation_opportunities(
             for topic_id in topic_ids_set:
                 entity_id_to_topic_ids[topic_id] = [topic_id]
 
-        else:
             raise Exception(f'Unsupported entity type: {entity_type}')
 
     return entity_id_to_topic_ids
@@ -946,11 +947,62 @@ def update_translation_opportunity_with_accepted_suggestion(
             suggestion.
         entity_type: str. The type of the entity.
     """
+
+    # Always update the OLD ExplorationOpportunitySummaryModel for backward compatibility.
+    if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+        exp_model = opportunity_models.ExplorationOpportunitySummaryModel.get(
+            entity_id, strict=False
+        )
+        if exp_model is not None:
+            exp_opportunity_summary = (
+                get_exploration_opportunity_summary_from_model(exp_model)
+            )
+
+            old_translation_count = (
+                exp_opportunity_summary.translation_counts.get(language_code, 0)
+            )
+
+            entity = get_entity_by_type_and_id(
+                feconf.ENTITY_TYPE_EXPLORATION, entity_id
+            )
+            entity_translation = translation_fetchers.get_entity_translation(
+                feconf.TranslatableEntityType.EXPLORATION,
+                entity_id,
+                entity.version,
+                language_code,
+            )
+            new_count = entity.get_translation_count(entity_translation)
+
+            exp_opportunity_summary.translation_counts[language_code] = (
+                new_count
+            )
+
+            if (
+                exp_opportunity_summary.content_count
+                == exp_opportunity_summary.translation_counts[language_code]
+            ):
+                if (
+                    language_code
+                    in exp_opportunity_summary.incomplete_translation_language_codes
+                ):
+                    exp_opportunity_summary.incomplete_translation_language_codes.remove(
+                        language_code
+                    )
+                exp_opportunity_summary.language_codes_needing_voice_artists.append(
+                    language_code
+                )
+
+            exp_opportunity_summary.validate()
+            _save_multi_exploration_opportunity_summary(
+                [exp_opportunity_summary]
+            )
+
     if feature_flag_services.is_feature_flag_enabled(
         feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
         None,
     ):
         model_id = f'{entity_type}.{entity_id}'
+
         model = opportunity_models.TranslationOpportunityModel.get(
             model_id, strict=False
         )
@@ -965,13 +1017,15 @@ def update_translation_opportunity_with_accepted_suggestion(
         )
 
         entity = get_entity_by_type_and_id(entity_type, entity_id)
-        current_translation_counts = (
-            translation_services.get_translation_counts(
-                feconf.TranslatableEntityType(entity_type), entity
-            )
+        entity_translation = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType(entity_type),
+            entity_id,
+            entity.version,
+            language_code,
         )
 
-        new_count = current_translation_counts.get(language_code, 0)
+        new_count = entity.get_translation_count(entity_translation)
+
         translation_opportunity.translation_counts[language_code] = new_count
         translation_opportunity.content_count = (
             entity.get_content_count()
@@ -1356,7 +1410,6 @@ def _get_translation_opportunity_cards_from_models(
         skills = skill_fetchers.get_multi_skills(entity_ids, strict=False)
         skill_map = {skill.id: skill for skill in skills if skill is not None}
 
-    else:
         topics = topic_fetchers.get_topics_by_ids(entity_ids, strict=False)
         topic_map = {topic.id: topic for topic in topics if topic is not None}
 
@@ -1406,7 +1459,6 @@ def _get_translation_opportunity_cards_from_models(
             if model.topic_ids:
                 currently_available_to_learners = True
 
-        else:
             currently_available_to_learners = (
                 model.entity_id in published_topic_ids
             )

@@ -28,6 +28,7 @@ from core.domain import (
     exp_fetchers,
     exp_services,
     feedback_services,
+    opportunity_services,
     question_domain,
     rights_domain,
     rights_manager,
@@ -646,12 +647,17 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 'accept',
                 lambda self, unused_commit_message: None,
             ):
-                suggestion_services.accept_suggestion(
-                    suggestion.suggestion_id,
-                    self.reviewer_id,
-                    self.COMMIT_MESSAGE,
-                    'review message',
-                )
+                with self.swap(
+                    opportunity_services,
+                    'update_translation_opportunity_with_accepted_suggestion',
+                    lambda *args: None,
+                ):
+                    suggestion_services.accept_suggestion(
+                        suggestion.suggestion_id,
+                        self.reviewer_id,
+                        self.COMMIT_MESSAGE,
+                        'review message',
+                    )
 
         # Verify the suggestion was accepted.
         updated_suggestion = suggestion_services.get_suggestion_by_id(

@@ -835,6 +835,9 @@ describe('Contributions and review component', () => {
         expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
           'Submitted suggestion review.'
         );
+        expect(
+          contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit
+        ).toHaveBeenCalled();
       }));
 
       it('should return false on Review Questions tab', () => {
