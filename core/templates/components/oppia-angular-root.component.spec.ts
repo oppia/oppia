@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the OppiaAngularRootComponent.
  */
 
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ComponentFixture, TestBed, async} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {AngularFireAuth} from '@angular/fire/auth';
 import {CookieModule} from 'ngx-cookie';
@@ -57,14 +57,13 @@ describe('OppiaAngularRootComponent', function () {
   let i18nService: I18nService;
   let emitSpy: jasmine.Spy;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     // Prevent the constructor from calling registerCustomElements, which uses
     // ComponentFactoryResolver internally. Angular 11 Ivy JIT does not expose
     // component factories for dynamically resolved components unless they are
     // listed in entryComponents. In Angular 12+ entryComponents is a no-op, so
     // we work around this by setting the static flag before component creation.
     OppiaAngularRootComponent.rteElementsAreInitialized = true;
-
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,

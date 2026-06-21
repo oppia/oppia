@@ -21,7 +21,7 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
-  waitForAsync,
+  async,
   TestBed,
   flushMicrotasks,
   tick,
@@ -67,7 +67,7 @@ describe('Admin page platform parameters tab', () => {
 
   let updateApiSpy: jasmine.Spy;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule],

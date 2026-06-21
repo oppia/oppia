@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for thanks for subscribing modal component.
  */
 
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -37,7 +37,7 @@ describe('Thanks for subscribing modal component', function () {
   let fixture: ComponentFixture<ThanksForSubscribingModalComponent>;
   let ngbActiveModal: NgbActiveModal;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [MockTranslatePipe, ThanksForSubscribingModalComponent],
       providers: [

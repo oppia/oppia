@@ -18,7 +18,7 @@
 
 import {
   TestBed,
-  waitForAsync,
+  async,
   ComponentFixture,
   tick,
   fakeAsync,
@@ -92,7 +92,7 @@ describe('Attribution Guide Component', function () {
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let windowDimensionsService: WindowDimensionsService;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [AttributionGuideComponent, MockTranslatePipe],
       providers: [

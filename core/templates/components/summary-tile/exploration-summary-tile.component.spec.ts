@@ -17,7 +17,7 @@
  */
 
 import {
-  waitForAsync,
+  async,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -159,7 +159,7 @@ describe('Exploration Summary Tile Component', () => {
     true
   );
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [

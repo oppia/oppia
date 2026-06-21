@@ -20,7 +20,7 @@ import {
   ComponentFixture,
   fakeAsync,
   TestBed,
-  waitForAsync,
+  async,
 } from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
@@ -45,7 +45,7 @@ describe('ExplorationEmbedButtonModalComponent', () => {
   let fixture: ComponentFixture<ExplorationEmbedButtonModalComponent>;
   let siteAnalyticsService: SiteAnalyticsService;
   let ngbActiveModal: NgbActiveModal;
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ExplorationEmbedButtonModalComponent],
       providers: [

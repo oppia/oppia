@@ -17,7 +17,7 @@
  */
 
 import {
-  waitForAsync,
+  async,
   ComponentFixture,
   fakeAsync,
   TestBed,
@@ -88,7 +88,7 @@ describe('Collection Summary Tile Component', () => {
     true
   );
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
         BrowserAnimationsModule,
