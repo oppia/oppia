@@ -1944,10 +1944,8 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             'exp_1', 'hi', entity_type=feconf.ENTITY_TYPE_EXPLORATION
         )
 
-        cards, _, _ = (
-            opportunity_services.get_translation_opportunities_with_new_models(
-                feconf.ENTITY_TYPE_EXPLORATION, 'hi'
-            )
+        cards = opportunity_services.get_translation_opportunity_cards_by_entity_ids_with_new_models(
+            feconf.ENTITY_TYPE_EXPLORATION, ['exp_1'], 'hi'
         )
         self.assertEqual(cards[0].translation_counts, {'hi': 1})
 
