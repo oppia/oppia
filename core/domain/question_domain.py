@@ -40,6 +40,7 @@ from extensions import domain
 
 from pylatexenc import latex2text
 from typing import (
+    Any,
     Dict,
     Final,
     List,
@@ -356,7 +357,7 @@ class Question(translation_domain.BaseTranslatableObject):
         self.last_updated = last_updated
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        self, **kwargs: Any
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the question.
 

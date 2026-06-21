@@ -155,7 +155,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         self.tagged_skill_misconception_id = tagged_skill_misconception_id
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        self, **kwargs: Any
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the answer group.
 
@@ -367,7 +367,7 @@ class Hint(translation_domain.BaseTranslatableObject):
         self.hint_content = hint_content
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        self, **kwargs: Any
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the hint.
 
@@ -492,7 +492,7 @@ class Solution(translation_domain.BaseTranslatableObject):
         self.explanation = explanation
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        self, **kwargs: Any
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the solution.
 
@@ -758,7 +758,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         self.solution = solution
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        self, **kwargs: Any
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the interaction instance.
 
@@ -2351,7 +2351,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         self.schema = schema
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        self, **kwargs: Any
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the interaction customization args.
 
@@ -2808,7 +2808,7 @@ class Outcome(translation_domain.BaseTranslatableObject):
         self.missing_prerequisite_skill_id = missing_prerequisite_skill_id
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        self, **kwargs: Any
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the outcome.
 
@@ -3279,7 +3279,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         self.inputs = inputs
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        self, **kwargs: Any
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the rule spec.
 
@@ -3830,7 +3830,7 @@ class State(translation_domain.BaseTranslatableObject):
         )
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        self, **kwargs: Any
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the state.
 

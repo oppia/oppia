@@ -27,7 +27,7 @@ from core.domain import (
 from core.domain import translation_domain
 from core.tests import test_utils
 
-from typing import Optional
+from typing import Any, Optional
 
 
 class DummyTranslatableObjectWithTwoParams(
@@ -44,7 +44,7 @@ class DummyTranslatableObjectWithTwoParams(
         self.param2 = param2
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        self, **kwargs: Any
     ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection()
@@ -73,7 +73,7 @@ class DummyTranslatableObjectWithSingleParam(
         self.param3 = param3
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        self, **kwargs: Any
     ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection()
@@ -100,7 +100,7 @@ class DummyTranslatableObjectWithDuplicateContentIdForParams(
         self.param2 = param2
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        self, **kwargs: Any
     ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection()
@@ -149,7 +149,7 @@ class DummyTranslatableObjectWithFourParams(
         self.param4 = param4
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        self, **kwargs: Any
     ) -> translation_domain.TranslatableContentsCollection:
         translatable_contents_collection = (
             translation_domain.TranslatableContentsCollection()

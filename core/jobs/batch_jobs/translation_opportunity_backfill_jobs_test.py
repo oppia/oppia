@@ -218,8 +218,8 @@ class BackfillTranslationOpportunityModelJobTests(
         self.assertEqual(model.entity_type, 'exploration')
         self.assertEqual(model.entity_id, self.exp_id)
         self.assertEqual(model.topic_ids, ['topic_id'])
-        # Exploration currently has 0 content_count from create_default_exploration.
-        self.assertEqual(model.content_count, 0)
+        # Exploration currently has 4 metadata fields (title, objective, category, 1 tag) when flag is overridden.
+        self.assertEqual(model.content_count, 4)
         self.assertEqual(model.translation_counts, {'hi': 1})
 
     def test_run_with_datastore_updates_disabled(self) -> None:
@@ -462,7 +462,8 @@ class BackfillTranslationOpportunityModelJobTests(
             )
         )
         self.assertIsNotNone(opportunity)
-        self.assertEqual(opportunity.content_count, 2)
+        # 2 translatable contents + 2 metadata fields (title, tag) = 4.
+        self.assertEqual(opportunity.content_count, 4)
         self.assertEqual(opportunity.translation_counts, {'hi': 1})
 
     def test_additional_story_references_and_missing_exploration_ids(
@@ -681,7 +682,7 @@ class AuditBackfillTranslationOpportunityModelJobTests(
             entity_type=feconf.TranslatableEntityType.EXPLORATION.value,
             entity_id=self.exp_id,
             topic_ids=['topic_id'],
-            content_count=1,
+            content_count=5,
             incomplete_translation_language_codes=[
                 lang['id']
                 for lang in constants.SUPPORTED_AUDIO_LANGUAGES
@@ -701,8 +702,8 @@ class AuditBackfillTranslationOpportunityModelJobTests(
                         '- Missing in Datastore: 0\n'
                         '- Discrepancies: 0\n'
                         '- Orphaned in Datastore: 0\n'
-                        '- Total Content Count (Existing): 1\n'
-                        '- Total Content Count (Computed): 1\n'
+                        '- Total Content Count (Existing): 5\n'
+                        '- Total Content Count (Computed): 5\n'
                         '- Total Translation Counts (Existing): hi: 1\n'
                         '- Total Translation Counts (Computed): hi: 1'
                     )
@@ -724,7 +725,7 @@ class AuditBackfillTranslationOpportunityModelJobTests(
                         '- Discrepancies: 0\n'
                         '- Orphaned in Datastore: 0\n'
                         '- Total Content Count (Existing): 0\n'
-                        '- Total Content Count (Computed): 0\n'
+                        '- Total Content Count (Computed): 4\n'
                         '- Total Translation Counts (Existing): None\n'
                         '- Total Translation Counts (Computed): hi: 1'
                     )
@@ -758,7 +759,7 @@ class AuditBackfillTranslationOpportunityModelJobTests(
                         '- Discrepancies: 1\n'
                         '- Orphaned in Datastore: 0\n'
                         '- Total Content Count (Existing): 10\n'
-                        '- Total Content Count (Computed): 0\n'
+                        '- Total Content Count (Computed): 4\n'
                         '- Total Translation Counts (Existing): None\n'
                         '- Total Translation Counts (Computed): hi: 1'
                     )
@@ -767,7 +768,7 @@ class AuditBackfillTranslationOpportunityModelJobTests(
                     stderr=(
                         'Discrepancy for model exploration.exp_1: '
                         'Existing (content_count=10, translation_counts={}), '
-                        'Computed (content_count=0, translation_counts={\'hi\': 1})'
+                        'Computed (content_count=4, translation_counts={\'hi\': 1})'
                     )
                 ),
                 job_run_result.JobRunResult(

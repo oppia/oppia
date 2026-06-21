@@ -103,7 +103,9 @@ class BackfillTranslationOpportunityModelJob(base_jobs.JobBase):
             )
         )
         with datastore_services.get_ndb_context():
-            content_count = exp.get_content_count()
+            content_count = exp.get_content_count(
+                override_metadata_feature_flag=True
+            )
 
             translation_counts = {}
             for translation_model in translations:

@@ -1562,9 +1562,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.edits_allowed = edits_allowed
 
     def get_translatable_contents_collection(
-        self, **kwargs: Optional[str]
+        self,
+        override_metadata_feature_flag: bool = False,
+        **kwargs: Any,
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the exploration.
+
+        Args:
+            override_metadata_feature_flag: bool. Whether to override the
+                metadata feature flag check.
+            **kwargs: Dict[str, Any]. Additional keyword arguments.
 
         Returns:
             TranslatableContentsCollection. An instance of
@@ -1581,9 +1588,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 )
             )
 
-        if feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
-            None,
+        if (
+            override_metadata_feature_flag
+            or feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+                None,
+            )
         ):
             if self.title:
                 translatable_contents_collection.add_translatable_field(
