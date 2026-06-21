@@ -89,6 +89,7 @@ import {ChapterProgressService} from '../../services/chapter-progress.service';
 import {CardAnimationService} from '../../services/card-animation.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {AuthService} from 'services/auth.service';
+import {InteractionRulesService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {CollectionPlaythrough} from '../../../../domain/collection/collection-playthrough.model';
 import {QuestionPlayerConfig} from './ratings-and-recommendations.component';
 class MockWindowRef {
@@ -1920,6 +1921,74 @@ describe('Conversation skin component', () => {
     expect(displayedCard.toggleSubmitClicked).toHaveBeenCalledOnceWith(true);
   });
 
+  it('should invoke conversationFlowService.submitAnswer when the setOnSubmitFn callback is triggered', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(
+        new UserInfo([], false, false, false, false, false, '', '', '', true)
+      )
+    );
+    spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
+      null
+    );
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+    spyOn(
+      localStorageService,
+      'getUniqueProgressIdOfLoggedOutLearner'
+    ).and.returnValue(null);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_id');
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(
+      urlInterpolationService,
+      'getStaticCopyrightedImageUrl'
+    ).and.returnValue('url');
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
+      false
+    );
+    const preventPageUnloadEventService = TestBed.inject(
+      PreventPageUnloadEventService
+    );
+    spyOn(preventPageUnloadEventService, 'addListener');
+    const cardAnimationService = TestBed.inject(CardAnimationService);
+    spyOn(cardAnimationService, 'adjustPageHeightOnresize');
+
+    let onSubmitCb: Function = () => {};
+    spyOn(currentInteractionService, 'setOnSubmitFn').and.callFake(
+      (cb: Function) => {
+        onSubmitCb = cb;
+      }
+    );
+
+    const readOnlyExplorationBackendApiService = TestBed.inject(
+      ReadOnlyExplorationBackendApiService
+    );
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'loadLatestExplorationAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        version: 1,
+        exploration: {
+          init_state_name: 'init',
+        },
+        most_recently_reached_checkpoint_state_name: 'init',
+      } as FetchExplorationBackendResponse)
+    );
+
+    spyOn(conversationFlowService, 'submitAnswer');
+
+    componentInstance.ngOnInit();
+    tick(100);
+    flush();
+
+    expect(currentInteractionService.setOnSubmitFn).toHaveBeenCalled();
+    onSubmitCb('answer', {} as InteractionRulesService);
+    expect(conversationFlowService.submitAnswer).toHaveBeenCalledWith(
+      'answer',
+      {} as InteractionRulesService
+    );
+  }));
+
   it('should tell if current supplemental card is non empty', () => {
     conversationFlowService.setDisplayedCard(displayedCard);
     spyOn(
@@ -1954,6 +2023,19 @@ describe('Conversation skin component', () => {
     );
     expect(componentInstance.isSupplementalNavShown()).toBeFalse();
     expect(componentInstance.isSupplementalNavShown()).toBeTrue();
+  });
+
+  it('should return false for supplemental nav if interaction id is missing', () => {
+    const card = new StateCard(
+      'stateName',
+      '',
+      '',
+      new Interaction([], [], {}, null, [], null as unknown as string, null),
+      [],
+      ''
+    );
+    conversationFlowService.setDisplayedCard(card);
+    expect(componentInstance.isSupplementalNavShown()).toBeFalse();
   });
 
   it('should call changeDetectorRef.detectChanges if submitButtonIsDisabled changes in ngAfterViewChecked', () => {

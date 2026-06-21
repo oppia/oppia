@@ -235,13 +235,11 @@ export class ExplorationFooterComponent {
     let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
     if (displayedCardIndex > 0) {
       let state = this.explorationEngineService.getState();
-      if (state.name !== null) {
-        let stateCard = this.explorationEngineService.getStateCardByName(
-          state.name
-        );
-        if (stateCard.isTerminal()) {
-          this.completedCheckpointsCount += 1;
-        }
+      let stateCard = this.explorationEngineService.getStateCardByName(
+        state.name ?? ''
+      );
+      if (stateCard.isTerminal()) {
+        this.completedCheckpointsCount += 1;
       }
     }
 
@@ -284,13 +282,11 @@ export class ExplorationFooterComponent {
     let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
     if (displayedCardIndex > 0) {
       let state = this.explorationEngineService.getState();
-      if (state.name !== null) {
-        let stateCard = this.explorationEngineService.getStateCardByName(
-          state.name
-        );
-        if (stateCard.isTerminal()) {
-          this.completedCheckpointsCount += 1;
-        }
+      let stateCard = this.explorationEngineService.getStateCardByName(
+        state.name ?? ''
+      );
+      if (stateCard.isTerminal()) {
+        this.completedCheckpointsCount += 1;
       }
     }
 
@@ -305,9 +301,8 @@ export class ExplorationFooterComponent {
     modalRef.componentInstance.completedCheckpointsCount =
       this.completedCheckpointsCount;
     modalRef.componentInstance.contributorNames = this.contributorNames;
-    if (this.expInfo !== null) {
-      modalRef.componentInstance.expInfo = this.expInfo;
-    }
+    modalRef.componentInstance.expInfo =
+      this.expInfo ?? ({} as LearnerExplorationSummaryBackendDict);
     modalRef.componentInstance.userIsLoggedIn = this.userIsLoggedIn;
 
     modalRef.result.then(

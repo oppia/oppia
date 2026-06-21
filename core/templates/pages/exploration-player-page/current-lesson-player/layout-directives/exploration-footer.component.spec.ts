@@ -1381,4 +1381,82 @@ describe('ExplorationFooterComponent', () => {
       ).not.toHaveBeenCalled();
     }
   );
+
+  it('should handle null state.name and terminal state in openProgressReminderModal', fakeAsync(() => {
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
+    spyOn(explorationEngineService, 'getState').and.returnValue({
+      name: null,
+    } as unknown as State);
+    spyOn(explorationEngineService, 'getStateCardByName').and.returnValue({
+      isTerminal: () => true,
+    } as unknown as StateCard);
+    component.checkpointCount = 2;
+    component.completedCheckpointsCount = 0;
+    component.expInfo = null;
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve(),
+      } as unknown as NgbModalRef;
+    });
+    component.openProgressReminderModal();
+    tick();
+    fixture.detectChanges();
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.completedCheckpointsCount).toEqual(1);
+  }));
+
+  it('should handle null state.name and terminal state in openInformationCardModal', fakeAsync(() => {
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
+    spyOn(explorationEngineService, 'getState').and.returnValue({
+      name: null,
+    } as unknown as State);
+    spyOn(explorationEngineService, 'getStateCardByName').and.returnValue({
+      isTerminal: () => false,
+    } as unknown as StateCard);
+    spyOn(component, 'getMostRecentlyReachedCheckpointIndex').and.returnValue(
+      1
+    );
+    component.checkpointCount = 2;
+    component.completedCheckpointsCount = 0;
+    component.expInfo = null;
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve(),
+      } as unknown as NgbModalRef;
+    });
+    component.openInformationCardModal();
+    tick();
+    fixture.detectChanges();
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.completedCheckpointsCount).toEqual(0);
+  }));
+
+  it('should handle lastCheckpointWasCompleted in openInformationCardModal', fakeAsync(() => {
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
+    spyOn(explorationEngineService, 'getState').and.returnValue({
+      name: 'Start',
+    } as unknown as State);
+    spyOn(explorationEngineService, 'getStateCardByName').and.returnValue({
+      isTerminal: () => true,
+    } as unknown as StateCard);
+    spyOn(component, 'getMostRecentlyReachedCheckpointIndex').and.returnValue(
+      3
+    );
+    component.checkpointCount = 3;
+    component.lastCheckpointWasCompleted = true;
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve(),
+      } as unknown as NgbModalRef;
+    });
+    component.openInformationCardModal();
+    tick();
+    fixture.detectChanges();
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.completedCheckpointsCount).toEqual(3);
+    expect(component.lastCheckpointWasCompleted).toBeTrue();
+  }));
 });
