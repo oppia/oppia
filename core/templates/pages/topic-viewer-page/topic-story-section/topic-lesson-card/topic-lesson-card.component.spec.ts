@@ -368,6 +368,17 @@ describe('TopicLessonCardComponent', () => {
     expect(windowRef.nativeWindow.location.assign).not.toHaveBeenCalled();
   });
 
+  it('should navigate directly when no text language is selected', () => {
+    component.startUrl = '/explore/123';
+    component.selectedTextLanguageCode = null;
+    component.selectedVoiceoverLanguageCode = null;
+    spyOn(windowRef.nativeWindow.location, 'assign');
+    component.onStartButtonClick();
+    expect(windowRef.nativeWindow.location.assign).toHaveBeenCalledWith(
+      '/explore/123'
+    );
+  });
+
   it('should auto-set voiceover when selected text language matches available voiceover codes', () => {
     i18nLanguageCodeService.getCurrentI18nLanguageCode.and.returnValue('en');
     component.availableTextLanguageCodes = ['en', 'es', 'fr'];
@@ -380,6 +391,11 @@ describe('TopicLessonCardComponent', () => {
     component.onSelectedTextLanguageCodeChange('fr');
 
     expect(component.selectedVoiceoverLanguageCode).toBe('fr');
+  });
+
+  it('should return empty start button label when no text language is selected', () => {
+    component.selectedTextLanguageCode = null;
+    expect(component.getStartButtonLabel()).toBe('');
   });
 
   it('should return fallback start button label when preferred language is selected', () => {
