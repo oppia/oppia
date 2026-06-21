@@ -20,7 +20,7 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {
   CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
   CERTIFICATE_OFFERING_SAVE_STATUSES,
-} from 'domain/certificate/certificate-offering-confirmation-modal.constants';
+} from 'domain/certificate-assessment/certificate-assessment-domain.constants';
 import {CertificateOfferingConfirmationModalComponent} from './certificate-offering-confirmation-modal.component';
 
 describe('Certificate offering confirmation modal component', () => {
