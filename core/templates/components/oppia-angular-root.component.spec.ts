@@ -63,12 +63,6 @@ describe('OppiaAngularRootComponent', function () {
   let emitSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
-    // Prevent the constructor from calling registerCustomElements, which uses
-    // ComponentFactoryResolver internally. Angular 11 Ivy JIT does not expose
-    // component factories for dynamically resolved components unless they are
-    // listed in entryComponents. In Angular 12+ entryComponents is a no-op, so
-    // we work around this by setting the static flag before component creation.
-    OppiaAngularRootComponent.rteElementsAreInitialized = true;
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
