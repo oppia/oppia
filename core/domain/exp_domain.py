@@ -5433,7 +5433,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     @classmethod
     def _convert_states_v57_dict_to_v58_dict(
         cls, states_dict: Dict[str, state_domain.StateDict]
-    ) -> Tuple[Dict[str, state_domain.StateDict], int]:
+    ) -> Dict[str, state_domain.StateDict]:
         """Converts from v57 to v58. Version 58 adds
         allowExponentialNotation customization arg to NumericInput and sets it
         to True for legacy states to preserve existing learner-facing behavior.
@@ -5454,8 +5454,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             customization_args = interaction['customization_args']
             if 'allowExponentialNotation' not in customization_args:
                 customization_args['allowExponentialNotation'] = {'value': True}
-
-        return states_dict, 58
+        return states_dict
 
     @classmethod
     def update_states_from_model(
@@ -5950,11 +5949,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
             following schema version v63.
         """
         exploration_dict['schema_version'] = 63
-        states_dict, states_schema_version = (
-            cls._convert_states_v57_dict_to_v58_dict(exploration_dict['states'])
+        exploration_dict['states'] = cls._convert_states_v57_dict_to_v58_dict(
+            exploration_dict['states']
         )
-        exploration_dict['states'] = states_dict
-        exploration_dict['states_schema_version'] = states_schema_version
+        exploration_dict['states_schema_version'] = 58
         return exploration_dict
 
     @classmethod
