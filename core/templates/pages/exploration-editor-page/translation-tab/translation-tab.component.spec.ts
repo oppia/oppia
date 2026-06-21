@@ -716,4 +716,18 @@ describe('Translation tab component', () => {
 
     expect(component.tutorialInProgress).toBe(false);
   });
+
+  it('should return early from startTutorial if another tour started while permissions were loading', fakeAsync(() => {
+    component.tutorialInProgress = false;
+    // @ts-ignore
+    component.permissions = null;
+
+    component.startTutorial();
+
+    component.tutorialInProgress = true;
+
+    tick();
+
+    expect(component.tutorialInProgress).toBe(true);
+  }));
 });
