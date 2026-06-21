@@ -376,12 +376,17 @@ const takeATourButtonSelector = '.e2e-test-tour-button';
 const translationTourButtonSelector = '.e2e-test-translation-tour-button';
 
 // Shepherd (Exploration Editor Tour).
-const shepherdBodySelector = '.shepherd-text';
-const shepherdTitleSelector = '.shepherd-title';
-const nextButtonSelector = 'button.shepherd-button-primary';
-const previousButtonSelector = 'button.shepherd-button-secondary';
-const shepherdDoneButtonSelector = 'button.shepherd-button-primary';
-const shepherdStepSelector = '.shepherd-text';
+const shepherdBodySelector = '.shepherd-element:not([hidden]) .shepherd-text';
+const shepherdTitleSelector = '.shepherd-element:not([hidden]) .shepherd-title';
+const nextButtonSelector =
+  '.shepherd-element:not([hidden]) button.shepherd-button-primary';
+const previousButtonSelector =
+  '.shepherd-element:not([hidden]) button.shepherd-button-secondary';
+const shepherdDoneButtonSelector =
+  '.shepherd-element:not([hidden]) button.shepherd-button-primary';
+const shepherdStepSelector = '.shepherd-element:not([hidden]) .shepherd-text';
+const shepherdFooterSelector =
+  '.shepherd-element:not([hidden]) .shepherd-footer';
 
 // Save Exploration Modal.
 const saveExplorationModalContainerSelector =
@@ -6466,7 +6471,24 @@ export class ExplorationEditor extends BaseUser {
   async expectShepherdDoneButtonToBeVisible(
     visible: boolean = true
   ): Promise<void> {
-    await this.expectElementToBeVisible(shepherdDoneButtonSelector, visible);
+    const selector = `${shepherdFooterSelector} button.shepherd-button-primary`;
+    await this.page.waitForFunction(
+      (sel: string, shouldBeVisible: boolean) => {
+        const buttons = document.querySelectorAll(sel);
+        const doneButton = Array.from(buttons).find(b =>
+          b.textContent?.trim().startsWith('Done')
+        );
+        if (shouldBeVisible) {
+          return (
+            doneButton && (doneButton as HTMLElement).offsetParent !== null
+          );
+        }
+        return !doneButton || (doneButton as HTMLElement).offsetParent === null;
+      },
+      {},
+      selector,
+      visible
+    );
   }
 
   /**
@@ -6475,7 +6497,24 @@ export class ExplorationEditor extends BaseUser {
   async expectShepherdNextButtonToBeVisible(
     visible: boolean = true
   ): Promise<void> {
-    await this.expectElementToBeVisible(nextButtonSelector, visible);
+    const selector = `${shepherdFooterSelector} button.shepherd-button-primary`;
+    await this.page.waitForFunction(
+      (sel: string, shouldBeVisible: boolean) => {
+        const buttons = document.querySelectorAll(sel);
+        const nextButton = Array.from(buttons).find(b =>
+          b.textContent?.trim().startsWith('Next')
+        );
+        if (shouldBeVisible) {
+          return (
+            nextButton && (nextButton as HTMLElement).offsetParent !== null
+          );
+        }
+        return !nextButton || (nextButton as HTMLElement).offsetParent === null;
+      },
+      {},
+      selector,
+      visible
+    );
   }
 
   /**

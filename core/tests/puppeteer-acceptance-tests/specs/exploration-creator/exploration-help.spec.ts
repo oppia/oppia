@@ -83,7 +83,10 @@ describe('Exploration Editor', function () {
     await explorationEditor.continueToNextShepherdStep();
     await explorationEditor.expectShepherdTitleToBe('Responses');
     await explorationEditor.expectShepherdContentToContain(
-      "After the learner uses the interaction you created, it's your turn again to choose how your exploration will respond to their input."
+      'After the learner uses the interaction you created, it is your turn again ' +
+        'to choose how your exploration will respond to their input. You can send ' +
+        'a learner to a new card or have them repeat the same card, depending on ' +
+        'how they answer.'
     );
 
     await explorationEditor.continueToNextShepherdStep();
@@ -155,7 +158,8 @@ describe('Exploration Editor', function () {
     await explorationEditor.continueToNextShepherdStep();
     await explorationEditor.expectShepherdTitleToBe('Recording Audio');
     await explorationEditor.expectShepherdContentToContain(
-      'To create audio translations in Oppia, we recommend using the  button to upload audio files from your computer.'
+      'To create audio translations in Oppia, we recommend using the upload button ' +
+        'to upload audio files from your computer. You can also record via your browser.'
     );
 
     await explorationEditor.continueToNextShepherdStep();

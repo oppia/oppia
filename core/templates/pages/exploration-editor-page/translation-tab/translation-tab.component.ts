@@ -129,8 +129,15 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     this.tutorialInProgress = false;
   }
 
-  startTutorial(): void {
+  async startTutorial(): Promise<void> {
+    if (this.tutorialInProgress) {
+      return;
+    }
     if (this.permissions === null) {
+      this.permissions =
+        await this.userExplorationPermissionsService.getPermissionsAsync();
+    }
+    if (this.tutorialInProgress) {
       return;
     }
     if (this.permissions.canVoiceover) {
