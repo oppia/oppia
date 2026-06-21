@@ -47,7 +47,7 @@ export class OppiaRteNode {
   children: (OppiaRteNode | TextNode)[] = [];
   parent: OppiaRteNode | null = null;
   nodeType: '' | 'component';
-  portal: TemplatePortal | undefined;
+  portal!: TemplatePortal;
   constructor(
     public readonly selector: string,
     public attrs: Record<string, string> = {}
@@ -55,7 +55,11 @@ export class OppiaRteNode {
     let t: '' | 'component' = '';
     if (this.selector.startsWith('oppia-noninteractive-')) {
       t = 'component';
-      if (!(this.selector in selectorToComponentClassMap)) {
+      if (
+        selectorToComponentClassMap[
+          this.selector as keyof typeof selectorToComponentClassMap
+        ] === undefined
+      ) {
         throw new Error('Unexpected tag encountered: ' + selector);
       }
     }

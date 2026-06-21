@@ -138,7 +138,7 @@ describe('Skill editor main tab Component', () => {
       version: 3,
       next_misconception_id: 3,
       prerequisite_skill_ids: ['skill_1'],
-      superseding_skill_id: null,
+      superseding_skill_id: null as unknown as string,
       all_questions_merged: true,
     });
 
@@ -432,8 +432,8 @@ describe('Skill editor main tab Component', () => {
       component.skill = sampleSkill;
       component.groupedSkillSummaries = {
         current: [
-          ShortSkillSummary.create('skill1', 'test description 1'),
-          ShortSkillSummary.create('skill2', 'test description 2'),
+          {id: 'skill1', description: 'test description 1'},
+          {id: 'skill2', description: 'test description 2'},
         ],
         others: [],
       };
@@ -441,21 +441,22 @@ describe('Skill editor main tab Component', () => {
         'Topic 1': {
           uncategorized: [],
           'Subtopic 1': [
-            ShortSkillSummary.create('skill1', 'test description 1'),
-            ShortSkillSummary.create('skill2', 'test description 2'),
+            {
+              id: 'skill1',
+              description: 'test description 1',
+            } as unknown as ShortSkillSummary,
+            {
+              id: 'skill2',
+              description: 'test description 2',
+            } as unknown as ShortSkillSummary,
           ],
         },
       };
       component.untriagedSkillSummaries = [
-        SkillSummary.createFromBackendDict({
+        {
           id: '4P77sLaU14DE',
           description: 'Dummy Skill 3',
-          language_code: 'en',
-          version: 1,
-          misconception_count: 0,
-          skill_model_created_on: 0,
-          skill_model_last_updated: 0,
-        }),
+        } as unknown as SkillSummary,
       ];
 
       const validSkillSummary = {
@@ -478,25 +479,17 @@ describe('Skill editor main tab Component', () => {
       expect(ngbModal.open).toHaveBeenCalled();
       // Verify skill2 was filtered out due to having a superseding skill ID.
       expect(modalRef.componentInstance.skillSummaries).toEqual([
-        ShortSkillSummary.create('skill1', 'test description 1'),
+        {id: 'skill1', description: 'test description 1'},
       ]);
       // Verify categorized skills were also filtered.
       expect(
         modalRef.componentInstance.categorizedSkills['Topic 1']['Subtopic 1']
-      ).toEqual([ShortSkillSummary.create('skill1', 'test description 1')]);
+      ).toEqual([{id: 'skill1', description: 'test description 1'}]);
       // Verify skillsInSameTopicCount was updated correctly.
       expect(modalRef.componentInstance.skillsInSameTopicCount).toBe(1);
       // Verify untriaged skills were filtered correctly.
       expect(modalRef.componentInstance.untriagedSkillSummaries).toEqual([
-        SkillSummary.createFromBackendDict({
-          id: '4P77sLaU14DE',
-          description: 'Dummy Skill 3',
-          language_code: 'en',
-          version: 1,
-          misconception_count: 0,
-          skill_model_created_on: 0,
-          skill_model_last_updated: 0,
-        }),
+        {id: '4P77sLaU14DE', description: 'Dummy Skill 3'},
       ]);
     }));
 
@@ -620,7 +613,7 @@ describe('Skill editor main tab Component', () => {
 
         component.skill = sampleSkill;
         component.groupedSkillSummaries = {
-          current: [ShortSkillSummary.create('skillId', 'New Skill')],
+          current: [{id: 'skillId', description: 'New Skill'}],
           others: [],
         };
         component.categorizedSkills = {};

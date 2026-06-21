@@ -26,7 +26,7 @@ export interface SkillBackendDict {
   prerequisite_skill_ids: string[];
   rubrics: RubricBackendDict[];
   skill_contents: ConceptCardBackendDict;
-  superseding_skill_id: string | null;
+  superseding_skill_id: string;
   version: number;
 }
 
@@ -50,7 +50,7 @@ export class Skill {
   _languageCode: string;
   _version: number;
   _nextMisconceptionId: number;
-  _supersedingSkillId: string | null;
+  _supersedingSkillId: string;
   _allQuestionsMerged: boolean;
   _prerequisiteSkillIds: string[];
   SKILL_DIFFICULTIES: readonly string[] = AppConstants.SKILL_DIFFICULTIES;
@@ -64,7 +64,7 @@ export class Skill {
     languageCode: string,
     version: number,
     nextMisconceptionId: number,
-    supersedingSkillId: string | null,
+    supersedingSkillId: string,
     allQuestionsMerged: boolean,
     prerequisiteSkillIds: string[]
   ) {
@@ -158,7 +158,7 @@ export class Skill {
     return id + 1;
   }
 
-  getSupersedingSkillId(): string | null {
+  getSupersedingSkillId(): string {
     return this._supersedingSkillId;
   }
 

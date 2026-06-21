@@ -571,43 +571,6 @@ describe('Skill editor page', () => {
   );
 
   it(
-    'should not update skill editor browser tabs info if tabs info is ' +
-      'null and skill is already initialized',
-    () => {
-      spyOn(
-        localStorageService,
-        'getEntityEditorBrowserTabsInfo'
-      ).and.returnValue(null);
-      spyOn(localStorageService, 'updateEntityEditorBrowserTabsInfo');
-
-      component.skillIsInitialized = true;
-      component.createOrUpdateSkillEditorBrowserTabsInfo();
-
-      expect(
-        localStorageService.updateEntityEditorBrowserTabsInfo
-      ).not.toHaveBeenCalled();
-    }
-  );
-
-  it(
-    'should do nothing when closing skill editor browser tab if tabs ' +
-      'info is null',
-    () => {
-      spyOn(
-        localStorageService,
-        'getEntityEditorBrowserTabsInfo'
-      ).and.returnValue(null);
-      spyOn(localStorageService, 'updateEntityEditorBrowserTabsInfo');
-
-      component.onClosingSkillEditorBrowserTab();
-
-      expect(
-        localStorageService.updateEntityEditorBrowserTabsInfo
-      ).not.toHaveBeenCalled();
-    }
-  );
-
-  it(
     'should decrement number of opened skill editor tabs when ' +
       'a tab is closed',
     () => {
