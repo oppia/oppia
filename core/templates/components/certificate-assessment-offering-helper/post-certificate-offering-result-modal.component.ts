@@ -24,7 +24,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {
   CERTIFICATE_OFFERING_RESULT_ACTIONS,
   CertificateOfferingResultAction,
-} from './certificate-offering-action.model';
+} from 'domain/certificate-assessment/certificate-assessment-domain.constants';
 import './post-certificate-offering-result-modal.component.css';
 
 @Component({

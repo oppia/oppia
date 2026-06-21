@@ -17,10 +17,10 @@
  */
 
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {CERTIFICATE_OFFERING_RESULT_ACTIONS} from './certificate-offering-action.model';
 import {PostCertificateOfferingResultModalComponent} from './post-certificate-offering-result-modal.component';
 import {Clipboard} from '@angular/cdk/clipboard';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {CERTIFICATE_OFFERING_RESULT_ACTIONS} from 'domain/certificate-assessment/certificate-assessment-domain.constants';
 
 describe('Post certificate offering result modal component', () => {
   let component: PostCertificateOfferingResultModalComponent;

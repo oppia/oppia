@@ -34,7 +34,7 @@ import {
   CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
   CERTIFICATE_OFFERING_RESULT_ACTIONS,
   CERTIFICATE_OFFERING_SAVE_STATUSES,
-} from 'components/certificate-assessment-offering-helper/certificate-offering-action.model';
+} from 'domain/certificate-assessment/certificate-assessment-domain.constants';
 import {CERTIFICATE_OFFERING_SECTION_IDS} from 'components/certificate-assessment-offering-helper/certificate-offering-section.model';
 import {AlertsService} from 'services/alerts.service';
 

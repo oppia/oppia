@@ -23,7 +23,7 @@ import {
   CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
   CertificateOfferingConfirmationAction,
   CERTIFICATE_OFFERING_SAVE_STATUSES,
-} from './certificate-offering-action.model';
+} from 'domain/certificate-assessment/certificate-assessment-domain.constants';
 
 @Component({
   selector: 'oppia-certificate-offering-confirmation-modal',

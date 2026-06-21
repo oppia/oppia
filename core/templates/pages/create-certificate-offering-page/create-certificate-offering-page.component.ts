@@ -33,7 +33,7 @@ import {
   CERTIFICATE_OFFERING_CONFIRMATION_ACTIONS,
   CERTIFICATE_OFFERING_RESULT_ACTIONS,
   CERTIFICATE_OFFERING_SAVE_STATUSES,
-} from 'components/certificate-assessment-offering-helper/certificate-offering-action.model';
+} from 'domain/certificate-assessment/certificate-assessment-domain.constants';
 import {CertificateOfferingConfirmationModalComponent} from 'components/certificate-assessment-offering-helper/certificate-offering-confirmation-modal.component';
 import {PostCertificateOfferingResultModalComponent} from 'components/certificate-assessment-offering-helper/post-certificate-offering-result-modal.component';
 import {AlertsService} from 'services/alerts.service';
