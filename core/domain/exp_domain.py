@@ -1564,6 +1564,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def get_translatable_contents_collection(
         self,
         override_metadata_feature_flag: bool = False,
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
         **kwargs: Any,
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the exploration.

@@ -357,7 +357,10 @@ class Question(translation_domain.BaseTranslatableObject):
         self.last_updated = last_updated
 
     def get_translatable_contents_collection(
-        self, **kwargs: Any
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
+        self,
+        **kwargs: Any,
     ) -> translation_domain.TranslatableContentsCollection:
         """Get all translatable fields in the question.
 

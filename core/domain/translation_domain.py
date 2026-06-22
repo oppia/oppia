@@ -260,6 +260,8 @@ class TranslatableContentsCollection:
     def add_fields_from_translatable_object(
         self,
         translatable_object: BaseTranslatableObject,
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
         **kwargs: Any,
     ) -> None:
         """Adds translatable fields from a translatable object parameter to
@@ -292,7 +294,10 @@ class BaseTranslatableObject:
     """
 
     def get_translatable_contents_collection(
-        self, **kwargs: Any
+        # Here we use type Any because the keyword arguments vary
+        # depending on the specific translatable object subclass.
+        self,
+        **kwargs: Any,
     ) -> TranslatableContentsCollection:
         """Get all translatable fields in a translatable object.
 
