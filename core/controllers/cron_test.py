@@ -56,8 +56,8 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
         app_feedback_report_models,
-        job_models,
         exp_models,
+        job_models,
         suggestion_models,
         user_models,
     )
@@ -81,7 +81,6 @@ if MYPY:  # pragma: no cover
 
 class CronJobTests(test_utils.GenericTestBase):
 
-    FIVE_WEEKS: Final = datetime.timedelta(weeks=5)
     NINE_WEEKS: Final = datetime.timedelta(weeks=9)
     FOURTEEN_WEEKS: Final = datetime.timedelta(weeks=14)
 

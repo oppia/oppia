@@ -208,7 +208,7 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         user_group_model2 = user_models.UserGroupModel(
             id='group_id_2',
             name='Group Two',
-            user_ids=['new_id'],
+            user_ids=[self.admin_user_id, 'new_id'],
             last_updated=self.curr_time,
         )
         cloud_datastore_services.update_timestamps_multi(
@@ -251,10 +251,9 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
             bool,
         ] = (
             user_models.UserGroupModel.query(
-                user_models.UserGroupModel.name != '',
+                user_models.UserGroupModel.user_ids == self.admin_user_id,
             )
             .order(user_models.UserGroupModel.name)
-            .fetch_page(2, cloud_datastore_services.make_cursor())
             .fetch_page(2, cloud_datastore_services.make_cursor())
         )
 
