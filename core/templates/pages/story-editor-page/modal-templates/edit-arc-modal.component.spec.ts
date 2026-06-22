@@ -20,6 +20,7 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {EditArcModalComponent} from './edit-arc-modal.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 class MockActiveModal {
   close(value?: {title: string; description: string}): void {
@@ -38,7 +39,7 @@ describe('Edit Arc Modal Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [EditArcModalComponent],
+      declarations: [EditArcModalComponent, MockTranslatePipe],
       providers: [
         {
           provide: NgbActiveModal,

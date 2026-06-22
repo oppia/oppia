@@ -45,6 +45,7 @@ import {
   StoryContents,
 } from 'domain/story/story-contents-object.model';
 import {EditArcModalComponent} from '../modal-templates/edit-arc-modal.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -93,6 +94,7 @@ describe('Story Editor Component having three story nodes', () => {
         NewChapterTitleModalComponent,
         DeleteChapterModalComponent,
         EditArcModalComponent,
+        MockTranslatePipe,
         UrlFragmentEditorComponent,
       ],
       providers: [
