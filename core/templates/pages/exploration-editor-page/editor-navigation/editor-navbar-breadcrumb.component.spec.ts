@@ -87,7 +87,13 @@ describe('Editor Navbar Breadcrumb component', () => {
   });
 
   it('should initialize component properties after controller is initialized', () => {
-    expect(component.navbarTitle).toBeUndefined();
+    expect(component.navbarTitle).toBe('Exploration Title...');
+  });
+
+  it('should set navbarTitle to null when exploration title is not yet initialized', () => {
+    explorationTitleService.savedMemento = null;
+    component.setNavbarTitle();
+    expect(component.navbarTitle).toBeNull();
   });
 
   it(

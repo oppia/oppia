@@ -1,11 +1,11 @@
-<ul class="nav navbar-nav d-none d-md-block oppia-navbar-breadcrumb ng-cloak">
+<ul class="nav navbar-nav d-none d-md-block oppia-navbar-breadcrumb">
   <li>
     <span class="oppia-navbar-breadcrumb-separator"></span>
     <span *ngIf="navbarTitle">
-      <[navbarTitle]>
+      {{navbarTitle}}
       <span class="oppia-navbar-breadcrumb-separator oppia-navbar-breadcrumb-separator-icon"></span>
       <span>
-        <[getCurrentTabName()]>
+        {{ getCurrentTabName() }}
       </span>
     </span>
     <span *ngIf="navbarTitle === ''" (click)="editTitle()" class="oppia-untitled-exploration-text">
