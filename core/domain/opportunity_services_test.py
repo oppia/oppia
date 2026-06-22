@@ -2551,3 +2551,33 @@ class TranslationOpportunityServicesUnitTest(test_utils.GenericTestBase):
             opportunity_services.update_translation_opportunity_with_accepted_suggestion(
                 'exp_1', 'hi'
             )
+
+    def test_update_translation_opp_for_legacy_skill_or_exp_with_completed_language(
+        self,
+    ) -> None:
+        opportunity_services.create_translation_opportunity(
+            {feconf.ENTITY_TYPE_EXPLORATION: ['exp_1']}
+        )
+        # Delete the translation counts cache.
+        model = opportunity_models.ExplorationOpportunitySummaryModel.get(
+            'exp_1'
+        )
+        model.translation_counts = {}
+        model.update_timestamps()
+        model.put()
+
+        self.assertIn('hi', model.incomplete_translation_language_codes)
+
+        with self.swap(
+            translation_services,
+            'get_translation_counts',
+            lambda *args: {'hi': 1},
+        ):
+            opportunity_services.update_translation_opportunity_with_accepted_suggestion(
+                'exp_1', 'hi'
+            )
+
+        model = opportunity_models.ExplorationOpportunitySummaryModel.get(
+            'exp_1'
+        )
+        self.assertNotIn('hi', model.incomplete_translation_language_codes)
