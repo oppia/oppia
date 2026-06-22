@@ -458,7 +458,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     # Here we use MyPy ignore because we override the definition of the function
     # from the parent class, but that is fine as _assert_validation_error is
     # supposed to be customizable and thus we add an ignore.
-    def _assert_validation_error(  # type: ignore[override]
+    def _assert_validation_error(  # type: ignore[override] pylint: disable=arguments-differ
         self, expected_error_substring: str
     ) -> None:
         """Checks that the topic passes strict validation."""
@@ -2040,7 +2040,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
     # Here we use MyPy ignore because we override the definition of the function
     # from the parent class, but that is fine as _assert_validation_error is
     # supposed to be customizable and thus we add an ignore.
-    def _assert_validation_error(  # type: ignore[override]
+    def _assert_validation_error(  # type: ignore[override] pylint: disable=arguments-differ
         self, expected_error_substring: str
     ) -> None:
         """Checks that the topic summary passes validation.
