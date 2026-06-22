@@ -162,7 +162,7 @@ export class StoryEditorPageComponent implements OnInit, OnDestroy {
     }
     this._validateExplorations();
     let storyPrepublishValidationIssues = this.story.prepublishValidate();
-    let nodePrepublishValidationIssues: string[] = ([] as string[]).concat(
+    let nodePrepublishValidationIssues: string[] = [].concat(
       ...nodes.map(node => node.prepublishValidate())
     );
     this.prepublishValidationIssues = storyPrepublishValidationIssues.concat(

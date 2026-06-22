@@ -136,6 +136,10 @@ describe('Story node editor component', () => {
   let alertsService: AlertsService;
   let storyEditorStateService: StoryEditorStateService;
   let focusManagerService: FocusManagerService;
+  let modalRef: {
+    componentInstance: Record<string, string>;
+    result: Promise<string | object | void>;
+  };
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let mockEventEmitterLast = new EventEmitter();
 
@@ -295,6 +299,11 @@ describe('Story node editor component', () => {
     component.storyNodeIds = ['node1', 'node_2', 'node_3', 'wroking'];
     component.destinationNodeIds = ['node_2'];
     component.ngOnInit();
+
+    modalRef = {
+      componentInstance: {},
+      result: Promise.resolve('success'),
+    };
   });
 
   afterEach(() => {
@@ -624,12 +633,6 @@ describe('Story node editor component', () => {
   });
 
   it('should open add skill modal for adding prerequisite skill', () => {
-    const modalRef = jasmine.createSpyObj('NgbModalRef', [
-      'componentInstance',
-      'result',
-    ]);
-    modalRef.componentInstance = {};
-    modalRef.result = Promise.resolve('success');
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => modalRef);
 
     component.addPrerequisiteSkillId();
@@ -649,11 +652,6 @@ describe('Story node editor component', () => {
       let alertsSpy = spyOn(alertsService, 'addInfoMessage').and.returnValue(
         null
       );
-      const modalRef = jasmine.createSpyObj('NgbModalRef', [
-        'componentInstance',
-        'result',
-      ]);
-      modalRef.componentInstance = {};
       modalRef.result = Promise.resolve({
         summary: {
           id: 'id',
@@ -676,12 +674,6 @@ describe('Story node editor component', () => {
     spyOn(storyUpdateService, 'addAcquiredSkillIdToNode').and.callFake(
       () => {}
     );
-    const modalRef = jasmine.createSpyObj('NgbModalRef', [
-      'componentInstance',
-      'result',
-    ]);
-    modalRef.componentInstance = {};
-    modalRef.result = Promise.resolve('success');
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => modalRef);
 
     component.addAcquiredSkillId();
@@ -700,12 +692,6 @@ describe('Story node editor component', () => {
       let alertsSpy = spyOn(alertsService, 'addInfoMessage').and.returnValue(
         null
       );
-      const modalRef = jasmine.createSpyObj('NgbModalRef', [
-        'componentInstance',
-        'result',
-      ]);
-      modalRef.componentInstance = {};
-      modalRef.result = Promise.resolve('success');
       spyOn(ngbModal, 'open').and.callFake(() => modalRef);
 
       component.addAcquiredSkillId();
