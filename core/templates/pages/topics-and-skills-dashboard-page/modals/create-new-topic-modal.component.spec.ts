@@ -28,6 +28,14 @@ import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {CreateNewTopicModalComponent} from './create-new-topic-modal.component';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
+import {
+  ComponentFixture,
+  TestBed,
+  waitForAsync,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {ImageUploaderData} from 'components/forms/custom-forms-directives/image-uploader.component';
 
 describe('Create new topic modal', () => {
   let fixture: ComponentFixture<CreateNewTopicModalComponent>;
@@ -207,4 +215,40 @@ describe('Create new topic modal', () => {
     );
     expect(componentInstance.onTopicUrlFragmentChange).toHaveBeenCalled();
   });
+
+  it('should save image and thumbnail bg color on image save', fakeAsync(() => {
+    const saveImageSpy = spyOn(imageLocalStorageService, 'saveImage');
+    const setBgColorSpy = spyOn(
+      imageLocalStorageService,
+      'setThumbnailBgColor'
+    );
+
+    const mockFileReader = {
+      result: 'data:image/svg+xml;base64,test',
+      onload: null as (() => void) | null,
+      readAsDataURL() {
+        if (this.onload) {
+          this.onload();
+        }
+      },
+    };
+
+    spyOn(window, 'FileReader').and.returnValue(
+      mockFileReader as unknown as FileReader
+    );
+
+    componentInstance.onImageSave({
+      filename: 'test.svg',
+      bg_color: '#C6DCDA',
+      image_data: new Blob(),
+    } as ImageUploaderData);
+
+    tick();
+
+    expect(saveImageSpy).toHaveBeenCalledWith(
+      'test.svg',
+      'data:image/svg+xml;base64,test'
+    );
+    expect(setBgColorSpy).toHaveBeenCalledWith('#C6DCDA');
+  }));
 });
