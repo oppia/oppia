@@ -55,9 +55,9 @@ describe('Edit Arc Modal Component', () => {
     component.arcDescription = 'Basics of fractions';
   });
 
-  it('should initialize editable fields from inputs', () => {
-    expect(component.editableArcTitle).toBe('Arc 2');
-    expect(component.editableArcDescription).toBe('Basics of fractions');
+  it('should initialize fields from inputs', () => {
+    expect(component.arcTitle).toBe('Arc 2');
+    expect(component.arcDescription).toBe('Basics of fractions');
   });
 
   it('should dismiss modal on cancel', () => {
@@ -70,7 +70,7 @@ describe('Edit Arc Modal Component', () => {
 
   it('should show error when title is empty', () => {
     const closeSpy = spyOn(ngbActiveModal, 'close');
-    component.editableArcTitle = '   ';
+    component.arcTitle = '   ';
 
     component.save();
 
@@ -80,8 +80,8 @@ describe('Edit Arc Modal Component', () => {
 
   it('should close modal with trimmed values', () => {
     const closeSpy = spyOn(ngbActiveModal, 'close');
-    component.editableArcTitle = '  Arc 3  ';
-    component.editableArcDescription = '  Intro to decimals  ';
+    component.arcTitle = '  Arc 3  ';
+    component.arcDescription = '  Intro to decimals  ';
 
     component.save();
 

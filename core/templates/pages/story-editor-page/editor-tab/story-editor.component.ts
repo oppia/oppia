@@ -51,7 +51,7 @@ import {StoryDomainConstants} from 'domain/story/story-domain.constants';
 })
 export class StoryEditorComponent implements OnInit, OnDestroy {
   story: Story;
-  storyContents: StoryContents | null;
+  storyContents!: StoryContents;
   disconnectedNodes: string[];
   linearNodesList: StoryNode[];
   nodes: StoryNode[];
@@ -119,12 +119,8 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
 
   _init(): void {
     this.story = this.storyEditorStateService.getStory();
-    if (this.story) {
-      this.storyContents = this.story.getStoryContents();
-    }
-    if (this.storyContents) {
-      this.setNodeToEdit(this.storyContents.getInitialNodeId());
-    }
+    this.storyContents = this.story.getStoryContents();
+    this.setNodeToEdit(this.storyContents.getInitialNodeId());
     this._initEditor();
   }
 
@@ -196,9 +192,6 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   }
 
   getArcIdForNode(nodeId: string): string | null {
-    if (!this.storyContents) {
-      return null;
-    }
     for (const arc of this.storyContents.getArcs()) {
       if (arc.getNodeIds().indexOf(nodeId) !== -1) {
         return arc.getId();
@@ -208,9 +201,6 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   }
 
   getArcForNode(nodeId: string): ArcModel | null {
-    if (!this.storyContents) {
-      return null;
-    }
     const arcId = this.getArcIdForNode(nodeId);
     if (!arcId) {
       return null;
@@ -220,9 +210,6 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   }
 
   getArcSequenceNumber(nodeId: string): number | null {
-    if (!this.storyContents) {
-      return null;
-    }
     const arcId = this.getArcIdForNode(nodeId);
     if (!arcId) {
       return null;
@@ -234,9 +221,6 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   getArcColorForNode(
     nodeId: string
   ): (typeof StoryDomainConstants.ARC_COLOR_PALETTE)[number] | null {
-    if (!this.storyContents) {
-      return null;
-    }
     const arcId = this.getArcIdForNode(nodeId);
     if (!arcId) {
       return null;
@@ -250,7 +234,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   }
 
   isSameArc(nodeIndex: number): boolean {
-    if (!this.storyContents || nodeIndex <= 0) {
+    if (nodeIndex <= 0) {
       return true;
     }
     const prevNodeId = this.linearNodesList[nodeIndex - 1].getId();
@@ -261,9 +245,6 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   }
 
   splitIntoArc(nodeIndex: number): void {
-    if (!this.storyContents) {
-      return;
-    }
     const nodeId = this.linearNodesList[nodeIndex].getId();
     const sourceArcId = this.getArcIdForNode(nodeId);
     if (!sourceArcId) {
@@ -306,10 +287,14 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     this._initEditor();
   }
 
-  editArc(arcId: string | null): void {
-    if (!this.storyContents || !arcId) {
-      return;
+  onEditArcClick(nodeId: string): void {
+    const arcId = this.getArcIdForNode(nodeId);
+    if (arcId) {
+      this.editArc(arcId);
     }
+  }
+
+  editArc(arcId: string): void {
     const arcIndex = this.storyContents.getArcIndex(arcId);
     if (arcIndex === -1) {
       return;
@@ -346,10 +331,14 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     );
   }
 
-  removeArcBoundary(arcId: string | null): void {
-    if (!this.storyContents || !arcId) {
-      return;
+  onRemoveArcClick(nodeId: string): void {
+    const arcId = this.getArcIdForNode(nodeId);
+    if (arcId) {
+      this.removeArcBoundary(arcId);
     }
+  }
+
+  removeArcBoundary(arcId: string): void {
     const arcIndex = this.storyContents.getArcIndex(arcId);
     if (arcIndex === -1) {
       return;
@@ -384,46 +373,43 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   _initEditor(): void {
     this.generatedUrlPrefix = `${this.hostname}/learn/${this.getClassroomUrlFragment()}/${this.getTopicUrlFragment()}/story`;
     this.story = this.storyEditorStateService.getStory();
-    if (this.story) {
-      this.storyContents = this.story.getStoryContents();
-      this.disconnectedNodes = [];
-      this.linearNodesList = [];
-      this.nodes = [];
-      if (this.storyContents && this.storyContents.getNodes().length > 0) {
-        this.nodes = this.storyContents.getNodes();
-        this.initialNodeId = this.storyContents.getInitialNodeId();
-        this.linearNodesList = this.storyContents.getLinearNodesList();
-        this.chapterIsPublishable = [];
-        this.linearNodesList.forEach((node, index) => {
-          if (node.getStatus() === 'Published') {
-            this.chapterIsPublishable.push(true);
-            this.selectedChapterIndexInPublishUptoDropdown = index;
-          } else if (
-            node.getStatus() === 'Ready To Publish' &&
-            ((index !== 0 && this.chapterIsPublishable[index - 1]) ||
-              index === 0)
-          ) {
-            this.chapterIsPublishable.push(true);
-          } else {
-            this.chapterIsPublishable.push(false);
-          }
-        });
-        this.updatePublishUptoChapterSelection(
-          this.selectedChapterIndexInPublishUptoDropdown
-        );
-      }
-      this.notesEditorIsShown = false;
-      this.storyTitleEditorIsShown = false;
-      this.editableTitle = this.story.getTitle();
-      this.editableUrlFragment = this.story.getUrlFragment();
-      this.editableMetaTagContent = this.story.getMetaTagContent();
-      this.initialStoryUrlFragment = this.story.getUrlFragment();
-      this.editableNotes = this.story.getNotes();
-      this.editableDescription = this.story.getDescription();
-      this.editableDescriptionIsEmpty = this.editableDescription === '';
-      this.storyDescriptionChanged = false;
-      this.storyUrlFragmentExists = false;
+    this.storyContents = this.story.getStoryContents();
+    this.disconnectedNodes = [];
+    this.linearNodesList = [];
+    this.nodes = [];
+    if (this.storyContents.getNodes().length > 0) {
+      this.nodes = this.storyContents.getNodes();
+      this.initialNodeId = this.storyContents.getInitialNodeId();
+      this.linearNodesList = this.storyContents.getLinearNodesList();
+      this.chapterIsPublishable = [];
+      this.linearNodesList.forEach((node, index) => {
+        if (node.getStatus() === 'Published') {
+          this.chapterIsPublishable.push(true);
+          this.selectedChapterIndexInPublishUptoDropdown = index;
+        } else if (
+          node.getStatus() === 'Ready To Publish' &&
+          ((index !== 0 && this.chapterIsPublishable[index - 1]) || index === 0)
+        ) {
+          this.chapterIsPublishable.push(true);
+        } else {
+          this.chapterIsPublishable.push(false);
+        }
+      });
+      this.updatePublishUptoChapterSelection(
+        this.selectedChapterIndexInPublishUptoDropdown
+      );
     }
+    this.notesEditorIsShown = false;
+    this.storyTitleEditorIsShown = false;
+    this.editableTitle = this.story.getTitle();
+    this.editableUrlFragment = this.story.getUrlFragment();
+    this.editableMetaTagContent = this.story.getMetaTagContent();
+    this.initialStoryUrlFragment = this.story.getUrlFragment();
+    this.editableNotes = this.story.getNotes();
+    this.editableDescription = this.story.getDescription();
+    this.editableDescriptionIsEmpty = this.editableDescription === '';
+    this.storyDescriptionChanged = false;
+    this.storyUrlFragmentExists = false;
   }
 
   setNodeToEdit(nodeId: string): void {

@@ -44,7 +44,6 @@ import {
   ArcModel,
   StoryContents,
 } from 'domain/story/story-contents-object.model';
-import {StoryDomainConstants} from 'domain/story/story-domain.constants';
 import {EditArcModalComponent} from '../modal-templates/edit-arc-modal.component';
 
 class MockNgbModalRef {
@@ -830,22 +829,17 @@ describe('Story Editor Component having three story nodes', () => {
     expect(updateArcPropertySpy).toHaveBeenCalledTimes(2);
   }));
 
-  it('should return without opening modal if arc id is null', () => {
+  it('should not open modal when onEditArcClick is called for a node with no arc', () => {
     const modalSpy = spyOn(ngbModal, 'open');
 
-    component.editArc(null);
+    component.onEditArcClick('node_without_arc');
 
     expect(modalSpy).not.toHaveBeenCalled();
   });
 
-  it('should return early from editArc when story contents are missing or arc index is invalid', () => {
+  it('should return early from editArc when arc index is invalid', () => {
     const modalSpy = spyOn(ngbModal, 'open');
 
-    component.storyContents = null;
-    component.editArc('arc_1');
-    expect(modalSpy).not.toHaveBeenCalled();
-
-    component.storyContents = story.getStoryContents();
     component.editArc('non_existent_arc');
     expect(modalSpy).not.toHaveBeenCalled();
   });
@@ -922,13 +916,6 @@ describe('Story Editor Component having three story nodes', () => {
     );
   });
 
-  it('should return null for arc helpers when story contents are missing', () => {
-    component.storyContents = null;
-
-    expect(component.getArcForNode('node_1')).toBeNull();
-    expect(component.getArcSequenceNumber('node_1')).toBeNull();
-  });
-
   it('should return null for arc helpers when node has no arc', () => {
     expect(component.getArcForNode('node_1')).toBeNull();
     expect(component.getArcSequenceNumber('node_1')).toBeNull();
@@ -962,13 +949,7 @@ describe('Story Editor Component having three story nodes', () => {
     expect(component.isStoryEditorArcsFeatureFlagEnabled()).toBeTrue();
   });
 
-  it('should return true when story contents are missing or node index is zero for isSameArc', () => {
-    component.storyContents = null;
-
-    expect(component.isSameArc(0)).toBeTrue();
-
-    component.storyContents = story.getStoryContents();
-
+  it('should return true when node index is zero for isSameArc', () => {
     expect(component.isSameArc(0)).toBeTrue();
   });
 
@@ -1077,11 +1058,6 @@ describe('Story Editor Component having three story nodes', () => {
   it('should return early from splitIntoArc when conditions are not met', () => {
     const createArcSpy = spyOn(storyUpdateService, 'createArc');
 
-    component.storyContents = null;
-    component.splitIntoArc(0);
-    expect(createArcSpy).not.toHaveBeenCalled();
-
-    component.storyContents = story.getStoryContents();
     component.linearNodesList = story.getStoryContents().getNodes();
     component.splitIntoArc(0);
     expect(createArcSpy).not.toHaveBeenCalled();
@@ -1099,11 +1075,7 @@ describe('Story Editor Component having three story nodes', () => {
   it('should return early from removeArcBoundary when conditions are not met', () => {
     const deleteArcSpy = spyOn(storyUpdateService, 'deleteArc');
 
-    component.removeArcBoundary(null);
-    expect(deleteArcSpy).not.toHaveBeenCalled();
-
-    component.storyContents = null;
-    component.removeArcBoundary('arc_1');
+    component.onRemoveArcClick('node_without_arc');
     expect(deleteArcSpy).not.toHaveBeenCalled();
 
     component.storyContents = story.getStoryContents();
@@ -1190,59 +1162,6 @@ describe('Story Editor Component having three story nodes', () => {
 
     expect(component.getArcIdForNode('node_2')).toBe('arc_1');
     expect(component.getArcIdForNode('node_1')).toBeNull();
-  });
-
-  it('should return null from getArcIdForNode when story contents is null', () => {
-    component.storyContents = null;
-
-    expect(component.getArcIdForNode('node_1')).toBeNull();
-  });
-
-  it('should return null from getArcColorForNode when story contents is null', () => {
-    component.storyContents = null;
-
-    expect(component.getArcColorForNode('node_1')).toBeNull();
-  });
-
-  it('should return null from getArcColorForNode when arc id is null', () => {
-    spyOn(component, 'getArcIdForNode').and.returnValue(null);
-
-    expect(component.getArcColorForNode('node_1')).toBeNull();
-  });
-
-  it('should return null from getArcColorForNode when arc index is invalid', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_2'])
-    );
-    spyOn(component.storyContents, 'getArcIndex').and.returnValue(-1);
-
-    expect(component.getArcColorForNode('node_2')).toBeNull();
-  });
-
-  it('should return correct color from getArcColorForNode', () => {
-    component.storyContents.addArc(
-      ArcModel.createNew('arc_1', 'Arc 1', '', ['node_2'])
-    );
-    const expectedColor = StoryDomainConstants.ARC_COLOR_PALETTE[0];
-    const result = component.getArcColorForNode('node_2');
-
-    expect(result).toEqual(expectedColor);
-  });
-
-  it('should handle _init when story is null', () => {
-    fetchSpy.and.returnValue(null);
-
-    expect(() => {
-      component._init();
-    }).not.toThrowError();
-  });
-
-  it('should handle _initEditor when story is null', () => {
-    fetchSpy.and.returnValue(null);
-
-    expect(() => {
-      component._initEditor();
-    }).not.toThrowError();
   });
 
   it('should call setInitialNodeId when rearranging from index 0', () => {

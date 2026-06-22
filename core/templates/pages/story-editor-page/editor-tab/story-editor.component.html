@@ -202,7 +202,7 @@
                   <div *ngFor="let node of linearNodesList;index as idx"
                        cdkDrag>
                     <div *ngIf="isStoryEditorArcsFeatureFlagEnabled() && (idx === 0 || !isSameArc(idx))"
-                         class="legacy-arc-boundary-row">
+                         class="inline-arc-boundary-row">
                       <div class="arc-boundary-header"
                            [style.background-color]="getArcColorForNode(node.getId())?.headerBg || '#eef7ef'"
                            [style.border-color]="getArcColorForNode(node.getId())?.headerBorder || '#b8dbbf'">
@@ -226,12 +226,12 @@
                         </div>
                         <div class="arc-boundary-actions">
                           <button type="button" class="btn btn-sm arc-edit-button"
-                                  (click)="editArc(getArcIdForNode(node.getId()));$event.stopPropagation()">
+                                  (click)="onEditArcClick(node.getId());$event.stopPropagation()">
                             <i class="fas fa-pen" aria-hidden="true"></i>
                             Edit Arc
                           </button>
                           <button type="button" class="btn btn-sm arc-remove-button"
-                                  (click)="removeArcBoundary(getArcIdForNode(node.getId()));$event.stopPropagation()">
+                                  (click)="onRemoveArcClick(node.getId());$event.stopPropagation()">
                             <i class="far fa-trash-alt" aria-hidden="true"></i>
                             Remove Arc Boundary
                           </button>
@@ -239,7 +239,7 @@
                       </div>
                     </div>
                     <div *ngIf="isStoryEditorArcsFeatureFlagEnabled() && idx > 0 && isSameArc(idx)"
-                         class="legacy-split-line-row">
+                         class="inline-split-line-row">
                       <div class="split-line-container">
                         <div class="split-line"></div>
                         <button type="button" class="btn btn-sm split-into-arc-button"
@@ -472,11 +472,11 @@
                           </div>
                           <div class="arc-header-actions">
                             <button type="button" class="arc-action-btn arc-edit-btn"
-                                    (click)="editArc(getArcIdForNode(node.getId()));$event.stopPropagation()">
+                                    (click)="onEditArcClick(node.getId());$event.stopPropagation()">
                               <i class="fas fa-pen" aria-hidden="true"></i> Edit Arc
                             </button>
                             <button type="button" class="arc-action-btn arc-remove-btn"
-                                    (click)="removeArcBoundary(getArcIdForNode(node.getId()));$event.stopPropagation()">
+                                    (click)="onRemoveArcClick(node.getId());$event.stopPropagation()">
                               <i class="far fa-trash-alt" aria-hidden="true"></i> Remove Arc Boundary
                             </button>
                           </div>
@@ -1373,8 +1373,8 @@
       font-size: 15px; font-weight: 500; margin: 0 14px; padding: 0; white-space: nowrap;
     }
     .split-into-arc-button i { font-size: 13px; margin-right: 6px; vertical-align: middle; }
-    .legacy-arc-boundary-row { margin: 8px 0; }
-    .legacy-split-line-row { margin: 4px 0; }
-    .legacy-arc-boundary-row .arc-boundary-header { align-items: flex-start; display: flex; justify-content: space-between; }
+    .inline-arc-boundary-row { margin: 8px 0; }
+    .inline-split-line-row { margin: 4px 0; }
+    .inline-arc-boundary-row .arc-boundary-header { align-items: flex-start; display: flex; justify-content: space-between; }
   </style>
 </div>

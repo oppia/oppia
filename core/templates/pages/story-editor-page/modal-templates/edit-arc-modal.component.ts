@@ -25,15 +25,8 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./edit-arc-modal.component.css'],
 })
 export class EditArcModalComponent {
-  @Input() set arcTitle(value: string) {
-    this.editableArcTitle = value || '';
-  }
-  @Input() set arcDescription(value: string) {
-    this.editableArcDescription = value || '';
-  }
-
-  editableArcTitle = '';
-  editableArcDescription = '';
+  @Input() arcTitle = '';
+  @Input() arcDescription = '';
   errorMessage: string | null = null;
 
   constructor(private ngbActiveModal: NgbActiveModal) {}
@@ -43,14 +36,14 @@ export class EditArcModalComponent {
   }
 
   save(): void {
-    const trimmedTitle = this.editableArcTitle.trim();
+    const trimmedTitle = this.arcTitle.trim();
     if (!trimmedTitle) {
       this.errorMessage = 'Arc title cannot be empty.';
       return;
     }
     this.ngbActiveModal.close({
       title: trimmedTitle,
-      description: this.editableArcDescription.trim(),
+      description: this.arcDescription.trim(),
     });
   }
 }

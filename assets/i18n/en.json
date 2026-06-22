@@ -1345,6 +1345,8 @@
     "I18N_SIGNUP_USERNAME": "Username",
     "I18N_SIGNUP_USERNAME_EXPLANATION": "Your username will be shown next to your contributions.",
     "I18N_SIGNUP_WHY_LICENSE": "Why CC-BY-SA?",
+    "I18N_STORY_EDITOR_EDIT_ARC": "Edit Arc",
+    "I18N_STORY_EDITOR_SAVE_ARC": "Save Arc",
     "I18N_SKILL_LEVEL_BEGINNER": "Beginner",
     "I18N_SKILL_LEVEL_INTERMIDIATE": "Intermediate",
     "I18N_SKILL_LEVEL_NEEDS_WORK": "Needs Work",

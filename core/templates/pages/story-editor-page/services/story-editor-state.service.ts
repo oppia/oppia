@@ -70,15 +70,6 @@ export class StoryEditorStateService {
   ) {}
 
   private _setStory(story: Story): void {
-    // Migrate legacy "Main Arc" title to "Arc 1".
-    const storyContents = story.getStoryContents();
-    if (storyContents) {
-      for (const arc of storyContents.getArcs()) {
-        if (arc.getTitle() === 'Main Arc') {
-          arc.setTitle('Arc 1');
-        }
-      }
-    }
     if (!this._story) {
       // The Story is set directly for the first load.
       this._story = story;
