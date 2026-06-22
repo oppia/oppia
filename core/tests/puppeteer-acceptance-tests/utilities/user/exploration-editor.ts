@@ -479,8 +479,6 @@ const saveRecommendationModalSaveButtonSelector =
 const nextCardButtonSelector = '.e2e-test-next-card-button';
 const viewSolutionButtonSelector = '.e2e-test-view-solution';
 const viewHintButtonSelector = '.e2e-test-view-hint';
-const submitAnswerButtonSelector = '.e2e-test-submit-answer-button';
-const previewRestartButtonSelector = '.e2e-test-preview-restart-button';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
@@ -8217,9 +8215,9 @@ export class ExplorationEditor extends BaseUser {
    * no submit-answer button is present and the restart button is visible.
    */
   async expectEndExplorationPreviewToBeVisible(): Promise<void> {
-    const submitButton = await this.page.$(submitAnswerButtonSelector);
+    const submitButton = await this.page.$(submitAnswerButton);
     expect(submitButton).toBeNull();
-    await this.page.waitForSelector(previewRestartButtonSelector, {
+    await this.page.waitForSelector(previewRestartButton, {
       visible: true,
     });
   }
