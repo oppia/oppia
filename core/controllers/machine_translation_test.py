@@ -19,17 +19,9 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import contributor_admin_services
 from core.domain import machine_translation_services
 from core.domain import translation_services
 from core.tests import test_utils
-
-
-class MockContributorRoles:
-    """Mock for the contributor_admin_services roles object."""
-
-    def __init__(self, allowed_languages: list[str]) -> None:
-        self.can_submit_translations_in_language = allowed_languages
 
 
 class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
@@ -58,12 +50,6 @@ class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
             lambda: True,
         )
 
-        self.roles_swap = self.swap(
-            contributor_admin_services,
-            'get_contributor_dashboard_roles',
-            lambda user_id: MockContributorRoles(['hi']),
-        )
-
     def test_post_fails_if_feature_flag_disabled(self) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
@@ -71,7 +57,7 @@ class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
             feconf, 'ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS', False
         )
 
-        with flag_swap, self.admin_toggle_swap, self.roles_swap:
+        with flag_swap, self.admin_toggle_swap:
             self.post_json(
                 '/generate-translation', self.payload, expected_status_int=404
             )
@@ -86,32 +72,13 @@ class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
             lambda: False,
         )
 
-        with self.feature_flag_swap, admin_toggle_swap, self.roles_swap:
+        with self.feature_flag_swap, admin_toggle_swap:
             response = self.post_json(
                 '/generate-translation', self.payload, expected_status_int=400
             )
             self.assertEqual(
                 response['error'],
                 'Automatic translation is currently disabled by the site admin.',
-            )
-        self.logout()
-
-    def test_post_fails_if_user_lacks_language_permission(self) -> None:
-        self.login(self.CONTRIBUTOR_EMAIL)
-
-        roles_swap = self.swap(
-            contributor_admin_services,
-            'get_contributor_dashboard_roles',
-            lambda user_id: MockContributorRoles(['es']),
-        )
-
-        with self.feature_flag_swap, self.admin_toggle_swap, roles_swap:
-            response = self.post_json(
-                '/generate-translation', self.payload, expected_status_int=401
-            )
-            self.assertEqual(
-                response['error'],
-                'You do not have permission to generate translations for hi.',
             )
         self.logout()
 
@@ -124,9 +91,7 @@ class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
             lambda src, tgt, text: None,
         )
 
-        with self.feature_flag_swap, self.admin_toggle_swap, self.roles_swap, (
-            domain_swap
-        ):
+        with self.feature_flag_swap, self.admin_toggle_swap, domain_swap:
             response = self.post_json(
                 '/generate-translation', self.payload, expected_status_int=400
             )
@@ -148,9 +113,7 @@ class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
             mock_generate,
         )
 
-        with self.feature_flag_swap, self.admin_toggle_swap, self.roles_swap, (
-            domain_swap
-        ):
+        with self.feature_flag_swap, self.admin_toggle_swap, domain_swap:
             response = self.post_json(
                 '/generate-translation', self.payload, expected_status_int=500
             )
@@ -166,9 +129,7 @@ class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
             lambda src, tgt, text: ('नमस्ते दुनिया', 'azure'),
         )
 
-        with self.feature_flag_swap, self.admin_toggle_swap, self.roles_swap, (
-            domain_swap
-        ):
+        with self.feature_flag_swap, self.admin_toggle_swap, domain_swap:
             response = self.post_json('/generate-translation', self.payload)
 
             self.assertEqual(response['translated_text'], 'नमस्ते दुनिया')

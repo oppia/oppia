@@ -21,7 +21,6 @@ from __future__ import annotations
 from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import contributor_admin_services
 from core.domain import machine_translation_services
 from core.domain import translation_services
 
@@ -46,23 +45,13 @@ class MachineTranslationGenerateHandler(base.BaseHandler):
                 'Automatic translation is currently disabled by the site admin.'
             )
 
+        # TODO(#24714): In Milestone 2, implement strict role-based access control
+        # to verify the user holds the new "translation submitter" role before
+        # allowing them to trigger paid Azure API calls.
+
         source_text = self.payload.get('source_text')
         source_language_code = self.payload.get('source_language_code')
         target_language_code = self.payload.get('target_language_code')
-
-        contributor_roles = (
-            contributor_admin_services.get_contributor_dashboard_roles(
-                self.user_id
-            )
-        )
-        if (
-            target_language_code
-            not in contributor_roles.can_submit_translations_in_language
-        ):
-            raise self.UnauthorizedUserException(
-                'You do not have permission to generate translations for %s.'
-                % target_language_code
-            )
 
         try:
             translation_result = (
