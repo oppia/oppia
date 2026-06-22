@@ -476,6 +476,12 @@ const saveRecommendationModalSelector = '.e2e-test-save-prompt-modal';
 const saveRecommendationModalSaveButtonSelector =
   'button.e2e-test-recommendation-prompt-save-button';
 
+const nextCardButtonSelector = '.e2e-test-next-card-button';
+const viewSolutionButtonSelector = '.e2e-test-view-solution';
+const viewHintButtonSelector = '.e2e-test-view-hint';
+const submitAnswerButtonSelector = '.e2e-test-submit-answer-button';
+const previewRestartButtonSelector = '.e2e-test-preview-restart-button';
+
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
   CODE_EDITOR = 'Code Editor',
@@ -8091,6 +8097,131 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectFeedbackPageTobeVisible(): Promise<void> {
     await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
+  }
+
+  /**
+   * Expects the interaction preview element to be absent from the DOM.
+   * Use this immediately after removeInteraction() to confirm the preview
+   * has been cleared.
+   */
+  async expectInteractionPreviewToBeAbsent(): Promise<void> {
+    const preview = await this.page.$(interactionPreviewSelector);
+    expect(preview).toBeNull();
+  }
+
+  /**
+   * Expects the "Customize Interaction" modal to have closed. Call this
+   * after clicking "Save Interaction" to confirm the modal disappears.
+   * Uses commonModalTitleSelector which is already defined in this file.
+   */
+  async expectCustomizeInteractionModalToBeClosed(): Promise<void> {
+    await this.page.waitForSelector(commonModalTitleSelector, {
+      hidden: true,
+      timeout: 10000,
+    });
+  }
+
+  /**
+   * Waits for the next-card button to be visible in the preview tab and
+   * asserts that its label matches the expected text (e.g. 'Continue').
+   */
+  async expectNextCardButtonTextToBe(expectedText: string): Promise<void> {
+    await this.page.waitForSelector(nextCardButtonSelector, {visible: true});
+    const buttonText = await this.page.$eval(
+      nextCardButtonSelector,
+      el => el.textContent?.trim() || ''
+    );
+    expect(buttonText).toBe(expectedText);
+  }
+
+  /**
+   * Waits until the next-card button is visible in the preview tab.
+   * Use this before asserting preview card content when the card has a
+   * Continue Button interaction.
+   */
+  async expectNextCardButtonToBeVisible(): Promise<void> {
+    await this.page.waitForSelector(nextCardButtonSelector, {visible: true});
+  }
+
+  /**
+   * Asserts that the multiple-choice options rendered in the preview tab
+   * match the expected set exactly (order-independent, ignoring empty strings).
+   * Uses multipleChoiceOptionSelector which is already defined in this file.
+   */
+  async expectPreviewMultipleChoiceOptionsToEqual(
+    expectedOptions: string[]
+  ): Promise<void> {
+    const choices = await this.page.$$eval(
+      multipleChoiceOptionSelector,
+      elements => elements.map(el => el.textContent?.trim() || '')
+    );
+    const nonEmptyChoices = choices.filter(choice => choice);
+    expect(nonEmptyChoices.length).toBe(expectedOptions.length);
+    expect(nonEmptyChoices).toEqual(expect.arrayContaining(expectedOptions));
+  }
+
+  /**
+   * Polls until the "View Solution" button becomes visible in the preview tab.
+   * The solution button is only unlocked after enough wrong submissions and
+   * hint consumption, so this method drives that process automatically by
+   * submitting the given wrong answer and consuming any newly-revealed hint on
+   * each iteration. Fails if the button is still not visible after 5 retries.
+   */
+  async waitForSolutionButtonToBeVisible(wrongAnswer: string): Promise<void> {
+    let isSolutionVisible = await this.isElementVisible(
+      viewSolutionButtonSelector,
+      true,
+      2000
+    );
+    for (let i = 0; i < 5 && !isSolutionVisible; i++) {
+      await this.submitTextInputAnsswer(wrongAnswer);
+      await this.expectResponseFeedbackToBe('Try again.');
+
+      const isHintVisible = await this.isElementVisible(
+        viewHintButtonSelector,
+        true,
+        2000
+      );
+      if (isHintVisible) {
+        await this.viewHint();
+        await this.closeHintModal();
+      }
+
+      isSolutionVisible = await this.isElementVisible(
+        viewSolutionButtonSelector,
+        true,
+        2000
+      );
+    }
+    expect(isSolutionVisible).toBe(true);
+  }
+
+  /**
+   * Waits for the solution modal body to be visible and asserts that it
+   * contains every string in expectedTexts.
+   * Uses commonModalBodySelector which is already defined in this file.
+   */
+  async expectSolutionModalToContain(expectedTexts: string[]): Promise<void> {
+    await this.page.waitForSelector(commonModalBodySelector, {visible: true});
+    const modalText = await this.page.$eval(
+      commonModalBodySelector,
+      el => el.textContent || ''
+    );
+    for (const text of expectedTexts) {
+      expect(modalText).toContain(text);
+    }
+  }
+
+  /**
+   * Asserts that the preview is showing the end-exploration card:
+   * no submit-answer button is present and the restart button is visible.
+   */
+  async expectEndExplorationPreviewToBeVisible(): Promise<void> {
+    const submitButton = await this.page.$(submitAnswerButtonSelector);
+    expect(submitButton).toBeNull();
+    await this.page.waitForSelector(previewRestartButtonSelector, {
+      visible: true,
+    });
   }
 }
 

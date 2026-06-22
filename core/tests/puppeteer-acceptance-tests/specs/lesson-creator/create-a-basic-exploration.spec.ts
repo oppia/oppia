@@ -98,11 +98,9 @@ describe('Lesson Creator', function () {
       await explorationEditor.expectInteractionPreviewCardToBeVisible();
       await explorationEditor.expectRemoveInteractionButtonToBeVisible();
 
+      // Remove the interaction and verify the preview is gone.
       await explorationEditor.removeInteraction();
-      const interactionPreviewAfterRemoval = await explorationEditor.page.$(
-        '.e2e-test-interaction-preview'
-      );
-      expect(interactionPreviewAfterRemoval).toBeNull();
+      await explorationEditor.expectInteractionPreviewToBeAbsent();
       await explorationEditor.expectNodeWariningSignToBeVisible(true);
 
       await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
@@ -110,27 +108,20 @@ describe('Lesson Creator', function () {
         INTERACTION_TYPES.CONTINUE_BUTTON
       );
 
+      // Open the customization modal, save, and verify the modal closes.
       await explorationEditor.clickOnTestExploration();
       await explorationEditor.expectModalTitleToBe(
         'Customize Interaction (Continue Button)'
       );
       await explorationEditor.clickOnElementWithText('Save Interaction');
+      await explorationEditor.expectCustomizeInteractionModalToBeClosed();
       await explorationEditor.expectSelectedInteractionNameToBe(
         INTERACTION_TYPES.CONTINUE_BUTTON
       );
 
+      // Verify the Continue button renders correctly in preview.
       await explorationEditor.navigateToPreviewTab();
-      await explorationEditor.page.waitForSelector(
-        '.e2e-test-next-card-button',
-        {
-          visible: true,
-        }
-      );
-      const continueButtonText = await explorationEditor.page.$eval(
-        '.e2e-test-next-card-button',
-        el => el.textContent?.trim() || ''
-      );
-      expect(continueButtonText).toBe('Continue');
+      await explorationEditor.expectNextCardButtonTextToBe('Continue');
       await explorationEditor.expectPreviewCardContentToBe(
         CARD_NAMES.FIRST,
         LONG_CONTENT
@@ -153,12 +144,7 @@ describe('Lesson Creator', function () {
     'should preview the lesson',
     async function () {
       await explorationEditor.navigateToPreviewTab();
-      await explorationEditor.page.waitForSelector(
-        '.e2e-test-next-card-button',
-        {
-          visible: true,
-        }
-      );
+      await explorationEditor.expectNextCardButtonToBeVisible();
       await explorationEditor.expectPreviewCardContentToBe(
         CARD_NAMES.FIRST,
         LONG_CONTENT
@@ -229,20 +215,16 @@ describe('Lesson Creator', function () {
         '(try again)'
       );
 
+      // Verify both choices render in preview.
       await explorationEditor.navigateToPreviewTab();
       await explorationEditor.expectPreviewCardContentToBe(
         CARD_NAMES.SECOND,
         'Which of these texts is bold?'
       );
-      const previewChoices = await explorationEditor.page.$$eval(
-        '.e2e-test-multiple-choice-option',
-        elements => elements.map(el => el.textContent?.trim() || '')
-      );
-      const nonEmptyPreviewChoices = previewChoices.filter(choice => choice);
-      expect(nonEmptyPreviewChoices.length).toBe(2);
-      expect(nonEmptyPreviewChoices).toEqual(
-        expect.arrayContaining(['Italic text', 'Bold text'])
-      );
+      await explorationEditor.expectPreviewMultipleChoiceOptionsToEqual([
+        'Italic text',
+        'Bold text',
+      ]);
 
       await explorationEditor.selectMultipleChoiceOption('Italic text');
       await explorationEditor.expectResponseFeedbackToBe('Try again.');
@@ -333,51 +315,15 @@ describe('Lesson Creator', function () {
       );
       await explorationEditor.closeHintModal();
 
-      // In preview, the solution button is released only after enough wrong
-      // submissions and hint-consumption side effects. Trigger retries until
-      // the button is actually visible to avoid timing-dependent flakes.
-      let isSolutionVisible = await explorationEditor.isElementVisible(
-        '.e2e-test-view-solution',
-        true,
-        2000
-      );
-      for (let i = 0; i < 5 && !isSolutionVisible; i++) {
-        await explorationEditor.submitTextInputAnsswer('Italic text');
-        await explorationEditor.expectResponseFeedbackToBe('Try again.');
-
-        const isHintVisible = await explorationEditor.isElementVisible(
-          '.e2e-test-view-hint',
-          true,
-          2000
-        );
-        if (isHintVisible) {
-          await explorationEditor.viewHint();
-          await explorationEditor.closeHintModal();
-        }
-
-        isSolutionVisible = await explorationEditor.isElementVisible(
-          '.e2e-test-view-solution',
-          true,
-          2000
-        );
-      }
-      expect(isSolutionVisible).toBe(true);
+      // The solution button only unlocks after enough wrong submissions and
+      // hint consumption. Poll until it becomes available.
+      await explorationEditor.waitForSolutionButtonToBeVisible('Italic text');
 
       await explorationEditor.viewSolution();
-      await explorationEditor.page.waitForSelector(
-        'ngb-modal-window.modal.show .modal-body',
-        {
-          visible: true,
-        }
-      );
-      const solutionModalText = await explorationEditor.page.$eval(
-        'ngb-modal-window.modal.show .modal-body',
-        el => el.textContent || ''
-      );
-      expect(solutionModalText).toContain('Bold text');
-      expect(solutionModalText).toContain(
-        'Bold text means the text is heavier.'
-      );
+      await explorationEditor.expectSolutionModalToContain([
+        'Bold text',
+        'Bold text means the text is heavier.',
+      ]);
       await explorationEditor.closeSolutionModal();
 
       await explorationEditor.submitTextInputAnsswer('Bold text');
@@ -404,17 +350,10 @@ describe('Lesson Creator', function () {
       await explorationEditor.expectGoalWarningToBeVisible(false);
       await explorationEditor.expectSaveDraftButtonToBeDisabled(false);
 
+      // Verify the end card renders correctly in preview: no submit button,
+      // restart button visible.
       await explorationEditor.navigateToPreviewTab();
-      const submitButton = await explorationEditor.page.$(
-        '.e2e-test-submit-answer-button'
-      );
-      expect(submitButton).toBeNull();
-      await explorationEditor.page.waitForSelector(
-        '.e2e-test-preview-restart-button',
-        {
-          visible: true,
-        }
-      );
+      await explorationEditor.expectEndExplorationPreviewToBeVisible();
       await explorationEditor.navigateToEditorTab();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
