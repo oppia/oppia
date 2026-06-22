@@ -140,6 +140,12 @@ describe('Create Certificate Offering Page Component', () => {
     );
   });
 
+  it('should initialize the offering with empty details values', () => {
+    expect(component.certificateAssessmentOffering).toEqual(
+      CertificateAssessmentOfferingData.createEmpty()
+    );
+  });
+
   it('should navigate back to the dashboard', () => {
     const routerSpy = spyOn(router, 'navigate');
 

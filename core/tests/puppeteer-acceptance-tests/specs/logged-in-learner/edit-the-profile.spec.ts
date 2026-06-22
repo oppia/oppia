@@ -49,6 +49,9 @@ describe('Logged-In Learner', function () {
   });
 
   it('should be able to find the preferences page', async function () {
+    await loggedInLearner.navigateToLoginPage();
+    await loggedInLearner.expectToBeOnLearnerDashboard();
+
     await loggedInLearner.clickOnProfileDropdown();
 
     await loggedInLearner.expectProfileDropdownToContainElementWithContent(
