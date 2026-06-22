@@ -19,25 +19,39 @@
 from __future__ import annotations
 
 from core import feconf
+from core import feature_flag_list
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import feature_flag_services
 from core.domain import machine_translation_services
 from core.domain import translation_services
 
-from typing import Dict, TypedDict
+from typing import Any, Dict
 
 
-class MachineTranslationGenerateHandler(base.BaseHandler):
+class MachineTranslationGenerateHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, Any]]
+):
     """Handler for generating AI translation suggestions."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_ENFORCERS = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, Any]] = {
+        'POST': {
+            'source_text': {'schema': {'type': 'unicode'}},
+            'source_language_code': {'schema': {'type': 'unicode'}},
+            'target_language_code': {'schema': {'type': 'unicode'}},
+        }
+    }
 
-    @acl_decorators.can_access_contributor_dashboard
+    @acl_decorators.open_access
     def post(self) -> None:
         """Handles POST requests to generate a machine translation."""
 
-        if not feconf.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS:
+        if not feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS.value,
+            self.user_id,
+        ):
             raise self.PageNotFoundException()
 
         if not translation_services.is_automatic_translation_enabled():

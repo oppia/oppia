@@ -146,7 +146,7 @@ def generate_and_cache_translation(
         email_manager.send_machine_translation_failure_email(
             provider_id, str(e)
         )
-        raise Exception('Failed to generate translation: %s' % e)
+        raise Exception('Failed to generate translation: %s' % e) from e
 
     clean_translated_html = (
         html_translation_services.postprocess_translated_html(

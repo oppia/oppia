@@ -24,8 +24,6 @@ from core.domain import translation_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Optional, Tuple
-
 (translation_models,) = models.Registry.import_models(
     [models.Names.TRANSLATION]
 )
@@ -93,7 +91,7 @@ class GenerateAndCacheTranslationTests(test_utils.GenericTestBase):
         )
 
         self.mock_provider_id_swap = self.swap(
-            machine_translation_services._PROVIDER_REGISTRY,
+            machine_translation_services._PROVIDER_REGISTRY,  # pylint: disable=protected-access
             'get_provider_id',
             lambda lang: 'azure' if lang == 'hi' else None,
         )
@@ -133,7 +131,7 @@ class GenerateAndCacheTranslationTests(test_utils.GenericTestBase):
                 return 'api_translated_text'
 
         provider_instance_swap = self.swap(
-            machine_translation_services._PROVIDER_REGISTRY,
+            machine_translation_services._PROVIDER_REGISTRY,  # pylint: disable=protected-access
             'get_provider_instance',
             lambda id: MockProvider(),
         )
@@ -161,7 +159,7 @@ class GenerateAndCacheTranslationTests(test_utils.GenericTestBase):
                 raise Exception('Azure Timeout')
 
         provider_instance_swap = self.swap(
-            machine_translation_services._PROVIDER_REGISTRY,
+            machine_translation_services._PROVIDER_REGISTRY,  # pylint: disable=protected-access
             'get_provider_instance',
             lambda id: MockFailingProvider(),
         )

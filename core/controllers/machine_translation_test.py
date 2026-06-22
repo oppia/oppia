@@ -18,10 +18,12 @@
 
 from __future__ import annotations
 
-from core import feconf
+from core.domain import feature_flag_services
 from core.domain import machine_translation_services
 from core.domain import translation_services
 from core.tests import test_utils
+
+from typing import Any
 
 
 class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
@@ -40,8 +42,11 @@ class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
             'target_language_code': 'hi',
         }
 
+        # Swap the official feature flag service to return True
         self.feature_flag_swap = self.swap(
-            feconf, 'ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS', True
+            feature_flag_services,
+            'is_feature_flag_enabled',
+            lambda *args, **kwargs: True,
         )
 
         self.admin_toggle_swap = self.swap(
@@ -53,8 +58,11 @@ class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
     def test_post_fails_if_feature_flag_disabled(self) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
+        # For this test, swap the flag to return False
         flag_swap = self.swap(
-            feconf, 'ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS', False
+            feature_flag_services,
+            'is_feature_flag_enabled',
+            lambda *args, **kwargs: False,
         )
 
         with flag_swap, self.admin_toggle_swap:
@@ -104,7 +112,7 @@ class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
     def test_post_fails_gracefully_on_api_exception(self) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        def mock_generate(*args, **kwargs) -> None:
+        def mock_generate(*args: Any, **kwargs: Any) -> None:
             raise Exception('Azure Quota Exceeded')
 
         domain_swap = self.swap(
