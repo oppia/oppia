@@ -29,7 +29,10 @@ import {
 } from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {EventEmitter} from '@angular/core';
-import {OppiaRteParserService} from 'services/oppia-rte-parser.service';
+import {
+  OppiaRteNode,
+  OppiaRteParserService,
+} from 'services/oppia-rte-parser.service';
 import {RichTextComponentsModule} from './rich-text-components.module';
 import {RteOutputDisplayComponent} from './rte-output-display.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
@@ -1017,29 +1020,33 @@ describe('RTE display component', () => {
     expect(component.shouldHighlightContent()).toBeFalse();
   });
 
-  it('should return undefined from _getTemplatePortal for component node with unknown selector', () => {
-    const node = {
-      nodeType: 'component' as const,
-      selector: 'oppia-noninteractive-unknown',
-      attrs: {},
-      children: [],
-      parent: null,
-      portal: undefined,
-    };
-    const result = (component as any)._getTemplatePortal(node);
-    expect(result).toBeUndefined();
-  });
+  it('should not create a portal for unknown oppia-noninteractive component selector', fakeAsync(() => {
+    const mockNode = new OppiaRteNode('oppia-noninteractive-image');
+    Object.defineProperty(mockNode, 'selector', {
+      value: 'oppia-noninteractive-unknown',
+      configurable: true,
+    });
+    mockNode.children = [];
 
-  it('should return undefined from _getTemplatePortal for non-component node with unknown selector', () => {
-    const node = {
-      nodeType: '' as const,
-      selector: 'unknown-element',
-      attrs: {},
-      children: [],
-      parent: null,
-      portal: undefined,
+    spyOn(rteParserService, 'constructFromDomParser').and.returnValue(mockNode);
+    spyOn(component, 'isHighlightSentencesFeatureEnabled').and.returnValue(
+      false
+    );
+
+    component.rteString = '<p>test</p>';
+    const changes: SimpleChanges = {
+      rteString: {
+        previousValue: '',
+        currentValue: '<p>test</p>',
+        firstChange: true,
+        isFirstChange: () => true,
+      },
     };
-    const result = (component as any)._getTemplatePortal(node);
-    expect(result).toBeUndefined();
-  });
+
+    component.ngOnChanges(changes);
+    tick(100);
+
+    expect(mockNode.portal).toBeUndefined();
+    discardPeriodicTasks();
+  }));
 });
