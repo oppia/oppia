@@ -48,19 +48,16 @@ class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
             'target_language_code': 'hi',
         }
 
-        # Enable the feature flag by default for tests
         self.feature_flag_swap = self.swap(
             feconf, 'ENABLE_AUTOMATIC_TRANSLATION_SUGGESTIONS', True
         )
 
-        # Enable the master admin toggle by default
         self.admin_toggle_swap = self.swap(
             translation_services,
             'is_automatic_translation_enabled',
             lambda: True,
         )
 
-        # Give the test user permission to translate Hindi by default
         self.roles_swap = self.swap(
             contributor_admin_services,
             'get_contributor_dashboard_roles',
@@ -102,7 +99,6 @@ class MachineTranslationGenerateHandlerTests(test_utils.ControllerTestBase):
     def test_post_fails_if_user_lacks_language_permission(self) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # User only has permission for 'es', but payload asks for 'hi'
         roles_swap = self.swap(
             contributor_admin_services,
             'get_contributor_dashboard_roles',
