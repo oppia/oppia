@@ -124,6 +124,11 @@ export class OpportunitiesListItemComponent {
       this.opportunityHeadingTruncationLength = 40;
     }
     if (this.opportunity) {
+      // We explicitly check for undefined and null instead of using a simple
+      // truthiness check (i.e., `if (this.opportunity.progressPercentage)`).
+      // This is because a progress percentage of 0 is falsy, which previously
+      // caused the progress bar to incorrectly fail to initialize or update
+      // for opportunities with 0% progress.
       if (
         this.opportunity.progressPercentage !== undefined &&
         this.opportunity.progressPercentage !== null

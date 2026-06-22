@@ -124,6 +124,9 @@ def get_exploration_opportunity_summary_from_model(
         model.chapter_title,
         model.content_count,
         new_incomplete_translation_language_codes,
+        # We use copy.deepcopy() and list() to ensure that the domain object
+        # gets its own independent copy of these mutable collections. This prevents
+        # accidental modifications to the underlying datastore model properties.
         copy.deepcopy(model.translation_counts),
         list(model.language_codes_needing_voice_artists),
         list(model.language_codes_with_assigned_voice_artists),
@@ -381,6 +384,9 @@ def get_translation_opportunity_summary_from_model(
         incomplete_translation_language_codes=list(
             model.incomplete_translation_language_codes
         ),
+        # We use copy.deepcopy() and list() to prevent accidental modifications
+        # to the underlying datastore model properties when the domain object
+        # is mutated.
         translation_counts=copy.deepcopy(model.translation_counts),
     )
 
@@ -1003,6 +1009,10 @@ def update_translation_opportunity_with_accepted_suggestion(
                 entity.version,
                 language_code,
             )
+            # In V2, we compute the translation count dynamically from the
+            # EntityTranslation object (which tracks actual translated contents)
+            # rather than querying the translation_counts dict from the
+            # deprecated translation suggestion models.
             new_count = (
                 entity.get_translation_count(entity_translation)
                 if isinstance(entity, translation_domain.BaseTranslatableObject)
