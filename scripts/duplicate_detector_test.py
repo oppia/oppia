@@ -147,11 +147,11 @@ class GetTemplateLinesTests(unittest.TestCase):
             )
         ]
 
-        file_contents = "name: bug\ntitle: bug\n### Description\nThis is a template line that is very long."
+        file_contents = 'name: bug\ntitle: bug\n### Description\nThis is a template line that is very long.'
         m = mock.mock_open(read_data=file_contents)
         with mock.patch('builtins.open', m):
             result = duplicate_detector.get_template_lines('/fake')
-            self.assertIn("this is a template line that is very long.", result)
+            self.assertIn('this is a template line that is very long.', result)
         mock_isfile.assert_called()
 
     @mock.patch('os.path.isfile')
@@ -162,13 +162,13 @@ class GetTemplateLinesTests(unittest.TestCase):
         """Test that get_template_lines parses file."""
         mock_isfile.side_effect = lambda path: 'PULL_REQUEST_TEMPLATE' in path
         file_contents = (
-            "name: bug\nThis is another template line that is very long."
+            'name: bug\nThis is another template line that is very long.'
         )
         m = mock.mock_open(read_data=file_contents)
         with mock.patch('builtins.open', m):
             result = duplicate_detector.get_template_lines('/fake')
             self.assertIn(
-                "this is another template line that is very long.", result
+                'this is another template line that is very long.', result
             )
         mock_isdir.assert_called()
 
@@ -240,16 +240,17 @@ class MainTests(unittest.TestCase):
                 'body': 'body 2',
                 'user': {'login': 'user2'},
             },
+            # Hits branch 169->168.
             {
                 'number': 11,
                 'title': 'issue 11',
                 'body': 'body 11',
                 'user': {'login': 'user11'},
-            },  # Hits branch 169->168
+            },
         ]
 
-        # mock cos_sim to return a tensor with an item() method
-        # Return 0.9 for the first comparison, then 0.5 for the second to hit branch 218->211
+        # Mock cos_sim to return a tensor with an item() method.
+        # Return 0.9 for the first comparison, then 0.5 for the second to hit branch 218->211.
         mock_tensor1 = mock.MagicMock()
         mock_tensor1.item.return_value = 0.9
         mock_tensor2 = mock.MagicMock()
@@ -304,12 +305,13 @@ class MainTests(unittest.TestCase):
                 'body': 'body 2',
                 'user': {'login': 'user2'},
             },
+            # Hits branch 169->168.
             {
                 'number': 15,
                 'title': 'issue 15',
                 'body': 'body 15',
                 'user': {'login': 'user15'},
-            },  # Hits branch 169->168
+            },
         ]
 
         mock_tensor = mock.MagicMock()
@@ -348,6 +350,7 @@ class MainTests(unittest.TestCase):
 
         duplicate_detector.main()
         mock_get_all_open_issues.assert_not_called()
+        mock_get_template_lines.assert_called_once()
 
     @mock.patch('builtins.open')
     @mock.patch('os.path.exists')
@@ -438,7 +441,7 @@ class MainTests(unittest.TestCase):
         mock_tensor.item.return_value = 0.9
         mock_cos_sim.return_value = mock_tensor
 
-        mock_urlopen.side_effect = Exception("API error")
+        mock_urlopen.side_effect = Exception('API error')
 
         duplicate_detector.main()
         self.assertEqual(mock_urlopen.call_count, 2)
