@@ -519,7 +519,7 @@ describe('Question player engine service', () => {
         'getMatchingClassificationResult'
       ).and.returnValue(answerClassificationResult);
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => html
+        (html, envs) => (html === '' ? (null as string | null as string) : html)
       );
 
       questionPlayerEngineService.init(
@@ -664,7 +664,7 @@ describe('Question player engine service', () => {
         'getMatchingClassificationResult'
       ).and.returnValue(answerClassificationResult);
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => html
+        (html, envs) => (html === '' ? (null as string | null as string) : html)
       );
 
       questionPlayerEngineService.init(
@@ -711,7 +711,7 @@ describe('Question player engine service', () => {
         'addWarning'
       ).and.callThrough();
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => html
+        (html, envs) => (html === '' ? (null as string | null as string) : html)
       );
 
       questionPlayerEngineService.init(
@@ -842,7 +842,8 @@ describe('Question player engine service', () => {
           'addWarning'
         ).and.callThrough();
         spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-          (html, envs) => html
+          (html, envs) =>
+            html === '' ? (null as string | null as string) : html
         );
 
         if (
@@ -901,7 +902,7 @@ describe('Question player engine service', () => {
       });
 
       spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => html
+        (html, envs) => (html === '' ? (null as string | null as string) : html)
       );
 
       questionPlayerEngineService.init(
@@ -949,7 +950,8 @@ describe('Question player engine service', () => {
           'getMatchingClassificationResult'
         ).and.returnValue(answerClassificationResult);
         spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-          (html, envs) => html
+          (html, envs) =>
+            html === '' ? (null as string | null as string) : html
         );
         spyOn(focusManagerService, 'generateFocusLabel').and.returnValue(
           'focusLabel'

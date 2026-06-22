@@ -79,8 +79,8 @@ export class QuestionPlayerEngineService {
   private _resultsPageIsLoadedEventEmitter = new EventEmitter<boolean>();
   private answerIsBeingProcessed: boolean = false;
   private questions: Question[] = [];
-  private nextIndex: number | null = null;
-  currentIndex: number | null = null;
+  private nextIndex: number = null;
+  currentIndex: number = null;
   questionPlayerState: QuestionPlayerState = {};
 
   constructor(
@@ -107,7 +107,7 @@ export class QuestionPlayerEngineService {
   initQuestionPlayer(
     questionPlayerConfig: QuestionPlayerConfigDict,
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
-    errorCallback?: () => void
+    errorCallback: () => void
   ): void {
     this.playerTranscriptService.init();
     this.questionBackendApiService
@@ -175,9 +175,7 @@ export class QuestionPlayerEngineService {
     }
     if (!this.questions || this.questions.length === 0) {
       this.alertsService.addWarning('There are no questions to display.');
-      if (errorCallback) {
-        errorCallback();
-      }
+      errorCallback();
       return;
     }
     this.loadInitialQuestion(successCallback, errorCallback);
@@ -205,7 +203,7 @@ export class QuestionPlayerEngineService {
    * @returns {Question} The current question.
    */
   getCurrentQuestion(): Question {
-    return this.questions[this.currentIndex as number];
+    return this.questions[this.currentIndex];
   }
 
   /**
@@ -214,7 +212,7 @@ export class QuestionPlayerEngineService {
    * @returns {string} The ID of the current question.
    */
   getCurrentQuestionId(): string {
-    return this.questions[this.currentIndex as number].getId() as string;
+    return this.questions[this.currentIndex].getId();
   }
 
   /**
@@ -243,7 +241,7 @@ export class QuestionPlayerEngineService {
    * @returns {string} The language code of the current question.
    */
   getLanguageCode(): string {
-    return this.questions[this.currentIndex as number].getLanguageCode();
+    return this.questions[this.currentIndex].getLanguageCode();
   }
 
   /**
@@ -307,19 +305,19 @@ export class QuestionPlayerEngineService {
       nextCard: StateCard,
       refreshInteraction: boolean,
       feedbackHtml: string,
-      refresherExplorationId: string | null,
-      missingPrerequisiteSkillId: string,
+      refresherExplorationId,
+      missingPrerequisiteSkillId,
       remainOnCurrentCard: boolean,
       taggedSkillMisconceptionId: string,
-      wasOldStateInitial: boolean,
-      isFirstHit: boolean,
+      wasOldStateInitial,
+      isFirstHit,
       isFinalQuestion: boolean,
-      nextCardIfReallyStuck: StateCard | null,
+      nextCardIfReallyStuck: null,
       focusLabel: string
     ) => void
   ): boolean {
     if (this.answerIsBeingProcessed) {
-      return false;
+      return;
     }
 
     const answerString = answer as string;
@@ -327,7 +325,7 @@ export class QuestionPlayerEngineService {
     const oldState = this.getCurrentStateData();
     const classificationResult =
       this.answerClassificationService.getMatchingClassificationResult(
-        oldState.name as string,
+        null,
         oldState.interaction,
         answer,
         interactionRulesService
@@ -353,16 +351,12 @@ export class QuestionPlayerEngineService {
     if (feedbackHtml === null) {
       this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Feedback content should not be empty.');
-      return false;
+      return;
     }
 
     let newState = null;
-    if (
-      answerIsCorrect &&
-      (this.currentIndex as number) < this.questions.length - 1
-    ) {
-      newState =
-        this.questions[(this.currentIndex as number) + 1].getStateData();
+    if (answerIsCorrect && this.currentIndex < this.questions.length - 1) {
+      newState = this.questions[this.currentIndex + 1].getStateData();
     } else {
       newState = oldState;
     }
@@ -376,19 +370,18 @@ export class QuestionPlayerEngineService {
     if (questionHtml === null) {
       this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Question name should not be empty.');
-      return false;
+      return;
     }
     this.setAnswerIsBeingProcessed(false);
 
     const interactionId = oldState.interaction.id;
     const interactionIsInline =
       !interactionId ||
-      InteractionSpecsConstants.INTERACTION_SPECS[
-        interactionId as keyof typeof InteractionSpecsConstants.INTERACTION_SPECS
-      ].display_mode === AppConstants.INTERACTION_DISPLAY_MODE_INLINE;
+      InteractionSpecsConstants.INTERACTION_SPECS[interactionId]
+        .display_mode === AppConstants.INTERACTION_DISPLAY_MODE_INLINE;
     const refreshInteraction = answerIsCorrect || interactionIsInline;
 
-    this.nextIndex = (this.currentIndex as number) + 1;
+    this.nextIndex = this.currentIndex + 1;
     const isFinalQuestion = this.nextIndex === this.questions.length;
     const onSameCard = !answerIsCorrect;
 
@@ -405,25 +398,19 @@ export class QuestionPlayerEngineService {
         questionHtml,
         nextInteractionHtml,
         this.getNextStateData().interaction,
-        this.getNextStateData().content.contentId as string
+        this.getNextStateData().content.contentId
       );
     }
     successCallback(
-      nextCard as StateCard,
+      nextCard,
       refreshInteraction,
-      feedbackHtml as string,
+      feedbackHtml,
       null,
-      // We use 'as unknown as string' here because the external callback
-      // defined in conversation-flow.service.ts expects a strict 'string',
-      // but our internal data models supply 'null'. This bypasses the TS
-      // compiler mismatch without altering the expected external signature.
-      null as unknown as string,
+      null,
       onSameCard,
-      // We use 'as unknown as string' here for the same reason: satisfying
-      // the external strict string signature while passing nullable values.
-      taggedSkillMisconceptionId as unknown as string,
-      false,
-      false,
+      taggedSkillMisconceptionId,
+      null,
+      null,
       isFinalQuestion,
       nextCardIfReallyStuck,
       _nextFocusLabel
@@ -536,10 +523,7 @@ export class QuestionPlayerEngineService {
   private makeFeedback(
     feedbackHtml: string,
     envs: Record<string, string>[]
-  ): string | null {
-    if (!feedbackHtml) {
-      return null;
-    }
+  ): string {
     return this.expressionInterpolationService.processHtml(feedbackHtml, envs);
   }
 
@@ -557,10 +541,7 @@ export class QuestionPlayerEngineService {
   private makeQuestion(
     newState: State,
     envs: Record<string, string>[]
-  ): string | null {
-    if (!newState.content.html) {
-      return null;
-    }
+  ): string {
     return this.expressionInterpolationService.processHtml(
       newState.content.html,
       envs
@@ -619,20 +600,18 @@ export class QuestionPlayerEngineService {
    */
   private loadInitialQuestion(
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
-    errorCallback?: () => void
+    errorCallback: () => void
   ): void {
     this.pageContextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.QUESTION,
-      this.questions[0].getId() as string
+      this.questions[0].getId()
     );
     const initialState = this.questions[0].getStateData();
 
     const questionHtml = this.makeQuestion(initialState, []);
     if (questionHtml === null) {
       this.alertsService.addWarning('Question name should not be empty.');
-      if (errorCallback) {
-        errorCallback();
-      }
+      errorCallback();
       return;
     }
 
@@ -655,11 +634,11 @@ export class QuestionPlayerEngineService {
       );
     }
     const initialCard = StateCard.createNewCard(
-      'question',
+      null,
       questionHtml,
-      interactionHtml || '',
+      interactionHtml,
       interaction,
-      initialState.content.contentId as string
+      initialState.content.contentId
     );
     successCallback(initialCard, nextFocusLabel);
   }
@@ -673,7 +652,7 @@ export class QuestionPlayerEngineService {
    * @returns {State} The current question's state data object.
    */
   private getCurrentStateData() {
-    return this.questions[this.currentIndex as number].getStateData();
+    return this.questions[this.currentIndex].getStateData();
   }
 
   /**
@@ -682,7 +661,7 @@ export class QuestionPlayerEngineService {
    * @returns {State} The state data object of the next question.
    */
   private getNextStateData() {
-    return this.questions[this.nextIndex as number].getStateData();
+    return this.questions[this.nextIndex].getStateData();
   }
 
   /**
@@ -692,7 +671,7 @@ export class QuestionPlayerEngineService {
    * @returns {string} The HTML string representing the interaction.
    */
   private getNextInteractionHtml(labelForFocusTarget: string): string {
-    const interactionId = this.getNextStateData().interaction.id as string;
+    const interactionId = this.getNextStateData().interaction.id;
     return this.explorationHtmlFormatterService.getInteractionHtml(
       interactionId,
       this.getNextStateData().interaction.customizationArgs,
@@ -712,7 +691,7 @@ export class QuestionPlayerEngineService {
   private initializeQuestionPlayerServices(
     questionDicts: QuestionBackendDict[],
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
-    errorCallback?: () => void
+    errorCallback: () => void
   ): void {
     let questionObjects = questionDicts.map(questionDict => {
       return Question.createFromBackendDict(questionDict);
