@@ -1100,4 +1100,57 @@ describe('Topic editor tab directive', () => {
       topicEditorStateService.updateExistenceOfTopicUrlFragment
     ).not.toHaveBeenCalled();
   });
+
+  it('should return early from onImageSave when entityType is null', () => {
+    const mockPageContextService = TestBed.inject(PageContextService);
+    spyOn(mockPageContextService, 'getEntityType').and.returnValue(undefined);
+    const postThumbnailSpy = spyOn(
+      assetsBackendApiService,
+      'postThumbnailFile'
+    );
+
+    component.onImageSave({
+      filename: 'img.svg',
+      bg_color: '#FFFFFF',
+      image_data: new Blob(),
+    } as ImageUploaderData);
+
+    expect(postThumbnailSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not splice availableSkillSummariesForDiagnosticTest when skillSummary is not found', () => {
+    component.skillForDiagnosticTestFormControl.setValue(skillSummary);
+    component.availableSkillSummariesForDiagnosticTest = [];
+    let updateSpy = spyOn(topicUpdateService, 'updateDiagnosticTestSkills');
+    component.addSkillForDiagnosticTest();
+    expect(updateSpy).toHaveBeenCalled();
+  });
+
+  it('should not set topicDataHasLoaded when hasLoadedTopic return false', () => {
+    spyOn(topicEditorStateService, 'hasLoadedTopic').and.returnValue(false);
+    component.topicDataHasLoaded = false;
+    component.initEditor();
+    expect(component.topicDataHasLoaded).toBe(false);
+  });
+
+  it('should use default bgColor and undefined filename when topic thumbnail is not set', () => {
+    spyOn(component.topic, 'getThumbnailBgColor').and.returnValue(
+      null as unknown as string
+    );
+    spyOn(component.topic, 'getThumbnailFilename').and.returnValue(
+      null as unknown as string
+    );
+    component.initEditor();
+    expect(component.imageUploaderParameters.bgColor).toEqual(
+      component.allowedBgColors[0]
+    );
+    expect(component.imageUploaderParameters.filename).toBeUndefined();
+  });
+
+  it('should toggle main topic card when called without arguments', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+    expect(component.mainTopicCardIsShown).toEqual(true);
+    component.togglePreviewListCards();
+    expect(component.mainTopicCardIsShown).toEqual(false);
+  });
 });

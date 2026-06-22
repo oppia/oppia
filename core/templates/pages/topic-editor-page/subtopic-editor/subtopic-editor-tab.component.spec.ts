@@ -328,6 +328,7 @@ describe('Subtopic editor tab', () => {
     tick();
 
     expect(thumbnailSpy).toHaveBeenCalled();
+    expect(component.editableThumbnailFilename).toBe('img.svg');
   }));
 
   it('should not call topicUpdateService when onImageSave is called with same filename', fakeAsync(() => {
@@ -377,6 +378,7 @@ describe('Subtopic editor tab', () => {
     tick();
 
     expect(thumbnailBgSpy).toHaveBeenCalled();
+    expect(component.editableThumbnailBgColor).toBe('#FFFFFF');
   }));
 
   it('should not call topicUpdateService when onImageSave is called with same bg color', fakeAsync(() => {
@@ -841,5 +843,22 @@ describe('Subtopic editor tab', () => {
     component.initEditor();
 
     expect(topicEditorStateService.loadSubtopicPage).not.toHaveBeenCalled();
+  });
+
+  it('should return early from onImageSave when entityType is null', () => {
+    const mockPageContextService = TestBed.inject(PageContextService);
+    spyOn(mockPageContextService, 'getEntityType').and.returnValue(undefined);
+    const postThumbnailSpy = spyOn(
+      assetsBackendApiService,
+      'postThumbnailFile'
+    );
+
+    component.onImageSave({
+      filename: 'img.svg',
+      bg_color: '#FFFFFF',
+      image_data: new Blob(),
+    } as ImageUploaderData);
+
+    expect(postThumbnailSpy).not.toHaveBeenCalled();
   });
 });
