@@ -753,9 +753,12 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
             )
 
             # Check 1: Modal Components (inject NgbActiveModal)
-            if (
-                'NgbActiveModal' in file_content_without_comments
-                and 'MatBottomSheetRef' not in file_content_without_comments
+            if bool(
+                re.search(r'\bNgbActiveModal\b', file_content_without_comments)
+            ) and not bool(
+                re.search(
+                    r'\bMatBottomSheetRef\b', file_content_without_comments
+                )
             ):
                 failed = True
                 error_messages.append(
@@ -765,8 +768,14 @@ class GeneralPurposeLinter(linter_utils.BaseLinter):
                 )
 
             # Check 2: Opener Components (call ngbModal.open)
-            if 'ngbModal.open' in file_content_without_comments:
-                if 'MatBottomSheet' not in file_content_without_comments:
+            if bool(
+                re.search(r'\bngbModal\.open\b', file_content_without_comments)
+            ):
+                if not bool(
+                    re.search(
+                        r'\bMatBottomSheet\b', file_content_without_comments
+                    )
+                ):
                     failed = True
                     error_messages.append(
                         '%s --> Components opening modals with ngbModal.open '
