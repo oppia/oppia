@@ -9411,3 +9411,27 @@ class EmailRetryQueueTests(test_utils.EmailTestBase):
             enqueued_tasks[0][0], feconf.TASK_URL_RETRY_FAILED_EMAIL
         )
         self.assertEqual(enqueued_tasks[0][1]['subject'], 'Bulk Subject')
+
+
+def test_send_machine_translation_failure_email(self) -> None:
+    """Tests the send_machine_translation_failure_email function."""
+    email_messages = []
+
+    def mock_send_mail_to_admin(subject: str, body: str) -> None:
+        email_messages.append((subject, body))
+
+    swap_send_mail = self.swap(
+        email_manager, 'send_mail_to_admin', mock_send_mail_to_admin
+    )
+
+    with swap_send_mail:
+        email_manager.send_machine_translation_failure_email(
+            'azure', 'Timeout Exception 504'
+        )
+
+    self.assertEqual(len(email_messages), 1)
+
+    self.assertEqual(email_messages, 'Machine Translation API Failure: Azure')
+
+    self.assertIn('provider "azure" has failed.', email_messages)
+    self.assertIn('Timeout Exception 504', email_messages)

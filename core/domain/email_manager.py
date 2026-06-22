@@ -3408,3 +3408,27 @@ def send_emails_to_voiceover_tech_leads(
     )
 
     _delete_voiceover_error_attachments(filename_to_path)
+
+
+def send_machine_translation_failure_email(
+    provider_id: str, error_message: str
+) -> None:
+    """Sends an email to the admin when the machine translation
+    API fails (e.g., due to quota exhaustion or timeouts).
+
+    Args:
+        provider_id: str. The ID of the provider that failed (e.g., 'azure').
+        error_message: str. The exception message or error details.
+    """
+    email_subject = (
+        'Machine Translation API Failure: %s' % provider_id.capitalize()
+    )
+
+    email_body = (
+        'The machine translation API for provider "%s" has failed.\n\n'
+        'Error Details:\n%s\n\n'
+        'Please check the translation service quotas and API status.'
+        % (provider_id, error_message)
+    )
+
+    send_mail_to_admin(email_subject, email_body)
